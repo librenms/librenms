@@ -26,7 +26,7 @@ class PortStp extends PortRelatedModel implements Keyable
         'forwardTransitions',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return "$this->vlan-$this->port_index";
     }

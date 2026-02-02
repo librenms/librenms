@@ -70,8 +70,8 @@ class Vminfo extends DeviceRelatedModel implements Keyable
         return $this->hasOne(Device::class, 'hostname', 'vmwVmDisplayName');
     }
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
-        return $this->vm_type . $this->vmwVmVMID;
+        return "$this->vm_type-$this->vmwVmVMID";
     }
 }

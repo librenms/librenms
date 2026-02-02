@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Casts\CompressedJson;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use LibreNMS\Enum\AlertLogState;
 
 class AlertLog extends DeviceRelatedModel
 {
@@ -12,12 +14,17 @@ class AlertLog extends DeviceRelatedModel
     public const UPDATED_AT = null;
     public const CREATED_AT = 'time_logged';
     protected $table = 'alert_log';
+    protected $casts = [
+        'state' => AlertLogState::class,
+        'details' => CompressedJson::class,
+        'time_logged' => 'datetime',
+    ];
 
-    protected function details(): Attribute
+    /**
+     * @return BelongsTo<AlertRule, $this>
+     */
+    public function rule(): BelongsTo
     {
-        return Attribute::make(
-            get: fn ($details) => json_decode(@gzuncompress($details), true) ?? [],
-            set: fn ($details) => gzcompress(json_encode($details)),
-        )->shouldCache();
+        return $this->belongsTo(AlertRule::class, 'rule_id', 'id');
     }
 }

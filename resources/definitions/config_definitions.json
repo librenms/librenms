@@ -392,47 +392,80 @@
             "type": "array"
         },
         "apps.powerdns-recursor.api-key": {
-            "type": "text"
+            "type": "text",
+            "group": "apps",
+            "section": "powerdns-recursor",
+            "order": 0
         },
         "apps.powerdns-recursor.https": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "powerdns-recursor",
+            "order": 1
         },
         "apps.powerdns-recursor.port": {
             "default": 8082,
-            "type": "integer"
+            "type": "integer",
+            "group": "apps",
+            "section": "powerdns-recursor",
+            "order": 2
         },
         "apps.oslv_monitor.seen_age": {
             "default": 604800,
-            "type": "integer"
+            "type": "integer",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 0
         },
         "apps.oslv_monitor.linux_pg_memory_stats": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 1
         },
         "apps.oslv_monitor.misc_linux_memory_stats": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 2
         },
         "apps.oslv_monitor.zswap_size": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 3
         },
         "apps.oslv_monitor.zswap_activity": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 4
         },
         "apps.oslv_monitor.workingset_stats": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 5
         },
         "apps.oslv_monitor.thp_activity": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 6
         },
         "apps.sneck.polling_time_diff": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "sneck",
+            "order": 0
         },
         "astext": {
             "default": {
@@ -1974,10 +2007,6 @@
             "order": 2,
             "default": false,
             "type": "boolean"
-        },
-        "dot": {
-            "default": "/usr/bin/dot",
-            "type": "executable"
         },
         "email_auto_tls": {
             "default": true,
@@ -6823,13 +6852,6 @@
             "section": "dispatcherservice",
             "order": 26,
             "type": "boolean"
-        },
-        "sfdp": {
-            "default": "/usr/bin/sfdp",
-            "group": "external",
-            "section": "binaries",
-            "order": 7,
-            "type": "executable"
         },
         "shorthost_target_length": {
             "group": "webui",

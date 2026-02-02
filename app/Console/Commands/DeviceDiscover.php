@@ -51,6 +51,8 @@ class DeviceDiscover extends LnmsCommand
         $this->setAliases(['poller:discovery']); // TODO remove
         $this->addArgument('device spec', InputArgument::REQUIRED);
         $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
+        $this->addOption('os', null, InputOption::VALUE_REQUIRED);
+        $this->addOption('type', null, InputOption::VALUE_REQUIRED);
     }
 
     public function handle(MeasurementManager $measurements): int
@@ -63,7 +65,9 @@ class DeviceDiscover extends LnmsCommand
                 $this->argument('device spec'),
                 DiscoverDevice::class,
                 DeviceDiscovered::class,
-                ModuleList::fromUserOverrides($this->option('modules'))
+                ModuleList::fromUserOverrides($this->option('modules')),
+                $this->option('os'),
+                $this->option('type')
             );
 
             $this->line(__('commands.device:discover.starting'));

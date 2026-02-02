@@ -3,7 +3,7 @@
 --   
 -- November 1997, Cliff L. Sojourner
 --   
--- Copyright (c) 1998-2003-2006, 2013, 2015 by cisco Systems Inc.
+-- Copyright (c) 1998-2017 by cisco Systems Inc.
 -- All rights reserved.
 -- *****************************************************************
 
@@ -32,7 +32,7 @@ IMPORTS
 
 
 ciscoEntitySensorMIB MODULE-IDENTITY
-    LAST-UPDATED    "201501150000Z"
+    LAST-UPDATED    "201701190000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Postal: Cisco Systems, Inc.
@@ -47,6 +47,9 @@ ciscoEntitySensorMIB MODULE-IDENTITY
         "The CISCO-ENTITY-SENSOR-MIB is used to monitor
         the values of sensors in the Entity-MIB (RFC 2037) 
         entPhysicalTable."
+    REVISION        "201701190000Z"
+    DESCRIPTION
+        "Added enumerated value dB(15) to SensorDataType."
     REVISION        "201501150000Z"
     DESCRIPTION
         "Corrected the definition of entSensorPrecision."
@@ -120,7 +123,8 @@ SensorDataType ::= TEXTUAL-CONVENTION
         cmm(11),:        cubic meters per minute (airflow)
         truthvalue(12):  value takes { true(1), false(2) }
         specialEnum(13): value takes user defined enumerated values
-        dBm(14):         dB relative to 1mW of power"
+        dBm(14):         dB relative to 1mW of power
+        dB(15):          decibel"
     SYNTAX          INTEGER  {
                         other(1),
                         unknown(2),
@@ -135,7 +139,8 @@ SensorDataType ::= TEXTUAL-CONVENTION
                         cmm(11),
                         truthvalue(12),
                         specialEnum(13),
-                        dBm(14)
+                        dBm(14),
+                        dB(15)
                     }
 
 SensorDataScale ::= TEXTUAL-CONVENTION
@@ -206,7 +211,6 @@ SensorValue ::= TEXTUAL-CONVENTION
         +1000000000 to indicate overflow.  Use SensorPrecision
         to indicate how many fractional digits the SensorValue
         has.
-
 
         For sensors that measure percentRH, this item
         is a number ranging from 0 to 100.
@@ -940,4 +944,27 @@ entitySensorNotificationGroup NOTIFICATION-GROUP
 END
 
 
+-- %DNP%  MLC -Compiled MLC
+
+-- %DNP%  MRS -with reviewer MRS
+
+-- %DNP%  MRC - ciscoEntitySensorMIB~1~ - 2017011904:47 PST - linche -18.0 -ACK
+-- %DNP%  - < ^^ Copyright (c) 1998-2017 by cisco Systems Inc. 
+-- %DNP%^^- 
+-- %DNP%> ^^ Copyright (c) 1998-2003-2006, 2013, 2015, 2017 by cisco Systems 
+-- %DNP%Inc. 
+-- %DNP%35c35 
+-- %DNP%<     LAST-UPDATED    "201701190000Z" 
+-- %DNP%^^- 
+-- %DNP%>     LAST-UPDATED    "201612210000Z" 
+-- %DNP%50c50 
+-- %DNP%<     REVISION        "201701190000Z" 
+-- %DNP%^^- 
+-- %DNP%>     REVISION        "201612210000Z" 
+-- %DNP%52c52 
+-- %DNP%<         "Added enumerated value dB(15) to SensorDataType." 
+-- %DNP%^^- 
+-- %DNP%>         "[1] Add dB(15) in SensorDataType."
+-- %DNP%
+-- %DNP% -0 MRC 
 

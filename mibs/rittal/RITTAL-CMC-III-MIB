@@ -1,13 +1,14 @@
 -- ********************************************************************
 -- RITTAL GmbH & Co. KG, Herborn
--- CMC-III-MIB Version 1.7
+-- CMC-III-MIB Version 1.8
 -- CMC-III-Processing Unit - 7030.000, 7030.010, 7030.020
 -- PDU Metered/Managed/Switched - 7955.xxx
 -- IoT Interface - 3124.300
+-- PDUi Metered/Managed/Switched - 7979.xxx
 --
 -- Management Information Base for SNMP Network Management
 --
--- Copyright 2018 Rittal Herborn.
+-- Copyright 2019 Rittal Herborn.
 -- All Rights Reserved.
 --
 -- The information in this document is subject to change without notice.
@@ -16,7 +17,7 @@
 -- ********************************************************************
 -- File   : $RCSfile: RITTAL-CMC-III-MIB.txt,v $
 -- Rev.   : $Revision: 1.7 $
--- Date   : $Date: 2018/03/05 $
+-- Date   : $Date: 2018/10/22 $
 -- Author : $Author: fis $
 -- Id     : $Id: RITTAL-CMC-III-MIB.txt,v 1.6 2015/10/09 17:29:40 fis Exp $
 -- ********************************************************************
@@ -43,7 +44,7 @@ RITTAL-CMC-III-MIB DEFINITIONS ::= BEGIN
 
 
 cmcIII                      MODULE-IDENTITY
-        LAST-UPDATED        "201803050000Z"
+        LAST-UPDATED        "201904100000Z"
         ORGANIZATION        "RITTAL GmbH & Co. KG"
         CONTACT-INFO        "www.rittal.de
 
@@ -57,9 +58,15 @@ cmcIII                      MODULE-IDENTITY
                             info@rittal.de."
         DESCRIPTION         "The MIB module for representing cmcIII SNMP agent."
 
+        REVISION            "201904100000Z"
+        DESCRIPTION         "additions for PDUi."   
+
+		REVISION            "201810220000Z"
+        DESCRIPTION         "flow parameter added to cmcIIISetpuGeneral."
+
         REVISION            "201803050000Z"
         DESCRIPTION         "enums added to cmcIIIVarType, enums added to cmcIIIUnitType."
-		
+
         REVISION            "201708040000Z"
         DESCRIPTION         "cmcIIIModbusAccess, changed enums to 'readonly' and 'readwrite'.
 							'noaccess' and 'writeonly' no longer supported."
@@ -178,7 +185,7 @@ cmcIII                      MODULE-IDENTITY
 --                          = 3 (cmcIII) * 10000
 --                            + x (0 as default or cmcIIIUnitType * 1000 for specific hardware)
 --                              + cmcIIIMibMajRev
---                                + cmcIIIMibMinRev        
+--                                + cmcIIIMibMinRev
         MAX-ACCESS          read-only
         STATUS              current
         DESCRIPTION         "This agents capabilities as used in RITTAL-CMC-III-CAPABILITY-MIB."
@@ -260,17 +267,21 @@ cmcIII                      MODULE-IDENTITY
                                 pdu             (5),
                                 rms             (6),
 								mcs				(7),
-								iot				(8)
+								iot				(8),
+								pdu3			(9)
                             }
         MAX-ACCESS          read-only
         STATUS              current
-        DESCRIPTION         "Type of CMCIII
+        DESCRIPTION         "Type of controller
                             (1) Unit unknown
                             (2) Processing Unit
                             (3) Processing Unit Compact
                             (4) LCP
                             (5) PDU
-                            (6) RiMatrix S."
+                            (6) RiMatrix S
+							(7) MCS
+							(8) IoT Interface
+							(9) PDUi."
         ::=                 { cmcIIIUnit        8 }
 
 
@@ -719,6 +730,20 @@ cmcIII                      MODULE-IDENTITY
         DESCRIPTION         "TCP/IP port of OPC UA daemon."
         DEFVAL              { 4840 }
         ::=                 { cmcIIISetupGeneral 21 }
+
+    cmcIIISetFlowUnit       OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                literMin       (1),
+                                gallonMin      (2)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Unit of all flow values and setpoints
+                            (1) literMin
+                            (2) gallonMin."
+        DEFVAL              { literMin }
+        ::=                 { cmcIIISetupGeneral 22 }
+
 
 --  cmcIIISetupTimer:  --
 
@@ -1821,7 +1846,8 @@ cmcIII                      MODULE-IDENTITY
                                 canBus1         (1),
                                 canBus2         (2),
                                 virtual         (3),
-								modbus          (4)
+								modbus          (4),
+								wireless        (5)
                             }
         MAX-ACCESS          read-only
         STATUS              current
@@ -2109,6 +2135,7 @@ cmcIII                      MODULE-IDENTITY
                                 sequence        (36),
                                 remote          (37),
 								stringValue		(38),
+								remoteTimeout	(39),
                                 outputPWM       (40),
                                 rotation        (41),
                                 circuit         (42),
@@ -2124,6 +2151,7 @@ cmcIII                      MODULE-IDENTITY
                                 devLocation     (53),
                                 currentMin      (54),
                                 currentMax      (55),
+								mode            (56),
                                 keycode         (80),
                                 command         (81),
                                 commandEnum     (82),
@@ -2131,6 +2159,7 @@ cmcIII                      MODULE-IDENTITY
                                 commandService  (84),
                                 commandRack     (85),
 								commandRCM		(86),
+								commandStatus	(87),
                                 unitType        (90),
                                 swVersion       (91),
                                 serialNumber    (92),
@@ -2139,6 +2168,7 @@ cmcIII                      MODULE-IDENTITY
                                 gsmStatus       (95),
                                 connected       (96),
                                 connectedEnum   (97),
+								hwVersion       (98),
                                 grouping        (100),
                                 scaleValue      (110),
                                 scaleUnit       (111),
@@ -2164,8 +2194,10 @@ cmcIII                      MODULE-IDENTITY
                                 tagsQuit        (138),
                                 tagsChanged     (139),
                                 uid             (140),
-								opModeMiniCh	(145),
-								opModeBEP		(146),
+								opModeBEP		(145),
+								opModeMiniCh	(146),
+								commandControl  (150),
+								commandSignal   (151),
                                 ignore          (254),
                                 illegal         (255)
                             }
@@ -2834,10 +2866,10 @@ cmcIII                      MODULE-IDENTITY
                             28: sensor is active
                             29: no Power (PSM)
                             30: read only (SD, USB-Stick)
-							31: control boards of LCP exchanged
-							32: valve open (info)
-							33: warning 
-							34: remote control."
+                            31: control boards of LCP exchanged
+                            32: valve open (info)
+                            33: warning
+                            34: remote control."
         ::=                 { cmcIIIMsgEntry    4 }
 
     cmcIIIMsgRelay          OBJECT-TYPE
@@ -3943,7 +3975,7 @@ cmcIII                      MODULE-IDENTITY
                                 cmcIIILanguage,
                                 cmcIIIOpcUaAccess,
                                 cmcIIIOpcUaPort,
-
+                                cmcIIISetFlowUnit,
                                 cmcIIINumberOfTrapReceivers,
                                 cmcIIITrapReceiverStatus,
                                 cmcIIITrapReceiverIpAddress

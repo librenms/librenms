@@ -30,6 +30,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
         'sensor_type',
         'sensor_descr',
         'sensor_divisor',
+        'sensor_current',
         'sensor_multiplier',
         'sensor_limit',
         'sensor_limit_warn',

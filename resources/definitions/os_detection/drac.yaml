@@ -3,6 +3,8 @@ text: 'Dell DRAC'
 icon: dell
 type: management
 mib_dir: dell
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
 discovery:
     -
         sysObjectID:

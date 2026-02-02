@@ -125,9 +125,19 @@ abstract class PaginatedAjaxController extends Controller
     protected function search($search, $query, $fields)
     {
         if ($search) {
-            $query->where(function ($query) use ($fields, $search): void {
-                foreach ($fields as $field) {
-                    $query->orWhere($field, 'like', '%' . $search . '%');
+            $query->where(function (Builder $query) use ($fields, $search): void {
+                foreach ($fields as $index => $field) {
+                    if (! is_numeric($index)) {
+                        $query->orWhereHas($index, function ($query) use ($field, $search): void {
+                            $query->where(function ($query) use ($field, $search): void {
+                                foreach ($field as $relatedField) {
+                                    $query->orWhere($relatedField, 'like', '%' . $search . '%');
+                                }
+                            });
+                        });
+                    } else {
+                        $query->orWhere($field, 'like', '%' . $search . '%');
+                    }
                 }
             });
         }
@@ -145,7 +155,7 @@ abstract class PaginatedAjaxController extends Controller
     {
         foreach ($fields as $target => $field) {
             $callable = is_callable($field);
-            $value = $request->get($callable ? $target : $field);
+            $value = $request->input($callable ? $target : $field);
 
             // unfiltered field
             if ($value === null) {
@@ -177,7 +187,7 @@ abstract class PaginatedAjaxController extends Controller
     {
         $columns = $this->sortFields($request);
 
-        $sort = $request->get('sort', $this->default_sort);
+        $sort = $request->input('sort', $this->default_sort);
 
         foreach ($sort as $column => $direction) {
             if (isset($columns[$column]) || in_array($column, $columns)) {

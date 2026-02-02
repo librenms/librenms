@@ -1,18 +1,17 @@
-mib: PowerNet-MIB
 modules:
     sensors:
         additional_oids:
             data:
                 -
                     oid:
-                        - airIRG2RDT2ThresholdsRackInletHighTempMetric
-                        - airIRG2RDT2ThresholdsSupplyAirHighTempMetric
-                        - airIRG2RDT2ThresholdsReturnAirHighTempMetric
+                        - PowerNet-MIB::airIRG2RDT2ThresholdsRackInletHighTempMetric
+                        - PowerNet-MIB::airIRG2RDT2ThresholdsSupplyAirHighTempMetric
+                        - PowerNet-MIB::airIRG2RDT2ThresholdsReturnAirHighTempMetric
         state:
             data:
                 -
-                    oid: upsBasicOutputStatus
-                    value: upsBasicOutputStatus
+                    oid: PowerNet-MIB::upsBasicOutputStatus
+                    value: PowerNet-MIB::upsBasicOutputStatus
                     num_oid: '.1.3.6.1.4.1.318.1.1.1.4.1.1.{{ $index }}'
                     descr: Output Status
                     index: '{{ $index }}'
@@ -41,30 +40,32 @@ modules:
                         - { descr: chargerSpotmode, graph: 0, value: 21, generic: 0 }
                         - { descr: inverterSpotmode, graph: 0, value: 22, generic: 0 }
                 -
-                    oid: memInputsConfigTable
+                    oid: PowerNet-MIB::memInputsConfigTable
                     state_name: memInputNormalState
-                    value: memInputNormalState
+                    value: PowerNet-MIB::memInputNormalState
                     num_oid: '.1.3.6.1.4.1.318.1.1.10.4.3.4.1.7.{{ $index }}'
                     index: 'memInputNormalState.{{ $index }}'
-                    descr: 'Normal state: {{ $memInputName }}'
+                    descr: 'Normal state: {{ PowerNet-MIB::memInputName }}'
                     states:
                         - { descr: Closed, graph: 1, value: 1, generic: 0 }
                         - { descr: Open, graph: 1, value: 2, generic: 0 }
                         - { descr: Disabled, graph: 1, value: 3, generic: 0 }
                         - { descr: No State, graph: 1, value: 4, generic: 0 }
                 -
-                    oid: memInputsStatusTable
+                    oid: PowerNet-MIB::memInputsStatusTable
                     state_name: memInputsStatusAlarmStatus
-                    value: memInputsStatusAlarmStatus
+                    value: PowerNet-MIB::memInputsStatusAlarmStatus
                     num_oid: '.1.3.6.1.4.1.318.1.1.10.4.3.2.1.7.{{ $index }}'
                     index: 'memInputStatusAlarmState.{{ $index }}'
-                    descr: memInputsStatusInputName
+                    descr: PowerNet-MIB::memInputsStatusInputName
                     states:
                         - { descr: Ok, graph: 1, value: 1, generic: 0 }
                         - { descr: Alarm, graph: 1, value: 2, generic: 1 }
                         - { descr: Critical, graph: 1, value: 3, generic: 2 }
                 -
-                    oid: airIRRP100UnitStatusOperateMode
+                    oid: PowerNet-MIB::airIRRP100UnitStatusOperateMode
+                    value: PowerNet-MIB::airIRRP100UnitStatusOperateMode
+                    state_name: airIRRP100UnitStatusOperateMode
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.1.{{ $index }}'
                     descr: Unit Status
                     states:
@@ -76,7 +77,9 @@ modules:
                         - { descr: backup, graph: 1, value: 6, generic: 1 }
                         - { descr: assist, graph: 1, value: 7, generic: 1 }
                 -
-                    oid: airIRRP100UnitStatusInputState
+                    oid: PowerNet-MIB::airIRRP100UnitStatusInputState
+                    value: PowerNet-MIB::airIRRP100UnitStatusInputState
+                    state_name: airIRRP100UnitStatusInputState
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.21.{{ $index }}'
                     descr: Input State
                     states:
@@ -84,13 +87,17 @@ modules:
                         - { descr: closed, graph: 1, value: 2, generic: 2 }
                 -
                     oid: airIRRP100UnitStatusOutputState
+                    value: PowerNet-MIB::airIRRP100UnitStatusOutputState
+                    state_name: airIRRP100UnitStatusOutputState
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.22.{{ $index }}'
                     descr: Output State
                     states:
                         - { descr: open, graph: 1, value: 1, generic: 0 }
                         - { descr: closed, graph: 1, value: 2, generic: 2 }
                 -
-                    oid: airIRRP500UnitStatusOperateMode
+                    oid: PowerNet-MIB::airIRRP500UnitStatusOperateMode
+                    value: PowerNet-MIB::airIRRP500UnitStatusOperateMode
+                    state_name: airIRRP500UnitStatusOperateMode
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.1.{{ $index }}'
                     descr: Unit Status
                     states:
@@ -101,23 +108,27 @@ modules:
                         - { descr: backup, graph: 1, value: 5, generic: 1 }
                         - { descr: assist, graph: 1, value: 6, generic: 1 }
                 -
-                    oid: airIRRP500UnitStatusInputState
+                    oid: PowerNet-MIB::airIRRP500UnitStatusInputState
+                    value: PowerNet-MIB::airIRRP500UnitStatusInputState
+                    state_name: airIRRP500UnitStatusInputState
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.21.{{ $index }}'
                     descr: Input State
                     states:
                         - { descr: open, graph: 1, value: 1, generic: 0 }
                         - { descr: closed, graph: 1, value: 2, generic: 2 }
                 -
-                    oid: airIRRP500UnitStatusOutputState
+                    oid: PowerNet-MIB::airIRRP500UnitStatusOutputState
+                    value: PowerNet-MIB::airIRRP500UnitStatusOutputState
+                    state_name: airIRRP500UnitStatusOutputState
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.22.{{ $index }}'
                     descr: Output State
                     states:
                         - { descr: open, graph: 1, value: 1, generic: 0 }
                         - { descr: closed, graph: 1, value: 2, generic: 2 }
                 -
-                    oid: rPDU2PhaseStatusTable
+                    oid: PowerNet-MIB::rPDU2PhaseStatusTable
                     state_name: rPDU2PhaseStatusLoadState
-                    value: rPDU2PhaseStatusLoadState
+                    value: PowerNet-MIB::rPDU2PhaseStatusLoadState
                     num_oid: '.1.3.6.1.4.1.318.1.1.26.6.3.1.4.{{ $index }}'
                     index: 'rPDU2PhaseStatusLoadState.{{ $index }}'
                     descr: 'Load State, Phase #{{ $index }}'
@@ -127,9 +138,9 @@ modules:
                         - { descr: nearOverload, graph: 1, value: 3, generic: 1 }
                         - { descr: overload, graph: 1, value: 4, generic: 2 }
                 -
-                    oid: rPDU2DeviceStatusTable
+                    oid: PowerNet-MIB::rPDU2DeviceStatusTable
                     state_name: rPDU2DeviceStatusLoadState
-                    value: rPDU2DeviceStatusLoadState
+                    value: PowerNet-MIB::rPDU2DeviceStatusLoadState
                     num_oid: '.1.3.6.1.4.1.318.1.1.26.4.3.1.4.{{ $index }}'
                     index: 'rPDU2DeviceStatusLoadState.{{ $index }}'
                     descr: 'Device State'
@@ -140,9 +151,9 @@ modules:
                         - { descr: overload, graph: 1, value: 4, generic: 2 }
                         - { descr: notsupported, graph: 1, value: 5, generic: 3 }
                 -
-                    oid: rPDU2DeviceStatusTable
+                    oid: PowerNet-MIB::rPDU2DeviceStatusTable
                     state_name: rPDU2DeviceStatusPowerSupplyAlarm
-                    value: rPDU2DeviceStatusPowerSupplyAlarm
+                    value: PowerNet-MIB::rPDU2DeviceStatusPowerSupplyAlarm
                     num_oid: '.1.3.6.1.4.1.318.1.1.26.4.3.1.12.{{ $index }}'
                     index: 'rPDU2DeviceStatusPowerSupplyAlarm.{{ $index }}'
                     descr: 'Power Supply State'
@@ -150,9 +161,9 @@ modules:
                         - { descr: normal, graph: 1, value: 1, generic: 0 }
                         - { descr: alarm, graph: 1, value: 2, generic: 2 }
                 -
-                    oid: rPDU2SensorTempHumidityStatusTable
+                    oid: PowerNet-MIB::rPDU2SensorTempHumidityStatusTable
                     state_name: rPDU2SensorTempHumidityStatusTempStatus
-                    value: rPDU2SensorTempHumidityStatusTempStatus
+                    value: PowerNet-MIB::rPDU2SensorTempHumidityStatusTempStatus
                     num_oid: '.1.3.6.1.4.1.318.1.1.26.10.2.2.1.9.{{ $index }}'
                     index: 'rPDU2SensorTempHumidityStatusTempStatus.{{ $index }}'
                     descr: 'Temperature Probe Status'
@@ -165,14 +176,14 @@ modules:
                         - { descr: aboveMax, graph: 1, value: 6, generic: 2 }
                     skip_values:
                         -
-                            oid: rPDU2SensorTempHumidityStatusTempStatus
+                            oid: PowerNet-MIB::rPDU2SensorTempHumidityStatusTempStatus
                             op: '='
                             value: 1
 
                 -
-                    oid: rPDU2SensorTempHumidityStatusTable
+                    oid: PowerNet-MIB::rPDU2SensorTempHumidityStatusTable
                     state_name: rPDU2SensorTempHumidityStatusHumidityStatus
-                    value: rPDU2SensorTempHumidityStatusHumidityStatus
+                    value: PowerNet-MIB::rPDU2SensorTempHumidityStatusHumidityStatus
                     num_oid: '.1.3.6.1.4.1.318.1.1.26.10.2.2.1.11.{{ $index }}'
                     index: 'rPDU2SensorTempHumidityStatusHumidityStatus.{{ $index }}'
                     descr: 'Humidity Probe Status'
@@ -185,12 +196,12 @@ modules:
                         - { descr: aboveMax, graph: 1, value: 6, generic: 2 }
                     skip_values:
                         -
-                            oid: rPDU2SensorTempHumidityStatusHumidityStatus
+                            oid: PowerNet-MIB::rPDU2SensorTempHumidityStatusHumidityStatus
                             op: '='
                             value: 1
                 -
-                    oid: atsStatusSourceAStatus
-                    value: atsStatusSourceAStatus
+                    oid: PowerNet-MIB::atsStatusSourceAStatus
+                    value: PowerNet-MIB::atsStatusSourceAStatus
                     state_name: atsStatusSourceAStatus
                     num_oid: '.1.3.6.1.4.1.318.1.1.8.5.1.12.{{ $index }}'
                     index: 'atsStatusSourceAStatus.{{ $index }}'
@@ -199,8 +210,8 @@ modules:
                         - { descr: Fail, graph: 0, value: 1, generic: 2 }
                         - { descr: OK, graph: 0, value: 2, generic: 0 }
                 -
-                    oid: atsStatusSourceBStatus
-                    value: atsStatusSourceBStatus
+                    oid: PowerNet-MIB::atsStatusSourceBStatus
+                    value: PowerNet-MIB::atsStatusSourceBStatus
                     state_name: atsStatusSourceBStatus
                     num_oid: '.1.3.6.1.4.1.318.1.1.8.5.1.13.{{ $index }}'
                     index: 'atsStatusSourceBStatus.{{ $index }}'
@@ -209,8 +220,8 @@ modules:
                         - { descr: Fail, graph: 0, value: 1, generic: 2 }
                         - { descr: OK, graph: 0, value: 2, generic: 0 }
                 -
-                    oid: atsStatusSwitchStatus
-                    value: atsStatusSwitchStatus
+                    oid: PowerNet-MIB::atsStatusSwitchStatus
+                    value: PowerNet-MIB::atsStatusSwitchStatus
                     state_name: atsStatusSwitchStatus
                     num_oid: '.1.3.6.1.4.1.318.1.1.8.5.1.10.{{ $index }}'
                     index: 'atsStatusSwitchStatus.{{ $index }}'
@@ -219,8 +230,8 @@ modules:
                         - { descr: Fail, graph: 0, value: 1, generic: 2 }
                         - { descr: OK, graph: 0, value: 2, generic: 0 }
                 -
-                    oid: atsStatusSelectedSource
-                    value: atsStatusSelectedSource
+                    oid: PowerNet-MIB::atsStatusSelectedSource
+                    value: PowerNet-MIB::atsStatusSelectedSource
                     state_name: atsStatusSelectedSource
                     num_oid: '.1.3.6.1.4.1.318.1.1.8.5.1.2.{{ $index }}'
                     index: 'atsStatusSelectedSource.{{ $index }}'
@@ -229,8 +240,8 @@ modules:
                         - { descr: Source A, graph: 0, value: 1, generic: 3 }
                         - { descr: Source B, graph: 0, value: 2, generic: 3 }
                 -
-                    oid: atsStatusRedundancyState
-                    value: atsStatusRedundancyState
+                    oid: PowerNet-MIB::atsStatusRedundancyState
+                    value: PowerNet-MIB::atsStatusRedundancyState
                     state_name: atsStatusRedundancyState
                     num_oid: '.1.3.6.1.4.1.318.1.1.8.5.1.3.{{ $index }}'
                     index: 'atsStatusRedundancyState.{{ $index }}'
@@ -239,8 +250,8 @@ modules:
                         - { descr: Redundancy Lost, graph: 0, value: 1, generic: 2 }
                         - { descr: Fully Redundant, graph: 0, value: 2, generic: 0 }
                 -
-                    oid: atsStatusPhaseSyncStatus
-                    value: atsStatusPhaseSyncStatus
+                    oid: PowerNet-MIB::atsStatusPhaseSyncStatus
+                    value: PowerNet-MIB::atsStatusPhaseSyncStatus
                     state_name: atsStatusPhaseSyncStatus
                     num_oid: '.1.3.6.1.4.1.318.1.1.8.5.1.14.{{ $index }}'
                     index: 'atsStatusPhaseSyncStatus.{{ $index }}'
@@ -249,10 +260,10 @@ modules:
                         - { descr: In Sync, graph: 0, value: 1, generic: 0 }
                         - { descr: Out Of Sync, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: sPDUOutletControlTable
-                    value: sPDUOutletCtl
+                    oid: PowerNet-MIB::sPDUOutletControlTable
+                    value: PowerNet-MIB::sPDUOutletCtl
                     num_oid: '.1.3.6.1.4.1.318.1.1.4.4.2.1.3.{{ $index }}'
-                    descr: '#{{ $subindex0 }} : {{ sPDUOutletCtlName }}'
+                    descr: '#{{ $subindex0 }} : {{ PowerNet-MIB::sPDUOutletCtlName }}'
                     index: 'sPDUOutletCtl.{{ $index }}'
                     state_name: sPDUOutletCtl
                     states:
@@ -264,8 +275,8 @@ modules:
                         - { value: 6, generic: 3, graph: 0, descr: outletOffWithDelay }
                         - { value: 7, generic: 1, graph: 0, descr: outletRebootWithDelay }
                 -
-                    oid: airFMGroup
-                    value: airFMGroupSysStatus
+                    oid: PowerNet-MIB::airFMGroup
+                    value: PowerNet-MIB::airFMGroupSysStatus
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.3.1.{{ $index }}'
                     descr: 'airFM Group Status'
                     index: 'airFMGroupSysStatus.{{ $index }}'
@@ -279,8 +290,8 @@ modules:
                         - { value: 6, generic: 3, graph: 0, descr: Disabled }
                         - { value: 7, generic: 1, graph: 0, descr: Undefined }
                 -
-                    oid: AirFMModCoolEntry
-                    value: airFMModComp1
+                    oid: PowerNet-MIB::airFMModCoolTable
+                    value: PowerNet-MIB::airFMModComp1
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.4.2.1.2.{{ $index }}'
                     descr: 'Compressor 1'
                     index: 'airFMModComp1.{{ $index }}'
@@ -290,8 +301,8 @@ modules:
                         - { value: 2, generic: 0, graph: 0, descr: On }
                         - { value: 3, generic: 0, graph: 0, descr: Off }
                 -
-                    oid: AirFMModCoolEntry
-                    value: airFMModComp2
+                    oid: PowerNet-MIB::airFMModCoolTable
+                    value: PowerNet-MIB::airFMModComp2
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.4.2.1.3.{{ $index }}'
                     descr: 'Compressor 2'
                     index: 'airFMModComp2.{{ $index }}'
@@ -301,8 +312,8 @@ modules:
                         - { value: 2, generic: 0, graph: 0, descr: On }
                         - { value: 3, generic: 0, graph: 0, descr: Off }
                 -
-                    oid: airFMSysCoolState
-                    value: airFMSysCoolState
+                    oid: PowerNet-MIB::airFMSysCoolState
+                    value: PowerNet-MIB::airFMSysCoolState
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.5.8.{{ $index }}'
                     descr: 'Cooling'
                     index: 'airFMSysCoolState.{{ $index }}'
@@ -312,8 +323,8 @@ modules:
                         - { value: 2, generic: 0, graph: 0, descr: Disabled }
                         - { value: 3, generic: 0, graph: 0, descr: Enabled }
                 -
-                    oid: airFMSysHumState
-                    value: airFMSysHumState
+                    oid: PowerNet-MIB::airFMSysHumState
+                    value: PowerNet-MIB::airFMSysHumState
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.6.1.{{ $index }}'
                     descr: 'Humidifier'
                     index: 'airFMSysHumState.{{ $index }}'
@@ -323,8 +334,8 @@ modules:
                         - { value: 2, generic: 0, graph: 0, descr: Disabled }
                         - { value: 3, generic: 0, graph: 0, descr: Enabled }
                 -
-                    oid: airFMSysDehumState
-                    value: airFMSysDehumState
+                    oid: PowerNet-MIB::airFMSysDehumState
+                    value: PowerNet-MIB::airFMSysDehumState
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.7.1.{{ $index }}'
                     descr: 'Dehumidifier'
                     index: 'airFMSysDehumState.{{ $index }}'
@@ -334,8 +345,8 @@ modules:
                         - { value: 2, generic: 0, graph: 0, descr: Disabled }
                         - { value: 3, generic: 0, graph: 0, descr: Enabled }
                 -
-                    oid: airFMSysReheatState
-                    value: airFMSysReheatState
+                    oid: PowerNet-MIB::airFMSysReheatState
+                    value: PowerNet-MIB::airFMSysReheatState
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.8.1.{{ $index }}'
                     descr: 'Heating'
                     index: 'airFMSysReheatState.{{ $index }}'
@@ -345,8 +356,8 @@ modules:
                         - { value: 2, generic: 0, graph: 0, descr: Disabled }
                         - { value: 3, generic: 0, graph: 0, descr: Enabled }
                 -
-                    oid: xATSSwitchStatusSelectedSource
-                    value: xATSSwitchStatusSelectedSource
+                    oid: PowerNet-MIB::xATSSwitchStatusSelectedSource
+                    value: PowerNet-MIB::xATSSwitchStatusSelectedSource
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.3.1.1.{{ $index }}'
                     descr: 'ATS Source'
                     index: 'xATSSwitchStatusSelectedSource.{{ $index }}'
@@ -358,8 +369,8 @@ modules:
                         - { value: 4, generic: 2, graph: 0, descr: fault }
                         - { value: 5, generic: 3, graph: 0, descr: unknown }
                 -
-                    oid: xATSSwitchStatusOperationalMode
-                    value: xATSSwitchStatusOperationalMode
+                    oid: PowerNet-MIB::xATSSwitchStatusOperationalMode
+                    value: PowerNet-MIB::xATSSwitchStatusOperationalMode
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.3.1.2.{{ $index }}'
                     descr: 'ATS Operation Mode'
                     index: 'xATSSwitchStatusOperationalMode.{{ $index }}'
@@ -370,8 +381,8 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: notInAuto }
                         - { value: 4, generic: 3, graph: 0, descr: unknown }
                 -
-                    oid: xATSSwitchStatusEngineStartSignal
-                    value: xATSSwitchStatusEngineStartSignal
+                    oid: PowerNet-MIB::xATSSwitchStatusEngineStartSignal
+                    value: PowerNet-MIB::xATSSwitchStatusEngineStartSignal
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.3.1.4.{{ $index }}'
                     descr: 'Engine Start Signal'
                     index: 'xATSSwitchStatusEngineStartSignal.{{ $index }}'
@@ -381,8 +392,8 @@ modules:
                         - { value: 2, generic: 0, graph: 0, descr: stop }
                         - { value: 3, generic: 3, graph: 0, descr: unknown }
                 -
-                    oid: xATSSource1Position
-                    value: xATSSource1Position
+                    oid: PowerNet-MIB::xATSSource1Position
+                    value: PowerNet-MIB::xATSSource1Position
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.1.2.{{ $index }}'
                     descr: 'Source1 Switch Position'
                     index: 'xATSSource1Position.{{ $index }}'
@@ -393,8 +404,8 @@ modules:
                         - { value: 3, generic: 2, graph: 0, descr: tripped }
                         - { value: 4, generic: 3, graph: 0, descr: unknown }
                 -
-                    oid: xATSSource2Position
-                    value: xATSSource2Position
+                    oid: PowerNet-MIB::xATSSource2Position
+                    value: PowerNet-MIB::xATSSource2Position
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.2.2.{{ $index }}'
                     descr: 'Source2 Switch Position'
                     index: 'xATSSource2Position.{{ $index }}'
@@ -405,8 +416,8 @@ modules:
                         - { value: 3, generic: 2, graph: 0, descr: tripped }
                         - { value: 4, generic: 3, graph: 0, descr: unknown }
                 -
-                    oid: xATSSource1Quality
-                    value: xATSSource1Quality
+                    oid: PowerNet-MIB::xATSSource1Quality
+                    value: PowerNet-MIB::xATSSource1Quality
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.1.4.{{ $index }}'
                     descr: 'Source1 Quality'
                     index: 'xATSSource1Quality.{{ $index }}'
@@ -420,8 +431,8 @@ modules:
                         - { value: 6, generic: 1, graph: 0, descr: badRotation }
                         - { value: 7, generic: 3, graph: 0, descr: unknown }
                 -
-                    oid: xATSSource2Quality
-                    value: xATSSource2Quality
+                    oid: PowerNet-MIB::xATSSource2Quality
+                    value: PowerNet-MIB::xATSSource2Quality
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.2.4.{{ $index }}'
                     descr: 'Source2 Quality'
                     index: 'xATSSource2Quality.{{ $index }}'
@@ -435,8 +446,8 @@ modules:
                         - { value: 6, generic: 1, graph: 0, descr: badRotation }
                         - { value: 7, generic: 3, graph: 0, descr: unknown }
                 -
-                    oid: xATSTestingStatusTestStatus
-                    value: xATSTestingStatusTestStatus
+                    oid: PowerNet-MIB::xATSTestingStatusTestStatus
+                    value: PowerNet-MIB::xATSTestingStatusTestStatus
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.5.1.2.{{ $index }}'
                     descr: 'Test Status'
                     index: 'xATSTestingStatusTestStatus.{{ $index }}'
@@ -454,8 +465,8 @@ modules:
                         - { value: 9, generic: 0, graph: 0, descr: stoppingEngine }
                         - { value: 10, generic: 0, graph: 0, descr: holdingOnGenerator }
                 -
-                    oid: xATSTestingResultsLastResult
-                    value: xATSTestingResultsLastResult
+                    oid: PowerNet-MIB::xATSTestingResultsLastResult
+                    value: PowerNet-MIB::xATSTestingResultsLastResult
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.5.2.2.{{ $index }}'
                     descr: 'Last Test Result'
                     index: 'xATSTestingResultsLastResult.{{ $index }}'
@@ -482,8 +493,8 @@ modules:
                         - { value: 18, generic: 3, graph: 0, descr: canceledManualTest }
                         - { value: 19, generic: 3, graph: 0, descr: canceledScheduledTest }
                 -
-                    oid: xATSGeneratorStatusOperational
-                    value: xATSGeneratorStatusOperational
+                    oid: PowerNet-MIB::xATSGeneratorStatusOperational
+                    value: PowerNet-MIB::xATSGeneratorStatusOperational
                     num_oid: '.1.3.6.1.4.1.318.1.1.18.1.2.2.{{ $index }}'
                     descr: 'Generator Status'
                     index: 'xATSGeneratorStatusOperational.{{ $index }}'
@@ -502,8 +513,8 @@ modules:
                         - { value: 10, generic: 1, graph: 0, descr: shutdown }
                         - { value: 11, generic: 3, graph: 0, descr: unknown }
                 -
-                    oid: xATSGeneratorStatusModeSwitchPosition
-                    value: xATSGeneratorStatusModeSwitchPosition
+                    oid: PowerNet-MIB::xATSGeneratorStatusModeSwitchPosition
+                    value: PowerNet-MIB::xATSGeneratorStatusModeSwitchPosition
                     num_oid: '.1.3.6.1.4.1.318.1.1.18.1.2.2.{{ $index }}'
                     descr: 'Mode Switch'
                     index: 'xATSGeneratorStatusModeSwitchPosition.{{ $index }}'
@@ -515,8 +526,8 @@ modules:
                         - { value: 3, generic: 0, graph: 0, descr: automatic }
                         - { value: 4, generic: 3, graph: 0, descr: unknown }
                 -
-                    oid: xATSGeneratorAdvStatusOilLevel
-                    value: xATSGeneratorAdvStatusOilLevel
+                    oid: PowerNet-MIB::xATSGeneratorAdvStatusOilLevel
+                    value: PowerNet-MIB::xATSGeneratorAdvStatusOilLevel
                     num_oid: '.1.3.6.1.4.1.318.1.1.18.1.3.5.{{ $index }}'
                     descr: 'Oil Level'
                     index: 'xATSGeneratorAdvStatusOilLevel.{{ $index }}'
@@ -527,8 +538,8 @@ modules:
                         - { value: 2, generic: 1, graph: 0, descr: low }
                         - { value: 3, generic: 3, graph: 0, descr: unknown }
                 -
-                    oid: xATSGeneratorAdvStatusCoolantLevel
-                    value: xATSGeneratorAdvStatusCoolantLevel
+                    oid: PowerNet-MIB::xATSGeneratorAdvStatusCoolantLevel
+                    value: PowerNet-MIB::xATSGeneratorAdvStatusCoolantLevel
                     num_oid: '.1.3.6.1.4.1.318.1.1.18.1.3.5.{{ $index }}'
                     descr: 'Coolant Level'
                     index: 'xATSGeneratorAdvStatusCoolantLevel.{{ $index }}'
@@ -539,10 +550,10 @@ modules:
                         - { value: 2, generic: 1, graph: 0, descr: low }
                         - { value: 3, generic: 3, graph: 0, descr: unknown }
                 -
-                    oid: xPDUSystemBreakerTable
-                    value: xPDUSystemBreakerPosition
+                    oid: PowerNet-MIB::xPDUSystemBreakerTable
+                    value: PowerNet-MIB::xPDUSystemBreakerPosition
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.4.1.2.1.3.{{ $index }}'
-                    descr: 'Breaker - {{ $xPDUSystemBreakerDescription }}'
+                    descr: 'Breaker - {{ PowerNet-MIB::xPDUSystemBreakerDescription }}'
                     index: 'xPDUSystemBreakerPosition.{{ $index }}'
                     state_name: xPDUSystemBreakerPosition
                     states:
@@ -550,8 +561,8 @@ modules:
                         - { descr: closed, graph: 0, value: 2, generic: 0 }
                         - { descr: unknown, graph: 0, value: 3, generic: 3 }
                 -
-                    oid: xPDUEPOMode
-                    value: xPDUEPOMode
+                    oid: PowerNet-MIB::xPDUEPOMode
+                    value: PowerNet-MIB::xPDUEPOMode
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.7.1.{{ $index }}'
                     descr: 'Emergency Power Off (EPO)'
                     index: 'xPDUEPOMode.{{ $index }}'
@@ -561,8 +572,8 @@ modules:
                         - { descr: disarmed, graph: 0, value: 2, generic: 1 }
                         - { descr: unknown, graph: 0, value: 3, generic: 3 }
                 -
-                    oid: xPDUTransformTempStatus
-                    value: xPDUTransformTempStatus
+                    oid: PowerNet-MIB::xPDUTransformTempStatus
+                    value: PowerNet-MIB::xPDUTransformTempStatus
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.7.2.{{ $index }}'
                     descr: 'Transformer Temperature'
                     index: 'xPDUTransformTempStatus.{{ $index }}'
@@ -574,8 +585,8 @@ modules:
                         - { descr: unknown, graph: 0, value: 4, generic: 3 }
                     skip_values: 3
                 -
-                    oid: xPDUCoolingFanStatus
-                    value: xPDUCoolingFanStatus
+                    oid: PowerNet-MIB::xPDUCoolingFanStatus
+                    value: PowerNet-MIB::xPDUCoolingFanStatus
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.7.3.{{ $index }}'
                     descr: 'Cooling Fan'
                     index: 'xPDUCoolingFanStatus.{{ $index }}'
@@ -587,8 +598,8 @@ modules:
                         - { descr: unknown, graph: 0, value: 4, generic: 3 }
                     skip_values: 3
                 -
-                    oid: upsAdvInputLineFailCause
-                    value: upsAdvInputLineFailCause
+                    oid: PowerNet-MIB::upsAdvInputLineFailCause
+                    value: PowerNet-MIB::upsAdvInputLineFailCause
                     num_oid: '.1.3.6.1.4.1.318.1.1.1.3.2.5.{{ $index }}'
                     descr: 'Last failure cause'
                     index: 'upsAdvInputLineFailCause.{{ $index }}'
@@ -605,7 +616,9 @@ modules:
                         - { descr: selfTest, graph: 0, value: 9, generic: 0 }
                         - { descr: rateOfVoltageChange, graph: 0, value: 10, generic: 0 }
                 -
-                    oid: upsAdvTestDiagnosticsResults
+                    oid: PowerNet-MIB::upsAdvTestDiagnosticsResults
+                    value: PowerNet-MIB::upsAdvTestDiagnosticsResults
+                    state_name: upsAdvTestDiagnosticsResults
                     num_oid: '.1.3.6.1.4.1.318.1.1.1.7.2.3.{{ $index }}'
                     descr: UPS diagnostics status
                     states:
@@ -614,11 +627,11 @@ modules:
                         - { descr: invalidTest, graph: 0, value: 3, generic: 1 }
                         - { descr: testInProgress, graph: 0, value: 4, generic: 1 }
                 -
-                    oid: upsOutletGroupControlTable
-                    value: upsOutletGroupControlCommand
+                    oid: PowerNet-MIB::upsOutletGroupControlTable
+                    value: PowerNet-MIB::upsOutletGroupControlCommand
                     num_oid: '.1.3.6.1.4.1.318.1.1.1.12.3.2.1.3.{{ $index }}'
                     group: 'UPS Outlet Group Status'
-                    descr: 'Main: {{ $upsOutletGroupControlName }}'
+                    descr: 'Main: {{ PowerNet-MIB::upsOutletGroupControlName }}'
                     index: 'upsOutletGroupControlCommand.{{ $index }}'
                     state_name: upsOutletGroupControlCommand
                     states:
@@ -634,15 +647,15 @@ modules:
                         - { value: 10, graph: 0, generic: 1, descr: Delayed Reboot Shutdown}
                     skip_values:
                         -
-                            oid: upsOutletGroupControlOutletType
+                            oid: PowerNet-MIB::upsOutletGroupControlOutletType
                             op: '!='
                             value: 2
                 -
-                    oid: upsOutletGroupControlTable
-                    value: upsOutletGroupControlCommand
+                    oid: PowerNet-MIB::upsOutletGroupControlTable
+                    value: PowerNet-MIB::upsOutletGroupControlCommand
                     num_oid: '.1.3.6.1.4.1.318.1.1.1.12.3.2.1.3.{{ $index }}'
                     group: 'UPS Outlet Group Status'
-                    descr: '{{ $upsOutletGroupControlName }}'
+                    descr: '{{ PowerNet-MIB::upsOutletGroupControlName }}'
                     index: 'upsOutletGroupControlCommand.{{ $index }}'
                     state_name: upsOutletGroupControlCommand
                     states:
@@ -658,152 +671,173 @@ modules:
                         - { value: 10, graph: 0, generic: 1, descr: Delayed Reboot Shutdown}
                     skip_values:
                         -
-                            oid: upsOutletGroupControlOutletType
+                            oid: PowerNet-MIB::upsOutletGroupControlOutletType
                             op: '!='
                             value: 1
 
         temperature:
             data:
                 -
-                    oid: airIRRP100UnitStatusRackInletTempMetric
+                    oid: PowerNet-MIB::airIRRP100UnitStatusRackInletTempMetric
+                    value: PowerNet-MIB::airIRRP100UnitStatusRackInletTempMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.3.{{ $index }}'
                     index: 'airIRRP100UnitStatusRackInletTempMetric.{{ $index }}'
                     descr: Rack Inlet
                     divisor: 10
                 -
-                    oid: airIRRP100UnitStatusSupplyAirTempMetric
+                    oid: PowerNet-MIB::airIRRP100UnitStatusSupplyAirTempMetric
+                    value: PowerNet-MIB::airIRRP100UnitStatusSupplyAirTempMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.5.{{ $index }}'
                     index: 'airIRRP100UnitStatusSupplyAirTempMetric.{{ $index }}'
                     descr: Supply Air
                     divisor: 10
                 -
-                    oid: airIRRP100UnitStatusReturnAirTempMetric
+                    oid: PowerNet-MIB::airIRRP100UnitStatusReturnAirTempMetric
+                    value: PowerNet-MIB::airIRRP100UnitStatusReturnAirTempMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.7.{{ $index }}'
                     index: 'airIRRP100UnitStatusReturnAirTempMetric.{{ $index }}'
                     descr: Return Air
                     divisor: 10
                 -
-                    oid: airIRRP100UnitStatusRackInletTemperature1Metric
+                    oid: PowerNet-MIB::airIRRP100UnitStatusRackInletTemperature1Metric
+                    value: PowerNet-MIB::airIRRP100UnitStatusRackInletTemperature1Metric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.24.{{ $index }}'
                     index: 'airIRRP100UnitStatusRackInletTemperature1Metric.{{ $index }}'
                     descr: 'Inlet #1'
                     divisor: 10
                 -
-                    oid: airIRRP100UnitStatusRackInletTemperature2Metric
+                    oid: PowerNet-MIB::airIRRP100UnitStatusRackInletTemperature2Metric
+                    value: PowerNet-MIB::airIRRP100UnitStatusRackInletTemperature2Metric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.26.{{ $index }}'
                     index: 'airIRRP100UnitStatusRackInletTemperature2Metric.{{ $index }}'
                     descr: 'Inlet #2'
                     divisor: 10
                 -
-                    oid: airIRRP100UnitStatusRackInletTemperature3Metric
+                    oid: PowerNet-MIB::airIRRP100UnitStatusRackInletTemperature3Metric
+                    value: PowerNet-MIB::airIRRP100UnitStatusRackInletTemperature3Metric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.28.{{ $index }}'
                     index: 'airIRRP100UnitStatusRackInletTemperature3Metric.{{ $index }}'
                     descr: 'Inlet #3'
                     divisor: 10
                 -
-                    oid: airIRRP100UnitStatusCompressorDriveHeatSinkTempMetric
+                    oid: PowerNet-MIB::airIRRP100UnitStatusCompressorDriveHeatSinkTempMetric
+                    value: PowerNet-MIB::airIRRP100UnitStatusCompressorDriveHeatSinkTempMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.41.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDriveHeatSinkTempMetric.{{ $index }}'
                     descr: 'Compressor Drive Heatsink'
                     divisor: 10
                 -
-                    oid: airIRRP100UnitStatusCompressorDriveControlCardTempMetric
+                    oid: PowerNet-MIB::airIRRP100UnitStatusCompressorDriveControlCardTempMetric
+                    value: PowerNet-MIB::airIRRP100UnitStatusCompressorDriveControlCardTempMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.43.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDriveControlCardTempMetric.{{ $index }}'
                     descr: 'Compressor Drive Control Card'
                     divisor: 10
                 -
-                    oid: airIRRP500UnitStatusSupplyAirTempMetric
+                    oid: PowerNet-MIB::airIRRP500UnitStatusSupplyAirTempMetric
+                    value: PowerNet-MIB::airIRRP500UnitStatusSupplyAirTempMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.5.{{ $index }}'
                     index: 'airIRRP500UnitStatusSupplyAirTempMetric.{{ $index }}'
                     descr: Supply Air
                     divisor: 10
                 -
-                    oid: airIRRP500UnitStatusReturnAirTempMetric
+                    oid: PowerNet-MIB::airIRRP500UnitStatusReturnAirTempMetric
+                    value: PowerNet-MIB::airIRRP500UnitStatusReturnAirTempMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.7.{{ $index }}'
                     index: 'airIRRP500UnitStatusReturnAirTempMetric.{{ $index }}'
                     descr: Return Air
                     divisor: 10
                 -
-                    oid: airIRRP500UnitStatusRackInletTemperature1Metric
+                    oid: PowerNet-MIB::airIRRP500UnitStatusRackInletTemperature1Metric
+                    value: PowerNet-MIB::airIRRP500UnitStatusRackInletTemperature1Metric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.24.{{ $index }}'
                     index: 'airIRRP500UnitStatusRackInletTemperature1Metric.{{ $index }}'
                     descr: 'Inlet #1'
                     divisor: 10
                 -
-                    oid: airIRRP500UnitStatusRackInletTemperature2Metric
+                    oid: PowerNet-MIB::airIRRP500UnitStatusRackInletTemperature2Metric
+                    value: PowerNet-MIB::airIRRP500UnitStatusRackInletTemperature2Metric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.26.{{ $index }}'
                     index: 'airIRRP500UnitStatusRackInletTemperature2Metric.{{ $index }}'
                     descr: 'Inlet #2'
                     divisor: 10
                 -
-                    oid: airIRRP500UnitStatusRackInletTemperature3Metric
+                    oid: PowerNet-MIB::airIRRP500UnitStatusRackInletTemperature3Metric
+                    value: PowerNet-MIB::airIRRP500UnitStatusRackInletTemperature3Metric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.28.{{ $index }}'
                     index: 'airIRRP500UnitStatusRackInletTemperature3Metric.{{ $index }}'
                     descr: 'Inlet #3'
                     divisor: 10
                 -
-                    oid: airIRG2RDT2StatusRackInletTempMetric
+                    oid: PowerNet-MIB::airIRG2RDT2StatusRackInletTempMetric
+                    value: PowerNet-MIB::airIRG2RDT2StatusRackInletTempMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.7.{{ $index }}'
                     index: 'airIRG2RDT2StatusRackInletTempMetric.{{ $index }}'
                     descr: 'Rack Inlet'
                     divisor: 10
-                    high_limit: airIRG2RDT2ThresholdsRackInletHighTempMetric
+                    high_limit: PowerNet-MIB::airIRG2RDT2ThresholdsRackInletHighTempMetric
                 -
-                    oid: airIRG2RDT2StatusSupplyAirTempMetric
+                    oid: PowerNet-MIB::airIRG2RDT2StatusSupplyAirTempMetric
+                    value: PowerNet-MIB::airIRG2RDT2StatusSupplyAirTempMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.9.{{ $index }}'
                     index: 'airIRG2RDT2StatusSupplyAirTempMetric.{{ $index }}'
                     descr: 'Supply Air'
                     divisor: 10
-                    high_limit: airIRG2RDT2ThresholdsSupplyAirHighTempMetric
+                    high_limit: PowerNet-MIB::airIRG2RDT2ThresholdsSupplyAirHighTempMetric
                 -
-                    oid: airIRG2RDT2StatusReturnAirTempMetric
+                    oid: PowerNet-MIB::airIRG2RDT2StatusReturnAirTempMetric
+                    value: PowerNet-MIB::airIRG2RDT2StatusReturnAirTempMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.11.{{ $index }}'
                     index: 'airIRG2RDT2StatusReturnAirTempMetric.{{ $index }}'
                     descr: 'Return Air'
                     divisor: 10
-                    high_limit: airIRG2RDT2ThresholdsReturnAirHighTempMetric
+                    high_limit: PowerNet-MIB::airIRG2RDT2ThresholdsReturnAirHighTempMetric
                 -
-                    oid: airIRG2RDT2StatusSuctionTempMetric
+                    oid: PowerNet-MIB::airIRG2RDT2StatusSuctionTempMetric
+                    value: PowerNet-MIB::airIRG2RDT2StatusSuctionTempMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.13.{{ $index }}'
                     index: 'airIRG2RDT2StatusSuctionTempMetric.{{ $index }}'
                     descr: 'Suction'
                     divisor: 10
                 -
-                    oid: rPDU2SensorTempHumidityStatusTable
-                    value: rPDU2SensorTempHumidityStatusTempC
+                    oid: PowerNet-MIB::rPDU2SensorTempHumidityStatusTable
+                    value: PowerNet-MIB::rPDU2SensorTempHumidityStatusTempC
                     num_oid: '.1.3.6.1.4.1.318.1.1.26.10.2.2.1.8.{{ $index }}'
                     index: 'rPDU2SensorTempHumidityStatusTempC.{{ $index }}'
                     descr: 'Temperature Probe'
                     divisor: 10
                     skip_values:
                         -
-                            oid: rPDU2SensorTempHumidityStatusType
+                            oid: PowerNet-MIB::rPDU2SensorTempHumidityStatusType
                             op: '='
                             value: 4
                 -
-                    oid: airFMModSupplyTempC
+                    oid: PowerNet-MIB::airFMModSupplyTempC
+                    value: PowerNet-MIB::airFMModSupplyTempC
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.2.2.1.2.{{ $index }}'
                     index: 'airFMModSupplyTempC.{{ $index }}'
                     descr: 'Supply Air'
                     divisor: 10
                     skip_values: -2147483648
                 -
-                    oid: airFMModReturnTempC
+                    oid: PowerNet-MIB::airFMModReturnTempC
+                    value: PowerNet-MIB::airFMModReturnTempC
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.2.2.1.5.{{ $index }}'
                     index: 'airFMModReturnTempC.{{ $index }}'
                     descr: 'Return Air'
                     divisor: 10
                     skip_values: -2147483648
                 -
-                    oid: airFMSysCoolSetpointC
+                    oid: PowerNet-MIB::airFMSysCoolSetpointC
+                    value: PowerNet-MIB::airFMSysCoolSetpointC
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.5.10.{{ $index }}'
                     index: 'airFMSysCoolSetpointC.{{ $index }}'
                     descr: 'Cooling Setpoint'
                     divisor: 10
                     skip_values: -2147483648
                 -
-                    oid: airFMSysReheatSetpointC
+                    oid: PowerNet-MIB::airFMSysReheatSetpointC
+                    value: PowerNet-MIB::airFMSysReheatSetpointC
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.8.3.{{ $index }}'
                     index: 'airFMSysReheatSetpointC.{{ $index }}'
                     descr: 'Heating Setpoint'
@@ -812,67 +846,75 @@ modules:
         humidity:
             data:
                 -
-                    oid: airIRRP100UnitStatusSupplyHumidity
+                    oid: PowerNet-MIB::airIRRP100UnitStatusSupplyHumidity
+                    value: PowerNet-MIB::airIRRP100UnitStatusSupplyHumidity
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.8.{{ $index }}'
                     index: 'airIRRP100UnitStatusSupplyHumidity.{{ $index }}'
                     descr: Supply
                     divisor: 10
                 -
-                    oid: airIRRP100UnitStatusReturnHumidity
+                    oid: PowerNet-MIB::airIRRP100UnitStatusReturnHumidity
+                    value: PowerNet-MIB::airIRRP100UnitStatusReturnHumidity
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.8.{{ $index }}'
                     index: 'airIRRP100UnitStatusReturnHumidity.{{ $index }}'
                     descr: Return
                     divisor: 10
                 -
-                    oid: airIRRP500UnitStatusSupplyHumidity
+                    oid: PowerNet-MIB::airIRRP500UnitStatusSupplyHumidity
+                    value: PowerNet-MIB::airIRRP500UnitStatusSupplyHumidity
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.8.{{ $index }}'
                     index: 'airIRRP500UnitStatusSupplyHumidity.{{ $index }}'
                     descr: Supply
                     divisor: 10
                 -
-                    oid: airIRRP500UnitStatusReturnHumidity
+                    oid: PowerNet-MIB::airIRRP500UnitStatusReturnHumidity
+                    value: PowerNet-MIB::airIRRP500UnitStatusReturnHumidity
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.8.{{ $index }}'
                     index: 'airIRRP500UnitStatusSupplyHumidity.{{ $index }}'
                     descr: Return
                     divisor: 10
                 -
-                    oid: rPDU2SensorTempHumidityStatusTable
-                    value: rPDU2SensorTempHumidityStatusRelativeHumidity
+                    oid: PowerNet-MIB::rPDU2SensorTempHumidityStatusTable
+                    value: PowerNet-MIB::rPDU2SensorTempHumidityStatusRelativeHumidity
                     num_oid: '.1.3.6.1.4.1.318.1.1.26.10.2.2.1.10.{{ $index }}'
                     index: 'rPDU2SensorTempHumidityStatusRelativeHumidity.{{ $index }}'
                     descr: 'Humidity Probe'
                     skip_values:
                         -
-                            oid: rPDU2SensorTempHumidityStatusType
+                            oid: PowerNet-MIB::rPDU2SensorTempHumidityStatusType
                             op: '='
                             value: 4
                         -
-                            oid: rPDU2SensorTempHumidityStatusRelativeHumidity
+                            oid: PowerNet-MIB::rPDU2SensorTempHumidityStatusRelativeHumidity
                             op: '<'
                             value: 0
                 -
-                    oid: airFMModSupplyHum
+                    oid: PowerNet-MIB::airFMModSupplyHum
+                    value: PowerNet-MIB::airFMModSupplyHum
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.2.2.1.4.{{ $index }}'
                     index: 'airFMModSupplyHum.{{ $index }}'
                     descr: 'Supply Air'
                     divisor: 10
                     skip_values: -2147483648
                 -
-                    oid: airFMModReturnHum
+                    oid: PowerNet-MIB::airFMModReturnHum
+                    value: PowerNet-MIB::airFMModReturnHum
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.2.2.1.7.{{ $index }}'
                     index: 'airFMModReturnHum.{{ $index }}'
                     descr: 'Return Air'
                     divisor: 10
                     skip_values: -2147483648
                 -
-                    oid: airFMSysHumSetpoint
+                    oid: PowerNet-MIB::airFMSysHumSetpoint
+                    value: PowerNet-MIB::airFMSysHumSetpoint
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.6.3.{{ $index }}'
                     index: 'airFMSysHumSetpoint.{{ $index }}'
                     descr: 'Humidifier Setpoint'
                     divisor: 10
                     skip_values: -2147483648
                 -
-                    oid: airFMSysDehumSetpoint
+                    oid: PowerNet-MIB::airFMSysDehumSetpoint
+                    value: PowerNet-MIB::airFMSysDehumSetpoint
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.7.3.{{ $index }}'
                     index: 'airFMSysDehumSetpoint.{{ $index }}'
                     descr: 'Dehumidifier Setpoint'
@@ -881,19 +923,22 @@ modules:
         airflow:
             data:
                 -
-                    oid: airIRRP100UnitStatusAirFlowMetric
+                    oid: PowerNet-MIB::airIRRP100UnitStatusAirFlowMetric
+                    value: PowerNet-MIB::airIRRP100UnitStatusAirFlowMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.11.{{ $index }}'
                     index: 'airIRRP100UnitStatusAirFlowMetric.{{ $index }}'
                     descr: Air Flow
                     divisor: 10
                 -
-                    oid: airIRRP500UnitStatusAirFlowMetric
+                    oid: PowerNet-MIB::airIRRP500UnitStatusAirFlowMetric
+                    value: PowerNet-MIB::airIRRP500UnitStatusAirFlowMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.11.{{ $index }}'
                     index: 'airIRRP500UnitStatusAirFlowMetric.{{ $index }}'
                     descr: Air Flow
                     divisor: 10
                 -
-                    oid: airIRG2RDT2StatusAirFlowMetric
+                    oid: PowerNet-MIB::airIRG2RDT2StatusAirFlowMetric
+                    value: PowerNet-MIB::airIRG2RDT2StatusAirFlowMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.5.{{ $index }}'
                     index: 'airIRG2RDT2StatusAirFlowMetric.{{ $index }}'
                     descr: Air Flow
@@ -901,105 +946,116 @@ modules:
             data:
                 # rPDUIdentDeviceLinetoLineVoltage is done in includes/discovery/sensors/voltage/apc.inc.php:141
                 -
-                    oid: airIRRP100UnitStatusCompressorDriveVoltage
+                    oid: PowerNet-MIB::airIRRP100UnitStatusCompressorDriveVoltage
+                    value: PowerNet-MIB::airIRRP100UnitStatusCompressorDriveVoltage
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.37.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDriveVoltage.{{ $index }}'
                     descr: Compressor Drive
                     divisor: 10
                 -
-                    oid: airIRRP100UnitStatusCompressorDriveDCLinkVoltage
+                    oid: PowerNet-MIB::airIRRP100UnitStatusCompressorDriveDCLinkVoltage
+                    value: PowerNet-MIB::airIRRP100UnitStatusCompressorDriveDCLinkVoltage
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.39.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDriveDCLinkVoltage.{{ $index }}'
                     descr: Compressor Drive DC Link
                     divisor: 10
                 -
-                    oid: airFMModBlwr1Vlt
+                    oid: PowerNet-MIB::airFMModBlwr1Vlt
+                    value: PowerNet-MIB::airFMModBlwr1Vlt
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.6.2.1.10.{{ $index }}'
                     index: 'airFMModBlwr1Vlt.{{ $index }}'
                     descr: 'Blower 1 Voltage'
                     divisor: 10
                 -
-                    oid: airFMModBlwr2Vlt
+                    oid: PowerNet-MIB::airFMModBlwr2Vlt
+                    value: PowerNet-MIB::airFMModBlwr2Vlt
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.7.2.1.10.{{ $index }}'
                     index: 'airFMModBlwr2Vlt.{{ $index }}'
                     descr: 'Blower 2 Voltage'
                     divisor: 10
                 -
-                    oid: xATSSource1VoltageLtoL
+                    oid: PowerNet-MIB::xATSSource1VoltageLtoL
+                    value: PowerNet-MIB::xATSSource1VoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.1.7.1.2.{{ $index }}'
                     index: 'xATSSource1VoltageLtoL.{{ $index }}'
                     descr: 'Source1 {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
                 -
-                    oid: xATSSource1VoltageLtoN
+                    oid: PowerNet-MIB::xATSSource1VoltageLtoN
+                    value: PowerNet-MIB::xATSSource1VoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.1.7.1.3.{{ $index }}'
                     index: 'xATSSource1VoltageLtoN.{{ $index }}'
                     descr: 'Source1 {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
                 -
-                    oid: xATSSource2VoltageLtoL
+                    oid: PowerNet-MIB::xATSSource2VoltageLtoL
+                    value: PowerNet-MIB::xATSSource2VoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.2.7.1.2.{{ $index }}'
                     index: 'xATSSource2VoltageLtoL.{{ $index }}'
                     descr: 'Source2 {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
                 -
-                    oid: xATSSource2VoltageLtoN
+                    oid: PowerNet-MIB::xATSSource2VoltageLtoN
+                    value: PowerNet-MIB::xATSSource2VoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.2.7.1.3.{{ $index }}'
                     index: 'xATSSource2VoltageLtoN.{{ $index }}'
                     descr: 'Source2 {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
                 -
-                    oid: xATSSystemOutputVoltageLtoL
+                    oid: PowerNet-MIB::xATSSystemOutputVoltageLtoL
+                    value: PowerNet-MIB::xATSSystemOutputVoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.3.12.1.2.{{ $index }}'
                     index: 'xATSSystemOutputVoltageLtoL.{{ $index }}'
                     descr: 'Output {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
                 -
-                    oid: xATSSystemOutputVoltageLtoN
+                    oid: PowerNet-MIB::xATSSystemOutputVoltageLtoN
+                    value: PowerNet-MIB::xATSSystemOutputVoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.3.12.1.3.{{ $index }}'
                     index: 'xATSSystemOutputVoltageLtoN.{{ $index }}'
                     descr: 'Output {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
                 -
-                    oid: xATSGeneratorAdvStatusBatteryVoltage
+                    oid: PowerNet-MIB::xATSGeneratorAdvStatusBatteryVoltage
+                    value: PowerNet-MIB::xATSGeneratorAdvStatusBatteryVoltage
                     num_oid: '.1.3.6.1.4.1.318.1.1.18.1.3.1.{{ $index }}'
                     index: 'xATSGeneratorAdvStatusBatteryVoltage.{{ $index }}'
                     descr: 'Generator Battery'
                     divisor: 10
                     skip_values: -1
                 -
-                    oid: xPDUMainInputVoltagePhaseTable
-                    value: xPDUMainInputVoltageLtoL
+                    oid: PowerNet-MIB::xPDUMainInputVoltagePhaseTable
+                    value: PowerNet-MIB::xPDUMainInputVoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.1.4.1.2.{{ $index }}'
                     index: 'xPDUMainInputVoltageLtoL.{{ $index }}'
                     descr: 'Input - Phase {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
                 -
-                    oid: xPDUMainInputVoltagePhaseTable
-                    value: xPDUMainInputVoltageLtoN
+                    oid: PowerNet-MIB::xPDUMainInputVoltagePhaseTable
+                    value: PowerNet-MIB::xPDUMainInputVoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.1.4.1.3.{{ $index }}'
                     index: 'xPDUMainInputVoltageLtoN.{{ $index }}'
                     descr: 'Input - Phase {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
                 -
-                    oid: xPDUSystemOutputPhaseTable
-                    value: xPDUSystemOutputVoltageLtoL
+                    oid: PowerNet-MIB::xPDUSystemOutputPhaseTable
+                    value: PowerNet-MIB::xPDUSystemOutputVoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.2.{{ $index }}'
                     index: 'xPDUSystemOutputVoltageLtoL.{{ $index }}'
                     descr: 'Output - Phase {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
                 -
-                    oid: xPDUSystemOutputPhaseTable
-                    value: xPDUSystemOutputVoltageLtoN
+                    oid: PowerNet-MIB::xPDUSystemOutputPhaseTable
+                    value: PowerNet-MIB::xPDUSystemOutputVoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.3.{{ $index }}'
                     index: 'xPDUSystemOutputVoltageLtoN.{{ $index }}'
                     descr: 'Output - Phase {{ $index }} L-N'
@@ -1009,41 +1065,45 @@ modules:
             data:
                 # rPDULoadStatusLoad and rPDU2PhaseStatusCurrent at OID .1.3.6.1.4.1.318.1.1.26.6.3.1.5 is done in the includes/discovery/sensors/current/apc.inc.php:19 file
                 -
-                    oid: airIRRP100UnitStatusHumidifierCurrent
+                    oid: PowerNet-MIB::airIRRP100UnitStatusHumidifierCurrent
+                    value: PowerNet-MIB::airIRRP100UnitStatusHumidifierCurrent
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.33.{{ $index }}'
                     index: 'airIRRP100UnitStatusHumidifierCurrent.{{ $index }}'
                     descr: Humidifier
                     divisor: 10
                 -
-                    oid: airIRRP100UnitStatusCompressorDriveCurrent
+                    oid: PowerNet-MIB::airIRRP100UnitStatusCompressorDriveCurrent
+                    value: PowerNet-MIB::airIRRP100UnitStatusCompressorDriveCurrent
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.38.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDriveCurrent.{{ $index }}'
                     descr: Compressor Drive
                     divisor: 10
                 -
-                    oid: airIRRP500UnitStatusHumidifierCurrent
+                    oid: PowerNet-MIB::airIRRP500UnitStatusHumidifierCurrent
+                    value: PowerNet-MIB::airIRRP500UnitStatusHumidifierCurrent
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.33.{{ $index }}'
                     index: 'airIRRP100UnitStatusHumidifierCurrent.{{ $index }}'
                     descr: Humidifier
                     divisor: 10
                 -
-                    oid: airFMModElectrodeCurrent
+                    oid: PowerNet-MIB::airFMModElectrodeCurrent
+                    value: PowerNet-MIB::airFMModElectrodeCurrent
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.5.2.1.3.{{ $index }}'
                     index: 'airFMModElectrodeCurrent.{{ $index }}'
                     descr: Humidifier
                     divisor: 10
                     skip_values: -2147483648
                 -
-                    oid: xPDUSystemOutputPhaseTable
-                    value: xPDUSystemOutputPhaseCurrent
+                    oid: PowerNet-MIB::xPDUSystemOutputPhaseTable
+                    value: PowerNet-MIB::xPDUSystemOutputPhaseCurrent
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.4.{{ $index }}'
                     index: 'xPDUSystemOutputPhaseCurrent.{{ $index }}'
                     descr: 'Output - Phase {{ $index }}'
                     divisor: 10
                     skip_values: -1
                 -
-                    oid: xPDUSystemOutput
-                    value: xPDUSystemOutputNeutralCurrent
+                    oid: PowerNet-MIB::xPDUSystemOutput
+                    value: PowerNet-MIB::xPDUSystemOutputNeutralCurrent
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.2.{{ $index }}'
                     index: 'xPDUSystemOutputNeutralCurrent.{{ $index }}'
                     descr: 'Neutral Current'
@@ -1052,13 +1112,15 @@ modules:
         fanspeed:
             data:
                 -
-                    oid: airIRRP100UnitStatusFanSpeed
+                    oid: PowerNet-MIB::airIRRP100UnitStatusFanSpeed
+                    value: PowerNet-MIB::airIRRP100UnitStatusFanSpeed
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.12.{{ $index }}'
                     index: 'airIRRP100UnitStatusFanSpeed.{{ $index }}'
                     descr: 'Fan Speed (%)'
                     divisor: 10
                 -
-                    oid: airIRRP500UnitStatusFanSpeed
+                    oid: PowerNet-MIB::airIRRP500UnitStatusFanSpeed
+                    value: PowerNet-MIB::airIRRP500UnitStatusFanSpeed
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.12.{{ $index }}'
                     index: 'airIRRP500UnitStatusFanSpeed.{{ $index }}'
                     descr: 'Fan Speed (%)'
@@ -1066,42 +1128,47 @@ modules:
         frequency:
             data:
                 -
-                    oid: airIRRP100UnitStatusCompressorDriveSpeed
+                    oid: PowerNet-MIB::airIRRP100UnitStatusCompressorDriveSpeed
+                    value: PowerNet-MIB::airIRRP100UnitStatusCompressorDriveSpeed
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.35.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDriveSpeed.{{ $index }}'
                     descr: 'Drive Speed'
                     divisor: 10
                 -
-                    oid: airFMModBlwr1CmdFreq
+                    oid: PowerNet-MIB::airFMModBlwr1CmdFreq
+                    value: PowerNet-MIB::airFMModBlwr1CmdFreq
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.6.2.1.3.{{ $index }}'
                     index: 'airFMModBlwr1CmdFreq.{{ $index }}'
                     descr: 'Blower 1 Requested Frequency'
                     divisor: 10
                     skip_values: -2147483648
                 -
-                    oid: airFMModBlwr1ActFreq
+                    oid: PowerNet-MIB::airFMModBlwr1ActFreq
+                    value: PowerNet-MIB::airFMModBlwr1ActFreq
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.6.2.1.4.{{ $index }}'
                     index: 'airFMModBlwr1ActFreq.{{ $index }}'
                     descr: 'Blower 1 Actual Frequency'
                     divisor: 10
                     skip_values: -2147483648
                 -
-                    oid: airFMModBlwr2CmdFreq
+                    oid: PowerNet-MIB::airFMModBlwr2CmdFreq
+                    value: PowerNet-MIB::airFMModBlwr2CmdFreq
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.7.2.1.3.{{ $index }}'
                     index: 'airFMModBlwr2CmdFreq.{{ $index }}'
                     descr: 'Blower 2 Requested Frequency'
                     divisor: 10
                     skip_values: -2147483648
                 -
-                    oid: airFMModBlwr2ActFreq
+                    oid: PowerNet-MIB::airFMModBlwr2ActFreq
+                    value: PowerNet-MIB::airFMModBlwr2ActFreq
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.7.2.1.4.{{ $index }}'
                     index: 'airFMModBlwr2ActFreq.{{ $index }}'
                     descr: 'Blower 2 Actual Frequency'
                     divisor: 10
                     skip_values: -2147483648
                 -
-                    oid: xPDUSystemOutput
-                    value: xPDUSystemOutputFrequency
+                    oid: PowerNet-MIB::xPDUSystemOutput
+                    value: PowerNet-MIB::xPDUSystemOutputFrequency
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.1.{{ $index }}'
                     index: 'xPDUSystemOutputFrequency.{{ $index }}'
                     descr: 'System Output'
@@ -1110,82 +1177,89 @@ modules:
         power:
             data:
                 -
-                    oid: upsAdvOutputActivePower
+                    oid: PowerNet-MIB::upsAdvOutputActivePower
+                    value: PowerNet-MIB::upsAdvOutputActivePower
                     num_oid: '.1.3.6.1.4.1.318.1.1.1.4.2.8.{{ $index }}'
                     index: 'PowerNet-MIB::upsAdvOutputActivePower.{{ $index }}'
                     descr: 'Active Power'
                 -
-                    oid: airIRRP100UnitStatusCompressorDrivePower
+                    oid: PowerNet-MIB::airIRRP100UnitStatusCompressorDrivePower
+                    value: PowerNet-MIB::airIRRP100UnitStatusCompressorDrivePower
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.35.{{ $index }}'
                     index: 'airIRRP100UnitStatusCompressorDrivePower.{{ $index }}'
                     descr: 'Drive Power'
                     multiplier: 10
                 -
-                    oid: airIRRP100UnitStatusCoolDemand
+                    oid: PowerNet-MIB::airIRRP100UnitStatusCoolDemand
+                    value: PowerNet-MIB::airIRRP100UnitStatusCoolDemand
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.13.{{ $index }}'
                     index: 'airIRRP100UnitStatusCoolDemand.{{ $index }}'
                     descr: 'Cooling Demand'
                     multiplier: 100
                 -
-                    oid: airIRRP100UnitStatusCoolOutput
+                    oid: PowerNet-MIB::airIRRP100UnitStatusCoolOutput
+                    value: PowerNet-MIB::airIRRP100UnitStatusCoolOutput
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.14.{{ $index }}'
                     index: 'airIRRP100UnitStatusCoolOutput.{{ $index }}'
                     descr: 'Cooling Output'
                     multiplier: 100
                 -
-                    oid: airIRRP500UnitStatusCoolDemand
+                    oid: PowerNet-MIB::airIRRP500UnitStatusCoolDemand
+                    value: PowerNet-MIB::airIRRP500UnitStatusCoolDemand
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.13.{{ $index }}'
                     index: 'airIRRP500UnitStatusCoolDemand.{{ $index }}'
                     descr: 'Cooling Demand'
                     multiplier: 100
                 -
-                    oid: airIRRP500UnitStatusCoolOutput
+                    oid: PowerNet-MIB::airIRRP500UnitStatusCoolOutput
+                    value: PowerNet-MIB::airIRRP500UnitStatusCoolOutput
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.14.{{ $index }}'
                     index: 'airIRRP500UnitStatusCoolOutput.{{ $index }}'
                     descr: 'Cooling Output'
                     multiplier: 100
                 -
-                    oid: rPDU2DeviceStatusTable
-                    value: rPDU2DeviceStatusPower
+                    oid: PowerNet-MIB::rPDU2DeviceStatusTable
+                    value: PowerNet-MIB::rPDU2DeviceStatusPower
                     num_oid: '.1.3.6.1.4.1.318.1.1.26.4.3.1.5.{{ $index }}'
                     multiplier: 10
                     index: 'rPDU2DeviceStatusPower.{{ $index }}'
                     descr: 'Power, Total'
                     skip_value_lt: 0
                 -
-                    oid: xPDUSystemOutput
-                    value: xPDUSystemOutputTotalPower
+                    oid: PowerNet-MIB::xPDUSystemOutput
+                    value: PowerNet-MIB::xPDUSystemOutputTotalPower
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.3.{{ $index }}'
                     index: 'xPDUSystemOutputTotalPower.{{ $index }}'
                     descr: 'Real Power - Total'
                     multiplier: 100
                     skip_values: -1
                 -
-                    oid: xPDUSystemOutput
-                    value: xPDUSystemOutputTotalApparentPower
+                    oid: PowerNet-MIB::xPDUSystemOutput
+                    value: PowerNet-MIB::xPDUSystemOutputTotalApparentPower
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.4.{{ $index }}'
                     index: 'xPDUSystemOutputTotalApparentPower.{{ $index }}'
                     descr: 'Apparent Power - Total'
                     multiplier: 100
                     skip_values: -1
                 -
-                    oid: xPDUSystemOutputPhaseTable
-                    value: xPDUSystemOutputPower
+                    oid: PowerNet-MIB::xPDUSystemOutputPhaseTable
+                    value: PowerNet-MIB::xPDUSystemOutputPower
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.5.{{ $index }}'
                     index: 'xPDUSystemOutputPower.{{ $index }}'
                     descr: 'Real Power - Phase {{ $index }}'
                     multiplier: 100
                     skip_values: -1
                 -
-                    oid: xPDUSystemOutputPhaseTable
-                    value: xPDUSystemOutputApparentPower
+                    oid: PowerNet-MIB::xPDUSystemOutputPhaseTable
+                    value: PowerNet-MIB::xPDUSystemOutputApparentPower
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.6.{{ $index }}'
                     index: 'xPDUSystemOutputApparentPower.{{ $index }}'
                     descr: 'Apparent Power - Phase {{ $index }}'
                     multiplier: 100
                     skip_values: -1
                 -
-                    oid: rPDUIdentDevicePowerWatts
+                    oid: PowerNet-MIB::rPDUIdentDevicePowerWatts
+                    value: PowerNet-MIB::rPDUIdentDevicePowerWatts
                     num_oid: '.1.3.6.1.4.1.318.1.1.12.1.16.{{ $index }}'
                     index: 'rPDUIdentDevicePowerWatts.{{ $index }}'
                     descr: 'Total power'
@@ -1197,47 +1271,53 @@ modules:
         power_consumed:
             data:
                 -
-                    oid: rPDU2DeviceStatusTable
-                    value: rPDU2DeviceStatusEnergy
+                    oid: PowerNet-MIB::rPDU2DeviceStatusTable
+                    value: PowerNet-MIB::rPDU2DeviceStatusEnergy
                     num_oid: '.1.3.6.1.4.1.318.1.1.26.4.3.1.9.{{ $index }}'
                     divisor: 10
                     index: 'rPDU2DeviceStatusEnergy.{{ $index }}'
-                    descr: 'Energy since {{ rPDU2DeviceStatusEnergyStartTime }}'
+                    descr: 'Energy since {{ PowerNet-MIB::rPDU2DeviceStatusEnergyStartTime }}'
                     skip_value_lt: 0
         pressure:
             data:
                 -
-                    oid: airIRG2RDT2StatusSuctionPressureMetric
+                    oid: PowerNet-MIB::airIRG2RDT2StatusSuctionPressureMetric
+                    value: PowerNet-MIB::airIRG2RDT2StatusSuctionPressureMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.19.{{ $index }}'
                     index: 'airIRG2RDT2StatusSuctionPressureMetric.{{ $index }}'
                     descr: Suction Pressure
                 -
-                    oid: airIRG2RDT2StatusDischargePressureMetric
+                    oid: PowerNet-MIB::airIRG2RDT2StatusDischargePressureMetric
+                    value: PowerNet-MIB::airIRG2RDT2StatusDischargePressureMetric
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.21.{{ $index }}'
                     index: 'airIRG2RDT2StatusDischargePressureMetric.{{ $index }}'
                     descr: Discharge Pressure
                 -
-                    oid: airFMModFilterDiffPresPa
+                    oid: PowerNet-MIB::airFMModFilterDiffPresPa
+                    value: PowerNet-MIB::airFMModFilterDiffPresPa
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.2.2.1.8.{{ $index }}'
                     index: 'airFMModFilterDiffPresPa.{{ $index }}'
                     descr: 'Filter Air Pressure Differential'
                     divisor: 1000
                     skip_values: -2147483648
                 -
-                    oid: airFMModCoilDiffPresPa
+                    oid: PowerNet-MIB::airFMModCoilDiffPresPa
+                    value: PowerNet-MIB::airFMModCoilDiffPresPa
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.2.2.1.10.{{ $index }}'
                     index: 'airFMModCoilDiffPresPa.{{ $index }}'
                     descr: 'Coil Air Pressure Differential'
                     divisor: 1000
                     skip_values: -2147483648
                 -
-                    oid: airFMModSuctPresKPa
+                    oid: PowerNet-MIB::airFMModSuctPresKPa
+                    value: PowerNet-MIB::airFMModSuctPresKPa
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.4.2.1.4.{{ $index }}'
                     index: 'airFMModSuctPresKPa.{{ $index }}'
                     descr: 'Refrigerant Pressure - Inlet'
                     skip_values: -2147483648
                 -
-                    oid: airFMModDischPresKPa
+                    oid: PowerNet-MIB::airFMModDischPresKPa
+                    value: PowerNet-MIB::airFMModDischPresKPa
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.4.2.1.6.{{ $index }}'
                     index: 'airFMModDischPresKPa.{{ $index }}'
                     descr: 'Refrigerant Pressure - Discharge'
@@ -1245,13 +1325,15 @@ modules:
         cooling:
             data:
                 -
-                    oid: airIRG2RDT2StatusCoolOutput
+                    oid: PowerNet-MIB::airIRG2RDT2StatusCoolOutput
+                    value: PowerNet-MIB::airIRG2RDT2StatusCoolOutput
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.2.{{ $index }}'
                     index: 'airIRG2RDT2StatusCoolOutput.{{ $index }}'
                     descr: Output
                     multiplier: 100
                 -
-                    oid: airIRG2RDT2StatusCoolDemand
+                    oid: PowerNet-MIB::airIRG2RDT2StatusCoolDemand
+                    value: PowerNet-MIB::airIRG2RDT2StatusCoolDemand
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.4.5.2.1.3.{{ $index }}'
                     index: 'airIRG2RDT2StatusCoolDemand.{{ $index }}'
                     descr: Demand
@@ -1259,77 +1341,89 @@ modules:
         percent:
             data:
                 -
-                    oid: airFMModHumActualOutput
+                    oid: PowerNet-MIB::airFMModHumActualOutput
+                    value: PowerNet-MIB::airFMModHumActualOutput
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.5.2.1.4.{{ $index }}'
                     index: 'airFMModHumActualOutput.{{ $index }}'
                     descr: 'Humidifier Output'
                     skip_values: -2147483648
                 -
-                    oid: airFMSysDXCoolingDmd
+                    oid: PowerNet-MIB::airFMSysDXCoolingDmd
+                    value: PowerNet-MIB::airFMSysDXCoolingDmd
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.2.1.{{ $index }}'
                     index: 'airFMSysDXCoolingDmd.{{ $index }}'
                     descr: 'Cooling Demand'
                     skip_values: -2147483648
                 -
-                    oid: airFMSysDXDehumDmd
+                    oid: PowerNet-MIB::airFMSysDXDehumDmd
+                    value: PowerNet-MIB::airFMSysDXDehumDmd
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.2.2.{{ $index }}'
                     index: 'airFMSysDXDehumDmd.{{ $index }}'
                     descr: 'Dehumidification Demand'
                     skip_values: -2147483648
                 -
-                    oid: airFMSysDXActualCoolDehum
+                    oid: PowerNet-MIB::airFMSysDXActualCoolDehum
+                    value: PowerNet-MIB::airFMSysDXActualCoolDehum
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.2.3.{{ $index }}'
                     index: 'airFMSysDXActualCoolDehum.{{ $index }}'
                     descr: 'Cooling/Dehumidification Output'
                     skip_values: -2147483648
                 -
-                    oid: airFMSysElectricReheatDmd
+                    oid: PowerNet-MIB::airFMSysElectricReheatDmd
+                    value: PowerNet-MIB::airFMSysElectricReheatDmd
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.2.7.{{ $index }}'
                     index: 'airFMSysElectricReheatDmd.{{ $index }}'
                     descr: 'Heating Demand'
                     skip_values: -2147483648
                 -
-                    oid: airFMSysActualElectricReheat
+                    oid: PowerNet-MIB::airFMSysActualElectricReheat
+                    value: PowerNet-MIB::airFMSysActualElectricReheat
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.2.8.{{ $index }}'
                     index: 'airFMSysActualElectricReheat.{{ $index }}'
                     descr: 'Heating Output'
                     skip_values: -2147483648
                 -
-                    oid: airFMSysSteamElectrodeHumDmd
+                    oid: PowerNet-MIB::airFMSysSteamElectrodeHumDmd
+                    value: PowerNet-MIB::airFMSysSteamElectrodeHumDmd
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.4.2.11.{{ $index }}'
                     index: 'airFMSysSteamElectrodeHumDmd.{{ $index }}'
                     descr: 'Humidification Demand'
                     skip_values: -2147483648
                 -
-                    oid: airFMModBlwr1ActTorq
+                    oid: PowerNet-MIB::airFMModBlwr1ActTorq
+                    value: PowerNet-MIB::airFMModBlwr1ActTorq
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.6.2.1.8.{{ $index }}'
                     index: 'airFMModBlwr1ActTorq.{{ $index }}'
                     descr: 'Blower 1 Torque'
                     divisor: 100
                     skip_values: -2147483648
                 -
-                    oid: airFMModBlwr1Current
+                    oid: PowerNet-MIB::airFMModBlwr1Current
+                    value: PowerNet-MIB::airFMModBlwr1Current
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.6.2.1.9.{{ $index }}'
                     index: 'airFMModBlwr1Current.{{ $index }}'
                     descr: 'Blower 1 Current'
                     divisor: 100
                     skip_values: -2147483648
                 -
-                    oid: airFMModBlwr2ActTorq
+                    oid: PowerNet-MIB::airFMModBlwr2ActTorq
+                    value: PowerNet-MIB::airFMModBlwr2ActTorq
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.7.2.1.8.{{ $index }}'
                     index: 'airFMModBlwr2ActTorq.{{ $index }}'
                     descr: 'Blower 2 Torque'
                     divisor: 100
                     skip_values: -2147483648
                 -
-                    oid: airFMModBlwr2Current
+                    oid: PowerNet-MIB::airFMModBlwr2Current
+                    value: PowerNet-MIB::airFMModBlwr2Current
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.7.2.1.9.{{ $index }}'
                     index: 'airFMModBlwr2Current.{{ $index }}'
                     descr: 'Blower 2 Current'
                     divisor: 100
                     skip_values: -2147483648
                 -
-                    oid: airFMModBlwr1CapLife
+                    oid: PowerNet-MIB::airFMModBlwr1CapLife
+                    value: PowerNet-MIB::airFMModBlwr1CapLife
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.6.2.1.14.{{ $index }}'
                     index: 'airFMModBlwr1CapLife.{{ $index }}'
                     descr: 'Blower 1 Capacitor Life Remaining'
@@ -1337,7 +1431,8 @@ modules:
                     skip_values: -2147483648
                     low_limit: 0
                 -
-                    oid: airFMModBlwr2CapLife
+                    oid: PowerNet-MIB::airFMModBlwr2CapLife
+                    value: PowerNet-MIB::airFMModBlwr2CapLife
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.5.7.2.1.14.{{ $index }}'
                     index: 'airFMModBlwr2CapLife.{{ $index }}'
                     descr: 'Blower 2 Capacitor Life Remaining'
@@ -1347,20 +1442,23 @@ modules:
         count:
             data:
                 -
-                    oid: airFMAlarmConditionsTableSize
+                    oid: PowerNet-MIB::airFMAlarmConditionsTableSize
+                    value: PowerNet-MIB::airFMAlarmConditionsTableSize
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.1.6.3.{{ $index }}'
                     index: 'airFMAlarmConditionsTableSize.{{ $index }}'
                     descr: 'Active Alarms'
                     warn_limit: 1
                     high_limit: 3
                 -
-                    oid: upsAdvBatteryNumOfBattPacks
+                    oid: PowerNet-MIB::upsAdvBatteryNumOfBattPacks
+                    value: PowerNet-MIB::upsAdvBatteryNumOfBattPacks
                     num_oid: '.1.3.6.1.4.1.318.1.1.1.2.2.5.{{ $index }}'
                     index: 'upsAdvBatteryNumOfBattPacks.{{ $index }}'
                     descr: 'Installed batteries'
                     low_limit: 0
                 -
-                    oid: upsAdvBatteryNumOfBadBattPacks
+                    oid: PowerNet-MIB::upsAdvBatteryNumOfBadBattPacks
+                    value: PowerNet-MIB::upsAdvBatteryNumOfBadBattPacks
                     num_oid: '.1.3.6.1.4.1.318.1.1.1.2.2.6.{{ $index }}'
                     index: 'upsAdvBatteryNumOfBadBattPacks.{{ $index }}'
                     descr: 'Bad batteries'
@@ -1368,7 +1466,8 @@ modules:
         runtime:
             data:
                 -
-                    oid: upsAdvBatteryRecommendedReplaceDate
+                    oid: PowerNet-MIB::upsAdvBatteryRecommendedReplaceDate
+                    value: PowerNet-MIB::upsAdvBatteryRecommendedReplaceDate
                     num_oid: '.1.3.6.1.4.1.318.1.1.1.2.2.21.{{ $index }}'
                     index: 'upsAdvBatteryRecommendedReplaceDate.{{ $index }}'
                     descr: 'Battery Recommended Days Remaining'
@@ -1376,7 +1475,8 @@ modules:
                     low_warn_limit: 43200  # 30 Days
                     low_limit: 0
                 -
-                    oid: upsBasicBatteryLastReplaceDate
+                    oid: PowerNet-MIB::upsBasicBatteryLastReplaceDate
+                    value: PowerNet-MIB::upsBasicBatteryLastReplaceDate
                     num_oid: '.1.3.6.1.4.1.318.1.1.1.2.1.3.{{ $index }}'
                     index: 'upsBasicBatteryLastReplaceDate.{{ $index }}'
                     descr: 'Last Battery Replacement'

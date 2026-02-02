@@ -100,12 +100,12 @@ class DeviceController extends TableController
             ->withCount(['ports', 'sensors', 'wirelessSensors']);
 
         // if searching or sorting the location field, join the locations table
-        if ($request->get('searchPhrase') || in_array('location', array_keys($request->get('sort', [])))) {
+        if ($request->input('searchPhrase') || in_array('location', array_keys($request->input('sort', [])))) {
             $query->leftJoin('locations', 'locations.id', 'devices.location_id');
         }
 
         // filter device group, not sure this is the most efficient query
-        if ($group = $request->get('group')) {
+        if ($group = $request->input('group')) {
             if ($group == 'none') {
                 $query->whereDoesntHave('groups');
             } else {
@@ -115,8 +115,8 @@ class DeviceController extends TableController
             }
         }
 
-        if ($request->get('poller_group') !== null) {
-            $query->where('poller_group', $request->get('poller_group'));
+        if ($request->input('poller_group') !== null) {
+            $query->where('poller_group', $request->input('poller_group'));
         }
 
         return $query;
