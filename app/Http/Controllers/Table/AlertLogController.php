@@ -58,7 +58,7 @@ class AlertLogController extends TableController
                     $q->whereHas('rule', fn ($q) => $q->whereIn('severity', array_map(intval(...), $severity)));
                 }
             },
-            'device_group' => function (AlertLog $q, ?int $group_id): void {
+            'device_group' => function ($q, ?int $group_id): void {
                 if ($group_id) {
                     $q->inDeviceGroup($group_id);
                 }
