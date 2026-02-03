@@ -278,7 +278,7 @@ if (! empty($peers)) {
                         static $bgp4Peers;
 
                         if (! isset($bgp4Peers)) {
-                            $bgp4Peers = SnmpQuery::enumStrings()->numericIndex()->walk('BGP4-MIB::bgpPeerTable')->valuesByIndex();
+                            $bgp4Peers = SnmpQuery::enumStrings()->numericIndex()->walk('BGP4-MIB::bgpPeerFsmEstablishedTime')->valuesByIndex();
                         }
 
                         $establishedTime = $bgp4Peers[$address]['BGP4-MIB::bgpPeerFsmEstablishedTime'] ?? 0;
