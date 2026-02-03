@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\IpsecTunnel;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 
@@ -260,15 +261,16 @@ if ($device['os'] == 'junos') {
         }
     }
 
-    $tunnels_db = dbFetchRows('SELECT * FROM `ipsec_tunnels` WHERE `device_id` = ?', [$device['device_id']]);
+    $tunnels_db = IpsecTunnel::where('device_id', $device['device_id'])->get();
     $tunnels = [];
     foreach ($tunnels_db as $tunnel) {
-        if (empty($tunnel['peer_addr']) && empty($tunnel['local_addr'])) {
-            dbDelete('ipsec_tunnels', '`tunnel_id` = ?', [$tunnel['tunnel_id']]);
+        if (empty($tunnel->peer_addr) && empty($tunnel->local_addr)) {
+            $tunnel->delete();
+            continue;
         }
 
-        $tunnel_index = $tunnel['tunnel_index'] ?? 0;
-        $tunnels[$tunnel['peer_addr'] . '_' . $tunnel_index] = $tunnel;
+        $tunnel_index = $tunnel->tunnel_index ?? 0;
+        $tunnels[$tunnel->peer_addr . '_' . $tunnel_index] = $tunnel;
     }
 
     $valid_tunnels = [];
@@ -293,28 +295,25 @@ if ($device['os'] == 'junos') {
 
         $tunnel_key = $peer_addr . '_' . $tunnel_index;
         if (! isset($tunnels[$tunnel_key])) {
-            $tunnel_id = dbInsert([
+            $newTunnel = IpsecTunnel::create([
                 'device_id' => $device['device_id'],
                 'tunnel_index' => $tunnel_index,
+                'peer_port' => 0,
                 'peer_addr' => $peer_addr,
+                'local_addr' => $local_addr,
+                'local_port' => 0,
+                'tunnel_name' => $tunnel_name,
+                'tunnel_status' => $tunnel_status,
+            ]);
+            $valid_tunnels[] = $newTunnel->tunnel_id;
+            $tunnels[$tunnel_key] = $newTunnel;
+        } else {
+            $tunnels[$tunnel_key]->update([
                 'local_addr' => $local_addr,
                 'tunnel_name' => $tunnel_name,
                 'tunnel_status' => $tunnel_status,
-            ], 'ipsec_tunnels');
-            $valid_tunnels[] = $tunnel_id;
-            $tunnels[$tunnel_key] = ['tunnel_id' => $tunnel_id];
-        } else {
-            dbUpdate(
-                [
-                    'local_addr' => $local_addr,
-                    'tunnel_name' => $tunnel_name,
-                    'tunnel_status' => $tunnel_status,
-                ],
-                'ipsec_tunnels',
-                '`tunnel_id` = ?',
-                [$tunnels[$tunnel_key]['tunnel_id']]
-            );
-            $valid_tunnels[] = $tunnels[$tunnel_key]['tunnel_id'];
+            ]);
+            $valid_tunnels[] = $tunnels[$tunnel_key]->tunnel_id;
         }
 
         $rrd_key = $tunnel_index > 0 ? $peer_addr . '_' . $tunnel_index : $peer_addr;
@@ -349,11 +348,9 @@ if ($device['os'] == 'junos') {
     }
 
     if (! empty($valid_tunnels)) {
-        dbDelete(
-            'ipsec_tunnels',
-            '`tunnel_id` NOT IN ' . dbGenPlaceholders(count($valid_tunnels)) . ' AND `device_id`=?',
-            array_merge($valid_tunnels, [$device['device_id']])
-        );
+        IpsecTunnel::where('device_id', $device['device_id'])
+            ->whereNotIn('tunnel_id', $valid_tunnels)
+            ->delete();
     }
 
     unset($ipsec_array, $sa_state, $tunnels_db, $valid_tunnels, $rrd_name, $rrd_def, $fields);
