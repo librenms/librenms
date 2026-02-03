@@ -159,13 +159,13 @@ if ($device['os_group'] == 'cisco') {
 
                         // Handle Other limit only if Warning limit is not set
                         if (! isset($warn_limit)) {
-	                        if ($key['entSensorThresholdSeverity'] == 'other' && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
+                            if ($key['entSensorThresholdSeverity'] == 'other' && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
                                 $warn_limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
-                        	}
+                            }
                         }
 
                         if (! isset($warn_limit_low)) {
-                        	if ($key['entSensorThresholdSeverity'] == 'other' && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
+                            if ($key['entSensorThresholdSeverity'] == 'other' && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
                                 $warn_limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                             }
                         }
