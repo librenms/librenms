@@ -180,6 +180,13 @@ if ($device['os_group'] == 'cisco') {
                         $limit_low = -5;
                     }
                 }
+                // TBD
+                if (! isset($limit_low) && ! isset($warn_limit_low) && isset($other_limit_low)) {
+                    $limit_low = $other_limit_low;
+                }
+                if (! isset($limit) && ! isset($warn_limit) && isset($other_limit)) {
+                    $limit = $other_limit;
+                }
 
                 // End Threshold code
                 $ok = true;
