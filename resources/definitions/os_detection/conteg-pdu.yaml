@@ -1,5 +1,5 @@
-os: conteg-databus
-text: 'Databus'
+os: conteg-pud
+text: 'Conteg PDU'
 type: power
 icon: conteg
 group: conteg
