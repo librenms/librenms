@@ -1,5 +1,10 @@
 parameters:
 	ignoreErrors:
+        -
+            identifier: include.fileNotFound
+            path: LibreNMS/ComposerHelper.php
+            reportUnmatched: false
+
 		-
 			message: "#^Parameter \\#1 \\$model of static method LibreNMS\\\\Model\\:\\:onCreate\\(\\) expects static\\(LibreNMS\\\\Device\\\\Processor\\), LibreNMS\\\\Device\\\\Processor given\\.$#"
 			count: 1
