@@ -182,7 +182,7 @@ if ($device['os_group'] == 'cisco') {
                 }
 
                 // Handle platforms that do not have the "Minor"/"Major"/"Critical" threshold for a sensor but instead only have the "Other" threshold for such sensor (ISR1k / ISR4k)
-                // Since there is no other threshold available other than "Other", tread these as Critical Limit
+                // Since there is no other threshold available other than "Other", treat these as Critical Limit
                 if (! isset($limit_low) && ! isset($warn_limit_low) && isset($other_limit_low)) {
                     $limit_low = $other_limit_low;
                 }
