@@ -59,7 +59,7 @@ $common_output[] = '
         <thead>
         <tr>
             <th data-column-id="status">State</th>
-            <th data-column-id="time_logged" data-order="desc">Timestamp</th>
+            <th data-column-id="time_logged" data-order="desc" data-converter="datetime">Timestamp</th>
             <th data-column-id="details" data-sortable="false">&nbsp;</th>
             <th data-column-id="hostname">Device</th>
             <th data-column-id="alert_rule">Alert</th>
@@ -119,7 +119,8 @@ $common_output[] = '</select> \
                 state: $(\'#state\').val(),
                 severity: $(\'#severity\').val() || []
             };
-        }
+        },
+        converters: LibreNMS.converters
     }).on("loaded.rs.jquery.bootgrid", function () {
 
         var results = $("div.infos").text().split(" ");

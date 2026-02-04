@@ -26,20 +26,7 @@
                     severity: @json($severity),
                 };
             },
-            converters: {
-                datetime: {
-                    from: function (value) {
-                        return new Date(value).toISOString();
-                    },
-                    to: function (value) {
-                        let formatter = new Intl.DateTimeFormat(navigator.language, {
-                            dateStyle: 'medium',
-                            timeStyle: 'short'
-                        });
-                        return formatter.format(new Date(value));
-                    }
-                }
-            }
+            converters: LibreNMS.converters
         }).on("loaded.rs.jquery.bootgrid", function () {
             grid.find(".incident-toggle").each(function () {
                 $(this).parent().addClass('incident-toggle-td');

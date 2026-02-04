@@ -77,7 +77,7 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=14012026') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=03022026') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
@@ -96,14 +96,17 @@
         });
     </script>
     @auth
-        @if(session('preferences.timezone_static') == null || ! session('preferences.timezone_static'))
         <script>
+        window.tz = undefined;
+        @if(session('preferences.timezone_static') === null || ! session('preferences.timezone_static'))
             var tz = window.Intl.DateTimeFormat().resolvedOptions().timeZone;
             if(tz !== '{{ session('preferences.timezone') }}') {
                 updateTimezone(tz, false);
             }
-        </script>
+        @elseif(session('preferences.timezone'))
+            window.tz = '{{ session('preferences.timezone') }}';
         @endif
+        </script>
         <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
     @endauth
     @yield('javascript')
