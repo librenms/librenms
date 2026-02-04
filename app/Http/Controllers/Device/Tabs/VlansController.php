@@ -111,8 +111,8 @@ class VlansController implements DeviceTab
         if ($searchVlanNumber) {
             $query->where(
                 'ports_vlans.vlan',
-                'LIKE',
-                '%' . $searchVlanNumber . '%'
+                '=',
+                $searchVlanNumber
             );
         }
 
