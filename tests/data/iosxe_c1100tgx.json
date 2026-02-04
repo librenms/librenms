@@ -12253,47 +12253,6 @@
             ]
         }
     },
-    "vlans": {
-        "discovery": {
-            "vlans": [
-                {
-                    "vlan_vlan": 1,
-                    "vlan_domain": 1,
-                    "vlan_name": "default",
-                    "vlan_type": "1",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 1002,
-                    "vlan_domain": 1,
-                    "vlan_name": "fddi-default",
-                    "vlan_type": "2",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 1003,
-                    "vlan_domain": 1,
-                    "vlan_name": "token-ring-default",
-                    "vlan_type": "3",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 1004,
-                    "vlan_domain": 1,
-                    "vlan_name": "fddinet-default",
-                    "vlan_type": "4",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 1005,
-                    "vlan_domain": 1,
-                    "vlan_name": "trnet-default",
-                    "vlan_type": "5",
-                    "vlan_state": 1
-                }
-            ]
-        }
-    },
     "wireless": {
         "discovery": {
             "wireless_sensors": [
