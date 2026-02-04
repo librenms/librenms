@@ -6,7 +6,8 @@ Most times in LibreNMS are absolute points in time when data has been collected.
   - They can be stored in the database as bigint unix epoch values
   - They can be stored in the database as datetime fields, using the timezone configured for the OS and PHP.
   - It is best practice to use UTC for PHP and the OS, otherwise there can be ambigous parsing of times around the daylight savings boundaries.
-- Dates being encoded in JSON on the URL should always use either the unix epoch or the ISO8601 representation in Zulu/UTC timezone.
+- Dates being encoded in the URL should use the unix epoch.
+- Dates being encoded in JSON should use the ISO8601 representation in Zulu/UTC timezone, and the javascript converter to display in the correct timezone.
 - Dates being displayed in HTML pages should be converted to the timezone that the user has selected (browser timezone by default).
 - Dates being parsed from user input should be interpreted using the user's selected timezone, and converted to a JSON/URL encoded format.
 
@@ -72,9 +73,9 @@ $jsontime = Time::toIso($dbtime);
 
 ## Javascript Time Library
 
-LibreNMS uses the moment-timezone javascript library for cases where we need to manipulate times in Javascript. This is generally needed if you want to convert an input date and time into a unix epoch on the client side for submitting in a URL or AJAX query.
+### User input
 
-To use the library, you will need to include the following in the script section of a laravel page:
+LibreNMS uses the moment-timezone javascript library to parse user input times in Javascript.  To use the library, you will need to include the following in the script section of a laravel page:
 ```
 <script src="{{ asset('js/RrdGraphJS/moment-timezone-with-data.js') }}"></script>
 ```
@@ -101,4 +102,16 @@ If the input was a unix epoch or a UTC time, you can use moment's format() funct
 
 The moment object can always output an ISO8601 date by using the `.toISOString()` method.
 
-The moment object can always output a unix epoch by using the `.unix()` method.
+The moment object can always output a unix epoch by using the `.un.ix()` method.
+
+### AJAX queries
+
+For AJAX queries, we have a converter function in the librenms javascript library.  This is available for all pages, and can be used as follows assuming that the input date is in ISO8601 format:
+```js
+datestring = LibreNMS.converters.datetime.from(isoDate);
+```
+
+If you are using a data table, it can look like this:
+```
+_Need an example using data-converter_
+```
