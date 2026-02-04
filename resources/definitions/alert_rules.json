@@ -15,6 +15,11 @@
     "notes": "Device may responds on ICMP but not on SNMP."
   },
   {
+    "builder": {"condition":"AND","rules":[{"id":"devices.mtu_status","field":"devices.mtu_status","type":"integer","input":"text","operator":"equal","value":"0"}],"valid":true},
+    "name": "Device MTU issues",
+    "notes": "Device is online but large packets are failing."
+  },
+  {
     "builder": {"condition":"AND","rules":[{"id":"devices.uptime","field":"devices.uptime","type":"string","input":"text","operator":"less","value":"300"},{"id":"macros.device","field":"macros.device","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
     "name": "Device rebooted",
     "extra": "{\"count\": 1}",

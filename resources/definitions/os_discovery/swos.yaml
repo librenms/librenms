@@ -1,51 +1,55 @@
-mib: MIKROTIK-MIB
 modules:
     os:
         sysDescr_regex: '/(?<hardware>.*)\sSwOS\s(?<version>.*)/'
+        serial: MIKROTIK-MIB::mtxrSerialNumber.0
+        version: MIKROTIK-MIB::mtxrFirmwareVersion.0
     sensors:
         additional_oids:
             data:
                 -
                     oid:
-                        - mtxrInterfaceStatsName
+                        - MIKROTIK-MIB::mtxrInterfaceStatsName
         temperature:
             data:
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalTemperature
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalTemperature
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.6.{{ $index }}'
-                    descr: mtxrOpticalName
+                    descr: MIKROTIK-MIB::mtxrOpticalName
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
                     index: 'mtxrOpticalTemperature.{{ $index }}'
                     skip_value_gt: 25000
                     skip_values:
-                    -
-                      oid: mtxrOpticalName
-                      op: '=='
-                      value: ""
+                        -   oid: MIKROTIK-MIB::mtxrOpticalName
+                            op: '=='
+                            value: ""
                 -
-                    oid: mtxrHlSensorTemperature
+                    oid: MIKROTIK-MIB::mtxrHlSensorTemperature
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.5.{{ $index }}'
+                    group: System
                     divisor: 10
                     descr: 'Sensor chip'
                     index: 'mtxrHlSensorTemperature.{{ $index }}'
                 -
-                    oid: mtxrHlCpuTemperature
+                    oid: MIKROTIK-MIB::mtxrHlCpuTemperature
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.6.{{ $index }}'
+                    group: System
                     divisor: 10
                     descr: 'Processor'
                     index: 'mtxrHlCpuTemperature.{{ $index }}'
                 -
-                    oid: mtxrHlBoardTemperature
+                    oid: MIKROTIK-MIB::mtxrHlBoardTemperature
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.7.{{ $index }}'
+                    group: System
                     divisor: 10
                     descr: 'System board'
                     index: 'mtxrHlBoardTemperature.{{ $index }}'
                 -
-                    oid: mtxrHlTemperature
+                    oid: MIKROTIK-MIB::mtxrHlTemperature
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.10.{{ $index }}'
+                    group: System
                     index: 0
                     divisor: 10
                     descr: 'Temperature {{ $index }}'
@@ -54,94 +58,138 @@ modules:
                     warn_limit: 65
                     high_limit: 70
                 -
-                    oid: mtxrHlProcessorTemperature
+                    oid: MIKROTIK-MIB::mtxrHlProcessorTemperature
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.11.{{ $index }}'
+                    group: System
                     index: 1
                     divisor: 10
                     descr: 'Processor Temperature {{ $index }}'
+                -
+                    oid: MIKROTIK-MIB::mtxrGaugeTable.1.3.52
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
+                    descr: 'CPU Temperature'
+                    group: System
+                    index: 'mtxrGaugeTemperature.{{ $index }}'
         voltage:
             data:
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalSupplyVoltage
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalSupplyVoltage
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.7.{{ $index }}'
                     divisor: 1000
-                    descr: mtxrOpticalName
+                    descr: MIKROTIK-MIB::mtxrOpticalName
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
                     index: 'mtxrOpticalSupplyVoltage.{{ $index }}'
                     skip_values:
-                    -
-                      oid: mtxrOpticalName
-                      op: '=='
-                      value: ""
-                    -
-                      oid: mtxrOpticalSupplyVoltage
-                      op: '=='
-                      value: 0
+                        -
+                            oid: MIKROTIK-MIB::mtxrOpticalName
+                            op: '=='
+                            value: ""
+                        -
+                            oid: MIKROTIK-MIB::mtxrOpticalSupplyVoltage
+                            op: '=='
+                            value: 0
                 -
-                    oid: mtxrPOETable
-                    value: mtxrPOEVoltage
+                    oid: MIKROTIK-MIB::mtxrPOETable
+                    value: MIKROTIK-MIB::mtxrPOEVoltage
                     num_oid: '.1.3.6.1.4.1.14988.1.1.15.1.1.4.{{ $index }}'
                     divisor: 10
-                    descr: '{{ $mtxrPOEName }} POE'
+                    descr: '{{ MIKROTIK-MIB::mtxrPOEName }} POE'
+                    group: Ports
                     index: 'mtxrPOEVoltage.{{ $index }}'
                 -
-                    oid: mtxrHlCoreVoltage
+                    oid: MIKROTIK-MIB::mtxrGaugeTable.1.3.7201
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
+                    descr: 'PSU1 Voltage'
+                    group: System
+                    divisor: 100
+                    index: 'mtxrGaugeVoltage.{{ $index }}'
+                -
+                    oid: MIKROTIK-MIB::mtxrGaugeTable.1.3.7202
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
+                    descr: 'PSU2 Voltage'
+                    group: System
+                    divisor: 100
+                    index: 'mtxrGaugeVoltage.{{ $index }}'
+                -
+                    oid: MIKROTIK-MIB::mtxrHlCoreVoltage
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.1.{{ $index }}'
+                    group: System
                     descr: 'Core'
                     index: 'mtxrHlCoreVoltage.{{ $index }}'
                 -
-                    oid: mtxrHlThreeDotThreeVoltage
+                    oid: MIKROTIK-MIB::mtxrHlThreeDotThreeVoltage
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.2.{{ $index }}'
                     descr: '3.3V'
                     index: 'mtxrHlThreeDotThreeVoltage.{{ $index }}'
                 -
-                    oid: mtxrHlFiveVoltage
+                    oid: MIKROTIK-MIB::mtxrHlFiveVoltage
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.3.{{ $index }}'
                     descr: '5V'
                     index: 'mtxrHlFiveVoltage.{{ $index }}'
                 -
-                    oid: mtxrHlTwelveVoltage
+                    oid: MIKROTIK-MIB::mtxrHlTwelveVoltage
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.4.{{ $index }}'
                     descr: '12V'
                     index: 'mtxrHlTwelveVoltage.{{ $index }}'
                 -
-                    oid: mtxrHlVoltage
+                    oid: MIKROTIK-MIB::mtxrHlVoltage
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.8.{{ $index }}'
+                    group: System
                     divisor: 10
                     descr: 'Voltage {{ $index }}'
         current:
             data:
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalTxBiasCurrent
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalTxBiasCurrent
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.8.{{ $index }}'
-                    divisor: 1000
-                    descr: '{{ $mtxrOpticalName }} Bias Current'
+                    descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Tx Bias'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
+                    divisor: 1000
                     index: 'mtxrOpticalTxBiasCurrent.{{ $index }}'
                     skip_values:
-                    -
-                      oid: mtxrOpticalName
-                      op: '=='
-                      value: ""
-                    -
-                      oid: mtxrOpticalTxBiasCurrent
-                      op: '=='
-                      value: 0
+                        -
+                            oid: MIKROTIK-MIB::mtxrOpticalName
+                            op: '=='
+                            value: ""
+                        -
+                            oid: MIKROTIK-MIB::mtxrOpticalTxBiasCurrent
+                            op: '=='
+                            value: 0
                 -
-                    oid: mtxrPOETable
-                    value: mtxrPOECurrent
+                    oid: MIKROTIK-MIB::mtxrPOETable
+                    value: MIKROTIK-MIB::mtxrPOECurrent
                     num_oid: '.1.3.6.1.4.1.14988.1.1.15.1.1.5.{{ $index }}'
+                    descr: '{{ MIKROTIK-MIB::mtxrPOEName }} POE'
+                    group: Ports
                     divisor: 1000
-                    descr: '{{ $mtxrPOEName }} POE'
                     index: 'mtxrPOECurrent.{{ $index }}'
                 -
-                    oid: mtxrHlCurrent
+                    oid: MIKROTIK-MIB::mtxrGaugeTable.1.3.7301
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
+                    group: System
+                    divisor: 1000
+                    descr: 'PSU1 Current'
+                    index: 'mtxrGaugeCurrent.{{ $index }}'
+                -
+                    oid: MIKROTIK-MIB::mtxrGaugeTable.1.3.7302
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
+                    group: System
+                    divisor: 1000
+                    descr: 'PSU2 Current'
+                    index: 'mtxrGaugeCurrent.{{ $index }}'
+                -
+                    oid: MIKROTIK-MIB::mtxrHlCurrent
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.13.{{ $index }}'
                     divisor: 1000
                     descr: 'Current'
@@ -149,32 +197,33 @@ modules:
         dbm:
             data:
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalTxPower
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalTxPower
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.9.{{ $index }}'
-                    divisor: 1000
-                    descr: '{{ $mtxrOpticalName }} Tx'
+                    descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Tx'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
+                    divisor: 1000
                     index: 'mtxrOpticalTxPower.{{ $index }}'
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalRxPower
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalRxPower
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.10.{{ $index }}'
-                    divisor: 1000
-                    descr: '{{ $mtxrOpticalName }} Rx'
+                    descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Rx'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
+                    divisor: 1000
                     index: 'mtxrOpticalRxPower.{{ $index }}'
         state:
             data:
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalRxLoss
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalRxLoss
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.3.{{ $index }}'
-                    descr: '{{ $mtxrOpticalName }} Rx'
+                    descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Rx'
+                    group: Ports
                     index: 'mtxrOpticalRxLoss.{{ $index }}'
                     state_name: mtxrOpticalRxLoss
                     states:
@@ -182,10 +231,11 @@ modules:
                         - { descr: yes, graph: 1, value: 1, generic: 2 }
                         - { descr: 'null', graph: 1, value: 2, generic: 3 }
                 -
-                    oid: mtxrOpticalTable
-                    value: mtxrOpticalTxFault
+                    oid: MIKROTIK-MIB::mtxrOpticalTable
+                    value: MIKROTIK-MIB::mtxrOpticalTxFault
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.4.{{ $index }}'
-                    descr: '{{ $mtxrOpticalName }} Tx'
+                    descr: '{{ MIKROTIK-MIB::mtxrOpticalName }} Tx'
+                    group: Ports
                     index: 'mtxrOpticalTxFault.{{ $index }}'
                     state_name: mtxrOpticalTxFault
                     states:
@@ -193,10 +243,11 @@ modules:
                         - { descr: yes, graph: 1, value: 1, generic: 2 }
                         - { descr: 'null', graph: 1, value: 2, generic: 3 }
                 -
-                    oid: mtxrPOETable
-                    value: mtxrPOEStatus
+                    oid: MIKROTIK-MIB::mtxrPOETable
+                    value: MIKROTIK-MIB::mtxrPOEStatus
                     num_oid: '.1.3.6.1.4.1.14988.1.1.15.1.1.3.{{ $index }}'
-                    descr: '{{ $mtxrPOEName }} POE'
+                    descr: '{{ MIKROTIK-MIB::mtxrPOEName }} POE'
+                    group: Ports
                     index: 'mtxrPOEStatus.{{ $index }}'
                     state_name: mtxrPOEStatus
                     states:
@@ -204,8 +255,17 @@ modules:
                         - { descr: 'waitingForLoad', graph: 1, value: 2, generic: 3 }
                         - { descr: 'poweredOn', graph: 1, value: 3, generic: 0 }
                         - { descr: 'overload', graph: 1, value: 4, generic: 2 }
+                        - { descr: 'shortCircuit', graph: 1, value: 5, generic: 3 }
+                        - { descr: 'voltageTooLow', graph: 1, value: 6, generic: 2 }
+                        - { descr: 'currentTooLow', graph: 1, value: 7, generic: 2 }
+                        - { descr: 'powerReset', graph: 1, value: 8, generic: 1 }
+                        - { descr: 'voltageTooHigh', graph: 1, value: 9, generic: 2 }
+                        - { descr: 'controllerError', graph: 1, value: 10, generic: 2 }
+                        - { descr: 'noValidPsu', graph: 1, value: 13, generic: 2 }
+                        - { descr: 'controllerInit', graph: 1, value: 14, generic: 1 }
+                        - { descr: 'lowVoltageTooLow', graph: 1, value: 15, generic: 2 }
                 -
-                    oid: mtxrHlPowerSupplyState
+                    oid: MIKROTIK-MIB::mtxrHlPowerSupplyState
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.15.{{ $index }}'
                     descr: Primary PSU
                     index: 'mtxrHlPowerSupplyState.{{ $index }}'
@@ -214,7 +274,7 @@ modules:
                         - { value: 0, generic: 2, graph: 1, descr: 'false' }
                         - { value: 1, generic: 0, graph: 1, descr: 'true' }
                 -
-                    oid: mtxrHlBackupPowerSupplyState
+                    oid: MIKROTIK-MIB::mtxrHlBackupPowerSupplyState
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.16.{{ $index }}'
                     descr: Backup PSU
                     index: 'mtxrHlBackupPowerSupplyState.{{ $index }}'
@@ -225,27 +285,37 @@ modules:
         power:
             data:
                 -
-                    oid: mtxrPOETable
-                    value: mtxrPOEPower
+                    oid: MIKROTIK-MIB::mtxrPOETable
+                    value: MIKROTIK-MIB::mtxrPOEPower
                     num_oid: '.1.3.6.1.4.1.14988.1.1.15.1.1.6.{{ $index }}'
+                    descr: '{{ MIKROTIK-MIB::mtxrPOEName }} POE'
+                    group: Ports
                     divisor: 10
-                    descr: '{{ $mtxrPOEName }} POE'
                     index: 'mtxrPOEPower.{{ $index }}'
                 -
-                    oid: mtxrHlPower
+                    oid: MIKROTIK-MIB::mtxrHlPower
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.12.{{ $index }}'
+                    group: System
                     divisor: 10
-                    descr: 'Power Usage'
+                    descr: 'Power Consuption'
                     index: '1'
+                -
+                    oid: MIKROTIK-MIB::mtxrGaugeTable.1.3.16
+                    value: MIKROTIK-MIB::mtxrGaugeValue
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.3.100.1.3.{{ $index }}'
+                    group: System
+                    divisor: 10
+                    descr: 'Power Consumption'
+                    index: 'mtxrGaugePower.{{ $index }}'
         fanspeed:
             data:
                 -
-                    oid: mtxrHlFanSpeed1
+                    oid: MIKROTIK-MIB::mtxrHlFanSpeed1
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.17.{{ $index }}'
                     descr: 'Fan #1'
                     index: '0'
                 -
-                    oid: mtxrHlFanSpeed2
+                    oid: MIKROTIK-MIB::mtxrHlFanSpeed2
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.18.{{ $index }}'
                     descr: 'Fan #2'
                     index: '1'

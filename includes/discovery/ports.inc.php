@@ -87,6 +87,11 @@ if ($device['os'] == 'tachyon') {
     require base_path('includes/discovery/ports/tachyon.inc.php');
 }
 
+// Nokia 1830 PSS/PSD - ensure ifDescr is set from ifName
+if ($device['os'] == 'nokia-1830') {
+    require base_path('includes/discovery/ports/nokia-1830.inc.php');
+}
+
 // End Building SNMP Cache Array
 d_echo($port_stats);
 

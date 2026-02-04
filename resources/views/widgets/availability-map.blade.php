@@ -1,3 +1,4 @@
+@if($show_totals)
 @if($device_totals)
 <div class="widget-availability-host">
     <span>{{ __('Total hosts') }}</span>
@@ -24,6 +25,7 @@
 @endif
 
 <br style="clear:both;">
+@endif
 
 @foreach($devices as $row)
     <a href="{{ $row['link'] }}" title="{{$row['tooltip'] }}">
