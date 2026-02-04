@@ -26,9 +26,9 @@
 
 namespace LibreNMS\Util;
 
+use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Carbon\Exceptions\InvalidFormatException;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 
 class Time
