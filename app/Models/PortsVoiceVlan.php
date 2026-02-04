@@ -19,7 +19,7 @@ class PortsVoiceVlan extends DeviceRelatedModel implements Keyable
         'voice_vlan',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string|int
     {
         return $this->port_id;
     }
