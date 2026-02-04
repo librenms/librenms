@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Parsers\AlertLogDetailParser;
 use App\Models\AlertLog;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use LibreNMS\Util\Html;
+use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
 class AlertLogController extends TableController
@@ -104,7 +106,7 @@ class AlertLogController extends TableController
 
         return [
             'id' => $model->id,
-            'time_logged' => $model->time_logged,
+            'time_logged' => Time::format($model->time_logged, LibrenmsConfig::get('dateformat.compact')),
             'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $model->id . '" data-parent="#alerts"></a>',
             'verbose_details' => "<button type='button' class='btn btn-alert-details verbose-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='$model->id'><i class='fa-solid fa-circle-info'></i></button>",
             'hostname' => '<div class="incident">' . Url::modernDeviceLink($model->device) . '<div id="incident' . $model->id . '" class="collapse">' . $fault_detail . '</div></div>',
