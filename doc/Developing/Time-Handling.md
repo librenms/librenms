@@ -12,6 +12,15 @@ Most times in LibreNMS are absolute points in time when data has been collected.
 
 There will be some exceptions to the above, for example scheduled maintenance where the server timezone observes daylight savings differently to the devices being scheduled.  When this happens, we should store the timezone along with the time information so we can interpret the time correctly relative to ths server's time.
 
+## Config options
+The following configuration options exist for displaying dates to users.  An example of the default output is shown next to each:
+ - `dateformat.long` - Wed, 04 Feb 2026 09:25:00 +0800
+ - `dateformat.compact` - 2026-02-04 09:25:00
+ - `dateformat.byminute` - 2026-02-04 09:25
+ - `dateformat.time` - 09:25:00
+
+When formatting dates for web pages, you should choose from one of the config options above to allow systems to have consistent formatting that can be customised.
+
 ## PHP Time Functions
 
 LibreNMS has a set of time functions that should be used for all point in time operations to ensure consistent handling of times.  These are in the `LibreNMS\Util\Time` class, and functions can either be called fully qualified or as shown below after adding `use LibreNMS\Util\Time;` to the top of your PHP file.
@@ -28,6 +37,38 @@ The following functions all take a Carbon object generated above, and change it 
 - `Time::toTimestamp()` - Outputs a unix epoch in seconds
 - `Time::toIso()` - Outputs a string in ISO8601 representation in Zulu/UTC timezone.
 - `Time::format()` - Takes both a Carbon object and a format string as inputs, and outputs the time in the user's selected timezone using the format string.
+
+### Examples
+
+If you have a timestamp field from the database that you want to display on a web page, the following code would be needed:
+```php
+use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\Time;
+
+$output = Time::format($dbtime, LibrenmsConfig::get('dateformat.long'));
+```
+
+If you have a unix epoch input that you want to display on a web page, the following code would be needed:
+```php
+use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\Time;
+
+$output = Time::format(Time::fromTimestamp($epoch), LibrenmsConfig::get('dateformat.compact'));
+```
+
+If you receive a ISO8601 date as part of data posted from an AJAX query, and want to convert it to a unix epoch to use in a SQL filter, you would do the following:
+```php
+use LibreNMS\Util\Time;
+
+$epoch = Time::toTimestamp(Time::parse($iso8601_date));
+```
+
+If you have a timestamp field from the database that you want to send to an AJAX endpoint as ISO8601 time, you would do the following:
+```php
+use LibreNMS\Util\Time;
+
+$jsontime = Time::toIso($dbtime);
+```
 
 ## Javascript Time Library
 
