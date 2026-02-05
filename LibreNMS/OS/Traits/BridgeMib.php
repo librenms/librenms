@@ -104,11 +104,11 @@ trait BridgeMib
     {
         $ports = new Collection;
 
-        // prep base port to port_id map if we have instances
-        $baseIfIndex = $stpInstances->isEmpty() ? [] : $this->getCacheByIndex('BRIDGE-MIB::dot1dBasePortIfIndex');
-        $basePortIdMap = array_map(fn ($ifIndex) => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()), $baseIfIndex);
-
         foreach ($stpInstances as $instance) {
+            // prep base port to port_id map for this specific VLAN context
+            $baseIfIndex = SnmpQuery::context("$instance->vlan", 'vlan-')->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+            $basePortIdMap = array_map(fn ($ifIndex) => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()), $baseIfIndex);
+
             $vlan_ports = SnmpQuery::context("$instance->vlan", 'vlan-')
                 ->enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
                 ->mapTable(fn ($data, $port) => new PortStp([
@@ -130,19 +130,16 @@ trait BridgeMib
 
                         return false;
                     }
-
                     if ($port->state === 'disabled') {
                         d_echo("$port->port_index ($port->vlan) state disabled skipping\n");
 
                         return false;
                     }
-
                     if (! $port->port_id) {
                         d_echo("$port->port_index ($port->vlan) port not found skipping\n");
 
                         return false;
                     }
-
                     d_echo("Discovered STP port $port->port_index ($port->vlan): $port->port_id");
 
                     return true;
