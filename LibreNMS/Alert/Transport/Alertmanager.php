@@ -61,14 +61,18 @@ class Alertmanager extends Transport
         $alertmanager_opts = $this->parseUserOptions($this->config['alertmanager-options']);
         foreach ($alertmanager_opts as $label => $value) {
             if (str_starts_with((string) $label, 'stc_')) {
-                $data[0]['labels'][$label] = strip_tags((string) $value);
+                // Static label: strip the stc_ prefix and use the value as-is
+                $cleanLabel = substr((string) $label, 4);
+                $data[0]['labels'][$cleanLabel] = strip_tags((string) $value);
             } else {
-                $data[0]['labels'][$label] = strip_tags(
-                    (string) ($alert_data[$value] ?? current(array_filter(
-                        array_column($alert_data['faults'] ?? [], $value),
-                        fn ($v) => ! empty($v)
-                    )) ?? $value)
-                );
+                // Dynamic label: try to resolve value from alert data, faults, or fall back to literal
+                $resolved = $alert_data[$value] ?? current(array_filter(
+                    array_column($alert_data['faults'] ?? [], $value),
+                    fn ($v) => ! empty($v)
+                )) ?: $value;
+
+                $data[0]['labels'][$label] = strip_tags((string) $resolved);
+
                 if (str_starts_with((string) $label, 'dyn_') && $data[0]['labels'][$label] == $value) {
                     unset($data[0]['labels'][$label]);
                 }
