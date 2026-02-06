@@ -275,7 +275,7 @@ class Core implements Module
             $uptime = round((float) substr((string) $agent_data['uptime'], 0, strpos((string) $agent_data['uptime'], ' ')));
             Log::info("Using UNIX Agent Uptime ($uptime)");
         } else {
-            $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
+            $uptime_data = SnmpQuery::make()->mibs(['HOST-RESOURCES-MIB', 'SNMP-FRAMEWORK-MIB'])->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
 
             $uptime = max(
                 round(Number::cast($sysUpTime) / 100),

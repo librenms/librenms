@@ -49,9 +49,14 @@ class SnmpResponse implements \Stringable
      * @param  string  $stderr
      * @param  int  $exitCode
      */
-    public function __construct(string $output, public readonly string $stderr = '', public readonly int $exitCode = 0)
+    public function __construct(string|array $output, public readonly string $stderr = '', public readonly int $exitCode = 0)
     {
-        $this->raw = (string) preg_replace('/Wrong Type \(should be .*\): /', '', $output);
+        if (is_array($output)) {
+            $this->values = $output;
+            $this->raw = implode(PHP_EOL, array_map(function ($k, $v) { return $k . self::KEY_VALUE_DELIMITER . $v; }, array_keys($output), $output));
+        } else {
+            $this->raw = (string) preg_replace('/Wrong Type \(should be .*\): /', '', $output);
+        }
     }
 
     public function isValid(bool $ignore_partial = false): bool
