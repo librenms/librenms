@@ -33,7 +33,7 @@ trait EntityMib
 {
     public function discoverEntityPhysical(): Collection
     {
-        $snmpQuery = \SnmpQuery::hideMib()->enumStrings();
+        $snmpQuery = \SnmpQuery::hideMib()->enumStrings()->mibs('ENTITY-MIB');
         if (isset($this->entityVendorTypeMib)) {
             $snmpQuery = $snmpQuery->mibs([$this->entityVendorTypeMib]);
         }

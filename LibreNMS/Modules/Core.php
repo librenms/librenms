@@ -180,7 +180,7 @@ class Core implements Module
                 }
 
                 foreach ($def['discovery'] as $item) {
-                    if (self::checkDiscovery($device, $item, $def['mib_dir'] ?? null)) {
+                    if (self::checkDiscovery($device, $item, $def['mib_dir'] ?? null, $def['mib'] ?? '')) {
                         return $os;
                     }
                 }
@@ -191,7 +191,7 @@ class Core implements Module
         $deferred_os = array_merge($deferred_os, $generic_os);
         foreach ($deferred_os as $os) {
             foreach ($os_defs[$os]['discovery'] as $item) {
-                if (self::checkDiscovery($device, $item, $os_defs[$os]['mib_dir'] ?? null)) {
+                if (self::checkDiscovery($device, $item, $os_defs[$os]['mib_dir'] ?? null, $os_defs[$os]['mib'] ?? '')) {
                     return $os;
                 }
             }
@@ -212,9 +212,10 @@ class Core implements Module
      * @param  Device  $device
      * @param  array  $array  Array of items, keys should be sysObjectID, sysDescr, or sysDescr_regex
      * @param  string|array  $mibdir  MIB directory for evaluated OS
+     * @param  string  $mibs  Colon separated list of MIBS to load in order
      * @return bool the result (all items passed return true)
      */
-    protected static function checkDiscovery(Device $device, array $array, $mibdir): bool
+    protected static function checkDiscovery(Device $device, array $array, $mibdir, $mibs): bool
     {
         // all items must be true
         foreach ($array as $key => $value) {
@@ -242,6 +243,8 @@ class Core implements Module
                 $get_value = SnmpQuery::device($device)
                     ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
+                    ->mibs(isset($value['mib']) ? explode(':', $value['mib']) : [])
+                    ->mibs($mibs)
                     ->get(isset($value['mib']) ? "{$value['mib']}::{$value['oid']}" : $value['oid'])
                     ->value();
                 if (Compare::values($get_value, $value['value'], $value['op'] ?? 'contains') == $check) {
@@ -251,6 +254,8 @@ class Core implements Module
                 $walk_value = SnmpQuery::device($device)
                     ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
+                    ->mibs(isset($value['mib']) ? explode(':', $value['mib']) : [])
+                    ->mibs($mibs)
                     ->walk(isset($value['mib']) ? "{$value['mib']}::{$value['oid']}" : $value['oid'])
                     ->raw;
                 if (Compare::values($walk_value, $value['value'], $value['op'] ?? 'contains') == $check) {
