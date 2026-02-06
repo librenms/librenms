@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.57206.1.11",
+                    "sysDescr": null,
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": null,
+                    "os": "snr-s5xxx",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "snr.png"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -1,5 +1,5 @@
-os: snr
-text: 'SNR'
+os: snr-s5xxx
+text: 'SNR S5XXX'
 type: network
 icon: snr
 group: snr
@@ -11,10 +11,4 @@ over:
 discovery:
     -
         sysObjectID:
-            - .1.3.6.1.4.1.40418.7
-            - .1.3.6.1.4.1.40418.8.67
-    -
-        sysDescr:
-            - SNR-S
-        sysObjectID_except:
-            - .1.3.6.1.4.1.57206.
+            - .1.3.6.1.4.1.57206.1
