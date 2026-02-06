@@ -53,7 +53,9 @@ class SnmpResponse implements \Stringable
     {
         if (is_array($output)) {
             $this->values = $output;
-            $this->raw = implode(PHP_EOL, array_map(function ($k, $v) { return $k . self::KEY_VALUE_DELIMITER . $v; }, array_keys($output), $output));
+            $this->raw = implode(PHP_EOL, array_map(function ($k, $v) {
+                return $k . self::KEY_VALUE_DELIMITER . $v;
+            }, array_keys($output), $output));
         } else {
             $this->raw = (string) preg_replace('/Wrong Type \(should be .*\): /', '', $output);
         }
