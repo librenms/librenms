@@ -1,0 +1,9 @@
+os: huber-suhner-cubo
+text: 'Huber+Suhner Cubo'
+type: network
+icon: huber-suhner
+discovery:
+    -
+        sysObjectID:
+            - '.1.3.6.1.4.1.27894.10.1'
+mib_dir: hubersuhner
