@@ -47,7 +47,7 @@ trait NetstatsPolling
 
     public function pollIpForwardNetstats(array $oids): array
     {
-        return SnmpQuery::get($oids)->values();
+        return SnmpQuery::mibs(['IANA-RTPROTO-MIB', 'INET-ADDRESS-MIB', 'IP-FORWARD-MIB'])->get($oids)->values();
     }
 
     public function pollUdpNetstats(array $oids): array

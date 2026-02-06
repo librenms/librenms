@@ -81,6 +81,7 @@ class Ospf implements Module
             // Pull data from device
             $ospf_instances_poll = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
+                ->mibs(['OSPF-MIB'])
                 ->walk('OSPF-MIB::ospfGeneralGroup')->valuesByIndex();
 
             $ospf_instances = new Collection();
