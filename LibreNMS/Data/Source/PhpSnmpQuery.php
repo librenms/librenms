@@ -28,24 +28,15 @@ namespace LibreNMS\Data\Source;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
-use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Oid;
-use LibreNMS\Util\Rewrite;
 use Log;
-use Symfony\Component\Process\Process;
 
 class PhpSnmpQuery implements SnmpQueryInterface
 {
-    private string $log_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
-    private string $log_replacement = '*';
-
     /**
      * @var string[]
      */
@@ -53,8 +44,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
     private array $mibDirs = [];
     private array $mibs = ['SNMPv2-SMI', 'SNMPv2-TC', 'SNMPv2-CONF', 'SNMPv2-MIB', 'IANAifType-MIB', 'IF-MIB', 'INET-ADDRESS-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'SNMP-FRAMEWORK-MIB', 'SNMP-VIEW-BASED-ACM-MIB', 'NET-SNMP-VACM-MIB'];
     private Device $device;
-    private bool $abort = false;
-    private bool $cache = false;
     private \SNMP $snmp;
     private NetSnmpQuery $netsnmp;
 
@@ -62,7 +51,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
     {
         $this->device = DeviceCache::getPrimary();
 
-        $snmpver = match($this->device->snmpver) {
+        $snmpver = match ($this->device->snmpver) {
             'v1' => \SNMP::VERSION_1,
             'v2c' => \SNMP::VERSION_2c,
             'v3' => \SNMP::VERSION_3,
@@ -83,6 +72,8 @@ class PhpSnmpQuery implements SnmpQueryInterface
         }
 
         $this->loadMibs();
+
+        $this->netsnmp = new NetSnmpQuery();
     }
 
     /**
@@ -142,7 +133,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
             if ($this->device->snmpver === 'v3') {
                 $this->setSecurity($v3_prefix . $context);
             } else {
-                // Cannot change context for community based 
+                // Cannot change context for community based
                 throw new \Exception('Cannot change context for v1/v2c');
             }
         } else {
@@ -253,8 +244,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
     public function options($options = []): SnmpQueryInterface
     {
         throw new \Exception('PHP-SNMP does not support raw options - we should fall back to NetSnmpQuery');
-
-        return $this;
     }
 
     /**
@@ -267,6 +256,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
     public function get($oid): SnmpResponse
     {
         $ret = [];
+
         foreach ($this->limitOids($this->parseOid($oid)) as $oids) {
             $measure = Measurement::start('snmpget');
             $this->logSnmpCmd('GET', $oids);
@@ -277,6 +267,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
                 $ret = array_merge($ret, $res);
             } else {
                 $this->logSnmpError('GET', $oids);
+
                 return new SnmpResponse($this->snmp->getError(), $this->snmp->getError());
             }
         }
@@ -301,8 +292,9 @@ class PhpSnmpQuery implements SnmpQueryInterface
         $ret = $this->snmp->walk($oids);
         $measure->manager()->recordSnmp($measure->end());
 
-        if (!$ret) {
+        if (! $ret) {
             $this->logSnmpError('WALK', $oids);
+
             return new SnmpResponse($this->snmp->getError(), $this->snmp->getError());
         }
 
@@ -320,6 +312,8 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function next($oid): SnmpResponse
     {
+        $ret = [];
+
         foreach ($this->limitOids($this->parseOid($oid)) as $oids) {
             $this->logSnmpCmd('GETNEXT', $oids);
 
@@ -331,6 +325,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
                 $ret = array_merge($ret, $res);
             } else {
                 $this->logSnmpError('GETNEXT', $oids);
+
                 return new SnmpResponse($this->snmp->getError(), $this->snmp->getError());
             }
         }
@@ -397,20 +392,22 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
     private function setSecurity(?string $context): void
     {
-        $options = [$this->device->authlevel];
         if ($this->device->authlevel === 'authpriv') {
+            $options[] = 'authPriv';
             $options[] = $this->device->authalgo;
             $options[] = $this->device->authpass;
             $options[] = $this->device->cryptoalgo;
             $options[] = $this->device->cryptopass;
             $options[] = $context ?: '';
         } elseif ($this->device->authlevel === 'authnopriv') {
+            $options[] = 'authNoPriv';
             $options[] = $this->device->authalgo;
             $options[] = $this->device->authpass;
             $options[] = '';
             $options[] = '';
             $options[] = $context ?: '';
         } else {
+            $options[] = 'noAuthNoPriv';
             $options[] = '';
             $options[] = '';
             $options[] = '';
@@ -432,7 +429,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
                     $mibfound = true;
                     break;
                 } elseif (file_exists($mibfile)) {
-                    if(Debug::isVerbose()) {
+                    if (Debug::isVerbose()) {
                         Log::debug("Reading SNMP MIB $mibfile");
                     }
 
@@ -446,7 +443,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
                 }
             }
 
-            if (!$mibfound) {
+            if (! $mibfound) {
                 Log::debug("MIB $mib was not found");
             }
         }
@@ -459,7 +456,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
     private function logSnmpCmd(string $cmd, array $oids): void
     {
-        if(Debug::isVerbose()) {
+        if (Debug::isVerbose()) {
             Log::debug("SNMP $cmd - MIBS: " . implode(':', array_keys($this->mibFilesLoaded)) . ' OIDS: ' . implode(' ', $oids));
         } else {
             Log::debug("SNMP $cmd - OIDS: " . implode(' ', $oids));
