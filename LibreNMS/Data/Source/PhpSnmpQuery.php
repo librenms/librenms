@@ -456,7 +456,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         Log::debug("Error running SNMP $cmd: " . $this->snmp->getError());
 
         if (preg_match('/(Invalid object identifier: .*)/', $this->snmp->getError(), $errors)) {
-             throw new \Exception($this->snmp->getError());
+            throw new \Exception($this->snmp->getError());
         }
     }
 

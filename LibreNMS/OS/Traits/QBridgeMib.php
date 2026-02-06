@@ -39,7 +39,7 @@ trait QBridgeMib
 {
     private function discoverIetfQBridgeMibVlans(): Collection
     {
-        return SnmpQuery::mibs(['BRIDGE-MIB','P-BRIDGE-MIB','RMON2-MIB','Q-BRIDGE-MIB'])->walk('Q-BRIDGE-MIB::dot1qVlanStaticName')
+        return SnmpQuery::mibs(['BRIDGE-MIB', 'P-BRIDGE-MIB', 'RMON2-MIB', 'Q-BRIDGE-MIB'])->walk('Q-BRIDGE-MIB::dot1qVlanStaticName')
             ->mapTable(fn ($data, $vlan_id) => new Vlan([
                 'vlan_vlan' => $vlan_id,
                 'vlan_domain' => 1,
