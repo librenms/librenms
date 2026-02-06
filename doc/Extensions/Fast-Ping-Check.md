@@ -24,12 +24,13 @@ devices by switching to 1 minute polling.
 
     This will flush all pending writes so that the lnms maintenance:rrd-step script can change the steps.
 
-2: Change the `ping_rrd_step` setting in WebUI or CLI
+2: Change the `ping_rrd_step` and `service_ping_frequency` settings in WebUI or CLI
 
 !!! setting "poller/rrdtool"
 
     ```bash
     lnms config:set ping_rrd_step 60
+    lnms config:set service_ping_frequency 60
     ```
 
 3: Update the rrd files to change the step (step is hardcoded at file
