@@ -1,0 +1,63 @@
+mib: CUBO-MINI-MIB
+modules:
+    sensors:
+        fanspeed:
+            data:
+                -
+                    oid: cubominiFanTable
+                    value: cubominiFanSpeed
+                    num_oid: '.1.3.6.1.4.1.27894.11.241.1.3.1.1.5.{{ $index }}'
+                    descr: 'Fan Speed {{ $subindex2 }}'
+        state:
+            data:
+                -
+                    oid: cubominiFanTable
+                    value: cubominiFanStatus
+                    num_oid: '.1.3.6.1.4.1.27894.11.241.1.3.1.1.4.{{ $index }}'
+                    descr: 'Fan State {{ $subindex2 }}'
+                    state_name: Fan State
+                    states:
+                        - { value: 2, generic: 2, graph: 0, descr: Failure }
+                        - { value: 3, generic: 0, graph: 0, descr: Okay }
+                -
+                    oid: cubominiXcvrGeneralIsInserted
+                    num_oid: '.1.3.6.1.4.1.27894.11.241.1.9.2.1.4.{{ $index }}'
+                    descr: 'Optic inserted {{ $subindex2 }}'
+                    state_name: Optic State
+                    states:
+                        - { value: 2, generic: 2, graph: 0, descr: Not inserted }
+                        - { value: 3, generic: 0, graph: 0, descr: Inserted }
+        dbm:
+            data:
+                -
+                    oid: cubominiXcvrOptChannelsTxPower
+                    num_oid: '.1.3.6.1.4.1.27894.11.241.1.9.6.1.5.{{ $index }}'
+                    divisor: 10
+                    descr: 'Line Port Channel {{ $subindex3 }} Tx Power'
+                    index: 'cubominiXcvrOptChannelsTxPower.0.1.1.{{ $subindex3 }}'
+                -
+                    oid: cubominiXcvrOptChannelsTxPower
+                    num_oid: '.1.3.6.1.4.1.27894.11.241.1.9.6.1.5.{{ $index }}'
+                    divisor: 10
+                    descr: 'Client Port Channel {{ $subindex3 }} Tx Power'
+                    index: 'cubominiXcvrOptChannelsTxPower.0.1.2.{{ $subindex3 }}'
+                -
+                    oid: cubominiXcvrOptChannelsRxPower
+                    num_oid: '.1.3.6.1.4.1.27894.11.241.1.9.6.1.6.{{ $index }}'
+                    divisor: 10
+                    descr: 'Line Port Channel {{ $subindex3 }} Rx Power'
+                    index: 'cubominiXcvrOptChannelsRxPower.0.1.1.{{ $subindex3 }}'
+                -
+                    oid: cubominiXcvrOptChannelsRxPower
+                    num_oid: '.1.3.6.1.4.1.27894.11.241.1.9.6.1.6.{{ $index }}'
+                    divisor: 10
+                    descr: 'Client Port Channel {{ $subindex3 }} Rx Power'
+                    index: 'cubominiXcvrOptChannelsRxPower.0.1.2.{{ $subindex3 }}'
+        temperature:
+            data:
+                -
+                    oid: cubominiXcvrDiagnosticsTable
+                    value: cubominiXcvrDiagnosticsTemperature
+                    num_oid: '.1.3.6.1.4.1.27894.11.241.1.9.5.1.4.{{ $index }}'
+                    descr: 'Temperature {{ $subindex2 }}'
+                    divisor: 10
