@@ -60,7 +60,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
     public function __construct()
     {
-        Log::debug("New PHP-SNMP");
         $this->device = DeviceCache::getPrimary();
 
         $snmpver = match($this->device->snmpver) {
@@ -267,7 +266,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function get($oid): SnmpResponse
     {
-        Log::Debug($oid);
         $ret = [];
         foreach ($this->limitOids($this->parseOid($oid)) as $oids) {
             $measure = Measurement::start('snmpget');
