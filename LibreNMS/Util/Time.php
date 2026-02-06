@@ -26,9 +26,9 @@
 
 namespace LibreNMS\Util;
 
+use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Carbon\Exceptions\InvalidFormatException;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 
 class Time
@@ -202,5 +202,56 @@ class Time
         mt_srand();
 
         return $time->format($format);
+    }
+
+    /**
+     * Returns current time in the server's timezone
+     */
+    public static function now(): Carbon
+    {
+        return Carbon::now();
+    }
+
+    /**
+     * Convert a timestamp to a time object in the server's timezone
+     */
+    public static function fromTimestamp(int $timestamp): Carbon
+    {
+        return Carbon::createFromTimestamp($timestamp);
+    }
+
+    /**
+     * Parse a time string into a time object in the server's timezone.
+     *
+     * ISO8601 strings in Zulu timezone are parsed correctly here
+     * Time strings without a timezone will be assumed to already be in the server timezone.
+     */
+    public static function parse(string $time): Carbon
+    {
+        return Carbon::parse($time)->setTimezone(date_default_timezone_get());
+    }
+
+    /**
+     * Return unix timestamp
+     */
+    public static function toTimestamp(Carbon $input): int
+    {
+        return $input->unix();
+    }
+
+    /**
+     * Return ISO date string
+     */
+    public static function toIso(Carbon $input): string
+    {
+        return $input->toIso8601ZuluString();
+    }
+
+    /**
+     * Format a timestamp for display to users in their selected timezone
+     */
+    public static function format(Carbon $input, string $format): string
+    {
+        return $input->setTimezone(session('preferences.timezone'))->format($format);
     }
 }
