@@ -144,6 +144,11 @@ class Os implements Module
         ];
     }
 
+    public function getSortColumns(string $table): array
+    {
+        return [];
+    }
+
     private function handleChanges(\LibreNMS\OS $os): void
     {
         $device = $os->getDevice();

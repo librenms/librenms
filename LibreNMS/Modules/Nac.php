@@ -138,10 +138,16 @@ class Nac implements Module
         }
 
         return [
-            'ports_nac' => $device->portsNac()->orderBy('ports.ifIndex')->orderBy('mac_address')
+            'ports_nac' => $device->portsNac()
+                ->orderByColumns($this->getSortColumns('ports_nac'))
                 ->leftJoin('ports', 'ports_nac.port_id', 'ports.port_id')
                 ->select(['ports_nac.*', 'ifIndex'])
                 ->get()->map->makeHidden(['ports_nac_id', 'device_id', 'port_id', 'updated_at', 'created_at']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['ifIndex', 'mac_address'];
     }
 }
