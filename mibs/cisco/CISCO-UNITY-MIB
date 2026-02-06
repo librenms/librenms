@@ -1,0 +1,839 @@
+-- *****************************************************************
+-- CISCO-UNITY-MIB.my: Cisco Unity MIB file.
+--
+-- January 2004, Sean Milligan
+--
+-- Copyright (c) 2004-2005 by Cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+CISCO-UNITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DateAndTime, TruthValue 
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+ciscoUnityMIB  MODULE-IDENTITY
+    LAST-UPDATED    "200512120000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+                "       Cisco Systems
+                        Customer Service
+
+                Postal: 170 W Tasman Drive
+                        San Jose, CA  95134
+                        USA
+
+                   Tel: +1 800 553-NETS
+
+                E-mail: cs-unity@cisco.com"
+DESCRIPTION
+        "The MIB Module for the management of Cisco Unity server.
+        Cisco Unity is a Unified Communications solution that provides 
+        advanced, convergence-based communication services. The MIB
+        presents provision and statistics information.
+
+                ACRONYMS 
+
+        AMIS
+            Analog Messaging Interface Standard
+        MWI
+            Message Waiting Indicator
+        TRAP
+            Telephone Record and Playback
+        TTS
+            Text-To-Speech
+        UM
+            Unified Messaging
+        VMI
+            Visual Messaging Interface
+        VPIM
+            Voice Profile for Internet Mail"
+
+    REVISION      "200512120000Z"
+    DESCRIPTION
+        "Added these objects:
+            ciscoUnityLicLanguagesMax,
+            ciscoUnityLicTTSSessionsMax,
+            ciscoUnityLicSubscribersMax,
+            ciscoUnityLicUMSubscribersMax,
+            ciscoUnityLicVMISubscribersMax,
+            ciscoUnityLicVoicePortsMax,
+            ciscoUnityLicBridgeSessionsMax,
+            ciscoUnityLicAMISIsLicensed,
+            ciscoUnityLicMaxMsgRecLenIsLic,
+            ciscoUnityLicPoolingIsEnabled,
+            ciscoUnityLicVPIMIsLicensed,
+            ciscoUnityLicPrimaryServerIsLic,
+            ciscoUnityLicSecondServerIsLic,
+            ciscoUnityLicUtilSecondServer,
+            ciscoUnityLicUtilSubs,
+            ciscoUnityLicUtilVMISubs,
+            ciscoUnityPortActivity,
+            ciscoUnityPortObjectId"
+            
+    REVISION      "200401060000Z"
+    DESCRIPTION
+            "The initial version of this MIB module."
+    ::= { ciscoMgmt 385 }
+
+--
+--      Textual Conventions
+--
+CiscoUnityIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This textual convention is used as the Index into a table.
+        A positive value is used to identify a unique entry in
+        the table."
+    SYNTAX      Unsigned32(1..2147483647)
+
+CiscoUnityServerStatus ::= TEXTUAL-CONVENTION
+    STATUS              current 
+    DESCRIPTION
+        "This textual convention is used to indicate the current
+        status of the local Unity server.
+        stopped(1)          The main Cisco Unity process is stopped
+        starting(2)         The main Cisco Unity process is starting
+        running(3)          The main Cisco Unity process is in normal
+                                operational mode
+        stopping(4)         The main Cisco Unity process is shutting
+                                down"
+    SYNTAX      INTEGER {
+        stopped(1),
+        starting(2),
+        running(3),
+        stopping(4)
+    }
+
+ciscoUnityMIBNotifs  OBJECT IDENTIFIER ::= { ciscoUnityMIB 0 }
+ciscoUnityMIBObjects OBJECT IDENTIFIER ::= { ciscoUnityMIB 1 }
+ciscoUnityMIBConform OBJECT IDENTIFIER ::= { ciscoUnityMIB 2 }
+
+
+ciscoUnityGeneralInfo       OBJECT IDENTIFIER
+    ::= { ciscoUnityMIBObjects 1 }
+ciscoUnityGlobalInfo        OBJECT IDENTIFIER
+    ::= { ciscoUnityMIBObjects 2 }
+ciscoUnityNotificationsInfo OBJECT IDENTIFIER 
+    ::= { ciscoUnityMIBObjects 3 }
+
+--
+--      THE UNITY TABLE
+--
+ciscoUnityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CiscoUnityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table containing information about all the Unity servers
+        on the network visible to the local Unity server."
+    ::= { ciscoUnityGeneralInfo 1 }
+    
+ciscoUnityEntry OBJECT-TYPE
+    SYNTAX      CiscoUnityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the Unity table, containing
+        the information about a Unity server."
+    INDEX { ciscoUnityIndex }
+    ::= { ciscoUnityTable 1 }
+    
+CiscoUnityEntry ::= SEQUENCE {
+    ciscoUnityIndex              CiscoUnityIndex,
+    ciscoUnityName               SnmpAdminString,
+    ciscoUnityVersion            SnmpAdminString
+}
+
+ciscoUnityIndex OBJECT-TYPE
+    SYNTAX      CiscoUnityIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer, selected by the local Unity, which
+        uniquely identifies a Unity server on the network."
+    ::= { ciscoUnityEntry 1 }
+    
+ciscoUnityName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The host name of the Unity server."
+    ::= { ciscoUnityEntry 2 }
+    
+ciscoUnityVersion OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version number of the Unity server software."
+    ::= { ciscoUnityEntry 3 }
+    
+    
+--
+--      THE PORT TABLE
+--
+ciscoUnityPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CiscoUnityPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table containing information about the configuration of
+        ports on the local Unity server."
+    ::= { ciscoUnityGeneralInfo 2 }
+    
+ciscoUnityPortEntry OBJECT-TYPE
+    SYNTAX      CiscoUnityPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the Port table, containing
+        the information about the port configuration on the local
+        Unity server."
+    INDEX { ciscoUnityPortIndex }
+    ::= { ciscoUnityPortTable 1 }
+    
+CiscoUnityPortEntry ::= SEQUENCE {
+    ciscoUnityPortIndex              CiscoUnityIndex,
+    ciscoUnityPortNumber             Unsigned32,
+    ciscoUnityPortIntegration        SnmpAdminString,
+    ciscoUnityPortExtension          SnmpAdminString,
+    ciscoUnityPortEnabled            TruthValue,
+    ciscoUnityPortAnswerCalls        TruthValue,
+    ciscoUnityPortMessageNotif       TruthValue,
+    ciscoUnityPortDialoutMWI         TruthValue,
+    ciscoUnityPortAMISDelivery       TruthValue,
+    ciscoUnityPortTRAPConnection     TruthValue,
+    ciscoUnityPortActivity           SnmpAdminString,
+    ciscoUnityPortObjectId           SnmpAdminString
+}
+ 
+ciscoUnityPortIndex OBJECT-TYPE
+    SYNTAX      CiscoUnityIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer, selected by the local Unity, which
+        uniquely identifies a port on the local Unity server." 
+    ::= { ciscoUnityPortEntry 1 }
+
+ciscoUnityPortNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Unity voice messaging port number."
+    ::= { ciscoUnityPortEntry 2 }
+        
+ciscoUnityPortIntegration OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The phone system integration to which this port belongs.  
+        This could be Cisco CallManager or a traditional PBX."
+    ::= { ciscoUnityPortEntry 3 }
+
+ciscoUnityPortExtension OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The extension for the port as assigned on the phone system."
+    ::= { ciscoUnityPortEntry 4 }
+
+ciscoUnityPortEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This indicates whether this port is enabled on the local
+        Unity server."
+    ::= { ciscoUnityPortEntry 5 }
+
+ciscoUnityPortAnswerCalls OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This indicates whether this port is designated to answer
+        incoming calls."
+    ::= { ciscoUnityPortEntry 6 }
+
+ciscoUnityPortMessageNotif OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This indicates whether this port is designated for notifying
+        subscribers of messages."
+    ::= { ciscoUnityPortEntry 7 }
+
+ciscoUnityPortDialoutMWI OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This indicates whether this port is designated for turning
+        MWIs on and off."
+    ::= { ciscoUnityPortEntry 8 }
+
+ciscoUnityPortAMISDelivery OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This indicates whether this port is designated for making
+        outbound AMIS calls to deliver voice messages from Unity
+        subscribers to users on another voice messaging system." 
+    ::= { ciscoUnityPortEntry 9 }
+
+ciscoUnityPortTRAPConnection OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This indicates whether this port is designated for use by
+        subscribers as a Telephone Recording And Playback (TRAP)
+        device in Unity web applications and e-mail clients."
+    ::= { ciscoUnityPortEntry 10 }
+
+ciscoUnityPortActivity OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port activity of the voice mail port.  This value
+        is available to monitor port activity over time.  The specific
+        value of this object is not as useful as monitoring for the 
+        changing of this value.  During normal operation this value
+        should change several times during a call.  You can use this
+        value to watch for abnormal operation that might indicate a
+        problem with this voice mail port.  For example, if you 
+        monitor this value and do not detect a change in value for
+        a long time (like 60 minutes) it could be an indication of
+        a problem with that voice mail port.  There are other 
+        explanations as well so more investigation on the server
+        should be conducted before taking any action with the voice
+        mail port."
+    ::= { ciscoUnityPortEntry 11 }
+    
+ciscoUnityPortObjectId  OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..38))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A globally unique, system-generated identifier for a port
+        object.  The ObjectId (UUID or GUID) uniquely identifies the 
+        port for the lifetime of this port.  A UUID is 128 bits long, 
+        and can guarantee uniqueness across space and time."
+    REFERENCE
+        "RFC-4122 A Universally Unique IDentifier (UUID) URN 
+        Namespace."
+    ::= { ciscoUnityPortEntry 12 }
+    
+--
+--      All Scalar Objects
+--
+ciscoUnityServerState OBJECT-TYPE
+    SYNTAX      CiscoUnityServerStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the local Unity server."
+    ::= { ciscoUnityGlobalInfo 1 }
+
+ciscoUnityPorts OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of ports on the local Unity server."
+    ::= { ciscoUnityGlobalInfo 2 }
+
+ciscoUnityPortsActive OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of ports that are currently active with
+        calls."
+    ::= { ciscoUnityGlobalInfo 3 }
+    
+ciscoUnityPortsInbound OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of ports that are designated to answer
+        incoming calls."
+    ::= { ciscoUnityGlobalInfo 4 }
+
+ciscoUnityPortsInboundActive OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inbound ports that are currently active with
+        calls."
+    ::= { ciscoUnityGlobalInfo 5 }
+
+ciscoUnityPortsOutbound OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of ports that are designated for outbound
+        calls (includes message notification, MWI dialout and AMIS
+        delivery)."
+    ::= { ciscoUnityGlobalInfo 6 }
+
+ciscoUnityPortsOutboundActive OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of outbound ports that are currently active with
+        calls."
+    ::= { ciscoUnityGlobalInfo 7 }
+
+--
+--      License Information
+--    
+ciscoUnityLicLanguagesMax OBJECT-TYPE
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of languages that Unity may use concurrently."
+    ::= { ciscoUnityGlobalInfo 8 }
+
+ciscoUnityLicTTSSessionsMax OBJECT-TYPE
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of ports licensed for Text-to-Speech
+        operations."
+    ::= { ciscoUnityGlobalInfo 9 }
+    
+ciscoUnityLicSubscribersMax OBJECT-TYPE
+    SYNTAX Unsigned32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of subscribers licensed."
+    ::= { ciscoUnityGlobalInfo 10 }
+    
+ciscoUnityLicUMSubscribersMax OBJECT-TYPE
+    SYNTAX Unsigned32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of subscribers licensed for unified 
+        messaging."
+    ::= { ciscoUnityGlobalInfo 11 }
+    
+ciscoUnityLicVMISubscribersMax OBJECT-TYPE
+    SYNTAX Unsigned32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of subscribers licensed for Visual
+        Messaging Interface (VMI)."
+    ::= { ciscoUnityGlobalInfo 12 }
+    
+ciscoUnityLicVoicePortsMax OBJECT-TYPE
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of voice ports licensed."
+    ::= { ciscoUnityGlobalInfo 13 }
+    
+ciscoUnityLicBridgeSessionsMax OBJECT-TYPE
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of sessions licensed for Unity Bridge
+        on the server."
+    ::= { ciscoUnityGlobalInfo 14 }
+    
+ciscoUnityLicAMISIsLicensed OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This indicates whether or not AMIS is licensed
+        for this server."
+    ::= { ciscoUnityGlobalInfo 15 }
+    
+ciscoUnityLicMaxMsgRecLenIsLic OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This indicates whether or not this server is
+        licensed to record voice mail messages of any length."
+    ::= { ciscoUnityGlobalInfo 16 }
+    
+ciscoUnityLicPoolingIsEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This indicates whether or not license pooling
+        is enabled for this server."
+    ::= { ciscoUnityGlobalInfo 17 }
+    
+ciscoUnityLicVPIMIsLicensed OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This indicates whether or not VPIM is licensed
+        for this server."
+    ::= { ciscoUnityGlobalInfo 18 }
+    
+ciscoUnityLicPrimaryServerIsLic OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This indicates whether or not this server
+        is licensed to run as a primary/stand-alone Unity server."
+    ::= { ciscoUnityGlobalInfo 19 }
+    
+ciscoUnityLicSecondServerIsLic OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This indicates whether or not a secondary
+        (failover) server is licensed."
+    ::= { ciscoUnityGlobalInfo 20 }
+    
+ciscoUnityLicUtilSecondServer OBJECT-TYPE
+    SYNTAX Unsigned32 (0..1)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This indicates the current number of licensed secondary 
+        servers."
+    ::= { ciscoUnityGlobalInfo 21 }
+    
+ciscoUnityLicUtilSubs OBJECT-TYPE
+    SYNTAX Unsigned32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This indicates the current number of licensed subscribers."
+    ::= { ciscoUnityGlobalInfo 22 }
+    
+ciscoUnityLicUtilVMISubs OBJECT-TYPE
+    SYNTAX Unsigned32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This indicates the current number of subscribers that are
+        licensed for VMI."
+    ::= { ciscoUnityGlobalInfo 23 }
+    
+
+--
+--      Notification Related Objects
+--
+ciscoUnityEventType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        error(1),
+        warning(2),
+        informational(3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The classification on the event severity.
+        error(1)            Error events indicate significant 
+                            problems that the user should know about
+        warning(2)          Warning events indicate problems that are
+                            not immediately significant, but that may
+                            indicate conditions that could cause
+                            future problems.
+        informational(3)    Information events indicate infrequent
+                            but significant successful operations."
+    ::= { ciscoUnityNotificationsInfo 1 }
+    
+ciscoUnityEventSource OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The software that logged the event, which can be either a
+        program name, a component of the system, or a component of
+        a large program."
+    ::= { ciscoUnityNotificationsInfo 2 }
+
+ciscoUnityEventCategory OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A classification of the event by the event source."
+    ::= { ciscoUnityNotificationsInfo 3 }
+    
+ciscoUnityEventId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A number identifying the particular event type.  The EventID
+        and EventSource can be used to troubleshoot system problems."
+    ::= { ciscoUnityNotificationsInfo 4 }    
+
+ciscoUnityEventDate OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The date and time the event occurred."
+    ::= { ciscoUnityNotificationsInfo 5 }    
+
+ciscoUnityEventUser OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The user name of the user on whose behalf the event occurred.
+        This name is the client ID if the event was actually caused by 
+        a server process, or the primary ID if impersonation is not 
+        taking place."
+    ::= { ciscoUnityNotificationsInfo 6 }    
+
+ciscoUnityEventComputer OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name of the computer where the event occurred."
+    ::= { ciscoUnityNotificationsInfo 7 }
+
+ciscoUnityEventDescription OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The event description indicates what happened or the 
+        significance of the event." 
+    ::= { ciscoUnityNotificationsInfo 8 }    
+
+ciscoUnityEventEMSNotes OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The contents of the notes field as entered into the EMS for
+        this monitored event."
+    ::= { ciscoUnityNotificationsInfo 9 }    
+
+--
+--      Notifications
+--
+    
+ciscoUnityMonitoredEvent NOTIFICATION-TYPE
+    OBJECTS      {
+        ciscoUnityEventType,
+        ciscoUnityEventSource,
+        ciscoUnityEventCategory,
+        ciscoUnityEventId,
+        ciscoUnityEventDate,
+        ciscoUnityEventUser,
+        ciscoUnityEventComputer,
+        ciscoUnityEventDescription,
+        ciscoUnityEventEMSNotes
+    }
+    STATUS      current
+    DESCRIPTION
+        "This Notification contains information from the Windows Event 
+        Log concerning an event that the Event Monitoring Service is
+        configured to monitor."
+    ::= { ciscoUnityMIBNotifs 1 }
+
+--
+--      MIB Conformance Statements
+--
+
+ciscoUnityMIBCompliances OBJECT IDENTIFIER 
+    ::= { ciscoUnityMIBConform 1 }
+ciscoUnityMIBGroups      OBJECT IDENTIFIER 
+    ::= { ciscoUnityMIBConform 2 }
+    
+-- Compliance
+
+ciscoUnityMIBCompliance MODULE-COMPLIANCE
+    STATUS  deprecated -- replaced by ciscoUnityMIBComplianceRev1
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Unity MIB"
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+        ciscoUnityInfoGroup, ciscoUnityNotificationsInfoGroup,
+        ciscoUnityNotificationsGroup
+    }
+    GROUP ciscoUnityPortInfoGroup
+    DESCRIPTION
+        "This group is mandatory for Cisco Unity servers that include
+        voice processing components."
+    ::= { ciscoUnityMIBCompliances 1 }
+
+ciscoUnityMIBComplianceRev1 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Unity MIB"
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+        ciscoUnityInfoGroup, ciscoUnityNotificationsInfoGroup,
+        ciscoUnityNotificationsGroup, ciscoUnityLicInfoGroup
+    }
+
+    GROUP   ciscoUnityPortInfoGroup
+    DESCRIPTION
+        "This group is mandatory for Cisco Unity servers that include
+        voice processing components."
+
+    GROUP   ciscoUnityPortInfoGroup2
+    DESCRIPTION
+        "This group is mandatory for Cisco Unity servers that include
+        voice processing components."
+
+    GROUP   ciscoUnityPortInfoGroup3
+    DESCRIPTION
+        "This group is mandatory only for Cisco Unity Connection 
+        servers that include voice processing components."
+    ::= { ciscoUnityMIBCompliances 2 }
+
+-- Units of Conformance
+--
+ciscoUnityInfoGroup OBJECT-GROUP
+    OBJECTS {
+        ciscoUnityName,
+        ciscoUnityVersion,
+        ciscoUnityServerState,
+        ciscoUnityPorts,
+        ciscoUnityPortsActive,
+        ciscoUnityPortsInbound,
+        ciscoUnityPortsInboundActive,
+        ciscoUnityPortsOutbound,
+        ciscoUnityPortsOutboundActive
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects which provide info about the local
+        Unity server."
+    ::= { ciscoUnityMIBGroups 1 }
+
+ciscoUnityPortInfoGroup OBJECT-GROUP
+    OBJECTS {
+        ciscoUnityPortNumber,
+        ciscoUnityPortIntegration,
+        ciscoUnityPortExtension,
+        ciscoUnityPortEnabled,
+        ciscoUnityPortAnswerCalls,
+        ciscoUnityPortMessageNotif,
+        ciscoUnityPortDialoutMWI,
+        ciscoUnityPortAMISDelivery,
+        ciscoUnityPortTRAPConnection
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects which provide info about the port
+        configuration of a Unity server."
+    ::= { ciscoUnityMIBGroups 2 }
+
+ciscoUnityNotificationsInfoGroup OBJECT-GROUP
+    OBJECTS {
+        ciscoUnityEventType,
+        ciscoUnityEventSource,
+        ciscoUnityEventCategory,
+        ciscoUnityEventId,
+        ciscoUnityEventDate,
+        ciscoUnityEventUser,
+        ciscoUnityEventComputer,
+        ciscoUnityEventDescription,
+        ciscoUnityEventEMSNotes
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects which provide info about all the
+        Notifications generated by the Cisco Unity Agent."
+    ::= { ciscoUnityMIBGroups 3 }
+
+ciscoUnityNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ciscoUnityMonitoredEvent
+    }
+    STATUS  current 
+    DESCRIPTION
+        "A collection of notifications that are generated by the
+        CISCO UNITY MIB Agent."
+    ::= { ciscoUnityMIBGroups 4 }
+
+ciscoUnityLicInfoGroup OBJECT-GROUP
+    OBJECTS {
+        ciscoUnityLicLanguagesMax,
+        ciscoUnityLicTTSSessionsMax,
+        ciscoUnityLicSubscribersMax,
+        ciscoUnityLicUMSubscribersMax,
+        ciscoUnityLicVMISubscribersMax,
+        ciscoUnityLicVoicePortsMax,
+        ciscoUnityLicBridgeSessionsMax,
+        ciscoUnityLicAMISIsLicensed,
+        ciscoUnityLicMaxMsgRecLenIsLic,
+        ciscoUnityLicPoolingIsEnabled,
+        ciscoUnityLicVPIMIsLicensed,
+        ciscoUnityLicPrimaryServerIsLic,
+        ciscoUnityLicSecondServerIsLic,
+        ciscoUnityLicUtilSecondServer,
+        ciscoUnityLicUtilSubs,
+        ciscoUnityLicUtilVMISubs
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects which provide info about the local
+        Unity server."
+    ::= { ciscoUnityMIBGroups 5 }
+
+ciscoUnityPortInfoGroup2 OBJECT-GROUP
+    OBJECTS {
+        ciscoUnityPortActivity
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects which provide info about the port
+        configuration of a Unity Connection server."
+    ::= { ciscoUnityMIBGroups 6 }
+
+ciscoUnityPortInfoGroup3 OBJECT-GROUP
+    OBJECTS {
+        ciscoUnityPortObjectId
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects which provide info about the port
+        configuration of a Unity Connection server. This object group
+        is only implemented on Cisco Unity Connection."
+    ::= { ciscoUnityMIBGroups 7 }
+
+END
