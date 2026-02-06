@@ -125,6 +125,12 @@
                         "location_template": {
                             "type": "string"
                         },
+                        "lat_template": {
+                            "type": "string"
+                        },
+                        "long_template": {
+                            "type": "string"
+                        },
                         "version_replace": {"$ref": "#/$defs/os_replacements"},
                         "hardware_replace": {"$ref": "#/$defs/os_replacements"},
                         "features_replace": {"$ref": "#/$defs/os_replacements"},
