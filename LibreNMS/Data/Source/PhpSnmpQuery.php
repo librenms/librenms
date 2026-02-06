@@ -73,7 +73,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
             $snmpver,
             $this->device->hostname,
             $this->device->snmpver === 'v3' ? ($this->device->authname ?: 'root') : $this->device->community,
-            ($this->device->timeout ?? LibrenmsConfig::get('snmp.timeout')) * 1000,
+            ($this->device->timeout ?? LibrenmsConfig::get('snmp.timeout')) * 1000000,
             $this->device->retries ?? LibrenmsConfig::get('snmp.retries'),
         );
         $this->snmp->quick_print = true;
