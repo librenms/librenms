@@ -39,7 +39,7 @@ trait QBridgeMib
 {
     private function discoverIetfQBridgeMibVlans(): Collection
     {
-        return SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticName')
+        return SnmpQuery::mibs(['BRIDGE-MIB', 'P-BRIDGE-MIB', 'RMON2-MIB', 'Q-BRIDGE-MIB'])->walk('Q-BRIDGE-MIB::dot1qVlanStaticName')
             ->mapTable(fn ($data, $vlan_id) => new Vlan([
                 'vlan_vlan' => $vlan_id,
                 'vlan_domain' => 1,
@@ -49,7 +49,7 @@ trait QBridgeMib
 
     private function discoverIeeeQBridgeMibVlans(): Collection
     {
-        return SnmpQuery::walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName')
+        return SnmpQuery::mibs(['IEEE8021-Q-BRIDGE-MIB'])->walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName')
             ->mapTable(fn ($data, $vlan_domain_id, $vlan_id) => new Vlan([
                 'vlan_vlan' => $vlan_id,
                 'vlan_domain' => $vlan_domain_id,
@@ -61,21 +61,21 @@ trait QBridgeMib
     {
         $ports = new Collection;
 
-        $vlanVersion = SnmpQuery::get('Q-BRIDGE-MIB::dot1qVlanVersionNumber.0')->value();
+        $vlanVersion = SnmpQuery::mibs(['Q-BRIDGE-MIB'])->get('Q-BRIDGE-MIB::dot1qVlanVersionNumber.0')->value();
 
         if ($vlanVersion < 1 || $vlanVersion > 2) {
             return $ports;
         }
 
         // fetch vlan data
-        $port_data = SnmpQuery::walk([
+        $port_data = SnmpQuery::mibs(['Q-BRIDGE-MIB'])->walk([
             'Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts',
             'Q-BRIDGE-MIB::dot1qVlanCurrentEgressPorts',
         ])->table(2);
 
         if (empty($port_data)) {
             // fall back to static
-            $port_data = SnmpQuery::walk([
+            $port_data = SnmpQuery::mibs(['Q-BRIDGE-MIB'])->walk([
                 'Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts',
                 'Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts',
             ])->table(1);
@@ -126,7 +126,7 @@ trait QBridgeMib
     {
         $ports = new Collection;
 
-        $port_data = SnmpQuery::walk([
+        $port_data = SnmpQuery::mibs(['IEEE8021-Q-BRIDGE-MIB'])->walk([
             'IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticUntaggedPorts',
             'IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticEgressPorts',
         ])->table(2);

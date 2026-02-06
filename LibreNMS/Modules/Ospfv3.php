@@ -73,6 +73,7 @@ class Ospfv3 implements Module
             // Check for instance data
             $ospf_group = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
+                ->mibs(['OSPFV3-MIB'])
                 ->walk('OSPFV3-MIB::ospfv3GeneralGroup')->valuesByIndex()[0] ?? [];
 
             if (empty($ospf_group['ospfv3RouterId'])) {

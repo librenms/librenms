@@ -1,4 +1,4 @@
-mib: SOCOMECUPS-MIB
+mib: UPS-MIB:SOCOMECUPS-MIB
 modules:
     os:
         hardware:
