@@ -78,7 +78,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
         );
         $this->snmp->quick_print = true;
         $this->snmp->valueretrieval = SNMP_VALUE_PLAIN;
-        $this->snmp->exceptions_enabled = \SNMP::ERRNO_ANY;
 
         if ($this->device->snmpver === 'v3') {
             $this->setSecurity(null);
@@ -268,20 +267,17 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function get($oid): SnmpResponse
     {
+        Log::Debug($oid);
         $ret = [];
         foreach ($this->limitOids($this->parseOid($oid)) as $oids) {
             $measure = Measurement::start('snmpget');
             $this->logSnmpCmd('GET', $oids);
-            try {
-                $res = $this->snmp->get($oids);
-            } catch (\SNMPException $e) {
-                Log::debug('SNMP error: ' . $e->getMessage());
-                return new SnmpResponse($e->getMessage(), $e->getMessage(), 1);
-            }
+            $res = $this->snmp->get($oids);
             if ($res) {
                 $ret = array_merge($ret, $res);
             } else {
                 $this->logSnmpError('GET', $oids);
+                return new SnmpResponse($this->snmp->getError(), $this->snmp->getError());
             }
             $measure->manager()->recordSnmp($measure->end());
         }
@@ -303,12 +299,13 @@ class PhpSnmpQuery implements SnmpQueryInterface
         $measure = Measurement::start('snmpwalk');
         $oids = $this->parseOid($oid);
         $this->logSnmpCmd('WALK', $oids);
-        try {
-            $ret = $this->snmp->walk($oids);
-        } catch (\SNMPException $e) {
-            Log::debug('SNMP error: ' . $e->getMessage());
-            return new SnmpResponse($e->getMessage(), $e->getMessage(), 1);
+        $ret = $this->snmp->walk($oids);
+
+        if (!$ret) {
+            $this->logSnmpError('WALK', $oids);
+            return new SnmpResponse($this->snmp->getError(), $this->snmp->getError());
         }
+
         $measure->manager()->recordSnmp($measure->end());
 
         Log::debug($ret);
@@ -326,19 +323,19 @@ class PhpSnmpQuery implements SnmpQueryInterface
     public function next($oid): SnmpResponse
     {
         $measure = Measurement::start('snmpget');
+        $error = '';
+
         foreach ($this->limitOids($this->parseOid($oid)) as $oids) {
             $this->logSnmpCmd('GETNEXT', $oids);
-            try {
-                $res = $this->snmp->getnext($oids);
-            } catch (\SNMPException $e) {
-                Log::debug('SNMP error: ' . $e->getMessage());
-                return new SnmpResponse($e->getMessage(), $e->getMessage(), 1);
-            }
+            $res = $this->snmp->getnext($oids);
             if ($res) {
                 $ret = array_merge($ret, $res);
             } else {
                 $this->logSnmpError('GETNEXT', $oids);
+                return new SnmpResponse($this->snmp->getError(), $this->snmp->getError());
             }
+
+            $error .= (count($ret) == count($oids) ? '' : $this->snmp->getError());
         }
         $measure->manager()->recordSnmp($measure->end());
 
@@ -462,7 +459,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
     private function logSnmpError(string $cmd, array $oids): void
     {
-        Log::debug("Error running SNMP $cmd");
+        Log::debug("Error running SNMP $cmd: " . $this->snmp->getError());
     }
 
     private function logSnmpCmd(string $cmd, array $oids): void
