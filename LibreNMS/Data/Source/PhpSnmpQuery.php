@@ -273,13 +273,14 @@ class PhpSnmpQuery implements SnmpQueryInterface
             $measure = Measurement::start('snmpget');
             $this->logSnmpCmd('GET', $oids);
             $res = $this->snmp->get($oids);
+            $measure->manager()->recordSnmp($measure->end());
+
             if ($res) {
                 $ret = array_merge($ret, $res);
             } else {
                 $this->logSnmpError('GET', $oids);
                 return new SnmpResponse($this->snmp->getError(), $this->snmp->getError());
             }
-            $measure->manager()->recordSnmp($measure->end());
         }
 
         Log::debug($ret);
@@ -300,13 +301,12 @@ class PhpSnmpQuery implements SnmpQueryInterface
         $oids = $this->parseOid($oid);
         $this->logSnmpCmd('WALK', $oids);
         $ret = $this->snmp->walk($oids);
+        $measure->manager()->recordSnmp($measure->end());
 
         if (!$ret) {
             $this->logSnmpError('WALK', $oids);
             return new SnmpResponse($this->snmp->getError(), $this->snmp->getError());
         }
-
-        $measure->manager()->recordSnmp($measure->end());
 
         Log::debug($ret);
 
@@ -322,23 +322,20 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function next($oid): SnmpResponse
     {
-        $measure = Measurement::start('snmpget');
-        $error = '';
-
         foreach ($this->limitOids($this->parseOid($oid)) as $oids) {
             $this->logSnmpCmd('GETNEXT', $oids);
+
+            $measure = Measurement::start('snmpget');
             $res = $this->snmp->getnext($oids);
+            $measure->manager()->recordSnmp($measure->end());
+
             if ($res) {
                 $ret = array_merge($ret, $res);
             } else {
                 $this->logSnmpError('GETNEXT', $oids);
                 return new SnmpResponse($this->snmp->getError(), $this->snmp->getError());
             }
-
-            $error .= (count($ret) == count($oids) ? '' : $this->snmp->getError());
         }
-        $measure->manager()->recordSnmp($measure->end());
-
         Log::debug($ret);
 
         return new SnmpResponse($ret);
