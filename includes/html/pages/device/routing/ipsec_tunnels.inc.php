@@ -116,9 +116,10 @@ if (is_null($vars['graph'])) {
         $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['id'] = $entry['tunnel_id'];
         $graph_array['type'] = $graph_type;
+        $tunnel_name = htmlentities((string) $entry['tunnel_name']);
         echo '<div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">' . $local_addr . '  &#187;  ' . $remote_addr . '</h3>
+                <h3 class="panel-title">' . $local_addr . ' &#187; ' . $remote_addr . ($tunnel_name !== '' ? ' <span class="text-muted">(' . $tunnel_name . ')</span>' : '') . '</h3>
             </div>
             <div class="panel-body">';
         echo "<div class='row'>";
