@@ -4,6 +4,7 @@ type: wireless
 icon: ubiquiti
 snmp_bulk: false
 mib_dir: ubnt
+mib: UBNT-MIB:UBNT-AFLTU-MIB
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_wireless_rate, text: 'Wireless Rate' }

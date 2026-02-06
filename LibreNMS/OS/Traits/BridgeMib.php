@@ -40,7 +40,7 @@ trait BridgeMib
 
     public function discoverStpInstances(?string $vlan = null): Collection
     {
-        $protocol = SnmpQuery::context("$vlan", 'vlan-')->get('BRIDGE-MIB::dot1dStpProtocolSpecification.0')->value();
+        $protocol = SnmpQuery::context("$vlan", 'vlan-')->mibs(['BRIDGE-MIB'])->get('BRIDGE-MIB::dot1dStpProtocolSpecification.0')->value();
         // 1 = unknown (mstp?), 3 = ieee8021d
 
         if ($protocol != 1 && $protocol != 3) {
@@ -50,7 +50,7 @@ trait BridgeMib
         $timeFactor = $this->stpTimeFactor ?? 0.01;
 
         // fetch STP config and store it
-        $stp = SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->get([
+        $stp = SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->mibs(['BRIDGE-MIB'])->get([
             'BRIDGE-MIB::dot1dBaseBridgeAddress.0',
             'BRIDGE-MIB::dot1dStpProtocolSpecification.0',
             'BRIDGE-MIB::dot1dStpPriority.0',
@@ -110,6 +110,7 @@ trait BridgeMib
 
         foreach ($stpInstances as $instance) {
             $vlan_ports = SnmpQuery::context("$instance->vlan", 'vlan-')
+                ->mibs(['BRIDGE-MIB'])
                 ->enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
                 ->mapTable(fn ($data, $port) => new PortStp([
                     'vlan' => $instance->vlan,
@@ -157,7 +158,7 @@ trait BridgeMib
     public function pollStpInstances(Collection $stpInstances): Collection
     {
         return $stpInstances->each(function (Stp $instance): void {
-            $data = SnmpQuery::context("$instance->vlan", 'vlan-')->enumStrings()->get([
+            $data = SnmpQuery::context("$instance->vlan", 'vlan-')->mibs(['BRIDGE-MIB'])->enumStrings()->get([
                 'BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0',
                 'BRIDGE-MIB::dot1dStpTopChanges.0',
                 'BRIDGE-MIB::dot1dStpDesignatedRoot.0',
@@ -183,7 +184,7 @@ trait BridgeMib
                 return $carry;
             }, []);
 
-            SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->get($oids)
+            SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->mibs(['BRIDGE-MIB'])->get($oids)
                 ->mapTable(function ($data, $base_port) use ($vlan, $vlan_ports) {
                     $port = $vlan_ports->get($base_port);
                     $port->vlan = $vlan;
@@ -222,7 +223,7 @@ trait BridgeMib
             return 0;
         }
 
-        $this->ifIndexToBridgePort ??= SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+        $this->ifIndexToBridgePort ??= SnmpQuery::mibs(['BRIDGE-MIB'])->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
 
         return (int) (array_flip($this->ifIndexToBridgePort)[$ifIndex] ?? 0);
     }
@@ -233,7 +234,7 @@ trait BridgeMib
             return 0;
         }
 
-        $this->ifIndexToBridgePort ??= SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+        $this->ifIndexToBridgePort ??= SnmpQuery::mibs(['BRIDGE-MIB'])->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
 
         return (int) ($this->ifIndexToBridgePort[$bridgePort] ?? 0);
     }

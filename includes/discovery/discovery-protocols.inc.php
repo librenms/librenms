@@ -10,7 +10,7 @@ global $link_exists;
 
 if ($device['os'] == 'ironware') {
     echo ' Brocade FDP: ';
-    $fdp_array = SnmpQuery::hideMib()->walk('FOUNDRY-SN-SWITCH-GROUP-MIB::snFdpCacheEntry')->table(2);
+    $fdp_array = SnmpQuery::hideMib()->mibs(['FOUNDRY-SN-SWITCH-GROUP-MIB'])->walk('FOUNDRY-SN-SWITCH-GROUP-MIB::snFdpCacheEntry')->table(2);
 
     foreach ($fdp_array as $ifIndex => $fdp_if_array) {
         $interface = \App\Facades\PortCache::getByIfIndex($ifIndex, $device['device_id']);
@@ -46,7 +46,7 @@ if ($device['os'] == 'ironware') {
 
 if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
     echo ' CISCO-CDP-MIB: ';
-    $cdp_array = SnmpQuery::hideMib()->walk('CISCO-CDP-MIB::cdpCache')->table(2);
+    $cdp_array = SnmpQuery::hideMib()->mibs(['CISCO-CDP-MIB'])->walk('CISCO-CDP-MIB::cdpCache')->table(2);
 
     foreach ($cdp_array as $ifIndex => $cdp_if_array) {
         $interface = PortCache::getByIfIndex($ifIndex, $device['device_id']);
@@ -98,15 +98,15 @@ if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
 
 if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', '<')) {
     echo ' LLDP-MIB: ';
-    $lldp_array = SnmpQuery::hideMib()->walk('LLDP-MIB::lldpRemEntry')->table(3);
+    $lldp_array = SnmpQuery::hideMib()->mibs(['LLDP-MIB'])->walk('LLDP-MIB::lldpRemEntry')->table(3);
     if (! empty($lldp_array)) {
         // workaround for routeros returning the incorrect index
         if (! empty($lldp_array[0][0])) {
             $lldp_array = $lldp_array[0][0];
         }
 
-        $lldp_ports = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->table();
-        $lldp_ports_num = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrNeighborInterfaceID')->table();
+        $lldp_ports = SnmpQuery::hideMib()->mibs(['MIKROTIK-MIB'])->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->table();
+        $lldp_ports_num = SnmpQuery::hideMib()->mibs(['MIKROTIK-MIB'])->walk('MIKROTIK-MIB::mtxrNeighborInterfaceID')->table();
 
         foreach ($lldp_array as $key => $lldp) {
             if (! isset($lldp_ports_num['mtxrNeighborInterfaceID'][$key]) ||
@@ -150,7 +150,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     echo PHP_EOL;
 } elseif ($device['os'] == 'pbn' || $device['os'] == 'bdcom' || $device['os'] == 'fs-bdcom') {
     echo ' NMS-LLDP-MIB: ';
-    $lldp_array = SnmpQuery::hideMib()->walk('NMS-LLDP-MIB::lldpRemoteSystemsData')->table(2);
+    $lldp_array = SnmpQuery::hideMib()->mibs(['NMS-LLDP-MIB'])->walk('NMS-LLDP-MIB::lldpRemoteSystemsData')->table(2);
     foreach ($lldp_array as $lldp_array_inner) {
         foreach ($lldp_array_inner as $lldp) {
             d_echo($lldp);
@@ -183,7 +183,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     echo PHP_EOL;
 } elseif ($device['os'] == 'timos') {
     echo ' TIMETRA-LLDP-MIB: ';
-    $lldp_array = SnmpQuery::hideMib()->walk('TIMETRA-LLDP-MIB::tmnxLldpRemoteSystemsData')->table(4);
+    $lldp_array = SnmpQuery::hideMib()->mibs(['TIMETRA-LLDP-MIB'])->walk('TIMETRA-LLDP-MIB::tmnxLldpRemoteSystemsData')->table(4);
     foreach ($lldp_array as $sub_lldp_1) {
         foreach ($sub_lldp_1 as $ifIndex => $sub_lldp_2) {
             foreach ($sub_lldp_2 as $sub_lldp_3) {
@@ -221,7 +221,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 } elseif ($device['os'] == 'jetstream') {
     echo ' JETSTREAM-LLDP MIB: ';
 
-    $lldp = SnmpQuery::hideMib()->walk('TPLINK-LLDPINFO-MIB::lldpNeighborInfoEntry')->table();
+    $lldp = SnmpQuery::hideMib()->mibs(['TPLINK-LLDPINFO-MIB'])->walk('TPLINK-LLDPINFO-MIB::lldpNeighborInfoEntry')->table();
 
     if (isset($lldp['lldpNeighborPortIndexId']) && is_array($lldp['lldpNeighborPortIndexId'])) {
         foreach ($lldp['lldpNeighborPortIndexId'] as $IndexId => $lldp_data) {
@@ -269,7 +269,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     echo PHP_EOL;
 } else {
     echo ' LLDP-MIB: ';
-    $lldp_array = SnmpQuery::hideMib()->walk('LLDP-MIB::lldpRemTable')->table(3);
+    $lldp_array = SnmpQuery::hideMib()->mibs(['LLDP-MIB'])->walk('LLDP-MIB::lldpRemTable')->table(3);
     if (! empty($lldp_array)) {
         $lldp_remAddr_num = SnmpQuery::hideMib()->numeric()->walk('.1.0.8802.1.1.2.1.4.2.1.3');
         foreach ($lldp_remAddr_num as $key => $value) {
@@ -300,7 +300,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
         }
     } else {
         echo ' LLDP-V2-MIB: ';
-        $lldpv2_array = SnmpQuery::hideMib()->walk('LLDP-V2-MIB::lldpV2RemTable')->table(4);
+        $lldpv2_array = SnmpQuery::hideMib()->mibs(['LLDP-V2-MIB'])->walk('LLDP-V2-MIB::lldpV2RemTable')->table(4);
     }
 
     $mapV2toV1 = [

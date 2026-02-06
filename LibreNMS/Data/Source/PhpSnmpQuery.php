@@ -114,8 +114,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
     public function cache(): SnmpQueryInterface
     {
-        $this->cache = true;
-
         return $this;
     }
 
@@ -243,7 +241,11 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function options($options = []): SnmpQueryInterface
     {
-        throw new \Exception('PHP-SNMP does not support raw options - we should fall back to NetSnmpQuery');
+        if ($options) {
+            throw new \Exception('PHP-SNMP does not support raw options - we should fall back to NetSnmpQuery');
+        }
+
+        return $this;
     }
 
     /**
@@ -452,6 +454,10 @@ class PhpSnmpQuery implements SnmpQueryInterface
     private function logSnmpError(string $cmd, array $oids): void
     {
         Log::debug("Error running SNMP $cmd: " . $this->snmp->getError());
+
+        if (preg_match('/(Invalid object identifier: .*)/', $this->snmp->getError(), $errors)) {
+             throw new \Exception($this->snmp->getError());
+        }
     }
 
     private function logSnmpCmd(string $cmd, array $oids): void
