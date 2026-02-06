@@ -92,12 +92,6 @@
 
             setCustomMapBackground(elementId, bgtype, bgdata);
 
-            network.on('zoom', function (data) {
-                if(data.scale < scale) {
-                    network.moveTo({position: {x: centreX, y: centreY}, scale: scale});
-                }
-            });
-
             return network;
         },
 

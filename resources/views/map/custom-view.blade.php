@@ -38,17 +38,22 @@
     #map-container {
         display: grid;
         grid-template: 1fr / 1fr;
-        place-items: center;
+        overflow: auto;
     }
     #custom-map {
         grid-column: 1 / 1;
         grid-row: 1 / 1;
         z-index: 2;
+        margin: auto;
+    }
+    #custom-map canvas {
+        touch-action: auto !important;
     }
     #custom-map-bg-geo-map {
         grid-column: 1 / 1;
         grid-row: 1 / 1;
         z-index: 1;
+        margin: auto;
     }
 </style>
 @endpush
@@ -67,6 +72,9 @@
     var edge_port_map = {};
     var custom_image_base = "{{ $base_url }}images/custommap/icons/";
     var network_options = {{ Js::from($map_conf) }};
+    network_options.interaction = network_options.interaction || {};
+    network_options.interaction.dragView = false;
+    network_options.interaction.zoomView = false;
 
     var Countdown;
     function refreshMap() {
