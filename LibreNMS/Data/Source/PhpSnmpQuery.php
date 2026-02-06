@@ -51,7 +51,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     private array $mibFilesLoaded = [];
     private array $mibDirs = [];
-    private array $mibs = ['SNMPv2-SMI', 'SNMPv2-TC', 'SNMPv2-CONF', 'SNMPv2-MIB', 'IANAifType-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'];
+    private array $mibs = ['SNMPv2-SMI', 'SNMPv2-TC', 'SNMPv2-CONF', 'SNMPv2-MIB', 'IANAifType-MIB', 'IF-MIB', 'INET-ADDRESS-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'SNMP-FRAMEWORK-MIB', 'SNMP-VIEW-BASED-ACM-MIB', 'NET-SNMP-VACM-MIB'];
     private Device $device;
     private bool $abort = false;
     private bool $cache = false;
@@ -271,7 +271,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         $ret = [];
         foreach ($this->limitOids($this->parseOid($oid)) as $oids) {
             $measure = Measurement::start('snmpget');
-            Log::debug('SNMP GET: ' . implode(' ', $oids));
+            $this->logSnmpCmd('GET', $oids);
             try {
                 $res = $this->snmp->get($oids);
             } catch (\SNMPException $e) {
@@ -281,7 +281,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
             if ($res) {
                 $ret = array_merge($ret, $res);
             } else {
-                Log::debug('Error in SNMP get for OIDS: "' . implode('","', $oids) . '"');
+                $this->logSnmpError('GET', $oids);
             }
             $measure->manager()->recordSnmp($measure->end());
         }
@@ -302,7 +302,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
     {
         $measure = Measurement::start('snmpwalk');
         $oids = $this->parseOid($oid);
-        Log::debug('SNMP WALK: ' . implode(' ', $oids));
+        $this->logSnmpCmd('WALK', $oids);
         try {
             $ret = $this->snmp->walk($oids);
         } catch (\SNMPException $e) {
@@ -327,7 +327,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
     {
         $measure = Measurement::start('snmpget');
         foreach ($this->limitOids($this->parseOid($oid)) as $oids) {
-            Log::debug('SNMP GETNEXT: ' . implode(' ', $oids));
+            $this->logSnmpCmd('GETNEXT', $oids);
             try {
                 $res = $this->snmp->getnext($oids);
             } catch (\SNMPException $e) {
@@ -337,7 +337,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
             if ($res) {
                 $ret = array_merge($ret, $res);
             } else {
-                Log::debug('Error in SNMP getnext for OIDS: "' . implode('","', $oids) . '"');
+                $this->logSnmpError('GETNEXT', $oids);
             }
         }
         $measure->manager()->recordSnmp($measure->end());
@@ -457,6 +457,20 @@ class PhpSnmpQuery implements SnmpQueryInterface
             if (!$mibfound) {
                 Log::debug("MIB $mib was not found");
             }
+        }
+    }
+
+    private function logSnmpError(string $cmd, array $oids): void
+    {
+        Log::debug("Error running SNMP $cmd");
+    }
+
+    private function logSnmpCmd(string $cmd, array $oids): void
+    {
+        if(Debug::isVerbose()) {
+            Log::debug("SNMP $cmd - MIBS: " . implode(':', array_keys($this->mibFilesLoaded)) . ' OIDS: ' . implode(' ', $oids));
+        } else {
+            Log::debug("SNMP $cmd - OIDS: " . implode(' ', $oids));
         }
     }
 }
