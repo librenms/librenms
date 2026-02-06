@@ -43,6 +43,7 @@ if (isset($vars['errors'])) {
                     <th data-column-id="secondsIfLastChange" data-converter="duration">Status Changed</th>
                     <th data-column-id="ifConnectorPresent" data-visible="false">Connected</th>
                     <th data-column-id="ifSpeed" data-converter="human-bps">Speed</th>
+					<th data-column-id="ifDuplex">Duplex</th>
                     <th data-column-id="ifMtu" data-visible="false">MTU</th>
                     <th data-column-id="ifInOctets_rate" data-searchable="false" data-css-class="green"
                         data-converter="human-bps">In
