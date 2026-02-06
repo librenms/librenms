@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Tests\Unit\Util;
 
+use InvalidArgumentException;
 use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Number;
@@ -118,5 +119,42 @@ final class NumberTest extends TestCase
             $this->fail('No exception thrown');
         } catch (InsufficientDataException) {
         }
+    }
+
+    public function testCalculateRate(): void
+    {
+        $this->assertEquals(100.0, Number::calculateRate('100', '200', 1.0, 2.0));
+        $this->assertEquals(101.0, Number::calculateRate('4294967295', '100', 1.0, 2.0));
+        $this->assertEquals(250.5, Number::calculateRate('18446744073709551615', '500', 1.0, 3.0, 64));
+        $this->assertEquals(0.0, Number::calculateRate('1000', '1000', 1.0, 2.0));
+        $this->assertEquals(100.0, Number::calculateRate('100', '200', 1.0, 2.0)); //32bit
+        $this->assertEquals(100.0, Number::calculateRate('5000000000', '5000000100', 1.0, 2.0)); //64bit
+        $this->assertEquals(200.0, Number::calculateRate('100', '300', 1.5, 2.5)); // 200 difference / 1.0 second
+    }
+
+    public function testCalculateRateInvalidTimeThrowsException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Current time must be greater than previous time');
+        Number::calculateRate('100', '200', 2.0, 1.0);
+    }
+
+    public function testCalculateRateEqualTimeThrowsException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        Number::calculateRate('100', '200', 1.0, 1.0);
+    }
+
+    public function testCalculateRateNegativeValueThrowsException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Counter values must be non-negative integers');
+        Number::calculateRate('-100', '200', 1.0, 2.0);
+    }
+
+    public function testCalculateRateNonNumericValueThrowsException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        Number::calculateRate('abc', '200', 1.0, 2.0);
     }
 }
