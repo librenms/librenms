@@ -28,15 +28,8 @@
             },
             converters: {
                 datetime: {
-                    from: function (value) {
-                        return new Date(value).toISOString();
-                    },
                     to: function (value) {
-                        let formatter = new Intl.DateTimeFormat(navigator.language, {
-                            dateStyle: 'medium',
-                            timeStyle: 'short'
-                        });
-                        return formatter.format(new Date(value));
+                        return LibreNMS.Time.format(value, {timeStyle: "short"});
                     }
                 }
             }
