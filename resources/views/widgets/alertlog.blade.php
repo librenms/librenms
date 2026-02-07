@@ -26,7 +26,13 @@
                     severity: @json($severity),
                 };
             },
-            converters: LibreNMS.converters
+            converters: {
+                datetime: {
+                    to: function (value) {
+                        return LibreNMS.Time.format(value, {timeStyle: "short"});
+                    }
+                }
+            }
         }).on("loaded.rs.jquery.bootgrid", function () {
             grid.find(".incident-toggle").each(function () {
                 $(this).parent().addClass('incident-toggle-td');

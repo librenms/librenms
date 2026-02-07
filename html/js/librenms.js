@@ -1,4 +1,4 @@
-var LibreNMS = {};
+var LibreNMS = {Time: {}};
 window.maps = {};
 
 function override_config(event, state, tmp_this) {
@@ -769,18 +769,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-LibreNMS.converters = {
-    datetime: {
-        from: function (value) {
-            return new Date(value).toISOString();
-        },
-        to: function (value) {
-            let options = {
-                dateStyle: "medium",
-                timeStyle: "medium",
-                timeZone: window.tz
-            };
-            return new Intl.DateTimeFormat(navigator.language, options).format(new Date(value));
-        }
-    }
+LibreNMS.Time.format = function (value, options = {}) {
+    let compositeOptions = {...{
+        dateStyle: "medium",
+        timeStyle: "medium",
+        timeZone: window.tz
+    }, ...options};
+
+    return new Intl.DateTimeFormat(navigator.language, compositeOptions).format(new Date(value));
 };

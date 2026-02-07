@@ -120,7 +120,11 @@ $common_output[] = '</select> \
                 severity: $(\'#severity\').val() || []
             };
         },
-        converters: LibreNMS.converters
+        converters: {
+            datetime: {
+              to: LibreNMS.Time.format
+            }
+        }
     }).on("loaded.rs.jquery.bootgrid", function () {
 
         var results = $("div.infos").text().split(" ");
