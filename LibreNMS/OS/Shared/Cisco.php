@@ -356,7 +356,7 @@ class Cisco extends OS implements
                         1,
                         $core_usage,
                         null,
-                        $entry['cpmCPUTotalPhysicalIndex']
+                        $entry['cpmCPUTotalPhysicalIndex'] ?? null
                     );
                 }
             } else {
@@ -369,7 +369,7 @@ class Cisco extends OS implements
                     1,
                     $usage,
                     null,
-                    $entry['cpmCPUTotalPhysicalIndex']
+                    $entry['cpmCPUTotalPhysicalIndex'] ?? null
                 );
             }
         }

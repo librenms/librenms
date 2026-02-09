@@ -1,92 +1,219 @@
-mib: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
+mib: CISCO-CCM-MIB:CISCO-UNITY-MIB
 modules:
     os:
         hardware_mib: CISCO-PRODUCTS-MIB
         version: SYSAPPL-MIB::sysApplInstallPkgVersion.1
     sensors:
-        additional_oids:
+        count:
             data:
+                # Phone Statistics
                 -
-                    oid:
-                        - cucsEquipmentChassisDn
-                        - cucsEquipmentFanModuleDn
-                        - cucsEquipmentPsuDn
+                    oid: ccmRegisteredPhones
+                    value: ccmRegisteredPhones
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.5{{ $noindex }}
+                    index: 'ccmRegisteredPhones'
+                    descr: 'Registered Phones'
+                    group: 'Phone Stats'
+                -
+                    oid: ccmUnregisteredPhones
+                    value: ccmUnregisteredPhones
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.6{{ $noindex }}
+                    index: 'ccmUnregisteredPhones'
+                    descr: 'Unregistered Phones'
+                    group: 'Phone Stats'
+                -
+                    oid: ccmRejectedPhones
+                    value: ccmRejectedPhones
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.7{{ $noindex }}
+                    index: 'ccmRejectedPhones'
+                    descr: 'Rejected Phones'
+                    group: 'Phone Stats'
+
+                # Gateway Statistics
+                -
+                    oid: ccmRegisteredGateways
+                    value: ccmRegisteredGateways
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.8{{ $noindex }}
+                    index: 'ccmRegisteredGateways'
+                    descr: 'Registered Gateways'
+                    group: 'Gateway Stats'
+                -
+                    oid: ccmUnregisteredGateways
+                    value: ccmUnregisteredGateways
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.9{{ $noindex }}
+                    index: 'ccmUnregisteredGateways'
+                    descr: 'Unregistered Gateways'
+                    group: 'Gateway Stats'
+                -
+                    oid: ccmRejectedGateways
+                    value: ccmRejectedGateways
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.10{{ $noindex }}
+                    index: 'ccmRejectedGateways'
+                    descr: 'Rejected Gateways'
+                    group: 'Gateway Stats'
+
+                # Media Device Statistics
+                -
+                    oid: ccmRegisteredMediaDevices
+                    value: ccmRegisteredMediaDevices
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.11{{ $noindex }}
+                    index: 'ccmRegisteredMediaDevices'
+                    descr: 'Registered Media Devices'
+                    group: 'Media Device Stats'
+                -
+                    oid: ccmUnregisteredMediaDevices
+                    value: ccmUnregisteredMediaDevices
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.12{{ $noindex }}
+                    index: 'ccmUnregisteredMediaDevices'
+                    descr: 'Unregistered Media Devices'
+                    group: 'Media Device Stats'
+                -
+                    oid: ccmRejectedMediaDevices
+                    value: ccmRejectedMediaDevices
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.13{{ $noindex }}
+                    index: 'ccmRejectedMediaDevices'
+                    descr: 'Rejected Media Devices'
+                    group: 'Media Device Stats'
+
+                # CTI Device Statistics
+                -
+                    oid: ccmRegisteredCTIDevices
+                    value: ccmRegisteredCTIDevices
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.14{{ $noindex }}
+                    index: 'ccmRegisteredCTIDevices'
+                    descr: 'Registered CTI Devices'
+                    group: 'CTI Device Stats'
+                -
+                    oid: ccmUnregisteredCTIDevices
+                    value: ccmUnregisteredCTIDevices
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.15{{ $noindex }}
+                    index: 'ccmUnregisteredCTIDevices'
+                    descr: 'Unregistered CTI Devices'
+                    group: 'CTI Device Stats'
+                -
+                    oid: ccmRejectedCTIDevices
+                    value: ccmRejectedCTIDevices
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.16{{ $noindex }}
+                    index: 'ccmRejectedCTIDevices'
+                    descr: 'Rejected CTI Devices'
+                    group: 'CTI Device Stats'
+
+                # Voice Mail Device Statistics
+                -
+                    oid: ccmRegisteredVoiceMailDevices
+                    value: ccmRegisteredVoiceMailDevices
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.17{{ $noindex }}
+                    index: 'ccmRegisteredVoiceMailDevices'
+                    descr: 'Registered Voice Mail Devices'
+                    group: 'Voice Mail Stats'
+                -
+                    oid: ccmUnregisteredVoiceMailDevices
+                    value: ccmUnregisteredVoiceMailDevices
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.18{{ $noindex }}
+                    index: 'ccmUnregisteredVoiceMailDevices'
+                    descr: 'Unregistered Voice Mail Devices'
+                    group: 'Voice Mail Stats'
+                -
+                    oid: ccmRejectedVoiceMailDevices
+                    value: ccmRejectedVoiceMailDevices
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.5.19{{ $noindex }}
+                    index: 'ccmRejectedVoiceMailDevices'
+                    descr: 'Rejected Voice Mail Devices'
+                    group: 'Voice Mail Stats'
+
+                # Unity Connection Port Statistics (CISCO-UNITY-MIB)
+                -
+                    oid: ciscoUnityPorts
+                    value: ciscoUnityPorts
+                    num_oid: .1.3.6.1.4.1.9.9.385.1.2.2{{ $noindex }}
+                    index: 'ciscoUnityPorts'
+                    descr: 'Total Voice Ports'
+                    group: 'Unity Connection Ports'
+                -
+                    oid: ciscoUnityPortsActive
+                    value: ciscoUnityPortsActive
+                    num_oid: .1.3.6.1.4.1.9.9.385.1.2.3{{ $noindex }}
+                    index: 'ciscoUnityPortsActive'
+                    descr: 'Active Voice Ports'
+                    group: 'Unity Connection Ports'
+                -
+                    oid: ciscoUnityPortsInbound
+                    value: ciscoUnityPortsInbound
+                    num_oid: .1.3.6.1.4.1.9.9.385.1.2.4{{ $noindex }}
+                    index: 'ciscoUnityPortsInbound'
+                    descr: 'Inbound Ports'
+                    group: 'Unity Connection Ports'
+                -
+                    oid: ciscoUnityPortsInboundActive
+                    value: ciscoUnityPortsInboundActive
+                    num_oid: .1.3.6.1.4.1.9.9.385.1.2.5{{ $noindex }}
+                    index: 'ciscoUnityPortsInboundActive'
+                    descr: 'Active Inbound Ports'
+                    group: 'Unity Connection Ports'
+                -
+                    oid: ciscoUnityPortsOutbound
+                    value: ciscoUnityPortsOutbound
+                    num_oid: .1.3.6.1.4.1.9.9.385.1.2.6{{ $noindex }}
+                    index: 'ciscoUnityPortsOutbound'
+                    descr: 'Outbound Ports'
+                    group: 'Unity Connection Ports'
+                -
+                    oid: ciscoUnityPortsOutboundActive
+                    value: ciscoUnityPortsOutboundActive
+                    num_oid: .1.3.6.1.4.1.9.9.385.1.2.7{{ $noindex }}
+                    index: 'ciscoUnityPortsOutboundActive'
+                    descr: 'Active Outbound Ports'
+                    group: 'Unity Connection Ports'
+
+                # Unity Connection License Information (CISCO-UNITY-MIB)
+                -
+                    oid: ciscoUnityLicVoicePortsMax
+                    value: ciscoUnityLicVoicePortsMax
+                    num_oid: .1.3.6.1.4.1.9.9.385.1.2.13{{ $noindex }}
+                    index: 'ciscoUnityLicVoicePortsMax'
+                    descr: 'Licensed Voice Ports'
+                    group: 'Unity Connection License'
+                -
+                    oid: ciscoUnityLicSubscribersMax
+                    value: ciscoUnityLicSubscribersMax
+                    num_oid: .1.3.6.1.4.1.9.9.385.1.2.10{{ $noindex }}
+                    index: 'ciscoUnityLicSubscribersMax'
+                    descr: 'Licensed Subscribers'
+                    group: 'Unity Connection License'
+                -
+                    oid: ciscoUnityLicUtilSubs
+                    value: ciscoUnityLicUtilSubs
+                    num_oid: .1.3.6.1.4.1.9.9.385.1.2.22{{ $noindex }}
+                    index: 'ciscoUnityLicUtilSubs'
+                    descr: 'Active Subscribers'
+                    group: 'Unity Connection License'
+
         state:
             data:
+                # CUCM Process Status (CISCO-CCM-MIB)
                 -
-                    oid: cucsEquipmentChassisOperState
-                    value: cucsEquipmentChassisOperState
-                    num_oid: '.1.3.6.1.4.1.9.9.719.1.15.7.1.27.{{ $index }}'
-                    descr: 'Chassis - {{ $cucsEquipmentChassisDn }}'
-                    index: '{{ $index }}'
-                    group: Chassis
+                    oid: ccmStatus
+                    value: ccmStatus
+                    # Removed .0 suffix to allow correct discovery of index .1
+                    num_oid: .1.3.6.1.4.1.9.9.156.1.1.2.1.2.{{ $index }}
+                    descr: 'CCM Process Status'
+                    group: 'System'
                     states:
-                        - { value: 0, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 1, descr: operable, graph: 1, generic: 0 }
-                        - { value: 2, descr: inoperable, graph: 1, generic: 2 }
-                        - { value: 3, descr: degraded, graph: 1, generic: 2 }
-                        - { value: 4, descr: powered off, graph: 1, generic: 3 }
-                        - { value: 5, descr: power problem, graph: 1, generic: 2 }
-                        - { value: 6, descr: removed, graph: 1, generic: 3 }
-                        - { value: 7, descr: voltage problem, graph: 1, generic: 2 }
-                        - { value: 8, descr: thermal problem, graph: 1, generic: 2 }
-                        - { value: 9, descr: performance problem, graph: 1, generic: 2 }
-                        - { value: 10, descr: accessibility problem, graph: 1, generic: 2 }
-                        - { value: 11, descr: identity unestablishable, graph: 1, generic: 2 }
-                        - { value: 12, descr: BIOS POST timeout, graph: 1, generic: 2 }
-                        - { value: 13, descr: disabled, graph: 1, generic: 3 }
-                        - { value: 14, descr: malformed FRU, graph: 1, generic: 1 }
-                        - { value: 51, descr: fabric connectivity problem, graph: 1, generic: 2 }
-                        - { value: 52, descr: fabric unsupported connection, graph: 1, generic: 2 }
-                        - { value: 81, descr: config, graph: 1, generic: 1 }
-                        - { value: 82, descr: equipment problem, graph: 1, generic: 2 }
-                        - { value: 83, descr: decomissioning, graph: 1, generic: 1 }
-                        - { value: 84, descr: chassis limit exceeded, graph: 1, generic: 1 }
-                        - { value: 100, descr: not supported, graph: 1, generic: 1 }
-                        - { value: 101, descr: discovery, graph: 1, generic: 3 }
-                        - { value: 102, descr: discovery failed, graph: 1, generic: 1 }
-                        - { value: 103, descr: identify, graph: 1, generic: 3 }
-                        - { value: 104, descr: post failure, graph: 1, generic: 2 }
-                        - { value: 105, descr: upgrade problem, graph: 1, generic: 2 }
-                        - { value: 106, descr: peer communication problem, graph: 1, generic: 2 }
-                        - { value: 107, descr: auto upgrade, graph: 1, generic: 3 }
+                        - { value: 1, descr: unknown, graph: 0, generic: 2 }
+                        - { value: 2, descr: up, graph: 0, generic: 0 }
+                        - { value: 3, descr: down, graph: 0, generic: 2 }
+                        - { value: 4, descr: testing, graph: 0, generic: 3 }
 
+                # Unity Connection Server Status (CISCO-UNITY-MIB)
                 -
-                    oid: cucsEquipmentFanModuleOperState
-                    value: cucsEquipmentFanModuleOperState
-                    num_oid: '.1.3.6.1.4.1.9.9.719.1.15.13.1.7.{{ $index }}'
-                    descr: 'Fan Module - {{ $cucsEquipmentFanModuleDn }}'
-                    index: '{{ $index }}'
-                    group: Fans
+                    oid: ciscoUnityServerState
+                    value: ciscoUnityServerState
+                    num_oid: .1.3.6.1.4.1.9.9.385.1.2.1{{ $noindex }}
+                    index: 'ciscoUnityServerState'
+                    descr: 'Unity Connection Server State'
+                    group: 'System'
                     states:
-                        - { value: 0, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 1, descr: ok, graph: 1, generic: 0 }
-                        - { value: 2, descr: upper non-recoverable, graph: 1, generic: 2 }
-                        - { value: 3, descr: upper critical, graph: 1, generic: 2 }
-                        - { value: 4, descr: upper non-critical, graph: 1, generic: 1 }
-                        - { value: 5, descr: lower non-critical, graph: 1, generic: 1 }
-                        - { value: 6, descr: lower critical, graph: 1, generic: 2 }
-                        - { value: 7, descr: lower non-recoverable, graph: 1, generic: 2 }
-                        - { value: 100, descr: not supported, graph: 1, generic: 3 }
-
-                -
-                    oid: cucsEquipmentPsuPower
-                    value: cucsEquipmentPsuPower
-                    num_oid: '.1.3.6.1.4.1.9.9.719.1.15.56.1.10.{{ $index }}'
-                    descr: 'PSU - {{ $cucsEquipmentPsuDn }}'
-                    index: '{{ $index }}'
-                    group: PSU
-                    states:
-                        - { value: 0, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 1, descr: on, graph: 1, generic: 0 }
-                        - { value: 2, descr: test, graph: 1, generic: 3 }
-                        - { value: 3, descr: off, graph: 1, generic: 0 }
-                        - { value: 4, descr: online, graph: 1, generic: 0 }
-                        - { value: 5, descr: offline, graph: 1, generic: 3 }
-                        - { value: 6, descr: off duty, graph: 1, generic: 3 }
-                        - { value: 7, descr: degraded, graph: 1, generic: 2 }
-                        - { value: 8, descr: power save, graph: 1, generic: 0 }
-                        - { value: 9, descr: error, graph: 1, generic: 2 }
-                        - { value: 10, descr: ok, graph: 1, generic: 0 }
-                        - { value: 11, descr: failed, graph: 1, generic: 2 }
-                        - { value: 100, descr: not supported, graph: 1, generic: 3 }
+                        - { value: 1, descr: stopped, graph: 0, generic: 2 }
+                        - { value: 2, descr: starting, graph: 0, generic: 1 }
+                        - { value: 3, descr: running, graph: 0, generic: 0 }
+                        - { value: 4, descr: stopping, graph: 0, generic: 1 }
