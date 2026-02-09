@@ -47,6 +47,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Plugins\Hooks\MenuEntryHook;
 use LibreNMS\Plugins;
 use LibreNMS\Util\ObjectCache;
@@ -150,12 +151,12 @@ class MenuComposer
         $vars['sensor_menu'] = ObjectCache::sensors();
 
         // Wireless menu
-        $wireless_menu_order = array_keys(\LibreNMS\Device\WirelessSensor::getTypes());
+        $wireless_menu_order = WirelessSensorType::values();
         $vars['wireless_menu'] = WirelessSensor::hasAccess($user)
             ->groupBy('sensor_class')
             ->get(['sensor_class'])
             ->sortBy(function ($wireless_sensor) use ($wireless_menu_order) {
-                $pos = array_search($wireless_sensor->sensor_class, $wireless_menu_order);
+                $pos = array_search($wireless_sensor->sensor_class->value, $wireless_menu_order);
 
                 return $pos === false ? 100 : $pos; // unknown at bottom
             });

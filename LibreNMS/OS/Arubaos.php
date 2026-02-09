@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -74,7 +75,7 @@ class Arubaos extends OS implements
         $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.2.0'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated.0
 
         return [
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Client Count'),
+            new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), $oid, 'arubaos', 1, 'Client Count'),
         ];
     }
 
@@ -122,7 +123,7 @@ class Arubaos extends OS implements
         }
 
         return [
-            new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'arubaos', 1, 'AP Count', $apCount, 1, 1, 'sum', null, null, $low_limit, null, $low_warn),
+            new WirelessSensor(WirelessSensorType::ApCount, $this->getDeviceId(), $oid, 'arubaos', 1, 'AP Count', $apCount, 1, 1, 'sum', null, null, $low_limit, null, $low_warn),
         ];
     }
 

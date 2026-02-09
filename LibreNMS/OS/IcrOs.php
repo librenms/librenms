@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
@@ -39,15 +40,15 @@ class IcrOs extends OS implements
     WirelessRsrqDiscovery,
     WirelessSinrDiscovery
 {
-    private function runWirelessSensor(string $miboid, string $what, array $nums): array
+    private function runWirelessSensor(string $miboid, WirelessSensorType $type, array $nums): array
     {
         $sensors = [];
         foreach ($nums as $index => $num) {
             $oid = "$miboid.$num.0";
             $mobile = $index + 1;
-            $name = "Mobile $mobile $what";
+            $name = "Mobile $mobile " . strtoupper($type->value);
             $sensors[] = new WirelessSensor(
-                strtolower($what),
+                $type,
                 $this->getDeviceId(),
                 $oid,
                 'icr-os',
@@ -61,37 +62,21 @@ class IcrOs extends OS implements
 
     public function discoverWirelessRssi()
     {
-        $miboid = '.1.3.6.1.4.1.30140.4';
-        $what = 'RSSI';
-        $nums = [30, 130];
-
-        return $this->runWirelessSensor($miboid, $what, $nums);
+        return $this->runWirelessSensor('.1.3.6.1.4.1.30140.4', WirelessSensorType::Rssi, [30, 130]);
     }
 
     public function discoverWirelessRsrp()
     {
-        $miboid = '.1.3.6.1.4.1.30140.4';
-        $what = 'RSRP';
-        $nums = [32, 132];
-
-        return $this->runWirelessSensor($miboid, $what, $nums);
+        return $this->runWirelessSensor('.1.3.6.1.4.1.30140.4', WirelessSensorType::Rsrp, [32, 132]);
     }
 
     public function discoverWirelessRsrq()
     {
-        $miboid = '.1.3.6.1.4.1.30140.4';
-        $what = 'RSRQ';
-        $nums = [33, 133];
-
-        return $this->runWirelessSensor($miboid, $what, $nums);
+        return $this->runWirelessSensor('.1.3.6.1.4.1.30140.4', WirelessSensorType::Rsrq, [33, 133]);
     }
 
     public function discoverWirelessSinr()
     {
-        $miboid = '.1.3.6.1.4.1.30140.4';
-        $what = 'SINR';
-        $nums = [41, 141];
-
-        return $this->runWirelessSensor($miboid, $what, $nums);
+        return $this->runWirelessSensor('.1.3.6.1.4.1.30140.4', WirelessSensorType::Sinr, [41, 141]);
     }
 }

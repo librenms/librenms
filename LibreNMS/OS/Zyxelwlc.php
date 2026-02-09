@@ -18,6 +18,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS\Shared\Zyxel;
@@ -30,7 +31,7 @@ class Zyxelwlc extends Zyxel implements WirelessApCountDiscovery, WirelessClient
         $total_station = (int) snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.890.1.15.3.3.1.4.0', '-Ovq'); //    ZYXEL-ES-CAPWAP::capwapTotalStation
 
         $sensors[] = new WirelessSensor(
-            'clients',
+            WirelessSensorType::Clients,
             $this->getDeviceId(),
             $oid,
             'zyxelwlc',
@@ -59,7 +60,7 @@ class Zyxelwlc extends Zyxel implements WirelessApCountDiscovery, WirelessClient
 
         return [
             new WirelessSensor(
-                'ap-count',
+                WirelessSensorType::ApCount,
                 $this->getDeviceId(),
                 $oid,
                 'zyxelwlc',

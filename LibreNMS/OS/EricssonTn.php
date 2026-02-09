@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -47,7 +48,7 @@ class EricssonTn extends OS implements
         $ifname = $this->getCacheTable('entPhysicalName', 'ENTITY-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'mse',
+                WirelessSensorType::Mse,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.193.81.3.4.2.1.1.1.15.' . $index,
                 'ericsson-tn',
@@ -70,7 +71,7 @@ class EricssonTn extends OS implements
         $carrier = $this->getCacheTable('xfTermSysName', 'XF-RADIOLINK-PTP-TERMINAL-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.193.81.3.4.1.1.14.1.7.' . $index,
                 'ericsson-tn',
@@ -94,7 +95,7 @@ class EricssonTn extends OS implements
         $ifname = $this->getCacheTable('ifName', 'IF-MIB');
         foreach ($data_tx as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.1.' . $index,
                 'ericsson-tn',
@@ -107,7 +108,7 @@ class EricssonTn extends OS implements
         }
         foreach ($data_rx as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.2.' . $index,
                 'ericsson-tn',
@@ -131,7 +132,7 @@ class EricssonTn extends OS implements
         $ifname = $this->getCacheTable('ifName', 'IF-MIB');
         foreach ($data_tx as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.193.81.3.4.3.1.3.1.1.' . $index,
                 'ericsson-tn',
@@ -141,7 +142,7 @@ class EricssonTn extends OS implements
         }
         foreach ($data_rx as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.193.81.3.4.3.1.3.1.10.' . $index,
                 'ericsson-tn',

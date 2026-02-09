@@ -29,6 +29,7 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -82,7 +83,7 @@ class Fortigate extends OS implements
         $oid = '.1.3.6.1.4.1.12356.101.14.2.7.0';
 
         return [
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'fortigate', 1, 'Clients: Total'),
+            new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), $oid, 'fortigate', 1, 'Clients: Total'),
         ];
     }
 
@@ -91,7 +92,7 @@ class Fortigate extends OS implements
         $oid = '.1.3.6.1.4.1.12356.101.14.2.5.0';
 
         return [
-            new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'fortigate', 1, 'Connected APs'),
+            new WirelessSensor(WirelessSensorType::ApCount, $this->getDeviceId(), $oid, 'fortigate', 1, 'Connected APs'),
         ];
     }
 }

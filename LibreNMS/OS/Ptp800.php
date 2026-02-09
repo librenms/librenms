@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
@@ -48,7 +49,7 @@ class Ptp800 extends OS implements
 
         return [
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 $transmit,
                 'ptp800-tx',
@@ -59,7 +60,7 @@ class Ptp800 extends OS implements
                 10
             ),
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 $receive,
                 'ptp800-rx',
@@ -86,7 +87,7 @@ class Ptp800 extends OS implements
 
         return [
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 $receive,
                 'ptp800-rx-rate',
@@ -97,7 +98,7 @@ class Ptp800 extends OS implements
                 1
             ),
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 $transmit,
                 'ptp800-tx-rate',
@@ -108,7 +109,7 @@ class Ptp800 extends OS implements
                 1
             ),
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 $aggregate,
                 'ptp800-ag-rate',
