@@ -26,8 +26,6 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use PHPUnit\Framework\Attributes\TestDox;
-
 final class AdvaObjectDeletionTest extends SnmpTrapTestCase
 {
     public function testUserDeletion(): void
