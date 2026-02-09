@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 // upsHighPrecBatteryTemperature
 $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.2.3.2.0', '-OsqnU', '');
 d_echo($oids . "\n");
@@ -19,7 +21,7 @@ if ($oids) {
     $index = 0;
     $descr = 'Internal Temperature';
 
-    discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, $precision, '1', null, null, null, null, $current / $precision);
+    discover_sensor(null, SensorEnum::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, $precision, '1', null, null, null, null, $current / $precision);
 }
 
 // Environmental monitoring on UPSes etc
@@ -49,7 +51,7 @@ if ($apc_env_data) {
             if (count($split_index) == 2 && $split_index[1] == 1) {
                 $index = $split_index[0];
             }
-            discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+            discover_sensor(null, SensorEnum::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
     }
 } else {
@@ -72,7 +74,7 @@ if ($apc_env_data) {
 
             if ($current > 0) {
                 // Temperature = 0 -> Sensor not available
-                discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+                discover_sensor(null, SensorEnum::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
             }
         }
     }
@@ -91,7 +93,7 @@ foreach (array_keys($apc_env_data) as $index) {
         $high_warn_limit = $apc_env_data[$index]['emsProbeStatusProbeHighTempThresh'];
         $high_limit = $apc_env_data[$index]['emsProbeStatusProbeMaxTempThresh'];
 
-        discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+        discover_sensor(null, SensorEnum::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
     }
 }
 
@@ -111,7 +113,7 @@ if ($oids) {
         [$oid,$current] = explode(' ', $oids);
         $divisor = 10;
         $sensorType = substr($descr, 0, 2);
-        discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, '0', $sensorType, $descr, $divisor, '1', null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::TEMPERATURE, $device, $oid, '0', $sensorType, $descr, $divisor, '1', null, null, null, null, $current);
     }
 }
 
@@ -137,7 +139,7 @@ if ($oids !== false) {
         $descr = 'Supply Temperature';
     }
 
-    discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, $precision, '1', null, null, null, null, $current);
+    discover_sensor(null, SensorEnum::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, $precision, '1', null, null, null, null, $current);
 }
 
 unset($oids);
@@ -159,7 +161,7 @@ if ($oids !== false) {
         $descr = 'Return Temperature';
     }
 
-    discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, $precision, '1', null, null, null, null, $current);
+    discover_sensor(null, SensorEnum::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, $precision, '1', null, null, null, null, $current);
 }
 
 unset($oids);
@@ -180,7 +182,7 @@ if ($oids !== false) {
         $descr = 'Remote Temperature';
     }
 
-    discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, $precision, '1', null, null, null, null, $current);
+    discover_sensor(null, SensorEnum::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, $precision, '1', null, null, null, null, $current);
 }
 
 $cooling_unit = snmpwalk_cache_oid($device, 'coolingUnitExtendedAnalogEntry', [], 'PowerNet-MIB');
@@ -190,7 +192,7 @@ foreach ($cooling_unit as $index => $data) {
     $scale = $data['coolingUnitExtendedAnalogScale'];
     $value = $data['coolingUnitExtendedAnalogValue'];
     if (preg_match('/Temperature/', (string) $descr) && $data['coolingUnitExtendedAnalogUnits'] == 'C' && $value >= 0) {
-        discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
+        discover_sensor(null, SensorEnum::TEMPERATURE, $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
     }
 }
 
@@ -200,7 +202,7 @@ foreach ($pre_cache['cooling_unit_analog'] as $index => $data) {
     $scale = $data['coolingUnitStatusAnalogScale'] ?? null;
     $value = $data['coolingUnitStatusAnalogValue'] ?? null;
     if (preg_match('/Temperature/', (string) $descr) && $data['coolingUnitStatusAnalogUnits'] == 'C' && $value >= 0) {
-        discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
+        discover_sensor(null, SensorEnum::TEMPERATURE, $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
     }
 }
 
@@ -215,6 +217,6 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
         if ($pre_cache['memSensorsStatusSysTempUnits'] === 'fahrenheit') {
             $user_func = 'fahrenheit_to_celsius';
         }
-        discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $cur_oid, 'memSensorsTemperature.' . $index, 'apc', $descr, $divisor, $multiplier, null, null, null, null, $value, 'snmp', null, null, $user_func);
+        discover_sensor(null, SensorEnum::TEMPERATURE, $device, $cur_oid, 'memSensorsTemperature.' . $index, 'apc', $descr, $divisor, $multiplier, null, null, null, null, $value, 'snmp', null, null, $user_func);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 echo 'MGE ';
 $oids = trim((string) snmp_walk($device, '.1.3.6.1.4.1.705.1.7.2.1.5', '-OsqnU')); // OID: mgoutputCurrent
 d_echo($oids . "\n");
@@ -28,7 +30,7 @@ for ($i = 1; $i <= $numPhase; $i++) {
     $limit = null;
     $lowwarnlimit = null;
 
-    discover_sensor(null, \LibreNMS\Enum\Sensor::CURRENT, $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $current);
+    discover_sensor(null, SensorEnum::CURRENT, $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $current);
 }//end for
 
 $oids = trim((string) snmp_walk($device, '.1.3.6.1.4.1.705.1.6.2.1.6', '-OsqnU')); // OID: mginputCurrent
@@ -58,5 +60,5 @@ for ($i = 1; $i <= $numPhase; $i++) {
     $limit = null;
     $lowwarnlimit = null;
 
-    discover_sensor(null, \LibreNMS\Enum\Sensor::CURRENT, $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $current);
+    discover_sensor(null, SensorEnum::CURRENT, $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $current);
 }//end for

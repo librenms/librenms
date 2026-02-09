@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 echo ' OPENBSD-SENSORS-MIB: ';
 
 echo 'Caching OIDs:';
@@ -19,15 +21,15 @@ $oids = snmpwalk_cache_multi_oid($device, 'sensorType', $oids, 'OPENBSD-SENSORS-
 // illuminance(12), drive(13), timedelta(14), humidity(15), freq(16),
 // angle(17), distance(18), pressure(19), accel(20)
 
-$entitysensor['voltsdc'] = 'voltage';
-$entitysensor['voltsac'] = 'voltage';
-$entitysensor['fan'] = 'fanspeed';
+$entitysensor['voltsdc'] = SensorEnum::VOLTAGE;
+$entitysensor['voltsac'] = SensorEnum::VOLTAGE;
+$entitysensor['fan'] = SensorEnum::FANSPEED;
 
-$entitysensor['current'] = 'current';
-$entitysensor['power'] = 'power';
-$entitysensor['freq'] = 'frequency';
-$entitysensor['humidity'] = 'humidity';
-$entitysensor['temperature'] = 'temperature';
+$entitysensor['current'] = SensorEnum::CURRENT;
+$entitysensor['power'] = SensorEnum::POWER;
+$entitysensor['freq'] = SensorEnum::FREQUENCY;
+$entitysensor['humidity'] = SensorEnum::HUMIDITY;
+$entitysensor['temperature'] = SensorEnum::TEMPERATURE;
 
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
@@ -41,11 +43,11 @@ if (is_array($oids)) {
 
             $type = $entitysensor[$entry['sensorType']];
 
-            if ($type == 'voltage') {
+            if ($type === SensorEnum::VOLTAGE) {
                 $descr = preg_replace('/ voltage/i', '', $descr);
             }
 
-            if ($type == 'temperature') {
+            if ($type === SensorEnum::TEMPERATURE) {
                 if ($current < -40 || $current > 200) {
                     $bogus = true;
                 }
@@ -54,7 +56,7 @@ if (is_array($oids)) {
 
             // echo($descr . "|" . $index . "|" .$current . "|" . $bogus . "\n");
             if (! $bogus) {
-                discover_sensor(null, \LibreNMS\Enum\Sensor::from($type), $device, $oid, $index, 'openbsd-sensor', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, $type, $device, $oid, $index, 'openbsd-sensor', $descr, '1', '1', null, null, null, null, $current);
             }
         }//end if
     }//end foreach

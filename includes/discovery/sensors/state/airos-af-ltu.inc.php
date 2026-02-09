@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 /**
  * airos-af-ltu.inc.php
  *
@@ -45,8 +47,8 @@ foreach ($oids as $index => $entry) {
     create_state_index($rxrate_state_name, $rate_states);
 
     //Discover Sensors
-    discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, '.1.3.6.1.4.1.41112.1.10.1.4.1.1.' . $index, 1, $txrate_state_name, 'TX Modulation Rate', '1', '1', null, null, null, null, $entry['afLTUStaTxRate']);
-    discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, '.1.3.6.1.4.1.41112.1.10.1.4.1.2.' . $index, 2, $rxrate_state_name, 'RX Modulation Rate', '1', '1', null, null, null, null, $entry['afLTUStaRxRate']);
+    discover_sensor(null, SensorEnum::STATE, $device, '.1.3.6.1.4.1.41112.1.10.1.4.1.1.' . $index, 1, $txrate_state_name, 'TX Modulation Rate', '1', '1', null, null, null, null, $entry['afLTUStaTxRate']);
+    discover_sensor(null, SensorEnum::STATE, $device, '.1.3.6.1.4.1.41112.1.10.1.4.1.2.' . $index, 2, $rxrate_state_name, 'RX Modulation Rate', '1', '1', null, null, null, null, $entry['afLTUStaRxRate']);
     break;
 }
 

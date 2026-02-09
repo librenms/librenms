@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 if (preg_match('/(Linux).+(ntc)/', (string) $device['sysDescr'])) {
     $sensor_type = 'chip_currents';
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.10.112.111.119.101.114.45.115.116.97.';
@@ -11,18 +13,18 @@ if (preg_match('/(Linux).+(ntc)/', (string) $device['sysDescr'])) {
     $current = '116.3';
     $value = snmp_get($device, $oid . $current, '-Oqv');
     if (is_numeric($value)) {
-        discover_sensor(null, \LibreNMS\Enum\Sensor::CURRENT, $device, $oid . $current, $current, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+        discover_sensor(null, SensorEnum::CURRENT, $device, $oid . $current, $current, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
     $descr = 'VBUS current';
     $current = '116.5';
     $value = snmp_get($device, $oid . $current, '-Oqv');
     if (is_numeric($value)) {
-        discover_sensor(null, \LibreNMS\Enum\Sensor::CURRENT, $device, $oid . $current, $current, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+        discover_sensor(null, SensorEnum::CURRENT, $device, $oid . $current, $current, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
     $descr = 'Battery current';
     $current = '116.7';
     $value = snmp_get($device, $oid . $current, '-Oqv');
     if (is_numeric($value)) {
-        discover_sensor(null, \LibreNMS\Enum\Sensor::CURRENT, $device, $oid . $current, $current, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+        discover_sensor(null, SensorEnum::CURRENT, $device, $oid . $current, $current, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
 }

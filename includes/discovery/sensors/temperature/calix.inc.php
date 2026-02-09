@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 /*
  * LibreNMS Calix E5-1xx Temperature Discovery module
  *
@@ -30,7 +32,7 @@ if (strstr((string) $device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, SensorEnum::TEMPERATURE, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }
@@ -50,7 +52,7 @@ if (strstr((string) $device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, SensorEnum::TEMPERATURE, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }
@@ -70,7 +72,7 @@ if (strstr((string) $device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, SensorEnum::TEMPERATURE, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }
@@ -90,7 +92,7 @@ if (strstr((string) $device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-
                 $descr = str_replace('"', '', $descr);
                 $current = $temperature;
 
-                discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, SensorEnum::TEMPERATURE, $device, $temperature_oid, $oid, 'calix', $descr, '1', '1', null, null, null, null, $current);
             }
         }
     }

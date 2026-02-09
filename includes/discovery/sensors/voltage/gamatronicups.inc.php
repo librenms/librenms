@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 for ($i = 1; $i <= 3; $i++) {
     $volt_oid = ".1.3.6.1.4.1.6050.5.4.1.1.2.$i";
     $descr = "Input Phase $i";
@@ -10,7 +12,7 @@ for ($i = 1; $i <= 3; $i++) {
     $lowlimit = 0;
     $limit = null;
 
-    discover_sensor(null, \LibreNMS\Enum\Sensor::VOLTAGE, $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
+    discover_sensor(null, SensorEnum::VOLTAGE, $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
 }
 
 for ($i = 1; $i <= 3; $i++) {
@@ -23,5 +25,5 @@ for ($i = 1; $i <= 3; $i++) {
     $lowlimit = 0;
     $limit = null;
 
-    discover_sensor(null, \LibreNMS\Enum\Sensor::VOLTAGE, $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
+    discover_sensor(null, SensorEnum::VOLTAGE, $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $volt);
 }

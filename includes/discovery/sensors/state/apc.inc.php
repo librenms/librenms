@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 /*
  * LibreNMS
  *
@@ -26,7 +28,7 @@ if (is_numeric($temp)) {
 
     $descr = 'UPS Battery Replacement Status';
     //Discover Sensors
-    discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp, 'snmp', $index);
+    discover_sensor(null, SensorEnum::STATE, $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp, 'snmp', $index);
 }
 
 $cooling_status = snmpwalk_cache_oid($device, 'coolingUnitStatusDiscreteEntry', [], 'PowerNet-MIB');
@@ -43,7 +45,7 @@ foreach ($cooling_status as $index => $data) {
     }
     create_state_index($state_name, $states);
 
-    discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitStatusDiscreteValueAsInteger']);
+    discover_sensor(null, SensorEnum::STATE, $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitStatusDiscreteValueAsInteger']);
 }
 
 unset($cooling_status);
@@ -62,7 +64,7 @@ foreach ($cooling_unit as $index => $data) {
     }
     create_state_index($state_name, $states);
 
-    discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitExtendedDiscreteValueAsInteger']);
+    discover_sensor(null, SensorEnum::STATE, $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitExtendedDiscreteValueAsInteger']);
 }
 
 unset($cooling_unit);
@@ -79,7 +81,7 @@ foreach ($relays as $index => $data) {
 
     $current = apc_relay_state($data['emsOutputRelayControlOutputRelayCommand']);
     if (is_numeric($current)) {
-        discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::STATE, $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $current);
     }
 }
 unset(
@@ -100,7 +102,7 @@ foreach ($switched as $index => $data) {
 
     $current = apc_relay_state($data['emsOutletControlOutletCommand']);
     if (is_numeric($current)) {
-        discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::STATE, $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $current);
     }
 }
 unset(
@@ -126,7 +128,7 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     $divisor = 1;
     $multiplier = 1;
     if (is_numeric($current)) {
-        discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::STATE, $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
     }
 
     if ($data['memSensorsAlarmStatus']) {
@@ -145,7 +147,7 @@ foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     $divisor = 1;
     $multiplier = 1;
     if (is_numeric($current)) {
-        discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::STATE, $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
     }
 }
 
@@ -183,7 +185,7 @@ if (isset($apcContactData['uioInputContactStatusTableSize']) && $apcContactData[
                 $index = $split_index[0];
             }
 
-            discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+            discover_sensor(null, SensorEnum::STATE, $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
         }
     }
 } else {
@@ -216,7 +218,7 @@ if (isset($apcContactData['uioInputContactStatusTableSize']) && $apcContactData[
             ];
             create_state_index($state_name, $states);
 
-            discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+            discover_sensor(null, SensorEnum::STATE, $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
         }
     }
 }
