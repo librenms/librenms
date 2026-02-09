@@ -116,7 +116,7 @@
         <select class="form-control" id="graph_sensors-{{ $id }}" name="graph_sensors[]" multiple="multiple" data-placeholder="{{ __('Type to search sensors...') }}">
             @foreach($graph_sensors as $sensor)
                 @if($sensor && $sensor->sensor_id)
-                    <option value="{{ $sensor->sensor_id }}" selected>{{ $sensor->device->shortDisplayName() . ' - ' . $sensor->sensor_descr . ' (' . ucfirst($sensor->sensor_class) . ')' }}</option>
+                    <option value="{{ $sensor->sensor_id }}" selected>{{ $sensor->device->shortDisplayName() . ' - ' . $sensor->sensor_descr . ' (' . ucfirst($sensor->sensor_class->value) . ')' }}</option>
                 @endif
             @endforeach
         </select>

@@ -43,7 +43,6 @@ use App\Models\Service;
 use App\Models\Vrf;
 use Cache;
 use Illuminate\Support\Collection;
-use LibreNMS\Enum\Sensor as SensorEnum;
 
 class ObjectCache
 {
@@ -92,10 +91,11 @@ class ObjectCache
             foreach ($sensor_classes as $sensor_model) {
                 /** @var Sensor $sensor_model */
                 $class = $sensor_model->sensor_class;
-                if (in_array($class, ['fanspeed', 'humidity', 'temperature', 'signal'])) {
+                $classValue = $class->value;
+                if (in_array($classValue, ['fanspeed', 'humidity', 'temperature', 'signal'])) {
                     // First group
                     $group = 0;
-                } elseif (in_array($class, ['current', 'frequency', 'power', 'voltage', 'power_factor', 'power_consumed'])) {
+                } elseif (in_array($classValue, ['current', 'frequency', 'power', 'voltage', 'power_factor', 'power_consumed'])) {
                     // Second group
                     $group = 1;
                 } else {
@@ -104,8 +104,8 @@ class ObjectCache
                 }
 
                 $sensor_menu[$group][] = [
-                    'class' => $class,
-                    'icon' => SensorEnum::from($class)->icon(),
+                    'class' => $classValue,
+                    'icon' => $class->icon(),
                     'descr' => $sensor_model->classDescr(),
                 ];
             }

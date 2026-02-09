@@ -6,6 +6,7 @@ use App\Models\Port;
 use App\Models\Sensor;
 use App\Models\StateTranslation;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
 
@@ -178,10 +179,10 @@ class AlertLogDetailParser
             Url::sensorUrl($sensor)
         );
 
-        if ($sensor->sensor_class == 'state') {
+        if ($sensor->sensor_class === SensorEnum::STATE) {
             $this->addField('State', $value . ' (numerical: ' . $sensor->sensor_current . ')');
         } else {
-            $this->addField('Value', $value . ' (' . $sensor->sensor_class . ')');
+            $this->addField('Value', $value . ' (' . $sensor->sensor_class->value . ')');
         }
 
         // Add thresholds if any exist

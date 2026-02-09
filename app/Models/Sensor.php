@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -47,12 +48,12 @@ class Sensor extends DeviceRelatedModel implements Keyable
     /**
      * Get the attributes that should be cast.
      *
-     * @return array<string, string>
+     * @return array{sensor_class: 'LibreNMS\Enum\Sensor'}
      */
     protected function casts(): array
     {
         return [
-            // 'sensor_class' => SensorEnum::class, // TODO
+            'sensor_class' => SensorEnum::class,
         ];
     }
 
@@ -60,34 +61,34 @@ class Sensor extends DeviceRelatedModel implements Keyable
 
     public function classDescr(): string
     {
-        return __('sensors.' . $this->sensor_class . '.short');
+        return __('sensors.' . $this->sensor_class->value . '.short');
     }
 
     public function classDescrLong(): string
     {
-        return __('sensors.' . $this->sensor_class . '.long');
+        return __('sensors.' . $this->sensor_class->value . '.long');
     }
 
     public function unit(): string
     {
-        if ($this->sensor_class == 'temperature') {
+        if ($this->sensor_class === SensorEnum::TEMPERATURE) {
             /** @var ?User $user */
             $user = auth()->user();
 
             return $user && UserPref::getPref($user, 'temp_units') == 'f' ? '°F' : '°C';
         }
 
-        return __('sensors.' . $this->sensor_class . '.unit');
+        return __('sensors.' . $this->sensor_class->value . '.unit');
     }
 
     public function unitLong(): string
     {
-        return __('sensors.' . $this->sensor_class . '.unit_long');
+        return __('sensors.' . $this->sensor_class->value . '.unit_long');
     }
 
     public function getGraphType(): string
     {
-        return 'sensor_' . $this->sensor_class;
+        return 'sensor_' . $this->sensor_class->value;
     }
 
     /**
@@ -110,19 +111,19 @@ class Sensor extends DeviceRelatedModel implements Keyable
         $user = auth()->user();
 
         return match ($this->sensor_class) {
-            'temperature' => $user && UserPref::getPref($user, 'temp_units') == 'f' ? Rewrite::celsiusToFahrenheit($value) . ' °F' : round($value, 2) . ' °C',
-            'state' => $this->currentTranslation()->state_descr ?? 'Unknown',
-            'current', 'power' => Number::formatSi($value, 3, 0, $this->unit()),
-            'runtime' => Time::formatInterval($value * 60),
-            'power_consumed' => trim(Number::formatSi($value * 1000, 5, 5, 'Wh')),
-            'dbm' => round($value, 3) . ' ' . $this->unit(),
+            SensorEnum::TEMPERATURE => $user && UserPref::getPref($user, 'temp_units') == 'f' ? Rewrite::celsiusToFahrenheit($value) . ' °F' : round($value, 2) . ' °C',
+            SensorEnum::STATE => $this->currentTranslation()->state_descr ?? 'Unknown',
+            SensorEnum::CURRENT, SensorEnum::POWER => Number::formatSi($value, 3, 0, $this->unit()),
+            SensorEnum::RUNTIME => Time::formatInterval($value * 60),
+            SensorEnum::POWER_CONSUMED => trim(Number::formatSi($value * 1000, 5, 5, 'Wh')),
+            SensorEnum::DBM => round($value, 3) . ' ' . $this->unit(),
             default => $value . ' ' . $this->unit(),
         };
     }
 
     public function currentTranslation(): ?StateTranslation
     {
-        if ($this->sensor_class !== 'state') {
+        if ($this->sensor_class !== SensorEnum::STATE) {
             return null;
         }
 
@@ -156,12 +157,12 @@ class Sensor extends DeviceRelatedModel implements Keyable
 
     public function getCompositeKey(): string
     {
-        return "$this->poller_type-$this->sensor_class-$this->device_id-$this->sensor_type-$this->sensor_index";
+        return "$this->poller_type-{$this->sensor_class->value}-$this->device_id-$this->sensor_type-$this->sensor_index";
     }
 
     public function syncGroup(): string
     {
-        return "$this->sensor_class-$this->poller_type";
+        return "{$this->sensor_class->value}-$this->poller_type";
     }
 
     /**

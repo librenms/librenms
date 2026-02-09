@@ -26,13 +26,14 @@
 
 namespace App\Models\Traits;
 
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Enum\Severity;
 
 trait HasThresholds
 {
     public function currentStatus(): Severity
     {
-        if ($this->sensor_class == 'state' && $this instanceof \App\Models\Sensor) {
+        if ($this instanceof \App\Models\Sensor && $this->sensor_class === SensorEnum::STATE) {
             return $this->currentTranslation()?->severity() ?? Severity::Unknown;
         }
 
@@ -73,8 +74,11 @@ trait HasThresholds
 
     public function guessLimits(bool $high, bool $low): void
     {
+        // Convert enum to string value for matching (supports both Sensor with enum cast and WirelessSensor with string)
+        $class = $this->sensor_class instanceof SensorEnum ? $this->sensor_class->value : $this->sensor_class;
+
         if ($high) {
-            $this->sensor_limit = match ($this->sensor_class) {
+            $this->sensor_limit = match ($class) {
                 'temperature' => $this->sensor_current + 20,
                 'voltage' => $this->sensor_current * 1.15,
                 'humidity' => 70,
@@ -88,7 +92,7 @@ trait HasThresholds
         }
 
         if ($low) {
-            $this->sensor_limit_low = match ($this->sensor_class) {
+            $this->sensor_limit_low = match ($class) {
                 'temperature' => $this->sensor_current - 10,
                 'voltage' => $this->sensor_current * 0.85,
                 'humidity' => 30,

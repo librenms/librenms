@@ -36,6 +36,7 @@ use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Enum\Severity;
 
 class Sensor
@@ -111,7 +112,8 @@ class Sensor
 
     public function canSkip(\App\Models\Sensor $sensor): bool
     {
-        if (! empty($sensor->sensor_class) && (LibrenmsConfig::getOsSetting($this->device->os, "disabled_sensors.$sensor->sensor_class") || LibrenmsConfig::get("disabled_sensors.$sensor->sensor_class"))) {
+        $sensorClass = $sensor->sensor_class->value;
+        if (! empty($sensorClass) && (LibrenmsConfig::getOsSetting($this->device->os, "disabled_sensors.$sensorClass") || LibrenmsConfig::get("disabled_sensors.$sensorClass"))) {
             return true;
         }
         foreach (LibrenmsConfig::getCombined($this->device->os, 'disabled_sensors_regex') as $skipRegex) {
@@ -119,7 +121,7 @@ class Sensor
                 return true;
             }
         }
-        foreach (LibrenmsConfig::getCombined($this->device->os, "disabled_sensors_regex.$sensor->sensor_class") as $skipRegex) {
+        foreach (LibrenmsConfig::getCombined($this->device->os, "disabled_sensors_regex.$sensorClass") as $skipRegex) {
             if (! empty($sensor->sensor_descr) && preg_match($skipRegex, (string) $sensor->sensor_descr)) {
                 return true;
             }
@@ -130,7 +132,7 @@ class Sensor
 
     private function syncStates(Collection $sensors): void
     {
-        $stateSensors = $sensors->where('sensor_class', 'state');
+        $stateSensors = $sensors->where('sensor_class', SensorEnum::STATE);
 
         if ($stateSensors->isEmpty()) {
             return;

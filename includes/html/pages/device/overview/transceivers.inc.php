@@ -23,6 +23,8 @@
  * @copyright  2024 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 if (DeviceCache::getPrimary()->transceivers->isNotEmpty()) {
     DeviceCache::getPrimary()->transceivers->load(['port']);
     echo view('device.overview.transceivers', [
@@ -31,11 +33,11 @@ if (DeviceCache::getPrimary()->transceivers->isNotEmpty()) {
         'sensors' => DeviceCache::getPrimary()->sensors->where('group', 'transceiver'),
         // only temp and rx power to reduce information overload, click through to see all
         'filterSensors' => function (\App\Models\Sensor $sensor) {
-            if ($sensor->sensor_class == 'temperature') {
+            if ($sensor->sensor_class === SensorEnum::TEMPERATURE) {
                 return true;
             }
 
-            if ($sensor->sensor_class == 'dbm') {
+            if ($sensor->sensor_class === SensorEnum::DBM) {
                 $haystack = strtolower($sensor->sensor_descr);
 
                 return str_contains($haystack, 'rx') || str_contains($haystack, 'receive');

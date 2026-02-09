@@ -41,7 +41,7 @@ foreach ($sensors as $sensor) {
          "    <div class='panel-body'>\n";
 
     $graph_array['id'] = $sensor->sensor_id;
-    $graph_array['type'] = 'sensor_' . $sensor->sensor_class;
+    $graph_array['type'] = 'sensor_' . $sensor->sensor_class->value;
 
     include 'includes/html/print-graphrow.inc.php';
 
