@@ -345,22 +345,21 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
  * @param  $sensor_type
  * @param  $pre_cache
  */
-function discovery_process($os, $sensor_class, $pre_cache)
+function discovery_process($os, SensorEnum $sensor_class, $pre_cache)
 {
-    $sensorEnum = SensorEnum::tryFrom($sensor_class);
     $discovery = $os->getDiscovery('sensors');
     $device = $os->getDeviceArray();
 
-    if (! empty($discovery[$sensor_class]) && ! app('sensor-discovery')->canSkip(new \App\Models\Sensor(['sensor_class' => $sensorEnum]))) {
+    if (! empty($discovery[$sensor_class->value]) && ! app('sensor-discovery')->canSkip(new \App\Models\Sensor(['sensor_class' => $sensor_class]))) {
         $sensor_options = [];
-        if (isset($discovery[$sensor_class]['options'])) {
-            $sensor_options = $discovery[$sensor_class]['options'];
+        if (isset($discovery[$sensor_class->value]['options'])) {
+            $sensor_options = $discovery[$sensor_class->value]['options'];
         }
 
-        Log::debug("Dynamic Discovery ($sensor_class): ");
-        Log::debug($discovery[$sensor_class]);
+        Log::debug("Dynamic Discovery ({$sensor_class->value}): ");
+        Log::debug($discovery[$sensor_class->value]);
 
-        foreach ($discovery[$sensor_class]['data'] as $data) {
+        foreach ($discovery[$sensor_class->value]['data'] as $data) {
             $tmp_name = $data['oid'];
 
             if (! isset($pre_cache[$tmp_name])) {
@@ -384,7 +383,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
 
                 $snmp_value = $snmp_data[$data['value']] ?? '';
                 if (! is_numeric($snmp_value)) {
-                    if ($sensorEnum === SensorEnum::TEMPERATURE) {
+                    if ($sensor_class === SensorEnum::TEMPERATURE) {
                         // For temp sensors, try and detect fahrenheit values
                         if (is_string($snmp_value) && Str::endsWith($snmp_value, ['f', 'F'])) {
                             $user_function = 'fahrenheit_to_celsius';
@@ -398,7 +397,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
 
                 if (is_numeric($snmp_value)) {
                     $value = $snmp_value;
-                } elseif ($sensorEnum === SensorEnum::STATE) {
+                } elseif ($sensor_class === SensorEnum::STATE) {
                     // translate string states to values (poller does this as well)
                     $states = array_column($data['states'], 'value', 'descr');
                     $value = $states[$snmp_value] ?? false;
@@ -484,7 +483,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
 
                     $sensor_name = $device['os'];
 
-                    if ($sensorEnum === SensorEnum::STATE) {
+                    if ($sensor_class === SensorEnum::STATE) {
                         $sensor_name = $data['state_name'] ?? $data['oid'];
                         create_state_index($sensor_name, $data['states']);
                     } else {
@@ -513,7 +512,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         }
                     }
 
-                    discover_sensor(null, $sensorEnum, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type'] ?? 'GAUGE');
+                    discover_sensor(null, $sensor_class, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type'] ?? 'GAUGE');
                 }
             }
         }
@@ -529,23 +528,24 @@ function sensors($types, $os, $pre_cache = [])
 {
     $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
-        echo ucfirst((string) $sensor_class) . ': ';
+        $class_value = $sensor_class->value;
+        echo ucfirst($class_value) . ': ';
 
-        if (isset($device['os_group']) && is_file(base_path("includes/discovery/sensors/$sensor_class/{$device['os_group']}.inc.php"))) {
-            include base_path("includes/discovery/sensors/$sensor_class/{$device['os_group']}.inc.php");
+        if (isset($device['os_group']) && is_file(base_path("includes/discovery/sensors/$class_value/{$device['os_group']}.inc.php"))) {
+            include base_path("includes/discovery/sensors/$class_value/{$device['os_group']}.inc.php");
         }
-        $os_file = base_path("includes/discovery/sensors/$sensor_class/{$device['os']}.inc.php");
+        $os_file = base_path("includes/discovery/sensors/$class_value/{$device['os']}.inc.php");
         if (is_file($os_file)) {
             include $os_file;
         }
         if (LibrenmsConfig::getOsSetting($device['os'], 'rfc1628_compat', false)) {
-            $ups_file = base_path("includes/discovery/sensors/$sensor_class/rfc1628.inc.php");
+            $ups_file = base_path("includes/discovery/sensors/$class_value/rfc1628.inc.php");
             if (is_file($ups_file)) {
                 include $ups_file;
             }
         }
         discovery_process($os, $sensor_class, $pre_cache);
-        app('sensor-discovery')->sync(sensor_class: $sensor_class, poller_type: 'snmp');
+        app('sensor-discovery')->sync(sensor_class: $class_value, poller_type: 'snmp');
         echo "\n";
     }
 }

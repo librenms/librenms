@@ -45,7 +45,7 @@ if ($device['os'] == 'gw-eydfa') {
 }
 
 // filter submodules
-$run_sensors = array_intersect(Sensor::values(), LibrenmsConfig::get('discovery_submodules.sensors', Sensor::values()));
+$run_sensors = array_map(Sensor::from(...), array_intersect(Sensor::values(), LibrenmsConfig::get('discovery_submodules.sensors', Sensor::values())));
 
 sensors($run_sensors, $os, $pre_cache);
 unset(
