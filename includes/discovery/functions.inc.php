@@ -137,7 +137,7 @@ function discover_sensor($unused, $class, $device, $oid, $index, $type, $descr, 
 
     app('sensor-discovery')->discover(new \App\Models\Sensor([
         'poller_type' => $poller_type,
-        'sensor_class' => $class,
+        'sensor_class' => SensorEnum::from($class),
         'device_id' => $device['device_id'],
         'sensor_oid' => $oid,
         'sensor_index' => $index,
@@ -351,7 +351,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
     $discovery = $os->getDiscovery('sensors');
     $device = $os->getDeviceArray();
 
-    if (! empty($discovery[$sensor_class]) && ! app('sensor-discovery')->canSkip(new \App\Models\Sensor(['sensor_class' => $sensor_class]))) {
+    if (! empty($discovery[$sensor_class]) && ! app('sensor-discovery')->canSkip(new \App\Models\Sensor(['sensor_class' => $sensorEnum]))) {
         $sensor_options = [];
         if (isset($discovery[$sensor_class]['options'])) {
             $sensor_options = $discovery[$sensor_class]['options'];
