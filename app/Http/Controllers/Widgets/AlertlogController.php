@@ -36,8 +36,8 @@ class AlertlogController extends WidgetController
         'title' => null,
         'device_id' => '',
         'device_group' => null,
-        'state' => -1,
-        'min_severity' => null,
+        'state' => null,
+        'severity' => [],
         'hidenavigation' => 0,
     ];
 
@@ -49,9 +49,6 @@ class AlertlogController extends WidgetController
             'ok' => 1,
             'warning' => 2,
             'critical' => 3,
-            'ok only' => 4,
-            'warning only' => 5,
-            'critical only' => 6,
         ];
 
         return view('widgets.settings.alertlog', $data);
