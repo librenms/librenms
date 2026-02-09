@@ -17,35 +17,34 @@ modules:
         version_template: '[TDCM {{ ALPINE-TDCM-EDFA-MIB::alpineTESBISlotFwVer.1 }} - EDFA {{ ALPINE-TDCM-EDFA-MIB::alpineTESBISlotFwVer.2 }}]'
 
     sensors:
-
         temperature:
             data:
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEBISlotTemperature
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEBISlotTemperature
                     num_oid: '.1.3.6.1.4.1.52326.2.1.1.1.8.{{ $index }}'
                     descr: 'Slot {{ $index }}'
                     index: 'alpineTEBISlotTemperature.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    low_limit: alpineTeatTempLowAlarmThld
-                    low_warn_limit: alpineTeatTempLowWarningThld
-                    warn_limit : alpineTeatTempHighWarningThld
-                    high_limit : alpineTeatTempHighAlarmThld
+                    low_limit: ALPINE-TDCM-EDFA-MIB::alpineTeatTempLowAlarmThld
+                    low_warn_limit: ALPINE-TDCM-EDFA-MIB::alpineTeatTempLowWarningThld
+                    warn_limit : ALPINE-TDCM-EDFA-MIB::alpineTeatTempHighWarningThld
+                    high_limit : ALPINE-TDCM-EDFA-MIB::alpineTeatTempHighAlarmThld
 
                 -
-                    oid: alpineGenCardEdfa
-                    value: gceTemperature
+                    oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
+                    value: ALPINE-GEN-CARD-EDFA-MIB::gceTemperature
                     num_oid: '.1.3.6.1.4.1.52326.1.1.1.1.8.{{ $index }}'
                     descr: 'Slot {{ $index }}'
                     index: 'gceTemperature.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    high_limit : gceaTemperatureThld
+                    high_limit : ALPINE-GEN-CARD-EDFA-MIB::gceaTemperatureThld
                     group: 'EDFA'
         state:
             data:
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEBISlotPower1Status
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEBISlotPower1Status
                     num_oid: '.1.3.6.1.4.1.52326.2.1.1.1.9.{{ $index }}'
                     descr: 'Slot {{ $index }} : Power 1'
                     index: 'alpineTEBISlotPower1Status.{{ $index }}'
@@ -58,8 +57,8 @@ modules:
 
 
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEBISlotPower2Status
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEBISlotPower2Status
                     num_oid: '.1.3.6.1.4.1.52326.2.1.1.1.11.{{ $index }}'
                     descr: 'Slot {{ $index }} : Power 2'
                     index: 'alpineTEBISlotPower2Status.{{ $index }}'
@@ -71,8 +70,8 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: alarm }
 
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEPowerCardPowerInStatus
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEPowerCardPowerInStatus
                     num_oid: '.1.3.6.1.4.1.52326.2.1.4.1.8.{{ $index }}'
                     descr: 'Slot {{ $index }} : PSU Input'
                     index: 'alpineTEPowerCardPowerInStatus.{{ $index }}'
@@ -84,8 +83,8 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'Off' }
 
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEPowerCardPowerOutStatus
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEPowerCardPowerOutStatus
                     num_oid: '.1.3.6.1.4.1.52326.2.1.4.1.10.{{ $index }}'
                     descr: 'Slot {{ $index }} : PSU Output'
                     index: 'alpineTEPowerCardPowerOutStatus.{{ $index }}'
@@ -98,8 +97,8 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: lowAlarm }
 
                 -
-                    oid: alpineGenCardEdfa
-                    value: geaiLossInputAlarm
+                    oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
+                    value: ALPINE-GEN-CARD-EDFA-MIB::geaiLossInputAlarm
                     num_oid: '.1.3.6.1.4.1.52326.1.1.2.2.1.7.{{ $index }}'
                     descr: 'Slot {{ $index }} : Alarm Input Loss'
                     index: 'geaiLossInputAlarm.{{ $index }}'
@@ -111,8 +110,8 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: lossAlarm }
 
                 -
-                    oid: alpineGenCardEdfa
-                    value: geaiLossOutputAlarm
+                    oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
+                    value: ALPINE-GEN-CARD-EDFA-MIB::geaiLossOutputAlarm
                     num_oid: '.1.3.6.1.4.1.52326.1.1.2.2.1.8.{{ $index }}'
                     descr: 'Slot {{ $index }} : Alarm Output Loss'
                     index: 'geaiLossOutputAlarm.{{ $index }}'
@@ -124,8 +123,8 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: lossAlarm }
 
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTESlotStatus
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTESlotStatus
                     num_oid: '.1.3.6.1.4.1.52326.2.1.2.1.2.{{ $index }}'
                     descr: 'Slot {{ $index }} : Status'
                     index: 'alpineTESlotStatus.{{ $index }}'
@@ -137,47 +136,47 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: inserted }
                 
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEFanCardFan1Status
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEFanCardFan1Status
                     num_oid: '.1.3.6.1.4.1.52326.2.1.5.1.10.{{ $index }}'
                     descr: 'Slot {{ $index }} : Fan 1'
                     index: 'alpineTEFanCardFan1Status.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
                     group: 'Fan'
-                    state_name: fanStatus
+                    state_name: alpineTEFanCardFanStatus
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: normal }
                         - { value: 1, generic: 2, graph: 0, descr: anormal }
 
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEFanCardFan2Status
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEFanCardFan2Status
                     num_oid: '.1.3.6.1.4.1.52326.2.1.5.1.12.{{ $index }}'
                     descr: 'Slot {{ $index }} : Fan 2'
                     index: 'alpineTEFanCardFan2Status.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
                     group: 'Fan'
-                    state_name: fanStatus
+                    state_name: alpineTEFanCardFanStatus
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: normal }
                         - { value: 1, generic: 2, graph: 0, descr: anormal }
 
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEFanCardFan3Status
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEFanCardFan3Status
                     num_oid: '.1.3.6.1.4.1.52326.2.1.5.1.14.{{ $index }}'
                     descr: 'Slot {{ $index }} : Fan 3'
                     index: 'alpineTEFanCardFan3Status.{{ $index }}'
-                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex: '{{ q$index }}'
                     group: 'Fan'
-                    state_name: fanStatus
+                    state_name: alpineTEFanCardFanStatus
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: normal }
                         - { value: 1, generic: 2, graph: 0, descr: anormal }
 
                 -
-                    oid: alpineGenCardTdcm
-                    value: gctiWorkMode
+                    oid: ALPINE-GEN-CARD-TDCM-MIB::alpineGenCardTdcm
+                    value: ALPINE-GEN-CARD-TDCM-MIB::gctiWorkMode
                     num_oid: '.1.3.6.1.4.1.52326.1.2.1.1.2.{{ $index }}'
                     descr: 'Slot {{ $index }} : Work mode'
                     index: 'gctiWorkMode.{{ $index }}'
@@ -189,8 +188,8 @@ modules:
                         - { value: 2, generic: 0, graph: 0, descr: auto }
 
                 -
-                    oid: alpineGenCardTdcm
-                    value: gctiSaveConfig
+                    oid: ALPINE-GEN-CARD-TDCM-MIB::alpineGenCardTdcm
+                    value: ALPINE-GEN-CARD-TDCM-MIB::gctiSaveConfig
                     num_oid: '.1.3.6.1.4.1.52326.1.2.1.1.6.{{ $index }}'
                     descr: 'Slot {{ $index }} : Save config'
                     index: 'gctiSaveConfig.{{ $index }}'
@@ -203,8 +202,8 @@ modules:
                         - { value: 2, generic: 1, graph: 0, descr: saving }
 
                 -
-                    oid: alpineGenCardEdfa
-                    value: gceMode
+                    oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
+                    value: ALPINE-GEN-CARD-EDFA-MIB::gceMode
                     num_oid: '.1.3.6.1.4.1.52326.1.1.1.1.3.{{ $index }}'
                     descr: 'Slot {{ $index }} : Work mode'
                     entPhysicalIndex: '{{ $index }}'
@@ -216,8 +215,8 @@ modules:
                         - { value: 2, generic: 0, graph: 0, descr: APC }
 
                 -
-                    oid: alpineGenCardEdfa
-                    value: gceSaveConfig
+                    oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
+                    value: ALPINE-GEN-CARD-EDFA-MIB::gceSaveConfig
                     num_oid: '.1.3.6.1.4.1.52326.1.1.1.1.9.{{ $index }}'
                     descr: 'Slot {{ $index }} : Save config'
                     index: 'gceSaveConfig.{{ $index }}'
@@ -230,8 +229,8 @@ modules:
                         - { value: 2, generic: 1, graph: 0, descr: saving }
 
                 -
-                    oid: alpineGenCardEdfa
-                    value: geaiCommonAlarm
+                    oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
+                    value: ALPINE-GEN-CARD-EDFA-MIB::geaiCommonAlarm
                     num_oid: '.1.3.6.1.4.1.52326.1.1.2.2.1.3.{{ $index }}'
                     descr: 'Slot {{ $index }} : Common alarm'
                     index: 'geaiCommonAlarm.{{ $index }}'
@@ -243,8 +242,8 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: alarm }
 
                 -
-                    oid: alpineGenCardEdfa
-                    value: geaiPumpTemperatureAlarm
+                    oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
+                    value: ALPINE-GEN-CARD-EDFA-MIB::geaiPumpTemperatureAlarm
                     num_oid: '.1.3.6.1.4.1.52326.1.1.2.2.1.5.{{ $index }}'
                     descr: 'Slot {{ $index }} : Temperature alarm'
                     index: 'geaiPumpTemperatureAlarm.{{ $index }}'
@@ -256,8 +255,8 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: alarm }
 
                 -
-                    oid: alpineGenCardEdfa
-                    value: geaiPumpBiasAlarm
+                    oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
+                    value: ALPINE-GEN-CARD-EDFA-MIB::geaiPumpBiasAlarm
                     num_oid: '.1.3.6.1.4.1.52326.1.1.2.2.1.6.{{ $index }}'
                     descr: 'Slot {{ $index }} : Bias alarm'
                     index: 'geaiPumpBiasAlarm.{{ $index }}'
@@ -272,24 +271,24 @@ modules:
         fanspeed:
             data:
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEFanCardFan1Speed
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEFanCardFan1Speed
                     num_oid: '.1.3.6.1.4.1.52326.2.1.5.1.9.{{ $index }}'
                     descr: 'Slot {{ $index }} : Fan 1'
                     index: 'alpineTEFanCardFan1Speed.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
 
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEFanCardFan2Speed
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEFanCardFan2Speed
                     num_oid: '.1.3.6.1.4.1.52326.2.1.5.1.11.{{ $index }}'
                     descr: 'Slot {{ $index }} : Fan 2'
                     index: 'alpineTEFanCardFan2Speed.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
 
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEFanCardFan3Speed
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEFanCardFan3Speed
                     num_oid: '.1.3.6.1.4.1.52326.2.1.5.1.13.{{ $index }}'
                     descr: 'Slot {{ $index }} : Fan 3'
                     index: 'alpineTEFanCardFan3Speed.{{ $index }}'
@@ -298,28 +297,28 @@ modules:
         dbm:
             data:
                 -
-                    oid: alpineGenCardEdfa
-                    value: gceInputPower
+                    oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
+                    value: ALPINE-GEN-CARD-EDFA-MIB::gceInputPower
                     num_oid: '.1.3.6.1.4.1.52326.1.1.1.1.10.{{ $index }}'
                     descr: 'Slot {{ $index }} : Power Input'
                     index: 'gceInputPower.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    low_limit: gceaInputPowerThld
+                    low_limit: ALPINE-GEN-CARD-EDFA-MIB::gceaInputPowerThld
                     group: 'Input'
 
                 -
-                    oid: alpineGenCardEdfa
-                    value: gceOutputPower
+                    oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
+                    value: ALPINE-GEN-CARD-EDFA-MIB::gceOutputPower
                     num_oid: '.1.3.6.1.4.1.52326.1.1.1.1.6.{{ $index }}'
                     descr: 'Slot {{ $index }} : Power Output'
                     index: 'gceOuputPower.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
-                    low_limit: gceaOutputPowerThld
+                    low_limit: ALPINE-GEN-CARD-EDFA-MIB::gceaOutputPowerThld
                     group: 'Output'
 
                 -
-                    oid: alpineGenCardEdfa
-                    value: gceOutputPowerTarget
+                    oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
+                    value: ALPINE-GEN-CARD-EDFA-MIB::gceOutputPowerTarget
                     num_oid: '.1.3.6.1.4.1.52326.1.1.1.1.4.{{ $index }}'
                     descr: 'Slot {{ $index }} : Power Output Target'
                     index: 'gceOutputPowerTarget.{{ $index }}'
@@ -329,16 +328,16 @@ modules:
         quality_factor:
             data:
                 -
-                    oid: alpineGenCardEdfa
-                    value: gceGain
+                    oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
+                    value: ALPINE-GEN-CARD-EDFA-MIB::gceGain
                     num_oid: '.1.3.6.1.4.1.52326.1.1.1.1.7.{{ $index }}'
                     descr: 'Slot {{ $index }} : Gain'
                     index: 'gceGain.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
 
                 -
-                    oid: alpineGenCardEdfa
-                    value: gceGainTarget
+                    oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
+                    value: ALPINE-GEN-CARD-EDFA-MIB::gceGainTarget
                     num_oid: '.1.3.6.1.4.1.52326.1.1.1.1.5.{{ $index }}'
                     descr: 'Slot {{ $index }} : Gain Target'
                     index: 'gceGainTarget.{{ $index }}'
@@ -347,16 +346,16 @@ modules:
         voltage:
             data:
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEBISlotPower1Val
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEBISlotPower1Val
                     num_oid: '.1.3.6.1.4.1.52326.2.1.1.1.10.{{ $index }}'
                     descr: 'Slot {{ $index }} : Power 1'
                     index: 'alpineTEBISlotPower1Val.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
                     group: 'Power'
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEBISlotPower2Val
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEBISlotPower2Val
                     num_oid: '.1.3.6.1.4.1.52326.2.1.1.1.12.{{ $index }}'
                     descr: 'Slot {{ $index }} : Power 2'
                     index: 'alpineTEBISlotPower2Val.{{ $index }}'
@@ -364,8 +363,8 @@ modules:
                     group: 'Power'
 
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEPowerCardPowerOutVal
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEPowerCardPowerOutVal
                     num_oid: '.1.3.6.1.4.1.52326.2.1.4.1.9.{{ $index }}'
                     descr: 'Slot {{ $index }} : PSU Ouput'
                     index: 'alpineTEPowerCardPowerOutVal.{{ $index }}'
@@ -373,8 +372,8 @@ modules:
                     group: 'Power'
 
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEFanCardPower1Val
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEFanCardPower1Val
                     num_oid: '.1.3.6.1.4.1.52326.2.1.5.1.8.{{ $index }}'
                     descr: 'Slot {{ $index }} : Fan'
                     index: 'alpineTEFanCardPower1Val.{{ $index }}'
@@ -384,16 +383,16 @@ modules:
         count:
             data:
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEFanCardFansTotalCnt
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEFanCardFansTotalCnt
                     num_oid: '.1.3.6.1.4.1.52326.2.1.5.1.2.{{ $index }}'
                     descr: 'Slot {{ $index }} : Fans'
                     index: 'alpineTEFanCardFansTotalCnt.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
                     group: 'Fan'
                 -
-                    oid: alpineTdcmEdfaSystem
-                    value: alpineTEBISlotPowerTotalCnt
+                    oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
+                    value: ALPINE-TDCM-EDFA-MIB::alpineTEBISlotPowerTotalCnt
                     num_oid: '.1.3.6.1.4.1.52326.2.1.1.1.13.{{ $index }}'
                     descr: 'Slot {{ $index }} : Powers'
                     index: 'alpineTEBISlotPowerTotalCnt.{{ $index }}'
@@ -403,16 +402,16 @@ modules:
         chromatic_dispersion:
             data:
                 -
-                    oid: alpineGenCardTdcm
-                    value: gctiDefaultDispersion
+                    oid: ALPINE-GEN-CARD-TDCM-MIB::alpineGenCardTdcm
+                    value: ALPINE-GEN-CARD-TDCM-MIB::gctiDefaultDispersion
                     num_oid: '.1.3.6.1.4.1.52326.1.2.1.1.3.{{ $index }}'
                     descr: 'Slot {{ $index }} : Default'
                     index: 'gctiDefaultDispersion.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
 
                 -
-                    oid: alpineGenCardTdcm
-                    value: gctiCurrentDispersion
+                    oid: ALPINE-GEN-CARD-TDCM-MIB::alpineGenCardTdcm
+                    value: ALPINE-GEN-CARD-TDCM-MIB::gctiCurrentDispersion
                     num_oid: '.1.3.6.1.4.1.52326.1.2.1.1.4.{{ $index }}'
                     descr: 'Slot {{ $index }} : Current'
                     index: 'gctiCurrentDispersion.{{ $index }}'

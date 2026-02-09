@@ -18,17 +18,18 @@ class AlertLogController extends TableController
     ) {
     }
 
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'severity' => 'array|nullable',
             'severity.*' => 'integer',
             'device_id' => 'integer|nullable',
+            'device_group' => 'integer|nullable',
             'state' => 'integer|nullable',
         ];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return [
             'time_logged',
@@ -39,7 +40,7 @@ class AlertLogController extends TableController
         ];
     }
 
-    protected function searchFields(Request $request)
+    protected function searchFields(Request $request): array
     {
         return [
             'device' => ['hostname', 'sysname'],
@@ -48,13 +49,18 @@ class AlertLogController extends TableController
         ];
     }
 
-    protected function filterFields(Request $request)
+    protected function filterFields(Request $request): array
     {
         return [
             'alert_log.device_id' => 'device_id',
             'severity' => function (Builder $q, ?array $severity): void {
                 if ($severity) {
                     $q->whereHas('rule', fn ($q) => $q->whereIn('severity', array_map(intval(...), $severity)));
+                }
+            },
+            'device_group' => function ($q, ?int $group_id): void {
+                if ($group_id) {
+                    $q->inDeviceGroup($group_id);
                 }
             },
             'state',
@@ -64,7 +70,7 @@ class AlertLogController extends TableController
     /**
      * @inheritDoc
      */
-    protected function baseQuery(Request $request)
+    protected function baseQuery(Request $request): Builder
     {
         $query = AlertLog::query()
             ->select('alert_log.*')

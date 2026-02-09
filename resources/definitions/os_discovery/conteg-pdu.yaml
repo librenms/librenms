@@ -1,0 +1,125 @@
+modules:
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid: 
+                       - CONTEG-DATABUS-MIB::sdbDevOutName
+                       - CONTEG-DATABUS-MIB::sdbDevIdName
+        power_consumed:
+            data:
+                -
+                    oid: CONTEG-DATABUS-MIB::sdbDevInTable
+                    value: CONTEG-DATABUS-MIB::sdbDevInKWhTotal
+                    num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.6.1.1.2.{{ $index }}'
+                    descr: 'PDU-{{ $subindex0 }} {{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }} Total KWh (Not Resetable)'
+                    index: 'sdbDevInKWhTotal.{{ $index }}'
+                    group: 'Total KWh (Not Resetable)'
+                -
+                    oid: CONTEG-DATABUS-MIB::sdbDevInTable
+                    value: CONTEG-DATABUS-MIB::sdbDevInKWhSubtotal
+                    num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.6.1.1.3.{{ $index }}'
+                    descr: 'PDU-{{ $subindex0 }} {{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }} Total KWh (Resetable)'
+                    index: 'sdbDevInKWhSubtotal.{{ $index }}'
+                    group: 'Total KWh (Resetable)'
+        percent:
+            data:
+                -
+                    oid: CONTEG-DATABUS-MIB::sdbDevInTable
+                    value: CONTEG-DATABUS-MIB::sdbDevInPowerFactor
+                    num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.6.1.1.4.{{ $index }}'
+                    descr: 'PDU-{{ $subindex0 }} {{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }} Power Factor'
+                    index: 'sdbDevInPowerFactor.{{ $index }}'
+                    divisor: 100
+        current:
+            data:
+                -
+                    oid: CONTEG-DATABUS-MIB::sdbDevInTable
+                    value: CONTEG-DATABUS-MIB::sdbDevInActualCurrent
+                    num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.6.1.1.5.{{ $index }}'
+                    descr: 'PDU-{{ $subindex0 }} {{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }} Total Current'
+                    index: 'sdbDevInActualCurrent.{{ $index }}'
+                    divisor: 100
+                -
+                    oid: CONTEG-DATABUS-MIB::sdbDevOutMtTable
+                    value: CONTEG-DATABUS-MIB::sdbDevOutMtActualCurrent
+                    num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.7.2.1.5.{{ $index }}'
+                    descr: 'PDU-{{ $subindex0 }} ({{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }}) Port-{{ $subindex1 }} ({{ CONTEG-DATABUS-MIB::sdbDevOutName }}) Current'
+                    index: 'sdbDevOutMtActualCurrent.{{ $index }}'
+                    divisor: 100
+                    group: 'PDU {{ $subindex0 }} {{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }}'
+                    skip_values:
+                    -
+                      oid: CONTEG-DATABUS-MIB::sdbDevOutMtActualCurrent
+                      op: '=='
+                      value: 0
+        voltage:
+            data:
+                -
+                    oid: CONTEG-DATABUS-MIB::sdbDevInTable
+                    value: CONTEG-DATABUS-MIB::sdbDevInActualVoltage
+                    num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.6.1.1.7.{{ $index }}'
+                    descr: 'PDU-{{ $subindex0 }} {{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }} Voltage'
+                    index: 'sdbDevInActualVoltage.{{ $index }}'
+                    divisor: 100
+        power:
+            data:
+                -
+                    oid: CONTEG-DATABUS-MIB::sdbDevInTable
+                    value: CONTEG-DATABUS-MIB::sdbDevInPowerWatt
+                    num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.6.1.1.10.{{ $index }}'
+                    descr: 'PDU-{{ $subindex0 }} {{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }} Total Wattage'
+                    index: 'sdbDevInPowerWatt.{{ $index }}'
+                    divisor: 100
+                -
+                    oid: CONTEG-DATABUS-MIB::sdbDevOutMtTable
+                    value: CONTEG-DATABUS-MIB::sdbDevOutMtPowerWatt
+                    num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.7.2.1.11.{{ $index }}'
+                    descr: 'PDU-{{ $subindex0 }} ({{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }}) Port-{{ $subindex1 }} ({{ CONTEG-DATABUS-MIB::sdbDevOutName }}) Wattage'
+                    index: 'sdbDevOutMtActualCurrent.{{ $index }}'
+                    divisor: 100
+                    group: 'PDU {{ $subindex0 }} {{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }} '
+                    skip_values:
+                    -
+                      oid: CONTEG-DATABUS-MIB::sdbDevOutMtPowerWatt
+                      op: '=='
+                      value: 0
+        temperature:
+            data:
+                -
+                    oid: CONTEG-DATABUS-MIB::sdbDevMeasuresTable
+                    value: CONTEG-DATABUS-MIB::sdbDevMsIntTemperature
+                    num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.8.1.1.1.{{ $index }}'
+                    descr: 'PDU-{{ $subindex0 }} {{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }} Internal Temperature'
+                    index: 'sdbDevMsIntTemperature.{{ $index }}'
+                    divisor: 100
+                    skip_values:
+                    -
+                      oid: CONTEG-DATABUS-MIB::sdbDevMsIntTemperature
+                      op: '=='
+                      value: 0
+                -
+                    oid: CONTEG-DATABUS-MIB::sdbDevMeasuresTable
+                    value: CONTEG-DATABUS-MIB::sdbDevMsExtTemperature
+                    num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.8.1.1.2.{{ $index }}'
+                    descr: 'PDU-{{ $subindex0 }} {{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }} External Temperature'
+                    index: 'sdbDevMsExtTemperature.{{ $index }}'
+                    divisor: 100
+                    skip_values:
+                    -
+                      oid: CONTEG-DATABUS-MIB::sdbDevMsExtTemperature
+                      op: '=='
+                      value: 0
+        count:
+            data:
+                -
+                    oid: CONTEG-DATABUS-MIB::sdbDevSnsTable
+                    value: CONTEG-DATABUS-MIB::sdbDevSnsValue
+                    num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.8.2.1.3.{{ $index }}'
+                    descr: 'Sensor {{ CONTEG-DATABUS-MIB::sdbDevSnsName }} Type -  {{ CONTEG-DATABUS-MIB::sdbDevSnsType }}'
+                    index: 'sdbDevSnsValue.{{ $index }}'
+                    skip_values:
+                    -
+                      oid: CONTEG-DATABUS-MIB::sdbDevSnsValue
+                      op: '=='
+                      value: 0
