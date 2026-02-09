@@ -1,7 +1,7 @@
 <?php
 
-use LibreNMS\Util\Rewrite;
 use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Util\Rewrite;
 
 echo 'Procurve ';
 

@@ -13,8 +13,8 @@
  */
 
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Util\Number;
 use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Util\Number;
 
 $oids = snmp_walk($device, 'eqlMemberHealthStatus', '-OQne', 'EQLMEMBER-MIB', 'equallogic');
 
