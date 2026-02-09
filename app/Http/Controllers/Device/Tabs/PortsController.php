@@ -407,13 +407,11 @@ class PortsController implements DeviceTab
             ->when(! $this->settings['ignored'], fn (Builder $q, $disabled) => $q->where('ignore', 0))
             ->when($this->settings['admin'] != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $this->settings['admin']))
             ->when($this->settings['status'] != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $this->settings['status']))
-            ->when($searchPort, function (Builder $q) use ($searchPort) {
-                return $q->where(function (Builder $q) use ($searchPort) {
-                    $q->where('ifName', 'LIKE', '%' . $searchPort . '%')
-                        ->orWhere('ifDescr', 'LIKE', '%' . $searchPort . '%')
-                        ->orWhere('ifAlias', 'LIKE', '%' . $searchPort . '%');
-                });
-            })
+            ->when($searchPort, fn(Builder $q) => $q->where(function (Builder $q) use ($searchPort): void {
+                $q->where('ifName', 'LIKE', '%' . $searchPort . '%')
+                    ->orWhere('ifDescr', 'LIKE', '%' . $searchPort . '%')
+                    ->orWhere('ifAlias', 'LIKE', '%' . $searchPort . '%');
+            }))
             ->when($this->settings['sort'] == 'port', fn (Builder $q, $sort) => $q
                 ->orderByRaw('SOUNDEX(ifName) ' . $this->settings['order'])
                 ->orderByRaw('CHAR_LENGTH(ifName) ' . $this->settings['order'])
