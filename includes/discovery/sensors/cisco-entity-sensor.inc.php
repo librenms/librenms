@@ -246,7 +246,7 @@ if ($device['os_group'] == 'cisco') {
         $entity_array
     );
 
-    foreach (array_unique($entitysensor) as $type) {
+    foreach (array_unique($entitysensor, SORT_REGULAR) as $type) {
         app('sensor-discovery')->sync(sensor_class: $type->value, poller_type: 'snmp');
     }
 }//end if

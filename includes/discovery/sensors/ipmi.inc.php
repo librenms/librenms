@@ -3,6 +3,7 @@
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 // IPMI - We can discover this on poll!
 if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
@@ -59,7 +60,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
         if ($current != 'na' && LibrenmsConfig::has("ipmi_unit.$unit")) {
             discover_sensor(
                 null,
-                LibrenmsConfig::get("ipmi_unit.$unit"),
+                SensorEnum::from(LibrenmsConfig::get("ipmi_unit.$unit")),
                 $device,
                 $desc,
                 $index,
