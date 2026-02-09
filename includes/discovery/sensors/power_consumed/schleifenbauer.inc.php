@@ -12,7 +12,7 @@ foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] ?? [] as $sdbMgmtCtrlDevUnitAdd
         // See includes/discovery/entity-physical/schleifenbauer.inc.php for an explanation why we set this as the entPhysicalIndex.
         $entPhysicalIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 100000 + $sdbDevInIndex * 1000 + 140;
 
-        discover_sensor(null, 'power_consumed', $device, $power_consumed_oid, $serial_input, 'schleifenbauer', $descr, '1', '1', '0', null, null, '16777215', $sdbDevInKWhTotal, 'snmp', $entPhysicalIndex);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::POWER_CONSUMED, $device, $power_consumed_oid, $serial_input, 'schleifenbauer', $descr, '1', '1', '0', null, null, '16777215', $sdbDevInKWhTotal, 'snmp', $entPhysicalIndex);
     }
 }
 
@@ -28,6 +28,6 @@ if (isset($pre_cache['sdbDevOutMtKWhTotal']) && is_array($pre_cache['sdbDevOutMt
         // See includes/discovery/entity-physical/schleifenbauer.inc.php for an explanation why we set this as the entPhysicalIndex.
         $entPhysicalIndex = $sdbMgmtCtrlDevUnitAddress * 1000000 + 200000 + $sdbDevOutMtIndex * 1000 + 140;
 
-        discover_sensor(null, 'power_consumed', $device, $power_consumed_oid, $serial_input, 'schleifenbauer', $descr, '1', '1', '0', null, null, '16777215', $sdbDevOutMtKWhTotal, 'snmp', $entPhysicalIndex);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::POWER_CONSUMED, $device, $power_consumed_oid, $serial_input, 'schleifenbauer', $descr, '1', '1', '0', null, null, '16777215', $sdbDevOutMtKWhTotal, 'snmp', $entPhysicalIndex);
     }
 }

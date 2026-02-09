@@ -228,7 +228,7 @@ foreach ($tables as $tablevalue) {
                     $repsegmentnumber++;
                     $descr = $tablevalue['descr'] . $repsegmentnumber;
                 }
-                discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, trim((string) $descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
+                discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid . $index, $index, $state_name, trim((string) $descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
             }
         }
     }

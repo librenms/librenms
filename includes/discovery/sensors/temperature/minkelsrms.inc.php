@@ -30,7 +30,7 @@ foreach (explode("\n", $oids) as $data) {
             $limit = snmp_get($device, $limit_oid, '-Oqv', '');
             $lowlimit = snmp_get($device, $lowlimit_oid, '-Oqv', '');
 
-            discover_sensor(null, 'temperature', $device, $temperature_oid, $temperature_id, 'akcp', $descr, '1', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $temperature);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $temperature_oid, $temperature_id, 'akcp', $descr, '1', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $temperature);
         }
     }
 }

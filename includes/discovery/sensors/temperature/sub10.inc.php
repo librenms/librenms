@@ -25,4 +25,4 @@ foreach (explode("\n", (string) $threshes) as $thresh) {
 }
 
 // Create Sensor
-discover_sensor(null, 'temperature', $device, $oid, $oid, 'sub10', 'Modem', '1', '1', $thresholds[$indexes['low']], null, null, $thresholds[$indexes['high']], $current);
+discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, $oid, 'sub10', 'Modem', '1', '1', $thresholds[$indexes['low']], null, null, $thresholds[$indexes['high']], $current);

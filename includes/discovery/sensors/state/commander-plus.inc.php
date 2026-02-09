@@ -35,7 +35,7 @@ foreach ($state_table[0] as $state_name => $state_value) {
     create_state_index($state_name, $states);
 
     $descr = $state_name;
-    discover_sensor(null, 'state', $device, $start_oid . '.' . $x . '.0', $state_name, $state_name, $descr, 1, 1, null, null, null, null, $state_value, 'snmp');
+    discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $start_oid . '.' . $x . '.0', $state_name, $state_name, $descr, 1, 1, null, null, null, null, $state_value, 'snmp');
     $x++;
 }
 

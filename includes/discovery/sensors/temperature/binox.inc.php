@@ -28,6 +28,6 @@ if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.738.10.5.100')) 
     $value = str_replace('"', '', $value);
 
     if (is_numeric($value)) {
-        discover_sensor(null, 'temperature', $device, $valueoid, 1, 'binox', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $valueoid, 1, 'binox', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
     }
 }

@@ -55,5 +55,5 @@ foreach (array_keys($oids) as $index) {
     $current = $oids[$index]['tempSensorValue'];
     $oid = $cur_oid . $index;
 
-    discover_sensor(null, 'temperature', $device, $oid, $index, 'axiscam', 'Temperature Sensor ' . $index, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, $index, 'axiscam', 'Temperature Sensor ' . $index, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
 }

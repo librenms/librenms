@@ -46,6 +46,6 @@ if (is_array($temp)) {
         $oid = $base_oid . $index;
 
         // Discover Sensors
-        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', $index);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', $index);
     }
 }

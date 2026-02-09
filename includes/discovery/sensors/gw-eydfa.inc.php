@@ -50,7 +50,7 @@ foreach (explode("\n", (string) $oids) as $data) {
             $high_warn = snmp_get($device, 'analogAlarmHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $high_limit = snmp_get($device, 'analogAlarmHIHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
         }
-        discover_sensor(null, 'current', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::CURRENT, $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
     if ($split_oid[0] == 'oaPumpTEC' && $index == 1) { // Current - A
         $divisor = 100;
@@ -64,7 +64,7 @@ foreach (explode("\n", (string) $oids) as $data) {
             $high_limit = snmp_get($device, 'analogAlarmHIHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
         }
         $sensor_index = 'oaPumpTEC' . $index;
-        discover_sensor(null, 'current', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::CURRENT, $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
     if ($split_oid[0] == 'oaPumpTemp' && $index == 1) { // Temperature - C
         $divisor = 10;
@@ -78,7 +78,7 @@ foreach (explode("\n", (string) $oids) as $data) {
             $high_limit = snmp_get($device, 'analogAlarmHIHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
         }
         $sensor_index = 'oaPumpTemp' . $index;
-        discover_sensor(null, 'temperature', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
     unset($oids, $split_oid, $index, $divisor, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
 }
@@ -107,7 +107,7 @@ foreach (explode("\n", $oids) as $data) {
         }
         $sensor_index = 'oaDCPowerVoltage' . $index;
         $value /= $divisor;
-        discover_sensor(null, 'voltage', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::VOLTAGE, $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
 }
 
@@ -127,7 +127,7 @@ if (is_numeric($value)) {
     $high_limit = snmp_get($device, 'analogAlarmHIHI.12.1.3.6.1.4.1.17409.1.3.1.13.0', '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB');
 }
 $sensor_index = 'commonDeviceInternalTemperature.1';
-discover_sensor(null, 'temperature', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, 1, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
+discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, 1, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
 
 unset($num_oid, $value, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
 
@@ -147,7 +147,7 @@ if (is_numeric($value)) {
 }
 $value /= $divisor;
 $sensor_index = 'oaOutputOpticalPower.0';
-discover_sensor(null, 'dbm', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
+discover_sensor(null, \LibreNMS\Enum\Sensor::DBM, $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
 
 unset($num_oid, $value, $divisor, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
 
@@ -167,7 +167,7 @@ if (is_numeric($value)) {
 }
 $value /= $divisor;
 $sensor_index = 'oaInputOpticalPower.0';
-discover_sensor(null, 'dbm', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
+discover_sensor(null, \LibreNMS\Enum\Sensor::DBM, $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
 
 unset($num_oid, $value, $divisor, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
 
@@ -189,6 +189,6 @@ foreach ($oids as $oid) {
     $value = snmp_get($device, $oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB');
     $descr = 'Power Supply ' . $n;
     $sensor_index = 'PowerSupplyState' . $n;
-    discover_sensor(null, 'state', $device, $oid, $sensor_index, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp');
+    discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $oid, $sensor_index, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp');
     $n++;
 }

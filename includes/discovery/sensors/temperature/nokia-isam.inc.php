@@ -13,7 +13,7 @@ foreach ($snmp_data['nokiaIsamSlotTemperature'] as $slotId => $slot) {
             $limit = $sensor['eqptBoardThermalSensorShutdownThresholdHigh'] ?? null;
             $warn_limit = $sensor['eqptBoardThermalSensorTcaThresholdHigh'] ?? null;
             $value = $sensor['eqptBoardThermalSensorActualTemperature'] / $divisor;
-            discover_sensor(null, 'temperature', $device, $oid, $slotName . '.' . $sensorId . '-temp', 'nokia-isam', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp');
+            discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, $slotName . '.' . $sensorId . '-temp', 'nokia-isam', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $value, 'snmp');
         }
     }
 }

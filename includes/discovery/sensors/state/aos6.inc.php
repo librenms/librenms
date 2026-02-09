@@ -25,7 +25,7 @@ foreach ($aos6_fan_oids as $index => $data) {
         ];
         if (! empty($current)) {
             create_state_index($state_name, $states);
-            discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current);
         }
     }
 }
@@ -49,7 +49,7 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
                 ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'Disconnected'],
             ];
             create_state_index($stack_state_namea, $states_stacka);
-            discover_sensor(null, 'state', $device, $oid_stackport_a, $stackindexa, $stack_state_namea, $descr_stacka, 1, 1, null, null, null, null, $current_stacka);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $oid_stackport_a, $stackindexa, $stack_state_namea, $descr_stacka, 1, 1, null, null, null, null, $current_stacka);
         }
     }
 }
@@ -66,7 +66,7 @@ if (($stack_left < $stacking) && ($stack_alone < $stacking_non)) {
                 ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'Disconnected'],
             ];
             create_state_index($stack_state_nameb, $states_stackb);
-            discover_sensor(null, 'state', $device, $oid_stackport_b, $stackindexb, $stack_state_nameb, $descr_stackb, 1, 1, null, null, null, null, $current_stackb);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $oid_stackport_b, $stackindexb, $stack_state_nameb, $descr_stackb, 1, 1, null, null, null, null, $current_stackb);
         }
     }
 }

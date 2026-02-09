@@ -36,6 +36,6 @@ if (! empty($oids)) {
         }
         $name = 'Interface ' . $ifname;
         //Discover Sensors
-        discover_sensor(null, 'state', $device, $num_oid . $index, $index, $state_name, $name, '1', '1', null, null, null, null, $entry['voiceIfState'], 'snmp', $index);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $num_oid . $index, $index, $state_name, $name, '1', '1', null, null, null, null, $entry['voiceIfState'], 'snmp', $index);
     }
 }

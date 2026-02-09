@@ -19,7 +19,7 @@ if (! empty($pre_cache['raspberry_pi_sensors'])) {
         }
         $value = current($pre_cache['raspberry_pi_sensors']['raspberry.' . $freq]);
         if (is_numeric($value)) {
-            discover_sensor(null, 'frequency', $device, $oid . $freq, $freq, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::FREQUENCY, $device, $oid . $freq, $freq, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
         } else {
             break;
         }

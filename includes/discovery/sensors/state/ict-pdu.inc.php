@@ -45,6 +45,6 @@ if (is_array($oids)) {
             $current_value = 2;
         }
 
-        discover_sensor(null, 'state', $device, $fuse_state_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current_value, 'snmp', $index);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $fuse_state_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current_value, 'snmp', $index);
     }
 }

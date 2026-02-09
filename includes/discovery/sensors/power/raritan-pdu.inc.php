@@ -20,7 +20,7 @@ if ($outlet_oids) {
             $outlet_descr = snmp_get($device, "outletLabel.$outletsuffix", '-Ovq', 'PDU-MIB');
             $outlet_power = snmp_get($device, "outletApparentPower.$outletsuffix", '-Ovq', 'PDU-MIB');
             if ($outlet_power >= 0) {
-                discover_sensor(null, 'power', $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $divisor, $multiplier, null, null, null, null, $outlet_power);
+                discover_sensor(null, \LibreNMS\Enum\Sensor::POWER, $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $divisor, $multiplier, null, null, null, null, $outlet_power);
             }
         }
     }

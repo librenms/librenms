@@ -34,7 +34,7 @@ if (is_array($raritan_data) && ! empty($raritan_data)) {
     $warn_limit = $raritan_data['unitTempUpperWarning.0'];
     $high_limit = $raritan_data['unitTempUpperCritical.0'];
     $current = $raritan_data['unitCpuTemp.0'] / $divisor;
-    discover_sensor(null, 'temperature', $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
 }
 
 //Check for PDU MIB external Sensors
@@ -52,7 +52,7 @@ foreach ($oids as $index => $sensor) {
         $limit_low_warn = $sensor['externalSensorLowerCriticalThreshold'] / $divisor;
         $offset++;
         if (is_numeric($temp_current) && $temp_current >= 0) {
-            discover_sensor(null, 'temperature', $device, $oid, $offset, 'raritan', $descr, $divisor, 1, $limit_low, $limit_low_warn, $limit_high_warn, $limit_high, $temp_current);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, $offset, 'raritan', $descr, $divisor, 1, $limit_low, $limit_low_warn, $limit_high_warn, $limit_high, $temp_current);
         }
     }
 }

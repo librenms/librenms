@@ -23,7 +23,7 @@ if (is_array($temp)) {
         (isset($temp[$index]['coolingDeviceUpperNonCriticalThreshold'])) ? $warnlimit = $temp[$index]['coolingDeviceUpperNonCriticalThreshold'] : $warnlimit = null;
         (isset($temp[$index]['coolingDeviceUpperCriticalThreshold'])) ? $limit = $temp[$index]['coolingDeviceUpperCriticalThreshold'] : $limit = null;
 
-        discover_sensor(null, 'fanspeed', $device, $cur_oid . $index, $index, 'dell', $descr, '0', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::FANSPEED, $device, $cur_oid . $index, $index, 'dell', $descr, '0', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
 
         unset(
             $descr,

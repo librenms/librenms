@@ -14,7 +14,7 @@ if ($oids) {
     $low_limit_warn = 10;
     $warn_limit = 2000;
     $high_limit = 3000;
-    discover_sensor(null, 'runtime', $device, $oid, $index, $type, $descr, $divisor, '1', $low_limit, $low_limit_warn, $warn_limit, $high_limit, $current);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::RUNTIME, $device, $oid, $index, $type, $descr, $divisor, '1', $low_limit, $low_limit_warn, $warn_limit, $high_limit, $current);
 }
 
 // InRow IRRP100
@@ -37,7 +37,7 @@ if ($oids) {
     $descr = 'Filter';
     $sensorType = 'apc';
 
-    discover_sensor(null, 'runtime', $device, $cur_oid . $index, 'airIRRP100UnitRunHoursAirFilter.' . $index, $sensorType, $descr, '1', $multiplier, null, null, null, $service_interval, $current);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::RUNTIME, $device, $cur_oid . $index, 'airIRRP100UnitRunHoursAirFilter.' . $index, $sensorType, $descr, '1', $multiplier, null, null, null, $service_interval, $current);
 
     // airIRRP100UnitRunHoursFan1
     $index = 0;
@@ -50,7 +50,7 @@ if ($oids) {
     $descr = 'Fan 1';
     $sensorType = 'apc';
 
-    discover_sensor(null, 'runtime', $device, $cur_oid . $index, 'airIRRP100UnitRunHoursFan1.' . $index, $sensorType, $descr, '1', $multiplier, null, null, null, $service_interval, $current);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::RUNTIME, $device, $cur_oid . $index, 'airIRRP100UnitRunHoursFan1.' . $index, $sensorType, $descr, '1', $multiplier, null, null, null, $service_interval, $current);
 
     // airIRRP100UnitRunHoursFan2
     $index = 0;
@@ -63,7 +63,7 @@ if ($oids) {
     $descr = 'Fan 2';
     $sensorType = 'apc';
 
-    discover_sensor(null, 'runtime', $device, $cur_oid . $index, 'airIRRP100UnitRunHoursFan2.' . $index, $sensorType, $descr, '1', $multiplier, null, null, null, $service_interval, $current);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::RUNTIME, $device, $cur_oid . $index, 'airIRRP100UnitRunHoursFan2.' . $index, $sensorType, $descr, '1', $multiplier, null, null, null, $service_interval, $current);
 
     // airIRRP100UnitRunHoursCompressor
     $index = 0;
@@ -76,5 +76,5 @@ if ($oids) {
     $descr = 'Compressor';
     $sensorType = 'apc';
 
-    discover_sensor(null, 'runtime', $device, $cur_oid . $index, 'airIRRP100UnitRunHoursCompressor.' . $index, $sensorType, $descr, '1', $multiplier, null, null, null, $service_interval, $current);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::RUNTIME, $device, $cur_oid . $index, 'airIRRP100UnitRunHoursCompressor.' . $index, $sensorType, $descr, '1', $multiplier, null, null, null, $service_interval, $current);
 }

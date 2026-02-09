@@ -44,7 +44,7 @@ if (! empty($entity_oids)) {
         'voltsAC' => 'voltage',
         'amperes' => 'current',
         'watts' => 'power',
-        'hertz' => 'freq',
+        'hertz' => 'frequency',
         'percentRH' => 'humidity',
         'rpm' => 'fanspeed',
         'celsius' => 'temperature',
@@ -243,7 +243,7 @@ if (! empty($entity_oids)) {
                     // End grouping sensors
                 }
                 $descr = trim((string) $descr);
-                discover_sensor(null, $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
+                discover_sensor(null, \LibreNMS\Enum\Sensor::from($type), $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
             }
         }//end if
     }//end foreach

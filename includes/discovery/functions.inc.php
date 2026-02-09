@@ -123,7 +123,7 @@ function discover_new_device($hostname, $device, $method, $interface = null)
 //end discover_new_device()
 
 // Discover sensors
-function discover_sensor($unused, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE'): bool
+function discover_sensor($unused, SensorEnum $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE'): bool
 {
     $low_limit = set_null($low_limit);
     $low_warn_limit = set_null($low_warn_limit);
@@ -137,7 +137,7 @@ function discover_sensor($unused, $class, $device, $oid, $index, $type, $descr, 
 
     app('sensor-discovery')->discover(new \App\Models\Sensor([
         'poller_type' => $poller_type,
-        'sensor_class' => SensorEnum::from($class),
+        'sensor_class' => $class,
         'device_id' => $device['device_id'],
         'sensor_oid' => $oid,
         'sensor_index' => $index,
@@ -513,7 +513,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         }
                     }
 
-                    discover_sensor(null, $sensor_class, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type'] ?? 'GAUGE');
+                    discover_sensor(null, $sensorEnum, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type'] ?? 'GAUGE');
                 }
             }
         }

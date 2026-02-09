@@ -18,7 +18,7 @@ foreach ($pre_cache['raisecomOpticalTransceiverDDMTable'] as $index => $data) {
             $current = $value['raisecomOpticalTransceiverParameterValue'] / $divisor;
             $entPhysicalIndex = $index;
             $entPhysicalIndex_measured = 'ports';
-            discover_sensor(null, 'temperature', $device, $oid, 'tx-' . $index, $sensor_type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, 'tx-' . $index, $sensor_type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
     }
 }
@@ -30,5 +30,5 @@ if (is_numeric($value)) {
     $low_limit = snmp_get($device, 'raisecomTemperatureThresholdLow.0', ['-OUvq', '-Pu'], 'RAISECOM-SYSTEM-MIB', 'raisecom');
     $high_limit = snmp_get($device, 'raisecomTemperatureThresholdHigh.0', ['-OUvq', '-Pu'], 'RAISECOM-SYSTEM-MIB', 'raisecom');
 
-    discover_sensor(null, 'temperature', $device, $oid, 0, 'raisecomTemperatureValue', $descr, '1', '1', $low_limit, null, null, $high_limit, $value);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, 0, 'raisecomTemperatureValue', $descr, '1', '1', $low_limit, null, null, $high_limit, $value);
 }

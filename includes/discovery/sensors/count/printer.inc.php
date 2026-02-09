@@ -69,7 +69,7 @@ if ($device['os'] == 'konica') {
             $oidArray = explode('.', $oid);
             $maxKey = max(array_keys($oidArray));
             $index = str_replace(' ', '', ucwords($cntName)) . '.' . $oidArray[$maxKey - 1] . '.' . $oidArray[$maxKey];
-            discover_sensor(null, 'count', $device, $oid, $index, $device['os'], $cntName, 1, 1, null, null, null, null, $value, 'snmp', null, null, null, 'Konica MIB');
+            discover_sensor(null, \LibreNMS\Enum\Sensor::COUNT, $device, $oid, $index, $device['os'], $cntName, 1, 1, null, null, null, null, $value, 'snmp', null, null, null, 'Konica MIB');
         }
     }
 }
@@ -84,7 +84,7 @@ if ($device['os'] == 'sharp') {
                 $value = $valuesData[$index1][$index2][$index3];
                 $oid = '.1.3.6.1.4.1.2385.1.1.19.2.1.3.' . $index1 . '.' . $index2 . '.' . $index3;
                 $index = $sensorName . '.' . $index3;
-                discover_sensor(null, 'count', $device, $oid, $index, $device['os'], $sensorName, 1, 1, null, null, null, null, $value, 'snmp', null, null, null, 'Sharp MIB');
+                discover_sensor(null, \LibreNMS\Enum\Sensor::COUNT, $device, $oid, $index, $device['os'], $sensorName, 1, 1, null, null, null, null, $value, 'snmp', null, null, null, 'Sharp MIB');
             }
         }
     }

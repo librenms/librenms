@@ -41,7 +41,7 @@ if (! empty($snmpData)) {
         $value = intval($lmData[$type . 'Value']) / $divisor;
         if (! empty($descr)) {
             $oid = Oid::of('LM-SENSORS-MIB::' . $type . 'Value.' . $index)->toNumeric();
-            discover_sensor(null, 'fanspeed', $device, $oid, $index, 'lmsensors', $descr, $divisor, 1, null, null, null, null, $value, 'snmp', null, null, null, 'lmsensors');
+            discover_sensor(null, \LibreNMS\Enum\Sensor::FANSPEED, $device, $oid, $index, 'lmsensors', $descr, $divisor, 1, null, null, null, null, $value, 'snmp', null, null, null, 'lmsensors');
         }
     }
 }

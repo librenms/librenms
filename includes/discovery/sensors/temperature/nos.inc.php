@@ -27,7 +27,7 @@ if ($oids = snmp_walk($device, '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2', '-Osqn')) {
             if (! strstr($descr, 'No') and ! strstr($value, 'No')) {
                 $descr = str_replace('"', '', $descr);
                 $descr = trim($descr);
-                discover_sensor(null, 'temperature', $device, $value_oid, $oididx, 'nos', $descr, '1', '1', null, null, '80', '100', $value);
+                discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $value_oid, $oididx, 'nos', $descr, '1', '1', null, null, '80', '100', $value);
             }
         }
     }

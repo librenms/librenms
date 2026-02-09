@@ -25,7 +25,7 @@ $entitysensor['fan'] = 'fanspeed';
 
 $entitysensor['current'] = 'current';
 $entitysensor['power'] = 'power';
-$entitysensor['freq'] = 'freq';
+$entitysensor['freq'] = 'frequency';
 $entitysensor['humidity'] = 'humidity';
 $entitysensor['temperature'] = 'temperature';
 
@@ -54,7 +54,7 @@ if (is_array($oids)) {
 
             // echo($descr . "|" . $index . "|" .$current . "|" . $bogus . "\n");
             if (! $bogus) {
-                discover_sensor(null, $type, $device, $oid, $index, 'openbsd-sensor', $descr, '1', '1', null, null, null, null, $current);
+                discover_sensor(null, \LibreNMS\Enum\Sensor::from($type), $device, $oid, $index, 'openbsd-sensor', $descr, '1', '1', null, null, null, null, $current);
             }
         }//end if
     }//end foreach

@@ -118,7 +118,7 @@ foreach ($tables as [$table, $num_oid, $value_oid, $descr_oid, $mib, $mib_dir]) 
                     $descr = strip_tags((string) $entry[$descr_oid]); // Use clean as virtualDiskDeviceName is user defined
                 }
                 //Discover Sensors
-                discover_sensor(null, 'state', $device, $num_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry[$value_oid], 'snmp', $index);
+                discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $num_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $entry[$value_oid], 'snmp', $index);
             }
         }
     }

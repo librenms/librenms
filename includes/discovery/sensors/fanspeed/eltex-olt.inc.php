@@ -36,7 +36,7 @@ if (isset($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.6.0'])) {
         $descr = 'Fan 0';
         $divisor = 1;
         $fanspeed = $tmp_eltex[$oid];
-        discover_sensor(null, 'fanspeed', $device, $oid, $index, $type, $descr, $divisor, '1', $min_eltex, null, null, $max_eltex, $fanspeed);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::FANSPEED, $device, $oid, $index, $type, $descr, $divisor, '1', $min_eltex, null, null, $max_eltex, $fanspeed);
     }
 }
 
@@ -48,7 +48,7 @@ if (isset($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.8.0'])) {
         $descr = 'Fan 1';
         $divisor = 1;
         $fanspeed = $tmp_eltex[$oid];
-        discover_sensor(null, 'fanspeed', $device, $oid, $index, $type, $descr, $divisor, '1', $min_eltex, null, null, $max_eltex, $fanspeed);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::FANSPEED, $device, $oid, $index, $type, $descr, $divisor, '1', $min_eltex, null, null, $max_eltex, $fanspeed);
     }
 }
 

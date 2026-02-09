@@ -29,6 +29,6 @@ foreach ($pre_cache['cooling_unit_analog'] as $index => $data) {
     $scale = $data['coolingUnitStatusAnalogScale'] ?? null;
     $value = $data['coolingUnitStatusAnalogValue'] ?? null;
     if (preg_match('/Fan Speed/', (string) $descr) && $data['coolingUnitStatusAnalogUnits'] == '%' && $value >= 0) {
-        discover_sensor(null, 'fanspeed', $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::FANSPEED, $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
     }
 }

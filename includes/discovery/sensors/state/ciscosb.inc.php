@@ -42,7 +42,7 @@ if (! empty($temp)) {
 
         if (Str::contains($descr, ['ethernet', 'Ethernet']) && $port?->ifOperStatus !== 'notPresent') {
             //Discover Sensors
-            discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $index);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $index);
         }
     }
 }
