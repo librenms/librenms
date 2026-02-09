@@ -90,8 +90,8 @@ class PortsController extends TableController
             'ifAlias',
             'ifMtu',
             'ifSpeed',
-			'ifDuplex',
-       ];
+            'ifDuplex',
+        ];
     }
 
     protected function baseQuery($request)
@@ -145,7 +145,7 @@ class PortsController extends TableController
             'secondsIfLastChange' => ceil($port->device?->uptime - ($port->ifLastChange / 100)),
             'ifConnectorPresent' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no',
             'ifSpeed' => $port->ifSpeed,
-			'ifDuplex' => $port->ifDuplex,
+            'ifDuplex' => $port->ifDuplex,
             'ifMtu' => $port->ifMtu,
             'ifInOctets_rate' => $port->ifInOctets_rate * 8,
             'ifOutOctets_rate' => $port->ifOutOctets_rate * 8,
@@ -210,7 +210,7 @@ class PortsController extends TableController
             'ifindex' => $port->ifIndex,
             'status' => $status,
             'admin_status' => $adminStatus,
-			'ifDuplex' => $port->ifDuplex,
+            'ifDuplex' => $port->ifDuplex,
             'speed' => $speed,
             'mtu' => $port->ifMtu,
             'type' => Rewrite::normalizeIfType($port->ifType),
