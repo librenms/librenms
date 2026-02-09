@@ -20,6 +20,7 @@ use App\Models\Port;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -346,6 +347,7 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
  */
 function discovery_process($os, $sensor_class, $pre_cache)
 {
+    $sensorEnum = SensorEnum::tryFrom($sensor_class);
     $discovery = $os->getDiscovery('sensors');
     $device = $os->getDeviceArray();
 
@@ -382,7 +384,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
 
                 $snmp_value = $snmp_data[$data['value']] ?? '';
                 if (! is_numeric($snmp_value)) {
-                    if ($sensor_class === 'temperature') {
+                    if ($sensorEnum === SensorEnum::TEMPERATURE) {
                         // For temp sensors, try and detect fahrenheit values
                         if (is_string($snmp_value) && Str::endsWith($snmp_value, ['f', 'F'])) {
                             $user_function = 'fahrenheit_to_celsius';
@@ -396,7 +398,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
 
                 if (is_numeric($snmp_value)) {
                     $value = $snmp_value;
-                } elseif ($sensor_class === 'state') {
+                } elseif ($sensorEnum === SensorEnum::STATE) {
                     // translate string states to values (poller does this as well)
                     $states = array_column($data['states'], 'value', 'descr');
                     $value = $states[$snmp_value] ?? false;
@@ -482,7 +484,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
 
                     $sensor_name = $device['os'];
 
-                    if ($sensor_class === 'state') {
+                    if ($sensorEnum === SensorEnum::STATE) {
                         $sensor_name = $data['state_name'] ?? $data['oid'];
                         create_state_index($sensor_name, $data['states']);
                     } else {

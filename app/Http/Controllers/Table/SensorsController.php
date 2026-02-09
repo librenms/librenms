@@ -50,9 +50,9 @@ class SensorsController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
-        $class = $request->input('class');
+        $class = SensorEnum::tryFrom($request->input('class'));
         $relations = [];
-        if ($class === SensorEnum::STATE->value) {
+        if ($class === SensorEnum::STATE) {
             $relations[] = 'translations';
         }
 
