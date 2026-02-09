@@ -77,7 +77,7 @@ if ($in_phaseNum == '1') {
 
         discover_sensor(
             null,
-            'voltage',
+            $sensor_class,
             $device,
             $in_voltage_oid,
             $index,
@@ -108,7 +108,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'voltage',
+            $sensor_class,
             $device,
             $in_voltage1_oid,
             $index,
@@ -136,7 +136,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'voltage',
+            $sensor_class,
             $device,
             $in_voltage2_oid,
             $index,
@@ -164,7 +164,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'voltage',
+            $sensor_class,
             $device,
             $in_voltage3_oid,
             $index,
@@ -195,7 +195,7 @@ if ($in_phaseNum == '1') {
 
         discover_sensor(
             null,
-            'voltage',
+            $sensor_class,
             $device,
             $out_voltage_oid,
             $index,
@@ -227,7 +227,7 @@ if ($out_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'voltage',
+            $sensor_class,
             $device,
             $out_voltage1_oid,
             $index,
@@ -255,7 +255,7 @@ if ($out_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'voltage',
+            $sensor_class,
             $device,
             $out_voltage2_oid,
             $index,
@@ -283,7 +283,7 @@ if ($out_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'voltage',
+            $sensor_class,
             $device,
             $out_voltage3_oid,
             $index,
@@ -315,7 +315,7 @@ if ($out_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'voltage',
+            $sensor_class,
             $device,
             $bypass_voltage1_oid,
             $index,
@@ -343,7 +343,7 @@ if ($out_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'voltage',
+            $sensor_class,
             $device,
             $bypass_voltage2_oid,
             $index,
@@ -371,7 +371,7 @@ if ($out_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'voltage',
+            $sensor_class,
             $device,
             $bypass_voltage3_oid,
             $index,
@@ -419,7 +419,7 @@ if (! empty($battery_voltage1) || $battery_voltage1 == 0) {
 
     discover_sensor(
         null,
-        'voltage',
+        $sensor_class,
         $device,
         $battery_voltage1_oid,
         $index,

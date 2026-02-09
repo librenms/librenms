@@ -27,7 +27,7 @@ foreach ($input_freq as $index => $data) {
 
     discover_sensor(
         null,
-        'frequency',
+        $sensor_class,
         $device,
         $freq_oid,
         "3.2.0.$index",
@@ -50,7 +50,7 @@ if (is_numeric($output_freq)) {
 
     discover_sensor(
         null,
-        'frequency',
+        $sensor_class,
         $device,
         $freq_oid,
         '4.2.0',
@@ -73,7 +73,7 @@ if (is_numeric($bypass_freq)) {
 
     discover_sensor(
         null,
-        'frequency',
+        $sensor_class,
         $device,
         $freq_oid,
         '5.1.0',

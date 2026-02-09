@@ -35,7 +35,7 @@ foreach ($modulation as $link => $linkEntry) {
         if (isset($radioEntry['linkAcmRxModulation'])) {
             discover_sensor(
                 null,
-                'state',
+                $sensor_class,
                 $device,
                 ".1.3.6.1.4.1.3373.1103.80.17.1.6.$index",
                 "rx-$index",
@@ -46,7 +46,7 @@ foreach ($modulation as $link => $linkEntry) {
         if (isset($radioEntry['linkAcmTxModulation'])) {
             discover_sensor(
                 null,
-                'state',
+                $sensor_class,
                 $device,
                 ".1.3.6.1.4.1.3373.1103.80.17.1.7.$index",
                 "tx-$index",

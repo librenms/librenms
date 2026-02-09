@@ -529,7 +529,7 @@ function sensors($types, $os, $pre_cache = [])
     $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
         $class_value = $sensor_class->value;
-        echo ucfirst($class_value) . ': ';
+        echo ucfirst((string) $class_value) . ': ';
 
         if (isset($device['os_group']) && is_file(base_path("includes/discovery/sensors/$class_value/{$device['os_group']}.inc.php"))) {
             include base_path("includes/discovery/sensors/$class_value/{$device['os_group']}.inc.php");

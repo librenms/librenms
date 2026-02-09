@@ -29,7 +29,7 @@ foreach ($pre_cache['wipipe_oids'] as $index => $entry) {
         // Discover Sensor
         discover_sensor(
             null,
-            'dbm',
+            $sensor_class,
             $device,
             $oid,
             'mdmSignalStrength.' . $index,

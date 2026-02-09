@@ -75,7 +75,7 @@ foreach ($octetSetup as $entry) {
             $port_number = $index + 1;
             discover_sensor(
                 null,
-                'state',
+                $sensor_class,
                 $device,
                 $entry['num_oid'],
                 $port_number,

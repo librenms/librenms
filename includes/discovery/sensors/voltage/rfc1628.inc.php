@@ -12,7 +12,7 @@ if (is_numeric($battery_volts)) {
 
     discover_sensor(
         null,
-        'voltage',
+        $sensor_class,
         $device,
         $volt_oid,
         '1.2.5.0',
@@ -52,7 +52,7 @@ foreach ($output_volts as $index => $data) {
 
     discover_sensor(
         null,
-        'voltage',
+        $sensor_class,
         $device,
         $volt_oid,
         $index,
@@ -91,7 +91,7 @@ foreach ($input_volts as $index => $data) {
 
     discover_sensor(
         null,
-        'voltage',
+        $sensor_class,
         $device,
         $volt_oid,
         100 + $index,
@@ -129,7 +129,7 @@ foreach ($bypass_volts as $index => $data) {
 
     discover_sensor(
         null,
-        'voltage',
+        $sensor_class,
         $device,
         $volt_oid,
         200 + $index,

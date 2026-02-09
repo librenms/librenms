@@ -34,7 +34,7 @@ if (! empty($entphydata)) {
                 $cur_oid = '.1.3.6.1.4.1.25506.2.6.1.1.1.1.12.';
                 discover_sensor(
                     null,
-                    'temperature',
+                    $sensor_class,
                     $device,
                     $cur_oid . $tempindex,
                     'temp-' . $tempindex,

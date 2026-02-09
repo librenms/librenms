@@ -19,7 +19,7 @@ $walk = snmpwalk_cache_oid($device, 'prtMarkerTable', [], 'Printer-MIB');
 foreach ($walk as $index => $data) {
     discover_sensor(
         null,
-        'count',
+        $sensor_class,
         $device,
         '.1.3.6.1.2.1.43.10.2.1.4.' . $index, // Printer-MIB::prtMarkerLifeCount.1.1
         'prtMarkerLifeCount',
@@ -36,7 +36,7 @@ foreach ($walk as $index => $data) {
 
     discover_sensor(
         null,
-        'count',
+        $sensor_class,
         $device,
         '.1.3.6.1.2.1.43.10.2.1.5.' . $index, // Printer-MIB::prtMarkerPowerOnCount.1.1
         'prtMarkerPowerOnCount',

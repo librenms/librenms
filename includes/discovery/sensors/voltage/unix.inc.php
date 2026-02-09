@@ -63,7 +63,7 @@ if (! empty($snmpData)) {
                 $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index)->toNumeric();
                 discover_sensor(
                     null,
-                    'voltage',
+                    $sensor_class,
                     $device,
                     $oid,
                     $index,

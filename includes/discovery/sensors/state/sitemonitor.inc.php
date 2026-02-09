@@ -37,7 +37,7 @@ if ($switch) {
     $sensor_index = 3;
     discover_sensor(
         null,
-        'state',
+        $sensor_class,
         $device,
         '.1.3.6.1.4.1.32050.2.1.26.5.3',
         $sensor_index,
