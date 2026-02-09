@@ -27,7 +27,7 @@ $entPhysicalIndex = null;
 $entPhysicalIndex_measured = null;
 $user_func = null;
 $group = null;
-$class = 'current';
+$class = $sensor_class;
 $poller_type = 'snmp';
 
 $psline_data = snmpwalk_cache_oid($device, 'lgpPduPsLineTable', [], 'LIEBERT-GP-PDU-MIB', 'liebert');
