@@ -1,0 +1,46 @@
+ZXAN-GLUE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises    FROM SNMPv2-SMI;
+
+    zxAnGlue  MODULE-IDENTITY
+        LAST-UPDATED    "202506060000Z"
+        ORGANIZATION    "LibreNMS Contributors"
+        CONTACT-INFO    "github.com/guipoletto
+                         Mail:
+                         Tel : "
+        DESCRIPTION     "This provides a glue-path for adding sensors to LibreNMS
+                         in parts of the tree not covevred by publishehd Mibs"
+        REVISION        "202506060000Z"
+        DESCRIPTION     "Initial version of this MIB module."
+
+        ::= { zxAnPon 10 }
+            lorem OBJECT IDENTIFIER ::= { zxAnGlue 2 }
+            ipsum OBJECT IDENTIFIER ::= { lorem 2 }
+            dolor OBJECT IDENTIFIER ::= { ipsum 3 }
+            zxAnGluePonPortStats OBJECT IDENTIFIER ::= { dolor 1 }
+
+    portTotalConfiguredTerminals  OBJECT-TYPE
+        SYNTAX      Integer32(1..7)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+             ""
+        ::= { zxAnGluePonPortStats 14 }
+
+
+    portCurrentOnlineTerminals  OBJECT-TYPE
+        SYNTAX      Integer32(1..7)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+             ""
+        ::= { zxAnGluePonPortStats 15 }
+
+
+
+
+    zte     OBJECT IDENTIFIER ::= { enterprises 3902 }
+
+END
+
