@@ -47,6 +47,8 @@ if (! empty($peers)) {
             ])->valuesByIndex();
     } elseif ($device['os_group'] === 'arista') {
         $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', [], 'ARISTA-BGP4V2-MIB');
+    } elseif ($device['os'] === 'vyos') {
+        $peer_data_check = snmpwalk_cache_oid($device, 'bgp4V2PeerRemoteAs', [], 'BGP4V2-MIB');
     } elseif ($device['os'] === 'dell-os10') {
         $peer_data_check = snmpwalk_cache_oid($device, 'os10bgp4V2PeerRemoteAs', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell'); // practically identical MIB as arista
     } elseif ($device['os'] === 'timos') {
@@ -334,6 +336,24 @@ if (! empty($peers)) {
                             'aristaBgp4V2PeerLastErrorCodeReceived' => 'bgpPeerLastErrorCode',
                             'aristaBgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
                             'aristaBgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',
+                        ];
+                    } elseif ($device['os'] == 'vyos' && $ip_ver == 'ipv6') {
+                        $peer_identifier = '1.' . $ip_type . '.' . $bgp_peer_ident;
+                        $mib = 'BGP4V2-MIB';
+                        $oid_map = [
+                            'bgp4V2PeerState' => 'bgpPeerState',
+                            'bgp4V2PeerAdminStatus' => 'bgpPeerAdminStatus',
+                            // 'bgp4V2PeerInUpdates' => 'bgpPeerInUpdates',
+                            // 'bgp4V2PeerOutUpdates' => 'bgpPeerOutUpdates',
+                            // 'bgp4V2PeerInTotalMessages' => 'bgpPeerInTotalMessages',
+                            // 'bgp4V2PeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
+                            'bgp4V2PeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
+                            'bgp4V2PeerInUpdatesElapsedTime' => 'bgpPeerInUpdateElapsedTime',
+                            'bgp4V2PeerLocalAddr' => 'bgpLocalAddr', // silly db field name
+                            'bgp4V2PeerDescription' => 'bgpPeerDescr',
+                            'bgp4V2PeerLastErrorCodeReceived' => 'bgpPeerLastErrorCode',
+                            'bgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
+                            'bgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',
                         ];
                     } elseif ($device['os'] == 'dell-os10') {
                         $peer_identifier = '1.' . $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;

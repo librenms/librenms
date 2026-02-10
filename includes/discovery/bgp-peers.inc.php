@@ -30,6 +30,35 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         if ($device['os_group'] === 'arista') {
             $peers_data = snmp_walk($device, 'aristaBgp4V2PeerRemoteAs', '-Oq', 'ARISTA-BGP4V2-MIB');
             $peer2 = true;
+        } elseif ($device['os'] === 'vyos') {
+            $v2_peers = snmp_walk($device, 'bgp4V2PeerRemoteAs', '-Oq', 'BGP4V2-MIB');
+            $peers_data = '';
+            foreach (explode("\n", (string) $v2_peers) as $line) {
+                $line = trim($line);
+                if (empty($line)) {
+                    continue;
+                }
+                $parts = explode(' ', $line, 2);
+                if (count($parts) !== 2) {
+                    continue;
+                }
+                [$oid, $remote_as] = $parts;
+                $remote_as = trim($remote_as);
+                $ip_addr = null;
+                if (preg_match('/\.ipv[46]\.([\d\.]+)/', $oid, $matches)) {
+                    if (str_contains($matches[0], '.ipv4.')) {
+                        $ip_addr = IP::isValid($matches[1]) ? $matches[1] : null;
+                    } else {
+                        $parts = explode('.', $matches[1]);
+                        if (count($parts) === 16) {
+                            $ip_addr = implode(':', array_map(fn($p) => sprintf('%02x', $p), $parts));
+                        }
+                    }
+                }
+                if ($ip_addr) {
+                    $peers_data .= "$ip_addr $remote_as\n";
+                }
+            }
         } elseif ($device['os'] == 'junos') {
             $peers_data = snmp_walk($device, 'jnxBgpM2PeerRemoteAs', '-Onq', 'BGP4-V2-MIB-JUNIPER', 'junos');
         } elseif ($device['os_group'] === 'cisco') {
