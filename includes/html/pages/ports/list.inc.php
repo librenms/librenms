@@ -43,7 +43,7 @@ if (isset($vars['errors'])) {
                     <th data-column-id="secondsIfLastChange" data-converter="duration">Status Changed</th>
                     <th data-column-id="ifConnectorPresent" data-visible="false">Connected</th>
                     <th data-column-id="ifSpeed" data-converter="human-bps">Speed</th>
-					<th data-column-id="ifDuplex" data-visible="<?php echo \App\Facades\LibrenmsConfig::get('duplex.enabled') ? 'true' : 'false' ?>" data-css-class="green" data-formatter="duplex">Duplex</th>
+					<th data-column-id="ifDuplex" data-css-class="green" data-formatter="duplex">Duplex</th>
                     <th data-column-id="ifMtu" data-visible="false">MTU</th>
                     <th data-column-id="ifInOctets_rate" data-searchable="false" data-css-class="green"
                         data-converter="human-bps">In
@@ -118,11 +118,11 @@ if (isset($vars['errors'])) {
                 const duplexValue = (row.ifDuplex || '').toLowerCase().trim();
                 switch (duplexValue) {
                     case 'halfduplex':
-                        return "<i class='fa-solid fa-circle-half-stroke'></i>";
+                        return "<i title='Half Duplex' data-toggle='tooltip' class='fa-solid fa-circle-half-stroke'></i>";
                     case 'fullduplex':
-                        return "<i class='fa-solid fa-circle'></i>";
+                        return "<i title='Full Duplex' data-toggle='tooltip' class='fa-solid fa-circle'></i>";
                     default:
-                        return "<i class='fa-regular fa-circle'></i>"; // or "<i class='fa-solid fa-question'></i>";
+                        return "<i title='No Duplex' data-toggle='tooltip' class='fa-regular fa-circle'></i>";
                 }
             }
         },
