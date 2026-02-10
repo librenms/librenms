@@ -1,4 +1,3 @@
-mib: DHCP-MIB
 modules:
     os:
         sysDescr_regex: '/Hardware: (?<hardware>[\w /]+) - Software: (?<software>.*)/'
@@ -6,22 +5,22 @@ modules:
         count:
           data:
                 -
-                    oid: noAddInUse
-                    value: noAddInUse
+                    oid: DHCP-MIB::noAddInUse
+                    value: DHCP-MIB::noAddInUse
                     num_oid: '.1.3.6.1.4.1.311.1.3.2.1.1.2.{{ $index }}'
                     index: 'noAddInUse.{{ $index }}'
                     descr: 'IP Addresses Allocated - {{ $index }}'
                     group: IP Addresses Allocated
                 -
-                    oid: noAddFree
-                    value: noAddFree
+                    oid: DHCP-MIB::noAddFree
+                    value: DHCP-MIB::noAddFree
                     num_oid: '.1.3.6.1.4.1.311.1.3.2.1.1.3.{{ $index }}'
                     index: 'noAddFree.{{ $index }}'
                     descr: 'IP Addresses Free - {{ $index }}'
                     group: IP Addresses Free
                 -
-                    oid: noPendingOffers
-                    value: noPendingOffers
+                    oid: DHCP-MIB::noPendingOffers
+                    value: DHCP-MIB::noPendingOffers
                     num_oid: '.1.3.6.1.4.1.311.1.3.2.1.1.4.{{ $index }}'
                     index: 'noPendingOffers.{{ $index }}'
                     descr: 'IP Addresses Pending - {{ $index }}'
