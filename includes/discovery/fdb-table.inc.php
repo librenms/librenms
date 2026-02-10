@@ -60,7 +60,7 @@ if (! empty($insert)) {
             } else {
                 if (is_null($entry['port_id'])) {
                     Log::warning("FDB: missing port id for MAC {$mac_address_entry}, VLAN {$vlan_id}, device {$device['device_id']}");
-                    continue;              
+                    continue;
                 }
 
                 DB::table('ports_fdb')->insert([
