@@ -38,7 +38,6 @@ modules:
                 -
                     oid: HH3C-ENTITY-EXT-MIB::hh3cEntityExtPowerEntry
                     value: HH3C-ENTITY-EXT-MIB::hh3cEntityExtCurrentPower
-                    state_name: 'hh3cEntityExtPowerEntry'
                     num_oid: '.1.3.6.1.4.1.25506.2.6.1.3.1.1.3.{{ $index }}'
                     descr: '{{ ENTITY-MIB::entPhysicalName }} Power Usage'
                     index: 'hh3cEntityExtCurrentPower.{{ $index }}'
