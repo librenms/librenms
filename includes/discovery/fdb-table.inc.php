@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Log;
 
 // Build a dictionary of vlans in database
