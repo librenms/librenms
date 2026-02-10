@@ -1,4 +1,3 @@
-mib: BRIDGE-MIB:NORTEL-OPTICAL-PM-MIB:CIENA-CES-PORT-XCVR-MIB:CIENA-CES-PORT-MIB:BRIDGE-MIB:CIENA-SMI:CIENA-CES-CHASSIS-MIB:CIENA-CES-FEATURE-LICENSE-MIB:CIENA-CES-PORT-MIB:CIENA-CES-PORT-XCVR-MIB:WWP-PRODUCTS-MIB:WWP-LEOS-PORT-XCVR-MIB:WWP-LEOS-SYSTEM-CONFIG-MIB:CIENA-CES-RAPS-MIB
 modules:
     os:
         sysDescr_regex:
@@ -6,208 +5,207 @@ modules:
             - '/Ciena Corporation, (?<hardware>.*) SAOS Operating System, Version saos-(?<version>.*+)/'
     additional_oids:
         data:
-            -
-                oid: nnOpticalPmRecentTable
-            - oid: ifName
+            - oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentTable
+            - oid: IF-MIB::ifName
     sensors:
         count:
             data:
                 -
-                    oid: nnOpticalPmRecentTable
-                    value: nnOpticalPmCurr15MinValue
+                    oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentTable
+                    value: NORTEL-OPTICAL-PM-MIB::nnOpticalPmCurr15MinValue
                     num_oid: .1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.{{ $index }}
-                    descr: nnOpticalPmRecentMonTypeDescr
+                    descr: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentMonTypeDescr
                     index: 'nnOpticalPmRecentTable.{{ $index }}'
                     skip_values:
                         -
-                            oid: nnOpticalPmRecentUnits
+                            oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentUnits
                             op: 'not_in_array'
                             value: [1]
                         -
-                            oid: nnOpticalPmRecentMonTypeDescr
+                            oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentMonTypeDescr
                             op: 'regex'
                             value: (.*(LOW|HIGH).*)
-                    group: nnOpticalPmRecentIfIndexDescr
+                    group: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentIfIndexDescr
         dbm:
             data:
                 -
-                    oid: nnOpticalPmRecentTable
-                    value: nnOpticalPmCurr15MinValue
+                    oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentTable
+                    value: NORTEL-OPTICAL-PM-MIB::nnOpticalPmCurr15MinValue
                     num_oid: .1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.{{ $index }}
-                    descr: nnOpticalPmRecentMonTypeDescr
+                    descr: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentMonTypeDescr
                     index: 'nnOpticalPmRecentTable.{{ $index }}'
                     skip_values:
                         -
-                            oid: nnOpticalPmRecentUnits
+                            oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentUnits
                             op: 'not_in_array'
                             value: [2, 3]
                         -
-                            oid: nnOpticalPmRecentMonTypeDescr
+                            oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentMonTypeDescr
                             op: 'regex'
                             value: (.*(LOW|HIGH).*)
-                    group: nnOpticalPmRecentIfIndexDescr
+                    group: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentIfIndexDescr
         percent:
             data:
                 -
-                    oid: nnOpticalPmRecentTable
-                    value: nnOpticalPmCurr15MinValue
+                    oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentTable
+                    value: NORTEL-OPTICAL-PM-MIB::nnOpticalPmCurr15MinValue
                     num_oid: .1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.{{ $index }}
-                    descr: nnOpticalPmRecentMonTypeDescr
+                    descr: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentMonTypeDescr
                     index: 'nnOpticalPmRecentTable.{{ $index }}'
                     skip_values:
                         -
-                            oid: nnOpticalPmRecentUnits
+                            oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentUnits
                             op: 'not_in_array'
                             value: [4]
                         -
-                            oid: nnOpticalPmRecentMonTypeDescr
+                            oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentMonTypeDescr
                             op: 'regex'
                             value: (.*(LOW|HIGH).*)
-                    group: nnOpticalPmRecentIfIndexDescr
+                    group: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentIfIndexDescr
         ber:
             data:
                 -
-                    oid: nnOpticalPmRecentTable
-                    value: nnOpticalPmCurr15MinValue
+                    oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentTable
+                    value: NORTEL-OPTICAL-PM-MIB::nnOpticalPmCurr15MinValue
                     num_oid: .1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.{{ $index }}
-                    descr: nnOpticalPmRecentMonTypeDescr
+                    descr: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentMonTypeDescr
                     index: 'nnOpticalPmRecentTable.{{ $index }}'
                     skip_values:
                         -
-                            oid: nnOpticalPmRecentUnits
+                            oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentUnits
                             op: 'not_in_array'
                             value: [5]
                         -
-                            oid: nnOpticalPmRecentMonTypeDescr
+                            oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentMonTypeDescr
                             op: 'regex'
                             value: (.*(LOW|HIGH).*)
-                    group: nnOpticalPmRecentIfIndexDescr
+                    group: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentIfIndexDescr
         runtime:
             data:
                 -
-                    oid: nnOpticalPmRecentTable
-                    value: nnOpticalPmCurr15MinValue
+                    oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentTable
+                    value: NORTEL-OPTICAL-PM-MIB::nnOpticalPmCurr15MinValue
                     num_oid: .1.3.6.1.4.1.562.68.10.1.1.1.1.1.6.{{ $index }}
-                    descr: nnOpticalPmRecentMonTypeDescr
+                    descr: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentMonTypeDescr
                     index: 'nnOpticalPmRecentTable.{{ $index }}'
                     skip_values:
                         -
-                            oid: nnOpticalPmRecentUnits
+                            oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentUnits
                             op: 'not_in_array'
                             value: [6]
                         -
-                            oid: nnOpticalPmRecentMonTypeDescr
+                            oid: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentMonTypeDescr
                             op: 'regex'
                             value: (.*(LOW|HIGH).*)
-                    group: nnOpticalPmRecentIfIndexDescr
+                    group: NORTEL-OPTICAL-PM-MIB::nnOpticalPmRecentIfIndexDescr
         temperature:
             data:
-                -   oid: cienaCesPortXcvrTable
-                    value: cienaCesPortXcvrTemperature
+                -   oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTemperature
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.3.{{ $index }}'
-                    descr: 'Port {{ $ifName }} Transceiver'
+                    descr: 'Port {{ IF-MIB::ifName }} Transceiver'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
-                    low_limit: cienaCesPortXcvrLowTempAlarmThreshold
-                    high_limit: cienaCesPortXcvrHighTempAlarmThreshold
+                    low_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrLowTempAlarmThreshold
+                    high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighTempAlarmThreshold
                     skip_values:
-                        -   oid: cienaCesPortXcvrOperState
+                        -   oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
                             op: 'in_array'
                             value: [ 4 ]
         voltage:
             data:
-                -   oid: cienaCesPortXcvrTable
-                    value: cienaCesPortXcvrVcc
+                -   oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrVcc
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.4.{{ $index }}'
-                    descr: 'Port {{ $ifName }} Transceiver Vcc'
+                    descr: 'Port {{ IF-MIB::ifName }} Transceiver Vcc'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
-                    low_limit: cienaCesPortXcvrLowVccAlarmThreshold
-                    high_limit: cienaCesPortXcvrHighVccAlarmThreshold
+                    low_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrLowVccAlarmThreshold
+                    high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighVccAlarmThreshold
                     divisor: 1000
                     index: 'xcvr-vcc-{{ $index }}'
                     skip_values:
-                        -   oid: cienaCesPortXcvrOperState
+                        -   oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
                             op: 'in_array'
                             value: [ 4 ]
         current:
             data:
                 -
-                    oid: cienaCesPortXcvrTable
-                    value: cienaCesPortXcvrBias
+                    oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrBias
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.5.{{ $index }}'
-                    descr: 'Port {{ $ifName }} Transceiver Bias Current'
+                    descr: 'Port {{ IF-MIB::ifName }} Transceiver Bias Current'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     low_limit: 0
-                    high_limit: cienaCesPortXcvrHighBiasAlarmThreshold
+                    high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighBiasAlarmThreshold
                     divisor: 1000
                     group: 'Transceivers'
                     index: 'xcvr-i-{{ $index }}'
                     skip_values:
                         -
-                            oid: cienaCesPortXcvrOperState
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
                             op: 'in_array'
                             value: [4]
         power:
             data:
                 -
-                    oid: cienaCesPortXcvrTable
-                    value: cienaCesPortXcvrRxPower
+                    oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrRxPower
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.6.{{ $index }}'
-                    descr: 'Port {{ $ifName }} Transceiver Rx Power'
+                    descr: 'Port {{ IF-MIB::ifName }} Transceiver Rx Power'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
-                    low_limit: cienaCesPortXcvrLowRxPwAlarmThreshold
-                    high_limit: cienaCesPortXcvrHighRxPwAlarmThreshold
+                    low_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrLowRxPwAlarmThreshold
+                    high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighRxPwAlarmThreshold
                     divisor: 1000000
                     index: 'rx-{{ $index }}'
                     skip_values:
                         -
-                            oid: cienaCesPortXcvrOperState
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
                             op: 'in_array'
                             value: [1,4]
                 -
-                    oid: cienaCesPortXcvrTable
-                    value: cienaCesPortXcvrTxOutputPower
+                    oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTxOutputPower
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.35.{{ $index }}'
-                    descr: 'Port {{ $ifName }} Transceiver Tx Power'
+                    descr: 'Port {{ IF-MIB::ifName }} Transceiver Tx Power'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     group: transceiver
-                    low_limit: cienaCesPortXcvrLowTxPwAlarmThreshold
-                    high_limit: cienaCesPortXcvrHighTxPwAlarmThreshold
+                    low_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrLowTxPwAlarmThreshold
+                    high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighTxPwAlarmThreshold
                     divisor: 1000000
                     index: 'tx-{{ $index }}'
                     skip_values:
                         -
-                            oid: cienaCesPortXcvrOperState
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
                             op: 'in_array'
                             value: [4]
                         -
-                            oid: cienaCesPortXcvrTxState
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTxState
                             op: 'in_array'
                             value: [2]
         state:
             data:
                 -
-                    oid: cienaCesPortXcvrTable
-                    value: cienaCesPortXcvrFecMode
+                    oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrFecMode
                     num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.36.{{ $index }}'
-                    descr: 'Port {{ $ifName }} Transceiver FEC Mode'
+                    descr: 'Port {{ IF-MIB::ifName }} Transceiver FEC Mode'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
                     state_name: cienaCesPortXcvrFecMode
                     skip_values:
                         -
-                            oid: cienaCesPortXcvrFecMode
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrFecMode
                             op: 'in_array'
                             value: [1]
                         -
-                            oid: cienaCesPortXcvrOperState
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
                             op: 'in_array'
                             value: [4]
                     states:
@@ -216,10 +214,10 @@ modules:
                         - { value: 3, generic: 0, graph: 0, descr: enhanced }
                     group: 'Transceiver FEC Mode'
                 -
-                    oid: cienaCesModuleTable
-                    value: cienaCesModuleAdminState
+                    oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
+                    value: CIENA-CES-MODULE-MIB::cienaCesModuleAdminState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.2.1.2.1.1.7.{{ $index }}'
-                    descr: 'Slot {{ $subindex2 }} Admin State - {{ $cienaCesModuleModel }}'
+                    descr: 'Slot {{ $subindex2 }} Admin State - {{ CIENA-CES-MODULE-MIB::cienaCesModuleModel }}'
                     state_name: cienaCesModuleAdminState
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: enabled }
@@ -227,10 +225,10 @@ modules:
                         - { value: 3, generic: 0, graph: 0, descr: shutdown }
                     group: 'Module Admin State'
                 -
-                    oid: cienaCesModuleTable
-                    value: cienaCesModuleOperState
+                    oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
+                    value: CIENA-CES-MODULE-MIB::cienaCesModuleOperState
                     num_oid: '.1.3.6.1.4.1.1271.2.1.2.1.2.1.1.8.{{ $index }}'
-                    descr: 'Slot {{ $subindex2 }} Oper State - {{ $cienaCesModuleModel }}'
+                    descr: 'Slot {{ $subindex2 }} Oper State - {{ CIENA-CES-MODULE-MIB::cienaCesModuleModel }}'
                     entPhysicalIndex: '55{{ $subindex2 }}'
                     state_name: cienaCesModuleOperState
                     states:
@@ -254,8 +252,8 @@ modules:
                         - { value: 18, generic: 1, graph: 0, descr: powerdown }
                     group: 'Module Operational State'
                 -
-                    oid: cienaCesModuleTable
-                    value: cienaCesModuleLastRebootReason
+                    oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
+                    value: CIENA-CES-MODULE-MIB::cienaCesModuleLastRebootReason
                     num_oid: '.1.3.6.1.4.1.1271.2.1.2.1.2.1.1.11.{{ $index }}'
                     descr: 'Slot {{ $subindex2 }} Reboot Reason'
                     state_name: cienaCesModuleLastRebootReason
