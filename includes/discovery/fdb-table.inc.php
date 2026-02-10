@@ -1,8 +1,7 @@
 <?php
+use Illuminate\Support\Facades\Log;
 
 // Build a dictionary of vlans in database
-use Log;
-
 $vlans_dict = [];
 foreach (dbFetchRows('SELECT `vlan_id`, `vlan_vlan` from `vlans` WHERE `device_id` = ?', [$device['device_id']]) as $vlan_entry) {
     $vlans_dict[$vlan_entry['vlan_vlan']] = $vlan_entry['vlan_id'];
