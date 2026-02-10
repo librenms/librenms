@@ -20,19 +20,19 @@ modules:
                     value: WebGraph-Thermometer-MIB::wtWebioAn1GraphBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.8.1.4.1.1.{{ $index }}'
                     descr: WebGraph-Thermometer-MIB::wtWebioAn1GraphPortText
-                    index: WebGraph-Thermometer-MIB::wtWebioAn1GraphSensorNo.{{ $index }}
+                    index: wtWebioAn1GraphSensorNo.{{ $index }}
                 -
                     oid: WebGraph-8xThermometer-US-MIB::wtWebioAn8Graph
                     value: WebGraph-8xThermometer-US-MIB::wtWebioAn8GraphBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.6.1.4.1.1.{{ $index }}'
                     descr: WebGraph-8xThermometer-US-MIB::wtWebioAn8GraphPortText
-                    index: WebGraph-8xThermometer-US-MIB::wtWebioAn8GraphSensorNo.{{ $index }}
+                    index: wtWebioAn8GraphSensorNo.{{ $index }}
                 -
                     oid: WebGraph-Thermo-Hygrometer-MIB::wtWebGraphThermHygro
                     value: WebGraph-Thermo-Hygrometer-MIB::wtWebGraphThermHygroBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.9.1.4.1.1.{{ $index }}'
                     descr: 'Environment'
-                    index: WebGraph-Thermo-Hygrometer-MIB::wtWebGraphThermHygroSensorNo.{{ $index }}
+                    index: wtWebGraphThermHygroSensorNo.{{ $index }}
                     skip_values:
                         -
                             oid: WebGraph-Thermo-Hygrometer-MIB::wtWebGraphThermHygroPortName
@@ -43,7 +43,7 @@ modules:
                     value: WebGraph-Thermo-Hygrometer-US-MIB::wtWebGraphThermoHygroBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.42.1.4.1.1.{{ $index }}'
                     descr: 'Environment'
-                    index: WebGraph-Thermo-Hygrometer-US-MIB::wtWebGraphThermoHygroSensorNo.{{ $index }}
+                    index: wtWebGraphThermoHygroSensorNo.{{ $index }}
                     skip_values:
                         -
                             oid: WebGraph-Thermo-Hygrometer-US-MIB::wtWebGraphThermoHygroSensorNo
@@ -58,7 +58,7 @@ modules:
                     value: WebGraph-Thermo-Hygrometer-MIB::wtWebGraphThermHygroBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.9.1.4.1.1.{{ $index }}'
                     descr: 'Environment'
-                    index: WebGraph-Thermo-Hygrometer-MIB::wtWebGraphThermHygroSensorNo.{{ $index }}
+                    index: wtWebGraphThermHygroSensorNo.{{ $index }}
                     skip_values:
                         -
                             oid: WebGraph-Thermo-Hygrometer-MIB::wtWebGraphThermHygroPortName
@@ -69,7 +69,7 @@ modules:
                     value: WebGraph-Thermo-Hygrometer-US-MIB::wtWebGraphThermoHygroBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.42.1.4.1.1.{{ $index }}'
                     descr: 'Environment'
-                    index: WebGraph-Thermo-Hygrometer-US-MIB::wtWebGraphThermoHygroSensorNo.{{ $index }}
+                    index: wtWebGraphThermoHygroSensorNo.{{ $index }}
                     skip_values:
                         -
                             oid: WebGraph-Thermo-Hygrometer-US-MIB::wtWebGraphThermoHygroSensorNo
@@ -84,7 +84,7 @@ modules:
                     value: WebGraph-Thermo-Hygro-Barometer-MIB::wtWebGraphThermoBaroBinaryTempValue
                     num_oid: '.1.3.6.1.4.1.5040.1.2.16.1.4.1.1.{{ $index }}'
                     descr: 'Environment'
-                    index: WebGraph-Thermo-Hygro-Barometer-MIB::wtWebGraphThermoBaroSensorNo.{{ $index }}
+                    index: wtWebGraphThermoBaroSensorNo.{{ $index }}
                     skip_values:
                         -
                             oid: WebGraph-Thermo-Hygro-Barometer-MIB::wtWebGraphThermoBaroPortName
