@@ -10,7 +10,7 @@ modules:
                 used: DLINKSW-ENTITY-EXT-MIB::dEntityExtMemUtilUsed
                 free: DLINKSW-ENTITY-EXT-MIB::dEntityExtMemUtilFree
                 descr: '{{ $subindex1 }} Memory'
-                snmp_flags: '-OQUs'
+                snmp_flags: '-OQ'
 
     os:
         sysDescr_regex: '/(D-Link )?(?<hardware>\S+) (?<version>[0-9.]+)?/'
