@@ -144,7 +144,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         ],
     ];
 } else {
-    echo "file missing: $rrd_filename";
+    throw new \LibreNMS\Exceptions\RrdGraphException("No Data file $rrd_filename");
 }
 
 require 'includes/html/graphs/generic_v3_multiline.inc.php';

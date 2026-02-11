@@ -33,3 +33,13 @@ An authoritative DNS server: <https://www.powerdns.com/auth.html>
     [Install the agent](../Agent-Setup.md) on this device if it isn't already
 
     and copy the `powerdns` script to `/usr/lib/check_mk_agent/local/`
+
+=== "Permissions"
+
+   If snmpd is running as an unpriveledged user, you may need to use sudo.
+   Here is a rough outline of one way to accomplish this.
+
+   Add `Debian-snmp ALL=(ALL) NOPASSWD: /usr/bin/pdns_control list` to your sudoers file
+   
+   In powerdns.py, modify the process from `[pdnscontrol, "list"]` to `["/usr/bin/sudo", pdnscontrol, "list"]`
+   

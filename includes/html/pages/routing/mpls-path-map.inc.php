@@ -12,12 +12,12 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 $hops = [];
 $links = [];
 
-$options = Config::get('network_map_vis_options');
+$options = LibrenmsConfig::get('network_map_vis_options');
 
 $lsp_path_id = $path['lsp_path_id'];
 $last_node = dbFetchCell('SELECT L.mplsLspToAddr FROM mpls_lsps AS L, mpls_lsp_paths AS P WHERE P.lsp_path_id = ? AND L.lsp_id = P.lsp_id', [$path['lsp_path_id']]);
@@ -97,9 +97,7 @@ $dev_mpls_tunnel_c_hops = collect(dbFetchRows('SELECT * FROM mpls_tunnel_c_hops 
 $keyed = $dev_mpls_tunnel_c_hops->keyBy('mplsTunnelCHopListIndex'); // reduce to last hops
 
 // Filter to only with final destination
-$filtered = $keyed->filter(function ($value) use ($last_node) {
-    return $value['mplsTunnelCHopRouterId'] == $last_node;
-});
+$filtered = $keyed->filter(fn ($value) => $value['mplsTunnelCHopRouterId'] == $last_node);
 // FIXME pick the last one, but it seems that the secod one could work too. On NOKIA it actually does not matter, the paths have the same hops.
 // The first one is the active route path.
 $filtered2 = $filtered->last()['mplsTunnelCHopListIndex'];

@@ -2,7 +2,16 @@
 
 $pagetitle[] = 'Routing';
 
-if ($_GET['optb'] == 'graphs' || $_GET['optc'] == 'graphs') {
+$optb = $_GET['optb'] ?? '';
+$optc = $_GET['optc'] ?? '';
+$vars['view'] ??= 'basic';
+$vars['graph'] ??= '';
+$vars['type'] ??= 'all';
+$vars['adminstatus'] ??= '';
+$vars['state'] ??= '';
+$width = $vars['width'] ?? '218';
+
+if ($optb == 'graphs' || $optc == 'graphs') {
     $graphs = 'graphs';
 } else {
     $graphs = 'nographs';
@@ -27,7 +36,7 @@ print_optionbar_start();
 // if (!$vars['protocol']) { $vars['protocol'] = "overview"; }
 echo "<span style='font-weight: bold;'>Routing</span> &#187; ";
 
-$vars['protocol'] = basename($vars['protocol']);
+$vars['protocol'] = basename((string) $vars['protocol']);
 $sep = '';
 foreach ($routing_count as $type => $value) {
     if (! $vars['protocol']) {
@@ -67,6 +76,6 @@ switch ($vars['protocol']) {
         break;
 
     default:
-        echo report_this('Unknown protocol ' . $vars['protocol']);
+        echo 'Unknown protocol';
         break;
 }

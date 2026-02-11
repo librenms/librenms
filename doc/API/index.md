@@ -73,6 +73,7 @@ Output from the API currently is via two output types:
 - [Ports](Ports.md)
 - [Port_Groups](Port_Groups.md)
 - [PortGroups](PortGroups.md)
+- [PortSecurity](PortSecurity.md)
 - [Alerts](Alerts.md)
 - [Routing](Routing.md)
 - [Switching](Switching.md)
@@ -82,4 +83,5 @@ Output from the API currently is via two output types:
 - [Services](Services.md)
 - [Logs](Logs.md)
 - [System](System.md)
+- [Pollers](Pollers.md)
 - [Locations](Locations.md)

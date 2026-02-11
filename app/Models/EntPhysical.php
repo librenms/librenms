@@ -29,8 +29,8 @@ class EntPhysical extends DeviceRelatedModel implements Keyable
         'ifIndex',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): int
     {
-        return $this->entPhysicalIndex;
+        return (int) $this->entPhysicalIndex;
     }
 }

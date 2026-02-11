@@ -38,10 +38,15 @@ class Bats extends OS implements
 {
     public function fetchLocation(): Location
     {
-        $location = parent::fetchLocation();
-        $lat = snmp_get($this->getDeviceArray(), 'AATS-MIB::networkGPSLatitudeFloat.0', '-Oqv');
-        $lng = snmp_get($this->getDeviceArray(), 'AATS-MIB::networkGPSLongitudeFloat.0', '-Oqv');
-        $pointing = snmp_get($this->getDeviceArray(), 'AATS-MIB::status.0', '-Oqv');
+        $response = \SnmpQuery::get([
+            'AATS-MIB::networkGPSLatitudeFloat.0',
+            'AATS-MIB::networkGPSLongitudeFloat.0',
+            'AATS-MIB::status.0',
+        ]);
+
+        $lat = $response->value('AATS-MIB::networkGPSLatitudeFloat.0');
+        $lng = $response->value('AATS-MIB::networkGPSLongitudeFloat.0');
+        $pointing = $response->value('AATS-MIB::status.0');
 
         return new Location([
             'location' => 'At ' . (string) $lat . ', ' . (string) $lng . '. ' . $pointing,

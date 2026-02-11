@@ -11,7 +11,7 @@ if ($device['os_group'] == 'cisco') {
     }
 
     foreach ($rserver_array as $index => $serverfarm) {
-        $farm_id = preg_replace('@\d+\."(.*?)"\.\d+@', '\\1', $index);
+        $farm_id = preg_replace('@\d+\."(.*?)"\.\d+@', '\\1', (string) $index);
 
         $oids = [
             'cesServerFarmRserverTotalConns',
@@ -58,7 +58,7 @@ if ($device['os_group'] == 'cisco') {
         }
 
         if (isset($serverfarms[$farm_id])) {
-            $tags = compact('farm_id', 'rrd_name', 'rrd_def');
+            $tags = ['farm_id' => $farm_id, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
             app('Datastore')->put($device, 'rservers', $tags, $fields);
         }
     }//end foreach

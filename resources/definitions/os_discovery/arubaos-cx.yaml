@@ -1,0 +1,197 @@
+modules:
+    os:
+        sysDescr_regex:
+            - '/ (?<hardware>\d{4,}.*) Swch (?<version>\D{2}\.\d{2}\.\d{2}\.\d{4})/'
+            - '/ (?<hardware>\d{4,}) (?<version>\D{2}\.\d{2}\.\d{2}\.\d{4})/'
+            - '/(?<version>\D{2}\.\d{2}\.\d{2}\.\d{4})/'
+        serial:
+            - ENTITY-MIB::entPhysicalSerialNum.1
+            - ENTITY-MIB::entPhysicalSerialNum.101001
+        version:
+            - ENTITY-MIB::entPhysicalSoftwareRev.1
+            - ENTITY-MIB::entPhysicalSoftwareRev.101001
+        hardware:
+            - ENTITY-MIB::entPhysicalDescr.1
+            - ENTITY-MIB::entPhysicalDescr.101001
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - ENTITY-MIB::entPhysicalName
+                        - ENTITY-MIB::entPhysicalSerialNum
+                        - ENTITY-MIB::entPhysicalSoftwareRev
+                        - ENTITY-MIB::entPhysicalDescr
+                        - IF-MIB::ifName
+                        - ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTable
+        temperature:
+            data:
+                -
+                    oid: ARUBAWIRED-TEMPSENSOR-MIB::arubaWiredTempSensorTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.11.3.1.1.7.{{ $index }}'
+                    descr: ARUBAWIRED-TEMPSENSOR-MIB::arubaWiredTempSensorName
+                    divisor: 1000
+                    value: ARUBAWIRED-TEMPSENSOR-MIB::arubaWiredTempSensorTemperature
+                    high_limit: ARUBAWIRED-TEMPSENSOR-MIB::arubaWiredTempSensorMaxTemp
+                    low_limit: ARUBAWIRED-TEMPSENSOR-MIB::arubaWiredTempSensorMinTemp
+
+                -
+                    oid: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.27.1.2.1.1.2.{{ $index }}'
+                    descr: '{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomPortDesc }} Temperature'
+                    value: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTemp
+                    group: transceiver
+                    index: 'arubaWiredPmXcvrDomTemp.{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    entPhysicalIndex: '{{ $index }}'
+                    high_limit: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTempHiAlarmThreshold
+                    warn_limit: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTempHiWarnThreshold
+                    low_warn_limit: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTempLoWarnThreshold
+                    low_limit: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTempLoAlarmThreshold
+        power:
+            data:
+                -
+                    oid: ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPowerSupplyTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.11.2.1.1.7.{{ $index }}'
+                    descr: 'Power Supply {{ ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUName }}'
+                    value: ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUInstantaneousPower
+                    high_limit: ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUMaximumPower
+        voltage:
+            data:
+                -
+                    oid: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.27.1.2.1.1.11.{{ $index }}'
+                    value: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomVoltage
+                    descr: '{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomPortDesc }} Voltage'
+                    group: transceiver
+                    index: 'arubaWiredPmXcvrDomVoltage.{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+        current:
+            data:
+                -
+                    oid: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrLaneDomTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.27.1.2.2.1.2.{{ $index }}'
+                    value: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrLaneDomTxBias
+                    descr: '{{ IF-MIB::ifName:0 }} TX Bias'
+                    divisor: 1000
+                    group: transceiver
+                    index: 'arubaWiredPmXcvrLaneDomTxBias.{{ $subindex0 }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+        dbm:
+            data:
+                -
+                    oid: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrLaneDomTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.27.1.2.2.1.12.{{ $index }}'
+                    value: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrLaneDomRxPower
+                    descr: "{{ IF-MIB::ifName:0 }} Lane {{ $subindex1 }} RX Power"
+                    group: transceiver
+                    index: 'arubaWiredPmXcvrLaneDomRxPower.{{ $index }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+                    user_func: 'mw_to_dbm'
+                    high_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomRxPwrHiAlarmThreshold:0 }}"
+                    warn_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomRxPwrHiWarnThreshold:0 }}"
+                    low_warn_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomRxPwrLoWarnThreshold:0 }}"
+                    low_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomRxPwrLoAlarmThreshold:0 }}"
+
+                -
+                    oid: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrLaneDomTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.27.1.2.2.1.7.{{ $index }}'
+                    value: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrLaneDomTxPower
+                    descr: "{{ IF-MIB::ifName:0 }} Lane {{ $subindex1 }} TX Power"
+                    group: transceiver
+                    index: 'arubaWiredPmXcvrLaneDomTxPower.{{ $index }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+                    user_func: 'mw_to_dbm'
+                    high_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTxPwrHiAlarmThreshold:0 }}"
+                    warn_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTxPwrHiWarnThreshold:0 }}"
+                    low_warn_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTxPwrLoWarnThreshold:0 }}"
+                    low_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTxPwrLoAlarmThreshold:0 }}"
+        state:
+            data:
+                -
+                    oid: ENTITY-SENSOR-MIB::entPhySensorTable
+                    num_oid: '.1.3.6.1.2.1.99.1.1.1.5.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }}'
+                    value: ENTITY-SENSOR-MIB::entPhySensorOperStatus
+                    state_name: entPhySensorTable
+                    skip_values:
+                        -
+                            oid: ENTITY-SENSOR-MIB::entPhySensorType
+                            op: '!='
+                            value: 6
+                    states:
+                        - { value: 1, descr: OK, graph: 1, generic: 0 }
+                        - { value: 3, descr: Not OK, graph: 1, generic: 2 }
+                -
+                    oid: ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPowerSupplyTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.11.2.1.1.11.{{ $index }}'
+                    descr: 'Power Supply {{ ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUName }}'
+                    value: ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUStateEnum
+                    state_name: arubaWiredPowerSupplyTable 
+                    states:
+                        - { value: 1, descr: ok, graph: 1, generic: 0 }
+                        - { value: 2, descr: Absent, graph: 1, generic: 2 }
+                        - { value: 3, descr: Fault Input, graph: 1, generic: 2 }
+                        - { value: 4, descr: Fault Output, graph: 1, generic: 2 }
+                        - { value: 5, descr: Fault POE, graph: 1, generic: 2 }
+                        - { value: 6, descr: Fault No Recovery, graph: 1, generic: 2 }
+                        - { value: 7, descr: alert, graph: 1, generic: 2 }
+                        - { value: 8, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 9, descr: unsuppored, graph: 1, generic: 3 }
+                        - { value: 10, descr: warning, graph: 1, generic: 1 }
+                        - { value: 11, descr: init, graph: 1, generic: 3 }
+                        - { value: 12, descr: Empty, graph: 1, generic: 2 }
+                        - { value: 13, descr: Fault Airflow, graph: 1, generic: 2 }
+                        - { value: 14, descr: Fault Redundancy, graph: 1, generic: 2 }
+                        - { value: 15, descr: Fault Mixed Input, graph: 1, generic: 2 }
+                        - { value: 16, descr: Over Voltage, graph: 1, generic: 2 }
+                        - { value: 17, descr: Under Voltage, graph: 1, generic: 2 }
+                -
+                    oid: ARUBAWIRED-VSX-MIB::arubaWiredVsxIslOperState
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.7.2.1.1.{{ $index }}'
+                    descr: ISL
+                    value: ARUBAWIRED-VSX-MIB::arubaWiredVsxIslOperState
+                    state_name: arubaWiredVsxIslOperState
+                    states:
+                        - { value: 1, descr: init, graph: 1, generic: 3 }
+                        - { value: 2, descr: out Sync, graph: 1, generic: 2 }
+                        - { value: 3, descr: in Sync, graph: 1, generic: 0 }
+                -
+                    oid: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2Topology
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.15.1.1.2.{{ $index }}'
+                    descr: 'VSF Topology'
+                    value: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2Topology
+                    index: 'arubaWiredVsfv2Topology.{{ $index }}'
+                    state_name: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2Topology
+                    states:
+                        - { value: 0, descr: standalone, graph: 1, generic: 0 }
+                        - { value: 1, descr: ring, graph: 1, generic: 0 }
+                        - { value: 2, descr: chain, graph: 1, generic: 2 }
+                -
+                    oid: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2OperStatus
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.15.1.1.1.{{ $index }}'
+                    descr: 'VSF Status'
+                    value: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2OperStatus
+                    index: '{{ $index }}'
+                    state_name: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2OperStatus
+                    states:
+                        - { value: 0, descr: no_split, graph: 1, generic: 0 }
+                        - { value: 1, descr: fragment_active, graph: 1, generic: 1 }
+                        - { value: 2, descr: fragment_inactive, graph: 1, generic: 2 }
+                -
+                    oid: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2MemberTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.15.1.2.1.3.{{ $index }}'
+                    descr: 'Member {{ ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2MemberSerialNum }} Status'
+                    value: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2MemberStatus
+                    index: '{{ $index }}'
+                    group: VSF
+                    state_name: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2MemberTable
+                    states:
+                        - { value: 10, descr: not_present, graph: 1, generic: 2 }
+                        - { value: 11, descr: booting, graph: 1, generic: 1 }
+                        - { value: 12, descr: ready, graph: 1, generic: 0 }
+                        - { value: 13, descr: version_mismatch, graph: 1, generic: 1 }

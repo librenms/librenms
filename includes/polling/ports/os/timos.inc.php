@@ -63,7 +63,9 @@ $translate = [
 $timos_ports = [];
 foreach ($timos_stats as $index => $value) {
     foreach ($translate as $ifEntry => $ifVrtrEntry) {
-        $timos_ports[$index][$ifEntry] = $value[$ifVrtrEntry];
+        if (isset($value[$ifVrtrEntry])) {
+            $timos_ports[$index][$ifEntry] = $value[$ifVrtrEntry];
+        }
     }
     if (empty($timos_ports[$index]['ifDescr'])) {
         $timos_ports[$index]['ifDescr'] = $timos_ports[$index]['ifName'];

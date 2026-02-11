@@ -2237,8 +2237,8 @@
                     "ifName": "vif0(tag=1:ports=1-5)",
                     "portName": null,
                     "ifIndex": 206,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -2337,8 +2337,8 @@
                     "ifName": "vif6(tag=6:ports=6:IPv6)",
                     "portName": null,
                     "ifIndex": 212,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2437,8 +2437,8 @@
                     "ifName": "vif7(tag=7:ports=7:IPv6)",
                     "portName": null,
                     "ifIndex": 213,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2537,8 +2537,8 @@
                     "ifName": "vif8(tag=8:ports=8:IPv6)",
                     "portName": null,
                     "ifIndex": 214,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2637,8 +2637,8 @@
                     "ifName": "vif4095:agFPGA(tag=4095)",
                     "portName": null,
                     "ifIndex": 4301,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -2737,8 +2737,8 @@
                     "ifName": "dummy1",
                     "portName": null,
                     "ifIndex": 4305,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -3346,5 +3346,32 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.0.210.10",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.0.210.8/30",
+                    "ifIndex": 214
+                },
+                {
+                    "ipv4_address": "10.0.210.14",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.0.210.12/30",
+                    "ifIndex": 213
+                },
+                {
+                    "ipv4_address": "10.0.217.126",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.0.217.120/29",
+                    "ifIndex": 212
+                }
+            ]
+        }
     }
 }

@@ -20,15 +20,13 @@ you want your alert to do.
 
 `configTemplate()` - This is used to define the form that will accept
 the transport config in the webui and then what data should be
-validated and how. Validation is done using [Laravel validation](https://laravel.com/docs/validation)
-
-The following function is __not__ required for new Transports and is
-for legacy reasons only. `deliverAlertOld()`.
+validated and how. Validation is done using
+[Laravel validation](https://laravel.com/docs/validation)
 
 ## Documentation
 
-Please don't forget to update the [Transport](Transports.md) file to
-include details of your new transport.
+Please don't forget to create a documentation file `doc/Alerting/Transports/$Transport.md`
+file to include details of your new transport.
 
 A table should be provided to indicate the form values that we ask for
 and examples. I.e:
@@ -38,3 +36,5 @@ and examples. I.e:
 Discord URL | <https://discordapp.com/api/webhooks/4515489001665127664/82-sf4385ysuhfn34u2fhfsdePGLrg8K7cP9wl553Fg6OlZuuxJGaa1d54fe>|
 Options | username=myname|
 
+Please also ensure that you link back to any 3rd party documentation that
+will help users understand how the transport can be used.

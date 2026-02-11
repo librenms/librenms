@@ -22,7 +22,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
         'NUMCLIENTS' => $aruba_stats['WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated.0'],
     ];
 
-    $tags = compact('rrd_name', 'rrd_def');
+    $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
     app('Datastore')->put($device, 'aruba-controller', $tags, $fields);
 
     // get AP data
@@ -48,7 +48,7 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
                 'nummonclients' => $data['WLSX-WLAN-MIB::wlanAPRadioNumMonitoredClients'] ?? null,
                 'numactbssid' => $data['WLSX-WLAN-MIB::wlanAPRadioNumActiveBSSIDs'] ?? null,
                 'nummonbssid' => $data['WLSX-WLAN-MIB::wlanAPRadioNumMonitoredBSSIDs'] ?? null,
-                'interference' => isset($data['WLSX-WLAN-MIB::wlanAPChInterferenceIndex']) ? ($data['WLSX-WLAN-MIB::wlanAPChInterferenceIndex'] / 600) : null,
+                'interference' => isset($data['WLSX-WLAN-MIB::wlanAPChInterferenceIndex']) ? ($data['WLSX-WLAN-MIB::wlanAPChInterferenceIndex'] / 600) : 0,
             ]);
 
             Log::debug(<<<DEBUG

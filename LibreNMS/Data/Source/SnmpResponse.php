@@ -26,20 +26,18 @@
 
 namespace LibreNMS\Data\Source;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Util\Oid;
 use Log;
 
-class SnmpResponse
+class SnmpResponse implements \Stringable
 {
     protected const KEY_VALUE_DELIMITER = ' = ';
 
     public readonly string $raw;
-    public readonly int $exitCode;
-    public readonly string $stderr;
 
     private ?string $errorMessage = null;
     private ?array $values = null;
@@ -48,14 +46,12 @@ class SnmpResponse
      * Create a new response object filling with output from the net-snmp command.
      *
      * @param  string  $output
-     * @param  string  $errorOutput
+     * @param  string  $stderr
      * @param  int  $exitCode
      */
-    public function __construct(string $output, string $errorOutput = '', int $exitCode = 0)
+    public function __construct(string $output, public readonly string $stderr = '', public readonly int $exitCode = 0)
     {
         $this->raw = (string) preg_replace('/Wrong Type \(should be .*\): /', '', $output);
-        $this->stderr = $errorOutput;
-        $this->exitCode = $exitCode;
     }
 
     public function isValid(bool $ignore_partial = false): bool
@@ -119,9 +115,9 @@ class SnmpResponse
             }
 
             // if this is a textual oid without an index, match the first one at any index
-            if (! preg_match('/[.[]\d+]?$/', $oid)) {
+            if (! preg_match('/[.[]\d+]?$/', (string) $oid)) {
                 foreach ($values as $key => $value) {
-                    if (preg_match('/^' . preg_quote($oid, '/') . '[.[]/', $key) && $value !== '') {
+                    if (preg_match('/^' . preg_quote((string) $oid, '/') . '[.[]/', (string) $key) && $value !== '') {
                         return $value;
                     }
                 }
@@ -131,7 +127,7 @@ class SnmpResponse
         // try to match table format
         if (str_contains($this->raw, '[')) {
             foreach ($oids as $oid) {
-                $dot_index_oid = preg_replace('/\.([^.]+)/', '[$1]', $oid);
+                $dot_index_oid = preg_replace('/\.([^.]+)/', '[$1]', (string) $oid);
                 // if new oid is different and exists and is not an empty string
                 if ($dot_index_oid !== $oid && isset($values[$dot_index_oid]) && $values[$dot_index_oid] !== '') {
                     return $values[$dot_index_oid];
@@ -151,7 +147,7 @@ class SnmpResponse
         $this->values = [];
         $line = strtok($this->raw, PHP_EOL);
         while ($line !== false) {
-            if (Str::contains($line, ['at this OID', 'this MIB View', 'End of MIB'])) {
+            if (Str::contains($line, ['at this OID', 'this MIB View', 'End of MIB']) || str_ends_with($line, ' = NULL')) {
                 // these occur when we seek past the end of data, usually the end of the response, but grab the next line and continue
                 $line = strtok(PHP_EOL);
                 continue;
@@ -170,7 +166,7 @@ class SnmpResponse
             }
 
             // remove extra escapes
-            if (Config::get('snmp.unescape')) {
+            if (LibrenmsConfig::get('snmp.unescape')) {
                 $value = stripslashes($value);
             }
 
@@ -192,11 +188,11 @@ class SnmpResponse
     public function pluck(?string $oid = null): array
     {
         $output = [];
-        $oid = $oid ?? '[a-zA-Z0-9:.-]+';
+        $oid ??= '[a-zA-Z0-9:.-]+';
         $regex = "/^{$oid}[[.]([\d.[\]]+?)]?$/";
 
         foreach ($this->values() as $key => $value) {
-            if (preg_match($regex, $key, $matches)) {
+            if (preg_match($regex, (string) $key, $matches)) {
                 $output_key = str_replace('][', '.', $matches[1]);
                 $output[$output_key] = $value;
             }
@@ -213,7 +209,7 @@ class SnmpResponse
     public function groupByIndex(int $index_count = 1, array &$array = []): array
     {
         foreach ($this->values() as $oid => $value) {
-            $parts = $this->getOidParts(ltrim($oid, '.')); // trim leftmost . so negative counts work as expected
+            $parts = $this->getOidParts(ltrim((string) $oid, '.')); // trim leftmost . so negative counts work as expected
             $suffix = array_slice($parts, -$index_count);
             $index = implode('.', $suffix);
 
@@ -251,7 +247,7 @@ class SnmpResponse
             // merge the parts into an array, creating keys if they don't exist
             $tmp = &$array;
             foreach ($parts as $part) {
-                $key = trim($part, '"');
+                $key = trim((string) $part, '"');
                 $tmp = &$tmp[$key];
             }
             $tmp = $value; // assign the value as the leaf
@@ -297,12 +293,14 @@ class SnmpResponse
      * Filter bad lines from the raw output, examples:
      * "No Such Instance currently exists at this OID"
      * "No more variables left in this MIB View (It is past the end of the MIB tree)"
+     * oidName = NULL
      */
     public function getRawWithoutBadLines(): string
     {
         return (string) preg_replace([
-            '/^.*No Such Instance currently exists.*$/m',
+            '/^.*No Such (Instance currently exists|Object available on this agent at this OID).*$/m',
             '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/m',
+            '/^.* = NULL[\r\n]*$/',
         ], '', $this->raw);
     }
 

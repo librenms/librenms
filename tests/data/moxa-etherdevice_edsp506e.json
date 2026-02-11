@@ -937,8 +937,8 @@
                     "ifName": "Ethernet Port 2",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1037,8 +1037,8 @@
                     "ifName": "Ethernet Port 3",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1337,8 +1337,8 @@
                     "ifName": "Ethernet Port G2",
                     "portName": null,
                     "ifIndex": 6,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -2054,7 +2054,7 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -2134,5 +2134,25 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 130
+                },
+                {
+                    "ipv4_address": "192.168.127.253",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.127.0/24",
+                    "ifIndex": 129
+                }
+            ]
+        }
     }
 }

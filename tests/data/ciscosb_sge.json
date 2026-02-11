@@ -11225,39 +11225,24 @@
         "discovery": {
             "vlans": [
                 {
-                    "vlan_vlan": 1,
-                    "vlan_domain": 1,
-                    "vlan_name": "VLAN 1",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                },
-                {
                     "vlan_vlan": 181,
                     "vlan_domain": 1,
                     "vlan_name": "LAB_REDES",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 999,
                     "vlan_domain": 1,
                     "vlan_name": "Gestion",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
                 {
                     "vlan": 1,
                     "baseport": 23,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 24,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -11640,14 +11625,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 181,
-                    "baseport": 133,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 999,
                     "baseport": 23,
                     "priority": 0,
@@ -11662,14 +11639,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 999,
-                    "baseport": 133,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 }
             ]
         }
@@ -14987,6 +14956,26 @@
                     "high_ifIndex": 1007,
                     "low_ifIndex": 100000,
                     "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "0.255.255.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "0.0.0.0/8",
+                    "ifIndex": 9000
+                },
+                {
+                    "ipv4_address": "172.31.35.249",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "172.31.32.0/21",
+                    "ifIndex": 100998
                 }
             ]
         }

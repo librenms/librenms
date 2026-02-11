@@ -437,8 +437,8 @@
                     "ifName": "eth0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -537,8 +537,8 @@
                     "ifName": "eth1",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -847,6 +847,40 @@
                     "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
+                    "ifIndex": 2
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.10.0.6",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "10.10.0.0/16",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "10.136.71.222",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "10.136.0.0/16",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "142.93.53.149",
+                    "ipv4_prefixlen": 20,
+                    "context_name": "",
+                    "ipv4_network": "142.93.48.0/20",
                     "ifIndex": 2
                 }
             ]

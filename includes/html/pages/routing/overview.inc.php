@@ -1,14 +1,14 @@
 <?php
 
 foreach ($datas as $type) {
-    $type = basename($type);
+    $type = basename((string) $type);
     if ($type != 'overview') {
         if (is_file("includes/html/pages/routing/overview/$type.inc.php")) {
             $g_i++;
-            if (! is_integer($g_i / 2)) {
-                $row_colour = \LibreNMS\Config::get('list_colour.even');
+            if (! is_int($g_i / 2)) {
+                $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
             } else {
-                $row_colour = \LibreNMS\Config::get('list_colour.odd');
+                $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
             }
 
             echo '<div style="background-color: ' . $row_colour . ';">';

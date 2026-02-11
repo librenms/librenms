@@ -11,7 +11,7 @@ foreach ($asterisk_graphs as $asterisk_graphs_key => $asterisk_graphs_value) {
     $graph_type = $asterisk_graphs_key;
     $graph_array['height'] = '100';
     $graph_array['id'] = $app['app_id'];
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['type'] = 'application_' . $asterisk_graphs_key;
     $graph_array['width'] = '215';
 

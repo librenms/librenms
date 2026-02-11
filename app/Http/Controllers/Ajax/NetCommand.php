@@ -26,10 +26,10 @@
 
 namespace App\Http\Controllers\Ajax;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Process\Process;
 
@@ -44,21 +44,21 @@ class NetCommand extends Controller
 
         ini_set('allow_url_fopen', '0');
 
-        switch ($request->get('cmd')) {
+        switch ($request->input('cmd')) {
             case 'whois':
-                $cmd = [Config::get('whois', 'whois'), $request->get('query')];
+                $cmd = [LibrenmsConfig::get('whois', 'whois'), $request->input('query')];
                 break;
             case 'ping':
-                $cmd = [Config::get('ping', 'ping'), '-c', '5', $request->get('query')];
+                $cmd = [LibrenmsConfig::get('ping', 'ping'), '-c', '5', $request->input('query')];
                 break;
             case 'tracert':
-                $cmd = [Config::get('mtr', 'mtr'), '-r', '-c', '5', $request->get('query')];
+                $cmd = [LibrenmsConfig::get('mtr', 'mtr'), '-r', '-c', '5', $request->input('query')];
                 break;
             case 'nmap':
                 if (! $request->user()->isAdmin()) {
                     return response('Insufficient privileges');
                 } else {
-                    $cmd = [Config::get('nmap', 'nmap'), $request->get('query')];
+                    $cmd = [LibrenmsConfig::get('nmap', 'nmap'), $request->input('query')];
                 }
                 break;
             default:
@@ -70,7 +70,7 @@ class NetCommand extends Controller
 
         //stream output
         return (new StreamedResponse(
-            function () use ($proc, $request) {
+            function () use ($proc, $request): void {
                 // a bit dirty, bust browser initial cache
                 $ua = $request->header('User-Agent');
                 if (Str::contains($ua, ['Chrome', 'Trident'])) {
@@ -81,7 +81,7 @@ class NetCommand extends Controller
                 echo str_repeat($char, 4096);
                 echo PHP_EOL; // avoid first line mess ups due to line feed
 
-                $proc->run(function ($type, $buffer) {
+                $proc->run(function ($type, $buffer): void {
                     echo $buffer;
                     ob_flush();
                     flush();

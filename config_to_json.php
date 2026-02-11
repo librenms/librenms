@@ -7,11 +7,11 @@
  *
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 $init_modules = ['nodb'];
 require __DIR__ . '/includes/init.php';
 
 if (App::runningInConsole()) {
-    echo Config::toJson();
+    echo LibrenmsConfig::toJson();
 }

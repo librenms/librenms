@@ -6837,8 +6837,8 @@
                     "ifName": "Console41",
                     "portName": null,
                     "ifIndex": 41,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6937,8 +6937,8 @@
                     "ifName": "Loopback0",
                     "portName": null,
                     "ifIndex": 1000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7037,8 +7037,8 @@
                     "ifName": "VLAN1",
                     "portName": null,
                     "ifIndex": 1001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7137,8 +7137,8 @@
                     "ifName": "VLAN2",
                     "portName": null,
                     "ifIndex": 1002,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7237,8 +7237,8 @@
                     "ifName": "VLAN3",
                     "portName": null,
                     "ifIndex": 1003,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7337,8 +7337,8 @@
                     "ifName": "VLAN4",
                     "portName": null,
                     "ifIndex": 1004,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7437,8 +7437,8 @@
                     "ifName": "VLAN5",
                     "portName": null,
                     "ifIndex": 1005,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7537,8 +7537,8 @@
                     "ifName": "VLAN6",
                     "portName": null,
                     "ifIndex": 1006,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7637,8 +7637,8 @@
                     "ifName": "VLAN7",
                     "portName": null,
                     "ifIndex": 1007,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7737,8 +7737,8 @@
                     "ifName": "VLAN8",
                     "portName": null,
                     "ifIndex": 1008,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7837,8 +7837,8 @@
                     "ifName": "VLAN9",
                     "portName": null,
                     "ifIndex": 1009,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7937,8 +7937,8 @@
                     "ifName": "VLAN10",
                     "portName": null,
                     "ifIndex": 1010,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -8065,70 +8065,70 @@
                     "vlan_domain": 1,
                     "vlan_name": "DefaultVlan",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 2",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 4",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 5,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 5",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 6,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 6",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 7,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 7",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 8,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 8",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 9,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 9",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 10",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -9662,5 +9662,18 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.0.5.30",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.0.5.0/24",
+                    "ifIndex": 1005
+                }
+            ]
+        }
     }
 }

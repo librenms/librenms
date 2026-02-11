@@ -26,21 +26,24 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\LibrenmsConfig;
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
-use LibreNMS\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Number;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Util\Color;
 
-class OSModulesTest extends DBTestCase
+#[TestDox('OS Modules')]
+final class OSModulesTest extends DBTestCase
 {
     use DatabaseTransactions;
 
@@ -52,15 +55,15 @@ class OSModulesTest extends DBTestCase
         parent::setUp();
 
         // backup modules
-        $this->discoveryModules = Config::get('discovery_modules');
-        $this->pollerModules = Config::get('poller_modules');
+        $this->discoveryModules = LibrenmsConfig::get('discovery_modules');
+        $this->pollerModules = LibrenmsConfig::get('poller_modules');
     }
 
     protected function tearDown(): void
     {
         // restore modules
-        Config::set('discovery_modules', $this->discoveryModules);
-        Config::set('poller_modules', $this->pollerModules);
+        LibrenmsConfig::set('discovery_modules', $this->discoveryModules);
+        LibrenmsConfig::set('poller_modules', $this->pollerModules);
 
         parent::tearDown();
     }
@@ -70,6 +73,7 @@ class OSModulesTest extends DBTestCase
      */
     #[Group('os')]
     #[DataProvider('dumpedDataProvider')]
+    #[TestDox('OS data is valid')]
     public function testDataIsValid($os, $variant, $modules): void
     {
         // special case if data provider throws exception
@@ -85,11 +89,12 @@ class OSModulesTest extends DBTestCase
      *
      * @param  string  $os  base os
      * @param  string  $variant  optional variant
-     * @param  array  $modules  modules to test for this os
+     * @param  array<string, bool>  $modules  modules to test for this os
      */
     #[Group('os')]
     #[DataProvider('dumpedDataProvider')]
-    public function testOS($os, $variant, $modules): void
+    #[TestDox('OS')]
+    public function testOS($os, $variant, array $modules): void
     {
         // Lock testing time
         $this->travelTo(new \DateTime('2022-01-01 00:00:00'));
@@ -98,7 +103,7 @@ class OSModulesTest extends DBTestCase
         $this->stubClasses();
 
         try {
-            $helper = new ModuleTestHelper($modules, $os, $variant);
+            $helper = new ModuleTestHelper(new ModuleList($modules), $os, $variant);
             $helper->setQuiet();
 
             $filename = $helper->getJsonFilepath(true);

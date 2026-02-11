@@ -27,13 +27,13 @@
 namespace LibreNMS\Data\Graphing;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\Time;
 
-class GraphParameters
+class GraphParameters implements \Stringable
 {
     public readonly array $visibleElements;
 
@@ -43,6 +43,7 @@ class GraphParameters
     public readonly string $subtype;
     public readonly ImageFormat $imageFormat;
 
+    public readonly string $style;
     public readonly string $font;
     public readonly string $font_color;
     public readonly int $font_size;
@@ -66,8 +67,18 @@ class GraphParameters
     public ?int $scale_min = null;
     public ?bool $scale_rigid = null;
     public bool $sloped = true;
+    public ?int $base = null;
+    public ?int $units_exponent = null;
+    public bool $logarithmic = false;
+    public bool $alt_y_grid = false;
 
     public int $float_precision = 2;
+
+    public ?string $right_axis = null;
+    public ?string $right_axis_label = null;
+    public ?string $left_axis_format = null;
+    public ?int $units_length = null;
+    public ?string $vertical_label = null;
 
     private const TINY = 99;
     private const SMALL = 224;
@@ -84,7 +95,8 @@ class GraphParameters
         $this->full_size = ! empty($vars['absolute']);
         $this->is_small = $this->width < self::SMALL;
 
-        $this->font = Config::get('mono_font');
+        $this->style = $vars['style'] ?? '';
+        $this->font = LibrenmsConfig::get('mono_font');
         $this->font_color = Clean::alphaDash($vars['font'] ?? '');
         $this->font_size = $this->width <= self::MEDIUM_SMALL ? 7 : 8;
 
@@ -179,6 +191,19 @@ class GraphParameters
             $options[] = '--slope-mode';
         }
 
+        if ($this->alt_y_grid) {
+            $options[] = '--alt-y-grid';
+        }
+        if ($this->base !== null) {
+            array_push($options, '--base', $this->base);
+        }
+        if ($this->units_exponent !== null) {
+            array_push($options, '--units-exponent', $this->units_exponent);
+        }
+        if ($this->logarithmic) {
+            $options[] = '--logarithmic';
+        }
+
         // remove all text, height is too small
         if ($this->height < self::TINY) {
             $options[] = '--only-graph';
@@ -190,7 +215,23 @@ class GraphParameters
 
         if ($this->visible('title')) {
             // remove single quotes, because we can't drop out of the string if this is sent to rrdtool stdin
-            $options[] = '--title=' . escapeshellarg(str_replace("'", '', $this->getTitle()));
+            $options[] = '--title=' . str_replace("'", '', $this->getTitle());
+        }
+
+        if ($this->right_axis !== null) {
+            array_push($options, '--right-axis', $this->right_axis);
+        }
+        if ($this->right_axis_label !== null) {
+            array_push($options, '--right-axis-label', $this->right_axis_label);
+        }
+        if ($this->left_axis_format !== null) {
+            array_push($options, '--left-axis-format', $this->left_axis_format);
+        }
+        if ($this->units_length !== null) {
+            array_push($options, '--units-length', $this->units_length);
+        }
+        if ($this->vertical_label !== null) {
+            array_push($options, '--vertical-label', $this->vertical_label);
         }
 
         return $options;
@@ -214,9 +255,9 @@ class GraphParameters
 
     private function graphColors(): array
     {
-        $config_suffix = Config::get('applied_site_style') == 'dark' ? '_dark' : '';
-        $def_colors = Config::get('rrdgraph_def_text' . $config_suffix);
-        $def_font = ltrim(Config::get('rrdgraph_def_text_color' . $config_suffix), '#');
+        $style = $this->style ?: session('applied_site_style');
+        $def_colors = LibrenmsConfig::get($style == 'dark' ? 'rrdgraph_def_text_dark' : 'rrdgraph_def_text');
+        $def_font = ltrim(LibrenmsConfig::get($style == 'dark' ? 'rrdgraph_def_text_color_dark' : 'rrdgraph_def_text_color'), '#');
 
         preg_match_all('/-c ([A-Z]+)#([0-9A-Fa-f]{6,8})/', $def_colors, $matches);
         $colors = ['FONT' => $def_font];

@@ -15,8 +15,8 @@
             ]
         },
         "poller": {
-            "applications": {
-                "0": {
+            "applications": [
+                {
                     "app_type": "linux_softnet_stat",
                     "app_state": "OK",
                     "discovered": "1",
@@ -26,7 +26,7 @@
                     "data": "{\"budget\":\"300\",\"budget_usecs\":\"8000\"}",
                     "deleted_at": null
                 }
-            },
+            ],
             "application_metrics": [
                 {
                     "metric": "backlog_length",

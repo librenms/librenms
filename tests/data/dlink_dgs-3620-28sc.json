@@ -8315,49 +8315,49 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1002,
                     "vlan_domain": 1,
                     "vlan_name": "1002",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2002,
                     "vlan_domain": 1,
                     "vlan_name": "2002",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3166,
                     "vlan_domain": 1,
                     "vlan_name": "3166",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3972,
                     "vlan_domain": 1,
                     "vlan_name": "3972",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4002,
                     "vlan_domain": 1,
                     "vlan_name": "4002",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4003,
                     "vlan_domain": 1,
                     "vlan_name": "4003",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -10181,6 +10181,47 @@
                     "ifAlias": "D-Link DGS-3620-28SC R3.00.004 Port 7 on Unit 1",
                     "ifDescr": "D-Link DGS-3620-28SC R3.00.004 Port 7 on Unit 1",
                     "ifName": "7"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "143.160.134.183",
+                    "ipv4_prefixlen": 31,
+                    "context_name": "",
+                    "ipv4_network": "143.160.134.182/31",
+                    "ifIndex": 5125
+                },
+                {
+                    "ipv4_address": "143.160.145.62",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "143.160.145.32/27",
+                    "ifIndex": 5122
+                },
+                {
+                    "ipv4_address": "143.160.6.36",
+                    "ipv4_prefixlen": 31,
+                    "context_name": "",
+                    "ipv4_network": "143.160.6.36/31",
+                    "ifIndex": 5124
+                },
+                {
+                    "ipv4_address": "196.252.166.1",
+                    "ipv4_prefixlen": 23,
+                    "context_name": "",
+                    "ipv4_network": "196.252.166.0/23",
+                    "ifIndex": 5121
+                },
+                {
+                    "ipv4_address": "196.252.91.1",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "196.252.91.0/25",
+                    "ifIndex": 5123
                 }
             ]
         }

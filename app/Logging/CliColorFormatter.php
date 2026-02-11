@@ -45,11 +45,20 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
         );
 
         $this->console_color = new \Console_Color2();
-        $this->console = $this->console ?? \App::runningInConsole();
+        $this->console ??= app()->runningInConsole();
     }
 
     public function format(\Monolog\LogRecord $record): string
     {
+        // if no line break is specified, just output the raw message (maybe colored)
+        if (isset($record->context['nlb']) && $record->context['nlb'] === true) {
+            if (isset($record->context['color']) && $record->context['color']) {
+                return $this->console_color->convert($record->message, $this->console);
+            }
+
+            return $record->message;
+        }
+
         // only format messages where color is enabled
         if (isset($record->context['color']) && $record->context['color']) {
             $context = $record->context;

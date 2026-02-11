@@ -10,13 +10,13 @@
 <div class="row collapse @if(!$hide_dashboard_editor)in @endif" id="dashboard-editor">
     <div class="col-md-12">
         <div class="btn-group btn-lg">
-            <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">Dashboards</span></button>
+            <button class="btn btn-default disabled" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.title') }}</span></button>
             <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;">
-                    <span class="pull-left">{{ $dashboard->user_id != Auth::id() ? ($dashboard->user->username ?? __('Deleted User')) . ':' : null}} {{ $dashboard->dashboard_name }}</span>
+                    <span class="pull-left">{{ $dashboard->user_id != Auth::id() ? ($dashboard->user->username ?? trans('dashboard.deleted_user')) . ':' : null}} {{ $dashboard->dashboard_name }}</span>
                 <span class="pull-right">
                 <span class="caret"></span>
-                <span class="sr-only">Toggle Dropdown</span>
+                <span class="sr-only">{{ trans('dashboard.toggle_dropdown') }}</span>
                 </span>
                 </button>
                 <ul class="dropdown-menu">
@@ -27,26 +27,26 @@
                         </li>
                         @endif
                     @empty
-                        <li><a>No other Dashboards</a></li>
+                        <li><a>{{ trans('dashboard.no_other') }}</a></li>
                     @endforelse
 
                     @isset($shared_dashboards)
                         <li role="separator" class="divider"></li>
-                        <li class="dropdown-header">Shared Dashboards</li>
+                        <li class="dropdown-header">{{ trans('dashboard.shared_title') }}</li>
                         @foreach ($shared_dashboards as $dash)
                             @if($dash->dashboard_id != $dashboard->dashboard_id)
                             <li>
                                 <a href="{{ route('dashboard.show', $dash->dashboard_id) }}">
-                                {{ ($dash->user->username ?? __('Deleted User')) . ':' . $dash->dashboard_name . ($dash->access == 1 ? ' (Read)' : '') }}</a>
+                                {{ ($dash->user->username ?? trans('dashboard.deleted_user')) . ':' . $dash->dashboard_name . ($dash->access == 1 ? ' (' . trans('dashboard.read_only') . ')' : '') }}</a>
                             </li>
                             @endif
                         @endforeach
                     @endisset
                 </ul>
             </div>
-            <button class="btn btn-default edit-dash-btn" href="#edit_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="Edit Dashboard"><i class="fa fa-pencil-square-o fa-fw"></i></button>
-            <button class="btn btn-danger" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="Remove Dashboard"><i class="fa fa-trash fa-fw"></i></button>
-            <button class="btn btn-success" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="New Dashboard"><i class="fa fa-plus fa-fw"></i></button>
+                        <button class="btn btn-default edit-dash-btn" href="#edit_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.edit') }}"><i class="fa fa-pencil-square-o fa-fw"></i></button>
+            <button class="btn btn-danger" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.remove') }}"><i class="fa fa-trash fa-fw"></i></button>
+            <button class="btn btn-success" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.new') }}"><i class="fa fa-plus fa-fw"></i></button>
         </div>
         <div class="dash-collapse" id="add_dash" style="display: none;" >
             <div class="row" style="margin-top:5px;">
@@ -56,11 +56,11 @@
                         <div class="col-sm-3 col-sx-6">
                             <div class="input-group">
                                 <span class="input-group-btn">
-                                    <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">New Dashboard</span></a>
+                                    <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.fields.new_dashboard') }}</span></a>
                                 </span>
-                                <input class="form-control" type="text" placeholder="Name" name="dashboard_name" id="dashboard_name" style="min-width:160px;">
+                                <input class="form-control" type="text" placeholder="{{ trans('dashboard.fields.name') }}" name="dashboard_name" id="dashboard_name" style="min-width:160px;">
                                 <span class="input-group-btn">
-                                    <button class="btn btn-primary" type="submit">Add</button>
+                                    <button class="btn btn-primary" type="submit">{{ trans('dashboard.buttons.add') }}</button>
                                 </span>
                             </div>
                         </div>
@@ -79,16 +79,17 @@
                             <div class="form-group">
                                 <div class="input-group">
                                     <span class="input-group-btn">
-                                        <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">Dashboard Name</span></a>
+                                        <a class="btn btn-default disabled" type="button" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.fields.dashboard_name') }}</span></a>
                                     </span>
-                                    <input class="form-control" type="text" placeholder="Dashbord Name" name="dashboard_name" value="{{ $dashboard->dashboard_name }}" style="width:160px;">
+                                    <input class="form-control" type="text" placeholder="{{ trans('dashboard.fields.dashboard_name') }}" name="dashboard_name" value="{{ $dashboard->dashboard_name }}" style="width:160px;">
                                     <select class="form-control" name="access" style="width:160px;">
-                                    @foreach (array('Private','Shared (Read)','Shared') as $k => $v)
+                                    @php($accessLabels = [0 => trans('dashboard.access.private'), 1 => trans('dashboard.access.shared_read'), 2 => trans('dashboard.access.shared_admin'), 3 => trans('dashboard.access.shared')])
+                                    @foreach ($accessLabels as $k => $v)
                                         <option value="{{ $k }}" {{ $dashboard->access == $k ? 'selected' : null }}>{{ $v }}</option>
                                     @endforeach
                                     </select>
                                     <span class="input-group-btn pull-left">
-                                        <button class="btn btn-primary" type="submit">Update</button>
+                                        <button class="btn btn-primary" type="submit">{{ trans('dashboard.buttons.update') }}</button>
                                     </span>
                                 </div>
                             </div>
@@ -98,13 +99,13 @@
                     <div class="btn-group btn-lg" style="margin-top:5px;position:absolute;right:0px;">
                         <div class="btn-group">
                         <select class="form-control" id="dashboard_copy_target" name="dashboard_copy_target" onchange="dashboard_copy_user_select()">
-                            <option value="-1" selected> Copy Dashboard to </option>
+                            <option value="-1" selected> {{ trans('dashboard.buttons.copy_to') }} </option>
                         @foreach ($user_list as $user_id => $username)
                             <option value="{{ $user_id }}">{{ $username }}</option>
                         @endforeach
                         </select>
                         </div>
-                        <button disabled id="do_copy_dashboard" class="btn btn-primary" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="Copy Dashboard"><i class="fa fa-copy fa-fw"></i></button>
+                        <button disabled id="do_copy_dashboard" class="btn btn-primary" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.copy') }}"><i class="fa fa-copy fa-fw"></i></button>
                     </div>
                     @endif
                 </div>
@@ -115,12 +116,12 @@
                 <div class="col-md-12">
                     <div class="col-md-12">
                         <div class="btn-group" role="group">
-                            <a class="btn btn-default disabled" role="button" style="min-width:160px;"><span class="pull-left">Add Widgets</span></a>
+                            <a class="btn btn-default disabled" role="button" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.add') }}</span></a>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left">Select Widget</span>
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.select') }}</span>
                                 <span class="pull-right">
                                     <span class="caret"></span>
-                                    <span class="sr-only">Toggle Dropdown</span>
+                                    <span class="sr-only">{{ trans('dashboard.toggle_dropdown') }}</span>
                                 </span>
                                 </button>
                                 <ul class="dropdown-menu">
@@ -142,14 +143,14 @@
             <div class="row" style="margin-top:5px;">
                 <div class="col-md-6">
                     <div class="col-md-6">
-                        <button class="btn btn-danger" type="button" id="clear_widgets" name="clear_widgets" style="min-width:160px;"><span class="pull-left">Remove</span><strong class="pull-right">Widgets</strong></button>
+                        <button class="btn btn-danger" type="button" id="clear_widgets" name="clear_widgets" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.widgets.remove') }}</span><strong class="pull-right">{{ trans('dashboard.widgets.label') }}</strong></button>
                     </div>
                 </div>
             </div>
             <div class="row" style="margin-top:5px;">
                 <div class="col-md-6">
                     <div class="col-md-6">
-                        <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="{{ $dashboard->dashboard_id }}" style="min-width:160px;"><span class="pull-left">Delete</span><strong class="pull-right">Dashboard</strong></button>
+                        <button class="btn btn-danger" type="button" onclick="dashboard_delete(this); return false;" data-dashboard="{{ $dashboard->dashboard_id }}" style="min-width:160px;"><span class="pull-left">{{ trans('dashboard.labels.delete') }}</span><strong class="pull-right">{{ trans('dashboard.labels.dashboard') }}</strong></button>
                     </div>
                 </div>
             </div>
@@ -513,7 +514,7 @@
 
                 @if (
                         ($dashboard->access == 1 && Auth::id() === $dashboard->user_id) ||
-                        ($dashboard->access == 0 || $dashboard->access == 2)
+                        ($dashboard->access == 0 || $dashboard->access >= 2)
                     )
                         '<i class="fa fa-pencil-square-o edit-widget" data-widget-id="'+data.user_widget_id+'" aria-label="Settings" data-toggle="tooltip" data-placement="top" title="Settings">&nbsp;</i>&nbsp;'+
                 @endif

@@ -49,19 +49,22 @@ if (! empty($fdbPort_table)) {
     $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
     foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
         if (isset($data['dot1dBasePortIfIndex'])) {
-            $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);
-            $portid_dict[$portLocal] = $port['port_id'];
+            $portid_dict[$portLocal] = \App\Facades\PortCache::getIdFromIfIndex($data['dot1dBasePortIfIndex'], $device['device_id']);
         }
     }
 
     // Build VLAN fdb index to real VLAN ID dictionary
-    $vlan_cur_table = snmpwalk_group($device, 'dot1qVlanFdbId', 'Q-BRIDGE-MIB', 2);
+    $vlan_cur_table = SnmpQuery::hideMib()->walk('Q-BRIDGE-MIB::dot1qVlanFdbId')->table(2);
     $vlan_fdb_dict = [];
 
     // Indexed first by dot1qVlanTimeMark, which we ignore
-    foreach ($vlan_cur_table as $dot1qVlanTimeMark => $a) {
+    foreach ($vlan_cur_table as $a) {
         // Then by VLAN ID mapped to a single member array with the dot1qVlanFdbId
         foreach ($a as $vid => $data) {
+            // Skip if $data is not an array (can happen with malformed SNMP responses)
+            if (! is_array($data) || ! isset($data['dot1qVlanFdbId'])) {
+                continue;
+            }
             // Flip it round into the dictionary
             $vlan_fdb_dict[$data['dot1qVlanFdbId']] = $vid;
         }
@@ -72,7 +75,7 @@ if (! empty($fdbPort_table)) {
         // Look the dot1qVlanFdbId up to a real VLAN number; if undefined assume the
         // index *is* the VLAN number. Code in fdb-table.inc.php to map to the
         // device VLANs table should catch anything invalid.
-        $vlan = isset($vlan_fdb_dict[$vlanIndex]) ? $vlan_fdb_dict[$vlanIndex] : $vlanIndex;
+        $vlan = $vlan_fdb_dict[$vlanIndex] ?? $vlanIndex;
 
         foreach ($data[$data_oid] ?? [] as $mac => $dot1dBasePort) {
             if ($dot1dBasePort == 0) {
@@ -85,7 +88,7 @@ if (! empty($fdbPort_table)) {
                 continue;
             }
             $port_id = $portid_dict[$dot1dBasePort] ?? PortCache::getIdFromIfIndex($dot1dBasePort); // if vendor messed up, assume base port = ifIndex
-            $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
+            $vlan_id = $vlans_dict[$vlan] ?? 0;
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
             Log::debug("vlan $vlan mac $mac_address port ($dot1dBasePort) $port_id\n");
         }

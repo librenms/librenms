@@ -25,7 +25,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\RRD\RrdDefinition;
 
 $data = '';
@@ -33,12 +33,12 @@ $name = 'powerdns-recursor';
 
 if (! empty($agent_data['app'][$name])) {
     $data = $agent_data['app'][$name];
-} elseif (Config::has('apps.powerdns-recursor.api-key')) {
-    $port = Config::get('apps.powerdns-recursor.port', 8082);
-    $scheme = Config::get('apps.powerdns-recursor.https') ? 'https://' : 'http://';
+} elseif (LibrenmsConfig::has('apps.powerdns-recursor.api-key')) {
+    $port = LibrenmsConfig::get('apps.powerdns-recursor.port', 8082);
+    $scheme = LibrenmsConfig::get('apps.powerdns-recursor.https') ? 'https://' : 'http://';
 
     d_echo("\nNo Agent Data. Attempting to connect directly to the powerdns-recursor server $scheme" . $device['hostname'] . ":$port\n");
-    $context = stream_context_create(['http' => ['header' => 'X-API-Key: ' . Config::get('apps.powerdns-recursor.api-key')]]);
+    $context = stream_context_create(['http' => ['header' => 'X-API-Key: ' . LibrenmsConfig::get('apps.powerdns-recursor.api-key')]]);
     $data = file_get_contents($scheme . $device['hostname'] . ':' . $port . '/api/v1/servers/localhost/statistics', false, $context);
     if ($data === false) {
         $data = file_get_contents($scheme . $device['hostname'] . ':' . $port . '/servers/localhost/statistics', false, $context);
@@ -113,7 +113,7 @@ if (! empty($data)) {
 
     //decode and flatten the data
     $stats = [];
-    [$json_data] = explode("\n", $data, 2);
+    [$json_data] = explode("\n", (string) $data, 2);
     foreach (json_decode($json_data, true) as $stat) {
         $stats[$stat['name']] = $stat['value'];
     }
@@ -128,7 +128,7 @@ if (! empty($data)) {
         if (isset($stats[$key])) {
             $fields[$key] = $stats[$key];
         } else {
-            $fields[$key] = 'U';
+            $fields[$key] = null;
         }
     }
 

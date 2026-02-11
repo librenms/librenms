@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Time;
 
 unset($vars['page']);
@@ -15,10 +15,10 @@ if (session('widescreen')) {
     $thumb_width = 113;
 }
 
-$vars['from'] = Time::parseAt($vars['from'] ?? '') ?: Config::get('time.day');
-$vars['to'] = Time::parseAt($vars['to'] ?? '') ?: Config::get('time.now');
+$vars['from'] = Time::parseAt($vars['from'] ?? '') ?: LibrenmsConfig::get('time.day');
+$vars['to'] = Time::parseAt($vars['to'] ?? '') ?: LibrenmsConfig::get('time.now');
 
-preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
+preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', (string) $vars['type'], $graphtype);
 
 $type = basename($graphtype['type']);
 $subtype = basename($graphtype['subtype']);
@@ -38,8 +38,8 @@ if (is_file('includes/html/graphs/' . $type . '/auth.inc.php')) {
 if (! $auth) {
     require 'includes/html/error-no-perm.inc.php';
 } else {
-    if (Config::has("graph_types.$type.$subtype.descr")) {
-        $title .= ' :: ' . Config::get("graph_types.$type.$subtype.descr");
+    if (LibrenmsConfig::has("graph_types.$type.$subtype.descr")) {
+        $title .= ' :: ' . LibrenmsConfig::get("graph_types.$type.$subtype.descr");
     } elseif ($type == 'device' && $subtype == 'collectd') {
         $title .= ' :: ' . \LibreNMS\Util\StringHelpers::niceCase($subtype) . ' :: ' . $vars['c_plugin'];
         if (isset($vars['c_plugin_instance'])) {
@@ -57,38 +57,41 @@ if (! $auth) {
     $graph_array['height'] = '60';
     $graph_array['width'] = $thumb_width;
     $graph_array['legend'] = 'no';
-    $graph_array['to'] = Config::get('time.now');
+    $graph_array['to'] = LibrenmsConfig::get('time.now');
 
     print_optionbar_start();
     echo $title;
 
     // FIXME allow switching between types for sensor and wireless also restrict types to ones that have data
-    if ($type != 'sensor') {
-        echo '<div style="float: right;"><form action="">';
-        echo csrf_field();
-        echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" class='devices-graphs-select'>";
+    if (! in_array($type, ['sensor', 'wireless'])) {
+        $graph_subtypes = get_graph_subtypes($type);
+        if (count($graph_subtypes) > 1) {
+            echo '<div style="float: right;"><form action="">';
+            echo csrf_field();
+            echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" class='devices-graphs-select'>";
 
-        foreach (get_graph_subtypes($type, $device) as $avail_type) {
-            echo "<option value='" . \LibreNMS\Util\Url::generate($vars, ['type' => $type . '_' . $avail_type, 'page' => 'graphs']) . "'";
-            if ($avail_type == $subtype) {
-                echo ' selected';
+            foreach ($graph_subtypes as $avail_type) {
+                echo "<option value='" . \LibreNMS\Util\Url::generate($vars, ['type' => $type . '_' . $avail_type, 'page' => 'graphs']) . "'";
+                if ($avail_type == $subtype) {
+                    echo ' selected';
+                }
+                $display_type = \LibreNMS\Util\StringHelpers::niceCase($avail_type);
+                echo ">$display_type</option>";
             }
-            $display_type = \LibreNMS\Util\StringHelpers::niceCase($avail_type);
-            echo ">$display_type</option>";
+            echo '</select></form></div>';
         }
-        echo '</select></form></div>';
     }
 
     print_optionbar_end();
 
     $show_command = isset($vars['showcommand']) && $vars['showcommand'] == 'yes';
     if (! $show_command) {
-        $thumb_array = Config::get('graphs.row.normal');
+        $thumb_array = LibrenmsConfig::get('graphs.row.normal');
 
         echo '<table width=100% class="thumbnail_graph_table"><tr>';
 
         foreach ($thumb_array as $period => $text) {
-            $graph_array['from'] = Config::get("time.$period");
+            $graph_array['from'] = LibrenmsConfig::get("time.$period");
 
             $link_array = $vars;
             $link_array['from'] = $graph_array['from'];
@@ -109,7 +112,7 @@ if (! $auth) {
     }
 
     $graph_array = $vars;
-    $graph_array['height'] = Config::get('webui.min_graph_height');
+    $graph_array['height'] = LibrenmsConfig::get('webui.min_graph_height');
     $graph_array['width'] = $graph_width;
 
     if ($screen_width = Session::get('screen_width')) {
@@ -158,7 +161,7 @@ if (! $auth) {
 
     if ($vars['type'] == 'port_bits') {
         echo ' | ';
-        if ($vars['port_speed_zoom'] ?? Config::get('graphs.port_speed_zoom')) {
+        if ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom')) {
             echo generate_link('Zoom to Traffic', $vars, ['page' => 'graphs', 'port_speed_zoom' => 0]);
         } else {
             echo generate_link('Zoom to Port Speed', $vars, ['page' => 'graphs', 'port_speed_zoom' => 1]);
@@ -166,7 +169,7 @@ if (! $auth) {
         echo ' | To show trend, set to future date';
     }
 
-    if (str_contains($vars['type'], 'sensor_')) {
+    if (str_contains((string) $vars['type'], 'sensor_')) {
         echo ' | To show trend, set to future date';
     }
 
@@ -175,7 +178,7 @@ if (! $auth) {
     echo generate_graph_js_state($graph_array);
 
     echo '<div style="width: ' . $graph_array['width'] . '; margin: auto;"><center>';
-    if (Config::get('webui.dynamic_graphs', false) === true) {
+    if (LibrenmsConfig::get('webui.dynamic_graphs', false) === true) {
         echo generate_dynamic_graph_js($graph_array);
         echo generate_dynamic_graph_tag($graph_array);
     } else {
@@ -183,14 +186,14 @@ if (! $auth) {
     }
     echo '</center></div>';
 
-    if (Config::has('graph_descr.' . $vars['type'])) {
+    if (LibrenmsConfig::has('graph_descr.' . $vars['type'])) {
         print_optionbar_start();
         echo '<div style="float: left; width: 30px;">
             <div style="margin: auto auto;">
             <i class="fa-solid fa-circle-info fa-lg icon-theme" aria-hidden="true"></i>
             </div>
             </div>';
-        echo Config::get('graph_descr.' . $vars['type']);
+        echo LibrenmsConfig::get('graph_descr.' . $vars['type']);
         print_optionbar_end();
     }
 

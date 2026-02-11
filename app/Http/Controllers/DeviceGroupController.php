@@ -7,7 +7,6 @@ use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
-use LibreNMS\Alerting\QueryBuilderFluentParser;
 
 class DeviceGroupController extends Controller
 {
@@ -67,7 +66,7 @@ class DeviceGroupController extends Controller
             $deviceGroup->devices()->sync($request->devices);
         }
 
-        $toast->success(__('Device Group :name created', ['name' => htmlentities($deviceGroup->name)]));
+        $toast->success(__('Device Group :name created', ['name' => htmlentities((string) $deviceGroup->name)]));
 
         return redirect()->route('device-groups.index');
     }
@@ -91,12 +90,6 @@ class DeviceGroupController extends Controller
      */
     public function edit(DeviceGroup $deviceGroup)
     {
-        // convert old rules on edit
-        if (is_null($deviceGroup->rules)) {
-            $query_builder = QueryBuilderFluentParser::fromOld($deviceGroup->pattern);
-            $deviceGroup->rules = $query_builder->toArray();
-        }
-
         return view('device-group.edit', [
             'device_group' => $deviceGroup,
             'filters' => json_encode(new QueryBuilderFilter('group')),
@@ -116,7 +109,7 @@ class DeviceGroupController extends Controller
             'name' => [
                 'required',
                 'string',
-                Rule::unique('device_groups')->where(function ($query) use ($deviceGroup) {
+                Rule::unique('device_groups')->where(function ($query) use ($deviceGroup): void {
                     $query->where('id', '!=', $deviceGroup->id);
                 }),
             ],
@@ -131,11 +124,9 @@ class DeviceGroupController extends Controller
         $devices_updated = false;
         if ($deviceGroup->type == 'static') {
             // sync device_ids from input
-            $updated = $deviceGroup->devices()->sync($request->get('devices', []));
+            $updated = $deviceGroup->devices()->sync($request->input('devices', []));
             // check for attached/detached/updated
-            $devices_updated = array_sum(array_map(function ($device_ids) {
-                return count($device_ids);
-            }, $updated)) > 0;
+            $devices_updated = array_sum(array_map(count(...), $updated)) > 0;
         } else {
             $deviceGroup->rules = json_decode($request->rules);
         }

@@ -637,8 +637,8 @@
                     "ifName": "tun0",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -737,8 +737,8 @@
                     "ifName": "tun1",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -1072,5 +1072,46 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.0.0.130",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.0.0.128/29",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "10.0.0.131",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.0.0.128/29",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.28.13.1",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "172.28.13.0/30",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "172.28.13.4",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "172.28.13.4/30",
+                    "ifIndex": 4
+                }
+            ]
+        }
     }
 }

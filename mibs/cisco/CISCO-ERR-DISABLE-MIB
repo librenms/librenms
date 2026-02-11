@@ -33,7 +33,7 @@ IMPORTS
 
 
 ciscoErrDisableMIB MODULE-IDENTITY
-    LAST-UPDATED    "201606020000Z"
+    LAST-UPDATED    "201911280000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -103,6 +103,11 @@ ciscoErrDisableMIB MODULE-IDENTITY
             3) If error recovery is possible, then the time
             interval to wait before the system starts the recovery
             attempt."
+    REVISION        "201911280000Z"
+    DESCRIPTION
+        "Added the following new enumerations in
+        CErrDisableFeatureID:
+        loopDetect(62)."
     REVISION        "201606020000Z"
     DESCRIPTION
         "Added the following new enumerations in
@@ -317,7 +322,8 @@ CErrDisableFeatureID ::= TEXTUAL-CONVENTION
 
         oneHundredPdusWithoutAck: DCX Recieved 100 PDUs without ACK
 
-        ipQosCompatCheckFailure: IP Qos DCBXP compat check failed"
+        ipQosCompatCheckFailure: IP Qos DCBXP compat check failed
+        loopDetect:              Loopdetection in the network"
     SYNTAX          INTEGER  {
                         udld(1),
                         bpduGuard(2),
@@ -379,7 +385,8 @@ CErrDisableFeatureID ::= TEXTUAL-CONVENTION
                         ipConflict(58),
                         multipleMSapIdsRcvd(59),
                         oneHundredPdusWithoutAck(60),
-                        ipQosCompatCheckFailure(61)
+                        ipQosCompatCheckFailure(61),
+                        loopDetect(62)
                     }
 
 -- Global configuration objects
@@ -930,7 +937,4 @@ ciscoErrDisableFeatureFlapGroup OBJECT-GROUP
     ::= { ciscoErrDisableMIBGroups 8 }
 
 END
-
-
-
 

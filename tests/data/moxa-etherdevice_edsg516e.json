@@ -4029,42 +4029,42 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 96,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 96",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 99",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 416,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 416",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 516,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 516",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 939,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 939",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -4224,5 +4224,25 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 130
+                },
+                {
+                    "ipv4_address": "192.168.127.253",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.127.0/24",
+                    "ifIndex": 129
+                }
+            ]
+        }
     }
 }

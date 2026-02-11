@@ -29,7 +29,7 @@ if ($components[$vars['bwcid']]['type'] == 'f5-ltm-bwc') {
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
     $graph_array['legend'] = 'no';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['type'] = 'device_bigip_ltm_bwc_BitsDropped';
     $graph_array['id'] = $vars['bwcid'];
     require 'includes/html/print-graphrow.inc.php'; ?>
@@ -47,7 +47,7 @@ if ($components[$vars['bwcid']]['type'] == 'f5-ltm-bwc') {
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
     $graph_array['legend'] = 'no';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['type'] = 'device_bigip_ltm_bwc_Bits';
     $graph_array['id'] = $vars['bwcid'];
     require 'includes/html/print-graphrow.inc.php'; ?>
@@ -65,7 +65,7 @@ if ($components[$vars['bwcid']]['type'] == 'f5-ltm-bwc') {
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
     $graph_array['legend'] = 'no';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['type'] = 'device_bigip_ltm_bwc_pkts';
     $graph_array['id'] = $vars['bwcid'];
     require 'includes/html/print-graphrow.inc.php'; ?>

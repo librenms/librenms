@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
@@ -34,35 +35,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use LibreNMS\Config;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
-    /** @var string[] */
-    public static $widgets = [
-        'alerts',
-        'alertlog',
-        'alertlog-stats',
-        'availability-map',
-        'component-status',
-        'custom-map',
-        'device-summary-horiz',
-        'device-summary-vert',
-        'device-types',
-        'eventlog',
-        'globe',
-        'generic-graph',
-        'graylog',
-        'generic-image',
-        'notes',
-        'server-stats',
-        'syslog',
-        'top-devices',
-        'top-errors',
-        'top-interfaces',
-        'worldmap',
-    ];
-
     /** @var \Illuminate\Support\Collection<\App\Models\Dashboard> */
     private $dashboards;
 
@@ -92,7 +69,7 @@ class DashboardController extends Controller
 
         // default dashboard
         $user_default_dash = (int) UserPref::getPref($user, 'dashboard');
-        $global_default = (int) Config::get('webui.default_dashboard_id');
+        $global_default = (int) LibrenmsConfig::get('webui.default_dashboard_id');
 
         // load user default
         if ($dashboards->has($user_default_dash)) {
@@ -132,9 +109,7 @@ class DashboardController extends Controller
 
         // Split dashboards into user owned or shared
         $dashboards = $this->getAvailableDashboards($user);
-        [$user_dashboards, $shared_dashboards] = $dashboards->partition(function ($dashboard) use ($user) {
-            return $dashboard->user_id == $user->user_id;
-        });
+        [$user_dashboards, $shared_dashboards] = $dashboards->partition(fn ($dashboard) => $dashboard->user_id == $user->user_id);
 
         $data = $dashboard->widgets;
 
@@ -153,9 +128,7 @@ class DashboardController extends Controller
             ];
         }
 
-        $widgets = array_combine(self::$widgets, array_map(function ($widget) {
-            return trans("widgets.$widget.title");
-        }, self::$widgets));
+        $widgets = self::listWidgets();
 
         $user_list = $user->can('manage', User::class)
             ? User::where('user_id', '!=', $user->user_id)
@@ -164,7 +137,7 @@ class DashboardController extends Controller
             : [];
 
         return view('overview.default', [
-            'bare' => $request->get('bare'),
+            'bare' => $request->input('bare'),
             'dash_config' => $data,
             'dashboard' => $dashboard,
             'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor'),
@@ -181,7 +154,7 @@ class DashboardController extends Controller
             'dashboard_name' => 'string|max:255',
         ]);
 
-        $name = trim(strip_tags($request->get('dashboard_name')));
+        $name = trim(strip_tags((string) $request->input('dashboard_name')));
         $dashboard = Dashboard::create([
             'user_id' => Auth::id(),
             'dashboard_name' => $name,
@@ -199,7 +172,7 @@ class DashboardController extends Controller
     {
         $validated = $this->validate($request, [
             'dashboard_name' => 'string|max:255',
-            'access' => 'int|in:0,1,2',
+            'access' => 'int|in:0,1,2,3',
         ]);
 
         $dashboard->fill($validated);
@@ -228,7 +201,7 @@ class DashboardController extends Controller
             'target_user_id' => 'required|exists:App\Models\User,user_id',
         ]);
 
-        $target_user_id = $request->get('target_user_id');
+        $target_user_id = $request->input('target_user_id');
 
         $this->authorize('copy', [$dashboard, $target_user_id]);
 
@@ -239,7 +212,7 @@ class DashboardController extends Controller
 
         if ($dashboard_copy->save()) {
             // copy widgets
-            $dashboard->widgets->each(function (UserWidget $widget) use ($dashboard_copy, $target_user_id) {
+            $dashboard->widgets->each(function (UserWidget $widget) use ($dashboard_copy, $target_user_id): void {
                 $dashboard_copy->widgets()->save($widget->replicate()->fill([
                     'user_id' => $target_user_id,
                 ]));
@@ -255,6 +228,30 @@ class DashboardController extends Controller
             'status' => 'error',
             'message' => 'ERROR: Could not copy Dashboard',
         ]);
+    }
+
+    /**
+     * @return Collection<string, string> widget name, widget localized title
+     */
+    public static function listWidgets(): Collection
+    {
+        return collect(Route::getRoutes())->filter(function (\Illuminate\Routing\Route $route) {
+            if (str_ends_with($route->uri, 'placeholder')) {
+                return false;
+            }
+
+            return $route->getPrefix() === 'ajax/dash';
+        })->mapWithKeys(function (\Illuminate\Routing\Route $route) {
+            $widget = Str::afterLast($route->uri, '/');
+            $title = $widget; // default to path for title
+
+            $controller = $route->getController();
+            if (method_exists($controller, 'getTitle')) {
+                $title = $controller->getTitle();
+            }
+
+            return [$widget => $title];
+        })->sort();
     }
 
     /**

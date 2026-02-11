@@ -1,0 +1,339 @@
+GS-HT8XX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE, Integer32, NOTIFICATION-TYPE, enterprises
+            FROM SNMPv2-SMI
+        DisplayString
+            FROM SNMPv2-TC;
+
+grandstream OBJECT IDENTIFIER
+    ::= { enterprises 42397 }
+
+productFamily OBJECT IDENTIFIER
+    ::= { grandstream 1 }
+
+ht8xx OBJECT IDENTIFIER
+    ::= { productFamily 2 }
+
+ht801 OBJECT IDENTIFIER
+    ::= { ht8xx 801 }
+
+ht802 OBJECT IDENTIFIER
+    ::= { ht8xx 802 }
+
+ht812 OBJECT IDENTIFIER
+    ::= { ht8xx 812 }
+
+ht814 OBJECT IDENTIFIER
+    ::= { ht8xx 814 }
+
+PartNo OBJECT-TYPE 
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Part No"
+    ::= { ht8xx 1 }
+
+Ports OBJECT IDENTIFIER 
+    ::= { ht8xx 2 }
+
+Firmware OBJECT IDENTIFIER 
+    ::= { ht8xx 3 }
+
+Network OBJECT IDENTIFIER 
+    ::= { ht8xx 4 }
+
+ht8xxNotifications OBJECT IDENTIFIER 
+    ::= { ht8xx 5 }
+
+networkMode OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Network mode DHCP, Static or PPPoE"
+    ::= { Network 1 }
+
+pppoeLink OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "PPPoE link enabled/disabled"
+    ::= { Network 2 }
+
+natTraversal1 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Nat traversal for profile 1"
+    ::= { Network 3 }
+
+natTraversal2 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Nat traversal for profile 2"
+    ::= { Network 4 }
+
+versionBoot OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version of boot loader."
+    ::= { Firmware 1 }
+
+versionCore OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version of core."
+    ::= { Firmware 2 }
+
+versionBase OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version of base."
+    ::= { Firmware 3 }
+
+versionProg OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version of prog."
+    ::= { Firmware 4 }
+
+hookStatus OBJECT IDENTIFIER
+    ::= { Ports 1 }
+
+regStatus OBJECT IDENTIFIER
+    ::= { Ports 2 }
+
+dnd OBJECT IDENTIFIER
+    ::= { Ports 3 }
+
+forward OBJECT IDENTIFIER
+    ::= { Ports 4 }
+
+busyForward OBJECT IDENTIFIER
+    ::= { Ports 5 }
+
+delayedForward OBJECT IDENTIFIER
+    ::= { Ports 6 }
+
+hookStatus1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 1 }
+
+hookStatus2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 2 }
+
+hookStatus3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 3 }
+
+hookStatus4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hook status"
+    ::= { hookStatus 4 }
+
+regStatus1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 1 }
+
+regStatus2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 2 }
+
+regStatus3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 3 }
+
+regStatus4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Registration status"
+    ::= { regStatus 4 }
+
+dnd1 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 1 }
+
+dnd2 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 2 }
+
+dnd3 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 3 }
+
+dnd4 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Do not disturb"
+    ::= { dnd 4 }
+
+forward1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 1 }
+
+forward2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 2 }
+
+forward3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 3 }
+
+forward4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Forward calls to"
+    ::= { forward 4 }
+
+busyForward1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 1 }
+
+busyForward2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 2 }
+
+busyForward3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 3 }
+
+busyForward4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if busy, forward calls to"
+    ::= { busyForward 4 }
+
+delayedForward1 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 1 }
+
+delayedForward2 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 2 }
+
+delayedForward3 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 3 }
+
+delayedForward4 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "if timeout, forward calls to"
+    ::= { delayedForward 4 }
+
+    TimedTrap NOTIFICATION-TYPE
+    OBJECTS     { 
+                    PartNo, networkMode, pppoeLink, natTraversal1, natTraversal2,
+                    versionBoot, versionCore, versionBase, versionProg,
+                    hookStatus1,hookStatus2,hookStatus3,hookStatus4,
+                    regStatus1,regStatus2,regStatus3,regStatus4,
+                    dnd1,dnd2,dnd3,dnd4,
+                    forward1,forward2,forward3,forward4,
+                    busyForward1,busyForward2,busyForward3,busyForward4,
+                    delayedForward1,delayedForward2,delayedForward3,delayedForward4,
+                }
+    STATUS      current
+    DESCRIPTION
+    "The mib is reported with this trap."
+    ::= { ht8xxNotifications 1 }
+END

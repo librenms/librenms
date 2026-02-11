@@ -6115,7 +6115,7 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -6997,5 +6997,18 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "143.160.92.6",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "143.160.92.0/22",
+                    "ifIndex": 5121
+                }
+            ]
+        }
     }
 }

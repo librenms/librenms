@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Port;
 use App\Models\Storage;
 
@@ -42,8 +43,8 @@ if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
         echo "\n<br>Current " . $oslvm_name . ": \n";
     }
     $index_int = 0;
-    foreach ($app_data['oslvms'] as $index => $oslvm) {
-        $oslvm = htmlspecialchars($oslvm);
+    foreach ($app_data['oslvms'] as $oslvm) {
+        $oslvm = htmlspecialchars((string) $oslvm);
         $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
             ? $oslvm
             : '<span class="pagemenu-selected">' . $oslvm . '</span>';
@@ -57,8 +58,8 @@ if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
         echo "\n<br>Old " . $oslvm_name . ': ';
         sort($app_data['inactive']);
         $index_int = 0;
-        foreach ($app_data['inactive'] as $index => $oslvm) {
-            $oslvm = htmlspecialchars($oslvm);
+        foreach ($app_data['inactive'] as $oslvm) {
+            $oslvm = htmlspecialchars((string) $oslvm);
             $label = (! isset($vars['inactive']) || $vars['oslvm'] != $oslvm)
                 ? $oslvm
                 : '<span class="pagemenu-selected">' . $oslvm . '</span>';
@@ -77,8 +78,8 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     $systemd_containers = [];
     $other_containers = [];
     $user_containers = [];
-    foreach ($app_data['oslvms'] as $index => $oslvm) {
-        $oslvm = htmlspecialchars($oslvm);
+    foreach ($app_data['oslvms'] as $oslvm) {
+        $oslvm = htmlspecialchars((string) $oslvm);
         if (preg_match('/^d_.*/', $oslvm)) {
             $docker_containers[] = $oslvm;
         } elseif (preg_match('/^s_.*/', $oslvm)) {
@@ -96,8 +97,8 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     $seen_systemd_containers = [];
     $seen_other_containers = [];
     $seen_user_containers = [];
-    foreach ($app_data['inactive'] as $index => $oslvm) {
-        $oslvm = htmlspecialchars($oslvm);
+    foreach ($app_data['inactive'] as $oslvm) {
+        $oslvm = htmlspecialchars((string) $oslvm);
         if (preg_match('/^d_.*/', $oslvm)) {
             $seen_docker_containers[] = $oslvm;
         } elseif (preg_match('/^s_.*/', $oslvm)) {
@@ -123,7 +124,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             echo "\n<br>Current Podman Containers<b>:</b> \n";
         }
         $index_int = 0;
-        foreach ($podman_containers as $index => $oslvm) {
+        foreach ($podman_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^p\_/', '', $oslvm_name);
             $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
@@ -139,7 +140,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     if (isset($seen_podman_containers[0])) {
         echo "\n<br>Previous Podman Containers<b>:</b> \n";
         $index_int = 0;
-        foreach ($seen_podman_containers as $index => $oslvm) {
+        foreach ($seen_podman_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^p\_/', '', $oslvm_name);
             $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
@@ -160,7 +161,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             echo "\n<br>Current Docker Containers<b>:</b> \n";
         }
         $index_int = 0;
-        foreach ($docker_containers as $index => $oslvm) {
+        foreach ($docker_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^d\_/', '', $oslvm_name);
             $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
@@ -176,7 +177,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     if (isset($seen_docker_containers[0])) {
         echo "\n<br>Previous Docker Containers<b>:</b> \n";
         $index_int = 0;
-        foreach ($seen_docker_containers as $index => $oslvm) {
+        foreach ($seen_docker_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^d\_/', '', $oslvm_name);
             $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
@@ -197,7 +198,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             echo "\n<br>Current SystemD Containers<b>:</b> \n";
         }
         $index_int = 0;
-        foreach ($systemd_containers as $index => $oslvm) {
+        foreach ($systemd_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^s\_/', '', $oslvm_name);
             $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
@@ -213,7 +214,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     if (isset($seen_systemd_containers[0])) {
         echo "\n<br>Previous SystemD Containers<b>:</b> \n";
         $index_int = 0;
-        foreach ($seen_systemd_containers as $index => $oslvm) {
+        foreach ($seen_systemd_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^s\_/', '', $oslvm_name);
             $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
@@ -234,7 +235,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             echo "\n<br>Current User Containers<b>:</b> \n";
         }
         $index_int = 0;
-        foreach ($user_containers as $index => $oslvm) {
+        foreach ($user_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^u\_/', '', $oslvm_name);
             if (isset($app_data['uid_mapping'][$oslvm_name])) {
@@ -253,7 +254,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     if (isset($seen_user_containers[0])) {
         echo "\n<br>Previous User Containers<b>:</b> \n";
         $index_int = 0;
-        foreach ($seen_user_containers as $index => $oslvm) {
+        foreach ($seen_user_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^u\_/', '', $oslvm_name);
             if (isset($app_data['uid_mapping'][$oslvm_name])) {
@@ -277,7 +278,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             echo "\n<br>Current Other Containers<b>:</b> \n";
         }
         $index_int = 0;
-        foreach ($other_containers as $index => $oslvm) {
+        foreach ($other_containers as $oslvm) {
             $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
                 ? $oslvm
                 : '<span class="pagemenu-selected">' . $oslvm . '</span>';
@@ -291,7 +292,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     if (isset($seen_other_containers[0])) {
         echo "\n<br>Previous Other Containers<b>:</b> \n";
         $index_int = 0;
-        foreach ($seen_other_containers as $index => $oslvm) {
+        foreach ($seen_other_containers as $oslvm) {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^d\_/', '', $oslvm_name);
             $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
@@ -317,8 +318,8 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
             ],
             'rows' => [],
         ];
-        foreach ($app_data['oslvm_data'][$vars['oslvm']]['path'] as $index => $path) {
-            $path = htmlspecialchars($path);
+        foreach ($app_data['oslvm_data'][$vars['oslvm']]['path'] as $path) {
+            $path = htmlspecialchars((string) $path);
             $path = preg_replace('/\/$/', '', $path);
             $mount_path = $path;
             $mount_path_raw = false;
@@ -330,8 +331,8 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 ['storage_descr' => $mount_path],
                 ['device_id' => $device['device_id']]
             );
-            if (! isset($storage_info) && ! preg_match('/^\/+$/', $mount_path)) {
-                $mount_path = preg_replace('/\/[^\/]+$/', '', $mount_path);
+            if (! isset($storage_info) && ! preg_match('/^\/+$/', (string) $mount_path)) {
+                $mount_path = preg_replace('/\/[^\/]+$/', '', (string) $mount_path);
                 while ($mount_path != '' && ! isset($storage_info)) {
                     $storage_info = Storage::firstWhere(
                         ['storage_descr' => $mount_path],
@@ -350,10 +351,10 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 $path_graph_array = [];
                 $path_graph_array['height'] = '100';
                 $path_graph_array['width'] = '210';
-                $path_graph_array['to'] = LibreNMS\Config::get('time.now');
+                $path_graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
                 $path_graph_array['id'] = $storage_info['storage_id'];
                 $path_graph_array['type'] = 'storage_usage';
-                $path_graph_array['from'] = LibreNMS\Config::get('time.day');
+                $path_graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
                 $path_graph_array['legend'] = 'no';
 
                 $path_link_array = $path_graph_array;
@@ -410,7 +411,7 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
             ],
             'rows' => [],
         ];
-        foreach ($app_data['oslvm_data'][$vars['oslvm']]['ip'] as $index => $ip_data) {
+        foreach ($app_data['oslvm_data'][$vars['oslvm']]['ip'] as $ip_data) {
             $ip = '';
             $interface = '';
             $interface_raw = false;
@@ -429,7 +430,7 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 if (is_array($ip_data)) {
                     if (isset($ip_data['ip']) && ! is_null($ip_data['ip'])) {
                         $ip = $ip_data['ip'];
-                        $ip = htmlspecialchars($ip);
+                        $ip = htmlspecialchars((string) $ip);
                     }
                     if (isset($ip_data['gw']) && ! is_null($ip_data['gw'])) {
                         $gw_ip = $ip_data['gw'];
@@ -611,26 +612,42 @@ if ($app_data['has']['sock']) {
     ];
 }
 if ($app_data['has']['linux_mem_stats']) {
-    $graphs[] = [
-        'type' => 'cgroups_pg',
-        'description' => 'Linux Pg Memory Stats',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_mem_misc',
-        'description' => 'Misc Linux Memory Stats',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_zswap',
-        'description' => 'Zswap Size',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_zswap_activity',
-        'description' => 'Zswap Activity',
-    ];
-    $graphs[] = [
-        'type' => 'cgroups_workingset',
-        'description' => 'Workingset Stats',
-    ];
+    if (LibrenmsConfig::get('apps.oslv_monitor.linux_pg_memory_stats')) {
+        $graphs[] = [
+            'type' => 'cgroups_pg',
+            'description' => 'Linux Pg Memory Stats',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.misc_linux_memory_stats')) {
+        $graphs[] = [
+            'type' => 'cgroups_mem_misc',
+            'description' => 'Misc Linux Memory Stats',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.zswap_size')) {
+        $graphs[] = [
+            'type' => 'cgroups_zswap',
+            'description' => 'Zswap Size',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.zswap_activity')) {
+        $graphs[] = [
+            'type' => 'cgroups_zswap_activity',
+            'description' => 'Zswap Activity',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.workingset_stats')) {
+        $graphs[] = [
+            'type' => 'cgroups_workingset',
+            'description' => 'Workingset Stats',
+        ];
+    }
+    if (LibrenmsConfig::get('apps.oslv_monitor.thp_activity')) {
+        $graphs[] = [
+            'type' => 'cgroups_thp_activity',
+            'description' => 'THP Activity',
+        ];
+    }
 }
 if ($app_data['has']['throttled_time']) {
     $graphs[] = [

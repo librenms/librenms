@@ -1,7 +1,7 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -16,7 +16,7 @@ try {
 }
 
 // grab the alert here as it is the global one
-$metrics = ['alert' => $suricata['alert']];
+$metrics = ['alert' => $suricata['alert'] ?? null];
 
 // Used by both.
 $instances = [];
@@ -183,7 +183,7 @@ if ($suricata['version'] == 1) {
     $new_data['version'] = 2;
 
     // Nothing here is used by version 1.
-    include Config::get('install_dir') . '/includes/suricata-shared.php';
+    include LibrenmsConfig::get('install_dir') . '/includes/suricata-shared.php';
 
     $counter_rrd_def = RrdDefinition::make()
         ->addDataset('data', 'DERIVE', 0);

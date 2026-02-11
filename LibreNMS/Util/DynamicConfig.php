@@ -26,9 +26,9 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use LibreNMS\Config;
 
 class DynamicConfig
 {
@@ -40,7 +40,7 @@ class DynamicConfig
         $config = [];
         @include base_path('config.php');
 
-        $this->definitions = collect(Config::getDefinitions())->map(function ($item, $key) use ($config) {
+        $this->definitions = collect(LibrenmsConfig::getDefinitions())->map(function ($item, $key) use ($config) {
             $item['overridden'] = Arr::has($config, $key);
 
             return new DynamicConfigItem($key, $item);
@@ -82,11 +82,7 @@ class DynamicConfig
     public function getSections()
     {
         /** @var Collection $sections */
-        $sections = $this->definitions->groupBy('group')->map(function ($items) {
-            return $items->pluck('section')->unique()->filter()->values();
-        })->sortBy(function ($item, $key) {
-            return $key;
-        });
+        $sections = $this->definitions->groupBy('group')->map(fn ($items) => $items->pluck('section')->unique()->filter()->values())->sortBy(fn ($item, $key) => $key);
         $sections->prepend($sections->pull('', []), 'global'); // rename '' to global
 
         return $sections;
@@ -100,12 +96,10 @@ class DynamicConfig
     public function getGrouped()
     {
         /** @var Collection $grouped */
-        $grouped = $this->definitions->filter->isValid()->sortBy('group')->groupBy('group')->map(function ($group) {
-            return $group->sortBy('section')->groupBy('section')->map(function ($section) {
-                /** @var Collection $section */
-                return $section->sortBy('order')->pluck('name');
-            });
-        });
+        $grouped = $this->definitions->filter->isValid()->sortBy('group')->groupBy('group')->map(fn ($group) => $group->sortBy('section')->groupBy('section')->map(function ($section) {
+            /** @var Collection $section */
+            return $section->sortBy('order')->pluck('name');
+        }));
         $grouped->prepend($grouped->pull(''), 'global'); // rename '' to global
 
         return $grouped;

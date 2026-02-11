@@ -26,10 +26,10 @@ foreach ($supplies as $type => $supply) {
             $graph_array = [
                 'height' => 100,
                 'width' => 210,
-                'to' => \LibreNMS\Config::get('time.now'),
+                'to' => \App\Facades\LibrenmsConfig::get('time.now'),
                 'id' => $toner['supply_id'],
                 'type' => $graph_type,
-                'from' => \LibreNMS\Config::get('time.day'),
+                'from' => \App\Facades\LibrenmsConfig::get('time.day'),
                 'legend' => 'no',
             ];
 
@@ -49,7 +49,12 @@ foreach ($supplies as $type => $supply) {
             echo '<tr>
             <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $toner['supply_descr'], $overlib_content) . '</td>
             <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
-            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']), $overlib_content) . '
+            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(200, 10, $percent, null, $percent . '%', null, null, [
+                'left' => $background['left'],
+                'left_text' => null,
+                'right' => $background['right'],
+                'right_text' => null,
+            ]), $overlib_content) . '
            </a></td>
          </tr>';
         }//end foreach

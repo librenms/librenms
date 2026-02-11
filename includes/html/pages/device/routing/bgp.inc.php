@@ -205,8 +205,8 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $graph_array = [];
     $graph_array['type'] = 'bgp_updates';
     $graph_array['id'] = $peer['bgpPeer_id'];
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
-    $graph_array['from'] = \LibreNMS\Config::get('time.day');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+    $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
     $graph_array['height'] = '110';
     if (isset($width)) {
         $graph_array['width'] = $width;
@@ -220,7 +220,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
 
     $link_array = $graph_array;
     $link_array['page'] = 'graphs';
-    unset($link_array['height'], $link_array['width'], $link_array['legend']);
+    unset($link_array['height'], $link_array['width']);
     $link = \LibreNMS\Util\Url::generate($link_array);
     $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($link, $peerIdentifierIp?->compressed(), \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
 
@@ -236,7 +236,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     echo '
         <td>' . $peeraddresslink . '<br />' . ($peername ?? '') . "</td>
         <td>$peer_type</td>
-        <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>" . (isset($peer['afi']) ? $peer['afi'] : '') . '</td>
+        <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>" . ($peer['afi'] ?? '') . '</td>
         <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . '</td>
         <td>' . $peer['bgpPeerDescr'] . "</td>
         <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "<span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . '</span></strong></td>
@@ -284,7 +284,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     if (! empty($peer['graph'])) {
         $graph_array['height'] = '100';
         $graph_array['width'] = '216';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         echo '<tr class="bgp"><td colspan="7">';
 
         include 'includes/html/print-graphrow.inc.php';

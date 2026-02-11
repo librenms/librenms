@@ -20,15 +20,19 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2017 Tony Murray
+ * @copyright  2025 Peca Nesovanovic
+ * @copyright  2025 Tony Murray
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\PortVlan;
 use App\Models\Qos;
 use App\Models\Transceiver;
+use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -45,14 +49,19 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
+use SnmpQuery;
 
 class Routeros extends OS implements
+    VlanDiscovery,
     OSPolling,
+    VlanPortDiscovery,
     QosDiscovery,
     QosPolling,
     TransceiverDiscovery,
@@ -85,7 +94,7 @@ class Routeros extends OS implements
             if ($entry['mtxrWlApClientCount'] > 0 && $entry['mtxrWlApOverallTxCCQ'] == 0) {
                 continue;
             }
-            $freq = $entry['mtxrWlApFreq'] ? substr($entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['mtxrWlApFreq'] ? substr((string) $entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
 
             $sensors[] = new WirelessSensor(
                 'ccq',
@@ -100,7 +109,7 @@ class Routeros extends OS implements
 
         $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlStatTable');
         foreach ($data as $index => $entry) {
-            $freq = $entry['mtxrWlStatFreq'] ? substr($entry['mtxrWlStatFreq'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['mtxrWlStatFreq'] ? substr((string) $entry['mtxrWlStatFreq'], 0, 1) . 'G' : 'SSID';
             if (empty($entry['mtxrWlStatTxCCQ']) && empty($entry['mtxrWlStatRxCCQ'])) {
                 continue;
             }
@@ -138,7 +147,7 @@ class Routeros extends OS implements
         $sensors = [];
         $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlApTable');
         foreach ($data as $index => $entry) {
-            $freq = $entry['mtxrWlApFreq'] ? substr($entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['mtxrWlApFreq'] ? substr((string) $entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
 
             $sensors[] = new WirelessSensor(
                 'clients',
@@ -168,7 +177,7 @@ class Routeros extends OS implements
             if ($entry['mtxrWlApFreq'] === '0') {
                 continue;
             }
-            $freq = substr($entry['mtxrWlApFreq'], 0, 1) . 'G';
+            $freq = substr((string) $entry['mtxrWlApFreq'], 0, 1) . 'G';
             $sensors[] = new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
@@ -185,7 +194,7 @@ class Routeros extends OS implements
             if ($entry['mtxrWlStatFreq'] === '0') {
                 continue;
             }
-            $freq = substr($entry['mtxrWlStatFreq'], 0, 1) . 'G';
+            $freq = substr((string) $entry['mtxrWlStatFreq'], 0, 1) . 'G';
             $sensors[] = new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
@@ -276,7 +285,7 @@ class Routeros extends OS implements
         $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlApTable');
 
         foreach ($data as $index => $entry) {
-            $freq = $entry['mtxrWlApFreq'] ? substr($entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['mtxrWlApFreq'] ? substr((string) $entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
 
             $sensors[] = new WirelessSensor(
                 'noise-floor',
@@ -308,7 +317,7 @@ class Routeros extends OS implements
                 continue;  // no data
             }
 
-            $freq = $entry['mtxrWlApFreq'] ? substr($entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['mtxrWlApFreq'] ? substr((string) $entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
             $sensors[] = new WirelessSensor(
                 'rate',
                 $this->getDeviceId(),
@@ -334,7 +343,7 @@ class Routeros extends OS implements
             if ($entry['mtxrWlStatTxRate'] === '0' && $entry['mtxrWlStatRxRate'] === '0') {
                 continue;  // no data
             }
-            $freq = $entry['mtxrWlStatFreq'] ? substr($entry['mtxrWlStatFreq'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['mtxrWlStatFreq'] ? substr((string) $entry['mtxrWlStatFreq'], 0, 1) . 'G' : 'SSID';
             $sensors[] = new WirelessSensor(
                 'rate',
                 $this->getDeviceId(),
@@ -492,7 +501,7 @@ class Routeros extends OS implements
                 'leases' => $leases,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'routeros_leases', $tags, $fields);
             $this->enableGraph('routeros_leases');
         }
@@ -506,7 +515,7 @@ class Routeros extends OS implements
                 'pppoe_sessions' => $pppoe_sessions,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'routeros_pppoe_sessions', $tags, $fields);
             $this->enableGraph('routeros_pppoe_sessions');
         }
@@ -517,23 +526,21 @@ class Routeros extends OS implements
         $this->qosIdxToParent = new Collection();
         $qos = new Collection();
 
-        $qos = $qos->concat(\SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleTable')->mapTable(function ($data, $qosIndex) {
-            return new Qos([
-                'device_id' => $this->getDeviceId(),
-                'type' => 'routeros_simple',
-                'title' => $data['MIKROTIK-MIB::mtxrQueueSimpleName'],
-                'snmp_idx' => $qosIndex,
-                'rrd_id' => $data['MIKROTIK-MIB::mtxrQueueSimpleName'],
-                'ingress' => 1,
-                'egress' => 1,
-            ]);
-        }));
+        $qos = $qos->concat(\SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleTable')->mapTable(fn ($data, $qosIndex) => new Qos([
+            'device_id' => $this->getDeviceId(),
+            'type' => 'routeros_simple',
+            'title' => $data['MIKROTIK-MIB::mtxrQueueSimpleName'],
+            'snmp_idx' => $qosIndex,
+            'rrd_id' => $data['MIKROTIK-MIB::mtxrQueueSimpleName'],
+            'ingress' => 1,
+            'egress' => 1,
+        ])));
 
         $this->qosIdxToParent->put('routeros_tree', new Collection());
         $qos = $qos->concat(\SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueTreeTable')->mapTable(function ($data, $qosIndex) {
             $thisQos = new Qos([
                 'device_id' => $this->getDeviceId(),
-                'port_id' => PortCache::getIdFromIfIndex(hexdec($data['MIKROTIK-MIB::mtxrQueueTreeParentIndex']), $this->getDevice()),
+                'port_id' => PortCache::getIdFromIfIndex(hexdec((string) $data['MIKROTIK-MIB::mtxrQueueTreeParentIndex']), $this->getDevice()),
                 'type' => 'routeros_tree',
                 'title' => $data['MIKROTIK-MIB::mtxrQueueTreeName'],
                 'snmp_idx' => $qosIndex,
@@ -543,7 +550,7 @@ class Routeros extends OS implements
             ]);
 
             // Save this child -> parent index into the collection for use in setQosParents();
-            $this->qosIdxToParent->get('routeros_tree')->put($qosIndex, hexdec($data['MIKROTIK-MIB::mtxrQueueTreeParentIndex']));
+            $this->qosIdxToParent->get('routeros_tree')->put($qosIndex, hexdec((string) $data['MIKROTIK-MIB::mtxrQueueTreeParentIndex']));
 
             return $thisQos;
         }));
@@ -553,7 +560,7 @@ class Routeros extends OS implements
 
     public function setQosParents($qos)
     {
-        $qos->each(function (Qos $thisQos, int $key) use ($qos) {
+        $qos->each(function (Qos $thisQos, int $key) use ($qos): void {
             $qosParentMap = $this->qosIdxToParent->get($thisQos->type);
             if (! $qosParentMap) {
                 // Parent data does not exist
@@ -597,7 +604,7 @@ class Routeros extends OS implements
         $simpleDropsIn = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleDroppedIn')->table(1);
         $simpleDropsOut = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleDroppedOut')->table(1);
 
-        $qos->each(function (Qos $thisQos, int $key) use ($poll_time, $treeNames, $treeBytes, $treeDrops, $simpleNames, $simpleBytesIn, $simpleBytesOut, $simpleDropsIn, $simpleDropsOut) {
+        $qos->each(function (Qos $thisQos, int $key) use ($poll_time, $treeNames, $treeBytes, $treeDrops, $simpleNames, $simpleBytesIn, $simpleBytesOut, $simpleDropsIn, $simpleDropsOut): void {
             switch ($thisQos->type) {
                 case 'routeros_tree':
                     if (! array_key_exists($thisQos->snmp_idx, $treeNames)) {
@@ -664,5 +671,80 @@ class Routeros extends OS implements
                 'entity_physical_index' => $ifIndex,
             ]);
         });
+    }
+
+    public function discoverVlans(): Collection
+    {
+        $vlans = parent::discoverVlans(); // Q-BRIDGE-MIB
+        if ($vlans->isNotEmpty()) {
+            return $vlans;
+        }
+
+        $scripts = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrScriptName')->table();
+        $scriptIndex = array_flip($scripts['MIKROTIK-MIB::mtxrScriptName'] ?? [])['LNMS_vlans'] ?? null;
+
+        if (! empty($scriptIndex)) {
+            $data = SnmpQuery::cache()->get('MIKROTIK-MIB::mtxrScriptRunOutput.' . $scriptIndex)->value();
+            $oldId = 0;
+
+            foreach (preg_split("/((\r?\n)|(\r\n?))/", (string) $data) as $line) {
+                if (! empty($line)) {
+                    [$mtType, $vlanId, $mtData] = array_map(trim(...), explode(',', $line));
+
+                    if ($mtType == 'N') {
+                        $vlanNames[$vlanId] = $mtData;
+                        continue;
+                    }
+
+                    if ($oldId != $vlanId) {
+                        $oldId = $vlanId;
+                        $vlans->push(new Vlan([
+                            'vlan_vlan' => $vlanId,
+                            'vlan_domain' => 1,
+                            'vlan_name' => $vlanNames[$vlanId] ?? 'Vlan_' . $vlanId,
+                        ]));
+                    }
+                }
+            }
+        }
+
+        return $vlans;
+    }
+
+    public function discoverVlanPorts(Collection $vlans): Collection
+    {
+        $ports = parent::discoverVlanPorts($vlans); // Q-BRIDGE-MIB
+        if ($ports->isNotEmpty()) {
+            return $ports;
+        }
+
+        $scripts = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrScriptName')->table();
+        $scriptIndex = array_flip($scripts['MIKROTIK-MIB::mtxrScriptName'] ?? [])['LNMS_vlans'] ?? null;
+
+        if (! empty($scriptIndex)) {
+            $data = SnmpQuery::cache()->get('MIKROTIK-MIB::mtxrScriptRunOutput.' . $scriptIndex)->value();
+            $ifNames = array_flip(SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck());
+
+            foreach (preg_split("/((\r?\n)|(\r\n?))/", (string) $data) as $line) {
+                if (! empty($line)) {
+                    [$mtType, $vlanId, $mtData] = array_map(trim(...), explode(',', $line));
+
+                    if ($mtType == 'N') { // type 'N' is for vlan name, skip from processing
+                        continue;
+                    }
+
+                    $ifIndex = $ifNames[$mtData] ?? 0;
+
+                    $ports->push(new PortVlan([
+                        'vlan' => $vlanId,
+                        'baseport' => $this->bridgePortFromIfIndex($ifIndex),
+                        'untagged' => ($mtType == 'U') ? 1 : 0,
+                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
+                    ]));
+                }
+            }
+        }
+
+        return $ports;
     }
 }

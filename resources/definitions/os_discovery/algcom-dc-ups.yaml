@@ -1,0 +1,187 @@
+modules:
+    sensors:
+        voltage:
+                data:
+                   -
+                     oid: ALGPOWER-v2-MIB::outputVoltage
+                     num_oid: '.1.3.6.1.4.1.49136.1.1.1.{{ $index }}'
+                     divisor: 10
+                     descr: 'DC Voltage'
+                     index: outputVoltage
+                   -
+                     oid: ALGPOWER-v2-MIB::batteryVoltage
+                     num_oid: '.1.3.6.1.4.1.49136.1.2.1.{{ $index }}'
+                     divisor: 10
+                     descr: 'Battery Voltage'
+                     index: batteryVoltage
+                   -
+                     oid: ALGPOWER-v2-MIB::supplyVoltage
+                     num_oid: '.1.3.6.1.4.1.49136.1.6.1.{{ $index }}'
+                     divisor: 10
+                     descr: 'AC Voltage (Optional)'
+                     index: supplyVoltage
+                   -
+                     oid: ALGPOWER-v2-MIB::btst-volt-i
+                     num_oid: '.1.3.6.1.4.1.49136.1.8.5.{{ $index }}'
+                     divisor: 10
+                     descr: 'Bat-test initial'
+                     index: btst-volt-i
+                   -
+                     oid: ALGPOWER-v2-MIB::btst-volt-f
+                     num_oid: '.1.3.6.1.4.1.49136.1.8.7.{{ $index }}'
+                     divisor: 10
+                     descr: 'Bat-test final'
+                     index: btst-volt-f
+        current:
+                data:
+                    -
+                      oid: ALGPOWER-v2-MIB::outputCurrent
+                      num_oid: '.1.3.6.1.4.1.49136.1.1.2.{{ $index }}'
+                      divisor: 1000
+                      descr: 'Total output current'
+                      index: outputCurrent
+                    -
+                      oid: ALGPOWER-v2-MIB::batteryCurrent
+                      num_oid: '.1.3.6.1.4.1.49136.1.2.2.{{ $index }}'
+                      divisor: 1000
+                      descr: 'Battery current'
+                      index: batteryCurrent
+                    -
+                      oid: ALGPOWER-v2-MIB::btst-amp-i
+                      num_oid: '.1.3.6.1.4.1.49136.1.8.6.{{ $index }}'
+                      divisor: 1000
+                      descr: 'Bat-test initial'
+                      index: btst-amp-i
+                    -
+                      oid: ALGPOWER-v2-MIB::btst-amp-f
+                      num_oid: '.1.3.6.1.4.1.49136.1.8.8.{{ $index }}'
+                      divisor: 1000
+                      descr: 'Bat-test final'
+                      index: btst-amp-f
+        temperature:
+                data:
+                    -
+                      oid: ALGPOWER-v2-MIB::innerTemperature
+                      num_oid: '.1.3.6.1.4.1.49136.1.4.1.{{ $index }}'
+                      multiplier: 1
+                      descr: 'Internal temperature'
+                      index: innerTemperature
+                    -
+                      oid: ALGPOWER-v2-MIB::outerTemperature
+                      num_oid: '.1.3.6.1.4.1.49136.1.4.2.{{ $index }}'
+                      multiplier: 1
+                      descr: 'External probe temperature'
+                      index: outerTemperature
+                    -
+                      oid: ALGPOWER-v2-MIB::heatSinkTemperature
+                      num_oid: '.1.3.6.1.4.1.49136.1.4.3.{{ $index }}'
+                      multiplier: 1
+                      descr: 'Heatsink temperature'
+                      index: heatSinkTemperature
+        state:
+                data:
+                    -
+                      oid: ALGPOWER-v2-MIB::chargerStatus
+                      value: ALGPOWER-v2-MIB::chargerStatus
+                      num_oid: '.1.3.6.1.4.1.49136.1.2.3.{{ $index }}'
+                      descr: 'Charger Status'
+                      index: chargerStatus
+                      state_name: chargerStatus
+                      states:
+                        - { graph: 1, value: 0, generic: 2, descr: BATTERY_DISCONNECTED }
+                        - { graph: 1, value: 1, generic: 2, descr: WRONG_BATTERY_VOLTAGE }
+                        - { graph: 1, value: 2, generic: 1, descr: DISCHARGING }
+                        - { graph: 1, value: 3, generic: 0, descr: CHARGING_BULK }
+                        - { graph: 1, value: 4, generic: 0, descr: CHARGING_ABSORPTION }
+                        - { graph: 1, value: 5, generic: 0, descr: CHARGING_FLOAT }
+                        - { graph: 1, value: 6, generic: 2, descr: CRITICAL_LOW_VOLTAGE }
+                        - { graph: 1, value: 7, generic: 0, descr: BATTERY_UNDER_TEST }
+                    -
+                      oid: ALGPOWER-v2-MIB::alarmOnBattery
+                      value: ALGPOWER-v2-MIB::alarmOnBattery
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.1.{{ $index }}'
+                      descr: 'Operation Mode'
+                      index: alarmOnBattery
+                      state_name: alarmOnBattery
+                      states:
+                        - { graph: 1, value: 0, generic: 0, descr: AC }
+                        - { graph: 1, value: 1, generic: 1, descr: BATTERY }
+                    -
+                      oid: ALGPOWER-v2-MIB::acFail
+                      value: ALGPOWER-v2-MIB::acFail
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.2.{{ $index }}'
+                      descr: 'AC Power'
+                      index: acFail
+                      state_name: acFail
+                      states:
+                        - { graph: 1, value: 0, generic: 0, descr: OK }
+                        - { graph: 1, value: 1, generic: 1, descr: FAIL }
+                    -
+                      oid: ALGPOWER-v2-MIB::batteryCharging
+                      value: ALGPOWER-v2-MIB::batteryCharging
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.3.{{ $index }}'
+                      descr: 'Charging'
+                      index: batteryCharging
+                      state_name: batteryCharging
+                      states:
+                        - { graph: 1, value: 0, generic: 0, descr: NO }
+                        - { graph: 1, value: 1, generic: 0, descr: YES }
+                    -
+                      oid: ALGPOWER-v2-MIB::batteryDischarging
+                      value: ALGPOWER-v2-MIB::batteryDischarging
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.4.{{ $index }}'
+                      descr: 'Discharging'
+                      index: batteryDischarging
+                      state_name: batteryDischarging
+                      states:
+                        - { graph: 1, value: 0, generic: 0, descr: NO }
+                        - { graph: 1, value: 1, generic: 0, descr: YES }
+                    -
+                      oid: ALGPOWER-v2-MIB::overheat
+                      value: ALGPOWER-v2-MIB::overheat
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.5.{{ $index }}'
+                      descr: 'Temperature Status'
+                      index: overheat
+                      state_name: overheat
+                      states:
+                        - { graph: 1, value: 0, generic: 0, descr: OK }
+                        - { graph: 1, value: 1, generic: 2, descr: OVERHEAT }
+                    -
+                      oid: ALGPOWER-v2-MIB::overload
+                      value: ALGPOWER-v2-MIB::overload
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.6.{{ $index }}'
+                      descr: 'Load Capacity'
+                      index: overload
+                      state_name: overload
+                      states:
+                        - { graph: 1, value: 0, generic: 0, descr: OK }
+                        - { graph: 1, value: 1, generic: 2, descr: OVERLOAD }
+                    -
+                      oid: ALGPOWER-v2-MIB::fanAfail
+                      value: ALGPOWER-v2-MIB::fanAfail
+                      state_name: fanAfail
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.7.{{ $index }}'
+                      descr: 'Fan A'
+                      index: fanAfail
+                      states:
+                        - { graph: 0, value: 0, generic: 0, descr: OK }
+                        - { graph: 0, value: 1, generic: 2, descr: FAIL }
+                    -
+                      oid: ALGPOWER-v2-MIB::fanBfail
+                      value: ALGPOWER-v2-MIB::fanBfail
+                      state_name: fanBfail
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.8.{{ $index }}'
+                      descr: 'Fan B'
+                      index: fanBfail
+                      states:
+                        - { graph: 0, value: 0, generic: 0, descr: OK }
+                        - { graph: 0, value: 1, generic: 2, descr: FAIL }
+        count:
+                data:
+                    -
+                      oid: ALGPOWER-v2-MIB::upTime
+                      value: ALGPOWER-v2-MIB::upTime
+                      num_oid: '.1.3.6.1.4.1.49136.1.3.11.{{ $index }}'
+                      descr: 'Horimeter'
+                      multiplier: 1
+                      index: upTime

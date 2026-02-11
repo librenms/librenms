@@ -13,20 +13,16 @@ $array = [
 ];
 
 $i = 0;
-if (Rrd::checkRrdExists($rrd_filename)) {
-    foreach ($array as $ds => $var) {
-        $rrd_list[$i]['filename'] = $rrd_filename;
-        if (is_array($var)) {
-            $rrd_list[$i]['descr'] = $var['descr'];
-        } else {
-            $rrd_list[$i]['descr'] = $var;
-        }
-
-        $rrd_list[$i]['ds'] = $ds;
-        $i++;
+foreach ($array as $ds => $var) {
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    if (is_array($var)) {
+        $rrd_list[$i]['descr'] = $var['descr'];
+    } else {
+        $rrd_list[$i]['descr'] = $var;
     }
-} else {
-    echo "file missing: $file";
+
+    $rrd_list[$i]['ds'] = $ds;
+    $i++;
 }
 
 $colours = 'mixed';

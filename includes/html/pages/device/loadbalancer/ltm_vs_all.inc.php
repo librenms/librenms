@@ -75,7 +75,7 @@
         $graph_array['height'] = '100';
         $graph_array['width'] = '215';
         $graph_array['legend'] = 'no';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['type'] = 'device_bigip_ltm_allvs_currconns';
         require 'includes/html/print-graphrow.inc.php';
         ?>
@@ -92,7 +92,7 @@
         $graph_array['height'] = '100';
         $graph_array['width'] = '215';
         $graph_array['legend'] = 'no';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['type'] = 'device_bigip_ltm_allvs_conns';
         require 'includes/html/print-graphrow.inc.php';
         ?>
@@ -110,7 +110,7 @@
         $graph_array['height'] = '100';
         $graph_array['width'] = '215';
         $graph_array['legend'] = 'no';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['type'] = 'device_bigip_ltm_allvs_bytesin';
         require 'includes/html/print-graphrow.inc.php';
         ?>
@@ -128,7 +128,7 @@
         $graph_array['height'] = '100';
         $graph_array['width'] = '215';
         $graph_array['legend'] = 'no';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['type'] = 'device_bigip_ltm_allvs_bytesout';
         require 'includes/html/print-graphrow.inc.php';
         ?>
@@ -146,7 +146,7 @@
         $graph_array['height'] = '100';
         $graph_array['width'] = '215';
         $graph_array['legend'] = 'no';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['type'] = 'device_bigip_ltm_allvs_pktsin';
         require 'includes/html/print-graphrow.inc.php';
         ?>
@@ -164,7 +164,7 @@
         $graph_array['height'] = '100';
         $graph_array['width'] = '215';
         $graph_array['legend'] = 'no';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['type'] = 'device_bigip_ltm_allvs_pktsout';
         require 'includes/html/print-graphrow.inc.php';
         ?>

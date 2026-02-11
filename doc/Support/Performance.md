@@ -32,7 +32,7 @@ performance to see what modules are consuming poller time. This data
 is shown per device under device > graphs > poller.
 
 Disable polling (and discovery) modules that you do not need. You can
-do this globally in `config.php` like:
+do this globally using `lnms config:set poller_module.<module>` like:
 
 Disable OSPF polling
 
@@ -52,8 +52,12 @@ where we poll a lot of ports or bgp sessions for instance and
 where snmpwalk or snmpbulkwalk is used. This needs to be enabled on a
 per device basis under edit device -> snmp -> Max repeaters.
 
-You can also set this globally with the config option
-`$config['snmp']['max_repeaters'] = X;`.
+You can also set this globally with the config option:
+
+!!! setting "poller/snmp"
+    ```bash
+    lnms config:set snmp.max_repeaters X
+    ```
 
 It's advisable to test the time taken to snmpwalk IF-MIB or something
 similar to work out what the best value is. To do this run the
@@ -61,23 +65,30 @@ following but replace -REPEATERS- with varying numbers from 10 upto
 around 50. You will also need to set the correct snmp version,
 hostname and community string:
 
-`time snmpbulkwalk -v2c -cpublic HOSTNAME -Cr-REPEATERS- -M
-/opt/librenms/mibs -m IF-MIB IfEntry`
+```bash
+time snmpbulkwalk -v2c -cpublic HOSTNAME -Cr-REPEATERS- -M /opt/librenms/mibs -m IF-MIB IfEntry
+```
 
-> NOTE: Do not go blindly setting this value as you can impact polling
-> negatively.
+!!! warning
+    Do not go blindly setting this value as you can impact polling
+    negatively.
 
 ## SNMP Max OIDs
 
-For sensors polling we now do bulk snmp gets to speed things up. By
+For sensors polling, we do bulk snmpgets to speed things up. By
 default this is ten but you can overwrite this per device under edit
 device -> snmp -> Max OIDs.
 
-You can also set this globally with the config option
-`$config['snmp']['max_oid'] = X;`.
+You can also set this globally with the config option:
 
-> NOTE: It is advisable to monitor sensor polling when you change this
-> to ensure you don't set the value too high.
+!!! setting "poller/snmp"
+    ```bash
+    lnms config:set snmp.max_oid X
+    ```
+
+!!! warning
+    It is advisable to monitor sensor polling when you change this
+    to ensure you don't set the value too high.
 
 ## fping tuning
 
@@ -112,51 +123,66 @@ quick the icmp packet is returned.
 ## Optimise poller-wrapper
 
 `poller-wrapper.py` defaults to using 16 threads, this isn't necessarily
-optimal. A general rule of thumb is 2 threads per core but we suggest 
-that you play around with lowering / increasing the number until you 
-get the optimal value. **Note** KEEP in MIND that this doesn't 
-always help, it depends on your system and CPU. So be careful. 
-This can be changed by going to the cron job for librenms. 
-Usually in `/etc/cron.d/librenms` and changing the "16"
+optimal. A general rule of thumb is 2 threads per core but we suggest
+that you play around with lowering / increasing the number until you
+get the optimal value.
+
+!!! note
+    KEEP in MIND that this doesn't always help, it depends on your system and
+    CPU. So be careful. This can be changed by going to the cron job for librenms.
+    Usually in `/etc/cron.d/librenms` and changing the "16"
 
 ```
 */5  *    * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
 ```
-Please also see [Dispatcher Service](../Extensions/Dispatcher-Service.md)
+
+If you use the Dispatch Service then you can adjust the number of threads
+within the WebUI. Please see [Dispatcher Service](../Extensions/Dispatcher-Service.md)
 
 ## Recursive DNS
 
-If your install uses hostnames for devices and you have quite a lot
+If your install uses hostnames for devices and you have quite a lot,
 then it's advisable to setup a local recursive dns instance on the
 LibreNMS server. Something like pdns-recursor can be used and then
 configure `/etc/resolv.conf` to use 127.0.0.1 for queries.
 
-## Per port polling - experimental
+## Per port polling
 
 By default the polling ports module will walk ifXEntry + some items
-from ifEntry regardless of the port. So if a port is marked as deleted
-because you don't want to see them or it's disabled then we still
-collect data. For the most part this is fine as the walks are quite
-quick. However for devices with a lot of ports and good % of those are
-either deleted or disabled then this approach isn't optimal. So to
-counter this you can enable 'selected port polling' per device within
-the edit device -> misc section or by globally enabling it (**not
-recommended**): `$config['polling']['selected_ports'] = true;`.  
-This is truly not recommended, as it has been proven to affect cpu
+from ifEntry regardless of the port status. So if a port is marked
+as deleted because you don't want to see them or it's disabled then
+we still collect data. For the most part this is fine as the walks
+are quite quick. However for devices with a lot of ports and good %
+of those are either deleted or disabled then this approach isn't
+optimal. So to counter this you can enable 'selected port polling'
+per device within the edit device -> misc section or by globally
+enabling it (**not recommended**):
+
+!!! setting "poller/ports"
+    ```bash
+    lnms config:set polling.selected_ports true
+    ```
+
+This is not recommended, as it has been proven to affect cpu
 usage of your poller negatively. You can also set it for a specific OS:
-`$config['os']['ios']['polling']['selected_ports'] = true;`.
 
-Running `./scripts/collect-port-polling.php` will poll your devices
-with both full and selective polling, display a table with the
-difference and optionally enable or disable selected ports polling for
-devices which would benefit from a change. Note that it doesn't
-continuously re-evaluate this, it will only be updated when the script
-is run. There are a number of options:
+!!! setting "poller/ports"
+    ```bash
+    lnms config:set os.ios.polling.selected_ports true
+    ```
 
-```
+Running `./scripts/collect-port-polling.php` as the `librenms` user
+will poll your devices with both full and selective polling,
+display a table with the difference and optionally enable or disable
+selected ports polling for devices which would benefit from a change.
+Note that it doesn't continuously re-evaluate this, it will only be
+updated when the script is run. There are a number of options:
+
+```bash
 -h <device id> | <device hostname wildcard>  Poll single device or wildcard hostname
 -e <percentage>                              Enable/disable selected ports polling for devices which would benefit <percentage> from a change
 ```
+
 If you want to run this script to have it set selected port polling
 on devices where a change of **10% or more is evaluated**, run it with
 `./scripts/collect-port-polling.php -e 10`. But note: it will not
@@ -185,9 +211,9 @@ Some distributions allow separate cli, mod_php and php-fpm configurations, we ca
 
 ### For web servers using mod_php and php-fpm
 
-Update your web PHP opcache.ini.  Possible locations: `/etc/php/8.1/fpm/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
+Update your web PHP opcache.ini.  Possible locations: `/etc/php/8.3/fpm/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
 
-```
+```ini
 zend_extension=opcache
 opcache.enable=1
 opcache.memory_consumption=256
@@ -200,9 +226,9 @@ If you are having caching issues, you can clear the opcache by simply restarting
 Create a cache directory that is writable by the librenms user first:
 `sudo mkdir -p /tmp/cache && sudo chmod 775 /tmp/cache && sudo chown -R librenms /tmp/cache`
 
-Update your PHP opcache.ini.  Possible locations: `/etc/php/8.1/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
+Update your PHP opcache.ini.  Possible locations: `/etc/php/8.3/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
 
-```
+```ini
 zend_extension=opcache.so
 opcache.enable=1
 opcache.enable_cli=1

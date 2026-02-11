@@ -1,0 +1,530 @@
+modules:
+    os:
+        version:
+            - TERACOM-TCW210-TH-MIB::version.0
+            - TERACOM-TCW220-MIB::version.0
+            - TERACOM-TCW241-MIB::version.0
+            - TERACOM-TCW242-MIB::version.0
+            - TERACOM-TCW260-MIB::version.0
+        version_regex: '/(.*)?-(?<version>.+)?/'
+        hardware:
+            - TERACOM-TCW210-TH-MIB::version.0
+            - TERACOM-TCW220-MIB::version.0
+            - TERACOM-TCW241-MIB::version.0
+            - TERACOM-TCW242-MIB::version.0
+            - TERACOM-TCW260-MIB::version.0
+        hardware_regex: '/(?<hardware>.+)-(.*)?/'
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - TERACOM-TCW241-MIB::voltage1description
+                        - TERACOM-TCW241-MIB::voltage1max
+                        - TERACOM-TCW241-MIB::voltage1min
+                        - TERACOM-TCW241-MIB::voltage2description
+                        - TERACOM-TCW241-MIB::voltage2max
+                        - TERACOM-TCW241-MIB::voltage2min
+                        - TERACOM-TCW241-MIB::voltage3description
+                        - TERACOM-TCW241-MIB::voltage3max
+                        - TERACOM-TCW241-MIB::voltage3min
+                        - TERACOM-TCW241-MIB::voltage4description
+                        - TERACOM-TCW241-MIB::voltage4max
+                        - TERACOM-TCW241-MIB::voltage4min
+                        - TERACOM-TCW241-MIB::digitalInput1description
+                        - TERACOM-TCW241-MIB::digitalInput2description
+                        - TERACOM-TCW241-MIB::digitalInput3description
+                        - TERACOM-TCW241-MIB::digitalInput4description
+                        - TERACOM-TCW241-MIB::relay1description
+                        - TERACOM-TCW241-MIB::relay2description
+                        - TERACOM-TCW241-MIB::relay3description
+                        - TERACOM-TCW241-MIB::relay4description
+                        - TERACOM-TCW241-MIB::voltage1Int
+                        - TERACOM-TCW241-MIB::voltage2Int
+                        - TERACOM-TCW241-MIB::voltage3Int
+                        - TERACOM-TCW241-MIB::voltage4Int
+                        - TERACOM-TCW241-MIB::s1description
+                        - TERACOM-TCW241-MIB::s2description
+                        - TERACOM-TCW241-MIB::s3description
+                        - TERACOM-TCW241-MIB::s4description
+                        - TERACOM-TCW241-MIB::s5description
+                        - TERACOM-TCW241-MIB::s6description
+                        - TERACOM-TCW241-MIB::s7description
+                        - TERACOM-TCW241-MIB::s8description
+                        - TERACOM-TCW241-MIB::s11Int
+                        - TERACOM-TCW241-MIB::s12Int
+                        - TERACOM-TCW241-MIB::s21Int
+                        - TERACOM-TCW241-MIB::s22Int
+                        - TERACOM-TCW241-MIB::s31Int
+                        - TERACOM-TCW241-MIB::s32Int
+                        - TERACOM-TCW241-MIB::s41Int
+                        - TERACOM-TCW241-MIB::s42Int
+                        - TERACOM-TCW241-MIB::s51Int
+                        - TERACOM-TCW241-MIB::s52Int
+                        - TERACOM-TCW241-MIB::s61Int
+                        - TERACOM-TCW241-MIB::s62Int
+                        - TERACOM-TCW241-MIB::s71Int
+                        - TERACOM-TCW241-MIB::s72Int
+                        - TERACOM-TCW241-MIB::s81Int
+                        - TERACOM-TCW241-MIB::s82Int
+        state:
+            data:
+                -
+                    oid: TERACOM-TCW241-MIB::hardwareErr
+                    value: TERACOM-TCW241-MIB::hardwareErr
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.8.{{ $index }}'
+                    descr: 'Hardware Error'
+                    index: '.hardwareErr0'
+                    state_name: hardwareErr
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: noErr }
+                        - { value: 1, generic: 1, graph: 0, descr: owErr }
+                        - { value: 2, generic: 2, graph: 0, descr: hwErr }
+                -
+                    oid: TERACOM-TCW241-MIB::s11Al
+                    value: TERACOM-TCW241-MIB::s11Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.1.4.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s1description
+                    group: 'Sensor Inputs'
+                    index: 's11Al.0'
+                    state_name: s11Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s11Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s12Al
+                    value: TERACOM-TCW241-MIB::s12Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.1.4.2.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s1description
+                    group: 'Sensor Inputs'
+                    index: 's12Al.0'
+                    state_name: s12Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s12Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s21Al
+                    value: TERACOM-TCW241-MIB::s21Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.2.4.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s2description
+                    group: 'Sensor Inputs'
+                    index: 's21Al.0'
+                    state_name: s21Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s21Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s22Al
+                    value: TERACOM-TCW241-MIB::s22Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.2.4.2.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s2description
+                    group: 'Sensor Inputs'
+                    index: 's22Al.0'
+                    state_name: s22Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s22Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s31Al
+                    value: TERACOM-TCW241-MIB::s31Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.3.4.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s3description
+                    group: 'Sensor Inputs'
+                    index: 's31Al.0'
+                    state_name: s31Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s31Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s32Al
+                    value: TERACOM-TCW241-MIB::s32Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.3.4.2.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s3description
+                    group: 'Sensor Inputs'
+                    index: 's32Al.0'
+                    state_name: s32Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s32Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s41Al
+                    value: TERACOM-TCW241-MIB::s41Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.4.4.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s4description
+                    group: 'Sensor Inputs'
+                    index: 's41Al.0'
+                    state_name: s41Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s41Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s42Al
+                    value: TERACOM-TCW241-MIB::s42Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.4.4.2.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s4description
+                    group: 'Sensor Inputs'
+                    index: 's42Al.0'
+                    state_name: s42Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s42Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s51Al
+                    value: TERACOM-TCW241-MIB::s51Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.5.4.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s5description
+                    group: 'Sensor Inputs'
+                    index: 's51Al.0'
+                    state_name: s51Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s51Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s52Al
+                    value: TERACOM-TCW241-MIB::s52Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.5.4.2.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s5description
+                    group: 'Sensor Inputs'
+                    index: 's52Al.0'
+                    state_name: s52Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s52Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s61Al
+                    value: TERACOM-TCW241-MIB::s61Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.6.4.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s6description
+                    group: 'Sensor Inputs'
+                    index: 's61Al.0'
+                    state_name: s61Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s61Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s62Al
+                    value: TERACOM-TCW241-MIB::s62Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.6.4.2.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s6description
+                    group: 'Sensor Inputs'
+                    index: 's62Al.0'
+                    state_name: s62Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s62Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s71Al
+                    value: TERACOM-TCW241-MIB::s71Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.7.4.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s7description
+                    group: 'Sensor Inputs'
+                    index: 's71Al.0'
+                    state_name: s71Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s71Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s72Al
+                    value: TERACOM-TCW241-MIB::s72Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.7.4.2.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s7description
+                    group: 'Sensor Inputs'
+                    index: 's72Al.0'
+                    state_name: s72Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s72Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s81Al
+                    value: TERACOM-TCW241-MIB::s81Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.8.4.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s8description
+                    group: 'Sensor Inputs'
+                    index: 's81Al.0'
+                    state_name: s81Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s81Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::s82Al
+                    value: TERACOM-TCW241-MIB::s82Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.1.8.4.2.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::s8description
+                    group: 'Sensor Inputs'
+                    index: 's82Al.0'
+                    state_name: s82Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::s82Int
+                            op: '<'
+                            value: 0
+                -
+                    oid: TERACOM-TCW241-MIB::volt1Al
+                    value: TERACOM-TCW241-MIB::volt1Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.2.5.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::voltage1description
+                    group: 'Analog Inputs'
+                    index: 'volt1Al.0'
+                    state_name: volt1Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::voltage1Int
+                            op: '<='
+                            value: '100'
+                -
+                    oid: TERACOM-TCW241-MIB::volt2Al
+                    value: TERACOM-TCW241-MIB::volt2Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.2.5.2.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::voltage2description
+                    group: 'Analog Inputs'
+                    index: 'volt2Al.0'
+                    state_name: volt2Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::voltage2Int
+                            op: '<='
+                            value: '100'
+                -
+                    oid: TERACOM-TCW241-MIB::volt3Al
+                    value: TERACOM-TCW241-MIB::volt3Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.2.5.3.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::voltage3description
+                    group: 'Analog Inputs'
+                    index: 'volt3Al.0'
+                    state_name: volt3Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::voltage3Int
+                            op: '<='
+                            value: '100'
+                -
+                    oid: TERACOM-TCW241-MIB::volt4Al
+                    value: TERACOM-TCW241-MIB::volt4Al
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.2.5.4.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::voltage4description
+                    group: 'Analog Inputs'
+                    index: 'volt4Al.0'
+                    state_name: volt4Al
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: normal }
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                    skip_values:
+                        -
+                            oid: TERACOM-TCW241-MIB::voltage4Int
+                            op: '<='
+                            value: '100'
+                -
+                    oid: TERACOM-TCW241-MIB::digitalInput1State
+                    value: TERACOM-TCW241-MIB::digitalInput1State
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.3.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::digitalInput1description
+                    group: 'Digital Inputs'
+                    index: 'digitalInput1State.0'
+                    state_name: digitalInput1State
+                    states:
+                        - { value: 0, generic: 1, graph: 0, descr: closed }
+                        - { value: 1, generic: 0, graph: 0, descr: open }
+                -
+                    oid: TERACOM-TCW241-MIB::digitalInput2State
+                    value: TERACOM-TCW241-MIB::digitalInput2State
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.3.2.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::digitalInput2description
+                    group: 'Digital Inputs'
+                    index: 'digitalInput2State.0'
+                    state_name: digitalInput2State
+                    states:
+                        - { value: 0, generic: 1, graph: 0, descr: closed }
+                        - { value: 1, generic: 0, graph: 0, descr: open }
+                -
+                    oid: TERACOM-TCW241-MIB::digitalInput3State
+                    value: TERACOM-TCW241-MIB::digitalInput3State
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.3.3.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::digitalInput3description
+                    group: 'Digital Inputs'
+                    index: 'digitalInput3State.0'
+                    state_name: digitalInput3State
+                    states:
+                        - { value: 0, generic: 1, graph: 0, descr: closed }
+                        - { value: 1, generic: 0, graph: 0, descr: open }
+                -
+                    oid: TERACOM-TCW241-MIB::digitalInput4State
+                    value: TERACOM-TCW241-MIB::digitalInput4State
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.3.4.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::digitalInput4description
+                    group: 'Digital Inputs'
+                    index: 'digitalInput4State.0'
+                    state_name: digitalInput4State
+                    states:
+                        - { value: 0, generic: 1, graph: 0, descr: closed }
+                        - { value: 1, generic: 0, graph: 0, descr: open }
+                -
+                    oid: TERACOM-TCW241-MIB::relay1State
+                    value: TERACOM-TCW241-MIB::relay1State
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.4.1.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::relay1description
+                    group: 'Relays'
+                    index: 'relay1State.0'
+                    state_name: relay1State
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: off }
+                        - { value: 1, generic: 0, graph: 0, descr: on }
+                -
+                    oid: TERACOM-TCW241-MIB::relay2State
+                    value: TERACOM-TCW241-MIB::relay2State
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.4.2.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::relay2description
+                    group: 'Relays'
+                    index: 'relay2State.0'
+                    state_name: relay2State
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: off }
+                        - { value: 1, generic: 0, graph: 0, descr: on }
+                -
+                    oid: TERACOM-TCW241-MIB::relay3State
+                    value: TERACOM-TCW241-MIB::relay3State
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.4.3.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::relay3description
+                    group: 'Relays'
+                    index: 'relay3State.0'
+                    state_name: relay3State
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: off }
+                        - { value: 1, generic: 0, graph: 0, descr: on }
+                -
+                    oid: TERACOM-TCW241-MIB::relay4State
+                    value: TERACOM-TCW241-MIB::relay4State
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.4.4.1.{{ $index }}'
+                    descr: TERACOM-TCW241-MIB::relay4description
+                    group: 'Relays'
+                    index: 'relay4State.0'
+                    state_name: relay4State
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: off }
+                        - { value: 1, generic: 0, graph: 0, descr: on }
+        voltage:
+            options:
+                skip_value_lt: 100
+            data:
+                -
+                    oid: TERACOM-TCW241-MIB::voltage1Int
+                    value: TERACOM-TCW241-MIB::voltage1Int
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.2.1.{{ $index }}'
+                    divisor: 1000
+                    descr: TERACOM-TCW241-MIB::voltage1description
+                    index: 'voltage1Int.0'
+                    high_limit: TERACOM-TCW241-MIB::voltage1max
+                    low_limit: TERACOM-TCW241-MIB::voltage1min
+                -
+                    oid: TERACOM-TCW241-MIB::voltage2Int
+                    value: TERACOM-TCW241-MIB::voltage2Int
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.2.2.{{ $index }}'
+                    divisor: 1000
+                    descr: TERACOM-TCW241-MIB::voltage2description
+                    index: 'voltage2Int.0'
+                    high_limit: TERACOM-TCW241-MIB::voltage2max
+                    low_limit: TERACOM-TCW241-MIB::voltage2min
+                -
+                    oid: TERACOM-TCW241-MIB::voltage3Int
+                    value: TERACOM-TCW241-MIB::voltage3Int
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.2.3.{{ $index }}'
+                    divisor: 1000
+                    descr: TERACOM-TCW241-MIB::voltage3description
+                    index: 'voltage3Int.0'
+                    high_limit: TERACOM-TCW241-MIB::voltage3max
+                    low_limit: TERACOM-TCW241-MIB::voltage3min
+                -
+                    oid: TERACOM-TCW241-MIB::voltage4Int
+                    value: TERACOM-TCW241-MIB::voltage4Int
+                    num_oid: '.1.3.6.1.4.1.38783.3.3.2.4.{{ $index }}'
+                    divisor: 1000
+                    descr: TERACOM-TCW241-MIB::voltage4description
+                    index: 'voltage4Int.0'
+                    high_limit: TERACOM-TCW241-MIB::voltage4max
+                    low_limit: TERACOM-TCW241-MIB::voltage4min

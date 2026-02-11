@@ -12570,7 +12570,7 @@
                     "designatedRoot": "8c85c162c740",
                     "designatedCost": 0,
                     "designatedBridge": "8c85c162c740",
-                    "designatedPort": 12,
+                    "designatedPort": 0,
                     "forwardTransitions": 4222451713,
                     "ifIndex": 815
                 },
@@ -14210,6 +14210,44 @@
                     "ifAlias": "uplink",
                     "ifDescr": "1/1/52",
                     "ifName": "1/1/52"
+                }
+            ]
+        }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 196608,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 9
+                },
+                {
+                    "hrDeviceIndex": 196609,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 10
+                },
+                {
+                    "hrDeviceIndex": 196610,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 9
+                },
+                {
+                    "hrDeviceIndex": 196611,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 9
                 }
             ]
         }

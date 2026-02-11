@@ -10,10 +10,8 @@ function printEntPhysical($device, $ent, $level, $class)
     foreach ($ents as $ent) {
         //Let's find if we have any sensors attached to the current entity;
         //We hit this code for every type of entity because not all vendors have 1 'sensor' entity per sensor
-        $sensors = DeviceCache::getPrimary()->sensors()->where(function (Builder $query) use ($ent) {
-            return $query->where('entPhysicalIndex', $ent['entPhysicalIndex'])
-                ->orWhere('sensor_index', $ent['entPhysicalIndex']);
-        })->get();
+        $sensors = DeviceCache::getPrimary()->sensors()->where(fn (Builder $query) => $query->where('entPhysicalIndex', $ent['entPhysicalIndex'])
+            ->orWhere('sensor_index', $ent['entPhysicalIndex']))->get();
         echo "
  <li class='$class'>";
 
@@ -41,9 +39,8 @@ function printEntPhysical($device, $ent, $level, $class)
 
         $display_entPhysicalName = $ent['entPhysicalName'];
         if ($ent['ifIndex']) {
-            $interface = get_port_by_ifIndex($device['device_id'], $ent['ifIndex']);
-            $interface = cleanPort($interface);
-            $display_entPhysicalName = generate_port_link($interface);
+            $port = PortCache::getByIfIndex($ent['ifIndex'], $device['device_id']);
+            $display_entPhysicalName = \LibreNMS\Util\Url::portLink($port);
         }
 
         if ($ent['entPhysicalModelName'] && $display_entPhysicalName) {

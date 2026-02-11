@@ -237,8 +237,8 @@
                     "ifName": "lo",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -337,8 +337,8 @@
                     "ifName": "eth0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -549,5 +549,25 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.2.255.254",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.2.255.248/29",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                }
+            ]
+        }
     }
 }

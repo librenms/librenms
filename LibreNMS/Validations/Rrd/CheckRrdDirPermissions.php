@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Validations\Rrd;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\ValidationResult;
 
@@ -37,12 +37,12 @@ class CheckRrdDirPermissions implements Validation
      */
     public function validate(): ValidationResult
     {
-        $rrd_dir = Config::get('rrd_dir');
+        $rrd_dir = LibrenmsConfig::get('rrd_dir');
 
         $dir_stat = stat($rrd_dir);
         if ($dir_stat[4] == 0 || $dir_stat[5] == 0) {
             return ValidationResult::warn(trans('validation.validations.rrd.CheckRrdDirPermissions.fail_root'),
-                sprintf('chown %s:%s %s', Config::get('user'), Config::get('group'), $rrd_dir)
+                sprintf('chown %s:%s %s', LibrenmsConfig::get('user'), LibrenmsConfig::get('group'), $rrd_dir)
             );
         }
 
@@ -58,6 +58,6 @@ class CheckRrdDirPermissions implements Validation
      */
     public function enabled(): bool
     {
-        return ! Config::get('rrdcached');
+        return ! LibrenmsConfig::get('rrdcached');
     }
 }

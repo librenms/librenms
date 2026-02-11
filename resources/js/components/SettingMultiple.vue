@@ -25,6 +25,7 @@
 <template>
     <div>
         <multiselect
+        class="form-control"
             @input="$emit('input', mutateInputEvent($event))"
             :value="formattedValue"
             :required="required"

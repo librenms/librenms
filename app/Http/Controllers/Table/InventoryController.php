@@ -29,10 +29,12 @@ namespace App\Http\Controllers\Table;
 use App\Models\EntPhysical;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Blade;
+use LibreNMS\Util\Url;
 
 class InventoryController extends TableController
 {
+    protected $model = EntPhysical::class;
+
     public function rules()
     {
         return [
@@ -73,9 +75,9 @@ class InventoryController extends TableController
             ->select(['entPhysical_id', 'device_id', 'entPhysicalDescr', 'entPhysicalName', 'entPhysicalModelName', 'entPhysicalSerialNum']);
 
         // apply specific field filters
-        $this->search($request->get('descr'), $query, ['entPhysicalDescr']);
-        $this->search($request->get('model'), $query, ['entPhysicalModelName']);
-        $this->search($request->get('serial'), $query, ['entPhysicalSerialNum']);
+        $this->search($request->input('descr'), $query, ['entPhysicalDescr']);
+        $this->search($request->input('model'), $query, ['entPhysicalModelName']);
+        $this->search($request->input('serial'), $query, ['entPhysicalSerialNum']);
 
         return $query;
     }
@@ -87,11 +89,44 @@ class InventoryController extends TableController
     public function formatItem($entPhysical)
     {
         return [
-            'device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $entPhysical->device]),
-            'descr' => htmlspecialchars($entPhysical->entPhysicalDescr),
-            'name' => htmlspecialchars($entPhysical->entPhysicalName),
-            'model' => htmlspecialchars($entPhysical->entPhysicalModelName),
-            'serial' => htmlspecialchars($entPhysical->entPhysicalSerialNum),
+            'device' => Url::modernDeviceLink($entPhysical->device),
+            'descr' => htmlspecialchars((string) $entPhysical->entPhysicalDescr),
+            'name' => htmlspecialchars((string) $entPhysical->entPhysicalName),
+            'model' => htmlspecialchars((string) $entPhysical->entPhysicalModelName),
+            'serial' => htmlspecialchars((string) $entPhysical->entPhysicalSerialNum),
+        ];
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device',
+            'Description',
+            'Name',
+            'Model',
+            'Serial Number',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  EntPhysical  $entPhysical
+     * @return array
+     */
+    protected function formatExportRow($entPhysical)
+    {
+        return [
+            $entPhysical->device ? $entPhysical->device->displayName() : '',
+            $entPhysical->entPhysicalDescr,
+            $entPhysical->entPhysicalName,
+            $entPhysical->entPhysicalModelName,
+            $entPhysical->entPhysicalSerialNum,
         ];
     }
 }

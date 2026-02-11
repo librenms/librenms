@@ -6,13 +6,9 @@ $descr = 'Ver1 Mal SRE Hdr';
 $ds = 'data';
 
 if (isset($vars['sinstance'])) {
-    $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__gre__version1_malformed_sre_hdr']);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___decoder__event__gre__version1_malformed_sre_hdr']);
 } else {
-    $filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__gre__version1_malformed_sre_hdr']);
-}
-
-if (Rrd::checkRrdExists($filename)) {
-    d_echo('RRD "' . $filename . '" not found');
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___decoder__event__gre__version1_malformed_sre_hdr']);
 }
 
 require 'includes/html/graphs/generic_stats.inc.php';

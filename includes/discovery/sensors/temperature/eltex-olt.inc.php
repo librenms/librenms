@@ -25,7 +25,7 @@
  */
 $tmp_eltex = snmp_get_multi_oid($device, 'ltp8xSensor1Temperature.0 ltp8xSensor2Temperature.0 ltp8xSensor1TemperatureExt.0 ltp8xSensor2TemperatureExt.0', '-OUQn', 'ELTEX-LTP8X-STANDALONE');
 
-if (is_numeric($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.10.0'])) {
+if (isset($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.10.0']) && is_numeric($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.10.0'])) {
     $oid = '.1.3.6.1.4.1.35265.1.22.1.10.10.0';
     $index = 'ltp8xSensor1Temperature';
     $type = 'eltex-olt';
@@ -35,7 +35,7 @@ if (is_numeric($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.10.0'])) {
     discover_sensor(null, 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
-if (is_numeric($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.11.0'])) {
+if (isset($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.11.0']) && is_numeric($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.11.0'])) {
     $oid = '.1.3.6.1.4.1.35265.1.22.1.10.11.0';
     $index = 'ltp8xSensor2Temperature';
     $type = 'eltex-olt';
@@ -45,7 +45,7 @@ if (is_numeric($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.11.0'])) {
     discover_sensor(null, 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
-if (is_numeric($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.12.0']) && $tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.12.0'] != 65535) {
+if (isset($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.12.0']) && is_numeric($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.12.0']) && $tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.12.0'] != 65535) {
     $oid = '.1.3.6.1.4.1.35265.1.22.1.10.12.0';
     $index = 'ltp8xSensor1TemperatureExt';
     $type = 'eltex-olt';
@@ -55,7 +55,7 @@ if (is_numeric($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.12.0']) && $tmp_eltex['.
     discover_sensor(null, 'temperature', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
-if (is_numeric($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.13.0']) && $tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.13.0'] != 65535) {
+if (isset($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.13.0']) && is_numeric($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.13.0']) && $tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.13.0'] != 65535) {
     $oid = '.1.3.6.1.4.1.35265.1.22.1.10.13.0';
     $index = 'ltp8xSensor2TemperatureExt';
     $type = 'eltex-olt';

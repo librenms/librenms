@@ -26,11 +26,11 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Mempool;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Config;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
@@ -39,7 +39,7 @@ class MempoolsController extends TableController
 {
     protected function searchFields($request)
     {
-        return ['hostname', 'mempool_descr'];
+        return ['hostname', 'display', 'mempool_descr'];
     }
 
     protected function sortFields($request)
@@ -52,7 +52,7 @@ class MempoolsController extends TableController
      */
     protected function baseQuery($request)
     {
-        if ($request->get('view') == 'graphs') {
+        if ($request->input('view') == 'graphs') {
             return Device::hasAccess($request->user())->has('mempools')->with('mempools');
         }
 
@@ -60,7 +60,7 @@ class MempoolsController extends TableController
             ->with(['device', 'device.location']);
 
         // join devices table to sort by hostname or search
-        if (array_key_exists('hostname', $request->get('sort', $this->default_sort)) || $request->get('searchPhrase')) {
+        if (array_key_exists('hostname', $request->input('sort', $this->default_sort)) || $request->input('searchPhrase')) {
             $query->join('devices', 'mempools.device_id', 'devices.device_id')
                 ->select('mempools.*');
         }
@@ -106,7 +106,7 @@ class MempoolsController extends TableController
         $graph = [
             'type' => 'mempool_usage',
             'id' => $mempool->mempool_id,
-            'from' => Config::get('time.day'),
+            'from' => LibrenmsConfig::get('time.day'),
             'height' => 20,
             'width' => 80,
         ];
@@ -121,7 +121,7 @@ class MempoolsController extends TableController
         $graph = [
             'type' => 'mempool_usage',
             'id' => $mempool->mempool_id,
-            'from' => Config::get('time.day'),
+            'from' => LibrenmsConfig::get('time.day'),
             'height' => 150,
             'width' => 400,
         ];
@@ -131,9 +131,50 @@ class MempoolsController extends TableController
         $used = $is_percent ? $mempool->mempool_used : Number::formatBi($mempool->mempool_used);
         $total = $is_percent ? $mempool->mempool_total : Number::formatBi($mempool->mempool_total);
 
-        $percent = Html::percentageBar(400, 20, $mempool->mempool_perc, "$used / $total", $free, $mempool->mempool_perc_warn);
+        $percent = Html::percentageBar(400, 10, $mempool->mempool_perc, "$used / $total", $total !== $free ? $free : $free, $mempool->mempool_perc_warn);
         $link = Url::generate(['page' => 'graphs'], Arr::only($graph, ['id', 'type', 'from']));
 
         return Url::overlibLink($link, $percent, Url::graphTag($graph));
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device ID',
+            'Hostname',
+            'Description',
+            'Used',
+            'Free',
+            'Total',
+            'Percentage',
+            'Warning Threshold',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Mempool  $mempool
+     * @return array
+     */
+    protected function formatExportRow($mempool)
+    {
+        $is_percent = $mempool->mempool_total == 100;
+
+        return [
+            'device_id' => $mempool->device_id,
+            'hostname' => $mempool->device->displayName(),
+            'description' => $mempool->mempool_descr,
+            'used' => $is_percent ? $mempool->mempool_used : Number::formatBi($mempool->mempool_used),
+            'free' => $is_percent ? $mempool->mempool_free : Number::formatBi($mempool->mempool_free),
+            'total' => $is_percent ? $mempool->mempool_total : Number::formatBi($mempool->mempool_total),
+            'percentage' => $mempool->mempool_perc . '%',
+            'warning_threshold' => $mempool->mempool_perc_warn ?? '-',
+        ];
     }
 }

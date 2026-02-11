@@ -28,7 +28,7 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\DB\Schema;
 
-class SchemaTest extends TestCase
+final class SchemaTest extends TestCase
 {
     private $mock_schema = [
         'bills' => [

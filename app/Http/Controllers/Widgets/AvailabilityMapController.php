@@ -26,34 +26,36 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\AlertSchedule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use LibreNMS\Config;
+use Illuminate\View\View;
 use LibreNMS\Util\Url;
 
 class AvailabilityMapController extends WidgetController
 {
-    protected $title = 'Availability Map';
+    protected string $name = 'availability-map';
 
     public function __construct()
     {
         $this->defaults = [
             'title' => null,
-            'type' => (int) Config::get('webui.availability_map_compact', 0),
+            'type' => (int) LibrenmsConfig::get('webui.availability_map_compact', 0),
             'tile_size' => 12,
             'color_only_select' => 0,
             'show_disabled_and_ignored' => 0,
+            'show_totals' => 1,
             'mode_select' => 0,
-            'order_by' => Config::get('webui.availability_map_sort_status') ? 'status' : 'display-name',
+            'order_by' => LibrenmsConfig::get('webui.availability_map_sort_status') ? 'status' : 'display-name',
             'device_group' => null,
         ];
     }
 
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $data = $this->getSettings();
 
@@ -66,11 +68,6 @@ class AvailabilityMapController extends WidgetController
         $data['services_totals'] = $services_totals;
 
         return view('widgets.availability-map', $data);
-    }
-
-    public function getSettingsView(Request $request)
-    {
-        return view('widgets.settings.availability-map', $this->getSettings(true));
     }
 
     private function getDevices(): array
@@ -94,7 +91,7 @@ class AvailabilityMapController extends WidgetController
         $devices = $device_query->select(['devices.device_id', 'hostname', 'sysName', 'display', 'status', 'uptime', 'last_polled', 'disabled', 'ignore', 'ignore_status'])->get();
 
         // process status
-        $uptime_warn = (int) Config::get('uptime_warning', 86400);
+        $uptime_warn = (int) LibrenmsConfig::get('uptime_warning', 86400);
         $check_maintenance = AlertSchedule::isActive()->exists(); // check if any maintenance schedule is active
         // TODO: take a deeper look, why key ignored still has to exist
         $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'ignored-up' => 0, 'ignored-down' => 0, 'disabled' => 0];
@@ -144,7 +141,7 @@ class AvailabilityMapController extends WidgetController
         }
 
         $services = $services_query->with([
-            'device' => function ($query) {
+            'device' => function ($query): void {
                 $query->select(['devices.device_id', 'hostname', 'sysName', 'display']);
             },
         ])->select(['service_id', 'services.device_id', 'service_type', 'service_name', 'service_desc', 'service_status'])->get();
@@ -164,7 +161,7 @@ class AvailabilityMapController extends WidgetController
                 'status' => $service->service_status,
                 'link' => Url::deviceUrl($service->device),
                 'tooltip' => $this->getServiceTooltip($service),
-                'label' => $this->getServiceLabel($service, $state_name),
+                'label' => $this->getServiceLabel($service),
                 'labelClass' => $class,
             ];
         }
@@ -176,47 +173,36 @@ class AvailabilityMapController extends WidgetController
 
     private function sort(array &$data): void
     {
-        switch ($this->getSettings()['order_by']) {
-            case 'status':
-                usort($data, function ($l, $r) {
-                    return ($l['status'] <=> $r['status']) ?: strcasecmp($l['label'], $r['label']);
-                });
-                break;
-            case 'label':
-                usort($data, function ($l, $r) {
-                    return strcasecmp($l['label'], $r['label']);
-                });
-                break;
-            default: // device display name (tooltip starts with the display name)
-                usort($data, function ($l, $r) {
-                    return strcasecmp($l['tooltip'], $r['tooltip']) ?: strcasecmp($l['label'], $r['label']);
-                });
-        }
+        match ($this->getSettings()['order_by']) {
+            'status' => usort($data, fn ($l, $r) => ($l['status'] <=> $r['status']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
+            'label' => usort($data, fn ($l, $r) => strcasecmp((string) $l['label'], (string) $r['label'])),
+            // device display name (tooltip starts with the display name)
+            default => usort($data, fn ($l, $r) => strcasecmp((string) $l['tooltip'], (string) $r['tooltip']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
+        };
     }
 
     private function getDeviceLabel(Device $device, string $state_name): string
     {
-        switch ($this->getSettings()['color_only_select']) {
-            case 1:
-                return '';
-            case 4:
-                return $device->shortDisplayName();
-            case 2:
-                return strtolower($device->hostname);
-            case 3:
-                return strtolower($device->sysName);
-            default:
-                return __($state_name);
-        }
+        $choice = (int) ($this->getSettings()['color_only_select'] ?? 0);
+
+        return match ($choice) {
+            1 => '',
+            4 => $device->shortDisplayName(),
+            2 => strtolower($device->hostname),
+            3 => strtolower($device->sysName),
+            default => __($state_name),
+        };
     }
 
-    private function getServiceLabel(Service $service, string $state_name): string
+    private function getServiceLabel(Service $service): string
     {
-        if ($this->getSettings()['color_only_select'] == 1) {
+        $choice = (int) ($this->getSettings()['color_only_select'] ?? 0);
+
+        if ($choice == 1) {
             return '';
         }
 
-        return $service->service_type . ' - ' . __($state_name);
+        return empty($service->service_name) ? $service->service_type : $service->service_name;
     }
 
     private function getDeviceTooltip(Device $device, string $state_name): string

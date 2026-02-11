@@ -7946,14 +7946,14 @@
                     "vlan_domain": 1,
                     "vlan_name": "vlan1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4094,
                     "vlan_domain": 1,
                     "vlan_name": "vlan4094",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -9134,6 +9134,19 @@
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 48
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "100.67.221.13",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "100.67.221.0/24",
+                    "ifIndex": 10
                 }
             ]
         }

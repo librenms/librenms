@@ -5537,8 +5537,8 @@
                     "ifName": "Console45",
                     "portName": null,
                     "ifIndex": 45,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -5637,8 +5637,8 @@
                     "ifName": "VLAN1",
                     "portName": null,
                     "ifIndex": 1001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -5737,8 +5737,8 @@
                     "ifName": "VLAN4093",
                     "portName": null,
                     "ifIndex": 5093,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -5838,14 +5838,14 @@
                     "vlan_domain": 1,
                     "vlan_name": "DefaultVlan",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4093,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 4093",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -6981,5 +6981,18 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "172.12.5.14",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "172.12.5.12/30",
+                    "ifIndex": 1001
+                }
+            ]
+        }
     }
 }

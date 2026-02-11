@@ -6703,7 +6703,7 @@
                     "vlan_domain": 1,
                     "vlan_name": "Default VLAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ]
         }
@@ -8651,6 +8651,33 @@
                     "high_ifIndex": 2147410305,
                     "low_ifIndex": 2147426433,
                     "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.0.0.1",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.0.0.0/30",
+                    "ifIndex": 2147442816
+                },
+                {
+                    "ipv4_address": "10.4.47.65",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.4.47.64/29",
+                    "ifIndex": 2147434624
+                },
+                {
+                    "ipv4_address": "10.4.49.66",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 2147426433
                 }
             ]
         }

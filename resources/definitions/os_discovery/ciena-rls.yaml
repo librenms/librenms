@@ -1,0 +1,127 @@
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>.+)/'
+        version: CIENA-PRO-SOFTWARE-MIB::cienaProSoftwareRunningVersion.0
+
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - CIENA-6500R-INVENTORY-MIB::rlsCircuitPackCtype
+        temperature:
+            data:
+                -
+                    oid: CIENA-6500R-INVENTORY-MIB::rlsCircuitPackCurrTemprature
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.1.1.1.29.{{ $index }}'
+                    index: 'rlsCircuitPackCurrTemprature.{{ $index }}'
+                    descr: '{{ CIENA-6500R-INVENTORY-MIB::rlsCircuitPackCtype }} Slot {{ $index_string }}'
+        state:
+            data:
+                -
+                    oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
+                    value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsAmpMode
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.3.{{ $index }}'
+                    index: 'rlsInventoryAmpsAmpMode.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} {{ $index_string:nns }}'
+                    group: 'Amplifier Mode'
+                    state_name: rlsInventoryAmpsAmpMode
+                    states:
+                        - { descr: Power, graph: 0, value: 1, generic: 0 }
+                        - { descr: Gain, graph: 0, value: 2, generic: 0 }
+                        - { descr: GainClamp, graph: 0, value: 3, generic: 0 }
+                -
+                    oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
+                    value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsState
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.4.{{ $index }}'
+                    index: 'rlsInventoryAmpsState.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} {{ $index_string:nns }}'
+                    group: 'Amplifier State'
+                    state_name: rlsInventoryAmpsState
+                    states:
+                        - { descr: Unknown, graph: 0, value: 0, generic: 3 }
+                        - { descr: Off, graph: 0, value: 1, generic: 1 }
+                        - { descr: APR, graph: 0, value: 2, generic: 1 }
+                        - { descr: Normal, graph: 0, value: 3, generic: 0 }
+                        - { descr: Clamped, graph: 0, value: 4, generic: 0 }
+                -
+                    oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
+                    value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsGainMode
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.5.{{ $index }}'
+                    index: 'rlsInventoryAmpsGainMode.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} {{ $index_string:nns }}'
+                    group: 'Amplifier Gain Mode'
+                    state_name: rlsInventoryAmpsGainMode
+                    states:
+                        - { descr: Low, graph: 0, value: 1, generic: 0 }
+                        - { descr: High, graph: 0, value: 2, generic: 0 }
+                -
+                    oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
+                    value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsForcedShutdown
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.6.{{ $index }}'
+                    index: 'rlsInventoryAmpsForcedShutdown.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} {{ $index_string:nns }}'
+                    group: 'Amplifier Forced Shutdown State'
+                    state_name: rlsInventoryAmpsForcedShutdown
+                    states:
+                        - { descr: Disabled, graph: 0, value: 1, generic: 0 }
+                        - { descr: Enabled, graph: 0, value: 2, generic: 1 }
+        dbm:
+            data:
+                -
+                    oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
+                    value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsInCurrPower
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.48.{{ $index }}'
+                    index: 'rlsInventoryAmpsInCurrPower.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} {{ $index_string:nns }}'
+                    group: 'Amplifier Input - Current'
+                    low_limit: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsInputLosThreshold
+                -
+                    oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
+                    value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsInMinPower
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.49.{{ $index }}'
+                    index: 'rlsInventoryAmpsInMinPower.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} {{ $index_string:nns }}'
+                    group: 'Amplifier Input - Minimum'
+                -
+                    oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
+                    value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsInMaxPower
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.50.{{ $index }}'
+                    index: 'rlsInventoryAmpsInMaxPower.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} {{ $index_string:nns }}'
+                    group: 'Amplifier Input - Maximum'
+                -
+                    oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
+                    value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsOutCurrPower
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.51.{{ $index }}'
+                    index: 'rlsInventoryAmpsOutCurrPower.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} {{ $index_string:nns }}'
+                    group: 'Amplifier Output - Current'
+                -
+                    oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
+                    value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsOutMinPower
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.52.{{ $index }}'
+                    index: 'rlsInventoryAmpsOutMinPower.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} {{ $index_string:nns }}'
+                    group: 'Amplifier Output - Minimum'
+                -
+                    oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
+                    value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsOutMaxPower
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.53.{{ $index }}'
+                    index: 'rlsInventoryAmpsOutMaxPower.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} {{ $index_string:nns }}'
+                    group: 'Amplifier Output - Maximum'
+                -
+                    oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
+                    value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsOpticalReturnLoss
+                    num_oid: '.1.3.6.1.4.1.1271.4.1.1.1.2.1.1.1.54.{{ $index }}'
+                    index: 'rlsInventoryAmpsOpticalReturnLoss.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} {{ $index_string:nns }}'
+                    group: 'Amplifier Optical Return Loss'
+                    low_warn_limit: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsOrlThreshold
+                    low_limit: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsAprThreshold
+                    skip_values:
+                        -
+                            oid: index
+                            op: 'contains'
+                            value: '7.80.114.101.45.65.109.112' # Pre-Amp

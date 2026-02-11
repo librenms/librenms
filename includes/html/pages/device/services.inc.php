@@ -24,10 +24,6 @@ $services = service_get($device['device_id']);
 require_once 'includes/html/modal/new_service.inc.php';
 require_once 'includes/html/modal/delete_service.inc.php';
 
-if (! $vars['view']) {
-    $vars['view'] = 'basic';
-}
-
 $menu_options = [
     'basic' => 'Basic',
     'details' => 'Details',
@@ -79,7 +75,7 @@ if (count($services) > '0') {
     echo '</thead>';
 
     foreach ($services as $service) {
-        $service['service_ds'] = htmlspecialchars_decode($service['service_ds']);
+        $service['service_ds'] = htmlspecialchars_decode((string) $service['service_ds']);
         if ($service['service_status'] == '2') {
             $status_label = 'label-danger';
         } elseif ($service['service_status'] == '1') {
@@ -91,12 +87,12 @@ if (count($services) > '0') {
         }
 
         echo '<tr id="row_' . $service['service_id'] . '">';
-        echo '<td class="col-sm-2"><span class="alert-status ' . $status_label . '"><span class="device-services-page text-nowrap">' . htmlentities($service['service_name']) . '</span></span></td>';
-        echo '<td class="col-sm-1 text-muted">' . htmlentities($service['service_type']) . '</td>';
-        echo '<td class="col-sm-1 text-muted">' . nl2br(htmlentities($service['service_ip'])) . '</td>';
-        echo '<td class="col-sm-4">' . nl2br(htmlentities(trim($service['service_message']))) . '</td>';
-        echo '<td class="col-sm-2 text-muted">' . htmlentities($service['service_desc']) . '</td>';
-        echo '<td class="col-sm-1 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</td>';
+        echo '<td class="col-sm-2"><span class="alert-status ' . $status_label . '"><span class="device-services-page text-nowrap">' . htmlentities((string) $service['service_name']) . '</span></span></td>';
+        echo '<td class="col-sm-1 text-muted">' . htmlentities((string) $service['service_type']) . '</td>';
+        echo '<td class="col-sm-1 text-muted">' . nl2br(htmlentities((string) $service['service_ip'])) . '</td>';
+        echo '<td class="col-sm-4">' . nl2br(htmlentities(trim((string) $service['service_message']))) . '</td>';
+        echo '<td class="col-sm-2 text-muted">' . htmlentities((string) $service['service_desc']) . '</td>';
+        echo '<td class="col-sm-1 text-muted">' . ($service['service_changed'] ? \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) : 'Waiting for first service check') . '</td>';
         echo '<td class="col-sm-1">';
         if (Auth::user()->hasGlobalAdmin()) {
             echo '<div class="pull-right">';
@@ -110,7 +106,7 @@ if (count($services) > '0') {
         if ($vars['view'] == 'details') {
             // if we have a script for this check, use it.
             $check_ds = null;
-            $check_script = \LibreNMS\Config::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
+            $check_script = \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower((string) $service['service_type']) . '.inc.php';
             if (is_file($check_script)) {
                 include $check_script;
 
@@ -122,15 +118,19 @@ if (count($services) > '0') {
 
             $graphs = json_decode($service['service_ds'], true);
             foreach ($graphs as $k => $v) {
+                $graph_title = $k;
+                if (isset($v['full_name'])) {
+                    $graph_title = htmlentities((string) $v['full_name']);
+                }
                 $graph_array['device'] = $device['device_id'];
                 $graph_array['type'] = 'service_graph';
                 $graph_array['id'] = $service['service_id'];
                 $graph_array['ds'] = $k;
 
                 echo '<tr>';
-                echo '<td colspan="7">';
+                echo '<td colspan="7" style="padding: 0">';
 
-                include 'includes/html/print-graphrow.inc.php';
+                include 'includes/html/print-device-graph.php';
 
                 echo '</td>';
                 echo '</tr>';

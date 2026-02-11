@@ -22,7 +22,7 @@ print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Wireless</span> &#187; ";
 
-if (! $vars['metric']) {
+if (empty($vars['metric'])) {
     $vars['metric'] = 'overview';
 }
 
@@ -56,7 +56,7 @@ if ($vars['metric'] == 'overview') {
         $graph_title = generate_link($text, $wireless_link_array, ['metric' => $type]);
         $graph_array['type'] = 'device_wireless_' . $type;
 
-        include \LibreNMS\Config::get('install_dir') . '/includes/html/print-device-graph.php';
+        include \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/html/print-device-graph.php';
     }
 } elseif (isset($types[$vars['metric']])) {
     $unit = __('wireless.' . $vars['metric'] . '.unit');
@@ -72,10 +72,10 @@ if ($vars['metric'] == 'overview') {
         [$vars['metric'], $device['device_id']]
     );
     foreach ($sensors as $sensor) {
-        if (! is_integer($row++ / 2)) {
-            $row_colour = \LibreNMS\Config::get('list_colour.even');
+        if (! is_int($row++ / 2)) {
+            $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
-            $row_colour = \LibreNMS\Config::get('list_colour.odd');
+            $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
         }
 
         $sensor_descr = $sensor['sensor_descr'];
@@ -102,7 +102,7 @@ if ($vars['metric'] == 'overview') {
         $graph_array['id'] = $sensor['sensor_id'];
         $graph_array['type'] = 'wireless_' . $vars['metric'];
 
-        include \LibreNMS\Config::get('install_dir') . '/includes/html/print-graphrow.inc.php';
+        include \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/html/print-graphrow.inc.php';
 
         echo '</div></div>';
     }

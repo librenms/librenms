@@ -1,0 +1,141 @@
+modules:
+    os:
+        hardware: ADIC-INTELLIGENT-STORAGE-MIB::productName.0
+        serial: ADIC-INTELLIGENT-STORAGE-MIB::productSerialNumber.0
+        version: ADIC-INTELLIGENT-STORAGE-MIB::productVersion.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: ADIC-INTELLIGENT-STORAGE-MIB::temperatureSensorTable
+                    value: ADIC-INTELLIGENT-STORAGE-MIB::temperatureSensorDegreesCelsius
+                    snmp_flags: ['-ObSaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.200.30.1.4.{{ $index }}'
+                    index: 'temp.{{ $index }}'
+                    descr: '{{ ADIC-INTELLIGENT-STORAGE-MIB::temperatureSensorName }} [{{ ADIC-INTELLIGENT-STORAGE-MIB::temperatureSensorLocation }}]'
+                    low_warn_limit: ADIC-INTELLIGENT-STORAGE-MIB::temperatureSensorWarningLo
+                    warn_limit: ADIC-INTELLIGENT-STORAGE-MIB::temperatureSensorWarningHi
+        fanspeed:
+            data:
+                -
+                    oid: ADIC-INTELLIGENT-STORAGE-MIB::coolingFanTable
+                    value: ADIC-INTELLIGENT-STORAGE-MIB::coolingFanRPM
+                    snmp_flags: ['-ObSaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.200.40.1.4.{{ $index }}'
+                    index: 'coolingFanRPM.{{ $index }}'
+                    descr: '{{ ADIC-INTELLIGENT-STORAGE-MIB::coolingFanName }} [{{ ADIC-INTELLIGENT-STORAGE-MIB::coolingFanLocation }}]'
+                    low_warn_limit: ADIC-INTELLIGENT-STORAGE-MIB::coolingFanWarningLo
+                    warn_limit: ADIC-INTELLIGENT-STORAGE-MIB::coolingFanWarningHi
+        count:
+            data:
+                -
+                    oid: ADIC-MANAGEMENT-MIB::phDriveTable
+                    value: ADIC-MANAGEMENT-MIB::phDriveReadErrors
+                    snmp_flags: ['-ObSaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.80.110.1.23.{{ $index }}'
+                    index: 'phDriveReadErrors.{{ $index }}'
+                    group: 'drives'
+                    descr: '{{ ADIC-MANAGEMENT-MIB::phDriveSerialNumber }} read errors'
+                -
+                    oid: ADIC-MANAGEMENT-MIB::phDriveTable
+                    value: ADIC-MANAGEMENT-MIB::phDriveWriteErrors
+                    snmp_flags: ['-ObSaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.80.110.1.24.{{ $index }}'
+                    index: 'phDriveWriteErrors.{{ $index }}'
+                    group: 'drives'
+                    descr: '{{ ADIC-MANAGEMENT-MIB::phDriveSerialNumber }} write errors'
+                -
+                    oid: ADIC-MANAGEMENT-MIB::phDriveTable
+                    value: ADIC-MANAGEMENT-MIB::phDriveMbytesRead
+                    snmp_flags: ['-ObSaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.80.110.1.25.{{ $index }}'
+                    index: 'phDriveBytesRead.{{ $index }}'
+                    multiplier: 1000000
+                    group: 'drives'
+                    descr: '{{ ADIC-MANAGEMENT-MIB::phDriveSerialNumber }} read'
+                -
+                    oid: ADIC-MANAGEMENT-MIB::phDriveTable
+                    value: ADIC-MANAGEMENT-MIB::phDriveMbytesWritten
+                    snmp_flags: ['-ObSaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.80.110.1.26.{{ $index }}'
+                    index: 'phDriveBytesWrite.{{ $index }}'
+                    multiplier: 1000000
+                    group: 'drives'
+                    descr: '{{ ADIC-MANAGEMENT-MIB::phDriveSerialNumber }} written'
+        state:
+            data:
+                -
+                    oid: ADIC-MANAGEMENT-MIB::phDriveTable
+                    value: ADIC-MANAGEMENT-MIB::phDriveRasStatus
+                    snmp_flags: ['-ObSaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.80.110.1.31.{{ $index }}'
+                    index: 'phDriveRasStatus.{{ $index }}'
+                    state_name: phDriveTable
+                    group: 'drives'
+                    descr: 'Service: {{ ADIC-MANAGEMENT-MIB::phDriveSerialNumber }}'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: good }
+                        - { value: 2, generic: 2, graph: 0, descr: failed }
+                        - { value: 3, generic: 2, graph: 0, descr: degraded }
+                        - { value: 4, generic: 1, graph: 0, descr: warning }
+                        - { value: 5, generic: 0, graph: 0, descr: informational }
+                        - { value: 6, generic: 3, graph: 0, descr: unknown }
+                        - { value: 7, generic: 3, graph: 0, descr: invalid }
+                -
+                    oid: ADIC-MANAGEMENT-MIB::phIeStationTable
+                    value: ADIC-MANAGEMENT-MIB::phIeStationDoorStatus
+                    snmp_flags: ['-ObSaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.80.110.1.31.{{ $index }}'
+                    index: 'phIeStationDoorStatus.{{ $index }}'
+                    state_name: phIeStationTable
+                    descr: 'Import/Export Door: {{ ADIC-MANAGEMENT-MIB::phIeStationNumber }}'
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: open }
+                        - { value: 2, generic: 0, graph: 0, descr: closed }
+                        - { value: 3, generic: 0, graph: 0, descr: closed and locked }
+                        - { value: 4, generic: 0, graph: 0, descr: closed and unlocked }
+                        - { value: 5, generic: 2, graph: 0, descr: controller failed }
+                        - { value: 6, generic: 4, graph: 0, descr: not installed }
+                        - { value: 7, generic: 3, graph: 0, descr: no data }
+                    skip_values:
+                        -
+                            oid: ADIC-MANAGEMENT-MIB::phIeStationDoorStatus
+                            op: '=='
+                            value: '6'
+                -
+                    oid: ADIC-MANAGEMENT-MIB::rasSystemStatusTable
+                    value: ADIC-MANAGEMENT-MIB::rasStatusGroupStatus
+                    snmp_flags: ['-ObSaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.20.100.10.1.2.{{ $index }}'
+                    index: 'rasStatusGroupStatus.{{ $index }}'
+                    state_name: rasSystemStatusTable
+                    group: '{{ ADIC-MANAGEMENT-MIB::rasStatusGroupIndex }}'
+                    descr: 'summary'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: good }
+                        - { value: 2, generic: 2, graph: 0, descr: failed }
+                        - { value: 3, generic: 2, graph: 0, descr: degraded }
+                        - { value: 4, generic: 1, graph: 0, descr: warning }
+                        - { value: 5, generic: 0, graph: 0, descr: informational }
+                        - { value: 6, generic: 3, graph: 0, descr: unknown }
+                        - { value: 7, generic: 3, graph: 0, descr: invalid }
+                -
+                    oid: ADIC-INTELLIGENT-STORAGE-MIB::powerSupplyTable
+                    value: ADIC-INTELLIGENT-STORAGE-MIB::powerSupplyStatus
+                    snmp_flags: ['-ObSaQ']
+                    num_oid: '.1.3.6.1.4.1.3764.1.1.200.200.10.1.8.{{ $index }}'
+                    index: 'powerSupplyStatus.{{ $index }}'
+                    state_name: powerSupplyTable
+                    group: 'powerAndCooling'
+                    descr: '{{ ADIC-INTELLIGENT-STORAGE-MIB::powerSupplyLocation }}'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 4, graph: 0, descr: not installed }
+                        - { value: 3, generic: 0, graph: 0, descr: ok }
+                        - { value: 4, generic: 1, graph: 0, descr: powered off }
+                        - { value: 5, generic: 2, graph: 0, descr: failed}
+                    skip_values:
+                        -
+                            oid: ADIC-INTELLIGENT-STORAGE-MIB::powerSupplyStatus
+                            op: '=='
+                            value: '2'

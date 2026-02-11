@@ -6838,14 +6838,14 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "LAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -6884,14 +6884,6 @@
                 {
                     "vlan": 1,
                     "baseport": 28,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 1003,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -7076,14 +7068,6 @@
                 {
                     "vlan": 10,
                     "baseport": 23,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 10,
-                    "baseport": 1003,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -8318,6 +8302,81 @@
                     "high_ifIndex": 1007,
                     "low_ifIndex": 100009,
                     "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 20000
+                },
+                {
+                    "ipv4_address": "169.254.0.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.0.0/24",
+                    "ifIndex": 8000
+                },
+                {
+                    "ipv4_address": "192.168.1.1",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "192.168.1.0/29",
+                    "ifIndex": 100009
+                }
+            ]
+        }
+    },
+    "route": {
+        "discovery": {
+            "route": [
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 100000,
+                    "inetCidrRouteType": 4,
+                    "inetCidrRouteProto": 3,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 4,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "0.0.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "10.41.142.57",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 0
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 100009,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 1,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "10.41.130.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 24
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 100000,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 1,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "10.41.142.56",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 29
                 }
             ]
         }

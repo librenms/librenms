@@ -26,8 +26,8 @@
 
 namespace LibreNMS\Alert;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Util\Time;
 
@@ -66,7 +66,7 @@ class AlertData extends \Illuminate\Support\Collection
             'uptime' => $device->uptime,
             'uptime_short' => Time::formatInterval($device->uptime, true),
             'uptime_long' => Time::formatInterval($device->uptime),
-            'title' => 'Testing transport from ' . Config::get('project_name'),
+            'title' => 'Testing transport from ' . LibrenmsConfig::get('project_name'),
             'elapsed' => '11s',
             'alerted' => 0,
             'alert_id' => '000',

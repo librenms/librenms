@@ -1,14 +1,14 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
-if (Config::get('graylog.server')) {
+if (LibrenmsConfig::get('graylog.server')) {
     echo '
         <div class="row" id="graylog-card">
             <div class="col-md-12">
                 <div class="panel panel-default panel-condensed">
                     <div class="panel-heading">
-                        <a href="device/device=' . $device['device_id'] . '/tab=logs/section=graylog/">
+                        <a href="' . route('device.graylog', ['device' => $device['device_id']]) . '">
                             <i class="fa fa-clone fa-lg icon-theme"
                             aria-hidden="true"></i>
                             <strong>Recent Graylog</strong>
@@ -33,13 +33,13 @@ if (Config::get('graylog.server')) {
     </div>
     <script>
     ';
-    $rowCount = Config::get('graylog.device-page.rowCount', 10);
-    $loglevel = Config::get('graylog.device-page.loglevel', 7);
+    $rowCount = LibrenmsConfig::get('graylog.device-page.rowCount', 10);
+    $loglevel = LibrenmsConfig::get('graylog.device-page.loglevel', 7);
     $tmp_output .= '
         $.ajax({
             type: "post",
             data: {
-                device: "' . (isset($filter_device) ? $filter_device : '') . '",
+                device: "' . ($filter_device ?? '') . '",
                 ' . ($rowCount ? 'rowCount: ' . $rowCount . ',' : '') . '
                 ' . ($loglevel ? 'loglevel: ' . $loglevel . ',' : '') . '
             },

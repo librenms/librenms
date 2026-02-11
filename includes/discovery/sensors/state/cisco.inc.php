@@ -30,7 +30,7 @@ $tables = [
     ['num_oid' => '.1.3.6.1.4.1.9.9.117.1.1.2.1.2.',    'oid' => 'CISCO-ENTITY-FRU-CONTROL-MIB::cefcFRUPowerStatusTable',       'state_name' => 'cefcFRUPowerOperStatus',          'descr' => 'Sensor Name'],
     ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.1.2.',        'oid' => 'CISCO-RF-MIB::cRFStatusUnitState',                            'state_name' => 'cRFStatusUnitState',              'descr' => 'VSS Device State'],
     ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.1.4.',        'oid' => 'CISCO-RF-MIB::cRFStatusPeerUnitState',                        'state_name' => 'cRFStatusPeerUnitState',          'descr' => 'VSS Peer State'],
-    ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.2.14.',       'oid' => 'CISCO-RF-MIB::cRFCfgRedundancyOperMode',                      'state_name' => 'cRFCfgRedundancyOperMode',        'descr' => 'VSS Mode'],
+    ['num_oid' => '.1.3.6.1.4.1.9.9.176.1.2.16.',       'oid' => 'CISCO-RF-MIB::cRFCfgRedundancyOperMode',                      'state_name' => 'cRFCfgRedundancyOperMode',        'descr' => 'VSS Mode'],
     ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.1.3.',        'oid' => 'CISCO-STACKWISE-MIB::cswGlobals',                             'state_name' => 'cswRingRedundant',                'descr' => 'Stack Ring - Redundant'],
     ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.2.1.1.3.',    'oid' => 'CISCO-STACKWISE-MIB::cswSwitchRole',                          'state_name' => 'cswSwitchRole',                   'descr' => 'Stack Role - Switch#'],
     ['num_oid' => '.1.3.6.1.4.1.9.9.500.1.2.1.1.6.',    'oid' => 'CISCO-STACKWISE-MIB::cswSwitchState',                         'state_name' => 'cswSwitchState',                  'descr' => 'Stack State - Switch#'],
@@ -217,8 +217,8 @@ foreach ($tables as $tablevalue) {
                     $swstatenumber++;
                     $descr = $tablevalue['descr'] . $swstatenumber;
                 } elseif ($state_name == 'cswStackPortOperStatus') {
-                    $stack_port_descr = get_port_by_index_cache($device['device_id'], $index);
-                    $descr = $tablevalue['descr'] . ($stack_port_descr['ifDescr'] ?? null);
+                    $port = PortCache::getByIfIndex($index, $device['device_id']);
+                    $descr = $tablevalue['descr'] . $port?->ifDescr;
                 } elseif ($state_name == 'cefcFRUPowerOperStatus') {
                     $descr = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value();
                 } elseif ($state_name == 'c3gModemStatus' || $state_name == 'c3gGsmCurrentBand' || $state_name == 'c3gGsmPacketService' || $state_name == 'c3gGsmCurrentRoamingStatus' || $state_name == 'c3gGsmSimStatus') {
@@ -228,7 +228,7 @@ foreach ($tables as $tablevalue) {
                     $repsegmentnumber++;
                     $descr = $tablevalue['descr'] . $repsegmentnumber;
                 }
-                discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, trim($descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
+                discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, trim((string) $descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
             }
         }
     }

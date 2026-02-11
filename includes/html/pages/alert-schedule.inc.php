@@ -30,6 +30,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             <thead>
                 <tr>
                     <th data-column-id="title">Title</th>
+                    <th data-column-id="behavior">Behavior</th>
                     <th data-column-id="recurring">Recurring</th>
                     <th data-column-id="start" data-order="desc">Start (no recurring)</th>
                     <th data-column-id="end">End (no recurring)</th>

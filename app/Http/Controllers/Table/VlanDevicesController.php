@@ -17,7 +17,7 @@ class VlanDevicesController extends TableController
             'domain' => 'vlans.vlan_domain',
             'name' => 'vlans.vlan_name',
             'type' => 'vlans.vlan_type',
-            'mtu' => 'vlans.vlan_mtu',
+            'state' => 'vlans.vlan_state',
         ];
     }
 
@@ -26,7 +26,7 @@ class VlanDevicesController extends TableController
     protected function baseQuery(Request $request)
     {
         $this->validate($request, ['vlan' => 'integer']);
-        $this->vlanId = $request->get('vlan', 1);
+        $this->vlanId = $request->input('vlan', 1);
 
         return Device::distinct()
             ->hasAccess($request->user())
@@ -35,17 +35,17 @@ class VlanDevicesController extends TableController
                 'devices.*',
                 'vlans.vlan_name',
                 'vlans.vlan_type',
-                'vlans.vlan_mtu',
+                'vlans.vlan_state',
             ])
-            ->withCount(['ports' => function ($query) {
+            ->withCount(['ports' => function ($query): void {
                 $query->distinct()->where('ifVlan', $this->vlanId)
                     ->orWhereHas('vlans', fn ($q) => $q->where('vlan', $this->vlanId));
             }])
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->where('vlans.vlan_vlan', $this->vlanId)
                     ->orWhereHas('ports', fn ($q) => $q->where('ifVlan', $this->vlanId));
             })
-        ->leftJoin('vlans', function ($join) {
+        ->leftJoin('vlans', function ($join): void {
             $join->on('devices.device_id', '=', 'vlans.device_id')
             ->on('vlans.vlan_vlan', '=', DB::raw($this->vlanId));
         });
@@ -63,7 +63,7 @@ class VlanDevicesController extends TableController
             'domain' => $model['vlan_domain'],
             'name' => $model['vlan_name'],
             'type' => $model['vlan_type'],
-            'mtu' => $model['vlan_mtu'],
+            'state' => $model['vlan_state'],
         ];
     }
 }

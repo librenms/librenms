@@ -10337,8 +10337,8 @@
                     "ifName": "Console49",
                     "portName": null,
                     "ifIndex": 49,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -10437,8 +10437,8 @@
                     "ifName": "Loopback0",
                     "portName": null,
                     "ifIndex": 746,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -10537,8 +10537,8 @@
                     "ifName": "VLAN1",
                     "portName": null,
                     "ifIndex": 1001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -10637,8 +10637,8 @@
                     "ifName": "VLAN199",
                     "portName": null,
                     "ifIndex": 1199,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -10737,8 +10737,8 @@
                     "ifName": "VLAN251",
                     "portName": null,
                     "ifIndex": 1251,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -10837,8 +10837,8 @@
                     "ifName": "VLAN1503",
                     "portName": null,
                     "ifIndex": 2503,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -10937,8 +10937,8 @@
                     "ifName": "VLAN1504",
                     "portName": null,
                     "ifIndex": 2504,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11037,8 +11037,8 @@
                     "ifName": "VLAN1505",
                     "portName": null,
                     "ifIndex": 2505,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11137,8 +11137,8 @@
                     "ifName": "VLAN1506",
                     "portName": null,
                     "ifIndex": 2506,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11237,8 +11237,8 @@
                     "ifName": "VLAN1507",
                     "portName": null,
                     "ifIndex": 2507,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11337,8 +11337,8 @@
                     "ifName": "VLAN1508",
                     "portName": null,
                     "ifIndex": 2508,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11437,8 +11437,8 @@
                     "ifName": "VLAN1509",
                     "portName": null,
                     "ifIndex": 2509,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11537,8 +11537,8 @@
                     "ifName": "VLAN1510",
                     "portName": null,
                     "ifIndex": 2510,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11637,8 +11637,8 @@
                     "ifName": "VLAN1511",
                     "portName": null,
                     "ifIndex": 2511,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11737,8 +11737,8 @@
                     "ifName": "VLAN1512",
                     "portName": null,
                     "ifIndex": 2512,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11837,8 +11837,8 @@
                     "ifName": "VLAN1513",
                     "portName": null,
                     "ifIndex": 2513,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -11937,8 +11937,8 @@
                     "ifName": "VLAN1514",
                     "portName": null,
                     "ifIndex": 2514,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -12037,8 +12037,8 @@
                     "ifName": "VLAN1515",
                     "portName": null,
                     "ifIndex": 2515,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -12137,8 +12137,8 @@
                     "ifName": "VLAN1516",
                     "portName": null,
                     "ifIndex": 2516,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -12237,8 +12237,8 @@
                     "ifName": "VLAN1517",
                     "portName": null,
                     "ifIndex": 2517,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -12337,8 +12337,8 @@
                     "ifName": "VLAN1518",
                     "portName": null,
                     "ifIndex": 2518,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -12437,8 +12437,8 @@
                     "ifName": "VLAN1519",
                     "portName": null,
                     "ifIndex": 2519,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -12537,8 +12537,8 @@
                     "ifName": "VLAN1520",
                     "portName": null,
                     "ifIndex": 2520,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -12637,8 +12637,8 @@
                     "ifName": "VLAN1521",
                     "portName": null,
                     "ifIndex": 2521,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -12737,8 +12737,8 @@
                     "ifName": "VLAN1522",
                     "portName": null,
                     "ifIndex": 2522,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -12837,8 +12837,8 @@
                     "ifName": "VLAN1523",
                     "portName": null,
                     "ifIndex": 2523,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -12937,8 +12937,8 @@
                     "ifName": "VLAN1524",
                     "portName": null,
                     "ifIndex": 2524,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -13037,8 +13037,8 @@
                     "ifName": "VLAN1525",
                     "portName": null,
                     "ifIndex": 2525,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -13137,8 +13137,8 @@
                     "ifName": "VLAN1526",
                     "portName": null,
                     "ifIndex": 2526,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -13237,8 +13237,8 @@
                     "ifName": "VLAN1527",
                     "portName": null,
                     "ifIndex": 2527,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -13337,8 +13337,8 @@
                     "ifName": "VLAN1528",
                     "portName": null,
                     "ifIndex": 2528,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -13437,8 +13437,8 @@
                     "ifName": "VLAN1529",
                     "portName": null,
                     "ifIndex": 2529,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -13537,8 +13537,8 @@
                     "ifName": "VLAN1530",
                     "portName": null,
                     "ifIndex": 2530,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -13637,8 +13637,8 @@
                     "ifName": "VLAN1531",
                     "portName": null,
                     "ifIndex": 2531,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -13737,8 +13737,8 @@
                     "ifName": "VLAN1532",
                     "portName": null,
                     "ifIndex": 2532,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -13837,8 +13837,8 @@
                     "ifName": "VLAN1533",
                     "portName": null,
                     "ifIndex": 2533,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -13937,8 +13937,8 @@
                     "ifName": "VLAN1534",
                     "portName": null,
                     "ifIndex": 2534,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -14037,8 +14037,8 @@
                     "ifName": "VLAN1535",
                     "portName": null,
                     "ifIndex": 2535,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -14137,8 +14137,8 @@
                     "ifName": "VLAN1536",
                     "portName": null,
                     "ifIndex": 2536,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -14237,8 +14237,8 @@
                     "ifName": "VLAN1537",
                     "portName": null,
                     "ifIndex": 2537,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -14337,8 +14337,8 @@
                     "ifName": "VLAN1538",
                     "portName": null,
                     "ifIndex": 2538,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -14437,8 +14437,8 @@
                     "ifName": "VLAN1539",
                     "portName": null,
                     "ifIndex": 2539,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -14537,8 +14537,8 @@
                     "ifName": "VLAN1540",
                     "portName": null,
                     "ifIndex": 2540,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -14637,8 +14637,8 @@
                     "ifName": "VLAN1541",
                     "portName": null,
                     "ifIndex": 2541,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -14737,8 +14737,8 @@
                     "ifName": "VLAN1542",
                     "portName": null,
                     "ifIndex": 2542,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -14837,8 +14837,8 @@
                     "ifName": "VLAN1543",
                     "portName": null,
                     "ifIndex": 2543,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -14937,8 +14937,8 @@
                     "ifName": "VLAN1544",
                     "portName": null,
                     "ifIndex": 2544,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -15037,8 +15037,8 @@
                     "ifName": "VLAN1545",
                     "portName": null,
                     "ifIndex": 2545,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -15137,8 +15137,8 @@
                     "ifName": "VLAN1546",
                     "portName": null,
                     "ifIndex": 2546,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -15237,8 +15237,8 @@
                     "ifName": "VLAN1547",
                     "portName": null,
                     "ifIndex": 2547,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -15337,8 +15337,8 @@
                     "ifName": "VLAN1548",
                     "portName": null,
                     "ifIndex": 2548,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -15437,8 +15437,8 @@
                     "ifName": "VLAN1549",
                     "portName": null,
                     "ifIndex": 2549,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -15537,8 +15537,8 @@
                     "ifName": "VLAN1550",
                     "portName": null,
                     "ifIndex": 2550,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -15637,8 +15637,8 @@
                     "ifName": "VLAN1551",
                     "portName": null,
                     "ifIndex": 2551,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -15737,8 +15737,8 @@
                     "ifName": "VLAN1552",
                     "portName": null,
                     "ifIndex": 2552,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -15883,371 +15883,371 @@
                     "vlan_domain": 1,
                     "vlan_name": "DefaultVlan",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 199,
                     "vlan_domain": 1,
                     "vlan_name": "Guest",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 251,
                     "vlan_domain": 1,
                     "vlan_name": "SWControl",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1503,
                     "vlan_domain": 1,
                     "vlan_name": "zd-cementnikiv12-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1504,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1504",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1505,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1505",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1506,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska2a-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1507,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1507",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1508,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1508",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1509,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1509",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1510,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska2-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1511,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1511",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1512,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska4-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1513,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1513",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1514,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska6-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1515,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1515",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1516,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska8-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1517,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1517",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1518,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska10-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1519,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1519",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1520,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska12-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1521,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1521",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1522,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska14-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1523,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1523",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1524,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska18a-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1525,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1525",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1526,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska18a-5-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1527,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1527",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1528,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska1-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1529,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1529",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1530,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska3-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1531,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1531",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1532,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska3-5-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1533,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1533",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1534,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska9-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1535,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1535",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1536,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1536",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1537,
                     "vlan_domain": 1,
                     "vlan_name": "zd-cementnikiv12a-1-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1538,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1538",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1539,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1539",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1540,
                     "vlan_domain": 1,
                     "vlan_name": "zd-festivalna2-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1541,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1541",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1542,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1542",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1543,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1543",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1544,
                     "vlan_domain": 1,
                     "vlan_name": "zd-kotlarevskogo2-3-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1545,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1545",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1546,
                     "vlan_domain": 1,
                     "vlan_name": "zavodska3-4-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1547,
                     "vlan_domain": 1,
                     "vlan_name": "zavodska3-4-2",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1548,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska14a-1-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1549,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska14a-2-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1550,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1550",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1551,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska14a-4-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1552,
                     "vlan_domain": 1,
                     "vlan_name": "zd-zavodska14a-5-1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -18345,5 +18345,18 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "172.16.251.2",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.16.251.0/24",
+                    "ifIndex": 1251
+                }
+            ]
+        }
     }
 }

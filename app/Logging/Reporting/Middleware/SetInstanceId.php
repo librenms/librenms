@@ -43,7 +43,7 @@ class SetInstanceId implements \Spatie\FlareClient\FlareMiddleware\FlareMiddlewa
             $user['id'] = self::getInstanceId();
 
             $report->group('user', $user);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
 
         return $next($report);

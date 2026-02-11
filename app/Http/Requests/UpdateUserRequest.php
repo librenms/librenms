@@ -6,7 +6,7 @@ use App\Models\User;
 use Hash;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use LibreNMS\Config;
+use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 
 class UpdateUserRequest extends FormRequest
@@ -48,7 +48,7 @@ class UpdateUserRequest extends FormRequest
                 'realname' => 'nullable|max:64|alpha_space',
                 'email' => 'nullable|email|max:64',
                 'descr' => 'nullable|max:30|alpha_space',
-                'new_password' => 'nullable|confirmed|min:' . Config::get('password.min_length', 8),
+                'new_password' => ['nullable', 'confirmed', Password::defaults()],
                 'new_password_confirmation' => 'nullable|same:new_password',
                 'dashboard' => 'int',
                 'roles' => 'array',
@@ -63,7 +63,7 @@ class UpdateUserRequest extends FormRequest
             'email' => 'nullable|email|max:64',
             'descr' => 'nullable|max:30|alpha_space',
             'old_password' => 'nullable|string',
-            'new_password' => 'nullable|confirmed|min:' . Config::get('password.min_length', 8),
+            'new_password' => ['nullable', 'confirmed', Password::defaults()],
             'new_password_confirmation' => 'nullable|same:new_password',
             'dashboard' => 'int',
         ];
@@ -77,12 +77,12 @@ class UpdateUserRequest extends FormRequest
      */
     public function withValidator($validator)
     {
-        $validator->after(function ($validator) {
+        $validator->after(function ($validator): void {
             // if not an admin and new_password is set, check old password matches
             $user = $this->route('user');
             if ($user && $this->user()->can('update', $user) && $this->user()->is($user)) {
-                if ($this->get('new_password')) {
-                    if ($this->get('old_password')) {
+                if ($this->input('new_password')) {
+                    if ($this->input('old_password')) {
                         $user = $this->route('user');
                         if ($user && ! Hash::check($this->old_password, $user->password)) {
                             $validator->errors()->add('old_password', __('Existing password did not match'));

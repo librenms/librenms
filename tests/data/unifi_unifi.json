@@ -1969,5 +1969,39 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.49.254.100",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.49.254.96/29",
+                    "ifIndex": 7
+                },
+                {
+                    "ipv4_address": "100.127.125.128",
+                    "ipv4_prefixlen": 31,
+                    "context_name": "",
+                    "ipv4_network": "100.127.125.128/31",
+                    "ifIndex": 9
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "192.168.1.130",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.1.0/24",
+                    "ifIndex": 8
+                }
+            ]
+        }
     }
 }

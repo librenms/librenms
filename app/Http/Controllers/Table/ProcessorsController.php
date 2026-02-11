@@ -11,6 +11,8 @@ use LibreNMS\Util\Url;
 
 class ProcessorsController extends TableController
 {
+    protected $model = Processor::class;
+
     protected $default_sort = ['device_hostname' => 'asc', 'processor_descr' => 'asc'];
 
     protected function sortFields($request): array
@@ -26,6 +28,7 @@ class ProcessorsController extends TableController
     {
         return [
             'hostname',
+            'display',
             'processor_descr',
         ];
     }
@@ -34,7 +37,7 @@ class ProcessorsController extends TableController
     {
         return Processor::query()
             ->hasAccess($request->user())
-            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'processors.device_id'))
+            ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'processors.device_id'))
             ->withAggregate('device', 'hostname');
     }
 
@@ -56,7 +59,7 @@ class ProcessorsController extends TableController
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $processor->device]);
         $descr = $processor->processor_descr;
         $mini_graph = Url::graphPopup($graph_array);
-        $bar = Html::percentageBar(400, 20, $perc, $perc . '%', (100 - $perc) . '%', $processor->processor_perc_warn);
+        $bar = Html::percentageBar(400, 10, $perc, $perc . '%', (100 - $perc) . '%', $processor->processor_perc_warn);
         $usage = Url::graphPopup($graph_array, $bar);
 
         if (\Request::input('view') == 'graphs') {
@@ -72,6 +75,35 @@ class ProcessorsController extends TableController
             'processor_descr' => $descr,
             'graph' => $mini_graph,
             'processor_usage' => $usage,
+        ];
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device Hostname',
+            'Processor',
+            'Usage',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Processor  $processor
+     * @return array
+     */
+    protected function formatExportRow($processor)
+    {
+        return [
+            $processor->device ? $processor->device->displayName() : '',
+            $processor->processor_descr,
+            $processor->processor_usage,
         ];
     }
 }

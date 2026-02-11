@@ -36,27 +36,31 @@
 <script>
     function themeToggleComponentData() {
         return {
-            theme: '{{ LibrenmsConfig::get('applied_site_style') }}',
+            theme: window.siteStylePreference,
             toggleTheme(newTheme) {
-                // reload if another theme is set
-                const reload = ! ['dark', 'light', 'device'].includes(this.theme);
-                this.theme = newTheme;
-
-                if (newTheme === 'dark' || (newTheme === 'device' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
+                if (this.theme === newTheme) {
+                    return;
                 }
 
-                $.ajax({
-                    url: '{{ route('preferences.store') }}',
-                    dataType: 'json',
-                    type: 'POST',
-                    data: {
+                this.theme = newTheme;
+                window.siteStylePreference = newTheme;
+
+                fetch('{{ route('preferences.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
                         pref: 'site_style',
                         value: newTheme
-                    },
-                    success:() => reload ? location.reload() : null
+                    })
+                }).then(() => {
+                    if (!['dark', 'light'].includes(window.siteStyle)) {
+                        location.reload();
+                    }
+
+                    applySiteStyle(newTheme);
                 });
             }
         }

@@ -20,7 +20,7 @@ if (isset($vars['netid'])) {
 
     // Create the rrdArray and map the address family's socket type
     // to its "clean" socket state name and description.
-    foreach ($local_ss_socket_states_mapper as $socket_state => $socket_state_clean_name) {
+    foreach ($local_ss_socket_states_mapper as $socket_state_clean_name) {
         $rrdArray[$af_netid][$socket_state_clean_name] = [
             'descr' => $socket_state_clean_name,
         ];
@@ -48,7 +48,7 @@ if (! isset($vars['netid']) && in_array($addr_family, $allowed_afs)) {
 
         // Create the rrdArray and map the address family's socket type
         // to its "clean" socket state name and description.
-        foreach ($local_ss_socket_states_mapper as $socket_state => $socket_state_clean_name) {
+        foreach ($local_ss_socket_states_mapper as $socket_state_clean_name) {
             $rrdArray[$af_netid][$socket_state_clean_name] = [
                 'descr' => $af_netid . '_' . $socket_state_clean_name,
             ];

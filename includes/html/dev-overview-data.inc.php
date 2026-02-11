@@ -1,7 +1,7 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Location;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
@@ -12,9 +12,9 @@ echo "<div class='row'>
           <div class='panel panel-default panel-condensed device-overview'>
             <div class='panel-heading'>";
 
-if (Config::get('overview_show_sysDescr')) {
+if (LibrenmsConfig::get('overview_show_sysDescr')) {
     echo '<i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i> <strong>';
-    echo Config::get('overview_show_sysDescr', true) ? Clean::html($device['sysDescr'], []) : 'System';
+    echo LibrenmsConfig::get('overview_show_sysDescr', true) ? Clean::html($device['sysDescr'], []) : 'System';
     echo '</strong>';
 }
 
@@ -33,7 +33,7 @@ if ($device['features']) {
     $device['features'] = '(' . $device['features'] . ')';
 }
 
-$device['os_text'] = Config::getOsSetting($device['os'], 'text');
+$device['os_text'] = LibrenmsConfig::getOsSetting($device['os'], 'text');
 
 echo '<div class="row">
         <div class="col-sm-4">System Name</div>
@@ -41,16 +41,16 @@ echo '<div class="row">
       </div>';
 
 if (! empty($device['overwrite_ip'])) {
-    echo "<div class='row'><div class='col-sm-4'>Assigned IP</div><div class='col-sm-8'>" . htmlentities($device['overwrite_ip']) . '</div></div>';
+    echo "<div class='row'><div class='col-sm-4'>Assigned IP</div><div class='col-sm-8'>" . htmlentities((string) $device['overwrite_ip']) . '</div></div>';
 } elseif (! empty($device['ip'])) {
-    echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>" . htmlentities($device['ip']) . '</div></div>';
+    echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>" . htmlentities((string) $device['ip']) . '</div></div>';
 } else {
     try {
         $ip = (string) IP::parse($device['hostname']);
         if ($ip !== format_hostname($device)) {
             echo "<div class='row'><div class='col-sm-4'>IP Address</div><div class='col-sm-8'>" . htmlentities($ip) . '</div></div>';
         }
-    } catch (InvalidIpException $e) {
+    } catch (InvalidIpException) {
         // don't add an ip line
     }
 }
@@ -104,15 +104,15 @@ if ($device['sysContact']) {
       </div>';
 }
 
-if (! empty($device['inserted']) && preg_match('/^0/', $device['inserted']) == 0) {
+if (! empty($device['inserted']) && preg_match('/^0/', (string) $device['inserted']) == 0) {
     $inserted_text = 'Device Added';
-    $inserted = (Time::formatInterval(-(time() - strtotime($device['inserted']))));
+    $inserted = (Time::formatInterval(-(time() - strtotime((string) $device['inserted']))));
     echo "<div class='row'><div class='col-sm-4'>$inserted_text</div><div class='col-sm-8' title='$inserted_text on " . $device['inserted'] . "'>$inserted</div></div>";
 }
 
 if (! empty($device['last_discovered'])) {
     $last_discovered_text = 'Last Discovered';
-    $last_discovered = (empty($device['last_discovered']) ? 'Never' : Time::formatInterval(-(time() - strtotime($device['last_discovered']))));
+    $last_discovered = (empty($device['last_discovered']) ? 'Never' : Time::formatInterval(-(time() - strtotime((string) $device['last_discovered']))));
     echo "<div class='row'><div class='col-sm-4'>$last_discovered_text</div><div class='col-sm-8' title='$last_discovered_text at " . $device['last_discovered'] . "'>$last_discovered</div></div>";
 }
 
@@ -133,8 +133,8 @@ if ($uptime) {
 }
 
 if ($device['location_id'] && $location = Location::find($device['location_id'])) {
-    $maps_api = Config::get('geoloc.api_key');
-    $maps_engine = $maps_api ? Config::get('geoloc.engine') : '';
+    $maps_api = LibrenmsConfig::get('geoloc.api_key');
+    $maps_engine = $maps_api ? LibrenmsConfig::get('geoloc.engine') : '';
     $location_valid = ($location && $location->coordinatesValid());
     $location_coords = $location_valid ? $location->lat . ', ' . $location->lng : 'N/A';
 
@@ -186,7 +186,7 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
              if (device_map == null) {
                 device_location = new L.LatLng(' . (float) $location->lat . ', ' . (float) $location->lng . ');
                 var config = {
-                    "tile_url": "' . Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org') . '",
+                    "tile_url": "' . LibrenmsConfig::get('leaflet.tile_url', '{s}.tile.openstreetmap.org') . '",
                     "engine": "' . $maps_engine . '",
                     "api_key": "' . $maps_api . '"
                 };
@@ -199,11 +199,11 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                 ';
 
     # If we are configured to show all devices on map
-    if (Config::get('device_location_map_show_devices')) {
+    if (LibrenmsConfig::get('device_location_map_show_devices')) {
         // Get a list of devices we have access to and add them to the map
         echo'
                 device_marker_cluster = L.markerClusterGroup({
-                    maxClusterRadius: ' . Config::get('leaflet.group_radius', 80) . ',
+                    maxClusterRadius: ' . LibrenmsConfig::get('leaflet.group_radius', 80) . ',
                     iconCreateFunction: function (cluster) {
                         var markers = cluster.getAllChildMarkers();
                         var n = 0;
@@ -252,7 +252,7 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                         device_marker_cluster.addLayer(marker);
         ';
         # If we are configured to show dependencies
-        if (Config::get('device_location_map_show_device_dependencies')) {
+        if (LibrenmsConfig::get('device_location_map_show_device_dependencies')) {
             echo'
                         $.each( device["parents"], function( parent_idx, parent_id ) {
                             if (parent_id in data && (data[parent_id]["lat"] != device["lat"] || data[parent_id]["lng"] != device["lng"])) {
@@ -299,7 +299,7 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
             $("#toggle-map-button").find(".fa").removeClass("fa-map-o").addClass("fa-map");
             $("#toggle-map-button span").text("View")
         });';
-    if (Config::get('device_location_map_open')) {
+    if (LibrenmsConfig::get('device_location_map_open')) {
         echo '$("#toggle-map").collapse("show");';
     }
     echo '</script>

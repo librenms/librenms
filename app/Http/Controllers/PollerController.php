@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Poller;
 use App\Models\PollerCluster;
@@ -9,7 +10,6 @@ use App\Models\PollerGroup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use LibreNMS\Config;
 
 class PollerController extends Controller
 {
@@ -17,7 +17,7 @@ class PollerController extends Controller
 
     public function __construct()
     {
-        $this->rrdstep = Config::get('rrd.step');
+        $this->rrdstep = LibrenmsConfig::get('rrd.step');
     }
 
     public function logTab(Request $request)
@@ -37,7 +37,7 @@ class PollerController extends Controller
         return view('poller.groups', [
             'current_tab' => 'groups',
             'poller_groups' => PollerGroup::query()->withCount('devices')->get(),
-            'default_group_id' => Config::get('default_poller_group'),
+            'default_group_id' => LibrenmsConfig::get('default_poller_group'),
             'ungrouped_count' => Device::where('poller_group', 0)->count(),
         ]);
     }
@@ -47,6 +47,7 @@ class PollerController extends Controller
         $this->authorize('viewAny', PollerCluster::class);
 
         return view('poller.poller', [
+            'timezone' => session('preferences.timezone'),
             'current_tab' => 'poller',
             'pollers' => $this->poller(),
             'poller_cluster' => $this->pollerCluster(),
@@ -84,16 +85,12 @@ class PollerController extends Controller
 
     private function poller()
     {
-        return Poller::query()->orderBy('poller_name')->get()->map(function ($poller) {
-            return $this->pollerStatus($poller, $poller->last_polled);
-        });
+        return Poller::query()->orderBy('poller_name')->get()->map(fn ($poller) => $this->pollerStatus($poller, $poller->last_polled));
     }
 
     private function pollerCluster()
     {
-        return PollerCluster::with('stats')->orderBy('poller_name')->get()->map(function ($poller) {
-            return $this->pollerStatus($poller, $poller->last_report);
-        });
+        return PollerCluster::with('stats')->orderBy('poller_name')->get()->map(fn ($poller) => $this->pollerStatus($poller, $poller->last_report));
     }
 
     private function checkTimeSinceLastPoll($seconds)

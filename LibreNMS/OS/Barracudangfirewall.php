@@ -51,7 +51,7 @@ class Barracudangfirewall extends OS implements OSDiscovery, OSPolling
             $rrd_def = RrdDefinition::make()->addDataset('fw_sessions', 'GAUGE', 0);
             $fields = ['fw_sessions' => $sessions];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'barracuda_firewall_sessions', $tags, $fields);
             $this->enableGraph('barracuda_firewall_sessions');
         }

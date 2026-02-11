@@ -28,11 +28,12 @@ namespace App\Http\Controllers\Widgets;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\DB\Eloquent;
 
 class DeviceTypeController extends WidgetController
 {
-    protected $title = 'Device Types';
+    protected string $name = 'device-types';
 
     public function __construct()
     {
@@ -43,9 +44,9 @@ class DeviceTypeController extends WidgetController
         ];
     }
 
-    public function getSettingsView(Request $request)
+    public function getView(Request $request): string|View
     {
-        return view('widgets.settings.device-types', $this->getSettings(true));
+        return view('widgets.device-types', $this->getData($request));
     }
 
     protected function getData(Request $request): array
@@ -62,7 +63,7 @@ class DeviceTypeController extends WidgetController
 
         $count = 0;
         $device_types = [];
-        foreach (\LibreNMS\Config::get('device_types') as $device_type) {
+        foreach (\App\Facades\LibrenmsConfig::get('device_types') as $device_type) {
             $count++;
             $device_types[] = [
                 'type' => $device_type['type'],
@@ -72,26 +73,13 @@ class DeviceTypeController extends WidgetController
         }
 
         if ($data['sort_order'] == 'name') {
-            usort($device_types, function ($item1, $item2) {
-                return $item1['type'] <=> $item2['type'];
-            });
+            usort($device_types, fn ($item1, $item2) => $item1['type'] <=> $item2['type']);
         } else {
-            usort($device_types, function ($item1, $item2) {
-                return $item2['count'] <=> $item1['count'];
-            });
+            usort($device_types, fn ($item1, $item2) => $item2['count'] <=> $item1['count']);
         }
 
         $data['device_types'] = $device_types;
 
         return $data;
-    }
-
-    /**
-     * @param  Request  $request
-     * @return \Illuminate\View\View
-     */
-    public function getView(Request $request)
-    {
-        return view('widgets.device-types', $this->getData($request));
     }
 }

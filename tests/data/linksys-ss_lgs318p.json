@@ -5052,32 +5052,25 @@
         "discovery": {
             "vlans": [
                 {
-                    "vlan_vlan": 1,
-                    "vlan_domain": 1,
-                    "vlan_name": "VLAN 1",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                },
-                {
                     "vlan_vlan": 5,
                     "vlan_domain": 1,
                     "vlan_name": "DMZ",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
                     "vlan_name": "GUEST",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 20,
                     "vlan_domain": 1,
                     "vlan_name": "Cameras",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -5194,14 +5187,6 @@
                     "untagged": 1
                 },
                 {
-                    "vlan": 1,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 5,
                     "baseport": 49,
                     "priority": 0,
@@ -5242,14 +5227,6 @@
                     "untagged": 1
                 },
                 {
-                    "vlan": 5,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 11,
                     "baseport": 62,
                     "priority": 0,
@@ -5290,14 +5267,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 11,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 20,
                     "baseport": 56,
                     "priority": 0,
@@ -5336,14 +5305,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 20,
-                    "baseport": 1003,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 }
             ]
         }
@@ -6104,6 +6065,26 @@
                     "high_ifIndex": 1003,
                     "low_ifIndex": 100000,
                     "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.10.0.10",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "10.10.0.0/22",
+                    "ifIndex": 300000
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 20000
                 }
             ]
         }

@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 require 'includes/html/collectd/config.php';
 require 'includes/html/collectd/functions.php';
@@ -26,7 +26,7 @@ require 'includes/html/collectd/definitions.php';
 function makeTextBlock($text, $fontfile, $fontsize, $width)
 {
     // TODO: handle explicit line-break!
-    $words = explode(' ', $text);
+    $words = explode(' ', (string) $text);
     $lines = [$words[0]];
     $currentLine = 0;
     foreach ($words as $word) {
@@ -61,8 +61,8 @@ function error($code, $code_msg, $title, $msg)
     header('Pragma: no-cache');
     header('Expires: Mon, 01 Jan 2008 00:00:00 CET');
     header('Content-Type: image/png');
-    $w = (Config::get('rrd_width') + 81);
-    $h = (Config::get('rrd_height') + 79);
+    $w = (LibrenmsConfig::get('rrd_width') + 81);
+    $h = (LibrenmsConfig::get('rrd_height') + 79);
 
     $png = imagecreate($w, $h);
     $c_bkgnd = imagecolorallocate($png, 240, 240, 240);
@@ -93,16 +93,16 @@ function error($code, $code_msg, $title, $msg)
     imageline($png, 1, $h - 2, $w, $h - 2, $c_brb);
     imageline($png, 0, $h - 1, $w, $h - 1, $c_brb);
 
-    imagestring($png, 4, ceil(($w - strlen($title) * imagefontwidth(4)) / 2), 10, $title, $c_txt);
+    imagestring($png, 4, ceil(($w - strlen((string) $title) * imagefontwidth(4)) / 2), 10, (string) $title, $c_txt);
     imagestring($png, 5, 60, 35, sprintf('%s [%d]', $code_msg, $code), $c_etxt);
-    if (function_exists('imagettfbbox') && is_file(Config::get('error_font'))) {
+    if (function_exists('imagettfbbox') && is_file(LibrenmsConfig::get('error_font'))) {
         // Detailled error message
-        $errorfont = Config::get('error_font');
+        $errorfont = LibrenmsConfig::get('error_font');
         $fmt_msg = makeTextBlock($msg, $errorfont, 10, $w - 86);
-        $fmtbox = imagettfbbox(12, 0, $errorfont, $fmt_msg);
-        imagettftext($png, 10, 0, 55, 35 + 3 + imagefontwidth(5) - $fmtbox[7] + $fmtbox[1], $c_txt, $errorfont, $fmt_msg);
+        $fmtbox = imagettfbbox(12, 0, $errorfont, (string) $fmt_msg);
+        imagettftext($png, 10, 0, 55, 35 + 3 + imagefontwidth(5) - $fmtbox[7] + $fmtbox[1], $c_txt, $errorfont, (string) $fmt_msg);
     } else {
-        imagestring($png, 4, 53, 35 + 6 + imagefontwidth(5), $msg, $c_txt);
+        imagestring($png, 4, 53, 35 + 6 + imagefontwidth(5), (string) $msg, $c_txt);
     }
 
     imagepng($png);
@@ -166,11 +166,11 @@ if (is_null($type)) {
 
 $tinst = read_var('c_type_instance', $_GET, '');
 
-$graph_identifier = $host . '/' . $plugin . (strlen($pinst) ? '-' . $pinst : '') . '/' . $type . (strlen($tinst) ? '-' . $tinst : '-*');
+$graph_identifier = $host . '/' . $plugin . (strlen($pinst) ? '-' . $pinst : '') . '/' . $type . (strlen((string) $tinst) ? '-' . $tinst : '-*');
 
-$timespan = read_var('timespan', $_GET, Config::get('timespan.0.name'));
+$timespan = read_var('timespan', $_GET, LibrenmsConfig::get('timespan.0.name'));
 $timespan_ok = false;
-foreach (Config::get('timespan') as &$ts) {
+foreach (LibrenmsConfig::get('timespan') as &$ts) {
     if ($ts['name'] == $timespan) {
         $timespan_ok = true;
     }
@@ -193,7 +193,7 @@ if (count($all_tinst) == 0) {
 load_graph_definitions($logscale, $tinylegend);
 
 $pinst = strlen($pinst) == 0 ? null : $pinst;
-$tinst = strlen($tinst) == 0 ? null : $tinst;
+$tinst = strlen((string) $tinst) == 0 ? null : $tinst;
 
 $opts = [];
 $opts['timespan'] = $timespan;
@@ -243,9 +243,9 @@ if ($height < '99') {
 }
 
 if ($width <= '300') {
-    $rrd_cmd .= ' --font LEGEND:7:' . Config::get('mono_font') . ' --font AXIS:6:' . Config::get('mono_font') . ' ';
+    $rrd_cmd .= ' --font LEGEND:7:' . LibrenmsConfig::get('mono_font') . ' --font AXIS:6:' . LibrenmsConfig::get('mono_font') . ' ';
 } else {
-    $rrd_cmd .= ' --font LEGEND:8:' . Config::get('mono_font') . ' --font AXIS:7:' . Config::get('mono_font') . ' ';
+    $rrd_cmd .= ' --font LEGEND:8:' . LibrenmsConfig::get('mono_font') . ' --font AXIS:7:' . LibrenmsConfig::get('mono_font') . ' ';
 }
 
 if (isset($_GET['debug'])) {

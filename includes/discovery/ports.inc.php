@@ -1,8 +1,8 @@
 <?php
 
 // Build SNMP Cache Array
+use App\Facades\LibrenmsConfig;
 use App\Models\PortGroup;
-use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Util\StringHelpers;
 
@@ -59,7 +59,7 @@ if ($device['os'] == 'zynos') {
 
 // Get correct eth0 port status for AirFiber 5XHD devices
 if ($device['os'] == 'airos-af-ltu') {
-    require 'ports/airos-af-ltu.inc.php';
+    require base_path('includes/discovery/ports/airos-af-ltu.inc.php');
 }
 
 //Teleste Luminato ifOperStatus
@@ -87,6 +87,11 @@ if ($device['os'] == 'tachyon') {
     require base_path('includes/discovery/ports/tachyon.inc.php');
 }
 
+// Nokia 1830 PSS/PSD - ensure ifDescr is set from ifName
+if ($device['os'] == 'nokia-1830') {
+    require base_path('includes/discovery/ports/nokia-1830.inc.php');
+}
+
 // End Building SNMP Cache Array
 d_echo($port_stats);
 
@@ -96,7 +101,7 @@ d_echo($port_stats);
 // The port association configuration allows to choose between association via ifIndex, ifName,
 // or maybe other means in the future. The default port association mode still is ifIndex for
 // compatibility reasons.
-$port_association_mode = Config::get('default_port_association_mode');
+$port_association_mode = LibrenmsConfig::get('default_port_association_mode');
 if ($device['port_association_mode']) {
     $port_association_mode = PortAssociationMode::getName($device['port_association_mode']);
 }
@@ -104,17 +109,6 @@ if ($device['port_association_mode']) {
 // Build array of ports in the database and an ifIndex/ifName -> port_id map
 $ports_mapped = get_ports_mapped($device['device_id']);
 $ports_db = $ports_mapped['ports'];
-
-//
-// Rename any old RRD files still named after the previous ifIndex based naming schema.
-foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
-    foreach (['', '-adsl', '-dot3'] as $suffix) {
-        $old_rrd_name = "port-$ifIndex$suffix.rrd";
-        $new_rrd_name = \Rrd::portName($port_id, ltrim($suffix, '-'));
-
-        \Rrd::renameFile($device, $old_rrd_name, $new_rrd_name);
-    }
-}
 
 // Fill ifAlias for fibrechannel ports
 if ($device['os'] == 'fabos') {
@@ -126,7 +120,7 @@ if ($device['os'] == 'ekinops') {
     require base_path('includes/discovery/ports/ekinops.inc.php');
 }
 
-$default_port_group = Config::get('default_port_group');
+$default_port_group = LibrenmsConfig::get('default_port_group');
 
 // New interface detection
 foreach ($port_stats as $ifIndex => $snmp_data) {
@@ -139,7 +133,7 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
     if (is_port_valid($snmp_data, $device)) {
         port_fill_missing_and_trim($snmp_data, $device);
 
-        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', $snmp_data['ifDescr'], $matches)) {
+        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', (string) $snmp_data['ifDescr'], $matches)) {
             $snmp_data['ifName'] = $matches[1];
         }
 

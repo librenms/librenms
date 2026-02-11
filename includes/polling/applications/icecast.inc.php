@@ -15,7 +15,7 @@ if (! empty($agent_data[$name])) {
     $rawdata = str_replace("<<<icecast>>>\n", '', $rawdata);
 }
 
-$lines = explode("\n", $rawdata);
+$lines = explode("\n", (string) $rawdata);
 
 $icecast = [];
 
@@ -32,9 +32,9 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('openfiles', 'GAUGE', 0, 125000000000);
 
 $fields = [
-    'cpu' => (float) $icecast['CPU Load'],
-    'kbyte' => (int) $icecast['Used Memory'],
-    'openfiles' => (int) $icecast['Open files'],
+    'cpu' => isset($icecast['CPU Load']) ? (float) $icecast['CPU Load'] : null,
+    'kbyte' => isset($icecast['Used Memory']) ? (int) $icecast['Used Memory'] : null,
+    'openfiles' => isset($icecast['Open files']) ? (int) $icecast['Open files'] : null,
 ];
 
 $tags = [

@@ -159,7 +159,7 @@ class Netscaler extends \LibreNMS\OS implements OSPolling
             $fields[$oid] = $data[0][$oid] ?? null;
         }
 
-        $tags = compact('rrd_def');
+        $tags = ['rrd_def' => $rrd_def];
         $datastore->put($this->getDeviceArray(), 'netscaler-stats-tcp', $tags, $fields);
 
         $this->enableGraph('netscaler_tcp_conn');

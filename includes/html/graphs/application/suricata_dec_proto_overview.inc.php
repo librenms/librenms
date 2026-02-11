@@ -276,7 +276,7 @@ if (! isset($rrd_list[0]) && Rrd::checkRrdExists($rrd_filename)) {
     ];
 }
 if (! isset($rrd_list[0])) {
-    d_echo('No RRDs found');
+    throw new \LibreNMS\Exceptions\RrdGraphException('No RRDs found');
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

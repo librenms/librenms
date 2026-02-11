@@ -27,25 +27,21 @@
 namespace App\Http\Controllers\Widgets;
 
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AlertlogController extends WidgetController
 {
-    protected $title = 'Alert history';
+    protected string $name = 'alertlog';
     protected $defaults = [
         'title' => null,
         'device_id' => '',
         'device_group' => null,
-        'state' => -1,
-        'min_severity' => null,
+        'state' => null,
+        'severity' => [],
         'hidenavigation' => 0,
     ];
 
-    public function getView(Request $request)
-    {
-        return view('widgets.alertlog', $this->getSettings());
-    }
-
-    public function getSettingsView(Request $request)
+    public function getSettingsView(Request $request): View
     {
         $data = $this->getSettings(true);
         $data['severities'] = [
@@ -53,9 +49,6 @@ class AlertlogController extends WidgetController
             'ok' => 1,
             'warning' => 2,
             'critical' => 3,
-            'ok only' => 4,
-            'warning only' => 5,
-            'critical only' => 6,
         ];
 
         return view('widgets.settings.alertlog', $data);

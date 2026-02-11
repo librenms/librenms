@@ -31,14 +31,13 @@ if (! empty($fdbPort_table)) {
             if (! $ifIndex) {
                 continue;
             }
-            $port = get_port_by_index_cache($device['device_id'], $ifIndex);
-            $port_id = $port['port_id'];
+            $port_id = PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
             $mac_address = Mac::parse($mac)->hex();
             if (strlen($mac_address) != 12) {
                 Log::debug("MAC address padding failed for $mac\n");
                 continue;
             }
-            $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
+            $vlan_id = $vlans_dict[$vlan] ?? 0;
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
             Log::debug("vlan $vlan mac $mac_address port ($ifIndex) $port_id\n");
         }
@@ -57,14 +56,13 @@ if (! empty($hwCfgMacAddrQueryIfIndex)) {
                     if (! $ifIndex) {
                         continue;
                     }
-                    $port = get_port_by_index_cache($device['device_id'], $ifIndex);
-                    $port_id = $port['port_id'];
+                    $port_id = PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
                     $mac_address = Mac::parse($mac)->hex();
                     if (strlen($mac_address) != 12) {
                         Log::debug("MAC address padding failed for $mac\n");
                         continue;
                     }
-                    $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
+                    $vlan_id = $vlans_dict[$vlan] ?? 0;
                     $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
                     Log::debug("vlan $vlan mac $mac_address port ($ifIndex) $port_id\n");
                 }

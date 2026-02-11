@@ -1,0 +1,970 @@
+modules:
+    os:
+        features: CIENA-CES-MODULE-MIB::cienaCesModuleDescription.1.1
+        hardware: CIENA-CES-CHASSIS-MIB::cienaCesChassisPartNumber.0
+        serial: CIENA-CES-CHASSIS-MIB::cienaCesChassisSerialNumber.0
+        version: CIENA-CES-MODULE-MIB::cienaCesModuleSwRunningRelease.1.1.31
+    processors:
+        data:
+            -
+                oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisCPUHealthCurrMeasurement.1
+                value: CIENA-CES-CHASSIS-MIB::cienaCesChassisCPUHealthCurrMeasurement
+                num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.5.1.4.{{ $index }}'
+                descr: 'Slot {{ $subindex1 }} CPU'
+            -
+                oid: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilization
+                value: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilizationLast5Seconds
+                num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.1.{{ $index }}'
+                descr: 'CPU Utilization 5'
+                index: cpu5.{{ $index }}
+                #low_limit: wwpLeosSystemCpuUtilizationLast5SecondsMinimum
+                #high_limit: wwpLeosSystemCpuUtilizationLast5SecondsMaximum
+            -
+                oid: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilization
+                value: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilizationLast10Seconds
+                num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.5.{{ $index }}'
+                descr: 'CPU Utilization 10'
+                index: cpu10.{{ $index }}
+                #low_limit: wwpLeosSystemCpuUtilizationLast10SecondsMinimum
+                #high_limit: wwpLeosSystemCpuUtilizationLast10SecondsMaximum
+            -
+                oid: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilization
+                value: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilizationLast60Seconds
+                num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.9.{{ $index }}'
+                descr: 'CPU Utilization 60'
+                index: cpu60.{{ $index }}
+                #low_limit: wwpLeosSystemCpuUtilizationLast60SecondsMinimum
+                #high_limit: wwpLeosSystemCpuUtilizationLast60SecondsMaximum
+    sensors:
+        additional_oids:
+            data:
+                - oid:
+                    - BRIDGE-MIB::dot1dBasePortIfIndex
+                    - CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName
+                    - CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerSupplySlotName
+        dbm:
+            data:
+                -
+                    oid: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrTable
+                    value: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrRxDbmPower
+                    num_oid: '.1.3.6.1.4.1.6141.2.60.4.1.1.1.1.105.{{ $index }}'
+                    descr: 'Rx Port {{ $index }} - Optic SN: {{ WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrSerialNum }}'
+                    divisor: 10000
+                    index: wwpLeosPortXcvrRxDbmPower.{{ $index }}
+                    group: 'Rx dBm'
+                    entPhysicalIndex: '{{ BRIDGE-MIB::dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    low_limit: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrLowRxDbmPwAlarmThreshold
+                    high_limit: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrHighRxDbmPwAlarmThreshold
+                    skip_values:
+                        -
+                            oid: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrWaveLength
+                            op: '='
+                            value: 0
+                -
+                    oid: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrTable
+                    value: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrTxDbmPower
+                    num_oid: '.1.3.6.1.4.1.6141.2.60.4.1.1.1.1.106.{{ $index }}'
+                    descr: 'Tx Port {{ $index }} - Optic SN: {{ WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrSerialNum }}'
+                    divisor: 10000
+                    index: wwpLeosPortXcvrTxDbmPower.{{ $index }}
+                    group: 'Tx dBm'
+                    entPhysicalIndex: '{{ BRIDGE-MIB::dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    low_limit: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrLowTxDbmPwAlarmThreshold
+                    high_limit: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrHighTxDbmPwAlarmThreshold
+                    skip_values:
+                        -
+                            oid: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrWaveLength
+                            op: '='
+                            value:  0
+        temperature:
+            data:
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanTempTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanTemp
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.3.2.1.4.{{ $index }}'
+                    entPhysicalIndex: '52{{ $subindex1 }}'
+                    descr: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanTempName
+                    low_limit: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanTempLoThreshold
+                    high_limit: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanTempHiThreshold
+                    group: 'Fans'
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisIomTempHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisIomTempHealthCurrMeasurement
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.35.1.4.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} I/O Module'
+                    low_limit: CIENA-CES-CHASSIS-MIB::cienaCesChassisIomTempHealthMinThreshold
+                    high_limit: CIENA-CES-CHASSIS-MIB::cienaCesChassisIomTempHealthMaxThreshold
+                    group: 'I/O Modules'
+                -
+                    oid: CIENA-CES-MODULE-MIB::cienaCesModuleTempSensorTable
+                    value: CIENA-CES-MODULE-MIB::cienaCesModuleSensorCurrentTemp
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.2.1.2.3.1.3.{{ $index }}'
+                    descr: CIENA-CES-MODULE-MIB::cienaCesModuleSensorDescription
+                    low_limit: CIENA-CES-MODULE-MIB::cienaCesModuleSensorLowTempThreshold
+                    high_limit: CIENA-CES-MODULE-MIB::cienaCesModuleSensorHighTempThreshold
+                    index: 'module-temp-{{ $index }}'
+                    group: 'Modules'
+                -
+                    oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTemperature
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.3.{{ $index }}'
+                    descr: 'Port {{ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName }} Transceiver'
+                    entPhysicalIndex: '{{ BRIDGE-MIB::dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    low_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrLowTempAlarmThreshold
+                    high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighTempAlarmThreshold
+                    group: 'Transceivers'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [4]
+                -
+                    oid: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrTable
+                    value: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrTemperature
+                    num_oid: '.1.3.6.1.4.1.6141.2.60.4.1.1.1.1.16.{{ $index }}'
+                    descr: 'Port {{ $subindex0 }} - Optic SN: {{ WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrSerialNum }}'
+                    index: wwpLeosPortXcvrTemperature.{{ $index }}
+                    group: 'Ports'
+                    entPhysicalIndex: '{{ BRIDGE-MIB::dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    low_limit: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrLowTempAlarmThreshold
+                    high_limit: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrHighTempAlarmThreshold
+                    skip_values:
+                        -
+                            oid: WWP-LEOS-PORT-XCVR-MIB::wwpLeosPortXcvrWaveLength
+                            op: '='
+                            value: 0
+        fanspeed:
+            data:
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanCurrentSpeed
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.2.1.1.5.{{ $index }}'
+                    entPhysicalIndex: '51{{ $subindex1 }}'
+                    descr: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanName
+                    low_limit: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanMinSpeed
+        voltage:
+            data:
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerOutputVoltageHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerOutputVoltageHealthCurrMeasurement
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.37.1.4.{{ $index }}'
+                    entPhysicalIndex: '50{{ $subindex1 }}'
+                    descr: 'Power Supply {{ $subindex1 }} Output'
+                    low_limit: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerOutputVoltageHealthMinThreshold
+                    high_limit: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerOutputVoltageHealthMaxThreshold
+                    divisor: 1000
+                    group: 'Power Supplies'
+                    index: 'psu-v-{{ $index }}'
+                -
+                    oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrVcc
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.4.{{ $index }}'
+                    descr: 'Port {{ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName }} Transceiver Vcc'
+                    entPhysicalIndex: '{{ BRIDGE-MIB::dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    low_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrLowVccAlarmThreshold
+                    high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighVccAlarmThreshold
+                    divisor: 1000
+                    group: 'Transceivers'
+                    index: 'xcvr-vcc-{{ $index }}'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [4]
+        current:
+            data:
+                -
+                    oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrBias
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.5.{{ $index }}'
+                    descr: 'Port {{ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName }} Transceiver Bias Current'
+                    entPhysicalIndex: '{{ BRIDGE-MIB::dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    low_limit: 0
+                    high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighBiasAlarmThreshold
+                    divisor: 1000
+                    group: 'Transceivers'
+                    index: 'xcvr-i-{{ $index }}'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [4]
+        power:
+            data:
+                -
+                    oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrRxPower
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.6.{{ $index }}'
+                    descr: 'Port {{ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName }} Transceiver Rx Power'
+                    entPhysicalIndex: '{{ BRIDGE-MIB::dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    low_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrLowRxPwAlarmThreshold
+                    high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighRxPwAlarmThreshold
+                    divisor: 1000000
+                    group: 'Transceiver Rx Power'
+                    index: 'rx-{{ $index }}'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [1,4]
+                -
+                    oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrRxPower
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.6.{{ $index }}'
+                    descr: 'Port {{ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName }} Transceiver Rx Power'
+                    entPhysicalIndex: '{{ BRIDGE-MIB::dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    low_limit: -1
+                    high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighRxPwAlarmThreshold
+                    divisor: 1000000
+                    group: 'Transceiver Rx Power'
+                    index: 'rx2-{{ $index }}'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
+                            op: 'not_in_array'
+                            value: [1]
+                -
+                    oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTxOutputPower
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.35.{{ $index }}'
+                    descr: 'Port {{ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName }} Transceiver Tx Power'
+                    entPhysicalIndex: '{{ BRIDGE-MIB::dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    low_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrLowTxPwAlarmThreshold
+                    high_limit: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrHighTxPwAlarmThreshold
+                    divisor: 1000000
+                    group: 'Transceiver Tx Power'
+                    index: 'tx-{{ $index }}'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [4]
+                        -
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTxState
+                            op: 'in_array'
+                            value: [2]
+        count:
+            data:
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMACHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisMACHealthCurrMeasurement
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.25.1.4.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} MAC Table Entries'
+                    low_limit: 0
+                    high_limit: CIENA-CES-CHASSIS-MIB::cienaCesChassisMACHealthMaxThreshold
+                    group: 'Service Line Modules'
+        state:
+            data:
+                -
+                    oid: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilization
+                    value: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilizationLast5SecondsState
+                    num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.4.{{ $index }}'
+                    descr: '5 Second CPU State'
+                    state_name: wwpLeosSystemCpuUtilizationLast5SecondsState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: normal }
+                        - { value: 2, generic: 1, graph: 0, descr: warning }
+                        - { value: 3, generic: 1, graph: 0, descr: degraded }
+                        - { value: 4, generic: 1, graph: 0, descr: faulted }
+                    group: 'CPU'
+                -
+                    oid: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilization
+                    value: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilizationLast10SecondsState
+                    num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.8.{{ $index }}'
+                    descr: '10 Second CPU State'
+                    state_name: wwpLeosSystemCpuUtilizationLast10SecondsState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: normal }
+                        - { value: 2, generic: 1, graph: 0, descr: warning }
+                        - { value: 3, generic: 1, graph: 0, descr: degraded }
+                        - { value: 4, generic: 1, graph: 0, descr: faulted }
+                    group: 'CPU'
+                -
+                    oid: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilization
+                    value: WWP-LEOS-SYSTEM-CONFIG-MIB::wwpLeosSystemCpuUtilizationLast60SecondsState
+                    num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.12.{{ $index }}'
+                    descr: '60 Second CPU State'
+                    state_name: wwpLeosSystemCpuUtilizationLast60SecondsState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: normal }
+                        - { value: 2, generic: 1, graph: 0, descr: warning }
+                        - { value: 3, generic: 1, graph: 0, descr: degraded }
+                        - { value: 4, generic: 1, graph: 0, descr: faulted }
+                    group: 'CPU'
+                -
+                    oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrFecMode
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.36.{{ $index }}'
+                    descr: 'Port {{ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName }} Transceiver FEC Mode'
+                    entPhysicalIndex: '{{ BRIDGE-MIB::dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    state_name: cienaCesPortXcvrFecMode
+                    skip_values:
+                        -
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrFecMode
+                            op: 'in_array'
+                            value: [1]
+                        -
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [4]
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: disabled }
+                        - { value: 2, generic: 0, graph: 0, descr: generic }
+                        - { value: 3, generic: 0, graph: 0, descr: enhanced }
+                    group: 'Transceiver FEC Mode'
+                -
+                    oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTxState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.32.{{ $index }}'
+                    descr: 'Port {{ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName }} Transceiver Tx State'
+                    entPhysicalIndex: '{{ BRIDGE-MIB::dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    state_name: cienaCesPortXcvrTxState
+                    skip_values:
+                        -
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTxState
+                            op: 'in_array'
+                            value: [0]
+                        -
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [4]
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: enabled }
+                        - { value: 2, generic: 0, graph: 0, descr: disabled }
+                    group: 'Transceiver Tx State'
+                -
+                    oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTable
+                    value: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTxFaultStatus
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.9.1.1.1.1.33.{{ $index }}'
+                    descr: 'Port {{ CIENA-CES-PORT-MIB::cienaCesLogicalPortConfigPortName }} Transceiver Tx Fault'
+                    entPhysicalIndex: '{{ BRIDGE-MIB::dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    state_name: cienaCesPortXcvrTxFaultStatus
+                    skip_values:
+                        -
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrTxFaultStatus
+                            op: 'in_array'
+                            value: [0]
+                        -
+                            oid: CIENA-CES-PORT-XCVR-MIB::cienaCesPortXcvrOperState
+                            op: 'in_array'
+                            value: [4]
+                    states:
+                        - { value: 1, generic: 2, graph: 0, descr: fault }
+                        - { value: 2, generic: 0, graph: 0, descr: noFault }
+                    group: 'Transceiver Tx Fault'
+                -
+                    oid: CIENA-CES-FEATURE-LICENSE-MIB::cienaCesPremiumFeatureStatusTable
+                    value: CIENA-CES-FEATURE-LICENSE-MIB::cienaCesPremiumFeatureOperStatus
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.11.1.1.1.1.3.{{ $index }}'
+                    descr: 'License {{ CIENA-CES-FEATURE-LICENSE-MIB::cienaCesPremiumFeatureName }}'
+                    state_name: cienaCesPremiumFeatureOperStatus
+                    skip_values: 1
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 0, graph: 0, descr: disabled }
+                        - { value: 2, generic: 0, graph: 0, descr: restrictedUse }
+                        - { value: 3, generic: 0, graph: 0, descr: fullyActive }
+                        - { value: 4, generic: 1, graph: 0, descr: someLicenseKeyMissing }
+                        - { value: 5, generic: 1, graph: 0, descr: licenseViolation }
+                    group: 'License Status'
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisProcessHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisProcessHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.41.1.3.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} Process Health'
+                    state_name: cienaCesChassisProcessHealthState
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Process Health'
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisThreadHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisThreadHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.42.1.3.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} Thread Health'
+                    state_name: cienaCesChassisThreadHealthState
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Thread Health'
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanTrayTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanTrayStatus
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.2.2.1.1.{{ $index }}'
+                    descr: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanTrayName
+                    entPhysicalIndex: '530'
+                    state_name: cienaCesChassisFanTrayStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: ok }
+                        - { value: 2, generic: 1, graph: 0, descr: pending }
+                        - { value: 3, generic: 2, graph: 0, descr: rpm-warning }
+                        - { value: 4, generic: 2, graph: 0, descr: uninstalled }
+                        - { value: 5, generic: 3, graph: 0, descr: unknown }
+                    group: 'Fan Trays'
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanStatus
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.2.1.1.3.{{ $index }}'
+                    descr: CIENA-CES-CHASSIS-MIB::cienaCesChassisFanName
+                    state_name: cienaCesChassisFanStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: ok }
+                        - { value: 2, generic: 1, graph: 0, descr: pending }
+                        - { value: 3, generic: 2, graph: 0, descr: rpm-warning }
+                        - { value: 4, generic: 2, graph: 0, descr: uninstalled }
+                        - { value: 5, generic: 3, graph: 0, descr: unknown }
+                    group: 'Fans'
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerOutputVoltageHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerOutputVoltageHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.37.1.3.{{ $index }}'
+                    descr: 'PS {{ $subindex1 }} Output Voltage'
+                    state_name: cienaCesChassisPowerOutputVoltageHealthTable
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Power Supplies'
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerSupplyType
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.1.1.1.3.{{ $index }}'
+                    descr: 'PS {{ $index }} Type'
+                    state_name: cienaCesChassisPowerSupplyType
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: ac }
+                        - { value: 2, generic: 0, graph: 0, descr: dc }
+                        - { value: 3, generic: 1, graph: 0, descr: unequipped }
+                        - { value: 99, generic: 3, graph: 0, descr: unknown }
+                    skip_values: 99
+                    group: 'Power Supplies'
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerSupplyState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.1.1.1.2.{{ $index }}'
+                    descr: 'PS {{ $index }} State'
+                    state_name: cienaCesChassisPowerSupplyState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: online }
+                        - { value: 2, generic: 2, graph: 0, descr: faulted }
+                        - { value: 3, generic: 2, graph: 0, descr: offline }
+                        - { value: 4, generic: 2, graph: 0, descr: uninstalled }
+                    group: 'Power Supplies'
+                -
+                    oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
+                    value: CIENA-CES-MODULE-MIB::cienaCesModuleAdminState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.2.1.2.1.1.7.{{ $index }}'
+                    descr: 'Slot {{ $subindex2 }} Admin State - {{ CIENA-CES-MODULE-MIB::cienaCesModuleModel }}'
+                    state_name: cienaCesModuleAdminState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: enabled }
+                        - { value: 2, generic: 0, graph: 0, descr: disabled }
+                        - { value: 3, generic: 0, graph: 0, descr: shutdown }
+                    group: 'Module Admin State'
+                -
+                    oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
+                    value: CIENA-CES-MODULE-MIB::cienaCesModuleOperState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.2.1.2.1.1.8.{{ $index }}'
+                    descr: 'Slot {{ $subindex2 }} Oper State - {{ CIENA-CES-MODULE-MIB::cienaCesModuleModel }}'
+                    entPhysicalIndex: '55{{ $subindex2 }}'
+                    state_name: cienaCesModuleOperState
+                    states:
+                        - { value:  1, generic: 0, graph: 0, descr: uninstalled }
+                        - { value:  2, generic: 0, graph: 0, descr: unequipped }
+                        - { value:  3, generic: 1, graph: 0, descr: init }
+                        - { value:  4, generic: 0, graph: 0, descr: disabled }
+                        - { value:  5, generic: 0, graph: 0, descr: enabled }
+                        - { value:  6, generic: 2, graph: 0, descr: faulted }
+                        - { value:  7, generic: 0, graph: 0, descr: hotswap }
+                        - { value:  8, generic: 1, graph: 0, descr: poweroff }
+                        - { value:  9, generic: 1, graph: 0, descr: hitlessInit }
+                        - { value: 10, generic: 1, graph: 0, descr: fastReload }
+                        - { value: 11, generic: 1, graph: 0, descr: krnInit }
+                        - { value: 12, generic: 2, graph: 0, descr: unsupported }
+                        - { value: 13, generic: 1, graph: 0, descr: installing }
+                        - { value: 14, generic: 2, graph: 0, descr: failed }
+                        - { value: 15, generic: 1, graph: 0, descr: krnDisable }
+                        - { value: 16, generic: 2, graph: 0, descr: appFault }
+                        - { value: 17, generic: 1, graph: 0, descr: booting }
+                        - { value: 18, generic: 1, graph: 0, descr: powerdown }
+                    group: 'Module Operational State'
+                -
+                    oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
+                    value: CIENA-CES-MODULE-MIB::cienaCesModuleLastRebootReason
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.2.1.2.1.1.11.{{ $index }}'
+                    descr: 'Slot {{ $subindex2 }} Reboot Reason'
+                    state_name: cienaCesModuleLastRebootReason
+                    states:
+                        - { value:  1, generic: 3, graph: 0, descr: unknown }
+                        - { value:  2, generic: 0, graph: 0, descr: snmp }
+                        - { value:  3, generic: 0, graph: 0, descr: pwrFail }
+                        - { value:  4, generic: 0, graph: 0, descr: appLoad }
+                        - { value:  5, generic: 0, graph: 0, descr: errorHandler }
+                        - { value:  6, generic: 0, graph: 0, descr: watchdog }
+                        - { value:  7, generic: 0, graph: 0, descr: upgrade }
+                        - { value:  8, generic: 0, graph: 0, descr: cli }
+                        - { value:  9, generic: 0, graph: 0, descr: resetButton }
+                        - { value: 10, generic: 0, graph: 0, descr: failOver }
+                        - { value: 11, generic: 0, graph: 0, descr: faultManager }
+                        - { value: 12, generic: 0, graph: 0, descr: communicationFailure }
+                        - { value: 13, generic: 0, graph: 0, descr: configurationRevert }
+                        - { value: 14, generic: 0, graph: 0, descr: unprotectedFailure }
+                        - { value: 15, generic: 0, graph: 0, descr: bootFailure }
+                        - { value: 16, generic: 0, graph: 0, descr: softwareRevert }
+                        - { value: 17, generic: 0, graph: 0, descr: processorWarmRestart }
+                        - { value: 18, generic: 0, graph: 0, descr: coldRestart }
+                        - { value: 19, generic: 0, graph: 0, descr: primaryRestart }
+                    group: 'Module Last Reboot Reason'
+                -
+                    oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
+                    value: CIENA-CES-MODULE-MIB::cienaCesModuleProtectionRole
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.2.1.2.1.1.9.{{ $index }}'
+                    descr: 'Slot {{ $subindex2 }} Protection Role - {{ CIENA-CES-MODULE-MIB::cienaCesModuleModel }}'
+                    state_name: cienaCesModuleProtectionRole
+                    skip_values: 1
+                    states:
+                        - { value:  1, generic: 0, graph: 0, descr: none }
+                        - { value:  2, generic: 0, graph: 0, descr: primary }
+                        - { value:  3, generic: 0, graph: 0, descr: secondary }
+                    group: 'Module Protection Role'
+                -
+                    oid: CIENA-CES-MODULE-MIB::cienaCesModuleTable
+                    value: CIENA-CES-MODULE-MIB::cienaCesModuleStandbyStatus
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.2.1.2.1.1.10.{{ $index }}'
+                    descr: 'Slot {{ $subindex2 }} Standby Status - {{ CIENA-CES-MODULE-MIB::cienaCesModuleModel }}'
+                    state_name: cienaCesModuleStandbyStatus
+                    skip_values: 0
+                    states:
+                        - { value:  0, generic: 0, graph: 0, descr: none }
+                        - { value:  1, generic: 0, graph: 0, descr: cold }
+                        - { value:  2, generic: 0, graph: 0, descr: warm }
+                        - { value:  3, generic: 0, graph: 0, descr: hot }
+                        - { value:  4, generic: 0, graph: 0, descr: protected }
+                    group: 'Module Standby Status'
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisDiskHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisDiskHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.12.1.3.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} Disk Health - Flash0'
+                    state_name: cienaCesChassisDiskHealthStateFlash0
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Disk'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisDiskHealthSubCategory
+                            op: '!='
+                            value: 1
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisDiskHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisDiskHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.12.1.3.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} Disk Health - RAM'
+                    state_name: cienaCesChassisDiskHealthStateRAM
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Disk'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisDiskHealthSubCategory
+                            op: '!='
+                            value: 2
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisDiskHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisDiskHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.12.1.3.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} Disk Health - USB'
+                    state_name: cienaCesChassisDiskHealthStateUSB
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Disk'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisDiskHealthSubCategory
+                            op: '!='
+                            value: 3
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
+                    descr: 'PS {{ $subindex1 }} Load Fuse'
+                    state_name: cienaCesChassisPowerParamsHealthStateLoadFuse
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 1
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
+                    descr: 'PS {{ $subindex1 }} Internal Fuse'
+                    state_name: cienaCesChassisPowerParamsHealthStateInternalFuse
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 2
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
+                    descr: 'PS {{ $subindex1 }} Voltage Regulator'
+                    state_name: cienaCesChassisPowerParamsHealthStateVoltageRegulator
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 3
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
+                    descr: 'PS {{ $subindex1 }} Temperature'
+                    state_name: cienaCesChassisPowerParamsHealthStateTemperature
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 4
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
+                    descr: 'PS {{ $subindex1 }} AC Input'
+                    state_name: cienaCesChassisPowerParamsHealthStateACInput
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 5
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
+                    descr: 'PS {{ $subindex1 }} Overload Protection'
+                    state_name: cienaCesChassisPowerParamsHealthStateOverloadProtection
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 6
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.36.1.3.{{ $index }}'
+                    descr: 'PS {{ $subindex1 }} Fan'
+                    state_name: cienaCesChassisPowerParamsHealthStateOverloadFan
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Power Supplies'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisPowerParamsHealthSubCategory
+                            op: '!='
+                            value: 7
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisSMFabricHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisSMFabricHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.32.1.3.{{ $index }}'
+                    descr: 'SM {{ $subindex1 }} Fabric Status'
+                    state_name: cienaCesChassisSMFabricHealthState
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Switch Modules'
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisSMHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisSMHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.9.1.4.{{ $index }}'
+                    descr: 'SM {{ $subindex1 }} Status'
+                    state_name: cienaCesChassisSMHealthState
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Switch Modules'
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.24.1.3.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} Global Heap'
+                    state_name: cienaCesChassisMemoryHealthStateGlobalHeap
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Memory'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthSubCategory
+                            op: '!='
+                            value: 1
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.24.1.3.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} Heap1'
+                    state_name: cienaCesChassisMemoryHealthStateHeap1
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Memory'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthSubCategory
+                            op: '=='
+                            value: 1
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.24.1.3.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} Heap2'
+                    state_name: cienaCesChassisMemoryHealthSubCategory
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Memory'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthSubCategory
+                            op: '!='
+                            value: 3
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.24.1.3.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} Pool1'
+                    state_name: cienaCesChassisMemoryHealthStatePool1
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Memory'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthOriginIndex
+                            op: '!='
+                            value: 4
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.24.1.3.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} Pool2'
+                    state_name: cienaCesChassisMemoryHealthStatePool2
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Memory'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthOriginIndex
+                            op: '!='
+                            value: 5
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.24.1.3.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} Heap'
+                    state_name: cienaCesChassisMemoryHealthStateHeap
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'Memory'
+                    skip_values:
+                        -
+                            oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisMemoryHealthOriginIndex
+                            op: '!='
+                            value: 6
+                -
+                    oid: CIENA-CES-CHASSIS-MIB::cienaCesChassisCPUHealthTable
+                    value: CIENA-CES-CHASSIS-MIB::cienaCesChassisCPUHealthState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.5.1.3.{{ $index }}'
+                    descr: 'Slot {{ $subindex1 }} CPU Status'
+                    state_name: cienaCesChassisCPUHealthStateCPUUsage
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: normal }
+                        - { value: 3, generic: 1, graph: 0, descr: warning }
+                        - { value: 4, generic: 1, graph: 0, descr: degraded }
+                        - { value: 5, generic: 2, graph: 0, descr: faulted }
+                    group: 'CPU'
+                -
+                    oid: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingTable
+                    value: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.20.1.3.1.1.7.{{ $index }}'
+                    descr: 'Virtual Ring {{ CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingName }} State'
+                    state_name: cienaCesRapsVirtualRingState
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: adminDisabled }
+                        - { value: 2, generic: 0, graph: 0, descr: ok }
+                        - { value: 3, generic: 2, graph: 0, descr: protecting }
+                        - { value: 4, generic: 1, graph: 0, descr: recovering }
+                        - { value: 5, generic: 1, graph: 0, descr: init }
+                        - { value: 6, generic: 3, graph: 0, descr: none }
+                    group: 'G.8032'
+                -
+                    oid: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingTable
+                    value: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingStatus
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.20.1.3.1.1.8.{{ $index }}'
+                    descr: 'Virtual Ring {{ CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingName }} Status'
+                    state_name: cienaCesRapsVirtualRingStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: clear }
+                        - { value: 2, generic: 1, graph: 0, descr: localSignalFail }
+                        - { value: 3, generic: 1, graph: 0, descr: localForceSwitch }
+                        - { value: 4, generic: 1, graph: 0, descr: remoteOrOtherPortSignalFail }
+                        - { value: 5, generic: 1, graph: 0, descr: remoteOrOtherPortForceSwitch }
+                        - { value: 6, generic: 1, graph: 0, descr: provisioningMismatch }
+                        - { value: 7, generic: 1, graph: 0, descr: noRapsPduReceived }
+                        - { value: 8, generic: 1, graph: 0, descr: noRplOwnerDetected }
+                    group: 'G.8032'
+                -
+                    oid: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingTable
+                    value: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingWestPortState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.20.1.3.1.1.14.{{ $index }}'
+                    descr: 'Virtual Ring {{ CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingName }} Port State - West'
+                    state_name: cienaCesRapsVirtualRingWestPortState
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: disabled }
+                        - { value: 2, generic: 0, graph: 0, descr: forwarding }
+                        - { value: 3, generic: 0, graph: 0, descr: blocked }
+                    group: 'G.8032'
+                -
+                    oid: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingTable
+                    value: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingEastPortState
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.20.1.3.1.1.25.{{ $index }}'
+                    descr: 'Virtual Ring {{ CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingName }} Port State - East'
+                    state_name: cienaCesRapsVirtualRingEastPortState
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: disabled }
+                        - { value: 2, generic: 0, graph: 0, descr: forwarding }
+                        - { value: 3, generic: 0, graph: 0, descr: blocked }
+                    group: 'G.8032'
+                -
+                    oid: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingTable
+                    value: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingWestPortStatus
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.20.1.3.1.1.15.{{ $index }}'
+                    descr: 'Virtual Ring {{ CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingName }} Port Status - West'
+                    state_name: cienaCesRapsVirtualRingWestPortStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: ok }
+                        - { value: 2, generic: 2, graph: 0, descr: down }
+                        - { value: 3, generic: 1, graph: 0, descr: ccmFailure }
+                        - { value: 4, generic: 0, graph: 0, descr: localForceSwitch }
+                        - { value: 5, generic: 0, graph: 0, descr: remoteForceSwitch }
+                        - { value: 6, generic: 1, graph: 0, descr: remoteSignalFailure }
+                    group: 'G.8032'
+                -
+                    oid: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingTable
+                    value: CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingEastPortStatus
+                    num_oid: '.1.3.6.1.4.1.1271.2.1.20.1.3.1.1.26.{{ $index }}'
+                    descr: 'Virtual Ring {{ CIENA-CES-RAPS-MIB::cienaCesRapsVirtualRingName }} Port Status - East'
+                    state_name: cienaCesRapsVirtualRingEastPortStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: ok }
+                        - { value: 2, generic: 2, graph: 0, descr: down }
+                        - { value: 3, generic: 1, graph: 0, descr: ccmFailure }
+                        - { value: 4, generic: 0, graph: 0, descr: localForceSwitch }
+                        - { value: 5, generic: 0, graph: 0, descr: remoteForceSwitch }
+                        - { value: 6, generic: 1, graph: 0, descr: remoteSignalFailure }
+                    group: 'G.8032'

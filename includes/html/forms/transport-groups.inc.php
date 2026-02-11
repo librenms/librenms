@@ -36,10 +36,10 @@ $status = 'ok';
 $message = '';
 
 $group_id = $vars['group_id'];
-$name = strip_tags($vars['name']);
+$name = strip_tags((string) $vars['name']);
 
 $target_members = [];
-foreach ((array) $vars['members'] as $target) {
+foreach ((array) ($vars['members'] ?? []) as $target) {
     $target_members[] = (int) $target;
 }
 

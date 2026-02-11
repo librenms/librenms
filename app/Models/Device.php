@@ -17,6 +17,9 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\AddressFamily;
+use LibreNMS\Enum\DeviceStatus;
+use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -36,6 +39,8 @@ use Permissions;
 class Device extends BaseModel
 {
     use PivotEventTrait, HasFactory;
+
+    private ?MaintenanceStatus $maintenanceStatus = null;
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
@@ -94,6 +99,13 @@ class Device extends BaseModel
             'last_polled' => 'datetime',
             'last_ping' => 'datetime',
             'status' => 'boolean',
+            'mtu_status' => 'boolean',
+            'ignore' => 'boolean',
+            'ignore_status' => 'boolean',
+            'disabled' => 'boolean',
+            'snmp_disable' => 'boolean',
+            'disable_notify' => 'boolean',
+            'override_sysLocation' => 'boolean',
         ];
     }
 
@@ -104,30 +116,14 @@ class Device extends BaseModel
         return static::where('hostname', $hostname)->first();
     }
 
-    /**
-     * Returns IP/Hostname where polling will be targeted to
-     *
-     * @param  string|array  $device  hostname which will be triggered
-     *                                array  $device associative array with device data
-     * @return string IP/Hostname to which Device polling is targeted
-     */
-    public static function pollerTarget($device)
+    public function pollerTarget(): string
     {
-        if (! is_array($device)) {
-            $ret = static::where('hostname', $device)->first(['hostname', 'overwrite_ip']);
-            if (empty($ret)) {
-                return $device;
-            }
-            $overwrite_ip = $ret->overwrite_ip;
-            $hostname = $ret->hostname;
-        } elseif (array_key_exists('overwrite_ip', $device)) {
-            $overwrite_ip = $device['overwrite_ip'];
-            $hostname = $device['hostname'];
-        } else {
-            return $device['hostname'];
-        }
+        return ($this->overwrite_ip ?: $this->hostname) ?: '';
+    }
 
-        return $overwrite_ip ?: $hostname;
+    public function ipFamily(): AddressFamily
+    {
+        return str_ends_with($this->transport ?? '', '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
     }
 
     public static function findByIp(?string $ip): ?Device
@@ -150,9 +146,7 @@ class Device extends BaseModel
             if ($port) {
                 return $port->device;
             }
-        } catch (InvalidIpException $e) {
-            //
-        } catch (ModelNotFoundException $e) {
+        } catch (InvalidIpException|ModelNotFoundException) {
             //
         }
 
@@ -164,9 +158,7 @@ class Device extends BaseModel
             if ($port) {
                 return $port->device;
             }
-        } catch (InvalidIpException $e) {
-            //
-        } catch (ModelNotFoundException $e) {
+        } catch (InvalidIpException|ModelNotFoundException) {
             //
         }
 
@@ -216,7 +208,7 @@ class Device extends BaseModel
     {
         $hostname_is_ip = IP::isValid($this->hostname);
 
-        return SimpleTemplate::parse($this->display ?: \LibreNMS\Config::get('device_display_default', '{{ $hostname }}'), [
+        return SimpleTemplate::parse($this->display ?: \App\Facades\LibrenmsConfig::get('device_display_default', '{{ $hostname }}'), [
             'hostname' => $this->hostname,
             'sysName' => $this->sysName ?: $this->hostname,
             'sysName_fallback' => $hostname_is_ip ? $this->sysName : $this->hostname,
@@ -240,32 +232,62 @@ class Device extends BaseModel
         return '';
     }
 
-    public function isUnderMaintenance()
+    public function isUnderMaintenance(): bool
+    {
+        return $this->getMaintenanceStatus() !== MaintenanceStatus::NONE;
+    }
+
+    public function getMaintenanceStatus(): MaintenanceStatus
     {
         if (! $this->device_id) {
-            return false;
+            return MaintenanceStatus::NONE;
         }
 
-        $query = AlertSchedule::isActive()
-            ->where(function (Builder $query) {
-                $query->whereHas('devices', function (Builder $query) {
+        // use cached status
+        if ($this->maintenanceStatus !== null) {
+            return $this->maintenanceStatus;
+        }
+
+        $behavior = AlertSchedule::isActive()
+            ->where(function (Builder $query): void {
+                $query->whereHas('devices', function (Builder $query): void {
                     $query->where('alert_schedulables.alert_schedulable_id', $this->device_id);
                 });
 
                 if ($this->groups->isNotEmpty()) {
-                    $query->orWhereHas('deviceGroups', function (Builder $query) {
+                    $query->orWhereHas('deviceGroups', function (Builder $query): void {
                         $query->whereIntegerInRaw('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
                     });
                 }
 
                 if ($this->location) {
-                    $query->orWhereHas('locations', function (Builder $query) {
+                    $query->orWhereHas('locations', function (Builder $query): void {
                         $query->where('alert_schedulables.alert_schedulable_id', $this->location->id);
                     });
                 }
-            });
+            })
+            ->value('behavior');
 
-        return $query->exists();
+        $this->maintenanceStatus = MaintenanceStatus::fromBehavior($behavior);
+
+        return $this->maintenanceStatus;
+    }
+
+    public function getDeviceStatus(): DeviceStatus
+    {
+        if ($this->disabled) {
+            return DeviceStatus::DISABLED;
+        }
+
+        if ($this->ignore) {
+            return $this->status ? DeviceStatus::IGNORED_UP : DeviceStatus::IGNORED_DOWN;
+        }
+
+        if ($this->status) {
+            return DeviceStatus::UP;
+        }
+
+        return $this->last_polled ? DeviceStatus::DOWN : DeviceStatus::NEVER_POLLED;
     }
 
     /**
@@ -284,7 +306,7 @@ class Device extends BaseModel
             return $name;
         }
 
-        $length = \LibreNMS\Config::get('shorthost_target_length', $length);
+        $length = \App\Facades\LibrenmsConfig::get('shorthost_target_length', $length);
         if ($length < strlen($name)) {
             $take = max(substr_count($name, '.', 0, $length), 1);
 
@@ -299,9 +321,11 @@ class Device extends BaseModel
      */
     public function getCurrentOutage(): ?DeviceOutage
     {
-        return $this->relationLoaded('outages')
-            ? $this->outages->whereNull('up_again')->sortBy('going_down', descending: true)->first()
-            : $this->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
+        if ($this->relationLoaded('outages')) {
+            return $this->outages->whereNull('up_again')->sortBy('going_down', descending: true)->first();
+        }
+
+        return $this->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
     }
 
     /**
@@ -419,9 +443,7 @@ class Device extends BaseModel
 
     public function setAttrib($name, $value)
     {
-        $attrib = $this->attribs->first(function ($item) use ($name) {
-            return $item->attrib_type === $name;
-        });
+        $attrib = $this->attribs->first(fn ($item) => $item->attrib_type === $name);
 
         if (! $attrib) {
             $attrib = new DeviceAttrib(['attrib_type' => $name]);
@@ -435,9 +457,7 @@ class Device extends BaseModel
 
     public function forgetAttrib($name)
     {
-        $attrib_index = $this->attribs->search(function ($attrib) use ($name) {
-            return $attrib->attrib_type === $name;
-        });
+        $attrib_index = $this->attribs->search(fn ($attrib) => $attrib->attrib_type === $name);
 
         if ($attrib_index !== false) {
             $deleted = (bool) $this->attribs->get($attrib_index)->delete();
@@ -459,16 +479,17 @@ class Device extends BaseModel
     /**
      * Update the location to the correct location and update GPS if needed
      *
-     * @param  Location|string  $new_location  location data
+     * @param  Location|string|null  $new_location  location data
      * @param  bool  $doLookup  try to lookup the GPS coordinates
+     * @param  bool  $user_override  Ignore user override and update the location anyway
      */
-    public function setLocation($new_location, bool $doLookup = false)
+    public function setLocation(Location|string|null $new_location, bool $doLookup = false, bool $user_override = false): void
     {
         $new_location = $new_location instanceof Location ? $new_location : new Location(['location' => $new_location]);
         $new_location->location = $new_location->location ? Rewrite::location($new_location->location) : null;
         $coord = array_filter($new_location->only(['lat', 'lng']));
 
-        if (! $this->override_sysLocation) {
+        if ($user_override || ! $this->override_sysLocation) {
             if (! $new_location->location) { // disassociate if the location name is empty
                 $this->location()->dissociate();
 
@@ -597,10 +618,10 @@ class Device extends BaseModel
 
     public function scopeWhereAttributeDisabled(Builder $query, string $attribute): Builder
     {
-        return $query->leftJoin('devices_attribs', function (JoinClause $query) use ($attribute) {
+        return $query->leftJoin('devices_attribs', function (JoinClause $query) use ($attribute): void {
             $query->on('devices.device_id', 'devices_attribs.device_id')
                 ->where('devices_attribs.attrib_type', $attribute);
-        })->where(function (Builder $query) {
+        })->where(function (Builder $query): void {
             $query->whereNull('devices_attribs.attrib_value')
                 ->orWhere('devices_attribs.attrib_value', '!=', 'true');
         });
@@ -627,7 +648,7 @@ class Device extends BaseModel
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
         return $query->whereIn(
-            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup): void {
                 $query->select('device_id')
                 ->from('device_group_device')
                 ->whereIn('device_group_id', Arr::wrap($deviceGroup));
@@ -638,7 +659,7 @@ class Device extends BaseModel
     public function scopeNotInDeviceGroup($query, $deviceGroup)
     {
         return $query->whereNotIn(
-            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup): void {
                 $query->select('device_id')
                 ->from('device_group_device')
                 ->whereIn('device_group_id', Arr::wrap($deviceGroup));
@@ -649,7 +670,7 @@ class Device extends BaseModel
     public function scopeInServiceTemplate($query, $serviceTemplate)
     {
         return $query->whereIn(
-            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate): void {
                 $query->select('device_id')
                 ->from('service_templates_device')
                 ->where('service_template_id', $serviceTemplate);
@@ -660,7 +681,7 @@ class Device extends BaseModel
     public function scopeNotInServiceTemplate($query, $serviceTemplate)
     {
         return $query->whereNotIn(
-            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate): void {
                 $query->select('device_id')
                 ->from('service_templates_device')
                 ->where('service_template_id', $serviceTemplate);
@@ -674,6 +695,8 @@ class Device extends BaseModel
             return $query;
         } elseif ($deviceSpec == 'all') {
             return $query;
+        } elseif ($deviceSpec == 'new') {
+            return $query->whereNull('last_discovered');
         } elseif ($deviceSpec == 'even') {
             return $query->whereRaw('device_id % 2 = 0');
         } elseif ($deviceSpec == 'odd') {
@@ -717,7 +740,7 @@ class Device extends BaseModel
      */
     public function alertSchedules(): MorphToMany
     {
-        return $this->morphToMany(AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+        return $this->morphToMany(AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'alert_schedulable_id', 'schedule_id');
     }
 
     /**
@@ -1079,6 +1102,14 @@ class Device extends BaseModel
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortSecurity, \App\Models\Port, $this>
+     */
+    public function portSecurity(): HasManyThrough
+    {
+        return $this->hasManyThrough(PortSecurity::class, Port::class, 'device_id', 'port_id');
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortVdsl, \App\Models\Port, $this>
      */
     public function portsVdsl(): HasManyThrough
@@ -1148,6 +1179,14 @@ class Device extends BaseModel
     public function services(): HasMany
     {
         return $this->hasMany(Service::class, 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\DeviceStats, $this>
+     */
+    public function stats(): HasOne
+    {
+        return $this->hasOne(DeviceStats::class, 'device_id');
     }
 
     /**

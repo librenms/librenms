@@ -12,6 +12,8 @@ use LibreNMS\Util\Url;
 
 class StoragesController extends TableController
 {
+    protected $model = Storage::class;
+
     protected $default_sort = ['device_hostname' => 'asc', 'storage_descr' => 'asc'];
 
     protected function sortFields($request): array
@@ -28,6 +30,7 @@ class StoragesController extends TableController
     {
         return [
             'hostname',
+            'display',
             'storage_descr',
         ];
     }
@@ -36,7 +39,7 @@ class StoragesController extends TableController
     {
         return Storage::query()
             ->hasAccess($request->user())
-            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'storage.device_id'))
+            ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'storage.device_id'))
             ->withAggregate('device', 'hostname');
     }
 
@@ -49,7 +52,7 @@ class StoragesController extends TableController
         $descr = $storage->storage_descr;
         $graph_array = [
             'type' => 'storage_usage',
-            'popup_title' => htmlentities(strip_tags($storage->device->displayName() . ': ' . $storage->storage_descr)),
+            'popup_title' => htmlentities(strip_tags($storage->device?->displayName() . ': ' . $storage->storage_descr)),
             'id' => $storage->storage_id,
             'from' => '-1d',
             'height' => 20,
@@ -77,10 +80,43 @@ class StoragesController extends TableController
 
     private function usageBar(Storage $storage, array $graph_array): string
     {
-        $left_text = Number::formatBi($storage->storage_used) . ' / ' . Number::formatBi($storage->storage_size);
-        $right_text = Number::formatBi($storage->storage_free);
-        $bar = Html::percentageBar(400, 20, $storage->storage_perc, $left_text, $right_text, $storage->storage_perc_warn);
+        $storage_size = Number::formatBi($storage->storage_size);
+        $left_text = Number::formatBi($storage->storage_used) . ' / ' . $storage_size;
+        $storage_free = Number::formatBi($storage->storage_free);
+        $right_text = $storage_free !== $storage_size ? $storage_free : null;
+        $bar = Html::percentageBar(400, 10, $storage->storage_perc, $left_text, $right_text, $storage->storage_perc_warn);
 
         return Url::graphPopup($graph_array, $bar);
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device Hostname',
+            'Storage',
+            'Used',
+            'Free',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Storage  $storage
+     * @return array
+     */
+    protected function formatExportRow($storage)
+    {
+        return [
+            $storage->device ? $storage->device->displayName() : '',
+            $storage->storage_descr,
+            Number::formatBi($storage->storage_used),
+            Number::formatBi($storage->storage_free),
+        ];
     }
 }

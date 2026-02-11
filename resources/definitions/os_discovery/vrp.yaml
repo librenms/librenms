@@ -1,0 +1,732 @@
+modules:
+    os:
+        sysDescr_regex: '/\((?<hardware>[^)]+) (?<version>V[0-9]{3}R[0-9]{3}[0-9A-Z]+)/'
+        hardware:
+            - HUAWEI-ENTITY-EXTENT-MIB::hwEntityExtentMIB.6.5.0
+            - HUAWEI-DEVICE-EXT-MIB::hwProductName.0
+            - HUAWEI-MIB::hwDatacomm.183.1.25.1.5.1
+            - HUAWEI-MIB::mlsr.20.1.1.1.3.0
+            - HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardName.9
+        serial:
+            - HUAWEI-DEVICE-EXT-MIB::hwDeviceEsn.0
+            - ENTITY-MIB::entPhysicalSerialNum.9
+    processors:
+        data:
+            -
+                oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityStateEntry
+                value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityCpuUsage
+                num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.{{ $index }}'
+                descr: '{{ ENTITY-MIB::entPhysicalName }} Processor'
+                skip_values:
+                    -
+                        oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOperStatus
+                        op: '!='
+                        value: 3
+                    -
+                        oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityCpuUsageThreshold
+                        op: '='
+                        value: 0
+    storage:
+        data:
+            -
+                oid: HUAWEI-FLASH-MAN-MIB::hwStorageTable
+                descr: HUAWEI-FLASH-MAN-MIB::hwStorageName
+                type: HUAWEI-FLASH-MAN-MIB::hwStorageType
+                size: HUAWEI-FLASH-MAN-MIB::hwStorageSpace
+                free: HUAWEI-FLASH-MAN-MIB::hwStorageSpaceFree
+                free_num_oid: '.1.3.6.1.4.1.2011.6.9.1.4.2.1.4.{{ $index }}'
+                units: 1024
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - ENTITY-MIB::entPhysicalName
+                        - HUAWEI-ENTITY-EXTENT-MIB::hwEntityStateTable
+                        - HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
+                        - HUAWEI-ENTITY-EXTENT-MIB::hwPwrStatusTable
+                        - HUAWEI-STACK-MIB::hwStackPortTable
+                        - HUAWEI-WAN-MIB::hw3GTable
+        temperature:
+            data:
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTemperature
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.5.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }}'
+                    index: '{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode
+                            op: '='
+                            value: '1'
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTemperature
+                            op: '<'
+                            value: '-50'
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTemperature
+                            op: '>='
+                            value: '2147483646'
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityStateTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityTemperature
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.11.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }}'
+                    index: '{{ $index }}'
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityTemperature
+                            op: '='
+                            value: '0'
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityTemperature
+                            op: '>='
+                            value: '2147483646'
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwTemperatureThresholdTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityTempValue
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.8.1.6.{{ $index }}'
+                    descr: 'TempSensor {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
+                    group: 'Slot-{{ $subindex0 }}'
+                    warn_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityTempMinorAlmThreshold
+                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityTempMajorAlmThreshold
+                    divisor: 1
+        count:
+            data:
+                -
+                    oid: HUAWEI-WAN-MIB::hw3GTable
+                    value: HUAWEI-WAN-MIB::hw3GBER
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.47.{{ $index }}'
+                    descr: 'Bit Error Rate'
+                    index: '3GBER-{{ $index }}'
+                    group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
+                    skip_values:
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GIMEI
+                            op: '='
+                            value: ''
+                -
+                    oid: HUAWEI-WAN-MIB::hw3GTable
+                    value: HUAWEI-WAN-MIB::hw3GUpBand
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.30.{{ $index }}'
+                    descr: 'Upstream Bandwidth'
+                    index: '3gup-{{ $index }}'
+                    group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
+                    skip_values:
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GIMEI
+                            op: '='
+                            value: ''
+                -
+                    oid: HUAWEI-WAN-MIB::hw3GTable
+                    value: HUAWEI-WAN-MIB::hw3GDownBand
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.31.{{ $index }}'
+                    descr: 'Downstream Bandwidth'
+                    index: '3gdown-{{ $index }}'
+                    group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
+                    skip_values:
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GIMEI
+                            op: '='
+                            value: ''
+                -
+                    oid: HUAWEI-WAN-MIB::hw3GTable
+                    value: HUAWEI-WAN-MIB::hw3GBytesRateSent
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.28.{{ $index }}'
+                    descr: 'Upstream Cur. Speed (bytes/s)'
+                    index: '3gupr-{{ $index }}'
+                    group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
+                    skip_values:
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GIMEI
+                            op: '='
+                            value: ''
+                -
+                    oid: HUAWEI-WAN-MIB::hw3GTable
+                    value: HUAWEI-WAN-MIB::hw3GBytesRateReceived
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.29.{{ $index }}'
+                    descr: 'Downstream Cur. Speed (bytes/s)'
+                    index: '3gdownr-{{ $index }}'
+                    group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
+                    skip_values:
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GIMEI
+                            op: '='
+                            value: ''
+        runtime:
+            data:
+                -
+                    oid: HUAWEI-WAN-MIB::hw3GTable
+                    value: HUAWEI-WAN-MIB::hw3GUpTime
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.55.{{ $index }}'
+                    descr: 'Uptime'
+                    divisor: 6000
+                    index: '3guptime-{{ $index }}'
+                    group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
+                    skip_values:
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GIMEI
+                            op: '='
+                            value: ''
+        dbm:
+            data:
+                -
+                    oid: HUAWEI-WAN-MIB::hw3GTable
+                    value: HUAWEI-WAN-MIB::hw3GCurrentRSSI
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.35.{{ $index }}'
+                    descr: 'RSSI'
+                    index: 'rssi-{{ $index }}'
+                    group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
+                    skip_values:
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GIMEI
+                            op: '='
+                            value: ''
+                -
+                    oid: HUAWEI-WAN-MIB::hw3GTable
+                    value: HUAWEI-WAN-MIB::hw3GCurrentLteRSRP
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.38.{{ $index }}'
+                    descr: 'LTE RSRP'
+                    index: 'rsrp-{{ $index }}'
+                    group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
+                    skip_values:
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GIMEI
+                            op: '='
+                            value: ''
+                -
+                    oid: HUAWEI-WAN-MIB::hw3GTable
+                    value: HUAWEI-WAN-MIB::hw3GCurrentLteRSRQ
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.40.{{ $index }}'
+                    descr: 'LTE RSRQ'
+                    index: 'rsrq-{{ $index }}'
+                    group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
+                    skip_values:
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GIMEI
+                            op: '='
+                            value: ''
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }} Rx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    index: 'rx-{{ $index }}'
+                    user_func: 'uw_to_dbm'
+                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxLowWarnThreshold
+                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxHighWarnThreshold
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
+                            op: '<='
+                            value: 0
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.8.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }} Rx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    index: 'rx-{{ $index }}'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
+                            op: '>'
+                            value: 0
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneRxPower
+                            op: 'exists'
+                            value: true
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '='
+                            value: 0
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }} Tx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    index: 'tx-{{ $index }}'
+                    user_func: 'uw_to_dbm'
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
+                            op: '<='
+                            value: 0
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.9.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }} Tx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    index: 'tx-{{ $index }}'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
+                            op: '>'
+                            value: 0
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneTxPower
+                            op: 'exists'
+                            value: true
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '='
+                            value: 0
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneRxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.32.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }} Rx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    index: 'lane-rx-{{ $index }}'
+                    divisor: 100
+                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxHighThreshold
+                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxLowThreshold
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
+                            op: '>'
+                            value: 0
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneTxPower
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.33.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }} Tx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    index: 'lane-tx-{{ $index }}'
+                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxHighThreshold
+                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxLowThreshold
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
+                            op: '>'
+                            value: 0
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
+                            op: '='
+                            value: 12
+                    divisor: 100
+        voltage:
+            data:
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVoltage
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.6.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVoltage
+                            op: '='
+                            value: '-1'
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalVoltage
+                            op: '='
+                            value: '-255'
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode
+                            op: '='
+                            value: '1'
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityStateTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityVoltage
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.13.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityVoltage
+                            op: '='
+                            value: '0'
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityVoltage
+                            op: '>='
+                            value: '2147483646'
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwPwrStatusTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityPwrVoltage
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.18.1.8.{{ $index }}'
+                    descr: 'PWR{{ HUAWEI-ENTITY-EXTENT-MIB::hwEntityPwrSlot }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwVoltageInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityVolCurValue
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.9.1.7.{{ $index }}'
+                    descr: 'VoltSensor {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
+                    group: 'Slot-{{ $subindex0 }}'
+                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityVolLowAlmFatal
+                    low_warn_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityVolLowAlmMajor
+                    warn_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityVolHighAlmMajor
+                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityVolHighAlmFatal
+                    divisor: 1000
+        current:
+            data:
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.7.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '='
+                            value: '-1'
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '='
+                            value: '-255'
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode
+                            op: '='
+                            value: '1'
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '<'
+                            value: '1000'
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.7.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '='
+                            value: '-1'
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '='
+                            value: '-255'
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode
+                            op: '='
+                            value: '1'
+                        -
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '>='
+                            value: '1000'
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwPwrStatusTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityPwrCurrent
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.18.1.7.{{ $index }}'
+                    descr: 'PWR{{ HUAWEI-ENTITY-EXTENT-MIB::hwEntityPwrSlot }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+        power:
+            data:
+                -
+                    oid: HUAWEI-ENERGYMNGT-MIB::hwAveragePower
+                    num_oid: '.1.3.6.1.4.1.2011.6.157.1.3.{{ $index }}'
+                    descr: 'Average Power Consumption'
+                    index: 0
+                    divisor: 1000
+                -
+                    oid: HUAWEI-ENERGYMNGT-MIB::hwCurrentPower
+                    num_oid: '.1.3.6.1.4.1.2011.6.157.1.6.{{ $index }}'
+                    descr: 'Current Power Consumption'
+                    index: 1
+                    divisor: 1000
+                -
+                    oid: HUAWEI-ENERGYMNGT-MIB::hwBoardPowerMngtTable
+                    value: HUAWEI-ENERGYMNGT-MIB::hwBoardCurrentPower
+                    num_oid: '.1.3.6.1.4.1.2011.6.157.2.1.1.4.{{ $index }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENERGYMNGT-MIB::hwBoardCurrentPower
+                            op: '='
+                            value: '-1'
+                        -
+                            oid: ENTITY-MIB::entPhysicalName
+                            op: '='
+                            value: ''
+                -
+                    oid: HUAWEI-ENERGYMNGT-MIB::hwBoardPowerMngtTable
+                    value: HUAWEI-ENERGYMNGT-MIB::hwBoardCurrentPower
+                    num_oid: '.1.3.6.1.4.1.2011.6.157.2.1.1.4.{{ $index }}'
+                    descr: '{{ HUAWEI-ENERGYMNGT-MIB::hwBoardType }} {{ HUAWEI-ENERGYMNGT-MIB::hwBoardName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: HUAWEI-ENERGYMNGT-MIB::hwBoardCurrentPower
+                            op: '='
+                            value: '-1'
+                        -
+                            oid: ENTITY-MIB::entPhysicalName
+                            op: '!='
+                            value: ''
+        percent:
+            data:
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwFanStatusTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityFanSpeed
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.10.1.5.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} Fan {{ $subindex1 }} Speed'
+        state:
+            data:
+                -
+                    oid: HUAWEI-WLAN-CONFIGURATION-MIB::hwWlanClusterSynConfig
+                    value: HUAWEI-WLAN-CONFIGURATION-MIB::hwWlanClusterSynConfigScheduleEnable
+                    num_oid: '.1.3.6.1.4.1.2011.6.139.11.1.83.5.4.{{ $index }}'
+                    descr: 'Configuration Sync'
+                    group: Redundancy
+                    state_name: hwWlanClusterSynConfigScheduleEnable
+                    states:
+                        - { descr: disable, graph: 1, value: 1, generic: 3 }
+                        - { descr: enable, graph: 1, value: 2, generic: 0 }
+                -
+                    oid: HUAWEI-WLAN-CONFIGURATION-MIB::hwWlanClusterACListInfoTable
+                    value: HUAWEI-WLAN-CONFIGURATION-MIB::hwWlanClusterACStatus
+                    num_oid: '.1.3.6.1.4.1.2011.6.139.11.1.83.6.1.7.{{ $index }}'
+                    descr: 'Current Redundancy Status'
+                    group: Redundancy
+                    state_name: hwWlanClusterACStatus
+                    states:
+                        - { descr: down, graph: 1, value: 1, generic: 2 }
+                        - { descr: up, graph: 1, value: 2, generic: 0 }
+                        - { descr: pskmismatch, graph: 1, value: 3, generic: 2 }
+                        - { descr: vermismatch, graph: 1, value: 4, generic: 2 }
+                        - { descr: cfgmismatch, graph: 1, value: 5, generic: 2 }
+                        - { descr: devmismatch, graph: 1, value: 6, generic: 2 }
+                        - { descr: initial, graph: 1, value: 7, generic: 3 }
+                -
+                    oid: HUAWEI-WLAN-CONFIGURATION-MIB::hwWlanClusterACListInfoTable
+                    value: HUAWEI-WLAN-CONFIGURATION-MIB::hwWlanClusterACRole
+                    num_oid: '.1.3.6.1.4.1.2011.6.139.11.1.83.6.1.4.{{ $index }}'
+                    descr: 'Peer Redundancy Role'
+                    group: Redundancy
+                    state_name: hwWlanClusterACRole
+                    states:
+                        - { descr: Master, graph: 1, value: 1, generic: 0 }
+                        - { descr: Slave, graph: 1, value: 2, generic: 0 }
+                        - { descr: Backup, graph: 1, value: 3, generic: 0 }
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwFanStatusTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityFanState
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.10.1.7.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} Fan {{ $subindex1 }} Status'
+                    group: Fans
+                    state_name: hwEntityFanState
+                    states:
+                        - { descr: Normal, graph: 1, value: 1, generic: 0 }
+                        - { descr: Abnormal, graph: 1, value: 2, generic: 2 }
+                -
+                    oid: HUAWEI-STACK-MIB::hwStackMemberInfoTable
+                    value: HUAWEI-STACK-MIB::hwMemberStackRole
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.183.1.20.1.3.{{ $index }}'
+                    descr: 'Unit {{ $index }} {{ HUAWEI-STACK-MIB::hwMemberStackDeviceType }} Status'
+                    group: Stack
+                    state_name: hwMemberStackRole
+                    states:
+                        - { descr: Master, graph: 1, value: 1, generic: 0 }
+                        - { descr: Standby, graph: 1, value: 2, generic: 0 }
+                        - { descr: Slave, graph: 1, value: 3, generic: 0 }
+                -
+                    oid: HUAWEI-STACK-MIB::hwStackPortTable
+                    value: HUAWEI-STACK-MIB::hwStackPortStatus
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.183.1.21.1.5.{{ $index }}'
+                    descr: 'Unit {{ $subindex0 }} stack-port {{ $subindex1 }} Status'
+                    group: Stack
+                    state_name: hwStackPortStatus
+                    states:
+                        - { descr: Up, graph: 0, value: 1, generic: 0 }
+                        - { descr: Down, graph: 0, value: 2, generic: 2 }
+                -
+                    oid: HUAWEI-WAN-MIB::hw3GTable
+                    value: HUAWEI-WAN-MIB::hw3GModemStatus
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.11.{{ $index }}'
+                    descr: 'Current Modem Status'
+                    group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
+                    state_name: hw3GModemStatus
+                    states:
+                        - { descr: onLine, graph: 1, value: 1, generic: 0 }
+                        - { descr: offLine, graph: 1, value: 4, generic: 2 }
+                    skip_values:
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GIMEI
+                            op: '='
+                            value: ''
+                -
+                    oid: HUAWEI-WAN-MIB::hw3GTable
+                    value: HUAWEI-WAN-MIB::hw3GCurrentNetworkConnection
+                    index: 'netConn-{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.34.{{ $index }}'
+                    descr: 'Current Network'
+                    group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
+                    state_name: hw3GCurrentNetworkConnection
+                    states:
+                        - { descr: '3G', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'LTE', graph: 1, value: 3, generic: 0 }
+                        - { descr: 'Unknown', graph: 1, value: 7, generic: 3 }
+                    skip_values:
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GIMEI
+                            op: '='
+                            value: ''
+                -
+                    oid: HUAWEI-WAN-MIB::hw3GTable
+                    value: HUAWEI-WAN-MIB::hw3GConnectionStatus
+                    index: 'netConnStatus-{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.241.1.2.1.1.53.{{ $index }}'
+                    descr: 'Current Network Status'
+                    group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
+                    state_name: hw3GConnectionStatus
+                    states:
+                        - { descr: 'noService', graph: 1, value: 0, generic: 2 }
+                        - { descr: 'emergency', graph: 1, value: 1, generic: 2 }
+                        - { descr: 'serviceAvailable', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'regionEmergency', graph: 1, value: 3, generic: 2 }
+                        - { descr: 'savingStatus', graph: 1, value: 4, generic: 3 }
+                    skip_values:
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
+                            op: '='
+                            value: ''
+                        -
+                            oid: HUAWEI-WAN-MIB::hw3GIMEI
+                            op: '='
+                            value: ''
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwVoltageInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityVolStatus
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.9.1.5.{{ $index }}'
+                    group: 'Slot-{{ $subindex0 }}'
+                    descr: 'VoltStatus {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
+                    state_name: hwVoltageInfoTable
+                    states:
+                        - { descr: 'Normal', graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Minor', graph: 1, value: 2, generic: 1 }
+                        - { descr: 'Major', graph: 1, value: 3, generic: 2 }
+                        - { descr: 'Fatal', graph: 1, value: 4, generic: 2 }
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwTemperatureThresholdTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityTempStatus
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.8.1.5.{{ $index }}'
+                    group: 'Slot-{{ $subindex0 }}'
+                    descr: 'TempStatus {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
+                    state_name: hwTemperatureThresholdTable
+                    states:
+                        - { descr: 'Normal', graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Minor', graph: 1, value: 2, generic: 1 }
+                        - { descr: 'Major', graph: 1, value: 3, generic: 2 }
+                        - { descr: 'Fatal', graph: 1, value: 4, generic: 2 }
+                -
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwPwrStatusTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityPwrState
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.18.1.6.{{ $index }}'
+                    group: 'Power Supply'
+                    descr: 'PWR{{ HUAWEI-ENTITY-EXTENT-MIB::hwEntityPwrSlot }}'
+                    state_name: hwPwrStatusTable
+                    states:
+                        - { descr: 'Supply', graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Not Supply', graph: 1, value: 2, generic: 2 }
+                        - { descr: 'Sleep', graph: 1, value: 3, generic: 1 }
+                        - { descr: 'Unknown', graph: 1, value: 4, generic: 3 }

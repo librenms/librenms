@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Checks;
+use App\Facades\LibrenmsConfig;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Util\Debug;
 
 class LegacyController extends Controller
@@ -35,16 +35,16 @@ class LegacyController extends Controller
         }
 
         // Load the settings for Multi-Tenancy.
-        if (Config::has('branding') && is_array(Config::get('branding'))) {
-            $branding = Arr::dot(Config::get('branding.' . $request->server('SERVER_NAME'), Config::get('branding.default')));
+        if (LibrenmsConfig::has('branding') && is_array(LibrenmsConfig::get('branding'))) {
+            $branding = Arr::dot(LibrenmsConfig::get('branding.' . $request->server('SERVER_NAME'), LibrenmsConfig::get('branding.default')));
             foreach ($branding as $key => $value) {
-                Config::set($key, $value);
+                LibrenmsConfig::set($key, $value);
             }
         }
 
         // page_title_prefix is displayed, unless page_title is set FIXME: NEEDED?
-        if (Config::has('page_title')) {
-            Config::set('page_title_prefix', Config::get('page_title'));
+        if (LibrenmsConfig::has('page_title')) {
+            LibrenmsConfig::set('page_title_prefix', LibrenmsConfig::get('page_title'));
         }
 
         // render page
@@ -61,13 +61,13 @@ class LegacyController extends Controller
 
         if (isset($pagetitle) && is_array($pagetitle)) {
             // if prefix is set, put it in front
-            if (Config::get('page_title_prefix')) {
-                array_unshift($pagetitle, Config::get('page_title_prefix'));
+            if (LibrenmsConfig::get('page_title_prefix')) {
+                array_unshift($pagetitle, LibrenmsConfig::get('page_title_prefix'));
             }
 
             // if suffix is set, put it in the back
-            if (Config::get('page_title_suffix')) {
-                $pagetitle[] = Config::get('page_title_suffix');
+            if (LibrenmsConfig::get('page_title_suffix')) {
+                $pagetitle[] = LibrenmsConfig::get('page_title_suffix');
             }
 
             // create and set the title
@@ -77,7 +77,7 @@ class LegacyController extends Controller
 
         return response()->view('layouts.legacy_page', [
             'content' => $html,
-            'refresh' => $no_refresh ? 0 : Config::get('page_refresh'),
+            'refresh' => $no_refresh ? 0 : LibrenmsConfig::get('page_refresh'),
         ]);
     }
 

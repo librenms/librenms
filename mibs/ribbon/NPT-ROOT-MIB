@@ -1,0 +1,75 @@
+
+-- File Name : NPT-ROOT-MIB
+-- Date      : Mon Jul 04 17:19:42 CST 2011
+-- Author    : AdventNet Agent Toolkit C Edition - MibEditor 6
+
+
+
+NPT-ROOT-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		enterprises
+			FROM RFC1155-SMI;
+
+	org	OBJECT IDENTIFIER
+		::=  {  iso  3  }
+
+	dod	OBJECT IDENTIFIER
+		::=  {  org  6  }
+
+	internet	OBJECT IDENTIFIER
+		::=  {  dod  1  }
+
+	private	OBJECT IDENTIFIER
+		::=  {  internet  4  }
+
+	enterprises	OBJECT IDENTIFIER
+		::=  {  private  1  }
+
+	eci	OBJECT IDENTIFIER
+		::=  {  enterprises  1286  }
+
+	eNpti	OBJECT IDENTIFIER
+		::=  {  eci  5  }
+
+	eNptiProducts	OBJECT IDENTIFIER
+		::=  {  eNpti  1  }
+
+	eciNpti	OBJECT IDENTIFIER
+		::=  {  eNptiProducts  1  }
+
+	nptSystem	OBJECT IDENTIFIER
+		::=  {  eciNpti  2  }
+
+	nptPerformance	OBJECT IDENTIFIER
+		::=  {  eciNpti  3  }
+		
+	nptStatistics	OBJECT IDENTIFIER
+		::=  {  eciNpti  4  }
+
+	nptAlarm	OBJECT IDENTIFIER
+		::=  {  eciNpti  5  }
+
+	nptTrap	OBJECT IDENTIFIER
+		::=  {  eciNpti  6  }
+
+	nptBGP	OBJECT IDENTIFIER
+		::=  {  eciNpti  7  }
+
+	nptOSPF	OBJECT IDENTIFIER
+		::=  {  eciNpti  8  }
+
+	nptOSPFv3	OBJECT IDENTIFIER
+		::=  {  eciNpti  9  }
+
+	nptVRF	OBJECT IDENTIFIER
+		::=  {  eciNpti  10  }
+
+	nptRSVP	OBJECT IDENTIFIER
+		::=  {  eciNpti  11  }
+		
+	nptIP	OBJECT IDENTIFIER
+		::=  {  eciNpti  12  }
+
+	nptMsdp	OBJECT IDENTIFIER
+		::=  {  eciNpti  13  }
+END

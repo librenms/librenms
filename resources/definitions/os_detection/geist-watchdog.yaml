@@ -1,0 +1,19 @@
+os: geist-watchdog
+text: 'Geist Watchdog'
+type: environment
+icon: geist
+group: geist
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.21239
+        sysObjectID_except:
+            - .1.3.6.1.4.1.21239.42.1.52
+            - .1.3.6.1.4.1.21239.42.1.53
+            - .1.3.6.1.4.1.21239.42.1.55
+        sysDescr_except:
+            - RCM-O
+mib_dir: geist
+over:
+    - { graph: device_temperature, text: 'Temperature' }
+    - { graph: device_humidity, text: 'Humidity' }

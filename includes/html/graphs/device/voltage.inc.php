@@ -1,6 +1,6 @@
 <?php
 
-$rrd_options .= ' --alt-y-grid';
+$graph_params->alt_y_grid = true;
 
 $class = 'voltage';
 $unit = 'V';

@@ -31,7 +31,7 @@ foreach ($components as $k => $v) {
 }
 $components = $keep;
 
-$subtype = basename($vars['subtype']);
+$subtype = basename((string) $vars['subtype']);
 if (is_file("includes/html/pages/device/loadbalancer/$subtype.inc.php")) {
     include "includes/html/pages/device/loadbalancer/$subtype.inc.php";
 } else {

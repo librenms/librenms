@@ -40,7 +40,7 @@ if (Debug::set(isset($options['d']))) {
     echo "DEBUG!\n";
 }
 
-$scheduler = \LibreNMS\Config::get('schedule_type.alerting');
+$scheduler = \App\Facades\LibrenmsConfig::get('schedule_type.alerting');
 if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
     if (Debug::isEnabled()) {
         echo "Alerts are not enabled for cron scheduling.  Add the -f command argument if you want to force this command to run.\n";
@@ -48,10 +48,10 @@ if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
     exit(0);
 }
 
-$alerts_lock = Cache::lock('alerts', \LibreNMS\Config::get('service_alerting_frequency'));
+$alerts_lock = Cache::lock('alerts', \App\Facades\LibrenmsConfig::get('service_alerting_frequency'));
 if ($alerts_lock->get()) {
     $alerts = new RunAlerts();
-    if (! defined('TEST') && \LibreNMS\Config::get('alert.disable') != 'true') {
+    if (! defined('TEST') && \App\Facades\LibrenmsConfig::get('alert.disable') != 'true') {
         echo 'Start: ' . date('r') . "\r\n";
         echo 'ClearStaleAlerts():' . PHP_EOL;
         $alerts->clearStaleAlerts();

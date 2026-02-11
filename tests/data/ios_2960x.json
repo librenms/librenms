@@ -30569,42 +30569,42 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0099",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 1002,
                     "vlan_domain": 1,
                     "vlan_name": "fddi-default",
                     "vlan_type": "fddi",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 1003,
                     "vlan_domain": 1,
                     "vlan_name": "trcrf-default",
                     "vlan_type": "tokenRing",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 1004,
                     "vlan_domain": 1,
                     "vlan_name": "fddinet-default",
                     "vlan_type": "fddiNet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 },
                 {
                     "vlan_vlan": 1005,
                     "vlan_domain": 1,
                     "vlan_name": "trbrf-default",
                     "vlan_type": "trNet",
-                    "vlan_mtu": null
+                    "vlan_state": 0
                 }
             ],
             "ports_vlans": [
@@ -30623,6 +30623,30 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 3,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 20000,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 4,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 20000,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 5,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 20000,
+                    "untagged": 0
                 },
                 {
                     "vlan": 1,
@@ -30690,6 +30714,22 @@
                 },
                 {
                     "vlan": 1,
+                    "baseport": 115,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 20000,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 116,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 20000,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1,
                     "baseport": 161,
                     "priority": 0,
                     "state": "unknown",
@@ -30715,9 +30755,9 @@
                 {
                     "vlan": 1,
                     "baseport": 456,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 10000,
                     "untagged": 1
                 }
             ]
@@ -34279,6 +34319,19 @@
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 11152
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.54.64.9",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "10.54.64.0/27",
+                    "ifIndex": 99
                 }
             ]
         }

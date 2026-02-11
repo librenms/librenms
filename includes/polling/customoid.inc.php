@@ -38,10 +38,10 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     }
 
     if ($customoid['customoid_divisor'] && $oid_value !== 0) {
-        $oid_value = ($oid_value / $customoid['customoid_divisor']);
+        $oid_value /= $customoid['customoid_divisor'];
     }
     if ($customoid['customoid_multiplier']) {
-        $oid_value = ($oid_value * $customoid['customoid_multiplier']);
+        $oid_value *= $customoid['customoid_multiplier'];
     }
 
     if (isset($customoid['user_func']) && in_array($customoid['user_func'], $user_funcs)) {
@@ -64,7 +64,7 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     $rrd_def = RrdDefinition::make()
         ->addDataset('oid_value', $datatype);
 
-    $tags = compact('descr', 'unit', 'rrd_name', 'rrd_def');
+    $tags = ['descr' => $descr, 'unit' => $unit, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
 
     app('Datastore')->put($device, 'customoid', $tags, $fields);
     dbUpdate(['customoid_current' => $oid_value, 'lastupdate' => ['NOW()'], 'customoid_prev' => $prev_oid_value], 'customoids', '`customoid_id` = ?', [$customoid['customoid_id']]);

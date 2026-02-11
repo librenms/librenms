@@ -3,7 +3,7 @@
 /**
  * addhostCliTest.php
  *
- * Tests for addhost.php cli tool
+ * Tests for lnms device:add cli tool
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,14 +28,17 @@ namespace LibreNMS\Tests;
 
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use PHPUnit\Framework\Attributes\TestDox;
 
-class AddHostCliTest extends DBTestCase
+#[TestDox('Add Host CLI')]
+final class AddHostCliTest extends DBTestCase
 {
     use DatabaseTransactions;
 
     /** @var string */
     private $hostName = 'testHost';
 
+    #[TestDox('CLI SNMP v1')]
     public function testCLIsnmpV1(): void
     {
         $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-c' => 'community', '--v1' => true])
@@ -50,6 +53,7 @@ class AddHostCliTest extends DBTestCase
         $this->assertEquals('v1', $device->snmpver, 'Wrong snmp version');
     }
 
+    #[TestDox('CLI SNMP v2')]
     public function testCLIsnmpV2(): void
     {
         $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-c' => 'community', '--v2c' => true])
@@ -64,6 +68,7 @@ class AddHostCliTest extends DBTestCase
         $this->assertEquals('v2c', $device->snmpver, 'Wrong snmp version');
     }
 
+    #[TestDox('CLI SNMP v3 user and password')]
     public function testCLIsnmpV3UserAndPW(): void
     {
         $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-u' => 'SecName', '-A' => 'AuthPW', '-X' => 'PrivPW', '--v3' => true])
@@ -96,6 +101,7 @@ class AddHostCliTest extends DBTestCase
         }
     }
 
+    #[TestDox('SNMP transport')]
     public function testSnmpTransport(): void
     {
         $modes = ['udp', 'udp6', 'tcp', 'tcp6'];
@@ -112,6 +118,7 @@ class AddHostCliTest extends DBTestCase
         }
     }
 
+    #[TestDox('SNMP v3 auth protocol')]
     public function testSnmpV3AuthProtocol(): void
     {
         $modes = \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms();
@@ -124,10 +131,11 @@ class AddHostCliTest extends DBTestCase
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
 
-            $this->assertEquals(strtoupper($mode), $device->authalgo, 'Wrong snmp v3 password algorithm');
+            $this->assertEquals(strtoupper((string) $mode), $device->authalgo, 'Wrong snmp v3 password algorithm');
         }
     }
 
+    #[TestDox('SNMP v3 privacy protocol')]
     public function testSnmpV3PrivacyProtocol(): void
     {
         $modes = \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms();
@@ -140,10 +148,11 @@ class AddHostCliTest extends DBTestCase
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
 
-            $this->assertEquals(strtoupper($mode), $device->cryptoalgo, 'Wrong snmp v3 crypt algorithm');
+            $this->assertEquals(strtoupper((string) $mode), $device->cryptoalgo, 'Wrong snmp v3 crypt algorithm');
         }
     }
 
+    #[TestDox('CLI ping')]
     public function testCLIping(): void
     {
         $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-P' => true, '-o' => 'nameOfOS', '-w' => 'hardware', '-s' => 'System', '--v1' => true])

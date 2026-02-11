@@ -52,6 +52,7 @@ return [
             'distributed' => ['name' => '分散式輪詢器'],
             'graphite' => ['name' => '資料存放區: Graphite'],
             'influxdb' => ['name' => '資料存放區: InfluxDB'],
+            'kafka' => ['name' => '資料存放區: Kafka'],
             'opentsdb' => ['name' => '資料存放區: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => '資料存放區: Prometheus'],
@@ -794,9 +795,6 @@ return [
         'rrdtool_tune' => [
             'description' => '調整所有 rrd 連接埠檔案使用最大值',
             'help' => '自動調整 rrd 連接埠檔案的最大值',
-        ],
-        'sfdp' => [
-            'description' => 'sfdp 路徑',
         ],
         'shorthost_target_length' => [
             'description' => 'Shortened hostname maximum length',

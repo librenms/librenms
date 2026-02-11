@@ -26,9 +26,9 @@
 
 namespace LibreNMS\DB;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Util\Version;
 use Schema as LaravelSchema;
 use Symfony\Component\Yaml\Yaml;
@@ -74,9 +74,7 @@ class Schema
     private static function getMigrationFiles()
     {
         $migrations = collect(glob(base_path('database/migrations/') . '*.php'))
-            ->map(function ($migration_file) {
-                return basename($migration_file, '.php');
-            });
+            ->map(fn ($migration_file) => basename($migration_file, '.php'));
 
         return $migrations;
     }
@@ -106,7 +104,7 @@ class Schema
     public function getSchema()
     {
         if (! isset($this->schema)) {
-            $file = Config::get('install_dir') . '/misc/db_schema.yaml';
+            $file = resource_path('definitions/schema/db_schema.yaml');
             $this->schema = Yaml::parse(file_get_contents($file));
         }
 
@@ -147,7 +145,7 @@ class Schema
     {
         $update_cache = true;
         $cache = [];
-        $cache_file = Config::get('install_dir') . "/cache/{$base}_relationships.cache";
+        $cache_file = LibrenmsConfig::get('install_dir') . "/cache/{$base}_relationships.cache";
         $db_version = Version::get()->databaseMigrationCount();
 
         if (is_file($cache_file)) {
@@ -199,7 +197,7 @@ class Schema
 
         $all = $this->getAllRelationshipPaths($start);
 
-        return isset($all[$target]) ? $all[$target] : false;
+        return $all[$target] ?? false;
     }
 
     private function findPathRecursive(array $tables, $target, $history = [])
@@ -235,9 +233,7 @@ class Schema
                     }
                 }
             } else {
-                $relations = array_keys(array_filter($relationships, function ($related) use ($table) {
-                    return in_array($table, $related);
-                }));
+                $relations = array_keys(array_filter($relationships, fn ($related) => in_array($table, $related)));
 
                 d_echo("Dead end at $table, searching for relationships " . json_encode($relations) . PHP_EOL);
                 $recurse = $this->findPathRecursive($relations, $target, array_merge($history, $tables));
@@ -289,7 +285,7 @@ class Schema
             }
 
             // try to guess assuming key_id = keys table
-            $guessed_table = substr($key, 0, -3);
+            $guessed_table = substr((string) $key, 0, -3);
 
             if (! Str::endsWith($guessed_table, 's')) {
                 if (Str::endsWith($guessed_table, 'x')) {
@@ -335,7 +331,7 @@ class Schema
             foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table' ORDER BY ORDINAL_POSITION")->getValue(DB::connection($connection)->getQueryGrammar())) as $data) {
                 $def = [
                     'Field' => $data->COLUMN_NAME,
-                    'Type' => preg_replace('/int\([0-9]+\)/', 'int', $data->COLUMN_TYPE),
+                    'Type' => preg_replace('/int\([0-9]+\)/', 'int', (string) $data->COLUMN_TYPE),
                     'Null' => $data->IS_NULLABLE === 'YES',
                     'Extra' => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data->EXTRA),
                 ];
@@ -353,9 +349,7 @@ class Schema
             }
 
             $keys = DB::connection($connection)->select(DB::raw("SHOW INDEX FROM `$table`")->getValue(DB::connection($connection)->getQueryGrammar()));
-            usort($keys, function ($a, $b) {
-                return $a->Key_name <=> $b->Key_name;
-            });
+            usort($keys, fn ($a, $b) => $a->Key_name <=> $b->Key_name);
             foreach ($keys as $key) {
                 $key_name = $key->Key_name;
                 if (isset($output[$table]['Indexes'][$key_name])) {

@@ -13,8 +13,8 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Alert\Transport;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
@@ -28,7 +28,7 @@ class Osticket extends Transport
         $token = $this->config['os-token'];
         $email = '';
 
-        foreach (\LibreNMS\Util\Mail::parseEmails(Config::get('email_from')) as $from => $from_name) {
+        foreach (\LibreNMS\Util\Mail::parseEmails((string) LibrenmsConfig::get('email_from')) as $from => $from_name) {
             $email = $from_name . ' <' . $from . '>';
             break;
         }
@@ -37,7 +37,7 @@ class Osticket extends Transport
             'name' => 'LibreNMS',
             'email' => $email,
             'subject' => ($alert_data['name'] ? $alert_data['name'] . ' on ' . $alert_data['hostname'] : $alert_data['title']),
-            'message' => strip_tags($alert_data['msg']),
+            'message' => strip_tags((string) $alert_data['msg']),
             'ip' => $_SERVER['REMOTE_ADDR'],
             'attachments' => [],
         ];

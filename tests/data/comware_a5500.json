@@ -6056,70 +6056,70 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 0001",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "PRINT",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 20,
                     "vlan_domain": 1,
                     "vlan_name": "LAB",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 25,
                     "vlan_domain": 1,
                     "vlan_name": "TEST",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 30,
                     "vlan_domain": 1,
                     "vlan_name": "PLATFORM",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 35,
                     "vlan_domain": 1,
                     "vlan_name": "VMOTION",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 40,
                     "vlan_domain": 1,
                     "vlan_name": "DNU",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 41,
                     "vlan_domain": 1,
                     "vlan_name": "SRV",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 42,
                     "vlan_domain": 1,
                     "vlan_name": "ESX",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 55,
                     "vlan_domain": 1,
                     "vlan_name": "DEV",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -8204,6 +8204,19 @@
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 26
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "192.168.10.3",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.10.0/24",
+                    "ifIndex": 33
                 }
             ]
         }

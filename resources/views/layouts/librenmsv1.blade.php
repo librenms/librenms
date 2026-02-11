@@ -41,10 +41,10 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
-    <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=16042501" rel="stylesheet">
-    <link href="{{ asset('css/tw_dark.css?ver=03052025') }}" rel="stylesheet">
-    @if(!in_array(LibrenmsConfig::get('applied_site_style'), ['device', 'light', 'dark']))
-    <link href="{{ asset('css/' . LibrenmsConfig::get('applied_site_style') . '.css?ver=732417643') }}" rel="stylesheet">
+    <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=10092025" rel="stylesheet">
+    <link href="{{ asset('css/tw_dark.css?ver=19112025') }}" rel="stylesheet">
+    @if(!in_array(session('applied_site_style', 'light'), ['light', 'dark']))
+    <link href="{{ asset('css/' . session('applied_site_style') . '.css?ver=732417643') }}" rel="stylesheet">
     @endif
     @foreach(LibrenmsConfig::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet">
@@ -53,7 +53,6 @@
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
-    <script src="{{ asset('js/alpine.min.js') }}" defer></script>
     <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js?ver=05072021') }}"></script>
@@ -78,27 +77,23 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=29042025') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=14012026') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
     <script>
+        window.siteStyle = '{{ session('applied_site_style') }}';
+        window.siteStylePreference = '{{ session('preferences.site_style') ?? session('applied_site_style', 'device') }}';
+
         // Apply color scheme
-        (function () {
-            const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-            const theme = '{{ LibrenmsConfig::get('applied_site_style') }}';
-            const applyTheme = (isDark) => {
-                document.documentElement.classList.toggle('dark', isDark);
-            };
+        applySiteStyle(window.siteStylePreference);
 
-            applyTheme(theme === 'dark' || (theme === 'device' && mediaQuery.matches));
-
-            mediaQuery.addEventListener('change', (event) => {
-                if (theme === 'device') {
-                    applyTheme(event.matches);
-                }
-            });
-        })();
+        // Listen for system theme changes in device mode
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+            if (window.siteStylePreference === 'device') {
+                applySiteStyle(event.matches ? 'dark' : 'light');
+            }
+        });
     </script>
     @auth
         @if(session('preferences.timezone_static') == null || ! session('preferences.timezone_static'))
@@ -115,7 +110,12 @@
 </head>
 <body>
 @if(Auth::check())
-    <script>updateResolution();</script>
+    <script>
+        // only update resolution if it doesn't match what is stored in the session
+        if (document.documentElement.clientWidth !== {{ (int) session('screen_width') }} || document.documentElement.clientHeight !== {{ (int) session('screen_height') }}) {
+            updateResolution(false);
+        }
+    </script>
 @endif
 
 @if(Request::get('bare') == 'yes')

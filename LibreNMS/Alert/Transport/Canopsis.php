@@ -28,19 +28,12 @@ class Canopsis extends Transport
         $ch->exchange_declare($exchange, AMQPExchangeType::TOPIC, false, true, false);
 
         // Create Canopsis event, see: https://github.com/capensis/canopsis/wiki/Event-specification
-        switch ($alert_data['severity']) {
-            case 'ok':
-                $state = 0;
-                break;
-            case 'warning':
-                $state = 2;
-                break;
-            case 'critical':
-                $state = 3;
-                break;
-            default:
-                $state = 0;
-        }
+        $state = match ($alert_data['severity']) {
+            'ok' => 0,
+            'warning' => 2,
+            'critical' => 3,
+            default => 0,
+        };
         $msg_body = [
             'timestamp' => time(),
             'connector' => 'librenms',

@@ -29,7 +29,7 @@ use LibreNMS\Util\Mac;
  */
 if (empty($fdbPort_table)) { // no empty if come from aos7 script
     // try nokia/ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition
-    $dot1d = snmpwalk_group($device, 'slMacAddressDisposition', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, [], 'nokia');
+    $dot1d = snmpwalk_group($device, 'slMacAddressDisposition', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, [], 'nokia/aos6');
     if (! empty($dot1d)) {
         echo 'AOS6 MAC-ADDRESS-MIB: ';
         $fdbPort_table = [];
@@ -49,9 +49,8 @@ if (! empty($fdbPort_table)) {
     // Build dot1dBasePort to port_id dictionary
     $portid_dict = [];
     $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
-    foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
-        $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);
-        $portid_dict[$port['ifIndex']] = $port['port_id'];
+    foreach ($dot1dBasePortIfIndex as $data) {
+        $portid_dict[$port['ifIndex']] = PortCache::getIdFromIfIndex($data['dot1dBasePortIfIndex'], $device['device_id']);
     }
     // Collect data and populate $insert
     foreach ($fdbPort_table as $vlan => $data) {
@@ -60,13 +59,18 @@ if (! empty($fdbPort_table)) {
                 Log::debug("No port known for $mac\n");
                 continue;
             }
+
+            if (! isset($portid_dict[$dot1dBasePort])) {
+                continue;
+            }
+
             $mac_address = Mac::parse($mac)->hex();
             if (strlen($mac_address) != 12) {
                 Log::debug("MAC address padding failed for $mac\n");
                 continue;
             }
             $port_id = $portid_dict[$dot1dBasePort];
-            $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
+            $vlan_id = $vlans_dict[$vlan] ?? 0;
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
             Log::debug("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
         }

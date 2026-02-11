@@ -26,10 +26,10 @@
 
 namespace LibreNMS\RRD;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\InvalidRrdTypeException;
 
-class RrdDefinition
+class RrdDefinition implements \Stringable
 {
     private static $types = ['GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE'];
     private $dataSets = [];
@@ -68,7 +68,7 @@ class RrdDefinition
         $this->dataSets[$name] = [
             'name' => $name,
             'type' => $this->checkType($type),
-            'hb' => is_null($heartbeat) ? Config::get('rrd.heartbeat') : $heartbeat,
+            'hb' => is_null($heartbeat) ? LibrenmsConfig::get('rrd.heartbeat') : $heartbeat,
             'min' => is_null($min) ? 'U' : $min,
             'max' => is_null($max) ? 'U' : $max,
             'source_ds' => $source_ds,
@@ -83,16 +83,25 @@ class RrdDefinition
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        $def = array_reduce($this->dataSets, function ($carry, $ds) {
+        return implode(' ', $this->getArguments());
+    }
+
+    public function getArguments(): array
+    {
+        $def = [];
+
+        foreach ($this->dataSets as $ds) {
             $name = $ds['name'] . $this->createSource($ds['source_ds'], $ds['source_file']);
+            $def[] = "DS:$name:{$ds['type']}:{$ds['hb']}:{$ds['min']}:{$ds['max']}";
+        }
 
-            return $carry . "DS:$name:{$ds['type']}:{$ds['hb']}:{$ds['min']}:{$ds['max']} ";
-        }, '');
-        $sources = implode(' ', array_map(fn ($s) => "--source $s ", $this->sources));
+        foreach ($this->sources as $source) {
+            array_unshift($def, '--source', $source);
+        }
 
-        return $sources . $def;
+        return $def;
     }
 
     /**
@@ -141,8 +150,7 @@ class RrdDefinition
                 }
 
                 $this->sources[] = $file;
-                end($this->sources);
-                $index = key($this->sources);
+                $index = array_key_last($this->sources);
             }
 
             $output .= '[' . ($index + 1) . ']'; // rrdcreate sources are 1 based
@@ -179,6 +187,6 @@ class RrdDefinition
     {
         $name = preg_replace('/[^a-zA-Z0-9_\-]/', '', $name);
 
-        return substr($name, 0, 19);
+        return substr((string) $name, 0, 19);
     }
 }

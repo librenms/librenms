@@ -11,9 +11,9 @@
  */
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Models\Port;
-use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -23,26 +23,26 @@ function toner2colour($descr, $percent)
 {
     $colour = \LibreNMS\Util\Color::percentage(100 - $percent, null);
 
-    if (substr($descr, -1) == 'C' || stripos($descr, 'cyan') !== false) {
+    if (str_ends_with((string) $descr, 'C') || stripos((string) $descr, 'cyan') !== false) {
         $colour['left'] = '55D6D3';
         $colour['right'] = '33B4B1';
     }
 
-    if (substr($descr, -1) == 'M' || stripos($descr, 'magenta') !== false) {
+    if (str_ends_with((string) $descr, 'M') || stripos((string) $descr, 'magenta') !== false) {
         $colour['left'] = 'F24AC8';
         $colour['right'] = 'D028A6';
     }
 
-    if (substr($descr, -1) == 'Y' || stripos($descr, 'yellow') !== false
-        || stripos($descr, 'giallo') !== false
-        || stripos($descr, 'gul') !== false
+    if (str_ends_with((string) $descr, 'Y') || stripos((string) $descr, 'yellow') !== false
+        || stripos((string) $descr, 'giallo') !== false
+        || stripos((string) $descr, 'gul') !== false
     ) {
         $colour['left'] = 'FFF200';
         $colour['right'] = 'DDD000';
     }
 
-    if (substr($descr, -1) == 'K' || stripos($descr, 'black') !== false
-        || stripos($descr, 'nero') !== false
+    if (str_ends_with((string) $descr, 'K') || stripos((string) $descr, 'black') !== false
+        || stripos((string) $descr, 'nero') !== false
     ) {
         $colour['left'] = '000000';
         $colour['right'] = '222222';
@@ -63,9 +63,9 @@ function escape_quotes($text)
 
 function generate_overlib_content($graph_array, $text)
 {
-    $overlib_content = '<div class=overlib><span class=overlib-text>' . htmlspecialchars($text) . '</span><br />';
+    $overlib_content = '<div class=overlib><span class=overlib-text>' . htmlspecialchars((string) $text) . '</span><br />';
     foreach (['day', 'week', 'month', 'year'] as $period) {
-        $graph_array['from'] = Config::get("time.$period");
+        $graph_array['from'] = LibrenmsConfig::get("time.$period");
         $overlib_content .= escape_quotes(Url::graphTag($graph_array));
     }
 
@@ -76,7 +76,7 @@ function generate_overlib_content($graph_array, $text)
 
 function generate_device_link($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
 {
-    $deviceModel = DeviceCache::get((int) $device['device_id']);
+    $deviceModel = DeviceCache::get((int) ($device['device_id'] ?? 0));
 
     return Url::deviceLink($deviceModel, $text, $vars, $start, $end, $escape_text, $overlib);
 }
@@ -146,7 +146,7 @@ function generate_dynamic_graph_tag($args)
     $urlargs = [];
     $width = 0;
     foreach ($args as $key => $arg) {
-        switch (strtolower($key)) {
+        switch (strtolower((string) $key)) {
             case 'width':
                 $width = $arg;
                 $value = '{{width}}';
@@ -164,7 +164,7 @@ function generate_dynamic_graph_tag($args)
         $urlargs[] = $key . '=' . $value;
     }
 
-    return '<img style="width:' . $width . 'px;height:100%" class="graph img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
+    return '<img style="width:' . $width . 'px;height:100%" class="graph graph-image img-responsive" data-src-template="graph.php?' . implode('&amp;', $urlargs) . '" border="0" />';
 }//end generate_dynamic_graph_tag()
 
 function generate_dynamic_graph_js($args)
@@ -218,18 +218,11 @@ STATE;
     return $state;
 }//end generate_graph_js_state()
 
-function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
-{
-    return \LibreNMS\Util\Html::percentageBar($width, $height, $percent, $left_text, $right_text, null, null, [
-        'left' => $left_background,
-        'left_text' => $left_colour,
-        'right' => $right_background,
-        'right_text' => $right_colour,
-    ]);
-}
-
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
+    if (is_null($port)) {
+        return (string) $text;
+    }
     $graph_array = [];
 
     if (! $text) {
@@ -254,7 +247,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = cleanPort($port);
     }
 
-    $content = '<div class=list-large>' . $port['hostname'] . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
+    $content = '<div class=list-large>' . ($port['hostname'] ?? '') . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
     $content .= addslashes(\LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
 
     $content .= "<div style=\'width: 850px\'>";
@@ -262,16 +255,16 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     $graph_array['legend'] = 'yes';
     $graph_array['height'] = '100';
     $graph_array['width'] = '340';
-    $graph_array['to'] = Config::get('time.now');
-    $graph_array['from'] = Config::get('time.day');
+    $graph_array['to'] = LibrenmsConfig::get('time.now');
+    $graph_array['from'] = LibrenmsConfig::get('time.day');
     $graph_array['id'] = $port['port_id'];
     $content .= Url::graphTag($graph_array);
     if ($single_graph == 0) {
-        $graph_array['from'] = Config::get('time.week');
+        $graph_array['from'] = LibrenmsConfig::get('time.week');
         $content .= Url::graphTag($graph_array);
-        $graph_array['from'] = Config::get('time.month');
+        $graph_array['from'] = LibrenmsConfig::get('time.month');
         $content .= Url::graphTag($graph_array);
-        $graph_array['from'] = Config::get('time.year');
+        $graph_array['from'] = LibrenmsConfig::get('time.year');
         $content .= Url::graphTag($graph_array);
     }
 
@@ -312,24 +305,24 @@ function generate_sensor_link($args, $text = null, $type = null)
         'legend' => 'yes',
         'height' => '100',
         'width' => '340',
-        'to' => Config::get('time.now'),
-        'from' => Config::get('time.day'),
+        'to' => LibrenmsConfig::get('time.now'),
+        'from' => LibrenmsConfig::get('time.day'),
         'id' => $args['sensor_id'],
     ];
     $content .= Url::graphTag($graph_array);
 
-    $graph_array['from'] = Config::get('time.week');
+    $graph_array['from'] = LibrenmsConfig::get('time.week');
     $content .= Url::graphTag($graph_array);
 
-    $graph_array['from'] = Config::get('time.month');
+    $graph_array['from'] = LibrenmsConfig::get('time.month');
     $content .= Url::graphTag($graph_array);
 
-    $graph_array['from'] = Config::get('time.year');
+    $graph_array['from'] = LibrenmsConfig::get('time.year');
     $content .= Url::graphTag($graph_array);
 
     $content .= '</div>';
 
-    $url = Url::generate(['page' => 'graphs', 'id' => $args['sensor_id'], 'type' => $args['graph_type'], 'from' => \LibreNMS\Config::get('time.day')], []);
+    $url = Url::generate(['page' => 'graphs', 'id' => $args['sensor_id'], 'type' => $args['graph_type'], 'from' => \App\Facades\LibrenmsConfig::get('time.day')], []);
 
     return Url::overlibLink($url, $text, $content);
 }//end generate_sensor_link()
@@ -446,15 +439,15 @@ function generate_ap_link($args, $text = null, $type = null)
     $graph_array['legend'] = 'yes';
     $graph_array['height'] = '100';
     $graph_array['width'] = '340';
-    $graph_array['to'] = Config::get('time.now');
-    $graph_array['from'] = Config::get('time.day');
+    $graph_array['to'] = LibrenmsConfig::get('time.now');
+    $graph_array['from'] = LibrenmsConfig::get('time.day');
     $graph_array['id'] = $args['accesspoint_id'];
     $content .= Url::graphTag($graph_array);
-    $graph_array['from'] = Config::get('time.week');
+    $graph_array['from'] = LibrenmsConfig::get('time.week');
     $content .= Url::graphTag($graph_array);
-    $graph_array['from'] = Config::get('time.month');
+    $graph_array['from'] = LibrenmsConfig::get('time.month');
     $content .= Url::graphTag($graph_array);
-    $graph_array['from'] = Config::get('time.year');
+    $graph_array['from'] = LibrenmsConfig::get('time.year');
     $content .= Url::graphTag($graph_array);
     $content .= '</div>';
 
@@ -560,7 +553,7 @@ function alert_details($details)
         if (isset($details['diff']['added'])) {
             foreach (array_values($details['diff']['added'] ?? []) as $oa => $tmp_alerts_added) {
                 $fault_detail = format_alert_details($oa, $tmp_alerts_added, 'Added');
-                $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+                $max_row_length = strlen(strip_tags((string) $fault_detail)) > $max_row_length ? strlen(strip_tags((string) $fault_detail)) : $max_row_length;
                 $all_fault_detail .= $fault_detail;
             }//end foreach
         }
@@ -569,7 +562,7 @@ function alert_details($details)
         if (isset($details['diff']['resolved'])) {
             foreach (array_values($details['diff']['resolved'] ?? []) as $or => $tmp_alerts_resolved) {
                 $fault_detail = format_alert_details($or, $tmp_alerts_resolved, 'Resolved');
-                $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+                $max_row_length = strlen(strip_tags((string) $fault_detail)) > $max_row_length ? strlen(strip_tags((string) $fault_detail)) : $max_row_length;
                 $all_fault_detail .= $fault_detail;
             }//end foreach
         }
@@ -580,7 +573,7 @@ function alert_details($details)
 
     foreach ($details['rule'] ?? [] as $o => $tmp_alerts_rule) {
         $fault_detail = format_alert_details($o, $tmp_alerts_rule);
-        $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+        $max_row_length = strlen(strip_tags((string) $fault_detail)) > $max_row_length ? strlen(strip_tags((string) $fault_detail)) : $max_row_length;
         $all_fault_detail .= $fault_detail;
     }//end foreach
 
@@ -599,7 +592,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     }
 
     if (isset($tmp_alerts['port_id'])) {
-        if ($tmp_alerts['isisISAdjState']) {
+        if (! empty($tmp_alerts['isisISAdjState'])) {
             $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
             $port = Port::find($tmp_alerts['port_id']);
             $fault_detail .= ', Interface ' . Url::portLink($port);
@@ -623,7 +616,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     if (isset($tmp_alerts['sensor_id'])) {
         if ($tmp_alerts['sensor_class'] == 'state') {
             // Give more details for a state (textual form)
-            $details = 'State: ' . $tmp_alerts['state_descr'] . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
+            $details = 'State: ' . ($tmp_alerts['state_descr'] ?? '') . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
         } else {
             // Other sensors
             $details = 'Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
@@ -644,7 +637,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
         }
         $details .= implode(', ', $details_a);
 
-        $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp; <br>' . $details;
+        $fault_detail .= generate_sensor_link($tmp_alerts, $tmp_alerts['name'] ?? '') . ';&nbsp; <br>' . $details;
         $fallback = false;
     }
 
@@ -694,11 +687,12 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     }
 
     if ($tmp_alerts['type'] && isset($tmp_alerts['label'])) {
-        if ($tmp_alerts['error'] == '') {
-            $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
-        } else {
-            $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ' - ' . $tmp_alerts['error'] . ';&nbsp;';
+        $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'];
+        if (! empty($tmp_alerts['error'])) {
+            $fault_detail .= ' - ' . $tmp_alerts['error'];
         }
+        $fault_detail .= ';&nbsp;';
+
         $fallback = false;
     }
 
@@ -751,9 +745,9 @@ function dynamic_override_config($type, $name, $device)
         $checked = '';
     }
     if ($type == 'checkbox') {
-        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="' . htmlentities($name) . '" data-device_id="' . $device['device_id'] . '" data-size="small" ' . $checked . '>';
+        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="' . htmlentities((string) $name) . '" data-device_id="' . $device['device_id'] . '" data-size="small" ' . $checked . '>';
     } elseif ($type == 'text') {
-        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . htmlentities($name) . '" data-device_id="' . $device['device_id'] . '" value="' . htmlentities($attrib_val) . '">';
+        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . htmlentities((string) $name) . '" data-device_id="' . $device['device_id'] . '" value="' . htmlentities((string) $attrib_val) . '">';
     }
 }//end dynamic_override_config()
 
@@ -778,8 +772,8 @@ function get_ports_from_type($given_types)
     //  entry in config.
     $search_types = [];
     foreach ($given_types as $type) {
-        if (Config::has($type . '_descr')) {
-            $type_descr = Config::get($type . '_descr');
+        if (LibrenmsConfig::has($type . '_descr')) {
+            $type_descr = LibrenmsConfig::get($type . '_descr');
             if (is_array($type_descr)) {
                 $search_types = array_merge($search_types, $type_descr);
             } else {
@@ -819,7 +813,7 @@ function get_ports_from_type($given_types)
  */
 function file_download($filename, $content)
 {
-    $length = strlen($content);
+    $length = strlen((string) $content);
     header('Content-Description: File Transfer');
     header('Content-Type: text/plain');
     header("Content-Disposition: attachment; filename=$filename");
@@ -833,7 +827,7 @@ function file_download($filename, $content)
 
 function get_rules_from_json()
 {
-    return json_decode(file_get_contents(Config::get('install_dir') . '/misc/alert_rules.json'), true);
+    return json_decode(file_get_contents(resource_path('definitions/alert_rules.json')), true);
 }
 
 function search_oxidized_config($search_in_conf_textbox)
@@ -842,7 +836,7 @@ function search_oxidized_config($search_in_conf_textbox)
         return false;
     }
 
-    $oxidized_search_url = Config::get('oxidized.url') . '/nodes/conf_search?format=json';
+    $oxidized_search_url = LibrenmsConfig::get('oxidized.url') . '/nodes/conf_search?format=json';
     $postdata = http_build_query(
         [
             'search_in_conf_textbox' => $search_in_conf_textbox,
@@ -880,20 +874,14 @@ function search_oxidized_config($search_in_conf_textbox)
  */
 function eventlog_severity($eventlog_severity)
 {
-    switch ($eventlog_severity) {
-        case 1:
-            return 'label-success'; //OK
-        case 2:
-            return 'label-info'; //Informational
-        case 3:
-            return 'label-primary'; //Notice
-        case 4:
-            return 'label-warning'; //Warning
-        case 5:
-            return 'label-danger'; //Critical
-        default:
-            return 'label-default'; //Unknown
-    }
+    return match ($eventlog_severity) {
+        1 => 'label-success',
+        2 => 'label-info',
+        3 => 'label-primary',
+        4 => 'label-warning',
+        5 => 'label-danger',
+        default => 'label-default',
+    };
 } // end eventlog_severity
 
 function get_oxidized_nodes_list()
@@ -904,7 +892,7 @@ function get_oxidized_nodes_list()
         ],
     ]);
 
-    $data = json_decode(file_get_contents(Config::get('oxidized.url') . '/nodes?format=json', false, $context), true);
+    $data = json_decode(file_get_contents(LibrenmsConfig::get('oxidized.url') . '/nodes?format=json', false, $context), true);
 
     foreach ($data as $object) {
         $device = device_by_name($object['name']);
@@ -921,7 +909,7 @@ function get_oxidized_nodes_list()
 
             // Generate local time string
             $formatted_local_time = $local_date->format('Y-m-d H:i:s T');
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Just display the current value of $object['time'];
             $formatted_local_time = $object['time'];
         }
@@ -946,95 +934,11 @@ function get_oxidized_nodes_list()
  */
 function generate_stacked_graphs($force_stack = false, $transparency = '88')
 {
-    if (Config::get('webui.graph_stacked') == true || $force_stack == true) {
+    if (LibrenmsConfig::get('webui.graph_stacked') == true || $force_stack == true) {
         return ['transparency' => $transparency, 'stacked' => '1'];
     } else {
         return ['transparency' => '', 'stacked' => '-1'];
     }
-}
-
-/**
- * Returns state generic label from value with optional text
- */
-function get_state_label($sensor)
-{
-    $state_translation = dbFetchRow('SELECT * FROM state_translations as ST, sensors_to_state_indexes as SSI WHERE ST.state_index_id=SSI.state_index_id AND SSI.sensor_id = ? AND ST.state_value = ? ', [$sensor['sensor_id'], $sensor['sensor_current']]);
-
-    switch ($state_translation['state_generic_value']) {
-        case 0:  // OK
-            $state_text = $state_translation['state_descr'] ?: 'OK';
-            $state_label = 'label-success';
-            break;
-        case 1:  // Warning
-            $state_text = $state_translation['state_descr'] ?: 'Warning';
-            $state_label = 'label-warning';
-            break;
-        case 2:  // Critical
-            $state_text = $state_translation['state_descr'] ?: 'Critical';
-            $state_label = 'label-danger';
-            break;
-        case 3:  // Unknown
-        default:
-            $state_text = $state_translation['state_descr'] ?: 'Unknown';
-            $state_label = 'label-default';
-    }
-
-    return "<span class='label $state_label'>$state_text</span>";
-}
-
-/**
- * Get sensor label and state color
- *
- * @param  array  $sensor
- * @param  string  $type  sensors or wireless
- * @return string
- */
-function get_sensor_label_color($sensor, $type = 'sensors')
-{
-    $label_style = 'label-success';
-    if (is_null($sensor)) {
-        return 'label-unknown';
-    }
-    if (! is_null($sensor['sensor_limit_warn']) && $sensor['sensor_current'] >= $sensor['sensor_limit_warn']) {
-        $label_style = 'label-warning';
-    }
-    if (! is_null($sensor['sensor_limit_low_warn']) && $sensor['sensor_current'] <= $sensor['sensor_limit_low_warn']) {
-        $label_style = 'label-warning';
-    }
-    if (! is_null($sensor['sensor_limit']) && $sensor['sensor_current'] >= $sensor['sensor_limit']) {
-        $label_style = 'label-danger';
-    }
-    if (! is_null($sensor['sensor_limit_low']) && $sensor['sensor_current'] <= $sensor['sensor_limit_low']) {
-        $label_style = 'label-danger';
-    }
-    $unit = __("$type.{$sensor['sensor_class']}.unit");
-    if ($sensor['sensor_class'] == 'runtime') {
-        $sensor['sensor_current'] = \LibreNMS\Util\Time::formatInterval($sensor['sensor_current'] * 60);
-
-        return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . '</span>';
-    }
-
-    if ($sensor['sensor_class'] == 'frequency' && $sensor['sensor_type'] == 'openwrt') {
-        return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . ' ' . $unit . '</span>';
-    }
-
-    if ($sensor['sensor_class'] == 'power_consumed') {
-        return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'] * 1000, 5, 5, 'Wh')) . '</span>';
-    }
-    if (in_array($sensor['rrd_type'], ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
-        //compute and display an approx rate for this sensor
-        return "<span class='label $label_style'>" . trim(Number::formatSi(max(0, $sensor['sensor_current'] - $sensor['sensor_prev']) / Config::get('rrd.step', 300), 2, 3, $unit)) . '</span>';
-    }
-
-    if ($type == 'wireless' && $sensor['sensor_class'] == 'frequency') {
-        return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'] * 1000000, 2, 3, 'Hz')) . '</span>';
-    }
-
-    if ($type == 'wireless' && $sensor['sensor_class'] == 'distance') {
-        return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'] * 1000, 2, 3, 'm')) . '</span>';
-    }
-
-    return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'], 2, 3, $unit)) . '</span>';
 }
 
 /**
@@ -1059,7 +963,7 @@ function lowest_time($time, $seconds = 300)
 /**
  * @params int
  *
- * @return string
+ * @return string|void
  *
  * This returns the subpath for working with nfdump.
  *
@@ -1083,7 +987,7 @@ function lowest_time($time, $seconds = 300)
 function time_to_nfsen_subpath($time)
 {
     $time = lowest_time($time);
-    $layout = Config::get('nfsen_subdirlayout');
+    $layout = LibrenmsConfig::get('nfsen_subdirlayout');
 
     if ($layout == 0) {
         return 'nfcapd.' . date('YmdHi', $time);
@@ -1116,10 +1020,10 @@ function time_to_nfsen_subpath($time)
  */
 function nfsen_hostname($hostname)
 {
-    $nfsen_hostname = str_replace('.', Config::get('nfsen_split_char'), $hostname);
+    $nfsen_hostname = str_replace('.', LibrenmsConfig::get('nfsen_split_char'), $hostname);
 
-    if (! is_null(Config::get('nfsen_suffix'))) {
-        $nfsen_hostname = str_replace(Config::get('nfsen_suffix'), '', $nfsen_hostname);
+    if (! is_null(LibrenmsConfig::get('nfsen_suffix'))) {
+        $nfsen_hostname = str_replace(LibrenmsConfig::get('nfsen_suffix'), '', $nfsen_hostname);
     }
 
     return $nfsen_hostname;
@@ -1128,7 +1032,7 @@ function nfsen_hostname($hostname)
 /**
  * @params string hostname
  *
- * @return string
+ * @return string|void
  *
  * Takes a hostname and returns the path to the nfsen
  * live dir.
@@ -1137,7 +1041,7 @@ function nfsen_live_dir($hostname)
 {
     $hostname = nfsen_hostname($hostname);
 
-    foreach (Config::get('nfsen_base') as $base_dir) {
+    foreach (LibrenmsConfig::get('nfsen_base') as $base_dir) {
         if (file_exists($base_dir) && is_dir($base_dir)) {
             return $base_dir . '/profiles-data/live/' . $hostname;
         }

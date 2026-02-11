@@ -15,9 +15,9 @@ if (count($processors)) {
         <table class="table table-hover table-condensed table-striped">';
 
     $graph_array = [];
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['type'] = 'processor_usage';
-    $graph_array['from'] = \LibreNMS\Config::get('time.day');
+    $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
     $graph_array['legend'] = 'no';
 
     $total_percent = [];
@@ -26,7 +26,7 @@ if (count($processors)) {
         $text_descr = rewrite_entity_descr($proc['processor_descr']);
 
         $percent = $proc['processor_usage'];
-        if (\LibreNMS\Config::get('cpu_details_overview') === true) {
+        if (\App\Facades\LibrenmsConfig::get('cpu_details_overview') === true) {
             $background = \LibreNMS\Util\Color::percentage($percent, $proc['processor_perc_warn']);
 
             $graph_array['id'] = $proc['processor_id'];
@@ -49,7 +49,12 @@ if (count($processors)) {
             echo '<tr>
                 <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $text_descr, $overlib_content) . '</td>
                 <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
-                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']), $overlib_content) . '
+                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(200, 10, $percent, null, $percent . '%', null, null, [
+                'left' => $background['left'],
+                'left_text' => null,
+                'right' => $background['right'],
+                'right_text' => null,
+            ]), $overlib_content) . '
                 </a></td>
               </tr>';
         } else {
@@ -67,7 +72,7 @@ if (count($processors)) {
         }
     }//end foreach
 
-    if (\LibreNMS\Config::get('cpu_details_overview') === false) {
+    if (\App\Facades\LibrenmsConfig::get('cpu_details_overview') === false) {
         $graph_array = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth($graph_array);
 
         //Generate average cpu graph
@@ -91,7 +96,7 @@ if (count($processors)) {
         echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
         echo '  </td>
             </tr>';
-        foreach ($total_percent as $type => $values) {
+        foreach ($total_percent as $values) {
             //Add a row with CPU desc, count and percent graph
             $percent_usage = ceil($values['usage'] / $values['count']);
             $percent_warn = $values['warn'] / $values['count'];
@@ -99,9 +104,13 @@ if (count($processors)) {
 
             echo '
               <tr>
-                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $values['descr'], $overlib_content) . '</td>
-                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, 'x' . $values['count'], $overlib_content) . '</td>
-                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(200, 20, $percent_usage, null, 'ffffff', $background['left'], $percent_usage . '%', 'ffffff', $background['right']), $overlib_content) . '</td>
+                <td class="col-md-8">' . \LibreNMS\Util\Url::overlibLink($link, 'x' . $values['count'] . ' ' . $values['descr'], $overlib_content) . '</td>
+                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(400, 10, $percent_usage, null, $percent_usage . '%', null, null, [
+                'left' => $background['left'],
+                'left_text' => null,
+                'right' => $background['right'],
+                'right_text' => null,
+            ]), $overlib_content) . '</td>
               </tr>';
         }
     }

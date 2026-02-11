@@ -1,22 +1,21 @@
 <?php
 
-use App\Models\Device;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\RRD\RrdDefinition;
 
 if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
-    echo \LibreNMS\Config::get('project_name') . ' UNIX Agent: ';
+    echo \App\Facades\LibrenmsConfig::get('project_name') . ' UNIX Agent: ';
 
     $agent_port = get_dev_attrib($device, 'override_Unixagent_port');
     if (empty($agent_port)) {
-        $agent_port = \LibreNMS\Config::get('unix-agent.port');
+        $agent_port = \App\Facades\LibrenmsConfig::get('unix-agent.port');
     }
 
     $agent_start = microtime(true);
     $agent = null;
     try {
-        $poller_target = \LibreNMS\Util\Rewrite::addIpv6Brackets(Device::pollerTarget($device['hostname']));
-        $agent = @fsockopen($poller_target, $agent_port, $errno, $errstr, \LibreNMS\Config::get('unix-agent.connection-timeout'));
+        $poller_target = \LibreNMS\Util\Rewrite::addIpv6Brackets(DeviceCache::getPrimary()->pollerTarget());
+        $agent = @fsockopen($poller_target, $agent_port, $errno, $errstr, \App\Facades\LibrenmsConfig::get('unix-agent.connection-timeout'));
     } catch (ErrorException $e) {
         echo $e->getMessage() . PHP_EOL; // usually connection timed out
 
@@ -27,7 +26,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         echo 'Connection to UNIX agent failed on port ' . $agent_port . '.';
     } else {
         // Set stream timeout (for timeouts during agent  fetch
-        stream_set_timeout($agent, \LibreNMS\Config::get('unix-agent.read-timeout'));
+        stream_set_timeout($agent, \App\Facades\LibrenmsConfig::get('unix-agent.read-timeout'));
         $agentinfo = stream_get_meta_data($agent);
         $agent_raw = '';
 
@@ -76,7 +75,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         ];
 
         $agent_data = [];
-        foreach (explode('<<<', $agent_raw) as $section) {
+        foreach (explode('<<<', (string) $agent_raw) as $section) {
             if (empty($section)) {
                 continue;
             }
@@ -96,14 +95,15 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
 
         d_echo($agent_data);
 
-        include 'unix-agent/packages.inc.php';
-        include 'unix-agent/munin-plugins.inc.php';
+        include base_path('includes/polling/unix-agent/packages.inc.php');
+        include base_path('includes/polling/unix-agent/munin-plugins.inc.php');
 
         foreach (array_keys($agent_data) as $key) {
-            if (file_exists("includes/polling/unix-agent/$key.inc.php")) {
+            $parser_file = base_path("includes/polling/unix-agent/$key.inc.php");
+            if (file_exists($parser_file)) {
                 d_echo("Including: unix-agent/$key.inc.php");
 
-                include "unix-agent/$key.inc.php";
+                include $parser_file;
             }
         }
 
@@ -131,7 +131,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             $data = [];
             foreach (explode("\n", $agent_data['ps:sep(9)']) as $process) {
                 $process = preg_replace('/\(([^,;]+),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*)?,?([0-9]*)\)(.*)/', '\\1|\\2|\\3|\\4|\\5|\\6|\\7|\\8|\\9|\\10|\\11|\\12', $process);
-                [$user, $VirtualSize, $WorkingSetSize, $zero, $processId, $PageFileUsage, $UserModeTime, $KernelModeTime, $HandleCount, $ThreadCount, $uptime, $process_name] = explode('|', $process, 12);
+                [$user, $VirtualSize, $WorkingSetSize, $zero, $processId, $PageFileUsage, $UserModeTime, $KernelModeTime, $HandleCount, $ThreadCount, $uptime, $process_name] = explode('|', (string) $process, 12);
                 if (! empty($process_name)) {
                     $cputime = ($UserModeTime + $KernelModeTime) / 10000000;
                     $days = floor($cputime / 86400);
@@ -149,7 +149,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         }
 
         foreach (array_keys($agent_data['app'] ?? []) as $key) {
-            if (file_exists("includes/polling/applications/$key.inc.php")) {
+            if (file_exists(base_path("includes/polling/applications/$key.inc.php"))) {
                 d_echo("Enabling $key for " . $device['hostname'] . " if not yet enabled\n");
 
                 if (in_array($key, $agentapps)) {
@@ -190,22 +190,37 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
 
     // Use agent DMI data if available
     if (isset($agent_data['dmi'])) {
-        if ($agent_data['dmi']['system-product-name']) {
-            $hardware = ($agent_data['dmi']['system-manufacturer'] ? $agent_data['dmi']['system-manufacturer'] . ' ' : '') . $agent_data['dmi']['system-product-name'];
+        $getDmiValue = function ($system_key, $baseboard_key, $generic_value) use ($agent_data) {
+            $dmi = $agent_data['dmi'];
 
+            if (isset($dmi[$system_key]) && $dmi[$system_key] !== $generic_value) {
+                return $dmi[$system_key];
+            }
+
+            return $dmi[$baseboard_key] ?? '';
+        };
+
+        $manufacturer = $getDmiValue('system-manufacturer', 'baseboard-manufacturer', 'System Manufacturer');
+        $product = $getDmiValue('system-product-name', 'baseboard-product-name', 'System Product Name');
+        if ($product || $manufacturer) {
             // Clean up Generic hardware descriptions
-            DeviceCache::getPrimary()->hardware = rewrite_generic_hardware($hardware);
-            unset($hardware);
+            DeviceCache::getPrimary()->hardware = str_replace([
+                ' Computer Corporation',
+                ' Corporation',
+                ' Inc.',
+            ], '', implode(' ', array_filter([$manufacturer, $product])));
         }
 
-        if ($agent_data['dmi']['system-serial-number']) {
-            DeviceCache::getPrimary()->serial = $agent_data['dmi']['system-serial-number'];
+        $serial = $getDmiValue('system-serial-number', 'baseboard-serial-number', 'System Serial Number');
+        if ($serial) {
+            DeviceCache::getPrimary()->serial = $serial;
         }
         DeviceCache::getPrimary()->save();
+        unset($dmi, $getDmiValue, $manufacturer, $product, $serial);
     }
 
     // store results in array cache
-    Cache::driver('array')->put('agent_data', $agent_data);
+    Cache::driver('array')->put('agent_data', $agent_data ?? null);
 
     if (! empty($agent_sensors)) {
         echo 'Sensors: ';

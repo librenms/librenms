@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use Permissions;
 
@@ -21,6 +22,7 @@ class Port extends DeviceRelatedModel
 
     public $timestamps = false;
     protected $primaryKey = 'port_id';
+    protected $guarded = [];
 
     /**
      * Initialize this class
@@ -29,7 +31,7 @@ class Port extends DeviceRelatedModel
     {
         parent::boot();
 
-        static::deleting(function (Port $port) {
+        static::deleting(function (Port $port): void {
             // delete related data
             $port->adsl()->delete();
             $port->vdsl()->delete();
@@ -71,28 +73,28 @@ class Port extends DeviceRelatedModel
     {
         $os = $this->device?->os;
 
-        if (\LibreNMS\Config::getOsSetting($os, 'ifname')) {
+        if (\App\Facades\LibrenmsConfig::getOsSetting($os, 'ifname')) {
             $label = $this->ifName;
-        } elseif (\LibreNMS\Config::getOsSetting($os, 'ifalias')) {
+        } elseif (\App\Facades\LibrenmsConfig::getOsSetting($os, 'ifalias')) {
             $label = $this->ifAlias;
         }
 
         if (empty($label)) {
             $label = $this->ifDescr;
 
-            if (\LibreNMS\Config::getOsSetting($os, 'ifindex')) {
+            if (\App\Facades\LibrenmsConfig::getOsSetting($os, 'ifindex')) {
                 $label .= " $this->ifIndex";
             }
         }
 
-        foreach ((array) \LibreNMS\Config::get('rewrite_if', []) as $src => $val) {
-            if (Str::contains(strtolower($label), strtolower($src))) {
+        foreach ((array) \App\Facades\LibrenmsConfig::get('rewrite_if', []) as $src => $val) {
+            if (Str::contains(strtolower($label), strtolower((string) $src))) {
                 $label = $val;
             }
         }
 
-        foreach ((array) \LibreNMS\Config::get('rewrite_if_regexp', []) as $reg => $val) {
-            $label = preg_replace($reg . 'i', $val, $label);
+        foreach ((array) \App\Facades\LibrenmsConfig::get('rewrite_if_regexp', []) as $reg => $val) {
+            $label = preg_replace($reg . 'i', (string) $val, $label);
         }
 
         return $label;
@@ -131,6 +133,29 @@ class Port extends DeviceRelatedModel
     }
 
     /**
+     * Get port speeds, respecting parsed interface circuit speeds as bps
+     *
+     * @return array{int, int} [egress bps, ingress bps]
+     */
+    public function getSpeeds(): array
+    {
+        $egress = $ingress = (int) $this->ifSpeed;
+
+        if (! empty($this->port_descr_speed)) {
+            $speed_parts = explode('/', (string) $this->port_descr_speed, 2);
+            $parsed_egress = Number::toBytes($speed_parts[0]);
+            $parsed_ingress = isset($speed_parts[1]) ? Number::toBytes($speed_parts[1]) : $parsed_egress;
+
+            if ($parsed_egress > 0 && $parsed_ingress > 0) {
+                $egress = $parsed_egress;
+                $ingress = $parsed_ingress;
+            }
+        }
+
+        return [$egress, $ingress];
+    }
+
+    /**
      * Check if user can access this port.
      *
      * @param  User|int  $user
@@ -154,7 +179,7 @@ class Port extends DeviceRelatedModel
     public function getIfPhysAddressAttribute($mac)
     {
         if (! empty($mac)) {
-            return preg_replace('/(..)(..)(..)(..)(..)(..)/', '\\1:\\2:\\3:\\4:\\5:\\6', $mac);
+            return preg_replace('/(..)(..)(..)(..)(..)(..)/', '\\1:\\2:\\3:\\4:\\5:\\6', (string) $mac);
         }
 
         return null;
@@ -261,7 +286,7 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-        ])->where(function ($query) {
+        ])->where(function ($query): void {
             /** @var Builder $query */
             $query->where($this->qualifyColumn('ifInErrors_delta'), '>', 0)
                 ->orWhere($this->qualifyColumn('ifOutErrors_delta'), '>', 0);
@@ -287,7 +312,7 @@ class Port extends DeviceRelatedModel
 
     public function scopeInPortGroup($query, $portGroup)
     {
-        return $query->whereIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup) {
+        return $query->whereIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup): void {
             $query->select('port_id')
                 ->from('port_group_port')
                 ->where('port_group_id', $portGroup);
@@ -397,11 +422,16 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Port, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Port, \App\Models\Ipv4Mac, $this>
      */
-    public function macLinkedPorts(): BelongsToMany
+    public function macLinkedPorts(): HasManyThrough
     {
-        return $this->belongsToMany(Port::class, 'view_port_mac_links', 'port_id', 'remote_port_id');
+        return $this->hasManyThrough(Port::class, Ipv4Mac::class, 'port_id', 'ifPhysAddress', 'port_id', 'mac_address')
+            ->join('ipv4_addresses', function ($j): void {
+                $j->on('ipv4_mac.ipv4_address', 'ipv4_addresses.ipv4_address');
+                $j->on('ports.port_id', 'ipv4_addresses.port_id');
+            })
+            ->whereNotIn('mac_address', ['000000000000', 'ffffffffffff']);
     }
 
     /**
@@ -493,6 +523,14 @@ class Port extends DeviceRelatedModel
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Route, $this>
+     */
+    public function routes(): HasMany
+    {
+        return $this->hasMany(Route::class, 'port_id');
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Port, \App\Models\PortStack, $this>
      */
     public function stackChildren(): HasManyThrough
@@ -555,5 +593,13 @@ class Port extends DeviceRelatedModel
     public function vrf(): HasOne
     {
         return $this->hasOne(Vrf::class, 'vrf_id', 'ifVrf');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\PortSecurity, $this>
+     */
+    public function portSecurity(): HasOne
+    {
+        return $this->hasOne(PortSecurity::class, 'port_id');
     }
 }

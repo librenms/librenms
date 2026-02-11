@@ -13,8 +13,8 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Alert\Transport;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
@@ -25,19 +25,19 @@ class Kayako extends Transport
         $url = $this->config['kayako-url'] . '/Tickets/Ticket';
         $key = $this->config['kayako-key'];
         $secret = $this->config['kayako-secret'];
-        $user = Config::get('email_from');
+        $user = LibrenmsConfig::get('email_from');
         $department = $this->config['kayako-department'];
         $ticket_type = 1;
         $ticket_status = 1;
         $ticket_prio = 1;
         $salt = bin2hex(random_bytes(20));
-        $signature = base64_encode(hash_hmac('sha256', $salt, $secret, true));
+        $signature = base64_encode(hash_hmac('sha256', $salt, (string) $secret, true));
 
         $protocol = [
             'subject' => ($alert_data['name'] ? $alert_data['name'] . ' on ' . $alert_data['hostname'] : $alert_data['title']),
             'fullname' => 'LibreNMS Alert',
             'email' => $user,
-            'contents' => strip_tags($alert_data['msg']),
+            'contents' => strip_tags((string) $alert_data['msg']),
             'departmentid' => $department,
             'ticketstatusid' => $ticket_status,
             'ticketpriorityid' => $ticket_prio,

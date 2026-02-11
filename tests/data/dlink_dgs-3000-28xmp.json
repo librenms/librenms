@@ -6715,28 +6715,28 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2002,
                     "vlan_domain": 1,
                     "vlan_name": "dienste",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3158,
                     "vlan_domain": 1,
                     "vlan_name": "prod",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3974,
                     "vlan_domain": 1,
                     "vlan_name": "remed",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -7993,6 +7993,19 @@
                     "ifAlias": "D-Link DGS-3000-28XMP R4.00.017 Port 25",
                     "ifDescr": "D-Link DGS-3000-28XMP R4.00.017 Port 25",
                     "ifName": "1/25"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "143.160.133.45",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "143.160.133.32/27",
+                    "ifIndex": 5121
                 }
             ]
         }

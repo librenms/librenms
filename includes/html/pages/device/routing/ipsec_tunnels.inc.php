@@ -89,8 +89,8 @@ if (is_null($vars['graph'])) {
     <tbody>';
 
     foreach ($tunnel as $entry) {
-        $local_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities($entry['local_addr']));
-        $remote_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities($entry['peer_addr']));
+        $local_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities((string) $entry['local_addr']));
+        $remote_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities((string) $entry['peer_addr']));
 
         if ($tunnel['tunnel_status'] = 'active') {
             $tunnel_label = 'success';
@@ -98,8 +98,8 @@ if (is_null($vars['graph'])) {
         echo '<tr>
             <td>' . $local_addr . '</td>
             <td>' . $remote_addr . '</td>
-            <td>' . htmlentities($entry['tunnel_name']) . '</td>
-            <td><span class="label label-' . $tunnel_label . '">' . htmlentities($entry['tunnel_status']) . '</span></td>
+            <td>' . htmlentities((string) $entry['tunnel_name']) . '</td>
+            <td><span class="label label-' . $tunnel_label . '">' . htmlentities((string) $entry['tunnel_status']) . '</span></td>
         </tr>';
     }
 
@@ -107,13 +107,13 @@ if (is_null($vars['graph'])) {
     </table>';
 } else {
     foreach ($tunnel as $entry) {
-        $local_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities($entry['local_addr']));
-        $remote_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities($entry['peer_addr']));
+        $local_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities((string) $entry['local_addr']));
+        $remote_addr = preg_replace('/\b0+(?=\d)/', '', htmlentities((string) $entry['peer_addr']));
 
         $graph_type = 'ipsectunnel_' . $vars['graph'];
         $graph_array['height'] = '100';
         $graph_array['width'] = '215';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['id'] = $entry['tunnel_id'];
         $graph_array['type'] = $graph_type;
         echo '<div class="panel panel-default">

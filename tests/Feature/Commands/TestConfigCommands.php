@@ -26,19 +26,19 @@
 
 namespace LibreNMS\Tests\Feature\Commands;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Tests\InMemoryDbTestCase;
 
-class TestConfigCommands extends InMemoryDbTestCase
+final class TestConfigCommands extends InMemoryDbTestCase
 {
     public function testSetting(): void
     {
         // simple
-        Config::set('login_message', null);
+        LibrenmsConfig::set('login_message', null);
         $this->assertCliSets('login_message', 'hello');
 
         // nested
-        Config::forget('allow_entity_sensor.amperes');
+        LibrenmsConfig::forget('allow_entity_sensor.amperes');
         $this->assertCliSets('allow_entity_sensor.amperes', 'false');
 
         // set inside
@@ -50,7 +50,7 @@ class TestConfigCommands extends InMemoryDbTestCase
             ->assertExitCode(0);
 
         // test append
-        $community = Config::get('snmp.community');
+        $community = LibrenmsConfig::get('snmp.community');
         $this->assertCliGets('snmp.community', $community);
         $community[] = 'extra_community';
         $this->artisan('config:set', ['setting' => 'snmp.community.+', 'value' => 'extra_community'])->assertExitCode(0);
@@ -64,13 +64,13 @@ class TestConfigCommands extends InMemoryDbTestCase
 
         // os array append
         $this->artisan('config:set', ['setting' => 'os.netonix.bad_iftype', 'value' => '["ethernet","psuedowire"]'])->assertExitCode(0);
-        $this->assertEquals(['ethernet', 'psuedowire'], Config::get('os.netonix.bad_iftype'));
+        $this->assertEquals(['ethernet', 'psuedowire'], LibrenmsConfig::get('os.netonix.bad_iftype'));
         $this->artisan('config:set', ['setting' => 'os.netonix.bad_iftype.+', 'value' => 'other'])->assertExitCode(0);
         $this->assertCliGets('os.netonix.bad_iftype', ['ethernet', 'psuedowire', 'other']);
 
         // dump
         $this->artisan('config:get', ['--dump' => true])
-            ->expectsOutput(Config::toJson())
+            ->expectsOutput(LibrenmsConfig::toJson())
             ->assertExitCode(0);
     }
 
@@ -96,8 +96,8 @@ class TestConfigCommands extends InMemoryDbTestCase
             ->assertExitCode(2);
 
         // append to non-array
-        Config::set('login_message', 'blah');
-        $message = Config::get('login_message');
+        LibrenmsConfig::set('login_message', 'blah');
+        LibrenmsConfig::get('login_message');
         $this->artisan('config:set', ['setting' => 'login_message.+', 'value' => 'something', '--no-ansi' => true])
             ->expectsOutput(trans('commands.config:set.errors.append'))
             ->assertExitCode(2);
@@ -124,7 +124,7 @@ class TestConfigCommands extends InMemoryDbTestCase
      */
     private function assertCliGets(string $setting, $expected): void
     {
-        $this->assertSame($expected, Config::get($setting));
+        $this->assertSame($expected, LibrenmsConfig::get($setting));
 
         $command = $this->artisan('config:get', ['setting' => $setting]);
         if ($expected === null) {

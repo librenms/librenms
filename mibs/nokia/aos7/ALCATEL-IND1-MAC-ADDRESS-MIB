@@ -20,32 +20,27 @@ IMPORTS
 
 
 alcatelIND1MacAddressMIB MODULE-IDENTITY
-    LAST-UPDATED "201005130000Z"
-    ORGANIZATION "Alcatel-Lucent, Enterprise Solutions Division"
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
     CONTACT-INFO
      "Please consult with Customer Service to ensure the most appropriate
       version of this document is used with the products in question:
 
-                 Alcatel-Lucent, Enterprise Solutions Division
-                (Formerly Alcatel Internetworking, Incorporated)
+                      ALE USA Inc. Enterprise
                         26801 West Agoura Road
                      Agoura Hills, CA  91301-5122
                        United States Of America
 
-     Telephone:               North America  +1 800 995 2696
-                              Latin America  +1 877 919 9526
-                              Europe         +31 23 556 0100
-                              Asia           +65 394 7933
-                              All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-     Electronic Mail:         support@ind.alcatel.com
-     World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-     File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
+
     DESCRIPTION
               "This module describes an authoritative enterprise-specific Simple
         Network Management Protocol (SNMP) Management Information Base (MIB):
 
-        For the Birds Of Prey Product Line, this is the MIB module for
+        For the OmniSwitch Product Line, this is the MIB module for
               address learning mac addresses entity.
 
         The right to make changes in specification and other information
@@ -59,15 +54,18 @@ alcatelIND1MacAddressMIB MODULE-IDENTITY
         non-exclusive license to use this specification in connection with
         management of the products for which it is intended to be used.
 
-                   Copyright (C) 1995-2007 Alcatel-Lucent
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
                        ALL RIGHTS RESERVED WORLDWIDE"
+    REVISION      "201911270000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
 
     REVISION      "201005130000Z"
     DESCRIPTION
         "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
 
     REVISION      "200704030000Z"
-
     DESCRIPTION
         "The MIB module for Source Learning Mac Address entity."
     ::= { softentIND1MacAddress 1}
@@ -186,7 +184,7 @@ slMacAgingRowStatus OBJECT-TYPE
                         disable(2)
                             }
             MAX-ACCESS  read-write
-            STATUS  current
+            STATUS  deprecated
             DESCRIPTION
             "Enable/Disable Distributed MAC Mode.
             When changed, the user must save the current
@@ -391,7 +389,11 @@ AlaSlMacAddressGlobalEntry ::= SEQUENCE
     slMacAddressGblProtocol      MacAddressProtocolType,
     slMacAddressGblGroupField    Unsigned32,
     slSvcISID                    Integer32,
-    slVxLanVnID                  Unsigned32
+    slVxLanVnID                  Unsigned32,
+    slL2GreVpnID                 Unsigned32,
+    slVplsID                     Unsigned32,
+    slMacAddressStatus           INTEGER,
+    slMacAddressGblInnerVlanId   Integer32
 }
 
 slMacDomain OBJECT-TYPE
@@ -402,13 +404,15 @@ slMacDomain OBJECT-TYPE
             spbm(3),
             evb(4),
             local(5),
-            vxlan(6)
+            vxlan(6),
+            guest(7),
+            evpnVxlan(8)
                     }
     MAX-ACCESS  not-accessible
     STATUS  current
     DESCRIPTION
         "* This object indicates whether this MAC is learned on Vlan, VPLS,
-           SPBM, VxLan,Local,EVB domain.
+           SPBM, VxLan,Local,EVB,EVPN-Vxlan domain.
 
          * To flush a MAC or MACs, this field may or may not be specified.  If this 
            field is not specified, then the default -all(0)- value will be expected;
@@ -611,6 +615,50 @@ slVxLanVnID OBJECT-TYPE
             field is not specified, then value `-1` will be expected;"
       ::= {alaSlMacAddressGlobalEntry 13 }
 
+slL2GreVpnID OBJECT-TYPE 
+   SYNTAX  Unsigned32 (0 | 1..16777215) 
+      MAX-ACCESS  read-create 
+      STATUS  current 
+      DESCRIPTION 
+        " * This field is used in L2Gre domain only.  This field is  
+              VPNID of L2Gre domain service;
+ 
+            * To flush a MAC or MACs, this field may or may not be specified.  If this
+            field is not specified, then value `0` will be expected;"
+      ::= {alaSlMacAddressGlobalEntry 14 }
+
+slVplsID OBJECT-TYPE 
+   SYNTAX  Unsigned32 (0 | 1..2147483647) 
+      MAX-ACCESS  read-create 
+      STATUS  current 
+      DESCRIPTION 
+        " * This field is used in VPLS domain only.  This field is  
+              VPLSID of VPLS domain service;
+ 
+            * To flush a MAC or MACs, this field may or may not be specified.  If this
+            field is not specified, then value `0` will be expected;"
+      ::= {alaSlMacAddressGlobalEntry 15 }
+
+slMacAddressStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    valid(1),
+                    invalid(2),
+                    duplicate(3)
+                    }
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Mac address status. "
+      ::= {alaSlMacAddressGlobalEntry 16 }
+
+slMacAddressGblInnerVlanId OBJECT-TYPE
+    SYNTAX  Integer32 (1..4094)
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "Inner vlan Id. "
+      ::= {alaSlMacAddressGlobalEntry 17 }
+
 -- ------------------------------------------------------------------------
 -- Following table provides number of MAC addresses count for
 -- VPLS based MAC addresses currently in CMM FDB.
@@ -690,7 +738,11 @@ slMacAddressGroup OBJECT-GROUP
 	slMacAddressGblProtocol,     
         slMacAddressGblGroupField,
         slSvcISID,
-        slVxLanVnID
+        slVxLanVnID,
+        slL2GreVpnID,
+        slVplsID,
+        slMacAddressStatus,
+        slMacAddressGblInnerVlanId
    }
    STATUS  current
    DESCRIPTION

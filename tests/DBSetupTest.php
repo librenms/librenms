@@ -30,7 +30,7 @@ use Artisan;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\DB\Schema;
 
-class DBSetupTest extends DBTestCase
+final class DBSetupTest extends DBTestCase
 {
     protected $db_name;
     protected $connection = 'testing';
@@ -54,9 +54,7 @@ class DBSetupTest extends DBTestCase
 
     public function testSchema(): void
     {
-        $files = array_map(function ($migration_file) {
-            return basename($migration_file, '.php');
-        }, array_diff(scandir(base_path('/database/migrations')), ['.', '..', '.gitkeep']));
+        $files = array_map(fn ($migration_file) => basename($migration_file, '.php'), array_diff(scandir(base_path('/database/migrations')), ['.', '..', '.gitkeep']));
         $migrated = DB::connection($this->connection)->table('migrations')->pluck('migration')->toArray();
         sort($files);
         sort($migrated);
@@ -97,7 +95,7 @@ class DBSetupTest extends DBTestCase
     public function testSqlMode(): void
     {
         $result = DB::connection($this->connection)->selectOne(DB::raw('SELECT @@version AS version, @@sql_mode AS mode')->getValue(DB::connection($this->connection)->getQueryGrammar()));
-        preg_match('/([0-9.]+)(?:-(\w+))?/', $result->version, $matches);
+        preg_match('/([0-9.]+)(?:-(\w+))?/', (string) $result->version, $matches);
         $version = $matches[1] ?? null;
         $vendor = $matches[2] ?? null;
         $mode = $result->mode;
@@ -114,16 +112,17 @@ class DBSetupTest extends DBTestCase
 
     public function testValidateSchema(): void
     {
-        if (is_file('misc/db_schema.yaml')) {
+        $file = resource_path('definitions/schema/db_schema.yaml');
+        if (is_file($file)) {
             DB::connection($this->connection)->statement('SET time_zone = "+00:00";');
 
             $master_schema = \Symfony\Component\Yaml\Yaml::parse(
-                file_get_contents('misc/db_schema.yaml')
+                file_get_contents($file)
             );
 
             $current_schema = Schema::dump($this->connection);
 
-            $message = "Schema does not match the expected schema defined by misc/db_schema.yaml\n";
+            $message = "Schema does not match the expected schema defined by resources/definitions/schema/db_schema.yaml\n";
             $message .= "If you have changed the schema, make sure you update it with: lnms schema:dump\n";
 
             $this->assertEquals($master_schema, $current_schema, $message);

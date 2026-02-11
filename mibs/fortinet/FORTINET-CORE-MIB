@@ -29,7 +29,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 fortinet MODULE-IDENTITY
-    LAST-UPDATED "202111150000Z"
+    LAST-UPDATED "202402290000Z"
     ORGANIZATION 
         "Fortinet Technologies, Inc."
     CONTACT-INFO 
@@ -39,6 +39,18 @@ fortinet MODULE-IDENTITY
         "
     DESCRIPTION 
         "MIB module for Fortinet network devices."
+    REVISION    "202402290000Z"
+    DESCRIPTION
+        "Added fnTrapSecurityLevelChange"
+    REVISION    "202310160000Z"
+    DESCRIPTION
+        "Changed fnTrapPowerSupplyFailure to fnTrapPowerSupply to include both power failure and restore"
+    REVISION    "202309210000Z"
+    DESCRIPTION
+        "Added fnGenTrapMsg in fnTrapMemThreshold"
+    REVISION    "202308280000Z"
+    DESCRIPTION
+        "Registered FortiPortal OIDs"
     REVISION    "202111150000Z"
     DESCRIPTION
         "Registered FortiNACMib OIDs"
@@ -197,6 +209,7 @@ fnCoreMib OBJECT IDENTIFIER ::= { fortinet 100 }
 -- fnFortiAPMib       OBJECT IDENTIFIER ::= { fortinet 120 }
 -- fnFortiExtenderMib OBJECT IDENTIFIER ::= { fortinet 121 }
 -- fnFortiNACMib      OBJECT IDENTIFIER ::= { fortinet 122 }
+-- fnFortiPortalMib   OBJECT IDENTIFIER ::= { fortinet 123 }
 --
 
 --
@@ -336,7 +349,7 @@ fnTrapCpuThreshold NOTIFICATION-TYPE
     ::= { fnTrapsPrefix 101 }
 
 fnTrapMemThreshold NOTIFICATION-TYPE
-    OBJECTS     { fnSysSerial, sysName }
+    OBJECTS     { fnSysSerial, sysName, fnGenTrapMsg }
     STATUS      current
     DESCRIPTION 
         "Indicates memory usage has exceeded the configured threshold."
@@ -366,11 +379,11 @@ fnTrapVoltageOutOfRange NOTIFICATION-TYPE
         have voltage monitoring instrumentation. See manual for specifications."
     ::= { fnTrapsPrefix 105 }
 
-fnTrapPowerSupplyFailure NOTIFICATION-TYPE
-    OBJECTS     { fnSysSerial, sysName }
+fnTrapPowerSupply NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fnGenTrapMsg }
     STATUS      current
     DESCRIPTION 
-        "Power supply failure detected. Not available on all models. Available
+        "Power supply  event (failure or restore) detected. Not available on all models. Available
         on some devices which support redundant power supplies. See manual
         for specifications."
     ::= { fnTrapsPrefix 106 }
@@ -404,6 +417,13 @@ fnTrapIfExitBypassMode NOTIFICATION-TYPE
     DESCRIPTION 
         "Interface exited bypass mode. Available on models with bypass ports."
     ::= { fnTrapsPrefix 110 }
+
+fnTrapSecurityLevelChange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fnGenTrapMsg }
+    STATUS      current
+    DESCRIPTION
+        "BIOS security level has been change."
+    ::= { fnTrapsPrefix 111 }
 
 fnTrapIpChange NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName, ifIndex }
@@ -449,9 +469,9 @@ fnAdminComplianceGroup OBJECT-GROUP
 fnTrapsComplianceGroup NOTIFICATION-GROUP
     NOTIFICATIONS { fnTrapCpuThreshold, fnTrapMemThreshold, 
                   fnTrapLogDiskThreshold, fnTrapTempHigh, 
-                  fnTrapVoltageOutOfRange, fnTrapPowerSupplyFailure, 
+                  fnTrapVoltageOutOfRange, fnTrapPowerSupply,
                   fnTrapAmcIfBypassMode, fnTrapIfEnterBypassMode, 
-                  fnTrapIfExitBypassMode, fnTrapFanFailure,
+                  fnTrapIfExitBypassMode, fnTrapFanFailure, fnTrapSecurityLevelChange,
                   fnTrapIpChange, fnTrapTest }
     STATUS      current
     DESCRIPTION 

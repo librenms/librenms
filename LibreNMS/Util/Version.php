@@ -27,6 +27,7 @@
 namespace LibreNMS\Util;
 
 use App\ConfigRepository;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\DB\Eloquent;
@@ -35,15 +36,13 @@ use Symfony\Component\Process\Process;
 class Version
 {
     /** @var string Update this on release */
-    public const VERSION = '25.4.0';
+    public const VERSION = '26.1.0';
 
     /** @var Git convenience instance */
     public $git;
-    private ConfigRepository $config;
 
-    public function __construct(ConfigRepository $config)
+    public function __construct(private readonly ConfigRepository $config)
     {
-        $this->config = $config;
         $this->git = Git::make();
     }
 
@@ -64,7 +63,20 @@ class Version
 
     public function name(): string
     {
-        return $this->git->tag() ?: self::VERSION;
+        $regex = '/^(?<year>\d+)\.(?<month>\d+)\.(?<minor>\d+)-(?<commits>\d+)-g(?<sha>[0-9a-f]{7,})$/';
+        if (preg_match($regex, $this->git->tag(), $matches)) {
+            // guess the next version
+            $year = (int) $matches['year'];
+            $month = (int) $matches['month'] + 1;
+            if ($month > 12) {
+                $year++;
+                $month = 1;
+            }
+
+            return sprintf('%d.%d.%d-dev.%s+%s', $year, $month, $matches['minor'], $matches['commits'], $matches['sha']);
+        }
+
+        return self::VERSION;
     }
 
     public function databaseServer(): string
@@ -77,7 +89,7 @@ class Version
             case 'mysql':
                 $ret = Arr::first(DB::selectOne('select version()'));
 
-                return (str_contains($ret, 'MariaDB') ? 'MariaDB ' : 'MySQL ') . $ret;
+                return (str_contains((string) $ret, 'MariaDB') ? 'MariaDB ' : 'MySQL ') . $ret;
             case 'sqlite':
                 return 'SQLite ' . Arr::first(DB::selectOne('select sqlite_version()'));
             default:
@@ -102,7 +114,7 @@ class Version
             if (Eloquent::isConnected()) {
                 return Eloquent::DB()->table('migrations')->count();
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
 
         return 0;
@@ -119,7 +131,7 @@ class Version
 
         try {
             return Eloquent::DB()->table('migrations')->orderBy('id', 'desc')->value('migration');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return 'No Schema';
         }
     }
@@ -185,6 +197,27 @@ class Version
         $only = array_intersect_key($info, ['NAME' => true, 'VERSION_ID' => true]);
 
         return implode(' ', $only);
+    }
+
+    public static function registerAboutCommand(): void
+    {
+        // spaces affect sorting, but not output
+        AboutCommand::add('LibreNMS', fn () => [
+            '  Version' => Version::get()->name(),
+            ' Last Update' => Version::get()->date(),
+            ' Update Channel' => Version::get()->release(),
+
+        ]);
+        AboutCommand::add('Environment', fn () => ['OS' => Version::get()->os()]);
+        AboutCommand::add('Drivers', fn () => [
+            'Database  Server' => Version::get()->databaseServer(),
+            'Database Migrations' => Version::get()->database(),
+        ]);
+        AboutCommand::add('External Tools', fn () => [
+            'Python' => Version::get()->python(),
+            'RRDTool' => Version::get()->rrdtool(),
+            'SNMP' => Version::get()->netSnmp(),
+        ]);
     }
 
     /**

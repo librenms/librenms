@@ -42,6 +42,7 @@ trait YamlOSDiscovery
         'hardware',
         'features',
         'serial',
+        'sysName',
     ];
 
     private $osFields = [
@@ -49,6 +50,7 @@ trait YamlOSDiscovery
         'hardware',
         'features',
         'serial',
+        'sysName',
     ];
 
     public function discoverOS(Device $device): void
@@ -135,7 +137,7 @@ trait YamlOSDiscovery
         $device = $this->getDevice();
 
         foreach (Arr::wrap($regexes) as $regex) {
-            if (preg_match($regex, $subject, $matches)) {
+            if (preg_match($regex, (string) $subject, $matches)) {
                 foreach ($this->osDbFields as $field) {
                     if (isset($matches[$field])) {
                         $device->$field = $matches[$field];
@@ -164,7 +166,7 @@ trait YamlOSDiscovery
                 }
 
                 if (isset($device->$field)) {
-                    $device->$field = preg_replace($search, $replacement, $device->$field);
+                    $device->$field = preg_replace($search, (string) $replacement, $device->$field);
                 }
             }
         }

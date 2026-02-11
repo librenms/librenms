@@ -10,7 +10,7 @@ $managers = [
     'rpm' => [
         'name' => 'RPM',
         'process' => function ($line) {
-            [$name, $version, $build, $arch, $size] = explode(' ', $line);
+            [$name, $version, $build, $arch, $size] = explode(' ', (string) $line);
 
             return new Package([
                 'manager' => 'rpm',
@@ -26,7 +26,7 @@ $managers = [
     'dpkg' => [
         'name' => 'DEB',
         'process' => function ($line) {
-            [$name, $version, $arch, $size] = explode(' ', $line);
+            [$name, $version, $arch, $size] = explode(' ', (string) $line);
 
             return new Package([
                 'manager' => 'deb',
@@ -42,7 +42,7 @@ $managers = [
     'pacman' => [
         'name' => 'Pacman',
         'process' => function ($line) {
-            [$name, $version, $arch, $size] = explode(' ', $line);
+            [$name, $version, $arch, $size] = explode(' ', (string) $line);
 
             return new Package([
                 'manager' => 'pacman',
@@ -68,7 +68,7 @@ foreach ($managers as $key => $manager) {
             return $package;
         })->keyBy->getCompositeKey();
 
-        foreach (explode("\n", trim($agent_data[$key])) as $line) {
+        foreach (explode("\n", trim((string) $agent_data[$key])) as $line) {
             /** @var \App\Models\Package $package */
             $package = $manager['process']($line);
 

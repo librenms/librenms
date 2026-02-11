@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "drac",
-                    "type": "appliance",
+                    "type": "management",
                     "serial": "1234ABC",
                     "icon": "dell.svg"
                 }
@@ -1582,6 +1582,31 @@
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "DELL-RAC-MIB::drsTempCurrStatus"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.674.10892.2.3.1.6.0",
+                    "sensor_index": "drsFanCurrStatus.0",
+                    "sensor_type": "drsFanCurrStatus",
+                    "sensor_descr": "FAN",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "drsFanCurrStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4233,6 +4258,48 @@
                     "state_generic_value": 2
                 },
                 {
+                    "state_name": "drsFanCurrStatus",
+                    "state_descr": "other",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "drsFanCurrStatus",
+                    "state_descr": "unknown",
+                    "state_draw_graph": 1,
+                    "state_value": 2,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "drsFanCurrStatus",
+                    "state_descr": "ok",
+                    "state_draw_graph": 1,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "drsFanCurrStatus",
+                    "state_descr": "nonCritical",
+                    "state_draw_graph": 1,
+                    "state_value": 4,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "drsFanCurrStatus",
+                    "state_descr": "critical",
+                    "state_draw_graph": 1,
+                    "state_value": 5,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "drsFanCurrStatus",
+                    "state_descr": "nonRecoverable",
+                    "state_draw_graph": 1,
+                    "state_value": 6,
+                    "state_generic_value": 2
+                },
+                {
                     "state_name": "drsGlobalSystemStatus",
                     "state_descr": "other",
                     "state_draw_graph": 1,
@@ -4865,5 +4932,39 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.60.40.79",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.60.40.0/24",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.16.12.6",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.16.12.0/24",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "172.24.1.247",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.24.1.0/24",
+                    "ifIndex": 6
+                }
+            ]
+        }
     }
 }

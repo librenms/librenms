@@ -13,12 +13,12 @@
  * @author     LibreNMS Contributors
 */
 
+use App\Facades\LibrenmsConfig;
 use Carbon\Carbon;
-use LibreNMS\Config;
 
 $no_refresh = true;
 $param = [];
-$device_id = (int) $vars['device'];
+$device_id = isset($vars['device']) ? (int) $vars['device'] : null;
 
 if (isset($vars['action']) && $vars['action'] == 'expunge' && \Auth::user()->hasGlobalAdmin()) {
     \App\Models\Syslog::truncate();
@@ -64,7 +64,7 @@ $pagetitle[] = 'Syslog';
         '<option value="">All Programs&nbsp;&nbsp;</option>' +
         <?php
         if (! empty($vars['program'])) {
-            $js_program = addcslashes(htmlentities($vars['program']), "'");
+            $js_program = addcslashes(htmlentities((string) $vars['program']), "'");
             echo "'<option value=\"$js_program\">$js_program</option>' +";
         }
         ?>
@@ -75,7 +75,7 @@ $pagetitle[] = 'Syslog';
         '<option value="">All Priorities</option>' +
         <?php
         if (! empty($vars['priority'])) {
-            $js_priority = addcslashes(htmlentities($vars['priority']), "'");
+            $js_priority = addcslashes(htmlentities((string) $vars['priority']), "'");
             echo "'<option value=\"$js_priority\">$js_priority</option>' +";
         }
         ?>
@@ -108,7 +108,7 @@ $pagetitle[] = 'Syslog';
                 clear: 'fa fa-trash-o',
                 close: 'fa fa-close'
             },
-            defaultDate: '<?php echo Carbon::now()->subDay()->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>'
+            defaultDate: '<?php echo Carbon::now()->subDay()->format(LibrenmsConfig::get('dateformat.byminute', 'Y-m-d H:i')); ?>'
         });
         $("#dtpickerfrom").on("dp.change", function (e) {
             $("#dtpickerto").data("DateTimePicker").minDate(e.date);
@@ -135,7 +135,7 @@ $pagetitle[] = 'Syslog';
         if ($("#dtpickerto").val() != "") {
             $("#dtpickerfrom").data("DateTimePicker").maxDate($("#dtpickerto").val());
         } else {
-            $("#dtpickerto").data("DateTimePicker").maxDate('<?php echo Carbon::now()->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>');
+            $("#dtpickerto").data("DateTimePicker").maxDate('<?php echo Carbon::now()->format(LibrenmsConfig::get('dateformat.byminute', 'Y-m-d H:i')); ?>');
         }
     });
 
@@ -147,7 +147,7 @@ $pagetitle[] = 'Syslog';
         allowClear: true,
         placeholder: "All Devices",
         ajax: {
-            url: '<?php echo url('/ajax/select/device'); ?>',
+            url: '<?php echo route('ajax.select.device') ?>',
             delay: 200
         }
     })<?php echo $device_id ? ".val($device_id).trigger('change');" : ''; ?>;
@@ -160,7 +160,7 @@ $pagetitle[] = 'Syslog';
         allowClear: true,
         placeholder: "All Programs",
         ajax: {
-            url: '<?php echo url('/ajax/select/syslog'); ?>',
+            url: '<?php echo route('ajax.select.syslog'); ?>',
             delay: 200,
             data: function(params) {
                 return {
@@ -180,7 +180,7 @@ $pagetitle[] = 'Syslog';
         allowClear: true,
         placeholder: "All Priorities",
         ajax: {
-            url: '<?php echo url('/ajax/select/syslog'); ?>',
+            url: '<?php echo route('ajax.select.syslog'); ?>',
             delay: 200,
             data: function(params) {
                 return {

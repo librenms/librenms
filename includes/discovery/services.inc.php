@@ -1,12 +1,14 @@
 <?php
 
-use App\Http\Controllers\ServiceTemplateController;
-use LibreNMS\Config;
+require_once base_path('includes/services.inc.php');
 
-if (Config::get('discover_services_templates')) {
+use App\Facades\LibrenmsConfig;
+use App\Http\Controllers\ServiceTemplateController;
+
+if (LibrenmsConfig::get('discover_services_templates')) {
     (new ServiceTemplateController())->applyDeviceAll($device['device_id']); // FIXME applyAll() should not be on a controller
 }
-if (Config::get('discover_services')) {
+if (LibrenmsConfig::get('discover_services')) {
     // FIXME: use /etc/services?
     $known_services = [
         22 => 'ssh',
@@ -19,7 +21,7 @@ if (Config::get('discover_services')) {
 
     // Services
     if ($device['type'] == 'server') {
-        $oids = trim(snmp_walk($device, '.1.3.6.1.2.1.6.13.1.1.0.0.0.0', '-Osqn'));
+        $oids = trim((string) snmp_walk($device, '.1.3.6.1.2.1.6.13.1.1.0.0.0.0', '-Osqn'));
         foreach (explode("\n", $oids) as $data) {
             $data = trim($data);
             if ($data) {
@@ -27,7 +29,7 @@ if (Config::get('discover_services')) {
                 if (trim($tcpstatus) == 'listen') {
                     $split_oid = explode('.', $oid);
                     $tcp_port = $split_oid[count($split_oid) - 6];
-                    if ($known_services[$tcp_port]) {
+                    if (isset($known_services[$tcp_port])) {
                         discover_service($device, $known_services[$tcp_port]);
                     }
                 }

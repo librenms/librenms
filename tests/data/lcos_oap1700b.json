@@ -29028,5 +29028,18 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.18.0.156",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "10.18.0.0/22",
+                    "ifIndex": 126
+                }
+            ]
+        }
     }
 }

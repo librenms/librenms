@@ -26,6 +26,8 @@
 
 namespace LibreNMS;
 
+use App\Facades\LibrenmsConfig;
+
 class Services
 {
     /**
@@ -36,9 +38,9 @@ class Services
     public static function list()
     {
         $services = [];
-        if (is_dir(Config::get('nagios_plugins'))) {
-            foreach (scandir(Config::get('nagios_plugins')) as $file) {
-                if (substr($file, 0, 6) === 'check_') {
+        if (is_dir(LibrenmsConfig::get('nagios_plugins'))) {
+            foreach (scandir(LibrenmsConfig::get('nagios_plugins')) as $file) {
+                if (str_starts_with($file, 'check_')) {
                     $services[] = substr($file, 6);
                 }
             }

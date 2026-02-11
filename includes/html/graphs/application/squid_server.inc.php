@@ -13,23 +13,19 @@ $transparency = 15;
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
-if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list = [
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'requests',
-            'ds' => 'serverrequests',
-            'colour' => '582a72',
-        ],
-        [
-            'filename' => $rrd_filename,
-            'descr' => 'hits',
-            'ds' => 'servererrors',
-            'colour' => '28774f',
-        ],
-    ];
-} else {
-    echo "file missing: $rrd_filename";
-}
+$rrd_list = [
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'requests',
+        'ds' => 'serverrequests',
+        'colour' => '582a72',
+    ],
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'hits',
+        'ds' => 'servererrors',
+        'colour' => '28774f',
+    ],
+];
 
 require 'includes/html/graphs/generic_v3_multiline.inc.php';

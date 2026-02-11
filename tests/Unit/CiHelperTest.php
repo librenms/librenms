@@ -29,17 +29,13 @@ namespace LibreNMS\Tests\Unit;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\CiHelper;
 
-class CiHelperTest extends TestCase
+final class CiHelperTest extends TestCase
 {
     public function testSetFlags(): void
     {
         $helper = new CiHelper();
-        $allFalse = array_map(function ($flag) {
-            return false;
-        }, $this->getDefaultFlags());
-        $allTrue = array_map(function ($flag) {
-            return false;
-        }, $this->getDefaultFlags());
+        $allFalse = array_map(fn ($flag) => false, $this->getDefaultFlags());
+        $allTrue = array_map(fn ($flag) => true, $this->getDefaultFlags());
 
         $helper->setFlags($allFalse);
         $this->assertEquals($allFalse, $helper->getFlags());
@@ -102,7 +98,7 @@ class CiHelperTest extends TestCase
             'lint_skip_bash' => true,
         ]);
 
-        putenv('FILES=includes/definitions/ios.yaml tests/data/fxos.json');
+        putenv('FILES=resources/definitions/os_detection/ios.yaml tests/data/fxos.json');
         $helper = new CiHelper();
         $helper->detectChangedFiles();
         $this->assertFlagsSet($helper, [
@@ -157,7 +153,7 @@ class CiHelperTest extends TestCase
             'lint_skip_bash' => true,
         ]);
 
-        putenv('FILES=includes/definitions/ios.yaml tests/data/fxos.json');
+        putenv('FILES=resources/definitions/os_detection/ios.yaml tests/data/fxos.json');
         $helper = new CiHelper();
         $helper->detectChangedFiles();
         $this->assertFlagsSet($helper, [
@@ -171,7 +167,7 @@ class CiHelperTest extends TestCase
             'lint_skip_bash' => true,
         ]);
 
-        putenv('FILES=includes/definitions/ios.yaml tests/data/fxos.json');
+        putenv('FILES=resources/definitions/os_detection/ios.yaml tests/data/fxos.json');
         $helper = new CiHelper();
         $helper->detectChangedFiles();
         $this->assertFlagsSet($helper, [

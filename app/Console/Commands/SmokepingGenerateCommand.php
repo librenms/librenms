@@ -27,8 +27,8 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
 use Symfony\Component\Console\Input\InputOption;
 
 class SmokepingGenerateCommand extends LnmsCommand
@@ -112,7 +112,7 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     public function buildProbesConfiguration()
     {
-        $probes = $this->assembleProbes(Config::get('smokeping.probes'));
+        $probes = $this->assembleProbes(LibrenmsConfig::get('smokeping.probes'));
         $header = $this->buildHeader($this->option('no-header'), $this->option('compat'));
 
         return $this->render($header, $probes);
@@ -134,7 +134,7 @@ class SmokepingGenerateCommand extends LnmsCommand
             ];
         }
 
-        $targets = $this->buildTargets($smokelist, Config::get('smokeping.probes'), $this->option('single-process'));
+        $targets = $this->buildTargets($smokelist, LibrenmsConfig::get('smokeping.probes'), $this->option('single-process'));
         $header = $this->buildHeader($this->option('no-header'), $this->option('compat'));
 
         return $this->render($header, $targets);
@@ -163,8 +163,8 @@ class SmokepingGenerateCommand extends LnmsCommand
         }
 
         return array_merge(
-            $this->buildProbes('FPing', self::DEFAULTIP4PROBE, self::IP4PROBE, Config::get('fping'), $probeCount),
-            $this->buildProbes('FPing6', self::DEFAULTIP6PROBE, self::IP6PROBE, Config::get('fping6'), $probeCount)
+            $this->buildProbes('FPing', self::DEFAULTIP4PROBE, self::IP4PROBE, LibrenmsConfig::get('fping'), $probeCount),
+            $this->buildProbes('FPing6', self::DEFAULTIP6PROBE, self::IP6PROBE, LibrenmsConfig::get('fping6'), $probeCount)
         );
     }
 
@@ -257,9 +257,9 @@ class SmokepingGenerateCommand extends LnmsCommand
      */
     private function validateOptions()
     {
-        if (! Config::has('smokeping.probes') ||
-            ! Config::has('fping') ||
-            ! Config::has('fping6')
+        if (! LibrenmsConfig::has('smokeping.probes') ||
+            ! LibrenmsConfig::has('fping') ||
+            ! LibrenmsConfig::has('fping6')
         ) {
             $this->error(__('commands.smokeping:generate.config-insufficient'));
 
@@ -272,7 +272,7 @@ class SmokepingGenerateCommand extends LnmsCommand
             return false;
         }
 
-        if (Config::get('smokeping.probes') < 1) {
+        if (LibrenmsConfig::get('smokeping.probes') < 1) {
             $this->error(__('commands.smokeping:generate.no-probes'));
 
             return false;

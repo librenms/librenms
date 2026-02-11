@@ -57,7 +57,7 @@ class SchemaDumpCommand extends DumpCommand
 
         \Artisan::call('migrate', $parameters, $stdout);
 
-        $file = $this->option('path') ?: base_path('/misc/db_schema.yaml');
+        $file = $this->option('path') ?: resource_path('definitions/schema/db_schema.yaml');
         $yaml = Yaml::dump(Schema::dump($database), 3, 2);
 
         if (file_put_contents($file, $yaml)) {

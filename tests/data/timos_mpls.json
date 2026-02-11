@@ -6337,7 +6337,7 @@
                     "vrf_oid": "1",
                     "vrf_name": "Base",
                     "bgpLocalAs": null,
-                    "mplsVpnVrfRouteDistinguisher": "0:0",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "1,2,3,4"
                 },
@@ -6345,7 +6345,7 @@
                     "vrf_oid": "254",
                     "vrf_name": "****",
                     "bgpLocalAs": null,
-                    "mplsVpnVrfRouteDistinguisher": "0:0",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
                 },
@@ -6353,7 +6353,7 @@
                     "vrf_oid": "255",
                     "vrf_name": "****",
                     "bgpLocalAs": null,
-                    "mplsVpnVrfRouteDistinguisher": "0:0",
+                    "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
                 }

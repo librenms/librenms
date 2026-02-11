@@ -26,28 +26,17 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use Symfony\Component\Process\Process;
 
-class FpingTest extends TestCase
+final class FpingTest extends TestCase
 {
     public function testUpPing(): void
     {
         $output = "192.168.1.3 : xmt/rcv/%loss = 3/3/0%, min/avg/max = 0.62/0.71/0.93\n";
         $this->mockFpingProcess($output, 0);
-
-        $expected = [
-            'xmt' => 3,
-            'rcv' => 3,
-            'loss' => 0,
-            'min' => 0.62,
-            'max' => 0.93,
-            'avg' => 0.71,
-            'dup' => 0,
-            'exitcode' => 0,
-        ];
 
         $actual = app()->make(Fping::class)->ping('192.168.1.3');
 
@@ -132,9 +121,7 @@ OUT;
         $process->shouldReceive('getErrorOutput')->andReturn($output);
         $process->shouldReceive('getExitCode')->andReturn($exitCode);
 
-        $this->app->bind(Process::class, function ($app, $params) use ($process) {
-            return $process;
-        });
+        $this->app->bind(Process::class, fn ($app, $params) => $process);
 
         return $process;
     }
@@ -150,7 +137,7 @@ OUT;
         $hosts = array_keys($expected);
 
         $process = \Mockery::mock(Process::class);
-        $process->shouldReceive('setTimeout')->with(Config::get('rrd.step', 300) * 2);
+        $process->shouldReceive('setTimeout')->with(LibrenmsConfig::get('rrd.step', 300) * 2);
         $process->shouldReceive('setInput')->with(implode("\n", $hosts) . "\n");
         $process->shouldReceive('getCommandLine');
         $process->shouldReceive('run')->withArgs(function ($callback) {
@@ -163,13 +150,11 @@ OUT;
             return true;
         });
 
-        $this->app->bind(Process::class, function ($app, $params) use ($process) {
-            return $process;
-        });
+        $this->app->bind(Process::class, fn ($app, $params) => $process);
 
         // make call
         $calls = 0;
-        app()->make(Fping::class)->bulkPing($hosts, function (FpingResponse $response) use ($expected, &$calls) {
+        app()->make(Fping::class)->bulkPing($hosts, function (FpingResponse $response) use ($expected, &$calls): void {
             $calls++;
 
             $this->assertArrayHasKey($response->host, $expected);

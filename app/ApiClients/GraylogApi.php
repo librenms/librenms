@@ -26,29 +26,29 @@
 
 namespace App\ApiClients;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
 use LibreNMS\Util\Http;
 
 class GraylogApi
 {
-    private \Illuminate\Http\Client\PendingRequest $client;
+    private readonly \Illuminate\Http\Client\PendingRequest $client;
     private string $api_prefix = '';
 
     public function __construct()
     {
-        if (version_compare(Config::get('graylog.version', '2.4'), '2.1', '>=')) {
+        if (version_compare(LibrenmsConfig::get('graylog.version', '2.4'), '2.1', '>=')) {
             $this->api_prefix = '/api';
         }
 
-        $base_uri = Config::get('graylog.server');
-        if ($port = Config::get('graylog.port')) {
+        $base_uri = LibrenmsConfig::get('graylog.server');
+        if ($port = LibrenmsConfig::get('graylog.port')) {
             $base_uri .= ':' . $port;
         }
 
         $this->client = Http::client()
             ->baseUrl($base_uri)
-            ->withBasicAuth(Config::get('graylog.username'), Config::get('graylog.password'))
+            ->withBasicAuth(LibrenmsConfig::get('graylog.username'), LibrenmsConfig::get('graylog.password'))
             ->acceptJson();
     }
 
@@ -74,7 +74,7 @@ class GraylogApi
             return [];
         }
 
-        $uri = Config::get('graylog.base_uri');
+        $uri = LibrenmsConfig::get('graylog.base_uri');
         if (! $uri) {
             $uri = $this->api_prefix . '/search/universal/relative';
         }
@@ -98,7 +98,7 @@ class GraylogApi
      */
     public function buildSimpleQuery(?string $search = null, ?Device $device = null): string
     {
-        $field = Config::get('graylog.query.field');
+        $field = LibrenmsConfig::get('graylog.query.field');
         $query = [];
         if ($search) {
             $query[] = 'message:"' . $search . '"';
@@ -125,17 +125,13 @@ class GraylogApi
             $device->sysName,
         ]);
 
-        if (Config::get('graylog.match-any-address')) {
+        if (LibrenmsConfig::get('graylog.match-any-address')) {
             $addresses = $addresses->merge($device->ipv4->pluck('ipv4_address')
                 ->filter(
-                    function ($address) {
-                        return $address != '127.0.0.1';
-                    }
+                    fn ($address) => $address != '127.0.0.1'
                 ))->merge($device->ipv6->pluck('ipv6_address')
                 ->filter(
-                    function ($address) {
-                        return $address != '0000:0000:0000:0000:0000:0000:0000:0001';
-                    }
+                    fn ($address) => $address != '0000:0000:0000:0000:0000:0000:0000:0001'
                 ));
         }
 
@@ -144,6 +140,6 @@ class GraylogApi
 
     public function isConfigured(): bool
     {
-        return (bool) Config::get('graylog.server');
+        return (bool) LibrenmsConfig::get('graylog.server');
     }
 }

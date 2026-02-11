@@ -57,8 +57,7 @@ if (! empty($fdbPort_table)) {
     }
 
     foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
-        $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);
-        $portid_dict[$portLocal] = $port['port_id'];
+        $portid_dict[$portLocal] = PortCache::getIdFromIfIndex($data['dot1dBasePortIfIndex'], $device['device_id']);
     }
 
     // Collect data and populate $insert
@@ -78,7 +77,7 @@ if (! empty($fdbPort_table)) {
             if ($port_id === null) {
                 $port_id = 0;
             }
-            $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
+            $vlan_id = $vlans_dict[$vlan] ?? 0;
 
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
             Log::debug("vlan $vlan mac $mac_address port ($dot1dBasePort) $port_id\n");

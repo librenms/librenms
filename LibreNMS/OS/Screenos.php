@@ -60,7 +60,7 @@ class Screenos extends \LibreNMS\OS implements OSPolling, ArpTableDiscovery
                 'failed' => $sessfailed,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'screenos_sessions', $tags, $fields);
 
             $this->enableGraph('screenos_sessions');

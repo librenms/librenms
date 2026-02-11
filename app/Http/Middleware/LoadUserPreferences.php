@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Facades\LibrenmsConfig;
 use Closure;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
 use Symfony\Component\HttpFoundation\Response;
 
 class LoadUserPreferences
@@ -21,18 +21,26 @@ class LoadUserPreferences
             $preferences = ['locale', 'site_style', 'timezone'];
             $this->loadPreferences($request, $preferences);
 
-            $this->setPreference($request, 'locale', function ($locale) {
+            $this->setPreference($request, 'locale', function ($locale): void {
                 app()->setLocale($locale);
             });
 
-            $this->setPreference($request, 'site_style', function ($style) {
-                Config::set('applied_site_style', $style);
+            $this->setPreference($request, 'site_style', function ($style, $request): void {
+                if ($style !== 'device' && $style !== $request->session()->get('applied_site_style')) {
+                    $request->session()->put('applied_site_style', $style);
+                }
             });
 
-            $this->setPreference($request, 'timezone', function ($timezone) use ($request) {
+            $this->setPreference($request, 'timezone', function ($timezone, $request): void {
                 $request->session()->put('preferences.timezone', $timezone);
                 $request->session()->put('preferences.timezone_static', true);
             });
+        } elseif (! $request->session()->has('applied_site_style')) {
+            // set applied_site_style for unauth sessions (once)
+            $site_style = LibrenmsConfig::get('site_style');
+            if ($site_style !== 'device') {
+                $request->session()->put('applied_site_style', $site_style);
+            }
         }
 
         return $next($request);
@@ -62,7 +70,7 @@ class LoadUserPreferences
     {
         $value = $request->session()->get("preferences.$pref");
         if ($value !== null) {
-            $callable($value);
+            $callable($value, $request);
         }
     }
 }

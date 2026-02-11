@@ -76,8 +76,7 @@ class Ospf implements Module
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
         foreach ($os->getDevice()->getVrfContexts() as $context_name) {
-            Log::info('Processes: ');
-            ModuleModelObserver::observe(OspfInstance::class);
+            ModuleModelObserver::observe(OspfInstance::class, 'Processes');
 
             // Pull data from device
             $ospf_instances_poll = SnmpQuery::context($context_name)
@@ -109,6 +108,7 @@ class Ospf implements Module
                 ->where('context_name', $context_name)
                 ->whereNotIn('id', $ospf_instances->pluck('id'))->delete();
 
+            ModuleModelObserver::done();
             $instance_count = $ospf_instances->count();
             Log::info("Total processes: $instance_count");
             if ($instance_count == 0) {
@@ -116,30 +116,27 @@ class Ospf implements Module
                 return;
             }
 
-            Log::info('Areas: ');
-            ModuleModelObserver::observe(OspfArea::class);
+            ModuleModelObserver::observe(OspfArea::class, 'Areas');
 
             // Pull data from device
             $ospf_areas = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfAreaTable')
-                ->mapTable(function ($ospf_area, $ospf_area_id) use ($context_name, $os) {
-                    return OspfArea::updateOrCreate([
-                        'device_id' => $os->getDeviceId(),
-                        'ospfAreaId' => $ospf_area_id,
-                        'context_name' => $context_name,
-                    ], $ospf_area);
-                });
+                ->mapTable(fn ($ospf_area, $ospf_area_id) => OspfArea::updateOrCreate([
+                    'device_id' => $os->getDeviceId(),
+                    'ospfAreaId' => $ospf_area_id,
+                    'context_name' => $context_name,
+                ], $ospf_area));
 
             // cleanup
             $os->getDevice()->ospfAreas()
                 ->where('context_name', $context_name)
                 ->whereNotIn('id', $ospf_areas->pluck('id'))->delete();
 
+            ModuleModelObserver::done();
             Log::info('Total areas: ' . $ospf_areas->count());
 
-            Log::info('Ports: ');
-            ModuleModelObserver::observe(OspfPort::class);
+            ModuleModelObserver::observe(OspfPort::class, 'Ports');
 
             // Pull data from device
             $ospf_ports = SnmpQuery::context($context_name)
@@ -164,10 +161,10 @@ class Ospf implements Module
                 ->where('context_name', $context_name)
                 ->whereNotIn('id', $ospf_ports->pluck('id'))->delete();
 
+            ModuleModelObserver::done();
             Log::info('Total Ports: ' . $ospf_ports->count());
 
-            Log::info('Neighbours: ');
-            ModuleModelObserver::observe(OspfNbr::class);
+            ModuleModelObserver::observe(OspfNbr::class, 'Neighbours');
 
             // Pull data from device
             $ospf_neighbours = SnmpQuery::context($context_name)
@@ -189,6 +186,7 @@ class Ospf implements Module
                 ->where('context_name', $context_name)
                 ->whereNotIn('id', $ospf_neighbours->pluck('id'))->delete();
 
+            ModuleModelObserver::done();
             Log::info('Total neighbors: ' . $ospf_neighbours->count());
 
             Log::info('TOS Metrics: ');
@@ -203,7 +201,7 @@ class Ospf implements Module
 
                     if (! $port) {
                         // didn't find port by IP, try harder
-                        $port = $ospf_ports_by_ip->where(fn ($p) => str_starts_with($p->ospf_port_id, $ip))->first();
+                        $port = $ospf_ports_by_ip->where(fn ($p) => str_starts_with((string) $p->ospf_port_id, $ip))->first();
                     }
 
                     if ($port) {
@@ -232,7 +230,7 @@ class Ospf implements Module
                     'neighbours' => $ospf_neighbours->count(),
                 ];
 
-                $tags = compact('rrd_def');
+                $tags = ['rrd_def' => $rrd_def];
                 $datastore->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
             }
         }

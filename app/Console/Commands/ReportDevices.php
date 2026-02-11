@@ -5,12 +5,12 @@ namespace App\Console\Commands;
 use App\Console\DynamicInputOption;
 use App\Console\LnmsCommand;
 use App\Console\SyntheticDeviceField;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
-use LibreNMS\Config;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -138,7 +138,7 @@ class ReportDevices extends LnmsCommand
         return [
             'displayName' => new SyntheticDeviceField('displayName', ['hostname', 'sysName', 'ip', 'display'], fn (Device $device) => $device->displayName(), headerName: 'display name'),
             'location' => new SyntheticDeviceField('location', ['location_id'], fn (Device $device) => $device->location->location, fn (Builder $q) => $q->with('location')),
-            'os_text' => new SyntheticDeviceField('os_text', ['os'], fn (Device $device) => Config::getOsSetting($device->os, 'text'), headerName: 'os text'),
+            'os_text' => new SyntheticDeviceField('os_text', ['os'], fn (Device $device) => LibrenmsConfig::getOsSetting($device->os, 'text'), headerName: 'os text'),
         ];
     }
 
@@ -161,18 +161,24 @@ class ReportDevices extends LnmsCommand
             $has_relationships = true;
         }
 
-        $devices = Device::when($has_relationships, fn ($q) => $q->with($relationships))
-            ->whereDeviceSpec($this->argument('device spec'))->get();
+        // handle as array differently as it does not benefit from chunk processing and needs searched for differently
+        if ($this->option('devices-as-array')) {
+            $devices = Device::when($has_relationships, fn ($q) => $q->with($relationships))
+                ->whereDeviceSpec($this->argument('device spec'))->get();
 
-        if (! $this->option('devices-as-array')) {
-            foreach ($devices as $device) {
-                $this->line(json_encode($device));
-            }
+            $this->line(json_encode($devices));
 
             return 0;
         }
 
-        $this->line(json_encode($devices));
+        /*
+         * This way if the fetch takes awhile if something is processing the output it can proceed
+         * with processing one device while we fetch the info for the next.
+         */
+        Device::when($has_relationships, fn ($q) => $q->with($relationships))
+            ->whereDeviceSpec($this->argument('device spec'))->orderBy('device_id')->chunk(1, function ($device): void {
+                $this->line(json_encode($device[0]));
+            });
 
         return 0;
     }
@@ -246,13 +252,13 @@ class ReportDevices extends LnmsCommand
                 ->merge(Schema::getColumnListing('devices'))
                 ->merge(array_keys($this->getSyntheticFields()))
                 ->merge(Device::definedRelations())
-                ->when($current, fn ($c) => $c->filter(fn ($i) => str_starts_with($i, $current)));
+                ->when($current, fn ($c) => $c->filter(fn ($i) => str_starts_with((string) $i, $current)));
         }
 
         if ($option->getName() == 'relationships') {
             return collect()
                 ->merge($this->getRelationships())
-                ->when($current, fn ($c) => $c->filter(fn ($i) => str_starts_with($i, $current)));
+                ->when($current, fn ($c) => $c->filter(fn ($i) => str_starts_with((string) $i, $current)));
         }
 
         return null;

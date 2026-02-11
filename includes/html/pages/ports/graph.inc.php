@@ -6,14 +6,14 @@ echo $displayLists;
 echo '</div>';
 echo '<div class="panel-body">';
 echo '<div style="padding-bottom: 10px;">';
-echo stripcslashes($output);
+echo stripcslashes((string) $output);
 echo '</div>';
 
 $param = [];
 $where = '';
 $ignore_filter = 0;
 $disabled_filter = 0;
-$device = DeviceCache::get((int) $vars['device_id']);
+$device = DeviceCache::get((int) ($vars['device_id'] ?? 0));
 
 $device_selected = json_encode($device->exists ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
 echo '<script>init_select2("#device_id", "device", {field: "device_id"}, ' . $device_selected . ' , "All Devices")</script>';
@@ -105,48 +105,22 @@ if ($ignore_filter == 0 && $disabled_filter == 0) {
 $query = 'SELECT * FROM `ports` AS I, `devices` AS D LEFT JOIN `locations` AS L ON D.location_id = L.id WHERE I.device_id = D.device_id' . $where;
 
 // only grab list of ports for graph pages, table uses ajax
-$ports = array_map(function ($value) {
-    return (array) $value;
-}, DB::select($query, $param));
+$ports = array_map(fn ($value) => (array) $value, DB::select($query, $param));
 
-switch ($vars['sort'] ?? '') {
-    case 'traffic':
-        $ports = collect($ports)->sortBy('ifOctets_rate', descending: true);
-        break;
-    case 'traffic_in':
-        $ports = collect($ports)->sortBy('ifInOctets_rate', descending: true);
-        break;
-    case 'traffic_out':
-        $ports = collect($ports)->sortBy('ifOutOctets_rate', descending: true);
-        break;
-    case 'packets':
-        $ports = collect($ports)->sortBy('ifUcastPkts_rate', descending: true);
-        break;
-    case 'packets_in':
-        $ports = collect($ports)->sortBy('ifInUcastOctets_rate', descending: true);
-        break;
-    case 'packets_out':
-        $ports = collect($ports)->sortBy('ifOutUcastOctets_rate', descending: true);
-        break;
-    case 'errors':
-        $ports = collect($ports)->sortBy('ifErrors_rate', descending: true);
-        break;
-    case 'speed':
-        $ports = collect($ports)->sortBy('ifSpeed', descending: true);
-        break;
-    case 'port':
-        $ports = collect($ports)->sortBy('ifDescr');
-        break;
-    case 'media':
-        $ports = collect($ports)->sortBy('ifType');
-        break;
-    case 'descr':
-        $ports = collect($ports)->sortBy('ifAlias');
-        break;
-    case 'device':
-    default:
-        $ports = collect($ports)->sortBy('hostname');
-}
+$ports = match ($vars['sort'] ?? '') {
+    'traffic' => collect($ports)->sortBy('ifOctets_rate', descending: true),
+    'traffic_in' => collect($ports)->sortBy('ifInOctets_rate', descending: true),
+    'traffic_out' => collect($ports)->sortBy('ifOutOctets_rate', descending: true),
+    'packets' => collect($ports)->sortBy('ifUcastPkts_rate', descending: true),
+    'packets_in' => collect($ports)->sortBy('ifInUcastOctets_rate', descending: true),
+    'packets_out' => collect($ports)->sortBy('ifOutUcastOctets_rate', descending: true),
+    'errors' => collect($ports)->sortBy('ifErrors_rate', descending: true),
+    'speed' => collect($ports)->sortBy('ifSpeed', descending: true),
+    'port' => collect($ports)->sortBy('ifDescr'),
+    'media' => collect($ports)->sortBy('ifType'),
+    'descr' => collect($ports)->sortBy('ifAlias'),
+    default => collect($ports)->sortBy('hostname'),
+};
 
 foreach ($ports as $port) {
     $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
@@ -181,10 +155,10 @@ foreach ($ports as $port) {
         $graph_array = [];
         $graph_array['height'] = 100;
         $graph_array['width'] = 210;
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['id'] = $port['port_id'];
         $graph_array['type'] = $graph_type;
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
         $graph_array['legend'] = 'no';
 
         $link_array = $graph_array;

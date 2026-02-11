@@ -35,12 +35,13 @@ class DatastoreServiceProvider extends ServiceProvider
 {
     protected $namespace = 'LibreNMS\\Data\\Store\\';
     protected $stores = [
-        'LibreNMS\Data\Store\Graphite',
-        'LibreNMS\Data\Store\InfluxDB',
-        'LibreNMS\Data\Store\InfluxDBv2',
-        'LibreNMS\Data\Store\OpenTSDB',
-        'LibreNMS\Data\Store\Prometheus',
-        'LibreNMS\Data\Store\Rrd',
+        \LibreNMS\Data\Store\Graphite::class,
+        \LibreNMS\Data\Store\InfluxDB::class,
+        \LibreNMS\Data\Store\InfluxDBv2::class,
+        \LibreNMS\Data\Store\OpenTSDB::class,
+        \LibreNMS\Data\Store\Prometheus::class,
+        \LibreNMS\Data\Store\Rrd::class,
+        \LibreNMS\Data\Store\Kafka::class,
     ];
 
     public function register(): void
@@ -65,12 +66,16 @@ class DatastoreServiceProvider extends ServiceProvider
 
         // additional bindings
         $this->registerInflux();
+        $this->registerKafka();
     }
 
     public function registerInflux()
     {
-        $this->app->singleton('InfluxDB\Database', function ($app) {
-            return \LibreNMS\Data\Store\InfluxDB::createFromConfig();
-        });
+        $this->app->singleton(\InfluxDB\Database::class, fn ($app) => \LibreNMS\Data\Store\InfluxDB::createFromConfig());
+    }
+
+    public function registerKafka()
+    {
+        $this->app->singleton(\RdKafka\Producer::class, fn ($app) => \LibreNMS\Data\Store\Kafka::getClient());
     }
 }

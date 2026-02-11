@@ -20,7 +20,9 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
+ * @copyright  2025 Peca Nesovanovic
+ * @copyright  2025 Tony Murray
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -32,8 +34,10 @@ use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
+use App\Models\PortVlan;
 use App\Models\Sla;
 use App\Models\Transceiver;
+use App\Models\Vlan;
 use App\Observers\ModuleModelObserver;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
@@ -51,6 +55,8 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
@@ -58,6 +64,9 @@ use LibreNMS\OS;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\Oid;
+use LibreNMS\Util\StringHelpers;
+use SnmpQuery;
 
 class Vrp extends OS implements
     MempoolsDiscovery,
@@ -69,7 +78,9 @@ class Vrp extends OS implements
     SlaDiscovery,
     SlaPolling,
     TransceiverDiscovery,
-    OSDiscovery
+    OSDiscovery,
+    VlanDiscovery,
+    VlanPortDiscovery
 {
     use SyncsModels;
     use EntityMib {EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical; }
@@ -85,7 +96,7 @@ class Vrp extends OS implements
             'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc',
         ])->table(1);
 
-        $inventory->each(function (EntPhysical $entry) use ($extra) {
+        $inventory->each(function (EntPhysical $entry) use ($extra): void {
             if (isset($entry->entPhysicalIndex)) {
                 if (! empty($extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'])) {
                     $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'];
@@ -171,7 +182,7 @@ class Vrp extends OS implements
             if (! is_null($type) && ! is_null($entityType)) {
                 $type .= " ($entityType)";
             } else {
-                $type = $type ?? $entityType;
+                $type ??= $entityType;
             }
             if (! is_null($type)) {
                 $type .= $mode;
@@ -285,7 +296,7 @@ class Vrp extends OS implements
                 //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
                 //$a_index_oid = implode(".", array_map("hexdec", explode(":", $ap_id)));
                 foreach ($ap as $r_id => $radio) {
-                    foreach ($radio as $s_index => $ssid) {
+                    foreach ($radio as $ssid) {
                         $clientPerRadio[$ap_id][$r_id] = ($clientPerRadio[$ap_id][$r_id] ?? 0) + ($ssid['hwWlanVapStaOnlineCnt'] ?? 0);
                         $numClients += ($ssid['hwWlanVapStaOnlineCnt'] ?? 0);
                     }
@@ -303,7 +314,7 @@ class Vrp extends OS implements
                 'NUMCLIENTS' => $numClients,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'vrp', $tags, $fields);
 
             $aps = new Collection;
@@ -319,7 +330,7 @@ class Vrp extends OS implements
                     $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? 0;
                     $radioutil = ($radioutil > 100 || $radioutil < 0) ? -1 : $radioutil;
                     $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? 0;
-                    $radio['hwWlanRadioType'] = $radio['hwWlanRadioType'] ?? 0;
+                    $radio['hwWlanRadioType'] ??= 0;
 
                     if ($txpow > 127) {
                         // means the radio is disabled for some reason.
@@ -386,7 +397,7 @@ class Vrp extends OS implements
                         'interference' => $interference,
                     ];
 
-                    $tags = compact('name', 'radionum', 'rrd_name', 'rrd_def');
+                    $tags = ['name' => $name, 'radionum' => $radionum, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
                     $datastore->put($this->getDeviceArray(), 'arubaap', $tags, $fields);
 
                     $aps->push(new AccessPoint([
@@ -557,11 +568,9 @@ class Vrp extends OS implements
         $ssid_total_oid_array = []; // keep all OIDs so we can compute the total of all STA
 
         foreach ($staTable as $ssid => $sta) {
-            //Convert string to num_oid
-            $numSsid = strlen($ssid) . '.' . implode('.', unpack('c*', $ssid));
             $ssid_oid_array = []; // keep all OIDs of different freqs for a single SSID, to compute each SSID sta count, all freqs included
             foreach ($sta as $staFreq => $count) {
-                $oid = $oidMap[$staFreq] . $numSsid;
+                $oid = $oidMap[$staFreq] . Oid::encodeString($ssid);
                 $ssid_oid_array[] = $oid;
                 $ssid_total_oid_array[] = $oid;
                 $sensors[] = new WirelessSensor(
@@ -626,7 +635,7 @@ class Vrp extends OS implements
         }
 
         foreach ($sla_table as $sla_key => $sla_config) {
-            [$owner, $test] = explode('.', $sla_key, 2);
+            [$owner, $test] = explode('.', (string) $sla_key, 2);
 
             $slas->push(new Sla([
                 'sla_nr' => hexdec(hash('crc32', $owner . $test)), // indexed by owner+test, convert to int
@@ -687,7 +696,7 @@ class Vrp extends OS implements
                         //->addDataset('MaxRtt', 'GAUGE', 0, 300000)
                         ->addDataset('ProbeResponses', 'GAUGE', 0, 300000)
                         ->addDataset('ProbeLoss', 'GAUGE', 0, 300000);
-                    $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
+                    $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'sla_nr' => $sla_nr, 'rtt_type' => $rtt_type];
                     app('Datastore')->put($device, 'sla', $tags, $icmp);
                     $collected = array_merge($collected, $icmp);
                     break;
@@ -696,5 +705,86 @@ class Vrp extends OS implements
             d_echo('The following datasources were collected for #' . $sla->sla_nr . ":\n");
             d_echo($collected);
         }
+    }
+
+    public function discoverVlans(): Collection
+    {
+        $vlansData = SnmpQuery::enumStrings()->walk([
+            'HUAWEI-L2VLAN-MIB::hwL2VlanDescr',
+            // 'HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus', // for filtering only active vlans
+            'HUAWEI-L2VLAN-MIB::hwL2VlanType',
+        ])->mapTable(fn ($vlanArray, $vlanId) => new Vlan([
+            'vlan_name' => $vlanArray['HUAWEI-L2VLAN-MIB::hwL2VlanDescr'] ?? '',
+            'vlan_vlan' => $vlanId,
+            'vlan_domain' => 1,
+            'vlan_type' => $vlanArray['HUAWEI-L2VLAN-MIB::hwL2VlanType'] ?? '',
+        ]));
+
+        if ($vlansData->isEmpty()) { // try standard QBridge Vlan data
+            $vlansData = parent::discoverVlans();
+        }
+
+        return $vlansData;
+    }
+
+    public function discoverVlanPorts(Collection $vlans): Collection
+    {
+        $ports = new Collection;
+
+        $maxVlanId = $vlans->max('vlan_vlan');
+
+        $portsIndexes = SnmpQuery::walk('HUAWEI-L2IF-MIB::hwL2IfPortIfIndex')->pluck();
+
+        $tagged = SnmpQuery::walk([
+            'HUAWEI-L2IF-MIB::hwL2IfTrunkAllowPassVlanListLow',
+            'HUAWEI-L2IF-MIB::hwL2IfHybridTaggedVlanListLow',
+        ])->table(1);
+        // high table
+        if ($maxVlanId > 2047) {
+            $tagged = SnmpQuery::walk([
+                'HUAWEI-L2IF-MIB::hwL2IfTrunkAllowPassVlanListHigh',
+                'HUAWEI-L2IF-MIB::hwL2IfHybridTaggedVlanListHigh',
+            ])->table(1, $tagged);
+        }
+
+        foreach ($tagged as $baseport => $vlanArray) {
+            foreach (['Low', 'High'] as $hilo) {
+                foreach (['TrunkAllowPass', 'HybridTagged'] as $pType) {
+                    $oid = 'HUAWEI-L2IF-MIB::hwL2If' . $pType . 'VlanList' . $hilo;
+                    if (! empty($vlanArray[$oid])) {
+                        $vlansOnPort = StringHelpers::bitsToIndices($vlanArray[$oid]);
+                        foreach ($vlansOnPort as $vlanIdOnPort) {
+                            $vlanIdOnPort = ($hilo == 'High') ? ($vlanIdOnPort + 2047) : ($vlanIdOnPort - 1);
+                            if ($vlans->contains('vlan_vlan', $vlanIdOnPort)) {
+                                $ports->push(new PortVlan([
+                                    'vlan' => $vlanIdOnPort,
+                                    'baseport' => $baseport,
+                                    'untagged' => 0,
+                                    'port_id' => PortCache::getIdFromIfIndex($portsIndexes[$baseport] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
+                                ]));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $portsData = SnmpQuery::walk('HUAWEI-L2IF-MIB::hwL2IfPVID')->table(1);
+        foreach ($portsData as $baseport => $data) {
+            if (! empty($data['HUAWEI-L2IF-MIB::hwL2IfPVID'])) {
+                $ports->push(new PortVlan([
+                    'vlan' => $data['HUAWEI-L2IF-MIB::hwL2IfPVID'],
+                    'baseport' => $baseport,
+                    'untagged' => 1,
+                    'port_id' => PortCache::getIdFromIfIndex($portsIndexes[$baseport] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
+                ]));
+            }
+        }
+
+        if ($ports->isEmpty()) { // try standard Q-BRIDGE-MIB
+            $ports = parent::discoverVlanPorts($vlans);
+        }
+
+        return $ports;
     }
 }

@@ -47,7 +47,7 @@ $std_tf = ['up', 'down'];
 $ifType = 'ethernetCsmacd';
 
 foreach ($exa_stats as $name => $tmp_stats) {
-    $e_name = explode('.', $name);
+    $e_name = explode('.', (string) $name);
     $index = (((int) $e_name[0]) - 1) * 16 + (int) $e_name[1];
     $port_stats[$index] = [];
     $port_stats[$index]['ifName'] = $name;

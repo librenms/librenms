@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Enum;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 enum ImageFormat: string
 {
@@ -35,7 +35,7 @@ enum ImageFormat: string
 
     public static function forGraph(?string $type = null): ImageFormat
     {
-        return ImageFormat::tryFrom($type ?? Config::get('webui.graph_type')) ?? ImageFormat::png;
+        return ImageFormat::tryFrom($type ?? LibrenmsConfig::get('webui.graph_type')) ?? ImageFormat::png;
     }
 
     public function contentType(): string

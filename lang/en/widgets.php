@@ -46,6 +46,9 @@ return [
     'notes' => [
         'title' => 'Notes',
     ],
+    'placeholder' => [
+        'title' => 'Placeholder',
+    ],
     'server-stats' => [
         'title' => 'Server Stats',
     ],
@@ -61,7 +64,7 @@ return [
     'top-interfaces' => [
         'title' => 'Top Interfaces',
     ],
-    'worldmap' => [
+    'world-map' => [
         'title' => 'World Map',
     ],
 ];

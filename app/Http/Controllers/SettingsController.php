@@ -16,14 +16,12 @@ class SettingsController extends Controller
      * @param  string  $section
      * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index(DynamicConfig $dynamicConfig, $tab = 'global', $section = '')
+    public function index(DynamicConfig $dynamicConfig, $tab = 'alerting', $section = '')
     {
         $data = [
             'active_tab' => $tab,
             'active_section' => $section,
-            'groups' => $dynamicConfig->getGroups()->reject(function ($group) {
-                return $group == 'global';
-            })->values(),
+            'groups' => $dynamicConfig->getGroups()->reject(fn ($group) => $group == 'global')->values(),
         ];
 
         return view('settings.index', $data);
@@ -39,20 +37,20 @@ class SettingsController extends Controller
      */
     public function update(DynamicConfig $config, Request $request, $id)
     {
-        $value = $request->get('value');
+        $value = $request->input('value');
 
         if (! $config->isValidSetting($id)) {
             return $this->jsonResponse($id, ':id is not a valid setting', null, 400);
         }
 
-        $current = \LibreNMS\Config::get($id);
+        $current = \App\Facades\LibrenmsConfig::get($id);
         $config_item = $config->get($id);
 
         if (! $config_item->checkValue($value)) {
             return $this->jsonResponse($id, $config_item->getValidationMessage($value), $current, 400);
         }
 
-        if (\LibreNMS\Config::persist($id, $value)) {
+        if (\App\Facades\LibrenmsConfig::persist($id, $value)) {
             return $this->jsonResponse($id, "Successfully set $id", $value);
         }
 

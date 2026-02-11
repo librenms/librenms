@@ -63,5 +63,19 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 768,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 42
+                }
+            ]
+        }
     }
 }
