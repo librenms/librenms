@@ -51,7 +51,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                     } else {
                         $parts = explode('.', $matches[1]);
                         if (count($parts) === 16) {
-                            $ip_addr = implode(':', array_map(fn($p) => sprintf('%02x', $p), $parts));
+                            $ip_addr = implode(':', array_map(fn ($p) => sprintf('%02x', $p), $parts));
                         }
                     }
                 }
