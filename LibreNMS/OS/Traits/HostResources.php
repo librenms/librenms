@@ -176,7 +176,7 @@ trait HostResources
 
     public function discoverMempools(): Collection
     {
-        $hr_storage = SnmpQuery::cache()->hideMib()->mibs(['HOST-RESOURCES-TYPES'])->walk('HOST-RESOURCES-MIB::hrStorageTable')->table(1);
+        $hr_storage = SnmpQuery::cache()->hideMib()->mibs(['HOST-RESOURCES-TYPES', 'HOST-RESOURCES-MIB'])->walk('HOST-RESOURCES-MIB::hrStorageTable')->table(1);
         $this->fixBadData($hr_storage);
 
         if (empty($hr_storage)) {
@@ -214,7 +214,7 @@ trait HostResources
 
     public function discoverStorage(): Collection
     {
-        $hr_storage = SnmpQuery::cache()->hideMib()->mibs(['HOST-RESOURCES-TYPES'])->walk('HOST-RESOURCES-MIB::hrStorageTable')->table(1);
+        $hr_storage = SnmpQuery::cache()->hideMib()->mibs(['HOST-RESOURCES-TYPES', 'HOST-RESOURCES-MIB'])->walk('HOST-RESOURCES-MIB::hrStorageTable')->table(1);
         $this->fixBadData($hr_storage);
 
         if (empty($hr_storage)) {

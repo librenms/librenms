@@ -1,3 +1,4 @@
+mib: EXCELIANCE-MIB
 modules:
     os:
         hardware: EXCELIANCE-MIB::alHardwareModel

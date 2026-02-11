@@ -11,7 +11,7 @@ if (file_exists(base_path("includes/discovery/bgp-peers/{$device['os']}.inc.php"
 }
 
 if (empty($bgpLocalAs)) {
-    $bgpLocalAs = \SnmpQuery::get('BGP4-MIB::bgpLocalAs.0')->value();
+    $bgpLocalAs = \SnmpQuery::mibs(['BGP4-MIB'])->get('BGP4-MIB::bgpLocalAs.0')->value();
 }
 
 foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
