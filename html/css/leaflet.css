@@ -138,7 +138,7 @@
 .leaflet-top,
 .leaflet-bottom {
 	position: absolute;
-	z-index: 1000;
+	z-index: 550;
 	pointer-events: none;
 	}
 .leaflet-top {
@@ -659,3 +659,4 @@ svg.leaflet-image-layer.leaflet-interactive path {
 		print-color-adjust: exact;
 		}
 	}
+
