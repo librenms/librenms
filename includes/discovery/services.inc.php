@@ -1,6 +1,6 @@
 <?php
 
-require_once 'includes/services.inc.php';
+require_once base_path('includes/services.inc.php');
 
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\ServiceTemplateController;
