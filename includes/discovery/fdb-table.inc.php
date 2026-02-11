@@ -59,7 +59,7 @@ if (! empty($insert)) {
                 unset($existing_fdbs[$vlan_id][$mac_address_entry]);
             } else {
                 if (is_null($entry['port_id'])) {
-                    Log::warning("FDB: missing port id for MAC {$mac_address_entry}, VLAN {$vlan_id}, device {$device['device_id']}");
+                    // Port id is missing. Skip invalid entry. 
                     continue;
                 }
 
