@@ -175,7 +175,7 @@ class PortsController extends TableController
             'ifIndex',
             'Status',
             'Admin Status',
-			'Duplex',
+            'Duplex',
             'Speed',
             'MTU',
             'Type',
