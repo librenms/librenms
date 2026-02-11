@@ -1,4 +1,3 @@
-mib: VERTIV-V5-MIB
 modules:
     os:
         hardware: VERTIV-V5-MIB::productModelNumber.0
@@ -8,45 +7,45 @@ modules:
         current:
             data:
                 -
-                   oid: pduLineTable
-                   value: pduLineCurrent
+                   oid: VERTIV-V5-MIB::pduLineTable
+                   value: VERTIV-V5-MIB::pduLineCurrent
                    num_oid: '.1.3.6.1.4.1.21239.5.2.3.4.1.4.{{ $index }}'
                    index: 'pduLineCurrent.{{ $index }}'
-                   descr: pduLineName
+                   descr: VERTIV-V5-MIB::pduLineName
                    divisor: 100
                 -
-                   oid: pduBreakerTable
-                   value: pduBreakerCurrent
+                   oid: VERTIV-V5-MIB::pduBreakerTable
+                   value: VERTIV-V5-MIB::pduBreakerCurrent
                    num_oid: '.1.3.6.1.4.1.21239.5.2.3.3.1.4.{{ $index }}'
                    index: 'pduBreakerCurrent.{{ $index }}'
-                   descr: pduBreakerLabel
+                   descr: VERTIV-V5-MIB::pduBreakerLabel
                    divisor: 100
                 -
-                   oid: pduPhaseTable
-                   value: pduPhaseCurrent
+                   oid: VERTIV-V5-MIB::pduPhaseTable
+                   value: VERTIV-V5-MIB::pduPhaseCurrent
                    num_oid: '.1.3.6.1.4.1.21239.5.2.3.2.1.8.{{ $index }}'
                    index: 'pduPhaseCurrent.{{ $index }}'
-                   descr: pduPhaseName
+                   descr: VERTIV-V5-MIB::pduPhaseName
                    divisor: 100
         voltage:
             data:
                 -
-                   oid: pduPhaseTable
-                   value: pduPhaseVoltage
+                   oid: VERTIV-V5-MIB::pduPhaseTable
+                   value: VERTIV-V5-MIB::pduPhaseVoltage
                    num_oid: '.1.3.6.1.4.1.21239.5.2.3.2.1.4.{{ $index }}'
-                   descr: pduPhaseName
+                   descr: VERTIV-V5-MIB::pduPhaseName
                    divisor: 10
         power:
             data:
                 -
-                    oid: pduTotalRealPower
+                    oid: VERTIV-V5-MIB::pduTotalRealPower
                     num_oid: '.1.3.6.1.4.1.21239.5.2.3.1.1.9.{{ $index }}'
                     index: 'pduTotalRealPower.{{ $index }}'
                     descr: Total Power
         power_consumed:
             data:
                 -
-                    oid: pduTotalEnergy
+                    oid: VERTIV-V5-MIB::pduTotalEnergy
                     num_oid: '.1.3.6.1.4.1.21239.5.2.3.1.1.12.{{ $index }}'
                     index: 'pduTotalEnergy.{{ $index }}'
                     descr: Total Energy
