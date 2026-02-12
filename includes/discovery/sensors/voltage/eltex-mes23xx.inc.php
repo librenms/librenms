@@ -19,7 +19,7 @@
  * @package    LibreNMS
  * @link       https://www.librenms.org
  *
- * @copyright  2022 Peca Nesovanovic
+ * @copyright  2025 Peca Nesovanovic
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
@@ -54,7 +54,7 @@ foreach ($oids as $ifIndex => $data) {
             'sensor_limit_warn' => $high_warn_limit,
             'sensor_limit' => $high_limit,
             'sensor_current' => $value,
-            'entPhysicalIndex' => $ifIndex,
+            'entPhysicalIndex' => DeviceCache::getPrimary()->entityPhysical()->where('ifIndex', $ifIndex)->value('entPhysicalIndex'),
             'entPhysicalIndex_measured' => 'port',
             'user_func' => null,
             'group' => 'transceiver',

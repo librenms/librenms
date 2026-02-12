@@ -19,7 +19,7 @@
  * @package    LibreNMS
  * @link       https://www.librenms.org
  *
- * @copyright  2022 Peca Nesovanovic
+ * @copyright  2025 Peca Nesovanovic
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
@@ -47,7 +47,7 @@ foreach ($oids as $ifIndex => $data) {
             'sensor_class' => 'dbm',
             'sensor_oid' => $oid,
             'sensor_index' => 'SfpTxDbm' . $ifIndex,
-            'sensor_type' => 'rlPhyTestTableTxOpticalPower',
+            'sensor_type' => 'eltex-mes23xx',
             'sensor_descr' => 'SfpTxDbm-' . $descr,
             'sensor_divisor' => $divisor,
             'sensor_multiplier' => $multiplier,
@@ -56,7 +56,7 @@ foreach ($oids as $ifIndex => $data) {
             'sensor_limit_warn' => $high_warn_limit,
             'sensor_limit' => $high_limit,
             'sensor_current' => $value,
-            'entPhysicalIndex' => $ifIndex,
+            'entPhysicalIndex' => DeviceCache::getPrimary()->entityPhysical()->where('ifIndex', $ifIndex)->value('entPhysicalIndex'),
             'entPhysicalIndex_measured' => 'port',
             'user_func' => null,
             'group' => 'transceiver',
@@ -78,7 +78,7 @@ foreach ($oids as $ifIndex => $data) {
             'sensor_class' => 'dbm',
             'sensor_oid' => $oid,
             'sensor_index' => 'SfpRxDbm' . $ifIndex,
-            'sensor_type' => 'rlPhyTestTableRxOpticalPower',
+            'sensor_type' => 'eltex-mes23xx',
             'sensor_descr' => 'SfpRxDbm-' . $descr,
             'sensor_divisor' => $divisor,
             'sensor_multiplier' => $multiplier,
@@ -87,7 +87,7 @@ foreach ($oids as $ifIndex => $data) {
             'sensor_limit_warn' => $high_warn_limit,
             'sensor_limit' => $high_limit,
             'sensor_current' => $value,
-            'entPhysicalIndex' => $ifIndex,
+            'entPhysicalIndex' => DeviceCache::getPrimary()->entityPhysical()->where('ifIndex', $ifIndex)->value('entPhysicalIndex'),
             'entPhysicalIndex_measured' => 'port',
             'user_func' => null,
             'group' => 'transceiver',
