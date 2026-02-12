@@ -127,13 +127,13 @@ class AlertMapController extends WidgetController
     private function sort(array &$data, string $order_by): void
     {
         match ($order_by) {
-            'severity' => usort($data, 
+            'severity' => usort($data,
                 // reverse sort as worse severities have higher values
-                fn($l, $r) => self::alertSeverityValue($r['severity']) <=> self::alertSeverityValue($l['severity']) ?:
+                fn ($l, $r) => self::alertSeverityValue($r['severity']) <=> self::alertSeverityValue($l['severity']) ?:
                 strcasecmp((string) $l['label'], (string) $r['label'])),
-            'label' => usort($data, fn($l, $r) => strcasecmp((string) $l['label'], (string) $r['label'])),
+            'label' => usort($data, fn ($l, $r) => strcasecmp((string) $l['label'], (string) $r['label'])),
             // device display name (tooltip starts with the display name)
-            default => usort($data, fn($l, $r) => strcasecmp((string) $l['tooltip'], (string) $r['tooltip']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
+            default => usort($data, fn ($l, $r) => strcasecmp((string) $l['tooltip'], (string) $r['tooltip']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
         };
     }
 
