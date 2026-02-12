@@ -371,7 +371,7 @@ if (! empty($peers)) {
                         $peer_data['bgpPeerLastErrorCode'] = intval($error_data[0]);
                         $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
                     } elseif ($device['os_group'] == 'cisco') {
-                        $peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
+                        $peer_identifiers = [$ip_ver, $bgp_peer_ident];
                         $mib = 'CISCO-BGP4-MIB';
                         $oid_map = [
                             'cbgpPeer2State' => 'bgpPeerState',
@@ -437,14 +437,24 @@ if (! empty($peers)) {
                 }
             }
 
-            // --- Build peer data if it is not already filled in ---
+            // --- Fetch peer data if it is not already filled in ---
             if (empty($peer_data) && isset($peer_identifier, $oid_map, $mib)) {
                 echo "Fetching $mib data... \n";
 
                 $get_oids = array_map(fn ($oid) => "$oid.$peer_identifier", array_keys($oid_map));
                 $peer_data_raw = snmp_get_multi($device, $get_oids, '-OQUs', $mib);
                 $peer_data_raw = reset($peer_data_raw);  // get the first element of the array
+            } elseif (empty($peer_data) && isset($peer_identifiers, $oid_map, $mib)) {
+                echo "Fetching $mib data... \n";
 
+                $snmp_raw = SnmpQuery::mibs([$mib])->enumStrings()->hideMib()->cache()->walk(array_keys($oid_map))->table(count($peer_identifiers));
+
+                // Fetch the snmp item related to this peer
+                $peer_data_raw = array_reduce($peer_identifiers, fn($ret, $item) => $ret[$item], $snmp_raw);
+            }
+
+            // --- Fill in peer data if raw data has been fetched ---
+            if (isset($peer_data_raw)) {
                 $peer_data = [];
 
                 foreach ($oid_map as $source => $target) {
@@ -578,65 +588,39 @@ if (! empty($peers)) {
                     $bgp_peer_ident = $peer_ip->toSnmpIndex();
 
                     $ip_ver = $peer_ip->getFamily();
-                    if ($ip_ver == 'ipv6') {
-                        $ip_type = 2;
-                        $ip_len = 16;
-                    } else {
-                        $ip_type = 1;
-                        $ip_len = 4;
-                    }
 
-                    $ip_cast = 1;
-                    if ($peer_afi['safi'] == 'multicast') {
-                        $ip_cast = 2;
-                    } elseif ($peer_afi['safi'] == 'unicastAndMulticast') {
-                        $ip_cast = 3;
-                    } elseif ($peer_afi['safi'] == 'vpn') {
-                        $ip_cast = 128;
-                    }
+                    $snmp_raw = SnmpQuery::mibs(['CISCO-BGP4-MIB'])->enumStrings()->hideMib()->cache()->walk([
+                        'cbgpPeer2AcceptedPrefixes',
+                        'cbgpPeer2DeniedPrefixes',
+                        'cbgpPeer2PrefixAdminLimit',
+                        'cbgpPeer2PrefixThreshold',
+                        'cbgpPeer2PrefixClearThreshold',
+                        'cbgpPeer2AdvertisedPrefixes',
+                        'cbgpPeer2SuppressedPrefixes',
+                        'cbgpPeer2WithdrawnPrefixes',
+                        'cbgpPeerAcceptedPrefixes',
+                        'cbgpPeerDeniedPrefixes',
+                        'cbgpPeerPrefixAdminLimit',
+                        'cbgpPeerPrefixThreshold',
+                        'cbgpPeerPrefixClearThreshold',
+                        'cbgpPeerAdvertisedPrefixes',
+                        'cbgpPeerSuppressedPrefixes',
+                        'cbgpPeerWithdrawnPrefixes',
+                    ])->table(4);
 
-                    $check = snmp_get($device, 'cbgpPeer2AcceptedPrefixes.' . $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident . '.' . $ip_type . '.' . $ip_cast, '', 'CISCO-BGP4-MIB');
-
-                    if (! empty($check)) {
-                        $cgp_peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident . '.' . $ip_type . '.' . $ip_cast;
-                        $cbgp2_oids = [
-                            'cbgpPeer2AcceptedPrefixes.' . $cgp_peer_identifier,
-                            'cbgpPeer2DeniedPrefixes.' . $cgp_peer_identifier,
-                            'cbgpPeer2PrefixAdminLimit.' . $cgp_peer_identifier,
-                            'cbgpPeer2PrefixThreshold.' . $cgp_peer_identifier,
-                            'cbgpPeer2PrefixClearThreshold.' . $cgp_peer_identifier,
-                            'cbgpPeer2AdvertisedPrefixes.' . $cgp_peer_identifier,
-                            'cbgpPeer2SuppressedPrefixes.' . $cgp_peer_identifier,
-                            'cbgpPeer2WithdrawnPrefixes.' . $cgp_peer_identifier,
-                        ];
-                        $cbgp_data_tmp = snmp_get_multi($device, $cbgp2_oids, '-OQUs', 'CISCO-BGP4-MIB');
-                        $ident = "$ip_ver.\"" . $peer['bgpPeerIdentifier'] . '"' . '.' . $ip_type . '.' . $ip_cast;
-
-                        $key = key($cbgp_data_tmp); // get key of item
+                    if (isset($snmp_raw[$ip_ver])) {
                         $cbgp_data = [
-                            'cbgpPeerAcceptedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2AcceptedPrefixes'] ?? null,
-                            'cbgpPeerDeniedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2DeniedPrefixes'] ?? null,
-                            'cbgpPeerPrefixAdminLimit' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixAdminLimit'] ?? null,
-                            'cbgpPeerPrefixThreshold' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixThreshold'] ?? null,
-                            'cbgpPeerPrefixClearThreshold' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixClearThreshold'] ?? null,
-                            'cbgpPeerAdvertisedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2AdvertisedPrefixes'] ?? null,
-                            'cbgpPeerSuppressedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2SuppressedPrefixes'] ?? null,
-                            'cbgpPeerWithdrawnPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2WithdrawnPrefixes'] ?? null,
+                            'cbgpPeerAcceptedPrefixes' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['cbgpPeer2AcceptedPrefixes'] ?? null,
+                            'cbgpPeerDeniedPrefixes' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['cbgpPeer2DeniedPrefixes'] ?? null,
+                            'cbgpPeerPrefixAdminLimit' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['cbgpPeer2PrefixAdminLimit'] ?? null,
+                            'cbgpPeerPrefixThreshold' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['cbgpPeer2PrefixThreshold'] ?? null,
+                            'cbgpPeerPrefixClearThreshold' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['cbgpPeer2PrefixClearThreshold'] ?? null,
+                            'cbgpPeerAdvertisedPrefixes' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['cbgpPeer2AdvertisedPrefixes'] ?? null,
+                            'cbgpPeerSuppressedPrefixes' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['cbgpPeer2SuppressedPrefixes'] ?? null,
+                            'cbgpPeerWithdrawnPrefixes' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['cbgpPeer2WithdrawnPrefixes'] ?? null,
                         ];
                     } else {
-                        $cbgp_oids = [
-                            'cbgpPeerAcceptedPrefixes.' . $peer['bgpPeerIdentifier'] . ".$afi.$safi",
-                            'cbgpPeerDeniedPrefixes.' . $peer['bgpPeerIdentifier'] . ".$afi.$safi",
-                            'cbgpPeerPrefixAdminLimit.' . $peer['bgpPeerIdentifier'] . ".$afi.$safi",
-                            'cbgpPeerPrefixThreshold.' . $peer['bgpPeerIdentifier'] . ".$afi.$safi",
-                            'cbgpPeerPrefixClearThreshold.' . $peer['bgpPeerIdentifier'] . ".$afi.$safi",
-                            'cbgpPeerAdvertisedPrefixes.' . $peer['bgpPeerIdentifier'] . ".$afi.$safi",
-                            'cbgpPeerSuppressedPrefixes.' . $peer['bgpPeerIdentifier'] . ".$afi.$safi",
-                            'cbgpPeerWithdrawnPrefixes.' . $peer['bgpPeerIdentifier'] . ".$afi.$safi",
-                        ];
-
-                        $cbgp_data = snmp_get_multi($device, $cbgp_oids, '-OUQs', 'CISCO-BGP4-MIB');
-                        $cbgp_data = reset($cbgp_data); // get first entry
+                        $cbgp_data = $snmp_raw[$bgp_peer_ident][$afi][$safi];
                     }
                     d_echo($cbgp_data);
 
@@ -649,7 +633,7 @@ if (! empty($peers)) {
                     $cbgpPeerWithdrawnPrefixes = 0; // no use, it is a gauge32 value, only the difference between cbgpPeerAdvertisedPrefixes  and cbgpPeerWithdrawnPrefixes makes sense.
                     // CF CISCO-BGP4-MIB definition for both
                     $cbgpPeerSuppressedPrefixes = $cbgp_data['cbgpPeerSuppressedPrefixes'];
-                    unset($cbgp_data);
+                    unset($cbgp_data, $snmp_raw);
                 } //end if
 
                 if ($device['os'] == 'junos') {
