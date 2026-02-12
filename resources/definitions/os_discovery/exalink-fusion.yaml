@@ -1,4 +1,3 @@
-mib: EXALINK-FUSION-MIB
 modules:
     os:
         version: EXALINK-FUSION-MIB::fusionInfoVersion
@@ -8,22 +7,22 @@ modules:
         power:
             data:
                 -
-                    oid: fusionPsuTable
-                    value: fusionPsuPowerIn
+                    oid: EXALINK-FUSION-MIB::fusionPsuTable
+                    value: EXALINK-FUSION-MIB::fusionPsuPowerIn
                     num_oid: '.1.3.6.1.4.1.43296.3.3.1.5.{{ $index }}'
                     descr: 'PSU{{ $index }} Input'
                     index: 'fusionPsuPowerIn.{{ $index }}'
                 -
-                    oid: fusionPsuTable
-                    value: fusionPsuPowerOut
+                    oid: EXALINK-FUSION-MIB::fusionPsuTable
+                    value: EXALINK-FUSION-MIB::fusionPsuPowerOut
                     num_oid: '.1.3.6.1.4.1.43296.3.3.1.6.{{ $index }}'
                     descr: 'PSU{{ $index }} Output'
                     index: 'fusionPsuPowerOut.{{ $index }}'
         state:
             data:
                 -
-                    oid: fusionPsuTable
-                    value: fusionPsuPresent
+                    oid: EXALINK-FUSION-MIB::fusionPsuTable
+                    value: EXALINK-FUSION-MIB::fusionPsuPresent
                     num_oid: '.1.3.6.1.4.1.43296.3.3.1.3.{{ $index }}'
                     descr: 'PSU{{ $index }} Presence'
                     index: 'fusionPsuPresent.{{ $index }}'
@@ -34,23 +33,23 @@ modules:
         temperature:
             data:
                 -
-                    oid: fusionPsuTable
-                    value: fusionPsuTemperature
+                    oid: EXALINK-FUSION-MIB::fusionPsuTable
+                    value: EXALINK-FUSION-MIB::fusionPsuTemperature
                     num_oid: '.1.3.6.1.4.1.43296.3.3.1.4.{{ $index }}'
                     descr: 'PSU{{ $index }} Temp.'
                     index: 'fusionPsuTemperature.{{ $index }}'
 
                 -
-                    oid: fusionTempSensorTable
-                    value: fusionTempSensorValue
+                    oid: EXALINK-FUSION-MIB::fusionTempSensorTable
+                    value: EXALINK-FUSION-MIB::fusionTempSensorValue
                     num_oid: '.1.3.6.1.4.1.43296.3.2.1.1.3.{{ $index }}'
-                    descr: 'temp{{ $index }} ({{ $fusionTempSensorName }})'
+                    descr: 'temp{{ $index }} ({{ EXALINK-FUSION-MIB::fusionTempSensorName }})'
                     index: 'fusionTempSensorValue.{{ $index }}'
         fanspeed:
             data:
                 -
-                    oid: fusionFanSensorTable
-                    value: fusionFanSensorValue
+                    oid: EXALINK-FUSION-MIB::fusionFanSensorTable
+                    value: EXALINK-FUSION-MIB::fusionFanSensorValue
                     num_oid: '.1.3.6.1.4.1.43296.3.2.2.1.3.{{ $index }}'
                     descr: 'fan{{ $index }} RPM'
                     index: 'fusionFanSensorValue.{{ $index }}'
