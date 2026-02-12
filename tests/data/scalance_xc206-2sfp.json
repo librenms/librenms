@@ -3374,5 +3374,22 @@
                 }
             ]
         }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "C3560",
+                    "remote_port": "Gi1/0/16 (3c410ee84b80)",
+                    "remote_platform": null,
+                    "remote_version": "Cisco IOS Software, C3560CX Software (C3560CX-UNIVERSALK9-M), Version 15.2(4)E8, RELEASE SOFTWARE (fc3)\nTechnical Support: http://www.cisco.com/techsupport\nCopyright (c) 1986-2019 by Cisco Systems, Inc.\nCompiled Fri 15-Mar-19 12:14 by prod_rel_team",
+                    "ifAlias": "Siemens, SIMATIC NET, SFP992-1LD, 6GK5 992-1AM00-8AA0, HW: Version 2, FW: Version -, S-, Ethernet Port, R0/S0/X1 P8",
+                    "ifDescr": "Siemens, SIMATIC NET, SFP992-1LD, 6GK5 992-1AM00-8AA0, HW: Version 2, FW: Version -, S-, Ethernet Port, R0/S0/X1 P8",
+                    "ifName": "P0.8"
+                }
+            ]
+        }
     }
 }
