@@ -1,0 +1,241 @@
+modules:
+    os:
+        sysName: COMM-BOARD-MIB::identification.0
+        serial: COMM-BOARD-MIB::unitSerialNum.0
+        hardware:
+            - COMM-BOARD-MIB::unitModelNum.0
+            - COMM-BOARD-MIB::stationName.0
+        version:
+            - COMM-BOARD-MIB::commRev.0
+            - COMM-BOARD-MIB::controlRev.0
+        hardware_template: '{{ COMM-BOARD-MIB::unitModelNum.0 }} {{ COMM-BOARD-MIB::stationName.0 }}'
+        version_template: '{{ COMM-BOARD-MIB::commRev.0 }} {{ COMM-BOARD-MIB::controlRev.0 }}'
+    sensors:
+        additional_oids:
+            data:
+                - oid: COMM-BOARD-MIB::umValue
+        temperature:
+            data:
+                -
+                    oid: COMM-BOARD-MIB::heatSetPoint
+                    value: COMM-BOARD-MIB::hspValue
+                    descr: 'Heat Set Point'
+                    num_oid: '.1.3.6.1.4.1.26609.2.1.5.2.{{ $index }}'
+                    index: 'hspValue.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::umValue
+                            op: '!='
+                            value: '2' #Skip if not celcius
+                -
+                    oid: COMM-BOARD-MIB::heatSetPoint
+                    value: COMM-BOARD-MIB::hspValue
+                    descr: 'Heat Set Point'
+                    num_oid: '.1.3.6.1.4.1.26609.2.1.5.2.{{ $index }}'
+                    index: 'hspValue.{{ $index }}'
+                    divisor: 10
+                    user_func: fahrenheit_to_celsius
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::umValue
+                            op: '!='
+                            value: '1' #Skip if not fahrenheit
+                
+                -
+                    oid: COMM-BOARD-MIB::heatDifferential
+                    value: COMM-BOARD-MIB::hdValue
+                    descr: 'Heat Differential'
+                    num_oid: '.1.3.6.1.4.1.26609.2.1.8.2.{{ $index }}'
+                    index: 'hdValue.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::umValue
+                            op: '!='
+                            value: '2' #Skip if not celcius
+                -
+                    oid: COMM-BOARD-MIB::heatDifferential
+                    value: COMM-BOARD-MIB::hdValue
+                    descr: 'Heat Differential'
+                    num_oid: '.1.3.6.1.4.1.26609.2.1.8.2.{{ $index }}'
+                    index: 'hdValue.{{ $index }}'
+                    divisor: 10
+                    user_func: fahrenheit_to_celsius
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::umValue
+                            op: '!='
+                            value: '1' #Skip if not fahrenheit
+                -
+                    oid: COMM-BOARD-MIB::inletSensor
+                    value: COMM-BOARD-MIB::p1iValue
+                    descr: '{{ COMM-BOARD-MIB::p1iName }}'
+                    num_oid: '.1.3.6.1.4.1.26609.2.4.1.2.{{ $index }}'
+                    index: 'p1iValue.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::umValue
+                            op: '!='
+                            value: '2' #Skip if not celcius
+                -
+                    oid: COMM-BOARD-MIB::inletSensor
+                    value: COMM-BOARD-MIB::p1iValue
+                    descr: '{{ COMM-BOARD-MIB::p1iName }}'
+                    num_oid: '.1.3.6.1.4.1.26609.2.4.1.2.{{ $index }}'
+                    index: 'p1iValue.{{ $index }}'
+                    divisor: 10
+                    user_func: fahrenheit_to_celsius
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::umValue
+                            op: '!='
+                            value: '1' #Skip if not fahrenheit
+                -
+                    oid: COMM-BOARD-MIB::outletSensor
+                    value: COMM-BOARD-MIB::p2iValue
+                    descr: '{{ COMM-BOARD-MIB::p2iName }}'
+                    num_oid: '.1.3.6.1.4.1.26609.2.4.2.2.{{ $index }}'
+                    index: 'p2iValue.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::umValue
+                            op: '!='
+                            value: '2' #Skip if not celcius
+                -
+                    oid: COMM-BOARD-MIB::outletSensor
+                    value: COMM-BOARD-MIB::p2iValue
+                    descr: '{{ COMM-BOARD-MIB::p2iName }}'
+                    num_oid: '.1.3.6.1.4.1.26609.2.4.2.2.{{ $index }}'
+                    index: 'p2iValue.{{ $index }}'
+                    divisor: 10
+                    user_func: fahrenheit_to_celsius
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::umValue
+                            op: '!='
+                            value: '1' #Skip if not fahrenheit
+        state:
+            data:
+                -
+                    oid: COMM-BOARD-MIB::frostAlarm
+                    value: COMM-BOARD-MIB::faState
+                    descr: '{{ COMM-BOARD-MIB::faName }}'
+                    num_oid: '.1.3.6.1.4.1.26609.2.2.1.3.{{ $index }}'
+                    index: 'faState.{{ $index }}'
+                    state_name: faState
+                    states:
+                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
+                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::faEnable
+                            op: '='
+                            value: '2'
+                -
+                    oid: COMM-BOARD-MIB::highTempAlarm
+                    value: COMM-BOARD-MIB::htaState
+                    descr: '{{ COMM-BOARD-MIB::htaName }}'
+                    num_oid: '.1.3.6.1.4.1.26609.2.2.4.3.{{ $index }}'
+                    index: 'htaState.{{ $index }}'
+                    state_name: htaState
+                    states:
+                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
+                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::htaEnable
+                            op: '='
+                            value: '2'
+                -
+                    oid: COMM-BOARD-MIB::lowTempAlarm
+                    value: COMM-BOARD-MIB::ltaState
+                    descr: '{{ COMM-BOARD-MIB::ltaName }}'
+                    num_oid: '.1.3.6.1.4.1.26609.2.2.5.3.{{ $index }}'
+                    index: 'ltaState.{{ $index }}'
+                    state_name: ltaState
+                    states:
+                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
+                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::ltaEnable
+                            op: '='
+                            value: '2'
+                -
+                    oid: COMM-BOARD-MIB::inletFailAlarm
+                    value: COMM-BOARD-MIB::isfaState
+                    descr: '{{ COMM-BOARD-MIB::isfaName }}'
+                    num_oid: '.1.3.6.1.4.1.26609.2.2.6.3.{{ $index }}'
+                    index: 'isfaState.{{ $index }}'
+                    state_name: isfaState
+                    states:
+                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
+                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::isfaEnable
+                            op: '='
+                            value: '2'
+                -
+                    oid: COMM-BOARD-MIB::outletFailAlarm
+                    value: COMM-BOARD-MIB::osfaState
+                    descr: '{{ COMM-BOARD-MIB::osfaName }}'
+                    num_oid: '.1.3.6.1.4.1.26609.2.2.7.3.{{ $index }}'
+                    index: 'osfaState.{{ $index }}'
+                    state_name: osfaState
+                    states:
+                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
+                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::osfaEnable
+                            op: '='
+                            value: '2'
+                -
+                    oid: COMM-BOARD-MIB::doorSmokeAlarm
+                    value: COMM-BOARD-MIB::dsaState
+                    descr: '{{ COMM-BOARD-MIB::dsaName }}'
+                    num_oid: '.1.3.6.1.4.1.26609.2.2.8.3.{{ $index }}'
+                    index: 'dsaState.{{ $index }}'
+                    state_name: dsaState
+                    states:
+                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
+                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::dsaEnable
+                            op: '='
+                            value: '2'
+                -
+                    oid: COMM-BOARD-MIB::highPressureAlarm
+                    value: COMM-BOARD-MIB::hpaState
+                    descr: '{{ COMM-BOARD-MIB::hpaName }}'
+                    num_oid: '.1.3.6.1.4.1.26609.2.2.9.3.{{ $index }}'
+                    index: 'hpaState.{{ $index }}'
+                    state_name: hpaState
+                    states:
+                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
+                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::hpaEnable
+                            op: '='
+                            value: '2'
+                -
+                    oid: COMM-BOARD-MIB::contCommFailAlarm
+                    value: COMM-BOARD-MIB::ccfaState
+                    descr: '{{ COMM-BOARD-MIB::ccfaName }}'
+                    num_oid: '.1.3.6.1.4.1.26609.2.2.10.3.{{ $index }}'
+                    index: 'ccfaState.{{ $index }}'
+                    state_name: ccfaState
+                    states:
+                        - { descr: 'Alarm', graph: 0, value: 1, generic: 2 }
+                        - { descr: 'Clear', graph: 0, value: 2, generic: 0 }
+                    skip_values:
+                        -
+                            oid: COMM-BOARD-MIB::ccfaEnable
+                            op: '='
+                            value: '2'
