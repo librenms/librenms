@@ -59,7 +59,7 @@ if (! empty($insert)) {
                 unset($existing_fdbs[$vlan_id][$mac_address_entry]);
             } else {
                 if (is_null($entry['port_id'])) {
-                   // If $entry['port_id'] truly is null then Illuminate throws a fatal error and all subsequent processing stops.
+                    // If $entry['port_id'] truly is null then Illuminate throws a fatal error and all subsequent processing stops.
                     // Cisco ISO (and others) may have null ids.
                     continue;
                 }
