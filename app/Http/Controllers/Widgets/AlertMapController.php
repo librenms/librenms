@@ -87,10 +87,10 @@ class AlertMapController extends WidgetController
         }
 
         $devices = $device_query->with([
-            'alerts' => function ($query) {
+            'alerts' => function ($query): void {
                 $query->active()->select('alerts.device_id', 'rule_id', 'state');
             },
-            'alerts.rule' => function ($query) {
+            'alerts.rule' => function ($query): void {
                 $query->select('id', 'severity');
             },
         ])->get();
@@ -100,7 +100,7 @@ class AlertMapController extends WidgetController
 
         foreach ($devices as $device) {
             [$worst_severity, $severities] = $this->getDeviceAlerts($device);
-            array_walk($severities, function ($n, $sev) use (&$totals) {
+            array_walk($severities, function ($n, $sev) use (&$totals): void {
                 $totals[$sev] += $n;
             });
 
@@ -126,41 +126,27 @@ class AlertMapController extends WidgetController
 
     private function sort(array &$data, string $order_by): void
     {
-        switch ($order_by) {
-            case 'severity':
-                usort($data, function ($l, $r) {
-                    // reverse sort as worse severities have higher values
-                    return $this->alertSeverityValue($r['severity']) <=> $this->alertSeverityValue($l['severity']) ?:
-                        strcasecmp($l['label'], $r['label']);
-                });
-                break;
-            case 'label':
-                usort($data, function ($l, $r) {
-                    return strcasecmp($l['label'], $r['label']);
-                });
-                break;
-            default: // device display name (tooltip starts with the display name)
-                usort($data, function ($l, $r) {
-                    return strcasecmp($l['tooltip'], $r['tooltip']) ?: strcasecmp($l['label'], $r['label']);
-                });
-        }
+        match ($order_by) {
+            'severity' => usort($data, 
+                // reverse sort as worse severities have higher values
+                fn($l, $r) => self::alertSeverityValue($r['severity']) <=> self::alertSeverityValue($l['severity']) ?:
+                strcasecmp((string) $l['label'], (string) $r['label'])),
+            'label' => usort($data, fn($l, $r) => strcasecmp((string) $l['label'], (string) $r['label'])),
+            // device display name (tooltip starts with the display name)
+            default => usort($data, fn($l, $r) => strcasecmp((string) $l['tooltip'], (string) $r['tooltip']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
+        };
     }
 
     private function getDeviceLabel(Device $device, string $severity, int $label_type): string
     {
-        switch ($label_type) {
-            case 1:
-                return '';
-            case 4:
-                return $device->shortDisplayName();
-            case 2:
-                return strtolower($device->hostname);
-            case 3:
-                return strtolower($device->sysName);
-            default:
-                // translation entries for severities are capitalised, e.g. Ok, Warning etc.
-                return __(ucfirst($severity));
-        }
+        return match ($label_type) {
+            1 => '',
+            4 => $device->shortDisplayName(),
+            2 => strtolower($device->hostname),
+            3 => strtolower($device->sysName),
+            // translation entries for severities are capitalised, e.g. Ok, Warning etc.
+            default => __(ucfirst($severity)),
+        };
     }
 
     private function getDeviceTooltip(Device $device, array $alert_severities): string
@@ -222,15 +208,11 @@ class AlertMapController extends WidgetController
 
     private static function alertSeverityValue(string $severity): int
     {
-        switch ($severity) {
-            case 'ok':
-                return 0;
-            case 'warning':
-                return 1;
-            case 'critical':
-                return 2;
-        }
-
-        return -1;
+        return match ($severity) {
+            'ok' => 0,
+            'warning' => 1,
+            'critical' => 2,
+            default => -1,
+        };
     }
 }
