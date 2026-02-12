@@ -122,4 +122,45 @@
     color: #fff;
     background-color: #555;
 }
+
+/* Dark mode */
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li > a,
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li > a:hover,
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li > a:focus {
+    color: var(--dark-text-secondary, #9198a1);
+}
+:root.dark .with-nav-tabs.panel-default .nav-tabs > .open > a,
+:root.dark .with-nav-tabs.panel-default .nav-tabs > .open > a:hover,
+:root.dark .with-nav-tabs.panel-default .nav-tabs > .open > a:focus,
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li > a:hover,
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li > a:focus {
+    color: var(--dark-text-primary, #e6edf3);
+    background-color: var(--dark-bg-muted, #30363d);
+    border-color: transparent;
+}
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li.active > a,
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li.active > a:hover,
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li.active > a:focus {
+    color: var(--dark-text-primary, #e6edf3);
+    background-color: var(--dark-bg-surface, #161b22);
+    border-color: var(--dark-border-default, #30363d);
+    border-bottom-color: transparent;
+}
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu {
+    background-color: var(--dark-bg-overlay, #1c2128);
+    border-color: var(--dark-border-default, #30363d);
+}
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > li > a {
+    color: var(--dark-text-primary, #e6edf3);
+}
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > li > a:hover,
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > li > a:focus {
+    background-color: var(--dark-bg-subtle, #21262d);
+}
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > .active > a,
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > .active > a:hover,
+:root.dark .with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > .active > a:focus {
+    color: var(--dark-text-primary, #e6edf3);
+    background-color: var(--dark-bg-muted, #30363d);
+}
 </style>

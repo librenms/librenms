@@ -17,7 +17,7 @@
      data-placeholder="{{ $placeholder }}">
     <div
         x-text="displayText"
-        class="{{ $class }} tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:px-3 tw:py-2 tw:cursor-pointer tw:bg-white tw:dark:text-gray-800"
+        class="{{ $class }} tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:px-3 tw:py-2 tw:cursor-pointer tw:bg-white tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200"
         :class="{'tw:text-gray-500 tw:dark:text-gray-400': !hasValue}"
         x-on:click="toggleDropdown"
         tabindex="0"
@@ -51,15 +51,15 @@
             <div class="tw:flex-1">
                 <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">From</label>
                 <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
-                    <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
-                    <input type="time" x-model="startTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200">
+                    <input type="time" x-model="startTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200">
                 </div>
             </div>
             <div class="tw:flex-1">
                 <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">To</label>
                 <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
-                    <input type="date" x-model="endDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
-                    <input type="time" x-model="endTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="date" x-model="endDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200">
+                    <input type="time" x-model="endTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:dark:bg-dark-gray-500 tw:dark:text-dark-white-200">
                 </div>
             </div>
         </div>

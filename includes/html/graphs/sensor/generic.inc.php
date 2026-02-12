@@ -9,9 +9,9 @@ if (empty($sensor)) {
 }
 
 $sensor_descr_fixed = Rrd::fixedSafeDescr($sensor->sensor_descr, 25);
-$sensor_color = session('applied_site_style') == 'dark' ? '#f2f2f2' : '#272b30';
-$background_color = session('applied_site_style') == 'dark' ? '#272b30' : '#ffffff';
-$variance_color = session('applied_site_style') == 'dark' ? '#3e444c' : '#c5c5c5';
+$sensor_color = session('applied_site_style') == 'dark' ? '#e6edf3' : '#272b30';
+$background_color = session('applied_site_style') == 'dark' ? '#0d1117' : '#ffffff';
+$variance_color = session('applied_site_style') == 'dark' ? '#30363d' : '#c5c5c5';
 $unit_label = str_replace('%', '%%', $sensor->unit());
 
 // Next line is a workaround while rrdtool --left-axis-format doesn't support %S

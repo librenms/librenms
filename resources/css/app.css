@@ -17,15 +17,15 @@
   --breakpoint-xl: 1200px;
   --breakpoint-2xl: 1440px;
 
-  --color-dark-gray-100: #4f565d;
-  --color-dark-gray-200: #3e444c;
-  --color-dark-gray-300: #353a41;
-  --color-dark-gray-400: #2e3338;
-  --color-dark-gray-500: #272b30;
-  --color-dark-white-100: #f9fafb;
-  --color-dark-white-200: #c8c8c8;
-  --color-dark-white-300: #bebfbf;
-  --color-dark-white-400: #acb6bf;
+  --color-dark-gray-100: #3d444d;
+  --color-dark-gray-200: #30363d;
+  --color-dark-gray-300: #21262d;
+  --color-dark-gray-400: #161b22;
+  --color-dark-gray-500: #0d1117;
+  --color-dark-white-100: #e6edf3;
+  --color-dark-white-200: #e6edf3;
+  --color-dark-white-300: #9198a1;
+  --color-dark-white-400: #9198a1;
 
   --border-width-0_5: 0.5px;
 

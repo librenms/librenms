@@ -51,6 +51,26 @@
     @endforeach
     @yield('css')
     @stack('styles')
+    <style>
+        body,
+        .navbar-default,
+        .panel,
+        .panel-heading,
+        .panel-footer,
+        .well,
+        .modal-content,
+        .dropdown-menu,
+        .form-control,
+        .btn-default,
+        .list-group-item,
+        .popover,
+        .alert,
+        .table,
+        table,
+        .select2-container--bootstrap .select2-selection {
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+    </style>
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
     <script src="{{ asset('js/popper.min.js') }}"></script>
