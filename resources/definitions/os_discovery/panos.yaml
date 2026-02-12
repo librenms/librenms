@@ -1,4 +1,3 @@
-mib: PAN-COMMON-MIB
 modules:
     os:
         hardware: PAN-COMMON-MIB::panChassisType.0
@@ -9,21 +8,22 @@ modules:
             data:
                 -
                     oid:
-                        - panSessionMax
-                        - panVsysName
-                        - panVsysMaxSessions
+                        - PAN-COMMON-MIB::panSessionMax
+                        - PAN-COMMON-MIB::panVsysName
+                        - PAN-COMMON-MIB::panVsysMaxSessions
         state:
             data:
                 -
-                    oid: panSysHAMode
+                    oid: PAN-COMMON-MIB::panSysHAMode
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.1.13.{{ $index }}'
                     index: 'panSysHAMode.{{ $index }}'
                     descr: High Availability Mode
+                    state_name: panSysHAMode
                     states:
                         - { value: 1, generic: 0, graph: 1, descr: active-passive }
                         - { value: 2, generic: 0, graph: 1, descr: active-active }
                 -
-                    oid: panSysHAState
+                    oid: PAN-COMMON-MIB::panSysHAState
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.1.11.{{ $index }}'
                     index: 'panSysHAState.{{ $index }}'
                     descr: High Availability Local Status
@@ -39,7 +39,7 @@ modules:
                         - { value: 11, generic: 3, graph: 1, descr: active-secondary }
                         - { value: 12, generic: 0, graph: 1, descr: active-primary }
                 -
-                    oid: panSysHAPeerState
+                    oid: PAN-COMMON-MIB::panSysHAPeerState
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.1.12.{{ $index }}'
                     index: 'panSysHAPeerState.{{ $index }}'
                     descr: High Availability Peer Status
@@ -56,15 +56,16 @@ modules:
                         - { value: 12, generic: 0, graph: 1, descr: active-primary }
                     skip_values:
                         -
-                          oid: panSysHAState.0
+                          oid: PAN-COMMON-MIB::panSysHAState.0
                           op: '='
                           value: 'disabled'
                 -
-                    oid: panMgmtPanoramaConnected
+                    oid: PAN-COMMON-MIB::panMgmtPanoramaConnected
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.4.1.{{ $index }}'
                     index: 'panMgmtPanoramaConnected.{{ $index }}'
                     descr: Panorama Server 1
                     group: Panorama
+                    state_name: panMgmtPanoramaConnected
                     states:
                         - { value: 0, generic: 1, graph: 1, descr: Not-Connected }
                         - { value: 1, generic: 0, graph: 1, descr: Connected }
@@ -74,11 +75,12 @@ modules:
                           op: '='
                           value: 'Panorama'
                 -
-                    oid: panMgmtPanorama2Connected
+                    oid: PAN-COMMON-MIB::panMgmtPanorama2Connected
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.4.2.{{ $index }}'
                     index: 'panMgmtPanorama2Connected.{{ $index }}'
                     descr: Panorama Server 2
                     group: Panorama
+                    state_name: panMgmtPanorama2Connected
                     states:
                         - { value: 0, generic: 1, graph: 1, descr: Not-Connected }
                         - { value: 1, generic: 0, graph: 1, descr: Connected }
@@ -90,67 +92,67 @@ modules:
         count:
             data:
                 -
-                    oid: panSessionActive
+                    oid: PAN-COMMON-MIB::panSessionActive
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.3.{{ $index }}'
                     index: 'panSessionActive.{{ $index }}'
                     descr: Active Sessions
                     group: Sessions
-                    high_limit: panSessionMax
+                    high_limit: PAN-COMMON-MIB::panSessionMax
                 -
-                    oid: panSessionActiveSslProxy
+                    oid: PAN-COMMON-MIB::panSessionActiveSslProxy
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.7.{{ $index }}'
                     index: 'panSessionActiveSslProxy.{{ $index }}'
                     descr: Active Sessions in SSL Proxy
                     group: Sessions
-                    high_limit: panSessionMax
+                    high_limit: PAN-COMMON-MIB::panSessionMax
                 -
-                    oid: panSessionActiveTcp
-                    value: panSessionActiveTcp
+                    oid: PAN-COMMON-MIB::panSessionActiveTcp
+                    value: PAN-COMMON-MIB::panSessionActiveTcp
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.4.{{ $index }}'
                     index: 'panSessionActiveTcp.{{ $index }}'
                     descr: Active TCP Sessions
                     group: Sessions
-                    high_limit: panSessionMax
+                    high_limit: PAN-COMMON-MIB::panSessionMax
                 -
-                    oid: panSessionActiveUdp
+                    oid: PAN-COMMON-MIB::panSessionActiveUdp
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.5.{{ $index }}'
                     index: 'panSessionActiveUdp.{{ $index }}'
                     descr: Active UDP Sessions
                     group: Sessions
-                    high_limit: panSessionMax
+                    high_limit: PAN-COMMON-MIB::panSessionMax
                 -
-                    oid: panVsysActiveSessions
+                    oid: PAN-COMMON-MIB::panVsysActiveSessions
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.4.{{ $index }}'
                     index: 'panVsysActiveSessions.{{ $index }}'
                     descr: Active Sessions
-                    group: '{{ $panVsysName }}'
-                    high_limit: panVsysMaxSessions
+                    group: '{{ PAN-COMMON-MIB::panVsysName }}'
+                    high_limit: PAN-COMMON-MIB::panVsysMaxSessions
                 -
-                    oid: panVsysActiveTcpCps
+                    oid: PAN-COMMON-MIB::panVsysActiveTcpCps
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.6.{{ $index }}'
                     index: 'panVsysActiveTcpCps.{{ $index }}'
                     descr: TCP Connections Per Second
-                    group: '{{ $panVsysName }}'
+                    group: '{{ PAN-COMMON-MIB::panVsysName }}'
                 -
-                    oid: panVsysActiveUdpCps
+                    oid: PAN-COMMON-MIB::panVsysActiveUdpCps
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.7.{{ $index }}'
                     index: 'panVsysActiveUdpCps.{{ $index }}'
                     descr: UDP Connections Per Second
-                    group: '{{ $panVsysName }}'
+                    group: '{{ PAN-COMMON-MIB::panVsysName }}'
                 -
-                    oid: panVsysActiveOtherIpCps
+                    oid: PAN-COMMON-MIB::panVsysActiveOtherIpCps
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.8.{{ $index }}'
                     index: 'panVsysActiveOtherIpCps.{{ $index }}'
                     descr: Other IP Connections Per Second
-                    group: '{{ $panVsysName }}'
+                    group: '{{ PAN-COMMON-MIB::panVsysName }}'
                 -
-                    oid: panLcLogRate
+                    oid: PAN-COMMON-MIB::panLcLogRate
                     num_oid: '.1.3.6.1.4.1.25461.2.3.30.1.1.{{ $index }}'
                     index: 'panLcLogRate.{{ $index }}'
                     descr: Log Collection Write Rate (logs/sec)
                     group: Log Collection
                 -
-                    oid: panGPGWUtilizationActiveTunnels
+                    oid: PAN-COMMON-MIB::panGPGWUtilizationActiveTunnels
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.5.1.3.{{ $index }}'
                     index: 'panGPGWUtilizationActiveTunnels.{{ $index }}'
                     descr: GlobalProtect VPN Active Sessions
@@ -160,21 +162,21 @@ modules:
         load:
             data:
                 -
-                    oid: panSessionUtilization
+                    oid: PAN-COMMON-MIB::panSessionUtilization
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.1.{{ $index }}'
                     index: 'panSessionUtilization.{{ $index }}'
                     descr: Session Utilization
                     group: Sessions
                 -
-                    oid: panSessionSslProxyUtilization
+                    oid: PAN-COMMON-MIB::panSessionSslProxyUtilization
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.8.{{ $index }}'
                     index: 'panSessionSslProxyUtilization.{{ $index }}'
                     descr: Session Utilization in SSL Proxy
                     group: Sessions
                 -
-                    oid: panVsysSessionUtilizationPct
+                    oid: PAN-COMMON-MIB::panVsysSessionUtilizationPct
                     num_oid: '.1.3.6.1.4.1.25461.2.1.2.3.9.1.3.{{ $index }}'
                     index: 'panVsysSessionUtilizationPct.{{ $index }}'
                     descr: Session Utilization
-                    group: '{{ $panVsysName }}'
+                    group: '{{ PAN-COMMON-MIB::panVsysName }}'
 
