@@ -97,15 +97,13 @@
     </script>
     @auth
         <script>
-        window.tz = undefined;
         @if(session('preferences.timezone_static') === null || ! session('preferences.timezone_static'))
             var tz = window.Intl.DateTimeFormat().resolvedOptions().timeZone;
             if(tz !== '{{ session('preferences.timezone') }}') {
                 updateTimezone(tz, false);
             }
-        @elseif(session('preferences.timezone'))
-            window.tz = '{{ session('preferences.timezone') }}';
         @endif
+        window.tz = '{{ session('preferences.timezone') }}';
         </script>
         <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
     @endauth
