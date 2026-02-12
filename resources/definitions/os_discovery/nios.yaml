@@ -1,4 +1,3 @@
-mib: IB-PLATFORMONE-MIB
 modules:
     os:
         hardware: IB-PLATFORMONE-MIB::ibHardwareType.0
@@ -15,26 +14,29 @@ modules:
         state:
             data:
                 -
-                    oid: ibGridStatus
+                    oid: IB-PLATFORMONE-MIB::ibGridStatus
                     num_oid: '.1.3.6.1.4.1.7779.3.1.1.2.1.12.{{ $index }}'
                     index: 'ibGridStatus.{{ $index }}'
                     descr: Grid Status
+                    state_name: ibGridStatus
                     states:
                         - { value: 1, generic: 0, graph: 1, descr: ID Grid Master }
                         - { value: 2, generic: 0, graph: 1, descr: ID Grid Member}
                 -
-                    oid: ibHaStatus
+                    oid: IB-PLATFORMONE-MIB::ibHaStatus
                     num_oid: '.1.3.6.1.4.1.7779.3.1.1.2.1.13.{{ $index }}'
                     index: 'ibHaStatus.{{ $index }}'
                     descr: HA Status
+                    state_name: ibHaStatus
                     states:
                         - { value: 1, generic: 0, graph: 1, descr: Active }
                         - { value: 2, generic: 0, graph: 1, descr: Passive }
                 -
-                    oid: ibServiceStatus
+                    oid: IB-PLATFORMONE-MIB::ibServiceStatus
                     num_oid: '.1.3.6.1.4.1.7779.3.1.1.2.1.9.1.2.{{ $index }}'
                     index: 'ibServiceStatus.{{ $index }}'
                     descr: '{{ IB-PLATFORMONE-MIB::ibServiceName }} Status'
+                    state_name: ibServiceStatus
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: Working }
                         - { value: 2, generic: 1, graph: 0, descr: Warning }
