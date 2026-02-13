@@ -338,6 +338,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::prefix('dash')->group(function (): void {
             Route::post('alerts', Widgets\AlertsController::class);
             Route::post('alertlog', Widgets\AlertlogController::class);
+            Route::post('alert-map', Widgets\AlertMapController::class);
             Route::post('alertlog-stats', Widgets\AlertlogStatsController::class);
             Route::post('availability-map', Widgets\AvailabilityMapController::class);
             Route::post('component-status', Widgets\ComponentStatusController::class);
