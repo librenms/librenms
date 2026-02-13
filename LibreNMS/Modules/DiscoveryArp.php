@@ -6,6 +6,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Ipv4Mac;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
@@ -50,7 +51,10 @@ class DiscoveryArp implements Module
         // Find all IPv4 addresses in the MAC table that haven't been discovered on monitored devices.
         $entries = Ipv4Mac::query()
             ->select(['id', 'ipv4_address', 'port_id'])
-            ->whereHas('port', fn ($query) => $query->isNotDeleted())
+            ->whereHas('port', function (Builder $query) {
+                /** @phpstan-ignore method.notFound */
+                $query->isNotDeleted();
+            })
             ->whereDoesntHave('ipv4Address')
             ->orderBy('ipv4_address')
             ->get();
