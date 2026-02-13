@@ -371,7 +371,7 @@ if (! empty($peers)) {
                         $peer_data['bgpPeerLastErrorCode'] = intval($error_data[0]);
                         $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
                     } elseif ($device['os_group'] == 'cisco') {
-                        $peer_identifiers = [$ip_ver, $bgp_peer_ident];
+                        $peer_identifiers = [$ip_ver, $peer_ip->toSnmpString()];
                         $mib = 'CISCO-BGP4-MIB';
                         $oid_map = [
                             'cbgpPeer2State' => 'bgpPeerState',
@@ -585,7 +585,7 @@ if (! empty($peers)) {
                 $safi = $peer_afi['safi'];
                 d_echo("$afi $safi\n");
                 if ($device['os_group'] == 'cisco') {
-                    $bgp_peer_ident = $peer_ip->toSnmpIndex();
+                    $bgp_peer_ident = $peer_ip->toSnmpString();
 
                     $ip_ver = $peer_ip->getFamily();
 
