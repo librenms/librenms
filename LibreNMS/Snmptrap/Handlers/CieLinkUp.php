@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CieLinkUp.php
  *
@@ -20,13 +21,13 @@
  * @link       https://www.librenms.org
  *
  * Based on LinkDown.php
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  *
  * Adapated by
  * @copyright  2023 Transitiv Technologies Ltd. <info@transitiv.co.uk>
  * @author     Adam Sweet <adam.sweet@transitiv.co.uk>
- *
  */
 
 namespace LibreNMS\Snmptrap\Handlers;

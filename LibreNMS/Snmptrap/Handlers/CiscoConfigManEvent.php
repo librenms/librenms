@@ -45,9 +45,9 @@ class CiscoConfigManEvent implements SnmptrapHandler
     {
         $EventID = explode('.', $trap->findOid('CISCO-CONFIG-MAN-MIB::ciscoConfigManEvent'));
 
-	    $CommandSource =   $trap->getOidData($trap->findOid('CISCO-CONFIG-MAN-MIB::ccmHistoryEventCommandSource.' . $EventID[0]));
-	    $ConfigSource =   $trap->getOidData($trap->findOid('CISCO-CONFIG-MAN-MIB::ccmHistoryEventConfigSource.' . $EventID[0]));
-	    $ConfigDest =   $trap->getOidData($trap->findOid('CISCO-CONFIG-MAN-MIB::ccmHistoryEventConfigDestination.' . $EventID[0]));
+        $CommandSource = $trap->getOidData($trap->findOid('CISCO-CONFIG-MAN-MIB::ccmHistoryEventCommandSource.' . $EventID[0]));
+        $ConfigSource = $trap->getOidData($trap->findOid('CISCO-CONFIG-MAN-MIB::ccmHistoryEventConfigSource.' . $EventID[0]));
+        $ConfigDest = $trap->getOidData($trap->findOid('CISCO-CONFIG-MAN-MIB::ccmHistoryEventConfigDestination.' . $EventID[0]));
 
         $trap->log("A configuration management event was triggered via $CommandSource from config source $ConfigSource to config destination $ConfigDest", Severity::Info);
     }
