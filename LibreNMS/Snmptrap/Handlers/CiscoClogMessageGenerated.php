@@ -1,6 +1,7 @@
 <?php
+
 /**
- * CiscoConfigManEvent.php
+ * CiscoClogMessageGenerated
  *
  * -Description-
  *
@@ -30,7 +31,7 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
-class  CiscoClogMessageGenerated implements SnmptrapHandler
+class CiscoClogMessageGenerated implements SnmptrapHandler
 {
     /**
      * Handle snmptrap.
@@ -42,45 +43,45 @@ class  CiscoClogMessageGenerated implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-	$EventID = explode('.', $trap->findOid('CISCO-SYSLOG-MIB::clogMessageGenerated'));
+        $EventID = explode('.', $trap->findOid('CISCO-SYSLOG-MIB::clogMessageGenerated'));
 
-	$Facility =   $trap->getOidData($trap->findOid('CISCO-SYSLOG-MIB::clogHistFacility.' . $EventID[0]));
-	$Name =   $trap->getOidData($trap->findOid('CISCO-SYSLOG-MIB::clogHistMsgName.' . $EventID[0]));
-	$CiscoSeverity =   $trap->getOidData($trap->findOid('CISCO-SYSLOG-MIB::clogHistSeverity.' . $EventID[0]));
-	$MsgTxt =   $trap->getOidData($trap->findOid('CISCO-SYSLOG-MIB::clogHistMsgText.' . $EventID[0]));
+	    $Facility =   $trap->getOidData($trap->findOid('CISCO-SYSLOG-MIB::clogHistFacility'));
+	    $Name =   $trap->getOidData($trap->findOid('CISCO-SYSLOG-MIB::clogHistMsgName.' . $EventID[0]));
+	    $CiscoSeverity =   $trap->getOidData($trap->findOid('CISCO-SYSLOG-MIB::clogHistSeverity.' . $EventID[0]));
+	    $MsgTxt =   $trap->getOidData($trap->findOid('CISCO-SYSLOG-MIB::clogHistMsgText.' . $EventID[0]));
 
-	// Match Cisco Syslog trap severity levels to LibreNMS eventlog colours
-	switch ($CiscoSeverity) {
-		case "emergency":
-		case "alert":
-		case "critical":
-		case "error":
-			$SeverityColour = Severity::Error; // red
-			break;
-		case "warning":
-			$SeverityColour = Severity::Warning; // yellow
-			break;
-		case "notice":
-			$SeverityColour = Severity::Notice; // blue
-			break;
-		case "info":
-			$SeverityColour = Severity::Info; // cyan
-			break;
-		default:
-			$SeverityColour = Severity::Ok; // green
-			break;
-	}
+        // Match Cisco Syslog trap severity levels to LibreNMS eventlog colours
+        switch ($CiscoSeverity) {
+            case "emergency":
+            case "alert":
+            case "critical":
+            case "error":
+                $SeverityColour = Severity::Error; // red
+                break;
+            case "warning":
+                $SeverityColour = Severity::Warning; // yellow
+                break;
+            case "notice":
+                $SeverityColour = Severity::Notice; // blue
+                break;
+            case "info":
+                $SeverityColour = Severity::Info; // cyan
+                break;
+            default:
+                $SeverityColour = Severity::Ok; // green
+                break;
+        }
 
-	// Special cases
-	// Set LibreNMS Eventlog severity colour to green for Link Up
-	if ($Facility == "LINK" && $Name == "UPDOWN" && $CiscoSeverity == "error" && str_ends_with($MsgTxt, 'changed state to up')) {
-		$Name = "UP";
-		$SeverityColour = Severity::Ok;
-	}
-	if ($Facility == "LINK" && $Name == "UPDOWN" && $CiscoSeverity == "error" && str_ends_with($MsgTxt, 'changed state to down')) {
-		$Name = "DOWN";
-	}
+        // Special cases
+        // Set LibreNMS Eventlog severity colour to green for Link Up
+        if ($Facility == "LINK" && $Name == "UPDOWN" && $CiscoSeverity == "error" && str_ends_with($MsgTxt, 'changed state to up')) {
+            $Name = "UP";
+            $SeverityColour = Severity::Ok;
+        }
+        if ($Facility == "LINK" && $Name == "UPDOWN" && $CiscoSeverity == "error" && str_ends_with($MsgTxt, 'changed state to down')) {
+            $Name = "DOWN";
+        }
 
-	$trap->log("Cisco Syslog Trap: $Facility $Name: $MsgTxt", $SeverityColour);
+        $trap->log("Cisco Syslog Trap: $Facility $Name: $MsgTxt", $SeverityColour);
     }
 }

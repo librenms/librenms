@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CiscoCCMCLIRunningConfigChanged
  *
@@ -42,9 +43,9 @@ class CiscoCCMCLIRunningConfigChanged implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-	    $EventID = explode('.', $trap->findOid('CISCO-CONFIG-MAN-MIB::ccmHistoryEventTerminalType'));
-    	$ChangeTime =   $trap->getOidData($trap->findOid('CISCO-CONFIG-MAN-MIB::ccmHistoryRunningLastChanged.0'));
-	    $TermType =   $trap->getOidData($trap->findOid('CISCO-CONFIG-MAN-MIB::ccmHistoryEventTerminalType.' . $EventID[0]));
+        $EventID = explode('.', $trap->findOid('CISCO-CONFIG-MAN-MIB::ccmCLIRunningConfigChanged'));
+        $ChangeTime =   $trap->getOidData($trap->findOid('CISCO-CONFIG-MAN-MIB::ccmHistoryRunningLastChanged.' . $EventID[0]));
+        $TermType =   $trap->getOidData($trap->findOid('CISCO-CONFIG-MAN-MIB::ccmHistoryEventTerminalType.' . $EventID[0]));
         $trap->log("The running config was changed at system uptime $ChangeTime from terminal type $TermType", Severity::Info);
     }
 }

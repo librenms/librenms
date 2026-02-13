@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CiscoSBRlDot1dStpPortStateForwarding.php
  *
@@ -26,10 +27,10 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Illuminate\Support\Facades\Log;
 
 class CiscoSBRlDot1dStpPortStateForwarding implements SnmptrapHandler
 {
