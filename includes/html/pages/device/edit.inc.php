@@ -68,7 +68,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
             echo "<span class='pagemenu-selected'>";
         }
 
-        echo match($type) {
+        echo match ($type) {
             'device' => '<a href="' . route('device.edit', [$device['device_id']]) . "\">$text</a>",
             'misc' => '<a href="' . route('device.edit.misc', [$device['device_id']]) . "\">$text</a>",
             default => generate_link($text, $link_array),
