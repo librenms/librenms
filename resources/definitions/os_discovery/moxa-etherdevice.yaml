@@ -28,11 +28,19 @@ modules:
             -
                 total: MOXA-EDSG512E8POE-MIB::totalMemory
                 used: MOXA-EDSG512E8POE-MIB::usedMemory
-                free: MOXA-EDSG512E8POE-MIB::freeMemory         
+                free: MOXA-EDSG512E8POE-MIB::freeMemory
             -
                 total: MOXA-PT7528V2-MIB::totalMemory
                 used: MOXA-PT7528V2-MIB::usedMemory
-                free: MOXA-PT7528V2-MIB::freeMemory                
+                free: MOXA-PT7528V2-MIB::freeMemory
+            -
+                total: MOXA-IKS6728A-8POE-MIB::totalMemory
+                used: MOXA-IKS6728A-8POE-MIB::usedMemory
+                free: MOXA-IKS6728A-8POE-MIB::freeMemory
+            -
+                total: MOXA-IKS6728A-MIB::totalMemory
+                used: MOXA-IKS6728A-MIB::usedMemory
+                free: MOXA-IKS6728A-MIB::freeMemory
     os:
         hardware:
             - MOXA-IKS6726A-MIB::switchModel
@@ -43,6 +51,8 @@ modules:
             - MOXA-EDSP510A8POE-MIB::switchModel.0
             - MOXA-EDSG512E8POE-MIB::switchModel
             - MOXA-PT7528V2-MIB::switchModel.0
+            - MOXA-IKS6728A-8POE-MIB::switchModel.0
+            - MOXA-IKS6728A-MIB::switchModel.0
         version:
             - MOXA-IKS6726A-MIB::firmwareVersion
             - MOXA-EDSG508E-MIB::firmwareVersion
@@ -52,12 +62,16 @@ modules:
             - MOXA-EDSP510A8POE-MIB::firmwareVersion.0
             - MOXA-EDSG512E8POE-MIB::firmwareVersion
             - MOXA-PT7528V2-MIB::firmwareVersion.0
+            - MOXA-IKS6728A-8POE-MIB::firmwareVersion.0
+            - MOXA-IKS6728A-MIB::firmwareVersion.0
         serial:
             - MOXA-EDSG508E-MIB::serialNumber
             - MOXA-EDSG512E-MIB::serialNumber.0
             - MOXA-EDSG516E-MIB::serialNumber.0
             - MOXA-EDSP506E-MIB::serialNumber.0
             - MOXA-EDSG512E8POE-MIB::serialNumber
+            - MOXA-IKS6728A-8POE-MIB::serialNumber.0
+            - MOXA-IKS6728A-MIB::serialNumber.0
     sensors:
         additional_oids:
             data:
@@ -67,6 +81,12 @@ modules:
                         - MOXA-PT7528V2-MIB::turboChainRole
                         - MOXA-PT7528V2-MIB::turboChainPort1
                         - MOXA-PT7528V2-MIB::turboChainPort2
+                        - MOXA-IKS6728A-8POE-MIB::turboChainRole
+                        - MOXA-IKS6728A-8POE-MIB::turboChainPort1
+                        - MOXA-IKS6728A-8POE-MIB::turboChainPort2
+                        - MOXA-IKS6728A-MIB::turboChainRole
+                        - MOXA-IKS6728A-MIB::turboChainPort1
+                        - MOXA-IKS6728A-MIB::turboChainPort2
         power:
             data:
                 -
@@ -103,6 +123,25 @@ modules:
                     descr: '{{ IF-MIB::ifDescr }} PoE Consumption'
                     index: 'poePortConsumption.{{ $index }}'
                     high_limit: 36.0
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::powerConsumption
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.10.8.{{ $index }}'
+                    descr: 'Power Consumption'
+                    index: 'powerConsumption.{{ $index }}'
+                    high_limit: 36.0
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::poePortConsumption
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.40.6.1.2.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} PoE Consumption'
+                    index: 'poePortConsumption.{{ $index }}'
+                    high_limit: 36.0
+                -
+                    oid: MOXA-IKS6728A-MIB::powerConsumption
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.40.6.1.2.{{ $index }}'
+                    descr: 'Power Consumption'
+                    index: 'powerConsumption.{{ $index }}'
+                    high_limit: 36.0
+
         temperature:
             data:
                 -
@@ -145,6 +184,23 @@ modules:
                     index: 'fiberTemperature.{{ $index }}'
                     low_limit: -40.0
                     high_limit: 85.0
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::monitorFiberCheckTable
+                    value: MOXA-IKS6728A-8POE-MIB::fiberTemperature
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.10.11.1.5.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module temperature'
+                    index: 'fiberTemperature.{{ $index }}'
+                    low_limit: -40.0
+                    high_limit: 85.0
+                -
+                    oid: MOXA-IKS6728A-MIB::monitorFiberCheckTable
+                    value: MOXA-IKS6728A-MIB::fiberTemperature
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.10.11.1.5.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module temperature'
+                    index: 'fiberTemperature.{{ $index }}'
+                    low_limit: -40.0
+                    high_limit: 85.0
+
         voltage:
             data:
                 -
@@ -187,6 +243,23 @@ modules:
                     index: 'fiberVoltage.{{ $index }}'
                     low_limit: 3.13
                     high_limit: 3.47
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::monitorFiberCheckTable
+                    value: MOXA-IKS6728A-8POE-MIB::fiberVoltage
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.10.11.1.4.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Supply Voltage'
+                    index: 'fiberVoltage.{{ $index }}'
+                    low_limit: 3.13
+                    high_limit: 3.47
+                -
+                    oid: MOXA-IKS6728A-MIB::monitorFiberCheckTable
+                    value: MOXA-IKS6728A-MIB::fiberVoltage
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.10.11.1.4.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Supply Voltage'
+                    index: 'fiberVoltage.{{ $index }}'
+                    low_limit: 3.13
+                    high_limit: 3.47
+
         dbm:
             data:
                 -
@@ -259,16 +332,49 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.7.85.1.10.11.1.7.{{ $index }}'
                     descr: '{{ IF-MIB::ifDescr }} SFP module Transmit Power'
                     index: 'fiberTxPower.{{ $index }}'
-                    low_limit: 0
-                    high_limit: -12.0
+                    low_limit: -9.0
+                    high_limit: -3.0
                 -
                     oid: MOXA-PT7528V2-MIB::monitorFiberCheckTable
                     value: MOXA-PT7528V2-MIB::fiberRxPower
                     num_oid: '.1.3.6.1.4.1.8691.7.85.1.10.11.1.9.{{ $index }}'
                     descr: '{{ IF-MIB::ifDescr }} SFP module Receive Power'
                     index: 'fiberRxPower.{{ $index }}'
-                    low_limit: -20.0
-                    high_limit: -0.0
+                    low_limit: -21.0
+                    high_limit: -3.0
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::monitorFiberCheckTable
+                    value: MOXA-IKS6728A-8POE-MIB::fiberTxPower
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.10.11.1.7.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Transmit Power'
+                    index: 'fiberTxPower.{{ $index }}'
+                    low_limit: -9.0
+                    high_limit: -3.0
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::monitorFiberCheckTable
+                    value: MOXA-IKS6728A-8POE-MIB::fiberRxPower
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.10.11.1.9.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Transmit Power'
+                    index: 'fiberRxPower.{{ $index }}'
+                    low_limit: -21.0
+                    high_limit: -3.0
+                -
+                    oid: MOXA-IKS6728A-MIB::monitorFiberCheckTable
+                    value: MOXA-IKS6728A-MIB::fiberRxPower
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.10.11.1.9.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Receive Power'
+                    index: 'fiberRxPower.{{ $index }}'
+                    low_limit: -21.0
+                    high_limit: -3.0
+                -
+                    oid: MOXA-IKS6728A-MIB::monitorFiberCheckTable
+                    value: MOXA-IKS6728A-MIB::fiberTxPower
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.10.11.1.7.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} SFP module Transmit Power'
+                    index: 'fiberTxPower.{{ $index }}'
+                    low_limit: -9.0
+                    high_limit: -3.0
+
         state:
             data:
                 -
@@ -380,6 +486,42 @@ modules:
                         - { value:  0, generic: 2, graph: 0, descr: not present }
                         - { value:  1, generic: 0, graph: 0, descr: present }
                 -
+                    oid: MOXA-IKS6728A-8POE-MIB::power1InputStatus
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.10.1.{{ $index }}'
+                    descr: 'Power Input 1 Status'
+                    index: 'power1InputStatus.{{ $index }}'
+                    state_name: power1InputStatus
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: not present }
+                        - { value:  1, generic: 0, graph: 0, descr: present }
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::power2InputStatus
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.10.2.{{ $index }}'
+                    descr: 'Power Input 2 Status'
+                    index: 'power2InputStatus.{{ $index }}'
+                    state_name: power2InputStatus
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: not present }
+                        - { value:  1, generic: 0, graph: 0, descr: present }
+                -
+                    oid: MOXA-IKS6728A-MIB::power1InputStatus
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.10.1.{{ $index }}'
+                    descr: 'Power Input 1 Status'
+                    index: 'power1InputStatus.{{ $index }}'
+                    state_name: power1InputStatus
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: not present }
+                        - { value:  1, generic: 0, graph: 0, descr: present }
+                -
+                    oid: MOXA-IKS6728A-MIB::power2InputStatus
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.10.2.{{ $index }}'
+                    descr: 'Power Input 2 Status'
+                    index: 'power2InputStatus.{{ $index }}'
+                    state_name: power2InputStatus
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: not present }
+                        - { value:  1, generic: 0, graph: 0, descr: present }
+                -
                     oid: MOXA-PT7528V2-MIB::activeProtocolOfRedundancy
                     num_oid: '.1.3.6.1.4.1.8691.7.85.1.16.4.{{ $index }}'
                     descr: 'Active Loop Protection'
@@ -409,7 +551,7 @@ modules:
                         -
                             oid: MOXA-PT7528V2-MIB::activeProtocolOfRedundancy
                             op: '!='
-                            value: 2                                                
+                            value: 2
                 -
                     oid: MOXA-PT7528V2-MIB::turboRingBrokenStatus
                     value: MOXA-PT7528V2-MIB::turboRingBrokenStatus
@@ -425,7 +567,7 @@ modules:
                         -
                             oid: MOXA-PT7528V2-MIB::activeProtocolOfRedundancy
                             op: '!='
-                            value: 2  
+                            value: 2
                 -
                     oid: MOXA-PT7528V2-MIB::ringEnableRing1
                     value: MOXA-PT7528V2-MIB::ringEnableRing1
@@ -449,8 +591,8 @@ modules:
                     index: 'rdnt1stPortStatusRing1.{{ $index }}'
                     state_name: rdnt1stPortStatusRing1
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: disabled }
-                        - { value:  1, generic: 3, graph: 0, descr: notRedundant }
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
                         - { value:  2, generic: 2, graph: 0, descr: linkdown }
                         - { value:  3, generic: 0, graph: 0, descr: blocking }
                         - { value:  4, generic: 3, graph: 0, descr: learning }
@@ -468,8 +610,8 @@ modules:
                     index: 'rdnt2ndPortStatusRing1.{{ $index }}'
                     state_name: rdnt2ndPortStatusRing1
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: disabled }
-                        - { value:  1, generic: 3, graph: 0, descr: notRedundant }
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
                         - { value:  2, generic: 2, graph: 0, descr: linkdown }
                         - { value:  3, generic: 0, graph: 0, descr: blocking }
                         - { value:  4, generic: 3, graph: 0, descr: learning }
@@ -494,7 +636,7 @@ modules:
                         -
                             oid: MOXA-PT7528V2-MIB::activeProtocolOfRedundancy
                             op: '!='
-                            value: 3                         
+                            value: 3
                 -
                     oid: MOXA-PT7528V2-MIB::ringEnableRing2
                     value: MOXA-PT7528V2-MIB::ringEnableRing2
@@ -518,8 +660,8 @@ modules:
                     index: 'rdnt1stPortStatusRing2.{{ $index }}'
                     state_name: rdnt1stPortStatusRing2
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: disabled }
-                        - { value:  1, generic: 3, graph: 0, descr: notRedundant }
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
                         - { value:  2, generic: 2, graph: 0, descr: linkdown }
                         - { value:  3, generic: 0, graph: 0, descr: blocking }
                         - { value:  4, generic: 3, graph: 0, descr: learning }
@@ -537,8 +679,8 @@ modules:
                     index: 'rdnt2ndPortStatusRing2.{{ $index }}'
                     state_name: rdnt2ndPortStatusRing2
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: disabled }
-                        - { value:  1, generic: 3, graph: 0, descr: notRedundant }
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
                         - { value:  2, generic: 2, graph: 0, descr: linkdown }
                         - { value:  3, generic: 0, graph: 0, descr: blocking }
                         - { value:  4, generic: 3, graph: 0, descr: learning }
@@ -572,14 +714,14 @@ modules:
                     index: 'couplingMode.{{ $index }}'
                     state_name: couplingMode
                     states:
-                        - { value:  1, generic: 3, graph: 0, descr: dualHoming }
-                        - { value:  2, generic: 3, graph: 0, descr: couplingBackup }
-                        - { value:  3, generic: 3, graph: 0, descr: couplingPrimary }
+                        - { value:  1, generic: 0, graph: 0, descr: dualHoming }
+                        - { value:  2, generic: 0, graph: 0, descr: couplingBackup }
+                        - { value:  3, generic: 0, graph: 0, descr: couplingPrimary }
                     skip_values:
                         -
                             oid: MOXA-PT7528V2-MIB::activeProtocolOfRedundancy
                             op: '!='
-                            value: 3                           
+                            value: 3
                 -
                     oid: MOXA-PT7528V2-MIB::coupling1stPortStatus
                     value: MOXA-PT7528V2-MIB::coupling1stPortStatus
@@ -588,8 +730,8 @@ modules:
                     index: 'coupling1stPortStatus.{{ $index }}'
                     state_name: coupling1stPortStatus
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: disabled }
-                        - { value:  1, generic: 3, graph: 0, descr: notRedundant }
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
                         - { value:  2, generic: 2, graph: 0, descr: linkdown }
                         - { value:  3, generic: 0, graph: 0, descr: blocking }
                         - { value:  4, generic: 3, graph: 0, descr: learning }
@@ -607,8 +749,8 @@ modules:
                     index: 'coupling2ndPortStatus.{{ $index }}'
                     state_name: coupling2ndPortStatus
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: disabled }
-                        - { value:  1, generic: 3, graph: 0, descr: notRedundant }
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
                         - { value:  2, generic: 2, graph: 0, descr: linkdown }
                         - { value:  3, generic: 0, graph: 0, descr: blocking }
                         - { value:  4, generic: 3, graph: 0, descr: learning }
@@ -619,15 +761,31 @@ modules:
                             op: '!='
                             value: 3
                 -
+                    oid: MOXA-PT7528V2-MIB::turboChainRole
+                    value: MOXA-PT7528V2-MIB::turboChainRole
+                    num_oid: '.1.3.6.1.4.1.8691.7.85.1.16.6.1.{{ $index }}'
+                    descr: 'TurboChain Port{{ MOXA-PT7528V2-MIB::turboChainPort1 }} Role'
+                    index: 'turboChainRole.{{ $index }}'
+                    state_name: turboChainRole
+                    states:
+                        - { value:  1, generic: 0, graph: 0, descr: Head }
+                        - { value:  2, generic: 0, graph: 0, descr: Member }
+                        - { value:  3, generic: 0, graph: 0, descr: Tail }
+                    skip_values:
+                        -
+                            oid: MOXA-PT7528V2-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 4
+                -
                     oid: MOXA-PT7528V2-MIB::turboChainPort1Status
                     value: MOXA-PT7528V2-MIB::turboChainPort1Status
                     num_oid: '.1.3.6.1.4.1.8691.7.85.1.16.6.4.{{ $index }}'
-                    descr: 'TurboChain Port{{  MOXA-PT7528V2-MIB::turboChainPort1 }} {{  MOXA-PT7528V2-MIB::turboChainRole }} Status'
+                    descr: 'TurboChain Port{{ MOXA-PT7528V2-MIB::turboChainPort1 }} Status'
                     index: 'turboChainPort1Status.{{ $index }}'
                     state_name: turboChainPort1Status
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: notTurboChainPort }
-                        - { value:  1, generic: 3, graph: 0, descr: linkDown }
+                        - { value:  0, generic: 2, graph: 0, descr: notTurboChainPort }
+                        - { value:  1, generic: 2, graph: 0, descr: linkDown }
                         - { value:  2, generic: 2, graph: 0, descr: blocking }
                         - { value:  3, generic: 0, graph: 0, descr: blocked }
                         - { value:  4, generic: 3, graph: 0, descr: forwarding }
@@ -640,13 +798,13 @@ modules:
                 -
                     oid: MOXA-PT7528V2-MIB::turboChainPort2Status
                     value: MOXA-PT7528V2-MIB::turboChainPort2Status
-                    num_oid: '.1.3.6.1.4.1.8691.7.85.1.16.6.4.{{ $index }}'
-                    descr: 'TurboChain Port{{  MOXA-PT7528V2-MIB::turboChainPort2 }} Status'
+                    num_oid: '.1.3.6.1.4.1.8691.7.85.1.16.6.5.{{ $index }}'
+                    descr: 'TurboChain Port{{ MOXA-PT7528V2-MIB::turboChainPort2 }} Status'
                     index: 'turboChainPort2Status.{{ $index }}'
                     state_name: turboChainPort2Status
                     states:
-                        - { value:  0, generic: 3, graph: 0, descr: notTurboChainPort }
-                        - { value:  1, generic: 3, graph: 0, descr: linkDown }
+                        - { value:  0, generic: 2, graph: 0, descr: notTurboChainPort }
+                        - { value:  1, generic: 2, graph: 0, descr: linkDown }
                         - { value:  2, generic: 2, graph: 0, descr: blocking }
                         - { value:  3, generic: 0, graph: 0, descr: blocked }
                         - { value:  4, generic: 3, graph: 0, descr: forwarding }
@@ -657,7 +815,591 @@ modules:
                             op: '!='
                             value: 4
 
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.4.{{ $index }}'
+                    descr: 'Active Loop Protection'
+                    index: 'activeProtocolOfRedundancy.{{ $index }}'
+                    state_name: activeProtocolOfRedundancy
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: None }
+                        - { value:  1, generic: 0, graph: 0, descr: SpanningTree }
+                        - { value:  2, generic: 0, graph: 0, descr: TurboRing }
+                        - { value:  3, generic: 0, graph: 0, descr: TurboRingV2 }
+                        - { value:  4, generic: 0, graph: 0, descr: TurboChain }
+                        - { value:  5, generic: 0, graph: 0, descr: MSTP }
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::turboRingPortTable
+                    value: MOXA-IKS6728A-8POE-MIB::turboRingPortStatus
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.2.3.1.2.{{ $index }}'
+                    descr: 'TurboRing Port {{ MOXA-IKS6728A-8POE-MIB::turboRingPortIndex }} Status'
+                    index: 'turboRingPortStatus.{{ $index }}'
+                    state_name: turboRingPortStatus
+                    states:
+                        - { value:  1, generic: 2, graph: 0, descr: PortDisabled }
+                        - { value:  2, generic: 1, graph: 0, descr: Not TurboRing Port }
+                        - { value:  3, generic: 0, graph: 0, descr: Blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: Learning }
+                        - { value:  5, generic: 0, graph: 0, descr: Forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 2
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::turboRingBrokenStatus
+                    value: MOXA-IKS6728A-8POE-MIB::turboRingBrokenStatus
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.2.14.{{ $index }}'
+                    descr: 'TurboRing Broken Status'
+                    index: 'turboRingBrokenStatus.{{ $index }}'
+                    state_name: turboRingBrokenStatus
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: NA }
+                        - { value:  1, generic: 0, graph: 0, descr: Normal }
+                        - { value:  2, generic: 2, graph: 0, descr: Broken }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 2
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::ringEnableRing1
+                    value: MOXA-IKS6728A-8POE-MIB::ringEnableRing1
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.5.1.2.{{ $index }}'
+                    descr: 'TurboRingV2 Ring1 Enabled'
+                    index: 'ringEnableRing1.{{ $index }}'
+                    state_name: ringEnableRing1
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: Disabled }
+                        - { value:  1, generic: 0, graph: 0, descr: Enabled }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::rdnt1stPortStatusRing1
+                    value: MOXA-IKS6728A-8POE-MIB::rdnt1stPortStatusRing1
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.5.1.7.{{ $index }}'
+                    descr: 'TurboRingV2 Ring1 Port1 Status'
+                    index: 'rdnt1stPortStatusRing1.{{ $index }}'
+                    state_name: rdnt1stPortStatusRing1
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
+                        - { value:  2, generic: 2, graph: 0, descr: linkdown }
+                        - { value:  3, generic: 0, graph: 0, descr: blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: learning }
+                        - { value:  5, generic: 0, graph: 0, descr: forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::rdnt2ndPortStatusRing1
+                    value: MOXA-IKS6728A-8POE-MIB::rdnt2ndPortStatusRing1
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.5.1.9.{{ $index }}'
+                    descr: 'TurboRingV2 Ring1 Port2 Status'
+                    index: 'rdnt2ndPortStatusRing1.{{ $index }}'
+                    state_name: rdnt2ndPortStatusRing1
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
+                        - { value:  2, generic: 2, graph: 0, descr: linkdown }
+                        - { value:  3, generic: 0, graph: 0, descr: blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: learning }
+                        - { value:  5, generic: 0, graph: 0, descr: forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::brokenStatusRing1
+                    value: MOXA-IKS6728A-8POE-MIB::brokenStatusRing1
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.5.1.10.{{ $index }}'
+                    descr: 'TurboRing Broken Status'
+                    index: 'brokenStatusRing1.{{ $index }}'
+                    state_name: brokenStatusRing1
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: NA }
+                        - { value:  1, generic: 0, graph: 0, descr: Normal }
+                        - { value:  2, generic: 2, graph: 0, descr: Broken }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::ringEnableRing2
+                    value: MOXA-IKS6728A-8POE-MIB::ringEnableRing2
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.5.2.2.{{ $index }}'
+                    descr: 'TurboRingV2 Ring2 Enabled'
+                    index: 'ringEnableRing2.{{ $index }}'
+                    state_name: ringEnableRing2
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: Disabled }
+                        - { value:  1, generic: 0, graph: 0, descr: Enabled }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::rdnt1stPortStatusRing2
+                    value: MOXA-IKS6728A-8POE-MIB::rdnt1stPortStatusRing2
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.5.2.7.{{ $index }}'
+                    descr: 'TurboRingV2 Ring2 Port1 Status'
+                    index: 'rdnt1stPortStatusRing2.{{ $index }}'
+                    state_name: rdnt1stPortStatusRing2
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
+                        - { value:  2, generic: 2, graph: 0, descr: linkdown }
+                        - { value:  3, generic: 0, graph: 0, descr: blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: learning }
+                        - { value:  5, generic: 0, graph: 0, descr: forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::rdnt2ndPortStatusRing2
+                    value: MOXA-IKS6728A-8POE-MIB::rdnt2ndPortStatusRing2
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.5.2.9.{{ $index }}'
+                    descr: 'TurboRingV2 Ring2 Port2 Status'
+                    index: 'rdnt2ndPortStatusRing2.{{ $index }}'
+                    state_name: rdnt2ndPortStatusRing2
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
+                        - { value:  2, generic: 2, graph: 0, descr: linkdown }
+                        - { value:  3, generic: 0, graph: 0, descr: blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: learning }
+                        - { value:  5, generic: 0, graph: 0, descr: forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::brokenStatusRing2
+                    value: MOXA-IKS6728A-8POE-MIB::brokenStatusRing2
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.5.2.10.{{ $index }}'
+                    descr: 'TurboRingV2 Broken Status'
+                    index: 'brokenStatusRing2.{{ $index }}'
+                    state_name: brokenStatusRing2
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: NA }
+                        - { value:  1, generic: 0, graph: 0, descr: Normal }
+                        - { value:  2, generic: 2, graph: 0, descr: Broken }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::couplingMode
+                    value: MOXA-IKS6728A-8POE-MIB::couplingMode
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.5.3.2.{{ $index }}'
+                    descr: 'TurboRingV2 Coupling Mode'
+                    index: 'couplingMode.{{ $index }}'
+                    state_name: couplingMode
+                    states:
+                        - { value:  1, generic: 3, graph: 0, descr: dualHoming }
+                        - { value:  2, generic: 3, graph: 0, descr: couplingBackup }
+                        - { value:  3, generic: 3, graph: 0, descr: couplingPrimary }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::coupling1stPortStatus
+                    value: MOXA-IKS6728A-8POE-MIB::coupling1stPortStatus
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.5.3.4.{{ $index }}'
+                    descr: 'TurboRingV2 Coupling Port1 Status'
+                    index: 'coupling1stPortStatus.{{ $index }}'
+                    state_name: coupling1stPortStatus
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
+                        - { value:  2, generic: 2, graph: 0, descr: linkdown }
+                        - { value:  3, generic: 0, graph: 0, descr: blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: learning }
+                        - { value:  5, generic: 0, graph: 0, descr: forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::coupling2ndPortStatus
+                    value: MOXA-IKS6728A-8POE-MIB::coupling2ndPortStatus
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.5.3.6.{{ $index }}'
+                    descr: 'TurboRingV2 Coupling Port2 Status'
+                    index: 'coupling2ndPortStatus.{{ $index }}'
+                    state_name: coupling2ndPortStatus
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
+                        - { value:  2, generic: 2, graph: 0, descr: linkdown }
+                        - { value:  3, generic: 0, graph: 0, descr: blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: learning }
+                        - { value:  5, generic: 0, graph: 0, descr: forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
 
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::turboChainRole
+                    value: MOXA-IKS6728A-8POE-MIB::turboChainRole
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.6.1.{{ $index }}'
+                    descr: 'TurboChain Port{{ MOXA-IKS6728A-8POE-MIB::turboChainPort1 }} Role'
+                    index: 'turboChainRole.{{ $index }}'
+                    state_name: turboChainRole
+                    states:
+                        - { value:  1, generic: 0, graph: 0, descr: Head }
+                        - { value:  2, generic: 0, graph: 0, descr: Member }
+                        - { value:  3, generic: 0, graph: 0, descr: Tail }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 4
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::turboChainPort1Status
+                    value: MOXA-IKS6728A-8POE-MIB::turboChainPort1Status
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.6.4.{{ $index }}'
+                    descr: 'TurboChain Port{{ MOXA-IKS6728A-8POE-MIB::turboChainPort1 }} Status'
+                    index: 'turboChainPort1Status.{{ $index }}'
+                    state_name: turboChainPort1Status
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: notTurboChainPort }
+                        - { value:  1, generic: 2, graph: 0, descr: linkDown }
+                        - { value:  2, generic: 0, graph: 0, descr: blocking }
+                        - { value:  3, generic: 0, graph: 0, descr: blocked }
+                        - { value:  4, generic: 0, graph: 0, descr: forwarding }
+                        - { value:  5, generic: 0, graph: 0, descr: na }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 4
+                -
+                    oid: MOXA-IKS6728A-8POE-MIB::turboChainPort2Status
+                    value: MOXA-IKS6728A-8POE-MIB::turboChainPort2Status
+                    num_oid: '.1.3.6.1.4.1.8691.7.114.1.16.6.5.{{ $index }}'
+                    descr: 'TurboChain Port{{ MOXA-IKS6728A-8POE-MIB::turboChainPort2 }} Status'
+                    index: 'turboChainPort2Status.{{ $index }}'
+                    state_name: turboChainPort2Status
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: notTurboChainPort }
+                        - { value:  1, generic: 2, graph: 0, descr: linkDown }
+                        - { value:  2, generic: 0, graph: 0, descr: blocking }
+                        - { value:  3, generic: 0, graph: 0, descr: blocked }
+                        - { value:  4, generic: 0, graph: 0, descr: forwarding }
+                        - { value:  5, generic: 0, graph: 0, descr: na }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-8POE-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 4
 
-
-
+                -
+                    oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.4.{{ $index }}'
+                    descr: 'Active Loop Protection'
+                    index: 'activeProtocolOfRedundancy.{{ $index }}'
+                    state_name: activeProtocolOfRedundancy
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: None }
+                        - { value:  1, generic: 0, graph: 0, descr: SpanningTree }
+                        - { value:  2, generic: 0, graph: 0, descr: TurboRing }
+                        - { value:  3, generic: 0, graph: 0, descr: TurboRingV2 }
+                        - { value:  4, generic: 0, graph: 0, descr: TurboChain }
+                        - { value:  5, generic: 0, graph: 0, descr: MSTP }
+                -
+                    oid: MOXA-IKS6728A-MIB::turboRingPortTable
+                    value: MOXA-IKS6728A-MIB::turboRingPortStatus
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.2.3.1.2.{{ $index }}'
+                    descr: 'TurboRing Port {{ MOXA-IKS6728A-MIB::turboRingPortIndex }} Status'
+                    index: 'turboRingPortStatus.{{ $index }}'
+                    state_name: turboRingPortStatus
+                    states:
+                        - { value:  1, generic: 2, graph: 0, descr: PortDisabled }
+                        - { value:  2, generic: 1, graph: 0, descr: Not TurboRing Port }
+                        - { value:  3, generic: 0, graph: 0, descr: Blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: Learning }
+                        - { value:  5, generic: 0, graph: 0, descr: Forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 2
+                -
+                    oid: MOXA-IKS6728A-MIB::turboRingBrokenStatus
+                    value: MOXA-IKS6728A-MIB::turboRingBrokenStatus
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.2.14.{{ $index }}'
+                    descr: 'TurboRing Broken Status'
+                    index: 'turboRingBrokenStatus.{{ $index }}'
+                    state_name: turboRingBrokenStatus
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: NA }
+                        - { value:  1, generic: 0, graph: 0, descr: Normal }
+                        - { value:  2, generic: 2, graph: 0, descr: Broken }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 2
+                -
+                    oid: MOXA-IKS6728A-MIB::ringEnableRing1
+                    value: MOXA-IKS6728A-MIB::ringEnableRing1
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.5.1.2.{{ $index }}'
+                    descr: 'TurboRingV2 Ring1 Enabled'
+                    index: 'ringEnableRing1.{{ $index }}'
+                    state_name: ringEnableRing1
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: Disabled }
+                        - { value:  1, generic: 0, graph: 0, descr: Enabled }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-MIB::rdnt1stPortStatusRing1
+                    value: MOXA-IKS6728A-MIB::rdnt1stPortStatusRing1
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.5.1.7.{{ $index }}'
+                    descr: 'TurboRingV2 Ring1 Port1 Status'
+                    index: 'rdnt1stPortStatusRing1.{{ $index }}'
+                    state_name: rdnt1stPortStatusRing1
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
+                        - { value:  2, generic: 2, graph: 0, descr: linkdown }
+                        - { value:  3, generic: 0, graph: 0, descr: blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: learning }
+                        - { value:  5, generic: 0, graph: 0, descr: forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-MIB::rdnt2ndPortStatusRing1
+                    value: MOXA-IKS6728A-MIB::rdnt2ndPortStatusRing1
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.5.1.9.{{ $index }}'
+                    descr: 'TurboRingV2 Ring1 Port2 Status'
+                    index: 'rdnt2ndPortStatusRing1.{{ $index }}'
+                    state_name: rdnt2ndPortStatusRing1
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
+                        - { value:  2, generic: 2, graph: 0, descr: linkdown }
+                        - { value:  3, generic: 0, graph: 0, descr: blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: learning }
+                        - { value:  5, generic: 0, graph: 0, descr: forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-MIB::brokenStatusRing1
+                    value: MOXA-IKS6728A-MIB::brokenStatusRing1
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.5.1.10.{{ $index }}'
+                    descr: 'TurboRing Broken Status'
+                    index: 'brokenStatusRing1.{{ $index }}'
+                    state_name: brokenStatusRing1
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: NA }
+                        - { value:  1, generic: 0, graph: 0, descr: Normal }
+                        - { value:  2, generic: 2, graph: 0, descr: Broken }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-MIB::ringEnableRing2
+                    value: MOXA-IKS6728A-MIB::ringEnableRing2
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.5.2.2.{{ $index }}'
+                    descr: 'TurboRingV2 Ring2 Enabled'
+                    index: 'ringEnableRing2.{{ $index }}'
+                    state_name: ringEnableRing2
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: Disabled }
+                        - { value:  1, generic: 0, graph: 0, descr: Enabled }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-MIB::rdnt1stPortStatusRing2
+                    value: MOXA-IKS6728A-MIB::rdnt1stPortStatusRing2
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.5.2.7.{{ $index }}'
+                    descr: 'TurboRingV2 Ring2 Port1 Status'
+                    index: 'rdnt1stPortStatusRing2.{{ $index }}'
+                    state_name: rdnt1stPortStatusRing2
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
+                        - { value:  2, generic: 2, graph: 0, descr: linkdown }
+                        - { value:  3, generic: 0, graph: 0, descr: blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: learning }
+                        - { value:  5, generic: 0, graph: 0, descr: forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-MIB::rdnt2ndPortStatusRing2
+                    value: MOXA-IKS6728A-MIB::rdnt2ndPortStatusRing2
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.5.2.9.{{ $index }}'
+                    descr: 'TurboRingV2 Ring2 Port2 Status'
+                    index: 'rdnt2ndPortStatusRing2.{{ $index }}'
+                    state_name: rdnt2ndPortStatusRing2
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
+                        - { value:  2, generic: 2, graph: 0, descr: linkdown }
+                        - { value:  3, generic: 0, graph: 0, descr: blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: learning }
+                        - { value:  5, generic: 0, graph: 0, descr: forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-MIB::brokenStatusRing2
+                    value: MOXA-IKS6728A-MIB::brokenStatusRing2
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.5.2.10.{{ $index }}'
+                    descr: 'TurboRingV2 Broken Status'
+                    index: 'brokenStatusRing2.{{ $index }}'
+                    state_name: brokenStatusRing2
+                    states:
+                        - { value:  0, generic: 3, graph: 0, descr: NA }
+                        - { value:  1, generic: 0, graph: 0, descr: Normal }
+                        - { value:  2, generic: 2, graph: 0, descr: Broken }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-MIB::couplingMode
+                    value: MOXA-IKS6728A-MIB::couplingMode
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.5.3.2.{{ $index }}'
+                    descr: 'TurboRingV2 Coupling Mode'
+                    index: 'couplingMode.{{ $index }}'
+                    state_name: couplingMode
+                    states:
+                        - { value:  1, generic: 3, graph: 0, descr: dualHoming }
+                        - { value:  2, generic: 3, graph: 0, descr: couplingBackup }
+                        - { value:  3, generic: 3, graph: 0, descr: couplingPrimary }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-MIB::coupling1stPortStatus
+                    value: MOXA-IKS6728A-MIB::coupling1stPortStatus
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.5.3.4.{{ $index }}'
+                    descr: 'TurboRingV2 Coupling Port1 Status'
+                    index: 'coupling1stPortStatus.{{ $index }}'
+                    state_name: coupling1stPortStatus
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
+                        - { value:  2, generic: 2, graph: 0, descr: linkdown }
+                        - { value:  3, generic: 0, graph: 0, descr: blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: learning }
+                        - { value:  5, generic: 0, graph: 0, descr: forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-MIB::coupling2ndPortStatus
+                    value: MOXA-IKS6728A-MIB::coupling2ndPortStatus
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.5.3.6.{{ $index }}'
+                    descr: 'TurboRingV2 Coupling Port2 Status'
+                    index: 'coupling2ndPortStatus.{{ $index }}'
+                    state_name: coupling2ndPortStatus
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: disabled }
+                        - { value:  1, generic: 2, graph: 0, descr: notRedundant }
+                        - { value:  2, generic: 2, graph: 0, descr: linkdown }
+                        - { value:  3, generic: 0, graph: 0, descr: blocking }
+                        - { value:  4, generic: 3, graph: 0, descr: learning }
+                        - { value:  5, generic: 0, graph: 0, descr: forwarding }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 3
+                -
+                    oid: MOXA-IKS6728A-MIB::turboChainRole
+                    value: MOXA-IKS6728A-MIB::turboChainRole
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.6.1.{{ $index }}'
+                    descr: 'TurboChain Port{{ MOXA-IKS6728A-MIB::turboChainPort1 }} Role'
+                    index: 'turboChainRole.{{ $index }}'
+                    state_name: turboChainRole
+                    states:
+                        - { value:  1, generic: 0, graph: 0, descr: Head }
+                        - { value:  2, generic: 0, graph: 0, descr: Member }
+                        - { value:  3, generic: 0, graph: 0, descr: Tail }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 4
+                -
+                    oid: MOXA-IKS6728A-MIB::turboChainPort1Status
+                    value: MOXA-IKS6728A-MIB::turboChainPort1Status
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.6.4.{{ $index }}'
+                    descr: 'TurboChain Port{{ MOXA-IKS6728A-MIB::turboChainPort1 }} Status'
+                    index: 'turboChainPort1Status.{{ $index }}'
+                    state_name: turboChainPort1Status
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: notTurboChainPort }
+                        - { value:  1, generic: 2, graph: 0, descr: linkDown }
+                        - { value:  2, generic: 0, graph: 0, descr: blocking }
+                        - { value:  3, generic: 0, graph: 0, descr: blocked }
+                        - { value:  4, generic: 0, graph: 0, descr: forwarding }
+                        - { value:  5, generic: 0, graph: 0, descr: na }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 4
+                -
+                    oid: MOXA-IKS6728A-MIB::turboChainPort2Status
+                    value: MOXA-IKS6728A-MIB::turboChainPort2Status
+                    num_oid: '.1.3.6.1.4.1.8691.7.117.1.16.6.5.{{ $index }}'
+                    descr: 'TurboChain Port{{ MOXA-IKS6728A-MIB::turboChainPort2 }} Status'
+                    index: 'turboChainPort2Status.{{ $index }}'
+                    state_name: turboChainPort2Status
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: notTurboChainPort }
+                        - { value:  1, generic: 2, graph: 0, descr: linkDown }
+                        - { value:  2, generic: 0, graph: 0, descr: blocking }
+                        - { value:  3, generic: 0, graph: 0, descr: blocked }
+                        - { value:  4, generic: 0, graph: 0, descr: forwarding }
+                        - { value:  5, generic: 0, graph: 0, descr: na }
+                    skip_values:
+                        -
+                            oid: MOXA-IKS6728A-MIB::activeProtocolOfRedundancy
+                            op: '!='
+                            value: 4
