@@ -44,7 +44,7 @@ DISMAN-EXPRESSION-MIB::sysUpTimeInstance = Timeticks: (498047044) 57 days, 15:27
 SNMPv2-MIB::snmpTrapOID.0 CISCO-CONFIG-MAN-MIB::ccmCLIRunningConfigChanged
 CISCO-CONFIG-MAN-MIB::ccmHistoryRunningLastChanged.0 = Timeticks: (498046440) 57 days, 15:27:44.40
 CISCO-CONFIG-MAN-MIB::ccmHistoryEventTerminalType.479 = INTEGER: notApplicable(1)',
-            'The running config was changed at system uptime = Timeticks: (498046440) 57 days, 15:27:44.40 from terminal type ',
+            'The running config was changed at system uptime = Timeticks: (498046440) 57 days, 15:27:44.40 from terminal type = INTEGER: notApplicable(1)',
             'Could not handle CiscoCCMCLIRunningConfigChanged trap',
             [Severity::Info],
         );
