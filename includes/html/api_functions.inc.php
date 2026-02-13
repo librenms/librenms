@@ -1118,11 +1118,27 @@ function get_device_ports(Illuminate\Http\Request $request): JsonResponse
     $device = DeviceCache::get($request->route('hostname'));
     $columns = validate_column_list($request->input('columns'), 'ports', ['ifName']);
 
+    // Add with parameter support for eager loading relationships
+    $with = $request->input('with');
+    $allowed = ['vlans'];
+
+    // Ensure port_id is included when eager loading relationships (required for foreign key matching)
+    if (in_array($with, $allowed) && ! in_array('port_id', $columns)) {
+        $columns[] = 'port_id';
+    }
+
     $ports = $device->ports()->isNotDeleted()->hasAccess(Auth::user())
+        ->when(in_array($with, $allowed), fn ($q) => $q->with($with))
         ->select($columns)->orderBy('ifIndex')->get();
 
     if ($ports->isEmpty()) {
         return api_error(404, 'No ports found');
+    }
+
+    // Hide the 'port' relationship from vlans to prevent bloated response
+    // (the port is lazy-loaded by PortVlan's getUntaggedAttribute accessor)
+    if ($with === 'vlans') {
+        $ports->each(fn ($port) => $port->vlans->each->makeHidden('port'));
     }
 
     return api_success($ports, 'ports');

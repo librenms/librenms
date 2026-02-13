@@ -1,4 +1,3 @@
-mib: MIMOSA-NETWORKS-BFIVE-MIB
 modules:
     os:
         hardware_mib: MIMOSA-NETWORKS-BASE-MIB
@@ -8,11 +7,12 @@ modules:
         state:
             data:
                 -
-                    oid: mimosaSatelliteStrength
-                    value: mimosaSatelliteStrength
+                    oid: MIMOSA-NETWORKS-BFIVE-MIB::mimosaSatelliteStrength
+                    value: MIMOSA-NETWORKS-BFIVE-MIB::mimosaSatelliteStrength
                     num_oid: '.1.3.6.1.4.1.43356.2.1.2.2.5.{{ $index }}'
                     descr: 'Satellite Strength'
                     index: '{{ $index }}'
+                    state_name: mimosaSatelliteStrength
                     states:
                         - { value: 1, descr: good, graph: 1, generic: 0 }
                         - { value: 2, descr: bad, graph: 1, generic: 2 }

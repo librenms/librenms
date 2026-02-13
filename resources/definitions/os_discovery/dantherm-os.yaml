@@ -1,4 +1,3 @@
-mib: DANTHERM-COOLING-MIB
 modules:
     os:
         sysName: DANTHERM-COOLING-MIB::hostName.0
@@ -10,75 +9,88 @@ modules:
                 skip_value_lt: -40
             data:
                 -
-                    oid: onBoardTempr
+                    oid: DANTHERM-COOLING-MIB::onBoardTempr
+                    value: DANTHERM-COOLING-MIB::onBoardTempr
                     index: onBoardTempr.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.1.{{ $index }}
                     descr: onBoard temperature
                 -
-                    oid: roomTempr
+                    oid: DANTHERM-COOLING-MIB::roomTempr
+                    value: DANTHERM-COOLING-MIB::roomTempr
                     index: roomTempr.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.2.{{ $index }}
                     descr: Room temperature
                 -
-                    oid: hotSpotTempr
+                    oid: DANTHERM-COOLING-MIB::hotSpotTempr
+                    value: DANTHERM-COOLING-MIB::hotSpotTempr
                     index: hotSpotTempr.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.3.{{ $index }}
                     descr: hotSpot temperature
                 -
-                    oid: outdoor1Tempr
+                    oid: DANTHERM-COOLING-MIB::outdoor1Tempr
+                    value: DANTHERM-COOLING-MIB::outdoor1Tempr
                     index: outdoor1Tempr.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.6.{{ $index }}
                     descr: Outdoor temperature
                 -
-                    oid: shelter1Setpoint
+                    oid: DANTHERM-COOLING-MIB::shelter1Setpoint
+                    value: DANTHERM-COOLING-MIB::shelter1Setpoint
                     index: shelter1Setpoint.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.29.{{ $index }}
                     descr: Shelter 1 temperature setpoint
         fanspeed:
             data:
                 -
-                    oid: fan1RPM
+                    oid: DANTHERM-COOLING-MIB::fan1RPM
+                    value: DANTHERM-COOLING-MIB::fan1RPM
                     index: fan1RPM.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.8.{{ $index }}
                     descr: Fan 1 RPM
                 -
-                    oid: fan2RPM
+                    oid: DANTHERM-COOLING-MIB::fan2RPM
+                    value: DANTHERM-COOLING-MIB::fan2RPM
                     index: fan2RPM.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.9.{{ $index }}
                     descr: Fan 2 RPM
         percent:
             data:
                 -
-                    oid: fan1SpeedPercentage
+                    oid: DANTHERM-COOLING-MIB::fan1SpeedPercentage
+                    value: DANTHERM-COOLING-MIB::fan1SpeedPercentage
                     index: fan1SpeedPercentage.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.10.{{ $index }}
                     descr: Fan 1 percent utilization
                 -
-                    oid: fan2SpeedPercentage
+                    oid: DANTHERM-COOLING-MIB::fan2SpeedPercentage
+                    value: DANTHERM-COOLING-MIB::fan2SpeedPercentage
                     index: fan2SpeedPercentage.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.11.{{ $index }}
                     descr: Fan 2 percent utilization
                 -
-                    oid: damper1Position
+                    oid: DANTHERM-COOLING-MIB::damper1Position
+                    value: DANTHERM-COOLING-MIB::damper1Position
                     index: damper1Position.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.12.{{ $index }}
                     descr: Damper 1 position (0% closed / 100% open)
                 -
-                    oid: damper2Position
+                    oid: DANTHERM-COOLING-MIB::damper2Position
+                    value: DANTHERM-COOLING-MIB::damper2Position
                     index: damper2Position.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.13.{{ $index }}
                     descr: Damper 2 position (0% closed / 100% open)
         voltage:
             data:
                 -
-                    oid: voltage
+                    oid: DANTHERM-COOLING-MIB::voltage
+                    value: DANTHERM-COOLING-MIB::voltage
                     index: voltage.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.33.{{ $index }}
                     descr: System voltage
         state:
             data:
                 -
-                    oid: fan1Status
+                    oid: DANTHERM-COOLING-MIB::fan1Status
+                    value: DANTHERM-COOLING-MIB::fan1Status
                     num_oid: .1.3.6.1.4.1.46651.1.1.18.{{ $index }}
                     descr: Fan 1 status
                     index: fan1Status.{{ $index }}
@@ -88,7 +100,8 @@ modules:
                         - { value: 1, graph: 0, generic: 0, descr: On }
                         - { value: 2, graph: 0, generic: 2, descr: emergency/boost }
                 -
-                    oid: fan2Status
+                    oid: DANTHERM-COOLING-MIB::fan2Status
+                    value: DANTHERM-COOLING-MIB::fan2Status
                     num_oid: .1.3.6.1.4.1.46651.1.1.19.{{ $index }}
                     descr: Fan 2 status
                     index: fan2Status.{{ $index }}
@@ -98,7 +111,8 @@ modules:
                         - { value: 1, graph: 0, generic: 0, descr: On }
                         - { value: 2, graph: 0, generic: 2, descr: emergency/boost }
                 -
-                    oid: damper1Status
+                    oid: DANTHERM-COOLING-MIB::damper1Status
+                    value: DANTHERM-COOLING-MIB::damper1Status
                     num_oid: .1.3.6.1.4.1.46651.1.1.20.{{ $index }}
                     descr: Damper 1 status
                     index: damper1Status.{{ $index }}
@@ -109,7 +123,8 @@ modules:
                         - { value: 2, graph: 0, generic: 0, descr: dynamic }
                         - { value: 3, graph: 0, generic: 2, descr: emergency/boost}
                 -
-                    oid: damper2Status
+                    oid: DANTHERM-COOLING-MIB::damper2Status
+                    value: DANTHERM-COOLING-MIB::damper2Status
                     num_oid: .1.3.6.1.4.1.46651.1.1.21.{{ $index }}
                     descr: Damper 2 status
                     index: damper2Status.{{ $index }}
@@ -120,7 +135,8 @@ modules:
                         - { value: 2, graph: 0, generic: 0, descr: dynamic }
                         - { value: 3, graph: 0, generic: 2, descr: emergency/boost}
                 -
-                    oid: shelter1Status
+                    oid: DANTHERM-COOLING-MIB::shelter1Status
+                    value: DANTHERM-COOLING-MIB::shelter1Status
                     num_oid: .1.3.6.1.4.1.46651.1.1.25.{{ $index }}
                     descr: Shelter 1 status
                     index: shelter1Status.{{ $index }}
@@ -134,7 +150,8 @@ modules:
                         - { value: 5, graph: 0, generic: 2, descr: Emergency state }
                         - { value: 6, graph: 0, generic: 0, descr: Intermediate state }
                 -
-                    oid: shelter1Mode
+                    oid: DANTHERM-COOLING-MIB::shelter1Mode
+                    value: DANTHERM-COOLING-MIB::shelter1Mode
                     num_oid: .1.3.6.1.4.1.46651.1.1.27.{{ $index }}
                     descr: Shelter 1 mode
                     index: shelter1Mode.{{ $index }}

@@ -27,7 +27,7 @@ if (! empty($peers)) {
     $generic = false;
     $cumulus_vrf = false;
     if ($device['os'] == 'junos') {
-        $peer_data_check = SnmpQuery::mibDir('junos')
+        $peer_data_check = SnmpQuery::mibDir('juniper/junos')
             ->enumStrings()
             ->numericIndex()
             ->abortOnFailure()

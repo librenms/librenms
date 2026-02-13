@@ -1,0 +1,1135 @@
+COMM-BOARD-MIB DEFINITIONS ::= BEGIN
+-- Using SMIv1
+--
+-- Revision E
+--********************************************************************************
+-- ** Version B		06-27-12	VD
+-- * changed comm_rev from integer to displaystring.
+--
+-- ** Version C		07-10-13	VD
+-- *  added comm board serial number, unit serial number and unit model number objects.
+--
+-- ** Version D		04-15-14	VD
+-- *  took out underscore from object names.
+--
+-- ** Version E		06-16-14	VD
+-- *  added support for station name.
+--
+--********************************************************************************
+--
+	IMPORTS
+--
+		enterprises
+			FROM RFC1155-SMI
+	
+		OBJECT-TYPE
+			FROM RFC-1212
+	
+--		DisplayString
+--			FROM RFC1213-MIB
+
+		TRAP-TYPE
+			FROM RFC-1215;
+--
+--
+	DisplayString ::= OCTET STRING (SIZE(1..16))
+	TruthValue ::= INTEGER { true(1), false(2) }
+
+	pentairTechProd		OBJECT IDENTIFIER	::= { enterprises 26609 }
+
+	carelBoardMIB		OBJECT IDENTIFIER	::= { pentairTechProd 2 }
+
+	menuInfo		OBJECT IDENTIFIER	::= { carelBoardMIB 1 }
+	coolSetPoint		OBJECT IDENTIFIER	::= { menuInfo 1 }
+	coolSetPointMin		OBJECT IDENTIFIER	::= { menuInfo 2 }
+	coolSetPointMax		OBJECT IDENTIFIER	::= { menuInfo 3 }
+	coolDifferential	OBJECT IDENTIFIER	::= { menuInfo 4 }
+	heatSetPoint		OBJECT IDENTIFIER	::= { menuInfo 5 }
+	heatSetPointMin		OBJECT IDENTIFIER	::= { menuInfo 6 }
+	heatSetPointMax		OBJECT IDENTIFIER	::= { menuInfo 7 }
+	heatDifferential	OBJECT IDENTIFIER	::= { menuInfo 8 }
+	unitOfMeasure		OBJECT IDENTIFIER	::= { menuInfo 9 }
+	
+
+	faultInfo		OBJECT IDENTIFIER	::= { carelBoardMIB 2 }
+	frostAlarm		OBJECT IDENTIFIER	::= { faultInfo 1 }
+--	startUpHiTempAlarm	OBJECT IDENTIFIER	::= { faultInfo 2 }
+--	startUpLowTempAlarm	OBJECT IDENTIFIER	::= { faultInfo 3 }
+	highTempAlarm		OBJECT IDENTIFIER	::= { faultInfo 4 }
+	lowTempAlarm		OBJECT IDENTIFIER	::= { faultInfo 5 }
+	inletFailAlarm		OBJECT IDENTIFIER	::= { faultInfo 6 }
+	outletFailAlarm		OBJECT IDENTIFIER	::= { faultInfo 7 }
+	doorSmokeAlarm		OBJECT IDENTIFIER	::= { faultInfo 8 }
+	highPressureAlarm	OBJECT IDENTIFIER	::= { faultInfo 9 }
+	contCommFailAlarm	OBJECT IDENTIFIER	::= { faultInfo 10 }
+
+	faultLog		OBJECT IDENTIFIER	::= { carelBoardMIB 3 }
+
+	dataLog			OBJECT IDENTIFIER	::= { carelBoardMIB 4 }
+	inletSensor		OBJECT IDENTIFIER	::= { dataLog 1 }
+	outletSensor		OBJECT IDENTIFIER	::= { dataLog 2 }
+
+	cbNotification		OBJECT IDENTIFIER 	::= { carelBoardMIB 5 }
+
+	trapFreq		OBJECT IDENTIFIER	::= { cbNotification 1 }
+	trapList		OBJECT IDENTIFIER	::= { cbNotification 2 }
+
+	addressInfo		OBJECT IDENTIFIER	::= { carelBoardMIB 20 }
+	
+	revisionIDInfo		OBJECT IDENTIFIER	::= { carelBoardMIB 21 }
+--
+--
+-- {{{		Object identifiers
+-- {{{		Menu Information Node (26609.2.1)
+--
+-- {{{		Menu Information cooling setpoint (26609.2.1.1)
+	cspValue			OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	" Cooling Setpoint menu value. Divide by 10. 
+						Read (26609.2.1.9.2) for unit of measure."
+			::= { coolSetPoint 2 }
+
+	cspName			OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Cooling Setpoint menu name."
+			::= { coolSetPoint 1 }
+	
+
+-- }}}	End of Cooling Setpoint
+--
+-- {{{		Menu Information cooling Setpoiint Low Limit (26609.2.1.2)
+	csplName			OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Cooling Setpoint Low Limit menu name."
+			::= { coolSetPointMin 1 }
+	
+	csplValue			OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Cooling Setpoint Low Limit menu value. Divide by 10. 
+						Read (26609.2.1.9.2) for unit of measure."
+			::= { coolSetPointMin 2 }
+
+-- }}}	End of Cooling Setpoint Low Limit
+--
+-- {{{		Menu Information cooling setpoint high limit (26609.2.1.3)
+	csphName		OBJECT-TYPE
+				SYNTAX		DisplayString 
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Cooling Setpoint High Limit menu name."
+			::= { coolSetPointMax 1 }
+	
+	csphValue			OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Cooling Setpoint High Limit menu value. Divide by 10. 
+						Read (26609.2.1.9.2) for unit of measure."
+			::= { coolSetPointMax 2 }
+
+-- }}}	End of Cooling Setpoint High Limit
+--
+-- {{{		Menu Information cooling differential (26609.2.1.4)
+	cdName			OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Cooling Differential menu name."
+			::= { coolDifferential 1 }
+	
+	cdValue		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	" Cooling Differential menu value. Divide by 10. 
+						Read (26609.2.1.9.2) for unit of measure."
+			::= { coolDifferential 2 }
+
+-- }}}	End of Cooling Differential
+--
+-- {{{		Menu Information Heater Setpoint (26609.2.1.5)
+	hspName		OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Heater Setpoint menu name."
+			::= { heatSetPoint 1 }
+	
+	hspValue		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	" Heater Setpoint menu value. Divide by 10. 
+						Read (26609.2.1.9.2) for unit of measure."
+			::= { heatSetPoint 2 }
+
+-- }}}	End of Heater Setpoint
+--
+-- {{{		Menu Information Heater Setpoint Low Limit (26609.2.1.6)
+	hsplName		OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Heater Setpoint Low Limit menu name."
+			::= { heatSetPointMin 1 }
+	
+	hsplValue		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Heater Setpoint Low Limit menu value. Divide by 10. 
+						Read (26609.2.1.9.2) for unit of measure."
+			::= { heatSetPointMin 2 }
+
+-- }}}	End of Heater Setpoint Low Limit
+--
+-- {{{		Menu Information Heater Setpoint High Limit (26609.2.1.7)
+	hsphName		OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Heater Setpoint High Limit menu name."
+			::= { heatSetPointMax 1 }
+	
+	hsphValue		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Heater Setpoint High Limit menu value. Divide by 10. 
+						Read (26609.2.1.9.2) for unit of measure."
+			::= { heatSetPointMax 2 }
+
+-- }}}	End of Heater Setpoint High Limit
+--
+-- {{{		Menu Information Heater Differential (26609.2.1.8)
+	hdName			OBJECT-TYPE
+				SYNTAX		DisplayString 
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Heater Differential menu name."
+			::= { heatDifferential 1 }
+	
+	hdValue		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	" Heater Differential menu value. Divide by 10. 
+						Read (26609.2.1.9.2) for unit of measure."
+			::= { heatDifferential 2 }
+
+-- }}}	End of Heater Differential
+--
+-- {{{		Menu Information Unit of Measure (26609.2.1.9)
+	umName			OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Unit of Measure menu name."
+			::= { unitOfMeasure 1 }
+	
+	umValue		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Unit of Measure menu value."
+			::= { unitOfMeasure 2 }
+
+-- }}}	End of Unit of Measure
+--
+-- {{{ High Temp set point value (26609.2.1.10)
+	highTempSetP		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	"set point for high temp alarm."
+			::= { menuInfo 10 }
+-- }}} end of High Temp set point
+--
+-- {{{ Low Temp set point value (26609.2.1.11)
+	lowTempSetP		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	"set point for low temp alarm."
+			::= { menuInfo 11 }
+-- }}} end of Low Temp set point
+--
+-- }}} End of Menu Information Node
+--
+-- {{{		Fault Information Node (26609.2.2)
+--
+-- {{{		Frost Alarm Fault objects (26609.2.2.1)
+	faName			OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Frost Alarm name."
+			::= { frostAlarm 1 }
+
+	faEnable		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	"Frost Alarm enable object. True=1, False=2."
+			::= { frostAlarm 2 }
+	
+	faState			OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	"Frost Alarm state object. True=1, False=2."
+			::= { frostAlarm 3 }
+	
+-- }}}	End of Frost Alarm
+--
+-- {{{		Startup Hi Temp Alarm Fault objects (26609.2.2.2)
+--	shtaName		OBJECT-TYPE
+--				SYNTAX		DisplayString
+--				ACCESS		read-only
+--				STATUS		mandatory
+--				DESCRIPTION	"Startup Hi Temp Alarm name."
+--			::= { startUpHiTempAlarm 1 }
+
+--	shtaEnable		OBJECT-TYPE
+--				SYNTAX		TruthValue
+--				ACCESS		read-write
+--				STATUS		mandatory
+--				DESCRIPTION	"Startup Hi Temp Alarm enable object. True=1, False=2."
+--			::= { startUpHiTempAlarm 2 }
+	
+--	shtaState		OBJECT-TYPE
+--				SYNTAX		TruthValue
+--				ACCESS		read-only
+--				STATUS		mandatory
+--				DESCRIPTION	"Startup Hi Temp Alarm state object. True=1, False=2."
+--			::= { startUpHiTempAlarm 3 }
+	
+-- }}}	End of Startup Hi Temp Alarm
+--
+-- {{{		Startup Low Temp Alarm Fault objects (26609.2.2.3)
+--	sltaName		OBJECT-TYPE
+--				SYNTAX		DisplayString
+--				ACCESS		read-only
+--				STATUS		mandatory
+--				DESCRIPTION	"Startup Low Temp Alarm name."
+--			::= { startUpLowTempAlarm 1 }
+
+--	sltaEnable		OBJECT-TYPE
+--				SYNTAX		TruthValue
+--				ACCESS		read-write
+--				STATUS		mandatory
+--				DESCRIPTION	"Startup Low Temp Alarm enable object. True=1, False=2."
+--			::= { startUpLowTempAlarm 2 }
+	
+--	sltaState		OBJECT-TYPE
+--				SYNTAX		TruthValue
+--				ACCESS		read-only
+--				STATUS		mandatory
+--				DESCRIPTION	"Startup Low Temp Alarm state object. True=1, False=2."
+--			::= { startUpLowTempAlarm 3 }
+	
+-- }}}	End of Startup Low Temp Alarm
+--
+-- {{{		High Temp Alarm Fault objects (26609.2.2.4)
+	htaName			OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" High Temp Alarm name."
+			::= { highTempAlarm 1 }
+
+	htaEnable		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	"High Temp Alarm enable object. True=1, False=2."
+			::= { highTempAlarm 2 }
+      
+	htaState		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	"High Temp Alarm state object. True=1, False=2."
+			::= { highTempAlarm 3 }
+	
+-- }}}	End of High Temp Alarm
+--
+-- {{{		Low Temp Alarm Fault objects (26609.2.2.5)
+	ltaName			OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	"Low Temp Alarm name."
+			::= { lowTempAlarm 1 }
+
+	ltaEnable		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	"Low Temp Alarm enable object. True=1, False=2."
+			::= { lowTempAlarm 2 }
+	
+	ltaState		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	"Low Temp Alarm state object. True=1, False=2."
+			::= { lowTempAlarm 3 }
+	
+-- }}}	End of General Alarm
+--
+-- {{{		Inlet sensor failure Alarm Fault objects (26609.2.2.6)
+	isfaName		OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	"Inlet sensor failure Alarm name."
+			::= { inletFailAlarm 1 }
+
+	isfaEnable		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	"Inlet sensor failure Alarm enable object. True=1, False=2."
+			::= { inletFailAlarm 2 }
+	
+	isfaState		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	"Inlet sensor failure Alarm state object. True=1, False=2."
+			::= { inletFailAlarm 3 }
+	
+-- }}}	End ofInlet sensor failure Alarm
+--
+-- {{{		Outlet Sensor Failure Alarm Fault objects (26609.2.2.7)
+	osfaName		OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Outlet Sensor Failure Alarm name."
+			::= { outletFailAlarm 1 }
+
+	osfaEnable		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	"Outlet Sensor Failure Alarm enable object. True=1, False=2."
+			::= { outletFailAlarm 2 }
+	
+	osfaState		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	"Outlet Sensor Failure Alarm state object. True=1, False=2."
+			::= { outletFailAlarm 3 }
+	
+-- }}}	End of Outlet Sensor Failure Alarm
+--
+-- {{{		Door Open / Smoke alarm Fault objects (26609.2.2.8)
+	dsaName			OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	"Door Open / Smoke alarm name."
+			::= { doorSmokeAlarm 1 }
+
+	dsaEnable		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	"Door Open / Smoke alarm enable object. True=1, False=2."
+			::= { doorSmokeAlarm 2 }
+	
+	dsaState		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	"Door Open / Smoke alarm state object. True=1, False=2."
+			::= { doorSmokeAlarm 3 }
+	
+-- }}}	End of Door Open / Smoke alarm
+--
+-- {{{		High Pressure Alarm Fault objects (26609.2.2.9)
+	hpaName			OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	"High Pressure Alarm name."
+			::= { highPressureAlarm 1 }
+
+	hpaEnable		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	"High Pressure Alarm enable object. True=1, False=2."
+			::= { highPressureAlarm 2 }
+      
+	hpaState		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	"High Pressure Alarm state object. True=1, False=2."
+			::= { highPressureAlarm 3 }
+	
+-- }}}	End of High Pressure Alarm
+--
+-- {{{		Controller Comm Fail Alarm Fault objects (26609.2.2.10)
+	ccfaName			OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	"Controller Comm Fail Alarm name."
+			::= { contCommFailAlarm 1 }
+
+	ccfaEnable		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-write
+				STATUS		mandatory
+				DESCRIPTION	"Controller Comm Fail Alarm enable object. True=1, False=2."
+			::= { contCommFailAlarm 2 }
+      
+	ccfaState		OBJECT-TYPE
+				SYNTAX		TruthValue
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	"Controller Comm Fail Alarm state object. True=1, False=2."
+			::= { contCommFailAlarm 3 }
+	
+-- }}}	End of Controller Comm Fail Alarm
+--
+-- }}} End of Fault Information Node
+--
+-- {{{		Fault Log Node (26609.2.3)
+--
+-- {{{		Fault Log 1 Node (26609.2.3.1)
+	log1Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 1 }
+
+-- }}}	End of Fault Log 1
+--
+-- {{{		Fault Log 2 Node (26609.2.3.2)
+	log2Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 2 }
+
+-- }}}	End of Fault Log 2
+--
+-- {{{		Fault Log 3 Node (26609.2.3.3)
+	log3Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 3 }
+
+-- }}}	End of Fault Log 3
+--
+-- {{{		Fault Log 4 Node (26609.2.3.4)
+	log4Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 4 }
+
+-- }}}	End of Fault Log 4
+--
+-- {{{		Fault Log 5 Node (26609.2.3.5)
+	log5Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 5 }
+
+-- }}}	End of Fault Log 5
+--
+-- {{{		Fault Log 6 Node (26609.2.3.6)
+	log6Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 6 }
+
+-- }}}	End of Fault Log 6
+--
+-- {{{		Fault Log 7 Node (26609.2.3.7)
+	log7Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 7 }
+
+-- }}}	End of Fault Log 7
+--
+-- {{{		Fault Log 8 Node (26609.2.3.8)
+	log8Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 8 }
+
+-- }}}	End of Fault Log 8
+--
+-- {{{		Fault Log 9 Node (26609.2.3.9)
+	log9Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 9 }
+
+-- }}}	End of Fault Log 9
+--
+-- {{{		Fault Log 10 Node (26609.2.3.10)
+	log10Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 10 }
+
+-- }}}	End of Fault Log 10
+--
+-- {{{		Fault Log 11 Node (26609.2.3.11)
+	log11Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 11 }
+
+-- }}}	End of Fault Log 11
+--
+-- {{{		Fault Log 12 Node (26609.2.3.12)
+	log12Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 12 }
+
+-- }}}	End of Fault Log 12
+--
+-- {{{		Fault Log 13 Node (26609.2.3.13)
+	log13Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 13 }
+
+-- }}}	End of Fault Log 13
+--
+-- {{{		Fault Log 14 Node (26609.2.3.14)
+	log14Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 14 }
+
+-- }}}	End of Fault Log 14
+--
+-- {{{		Fault Log 15 Node (26609.2.3.15)
+	log15Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 15 }
+
+-- }}}	End of Fault Log 15
+--
+-- {{{		Fault Log 16 Node (26609.2.3.16)
+	log16Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 16 }
+
+-- }}}	End of Fault Log 16
+--
+-- {{{		Fault Log 17 Node (26609.2.3.17)
+	log17Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 17 }
+
+-- }}}	End of Fault Log 17
+--
+-- {{{		Fault Log 18 Node (26609.2.3.18)
+	log18Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 18 }
+
+-- }}}	End of Fault Log 18
+--
+-- {{{		Fault Log 19 Node (26609.2.3.19)
+	log19Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 19 }
+
+-- }}}	End of Fault Log 19
+--
+-- {{{		Fault Log 20 Node (26609.2.3.20)
+	log20Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 20 }
+
+-- }}}	End of Fault Log 20
+--
+-- {{{		Fault Log 21 Node (26609.2.3.21)
+	log21Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 21 }
+
+-- }}}	End of Fault Log 21
+--
+-- {{{		Fault Log 22 Node (26609.2.3.22)
+	log22Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 22 }
+
+-- }}}	End of Fault Log 22
+--
+-- {{{		Fault Log 23 Node (26609.2.3.23)
+	log23Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 23 }
+
+-- }}}	End of Fault Log 23
+--
+-- {{{		Fault Log 24 Node (26609.2.3.24)
+	log24Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 24 }
+
+-- }}}	End of Fault Log 24
+--
+-- {{{		Fault Log 25 Node (26609.2.3.25)
+	log25Value		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Log1 = newest, Log25 = oldest, Alarms: 1=Frost,
+						4=High Temp, 5=Low Temp, 6=Inlet Fail, 7=Outlet Fail,
+						8=DoorSmoke, 9=High Pressure"
+			::= { faultLog 25 }
+
+-- }}}	End of Fault Log 25
+--
+-- }}} End of Fault Log Node
+--
+-- {{{ 		Data Log node and objects (26609.2.4)
+--
+-- {{{		Probe 1 Information (26609.2.4.1)
+	p1iName			OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Data Log Probe 1 name."
+			::= { inletSensor 1 }
+	
+	p1iValue		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Data Log Probe 1 value. Divide by 10. 
+						Read (26609.2.1.9.2) for unit of measure."
+			::= { inletSensor 2 }
+
+-- }}}	End of Probe 1 Information
+--
+-- {{{		Probe 2 Information (26609.2.4.2)
+	p2iName			OBJECT-TYPE
+				SYNTAX		DisplayString
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Data Log Probe 2 name."
+			::= { outletSensor 1 }
+	
+	p2iValue		OBJECT-TYPE
+				SYNTAX		INTEGER
+				ACCESS		read-only
+				STATUS		mandatory
+				DESCRIPTION	" Data Log Probe 2 value. Divide by 10. 
+						Read (26609.2.1.9.2) for unit of measure."
+			::= { outletSensor 2 }
+
+-- }}}	End of Probe 2 Information
+--
+-- }}} End of Data Log Node
+--
+-- {{{ Notification nodes and objects (26609.2.5)
+--
+-- {{{ Notification fields (26609.2.5.1)
+--
+	trapRate	OBJECT-TYPE					-- Trap Rate Object
+			SYNTAX		INTEGER { off(1), once(2), interval(3) }
+			ACCESS		read-write
+			STATUS		mandatory
+			DESCRIPTION	"Set rate at which traps will be sent."
+		::= { trapFreq 1 }
+	
+	trapInterval	OBJECT-TYPE				-- Trap Interval Object
+			SYNTAX		INTEGER (1..180)
+			ACCESS		read-write
+			STATUS		mandatory
+			DESCRIPTION	"Interval at which traps will be repeated. Multiple of 10
+					seconds."
+		::= { trapFreq 2 }
+	
+-- }}} End of Notification fields
+--
+-- {{{ Trap list objects (26609.2.5.2)
+--
+--
+	frostTrap	OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-only
+			STATUS		mandatory
+			DESCRIPTION	" Frost Alarm Trap."
+		::= { trapList 1 }
+
+	startUpHiTempTrap	OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-only
+			STATUS		mandatory
+			DESCRIPTION	" Startup High Temp Alarm Trap."
+		::= { trapList 2 }
+
+	startUpLowTempTrap	OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-only
+			STATUS		mandatory
+			DESCRIPTION	" Startup Low Temp Alarm Trap."
+		::= { trapList 3 }
+
+	highTempTrap	OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-only
+			STATUS		mandatory
+			DESCRIPTION	" High Temp Alarm Trap."
+		::= { trapList 4 }
+
+	lowTempTrap	OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-only
+			STATUS		mandatory
+			DESCRIPTION	" Low Temp Alarm Trap."
+		::= { trapList 5 }
+
+	inletSensFailTrap	OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-only
+			STATUS		mandatory
+			DESCRIPTION	" Inlet Sensor Failure Alarm Trap."
+		::= { trapList 6 }
+
+	outletSensFailTrap	OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-only
+			STATUS		mandatory
+			DESCRIPTION	" Outlet Sensor Failure Alarm Trap."
+		::= { trapList 7 }
+
+	doorSmokeTrap		OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-only
+			STATUS		mandatory
+			DESCRIPTION	" Door Open / Smoke Alarm Trap."
+		::= { trapList 8 }
+
+	highPressureTrap		OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-only
+			STATUS		mandatory
+			DESCRIPTION	" High Pressure Alarm Trap."
+		::= { trapList 9 }
+
+
+	contcommfailTrap		OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-only
+			STATUS		mandatory
+			DESCRIPTION	" Controller Comm Fail Alarm Trap."
+		::= { trapList 10 }
+
+	frostAlarmEV		TRAP-TYPE
+			ENTERPRISE trapList
+			VARIABLES {
+				frostTrap
+				}
+			DESCRIPTION "Frost Alarm trap object"
+		::= 51
+
+	startUpHiTempEV		TRAP-TYPE
+			ENTERPRISE trapList
+			VARIABLES {
+				startUpHiTempTrap
+				}
+			DESCRIPTION "High Temp Alarm at Start-up trap object"
+		::= 52
+
+	startUpLowTempEV		TRAP-TYPE
+			ENTERPRISE trapList
+			VARIABLES {
+				startUpLowTempTrap
+				}
+			DESCRIPTION "Low Temp Alarm at Start-up trap object"
+		::= 53
+
+	highTempAlarmEV		TRAP-TYPE
+			ENTERPRISE trapList
+			VARIABLES {
+				highTempTrap
+				}
+			DESCRIPTION "High Temp Alarm trap object"
+		::= 54
+
+	lowTempAlarmEV		TRAP-TYPE
+			ENTERPRISE trapList
+			VARIABLES {
+				lowTempTrap
+				}
+			DESCRIPTION "Low Temp Alarm trap object"
+		::= 55
+
+	inletSensAlarmEV		TRAP-TYPE
+			ENTERPRISE trapList
+			VARIABLES {
+				inletSensFailTrap
+				}
+			DESCRIPTION "Inlet sensor failure Alarm trap object"
+		::= 56
+
+	outletSensAlarmEV	TRAP-TYPE
+			ENTERPRISE trapList
+			VARIABLES {
+				outletSensFailTrap
+				}
+			DESCRIPTION "Outlet sensor failure Alarm trap object"
+		::= 57
+
+	doorSmokeEV	TRAP-TYPE
+			ENTERPRISE trapList
+			VARIABLES {
+				doorSmokeTrap
+				}
+			DESCRIPTION	"Door Smoke trap object"
+		::= 58
+
+	highPressureEV	TRAP-TYPE
+			ENTERPRISE trapList
+			VARIABLES {
+				highPressureTrap
+				}
+			DESCRIPTION	"High Pressure trap object"
+		::= 59
+
+	contcommfailEV	TRAP-TYPE
+			ENTERPRISE trapList
+			VARIABLES {
+				contcommfailTrap
+				}
+			DESCRIPTION	"Controller Comm Fail trap object"
+		::= 60
+--
+-- }}} End of Trap List ojects
+--
+-- }}} End of Notification Nodes and Objects
+--
+-- {{{Address Node (26609.2.20)
+--
+	deviceIP	OBJECT-TYPE					-- device ip address object
+			SYNTAX		IpAddress
+			ACCESS		read-write
+			STATUS		mandatory
+			DESCRIPTION	"Device IP Address."
+		::= { addressInfo 1 }
+--
+	gatewayIP	OBJECT-TYPE					-- gateway ip address object
+			SYNTAX		IpAddress
+			ACCESS		read-write
+			STATUS		mandatory
+			DESCRIPTION	"gateway IP Address."
+		::= { addressInfo 2 }
+--
+	subnetMask	OBJECT-TYPE					-- subnet Mask address object
+			SYNTAX		IpAddress
+			ACCESS		read-write
+			STATUS		mandatory
+			DESCRIPTION	"Subnet Mask Address."
+		::= { addressInfo 3 }
+--
+	trapIP		OBJECT-TYPE					-- trap ip address object
+			SYNTAX		IpAddress
+			ACCESS		read-write
+			STATUS		mandatory
+			DESCRIPTION	"trap IP Address."
+		::= { addressInfo 4 }
+--
+	dhcpServer	OBJECT-TYPE
+			SYNTAX		TruthValue
+			ACCESS		read-write
+			STATUS		mandatory
+			DESCRIPTION	"Define dhcp server's state. True means dhcp is in use. True=1, False=2."
+		::= { addressInfo 5 }
+--
+	snmpComm	OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-write
+			STATUS		mandatory
+			DESCRIPTION	"community string. must be between 4 and 8 chars. char must be > 0x20."
+		::= { addressInfo 6 }
+
+-- }}} End of Address Node
+--
+-- {{{ Revision ID Node (26609.2.21)
+--
+	identification	OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-write
+			STATUS		mandatory
+			DESCRIPTION	"Unit's identification. must be between 1 and 8 chars. char must be > 0x20."
+		::= { revisionIDInfo 1 }
+--
+	commRev	OBJECT-TYPE				-- communication board revision Object
+			SYNTAX		DisplayString
+			ACCESS		read-only
+			STATUS		mandatory
+			DESCRIPTION	"communication board revision. First char is Major and second is Minor."
+		::= { revisionIDInfo 2 }
+--
+	controlRev	OBJECT-TYPE				-- controller revision Object
+			SYNTAX		INTEGER (1..999)
+			ACCESS		read-only
+			STATUS		mandatory
+			DESCRIPTION	"controller revision number."
+		::= { revisionIDInfo 3 }
+
+	commSerialNum	OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-write
+			STATUS		mandatory
+			DESCRIPTION	"Comm Board serial number. upto 12 number chars."
+		::= { revisionIDInfo 4 }
+
+	unitSerialNum	OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-write
+			STATUS		mandatory
+			DESCRIPTION	"Unit serial number. upto 16 chars."
+		::= { revisionIDInfo 5 }
+
+	unitModelNum	OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-write
+			STATUS		mandatory
+			DESCRIPTION	"Unit Model number. upto 16 chars."
+		::= { revisionIDInfo 6 }
+
+	stationName	OBJECT-TYPE
+			SYNTAX		DisplayString
+			ACCESS		read-write
+			STATUS		mandatory
+			DESCRIPTION	"Station name. upto 240 chars."
+		::= { revisionIDInfo 7 }
+--
+-- }}} End of Revision ID Node
+--
+-- }}} End of Object Identifiers
+
+END

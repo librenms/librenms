@@ -7,59 +7,59 @@ modules:
         temperature:
             data:
                 -
-                    oid: AxosOltPonPortEntry
-                    value: axosOltPonPortTemperature
+                    oid: Axos-Card-MIB::AxosOltPonPortEntry
+                    value: Axos-Card-MIB::axosOltPonPortTemperature
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.4.{{ $index }}'
                     group: transceiver
-                    descr: '{{ $axosOltPonPortName }} Temperature'
+                    descr: '{{ Axos-Card-MIB::axosOltPonPortName }} Temperature'
                     index: 'axosOltPonPortTemperature.{{ $index }}'
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     skip_values:
                         -
-                            oid: axosOltPonPortStatus
+                            oid: Axos-Card-MIB::axosOltPonPortStatus
                             op: '='
                             value: 0
         voltage:
             data:
                 -
-                    oid: AxosOltPonPortEntry
-                    value: axosOltPonPortVoltage
+                    oid: Axos-Card-MIB::AxosOltPonPortEntry
+                    value: Axos-Card-MIB::axosOltPonPortVoltage
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.8.{{ $index }}'
                     group: transceiver
-                    descr: '{{ $axosOltPonPortName }} Voltage'
+                    descr: '{{ Axos-Card-MIB::axosOltPonPortName }} Voltage'
                     index: 'axosOltPonPortVoltage.{{ $index }}'
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     skip_values:
                         -
-                            oid: axosOltPonPortStatus
+                            oid: Axos-Card-MIB::axosOltPonPortStatus
                             op: '='
                             value: 0
         current:
             data:
                 -
-                    oid: AxosOltPonPortEntry
-                    value: axosOltPonPortTxBias
+                    oid: Axos-Card-MIB::AxosOltPonPortEntry
+                    value: Axos-Card-MIB::axosOltPonPortTxBias
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.5.{{ $index }}'
                     group: transceiver
-                    descr: '{{ $axosOltPonPortName }} TX Bias'
+                    descr: '{{ Axos-Card-MIB::axosOltPonPortName }} TX Bias'
                     index: 'axosOltPonPortTxBias.{{ $index }}'
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     skip_values:
                         -
-                            oid: axosOltPonPortStatus
+                            oid: Axos-Card-MIB::axosOltPonPortStatus
                             op: '='
                             value: 0
 
         state:
             data:
                 -
-                    oid: AxosOltPonPortEntry
-                    value: axosOltPonPortStatus
+                    oid: Axos-Card-MIB::AxosOltPonPortEntry
+                    value: Axos-Card-MIB::axosOltPonPortStatus
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.3.{{ $index }}'
-                    descr: '{{ $axosOltPonPortName }} Status'
+                    descr: '{{ Axos-Card-MIB::axosOltPonPortName }} Status'
                     index: axosOltPonPortStatus.{{ $index }}
                     group: transceiver
                     entPhysicalIndex: '{{ $index }}'
@@ -70,10 +70,10 @@ modules:
                         - { value: 2, generic: 1, graph: 0, descr: Down }
 
                 -
-                    oid: axosCardTable
-                    value: axosCardAdminStatus
+                    oid: Axos-Card-MIB::axosCardTable
+                    value: Axos-Card-MIB::axosCardAdminStatus
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.1.1.3.{{ $index }}'
-                    descr: '{{ $axosCardSerialNumber }}'
+                    descr: '{{ Axos-Card-MIB::axosCardSerialNumber }}'
                     index: axosCardAdminStatus.{{ $index }}
                     state_name: axosCardAdminStatus
                     states:
@@ -82,10 +82,10 @@ modules:
                         - { value: 2, generic: 1, graph: 0, descr: Alarm Suppress }
                         - { value: 3, generic: 0, graph: 0, descr: Disabled }
                 -
-                    oid: axosOntTable
-                    value: axosOntOperStatus
+                    oid: Axos-Ont-MIB::axosOntTable
+                    value: Axos-Ont-MIB::axosOntOperStatus
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.6.1.1.4.{{ $index }}'
-                    descr: 'ONT {{ $axosOntID }} Oper Status'
+                    descr: 'ONT {{ Axos-Ont-MIB::axosOntID }} Oper Status'
                     index: axosOntOperStatus.{{ $index }}
                     state_name: axosOntOperStatus
                     states:
@@ -93,10 +93,10 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: Enabled }
                         - { value: 2, generic: 0, graph: 0, descr: Disabled }
                 -
-                    oid: axosOntTable
-                    value: axosOntAdminStatus
+                    oid: Axos-Ont-MIB::axosOntTable
+                    value: Axos-Ont-MIB::axosOntAdminStatus
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.6.1.1.3.{{ $index }}'
-                    descr: 'ONT {{ $axosOntID }} Admin Status'
+                    descr: 'ONT {{ Axos-Ont-MIB::axosOntID }} Admin Status'
                     index: axosOntAdminStatus.{{ $index }}
                     state_name: axosOntAdminStatus
                     states:
@@ -107,76 +107,76 @@ modules:
         dbm:
             data:
                 -
-                    oid: AxosOltPonPortEntry
-                    value: axosOltPonPortRxPower
+                    oid: Axos-Card-MIB::AxosOltPonPortEntry
+                    value: Axos-Card-MIB::axosOltPonPortRxPower
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.7.{{ $index }}'
                     group: transceiver
-                    descr: '{{ $axosOltPonPortName }} Rx Power'
+                    descr: '{{ Axos-Card-MIB::axosOltPonPortName }} Rx Power'
                     index: 'axosOltPonPortRxPower.{{ $index }}'
                     divisor: 10000
                     user_func: 'mw_to_dbm'
                     entPhysicalIndex: '{{ $index }}'
                     skip_values:
                         -
-                            oid: axosOltPonPortStatus
+                            oid: Axos-Card-MIB::axosOltPonPortStatus
                             op: '='
                             value: 0
                 -
-                    oid: AxosOltPonPortEntry
-                    value: axosOltPonPortTxPower
+                    oid: Axos-Card-MIB::AxosOltPonPortEntry
+                    value: Axos-Card-MIB::axosOltPonPortTxPower
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.6.{{ $index }}'
                     group: transceiver
-                    descr: '{{ $axosOltPonPortName }} Tx Power'
+                    descr: '{{ Axos-Card-MIB::axosOltPonPortName }} Tx Power'
                     index: 'axosOltPonPortTxPower.{{ $index }}'
                     divisor: 10000
                     user_func: 'mw_to_dbm'
                     entPhysicalIndex: '{{ $index }}'
                     skip_values:
                         -
-                            oid: axosOltPonPortStatus
+                            oid: Axos-Card-MIB::axosOltPonPortStatus
                             op: '='
                             value: 0
 
                 -
-                    oid: AxosOntTable
-                    value: axosOntRxOpticalLevel
+                    oid: Axos-Ont-MIB::AxosOntTable
+                    value: Axos-Ont-MIB::axosOntRxOpticalLevel
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.6.1.1.6.{{ $index }}'
-                    descr: "ONT {{ $axosOntID }} RX Power"
-                    group: 'ONT {{ $axosOntID }}'
+                    descr: "ONT {{ Axos-Ont-MIB::axosOntID }} RX Power"
+                    group: 'ONT {{ Axos-Ont-MIB::axosOntID }}'
                     index: 'axosOntRxOpticalLevel.{{ $index }}'
                     divisor: 10000
                     user_func: 'mw_to_dbm'
                     skip_values:
                         -
-                            oid: axosOntAdminStatus
+                            oid: Axos-Ont-MIB::axosOntAdminStatus
                             op: '='
                             value: 2
                 -
-                    oid: AxosOntTable
-                    value: axosOntFarEndRxOpticalLevel
+                    oid: Axos-Ont-MIB::AxosOntTable
+                    value: Axos-Ont-MIB::axosOntFarEndRxOpticalLevel
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.6.1.1.6.{{ $index }}'
-                    descr: "ONT {{ $axosOntID }} OLT RX Signal Level"
-                    group: 'ONT {{ $axosOntID }}'
+                    descr: "ONT {{ Axos-Ont-MIB::axosOntID }} OLT RX Signal Level"
+                    group: 'ONT {{ Axos-Ont-MIB::axosOntID }}'
                     index: 'axosOntFarEndRxOpticalLevel.{{ $index }}'
                     divisor: 10000
                     user_func: 'mw_to_dbm'
                     skip_values:
                         -
-                            oid: axosOntAdminStatus
+                            oid: Axos-Ont-MIB::axosOntAdminStatus
                             op: '='
                             value: 2
                 -
-                    oid: AxosOntTable
-                    value: axosOntTxOpticalLevel
+                    oid: Axos-Ont-MIB::AxosOntTable
+                    value: Axos-Ont-MIB::axosOntTxOpticalLevel
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.6.1.1.7.{{ $index }}'
-                    descr: "ONT {{ $axosOntID }} TX Power"
-                    group: 'ONT {{ $axosOntID }}'
+                    descr: "ONT {{ Axos-Ont-MIB::axosOntID }} TX Power"
+                    group: 'ONT {{ Axos-Ont-MIB::axosOntID }}'
                     index: 'axosOntTxOpticalLevel.{{ $index }}'
                     divisor: 10000
                     user_func: 'mw_to_dbm'
                     skip_values:
                         -
-                            oid: axosOntAdminStatus
+                            oid: Axos-Ont-MIB::axosOntAdminStatus
                             op: '='
                             value: 2
 

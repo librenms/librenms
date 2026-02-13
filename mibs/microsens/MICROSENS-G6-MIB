@@ -1,0 +1,33 @@
+MICROSENS-G6-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32, enterprises,NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	DisplayString, MacAddress
+		FROM SNMPv2-TC
+	;
+
+microsens MODULE-IDENTITY --Category
+	LAST-UPDATED "202302141126Z"
+	ORGANIZATION "MICROSENS GmbH & Co. KG"
+	CONTACT-INFO
+		"Kueferstrasse 16
+		D-59067 Hamm
+		Germany
+		support@microsens.de
+		http://www.microsens.de"
+	DESCRIPTION
+		"Microsens private MIB for Generation 6 Ethernet Switches"
+
+	REVISION "202302141126Z"
+	DESCRIPTION
+		"File creation"
+	::= { enterprises 3181 }
+
+managedSwitches  OBJECT IDENTIFIER ::= { microsens 10 }
+g6               OBJECT IDENTIFIER ::= { managedSwitches 6 }
+
+
+
+END
+

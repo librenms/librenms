@@ -1,0 +1,78 @@
+-- *****************************************************************
+-- *  Moxa Switching Function PRIVATE MIB
+-- *
+-- *  Copyright (c) 2019 by Moxa Inc.
+-- *  All rights reserved.
+-- *****************************************************************
+
+MOXA-SWITCHING-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+	    enterprises, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+			Integer32
+			FROM SNMPv2-SMI
+	    TEXTUAL-CONVENTION
+			FROM SNMPv2-TC;
+
+	switching MODULE-IDENTITY
+        LAST-UPDATED "202202170000Z"
+        ORGANIZATION "Moxa Inc."
+        CONTACT-INFO
+            "
+            Postal: Moxa Inc.
+            13F., No. 3, Sec. 4, New Taipei Blvd.
+            Xinzhuang Dist., New Taipei City 242032, Taiwan, R.O.C.
+
+            Tel: +866-2-89191230
+            Web: http://www.moxa.com/
+            "
+        DESCRIPTION
+            "The MIB module for Moxa Switching Feature Grouping."
+
+        REVISION    "202202170000Z"
+        DESCRIPTION "update CONTACT-INFO"
+
+        REVISION    "201906300000Z"
+        DESCRIPTION "Initial Revision"
+
+        ::= { moxa 603 }
+
+    moxa OBJECT IDENTIFIER ::= { enterprises 8691 }
+
+-- -------------------------------------------------------------
+-- groups in the MOXA-SWITCHING-MIB MIB
+-- -------------------------------------------------------------
+	portInterface	        OBJECT IDENTIFIER ::= { switching 1 }
+	basicLayer2             OBJECT IDENTIFIER ::= { switching 2 }
+ 	layer2Redundancy        OBJECT IDENTIFIER ::= { switching 3 }
+	layer2Security		OBJECT IDENTIFIER ::= { switching 4 }
+	layer2Diagnosic         OBJECT IDENTIFIER ::= { switching 5 }
+	layer3Diagnosic         OBJECT IDENTIFIER ::= { switching 6 }
+	layer2Multicast		OBJECT IDENTIFIER ::= { switching 7 }
+	layer3Multicast         OBJECT IDENTIFIER ::= { switching 8 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+	PortList ::= TEXTUAL-CONVENTION
+		STATUS			current
+		DESCRIPTION
+					"Each octet within this value specifies a set of eight
+					ports, with the first octet specifying ports 1 through
+					8, the second octet specifying ports 9 through 16, etc.
+					Within each octet, the most significant bit represents
+					the lowest numbered port, and the least significant bit
+					represents the highest numbered port.  Thus, each port
+					of the bridge is represented by a single bit within the
+					value of this object.  If that bit has a value of '1'
+					then that port is included in the set of ports; the port
+					is not included if its bit has a value of '0'."
+			SYNTAX      OCTET STRING
+
+	Timeout ::= TEXTUAL-CONVENTION
+			DISPLAY-HINT "d4"
+			STATUS      current
+			DESCRIPTION
+									" Time out value in 4 byte"
+			SYNTAX      Integer32
+
+END
