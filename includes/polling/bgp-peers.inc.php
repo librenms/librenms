@@ -450,11 +450,11 @@ if (! empty($peers)) {
                 $snmp_raw = SnmpQuery::mibs([$mib])->enumStrings()->hideMib()->cache()->walk(array_keys($oid_map))->table(count($peer_identifiers));
 
                 // Fetch the snmp item related to this peer
-                $peer_data_raw = array_reduce($peer_identifiers, fn ($ret, $item) => $ret[$item], $snmp_raw);
+                $peer_data_raw = array_reduce($peer_identifiers, fn ($ret, $item) => $ret[$item] ?? [], $snmp_raw);
             }
 
             // --- Fill in peer data if raw data has been fetched ---
-            if (isset($peer_data_raw)) {
+            if (! empty($peer_data_raw)) {
                 $peer_data = [];
 
                 foreach ($oid_map as $source => $target) {
