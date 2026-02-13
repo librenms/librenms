@@ -1,4 +1,3 @@
-mib: FORTINET-FORTIGATE-MIB
 modules:
     mempools:
         data:
@@ -20,12 +19,12 @@ modules:
     processors:
         data:
             -
-                oid: fgSysCpuUsage
+                oid: FORTINET-FORTIGATE-MIB::fgSysCpuUsage
                 num_oid: '.1.3.6.1.4.1.12356.101.4.1.3.{{ $index }}'
                 descr: System Cpu Usage
                 type: fortigate-fixed
             -
-                oid: fgProcessorUsage
+                oid: FORTINET-FORTIGATE-MIB::fgProcessorUsage
                 num_oid: '.1.3.6.1.4.1.12356.101.4.4.2.1.2.{{ $index }}'
                 descr: 'CPU Core {{ $index }}'
                 type: fortigate-core
@@ -34,52 +33,56 @@ modules:
             data:
                 -
                     oid:
-                        - fgVdEntName
+                        - FORTINET-FORTIGATE-MIB::fgVdEntName
         state:
             data:
                 -
-                    oid: fgHwSensors
+                    oid: FORTINET-FORTIGATE-MIB::fgHwSensors
                     num_oid: '.1.3.6.1.4.1.12356.101.4.3.2.1.4.{{ $index }}'
+                    state_name: fgHwSensors
                     index: 'fgHwSensorEntIndex.{{ $index }}'
-                    descr: fgHwSensorEntName
-                    value: fgHwSensorEntAlarmStatus
+                    descr: FORTINET-FORTIGATE-MIB::fgHwSensorEntName
+                    value: FORTINET-FORTIGATE-MIB::fgHwSensorEntAlarmStatus
                     skip_values:
                         -
-                            oid: fgHwSensorEntName
+                            oid: FORTINET-FORTIGATE-MIB::fgHwSensorEntName
                             op: '='
                             value: ''
                     states:
                         - { value: 0, descr: OK, graph: 1, generic: 0 }
                         - { value: 1, descr: ERROR, graph: 1, generic: 2 }
                 -
-                    oid: fgVpn2TunTable
+                    oid: FORTINET-FORTIGATE-MIB::fgVpn2TunTable
                     num_oid: '.1.3.6.1.4.1.12356.101.12.4.2.1.26.{{ $index }}'
-                    index: 'Vdom_{{ $fgVpn2TunVdom }}.Ph1_{{ $fgVpn2TunPhase1Name }}.Ph2_{{ $fgVpn2TunPhase2Name }}'
-                    snmp_flags: '-OteQUsax'
+                    state_name: fgVpn2TunTable
+                    index: 'Vdom_{{ FORTINET-FORTIGATE-MIB::fgVpn2TunVdom }}.Ph1_{{ FORTINET-FORTIGATE-MIB::fgVpn2TunPhase1Name }}.Ph2_{{ FORTINET-FORTIGATE-MIB::fgVpn2TunPhase2Name }}'
+                    snmp_flags: '-OteQUax'
                     snmp_no_Ih_flag: ''
-                    descr: "{{ $fgVpn2TunPhase1Name }}\\{{ $fgVpn2TunPhase2Name }} ({{ $InetAddress_fgVpn2TunRemGwyIp }})"
+                    descr: "{{ FORTINET-FORTIGATE-MIB::fgVpn2TunPhase1Name }}\\{{ FORTINET-FORTIGATE-MIB::fgVpn2TunPhase2Name }} ({{ InetAddress_FORTINET-FORTIGATE-MIB::fgVpn2TunRemGwyIp }})"
                     group: IPSEC VPN
-                    value: fgVpn2TunStatus
+                    value: FORTINET-FORTIGATE-MIB::fgVpn2TunStatus
                     states:
                         - { value: 1, descr: Down, graph: 1, generic: 2 }
                         - { value: 2, descr: Up, graph: 1, generic: 0 }
                 -
-                    oid: fgVpnSslState
+                    oid: FORTINET-FORTIGATE-MIB::fgVpnSslState
                     num_oid: '.1.3.6.1.4.1.12356.101.12.2.3.1.1.{{ $index }}'
+                    state_name: fgVpnSslState
                     index: 'fgVpnSslState.{{ $index }}'
                     descr: "SSL-VPN Status"
                     group: SSL VPN
-                    value: fgVpnSslState
+                    value: FORTINET-FORTIGATE-MIB::fgVpnSslState
                     states:
                         - { value: 1, descr: Disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: Enabled, graph: 1, generic: 0 }
                 -
-                    oid: fdLteSessConnStat
+                    oid: FORTINET-FORTIGATE-MIB::fdLteSessConnStat
                     num_oid: '.1.3.6.1.4.1.12356.101.19.5.1.4.{{ $index }}'
+                    state_name: fdLteSessConnStat
                     index: 'fdLteSessConnStat.{{ $index }}'
                     descr: "LTE Session Status"
                     group: LTE Modem
-                    value: fdLteSessConnStat
+                    value: FORTINET-FORTIGATE-MIB::fdLteSessConnStat
                     states:
                         - { value: 0, descr: Unknown, graph: 1, generic: 3 }
                         - { value: 1, descr: Disconnected, graph: 1, generic: 2 }
@@ -87,30 +90,33 @@ modules:
                         - { value: 3, descr: Suspended, graph: 1, generic: 2 }
                         - { value: 4, descr: Authenticating, graph: 1, generic: 1 }
                 -
-                    oid: fgVWLHealthCheckLinkTable
-                    value: fgVWLHealthCheckLinkState
+                    oid: FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkTable
+                    value: FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkState
                     num_oid: '.1.3.6.1.4.1.12356.101.4.9.2.1.4.{{ $index }}'
-                    descr: '{{ $fgVWLHealthCheckLinkName }}\{{ $fgVWLHealthCheckLinkIfName }}'
+                    state_name: fgVWLHealthCheckLinkTable
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkName }}\{{ FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkIfName }}'
                     group: SD-Wan
                     index: 'fgVWLHealthCheckLinkState.{{ $index }}'
                     states:
                         - { descr: Alive, graph: 1, value: 0, generic: 0 }
                         - { descr: Dead, graph: 0, value: 1, generic: 2 }
                 -
-                    oid: fgLinkMonitorTable
+                    oid: FORTINET-FORTIGATE-MIB::fgLinkMonitorTable
                     num_oid: '.1.3.6.1.4.1.12356.101.4.8.2.1.3.{{ $index }}'
+                    state_name: fgLinkMonitorTable
                     index: 'fgLinkMonitorID.{{ $index }}'
-                    descr: fgLinkMonitorName
-                    value: fgLinkMonitorState
+                    descr: FORTINET-FORTIGATE-MIB::fgLinkMonitorName
+                    value: FORTINET-FORTIGATE-MIB::fgLinkMonitorState
                     group: Link monitor
                     states:
                         - { value: 0, descr: Alive, graph: 1, generic: 0 }
                         - { value: 1, descr: Dead, graph: 1, generic: 2 }
                 -
-                    oid: fgVdTable
-                    value: fgVdEntHaState
+                    oid: FORTINET-FORTIGATE-MIB::fgVdTable
+                    value: FORTINET-FORTIGATE-MIB::fgVdEntHaState
                     num_oid: '.1.3.6.1.4.1.12356.101.3.2.1.1.4.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} vDom HA state'
+                    state_name: fgVdTable
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} vDom HA state'
                     group: HA
                     index: 'fgVdEntIndex.{{ $index }}'
                     states:
@@ -120,190 +126,190 @@ modules:
         count:
             data:
                 -
-                    oid: fgWebfilterStatsTable
-                    value: fgWfHTTPBlocked
+                    oid: FORTINET-FORTIGATE-MIB::fgWebfilterStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgWfHTTPBlocked
                     num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.1.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} HTTP Sessions Blocked'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} HTTP Sessions Blocked'
                     group: Webfilter
                     index: 'fgWfHTTPBlocked.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgWebfilterStatsTable
-                    value: fgWfHTTPSBlocked
+                    oid: FORTINET-FORTIGATE-MIB::fgWebfilterStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgWfHTTPSBlocked
                     num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.2.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} HTTPS Sessions Blocked'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} HTTPS Sessions Blocked'
                     group: Webfilter
                     index: 'fgWfHTTPSBlocked.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgWebfilterStatsTable
-                    value: fgWfHTTPURLBlocked
+                    oid: FORTINET-FORTIGATE-MIB::fgWebfilterStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgWfHTTPURLBlocked
                     num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.3.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} HTTP URLs Blocked'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} HTTP URLs Blocked'
                     group: Webfilter
                     index: 'fgWfHTTPURLBlocked.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgWebfilterStatsTable
-                    value: fgWfHTTPSURLBlocked
+                    oid: FORTINET-FORTIGATE-MIB::fgWebfilterStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgWfHTTPSURLBlocked
                     num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.4.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} HTTPS URLs Blocked'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} HTTPS URLs Blocked'
                     group: Webfilter
                     index: 'fgWfHTTPSURLBlocked.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgWebfilterStatsTable
-                    value: fgWfActiveXBlocked
+                    oid: FORTINET-FORTIGATE-MIB::fgWebfilterStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgWfActiveXBlocked
                     num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.5.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} ActiveX Blocked'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} ActiveX Blocked'
                     group: Webfilter
                     index: 'fgWfActiveXBlocked.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgWebfilterStatsTable
-                    value: fgWfCookieBlocked
+                    oid: FORTINET-FORTIGATE-MIB::fgWebfilterStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgWfCookieBlocked
                     num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.6.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} Cookies Blocked'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} Cookies Blocked'
                     group: Webfilter
                     index: 'fgWfCookieBlocked.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgWebfilterStatsTable
-                    value: fgWfAppletBlocked
+                    oid: FORTINET-FORTIGATE-MIB::fgWebfilterStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgWfAppletBlocked
                     num_oid: '.1.3.6.1.4.1.12356.101.10.1.2.1.1.7.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} Applets Blocked'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} Applets Blocked'
                     group: Webfilter
                     index: 'fgWfAppletBlocked.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgVpnTunnelUpCount
+                    oid: FORTINET-FORTIGATE-MIB::fgVpnTunnelUpCount
                     num_oid: '.1.3.6.1.4.1.12356.101.12.1.1.{{ $index }}'
                     index: 'fgVpnTunnelUpCount.{{ $index }}'
                     descr: IPSEC VPN tunnels
                     group: VPN
                 -
-                    oid: fgVpnSslStatsLoginUsers
+                    oid: FORTINET-FORTIGATE-MIB::fgVpnSslStatsLoginUsers
                     num_oid: '.1.3.6.1.4.1.12356.101.12.2.3.1.2.{{ $index }}'
                     index: 'fgVpnSslStatsLoginUsers.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} SSL VPN Logged users'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} SSL VPN Logged users'
                     group: VPN
                 -
-                    oid: fgVpnSslStatsActiveTunnels
+                    oid: FORTINET-FORTIGATE-MIB::fgVpnSslStatsActiveTunnels
                     num_oid: '.1.3.6.1.4.1.12356.101.12.2.3.1.6.{{ $index }}'
                     index: 'fgVpnSslStatsActiveTunnels.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} SSL VPN Active tunnels'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} SSL VPN Active tunnels'
                     group: VPN
                 -
-                    oid: fgVWLHealthCheckLinkTable
-                    value: fgVWLHealthCheckLinkLatency
+                    oid: FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkTable
+                    value: FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkLatency
                     num_oid: '.1.3.6.1.4.1.12356.101.4.9.2.1.5.{{ $index }}'
-                    descr: 'Link Latency {{ $fgVWLHealthCheckLinkName }}\{{ $fgVWLHealthCheckLinkIfName }}'
+                    descr: 'Link Latency {{ FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkName }}\{{ FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkIfName }}'
                     group: SD-WAN
                     index: 'fgVWLHealthCheckLinkLatency.{{ $index }}'
                 -
-                    oid: fgVWLHealthCheckLinkTable
-                    value: fgVWLHealthCheckLinkJitter
+                    oid: FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkTable
+                    value: FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkJitter
                     num_oid: '.1.3.6.1.4.1.12356.101.4.9.2.1.6.{{ $index }}'
-                    descr: 'Link Jitter {{ $fgVWLHealthCheckLinkName }}\{{ $fgVWLHealthCheckLinkIfName }}'
+                    descr: 'Link Jitter {{ FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkName }}\{{ FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkIfName }}'
                     group: SD-WAN
                     index: 'fgVWLHealthCheckLinkJitter.{{ $index }}'
                 -
-                    oid: fgVWLHealthCheckLinkTable
-                    value: fgVWLHealthCheckLinkPacketLoss
+                    oid: FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkTable
+                    value: FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkPacketLoss
                     num_oid: '.1.3.6.1.4.1.12356.101.4.9.2.1.9.{{ $index }}'
-                    descr: 'Link Packet Loss {{ $fgVWLHealthCheckLinkName }}\{{ $fgVWLHealthCheckLinkIfName }}'
+                    descr: 'Link Packet Loss {{ FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkName }}\{{ FORTINET-FORTIGATE-MIB::fgVWLHealthCheckLinkIfName }}'
                     group: SD-WAN
                     index: 'fgVWLHealthCheckLinkPacketLoss.{{ $index }}'
                 -
-                    oid: fgLinkMonitorTable
-                    value: fgLinkMonitorLatency
+                    oid: FORTINET-FORTIGATE-MIB::fgLinkMonitorTable
+                    value: FORTINET-FORTIGATE-MIB::fgLinkMonitorLatency
                     num_oid: '.1.3.6.1.4.1.12356.101.4.8.2.1.4.{{ $index }}'
-                    descr: 'Monitor Latency {{ $fgLinkMonitorName }}'
+                    descr: 'Monitor Latency {{ FORTINET-FORTIGATE-MIB::fgLinkMonitorName }}'
                     group: Link monitor
                     index: 'fgLinkMonitorLatency.{{ $index }}'
                 -
-                    oid: fgLinkMonitorTable
-                    value: fgLinkMonitorJitter
+                    oid: FORTINET-FORTIGATE-MIB::fgLinkMonitorTable
+                    value: FORTINET-FORTIGATE-MIB::fgLinkMonitorJitter
                     num_oid: '.1.3.6.1.4.1.12356.101.4.8.2.1.5.{{ $index }}'
-                    descr: 'Monitor Jitter {{ $fgLinkMonitorName }}'
+                    descr: 'Monitor Jitter {{ FORTINET-FORTIGATE-MIB::fgLinkMonitorName }}'
                     group: Link monitor
                     index: 'fgLinkMonitorJitter.{{ $index }}'
                 -
-                    oid: fgLinkMonitorTable
-                    value: fgLinkMonitorPacketLoss
+                    oid: FORTINET-FORTIGATE-MIB::fgLinkMonitorTable
+                    value: FORTINET-FORTIGATE-MIB::fgLinkMonitorPacketLoss
                     num_oid: '.1.3.6.1.4.1.12356.101.4.8.2.1.8.{{ $index }}'
-                    descr: 'Monitor Packet Loss {{ $fgLinkMonitorName }}'
+                    descr: 'Monitor Packet Loss {{ FORTINET-FORTIGATE-MIB::fgLinkMonitorName }}'
                     group: Link monitor
                     index: 'fgLinkMonitorPacketLoss.{{ $index }}'
                 -
-                    oid: fgIpsStatsTable
-                    value: fgIpsIntrusionsDetected
+                    oid: FORTINET-FORTIGATE-MIB::fgIpsStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgIpsIntrusionsDetected
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.1.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} IPS Intrusions Detected'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} IPS Intrusions Detected'
                     group: IPS
                     index: 'fgIpsIntrusionsDetected.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgIpsStatsTable
-                    value: fgIpsIntrusionsBlocked
+                    oid: FORTINET-FORTIGATE-MIB::fgIpsStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgIpsIntrusionsBlocked
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.2.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} IPS Intrusions Blocked'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} IPS Intrusions Blocked'
                     group: IPS
                     index: 'fgIpsIntrusionsBlocked.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgIpsStatsTable
-                    value: fgIpsCritSevDetections
+                    oid: FORTINET-FORTIGATE-MIB::fgIpsStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgIpsCritSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.3.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} IPS Severity Critical Detected'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} IPS Severity Critical Detected'
                     group: IPS
                     index: 'fgIpsCritSevDetections.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgIpsStatsTable
-                    value: fgIpsHighSevDetections
+                    oid: FORTINET-FORTIGATE-MIB::fgIpsStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgIpsHighSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.4.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} IPS Severity High Detected'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} IPS Severity High Detected'
                     group: IPS
                     index: 'fgIpsHighSevDetections.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgIpsStatsTable
-                    value: fgIpsMedSevDetections
+                    oid: FORTINET-FORTIGATE-MIB::fgIpsStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgIpsMedSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.5.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} IPS Severity Medium Detected'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} IPS Severity Medium Detected'
                     group: IPS
                     index: 'fgIpsMedSevDetections.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgIpsStatsTable
-                    value: fgIpsLowSevDetections
+                    oid: FORTINET-FORTIGATE-MIB::fgIpsStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgIpsLowSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.6.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} IPS Severity Low Detected'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} IPS Severity Low Detected'
                     group: IPS
                     index: 'fgIpsLowSevDetections.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgIpsStatsTable
-                    value: fgIpsInfoSevDetections
+                    oid: FORTINET-FORTIGATE-MIB::fgIpsStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgIpsInfoSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.7.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} IPS Severity Informational Detected'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} IPS Severity Informational Detected'
                     group: IPS
                     index: 'fgIpsInfoSevDetections.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgIpsStatsTable
-                    value: fgIpsSignatureDetections
+                    oid: FORTINET-FORTIGATE-MIB::fgIpsStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgIpsSignatureDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.8.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} IPS Signature Detected'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} IPS Signature Detected'
                     group: IPS
                     index: 'fgIpsSignatureDetections.{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: fgIpsStatsTable
-                    value: fgIpsAnomalyDetections
+                    oid: FORTINET-FORTIGATE-MIB::fgIpsStatsTable
+                    value: FORTINET-FORTIGATE-MIB::fgIpsAnomalyDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.9.{{ $index }}'
-                    descr: '{{ $fgVdEntName }} IPS Anomaly Detected'
+                    descr: '{{ FORTINET-FORTIGATE-MIB::fgVdEntName }} IPS Anomaly Detected'
                     group: IPS
                     index: 'fgIpsAnomalyDetections.{{ $index }}'
                     rrd_type: COUNTER
@@ -311,8 +317,8 @@ modules:
         signal:
             data:
                 -
-                    oid: fgSignalInfoTable
-                    value: fgWcdmaRssi
+                    oid: FORTINET-FORTIGATE-MIB::fgSignalInfoTable
+                    value: FORTINET-FORTIGATE-MIB::fgWcdmaRssi
                     num_oid: '.1.3.6.1.4.1.12356.101.19.3.1.9.{{ $index }}'
                     descr: 'LTE Modem WCDMA RSSI'
                     index: 'fgWcdmaRssi.{{ $index }}'
@@ -321,8 +327,8 @@ modules:
                     warn_limit: -40
                     high_limit: -30
                 -
-                    oid: fgSignalInfoTable
-                    value: fgLteRssi
+                    oid: FORTINET-FORTIGATE-MIB::fgSignalInfoTable
+                    value: FORTINET-FORTIGATE-MIB::fgLteRssi
                     num_oid: '.1.3.6.1.4.1.12356.101.19.3.1.11.{{ $index }}'
                     descr: 'LTE Modem LTE RSSI'
                     index: 'fgLteRssi.{{ $index }}'
@@ -333,51 +339,51 @@ modules:
         temperature:
             data:
                 -
-                    oid:  fgHwSensors
+                    oid: FORTINET-FORTIGATE-MIB::fgHwSensors
                     num_oid: '.1.3.6.1.4.1.12356.101.4.3.2.1.3.{{ $index }}'
                     index: 'fgHwSensorEntIndex.{{ $index }}'
-                    descr: fgHwSensorEntName
-                    value:  fgHwSensorEntValue
+                    descr: FORTINET-FORTIGATE-MIB::fgHwSensorEntName
+                    value: FORTINET-FORTIGATE-MIB::fgHwSensorEntValue
                     skip_values:
                         -
-                            oid: fgHwSensorEntName
+                            oid: FORTINET-FORTIGATE-MIB::fgHwSensorEntName
                             op: 'regex'
                             value: '/^((?!Temp).)*$/'
                         -
-                            oid: fgHwSensorEntValue
+                            oid: FORTINET-FORTIGATE-MIB::fgHwSensorEntValue
                             op: '='
                             value: -1
         fanspeed:
             data:
                 -
-                    oid:  fgHwSensors
+                    oid: FORTINET-FORTIGATE-MIB::fgHwSensors
                     num_oid: '.1.3.6.1.4.1.12356.101.4.3.2.1.3.{{ $index }}'
                     index: 'fgHwSensorEntIndex.{{ $index }}'
-                    descr: fgHwSensorEntName
-                    value:  fgHwSensorEntValue
+                    descr: FORTINET-FORTIGATE-MIB::fgHwSensorEntName
+                    value: FORTINET-FORTIGATE-MIB::fgHwSensorEntValue
                     skip_values:
                         -
-                            oid: fgHwSensorEntName
+                            oid: FORTINET-FORTIGATE-MIB::fgHwSensorEntName
                             op: 'regex'
                             value: '/^((?!Fan).)*$/'
                         -
-                            oid: fgHwSensorEntName
+                            oid: FORTINET-FORTIGATE-MIB::fgHwSensorEntName
                             op: 'regex'
                             value: '/.*Temp.*/'
                         -
-                            oid: fgHwSensorEntValue
+                            oid: FORTINET-FORTIGATE-MIB::fgHwSensorEntValue
                             op: '='
                             value: -1
         voltage:
             data:
                 -
-                    oid:  fgHwSensors
+                    oid: FORTINET-FORTIGATE-MIB::fgHwSensors
                     num_oid: '.1.3.6.1.4.1.12356.101.4.3.2.1.3.{{ $index }}'
                     index: 'fgHwSensorEntIndex.{{ $index }}'
-                    descr: fgHwSensorEntName
-                    value:  fgHwSensorEntValue
+                    descr: FORTINET-FORTIGATE-MIB::fgHwSensorEntName
+                    value: FORTINET-FORTIGATE-MIB::fgHwSensorEntValue
                     skip_values:
                         -
-                            oid: fgHwSensorEntName
+                            oid: FORTINET-FORTIGATE-MIB::fgHwSensorEntName
                             op: 'regex'
                             value: '/^((?!VCC).)*$/'

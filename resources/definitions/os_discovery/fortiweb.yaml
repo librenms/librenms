@@ -1,4 +1,3 @@
-mib: FORTINET-FORTIWEB-MIB
 modules:
     mempools:
         data:
@@ -18,6 +17,6 @@ modules:
     processors:
         data:
             -
-                oid: fwSysCpuUsage
+                oid: FORTINET-FORTIWEB-MIB::fwSysCpuUsage
                 num_oid: '.1.3.6.1.4.1.12356.107.2.1.5.{{ $index }}'
                 type: fortiweb

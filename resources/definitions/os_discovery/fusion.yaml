@@ -1,4 +1,3 @@
-mib: ES4552BH2-MIB
 modules:
     os:
         hardware: ES4552BH2-MIB::swModelNumber.1
@@ -9,70 +8,70 @@ modules:
             data:
                 -
                     oid:
-                        - portTransceiverThresholdInfoTable
-                        - portName
+                        - ES4552BH2-MIB::portTransceiverThresholdInfoTable
+                        - ES4552BH2-MIB::portName
         voltage:
             data:
                 -
-                    oid: portOpticalMonitoringInfoTable
-                    value: portOpticalMonitoringInfoVcc
+                    oid: ES4552BH2-MIB::portOpticalMonitoringInfoTable
+                    value: ES4552BH2-MIB::portOpticalMonitoringInfoVcc
                     num_oid: '.1.3.6.1.4.1.259.6.10.120.1.2.11.1.3.{{ $index }}'
-                    descr: '{{ $portName }}'
+                    descr: '{{ ES4552BH2-MIB::portName }}'
                     index: 'portOpticalMonitoringInfoVcc.{{ $index }}'
-                    low_warn_limit: portTransceiverThresholdInfoVccLowWarn
-                    low_limit: portTransceiverThresholdInfoVccLowAlarm
-                    warn_limit: portTransceiverThresholdInfoVccHighWarn
-                    high_limit: portTransceiverThresholdInfoVccHighAlarm
+                    low_warn_limit: ES4552BH2-MIB::portTransceiverThresholdInfoVccLowWarn
+                    low_limit: ES4552BH2-MIB::portTransceiverThresholdInfoVccLowAlarm
+                    warn_limit: ES4552BH2-MIB::portTransceiverThresholdInfoVccHighWarn
+                    high_limit: ES4552BH2-MIB::portTransceiverThresholdInfoVccHighAlarm
         current:
             data:
                 -
-                    oid: portOpticalMonitoringInfoTable
-                    value: portOpticalMonitoringInfoTxBiasCurrent
+                    oid: ES4552BH2-MIB::portOpticalMonitoringInfoTable
+                    value: ES4552BH2-MIB::portOpticalMonitoringInfoTxBiasCurrent
                     num_oid: '.1.3.6.1.4.1.259.6.10.120.1.2.11.1.4.{{ $index }}'
-                    descr: '{{ $portName }} - Tx'
+                    descr: '{{ ES4552BH2-MIB::portName }} - Tx'
                     index: 'portOpticalMonitoringInfoTxBiasCurrent.{{ $index }}'
-                    low_warn_limit: portTransceiverThresholdInfoTxBiasCurrentLowWarn
-                    low_limit: portTransceiverThresholdInfoTxBiasCurrentLowAlarm
-                    warn_limit: portTransceiverThresholdInfoTxBiasCurrentHighWarn
-                    high_limit: portTransceiverThresholdInfoTxBiasCurrentHighAlarm
+                    low_warn_limit: ES4552BH2-MIB::portTransceiverThresholdInfoTxBiasCurrentLowWarn
+                    low_limit: ES4552BH2-MIB::portTransceiverThresholdInfoTxBiasCurrentLowAlarm
+                    warn_limit: ES4552BH2-MIB::portTransceiverThresholdInfoTxBiasCurrentHighWarn
+                    high_limit: ES4552BH2-MIB::portTransceiverThresholdInfoTxBiasCurrentHighAlarm
                     divisor: 1000
         dbm:
             data:
                 -
-                    oid: portOpticalMonitoringInfoTable
-                    value: portOpticalMonitoringInfoTxPower
+                    oid: ES4552BH2-MIB::portOpticalMonitoringInfoTable
+                    value: ES4552BH2-MIB::portOpticalMonitoringInfoTxPower
                     num_oid: '.1.3.6.1.4.1.259.6.10.120.1.2.11.1.5.{{ $index }}'
-                    descr: '{{ $portName }} - Tx'
+                    descr: '{{ ES4552BH2-MIB::portName }} - Tx'
                     index: 'portOpticalMonitoringInfoTxPower.{{ $index }}'
-                    low_warn_limit: portTransceiverThresholdInfoTxPowerLowWarn
-                    low_limit: portTransceiverThresholdInfoTxPowerLowAlarm
-                    warn_limit: portTransceiverThresholdInfoTxPowerHighWarn
-                    high_limit: portTransceiverThresholdInfoTxPowerHighAlarm
+                    low_warn_limit: ES4552BH2-MIB::portTransceiverThresholdInfoTxPowerLowWarn
+                    low_limit: ES4552BH2-MIB::portTransceiverThresholdInfoTxPowerLowAlarm
+                    warn_limit: ES4552BH2-MIB::portTransceiverThresholdInfoTxPowerHighWarn
+                    high_limit: ES4552BH2-MIB::portTransceiverThresholdInfoTxPowerHighAlarm
                 -
-                    oid: portOpticalMonitoringInfoTable
-                    value: portOpticalMonitoringInfoRxPower
+                    oid: ES4552BH2-MIB::portOpticalMonitoringInfoTable
+                    value: ES4552BH2-MIB::portOpticalMonitoringInfoRxPower
                     num_oid: '.1.3.6.1.4.1.259.6.10.120.1.2.11.1.6.{{ $index }}'
-                    descr: '{{ $portName }} - Rx'
+                    descr: '{{ ES4552BH2-MIB::portName }} - Rx'
                     index: 'portOpticalMonitoringInfoRxPower.{{ $index }}'
-                    low_warn_limit: portTransceiverThresholdInfoRxPowerLowWarn
-                    low_limit: portTransceiverThresholdInfoRxPowerLowAlarm
-                    warn_limit: portTransceiverThresholdInfoRxPowerHighWarn
-                    high_limit: portTransceiverThresholdInfoRxPowerHighAlarm
+                    low_warn_limit: ES4552BH2-MIB::portTransceiverThresholdInfoRxPowerLowWarn
+                    low_limit: ES4552BH2-MIB::portTransceiverThresholdInfoRxPowerLowAlarm
+                    warn_limit: ES4552BH2-MIB::portTransceiverThresholdInfoRxPowerHighWarn
+                    high_limit: ES4552BH2-MIB::portTransceiverThresholdInfoRxPowerHighAlarm
         temperature:
             data:
                 -
-                    oid: portOpticalMonitoringInfoTable
-                    value: portOpticalMonitoringInfoTemperature
+                    oid: ES4552BH2-MIB::portOpticalMonitoringInfoTable
+                    value: ES4552BH2-MIB::portOpticalMonitoringInfoTemperature
                     num_oid: '.1.3.6.1.4.1.259.6.10.120.1.2.11.1.2.{{ $index }}'
-                    descr: '{{ $portName }}'
+                    descr: '{{ ES4552BH2-MIB::portName }}'
                     index: 'portOpticalMonitoringInfoTemperature.{{ $index }}'
-                    low_warn_limit: portTransceiverThresholdInfoTemperatureLowWarn
-                    low_limit: portTransceiverThresholdInfoTemperatureLowAlarm
-                    warn_limit: portTransceiverThresholdInfoTemperatureHighWarn
-                    high_limit: portTransceiverThresholdInfoTemperatureHighAlarm
+                    low_warn_limit: ES4552BH2-MIB::portTransceiverThresholdInfoTemperatureLowWarn
+                    low_limit: ES4552BH2-MIB::portTransceiverThresholdInfoTemperatureLowAlarm
+                    warn_limit: ES4552BH2-MIB::portTransceiverThresholdInfoTemperatureHighWarn
+                    high_limit: ES4552BH2-MIB::portTransceiverThresholdInfoTemperatureHighAlarm
                 -
-                    oid: switchThermalTempTable
-                    value: switchThermalTempValue
+                    oid: ES4552BH2-MIB::switchThermalTempTable
+                    value: ES4552BH2-MIB::switchThermalTempValue
                     group: 'Unit {{ $subindex0 }}'
                     num_oid: '.1.3.6.1.4.1.259.6.10.120.1.1.11.1.3.{{ $index }}'
                     descr: 'Unit {{ $subindex0 }} Thermal {{ $subindex1 }}'
@@ -80,8 +79,8 @@ modules:
         fanspeed:
             data:
                 -
-                    oid: switchFanTable
-                    value: switchFanOperSpeed
+                    oid: ES4552BH2-MIB::switchFanTable
+                    value: ES4552BH2-MIB::switchFanOperSpeed
                     num_oid: '.1.3.6.1.4.1.259.6.10.120.1.1.9.1.6.{{ $index }}'
                     group: 'Unit {{ $subindex0 }}'
                     descr: 'Unit {{ $subindex0 }} Fan {{ $subindex1 }}'
@@ -89,8 +88,8 @@ modules:
         state:
             data:
                 -
-                    oid: switchFanTable
-                    value: switchFanStatus
+                    oid: ES4552BH2-MIB::switchFanTable
+                    value: ES4552BH2-MIB::switchFanStatus
                     num_oid: '.1.3.6.1.4.1.259.6.10.120.1.1.9.1.3.{{ $index }}'
                     group: 'Unit {{ $subindex0 }}'
                     descr: 'Unit {{ $subindex0 }} Fan {{ $subindex1 }}'
@@ -100,8 +99,8 @@ modules:
                         - { value: 1, generic: 0, graph: 1, descr: ok }
                         - { value: 2, generic: 2, graph: 1, descr: failure }
                 -
-                    oid: switchInfoTable
-                    value: swPowerStatus
+                    oid: ES4552BH2-MIB::switchInfoTable
+                    value: ES4552BH2-MIB::swPowerStatus
                     num_oid: '.1.3.6.1.4.1.259.6.10.120.1.1.3.1.8.{{ $index }}'
                     descr: Power state
                     index: 'swPowerStatus.{{ $index }}'
@@ -111,8 +110,8 @@ modules:
                         - { value: 2, generic: 0, graph: 1, descr: redundantPower }
                         - { value: 3, generic: 0, graph: 1, descr: internalAndRedundantPower }
                 -
-                    oid: switchInfoTable
-                    value: swRoleInSystem
+                    oid: ES4552BH2-MIB::switchInfoTable
+                    value: ES4552BH2-MIB::swRoleInSystem
                     num_oid: '.1.3.6.1.4.1.259.6.10.120.1.1.3.1.9.{{ $index }}'
                     descr: Switch role
                     index: 'swRoleInSystem.{{ $index }}'
