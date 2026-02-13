@@ -52,24 +52,13 @@ class CiscoUnifiedComputingCucsFaultClearNotif implements SnmptrapHandler
         $Severity = $trap->getOidData($trap->findOid('CISCO-UNIFIED-COMPUTING-MIB::cucsFaultSeverity'));
 
         // Match cucsFaultSeverity to LibreNMS eventlog colours
-        switch ($Severity) {
-            case 'critical':
-            case 'major':
-                $SeverityColour = Severity::Error; // red
-                break;
-            case 'minor':
-            case 'warning':
-                $SeverityColour = Severity::Warning; // yellow
-                break;
-            case 'info':
-                $SeverityColour = Severity::Info; // cyan
-                break;
-            case 'cleared':
-                $SeverityColour = Severity::Ok; // green
-                break;
-            default:
-                $SeverityColour = Severity::Notice; // blue
-        }
+        $SeverityColour = match ($Severity) {
+            'critical', 'major' => Severity::Error,
+            'minor', 'warning' => Severity::Warning,
+            'info' => Severity::Info,
+            'cleared' => Severity::Ok,
+            default => Severity::Notice,
+        };
 
         $trap->log("Cisco Unified Computing Fault $FaultIndex Cleared: $Desc for $Obj started at $Ctime, last updated at $Mtime. Probable cause: $Cause", $SeverityColour);
     }

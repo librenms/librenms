@@ -51,26 +51,13 @@ class CiscoClogMessageGenerated implements SnmptrapHandler
         $MsgTxt = $trap->getOidData($trap->findOid('CISCO-SYSLOG-MIB::clogHistMsgText.' . $EventID[0]));
 
         // Match Cisco Syslog trap severity levels to LibreNMS eventlog colours
-        switch ($CiscoSeverity) {
-            case 'emergency':
-            case 'alert':
-            case 'critical':
-            case 'error':
-                $SeverityColour = Severity::Error; // red
-                break;
-            case 'warning':
-                $SeverityColour = Severity::Warning; // yellow
-                break;
-            case 'notice':
-                $SeverityColour = Severity::Notice; // blue
-                break;
-            case 'info':
-                $SeverityColour = Severity::Info; // cyan
-                break;
-            default:
-                $SeverityColour = Severity::Ok; // green
-                break;
-        }
+        $SeverityColour = match ($CiscoSeverity) {
+            'emergency', 'alert', 'critical', 'error' => Severity::Error,
+            'warning' => Severity::Warning,
+            'notice' => Severity::Notice,
+            'info' => Severity::Info,
+            default => Severity::Ok,
+        };
 
         // Special cases
         // Set LibreNMS Eventlog severity colour to green for Link Up
