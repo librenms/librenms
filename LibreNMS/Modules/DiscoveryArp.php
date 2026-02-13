@@ -49,7 +49,7 @@ class DiscoveryArp implements Module
     {
         // Find all IPv4 addresses in the MAC table that haven't been discovered on monitored devices.
         $entries = Ipv4Mac::query()
-            ->select(['ipv4_address', 'mac_address', 'port_id'])
+            ->select(['id', 'ipv4_address', 'port_id'])
             ->whereHas('port', fn ($query) => $query->isNotDeleted())
             ->whereDoesntHave('ipv4Address')
             ->orderBy('ipv4_address')
