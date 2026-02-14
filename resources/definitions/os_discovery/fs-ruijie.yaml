@@ -1,0 +1,133 @@
+mib: FS-SYSTEM-MIB:FS-PROCESS-MIB:FS-MEMORY-MIB:FS-POE-MIB:FS-FIBER-MIB
+modules:
+    os:
+        hardware: .1.3.6.1.4.1.52642.1.1.10.2.1.1.26.0
+        version: .1.3.6.1.4.1.52642.1.1.10.2.1.1.2.0
+        serial: .1.3.6.1.4.1.52642.1.1.10.2.1.1.24.0
+    processors:
+        data:
+            -
+                oid: fsCPUUtilization5Min
+                num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.36.1.1.3.{{ $index }}'
+                descr: 'CPU {{ $index }}'
+    mempools:
+        data:
+            -
+                oid: FS-MEMORY-MIB::fsMemoryPoolUtilizationTable
+                total: FS-MEMORY-MIB::fsMemoryPoolSize
+                used: FS-MEMORY-MIB::fsMemoryPoolUsed
+                precision: 1024
+                descr: 'Memory Pool {{ $index }}'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: fsSystemMultipleTemperatureTable
+                    value: fsSystemMultipleTemperatureCurrent
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.1.1.44.1.5.{{ $index }}'
+                    descr: 'Temperature Slot {{ $subindex0 }} Sensor {{ $subindex1 }}'
+                    high_limit: fsSystemMultipleTemperatureCritical
+                    warn_limit: fsSystemMultipleTemperatureWarning
+                -
+                    oid: fsFiberTable
+                    value: fsFiberTemp
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.17.{{ $index }}'
+                    descr: '{{ $fsFiberPortDescr }} Temperature'
+                    low_limit: fsFiberTempLowAlarmThreshold
+                    high_limit: fsFiberTempHighAlarmThreshold
+                    skip_values:
+                        -
+                            oid: fsFiberDDMSupportStatus
+                            op: '!='
+                            value: 1
+                        -
+                            oid: fsFiberTemp
+                            op: '='
+                            value: 0
+        voltage:
+            data:
+                -
+                    oid: fsFiberTable
+                    value: fsFiberVoltage
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.19.{{ $index }}'
+                    descr: '{{ $fsFiberPortDescr }} Voltage'
+                    divisor: 1000
+                    low_limit: fsFiberVoltageLowAlarmThreshold
+                    high_limit: fsFiberVoltageHighAlarmThreshold
+                    skip_values:
+                        -
+                            oid: fsFiberDDMSupportStatus
+                            op: '!='
+                            value: 1
+                        -
+                            oid: fsFiberVoltage
+                            op: '='
+                            value: 0
+        current:
+            data:
+                -
+                    oid: fsFiberTable
+                    value: fsFiberBias
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.21.{{ $index }}'
+                    descr: '{{ $fsFiberPortDescr }} Bias Current'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: fsFiberDDMSupportStatus
+                            op: '!='
+                            value: 1
+                        -
+                            oid: fsFiberBias
+                            op: '='
+                            value: 0
+        power:
+            data:
+                -
+                    oid: fsIfPoeTable
+                    value: ifPoeConsumingPwr
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.110.1.1.1.7.{{ $index }}'
+                    descr: 'PoE Port {{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: ifIsPoe
+                            op: '!='
+                            value: 1
+        state:
+            data:
+                -
+                    oid: fsSystemElectricalSourceIsNormalTable
+                    value: fsSystemElectricalSourceIsNormal
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.1.1.18.1.2.{{ $index }}'
+                    descr: '{{ $fsSystemElectricalSourceName }}'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: 'Unknown' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'Green' }
+                        - { value: 3, generic: 1, graph: 0, descr: 'Yellow' }
+                        - { value: 4, generic: 2, graph: 0, descr: 'Not present' }
+                        - { value: 5, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value: 6, generic: 2, graph: 0, descr: 'Abnormal' }
+                -
+                    oid: fsSystemFanIsNormalTable
+                    value: fsSystemFanIsNormal
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.1.1.21.1.2.{{ $index }}'
+                    descr: '{{ $fsSystemFanName }}'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: 'Unknown' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'Green' }
+                        - { value: 3, generic: 1, graph: 0, descr: 'Yellow' }
+                        - { value: 4, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value: 5, generic: 2, graph: 0, descr: 'Abnormal' }
+                -
+                    oid: fsIfPoeTable
+                    value: ifPoePwrStatus
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.110.1.1.1.4.{{ $index }}'
+                    descr: 'PoE Port {{ $index }} Status'
+                    skip_values:
+                        -
+                            oid: ifIsPoe
+                            op: '!='
+                            value: 1
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'On' }
+                        - { value: 2, generic: 3, graph: 0, descr: 'Off' }
