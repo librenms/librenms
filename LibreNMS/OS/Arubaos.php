@@ -136,7 +136,7 @@ class Arubaos extends OS implements
     public function discoverWirelessFrequency()
     {
         // instant
-        return $this->discoverInstantRadio('frequency', 'aiRadioChannel');
+        return $this->discoverInstantRadio(WirelessSensorType::Frequency, 'aiRadioChannel');
     }
 
     /**
@@ -148,7 +148,7 @@ class Arubaos extends OS implements
     public function discoverWirelessNoiseFloor()
     {
         // instant
-        return $this->discoverInstantRadio('noise-floor', 'aiRadioNoiseFloor');
+        return $this->discoverInstantRadio(WirelessSensorType::NoiseFloor, 'aiRadioNoiseFloor');
     }
 
     /**
@@ -160,7 +160,7 @@ class Arubaos extends OS implements
     public function discoverWirelessPower()
     {
         // instant
-        return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', 'Radio %s: Tx Power');
+        return $this->discoverInstantRadio(WirelessSensorType::Power, 'aiRadioTransmitPower', 'Radio %s: Tx Power');
     }
 
     protected function decodeChannel($channel)
@@ -168,7 +168,7 @@ class Arubaos extends OS implements
         return Number::cast($channel) & 255; // mask off the channel width information
     }
 
-    private function discoverInstantRadio($type, $oid, $desc = 'Radio %s')
+    private function discoverInstantRadio(WirelessSensorType $type, $oid, $desc = 'Radio %s')
     {
         $data = SnmpQuery::numeric()->walk("AI-AP-MIB::$oid")->groupByIndex(1); // group by radio index
 
@@ -177,7 +177,7 @@ class Arubaos extends OS implements
             $value = reset($entry);
             $oid = key($entry);
 
-            if ($type == 'frequency') {
+            if ($type === WirelessSensorType::Frequency) {
                 $value = WirelessSensor::channelToFrequency($this->decodeChannel($value));
             }
 
@@ -204,7 +204,7 @@ class Arubaos extends OS implements
     public function discoverWirelessUtilization()
     {
         // instant
-        return $this->discoverInstantRadio('utilization', 'aiRadioUtilization64');
+        return $this->discoverInstantRadio(WirelessSensorType::Utilization, 'aiRadioUtilization64');
     }
 
     /**
