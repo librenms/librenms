@@ -7,20 +7,18 @@ modules:
             - '/^(?<hardware>SNR-S\S+) Device/s'
     mempools:
         data:
-            # S5XXX series (slot-based) - sysMemorySize/sysMemoryBusy
             -
-                total: .1.3.6.1.4.1.40418.7.100.1.8.1.7.1
-                used: .1.3.6.1.4.1.40418.7.100.1.8.1.8.1
+                total: .1.3.6.1.4.1.40418.7.100.1.11.6.0
+                used: .1.3.6.1.4.1.40418.7.100.1.11.7.0
                 descr: 'Memory'
                 index: 0
     processors:
         data:
-            # S5XXX series (slot-based)
             -
-                oid: sysCpuUsage
-                num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.11.{{ $index }}'
+                oid: switchCpuUsage
+                num_oid: '.1.3.6.1.4.1.40418.7.100.1.11.10.{{ $index }}'
                 descr: 'CPU'
-                index: 'sysCpuUsage.{{ $index }}'
+                index: 'switchCpuUsage.{{ $index }}'
     sensors:
         additional_oids:
             data:
@@ -29,21 +27,12 @@ modules:
                         - IF-MIB::ifName
         temperature:
             data:
-                # S5XXX series (slot-based)
-                -
-                    oid: sysTemperature
-                    value: sysTemperature
-                    num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.10.{{ $index }}'
-                    descr: 'Temperature'
-                    index: 'sysTemperature.{{ $index }}'
-                # S2XXX series (switch-based) - skip_value_gt filters invalid bitmask values (268435356)
                 -
                     oid: switchTemperature
                     value: switchTemperature
                     num_oid: '.1.3.6.1.4.1.40418.7.100.1.11.9.{{ $index }}'
                     descr: 'Switch Temperature'
                     index: 'switchTemperature.{{ $index }}'
-                    skip_value_gt: 150
         state:
             data:
                 -
@@ -55,33 +44,8 @@ modules:
                     states:
                         - { descr: Normal, graph: 0, value: 0, generic: 0 }
                         - { descr: Abnormal, graph: 0, value: 1, generic: 2 }
-                -
-                    oid: sysFanSpeed
-                    value: sysFanSpeed
-                    num_oid: '.1.3.6.1.4.1.40418.7.100.1.12.1.4.{{ $index }}'
-                    descr: 'Fan {{ $index }} Speed'
-                    index: 'sysFanSpeed.{{ $index }}'
-                    states:
-                        - { value: 0, generic: 3, graph: 0, descr: none }
-                        - { value: 1, generic: 0, graph: 0, descr: low }
-                        - { value: 2, generic: 0, graph: 0, descr: medium-low }
-                        - { value: 3, generic: 1, graph: 0, descr: medium }
-                        - { value: 4, generic: 2, graph: 0, descr: medium-high }
-                        - { value: 5, generic: 2, graph: 0, descr: high }
-                -
-                    oid: showSwitchStartUpStatus
-                    value: showSwitchStartUpStatus
-                    num_oid: '.1.3.6.1.4.1.40418.7.100.1.16.{{ $index }}'
-                    descr: 'Switch {{ $index }} Startup Status'
-                    index: 'showSwitchStartUpStatus.{{ $index }}'
-                    states:
-                        - { descr: idle, graph: 0, value: 1, generic: 3 }
-                        - { descr: success, graph: 0, value: 2, generic: 0 }
-                        - { descr: fail, graph: 0, value: 3, generic: 2 }
-                        - { descr: inProgress, graph: 0, value: 4, generic: 3 }
         dbm:
             options:
-                # skip_value_lt: -50 filters disconnected SFP modules that return -Inf
                 skip_value_lt: -50
             data:
                 -
