@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::table('alert_schedule', function (Blueprint $table) {
             $table->integer('behavior')->default(
-                MaintenanceBehavior::SKIP_ALERTS->value
+                MaintenanceBehavior::SkipAlerts->value
             );
         });
     }

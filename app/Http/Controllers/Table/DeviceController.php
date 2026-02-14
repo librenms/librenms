@@ -152,9 +152,9 @@ class DeviceController extends TableController
     {
         $deviceStatus = $device->getDeviceStatus();
         $status = match ($deviceStatus) {
-            DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED => 'down',
-            DeviceStatus::IGNORED_UP, DeviceStatus::UP => 'up',
-            DeviceStatus::IGNORED_DOWN, DeviceStatus::DISABLED => 'disabled',
+            DeviceStatus::Down, DeviceStatus::NeverPolled => 'down',
+            DeviceStatus::IgnoredUp, DeviceStatus::Up => 'up',
+            DeviceStatus::IgnoredDown, DeviceStatus::Disabled => 'disabled',
         };
 
         return [
@@ -162,11 +162,11 @@ class DeviceController extends TableController
             'status' => $status,
             'maintenance' => $device->isUnderMaintenance(),
             'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo((string) $device->icon, PATHINFO_FILENAME) . '">',
-            'hostname' => URL::modernDeviceLink($device, extra: $this->isDetailed() ? $device->name() : ''),
+            'hostname' => Url::modernDeviceLink($device, extra: $this->isDetailed() ? $device->name() : ''),
             'metrics' => $this->getMetrics($device),
             'hardware' => htmlspecialchars(Rewrite::ciscoHardware($device)),
             'os' => $this->getOsText($device),
-            'uptime' => $deviceStatus == DeviceStatus::NEVER_POLLED ? __('device.never_polled') : Time::formatInterval($device->status ? $device->uptime : (int) $device->downSince()->diffInSeconds(null, true), true),
+            'uptime' => $deviceStatus == DeviceStatus::NeverPolled ? __('device.never_polled') : Time::formatInterval($device->status ? $device->uptime : (int) $device->downSince()->diffInSeconds(null, true), true),
             'location' => htmlspecialchars($this->getLocation($device)),
             'actions' => view('device.actions', ['actions' => $this->getActions($device)])->__toString(),
             'device_id' => $device->device_id,
