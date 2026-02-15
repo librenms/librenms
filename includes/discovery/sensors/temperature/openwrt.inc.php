@@ -19,15 +19,17 @@
  * This is commonly used for thermal_zone sensors on ARM SoCs.
  */
 
+use LibreNMS\Util\SnmpQuery;
+
 if ($device['os'] === 'openwrt') {
     // Query temperature values directly (entire Entry walk times out)
-    $temps = \LibreNMS\Util\SnmpQuery::walk('LM-SENSORS-MIB::lmTempSensorsValue')->table(1);
+    $temps = SnmpQuery::walk('LM-SENSORS-MIB::lmTempSensorsValue')->table(1);
     
     if (!empty($temps)) {
         d_echo("OpenWrt: Found LM-SENSORS-MIB temperature sensors\n");
         
         // Also get sensor names for better descriptions
-        $names = \LibreNMS\Util\SnmpQuery::walk('LM-SENSORS-MIB::lmTempSensorsDevice')->table(1);
+        $names = SnmpQuery::walk('LM-SENSORS-MIB::lmTempSensorsDevice')->table(1);
 
         foreach ($temps as $index => $entry) {
             $current = $entry['lmTempSensorsValue'] ?? null;
