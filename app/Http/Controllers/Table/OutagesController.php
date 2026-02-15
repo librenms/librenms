@@ -191,8 +191,8 @@ class OutagesController extends TableController
     {
         return [
             $outage->device ? $outage->device->displayName() : '',
-            Time::toIso(Time::fromTimestamp($outage->going_down)),
-            $outage->up_again ? Time::toIso(Time::fromTimestamp($outage->up_again)) : '-',
+            Time::fromTimestamp($outage->going_down)->toIso8601ZuluString(),
+            $outage->up_again ? Time::fromTimestamp($outage->up_again)->toIso8601ZuluString() : '-',
             $this->asDuration($outage)->format('%H:%I:%S'),
         ];
     }

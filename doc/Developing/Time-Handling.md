@@ -2,7 +2,7 @@
 
 Most times in LibreNMS are absolute points in time when data has been collected.  What this means is that midnight UTC is the same as 8pm in the -0400 timezone, and 8am in +0800.  When dealing with these points in time, the preference is:
 
-- Date objects in PHP should use Carbon objects that contain timezone information, but when being saved they should use one of the following:
+- Date objects being manipulated in PHP should use Carbon objects that contain timezone information. When being saved they should use one of the following:
   - bigint unix epoch values.
   - timestamp fields, which have provisions on the SQL server side for converting to the appropriate timezone when read.
 - Dates being encoded in the URL should use the unix epoch.
@@ -13,20 +13,9 @@ Most times in LibreNMS are absolute points in time when data has been collected.
 There will be some exceptions to the above, for example scheduled maintenance where the server timezone observes daylight savings differently to the devices being scheduled.  When this happens, we should store the timezone along with the time information so we can interpret the time correctly relative to ths server's time.
 
 Some additional noted on database fields:
-- datetime fields are not good because they are not timezone aware, which creates issues with the boundaries of daylight savings as well as assumptions about timezone when parsing
+- datetime fields are not normally acceptable because they are not timezone aware. This creates issues near the boundaries of daylight savings as well as assumptions about timezone when parsing.
 - timestamp fields currently have a maximum date in 2038, and can store times with a granularity of microseconds.
-- unix epoch fields have a granulariy of 1 second
-
-## Config options
-The following configuration options exist for displaying dates to users.  An example of the default output is shown next to each:
- - `dateformat.long` - Wed, 04 Feb 2026 09:25:00 +0800
- - `dateformat.compact` - 2026-02-04 09:25:00
- - `dateformat.byminute` - 2026-02-04 09:25
- - `dateformat.time` - 09:25:00
-
-When formatting dates for web pages, you should choose from one of the config options above to allow systems to have consistent formatting that can be customised.
-
-A better solution is to use JSON to fetch the data from an AJAX endpoint and then use the javascript formatting function to format the time.  This allows dates to be formatted using the locale of the end user (e.g. dd/mm/yy vs mm/dd/yy).
+- unix epoch fields have a granulariy of 1 second.
 
 ## PHP Time Functions
 
@@ -40,10 +29,18 @@ The following functions all return a Carbon object representing a point in time 
   - ISO8601 times with a UTC offset (-1200 to +1200) at the end
   - Datetime fields from the database with no UTC offset (assumes the time is in the PHP timezone)
 
-The following functions all take a Carbon object generated above, and change it to the correct output format:
-- `Time::toTimestamp()` - Outputs a unix epoch in seconds
-- `Time::toIso()` - Outputs a string in ISO8601 representation in Zulu/UTC timezone.
+The following methods should be used on Carbon objects to convert them to unix epoch timestamps or ISO8601 Zulu time strings:
+- `$object->unix()`
+- `$object->toIso8601ZuluString()`
+
+The following function has been created for formatting dates on web pages, but are considered legacy because a better solution exists using JSON to fetch the data from an AJAX endpoint and then using the javascript formatting functions explained further down this page to format the time. This allows dates to be formatted using the locale of the end user (e.g. dd/mm/yy vs mm/dd/yy):
 - `Time::format()` - Takes both a Carbon object and a format string as inputs, and outputs the time in the user's selected timezone using the format string.
+
+When using the `Time::format()` function, you should choose from one of the following config options for chooing a date format.  An example of the default output is shown next to each:
+ - `dateformat.long` - Wed, 04 Feb 2026 09:25:00 +0800
+ - `dateformat.compact` - 2026-02-04 09:25:00
+ - `dateformat.byminute` - 2026-02-04 09:25
+ - `dateformat.time` - 09:25:00
 
 ### Examples
 
@@ -67,14 +64,12 @@ If you receive a ISO8601 date as part of data posted from an AJAX query, and wan
 ```php
 use LibreNMS\Util\Time;
 
-$epoch = Time::toTimestamp(Time::parse($iso8601_date));
+$epoch = Time::parse($iso8601_date)->unix();
 ```
 
 If you have a timestamp field from the database that you want to send to an AJAX endpoint as ISO8601 time, you would do the following:
 ```php
-use LibreNMS\Util\Time;
-
-$jsontime = Time::toIso($dbtime);
+$jsontime = $dbtime->toIso8601ZuluString();
 ```
 
 ## Javascript Time Library

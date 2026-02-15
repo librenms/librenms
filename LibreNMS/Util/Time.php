@@ -232,22 +232,6 @@ class Time
     }
 
     /**
-     * Return unix timestamp
-     */
-    public static function toTimestamp(Carbon $input): int
-    {
-        return $input->unix();
-    }
-
-    /**
-     * Return ISO date string
-     */
-    public static function toIso(Carbon $input): string
-    {
-        return $input->toIso8601ZuluString();
-    }
-
-    /**
      * Format a timestamp for display to users in their selected timezone
      */
     public static function format(Carbon $input, string $format): string
