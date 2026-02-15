@@ -20,9 +20,9 @@
  */
 
 if ($device['os'] === 'openwrt') {
-    $oids = snmpwalk_cache_oid($device, 'lmTempSensorsEntry', [], 'LM-SENSORS-MIB');
+    $oids = SnmpQuery::walk('LM-SENSORS-MIB::lmTempSensorsEntry')->table(1);
 
-    if (is_array($oids) && count($oids)) {
+    if (!empty($oids)) {
         d_echo("OpenWrt: Found LM-SENSORS-MIB temperature sensors\n");
 
         foreach ($oids as $index => $entry) {
