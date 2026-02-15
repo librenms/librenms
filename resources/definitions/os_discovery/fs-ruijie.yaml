@@ -28,6 +28,7 @@ modules:
                     descr: 'Temperature Slot {{ $subindex0 }} Sensor {{ $subindex1 }}'
                     high_limit: fsSystemMultipleTemperatureCritical
                     warn_limit: fsSystemMultipleTemperatureWarning
+                    low_limit: fsSystemMultipleTemperatureLow
                 -
                     oid: fsFiberTable
                     value: fsFiberTemp
