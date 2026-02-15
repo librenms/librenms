@@ -72,7 +72,7 @@
     <script>
         function delete_dg(button, url) {
             var index = button.parentNode.parentNode.rowIndex;
-            var name = button.getAttribute('data-group-name');
+            var name = button.dataset.groupName;
 
             if (confirm('{{ __('Are you sure you want to delete ') }}' + name + '?')) {
                 $.ajax({
