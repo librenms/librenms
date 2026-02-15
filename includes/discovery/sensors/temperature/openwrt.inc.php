@@ -20,27 +20,31 @@
  */
 
 if ($device['os'] === 'openwrt') {
-    $oids = SnmpQuery::walk('LM-SENSORS-MIB::lmTempSensorsEntry')->table(1);
-
-    if (!empty($oids)) {
+    // Query temperature values directly (entire Entry walk times out)
+    $temps = \LibreNMS\Util\SnmpQuery::walk('LM-SENSORS-MIB::lmTempSensorsValue')->table(1);
+    
+    if (!empty($temps)) {
         d_echo("OpenWrt: Found LM-SENSORS-MIB temperature sensors\n");
+        
+        // Also get sensor names for better descriptions
+        $names = \LibreNMS\Util\SnmpQuery::walk('LM-SENSORS-MIB::lmTempSensorsDevice')->table(1);
 
-        foreach ($oids as $index => $entry) {
-            if (!isset($entry['lmTempSensorsValue']) || $entry['lmTempSensorsValue'] <= 0) {
+        foreach ($temps as $index => $entry) {
+            $current = $entry['lmTempSensorsValue'] ?? null;
+            
+            if (!is_numeric($current) || $current <= 0) {
                 continue;
             }
 
             $oid = '.1.3.6.1.4.1.2021.13.16.2.1.3.' . $index;
-            $descr = $entry['lmTempSensorsDevice'] ?? 'Sensor ' . $index;
-            $current = $entry['lmTempSensorsValue'];
-
+            $descr = $names[$index]['lmTempSensorsDevice'] ?? 'Sensor ' . $index;
+            
             // LM-SENSORS-MIB returns temperature in millidegrees
             $divisor = 1000;
             $current_celsius = $current / $divisor;
 
-            // High limit defaults to 100°C if not specified
-            $limit = $entry['lmTempSensorsLimit'] ?? 100000;
-            $limit_celsius = $limit / $divisor;
+            // High limit defaults to 100°C
+            $limit_celsius = 100;
 
             discover_sensor(
                 $valid['sensor'],
@@ -62,4 +66,4 @@ if ($device['os'] === 'openwrt') {
     }
 }
 
-unset($oids, $index, $entry, $oid, $descr, $current, $divisor, $limit);
+unset($temps, $names, $index, $entry, $current, $oid, $descr, $divisor, $limit_celsius);
