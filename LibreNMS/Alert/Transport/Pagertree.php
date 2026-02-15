@@ -52,7 +52,6 @@ class Pagertree extends Transport
             $event_type = 'acknowledge';
         }
 
-
         $event = [
             'event_type' => $event_type,
             'Id' => $alert_data['alert_id'],
