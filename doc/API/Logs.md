@@ -25,7 +25,7 @@ Route: `/api/v0/logs/alertlog/:hostname`
 
 ### `list_authlog`
 
-Route: `/api/v0/logs/authlog/:hostname`
+Route: `/api/v0/logs/authlog`
 
 Example:
 
