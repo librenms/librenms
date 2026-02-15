@@ -97,7 +97,7 @@ class Pagertree extends Transport
 
     private function testMessage(): string
     {
-        $test_id = 'TEST-' . strval(rand(100000, 200000));
+        $test_id = 'TEST-' . strval(random_int(100000, 200000));
         $event = [
             'event_type' => 'create',
             'Id' => $test_id,
