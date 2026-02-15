@@ -34,7 +34,7 @@ use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class PagerTree extends Transport
+class Pagertree extends Transport
 {
     protected string $name = 'PagerTree';
 
@@ -42,12 +42,15 @@ class PagerTree extends Transport
     {
         $event_type = 'create';
 
-        if ($alert_data['state'] === 0)
+        if ($alert_data['state'] === 0) {
             $event_type = 'resolve';
-        if ($alert_data['state'] === 1)
+        }
+        if ($alert_data['state'] === 1) {
             $event_type = 'create';
-        if ($alert_data['state'] === 2)
+        }
+        if ($alert_data['state'] === 2) {
             $event_type = 'acknowledge';
+        }
 
 
         $event = [
@@ -95,14 +98,16 @@ class PagerTree extends Transport
 
     private function testMessage(): string
     {
-        $test_id = 'TEST-' . strval(rand(100000,200000));
+        $test_id = 'TEST-' . strval(rand(100000, 200000));
         $event = [
-            "event_type" => 'create',
-            "Id" => $test_id,
-            "Title" => 'LibreNMS PagerTree Test Alert',
-            "Description" => 'Testing PagerTree Transport',
-          ];
+            'event_type' => 'create',
+            'Id' => $test_id,
+            'Title' => 'LibreNMS PagerTree Test Alert',
+            'Description' => 'Testing PagerTree Transport',
+        ];
+
         $event_json = json_encode($event);
+
         return $event_json;
     }
 }
