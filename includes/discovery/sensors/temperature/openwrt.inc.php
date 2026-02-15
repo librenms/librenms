@@ -1,109 +1,65 @@
 <?php
 /**
- * OpenWrt Multi-Zone Temperature Sensor Discovery
- * 
- * Discovers thermal sensors from OpenWrt devices that expose them via nsExtend.
- * Uses nsExtendOutLine to get ALL lines from multi-line output.
- * 
- * Place in: /opt/librenms/includes/discovery/sensors/temperature/openwrt.inc.php
+ * LibreNMS
+ *
+ * Copyright (c) 2025 LibreNMS Contributors
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @link       https://www.librenms.org
+ *
+ * OpenWrt LM-SENSORS Temperature Sensor Discovery
+ *
+ * OpenWrt devices can provide temperature sensors via LM-SENSORS-MIB
+ * when using the snmpd 'pass' directive with a thermal sensor script.
+ * This is commonly used for thermal_zone sensors on ARM SoCs.
  */
 
-if ($device['os'] == 'openwrt') {
-    echo "OpenWrt Thermal Sensor Discovery\n";
-    
-    // Get all nsExtendOutLine data (multi-line output)
-    $thermal_temps = snmpwalk_cache_oid($device, 'nsExtendOutLine."thermal-temp"', [], 'NET-SNMP-EXTEND-MIB');
-    $thermal_names = snmpwalk_cache_oid($device, 'nsExtendOutLine."thermal-name"', [], 'NET-SNMP-EXTEND-MIB');
-    $thermal_indices = snmpwalk_cache_oid($device, 'nsExtendOutLine."thermal-index"', [], 'NET-SNMP-EXTEND-MIB');
-    
-    if (empty($thermal_temps)) {
-        echo "  No thermal sensors found via nsExtendOutLine\n";
-        return;
-    }
-    
-    // nsExtendOutLine uses format: nsExtendOutLine."extend-name".line_number
-    // We need to iterate through line numbers
-    foreach ($thermal_temps as $oid_key => $data) {
-        // Extract line number from OID
-        // Format: .1.3.6.1.4.1.8072.1.3.2.4.1.2.12.116.104.101.114.109.97.108.45.116.101.109.112.LINE_NUM
-        preg_match('/\.(\d+)$/', $oid_key, $matches);
-        $line_num = $matches[1] ?? '1';
-        
-        // Get values from the nested array structure
-        // The data comes back with the full column name as key
-        $temp_value = null;
-        $sensor_name = null;
-        $zone_index = null;
-        
-        // Find the temperature value in the data array
-        foreach ($data as $key => $value) {
-            if (strpos($key, 'thermal-temp') !== false) {
-                $temp_value = $value;
-                break;
+if ($device['os'] === 'openwrt') {
+    $oids = snmpwalk_cache_oid($device, 'lmTempSensorsEntry', [], 'LM-SENSORS-MIB');
+
+    if (is_array($oids) && count($oids)) {
+        d_echo("OpenWrt: Found LM-SENSORS-MIB temperature sensors\n");
+
+        foreach ($oids as $index => $entry) {
+            if (!isset($entry['lmTempSensorsValue']) || $entry['lmTempSensorsValue'] <= 0) {
+                continue;
             }
-        }
-        
-        // Get corresponding name and index
-        if (isset($thermal_names[$oid_key])) {
-            foreach ($thermal_names[$oid_key] as $key => $value) {
-                if (strpos($key, 'thermal-name') !== false) {
-                    $sensor_name = $value;
-                    break;
-                }
-            }
-        }
-        
-        if (isset($thermal_indices[$oid_key])) {
-            foreach ($thermal_indices[$oid_key] as $key => $value) {
-                if (strpos($key, 'thermal-index') !== false) {
-                    $zone_index = $value;
-                    break;
-                }
-            }
-        }
-        
-        // Fallback values
-        $sensor_name = $sensor_name ?? "Thermal $line_num";
-        $zone_index = $zone_index ?? $line_num;
-        
-        if (is_numeric($temp_value) && $temp_value > 0) {
-            // Build OID for this specific line
-            // Base: .1.3.6.1.4.1.8072.1.3.2.4.1.2 (nsExtendOutLine)
-            // + length of "thermal-temp" (12)
-            // + ASCII encoding of "thermal-temp"
-            // + line number
-            
-            $extend_name = "thermal-temp";
-            $ascii_encoded = implode('.', array_map('ord', str_split($extend_name)));
-            $temp_oid = ".1.3.6.1.4.1.8072.1.3.2.4.1.2." . strlen($extend_name) . ".$ascii_encoded.$line_num";
-            
-            $descr = trim($sensor_name, '"') ?: "Thermal Zone $zone_index";
-            
-            echo "  Found: $descr = " . ($temp_value / 1000) . "°C (line $line_num, zone $zone_index)\n";
-            
+
+            $oid = '.1.3.6.1.4.1.2021.13.16.2.1.3.' . $index;
+            $descr = $entry['lmTempSensorsDevice'] ?? 'Sensor ' . $index;
+            $current = $entry['lmTempSensorsValue'];
+
+            // LM-SENSORS-MIB returns temperature in millidegrees
+            $divisor = 1000;
+            $current_celsius = $current / $divisor;
+
+            // High limit defaults to 100°C if not specified
+            $limit = $entry['lmTempSensorsLimit'] ?? 100000;
+            $limit_celsius = $limit / $divisor;
+
             discover_sensor(
                 $valid['sensor'],
                 'temperature',
                 $device,
-                $temp_oid,
-                "thermal-line-$line_num",
-                'openwrt-nsextend',
+                $oid,
+                $index,
+                'lm-sensors',
                 $descr,
-                1000,      // divisor - millidegrees to degrees
-                1,         // multiplier
-                null,      // limit_low
-                null,      // limit_low_warn  
-                null,      // limit_warn
-                100,       // limit (100°C)
-                $temp_value / 1000,
-                'snmp',
+                $divisor,
+                1,
                 null,
                 null,
-                "OpenWrt thermal sensor via nsExtend (zone $zone_index)"
+                null,
+                $limit_celsius,
+                $current_celsius
             );
         }
     }
-    
-    $thermal_count = count($thermal_temps);
-    echo "  Discovered $thermal_count thermal sensor(s)\n";
 }
+
+unset($oids, $index, $entry, $oid, $descr, $current, $divisor, $limit);
