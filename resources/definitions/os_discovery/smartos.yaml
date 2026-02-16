@@ -1,4 +1,3 @@
-mib: MSERIES-ENVMON-MIB:MSERIES-PORT-MIB
 modules:
     os:
         sysDescr_regex: '/Smart[Oo]ptics, (M-Series )?(?<hardware>\S+( [^,]+))(, SmartOS (?<version>\S+))?/'
@@ -6,10 +5,10 @@ modules:
         state:
             data:
                 -
-                    oid: smartPortTable
+                    oid: MSERIES-PORT-MIB::smartPortTable
                     num_oid: '.1.3.6.1.4.1.30826.1.3.1.2.1.1.6.{{ $index }}'
-                    value: smartPortStatus
-                    descr: '{{ $smartPortAlias }} - {{ $smartPortName }}'
+                    value: MSERIES-PORT-MIB::smartPortStatus
+                    descr: '{{ MSERIES-PORT-MIB::smartPortAlias }} - {{ MSERIES-PORT-MIB::smartPortName }}'
                     index: 'smartPortStatus.{{ $index }}'
                     state_name: smartPortStatus
                     states:
@@ -24,18 +23,18 @@ modules:
         temperature:
             data:
                 -
-                    oid: smartEnvMonTemperatureTable
-                    value: smartEnvMonTemperatureValue
+                    oid: MSERIES-ENVMON-MIB::smartEnvMonTemperatureTable
+                    value: MSERIES-ENVMON-MIB::smartEnvMonTemperatureValue
                     num_oid: '.1.3.6.1.4.1.30826.1.4.1.1.1.3.{{ $index }}'
-                    descr: smartEnvMonTemperatureDescr
+                    descr: MSERIES-ENVMON-MIB::smartEnvMonTemperatureDescr
         power:
             data:
                 -
-                    oid: smartPortTable
-                    value: smartPortPower
+                    oid: MSERIES-PORT-MIB::smartPortTable
+                    value: MSERIES-PORT-MIB::smartPortPower
                     num_oid: '.1.3.6.1.4.1.30826.1.3.1.2.1.1.5.{{ $index }}'
                     divisor: 10
-                    descr: '{{ $smartPortAlias }} - {{ $smartPortName }}'
-                    low_limit: smartPortLowPowerAlarmThreshold
-                    high_limit: smartPortHighPowerAlarmThreshold
+                    descr: '{{ MSERIES-PORT-MIB::smartPortAlias }} - {{ MSERIES-PORT-MIB::smartPortName }}'
+                    low_limit: MSERIES-PORT-MIB::smartPortLowPowerAlarmThreshold
+                    high_limit: MSERIES-PORT-MIB::smartPortHighPowerAlarmThreshold
                     skip_values: -400
