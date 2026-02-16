@@ -2558,3 +2558,710 @@ modules:
                             oid: SUPERCAPBATTERY-MIB::BMS15-Voltage
                             op: '='
                             value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS01-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.13{{ $noindex }}'
+                    descr: 'BMS 01 Charge Discharge Current Alarm Status'
+                    index: 'BMS01-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 01'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS02-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.26{{ $noindex }}'
+                    descr: 'BMS 02 Charge Discharge Current Alarm Status'
+                    index: 'BMS02-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 02'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS03-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.39{{ $noindex }}'
+                    descr: 'BMS 03 Charge Discharge Current Alarm Status'
+                    index: 'BMS03-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 03'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS04-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.52{{ $noindex }}'
+                    descr: 'BMS 04 Charge Discharge Current Alarm Status'
+                    index: 'BMS04-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 04'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS05-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.65{{ $noindex }}'
+                    descr: 'BMS 05 Charge Discharge Current Alarm Status'
+                    index: 'BMS05-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 05'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS06-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.78{{ $noindex }}'
+                    descr: 'BMS 06 Charge Discharge Current Alarm Status'
+                    index: 'BMS06-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 06'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS07-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.91{{ $noindex }}'
+                    descr: 'BMS 07 Charge Discharge Current Alarm Status'
+                    index: 'BMS07-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 07'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS08-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.104{{ $noindex }}'
+                    descr: 'BMS 08 Charge Discharge Current Alarm Status'
+                    index: 'BMS08-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 08'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS09-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.117{{ $noindex }}'
+                    descr: 'BMS 09 Charge Discharge Current Alarm Status'
+                    index: 'BMS09-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 09'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS10-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.130{{ $noindex }}'
+                    descr: 'BMS 10 Charge Discharge Current Alarm Status'
+                    index: 'BMS10-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 10'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS11-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.143{{ $noindex }}'
+                    descr: 'BMS 11 Charge Discharge Current Alarm Status'
+                    index: 'BMS11-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 11'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS12-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.156{{ $noindex }}'
+                    descr: 'BMS 12 Charge Discharge Current Alarm Status'
+                    index: 'BMS12-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 12'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS13-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.169{{ $noindex }}'
+                    descr: 'BMS 13 Charge Discharge Current Alarm Status'
+                    index: 'BMS13-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 13'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS14-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.182{{ $noindex }}'
+                    descr: 'BMS 14 Charge Discharge Current Alarm Status'
+                    index: 'BMS14-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 14'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS15-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.195{{ $noindex }}'
+                    descr: 'BMS 15 Charge Discharge Current Alarm Status'
+                    index: 'BMS15-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 15'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS01-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.14{{ $noindex }}'
+                    descr: 'BMS 01 Battery Voltage Alarm Status'
+                    index: 'BMS01-BatteryVoltageAlarmStatus'
+                    group: 'BMS 01'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS02-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.27{{ $noindex }}'
+                    descr: 'BMS 02 Battery Voltage Alarm Status'
+                    index: 'BMS02-BatteryVoltageAlarmStatus'
+                    group: 'BMS 02'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS03-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.40{{ $noindex }}'
+                    descr: 'BMS 03 Battery Voltage Alarm Status'
+                    index: 'BMS03-BatteryVoltageAlarmStatus'
+                    group: 'BMS 03'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS04-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.53{{ $noindex }}'
+                    descr: 'BMS 04 Battery Voltage Alarm Status'
+                    index: 'BMS04-BatteryVoltageAlarmStatus'
+                    group: 'BMS 04'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS05-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.66{{ $noindex }}'
+                    descr: 'BMS 05 Battery Voltage Alarm Status'
+                    index: 'BMS05-BatteryVoltageAlarmStatus'
+                    group: 'BMS 05'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS06-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.79{{ $noindex }}'
+                    descr: 'BMS 06 Battery Voltage Alarm Status'
+                    index: 'BMS06-BatteryVoltageAlarmStatus'
+                    group: 'BMS 06'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS07-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.92{{ $noindex }}'
+                    descr: 'BMS 07 Battery Voltage Alarm Status'
+                    index: 'BMS07-BatteryVoltageAlarmStatus'
+                    group: 'BMS 07'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS08-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.105{{ $noindex }}'
+                    descr: 'BMS 08 Battery Voltage Alarm Status'
+                    index: 'BMS08-BatteryVoltageAlarmStatus'
+                    group: 'BMS 08'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS09-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.118{{ $noindex }}'
+                    descr: 'BMS 09 Battery Voltage Alarm Status'
+                    index: 'BMS09-BatteryVoltageAlarmStatus'
+                    group: 'BMS 09'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS10-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.131{{ $noindex }}'
+                    descr: 'BMS 10 Battery Voltage Alarm Status'
+                    index: 'BMS10-BatteryVoltageAlarmStatus'
+                    group: 'BMS 10'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS11-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.144{{ $noindex }}'
+                    descr: 'BMS 11 Battery Voltage Alarm Status'
+                    index: 'BMS11-BatteryVoltageAlarmStatus'
+                    group: 'BMS 11'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS12-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.157{{ $noindex }}'
+                    descr: 'BMS 12 Battery Voltage Alarm Status'
+                    index: 'BMS12-BatteryVoltageAlarmStatus'
+                    group: 'BMS 12'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS13-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.170{{ $noindex }}'
+                    descr: 'BMS 13 Battery Voltage Alarm Status'
+                    index: 'BMS13-BatteryVoltageAlarmStatus'
+                    group: 'BMS 13'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS14-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.183{{ $noindex }}'
+                    descr: 'BMS 14 Battery Voltage Alarm Status'
+                    index: 'BMS14-BatteryVoltageAlarmStatus'
+                    group: 'BMS 14'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS15-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.196{{ $noindex }}'
+                    descr: 'BMS 15 Battery Voltage Alarm Status'
+                    index: 'BMS15-BatteryVoltageAlarmStatus'
+                    group: 'BMS 15'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-Voltage
+                            op: '='
+                            value: 0
+        voltage:
+            data:
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS01-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.5{{ $noindex }}'
+                    descr: 'Total Voltage BMS 01'
+                    index: 'BMS01-Voltage'
+                    group: 'BMS 01'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS02-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.18{{ $noindex }}'
+                    descr: 'Total Voltage BMS 02'
+                    index: 'BMS02-Voltage'
+                    group: 'BMS 02'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS03-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.31{{ $noindex }}'
+                    descr: 'Total Voltage BMS 03'
+                    index: 'BMS03-Voltage'
+                    group: 'BMS 03'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS04-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.44{{ $noindex }}'
+                    descr: 'Total Voltage BMS 04'
+                    index: 'BMS04-Voltage'
+                    group: 'BMS 04'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS05-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.57{{ $noindex }}'
+                    descr: 'Total Voltage BMS 05'
+                    index: 'BMS05-Voltage'
+                    group: 'BMS 05'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS06-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.70{{ $noindex }}'
+                    descr: 'Total Voltage BMS 06'
+                    index: 'BMS06-Voltage'
+                    group: 'BMS 06'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS07-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.83{{ $noindex }}'
+                    descr: 'Total Voltage BMS 07'
+                    index: 'BMS07-Voltage'
+                    group: 'BMS 07'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS08-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.96{{ $noindex }}'
+                    descr: 'Total Voltage BMS 08'
+                    index: 'BMS08-Voltage'
+                    group: 'BMS 08'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS09-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.109{{ $noindex }}'
+                    descr: 'Total Voltage BMS 09'
+                    index: 'BMS09-Voltage'
+                    group: 'BMS 09'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS10-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.122{{ $noindex }}'
+                    descr: 'Total Voltage BMS 10'
+                    index: 'BMS10-Voltage'
+                    group: 'BMS 10'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS11-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.135{{ $noindex }}'
+                    descr: 'Total Voltage BMS 11'
+                    index: 'BMS11-Voltage'
+                    group: 'BMS 11'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS12-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.148{{ $noindex }}'
+                    descr: 'Total Voltage BMS 12'
+                    index: 'BMS12-Voltage'
+                    group: 'BMS 12'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS13-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.161{{ $noindex }}'
+                    descr: 'Total Voltage BMS 13'
+                    index: 'BMS13-Voltage'
+                    group: 'BMS 13'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS14-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.174{{ $noindex }}'
+                    descr: 'Total Voltage BMS 14'
+                    index: 'BMS14-Voltage'
+                    group: 'BMS 14'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-Voltage
+                    value: SUPERCAPBATTERY-MIB::BMS15-Voltage
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.187{{ $noindex }}'
+                    descr: 'Total Voltage BMS 15'
+                    index: 'BMS15-Voltage'
+                    group: 'BMS 15'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-Voltage
+                            op: '='
+                            value: 0

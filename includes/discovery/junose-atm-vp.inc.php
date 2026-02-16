@@ -6,7 +6,7 @@
 use App\Facades\LibrenmsConfig;
 
 if ($device['os'] == 'junose' && LibrenmsConfig::get('enable_ports_junoseatmvp')) {
-    $vp_array = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsInCells', $vp_array, 'Juniper-UNI-ATM-MIB', 'junose');
+    $vp_array = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsInCells', $vp_array, 'Juniper-UNI-ATM-MIB', 'juniper/junose');
     $valid_vp = [];
     d_echo($vp_array);
 

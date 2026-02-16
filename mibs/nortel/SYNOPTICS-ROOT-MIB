@@ -8,7 +8,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 synoptics MODULE-IDENTITY
-       LAST-UPDATED    "201711290000Z"
+       LAST-UPDATED    "202003190000Z"
        ORGANIZATION    "Nortel Networks"
        CONTACT-INFO    "Nortel Networks"
        DESCRIPTION
@@ -25,6 +25,40 @@ synoptics MODULE-IDENTITY
             This Specification is supplied 'AS IS,' and Avaya makes
             no warranty, either express or implied, as to the use,
             operation, condition, or performance of the Specification."
+
+       REVISION "202003190000Z" -- 19 Mar. 2020
+       DESCRIPTION "Version 316:  Add m552048TVOSS, m552048WVOSS, m552012MW36WVOSS
+                                  m552024TVOSS, m552024WVOSS, m552024XVOSS, m552048SEVOSS
+	   			  X3/5520/U100 Platforms. (Prem)"
+
+       REVISION "201909200000Z" -- 20 Sep. 2019
+       DESCRIPTION "Version 315:  Add mVSP490024XE(263), mVSP490012MXU12XE(264) and mVSP490024S(265)
+	   			  - Seadart platforms.
+                                  Requested by Eeranna for VOSS (Prem)"
+
+       REVISION "201904040000Z" -- 04 Apr. 2019
+       DESCRIPTION "Version 314:  Add mXA1440(261) and mXA1480(262)
+	   			  - MicroVSP platforms.
+                                  Requested by Prakash for VOSS (Prem)"
+
+       REVISION "201903270000Z" -- 27 Mar. 2019
+       DESCRIPTION "Version 313:  Add mVSP1100(258), mVSP490024P(259), mVSP490048P(260)
+                                  Requested by Amogha for VOSS Seadart (Prem)"
+
+       REVISION "201812130000Z" -- 13 Dec. 2018
+       DESCRIPTION "Version 312:  Added bayStackZtpMib (bayStackMibs 50)
+                                  -Requested by Claudiu Mondoc (azmeu)"
+
+       REVISION "201811210000Z" -- 21 Nov. 2018
+       DESCRIPTION "Version 311:  Renamed mVSP7456VSC to mVSP740048Y8C"
+
+       REVISION "201808130000Z" -- 13 Aug. 2018
+       DESCRIPTION "Version 310:  Renamed mES6108-32c to mVSP7432CQ and 
+	   			  mES6108-48v-8c to mVSP7456VSC"
+
+       REVISION "201804090000Z" -- 09 April. 2018
+       DESCRIPTION "Version 309:  Added mES6108-32c(256),mES6108-48v-8c(257)"
+
 
        REVISION "201711290000Z" -- 29 Nov. 2017
        DESCRIPTION "Version 308:  Removed mVSP5030GSXuPWR(254),
@@ -66,7 +100,7 @@ synoptics MODULE-IDENTITY
 	   
        REVISION "201506260000Z" -- 20 June 2015
        DESCRIPTION "Version 299:  Change ,NetApp8032 to mCN3240"
-	   	
+	   
        REVISION "201505050000Z" -- 5 May 2015
        DESCRIPTION "Version 298:  Added registrations for ERS3550T and ERS3550T-PWR+ models."
 
@@ -441,27 +475,27 @@ SnpxChassisType ::=  TEXTUAL-CONVENTION
         mPassport1150(53),      -- product Passport 1150 L3 Switch
         mPassport1050(54),      -- product Passport 1050 L3 Switch
         mPassport1051(55),      -- product Passport 1051 L3 Switch
-        mERS8610(56),      -- product Passport 8610 L3 Switch
-        mERS8606(57),      -- product Passport 8606 L3 Switch
-        mERS8010(58),      -- product Passport 8010
-        mERS8006(59),      -- product Passport 8006
+        mPassport8610(56),      -- product Passport 8610 L3 Switch
+        mPassport8606(57),      -- product Passport 8606 L3 Switch
+        mPassport8010(58),      -- product Passport 8010
+        mPassport8006(59),      -- product Passport 8006
         mBayStack670(60),       -- product BayStack 670 wireless access point
-        mERS740(61),       -- product Passport 740 
-        mERS750(62),       -- product Passport 750 
-        mERS790(63),       -- product Passport 790
+        mPassport740(61),       -- product Passport 740 
+        mPassport750(62),       -- product Passport 750 
+        mPassport790(63),       -- product Passport 790
         mBPS2000(64),           -- product Business Policy Switch 2000 10/100 Switches
-        mERS8110(65),      -- product Passport 8110 L2 Switch
-        mERS8106(66),      -- product Passport 8106 L2 Switch
+        mPassport8110(65),      -- product Passport 8110 L2 Switch
+        mPassport8106(66),      -- product Passport 8106 L2 Switch
         mBayStack3580(67),      -- product BayStack 3580 Gig Switch
         mBayStack10(68),        -- product BayStack 10 Power Supply Unit
         mBayStack420(69),       -- product BayStack 420 10/100 Switch
         mMetro1200ESM(70),      -- product OPTera Metro 1200 Ethernet Service Module
-        mERS8010co(71),    -- product OPTera 8010co
-        mERS8610co(72),    -- product OPTera 8610co L3 switch
-        mERS8110co(73),    -- product OPTera 8110co L2 switch
-        mERS8003(74),      -- product OPTera 8003
-        mERS8603(75),      -- product OPTera 8603 L3 switch
-        mERS8103(76),      -- product OPTera 8103 L2 switch
+        mPassport8010co(71),    -- product OPTera 8010co
+        mPassport8610co(72),    -- product OPTera 8610co L3 switch
+        mPassport8110co(73),    -- product OPTera 8110co L2 switch
+        mPassport8003(74),      -- product OPTera 8003
+        mPassport8603(75),      -- product OPTera 8603 L3 switch
+        mPassport8103(76),      -- product OPTera 8103 L2 switch
         mBayStack380(77),       -- product BayStack 380 10/100/1000 Switch
         mES470-48T(78),             -- product Ethernet Switch 470-48T
         mMetro1450ESM(79),      -- product OPTera Metro 1450 Ethernet Service Module
@@ -476,16 +510,16 @@ SnpxChassisType ::=  TEXTUAL-CONVENTION
         mAlteonAD3(88),         -- product Alteon AD3
         mAlteon184(89),         -- product Alteon 184
         mAlteonAD4(90),         -- product Alteon AD4
-        mERS1424(91),      -- product Passport 1424 L3 switch
-        mERS1648(92),      -- product Passport 1648 L3 switch
-        mERS1612(93),      -- product Passport 1612 L3 switch
-        mERS1624(94),      -- product Passport 1624 L3 switch 
+        mPassport1424(91),      -- product Passport 1424 L3 switch
+        mPassport1648(92),      -- product Passport 1648 L3 switch
+        mPassport1612(93),      -- product Passport 1612 L3 switch
+        mPassport1624(94),      -- product Passport 1624 L3 switch 
         mBayStack380-24F(95),   -- product BayStack 380-24F Fiber 1000 Switch
         mERS5510-24T(96),       -- product Ethernet Routing Switch 5510-24T
         mERS5510-48T(97),       -- product Ethernet Routing Switch 5510-48T
         mES470-24T(98),         -- product Ethernet Switch 470-24T
         mWLANAccessPoint2220(99),   -- product Nortel Networks Wireless LAN Access Point 2220
-        mERS2402(100),         -- product Passport RBS 2402 L3 switch
+        mPassport2402(100),         -- product Passport RBS 2402 L3 switch
         mAlteon2424(101),           -- product Alteon Application Switch 2424  
         mAlteon2224(102),           -- product Alteon Application Switch 2224 
         mAlteon2208(103),           -- product Alteon Application Switch 2208 
@@ -498,8 +532,8 @@ SnpxChassisType ::=  TEXTUAL-CONVENTION
         mWLANAccessPoint2221(110),    -- product Nortel Networks Wireless LAN Access Point 2221
         mMetroESU1800-24T(111),       -- product Nortel Metro Ethernet Service Unit 24-T SPF switch
         mMetroESU1800-24T-LX-DC(112), -- product Nortel Metro Ethernet Service Unit 24-T LX DC switch
-        mERS8310(113),         -- product Passport 8300 10-slot chassis
-        mERS8306(114),         -- product Passport 8300 6-slot chassis
+        mPassport8310(113),         -- product Passport 8300 10-slot chassis
+        mPassport8306(114),         -- product Passport 8300 6-slot chassis
         mERS5520-24T-PWR(115),      -- product Ethernet Routing Switch 5520-24T-PWR
         mERS5520-48T-PWR(116),      -- product Ethernet Routing Switch 5520-48T-PWR
         mNnVPNGw3050(117),          -- product Nortel Networks VPN Gateway 3050
@@ -639,8 +673,25 @@ SnpxChassisType ::=  TEXTUAL-CONVENTION
         mERS3650GTS-PWR-PLUS(251),  -- Ethernet Routing Switch 3650GTS-PWR+  
         mVSP8608(252),              -- Virtual Services Platform 8608
         mERS5928MTS-UPWR(253),      -- Ethernet Routing Switch 5928MTS-uPWR
-        mDSGDPM624(254),       -- APLS Virtual Services Platform DSGDPM624
-        mDSGDPM648(255)        -- APLS Virtual Services Platform DSGDPM648	
+        mDSGDPM624(254),            -- APLS Virtual Services Platform DSGDPM624
+        mDSGDPM648(255),            -- APLS Virtual Services Platform DSGDPM648
+        mVSP7432CQ(256),            -- Virtual Services Platform 7432CQ
+	mVSP740048Y8C(257),         -- Virtual Services Platform Display: VSP7400-48Y-8C
+        mVSP1100(258),               -- Voss as a service
+	mVSP490024P(259),            -- Virtual Services Platform Display: VSP4900-24P
+        mVSP490048P(260),            -- Virtual Services Platform Display: VSP4900-48P
+        mXA1440(261),               -- MicroVSP 4-core
+        mXA1480(262),               -- MicroVSP 8-core
+        mVSP490024XE(263),          -- Virtual Services Platform Display: VSP4900-24XE
+        mVSP490012MXU12XE(264),     -- Virtual Services Platform Display: VSP4900-12MXU-12XE
+        mVSP490024S(265),           -- Virtual Services Platform Display: VSP4900-24S
+        m552048TVOSS(266),          -- Virtual Services Platform Display: 5520-48T-VOSS
+        m552048WVOSS(267),          -- Virtual Services Platform Display: 5520-48W-VOSS
+        m552012MW36WVOSS(268),      -- Virtual Services Platform Display: 5520-12MW-36W-VOSS
+        m552024TVOSS(269),          -- Virtual Services Platform Display: 5520-24T-VOSS
+        m552024WVOSS(270),          -- Virtual Services Platform Display: 5520-24W-VOSS
+        m552024XVOSS(271),          -- Virtual Services Platform Display: 5520-24X-VOSS
+        m552048SEVOSS(272)          -- Virtual Services Platform Display: 5520-48SE-VOSS
         }
 
 -- Top Branches under "synoptics"

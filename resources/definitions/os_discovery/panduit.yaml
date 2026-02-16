@@ -1,4 +1,3 @@
-mib: PANDUIT-MIB
 modules:
     os:
         hardware: PANDUIT-MIB::pdug5PartNumber.1
@@ -12,20 +11,21 @@ modules:
         state:
               data:
                   -
-                    oid: pdug5IdentEntry
-                    value: pdug5Status
+                    oid: PANDUIT-MIB::pdug5IdentEntry
+                    value: PANDUIT-MIB::pdug5Status
                     num_oid: '.1.3.6.1.4.1.19536.10.1.1.2.1.9.{{ $index }}'
-                    descr: 'System {{ index }} Overall Status'
+                    descr: 'System {{ $index }} Overall Status'
+                    state_name: pdug5IdentEntry
                     states:
                       - { descr: 'Other', graph: 0, value: 1, generic: 3 }
                       - { descr: 'OK', graph: 0, value: 2, generic: 0 }
                       - { descr: 'degraded', graph: 0, value: 3, generic: 1 }
                       - { descr: 'failed', graph: 0, value: 4, generic: 2 }
                   -
-                    oid: pdug5GroupEntry
-                    value: pdug5GroupBreakerStatus
+                    oid: PANDUIT-MIB::pdug5GroupEntry
+                    value: PANDUIT-MIB::pdug5GroupBreakerStatus
                     num_oid: '.1.3.6.1.4.1.19536.10.1.3.1.1.26.{{ $index }}'
-                    descr: 'Breaker {{ pdug5GroupName }} Status'
+                    descr: 'Breaker {{ PANDUIT-MIB::pdug5GroupName }} Status'
                     index: 'pdug5GroupBreakerStatus.{{ $index }}'
                     state_name: pdug5GroupBreakerStatus
                     states:
@@ -34,16 +34,17 @@ modules:
                       - { descr: 'Off', graph: 0, value: 3, generic: 2 }
                     skip_values:
                         -
-                          oid: pdug5GroupBreakerStatus
+                          oid: PANDUIT-MIB::pdug5GroupBreakerStatus
                           op: '='
                           value: 0
                   -
-                    oid: pdug5Outlet
-                    value: pdug5OutletControlStatus
+                    oid: PANDUIT-MIB::pdug5Outlet
+                    value: PANDUIT-MIB::pdug5OutletControlStatus
                     index: 'pdug5OutletIndex.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.19536.10.1.5.2.1.1.{{ $index }}'
-                    descr: '{{ $pdug5OutletName }} (#{{ $subindex1 }}) State'
+                    descr: '{{ PANDUIT-MIB::pdug5OutletName }} (#{{ $subindex1 }}) State'
                     group: 'Outlets'
+                    state_name: pdug5Outlet
                     states:
                         - { value: 1, generic: 3, descr: off, graph: 0 }
                         - { value: 2, generic: 0, descr: on, graph: 0 }
@@ -51,159 +52,159 @@ modules:
                         - { value: 4, generic: 2, descr: pendingOn, graph: 0 }
                     skip_values:
                         -
-                          oid: 'pdug5OutletIndex'
+                          oid: 'PANDUIT-MIB::pdug5OutletIndex'
                           op: '='
                           value: 0
         power:
             data:
                 -
-                    oid: pdug5GroupEntry
-                    value: pdug5GroupPowerWatts
+                    oid: PANDUIT-MIB::pdug5GroupEntry
+                    value: PANDUIT-MIB::pdug5GroupPowerWatts
                     num_oid: '.1.3.6.1.4.1.19536.10.1.3.1.1.20.{{ $index }}'
                     multiplier: 1
-                    descr: 'Breaker {{ $pdug5GroupName }} Output'
+                    descr: 'Breaker {{ PANDUIT-MIB::pdug5GroupName }} Output'
                     group: breakers
                     index: 'pdug5GroupPowerWatts.{{ $index }}'
                     skip_values:
                         -
-                             oid: pdug5GroupName
+                             oid: PANDUIT-MIB::pdug5GroupName
                              op: '='
                              value: '.'
                 -
-                    oid: pdug5InputEntry
-                    value: pdug5InputPowerWatts
+                    oid: PANDUIT-MIB::pdug5InputEntry
+                    value: PANDUIT-MIB::pdug5InputPowerWatts
                     num_oid: '.1.3.6.1.4.1.19536.10.1.2.1.1.5.{{ $index }}'
                     multiplier: 1
                     descr: 'Input power'
                 -
-                    oid: pdug5OutletEntry
-                    value: pdug5OutletWatts
+                    oid: PANDUIT-MIB::pdug5OutletEntry
+                    value: PANDUIT-MIB::pdug5OutletWatts
                     num_oid: '.1.3.6.1.4.1.19536.10.1.5.1.1.13.{{ $index }}'
                     multiplier: 1
-                    descr: '{{ $pdug5OutletName }} (#{{ $subindex1 }})'
+                    descr: '{{ PANDUIT-MIB::pdug5OutletName }} (#{{ $subindex1 }})'
                     group: outlets
                     index: 'pdug5OutletIndex.{{ $index }}'
                     skip_values:
                         -
-                          oid: pdug5OutletIndex
+                          oid: PANDUIT-MIB::pdug5OutletIndex
                           op: '='
                           value: 0
         power_factor:
             data:
                 -
-                    oid: pdug5InputPhaseEntry
-                    value: pdug5InputPhasePowerFactor
+                    oid: PANDUIT-MIB::pdug5InputPhaseEntry
+                    value: PANDUIT-MIB::pdug5InputPhasePowerFactor
                     index: 'pdug5InputPhaseIndex.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.19536.10.1.2.2.1.23.{{ $index }}'
-                    descr: '{{ $pdug5InputPhasePowerMeasType }} Power Factor'
+                    descr: '{{ PANDUIT-MIB::pdug5InputPhasePowerMeasType }} Power Factor'
                     divisor: 100
                     skip_values:
                       -
-                        oid: pdug5InputPhaseIndex
+                        oid: PANDUIT-MIB::pdug5InputPhaseIndex
                         op: '='
                         value: 0
         current:
             data:
                 -
-                    oid: pdug5GroupEntry
-                    value: pdug5GroupCurrent
+                    oid: PANDUIT-MIB::pdug5GroupEntry
+                    value: PANDUIT-MIB::pdug5GroupCurrent
                     num_oid: '.1.3.6.1.4.1.19536.10.1.3.1.1.12.{{ $index }}'
-                    descr: 'Breaker {{ $pdug5GroupName }} Current'
+                    descr: 'Breaker {{ PANDUIT-MIB::pdug5GroupName }} Current'
                     group: breakers
                     divisor: 100
                     index: 'pdug5GroupCurrent.{{ $index }}'
-                    high_limit: pdug5GroupCurrentThUpperCritical
-                    warn_limit: pdug5GroupCurrentThUpperWarning
+                    high_limit: PANDUIT-MIB::pdug5GroupCurrentThUpperCritical
+                    warn_limit: PANDUIT-MIB::pdug5GroupCurrentThUpperWarning
                     skip_values:
                         -
-                             oid: pdug5GroupName
+                             oid: PANDUIT-MIB::pdug5GroupName
                              op: '='
                              value: '.'
                 -
-                    oid: pdug5InputEntry
-                    value: pdug5InputTotalCurrent
+                    oid: PANDUIT-MIB::pdug5InputEntry
+                    value: PANDUIT-MIB::pdug5InputTotalCurrent
                     num_oid: '.1.3.6.1.4.1.19536.10.1.2.1.1.11.{{ $index }}'
                     divisor: 100
                     descr: 'Input current'
         voltage:
             data:
                 -
-                    oid: pdug5GroupEntry
-                    value: pdug5GroupVoltage
+                    oid: PANDUIT-MIB::pdug5GroupEntry
+                    value: PANDUIT-MIB::pdug5GroupVoltage
                     num_oid: '.1.3.6.1.4.1.19536.10.1.3.1.1.5.{{ $index }}'
                     divisor: 10
-                    descr: 'Breaker {{ $pdug5GroupName }} Voltage'
+                    descr: 'Breaker {{ PANDUIT-MIB::pdug5GroupName }} Voltage'
                     group: breakers
                     index: 'pdug5GroupVoltage.{{ $index }}'
                     skip_values:
                         -
-                            oid: pdug5GroupName
+                            oid: PANDUIT-MIB::pdug5GroupName
                             op: '='
                             value: '.'
         frequency:
               data:
                   -
-                    oid: pdug5InputEntry
-                    value: pdug5InputFrequency
+                    oid: PANDUIT-MIB::pdug5InputEntry
+                    value: PANDUIT-MIB::pdug5InputFrequency
                     num_oid: '.1.3.6.1.4.1.19536.10.1.2.1.1.2.{{ $index }}'
                     divisor: 10
                     descr: 'Input frequency'
         load:
               data:
                   -
-                    oid: pdug5InputPhaseTable
-                    value: pdug5InputPhaseCurrentPercentLoad
+                    oid: PANDUIT-MIB::pdug5InputPhaseTable
+                    value: PANDUIT-MIB::pdug5InputPhaseCurrentPercentLoad
                     num_oid: '.1.3.6.1.4.1.19536.10.1.2.2.1.17.{{ $index }}'
-                    descr: '{{ pdug5InputPhasePowerMeasType }} Input Load'
+                    descr: '{{ PANDUIT-MIB::pdug5InputPhasePowerMeasType }} Input Load'
                     index: 'pdug5InputPhaseIndex.{{ $index }}'
                     skip_values:
                       -
-                        oid: pdug5InputPhaseIndex
+                        oid: PANDUIT-MIB::pdug5InputPhaseIndex
                         op: '='
                         value: 0
                   -
-                    oid: pdug5GroupEntry
-                    value: pdug5GroupCurrentPercentLoad
+                    oid: PANDUIT-MIB::pdug5GroupEntry
+                    value: PANDUIT-MIB::pdug5GroupCurrentPercentLoad
                     num_oid: '.1.3.6.1.4.1.19536.10.1.3.1.1.18.{{ $index }}'
-                    descr: 'Breaker {{ pdug5GroupName }} Output Load'
+                    descr: 'Breaker {{ PANDUIT-MIB::pdug5GroupName }} Output Load'
                     group: breakers
                     skip_values:
                       -
-                        oid: pdug5GroupName
+                        oid: PANDUIT-MIB::pdug5GroupName
                         op: '='
                         value: '.'
         temperature:
             data:
                   -
-                    oid: pdug5TemperatureTable
-                    value: pdug5TemperatureValue
+                    oid: PANDUIT-MIB::pdug5TemperatureTable
+                    value: PANDUIT-MIB::pdug5TemperatureValue
                     index: 'pdug5TemperatureIndex.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.19536.10.1.4.2.1.4.{{ $index }}'
-                    descr: '{{ $pdug5TemperatureName }} Temperature sensor'
-                    low_limit: pdug5TemperatureThLowerCritical
-                    low_warn_limit: pdug5TemperatureThLowerWarning
-                    warn_limit: pdug5TemperatureThUpperWarning
-                    high_limit: pdug5TemperatureThUpperCritical
+                    descr: '{{ PANDUIT-MIB::pdug5TemperatureName }} Temperature sensor'
+                    low_limit: PANDUIT-MIB::pdug5TemperatureThLowerCritical
+                    low_warn_limit: PANDUIT-MIB::pdug5TemperatureThLowerWarning
+                    warn_limit: PANDUIT-MIB::pdug5TemperatureThUpperWarning
+                    high_limit: PANDUIT-MIB::pdug5TemperatureThUpperCritical
                     skip_values:
                     -
-                        oid: 'pdug5TemperatureProbeStatus'
+                        oid: 'PANDUIT-MIB::pdug5TemperatureProbeStatus'
                         op: '=='
                         value: '1'
         humidity:
             data:
                   -
-                    oid: pdug5HumidityTable
-                    value: pdug5HumidityValue
+                    oid: PANDUIT-MIB::pdug5HumidityTable
+                    value: PANDUIT-MIB::pdug5HumidityValue
                     index: 'pdug5HumidityIndex.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.19536.10.1.4.3.1.4.{{ $index }}'
-                    descr: '{{ $pdug5HumidityName.0.1 }} Humidity sensor'
-                    low_limit: pdug5HumidityThLowerCritical
-                    low_warn_limit: pdug5HumidityThLowerWarning
-                    warn_limit: pdug5HumidityThUpperWarning
-                    high_limit: pdug5HumidityThUpperCritical
+                    descr: '{{ PANDUIT-MIB::pdug5HumidityName.0.1 }} Humidity sensor'
+                    low_limit: PANDUIT-MIB::pdug5HumidityThLowerCritical
+                    low_warn_limit: PANDUIT-MIB::pdug5HumidityThLowerWarning
+                    warn_limit: PANDUIT-MIB::pdug5HumidityThUpperWarning
+                    high_limit: PANDUIT-MIB::pdug5HumidityThUpperCritical
                     group: 'Sensors'
                     skip_values:
                     -
-                        oid: 'pdug5HumidityProbeStatus'
+                        oid: 'PANDUIT-MIB::pdug5HumidityProbeStatus'
                         op: '=='
                         value: '1'

@@ -1,4 +1,3 @@
-mib: STONESOFT-SMI-MIB:STONESOFT-FIREWALL-MIB:STONESOFT-NETNODE-MIB
 modules:
     mempools:
         data:

@@ -1,4 +1,3 @@
-mib: IONODES-IONSERIES-MIB
 modules:
     mempools:
         data:
@@ -8,25 +7,25 @@ modules:
     processors:
         data:
             -
-                oid: ionSysCpuUsage
+                oid: IONODES-IONSERIES-MIB::ionSysCpuUsage
                 num_oid: '.1.3.6.1.4.1.40748.2.1.{{ $index }}'
                 descr: 'CPU usage'
                 index: 'ionSysCpuUsage.{{ $index }}'
-                value: ionSysCpuUsage
+                value: IONODES-IONSERIES-MIBionSysCpuUsage
     sensors:
         additional_oids:
             data:
                 -
                     oid:
-                        - ionVInDescr
+                        - IONODES-IONSERIES-MIB::ionVInDescr
         state:
             data:
                 -
-                    oid: ionVInAnalogSignalLock
+                    oid: IONODES-IONSERIES-MIB::ionVInAnalogSignalLock
                     num_oid: '.1.3.6.1.4.1.40748.3.2.1.3.{{ $index }}'
-                    descr: '{{ $ionVInDescr }}'
+                    descr: '{{ IONODES-IONSERIES-MIB::ionVInDescr }}'
                     index: 'ionVInAnalogSignalLock.{{ $index }}'
-                    value: ionVInAnalogSignalLock
+                    value: IONODES-IONSERIES-MIB::ionVInAnalogSignalLock
                     state_name: videoInputStatus
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: present }
@@ -34,8 +33,8 @@ modules:
         temperature:
             data:
                 -
-                    oid: ionSysTemperature
+                    oid: IONODES-IONSERIES-MIB::ionSysTemperature
                     num_oid: '.1.3.6.1.4.1.40748.2.3.{{ $index }}'
                     descr: 'System Temperature'
                     index: 'ionSysTemperature.{{ $index }}'
-                    value: ionSysTemperature
+                    value: IONODES-IONSERIES-MIB::ionSysTemperature

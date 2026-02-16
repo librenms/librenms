@@ -1,4 +1,3 @@
-mib: CELLULAR:DEVICE:PEPVPN-SPEEDFUSION:WAN:WLC
 modules:
     os:
         hardware: DEVICE::deviceModel.0
@@ -9,13 +8,13 @@ modules:
             data:
                 -
                     oid:
-                        - devicePowerSourceName
-                        - wanName
-                        - pepVpnStatusProfileName
+                        - DEVICE::devicePowerSourceName
+                        - WAN::wanName
+                        - PEPVPN-SPEEDFUSION::pepVpnStatusProfileName
         temperature:
             data:
                 -
-                    oid: deviceTemperatureCelsius
+                    oid: DEVICE::deviceTemperatureCelsius
                     num_oid: ".1.3.6.1.4.1.27662.200.1.1.1.4.4.1.{{ $index }}"
                     descr: System Temperature
                     index: "deviceTemperatureCelsius.{{ $index }}"
@@ -23,31 +22,31 @@ modules:
         count:
             data:
                 -
-                    oid: wlcMaxNumAp
+                    oid: WLC::wlcMaxNumAp
                     num_oid: ".1.3.6.1.4.1.27662.4.1.1.3.{{ $index }}"
                     descr: Max. Number of Supported AP Licensed
                     group: WLC
                     index: "wlcMaxNumAp.{{ $index }}"
                 -
-                    oid: wlcNumApProfile
+                    oid: WLC::wlcNumApProfile
                     num_oid: ".1.3.6.1.4.1.27662.4.1.1.4.{{ $index }}"
                     descr: Number of AP Profile Created
                     group: WLC
                     index: "wlcNumApProfile.{{ $index }}"
                 -
-                    oid: wlcNumWlanNetwork
+                    oid: WLC::wlcNumWlanNetwork
                     num_oid: ".1.3.6.1.4.1.27662.4.1.1.5.{{ $index }}"
                     descr: Number of WLAN Network Created
                     group: WLC
                     index: "wlcNumWlanNetwork.{{ $index }}"
                 -
-                    oid: wlcNumApReg
+                    oid: WLC::wlcNumApReg
                     num_oid: ".1.3.6.1.4.1.27662.4.1.1.6.{{ $index }}"
                     descr: Number of AP Registered
                     group: WLC
                     index: "wlcNumApReg.{{ $index }}"
                 -
-                    oid: wlcNumAssocSta
+                    oid: WLC::wlcNumAssocSta
                     num_oid: ".1.3.6.1.4.1.27662.4.1.1.8.{{ $index }}"
                     descr: Number of Associated WLAN Station
                     group: WLC
@@ -55,7 +54,7 @@ modules:
         power:
             data:
                 -
-                    oid: deviceCurrentPower
+                    oid: DEVICE::deviceCurrentPower
                     num_oid: ".1.3.6.1.4.1.27662.200.1.1.1.4.1.1.3.{{ $index }}"
                     descr: Power Consumption
                     index: "deviceCurrentPower.{{ $index }}"
@@ -64,15 +63,15 @@ modules:
                 skip_values: -9999
             data:
                 -
-                    oid: wanSignal
+                    oid: WAN::wanSignal
                     num_oid: ".1.3.6.1.4.1.27662.2.1.2.1.5.{{ $index }}"
-                    descr: "{{ $wanName }} Signal"
+                    descr: "{{ WAN::wanName }} Signal"
                     index: "wanSignal.{{ $index }}"
 
         state:
             data:
                 -
-                    oid: devicePSUStatus
+                    oid: DEVICE::devicePSUStatus
                     num_oid: ".1.3.6.1.4.1.27662.200.1.1.1.4.1.1.2.{{ $index }}"
                     descr: PSU Status
                     group: Power Consumption
@@ -81,7 +80,7 @@ modules:
                         - { descr: error, graph: 1, value: 0, generic: 2 }
                         - { descr: on, graph: 1, value: 1, generic: 0 }
                 -
-                    oid: deviceFANStatus
+                    oid: DEVICE::deviceFANStatus
                     num_oid: ".1.3.6.1.4.1.27662.200.1.1.1.4.4.1.{{ $index }}"
                     descr: FAN Status
                     group: Fan
@@ -90,9 +89,9 @@ modules:
                         - { descr: error, graph: 1, value: 0, generic: 2 }
                         - { descr: on, graph: 1, value: 1, generic: 0 }
                 -
-                    oid: devicePowerSourceStatus
+                    oid: DEVICE::devicePowerSourceStatus
                     num_oid: ".1.3.6.1.4.1.27662.200.1.1.1.4.3.1.3.{{ $index }}"
-                    descr: "{{ $devicePowerSourceName }}"
+                    descr: "{{ DEVICE::devicePowerSourceName }}"
                     group: "Power Source"
                     index: "devicePowerSourceStatus.{{ $index }}"
                     state_name: devicePowerSourceStatus
@@ -100,9 +99,9 @@ modules:
                         - { descr: noCableDetected, graph: 1, value: 0, generic: 3 }
                         - { descr: connected, graph: 1, value: 1, generic: 0 }
                 -
-                    oid: pepVpnStatusConnectionState
+                    oid: PEPVPN-SPEEDFUSION::pepVpnStatusConnectionState
                     num_oid: ".1.3.6.1.4.1.23695.200.1.10.1.1.2.1.3.{{ $index }}"
-                    descr: "{{ $pepVpnStatusProfileName }}"
+                    descr: "{{ PEPVPN-SPEEDFUSION::pepVpnStatusProfileName }}"
                     group: "VPN"
                     index: "pepVpnStatusConnectionState.{{ $index }}"
                     state_name: pepVpnStatusConnectionState
@@ -113,9 +112,9 @@ modules:
                         - { descr: route, graph: 1, value: 3, generic: 3 }
                         - { descr: connected, graph: 1, value: 4, generic: 0 }
                 -
-                    oid: wanState
+                    oid: WAN::wanState
                     num_oid: ".1.3.6.1.4.1.27662.2.1.2.1.3.{{ $index }}"
-                    descr: "{{ $wanName }}"
+                    descr: "{{ WAN::wanName }}"
                     group: "WAN"
                     index: "wanState.{{ $index }}"
                     state_name: wanState

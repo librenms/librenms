@@ -1,85 +1,86 @@
-mib: LIEBERT-GP-AGENT-MIB:LIEBERT-GP-PDU-MIB:LIEBERT-GP-ENVIRONMENTAL-MIB:LIEBERT-GP-POWER-MIB
 modules:
     sensors:
         temperature:
             data:
                 -
-                    oid: lgpPduAuxMeasTable
-                    value: lgpPduAuxMeasTempDegC
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduAuxMeasTable
+                    value: LIEBERT-GP-PDU-MIB::lgpPduAuxMeasTempDegC
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.60.15.1.70.{{ $index }}'
-                    descr: 'Temp for {{ $lgpPduAuxMeasUsrLabel }}'
+                    descr: 'Temp for {{ LIEBERT-GP-PDU-MIB::lgpPduAuxMeasUsrLabel }}'
                     index: 'lgpPduAuxMeasTempDegC.{{ $index }}'
                     divisor: 10
-                    low_limit: lgpPduAuxMeasTempThrshldUndrAlmDegC
-                    low_warn_limit: lgpPduAuxMeasTempThrshldUndrWarnDegC
-                    warn_limit: lgpPduAuxMeasTempThrshldOvrWarnDegC
-                    high_limit: lgpPduAuxMeasTempThrshldOvrAlmDegC
+                    low_limit: LIEBERT-GP-PDU-MIB::lgpPduAuxMeasTempThrshldUndrAlmDegC
+                    low_warn_limit: LIEBERT-GP-PDU-MIB::lgpPduAuxMeasTempThrshldUndrWarnDegC
+                    warn_limit: LIEBERT-GP-PDU-MIB::lgpPduAuxMeasTempThrshldOvrWarnDegC
+                    high_limit: LIEBERT-GP-PDU-MIB::lgpPduAuxMeasTempThrshldOvrAlmDegC
                 -
-                    oid: lgpEnvTemperatureTableDegC
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvTemperatureTableDegC
                     value: lgpEnvTemperatureSetPointDegC
+                    snmp_flags: ['-OteQUsab', '-Pu']
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.1.3.3.1.6.{{ $index }}'
-                    descr: 'Setpoint for {{ $lgpEnvTemperatureDescrDegC }}'
+                    descr: 'Setpoint for {{ lgpEnvTemperatureDescrDegC }}'
                     index: 'lgpEnvTemperatureSetPointDegC.{{ $index }}'
         humidity:
             data:
                 -
-                    oid: lgpPduAuxMeasTable
-                    value: lgpPduAuxMeasHum
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduAuxMeasTable
+                    value: LIEBERT-GP-PDU-MIB::lgpPduAuxMeasHum
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.60.15.1.95.{{ $index }}'
-                    descr: 'Humidity for {{ $lgpPduAuxMeasUsrLabel }}'
+                    descr: 'Humidity for {{ LIEBERT-GP-PDU-MIB::lgpPduAuxMeasUsrLabel }}'
                     index: 'lgpPduAuxMeasHum.{{ $index }}'
                     divisor: 10
-                    low_limit: lgpPduAuxMeasHumThrshldUndrAlm
-                    low_warn_limit: lgpPduAuxMeasHumThrshldUndrWarn
-                    warn_limit: lgpPduAuxMeasHumThrshldOvrWarn
-                    high_limit: lgpPduAuxMeasHumThrshldOvrAlm
+                    low_limit: LIEBERT-GP-PDU-MIB::lgpPduAuxMeasHumThrshldUndrAlm
+                    low_warn_limit: LIEBERT-GP-PDU-MIB::lgpPduAuxMeasHumThrshldUndrWarn
+                    warn_limit: LIEBERT-GP-PDU-MIB::lgpPduAuxMeasHumThrshldOvrWarn
+                    high_limit: LIEBERT-GP-PDU-MIB::lgpPduAuxMeasHumThrshldOvrAlm
                 -
-                    oid: lgpEnvHumidityTableRel
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvHumidityTableRel
                     value: lgpEnvHumiditySetPoint
+                    snmp_flags: ['-OteQUsab', '-Pu']
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.6.{{ $index }}'
-                    descr: 'Setpoint for {{ $lgpEnvHumidityDescrRel }}'
+                    descr: 'Setpoint for {{ lgpEnvHumidityDescrRel }}'
                     index: 'lgpEnvHumiditySetPoint.{{ $index }}'
         voltage:
             data:
                 -
-                    oid: lgpPduPsLineTable
-                    value: lgpPduPsLineEntryEpLNTenths
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduPsLineTable
+                    value: LIEBERT-GP-PDU-MIB::lgpPduPsLineEntryEpLNTenths
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.30.40.1.19.{{ $index }}'
-                    descr: 'AC RMS {{ $lgpPduPsLineEntryLine }}'
+                    descr: 'AC RMS {{ LIEBERT-GP-PDU-MIB::lgpPduPsLineEntryLine }}'
                     index: 'lgpPduPsLineEntryEpLNTenths.{{ $index }}'
                     divisor: 10
                 -
-                    oid: lgpPduRcpTable
-                    value: lgpPduRcpEntryEp
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduRcpTable
+                    value: LIEBERT-GP-PDU-MIB::lgpPduRcpEntryEp
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.55.{{ $index }}'
-                    descr: 'Voltage {{ $lgpPduRcpEntryUsrLabel }}'
+                    descr: 'Voltage {{ LIEBERT-GP-PDU-MIB::lgpPduRcpEntryUsrLabel }}'
                     index: 'lgpPduRcpEntryEp.{{ $index }}'
         power:
             data:
                 -
-                    oid: lgpPduPsTable
-                    value: lgpPduPsEntryPwrTotal
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduPsTable
+                    value: LIEBERT-GP-PDU-MIB::lgpPduPsEntryPwrTotal
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.30.20.1.65.{{ $index }}'
-                    descr: 'Total for {{ $lgpPduPsEntryModel }}'
+                    descr: 'Total for {{ LIEBERT-GP-PDU-MIB::lgpPduPsEntryModel }}'
                     index: 'lgpPduPsEntryPwrTotal.{{ $index }}'
                 -
-                    oid: lgpPduPsTable
-                    value: lgpPduPsEntryApTotal
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduPsTable
+                    value: LIEBERT-GP-PDU-MIB::lgpPduPsEntryApTotal
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.30.20.1.90.{{ $index }}'
-                    descr: 'Apparent Power {{ $lgpPduPsEntryModel }}'
+                    descr: 'Apparent Power {{ LIEBERT-GP-PDU-MIB::lgpPduPsEntryModel }}'
                     index: 'lgpPduPsEntryApTotal.{{ $index }}'
                     group: ApparentPower
                 -
-                    oid: lgpPduRcpTable
-                    value: lgpPduRcpEntryPwrOut
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduRcpTable
+                    value: LIEBERT-GP-PDU-MIB::lgpPduRcpEntryPwrOut
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.65.{{ $index }}'
-                    descr: 'Power {{ $lgpPduRcpEntryUsrLabel }}'
+                    descr: 'Power {{ LIEBERT-GP-PDU-MIB::lgpPduRcpEntryUsrLabel }}'
                     index: 'lgpPduRcpEntryPwrOut.{{ $index }}'
                 -
-                    oid: lgpPduRcpTable
-                    value: lgpPduRcpEntryApOut
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduRcpTable
+                    value: LIEBERT-GP-PDU-MIB::lgpPduRcpEntryApOut
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.70.{{ $index }}'
-                    descr: 'Apparent Power {{ $lgpPduRcpEntryUsrLabel }}'
+                    descr: 'Apparent Power {{ LIEBERT-GP-PDU-MIB::lgpPduRcpEntryUsrLabel }}'
                     index: 'lgpPduRcpEntryApOut.{{ $index }}'
                     group: ApparentPower
                 -
@@ -90,47 +91,48 @@ modules:
                     index: 'lgpFlexibleEntryValue.{{ $index }}'
                     multiplier: 1000
                     skip_values:
-                        - 
+                        -
                             oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataLabel
-                            op: '!==' 
+                            op: '!=='
                             value: 'System Output Power'
         current:
             data:
                 -
-                    oid: lgpPduRbTable
-                    value: lgpPduRbEntryEcAvailBeforeAlarmHundredths
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduRbTable
+                    value: LIEBERT-GP-PDU-MIB::lgpPduRbEntryEcAvailBeforeAlarmHundredths
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.40.20.1.150.{{ $index }}'
-                    descr: 'Before Alarm {{ $lgpPduRbEntryUsrLabel }}'
+                    descr: 'Before Alarm {{ LIEBERT-GP-PDU-MIB::lgpPduRbEntryUsrLabel }}'
                     index: 'lgpPduRbEntryEcAvailBeforeAlarmHundredths.{{ $index }}'
                     divisor: 100
                     group: Available
                 -
-                    oid: lgpPduRcpTable
-                    value: lgpPduRcpEntryEc
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduRcpTable
+                    value: LIEBERT-GP-PDU-MIB::lgpPduRcpEntryEc
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.60.{{ $index }}'
-                    descr: 'Current {{ $lgpPduRcpEntryUsrLabel }}'
+                    descr: 'Current {{ LIEBERT-GP-PDU-MIB::lgpPduRcpEntryUsrLabel }}'
                     divisor: 10
                     index: 'lgpPduRcpEntryEc.{{ $index }}'
         count:
             data:
                 -
-                    oid: lgpPduRbTable
-                    value: lgpPduRbEntryEcUsedBeforeAlarm
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduRbTable
+                    value: LIEBERT-GP-PDU-MIB::lgpPduRbEntryEcUsedBeforeAlarm
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.40.20.1.160.{{ $index }}'
-                    descr: 'Utilization Percent {{ $lgpPduRbEntryUsrLabel }}'
+                    descr: 'Utilization Percent {{ LIEBERT-GP-PDU-MIB::lgpPduRbEntryUsrLabel }}'
                     index: 'lgpPduRbEntryEcAvailBeforeAlarmHundredths.{{ $index }}'
                     divisor: 10
                 -
-                    oid: lgpEnvOperationalTimeTable
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvOperationalTimeTable
                     value: lgpEnvOperationTimeValue
+                    snmp_flags: ['-OteQUsab', '-Pu']
                     group: 'Operating Time'
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.4.32.1.5.{{ $index }}'
-                    descr: '{{ $lgpEnvOperationTimePoint }} - ID {{ $lgpEnvOperationTimeSubID }}'
+                    descr: '{{ lgpEnvOperationTimePoint }} - ID {{ lgpEnvOperationTimeSubID }}'
                     index: '.1.3.6.1.4.1.476.1.42.3.4.4.32.1.1.{{ $index }}'
         state:
             data:
                 -
-                    oid: lgpAgentTelnetEnabled
+                    oid: LIEBERT-GP-AGENT-MIB::lgpAgentTelnetEnabled
                     num_oid: '.1.3.6.1.4.1.476.1.42.2.5.2.{{ $index }}'
                     descr: Telnet Enabled
                     index: 'lgpAgentTelnetEnabled.{{ $index }}'
@@ -139,7 +141,7 @@ modules:
                         - { value: 1, graph: 0, descr: yes, generic: 0 }
                         - { value: 2, graph: 0, descr: no, generic: 2 }
                 -
-                    oid: lgpAgentVelocityServerEnabled
+                    oid: LIEBERT-GP-AGENT-MIB::lgpAgentVelocityServerEnabled
                     num_oid: '.1.3.6.1.4.1.476.1.42.2.5.3.{{ $index }}'
                     descr: Velocity Server Enabled
                     index: 'lgpAgentVelocityServerEnabled.{{ $index }}'
@@ -148,7 +150,7 @@ modules:
                         - { value: 1, graph: 0, descr: yes, generic: 0 }
                         - { value: 2, graph: 0, descr: no, generic: 2 }
                 -
-                    oid: lgpAgentWebServerMode
+                    oid: LIEBERT-GP-AGENT-MIB::lgpAgentWebServerMode
                     num_oid: '.1.3.6.1.4.1.476.1.42.2.5.4.{{ $index }}'
                     descr: Webserver Mode
                     index: 'lgpAgentWebServerMode.{{ $index }}'
@@ -158,7 +160,7 @@ modules:
                         - { value: 1, graph: 0, descr: http, generic: 1 }
                         - { value: 2, graph: 0, descr: https, generic: 0 }
                 -
-                    oid: lgpPduEntrySysStatus
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduEntrySysStatus
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.20.1.25.{{ $index }}'
                     descr: System Status
                     index: 'lgpPduGrpSysStatus.{{ $index }}'
@@ -172,75 +174,84 @@ modules:
                         - { value: 32, graph: 0, descr: abnormalOperation, generic: 2 }
                         - { value: 64, graph: 0, descr: unknownCommFailure, generic: 2 }
                 -
-                    oid: lgpEnvStateFan
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateFan
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.7.{{ $index }}'
                     descr: 'System Fan Status'
                     index: 'lgpEnvStateFan.{{ $index }}'
+                    state_name: lgpEnvStateFan
                     states:
                         - { value: 1, graph: 0, descr: 'on', generic: 0 }
                         - { value: 2, graph: 0, descr: 'off', generic: 1 }
                 -
-                    oid: lgpEnvStateSystem
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateSystem
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.1.{{ $index }}'
                     descr: 'System Status'
                     index: 'lgpEnvStateSystem.{{ $index }}'
+                    state_name: lgpEnvStateSystem
                     states:
                         - { value: 1, graph: 0, descr: 'on', generic: 0 }
                         - { value: 2, graph: 1, descr: 'off', generic: 1 }
                         - { value: 3, graph: 2, descr: 'standby', generic: 0 }
                 -
-                    oid: lgpEnvStateCooling
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateCooling
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.2.{{ $index }}'
                     descr: 'Cooling Subsystem Status'
                     index: 'lgpEnvStateCooling.{{ $index }}'
+                    state_name: lgpEnvStateCooling
                     states:
                         - { value: 1, graph: 0, descr: 'on', generic: 0 }
                         - { value: 2, graph: 0, descr: 'off', generic: 1 }
                 -
-                    oid: lgpEnvStateHumidifying
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateHumidifying
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.4.{{ $index }}'
                     descr: 'Humidifier Subsystem Status'
                     index: 'lgpEnvStateHumidifying.{{ $index }}'
+                    state_name: lgpEnvStateHumidifying
                     states:
                         - { value: 1, graph: 0, descr: 'on', generic: 0 }
                         - { value: 2, graph: 0, descr: 'off', generic: 1 }
                 -
-                    oid: lgpEnvStateDehumidifying
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateDehumidifying
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.5.{{ $index }}'
                     descr: 'Dehumidifier Subsystem Status'
                     index: 'lgpEnvStateDehumidifying.{{ $index }}'
+                    state_name: lgpEnvStateDehumidifying
                     states:
                         - { value: 1, graph: 0, descr: 'on', generic: 0 }
                         - { value: 2, graph: 0, descr: 'off', generic: 1 }
                 -
-                    oid: lgpEnvStateFan
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateFan
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.7.{{ $index }}'
                     descr: 'System Fan Status'
                     index: 'lgpEnvStateFan.{{ $index }}'
+                    state_name: lgpEnvStateFan
                     states:
                         - { value: 1, graph: 0, descr: 'on', generic: 0 }
                         - { value: 2, graph: 0, descr: 'off', generic: 1 }
                 -
-                    oid: lgpEnvStateGeneralAlarmOutput
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateGeneralAlarmOutput
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.8.{{ $index }}'
                     descr: 'General Alarm Status'
                     index: 'lgpEnvStateGeneralAlarmOutput.{{ $index }}'
+                    state_name: lgpEnvStateGeneralAlarmOutput
                     states:
                         - { value: 1, graph: 0, descr: 'on', generic: 2 }
                         - { value: 2, graph: 0, descr: 'off', generic: 0 }
                 -
-                    oid: lgpEnvStateAudibleAlarm
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateAudibleAlarm
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.11.{{ $index }}'
                     descr: 'Audible Alarm Status'
                     index: 'lgpEnvStateAudibleAlarm.{{ $index }}'
+                    state_name: lgpEnvStateAudibleAlarm
                     states:
                         - { value: 1, graph: 0, descr: 'on', generic: 2 }
                         - { value: 2, graph: 0, descr: 'off', generic: 0 }
                 -
-                    oid: lgpEnvStateOperatingReason
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateOperatingReason
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.14.{{ $index }}'
                     descr: 'Operating State Reason'
                     index: 'lgpEnvStateOperatingReason.{{ $index }}'
+                    state_name: lgpEnvStateOperatingReason
                     states:
                         - { value: 1, graph: 0, descr: 'none', generic: 0 }
                         - { value: 2, graph: 1, descr: 'localUser', generic: 0 }
@@ -250,35 +261,38 @@ modules:
                         - { value: 6, graph: 5, descr: 'externalDevice', generic: 0 }
                         - { value: 7, graph: 6, descr: 'localDisplay', generic: 0 }
                 -
-                    oid: lgpEnvStateOperatingMode
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateOperatingMode
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.15.{{ $index }}'
                     descr: 'Operating Mode'
                     index: 'lgpEnvStateOperatingMode.{{ $index }}'
+                    state_name: lgpEnvStateOperatingMode
                     states:
                         - { value: 1, graph: 0, descr: 'auto', generic: 0 }
                         - { value: 2, graph: 1, descr: 'manual', generic: 0 }
                 -
-                    oid: lgpEnvStateElectricHeater
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateElectricHeater
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.21.{{ $index }}'
                     descr: 'Electric Heaters Status'
                     index: 'lgpEnvStateElectricHeater.{{ $index }}'
+                    state_name: lgpEnvStateElectricHeater
                     states:
                         - { value: 1, graph: 0, descr: 'on', generic: 0 }
                         - { value: 2, graph: 1, descr: 'off', generic: 0 }
                 -
-                    oid: lgpEnvStateHotWater
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateHotWater
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.22.{{ $index }}'
                     descr: 'Hot Water System Status'
                     index: 'lgpEnvStateHotWater.{{ $index }}'
+                    state_name: lgpEnvStateHotWater
                     states:
                         - { value: 1, graph: 0, descr: 'on', generic: 0 }
                         - { value: 2, graph: 1, descr: 'off', generic: 0 }
                 -
-                    oid: lgpPduRcpTable
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduRcpTable
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.95.{{ $index }}'
-                    descr: 'State {{ $lgpPduRcpEntryUsrLabel }}'
+                    descr: 'State {{ LIEBERT-GP-PDU-MIB::lgpPduRcpEntryUsrLabel }}'
                     index: 'lgpPduRcpEntryPwrState.{{ $index }}'
-                    value: lgpPduRcpEntryPwrState
+                    value: LIEBERT-GP-PDU-MIB::lgpPduRcpEntryPwrState
                     state_name: lgpPduRcpEntryPwrState
                     states:
                         - { value: 2, graph: 0, descr: 'on', generic: 1 }
@@ -287,36 +301,36 @@ modules:
         percent:
             data:
                 -
-                    oid: lgpEnvStateCoolingCapacity
-                    value: lgpEnvStateCoolingCapacity
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateCoolingCapacity
+                    value: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateCoolingCapacity
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.9.{{ $index }}'
                     descr: 'Cooling Capacity Usage'
                     index: 'lgpEnvStateCoolingCapacity.{{ $index }}'
                     skip_values: 4294967295
                 -
-                    oid: lgpEnvStateFanCapacity
-                    value: lgpEnvStateFanCapacity
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateFanCapacity
+                    value: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateFanCapacity
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.16.{{ $index }}'
                     descr: 'Fan Capacity Usage'
                     index: 'lgpEnvStateFanCapacity.{{ $index }}'
                     skip_values: 4294967295
                 -
-                    oid: lgpEnvStateFreeCoolingCapacity
-                    value: lgpEnvStateFreeCoolingCapacity
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateFreeCoolingCapacity
+                    value: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateFreeCoolingCapacity
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.17.{{ $index }}'
                     descr: 'Free Cooling Capacity Usage'
                     index: 'lgpEnvStateFreeCoolingCapacity.{{ $index }}'
                     skip_values: 4294967295
                 -
-                    oid: lgpEnvStateDehumidifyingCapacity
-                    value: lgpEnvStateDehumidifyingCapacity
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateDehumidifyingCapacity
+                    value: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateDehumidifyingCapacity
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.18.{{ $index }}'
                     descr: 'Dehumidifying Capacity Usage'
                     index: 'lgpEnvStateDehumidifyingCapacity.{{ $index }}'
                     skip_values: 4294967295
                 -
-                    oid: lgpEnvStateHumidifyingCapacity
-                    value: lgpEnvStateHumidifyingCapacity
+                    oid: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateHumidifyingCapacity
+                    value: LIEBERT-GP-ENVIRONMENTAL-MIB::lgpEnvStateHumidifyingCapacity
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.19.{{ $index }}'
                     descr: 'Humidifying Capacity Usage'
                     index: 'lgpEnvStateHumidifyingCapacity.{{ $index }}'
@@ -324,23 +338,24 @@ modules:
         power_factor:
             data:
                 -
-                    oid: lgpPwrLineMeasurementTable
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementTable
                     value: lgpPwrLineMeasurementPowerFactor
+                    snmp_flags: ['-OteQUsab', '-Pu']
                     divisor: 100
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.14.{{ $index }}'
-                    descr: '{{ $lgpPwrMeasurementPoint }}.{{ $index }}'
+                    descr: '{{ lgpPwrMeasurementPoint }}.{{ $index }}'
                     index: 'lgpPwrLineMeasurementPowerFactor.{{ $index }}'
                 -
-                    oid: lgpPduRcpTable
-                    value: lgpPduRcpEntryPf
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduRcpTable
+                    value: LIEBERT-GP-PDU-MIB::lgpPduRcpEntryPf
                     divisor: 100
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.75.{{ $index }}'
-                    descr: 'Power Factor {{ $lgpPduRcpEntryUsrLabel }}'
+                    descr: 'Power Factor {{ LIEBERT-GP-PDU-MIB::lgpPduRcpEntryUsrLabel }}'
                     index: 'lgpPduRcpEntryPf.{{ $index }}'
                 -
-                    oid: lgpPduPsTable
-                    value: lgpPduPsEntryPfTotal
+                    oid: LIEBERT-GP-PDU-MIB::lgpPduPsTable
+                    value: LIEBERT-GP-PDU-MIB::lgpPduPsEntryPfTotal
                     divisor: 100
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.30.20.1.95.{{ $index }}'
-                    descr: 'Power Factor Total {{ $lgpPduPsEntryModel }}'
+                    descr: 'Power Factor Total {{ LIEBERT-GP-PDU-MIB::lgpPduPsEntryModel }}'
                     index: 'lgpPduPsEntryPfTotal.{{ $index }}'

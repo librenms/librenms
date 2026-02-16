@@ -1,4 +1,3 @@
-mib: XF-RADIOLINK-PTP-RADIO-MIB:XF-RADIOLINK-RLT-MIB:ENTITY-MIB:IF-MIB
 modules:
     os:
         hardware: ENTITY-MIB::entPhysicalDescr.1
@@ -7,46 +6,46 @@ modules:
             data:
                 -
                     oid:
-                        - entPhysicalName
-                        - ifName
+                        - ENTITY-MIB::entPhysicalName
+                        - IF-MIB::ifName
         temperature:
             data:
                 -
-                    oid: XfRAUEntry
-                    value: xfRAUTemperature
+                    oid: XF-RADIOLINK-PTP-RADIO-MIB::xfRAUTable
+                    value: XF-RADIOLINK-PTP-RADIO-MIB::xfRAUTemperature
                     num_oid: .1.3.6.1.4.1.193.81.3.4.3.1.1.1.8.{{ $index }}
-                    descr: 'RAU: {{ $entPhysicalName }}'
+                    descr: 'RAU: {{ ENTITY-MIB::entPhysicalName:0 }}'
         runtime:
             data:
                 -
-                    oid: xfPMTimeElapsed
+                    oid: XF-RADIOLINK-RLT-MIB::xfPMTimeElapsed
                     num_oid: .1.3.6.1.4.1.193.81.3.4.5.2.1.1.1.{{ $index }}
                     index: 'xfPMTimeElapsed.{{ $index }}'
-                    descr: 'Current Error Period: {{ $ifName }}'
+                    descr: 'Current Error Period: {{ IF-MIB::ifName:0 }}'
                 -
-                    oid: xfPMCurrentES
+                    oid: XF-RADIOLINK-RLT-MIB::xfPMCurrentES
                     num_oid: .1.3.6.1.4.1.193.81.3.4.5.2.1.1.2.{{ $index }}
                     index: 'xfPMCurrentES.{{ $index }}'
-                    descr: 'Errored Seconds: {{ $ifName }}'
+                    descr: 'Errored Seconds: {{ IF-MIB::ifName:0 }}'
                 -
-                    oid: xfPMCurrentSES
+                    oid: XF-RADIOLINK-RLT-MIB::xfPMCurrentSES
                     num_oid: .1.3.6.1.4.1.193.81.3.4.5.2.1.1.3.{{ $index }}
                     index: 'xfPMCurrentSES.{{ $index }}'
-                    descr: 'Severly Errored Seconds: {{ $ifName }}'
+                    descr: 'Severly Errored Seconds: {{ IF-MIB::ifName:0 }}'
                 -
-                    oid: xfPMCurrentUAS
+                    oid: XF-RADIOLINK-RLT-MIB::xfPMCurrentUAS
                     num_oid: .1.3.6.1.4.1.193.81.3.4.5.2.1.1.5.{{ $index }}
                     index: 'xfPMCurrentUAS.{{ $index }}'
-                    descr: 'Unavailable Seconds: {{ $ifName }}'
+                    descr: 'Unavailable Seconds: {{ IF-MIB::ifName:0 }}'
         count:
             data:
                 -
-                    oid: xfPMCurrentBBE
+                    oid: XF-RADIOLINK-RLT-MIB::xfPMCurrentBBE
                     num_oid: .1.3.6.1.4.1.193.81.3.4.5.2.1.1.4.{{ $index }}
                     index: 'xfPMCurrentBBE.{{ $index }}'
-                    descr: 'Background Block Errors: {{ $ifName }}'
+                    descr: 'Background Block Errors: {{ IF-MIB::ifName:0 }}'
                 -
-                    oid: xfPMCurrentBB
+                    oid: XF-RADIOLINK-RLT-MIB::xfPMCurrentBB
                     num_oid: .1.3.6.1.4.1.193.81.3.4.5.2.1.1.6.{{ $index }}
                     index: 'xfPMCurrentBB.{{ $index }}'
-                    descr: 'Background blocks: {{ $ifName }}'
+                    descr: 'Background blocks: {{ IF-MIB::ifName:0 }}'

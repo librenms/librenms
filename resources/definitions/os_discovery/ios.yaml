@@ -1,43 +1,44 @@
-mib: POWER-ETHERNET-MIB:CISCO-POWER-ETHERNET-EXT-MIB:CISCO-ENTITY-FRU-CONTROL-MIB:CISCO-HSRP-MIB
 modules:
     sensors:
         additional_oids:
             data:
                 -
                     oid:
-                        - entPhysicalName
+                        - ENTITY-MIB::entPhysicalName
+                        - ENTITY-MIB::entPhysicalIndex
         power:
             data:
                 -
-                    oid: pethMainPseTable
-                    value: pethMainPsePower
+                    oid: POWER-ETHERNET-MIB::pethMainPseTable
+                    value: POWER-ETHERNET-MIB::pethMainPsePower
                     num_oid: '.1.3.6.1.2.1.105.1.3.1.1.2.{{ $index }}'
                     index: 'pethMainPsePower.{{ $index }}'
                     group: "PoE"
                     descr: "PoE Budget Total - ID {{ $index }}"
                 -
-                    oid: pethMainPseTable
-                    value: pethMainPseConsumptionPower
+                    oid: POWER-ETHERNET-MIB::pethMainPseTable
+                    value: POWER-ETHERNET-MIB::pethMainPseConsumptionPower
                     num_oid: '.1.3.6.1.2.1.105.1.3.1.1.4.{{ $index }}'
                     index: 'pethMainPseConsumptionPower.{{ $index }}'
-                    high_limit: pethMainPsePower
+                    high_limit: POWER-ETHERNET-MIB::pethMainPsePower
                     group: "PoE"
                     descr: "PoE Budget Consumed - ID {{ $index }}"
         count:
             data:
                 -
-                    oid: cpeExtPdStatistics
-                    value:  cpeExtPdStatsTotalDevices
+                    oid: CISCO-POWER-ETHERNET-EXT-MIB::cpeExtPdStatistics
+                    value: CISCO-POWER-ETHERNET-EXT-MIB::cpeExtPdStatsTotalDevices
                     num_oid: '.1.3.6.1.4.1.9.9.402.1.4.1.{{ $index }}'
                     group: "PoE"
                     descr: "PoE Devices Connected"
         state:
             data:
                 -
-                    oid: cHsrpGrpTable
-                    value: cHsrpGrpStandbyState
+                    oid: CISCO-HSRP-MIB::cHsrpGrpTable
+                    value: CISCO-HSRP-MIB::cHsrpGrpStandbyState
                     num_oid: '.1.3.6.1.4.1.9.9.106.1.2.1.1.15.{{ $index }}'
-                    descr: 'HSRP Status {{ $cHsrpGrpVirtualIpAddr }}'
+                    state_name: cHsrpGrpTable
+                    descr: 'HSRP Status {{ CISCO-HSRP-MIB::cHsrpGrpVirtualIpAddr }}'
                     index: 'cHsrpGrpStandbyState.{{ $index }}'
                     group: 'HSRP'
                     states:
@@ -48,13 +49,13 @@ modules:
                         - { value:  5, generic: 0, graph: 0, descr: 'standby' }
                         - { value:  6, generic: 0, graph: 0, descr: 'active' }
                 -
-                    oid: cefcModuleOperStatus
-                    value: cefcModuleOperStatus
+                    oid: CISCO-ENTITY-FRU-CONTROL-MIB::cefcModuleOperStatus
+                    value: CISCO-ENTITY-FRU-CONTROL-MIB::cefcModuleOperStatus
                     num_oid: '.1.3.6.1.4.1.9.9.117.1.2.1.1.2.{{ $index }}'
-                    descr: 'Operating Status - {{ $entPhysicalName }}'
+                    descr: 'Operating Status - {{ ENTITY-MIB::entPhysicalName }}'
                     group: Module Operating Status
                     index: 'cefcModuleOperStatus.{{ $index }}'
-                    entPhysicalIndex: '{{ index }}'
+                    entPhysicalIndex: '{{ $index }}'
                     state_name: cefcModuleOperStatus
                     states:
                         - { value:  1, generic: 3, graph: 0, descr: 'unknown' }

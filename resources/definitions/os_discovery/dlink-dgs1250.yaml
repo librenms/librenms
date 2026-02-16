@@ -1,4 +1,3 @@
-mib: DLINKSW-ENTITY-EXT-MIB:DLINKSW-DDM-MIB
 modules:
     os:
         hardware: SNMPv2-MIB::sysDescr.0
@@ -27,98 +26,102 @@ modules:
         temperature:
             data:
                 -
-                    oid: dEntityExtEnvTempTable
-                    value: dEntityExtEnvTempCurrent
+                    oid: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvTempTable
+                    value: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvTempCurrent
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.5.1.1.1.1.4.{{ $index }}'
-                    descr: dEntityExtEnvTempDescr
+                    descr: '{{ DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvTempDescr }}'
                     index: 'dEntityExtEnvTempCurrent.{{ $index }}'
-                    low_limit: dEntityExtEnvTempThresholdLow
-                    high_limit: dEntityExtEnvTempThresholdHigh
+                    low_limit: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvTempThresholdLow
+                    high_limit: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvTempThresholdHigh
                 -
-                    oid: dDdmIfInfoTable
-                    value: dDdmIfInfoCurrentTemperature
+                    oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
+                    value: DLINKSW-DDM-MIB::dDdmIfInfoCurrentTemperature
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.1.{{ $index }}'
                     descr: 'SFP {{ $index }} Temp'
                     index: 'dDdmIfInfoCurrentTemperature.{{ $index }}'
-                    low_limit: dDdmIfInfoLowAlarmTemperature
-                    high_limit: dDdmIfInfoHighAlarmTemperature
+                    low_limit: DLINKSW-DDM-MIB::dDdmIfInfoLowAlarmTemperature
+                    high_limit: DLINKSW-DDM-MIB::dDdmIfInfoHighAlarmTemperature
                     divisor: 1000
         voltage:
             data:
                 -
-                    oid: dDdmIfInfoTable
-                    value: dDdmIfInfoCurrentVoltage
+                    oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
+                    value: DLINKSW-DDM-MIB::dDdmIfInfoCurrentVoltage
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.7.{{ $index }}'
                     descr: 'SFP {{ $index }} Volt'
                     index: 'dDdmIfInfoCurrentVoltage.{{ $index }}'
-                    low_limit: dDdmIfInfoHighAlarmVoltage
-                    high_limit: dDdmIfInfoLowAlarmVoltage
+                    low_limit: DLINKSW-DDM-MIB::dDdmIfInfoHighAlarmVoltage
+                    high_limit: DLINKSW-DDM-MIB::dDdmIfInfoLowAlarmVoltage
                     divisor: 100
         current:
             data:
                 -
-                    oid: dDdmIfInfoTable
-                    value: dDdmIfInfoCurrentBiasCurrent
+                    oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
+                    value: DLINKSW-DDM-MIB::dDdmIfInfoCurrentBiasCurrent
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.13.{{ $index }}'
                     descr: 'SFP {{ $index }} Bias'
                     index: 'dDdmIfInfoCurrentBiasCurrent.{{ $index }}'
-                    low_limit: dDdmIfInfoHighAlarmBiasCurrent
-                    high_limit: dDdmIfInfoLowAlarmBiasCurrent
+                    low_limit: DLINKSW-DDM-MIB::dDdmIfInfoHighAlarmBiasCurrent
+                    high_limit: DLINKSW-DDM-MIB::dDdmIfInfoLowAlarmBiasCurrent
                     divisor: 1000
         power:
             data:
                 -
-                    oid: dDdmIfInfoTable
-                    value: dDdmIfInfoCurrentTxPower
+                    oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
+                    value: DLINKSW-DDM-MIB::dDdmIfInfoCurrentTxPower
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.19.{{ $index }}'
                     descr: 'SFP {{ $index }} TX Power'
                     index: ' dDdmIfInfoCurrentTxPower.{{ $index }}'
-                    low_limit: dDdmIfInfoHighAlarmTxPower
-                    high_limit: dDdmIfInfoLowAlarmTxPower
+                    low_limit: DLINKSW-DDM-MIB::dDdmIfInfoHighAlarmTxPower
+                    high_limit: DLINKSW-DDM-MIB::dDdmIfInfoLowAlarmTxPower
                     divisor: 1000000
                 -
-                    oid: dDdmIfInfoTable
-                    value: dDdmIfInfoCurrentRxPower
+                    oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
+                    value: DLINKSW-DDM-MIB::dDdmIfInfoCurrentRxPower
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.25.{{ $index }}'
                     descr: 'SFP {{ $index }} RX Power'
                     index: ' dDdmIfInfoCurrentRxPower.{{ $index }}'
-                    low_limit: dDdmIfInfoHighAlarmRxPower
-                    high_limit: dDdmIfInfoLowAlarmRxPower
+                    low_limit: DLINKSW-DDM-MIB::dDdmIfInfoHighAlarmRxPower
+                    high_limit: DLINKSW-DDM-MIB::dDdmIfInfoLowAlarmRxPower
                     divisor: 1000000
         state:
             data:
                 -
-                    oid: dEntityExtEnvFanTable
-                    value: dEntityExtEnvFanStatus
+                    oid: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvFanTable
+                    value: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvFanStatus
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.5.1.1.2.1.4.{{ $index }}'
-                    descr: dEntityExtEnvFanDescr
+                    state_name: dEntityExtEnvFanTable
+                    descr: '{{ DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvFanDescr }}'
                     index: 'dEntityExtEnvFanStatus.{{ $index }}'
                     states:
-                        - { descr: Ok, graph: 1, value: 1, generic: 0 }
-                        - { descr: Fault, graph: 1, value: 2, generic: 2 }
+                        - { value: 1, descr: Ok, graph: 1, generic: 0 }
+                        - { value: 2, descr: Fault, graph: 1, generic: 2 }
                 -
-                    oid: dEntityExtEnvPowerTable
-                    value: dEntityExtEnvPowerStatus
+                    oid: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvPowerTable
+                    value: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvPowerStatus
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.5.1.1.3.1.6.{{ $index }}'
-                    descr: dEntityExtEnvPowerDescr
+                    state_name: dEntityExtEnvPowerTable
+                    descr: '{{ DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvPowerDescr }}'
                     index: 'dEntityExtEnvPowerStatus.{{ $index }}'
                     states:
                         - { descr: In Operation, graph: 1, value: 1, generic: 0 }
                         - { descr: Failed, graph: 1, value: 2, generic: 2 }
                         - { descr: Empty, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: dEntityExtEnvTempTable
-                    value: dEntityExtEnvTempStatus
+                    oid: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvTempTable
+                    value: DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvTempStatus
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.5.1.1.1.1.7.{{ $index }}'
-                    descr: dEntityExtEnvTempDescr
+                    state_name: dEntityExtEnvTempTable
+                    descr: '{{ DLINKSW-ENTITY-EXT-MIB::dEntityExtEnvTempDescr }}'
                     index: 'dEntityExtEnvTempStatus.{{ $index }}'
                     states:
                         - { descr: Ok, graph: 1, value: 1, generic: 0 }
                         - { descr: Abnormal, graph: 1, value: 2, generic: 2 }
                 -
-                    oid: dDdmIfInfoTable
-                    value: dDdmIfInfoTemperatureState
+                    oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
+                    value: DLINKSW-DDM-MIB::dDdmIfInfoTemperatureState
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.2.{{ $index }}'
+                    state_name: dDdmIfInfoTable
                     descr: 'SFP {{ $index }} Temp'
                     index: 'dDdmIfInfoTemperatureState.{{ $index }}'
                     states:
@@ -128,9 +131,10 @@ modules:
                         - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
                         - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
                 -
-                    oid: dDdmIfInfoTable
-                    value: dDdmIfInfoVoltageState
+                    oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
+                    value: DLINKSW-DDM-MIB::dDdmIfInfoVoltageState
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.8.{{ $index }}'
+                    state_name: dDdmIfInfoTable
                     descr: 'SFP {{ $index }} Voltage'
                     index: 'dDdmIfInfoVoltageState.{{ $index }}'
                     states:
@@ -140,9 +144,10 @@ modules:
                         - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
                         - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
                 -
-                    oid: dDdmIfInfoTable
-                    value: dDdmIfInfoBiasCurrentState
+                    oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
+                    value: DLINKSW-DDM-MIB::dDdmIfInfoBiasCurrentState
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.14.{{ $index }}'
+                    state_name: dDdmIfInfoTable
                     descr: 'SFP {{ $index }} Bias'
                     index: 'dDdmIfInfoBiasCurrentState.{{ $index }}'
                     states:
@@ -152,8 +157,9 @@ modules:
                         - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
                         - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
                 -
-                    oid: dDdmIfInfoTable
-                    value: dDdmIfInfoTxPowerState
+                    oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
+                    value: DLINKSW-DDM-MIB::dDdmIfInfoTxPowerState
+                    state_name: dDdmIfInfoTable
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.20.{{ $index }}'
                     descr: 'SFP {{ $index }} TX Power'
                     index: 'dDdmIfInfoTxPowerState.{{ $index }}'
@@ -164,8 +170,9 @@ modules:
                         - { descr: LoWarning, graph: 1, value: 3, generic: 1 }
                         - { descr: LoAlarm, graph: 1, value: 4, generic: 2 }
                 -
-                    oid: dDdmIfInfoTable
-                    value: dDdmIfInfoRxPowerState
+                    oid: DLINKSW-DDM-MIB::dDdmIfInfoTable
+                    value: DLINKSW-DDM-MIB::dDdmIfInfoRxPowerState
+                    state_name: dDdmIfInfoTable
                     num_oid: '.1.3.6.1.4.1.171.11.165.1000.72.1.4.1.1.26.{{ $index }}'
                     descr: 'SFP {{ $index }} RX Power'
                     index: 'dDdmIfInfoRxPowerState.{{ $index }}'

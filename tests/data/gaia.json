@@ -2589,5 +2589,162 @@
                 }
             ]
         }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 768,
+                    "hrDeviceDescr": "GenuineIntel:         Intel(R) Atom(TM) CPU  C2558  @ 2.40GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 769,
+                    "hrDeviceDescr": "GenuineIntel:         Intel(R) Atom(TM) CPU  C2558  @ 2.40GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 770,
+                    "hrDeviceDescr": "GenuineIntel:         Intel(R) Atom(TM) CPU  C2558  @ 2.40GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 771,
+                    "hrDeviceDescr": "GenuineIntel:         Intel(R) Atom(TM) CPU  C2558  @ 2.40GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1025,
+                    "hrDeviceDescr": "network interface lo",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1026,
+                    "hrDeviceDescr": "network interface eth1",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1027,
+                    "hrDeviceDescr": "network interface eth2",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1028,
+                    "hrDeviceDescr": "network interface eth3",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1029,
+                    "hrDeviceDescr": "network interface eth4",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1030,
+                    "hrDeviceDescr": "network interface eth5",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1031,
+                    "hrDeviceDescr": "network interface Mgmt",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1033,
+                    "hrDeviceDescr": "network interface bond3",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1552,
+                    "hrDeviceDescr": "SCSI disk (/dev/sda)",
+                    "hrDeviceType": "hrDeviceDiskStorage",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 3072,
+                    "hrDeviceDescr": "Guessing that there's a floating point co-processor",
+                    "hrDeviceType": "hrDeviceCoprocessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                }
+            ]
+        }
+    },
+    "ucd-diskio": {
+        "discovery": {
+            "disks": [
+                {
+                    "diskio_index": 21,
+                    "diskio_descr": "dm-0"
+                },
+                {
+                    "diskio_index": 22,
+                    "diskio_descr": "dm-1"
+                },
+                {
+                    "diskio_index": 23,
+                    "diskio_descr": "dm-2"
+                },
+                {
+                    "diskio_index": 24,
+                    "diskio_descr": "dm-3"
+                },
+                {
+                    "diskio_index": 17,
+                    "diskio_descr": "sda"
+                },
+                {
+                    "diskio_index": 18,
+                    "diskio_descr": "sda1"
+                },
+                {
+                    "diskio_index": 19,
+                    "diskio_descr": "sda2"
+                },
+                {
+                    "diskio_index": 20,
+                    "diskio_descr": "sda3"
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
