@@ -189,7 +189,7 @@ class PortsController implements DeviceTab
         if (LibrenmsConfig::get('ports_ipv4_neighbours') == 'arp') {
             $ids = $port->macLinkedPorts->where('port_id', '<>', $port->port_id)->pluck('port_id');
         } else {
-            $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4where('port_id', '<>', $port->port_id)->->pluck('port_id'))->flatten();
+            $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4->where('port_id', '<>', $port->port_id)->pluck('port_id'))->flatten();
         }
 
         foreach ($ids as $port_id) {
