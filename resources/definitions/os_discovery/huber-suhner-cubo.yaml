@@ -1,54 +1,56 @@
-mib: CUBO-MINI-MIB
 modules:
     sensors:
         fanspeed:
             data:
                 -
-                    oid: cubominiFanTable
-                    value: cubominiFanSpeed
+                    oid: CUBO-MINI-MIB::cubominiFanTable
+                    value: CUBO-MINI-MIB::cubominiFanSpeed
                     num_oid: '.1.3.6.1.4.1.27894.11.241.1.3.1.1.5.{{ $index }}'
                     descr: 'Fan Speed {{ $subindex2 }}'
+                    index: cubominiFanSpeed.{{ $index }}
         state:
             data:
                 -
-                    oid: cubominiFanTable
-                    value: cubominiFanStatus
+                    oid: CUBO-MINI-MIB::cubominiFanTable
+                    value: CUBO-MINI-MIB::cubominiFanStatus
                     num_oid: '.1.3.6.1.4.1.27894.11.241.1.3.1.1.4.{{ $index }}'
                     descr: 'Fan State {{ $subindex2 }}'
-                    state_name: Fan State
+                    state_name: cubominiFanStatus
+                    index: cubominiFanStatus.{{ $index }}
                     states:
                         - { value: 2, generic: 2, graph: 0, descr: Failure }
                         - { value: 3, generic: 0, graph: 0, descr: Okay }
                 -
-                    oid: cubominiXcvrGeneralIsInserted
+                    oid: CUBO-MINI-MIB::cubominiXcvrGeneralIsInserted
                     num_oid: '.1.3.6.1.4.1.27894.11.241.1.9.2.1.4.{{ $index }}'
                     descr: 'Optic inserted {{ $subindex2 }}'
-                    state_name: Optic State
+                    state_name: cubominiXcvrGeneralIsInserted
+                    index: cubominiXcvrGeneralIsInserted.{{ $index }}
                     states:
                         - { value: 2, generic: 2, graph: 0, descr: Not inserted }
                         - { value: 3, generic: 0, graph: 0, descr: Inserted }
         dbm:
             data:
                 -
-                    oid: cubominiXcvrOptChannelsTxPower
+                    oid: CUBO-MINI-MIB::cubominiXcvrOptChannelsTxPower
                     num_oid: '.1.3.6.1.4.1.27894.11.241.1.9.6.1.5.{{ $index }}'
                     divisor: 10
                     descr: 'Line Port Channel {{ $subindex3 }} Tx Power'
                     index: 'cubominiXcvrOptChannelsTxPower.0.1.1.{{ $subindex3 }}'
                 -
-                    oid: cubominiXcvrOptChannelsTxPower
+                    oid: CUBO-MINI-MIB::cubominiXcvrOptChannelsTxPower
                     num_oid: '.1.3.6.1.4.1.27894.11.241.1.9.6.1.5.{{ $index }}'
                     divisor: 10
                     descr: 'Client Port Channel {{ $subindex3 }} Tx Power'
                     index: 'cubominiXcvrOptChannelsTxPower.0.1.2.{{ $subindex3 }}'
                 -
-                    oid: cubominiXcvrOptChannelsRxPower
+                    oid: CUBO-MINI-MIB::cubominiXcvrOptChannelsRxPower
                     num_oid: '.1.3.6.1.4.1.27894.11.241.1.9.6.1.6.{{ $index }}'
                     divisor: 10
                     descr: 'Line Port Channel {{ $subindex3 }} Rx Power'
                     index: 'cubominiXcvrOptChannelsRxPower.0.1.1.{{ $subindex3 }}'
                 -
-                    oid: cubominiXcvrOptChannelsRxPower
+                    oid: CUBO-MINI-MIB::cubominiXcvrOptChannelsRxPower
                     num_oid: '.1.3.6.1.4.1.27894.11.241.1.9.6.1.6.{{ $index }}'
                     divisor: 10
                     descr: 'Client Port Channel {{ $subindex3 }} Rx Power'
@@ -56,8 +58,9 @@ modules:
         temperature:
             data:
                 -
-                    oid: cubominiXcvrDiagnosticsTable
-                    value: cubominiXcvrDiagnosticsTemperature
+                    oid: CUBO-MINI-MIB::cubominiXcvrDiagnosticsTable
+                    value: CUBO-MINI-MIB::cubominiXcvrDiagnosticsTemperature
                     num_oid: '.1.3.6.1.4.1.27894.11.241.1.9.5.1.4.{{ $index }}'
                     descr: 'Temperature {{ $subindex2 }}'
                     divisor: 10
+                    index: cubominiXcvrDiagnosticsTemperature.{{ $index }}
