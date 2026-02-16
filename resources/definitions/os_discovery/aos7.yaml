@@ -4,7 +4,6 @@ modules:
             -
                 total: ALCATEL-IND1-SYSTEM-MIB::systemHardwareMemorySize
                 percent_used: ALCATEL-IND1-HEALTH-MIB::healthModuleMemory1MinAvg.0
-                index: 0
                 precision: 1024
                 descr: 'Device Memory'
                 skip_values:
