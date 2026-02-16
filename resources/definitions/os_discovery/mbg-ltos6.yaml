@@ -1,4 +1,3 @@
-mib: MBG-SNMP-LTNG-MIB
 modules:
     os:
         serial: MBG-SNMP-LTNG-MIB::mbgLtNgSerialNumber.0
@@ -7,16 +6,16 @@ modules:
         count:
             data:
                 -
-                    oid: mbgLtNgRefclockStatusA
-                    value: mbgLtNgRefclockStatusA
+                    oid: MBG-SNMP-LTNG-MIB::mbgLtNgRefclockStatusA
+                    value: MBG-SNMP-LTNG-MIB::mbgLtNgRefclockStatusA
                     num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.6.{{ $index }}'
                     descr: 'Antenna A{{ $index }} Satellites'
                     low_warn_limit: 0
                     low_limit: 0
                     index: 'mbgLtNgRefclockStatusA.{{ $index }}'
                 -
-                    oid: mbgLtNgRefclockStatusB
-                    value: mbgLtNgRefclockStatusB
+                    oid: MBG-SNMP-LTNG-MIB::mbgLtNgRefclockStatusB
+                    value: MBG-SNMP-LTNG-MIB::mbgLtNgRefclockStatusB
                     num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.8.{{ $index }}'
                     descr: 'Antenna B{{ $index }} Satellites'
                     low_warn_limit: 0
@@ -25,11 +24,12 @@ modules:
         state:
             data:
                 -
-                    oid: mbgLtNgRefclockType
-                    value: mbgLtNgRefclockType
+                    oid: MBG-SNMP-LTNG-MIB::mbgLtNgRefclockType
+                    value: MBG-SNMP-LTNG-MIB::mbgLtNgRefclockType
                     num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.2.{{ $index }}'
                     descr: 'Reference Clock Type'
                     index: 'mbgLtNgRefclockType.{{ $index }}'
+                    state_name: mbgLtNgRefclockType
                     states:
                         - { value: 0, descr: unknown, graph: 0, generic: 3 }
                         - { value: 1, descr: gps166, graph: 1, generic: 0 }
@@ -94,26 +94,25 @@ modules:
                         - { value: 60, descr: pzf180, graph: 60, generic: 0 }
                         - { value: 61, descr: rel1000, graph: 61, generic: 0 }
                 -
-                    oid: mbgLtNgRefclockUsage
-                    value: mbgLtNgRefclockUsage
+                    oid: MBG-SNMP-LTNG-MIB::mbgLtNgRefclockUsage
+                    value: MBG-SNMP-LTNG-MIB::mbgLtNgRefclockUsage
                     num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.3.{{ $index }}'
                     descr: 'Reference Clock Usage'
                     index: 'mbgLtNgRefclockUsage.{{ $index }}'
+                    state_name: mbgLtNgRefclockUsage
                     states:
                         - { value: 0, descr: notAvailable, graph: 0, generic: 2 }
                         - { value: 1, descr: secondary, graph: 1, generic: 0 }
                         - { value: 2, descr: compare, graph: 2, generic: 1 }
                         - { value: 3, descr: primary, graph: 3, generic: 0 }
                 -
-                    oid: mbgLtNgRefclockState
-                    value: mbgLtNgRefclockState
+                    oid: MBG-SNMP-LTNG-MIB::mbgLtNgRefclockState
+                    value: MBG-SNMP-LTNG-MIB::mbgLtNgRefclockState
                     num_oid: '.1.3.6.1.4.1.5597.30.0.1.2.1.5.{{ $index }}'
                     descr: 'Reference Clock State'
                     index: 'mbgLtNgRefclockState.{{ $index }}'
+                    state_name: mbgLtNgRefclockState
                     states:
                         - { value: 0, descr: notAvailable, graph: 0, generic: 2 }
                         - { value: 1, descr: synchronized, graph: 1, generic: 0 }
                         - { value: 2, descr: notSynchronized, graph: 2, generic: 0 }
-
-
-                

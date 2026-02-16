@@ -25,7 +25,9 @@
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
+use PHPUnit\Framework\Attributes\TestDox;
 
+#[TestDox('Cisco DHCP Server Trap')]
 final class CiscoDHCPServerTrapTest extends SnmpTrapTestCase
 {
     /**
@@ -33,6 +35,7 @@ final class CiscoDHCPServerTrapTest extends SnmpTrapTestCase
      *
      * @return void
      */
+    #[TestDox('Cisco DHCP server free address high')]
     public function testCiscoDHCPServerFreeAddressHigh(): void
     {
         $this->assertTrapLogsMessage('{{ hostname }}
@@ -47,6 +50,7 @@ CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerSharedNetFreeAddresses."some-dhcp-pool"
         );
     }
 
+    #[TestDox('Cisco DHCP server free address low')]
     public function testCiscoDHCPServerFreeAddressLow(): void
     {
         $this->assertTrapLogsMessage('{{ hostname }}
@@ -61,6 +65,7 @@ CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerSharedNetFreeAddresses."some-dhcp-pool"
         );
     }
 
+    #[TestDox('Cisco DHCP server start')]
     public function testCiscoDHCPServerStart(): void
     {
         $this->assertTrapLogsMessage('{{ hostname }}
@@ -74,6 +79,7 @@ CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStartTime = Hex-STRING: 07 E6 0B 0A 03 
         );
     }
 
+    #[TestDox('Cisco DHCP server stop')]
     public function testCiscoDHCPServerStop(): void
     {
         $this->assertTrapLogsMessage('{{ hostname }}

@@ -89,6 +89,12 @@ class RrdProcess
     public function runAsync(string $command): void
     {
         $this->start();
+
+        // clean directory path when using rrdcached
+        if ($this->rrdcached) {
+            $command = str_replace($this->rrd_dir, '', $command);
+        }
+
         $this->logger->debug("RRD[%g$command%n]", ['color' => true]);
         $this->input->write("$command\n");
     }

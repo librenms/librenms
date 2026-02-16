@@ -4,9 +4,9 @@
 -- MIB representation of the Cisco Unified Computing System
 -- MEMORY management information model package
 -- 
--- Created October 2017 by Charles Bullis
+-- Created July 2018 by Charles Bullis
 -- 
--- Copyright (c) 2005-2017 Cisco Systems, Inc. All rights reserved.
+-- Copyright (c) 2005-2018 Cisco Systems, Inc. All rights reserved.
 -- 
 -- *********************************************************************
 
@@ -74,7 +74,7 @@ IMPORTS
         FROM CISCO-UNIFIED-COMPUTING-TC-MIB;
 
 cucsMemoryObjects MODULE-IDENTITY
-    LAST-UPDATED    "201710060000Z"
+    LAST-UPDATED    "201807260000Z"
     ORGANIZATION    "Cisco Systems Inc."
     CONTACT-INFO
         "Cisco Systems
@@ -341,10 +341,10 @@ CucsMemoryArrayEnvStatsEntry ::= SEQUENCE {
     cucsMemoryArrayEnvStatsInstanceId                                CucsManagedObjectId,
     cucsMemoryArrayEnvStatsDn                                        CucsManagedObjectDn,
     cucsMemoryArrayEnvStatsRn                                        SnmpAdminString,
-    cucsMemoryArrayEnvStatsInputCurrent                              SnmpAdminString,
-    cucsMemoryArrayEnvStatsInputCurrentAvg                           SnmpAdminString,
-    cucsMemoryArrayEnvStatsInputCurrentMax                           SnmpAdminString,
-    cucsMemoryArrayEnvStatsInputCurrentMin                           SnmpAdminString,
+    cucsMemoryArrayEnvStatsInputCurrent                              INTEGER,
+    cucsMemoryArrayEnvStatsInputCurrentAvg                           INTEGER,
+    cucsMemoryArrayEnvStatsInputCurrentMax                           INTEGER,
+    cucsMemoryArrayEnvStatsInputCurrentMin                           INTEGER,
     cucsMemoryArrayEnvStatsIntervals                                 Gauge32,
     cucsMemoryArrayEnvStatsSuspect                                   TruthValue,
     cucsMemoryArrayEnvStatsThresholded                               CucsMemoryArrayEnvStatsThresholded,
@@ -377,7 +377,7 @@ cucsMemoryArrayEnvStatsRn OBJECT-TYPE
     ::= { cucsMemoryArrayEnvStatsEntry 3 }
 
 cucsMemoryArrayEnvStatsInputCurrent OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -386,7 +386,7 @@ cucsMemoryArrayEnvStatsInputCurrent OBJECT-TYPE
     ::= { cucsMemoryArrayEnvStatsEntry 4 }
 
 cucsMemoryArrayEnvStatsInputCurrentAvg OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -395,7 +395,7 @@ cucsMemoryArrayEnvStatsInputCurrentAvg OBJECT-TYPE
     ::= { cucsMemoryArrayEnvStatsEntry 5 }
 
 cucsMemoryArrayEnvStatsInputCurrentMax OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -404,7 +404,7 @@ cucsMemoryArrayEnvStatsInputCurrentMax OBJECT-TYPE
     ::= { cucsMemoryArrayEnvStatsEntry 6 }
 
 cucsMemoryArrayEnvStatsInputCurrentMin OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -476,10 +476,10 @@ CucsMemoryArrayEnvStatsHistEntry ::= SEQUENCE {
     cucsMemoryArrayEnvStatsHistDn                                    CucsManagedObjectDn,
     cucsMemoryArrayEnvStatsHistRn                                    SnmpAdminString,
     cucsMemoryArrayEnvStatsHistId                                    Unsigned64,
-    cucsMemoryArrayEnvStatsHistInputCurrent                          SnmpAdminString,
-    cucsMemoryArrayEnvStatsHistInputCurrentAvg                       SnmpAdminString,
-    cucsMemoryArrayEnvStatsHistInputCurrentMax                       SnmpAdminString,
-    cucsMemoryArrayEnvStatsHistInputCurrentMin                       SnmpAdminString,
+    cucsMemoryArrayEnvStatsHistInputCurrent                          INTEGER,
+    cucsMemoryArrayEnvStatsHistInputCurrentAvg                       INTEGER,
+    cucsMemoryArrayEnvStatsHistInputCurrentMax                       INTEGER,
+    cucsMemoryArrayEnvStatsHistInputCurrentMin                       INTEGER,
     cucsMemoryArrayEnvStatsHistMostRecent                            TruthValue,
     cucsMemoryArrayEnvStatsHistSuspect                               TruthValue,
     cucsMemoryArrayEnvStatsHistThresholded                           CucsMemoryArrayEnvStatsHistThresholded,
@@ -519,7 +519,7 @@ cucsMemoryArrayEnvStatsHistId OBJECT-TYPE
     ::= { cucsMemoryArrayEnvStatsHistEntry 4 }
 
 cucsMemoryArrayEnvStatsHistInputCurrent OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -528,7 +528,7 @@ cucsMemoryArrayEnvStatsHistInputCurrent OBJECT-TYPE
     ::= { cucsMemoryArrayEnvStatsHistEntry 5 }
 
 cucsMemoryArrayEnvStatsHistInputCurrentAvg OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -537,7 +537,7 @@ cucsMemoryArrayEnvStatsHistInputCurrentAvg OBJECT-TYPE
     ::= { cucsMemoryArrayEnvStatsHistEntry 6 }
 
 cucsMemoryArrayEnvStatsHistInputCurrentMax OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -546,7 +546,7 @@ cucsMemoryArrayEnvStatsHistInputCurrentMax OBJECT-TYPE
     ::= { cucsMemoryArrayEnvStatsHistEntry 7 }
 
 cucsMemoryArrayEnvStatsHistInputCurrentMin OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -787,10 +787,10 @@ CucsMemoryBufferUnitEnvStatsEntry ::= SEQUENCE {
     cucsMemoryBufferUnitEnvStatsRn                                   SnmpAdminString,
     cucsMemoryBufferUnitEnvStatsIntervals                            Gauge32,
     cucsMemoryBufferUnitEnvStatsSuspect                              TruthValue,
-    cucsMemoryBufferUnitEnvStatsTemperature                          SnmpAdminString,
-    cucsMemoryBufferUnitEnvStatsTemperatureAvg                       SnmpAdminString,
-    cucsMemoryBufferUnitEnvStatsTemperatureMax                       SnmpAdminString,
-    cucsMemoryBufferUnitEnvStatsTemperatureMin                       SnmpAdminString,
+    cucsMemoryBufferUnitEnvStatsTemperature                          INTEGER,
+    cucsMemoryBufferUnitEnvStatsTemperatureAvg                       INTEGER,
+    cucsMemoryBufferUnitEnvStatsTemperatureMax                       INTEGER,
+    cucsMemoryBufferUnitEnvStatsTemperatureMin                       INTEGER,
     cucsMemoryBufferUnitEnvStatsThresholded                          CucsMemoryBufferUnitEnvStatsThresholded,
     cucsMemoryBufferUnitEnvStatsTimeCollected                        DateAndTime,
     cucsMemoryBufferUnitEnvStatsUpdate                               Gauge32
@@ -839,7 +839,7 @@ cucsMemoryBufferUnitEnvStatsSuspect OBJECT-TYPE
     ::= { cucsMemoryBufferUnitEnvStatsEntry 5 }
 
 cucsMemoryBufferUnitEnvStatsTemperature OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -848,7 +848,7 @@ cucsMemoryBufferUnitEnvStatsTemperature OBJECT-TYPE
     ::= { cucsMemoryBufferUnitEnvStatsEntry 6 }
 
 cucsMemoryBufferUnitEnvStatsTemperatureAvg OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -857,7 +857,7 @@ cucsMemoryBufferUnitEnvStatsTemperatureAvg OBJECT-TYPE
     ::= { cucsMemoryBufferUnitEnvStatsEntry 7 }
 
 cucsMemoryBufferUnitEnvStatsTemperatureMax OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -866,7 +866,7 @@ cucsMemoryBufferUnitEnvStatsTemperatureMax OBJECT-TYPE
     ::= { cucsMemoryBufferUnitEnvStatsEntry 8 }
 
 cucsMemoryBufferUnitEnvStatsTemperatureMin OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -925,10 +925,10 @@ CucsMemoryBufferUnitEnvStatsHistEntry ::= SEQUENCE {
     cucsMemoryBufferUnitEnvStatsHistId                               Unsigned64,
     cucsMemoryBufferUnitEnvStatsHistMostRecent                       TruthValue,
     cucsMemoryBufferUnitEnvStatsHistSuspect                          TruthValue,
-    cucsMemoryBufferUnitEnvStatsHistTemperature                      SnmpAdminString,
-    cucsMemoryBufferUnitEnvStatsHistTemperatureAvg                   SnmpAdminString,
-    cucsMemoryBufferUnitEnvStatsHistTemperatureMax                   SnmpAdminString,
-    cucsMemoryBufferUnitEnvStatsHistTemperatureMin                   SnmpAdminString,
+    cucsMemoryBufferUnitEnvStatsHistTemperature                      INTEGER,
+    cucsMemoryBufferUnitEnvStatsHistTemperatureAvg                   INTEGER,
+    cucsMemoryBufferUnitEnvStatsHistTemperatureMax                   INTEGER,
+    cucsMemoryBufferUnitEnvStatsHistTemperatureMin                   INTEGER,
     cucsMemoryBufferUnitEnvStatsHistThresholded                      CucsMemoryBufferUnitEnvStatsHistThresholded,
     cucsMemoryBufferUnitEnvStatsHistTimeCollected                    DateAndTime
 }
@@ -987,7 +987,7 @@ cucsMemoryBufferUnitEnvStatsHistSuspect OBJECT-TYPE
     ::= { cucsMemoryBufferUnitEnvStatsHistEntry 6 }
 
 cucsMemoryBufferUnitEnvStatsHistTemperature OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -996,7 +996,7 @@ cucsMemoryBufferUnitEnvStatsHistTemperature OBJECT-TYPE
     ::= { cucsMemoryBufferUnitEnvStatsHistEntry 7 }
 
 cucsMemoryBufferUnitEnvStatsHistTemperatureAvg OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -1005,7 +1005,7 @@ cucsMemoryBufferUnitEnvStatsHistTemperatureAvg OBJECT-TYPE
     ::= { cucsMemoryBufferUnitEnvStatsHistEntry 8 }
 
 cucsMemoryBufferUnitEnvStatsHistTemperatureMax OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -1014,7 +1014,7 @@ cucsMemoryBufferUnitEnvStatsHistTemperatureMax OBJECT-TYPE
     ::= { cucsMemoryBufferUnitEnvStatsHistEntry 9 }
 
 cucsMemoryBufferUnitEnvStatsHistTemperatureMin OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -1595,7 +1595,7 @@ CucsMemoryQualEntry ::= SEQUENCE {
     cucsMemoryQualDn                                                 CucsManagedObjectDn,
     cucsMemoryQualRn                                                 SnmpAdminString,
     cucsMemoryQualClock                                              Gauge32,
-    cucsMemoryQualLatency                                            SnmpAdminString,
+    cucsMemoryQualLatency                                            INTEGER,
     cucsMemoryQualMaxCap                                             Gauge32,
     cucsMemoryQualMinCap                                             Gauge32,
     cucsMemoryQualSpeed                                              Gauge32,
@@ -1636,7 +1636,7 @@ cucsMemoryQualClock OBJECT-TYPE
     ::= { cucsMemoryQualEntry 4 }
 
 cucsMemoryQualLatency OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -2123,7 +2123,7 @@ CucsMemoryUnitEntry ::= SEQUENCE {
     cucsMemoryUnitClock                                              Gauge32,
     cucsMemoryUnitFormFactor                                         CucsMemoryFormFactor,
     cucsMemoryUnitId                                                 CucsMemoryUnitId,
-    cucsMemoryUnitLatency                                            SnmpAdminString,
+    cucsMemoryUnitLatency                                            INTEGER,
     cucsMemoryUnitLocation                                           SnmpAdminString,
     cucsMemoryUnitModel                                              SnmpAdminString,
     cucsMemoryUnitOperState                                          CucsEquipmentOperability,
@@ -2220,7 +2220,7 @@ cucsMemoryUnitId OBJECT-TYPE
     ::= { cucsMemoryUnitEntry 9 }
 
 cucsMemoryUnitLatency OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -2419,10 +2419,10 @@ CucsMemoryUnitEnvStatsEntry ::= SEQUENCE {
     cucsMemoryUnitEnvStatsRn                                         SnmpAdminString,
     cucsMemoryUnitEnvStatsIntervals                                  Gauge32,
     cucsMemoryUnitEnvStatsSuspect                                    TruthValue,
-    cucsMemoryUnitEnvStatsTemperature                                SnmpAdminString,
-    cucsMemoryUnitEnvStatsTemperatureAvg                             SnmpAdminString,
-    cucsMemoryUnitEnvStatsTemperatureMax                             SnmpAdminString,
-    cucsMemoryUnitEnvStatsTemperatureMin                             SnmpAdminString,
+    cucsMemoryUnitEnvStatsTemperature                                INTEGER,
+    cucsMemoryUnitEnvStatsTemperatureAvg                             INTEGER,
+    cucsMemoryUnitEnvStatsTemperatureMax                             INTEGER,
+    cucsMemoryUnitEnvStatsTemperatureMin                             INTEGER,
     cucsMemoryUnitEnvStatsThresholded                                CucsMemoryUnitEnvStatsThresholded,
     cucsMemoryUnitEnvStatsTimeCollected                              DateAndTime,
     cucsMemoryUnitEnvStatsUpdate                                     Gauge32
@@ -2469,7 +2469,7 @@ cucsMemoryUnitEnvStatsSuspect OBJECT-TYPE
     ::= { cucsMemoryUnitEnvStatsEntry 5 }
 
 cucsMemoryUnitEnvStatsTemperature OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -2478,7 +2478,7 @@ cucsMemoryUnitEnvStatsTemperature OBJECT-TYPE
     ::= { cucsMemoryUnitEnvStatsEntry 6 }
 
 cucsMemoryUnitEnvStatsTemperatureAvg OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -2487,7 +2487,7 @@ cucsMemoryUnitEnvStatsTemperatureAvg OBJECT-TYPE
     ::= { cucsMemoryUnitEnvStatsEntry 7 }
 
 cucsMemoryUnitEnvStatsTemperatureMax OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -2496,7 +2496,7 @@ cucsMemoryUnitEnvStatsTemperatureMax OBJECT-TYPE
     ::= { cucsMemoryUnitEnvStatsEntry 8 }
 
 cucsMemoryUnitEnvStatsTemperatureMin OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -2554,10 +2554,10 @@ CucsMemoryUnitEnvStatsHistEntry ::= SEQUENCE {
     cucsMemoryUnitEnvStatsHistId                                     Unsigned64,
     cucsMemoryUnitEnvStatsHistMostRecent                             TruthValue,
     cucsMemoryUnitEnvStatsHistSuspect                                TruthValue,
-    cucsMemoryUnitEnvStatsHistTemperature                            SnmpAdminString,
-    cucsMemoryUnitEnvStatsHistTemperatureAvg                         SnmpAdminString,
-    cucsMemoryUnitEnvStatsHistTemperatureMax                         SnmpAdminString,
-    cucsMemoryUnitEnvStatsHistTemperatureMin                         SnmpAdminString,
+    cucsMemoryUnitEnvStatsHistTemperature                            INTEGER,
+    cucsMemoryUnitEnvStatsHistTemperatureAvg                         INTEGER,
+    cucsMemoryUnitEnvStatsHistTemperatureMax                         INTEGER,
+    cucsMemoryUnitEnvStatsHistTemperatureMin                         INTEGER,
     cucsMemoryUnitEnvStatsHistThresholded                            CucsMemoryUnitEnvStatsHistThresholded,
     cucsMemoryUnitEnvStatsHistTimeCollected                          DateAndTime
 }
@@ -2613,7 +2613,7 @@ cucsMemoryUnitEnvStatsHistSuspect OBJECT-TYPE
     ::= { cucsMemoryUnitEnvStatsHistEntry 6 }
 
 cucsMemoryUnitEnvStatsHistTemperature OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -2622,7 +2622,7 @@ cucsMemoryUnitEnvStatsHistTemperature OBJECT-TYPE
     ::= { cucsMemoryUnitEnvStatsHistEntry 7 }
 
 cucsMemoryUnitEnvStatsHistTemperatureAvg OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -2631,7 +2631,7 @@ cucsMemoryUnitEnvStatsHistTemperatureAvg OBJECT-TYPE
     ::= { cucsMemoryUnitEnvStatsHistEntry 8 }
 
 cucsMemoryUnitEnvStatsHistTemperatureMax OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -2640,7 +2640,7 @@ cucsMemoryUnitEnvStatsHistTemperatureMax OBJECT-TYPE
     ::= { cucsMemoryUnitEnvStatsHistEntry 9 }
 
 cucsMemoryUnitEnvStatsHistTemperatureMin OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION

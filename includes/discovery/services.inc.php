@@ -1,5 +1,7 @@
 <?php
 
+require_once base_path('includes/services.inc.php');
+
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\ServiceTemplateController;
 
@@ -27,7 +29,7 @@ if (LibrenmsConfig::get('discover_services')) {
                 if (trim($tcpstatus) == 'listen') {
                     $split_oid = explode('.', $oid);
                     $tcp_port = $split_oid[count($split_oid) - 6];
-                    if ($known_services[$tcp_port]) {
+                    if (isset($known_services[$tcp_port])) {
                         discover_service($device, $known_services[$tcp_port]);
                     }
                 }

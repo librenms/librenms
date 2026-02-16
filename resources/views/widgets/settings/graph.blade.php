@@ -110,6 +110,21 @@
             @endforeach
         </select>
     </div>
+    <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_sensors-{{ $id }}" style="display: none;">
+        <label for="graph_sensors-{{ $id }}" class="control-label">{{ __('Sensors') }}</label>
+        <p class="help-block small">{{ __('Select sensors of the same type (e.g., all Power or all Temperature). Type to search or scroll for more.') }}</p>
+        <select class="form-control" id="graph_sensors-{{ $id }}" name="graph_sensors[]" multiple="multiple" data-placeholder="{{ __('Type to search sensors...') }}">
+            @foreach($graph_sensors as $sensor)
+                @if($sensor && $sensor->sensor_id)
+                    <option value="{{ $sensor->sensor_id }}" selected>{{ $sensor->device->shortDisplayName() . ' - ' . $sensor->sensor_descr . ' (' . ucfirst($sensor->sensor_class) . ')' }}</option>
+                @endif
+            @endforeach
+        </select>
+        <label class="control-label" style="margin-top: 10px; font-weight: normal;">
+            <input type="checkbox" name="graph_stack" value="yes" @if(($graph_stack ?? 'no') == 'yes') checked @endif style="margin-right: 5px;">
+            {{ __('Stack sensors (show aggregate total)') }}
+        </label>
+    </div>
 @endsection
 
 @section('javascript')
@@ -132,7 +147,33 @@
         init_select2('#graph_customoid-{{ $id }}', 'customoid', {limit: 100}, '{{ $graph_customoid ?: '' }}');
         init_select2('#graph_bill-{{ $id }}', 'bill', {limit: 100}, '{{ $graph_bill ?: '' }}');
         init_select2('#graph_custom-{{ $id }}', 'graph-aggregate', {}, false);
-        init_select2('#graph_ports-{{ $id }}', 'port', {limit: 100}, {{ $graph_port_ids }});
+        init_select2('#graph_ports-{{ $id }}', 'port', {limit: 100}, false);
+
+        // Sensor selector with intelligent class filtering
+        var sensorClassFilter{{ $id }} = null;
+        init_select2('#graph_sensors-{{ $id }}', 'sensor', function(params) {
+            return {
+                limit: 50,
+                term: params.term,
+                page: params.page || 1,
+                sensor_class: sensorClassFilter{{ $id }}
+            };
+        }, false);  // Don't pass initial selection - options already rendered in template
+
+        // When a sensor is selected, filter subsequent selections to same class
+        $('#graph_sensors-{{ $id }}').on('select2:select', function(e) {
+            if (e.params.data.sensor_class && !sensorClassFilter{{ $id }}) {
+                sensorClassFilter{{ $id }} = e.params.data.sensor_class;
+            }
+        });
+
+        // When all sensors are removed, clear the filter
+        $('#graph_sensors-{{ $id }}').on('select2:unselect', function(e) {
+            var remaining = $(this).val();
+            if (!remaining || remaining.length === 0) {
+                sensorClassFilter{{ $id }} = null;
+            }
+        });
 
         function switch_graph_type{{ $id }}(data) {
             $('.graph_select_extra-{{ $id }}').hide();

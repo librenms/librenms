@@ -1,4 +1,3 @@
-mib: SEMI-MIB
 modules:
     os:
         hardware: SEMI-MIB::hpHttpMgDeviceProductName.1
@@ -8,10 +7,10 @@ modules:
         state:
             data:
                 -
-                    oid: hpHttpMgHealth
+                    oid: SEMI-MIB::hpHttpMgHealth
                     num_oid: '.1.3.6.1.4.1.11.2.36.1.1.2.3.{{ $index }}'
                     index: 'hpHttpMgHealth.{{ $index }}'
-                    descr: Operating Status
+                    descr: SEMI-MIB::Operating Status
                     states:
                         - { descr: Unknown, graph: 1, value: 1, generic: 3 }
                         - { descr: Information, graph: 1, value: 2, generic: 0 }

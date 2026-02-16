@@ -3,7 +3,7 @@
 @section('title', __('Outages'))
 
 @php
-$refresh = request()->get('refresh', 30);
+$refresh = request()->input('refresh', 30);
 @endphp
 
 @section('content')

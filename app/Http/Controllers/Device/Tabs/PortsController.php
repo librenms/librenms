@@ -249,7 +249,7 @@ class PortsController implements DeviceTab
     private function graphData(Device $device, Request $request): array
     {
         return [
-            'graph_type' => 'port_' . $request->get('type'),
+            'graph_type' => 'port_' . $request->input('type'),
             'ports' => $this->getFilteredPortsQuery($device)->get(),
         ];
     }

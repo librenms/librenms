@@ -124,6 +124,14 @@ modules:
                     index: 'ePDULoadStatusVoltage.{{ $index }}'
                     descr: 'Input'
                     divisor: 10
+        power:
+            data:
+                -
+                    oid: CPS-MIB::ePDULoadStatusActivePower
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.3.2.3.1.1.7.{{ $index }}'
+                    index: 'ePDULoadStatusActivePower.{{ $index }}'
+                    descr: 'PDU Active Power {{ $index }}'
+                    divisor: 1
         load:
             data:
                 -

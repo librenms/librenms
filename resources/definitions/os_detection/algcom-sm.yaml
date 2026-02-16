@@ -1,6 +1,6 @@
 os: algcom-sm
 text: 'ALGCOM SM'
-type: power
+type: environment
 icon: algcom
 mib_dir: algcom
 over:

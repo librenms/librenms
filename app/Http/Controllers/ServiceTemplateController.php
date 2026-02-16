@@ -195,7 +195,7 @@ class ServiceTemplateController extends Controller
         $devices_updated = false;
         if ($template->type == 'static') {
             // sync device_ids from input
-            $updated = $template->devices()->sync($request->get('devices', []));
+            $updated = $template->devices()->sync($request->input('devices', []));
             // check for attached/detached/updated
             $devices_updated = array_sum(array_map(count(...), $updated)) > 0;
         } elseif ($template->type == 'dynamic') {
@@ -203,7 +203,7 @@ class ServiceTemplateController extends Controller
         }
 
         // sync device_group_ids from input
-        $updated = $template->groups()->sync($request->get('groups', []));
+        $updated = $template->groups()->sync($request->input('groups', []));
         // check for attached/detached/updated
         $device_groups_updated = array_sum(array_map(count(...), $updated)) > 0;
 

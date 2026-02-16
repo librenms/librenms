@@ -107,6 +107,7 @@ return [
                 'list_bad_files_title' => 'Error running rrdinfo on files',
                 'list_bad_step_item' => ':file: step is :step, should be :target',
                 'ok' => 'All :total RRD files have the correct step.',
+                'timeout' => 'Checking RRD files took too long, check skipped. You can run :command to check and fix all rrd files.',
             ],
         ],
         'database' => [

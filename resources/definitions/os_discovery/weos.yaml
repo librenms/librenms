@@ -1,4 +1,3 @@
-mib: HDSL2-SHDSL-LINE-MIB:WESTERMO-INTERFACE-MIB:WESTERMO-OID-MIB:WESTERMO-WEOS-MIB
 modules:
     os:
         version: SNMPv2-MIB::sysDescr.0
@@ -13,14 +12,14 @@ modules:
             data:
                 -
                     oid:
-                        - ifName
+                        - IF-MIB::ifName
         snr:
             data:
                 -
-                    oid: hdsl2ShdslEndpointCurrTable
-                    value: hdsl2ShdslEndpointCurrSnrMgn
+                    oid: HDSL2-SHDSL-LINE-MIB::hdsl2ShdslEndpointCurrTable
+                    value: HDSL2-SHDSL-LINE-MIB::hdsl2ShdslEndpointCurrSnrMgn
                     num_oid: '.1.3.6.1.2.1.10.48.1.5.1.2.{{ $index }}'
-                    descr: 'DSL {{ $ifName:0 }} SNR'
+                    descr: 'DSL {{ IF-MIB::ifName:0 }} SNR'
                     index: 'snr-{{ $index }}'
                     low_limit: 6
                     low_warn_limit: 10

@@ -1,10 +1,10 @@
 <div id="alertlog_container-{{ $id }}" data-reload="false">
     <div class="table-responsive">
-        <table id="alertlog_{{ $id }}" class="table table-hover table-condensed alerts">
+        <table id="alertlog_{{ $id }}" class="table table-hover table-condensed alerts" data-url="{{ route('table.alertlog') }}">
             <thead>
             <tr>
                 <th data-column-id="status" data-sortable="false"></th>
-                <th data-column-id="time_logged" data-order="desc">{{ __('Timestamp') }}</th>
+                <th data-column-id="time_logged" data-order="desc" data-converter="datetime">{{ __('Timestamp') }}</th>
                 <th data-column-id="details" data-sortable="false">&nbsp;</th>
                 <th data-column-id="hostname">{{ __('Device') }}</th>
                 <th data-column-id="alert">{{ __('Alert') }}</th>
@@ -21,14 +21,25 @@
             navigation: ! {{ $hidenavigation }},
             post: function () {
                 return {
-                    id: "alertlog",
-                    device_id: "",
                     device_group: "{{ $device_group }}",
                     state: '{{ $state }}',
-                    min_severity: '{{ $min_severity }}',
+                    severity: @json($severity),
                 };
             },
-            url: "ajax_table.php"
+            converters: {
+                datetime: {
+                    from: function (value) {
+                        return new Date(value).toISOString();
+                    },
+                    to: function (value) {
+                        let formatter = new Intl.DateTimeFormat(navigator.language, {
+                            dateStyle: 'medium',
+                            timeStyle: 'short'
+                        });
+                        return formatter.format(new Date(value));
+                    }
+                }
+            }
         }).on("loaded.rs.jquery.bootgrid", function () {
             grid.find(".incident-toggle").each(function () {
                 $(this).parent().addClass('incident-toggle-td');

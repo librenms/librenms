@@ -1,4 +1,3 @@
-mib: L-AM3440-A-Private
 modules:
   os:
     hardware_mib: L-AM3440-A-Private
@@ -7,8 +6,8 @@ modules:
   sensors:
     state:
       data:
-        - oid: dualPowerTable
-          value: power1Status
+        - oid: L-AM3440-A-Private::dualPowerTable
+          value: L-AM3440-A-Private::power1Status
           state_name: power1Status
           num_oid: ".1.3.6.1.4.1.823.34441.1.10.3.{{ $index }}"
           index: "power1Status.{{ $index }}"
@@ -23,8 +22,9 @@ modules:
             - { value: 6, generic: 3, graph: 0, descr: none }
             - { value: 7, generic: 0, graph: 0, descr: dc-125v }
 
-        - oid: dualPowerTable
-          value: power2Status
+        - oid: L-AM3440-A-Private::dualPowerTable
+          value: L-AM3440-A-Private::power2Status
+          state_name: dualPowerTable
           num_oid: ".1.3.6.1.4.1.823.34441.1.10.4.{{ $index }}"
           index: "power2Status.{{ $index }}"
           descr: Power 2 Status
@@ -38,7 +38,8 @@ modules:
             - { value: 6, generic: 3, graph: 0, descr: none }
             - { value: 7, generic: 0, graph: 0, descr: dc-125v }
 
-        - oid: ccConsoleStatus
+        - oid: L-AM3440-A-Private::ccConsoleStatus
+          state_name: ccConsoleStatus
           num_oid: ".1.3.6.1.4.1.823.34441.1.4.21.{{ $index }}"
           index: 'ccConsoleStatus.{{ $index }}'
           descr: Console state
@@ -58,7 +59,8 @@ modules:
             - { value: 18, generic: 0, graph: 0, descr: ssh4-active }
             - { value: 19, generic: 0, graph: 0, descr: ssh5-active }
 
-        - oid: ccConsoleLockoutState
+        - oid: L-AM3440-A-Private::ccConsoleLockoutState
+          state_name: ccConsoleLockoutState
           num_oid: ".1.3.6.1.4.1.823.34441.1.4.34.{{ $index }}"
           index: 'ccConsoleLockoutState.{{ $index }}'
           descr: Local console state
@@ -67,7 +69,8 @@ modules:
             - { value: 1, generic: 2, graph: 0, descr: 'Locked' }
             - { value: 2, generic: 0, graph: 0, descr: 'Open' }
 
-        - oid:  ccTelnetLockoutState
+        - oid: L-AM3440-A-Private::ccTelnetLockoutState
+          state_name: ccTelnetLockoutState
           num_oid: ".1.3.6.1.4.1.823.34441.1.4.35.{{ $index }}"
           index: 'ccTelnetLockoutState.{{ $index }}'
           descr: Remote console state
@@ -78,71 +81,71 @@ modules:
 
     power:
       data:
-        - oid:  dualPowerTable
-          value: powerConsumption
+        - oid: L-AM3440-A-Private::dualPowerTable
+          value: L-AM3440-A-Private::powerConsumption
           num_oid: ".1.3.6.1.4.1.823.34441.1.10.5.{{ $index }}"
           index: "powerConsumption.{{ $index }}"
           descr: Power consumption
     temperature:
       data:
-        - oid: c1Temperature
+        - oid: L-AM3440-A-Private::c1Temperature
           num_oid: '.1.3.6.1.4.1.823.34441.1.10.11.{{ $index }}'
-          snmp_flags: '-OQUsb'
+          snmp_flags: '-OQUSb'
           index: 'c1Temperature.{{ $index }}'
           descr: Chassis 1
           high_limit: 90
 
-        - oid:  dpwmTemperature
+        - oid: L-AM3440-A-Private::dpwmTemperature
           num_oid: '.1.3.6.1.4.1.823.34441.1.10.16.{{ $index }}'
-          snmp_flags: '-OQUsb'
+          snmp_flags: '-OQUSb'
           index: ' dpwmTemperature.{{ $index }}'
           descr: DPWM Temperature
           high_limit: 90
 
     voltage:
       data:
-        - oid: dpwmInputVoltage
+        - oid: L-AM3440-A-Private::dpwmInputVoltage
           num_oid: '.1.3.6.1.4.1.823.34441.1.10.15.{{ $index }}'
           descr:  DWMP Input Voltage
           index: 'dpwmInputVoltage.{{ $index }}'
 
-        - oid: dpwmCH0Voltage
+        - oid: L-AM3440-A-Private::dpwmCH0Voltage
           num_oid: '.1.3.6.1.4.1.823.34441.1.10.17.{{ $index }}'
           descr:  DWMP Chanel 0 Voltage
           index: 'dpwmCH0Voltage.{{ $index }}'
 
-        - oid: dpwmCH1Voltage
+        - oid: L-AM3440-A-Private::dpwmCH1Voltage
           num_oid: '.1.3.6.1.4.1.823.34441.1.10.18.{{ $index }}'
           descr:  DWMP Chanel 1 Voltage
           index: 'dpwmCH1Voltage.{{ $index }}'
 
-        - oid: dpwmCH2Voltage
+        - oid: L-AM3440-A-Private::dpwmCH2Voltage
           num_oid: '.1.3.6.1.4.1.823.34441.1.10.19.{{ $index }}'
           descr:  DWMP Chanel 2 Voltage
           index: 'dpwmCH2Voltage.{{ $index }}'
 
-        - oid: dpwmCH3Voltage
+        - oid: L-AM3440-A-Private::dpwmCH3Voltage
           num_oid: '.1.3.6.1.4.1.823.34441.1.10.20.{{ $index }}'
           descr:  DWMP Chanel 3 Voltage
           index: 'dpwmCH3Voltage.{{ $index }}'
     current:
       data:
-        - oid: dpwmCH0Current
+        - oid: L-AM3440-A-Private::dpwmCH0Current
           num_oid: '.1.3.6.1.4.1.823.34441.1.10.21.{{ $index }}'
           descr:  DWMP Chanel 0 current
           index: 'dpwmCH0Current.{{ $index }}'
 
-        - oid: dpwmCH1Current
+        - oid: L-AM3440-A-Private::dpwmCH1Current
           num_oid: '.1.3.6.1.4.1.823.34441.1.10.22.{{ $index }}'
           descr:  DWMP Chanel 1 current
           index: 'dpwmCH1Current.{{ $index }}'
 
-        - oid: dpwmCH2Current
+        - oid: L-AM3440-A-Private::dpwmCH2Current
           num_oid: '.1.3.6.1.4.1.823.34441.1.10.23.{{ $index }}'
           descr:  DWMP Chanel 2 current
           index: 'dpwmCH2Current.{{ $index }}'
 
-        - oid: dpwmCH3Current
+        - oid: L-AM3440-A-Private::dpwmCH3Current
           num_oid: '.1.3.6.1.4.1.823.34441.1.10.24.{{ $index }}'
           descr:  DWMP Chanel 3 current
           index: 'dpwmCH3Current.{{ $index }}'

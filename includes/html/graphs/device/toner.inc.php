@@ -3,7 +3,6 @@
 require 'includes/html/graphs/common.inc.php';
 
 $graph_params->scale_min = 0;
-$graph_params->sloped_mode = true;
 
 $iter = '1';
 $rrd_options[] = 'COMMENT:Toner level            Cur     Min      Max\\n';

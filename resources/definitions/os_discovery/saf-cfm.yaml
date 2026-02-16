@@ -1,11 +1,9 @@
----
-mib: SAF-MPMUX-MIB
 modules:
     processors:
         data:
             -
                 num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.28.{{ $index }}'
-                oid: cpuUsage
+                oid: SAF-MPMUX-MIB::cpuUsage
                 precision: 1
                 type: saf-cfm
     sensors:
@@ -15,7 +13,7 @@ modules:
                     descr: 'Active link'
                     index: 'activeLink.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.5.1.{{ $index }}'
-                    oid: activeLink
+                    oid: SAF-MPMUX-MIB::activeLink
                     state_name: activeLink
                     states:
                         - { value: 0, descr: Unknown, graph: 1, generic: 1 }
@@ -26,7 +24,7 @@ modules:
                     descr: 'Active TX'
                     index: 'activeTx.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.5.2.{{ $index }}'
-                    oid: activeTx
+                    oid: SAF-MPMUX-MIB::activeTx
                     state_name: activeTx
                     states:
                         - { value: 0, descr: None, graph: 1, generic: 2 }
@@ -37,7 +35,7 @@ modules:
                     descr: 'Forced link'
                     index: 'forcedLink.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.5.4.{{ $index }}'
-                    oid: forcedLink
+                    oid: SAF-MPMUX-MIB::forcedLink
                     state_name: forcedLink
                     states:
                         - { value: 0, descr: Off, graph: 1, generic: 0 }
@@ -48,7 +46,7 @@ modules:
                     descr: 'Switch mode'
                     index: 'switchMode.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.5.5.{{ $index }}'
-                    oid: switchMode
+                    oid: SAF-MPMUX-MIB::switchMode
                     state_name: switchMode
                     states:
                         - { value: 0, descr: Unknown, graph: 1, generic: 1 }
@@ -59,7 +57,7 @@ modules:
                     descr: 'Switch enabled for RX BER'
                     index: 'switchEnabledForRxBer.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.5.13.{{ $index }}'
-                    oid: switchEnabledForRxBer
+                    oid: SAF-MPMUX-MIB::switchEnabledForRxBer
                     state_name: switchEnabledForRxBer
                     states:
                         - { value: 0, descr: Disabled, graph: 1, generic: 0 }
@@ -68,7 +66,7 @@ modules:
                     descr: Sync
                     index: 'bbSyncLostAlarm.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.2.6.{{ $index }}'
-                    oid: bbSyncLostAlarm
+                    oid: SAF-MPMUX-MIB::bbSyncLostAlarm
                     state_name: bbSyncLostAlarm
                     states:
                         - { value: 0, descr: Ok, graph: 1, generic: 0 }
@@ -77,7 +75,7 @@ modules:
                     descr: 'R1 Operation'
                     index: 'rf1Operation.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.3.1.{{ $index }}'
-                    oid: rf1Operation
+                    oid: SAF-MPMUX-MIB::rf1Operation
                     state_name: rf1Operation
                     states:
                         - { value: 0, descr: None, graph: 1, generic: 1 }
@@ -90,7 +88,7 @@ modules:
                     descr: 'R2 Operation'
                     index: 'rf2Operation.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.4.1.{{ $index }}'
-                    oid: rf2Operation
+                    oid: SAF-MPMUX-MIB::rf2Operation
                     state_name: rf2Operation
                     states:
                         - { value: 0, graph: 1, generic: 1, descr: None }
@@ -103,7 +101,7 @@ modules:
                     descr: 'R1 Humidity'
                     index: 'rf1OduHumidity.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.3.16.{{ $index }}'
-                    oid: rf1OduHumidity
+                    oid: SAF-MPMUX-MIB::rf1OduHumidity
                     state_name: rf1OduHumidity
                     states:
                         - { value: 0, descr: Low, graph: 1, generic: 0 }
@@ -112,7 +110,7 @@ modules:
                     descr: 'R2 Humidity'
                     index: 'rf2OduHumidity.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.4.16.{{ $index }}'
-                    oid: rf2OduHumidity
+                    oid: SAF-MPMUX-MIB::rf2OduHumidity
                     state_name: rf2OduHumidity
                     states:
                         - { value: 0, descr: Low, graph: 1, generic: 0 }
@@ -121,7 +119,7 @@ modules:
                     descr: R1CblPwrStat
                     index: 'termRf1CablePowerStatus.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.14.{{ $index }}'
-                    oid: termRf1CablePowerStatus
+                    oid: SAF-MPMUX-MIB::termRf1CablePowerStatus
                     state_name: termRf1CablePowerStatus
                     states:
                         - { value: 0, descr: 'false', graph: 1, generic: 1 }
@@ -133,7 +131,7 @@ modules:
                     descr: R2CblPwrStat
                     index: 'termRf2CablePowerStatus.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.15.{{ $index }}'
-                    oid: termRf2CablePowerStatus
+                    oid: SAF-MPMUX-MIB::termRf2CablePowerStatus
                     state_name: termRf2CablePowerStatus
                     states:
                         - { value: 0, descr: 'false', graph: 1, generic: 1 }
@@ -147,93 +145,93 @@ modules:
                     descr: 'R1 cable attenuation'
                     index: 'rf1CableAttenuation.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.3.11.{{ $index }}'
-                    oid: rf1CableAttenuation
+                    oid: SAF-MPMUX-MIB::rf1CableAttenuation
                 -
                     descr: 'R2 cable attenuation'
                     index: 'rf2CableAttenuation.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.4.11.{{ $index }}'
-                    oid: rf2CableAttenuation
+                    oid: SAF-MPMUX-MIB::rf2CableAttenuation
         temperature:
             data:
                 -
                     descr: 'Idu temp'
                     index: 'termIduTemperature.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.6.{{ $index }}'
-                    oid: termIduTemperature
+                    oid: SAF-MPMUX-MIB::termIduTemperature
                 -
                     descr: 'R1 odu temp'
                     index: 'rf1OduTemperature.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.3.15.{{ $index }}'
-                    oid: rf1OduTemperature
+                    oid: SAF-MPMUX-MIB::rf1OduTemperature
                 -
                     descr: 'R2 odu temp'
                     index: 'rf2OduTemperature.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.4.15.{{ $index }}'
-                    oid: rf2OduTemperature
+                    oid: SAF-MPMUX-MIB::rf2OduTemperature
         voltage:
             data:
                 -
                     descr: 'PSU-1 3V'
                     index: 'power3V3PS1.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.16.{{ $index }}'
-                    oid: power3V3PS1
+                    oid: SAF-MPMUX-MIB::power3V3PS1
                 -
                     descr: 'PSU-1 5V'
                     index: 'power5VPS1.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.17.{{ $index }}'
-                    oid: power5VPS1
+                    oid: SAF-MPMUX-MIB::power5VPS1
                 -
                     descr: 'PSU-1 -5V'
                     index: 'powerM5VPS1.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.18.{{ $index }}'
-                    oid: powerM5VPS1
+                    oid: SAF-MPMUX-MIB::powerM5VPS1
                 -
                     descr: 'ODU-1 V'
                     index: 'powerODU1V.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.19.{{ $index }}'
-                    oid: powerODU1V
+                    oid: SAF-MPMUX-MIB::powerODU1V
                 -
                     descr: 'PSU-2 3V'
                     index: 'power3V3PS2.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.22.{{ $index }}'
-                    oid: power3V3PS2
+                    oid: SAF-MPMUX-MIB::power3V3PS2
                 -
                     descr: 'PSU-2 5V'
                     index: 'power5VPS2.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.23.{{ $index }}'
-                    oid: power5VPS2
+                    oid: SAF-MPMUX-MIB::power5VPS2
                 -
                     descr: 'PSU-2 -5V'
                     index: 'powerM5VPS2.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.24.{{ $index }}'
-                    oid: powerM5VPS2
+                    oid: SAF-MPMUX-MIB::powerM5VPS2
                 -
                     descr: 'ODU-2 V'
                     index: 'powerODU2V.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.25.{{ $index }}'
-                    oid: powerODU2V
+                    oid: SAF-MPMUX-MIB::powerODU2V
         current:
             data:
                 -
                     descr: 'ODU-1 Amp'
                     index: 'powerODU1I.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.20.{{ $index }}'
-                    oid: powerODU1I
+                    oid: SAF-MPMUX-MIB::powerODU1I
                 -
                     descr: 'ODU-2 Amp'
                     index: 'powerODU2I.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.26.{{ $index }}'
-                    oid: powerODU2I
+                    oid: SAF-MPMUX-MIB::powerODU2I
         power:
             data:
                 -
                     descr: 'OUD-1 Watt'
                     index: 'powerODU1W.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.21.{{ $index }}'
-                    oid: powerODU1W
+                    oid: SAF-MPMUX-MIB::powerODU1W
                 -
                     descr: 'OUD-2 Watt'
                     index: 'powerODU2W.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.27.{{ $index }}'
-                    oid: powerODU2W
+                    oid: SAF-MPMUX-MIB::powerODU2W
 

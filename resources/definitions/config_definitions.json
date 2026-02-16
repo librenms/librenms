@@ -392,47 +392,80 @@
             "type": "array"
         },
         "apps.powerdns-recursor.api-key": {
-            "type": "text"
+            "type": "text",
+            "group": "apps",
+            "section": "powerdns-recursor",
+            "order": 0
         },
         "apps.powerdns-recursor.https": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "powerdns-recursor",
+            "order": 1
         },
         "apps.powerdns-recursor.port": {
             "default": 8082,
-            "type": "integer"
+            "type": "integer",
+            "group": "apps",
+            "section": "powerdns-recursor",
+            "order": 2
         },
         "apps.oslv_monitor.seen_age": {
             "default": 604800,
-            "type": "integer"
+            "type": "integer",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 0
         },
         "apps.oslv_monitor.linux_pg_memory_stats": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 1
         },
         "apps.oslv_monitor.misc_linux_memory_stats": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 2
         },
         "apps.oslv_monitor.zswap_size": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 3
         },
         "apps.oslv_monitor.zswap_activity": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 4
         },
         "apps.oslv_monitor.workingset_stats": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 5
         },
         "apps.oslv_monitor.thp_activity": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 6
         },
         "apps.sneck.polling_time_diff": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "sneck",
+            "order": 0
         },
         "astext": {
             "default": {
@@ -1974,10 +2007,6 @@
             "order": 2,
             "default": false,
             "type": "boolean"
-        },
-        "dot": {
-            "default": "/usr/bin/dot",
-            "type": "executable"
         },
         "email_auto_tls": {
             "default": true,
@@ -6824,13 +6853,6 @@
             "order": 26,
             "type": "boolean"
         },
-        "sfdp": {
-            "default": "/usr/bin/sfdp",
-            "group": "external",
-            "section": "binaries",
-            "order": 7,
-            "type": "executable"
-        },
         "shorthost_target_length": {
             "group": "webui",
             "section": "graph",
@@ -7036,15 +7058,130 @@
         },
         "sso.create_users": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "auth",
+            "section": "sso",
+            "order": 0
+        },
+        "sso.descr_attr":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 1
+        },
+        "sso.email_attr":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 2
+        },
+        "sso.group_attr":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 3
+        },
+        "sso.group_delimiter":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 4
+        },
+        "sso.group_filter":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 5
+        },
+        "sso.group_level_map":{
+            "default": {},
+            "type": "group-role-map",
+            "group": "auth",
+            "section": "sso",
+            "options": {
+                "groupPlaceholder": "Group Name"
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "array",
+                "value.*.roles": "array|required",
+                "value.*.roles.*": "string"
+            },
+            "order": 6
+        },
+        "sso.group_strategy": {
+            "default": null,
+            "type": "select",
+            "options": {
+                "attribute": "attribute",
+                "map": "map",
+                "static": "static"
+            },
+            "group": "auth",
+            "section": "sso",
+            "order": 7
+        },
+        "sso.level_attr":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 8
+        },
+        "sso.mode":{
+            "default": "env",
+            "type": "select",
+            "options": {
+                "env": "env",
+                "header": "header"
+            },
+            "group": "auth",
+            "section": "sso",
+            "order": 9
+        },
+        "sso.realname_attr":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 10
+        },
+        "sso.static_level":{
+            "default": null,
+            "type": "integer",
+            "group": "auth",
+            "section": "sso",
+            "order": 11
+        },
+        "sso.trusted_proxies":{
+            "default": [],
+            "type": "array",
+            "group": "auth",
+            "section": "sso",
+            "validate": {
+                 "value": "array",
+                 "value.*": "string"
+             },
+            "order": 12
         },
         "sso.update_users": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "auth",
+            "section": "sso",
+            "order": 13
         },
         "sso.user_attr": {
             "default": "REMOTE_USER",
-            "type": "text"
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 14
         },
         "storage_perc_warn": {
             "default": 60,
@@ -7219,6 +7356,34 @@
             "section": "general",
             "type": "boolean",
             "order": 4
+        },
+        "webui.alert_map_box_size": {
+            "default": 165,
+            "group": "webui",
+            "section": "alert-map",
+            "order": 3,
+            "type": "text"
+        },
+        "webui.alert_map_compact": {
+            "default": false,
+            "group": "webui",
+            "section": "alert-map",
+            "order": 0,
+            "type": "boolean"
+        },
+        "webui.alert_map_sort_status": {
+            "default": false,
+            "group": "webui",
+            "section": "alert-map",
+            "order": 1,
+            "type": "boolean"
+        },
+        "webui.alert_map_use_device_groups": {
+            "default": false,
+            "group": "webui",
+            "section": "alert-map",
+            "order": 2,
+            "type": "boolean"
         },
         "webui.availability_map_box_size": {
             "default": 165,

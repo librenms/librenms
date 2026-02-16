@@ -174,7 +174,7 @@ abstract class Model
      */
     public static function onDelete($model)
     {
-        if (\App::runningInConsole()) {
+        if (app()->runningInConsole()) {
             echo '-';
         }
     }
@@ -184,7 +184,7 @@ abstract class Model
      */
     public static function onCreate($model)
     {
-        if (\App::runningInConsole()) {
+        if (app()->runningInConsole()) {
             echo '+';
         }
     }
@@ -194,14 +194,14 @@ abstract class Model
      */
     public static function onUpdate($model)
     {
-        if (\App::runningInConsole()) {
+        if (app()->runningInConsole()) {
             echo 'U';
         }
     }
 
     public static function onNoUpdate()
     {
-        if (\App::runningInConsole()) {
+        if (app()->runningInConsole()) {
             echo '.';
         }
     }

@@ -1,4 +1,3 @@
-mib: SYNOLOGY-SYSTEM-MIB:SYNOLOGY-RAID-MIB:SYNOLOGY-DISK-MIB
 modules:
     os:
         hardware: SYNOLOGY-SYSTEM-MIB::modelName.0
@@ -9,31 +8,32 @@ modules:
         temperature:
             data:
                 -
-                    oid: temperature
+                    oid: SYNOLOGY-SYSTEM-MIB::temperature
                     num_oid: '.1.3.6.1.4.1.6574.1.2.{{ $index }}'
                     descr: 'System'
                     index: '99'
                     group: 'System'
                 -
-                    oid: diskTable
-                    value: diskTemperature
+                    oid: SYNOLOGY-DISK-MIB::diskTable
+                    value: SYNOLOGY-DISK-MIB::diskTemperature
                     num_oid: '.1.3.6.1.4.1.6574.2.1.1.6.{{ $index }}'
-                    descr: '{{ $diskID }} {{ $diskModel }}'
+                    descr: '{{ SYNOLOGY-DISK-MIB::diskID }} {{ SYNOLOGY-DISK-MIB::diskModel }}'
                     index: '{{ $index }}'
                     group: 'Disks'
         count:
             data:
                 -
-                    oid: diskTable
-                    value: diskBadSector
+                    oid: SYNOLOGY-DISK-MIB::diskTable
+                    value: SYNOLOGY-DISK-MIB::diskBadSector
                     num_oid: '.1.3.6.1.4.1.6574.2.1.1.9.{{ $index }}'
-                    descr: '{{ $diskID }} {{ $diskModel }}'
+                    descr: '{{ SYNOLOGY-DISK-MIB::diskID }} {{ SYNOLOGY-DISK-MIB::diskModel }}'
                     index: '{{ $index }}'
                     group: 'Bad sectors'
         state:
             data:
                 -
-                    oid: systemStatus
+                    oid: SYNOLOGY-SYSTEM-MIB::systemStatus
+                    value: SYNOLOGY-SYSTEM-MIB::systemStatus
                     num_oid: '.1.3.6.1.4.1.6574.1.1.{{ $index }}'
                     descr: 'System'
                     index: '{{ $index }}'
@@ -43,7 +43,8 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: 'Normal' }
                         - { value: 2, generic: 2, graph: 0, descr: 'Failed' }
                 -
-                    oid: powerStatus
+                    oid: SYNOLOGY-SYSTEM-MIB::powerStatus
+                    value: SYNOLOGY-SYSTEM-MIB::powerStatus
                     num_oid: '.1.3.6.1.4.1.6574.1.3.{{ $index }}'
                     descr: 'Power'
                     index: '{{ $index }}'
@@ -53,7 +54,8 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: 'Normal' }
                         - { value: 2, generic: 2, graph: 0, descr: 'Failed' }
                 -
-                    oid: systemFanStatus
+                    oid: SYNOLOGY-SYSTEM-MIB::systemFanStatus
+                    value: SYNOLOGY-SYSTEM-MIB::systemFanStatus
                     num_oid: '.1.3.6.1.4.1.6574.1.4.1.{{ $index }}'
                     descr: 'FAN - System'
                     index: '{{ $index }}'
@@ -63,7 +65,8 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: 'Normal' }
                         - { value: 2, generic: 2, graph: 0, descr: 'Failed' }
                 -
-                    oid: cpuFanStatus
+                    oid: SYNOLOGY-SYSTEM-MIB::cpuFanStatus
+                    value: SYNOLOGY-SYSTEM-MIB::cpuFanStatus
                     num_oid: '.1.3.6.1.4.1.6574.1.4.2.{{ $index }}'
                     descr: 'FAN - CPU'
                     index: '{{ $index }}'
@@ -73,7 +76,8 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: 'Normal' }
                         - { value: 2, generic: 2, graph: 0, descr: 'Failed' }
                 -
-                    oid: upgradeAvailable
+                    oid: SYNOLOGY-SYSTEM-MIB::upgradeAvailable
+                    value: SYNOLOGY-SYSTEM-MIB::upgradeAvailable
                     num_oid: '.1.3.6.1.4.1.6574.1.5.4.{{ $index }}'
                     descr: 'Upgrade Availability'
                     index: '{{ $index }}'
@@ -86,10 +90,10 @@ modules:
                         - { value: 4, generic: 3, graph: 0, descr: 'Disconnected' }
                         - { value: 5, generic: 3, graph: 0, descr: 'Others' }
                 -
-                    oid: raidTable
-                    value: raidStatus
+                    oid: SYNOLOGY-RAID-MIB::raidTable
+                    value: SYNOLOGY-RAID-MIB::raidStatus
                     num_oid: '.1.3.6.1.4.1.6574.3.1.1.3.{{ $index }}'
-                    descr: '{{ $raidName }}'
+                    descr: '{{ SYNOLOGY-RAID-MIB::raidName }}'
                     index: '{{ $index }}'
                     group: 'RAIDs'
                     state_name: raidStatusState
@@ -116,10 +120,10 @@ modules:
                         - { value: 20, generic: 1, graph: 0, descr: 'RaidMigrateSHR1ToSHR2' }
                         - { value: 21, generic: 3, graph: 0, descr: 'RaidUnknownStatus' }
                 -
-                    oid: diskTable
-                    value: diskStatus
+                    oid: SYNOLOGY-DISK-MIB::diskTable
+                    value: SYNOLOGY-DISK-MIB::diskStatus
                     num_oid: '.1.3.6.1.4.1.6574.2.1.1.5.{{ $index }}'
-                    descr: '{{ $diskID }} {{ $diskModel }}'
+                    descr: '{{ SYNOLOGY-DISK-MIB::diskID }} {{ SYNOLOGY-DISK-MIB::diskModel }}'
                     index: '{{ $index }}'
                     group: 'Disks'
                     state_name: diskStatusState
@@ -130,10 +134,10 @@ modules:
                         - { value: 4, generic: 2, graph: 0, descr: 'SystemPartitionFailed' }
                         - { value: 5, generic: 2, graph: 0, descr: 'Crashed' }
                 -
-                    oid: diskTable
-                    value: diskHealthStatus
+                    oid: SYNOLOGY-DISK-MIB::diskTable
+                    value: SYNOLOGY-DISK-MIB::diskHealthStatus
                     num_oid: '.1.3.6.1.4.1.6574.2.1.1.13.{{ $index }}'
-                    descr: '{{ $diskID }} {{ $diskModel }}'
+                    descr: '{{ SYNOLOGY-DISK-MIB::diskID }} {{ SYNOLOGY-DISK-MIB::diskModel }}'
                     index: '{{ $index }}'
                     group: 'Disk Health'
                     state_name: diskHealthStatusState

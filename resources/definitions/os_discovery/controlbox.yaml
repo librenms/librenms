@@ -1,10 +1,9 @@
-mib: CONTROLBOX-TH332-MIB
 modules:
     sensors:
         temperature:
             data:
                 -
-                    oid: temperature
+                    oid: CONTROLBOX-TH332-MIB::temperature
                       #value: sensValue
                     num_oid: '.1.3.6.1.4.1.17095.2.1.3.{{ $index }}'
                     descr: Temperature
@@ -13,7 +12,7 @@ modules:
         humidity:
             data:
                 -
-                    oid: humidity
+                    oid: CONTROLBOX-TH332-MIB::humidity
                       #value: sensValue
                     num_oid: '.1.3.6.1.4.1.17095.2.1.4.{{ $index }}'
                     descr: Humidity
@@ -22,14 +21,14 @@ modules:
         pressure:
             data:
                 -
-                     oid: dewpoint
+                     oid: CONTROLBOX-TH332-MIB::dewpoint
                      num_oid: '.1.3.6.1.4.1.17095.2.1.5.{{ $index }}'
                      descr: DewPoint
                      index: '{{ $index }}'
         state:
             data:
                 -
-                    oid: temperatureState
+                    oid: CONTROLBOX-TH332-MIB::temperatureState
                       #value: inpAlarmState
                     num_oid: '.1.3.6.1.4.1.17095.2.1.6.{{ $index }}'
                     descr: Alarm TemperatureState

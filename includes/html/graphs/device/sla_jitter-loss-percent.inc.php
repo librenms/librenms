@@ -19,7 +19,6 @@ if ($sla_nr) {
     require 'includes/html/graphs/common.inc.php';
     $graph_params->scale_min = -100;
     $graph_params->scale_max = 100;
-    $graph_params->sloped_mode = true;
     $graph_params->scale_rigid = true;
     $rrd_filename_1 = Rrd::name($device['hostname'], ['sla', $sla_nr, 'jitter']);
     $rrd_filename_2 = Rrd::name($device['hostname'], ['sla', $sla_nr, 'NumPackets']);

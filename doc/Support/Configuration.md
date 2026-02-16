@@ -320,8 +320,6 @@ SNMP program locations.
     lnms config:set nagios_plugins /usr/lib/nagios/plugins
     lnms config:set ipmitool /usr/bin/ipmitool
     lnms config:set virsh /usr/bin/virsh
-    lnms config:set dot /usr/bin/dot
-    lnms config:set sfdp /usr/bin/sfdp
     ```
 
 ## Authentication
@@ -726,7 +724,7 @@ pings enabled and also requires the following configuration setting to enable th
 To disable the MTU test, set the packet size to null (the default).
 
 The MTU check does not ensure packets can traverse the network without being fragmented.  The test makes
-sure that 2 way communication can occure even if packets need to be fragmented at any poing along the way.
+sure that 2 way communication can occure even if packets need to be fragmented at any point along the way.
 
 ## Auto discovery settings
 
