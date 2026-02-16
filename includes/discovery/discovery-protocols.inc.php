@@ -355,7 +355,6 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 
     foreach ($lldp_array as $lldp_if_array) {
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
-            
             // Initialize vars to prevent leakage from previous loops
             $ifIndex = null;
             $ifName = null;
