@@ -355,19 +355,18 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 
     foreach ($lldp_array as $lldp_if_array) {
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
-            
             $ifIndex = null;
             $ifName = null;
 
             if ($device['os'] == 'aos7') {
                 $locPortId = $lldp_local[$entry_key]['lldpLocPortId'] ?? '';
                 if (is_numeric($locPortId)) {
-                     $ifIndex = $locPortId;
-                     $ifName = null;
+                    $ifIndex = $locPortId;
+                    $ifName = null;
                 } elseif (isset($lldp_local[$entry_key]['lldpLocPortDesc'])) {
-                     $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
+                    $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
                 } else {
-                     continue;
+                    continue;
                 }
             } elseif ($device['os'] == 'routeros') {
                 $ifIndex = $entry_key;
@@ -391,7 +390,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 continue;
             }
 
-            // CRITICAL FIX: Unset the remote device variable to prevent it from leaking 
+            // CRITICAL FIX: Unset the remote device variable to prevent it from leaking
             // from the previous iteration to the current one if the current neighbor has no hostname.
             unset($remote_device);
 
