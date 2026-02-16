@@ -31,7 +31,7 @@
             </div>
             <div class="form-group @error('override_device_ssh_port') has-error @enderror">
                 <label for="override_device_ssh_port" class="col-sm-4 control-label">Override default ssh port</label>
-                <div class="col-sm-8">
+                <div class="col-sm-1">
                     <input type="text" name="override_device_ssh_port" id="override_device_ssh_port" class="form-control" value="{{ old('override_device_ssh_port', $override_device_ssh_port) }}">
                     @error('override_device_ssh_port')
                         <span class="help-block">{{ $message }}</span>
@@ -40,7 +40,7 @@
             </div>
             <div class="form-group @error('override_device_telnet_port') has-error @enderror">
                 <label for="override_device_telnet_port" class="col-sm-4 control-label">Override default telnet port</label>
-                <div class="col-sm-8">
+                <div class="col-sm-1">
                     <input type="text" name="override_device_telnet_port" id="override_device_telnet_port" class="form-control" value="{{ old('override_device_telnet_port', $override_device_telnet_port) }}">
                     @error('override_device_telnet_port')
                         <span class="help-block">{{ $message }}</span>
@@ -49,7 +49,7 @@
             </div>
             <div class="form-group @error('override_device_http_port') has-error @enderror">
                 <label for="override_device_http_port" class="col-sm-4 control-label">Override default http port</label>
-                <div class="col-sm-8">
+                <div class="col-sm-1">
                     <input type="text" name="override_device_http_port" id="override_device_http_port" class="form-control" value="{{ old('override_device_http_port', $override_device_http_port) }}">
                     @error('override_device_http_port')
                         <span class="help-block">{{ $message }}</span>
@@ -58,7 +58,7 @@
             </div>
             <div class="form-group @error('override_Unixagent_port') has-error @enderror">
                 <label for="override_Unixagent_port" class="col-sm-4 control-label">Unix agent port</label>
-                <div class="col-sm-8">
+                <div class="col-sm-1">
                     <input type="text" name="override_Unixagent_port" id="override_Unixagent_port" class="form-control" value="{{ old('override_Unixagent_port', $override_Unixagent_port) }}">
                     @error('override_Unixagent_port')
                         <span class="help-block">{{ $message }}</span>
