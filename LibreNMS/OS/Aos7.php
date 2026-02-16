@@ -133,20 +133,24 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             $authtype = (int) ($this->rowValue($row, 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserAuthtype') ?? 0);
             $loginTs = (string) ($this->rowValue($row, 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserLoginTimeStamp') ?? '');
 
-            // Logic to handle IP Address (Convert Integer to IP, handle Nulls)
-            $ipRaw = $this->rowValue($row, 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserIpAddress');
-            $ip = '0.0.0.0'; // Default to 0.0.0.0 to avoid DB Not Null constraint violation
+            // Handle IP Address parsing (AOS7 often sends Hex-String, but can send other formats)
+            $ipRaw = (string) ($this->rowValue($row, 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserIpAddress') ?? '');
+            $ip = '0.0.0.0'; // Default to prevent DB errors
 
-            if ($ipRaw !== null && $ipRaw !== '') {
-                if (is_numeric($ipRaw)) {
-                    // AOS often returns IP as an unsigned integer (e.g. 178793645) -> Convert to IP
-                    $converted = long2ip((int) $ipRaw);
-                    if ($converted) {
-                        $ip = $converted;
-                    }
-                } elseif (filter_var($ipRaw, FILTER_VALIDATE_IP)) {
-                    // If it is already a string IP
-                    $ip = $ipRaw;
+            // 1. Try Hex String decoding (Common for AOS7/8) e.g. "0A 0B 0C 0D"
+            $hexDecoded = $this->decodeHexIp($ipRaw);
+            if ($hexDecoded) {
+                $ip = $hexDecoded;
+            }
+            // 2. If it was already a valid IP string
+            elseif (filter_var($ipRaw, FILTER_VALIDATE_IP)) {
+                $ip = $ipRaw;
+            }
+            // 3. Fallback for Integer format (Common for AOS6, rare for AOS7 but safer to have)
+            elseif (is_numeric($ipRaw) && $ipRaw > 0) {
+                $converted = long2ip((int) $ipRaw);
+                if ($converted) {
+                    $ip = $converted;
                 }
             }
 
@@ -239,6 +243,35 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         }
 
         return $nac;
+    }
+
+    /**
+     * Helper to decode Hex-String IP (e.g. "0A 01 02 03") to "10.1.2.3"
+     */
+    private function decodeHexIp(string $hex): ?string
+    {
+        // Clean up quotes and whitespace
+        $hex = trim($hex, " \"'");
+
+        if ($hex === '') {
+            return null;
+        }
+
+        // Match exactly 4 groups of 1-2 hex digits
+        // This handles "0a 0b 0c 0d", "0a:0b:0c:0d", "0a0b0c0d"
+        preg_match_all('/([0-9a-fA-F]{1,2})/', $hex, $matches);
+
+        // We specifically want IPv4 (4 octets)
+        // If we get 4 matches that look like bytes, assume it's an IP
+        if (! empty($matches[1]) && count($matches[1]) >= 4) {
+            // Take the first 4 bytes found
+            $bytes = array_slice($matches[1], 0, 4);
+            $octets = array_map('hexdec', $bytes);
+
+            return implode('.', $octets);
+        }
+
+        return null;
     }
 
     /**
