@@ -1,4 +1,3 @@
-mib: ICT-PLATINUM-MIB
 modules:
     os:
         hardware: ICT-PLATINUM-MIB::deviceModel.0
