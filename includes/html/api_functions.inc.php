@@ -16,6 +16,7 @@ use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\AlertTemplate;
+use App\Models\AlertTemplateMap;
 use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
@@ -1445,36 +1446,51 @@ function add_edit_alert_template(Illuminate\Http\Request $request)
     if(! isset($vars['template']) || empty($vars['template'])){
         return api_error(400, 'template variable must be set');
     }
-    if (is_numeric($vars['template_id'])) {
+    if (isset($vars['template_id']) && is_numeric($vars['template_id'])) {
         // Update template
         $create = false;
         $template_id = $vars['template_id'];
-        if (! dbUpdate(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], 'alert_templates', 'id = ?', [$vars['template_id']]) >= 0) {
-            $status = 'ok';
-        } else {
-            $message = 'Failed to update the template';
-        }
+        $template = AlertTemplate::find($template_id);
+
+        $template->template = $vars['template'];
+        $template->name = $vars['name'];
+        $template->title = $vars['title'];
+        $template->title_rec = $vars['title_rec'];
+        $template->save();
+        $status = 'ok';
     } else {
         // Create template
         if ($name != 'Default Alert Template') {
-            $vars['template_id'] = dbInsert(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], 'alert_templates');
-            if ($vars['template_id'] != false) {
+            $template = new AlertTemplate;
+            $template->template = $vars['template'];
+            $template->name = $vars['name'];
+            $template->title = $vars['title'];
+            $template->title_rec = $vars['title_rec'];
+
+
+            $template->save();
+            $template->fresh();
+            $template_id = $template->id;
+            if ($template_id != NULL) {
                 $status = 'ok';
             } else {
                 $message = 'Could not create alert template';
             }
         } else {
             $message = 'This template name is reserved!';
+            $status = 'error';
         }
     }
+
     if ($status == 'ok') {
         $alertRulesOk = true;
-        dbDelete('alert_template_map', 'alert_templates_id = ?', [$vars['template_id']]);
-
+        $alertTemplatemap = AlertTemplateMap::where('alert_templates_id', $template_id)->delete();
         foreach ($rules as $rule_id) {
-            if (! dbInsert(['alert_rule_id' => $rule_id, 'alert_templates_id' => $vars['template_id']], 'alert_template_map')) {
-                $alertRulesOk = false;
-            }
+            // Check if succesfull?
+            $new_alert_template_mapping = new AlertTemplateMap;
+            $new_alert_template_mapping->alert_rule_id = $rule_id;
+            $new_alert_template_mapping->alert_templates_id = $template_id;
+            $new_alert_template_mapping->save();
         }
 
         if ($alertRulesOk) {
@@ -1487,14 +1503,16 @@ function add_edit_alert_template(Illuminate\Http\Request $request)
     }
     
 
-    $response = ['status' => $status, 'message' => htmlentities((string) $message), 'id' => $vars['template_id'] ?? null];
+    $response = ['status' => $status, 'message' => htmlentities((string) $message), 'id' => $template_id ?? null];
     if($status == 'error'){
         return api_error(400, $message);
     }
     if($create){
         return response()->json($response, 201, [], JSON_PRETTY_PRINT);
     }
-    return response()->json($response, 201, [], JSON_PRETTY_PRINT);
+
+    return response()->json($response, 200, [], JSON_PRETTY_PRINT);
+
 
     
 }
