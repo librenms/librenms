@@ -355,17 +355,20 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 
     foreach ($lldp_array as $lldp_if_array) {
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
-            // Initialize vars to prevent leakage from previous loops
+            
             $ifIndex = null;
             $ifName = null;
 
             if ($device['os'] == 'aos7') {
-                if (isset($lldp_local[$entry_key]['lldpLocPortId']) && is_numeric($lldp_local[$entry_key]['lldpLocPortId'])) {
-                    $ifIndex = $lldp_local[$entry_key]['lldpLocPortId'];
+                $locPortId = $lldp_local[$entry_key]['lldpLocPortId'] ?? '';
+
+                if (is_numeric($locPortId)) {
+                     $ifIndex = $locPortId;
+                     $ifName = null;
                 } elseif (isset($lldp_local[$entry_key]['lldpLocPortDesc'])) {
-                    $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
+                     $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
                 } else {
-                    continue;
+                     continue;
                 }
             } elseif ($device['os'] == 'routeros') {
                 $ifIndex = $entry_key;
@@ -376,7 +379,6 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             }
 
             if ($device['os'] == 'aos7') {
-                // Pass whatever we found: ifIndex (ID) or ifName (Desc)
                 $local_port_id = find_port_id($ifName, $ifIndex, $device['device_id']);
             } else {
                 $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'] ?? null, $ifIndex, $device['device_id']);
