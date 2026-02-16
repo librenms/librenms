@@ -88,6 +88,10 @@ class ModuleTestHelper
         LibrenmsConfig::set('graphite.enable', false);
         LibrenmsConfig::set('prometheus.enable', false);
         LibrenmsConfig::set('kafka.enable', false);
+
+        // snmpsim handles any batch size, so increase max_oid to reduce process spawns
+        LibrenmsConfig::set('snmp.max_oid', 100);
+        LibrenmsConfig::set('snmp.retries', 1);
     }
 
     private static function compareOid(mixed $a, mixed $b): int
