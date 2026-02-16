@@ -1,3 +1,4 @@
+var LibreNMS = {Time: {}};
 window.maps = {};
 
 function override_config(event, state, tmp_this) {
@@ -768,4 +769,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+LibreNMS.Time.format = function (value, options = {}) {
+    let compositeOptions = {...{
+        dateStyle: "medium",
+        timeStyle: "medium",
+        timeZone: window.tz
+    }, ...options};
 
+    return new Intl.DateTimeFormat(navigator.language, compositeOptions).format(new Date(value));
+};
