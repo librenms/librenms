@@ -2284,7 +2284,7 @@
         "enable_ports_etherlike": {
             "group": "webui",
             "section": "device",
-            "order": 22,
+            "order": 23,
             "default": false,
             "type": "boolean"
         },

@@ -128,7 +128,7 @@ class PortsController implements DeviceTab
             $relationships['stackParent'] = fn ($q) => $q->select('port_id');
             $relationships['stackChildren'] = fn ($q) => $q->select('port_id');
 
-            if (Config::get('ports_ipv4_neighbours') == 'arp') {
+            if (LibrenmsConfig::get('ports_ipv4_neighbours') == 'arp') {
                 $relationships[] = 'macLinkedPorts';
             } else {
                 $relationships[] = 'ipv4Networks.ipv4';
@@ -186,20 +186,14 @@ class PortsController implements DeviceTab
         // IPv4 + IPv6 subnet if detailed
         // fa-arrow-right green portlink on devicelink
         $ids = [];
-        if (Config::get('ports_ipv4_neighbours') == 'arp') {
-            if ($port->macLinkedPorts->isNotEmpty()) {
-                $ids = $port->macLinkedPorts->pluck('port_id');
-            }
+        if (LibrenmsConfig::get('ports_ipv4_neighbours') == 'arp') {
+            $ids = $port->macLinkedPorts->where('port_id', '<>', $port->port_id)->pluck('port_id');
         } else {
-            if ($port->ipv4Networks->isNotEmpty()) {
-                $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4->pluck('port_id'))->flatten();
-            }
+            $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4where('port_id', '<>', $port->port_id)->->pluck('port_id'))->flatten();
         }
 
         foreach ($ids as $port_id) {
-            if ($port_id !== $port->port_id) {
-                $this->addPortNeighbor($neighbors, 'ipv4_network', $port_id);
-            }
+            $this->addPortNeighbor($neighbors, 'ipv4_network', $port_id);
         }
 
         if ($port->ipv6Networks->isNotEmpty()) {
