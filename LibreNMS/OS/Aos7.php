@@ -132,7 +132,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             $username = (string) ($this->rowValue($row, 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserName') ?? $macColon);
             $authtype = (int) ($this->rowValue($row, 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserAuthtype') ?? 0);
             $loginTs = (string) ($this->rowValue($row, 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserLoginTimeStamp') ?? '');
-            
+
             // Logic to handle IP Address (Convert Integer to IP, handle Nulls)
             $ipRaw = $this->rowValue($row, 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserIpAddress');
             $ip = '0.0.0.0'; // Default to 0.0.0.0 to avoid DB Not Null constraint violation
