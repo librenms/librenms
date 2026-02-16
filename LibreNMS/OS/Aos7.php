@@ -132,7 +132,23 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             $username = (string) ($this->rowValue($row, 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserName') ?? $macColon);
             $authtype = (int) ($this->rowValue($row, 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserAuthtype') ?? 0);
             $loginTs = (string) ($this->rowValue($row, 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserLoginTimeStamp') ?? '');
-            $ipHex = (string) ($this->rowValue($row, 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserIpAddress') ?? '');
+            
+            // Logic to handle IP Address (Convert Integer to IP, handle Nulls)
+            $ipRaw = $this->rowValue($row, 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserIpAddress');
+            $ip = '0.0.0.0'; // Default to 0.0.0.0 to avoid DB Not Null constraint violation
+
+            if ($ipRaw !== null && $ipRaw !== '') {
+                if (is_numeric($ipRaw)) {
+                    // AOS often returns IP as an unsigned integer (e.g. 178793645) -> Convert to IP
+                    $converted = long2ip((int) $ipRaw);
+                    if ($converted) {
+                        $ip = $converted;
+                    }
+                } elseif (filter_var($ipRaw, FILTER_VALIDATE_IP)) {
+                    // If it is already a string IP
+                    $ip = $ipRaw;
+                }
+            }
 
             // UNP details:
             //  - UnpUsed = what the switch actually applied for classification
@@ -156,7 +172,6 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
 
             $authId = sprintf('%d-%s-%d', $ifIndex, $macNoSep, (int) $vlan);
             $timeElapsed = $this->parseAosTimestamp($loginTs);
-            $ip = $this->decodeHexIp($ipHex);
 
             $authcStatus = $this->mapAosAuthcStatus($authStatus);
 
@@ -246,9 +261,9 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
 
     /**
      * Flatten COLUMN-oriented structure:
-     *   [column][ifIndex][mac][vlan] => value
+     * [column][ifIndex][mac][vlan] => value
      * into:
-     *   ["ifIndex.mac.vlan"] => [column => value, shortColumn => value, ...]
+     * ["ifIndex.mac.vlan"] => [column => value, shortColumn => value, ...]
      */
     private function flattenColumnOrientedDaTable(array $raw): array
     {
@@ -468,22 +483,6 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         }
 
         return 0;
-    }
-
-    private function decodeHexIp(string $hex): ?string
-    {
-        $hex = trim($hex);
-        $hex = trim($hex, "\"'");
-        preg_match_all('/\b[0-9a-fA-F]{2}\b/', $hex, $m);
-        $bytes = $m[0];
-
-        if (count($bytes) === 4) {
-            $octets = array_map(hexdec(...), $bytes);
-
-            return implode('.', $octets);
-        }
-
-        return null;
     }
 
     public function discoverVlans(): Collection
