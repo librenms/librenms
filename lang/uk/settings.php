@@ -1026,10 +1026,6 @@ return [
         'ping' => [
             'description' => 'Шлях до ping',
         ],
-        'ping_rrd_step' => [
-            'description' => 'Частота Ping',
-            'help' => 'Частота перевірок. Є значенням за замовчуванням для всіх пристроїв. Увага! При зміні цього значення необхідно ввести додаткоі зміни.  Зверніться до документації Fast Ping.',
-        ],
         'poller_modules' => [
             'unix-agent' => [
                 'description' => 'Unix Agent',

@@ -1420,10 +1420,6 @@ return [
         'ping' => [
             'description' => 'Caminho para ping',
         ],
-        'ping_rrd_step' => [
-            'description' => 'Frequência de Ping',
-            'help' => 'Com que frequência executar. Valor padrão para todos os nós. Aviso! Se você mudar isso, você deve fazer mudanças adicionais. Verifique os documentos de Fast Ping.',
-        ],
         'poller_modules' => [
             'unix-agent' => [
                 'description' => 'Agente Unix',

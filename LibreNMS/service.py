@@ -204,7 +204,10 @@ class ServiceConfig(DBConfig):
             if config.get("schedule_type").get("ping", "legacy") == "legacy"
             else config.get("schedule_type").get("ping", "legacy") == "dispatcher"
         )
-        self.ping.frequency = config.get("ping_rrd_step", ServiceConfig.ping.frequency)
+        self.ping.frequency = config.get(
+            "service_ping_frequency",
+            config.get("ping_rrd_step", ServiceConfig.ping.frequency),
+        )
         self.down_retry = config.get(
             "service_poller_down_retry", ServiceConfig.down_retry
         )
