@@ -181,5 +181,7 @@ return [
         'HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap' => LibreNMS\Snmptrap\Handlers\HpFault::class,
         'MPLS-LDP-MIB::mplsLdpSessionDown' => LibreNMS\Snmptrap\Handlers\CiscoLdpSesDown::class,
         'MPLS-LDP-MIB::mplsLdpSessionUp' => LibreNMS\Snmptrap\Handlers\CiscoLdpSesUp::class,
+        'ZEBRA-QL-MIB::zebra.1.0.1' => LibreNMS\Snmptrap\Handlers\ZebraPrinterAlert::class,
+        'ZEBRA-QL-MIB::zebra.1.0.2' => LibreNMS\Snmptrap\Handlers\ZebraPrinterAlertCleared::class,
     ],
 ];
