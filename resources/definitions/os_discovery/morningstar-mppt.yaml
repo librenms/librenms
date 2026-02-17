@@ -1,7 +1,6 @@
-mib: GENSTAR:SUNSAVER-MPPT:PROSTAR-MPPT:TRISTAR-MPPT:TRISTAR-MPPT-600V
 modules:
     os:
-        hardware: 
+        hardware:
             - GENSTAR::subModel.0
             - SUNSAVER-MPPT::subModel.0
             - PROSTAR-MPPT::subModel.0

@@ -44,7 +44,7 @@ class PrinterSupplyController extends TableController
         return PrinterSupply::query()
             ->hasAccess($request->user())
             ->with('device')
-            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'printer_supplies.device_id'))
+            ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'printer_supplies.device_id'))
             ->withAggregate('device', 'hostname');
     }
 

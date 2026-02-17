@@ -1,4 +1,3 @@
-mib: FE-FIREEYE-MIB
 modules:
     os:
         version: FE-FIREEYE-MIB::feSystemImageVersionCurrent.0
@@ -8,23 +7,23 @@ modules:
         fanspeed:
             data:
                 -
-                    oid: feFanStatusTable
-                    value: feFanSpeed
+                    oid: FE-FIREEYE-MIB::feFanStatusTable
+                    value: FE-FIREEYE-MIB::feFanSpeed
                     num_oid: '.1.3.6.1.4.1.25597.11.4.1.3.1.4.{{ $index }}'
-                    descr: 'Fan {{ $feFanIndex }}'
-                    index: 'feFanSpeed.{{ $feFanIndex }}'
+                    descr: 'Fan {{ FE-FIREEYE-MIB::feFanIndex }}'
+                    index: 'feFanSpeed.{{ FE-FIREEYE-MIB::feFanIndex }}'
         temperature:
             data:
                 -
-                    oid: feSystemInfo
-                    value: feTemperatureValue
+                    oid: FE-FIREEYE-MIB::feSystemInfo
+                    value: FE-FIREEYE-MIB::feTemperatureValue
                     num_oid: '.1.3.6.1.4.1.25597.11.1.1.4.{{ $index }}'
                     descr: 'System Temperature'
         state:
             data:
                 -
-                    oid: feSystemInfo
-                    value: feTemperatureIsHealthy
+                    oid: FE-FIREEYE-MIB::feSystemInfo
+                    value: FE-FIREEYE-MIB::feTemperatureIsHealthy
                     num_oid: '.1.3.6.1.4.1.25597.11.1.1.6.{{ $index }}'
                     group: System Health
                     descr: 'System Temperature Health'
@@ -33,8 +32,8 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
                         - { value: 1, generic: 0, graph: 0, descr: 'Good' } 
                 -
-                    oid: feStorageInfo
-                    value: feRaidIsHealthy
+                    oid: FE-FIREEYE-MIB::feStorageInfo
+                    value: FE-FIREEYE-MIB::feRaidIsHealthy
                     num_oid: '.1.3.6.1.4.1.25597.11.2.1.2.{{ $index }}'
                     group: System Health
                     descr: 'System RAID Health'
@@ -43,19 +42,19 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
                         - { value: 1, generic: 0, graph: 0, descr: 'Good' }
                 -
-                    oid: fePhysicalDiskTable
-                    value: fePhysicalDiskIsHealthy 
+                    oid: FE-FIREEYE-MIB::fePhysicalDiskTable
+                    value: FE-FIREEYE-MIB::fePhysicalDiskIsHealthy 
                     num_oid: '.1.3.6.1.4.1.25597.11.2.1.3.1.4.{{ $index }}'
                     group: Disk Health
-                    descr: 'Disk {{ $fePhysicalDiskName }} Health'
-                    index: fePhysicalDiskIsHealthy.{{ $fePhysicalDiskIndex }}
+                    descr: 'Disk {{ FE-FIREEYE-MIB::fePhysicalDiskName }} Health'
+                    index: fePhysicalDiskIsHealthy.{{ FE-FIREEYE-MIB::fePhysicalDiskIndex }}
                     state_name: fePhysicalDiskIsHealthy
                     states:
                         - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
                         - { value: 1, generic: 0, graph: 0, descr: 'Good' } 
                 -
-                    oid: fePowerSupply
-                    value:  fePowerSupplyOverallIsHealthy
+                    oid: FE-FIREEYE-MIB::fePowerSupply
+                    value:  FE-FIREEYE-MIB::fePowerSupplyOverallIsHealthy
                     num_oid: '.1.3.6.1.4.1.25597.11.3.1.2.{{ $index }}'
                     group: System Health
                     descr: 'System Power Supply Health'
@@ -64,8 +63,8 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
                         - { value: 1, generic: 0, graph: 0, descr: 'Good' }
                 -
-                    oid: feFanHealth
-                    value: feFanOverallIsHealthy
+                    oid: FE-FIREEYE-MIB::feFanHealth
+                    value: FE-FIREEYE-MIB::feFanOverallIsHealthy
                     num_oid: '.1.3.6.1.4.1.25597.11.4.1.2.{{ $index }}'
                     group: System Health
                     descr: 'System Fan Health'
@@ -74,19 +73,19 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
                         - { value: 1, generic: 0, graph: 0, descr: 'Good' }
                 -
-                    oid: feFanStatusTable
-                    value: feFanIsHealthy
+                    oid: FE-FIREEYE-MIB::feFanStatusTable
+                    value: FE-FIREEYE-MIB::feFanIsHealthy
                     num_oid: '.1.3.6.1.4.1.25597.11.4.1.3.1.3.{{ $index }}'
                     group: Fan Health
-                    descr: 'Fan {{ $feFanIndex }} Health'
+                    descr: 'Fan {{ FE-FIREEYE-MIB::feFanIndex }} Health'
                     state_name: feFanIsHealthy
-                    index: feFanIsHealthy.{{ $feFanIndex }}
+                    index: feFanIsHealthy.{{ FE-FIREEYE-MIB::feFanIndex }}
                     states:
                         - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
                         - { value: 1, generic: 0, graph: 0, descr: 'Good' }
                 -
-                    oid: feApplication
-                    value: feProductLicenseActive
+                    oid: FE-FIREEYE-MIB::feApplication
+                    value: FE-FIREEYE-MIB::feProductLicenseActive
                     num_oid: '.1.3.6.1.4.1.25597.11.5.1.10.{{ $index }}'
                     group: License Status
                     descr: 'Product License Status'
@@ -95,8 +94,8 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: 'Not Active' }
                         - { value: 1, generic: 0, graph: 0, descr: 'Active' }
                 -
-                    oid: feApplication
-                    value: feContentLicenseActive 
+                    oid: FE-FIREEYE-MIB::feApplication
+                    value: FE-FIREEYE-MIB::feContentLicenseActive 
                     num_oid: '.1.3.6.1.4.1.25597.11.5.1.11.{{ $index }}'
                     group: License Status
                     descr: 'Content License Status'
@@ -105,8 +104,8 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: 'Not Active' }
                         - { value: 1, generic: 0, graph: 0, descr: 'Active' }
                 -
-                    oid: feApplication
-                    value:  feSupportLicenseActive
+                    oid: FE-FIREEYE-MIB::feApplication
+                    value:  FE-FIREEYE-MIB::feSupportLicenseActive
                     num_oid: '.1.3.6.1.4.1.25597.11.5.1.12.{{ $index }}'
                     group: License Status
                     descr: 'Support License Status'

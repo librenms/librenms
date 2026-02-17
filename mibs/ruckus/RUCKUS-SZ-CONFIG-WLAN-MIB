@@ -40,7 +40,7 @@ IMPORTS
         FROM IPV6-TC;
 
 ruckusSZConfigWLANMIB MODULE-IDENTITY
-    LAST-UPDATED "201503191100Z"
+    LAST-UPDATED "202006151100Z"
     ORGANIZATION "Ruckus Wireless, Inc."
     CONTACT-INFO
         "Ruckus Wireless, Inc.
@@ -55,6 +55,9 @@ ruckusSZConfigWLANMIB MODULE-IDENTITY
         Web: www.ruckuswireless.com"
     DESCRIPTION
         "Ruckus WLAN mib"
+    REVISION "202006151100Z"
+    DESCRIPTION
+        "Update authentication and encryption method"
     ::= { ruckusSZWLANModule 2 }
 
 ruckusSZConfigWLANObjects OBJECT IDENTIFIER     ::= { ruckusSZConfigWLANMIB 1 }
@@ -92,6 +95,7 @@ RuckusSZConfigWLANEntry ::= SEQUENCE {
 	ruckusSZConfigWLANWEPKey            OCTET STRING,
   ruckusSZConfigWLANWPACipherType		 INTEGER,	
 	ruckusSZConfigWLANWPAKey            OCTET STRING,
+	ruckusSZConfigWLANSAEPassphrase     OCTET STRING,
   ruckusSZConfigWLANWirelessClientIsolation  INTEGER,
 	ruckusSZConfigWLANZeroITActivation  INTEGER,
   ruckusSZConfigWLANServicePriority   INTEGER,
@@ -140,7 +144,8 @@ ruckusSZConfigWLANWLANServiceType OBJECT-TYPE
             guest(3),
             webauth(4),
             hotspot20(5),
-            hotspot20-osen(6) } 
+            hotspot20-osen(6),
+            weChat(7)}
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -152,7 +157,8 @@ ruckusSZConfigWLANAuthentication OBJECT-TYPE
     SYNTAX  INTEGER {
             open(1),
             eap(2),
-            mac-address(3) } 
+            mac-address(3),
+            eapMacAddress(4)}
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -166,7 +172,10 @@ ruckusSZConfigWLANEncryption OBJECT-TYPE
             wpa-Mixed(2),
             wep-64(3),
             wep-128(4),
-            none-enc(5) } 
+            none-enc(5),
+            wpa3(6),
+            wpa2Wpa3Mixed(7),
+            owe(8) }
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -179,7 +188,8 @@ ruckusSZConfigWLANWEPKeyIndex OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Select the WEP key index for the WEP encryption."
+        "Select the WEP key index for the WEP encryption.
+        for 802.1x wlan(eap), this node should not be set."
         DEFVAL {1}
     ::= { ruckusSZConfigWLANEntry 15 }
 
@@ -189,19 +199,21 @@ ruckusSZConfigWLANWEPKey OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "Enter the Pass-phrase for the WEP encryption method.
-        Only 10 or 26 Hex character.such as: 1122334455"
+        Only 10 or 26 Hex character.such as: 1122334455
+        for 802.1x wlan(eap), this node should not be set."
     ::= { ruckusSZConfigWLANEntry 16 }
-    
+
 ruckusSZConfigWLANWPACipherType OBJECT-TYPE
-    SYNTAX  INTEGER {            
+    SYNTAX  INTEGER {
             aes(1),
             tkipaes(2),
-            null(3)} 
+            null(3),
+            aesGCMP256(4)}
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "Enter the encryption cipher method for the WPA encryption.
-        fpr WPA2,aes is only supported.null is only for read."
+        For WPA2, aes is only supported. null is only for read"
         DEFVAL {aes}
     ::= { ruckusSZConfigWLANEntry 20 }    
 
@@ -214,8 +226,20 @@ ruckusSZConfigWLANWPAKey OBJECT-TYPE
         Specifies the WPA PSK (Wi-Fi Protected Access
         Pre Shared key)
         If the key length is 64 then all 64 characters should be in hex,
-        otherwise the key assumed to be ascii."
+        otherwise the key assumed to be ascii.
+        for 802.1x wlan(eap), this node should not be set."
     ::= { ruckusSZConfigWLANEntry 21 }
+
+ruckusSZConfigWLANSAEPassphrase OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (8..63 | 64)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enter the The SAE Passphrase for WPA3 encryption.
+        If the key length is 64 then all 64 characters should be in hex,
+        otherwise the key assumed to be ascii.
+        for 802.1x wlan(eap), this node should not be set."
+    ::= { ruckusSZConfigWLANEntry 23 }
 
 ruckusSZConfigWLANWirelessClientIsolation OBJECT-TYPE
     SYNTAX  INTEGER {

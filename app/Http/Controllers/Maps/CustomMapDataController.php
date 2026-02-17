@@ -79,36 +79,11 @@ class CustomMapDataController extends Controller
                 $edges[$edgeid]['port_name'] = $edge->port->device->displayName() . ' - ' . $edge->port->getLabel();
                 $edges[$edgeid]['port_info'] = Blade::render('<x-port-link-map :port="$port" />', ['port' => $edge->port]);
 
-                // Work out speed to and from
-                $speedto = 0;
-                $speedfrom = 0;
-                $rateto = 0;
-                $ratefrom = 0;
-
-                // Try to interpret the SNMP speeds
-                if ($edge->port->port_descr_speed) {
-                    $speed_parts = explode('/', (string) $edge->port->port_descr_speed, 2);
-
-                    if (count($speed_parts) == 1) {
-                        $speedto = $this->snmpSpeed($speed_parts[0]);
-                        $speedfrom = $speedto;
-                    } elseif ($edge->reverse) {
-                        $speedto = $this->snmpSpeed($speed_parts[1]);
-                        $speedfrom = $this->snmpSpeed($speed_parts[0]);
-                    } else {
-                        $speedto = $this->snmpSpeed($speed_parts[0]);
-                        $speedfrom = $this->snmpSpeed($speed_parts[1]);
-                    }
-                    if ($speedto == 0 || $speedfrom == 0) {
-                        $speedto = 0;
-                        $speedfrom = 0;
-                    }
-                }
-
-                // If we did not get a speed from the snmp desc, use the deteced speed
-                if ($speedto == 0 && $edge->port->ifSpeed) {
-                    $speedto = $edge->port->ifSpeed;
-                    $speedfrom = $edge->port->ifSpeed;
+                // Get speed to and from
+                if ($edge->reverse) {
+                    [$speedto, $speedfrom] = $edge->port->getSpeeds();
+                } else {
+                    [$speedfrom, $speedto] = $edge->port->getSpeeds();
                 }
 
                 // Get the to/from rates
@@ -337,12 +312,6 @@ class CustomMapDataController extends Controller
     private function rateString(int $rate): string
     {
         return Number::formatSi($rate, 2, 3, 'bps');
-    }
-
-    private function snmpSpeed(string $speeds): int
-    {
-        // Only succeed if the string starts with a number optionally followed by a unit, return 0 for non-parsable
-        return (int) Number::toBytes($speeds);
     }
 
     private function fixedColour(array $colours, float $pct): string

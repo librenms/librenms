@@ -263,7 +263,7 @@ foreach ($rule_list as $rule) {
 
     // Name
 
-    echo '<td><a href="' . url('alerts/rule_id='.$rule['id']) .'" data-container="body" data-toggle="popover" data-placement="right" data-content="View active alerts for this rule" target="_blank">' . htmlentities((string) $rule['name']) . '</a></td>';
+    echo '<td><a href="' . url('alerts/rule_id='.$rule['id']) .'" data-container="body" data-toggle="popover" data-placement="right" data-content="View active alerts for this rule" target="_blank">' . e(strip_tags((string) $rule['name']), true) . '</a></td>';
 
     // Devices (and Groups)
 

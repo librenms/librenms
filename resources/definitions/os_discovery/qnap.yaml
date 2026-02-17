@@ -1,67 +1,66 @@
-mib: NAS-MIB
 modules:
     sensors:
         additional_oids:
             data:
                 -
                     oid:
-                        - diskEnclosureID
-                        - volumeName
+                        - NAS-MIB::diskEnclosureID
+                        - NAS-MIB::volumeName
         temperature:
             options:
                 skip_values: -1
             data:
                 -
-                    oid: enclosureTable
-                    value: enclosureSystemTemp
+                    oid: NAS-MIB::enclosureTable
+                    value: NAS-MIB::enclosureSystemTemp
                     num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.1.2.1.7.{{ $index }}'
-                    descr: 'Enclosure {{ $enclosureID }}'
+                    descr: 'Enclosure {{ NAS-MIB::enclosureID }}'
                     index: 'enclosureSystemTemp.{{ $index }}'
                     group: 'System'
                 -
-                    oid: cpuTemp
-                    value: cpuTemp
+                    oid: NAS-MIB::cpuTemp
+                    value: NAS-MIB::cpuTemp
                     num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.4.2.{{ $index }}'
                     descr: 'CPU'
                     index: 'cpuTemp.{{ $index }}'
                     group: 'System'
                 -
-                    oid: systemPowerTable
-                    value: systemPowerTemp
+                    oid: NAS-MIB::systemPowerTable
+                    value: NAS-MIB::systemPowerTemp
                     num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.3.2.1.6.{{ $index }}'
-                    descr: 'Enclosure {{ $systemPowerEnclosureID }} PSU {{ $systemPowerID}}'
+                    descr: 'Enclosure {{ NAS-MIB::systemPowerEnclosureID }} PSU {{ NAS-MIB::systemPowerID}}'
                     index: 'systemPowerTemp.{{ $index }}'
                     group: 'System'
                 -
-                    oid: diskTable
-                    value: diskTemperture
+                    oid: NAS-MIB::diskTable
+                    value: NAS-MIB::diskTemperture
                     num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.5.2.1.6.{{ $index }}'
-                    descr: 'Disk {{ $index }} {{ $diskModel }}'
+                    descr: 'Disk {{ $index }} {{ NAS-MIB::diskModel }}'
                     index: 'diskTemperture.{{ $index }}'
-                    group: 'Disks enclosure {{ $diskEnclosureID }}'
+                    group: 'Disks enclosure {{ NAS-MIB::diskEnclosureID }}'
         fanspeed:
             options:
                 skip_values: -1
             data:
                 -
-                    oid: systemFan2Table
-                    value: systemFanSpeed
+                    oid: NAS-MIB::systemFan2Table
+                    value: NAS-MIB::systemFanSpeed
                     num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.2.2.1.5.{{ $index }}'
                     descr: 'FAN {{ $index }}'
                     index: 'systemFanSpeed.{{ $index }}'
-                    group: 'System enclosure {{ $systemFanEnclosureID }}'
+                    group: 'System enclosure {{ NAS-MIB::systemFanEnclosureID }}'
                 -
-                    oid: systemPowerTable
-                    value: systemPowerFanSpeed
+                    oid: NAS-MIB::systemPowerTable
+                    value: NAS-MIB::systemPowerFanSpeed
                     num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.3.2.1.5.{{ $index }}'
-                    descr: 'PSU {{ $systemPowerID }}'
+                    descr: 'PSU {{ NAS-MIB::systemPowerID }}'
                     index: 'systemPowerFanSpeed.{{ $index }}'
-                    group: 'Power enclosure {{ $systemPowerEnclosureID }}'
+                    group: 'Power enclosure {{ NAS-MIB::systemPowerEnclosureID }}'
         state:
             data:
                 -
-                    oid: systemHdTable
-                    value: hdStatus
+                    oid: NAS-MIB::systemHdTable
+                    value: NAS-MIB::hdStatus
                     num_oid: '.1.3.6.1.4.1.24681.1.2.11.1.4.{{ $index }}'
                     descr: 'Disk {{ $index }}'
                     index: 'hdStatus.{{ $index }}'
@@ -74,12 +73,12 @@ modules:
                         - { value: -9, generic: 2, graph: 0, descr: 'RW Error' }
                         - { value: -4, generic: 3, graph: 0, descr: 'Unknown' }
                 -
-                    oid: diskTable
-                    value: diskSmartInfo
+                    oid: NAS-MIB::diskTable
+                    value: NAS-MIB::diskSmartInfo
                     num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.5.2.1.5.{{ $index }}'
                     descr: 'Disk {{ $index }}'
                     index: 'diskSmartInfo.{{ $index }}'
-                    group: 'Disk S.M.A.R.T. enclosure {{ $diskEnclosureID }}'
+                    group: 'Disk S.M.A.R.T. enclosure {{ NAS-MIB::diskEnclosureID }}'
                     state_name: diskSmartInfo
                     states:
                         - { value: 2, generic: 2, graph: 0, descr: 'Abnormal' }
@@ -87,32 +86,32 @@ modules:
                         - { value: 0, generic: 0, graph: 0, descr: 'Good' }
                         - { value: -1, generic: 2, graph: 0, descr: 'Error' }
                 -
-                    oid: systemFan2Table
-                    value: systemFanStatus
+                    oid: NAS-MIB::systemFan2Table
+                    value: NAS-MIB::systemFanStatus
                     num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.5.2.1.5.{{ $index }}'
                     descr: 'FAN {{ $index }}'
                     index: 'systemFanStatus.{{ $index }}'
-                    group: 'FANs enclosure {{ $systemFanEnclosureID }}'
+                    group: 'FANs enclosure {{ NAS-MIB::systemFanEnclosureID }}'
                     state_name: systemFanStatus
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
                         - { value: -1, generic: 2, graph: 0, descr: 'Fail' }
                 -
-                    oid: systemPowerTable
-                    value: systemPowerStatus
+                    oid: NAS-MIB::systemPowerTable
+                    value: NAS-MIB::systemPowerStatus
                     num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.5.2.1.5.{{ $index }}'
                     descr: 'PSU {{ $index }}'
                     index: 'systemPowerStatus.{{ $index }}'
-                    group: 'PSUs enclosure {{ $systemPowerEnclosureID }}'
+                    group: 'PSUs enclosure {{ NAS-MIB::systemPowerEnclosureID }}'
                     state_name: systemPowerStatus
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
                         - { value: -1, generic: 2, graph: 0, descr: 'Fail' }
                 -
-                    oid: raidGroupTable
-                    value: raidStatus
+                    oid: NAS-MIB::raidGroupTable
+                    value: NAS-MIB::raidStatus
                     num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.2.1.2.1.5.{{ $index }}'
-                    descr: '{{ $volumeName }} Raid {{ $raidLevel }}'
+                    descr: '{{ NAS-MIB::volumeName }} Raid {{ NAS-MIB::raidLevel }}'
                     index: 'raidStatus.{{ $index }}'
                     group: 'Volumes'
                     state_name: raidStatus

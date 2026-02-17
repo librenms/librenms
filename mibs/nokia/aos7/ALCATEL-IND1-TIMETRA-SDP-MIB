@@ -46,18 +46,28 @@ IMPORTS
     tmnxMDASlotNum                              FROM ALCATEL-IND1-TIMETRA-CHASSIS-MIB;
 
 timetraServicesSdpMIBModule   MODULE-IDENTITY
-    LAST-UPDATED    "0710010000Z"
-    ORGANIZATION    "Alcatel"
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
     CONTACT-INFO
-        "Alcatel 7x50 Support
-         Web: http://www.alcatel.com/comps/pages/carrier_support.jhtml"
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
+
+                      Alcatel-Lucent Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
+
+     Telephone:          +1 800 995 2696
+
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
+
     DESCRIPTION
         "This  document  is the SNMP MIB module to manage and provision
         the various services of the Alcatel 7x50 SR system.
 
-        Copyright  2003-2008 Alcatel-Lucent. All rights reserved. Reproduction
-        of  this  document  is  authorized  on  the  condition that the
-        foregoing copyright notice is included.
+        Reproduction of this document is  authorized on  the  condition 
+        that the foregoing copyright notice is included.
 
         This   SNMP   MIB  module  (Specification)  embodies  Alcatel's
         proprietary  intellectual  property.  Alcatel retains all title
@@ -71,15 +81,21 @@ timetraServicesSdpMIBModule   MODULE-IDENTITY
 
         This  Specification  is  supplied `as is', and Alcatel makes no
         warranty,  either express or implied, as to the use, operation,
-        condition, or performance of the Specification."
+        condition, or performance of the Specification.
+
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 2003-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
 
 --
 --  Revision History
 --
+    REVISION        "201911270000Z"
+    DESCRIPTION     "Updated the latest contact and Copyright information for ALE USA Inc."
+
     REVISION        "0710010000Z"
     DESCRIPTION     "Rev 1.0                01 Oct 2007 00:00
                      1.0 release of the TIMETRA-SDP-MIB from TIMETRA-SERV-MIB."
-
     ::= { timetraSRMIBModules 56 }
 
 -- --------------------------------------------------------------------

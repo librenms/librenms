@@ -139,7 +139,7 @@ class RoutesTablesController extends TableController
      */
     public function sort($request, $query)
     {
-        $sort = $request->get('sort');
+        $sort = $request->input('sort');
         if (isset($sort['inetCidrRouteIfIndex'])) {
             $query->orderBy('ifDescr', $sort['inetCidrRouteIfIndex'])
                 ->orderBy('inetCidrRouteIfIndex', $sort['inetCidrRouteIfIndex']);

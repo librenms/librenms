@@ -1,4 +1,3 @@
-mib: HUAWEI-SERVER-IBMC-MIB
 modules:
     os:
         hardware: HUAWEI-SERVER-IBMC-MIB::deviceName.0
@@ -9,25 +8,25 @@ modules:
     processors:
         data:
             -
-                oid: systemCpuUsage
-                value: systemCpuUsage
+                oid: HUAWEI-SERVER-IBMC-MIB::systemCpuUsage
+                value: HUAWEI-SERVER-IBMC-MIB::systemCpuUsage
                 num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.1.23.{{ $index }}'
                 descr: 'Main(s) CPU average usage'
     sensors:
         fanspeed:
             data:
                 -
-                    oid: fanDescriptionEntry
-                    value: fanSpeed
+                    oid: HUAWEI-SERVER-IBMC-MIB::fanDescriptionEntry
+                    value: HUAWEI-SERVER-IBMC-MIB::fanSpeed
                     skip_value_lt: 0
                     num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.8.50.1.2.{{ $index }}'
-                    descr: 'fanDevicename'
+                    descr: '{{ HUAWEI-SERVER-IBMC-MIB::fanDevicename }}'
                     index: 'fanSpeed.{{ $index }}'
         power:
             data:
                 -
-                    oid: powerSupplyDescriptionEntry
-                    value: powerSupplyInputPower
+                    oid: HUAWEI-SERVER-IBMC-MIB::powerSupplyDescriptionEntry
+                    value: HUAWEI-SERVER-IBMC-MIB::powerSupplyInputPower
                     skip_value_lt: 0
                     num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.6.50.1.8.{{ $index }}'
                     descr: 'Power Supply {{ $index }} Input'
@@ -35,19 +34,19 @@ modules:
         temperature:
             data:
                 -
-                    oid: TemperatureDescriptionEntry
-                    value: temperatureReading
+                    oid: HUAWEI-SERVER-IBMC-MIB::temperatureDescriptionTable
+                    value: HUAWEI-SERVER-IBMC-MIB::temperatureReading
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.26.50.1.3.{{ $index }}'
-                    descr: 'temperatureObject'
+                    descr: '{{ HUAWEI-SERVER-IBMC-MIB::temperatureObject }}'
                     index: 'temperatureIndex.{{ $index }}'
         state:
             data:
                 -
-                    oid: cpuDescriptionEntry
-                    value: cpuStatus
+                    oid: HUAWEI-SERVER-IBMC-MIB::cpuDescriptionEntry
+                    value: HUAWEI-SERVER-IBMC-MIB::cpuStatus
                     num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.15.50.1.6.{{ $index }}'
-                    descr: 'Processor {{ $cpuFamily }} @{{ $cpuClockRate }} #{{ $cpuIndex }}'
+                    descr: 'Processor {{ HUAWEI-SERVER-IBMC-MIB::cpuFamily }} @{{ HUAWEI-SERVER-IBMC-MIB::cpuClockRate }} #{{ HUAWEI-SERVER-IBMC-MIB::cpuIndex }}'
                     index: 'cpuStatus.{{ $index }}'
                     state_name: cpuStatus
                     group: 'CPU'
@@ -59,10 +58,10 @@ modules:
                         - { descr: absent, graph: 0, value: 5, generic: 3 }
                         - { descr: unknown, graph: 0, value: 6, generic: 3 }
                 -
-                    oid: hardDiskDescriptionEntry
-                    value: hardDiskStatus
+                    oid: HUAWEI-SERVER-IBMC-MIB::hardDiskDescriptionEntry
+                    value: HUAWEI-SERVER-IBMC-MIB::hardDiskStatus
                     num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.18.50.1.3.{{ $index }}'
-                    descr: 'Drive Bay {{ $index }} {{ $hardDiskDevicename }}'
+                    descr: 'Drive Bay {{ $index }} {{ HUAWEI-SERVER-IBMC-MIB::hardDiskDevicename }}'
                     index: 'hardDiskStatus.{{ $index }}'
                     state_name: hardDiskStatus
                     group: 'Drive Bays'
@@ -74,10 +73,10 @@ modules:
                         - { descr: absent, graph: 0, value: 5, generic: 3 }
                         - { descr: unknown, graph: 0, value: 6, generic: 3 }
                 -
-                    oid: fanDescriptionEntry
-                    value: fanStatus
+                    oid: HUAWEI-SERVER-IBMC-MIB::fanDescriptionTable
+                    value: HUAWEI-SERVER-IBMC-MIB::fanStatus
                     num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.8.50.1.4.{{ $index }}'
-                    descr: 'fanDevicename'
+                    descr: '{{ HUAWEI-SERVER-IBMC-MIB::fanDevicename }}'
                     index: 'fanSpeed.{{ $index }}'
                     state_name: fanStatus
                     group: 'Fans'
@@ -89,8 +88,8 @@ modules:
                         - { descr: absent, graph: 0, value: 5, generic: 3 }
                         - { descr: unknown, graph: 0, value: 6, generic: 3 }
                 -
-                    oid: memoryEntireStatus
-                    value: memoryEntireStatus
+                    oid: HUAWEI-SERVER-IBMC-MIB::memoryEntireStatus
+                    value: HUAWEI-SERVER-IBMC-MIB::memoryEntireStatus
                     num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.16.1.{{ $index }}'
                     descr: 'Memory Status'
                     index: 'memoryEntireStatus.{{ $index }}'
@@ -104,10 +103,10 @@ modules:
                         - { descr: absent, graph: 0, value: 5, generic: 3 }
                         - { descr: unknown, graph: 0, value: 6, generic: 3 }
                 -
-                    oid: memoryDescriptionEntry
-                    value: memoryStatus
+                    oid: HUAWEI-SERVER-IBMC-MIB::memoryDescriptionEntry
+                    value: HUAWEI-SERVER-IBMC-MIB::memoryStatus
                     num_oid: '.1.3.6.1.4.1.2011.2.235.1.1.16.50.1.6.{{ $index }}'
-                    descr: '{{ $memoryLogic }} {{ $memoryManufacturer }} {{ $memorySize }} {{ $memoryClockRate }}'
+                    descr: '{{ HUAWEI-SERVER-IBMC-MIB::memoryLogic }} {{ HUAWEI-SERVER-IBMC-MIB::memoryManufacturer }} {{ HUAWEI-SERVER-IBMC-MIB::memorySize }} {{ HUAWEI-SERVER-IBMC-MIB::memoryClockRate }}'
                     index: 'memoryStatus.{{ $index }}'
                     state_name: memoryStatus
                     group: 'RAM'
@@ -120,7 +119,7 @@ modules:
                         - { descr: unknown, graph: 0, value: 6, generic: 3 }
                     skip_values:
                         -
-                            oid: memoryStatus
+                            oid: HUAWEI-SERVER-IBMC-MIB::memoryStatus
                             op: '='
                             value: 5
 

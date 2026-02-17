@@ -13,19 +13,21 @@ AC-QOS-MIB DEFINITIONS ::= BEGIN
         IpAddress                                   FROM RFC1155-SMI
         RowPointer				    FROM SNMPv2-TC
         Unsigned32,
-		Integer32,
+	Integer32,
+	Counter32,
+	Gauge32,
         enterprises                                 FROM SNMPv2-SMI
-		RowStatus      								FROM SNMPv2-TC
-		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
-		audioCodes,       
-		acRegistrations,
-		acGeneric, 
-		acProducts,acBoardMibs						FROM AUDIOCODES-TYPES-MIB
-		InetAddress, InetAddressType				FROM INET-ADDRESS-MIB;
+	RowStatus      								FROM SNMPv2-TC
+	SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
+	audioCodes,
+	acRegistrations,
+	acGeneric,
+	acProducts,acBoardMibs						FROM AUDIOCODES-TYPES-MIB
+	InetAddress, InetAddressType				FROM INET-ADDRESS-MIB;
 
        
 acQoS  MODULE-IDENTITY       
-    LAST-UPDATED "201211131703Z"          --Tuesday, November 13 2012
+    LAST-UPDATED "201902271037Z"          --Wednesday, February 27 2019
     ORGANIZATION "AudioCodes Ltd"
     CONTACT-INFO
     "Postal: Support

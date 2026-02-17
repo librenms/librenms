@@ -1,4 +1,3 @@
-mib: SMARTNODE-MIB
 modules:
     mempools:
         additional_oids:
@@ -20,33 +19,33 @@ modules:
     processors:
         data:
             -
-                oid: cpuTable
-                value: cpuWorkloadCurrent
+                oid: SMARTNODE-MIB::cpuTable
+                value: SMARTNODE-MIB::cpuWorkloadCurrent
                 num_oid: '.1.3.6.1.4.1.1768.100.70.10.2.1.2.{{ $index }}'
-                descr: '{{ $cpuDescr }} Processor'
+                descr: '{{ SMARTNODE-MIB::cpuDescr }} Processor'
                 index: 'cpu.{{ $index }}'
     sensors:
         temperature:
             data:
                 -
-                    oid: tempProbeTable
-                    value: currentDegreesCelsius
+                    oid: SMARTNODE-MIB::tempProbeTable
+                    value: SMARTNODE-MIB::currentDegreesCelsius
                     num_oid: '.1.3.6.1.4.1.1768.100.70.30.2.1.2.{{ $index }}'
-                    descr: '{{ $tempProbeDescr }}'
+                    descr: '{{ SMARTNODE-MIB::tempProbeDescr }}'
                     index: 'temp.{{ $index }}'
         count:
             data:
                 -
-                    oid: gwTable
-                    value: gwCurrentOngoingCalls
+                    oid: SMARTNODE-MIB::gwTable
+                    value: SMARTNODE-MIB::gwCurrentOngoingCalls
                     num_oid: '.1.3.6.1.4.1.1768.100.70.40.2.1.3.{{ $index }}'
-                    descr: '{{ $gwDescr }} ongoing calls'
+                    descr: '{{ SMARTNODE-MIB::gwDescr }} ongoing calls'
                     index: 'gw-{{ $index }}'
                     group: 'Ongoing calls'
                 -
-                    oid: isdnPortTable
-                    value: isdnPortCurrentOngoingCalls
+                    oid: SMARTNODE-MIB::isdnPortTable
+                    value: SMARTNODE-MIB::isdnPortCurrentOngoingCalls
                     num_oid: '.1.3.6.1.4.1.1768.100.70.50.2.1.3.{{ $index }}'
-                    descr: '{{ $isdnPortDescr }} ongoing calls'
+                    descr: '{{ SMARTNODE-MIB::isdnPortDescr }} ongoing calls'
                     index: 'isdn-{{ $index }}'
                     group: 'Ongoing calls'

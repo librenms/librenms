@@ -24,11 +24,14 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Models\Eventlog;
 use Exception;
 use Illuminate\Support\Str;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\Transport;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use Spatie\Permission\Models\Role;
 
@@ -42,6 +45,13 @@ class Mail extends Transport
             'role' => AlertUtil::findContactsRoles([$this->config['role']]),
             default => $this->config['email'] ?? $alert_data['contacts'] ?? [], // contacts is only used by legacy synthetic transport
         };
+
+        if (is_array($emails) && count($emails) == 0) {
+            $device = DeviceCache::get($alert_data['device_id']);
+            Eventlog::log('No e-mail recipients found for transport ' . $alert_data['transport_name'], $device, 'alert', Severity::Notice);
+
+            return true;
+        }
 
         $html = LibrenmsConfig::get('email_html');
 

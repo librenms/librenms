@@ -1,4 +1,3 @@
-mib: FORTINET-FORTIAUTHENTICATOR-MIB
 modules:
     os:
         hardware: FORTINET-FORTIAUTHENTICATOR-MIB::facSysModel.0
@@ -7,6 +6,6 @@ modules:
     processors:
         data:
             -
-                oid: facSysCpuUsage
+                oid: FORTINET-FORTIAUTHENTICATOR-MIB::facSysCpuUsage
                 num_oid: '.1.3.6.1.4.1.12356.113.1.4.{{ $index }}'
                 type: fortiauth

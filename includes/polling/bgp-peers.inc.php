@@ -27,7 +27,7 @@ if (! empty($peers)) {
     $generic = false;
     $cumulus_vrf = false;
     if ($device['os'] == 'junos') {
-        $peer_data_check = SnmpQuery::mibDir('junos')
+        $peer_data_check = SnmpQuery::mibDir('juniper/junos')
             ->enumStrings()
             ->numericIndex()
             ->abortOnFailure()
@@ -256,17 +256,43 @@ if (! empty($peers)) {
                         }
                     }
                     $address = (string) $peer_ip;
-                    $establishedTime = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgLastChanged'] / 100;
+                    $peerData = $bgpPeers[$vrfOid][$address] ?? null;
+
+                    if ($peerData === null) {
+                        // VRF OID from database didn't match, search all VRFs for this peer
+                        foreach ($bgpPeers as $candidatePeers) {
+                            if (isset($candidatePeers[$address])) {
+                                $peerData = $candidatePeers[$address];
+                                break;
+                            }
+                        }
+                    }
+
+                    if ($peerData === null) {
+                        Log::warning("Missing TIMETRA data for peer $address - peer may have configuration/data mismatch");
+                        continue;
+                    }
+                    $establishedTime = $peerData['TIMETRA-BGP-MIB::tBgpPeerFsmEstablishedTime'] ?? null;
+
+                    if ($establishedTime === null) {
+                        static $bgp4Peers;
+
+                        if (! isset($bgp4Peers)) {
+                            $bgp4Peers = SnmpQuery::enumStrings()->numericIndex()->walk('BGP4-MIB::bgpPeerFsmEstablishedTime')->valuesByIndex();
+                        }
+
+                        $establishedTime = $bgp4Peers[$address]['BGP4-MIB::bgpPeerFsmEstablishedTime'] ?? 0;
+                    }
 
                     $peer_data = [];
-                    $peer_data['bgpPeerState'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgConnState'];
-                    if ($bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgShutdown'] == '1') {
+                    $peer_data['bgpPeerState'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgConnState'];
+                    if ($peerData['TIMETRA-BGP-MIB::tBgpPeerNgShutdown'] == '1') {
                         $peer_data['bgpPeerAdminStatus'] = 'adminShutdown';
                     } else {
-                        $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent'];
+                        $peer_data['bgpPeerAdminStatus'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent'];
                     }
-                    $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] % (2 ** 32);  // That are actually only octets available,
-                    $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] % (2 ** 32); // not messages
+                    $peer_data['bgpPeerInTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] % (2 ** 32);  // That are actually only octets available,
+                    $peer_data['bgpPeerOutTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] % (2 ** 32); // not messages
                     $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
                 } elseif ($device['os'] == 'firebrick') {
                     // ToDo, It seems that bgpPeer(In|Out)Updates and bgpPeerInUpdateElapsedTime are actually not available over SNMP
@@ -285,30 +311,16 @@ if (! empty($peers)) {
                         }
 
                         if ($address == $peer_ip) {
-                            switch ($value['fbBgpPeerState']) {
-                                case 0:
-                                    $peer_data['bgpPeerState'] = 'idle';
-                                    break;
-                                case 1:
-                                case 2:
-                                    $peer_data['bgpPeerState'] = 'active';
-                                    break;
-                                case 3:
-                                    $peer_data['bgpPeerState'] = 'opensent';
-                                    break;
-                                case 4:
-                                    $peer_data['bgpPeerState'] = 'openconfig';
-                                    break;
-                                case 5:
-                                    $peer_data['bgpPeerState'] = 'established';
-                                    break;
-                                case 6:
-                                    $peer_data['bgpPeerState'] = 'closed';
-                                    break;
-                                case 7:
-                                    $peer_data['bgpPeerState'] = 'free';
-                                    break;
-                            }
+                            // Map Firebrick BGP state (MIB enum strings) to standard BGP state names
+                            $peer_data['bgpPeerState'] = match ($value['fbBgpPeerState']) {
+                                'idle', 'closed', 'preshutdown', 'shutdown' => 'idle',
+                                'active', 'openWait' => 'active',
+                                'openSent' => 'opensent',
+                                'openConfirm' => 'openconfirm',
+                                'established' => 'established',
+                                default => 'idle',
+                            };
+
                             $peer_data['bgpPeerRemoteAddr'] = $address;
                             $peer_data['bgpPeerRemoteAs'] = $value['fbBgpPeerRemoteAS'];
                             $peer_data['bgpPeerAdminStatus'] = 'start';

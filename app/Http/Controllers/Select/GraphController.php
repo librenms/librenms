@@ -48,8 +48,8 @@ class GraphController extends Controller
         $this->validate($request, $this->rules);
 
         $data = [];
-        $search = $request->get('term');
-        $device_id = $request->get('device');
+        $search = $request->input('term');
+        $device_id = $request->input('device');
         $device = $device_id ? Device::find($device_id) : null;
 
         foreach (Graph::getTypes() as $type) {
@@ -69,6 +69,7 @@ class GraphController extends Controller
             'core' => 'Core',
             'custom' => 'Custom',
             'ports' => 'Manual Ports',
+            'sensors' => 'Manual Sensors',
         ]), 'aggregators', $search);
         if ($aggregators->isNotEmpty()) {
             $data[] = [

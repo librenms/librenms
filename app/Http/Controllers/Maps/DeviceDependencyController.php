@@ -37,7 +37,7 @@ class DeviceDependencyController extends Controller
     // Device Dependency Map
     public function dependencyMap(Request $request): View
     {
-        $group_id = $request->get('group');
+        $group_id = $request->input('group');
 
         $group_name = DeviceGroup::where('id', '=', $group_id)->first('name');
         if (! empty($group_name)) {

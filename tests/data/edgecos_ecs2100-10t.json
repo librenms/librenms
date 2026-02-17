@@ -3579,5 +3579,22 @@
                 }
             ]
         }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "Klubovna-d",
+                    "remote_port": "bridge1-LANklub (90a4deacdea1)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 6.42.5 (stable) RB433GL",
+                    "ifAlias": "Ethernet Port on unit 1, port 8",
+                    "ifDescr": "Ethernet Port on unit 1, port 8",
+                    "ifName": "Port8"
+                }
+            ]
+        }
     }
 }

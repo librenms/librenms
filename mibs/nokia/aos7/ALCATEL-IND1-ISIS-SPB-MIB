@@ -21,30 +21,26 @@ IMPORTS
         InterfaceIndexOrZero
                 FROM IF-MIB
         routingIND1IsisSpb
-                FROM ALCATEL-IND1-BASE;
+                FROM ALCATEL-IND1-BASE
+        InetAddress, InetAddressType, InetAddressPrefixLength
+                FROM INET-ADDRESS-MIB;
 
 alcatelIND1IsisSpbMib MODULE-IDENTITY
-        LAST-UPDATED  "201311070000Z"
-        ORGANIZATION  "Alcatel-Lucent"
-        CONTACT-INFO
-            "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
         DESCRIPTION
             "This module describes an authoritative enterprise-specific Simple
@@ -63,13 +59,17 @@ alcatelIND1IsisSpbMib MODULE-IDENTITY
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
 
-        REVISION      "200704030000Z"
+        REVISION      "201911270000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
+
+        REVISION      "201801050000Z"
         DESCRIPTION
             "The latest version of this MIB Module."
-
         ::= { routingIND1IsisSpb 1 } -- actual OID TBD
 
 ----------------------------------------------------------------------
@@ -220,11 +220,14 @@ alcatelIND1IsisSpbSys OBJECT IDENTIFIER
 alcatelIND1IsisSpbProtocolConfig OBJECT IDENTIFIER
         ::= { alcatelIND1IsisSpbMibObjects 2 }
 
+alcatelIND1IsisSpbRapidLspConvergence OBJECT IDENTIFIER
+        ::= { alcatelIND1IsisSpbMibObjects 19 }
+
 --
 --
 
 alcatelIND1IsisSpbSysControlBvlan OBJECT-TYPE
-        SYNTAX VlanId
+        SYNTAX VlanIdOrNone
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -507,6 +510,15 @@ alcatelIND1isisSpbSysLastSpfRunTimeStamp OBJECT-TYPE
                  SPF run was performed for this instance of the IS-IS protocol."
         ::= { alcatelIND1IsisSpbSys 21 }
 
+alcatelIND1IsisSpbLevelCapability OBJECT-TYPE
+         SYNTAX          INTEGER { level1(1), level2(2), level1L2(3), unknown(4) }
+         MAX-ACCESS      read-write
+         STATUS          current
+         DESCRIPTION
+                 "Level Capability specifies the circuit type of the adjacency as
+                  advertised."
+         ::= { alcatelIND1IsisSpbSys 22 }
+
 --
 --
 
@@ -652,7 +664,13 @@ AlcatelIND1IsisSpbAdjStaticTableEntry ::=
             alcatelIND1IsisSpbAdjStaticEntryRowStatus RowStatus,
             alcatelIND1IsisSpbAdjStaticEntryCircuitId Unsigned32,
             alcatelIND1IsisSpbAdjStaticEntryIfOperState AlcatelIND1IsisSpbIfOperState,
-            alcatelIND1IsisSpbAdjStaticEntryAFDConfig Unsigned32
+            alcatelIND1IsisSpbAdjStaticEntryAFDConfig Unsigned32,
+            alcatelIND1IsisSpbAdjStaticEntryIfType INTEGER,
+            alcatelIND1IsisSpbAdjStaticEntryIfPriority Unsigned32,
+            alcatelIND1IsisSpbAdjStaticEntryIfCsnpInterval Unsigned32,
+            alcatelIND1IsisSpbAdjStaticEntryIfNumAdjacencies Unsigned32,
+            alcatelIND1IsisSpbAdjStaticEntryIfDis MacAddress,
+            alcatelIND1IsisSpbAdjStaticEntryIfLevel INTEGER
         }
 
 alcatelIND1IsisSpbAdjStaticEntryTopIx OBJECT-TYPE
@@ -761,7 +779,75 @@ alcatelIND1IsisSpbAdjStaticEntryAFDConfig OBJECT-TYPE
                  this interface"
         ::= { alcatelIND1IsisSpbAdjStaticTableEntry 10 }
 
+alcatelIND1IsisSpbAdjStaticEntryIfType OBJECT-TYPE
+        SYNTAX INTEGER {
+              multi-access(1),
+              p2p(2)            
+          }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+                "The type of IS-IS SPB interface. When the interface type is
+                 changed the operational status of an interface will be flapped,
+                 which leads to reestablishing the adjacencies on that interface,
+                 re generating the LSPs and recalculation of SPF." 
+        DEFVAL { p2p }
+        ::= { alcatelIND1IsisSpbAdjStaticTableEntry 11 }
 
+alcatelIND1IsisSpbAdjStaticEntryIfPriority OBJECT-TYPE
+        SYNTAX      Unsigned32(0..127)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                "Priority of an interface which is used in DIS election on multi-access medium."
+        DEFVAL { 64 }
+        ::= { alcatelIND1IsisSpbAdjStaticTableEntry 12 }
+
+alcatelIND1IsisSpbAdjStaticEntryIfCsnpInterval OBJECT-TYPE
+        SYNTAX      Unsigned32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This vlaue specifies the interval, in seconds, between 
+             transmission of Complete Sequence Number PDUs (CSNP). 
+             If the value of isisCircType for this interface is 
+             'multi-aaccess' and this router is the designated router
+             on a LAN, the default frequency is ten seconds.  if the value of
+             isisCircType for this  interface is point-to-point,
+             the default frequency is every five seconds."
+        ::= { alcatelIND1IsisSpbAdjStaticTableEntry 13 }
+
+alcatelIND1IsisSpbAdjStaticEntryIfNumAdjacencies OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This value specifies the number of adjacencies
+             discovered dynamically on an interface."
+        ::= { alcatelIND1IsisSpbAdjStaticTableEntry 14 }
+
+
+alcatelIND1IsisSpbAdjStaticEntryIfDis OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+             "The ID of the LAN Designated Intermediate System
+             on this circuit."
+     ::= { alcatelIND1IsisSpbAdjStaticTableEntry 15 }
+
+alcatelIND1IsisSpbAdjStaticEntryIfLevel OBJECT-TYPE
+        SYNTAX INTEGER {
+              level1(1),
+              level2(2)            
+          }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+                "The type of IS-IS SPB protocol level."
+        DEFVAL { level1 }
+        ::= { alcatelIND1IsisSpbAdjStaticTableEntry 16 }
 
 --
 --
@@ -1390,7 +1476,7 @@ alcatelIND1IsisSpbLSPTopIx OBJECT-TYPE
         ::= { alcatelIND1IsisSpbLSPEntry 1 }
 
 alcatelIND1IsisSpbLSPId OBJECT-TYPE
-        SYNTAX     OCTET STRING
+        SYNTAX     OCTET STRING (SIZE(8))
         MAX-ACCESS not-accessible
         STATUS     current
         DESCRIPTION
@@ -1913,7 +1999,8 @@ AlcatelIND1IsisSpbServiceTableEntry ::=
             alcatelIND1IsisSpbServiceTableEntryIsid AlcatelSpbServiceIdentifier,
             alcatelIND1IsisSpbServiceTableEntrySysMac MacAddress,
             alcatelIND1IsisSpbServiceTableEntrySysName AlcatelIND1IsisSpbSystemName,
-            alcatelIND1IsisSpbServiceTableEntryIsidFlags AlcatelIND1IsisSpbmIsidFlags
+            alcatelIND1IsisSpbServiceTableEntryIsidFlags AlcatelIND1IsisSpbmIsidFlags,
+            alcatelIND1IsisSpbServiceTableEntrySvcOption INTEGER
         }
 
 alcatelIND1IsisSpbServiceTableEntryTopIx OBJECT-TYPE
@@ -1973,70 +2060,20 @@ alcatelIND1IsisSpbServiceTableEntryIsidFlags  OBJECT-TYPE
         REFERENCE "NONE"
         ::= { alcatelIND1IsisSpbServiceTableEntry 6 }
 
--- |--
---
---alcatelIND1SpbIPVPNExportTable OBJECT-TYPE
---    SYNTAX        SEQUENCE OF AlcatelIND1SpbIPVPNExportTableEntry
---    MAX-ACCESS    not-accessible
---    STATUS        current
---    DESCRIPTION   "The table of ISIDs for which routes are exported from ISIS-SPB to GRM.
---                  cf. show spb ipvpn export"
---    ::= { alcatelIND1IsisSpbMibObjects 15 }
---
---alcatelIND1SpbIPVPNExportTableEntry OBJECT-TYPE
---    SYNTAX        AlcatelIND1SpbIPVPNExportTableEntry
---    MAX-ACCESS    not-accessible
---    STATUS        current
---    DESCRIPTION   "An Entry in the alcatelIND1SpbIPVPNExportTable"
---    INDEX {
---            alcatelIND1SpbIPVPNExportTableEntryTopIx,
---            alcatelIND1SpbIPVPNExportIsid
---    }
---    ::= { alcatelIND1SpbIPVPNExportTable 1 }
+alcatelIND1IsisSpbServiceTableEntrySvcOption  OBJECT-TYPE
+        SYNTAX INTEGER { eLan(1), eLine(2), eTreeLeaf(3), eTreeRoot(4) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Service Option received for local / remote services"
+        REFERENCE "NONE"
+        ::= { alcatelIND1IsisSpbServiceTableEntry 7 }
 
---AlcatelIND1SpbIPVPNExportTableEntry ::=
---        SEQUENCE {
---            alcatelIND1SpbIPVPNExportTableEntryTopIx AlcatelIND1IsisSpbMTID,
---            alcatelIND1SpbIPVPNExportIsid            Unsigned32,
---            alcatelIND1SpbIPVPNExportRowStatus       RowStatus
---        }
---
---alcatelIND1SpbIPVPNExportTableEntryTopIx OBJECT-TYPE
---        SYNTAX AlcatelIND1IsisSpbMTID
---        MAX-ACCESS not-accessible
---        STATUS current
---        DESCRIPTION
---                "The ISIS Topology Index identifier to which this
---                 instance belongs. Each Topology Index defines logical topology
---                 and is used to enable multiple SPB instances within several
---                 ISIS instances."
---        REFERENCE "12.25.11.1.2, 12.25.11.1.3, 28.12"
---        ::= { alcatelIND1SpbIPVPNExportTableEntry 1 }
---
---alcatelIND1SpbIPVPNExportIsid OBJECT-TYPE
---         SYNTAX        Unsigned32
---         MAX-ACCESS    not-accessible
---         STATUS        current
---         DESCRIPTION   "The ISID for which routes are being exported from ISIS-SPB to GRM."
---         ::= { alcatelIND1SpbIPVPNExportTableEntry 2 }
---
---alcatelIND1SpbIPVPNExportRowStatus OBJECT-TYPE
---        SYNTAX RowStatus
---        MAX-ACCESS read-create
---        STATUS current
---        DESCRIPTION
---                "The object indicates the status of an entry, and is used
---                 to create/delete entries.
---                 This object is persistent."
---        REFERENCE "12.25.6.1.3"
---        ::= { alcatelIND1SpbIPVPNExportTableEntry 3 }
-
--- |--
 --
 alcatelIND1SpbIPVPNBindTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF AlcatelIND1SpbIPVPNBindTableEntry
     MAX-ACCESS    not-accessible
-    STATUS        current
+    STATUS        deprecated
     DESCRIPTION   "The table binds vrf, ISID and IP gateway together to enable
 		  route exchange between GRM and SPB-ISIS. The exchange is bidirectional.
 		  route-map only applies to VRF routes imported to ISIS from GRM.
@@ -2047,7 +2084,7 @@ alcatelIND1SpbIPVPNBindTable OBJECT-TYPE
 alcatelIND1SpbIPVPNBindTableEntry OBJECT-TYPE
     SYNTAX        AlcatelIND1SpbIPVPNBindTableEntry
     MAX-ACCESS    not-accessible
-    STATUS        current
+    STATUS        deprecated
     DESCRIPTION   "An Entry in the alcatelIND1SpbIPVPNBindTable"
     INDEX  {
             alcatelIND1SpbIPVPNBindTableEntryTopIx,
@@ -2070,7 +2107,7 @@ AlcatelIND1SpbIPVPNBindTableEntry ::=
 alcatelIND1SpbIPVPNBindTableEntryTopIx OBJECT-TYPE
         SYNTAX AlcatelIND1IsisSpbMTID
         MAX-ACCESS not-accessible
-        STATUS current
+        STATUS deprecated
         DESCRIPTION
                 "The ISIS Topology Index identifier to which this
                  instance belongs. Each Topology Index defines logical topology
@@ -2080,37 +2117,37 @@ alcatelIND1SpbIPVPNBindTableEntryTopIx OBJECT-TYPE
         ::= { alcatelIND1SpbIPVPNBindTableEntry 1  }
 
 alcatelIND1SpbIPVPNBindVrfName  OBJECT-TYPE
-         SYNTAX        SnmpAdminString (SIZE (0..20))
+         SYNTAX        SnmpAdminString (SIZE (0..32))
          MAX-ACCESS    not-accessible
-         STATUS        current
+         STATUS        deprecated
          DESCRIPTION   "The VRF for which routes are being imported from GRM to ISIS-SPB."
          ::= { alcatelIND1SpbIPVPNBindTableEntry 2  }
 
 alcatelIND1SpbIPVPNBindIsid OBJECT-TYPE
          SYNTAX        Unsigned32
          MAX-ACCESS    not-accessible
-         STATUS        current
+         STATUS        deprecated
          DESCRIPTION   "The ISID to set for routes imported from GRM to ISIS-SPB."
          ::= { alcatelIND1SpbIPVPNBindTableEntry 3  }
 
 alcatelIND1SpbIPVPNBindGateway OBJECT-TYPE
          SYNTAX        IpAddress
          MAX-ACCESS    not-accessible
-         STATUS        current
+         STATUS        deprecated
          DESCRIPTION   "The IP gateway to set for routes imported from GRM to ISIS-SPB."
          ::= { alcatelIND1SpbIPVPNBindTableEntry 4  }
 
 alcatelIND1SpbIPVPNBindImportRouteMap OBJECT-TYPE
          SYNTAX        SnmpAdminString (SIZE (0..20))
          MAX-ACCESS    read-create
-         STATUS        current
+         STATUS        deprecated
          DESCRIPTION   "The route-map name (or empty-string for all-routes) for routes imported from GRM to ISIS-SPB."
          ::= { alcatelIND1SpbIPVPNBindTableEntry 5  }
 
 alcatelIND1SpbIPVPNBindRowStatus OBJECT-TYPE
         SYNTAX RowStatus
         MAX-ACCESS read-create
-        STATUS current
+        STATUS deprecated
         DESCRIPTION
                 "The object indicates the status of an entry, and is used
                  to create/delete entries.
@@ -2123,7 +2160,7 @@ alcatelIND1SpbIPVPNBindRowStatus OBJECT-TYPE
 alcatelIND1SpbIPVPNRouteTable OBJECT-TYPE
         SYNTAX          SEQUENCE OF AlcatelIND1SpbIPVPNRouteTableEntry
         MAX-ACCESS      not-accessible
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION     "The IP-VPN table of routes.
                          cf. show spb ipvpn route-table"
         ::= { alcatelIND1IsisSpbMibObjects 16 }
@@ -2131,7 +2168,7 @@ alcatelIND1SpbIPVPNRouteTable OBJECT-TYPE
 alcatelIND1SpbIPVPNRouteTableEntry OBJECT-TYPE
         SYNTAX          AlcatelIND1SpbIPVPNRouteTableEntry
         MAX-ACCESS      not-accessible
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION     "An Entry in the alcatelIND1SpbIPVPNRouteTable"
         INDEX  {
                 alcatelIND1SpbIPVPNRouteTableEntryTopIx,
@@ -2156,7 +2193,7 @@ AlcatelIND1SpbIPVPNRouteTableEntry ::=
 alcatelIND1SpbIPVPNRouteTableEntryTopIx OBJECT-TYPE
         SYNTAX          AlcatelIND1IsisSpbMTID
         MAX-ACCESS      not-accessible
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION
                 "The ISIS Topology Index identifier to which this
                  instance belongs. Each Topology Index defines logical topology
@@ -2168,42 +2205,42 @@ alcatelIND1SpbIPVPNRouteTableEntryTopIx OBJECT-TYPE
 alcatelIND1SpbIPVPNRouteIsid    OBJECT-TYPE
         SYNTAX          Unsigned32
         MAX-ACCESS      not-accessible
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION     "The ISID of the IP-VPN route"
         ::= { alcatelIND1SpbIPVPNRouteTableEntry 2  }
 
 alcatelIND1SpbIPVPNRoutePrefix    OBJECT-TYPE
         SYNTAX          IpAddress
         MAX-ACCESS      not-accessible
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION     "The destination prefix of the IP-VPN route"
         ::= { alcatelIND1SpbIPVPNRouteTableEntry 3  }
 
 alcatelIND1SpbIPVPNRoutePrefixLen    OBJECT-TYPE
         SYNTAX          Unsigned32
         MAX-ACCESS      not-accessible
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION     "The prefix length of the IP-VPN route"
         ::= { alcatelIND1SpbIPVPNRouteTableEntry 4  }
 
 alcatelIND1SpbIPVPNRouteGateway    OBJECT-TYPE
         SYNTAX          IpAddress
         MAX-ACCESS      not-accessible
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION     "The next-hop/gateway of the IP-VPN route"
         ::= { alcatelIND1SpbIPVPNRouteTableEntry 5  }
 
 alcatelIND1SpbIPVPNRouteNodeName    OBJECT-TYPE
         SYNTAX          OCTET STRING
         MAX-ACCESS      read-only
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION     "The BEB name of the node that advertised the IP-VPN route"
         ::= { alcatelIND1SpbIPVPNRouteTableEntry 6  }
 
 alcatelIND1SpbIPVPNRouteMetric    OBJECT-TYPE
         SYNTAX          Unsigned32
         MAX-ACCESS      read-only
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION     "The route-metric of the IP-VPN route"
         ::= { alcatelIND1SpbIPVPNRouteTableEntry 7  }
 
@@ -2212,7 +2249,7 @@ alcatelIND1SpbIPVPNRouteMetric    OBJECT-TYPE
 alcatelIND1SpbIPVPNRedistVrfTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF AlcatelIND1SpbIPVPNRedistVrfTableEntry
     MAX-ACCESS    not-accessible
-    STATUS        current
+    STATUS        deprecated
     DESCRIPTION   "The IP-VPN table of configured route-redistributions where the source entity is a VRF.
                   cf. show spb ipvpn redist"
     ::= { alcatelIND1IsisSpbMibObjects 17 }
@@ -2220,7 +2257,7 @@ alcatelIND1SpbIPVPNRedistVrfTable OBJECT-TYPE
 alcatelIND1SpbIPVPNRedistVrfTableEntry OBJECT-TYPE
         SYNTAX          AlcatelIND1SpbIPVPNRedistVrfTableEntry
         MAX-ACCESS      not-accessible
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION     "An Entry in the alcatelIND1SpbIPVPNRedistVrfTable"
         INDEX  {
                 alcatelIND1SpbIPVPNRedistVrfTableEntryTopIx,
@@ -2241,7 +2278,7 @@ AlcatelIND1SpbIPVPNRedistVrfTableEntry ::=
 alcatelIND1SpbIPVPNRedistVrfTableEntryTopIx OBJECT-TYPE
         SYNTAX AlcatelIND1IsisSpbMTID
         MAX-ACCESS not-accessible
-        STATUS current
+        STATUS deprecated
         DESCRIPTION
                 "The ISIS Topology Index identifier to which this
                  instance belongs. Each Topology Index defines logical topology
@@ -2253,28 +2290,28 @@ alcatelIND1SpbIPVPNRedistVrfTableEntryTopIx OBJECT-TYPE
 alcatelIND1SpbIPVPNRedistVrfSourceVrf  OBJECT-TYPE
          SYNTAX        SnmpAdminString (SIZE (0..20))
          MAX-ACCESS    not-accessible
-         STATUS        current
+         STATUS        deprecated
          DESCRIPTION   "The source VRF from which routes are being redistributed."
          ::= { alcatelIND1SpbIPVPNRedistVrfTableEntry 2  }
 
 alcatelIND1SpbIPVPNRedistVrfDestIsid  OBJECT-TYPE
          SYNTAX        Unsigned32
          MAX-ACCESS    not-accessible
-         STATUS        current
+         STATUS        deprecated
          DESCRIPTION   "The destination ISID to which routes are being redistributed."
          ::= { alcatelIND1SpbIPVPNRedistVrfTableEntry 3  }
 
 alcatelIND1SpbIPVPNRedistVrfRouteMap  OBJECT-TYPE
          SYNTAX        SnmpAdminString (SIZE (0..20))
          MAX-ACCESS    read-create
-         STATUS        current
+         STATUS        deprecated
          DESCRIPTION   "The route-map name (or empty-string for all-routes) for the filter to be applied to this route-redistribution."
          ::= { alcatelIND1SpbIPVPNRedistVrfTableEntry 4  }
 
 alcatelIND1SpbIPVPNRedistVrfRowStatus OBJECT-TYPE
         SYNTAX RowStatus
         MAX-ACCESS read-create
-        STATUS current
+        STATUS deprecated
         DESCRIPTION
                 "The object indicates the status of an entry, and is used
                  to create/delete entries.
@@ -2287,7 +2324,7 @@ alcatelIND1SpbIPVPNRedistVrfRowStatus OBJECT-TYPE
 alcatelIND1SpbIPVPNRedistIsidTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF AlcatelIND1SpbIPVPNRedistIsidTableEntry
     MAX-ACCESS    not-accessible
-    STATUS        current
+    STATUS        deprecated
     DESCRIPTION   "The IP-VPN table of configured route-redistributions where the source entity is an ISID.
                   cf. show spb ipvpn redist"
     ::= { alcatelIND1IsisSpbMibObjects 18 }
@@ -2295,7 +2332,7 @@ alcatelIND1SpbIPVPNRedistIsidTable OBJECT-TYPE
 alcatelIND1SpbIPVPNRedistIsidTableEntry OBJECT-TYPE
         SYNTAX          AlcatelIND1SpbIPVPNRedistIsidTableEntry
         MAX-ACCESS      not-accessible
-        STATUS          current
+        STATUS          deprecated
         DESCRIPTION     "An Entry in the alcatelIND1SpbIPVPNRedistIsidTable"
         INDEX  {
                 alcatelIND1SpbIPVPNRedistIsidTableEntryTopIx,
@@ -2316,7 +2353,7 @@ AlcatelIND1SpbIPVPNRedistIsidTableEntry ::=
 alcatelIND1SpbIPVPNRedistIsidTableEntryTopIx OBJECT-TYPE
         SYNTAX AlcatelIND1IsisSpbMTID
         MAX-ACCESS not-accessible
-        STATUS current
+        STATUS deprecated
         DESCRIPTION
                 "The ISIS Topology Index identifier to which this
                  instance belongs. Each Topology Index defines logical topology
@@ -2328,25 +2365,140 @@ alcatelIND1SpbIPVPNRedistIsidTableEntryTopIx OBJECT-TYPE
 alcatelIND1SpbIPVPNRedistIsidSourceIsid  OBJECT-TYPE
          SYNTAX        Unsigned32
          MAX-ACCESS    not-accessible
-         STATUS        current
+         STATUS        deprecated
          DESCRIPTION   "The source ISID from which routes are being redistributed."
          ::= { alcatelIND1SpbIPVPNRedistIsidTableEntry 2  }
 
 alcatelIND1SpbIPVPNRedistIsidDestIsid  OBJECT-TYPE
          SYNTAX        Unsigned32
          MAX-ACCESS    not-accessible
-         STATUS        current
+         STATUS        deprecated
          DESCRIPTION   "The destination ISID to which routes are being redistributed."
          ::= { alcatelIND1SpbIPVPNRedistIsidTableEntry 3  }
 
 alcatelIND1SpbIPVPNRedistIsidRouteMap  OBJECT-TYPE
          SYNTAX        SnmpAdminString (SIZE (0..20))
          MAX-ACCESS    read-create
-         STATUS        current
+         STATUS        deprecated
          DESCRIPTION   "The route-map name (or empty-string for all-routes) for the filter to be applied to this route-redistribution."
          ::= { alcatelIND1SpbIPVPNRedistIsidTableEntry 4  }
 
 alcatelIND1SpbIPVPNRedistIsidRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS deprecated
+        DESCRIPTION
+                "The object indicates the status of an entry, and is used
+                 to create/delete entries.
+                 This object is persistent."
+        REFERENCE "12.25.6.1.3"
+        ::= { alcatelIND1SpbIPVPNRedistIsidTableEntry 5 }
+
+-- |--
+--
+
+alcatelIND1IsisSpbRapidLspConvergenceAdminState OBJECT-TYPE
+        SYNTAX INTEGER { enable(1), disable(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION     "Controls the operational state of the ISIS-SPB rapid lsp convergence.
+                        Default value is enable(1)."
+        DEFVAL {enable}
+        ::= { alcatelIND1IsisSpbRapidLspConvergence 1 }
+
+alcatelIND1IsisSpbRapidLspConvergenceIsid OBJECT-TYPE
+        SYNTAX          AlcatelSpbServiceIdentifier (256..16777214)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The reserved Service Indentifier (I-SID) that is allocated to setup a multicast domain 
+                         for forwarding the SPB Rapid Lsp Connvergence frames. Default value is 16776961."
+        DEFVAL { 16776961 }
+        ::= { alcatelIND1IsisSpbRapidLspConvergence  2 }
+
+
+alcatelIND1IsisSpbIPVPNBindTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AlcatelIND1IsisSpbIPVPNBindTableEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+	 DESCRIPTION   "The table binds vrf, ISID and IP gateway together to enable
+		  route exchange between GRM and SPB-ISIS. The exchange is bidirectional.
+		  route-map only applies to VRF routes imported to ISIS from GRM.
+		  There is no filter from ISIS to GRM.
+                  cf. show spb ipvpn bind, show spb ipvpn6 bind"
+    ::= { alcatelIND1IsisSpbMibObjects 20 }
+
+alcatelIND1IsisSpbIPVPNBindTableEntry OBJECT-TYPE
+    SYNTAX        AlcatelIND1IsisSpbIPVPNBindTableEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An Entry in the alcatelIND1IsisSpbIPVPNBindTable"
+    INDEX  {
+            alcatelIND1IsisSpbIPVPNBindTableEntryTopIx,
+            alcatelIND1IsisSpbIPVPNBindVrfName,
+            alcatelIND1IsisSpbIPVPNBindIsid,
+            alcatelIND1IsisSpbIPVPNBindGatewayType
+    }
+    ::= { alcatelIND1IsisSpbIPVPNBindTable 1 }
+
+AlcatelIND1IsisSpbIPVPNBindTableEntry ::=
+        SEQUENCE {
+            alcatelIND1IsisSpbIPVPNBindTableEntryTopIx  AlcatelIND1IsisSpbMTID,
+            alcatelIND1IsisSpbIPVPNBindVrfName          SnmpAdminString,
+            alcatelIND1IsisSpbIPVPNBindIsid             Unsigned32,
+            alcatelIND1IsisSpbIPVPNBindGatewayType      InetAddressType,
+            alcatelIND1IsisSpbIPVPNBindGateway          InetAddress,
+            alcatelIND1IsisSpbIPVPNBindImportRouteMap   SnmpAdminString,
+            alcatelIND1IsisSpbIPVPNBindRowStatus        RowStatus
+        }
+
+alcatelIND1IsisSpbIPVPNBindTableEntryTopIx OBJECT-TYPE
+        SYNTAX AlcatelIND1IsisSpbMTID
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "The ISIS Topology Index identifier to which this
+                 instance belongs. Each Topology Index defines logical topology
+                 and is used to enable multiple SPB instances within several
+                 ISIS instances."
+        REFERENCE "12.25.11.1.2, 12.25.11.1.3, 28.12"
+        ::= { alcatelIND1IsisSpbIPVPNBindTableEntry 1  }
+
+alcatelIND1IsisSpbIPVPNBindVrfName  OBJECT-TYPE
+         SYNTAX        SnmpAdminString (SIZE (0..32))
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION   "The VRF for which routes are being imported from GRM to ISIS-SPB."
+         ::= { alcatelIND1IsisSpbIPVPNBindTableEntry 2  }
+
+alcatelIND1IsisSpbIPVPNBindIsid OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION   "The ISID to set for routes imported from GRM to ISIS-SPB."
+         ::= { alcatelIND1IsisSpbIPVPNBindTableEntry 3  }
+
+alcatelIND1IsisSpbIPVPNBindGatewayType OBJECT-TYPE
+         SYNTAX        InetAddressType
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION   "The gateway type to set for routes imported from GRM to ISIS-SPB."
+         ::= { alcatelIND1IsisSpbIPVPNBindTableEntry 4  }
+
+alcatelIND1IsisSpbIPVPNBindGateway OBJECT-TYPE
+         SYNTAX        InetAddress
+         MAX-ACCESS    read-create
+         STATUS        current
+         DESCRIPTION   "The IP gateway to set for routes imported from GRM to ISIS-SPB."
+         ::= { alcatelIND1IsisSpbIPVPNBindTableEntry 5  }
+
+alcatelIND1IsisSpbIPVPNBindImportRouteMap OBJECT-TYPE
+         SYNTAX        SnmpAdminString (SIZE (0..20))
+         MAX-ACCESS    read-create
+         STATUS        current
+         DESCRIPTION   "The route-map name (or empty-string for all-routes) for routes imported from GRM to ISIS-SPB."
+         ::= { alcatelIND1IsisSpbIPVPNBindTableEntry 6  }
+
+alcatelIND1IsisSpbIPVPNBindRowStatus OBJECT-TYPE
         SYNTAX RowStatus
         MAX-ACCESS read-create
         STATUS current
@@ -2355,7 +2507,279 @@ alcatelIND1SpbIPVPNRedistIsidRowStatus OBJECT-TYPE
                  to create/delete entries.
                  This object is persistent."
         REFERENCE "12.25.6.1.3"
-        ::= { alcatelIND1SpbIPVPNRedistIsidTableEntry 5 }
+        ::= { alcatelIND1IsisSpbIPVPNBindTableEntry 7 }
+
+
+alcatelIND1IsisSpbIPVPNRouteTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AlcatelIND1IsisSpbIPVPNRouteTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The IP-VPN table of IP routes.
+                         cf. show spb ipvpn route-table, show spb ipvpn6 route-table"
+        ::= { alcatelIND1IsisSpbMibObjects 21 }
+
+alcatelIND1IsisSpbIPVPNRouteTableEntry OBJECT-TYPE
+        SYNTAX          AlcatelIND1IsisSpbIPVPNRouteTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An Entry in the alcatelIND1IsisSpbIPVPNRouteTable"
+        INDEX  {
+                alcatelIND1IsisSpbIPVPNRouteTableEntryTopIx,
+                alcatelIND1IsisSpbIPVPNRouteIsid,
+                alcatelIND1IsisSpbIPVPNRoutePrefixType,
+                alcatelIND1IsisSpbIPVPNRoutePrefix,
+                alcatelIND1IsisSpbIPVPNRoutePrefixLen,
+                alcatelIND1IsisSpbIPVPNRouteGateway
+        }
+        ::= { alcatelIND1IsisSpbIPVPNRouteTable 1 }
+
+AlcatelIND1IsisSpbIPVPNRouteTableEntry ::=
+        SEQUENCE {
+            alcatelIND1IsisSpbIPVPNRouteTableEntryTopIx AlcatelIND1IsisSpbMTID,
+            alcatelIND1IsisSpbIPVPNRouteIsid            Unsigned32,
+            alcatelIND1IsisSpbIPVPNRoutePrefixType      InetAddressType,
+            alcatelIND1IsisSpbIPVPNRoutePrefix          InetAddress,
+            alcatelIND1IsisSpbIPVPNRoutePrefixLen       InetAddressPrefixLength,
+            alcatelIND1IsisSpbIPVPNRouteGateway         InetAddress,
+            alcatelIND1IsisSpbIPVPNRouteNodeName        OCTET STRING,
+            alcatelIND1IsisSpbIPVPNRouteMetric          Unsigned32,
+            alcatelIND1IsisSpbIPVPNRouteTag             Unsigned32
+        }
+
+alcatelIND1IsisSpbIPVPNRouteTableEntryTopIx OBJECT-TYPE
+        SYNTAX          AlcatelIND1IsisSpbMTID
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The ISIS Topology Index identifier to which this
+                 instance belongs. Each Topology Index defines logical topology
+                 and is used to enable multiple SPB instances within several
+                 ISIS instances."
+        REFERENCE "12.25.11.1.2, 12.25.11.1.3, 28.12"
+        ::= { alcatelIND1IsisSpbIPVPNRouteTableEntry 1 }
+
+alcatelIND1IsisSpbIPVPNRouteIsid    OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The ISID of the IP-VPN route"
+        ::= { alcatelIND1IsisSpbIPVPNRouteTableEntry 2  }
+
+alcatelIND1IsisSpbIPVPNRoutePrefixType    OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The destination address type of the IP-VPN route.
+                         Should always be ipv4 or ipv6."
+        ::= { alcatelIND1IsisSpbIPVPNRouteTableEntry 3  }
+
+alcatelIND1IsisSpbIPVPNRoutePrefix    OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The destination prefix of the IP-VPN route"
+        ::= { alcatelIND1IsisSpbIPVPNRouteTableEntry 4  }
+
+alcatelIND1IsisSpbIPVPNRoutePrefixLen    OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The prefix length of the IP-VPN route"
+        ::= { alcatelIND1IsisSpbIPVPNRouteTableEntry 5  }
+
+alcatelIND1IsisSpbIPVPNRouteGateway    OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The next-hop/gateway of the IP-VPN route"
+        ::= { alcatelIND1IsisSpbIPVPNRouteTableEntry 6  }
+
+alcatelIND1IsisSpbIPVPNRouteNodeName    OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The BEB name of the node that advertised the IP-VPN route"
+        ::= { alcatelIND1IsisSpbIPVPNRouteTableEntry 7  }
+
+alcatelIND1IsisSpbIPVPNRouteMetric    OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The route-metric of the IP-VPN route"
+        ::= { alcatelIND1IsisSpbIPVPNRouteTableEntry 8  }
+
+alcatelIND1IsisSpbIPVPNRouteTag    OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The route-tag of the IP-VPN route"
+        ::= { alcatelIND1IsisSpbIPVPNRouteTableEntry 9  }
+
+
+alcatelIND1IsisSpbIPVPNRedistVrfTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AlcatelIND1IsisSpbIPVPNRedistVrfTableEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "The IP-VPN table of configured IP route-redistributions where the source entity is a VRF.
+                  cf. show spb ipvpn redist / show spb ipvpn6 redist"
+    ::= { alcatelIND1IsisSpbMibObjects 22 }
+
+alcatelIND1IsisSpbIPVPNRedistVrfTableEntry OBJECT-TYPE
+        SYNTAX          AlcatelIND1IsisSpbIPVPNRedistVrfTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An Entry in the alcatelIND1IsisSpbIPVPNRedistVrfTable"
+        INDEX  {
+                alcatelIND1IsisSpbIPVPNRedistVrfTableEntryTopIx,
+                alcatelIND1IsisSpbIPVPNRedistVrfSourceVrf,
+                alcatelIND1IsisSpbIPVPNRedistVrfDestIsid,
+                alcatelIND1IsisSpbIPVPNRedistVrfInetType
+        }
+        ::= { alcatelIND1IsisSpbIPVPNRedistVrfTable 1 }
+
+AlcatelIND1IsisSpbIPVPNRedistVrfTableEntry ::=
+        SEQUENCE {
+                alcatelIND1IsisSpbIPVPNRedistVrfTableEntryTopIx  AlcatelIND1IsisSpbMTID,
+                alcatelIND1IsisSpbIPVPNRedistVrfSourceVrf        SnmpAdminString,
+                alcatelIND1IsisSpbIPVPNRedistVrfDestIsid         Unsigned32,
+                alcatelIND1IsisSpbIPVPNRedistVrfInetType         InetAddressType,
+                alcatelIND1IsisSpbIPVPNRedistVrfRouteMap         SnmpAdminString,
+                alcatelIND1IsisSpbIPVPNRedistVrfRowStatus        RowStatus
+        }
+
+alcatelIND1IsisSpbIPVPNRedistVrfTableEntryTopIx OBJECT-TYPE
+        SYNTAX AlcatelIND1IsisSpbMTID
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "The ISIS Topology Index identifier to which this
+                 instance belongs. Each Topology Index defines logical topology
+                 and is used to enable multiple SPB instances within several
+                 ISIS instances."
+        REFERENCE "12.25.11.1.2, 12.25.11.1.3, 28.12"
+        ::= { alcatelIND1IsisSpbIPVPNRedistVrfTableEntry 1  }
+
+alcatelIND1IsisSpbIPVPNRedistVrfSourceVrf  OBJECT-TYPE
+         SYNTAX        SnmpAdminString (SIZE (0..20))
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION   "The source VRF from which routes are being redistributed."
+         ::= { alcatelIND1IsisSpbIPVPNRedistVrfTableEntry 2  }
+
+alcatelIND1IsisSpbIPVPNRedistVrfDestIsid  OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION   "The destination ISID to which routes are being redistributed."
+         ::= { alcatelIND1IsisSpbIPVPNRedistVrfTableEntry 3  }
+
+alcatelIND1IsisSpbIPVPNRedistVrfInetType  OBJECT-TYPE
+         SYNTAX        InetAddressType
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION   "The InetAddressType to identify if the entry is for IPv4 or IPv6."
+         ::= { alcatelIND1IsisSpbIPVPNRedistVrfTableEntry 4  }
+
+alcatelIND1IsisSpbIPVPNRedistVrfRouteMap  OBJECT-TYPE
+         SYNTAX        SnmpAdminString (SIZE (0..20))
+         MAX-ACCESS    read-create
+         STATUS        current
+         DESCRIPTION   "The route-map name (or empty-string for all-routes) for the filter to be applied to this route-redistribution."
+         ::= { alcatelIND1IsisSpbIPVPNRedistVrfTableEntry 5  }
+
+alcatelIND1IsisSpbIPVPNRedistVrfRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+                "The object indicates the status of an entry, and is used
+                 to create/delete entries.
+                 This object is persistent."
+        REFERENCE "12.25.6.1.3"
+        ::= { alcatelIND1IsisSpbIPVPNRedistVrfTableEntry 6 }
+
+
+alcatelIND1IsisSpbIPVPNRedistIsidTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AlcatelIND1IsisSpbIPVPNRedistIsidTableEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "The IP-VPN table of configured IP route-redistributions where the source entity is an ISID.
+                  cf. show spb ipvpn redist"
+    ::= { alcatelIND1IsisSpbMibObjects 23 }
+
+alcatelIND1IsisSpbIPVPNRedistIsidTableEntry OBJECT-TYPE
+        SYNTAX          AlcatelIND1IsisSpbIPVPNRedistIsidTableEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An Entry in the alcatelIND1IsisSpbIPVPNRedistIsidTable"
+        INDEX  {
+                alcatelIND1IsisSpbIPVPNRedistIsidTableEntryTopIx,
+                alcatelIND1IsisSpbIPVPNRedistIsidSourceIsid,
+                alcatelIND1IsisSpbIPVPNRedistIsidDestIsid,
+                alcatelIND1IsisSpbIPVPNRedistIsidInetType
+        }
+        ::= { alcatelIND1IsisSpbIPVPNRedistIsidTable 1 }
+
+AlcatelIND1IsisSpbIPVPNRedistIsidTableEntry ::=
+        SEQUENCE {
+                alcatelIND1IsisSpbIPVPNRedistIsidTableEntryTopIx  AlcatelIND1IsisSpbMTID,
+                alcatelIND1IsisSpbIPVPNRedistIsidSourceIsid       Unsigned32,
+                alcatelIND1IsisSpbIPVPNRedistIsidDestIsid         Unsigned32,
+                alcatelIND1IsisSpbIPVPNRedistIsidInetType         InetAddressType,
+                alcatelIND1IsisSpbIPVPNRedistIsidRouteMap         SnmpAdminString,
+                alcatelIND1IsisSpbIPVPNRedistIsidRowStatus        RowStatus
+        }
+
+alcatelIND1IsisSpbIPVPNRedistIsidTableEntryTopIx OBJECT-TYPE
+        SYNTAX AlcatelIND1IsisSpbMTID
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "The ISIS Topology Index identifier to which this
+                 instance belongs. Each Topology Index defines logical topology
+                 and is used to enable multiple SPB instances within several
+                 ISIS instances."
+        REFERENCE "12.25.11.1.2, 12.25.11.1.3, 28.12"
+        ::= { alcatelIND1IsisSpbIPVPNRedistIsidTableEntry 1  }
+
+alcatelIND1IsisSpbIPVPNRedistIsidSourceIsid  OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION   "The source ISID from which routes are being redistributed."
+         ::= { alcatelIND1IsisSpbIPVPNRedistIsidTableEntry 2  }
+
+alcatelIND1IsisSpbIPVPNRedistIsidDestIsid  OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION   "The destination ISID to which routes are being redistributed."
+         ::= { alcatelIND1IsisSpbIPVPNRedistIsidTableEntry 3  }
+
+alcatelIND1IsisSpbIPVPNRedistIsidInetType  OBJECT-TYPE
+         SYNTAX        InetAddressType
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION   "The InetAddressType to identify if the entry is for IPv4 or IPv6."
+         ::= { alcatelIND1IsisSpbIPVPNRedistIsidTableEntry 4  }
+
+alcatelIND1IsisSpbIPVPNRedistIsidRouteMap  OBJECT-TYPE
+         SYNTAX        SnmpAdminString (SIZE (0..20))
+         MAX-ACCESS    read-create
+         STATUS        current
+         DESCRIPTION   "The route-map name (or empty-string for all-routes) for the filter to be applied to this route-redistribution."
+         ::= { alcatelIND1IsisSpbIPVPNRedistIsidTableEntry 5  }
+
+alcatelIND1IsisSpbIPVPNRedistIsidRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+                "The object indicates the status of an entry, and is used
+                 to create/delete entries.
+                 This object is persistent."
+        REFERENCE "12.25.6.1.3"
+        ::= { alcatelIND1IsisSpbIPVPNRedistIsidTableEntry 6 }
 
 
 -- =============================================================
@@ -2383,7 +2807,8 @@ alcatelIND1IsisSpbSysGroupSPBM OBJECT-GROUP
                 alcatelIND1IsisSpbSysOverloadTimeout,
                 alcatelIND1IsisSpbSysSetOverload,
                 alcatelIND1isisSpbSysLastSpfRunTimeStamp,
-                alcatelIND1IsisSpbSysLastEnabledTimeStamp
+                alcatelIND1IsisSpbSysLastEnabledTimeStamp,
+                alcatelIND1IsisSpbLevelCapability
         }
         STATUS current
         DESCRIPTION
@@ -2415,7 +2840,10 @@ alcatelIND1IsisSpbAdjStaticEntryConfigGroupSPBM OBJECT-GROUP
            alcatelIND1IsisSpbAdjStaticEntryRowStatus,
            alcatelIND1IsisSpbEctStaticEntryEctAlgorithm,
            alcatelIND1IsisSpbEctStaticEntryRowStatus,
-           alcatelIND1IsisSpbvEctStaticEntrySpvid
+           alcatelIND1IsisSpbvEctStaticEntrySpvid,
+           alcatelIND1IsisSpbAdjStaticEntryIfPriority,
+           alcatelIND1IsisSpbAdjStaticEntryIfType,
+           alcatelIND1IsisSpbAdjStaticEntryIfCsnpInterval
         }
         STATUS current
         DESCRIPTION
@@ -2457,7 +2885,10 @@ alcatelIND1IsisSpbAdjGroupSPBM OBJECT-GROUP
            alcatelIND1IsisSpbEctStaticEntryRootBridgeSysMac,
            alcatelIND1IsisSpbEctStaticEntryRootBridgeSysName,
            alcatelIND1IsisSpbAdjStaticEntryAFDConfig,
-           alcatelIND1IsisSpbAdjDynamicEntryAdjUpTimeStamp
+           alcatelIND1IsisSpbAdjDynamicEntryAdjUpTimeStamp,
+           alcatelIND1IsisSpbAdjStaticEntryIfNumAdjacencies,
+           alcatelIND1IsisSpbAdjStaticEntryIfDis,
+           alcatelIND1IsisSpbAdjStaticEntryIfLevel
         }
         STATUS current
         DESCRIPTION
@@ -2524,7 +2955,8 @@ alcatelIND1IsisSpbMulticastTableEntryGroupSPBM OBJECT-GROUP
 alcatelIND1IsisSpbServiceTableEntryGroupSPBM OBJECT-GROUP
         OBJECTS {
            alcatelIND1IsisSpbServiceTableEntryIsidFlags,
-           alcatelIND1IsisSpbServiceTableEntrySysName
+           alcatelIND1IsisSpbServiceTableEntrySysName,
+           alcatelIND1IsisSpbServiceTableEntrySvcOption 
         }
         STATUS current
         DESCRIPTION
@@ -2566,21 +2998,13 @@ alcatelIND1IsisSpbNodeGroupSPBM OBJECT-GROUP
         "The collection of objects to represent Isis Spb Node Group SPBM information"
         ::= { alcatelIND1IsisSpbGroups 13 }
 
---alcatelIND1IsisSpbVPNExportTableGroupSPBM OBJECT-GROUP
---        OBJECTS {
---            alcatelIND1SpbIPVPNExportRowStatus
---        }
---        STATUS current
---        DESCRIPTION
---        "The collection of objects to represent Isis Spb Vpn Export Table Group SPBM information"
---        ::= { alcatelIND1IsisSpbGroups 14 }
 
 alcatelIND1IsisSpbVPNBindTableGroupSPBM OBJECT-GROUP
         OBJECTS {
             alcatelIND1SpbIPVPNBindImportRouteMap,
             alcatelIND1SpbIPVPNBindRowStatus
         }
-        STATUS current
+        STATUS deprecated
         DESCRIPTION
         "The collection of objects to represent Isis Spb Vpn Bind Table Group SPBM information"
         ::= { alcatelIND1IsisSpbGroups 14 }
@@ -2591,7 +3015,7 @@ alcatelIND1IsisSpbVPNRouteTableGroupSPBM OBJECT-GROUP
             alcatelIND1SpbIPVPNRouteNodeName,
             alcatelIND1SpbIPVPNRouteMetric
         }
-        STATUS current
+        STATUS deprecated
         DESCRIPTION
         "The collection of objects to represent Isis Spb Vpn Route Table Group SPBM information"
         ::= { alcatelIND1IsisSpbGroups 15 }
@@ -2601,7 +3025,7 @@ alcatelIND1IsisSpbVPNRedistVrfTableGroupSPBM OBJECT-GROUP
             alcatelIND1SpbIPVPNRedistVrfRouteMap,
             alcatelIND1SpbIPVPNRedistVrfRowStatus
         }
-        STATUS current
+        STATUS deprecated
         DESCRIPTION
         "The collection of objects to represent Isis Spb Vpn Redist Vrf Table Group SPBM information"
         ::= { alcatelIND1IsisSpbGroups 16 }
@@ -2611,10 +3035,63 @@ alcatelIND1IsisSpbVPNRedistIsidTableGroupSPBM OBJECT-GROUP
             alcatelIND1SpbIPVPNRedistIsidRouteMap,
             alcatelIND1SpbIPVPNRedistIsidRowStatus
         }
-        STATUS current
+        STATUS deprecated
         DESCRIPTION
         "The collection of objects to represent Isis Spb Vpn Redist Isid Table Group SPBM information"
         ::= { alcatelIND1IsisSpbGroups 17 }
+
+alcatelIND1IsisSpbRapidLspConvergenceGroupSPBM OBJECT-GROUP
+        OBJECTS {
+            alcatelIND1IsisSpbRapidLspConvergenceAdminState,
+            alcatelIND1IsisSpbRapidLspConvergenceIsid
+        }
+        STATUS current
+        DESCRIPTION
+        "The collection of objects to represent Isis Spb Rapid Lsp convergence information"
+        ::= { alcatelIND1IsisSpbGroups 18 }
+
+alcatelIND1IsisSpbIPVPNBindTableGroupSPBM OBJECT-GROUP
+        OBJECTS {
+            alcatelIND1IsisSpbIPVPNBindGateway,
+            alcatelIND1IsisSpbIPVPNBindImportRouteMap,
+            alcatelIND1IsisSpbIPVPNBindRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+        "The collection of objects to represent Isis Spb IPVPN Bind Table Group SPBM information"
+        ::= { alcatelIND1IsisSpbGroups 19 }
+
+
+alcatelIND1IsisSpbIPVPNRouteTableGroupSPBM OBJECT-GROUP
+        OBJECTS {
+            alcatelIND1IsisSpbIPVPNRouteNodeName,
+            alcatelIND1IsisSpbIPVPNRouteMetric,
+            alcatelIND1IsisSpbIPVPNRouteTag
+        }
+        STATUS current
+        DESCRIPTION
+        "The collection of objects to represent Isis Spb IPVPN Route Table Group SPBM information"
+        ::= { alcatelIND1IsisSpbGroups 20 }
+
+alcatelIND1IsisSpbIPVPNRedistVrfTableGroupSPBM OBJECT-GROUP
+        OBJECTS {
+            alcatelIND1IsisSpbIPVPNRedistVrfRouteMap,
+            alcatelIND1IsisSpbIPVPNRedistVrfRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+        "The collection of objects to represent Isis Spb Vpn Redist Vrf Table Group SPBM information"
+        ::= { alcatelIND1IsisSpbGroups 21 }
+
+alcatelIND1IsisSpbIPVPNRedistIsidTableGroupSPBM OBJECT-GROUP
+        OBJECTS {
+            alcatelIND1IsisSpbIPVPNRedistIsidRouteMap,
+            alcatelIND1IsisSpbIPVPNRedistIsidRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+        "The collection of objects to represent Isis Spb Vpn Redist Isid Table Group SPBM information"
+        ::= { alcatelIND1IsisSpbGroups 22 }
 
 
 
@@ -2639,11 +3116,15 @@ alcatelIND1IsisSpbComplianceSPBM MODULE-COMPLIANCE
                         alcatelIND1IsisSpbSpfGroupSPBM,
                         alcatelIND1IsisSpbUnicastGroupSPBM,
                         alcatelIND1IsisSpbNodeGroupSPBM,
---                      alcatelIND1IsisSpbVPNExportTableGroupSPBM,
                         alcatelIND1IsisSpbVPNBindTableGroupSPBM,
                         alcatelIND1IsisSpbVPNRouteTableGroupSPBM,
                         alcatelIND1IsisSpbVPNRedistVrfTableGroupSPBM,
-                        alcatelIND1IsisSpbVPNRedistIsidTableGroupSPBM
+                        alcatelIND1IsisSpbVPNRedistIsidTableGroupSPBM,
+                        alcatelIND1IsisSpbRapidLspConvergenceGroupSPBM,
+                        alcatelIND1IsisSpbIPVPNBindTableGroupSPBM,
+                        alcatelIND1IsisSpbIPVPNRouteTableGroupSPBM,
+                        alcatelIND1IsisSpbIPVPNRedistVrfTableGroupSPBM,
+                        alcatelIND1IsisSpbIPVPNRedistIsidTableGroupSPBM
                 }
         ::= { alcatelIND1IsisSpbCompliances 1 }
 

@@ -3,9 +3,9 @@ text: 'Tycon Systems TPDIN'
 type: appliance
 icon: tyconsystems
 over:
-    - { graph: sensor_voltage, text: 'Device Voltage' }
-    - { graph: sensor_current, text: 'Device Current' }
-    - { graph: sensor_temperature, text: 'Device Temperature' }
+    - { graph: device_voltage, text: 'Device Voltage' }
+    - { graph: device_current, text: 'Device Current' }
+    - { graph: device_temperature, text: 'Device Temperature' }
 mib_dir: tycon
 discovery:
     -

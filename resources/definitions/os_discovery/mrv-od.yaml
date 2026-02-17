@@ -1,4 +1,3 @@
-mib: NBS-CMMC-MIB
 modules:
     os:
         hardware: NBS-CMMC-MIB::nbsCmmcChassisModel.1
@@ -9,91 +8,91 @@ modules:
             data:
                 -
                     oid:
-                        - nbsCmmcChassisTable
-                        - nbsCmmcSlotTable
-                        - nbsCmmcPortTable
+                        - NBS-CMMC-MIB::nbsCmmcChassisTable
+                        - NBS-CMMC-MIB::nbsCmmcSlotTable
+                        - NBS-CMMC-MIB::nbsCmmcPortTable
         dbm:
             options:
                 divisor: 1000
                 skip_values: -2147483648
             data:
                 -
-                    oid: nbsCmmcPortTable
-                    value: nbsCmmcPortRxPower
+                    oid: NBS-CMMC-MIB::nbsCmmcPortTable
+                    value: NBS-CMMC-MIB::nbsCmmcPortRxPower
                     num_oid: '.1.3.6.1.4.1.629.200.8.1.1.32.{{ $index }}'
                     descr: 'Port {{ $index }} Rx Power'
                     index: 'nbsCmmcPortRxPower.{{ $index }}'
-                    entPhysicalIndex: '{{ $nbsCmmcPortIfIndex }}32'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcPortIfIndex }}32'
                 -
-                    oid: nbsCmmcPortTable
-                    value: nbsCmmcPortTxPower
+                    oid: NBS-CMMC-MIB::nbsCmmcPortTable
+                    value: NBS-CMMC-MIB::nbsCmmcPortTxPower
                     num_oid: '.1.3.6.1.4.1.629.200.8.1.1.31.{{ $index }}'
                     descr: 'Port {{ $index }} Tx Power'
                     index: 'nbsCmmcPortTxPower.{{ $index }}'
-                    entPhysicalIndex: '{{ $nbsCmmcPortIfIndex }}31'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcPortIfIndex }}31'
         current:
             options:
                 divisor: 1000000
                 skip_values: -1
             data:
                 -
-                    oid: nbsCmmcPortTable
-                    value: nbsCmmcPortBiasAmps
+                    oid: NBS-CMMC-MIB::nbsCmmcPortTable
+                    value: NBS-CMMC-MIB::nbsCmmcPortBiasAmps
                     num_oid: '.1.3.6.1.4.1.629.200.8.1.1.33.{{ $index }}'
                     descr: 'Port {{ $index }} Tx Bias Current'
                     index: 'nbsCmmcPortBiasAmps.{{ $index }}'
-                    entPhysicalIndex: '{{ $nbsCmmcPortIfIndex }}33'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcPortIfIndex }}33'
         voltage:
             options:
                 divisor: 1000
                 skip_values: -1
             data:
                 -
-                    oid: nbsCmmcPortTable
-                    value: nbsCmmcPortSupplyVolts
+                    oid: NBS-CMMC-MIB::nbsCmmcPortTable
+                    value: NBS-CMMC-MIB::nbsCmmcPortSupplyVolts
                     num_oid: '.1.3.6.1.4.1.629.200.8.1.1.34.{{ $index }}'
                     descr: 'Port {{ $index }} Tx Supply Voltage'
                     index: 'nbsCmmcPortSupplyVolts.{{ $index }}'
-                    entPhysicalIndex: '{{ $nbsCmmcPortIfIndex }}34'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcPortIfIndex }}34'
         temperature:
             options:
                 skip_values: -2147483648
             data:
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisTemperature
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisTemperature
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.15.{{ $index }}'
-                    low_limit: nbsCmmcChassisTemperatureMin
-                    high_limit: nbsCmmcChassisTemperatureLimit
+                    low_limit: NBS-CMMC-MIB::nbsCmmcChassisTemperatureMin
+                    high_limit: NBS-CMMC-MIB::nbsCmmcChassisTemperatureLimit
                     descr: 'Chassis {{ $index }} Temperature'
                     index: 'nbsCmmcChassisTemperature.{{ $index }}'
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}15'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}15'
                 -
-                    oid: nbsCmmcSlotTable
-                    value: nbsCmmcSlotTemperature
+                    oid: NBS-CMMC-MIB::nbsCmmcSlotTable
+                    value: NBS-CMMC-MIB::nbsCmmcSlotTemperature
                     num_oid: '.1.3.6.1.4.1.629.200.7.1.1.34.{{ $index }}'
-                    low_limit: nbsCmmcSlotTemperatureMin
-                    high_limit: nbsCmmcSlotTemperatureLimit
+                    low_limit: NBS-CMMC-MIB::nbsCmmcSlotTemperatureMin
+                    high_limit: NBS-CMMC-MIB::nbsCmmcSlotTemperatureLimit
                     descr: 'Slot {{ $index }} Temperature'
                     index: 'nbsCmmcSlotTemperature.{{ $index }}'
-                    entPhysicalIndex: '{{ $nbsCmmcSlotIfIndex }}34'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcSlotIfIndex }}34'
                 -
-                    oid: nbsCmmcPortTable
-                    value: nbsCmmcPortTemperature
+                    oid: NBS-CMMC-MIB::nbsCmmcPortTable
+                    value: NBS-CMMC-MIB::nbsCmmcPortTemperature
                     num_oid: '.1.3.6.1.4.1.629.200.8.1.1.30.{{ $index }}'
                     descr: 'Port {{ $index }} Temperature'
                     index: 'nbsCmmcPortTemperature.{{ $index }}'
-                    entPhysicalIndex: '{{ $nbsCmmcPortIfIndex }}30'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcPortIfIndex }}30'
         state:
             data:
                 -
-                    oid: nbsCmmcPortTable
-                    value: nbsCmmcPortDigitalDiags
+                    oid: NBS-CMMC-MIB::nbsCmmcPortTable
+                    value: NBS-CMMC-MIB::nbsCmmcPortDigitalDiags
                     num_oid: '.1.3.6.1.4.1.629.200.8.1.1.38.{{ $index }}'
                     descr: 'Port {{ $index }} Overall DigiDiags State'
                     index: 'nbsCmmcPortDigitalDiags.{{ $index }}'
                     skip_values: 1
-                    entPhysicalIndex: '{{ $nbsCmmcPortIfIndex }}38'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcPortIfIndex }}38'
                     state_name: nbsCmmcPortDigitalDiags
                     states:
                         - { value: 1, descr: notSupported, graph: 0, generic: 3 }
@@ -101,26 +100,26 @@ modules:
                         - { value: 3, descr: diagsWarning, graph: 1, generic: 1 }
                         - { value: 4, descr: diagsAlarm, graph: 2, generic: 2 }
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisPowerStatus
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisPowerStatus
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.51.{{ $index }}'
                     descr: 'Chassis {{ $index }} Power Budget Status'
                     index: 'nbsCmmcChassisPowerStatus.{{ $index }}'
                     skip_values: 1
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}51'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}51'
                     state_name: nbsCmmcChassisPowerStatus
                     states:
                         - { value: 1, descr: notSupported, graph: 0, generic: 3 }
                         - { value: 2, descr: sufficient, graph: 1, generic: 0 }
                         - { value: 3, descr: insufficient, graph: -1, generic: 2 }
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisPS1Status
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisPS1Status
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.7.{{ $index }}'
                     descr: 'Chassis {{ $index }} Power Supply 1'
                     index: 'nbsCmmcChassisPS1Status.{{ $index }}'
                     skip_values: 6
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}7'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}7'
                     state_name: nbsCmmcChassisPSStatus
                     states:
                         - { value: 1, descr: notInstalled, graph: 0, generic: 2 }
@@ -132,13 +131,13 @@ modules:
                         - { value: 7, descr: good, graph: 1, generic: 0 }
                         - { value: 8, descr: bad, graph: -1, generic: 2 }
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisPS2Status
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisPS2Status
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.8.{{ $index }}'
                     descr: 'Chassis {{ $index }} Power Supply 2'
                     index: 'nbsCmmcChassisPS2Status.{{ $index }}'
                     skip_values: 6
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}8'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}8'
                     state_name: nbsCmmcChassisPSStatus
                     states:
                         - { value: 1, descr: notInstalled, graph: 0, generic: 2 }
@@ -150,13 +149,13 @@ modules:
                         - { value: 7, descr: good, graph: 1, generic: 0 }
                         - { value: 8, descr: bad, graph: -1, generic: 2 }
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisPS3Status
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisPS3Status
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.9.{{ $index }}'
                     descr: 'Chassis {{ $index }} Power Supply 3'
                     index: 'nbsCmmcChassisPS3Status.{{ $index }}'
                     skip_values: 6
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}9'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}9'
                     state_name: nbsCmmcChassisPSStatus
                     states:
                         - { value: 1, descr: notInstalled, graph: 0, generic: 2 }
@@ -168,13 +167,13 @@ modules:
                         - { value: 7, descr: good, graph: 1, generic: 0 }
                         - { value: 8, descr: bad, graph: -1, generic: 2 }
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisPS4Status
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisPS4Status
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.10.{{ $index }}'
                     descr: 'Chassis {{ $index }} Power Supply 4'
                     index: 'nbsCmmcChassisPS4Status.{{ $index }}'
                     skip_values: 6
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}10'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}10'
                     state_name: nbsCmmcChassisPSStatus
                     states:
                         - { value: 1, descr: notInstalled, graph: 0, generic: 2 }
@@ -186,13 +185,13 @@ modules:
                         - { value: 7, descr: good, graph: 1, generic: 0 }
                         - { value: 8, descr: bad, graph: -1, generic: 2 }
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisFan1Status
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisFan1Status
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.11.{{ $index }}'
                     descr: 'Chassis {{ $index }} Fan 1'
                     index: 'nbsCmmcChassisFan1Status.{{ $index }}'
                     skip_values: 1
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}11'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}11'
                     state_name: nbsCmmcChassisFanStatus
                     states:
                         - { value: 1, descr: notSupported, graph: 0, generic: 3 }
@@ -200,13 +199,13 @@ modules:
                         - { value: 3, descr: good, graph: 1, generic: 0 }
                         - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisFan2Status
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisFan2Status
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.12.{{ $index }}'
                     descr: 'Chassis {{ $index }} Fan 2'
                     index: 'nbsCmmcChassisFan2Status.{{ $index }}'
                     skip_values: 1
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}12'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}12'
                     state_name: nbsCmmcChassisFanStatus
                     states:
                         - { value: 1, descr: notSupported, graph: 0, generic: 3 }
@@ -214,13 +213,13 @@ modules:
                         - { value: 3, descr: good, graph: 1, generic: 0 }
                         - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisFan3Status
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisFan3Status
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.13.{{ $index }}'
                     descr: 'Chassis {{ $index }} Fan 3'
                     index: 'nbsCmmcChassisFan3Status.{{ $index }}'
                     skip_values: 1
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}13'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}13'
                     state_name: nbsCmmcChassisFanStatus
                     states:
                         - { value: 1, descr: notSupported, graph: 0, generic: 3 }
@@ -228,13 +227,13 @@ modules:
                         - { value: 3, descr: good, graph: 1, generic: 0 }
                         - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisFan4Status
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisFan4Status
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.14.{{ $index }}'
                     descr: 'Chassis {{ $index }} Fan 4'
                     index: 'nbsCmmcChassisFan4Status.{{ $index }}'
                     skip_values: 1
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}14'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}14'
                     state_name: nbsCmmcChassisFanStatus
                     states:
                         - { value: 1, descr: notSupported, graph: 0, generic: 3 }
@@ -242,13 +241,13 @@ modules:
                         - { value: 3, descr: good, graph: 1, generic: 0 }
                         - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisFan5Status
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisFan5Status
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.36.{{ $index }}'
                     descr: 'Chassis {{ $index }} Fan 5'
                     index: 'nbsCmmcChassisFan5Status.{{ $index }}'
                     skip_values: 1
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}36'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}36'
                     state_name: nbsCmmcChassisFanStatus
                     states:
                         - { value: 1, descr: notSupported, graph: 0, generic: 3 }
@@ -256,13 +255,13 @@ modules:
                         - { value: 3, descr: good, graph: 1, generic: 0 }
                         - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisFan6Status
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisFan6Status
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.37.{{ $index }}'
                     descr: 'Chassis {{ $index }} Fan 6'
                     index: 'nbsCmmcChassisFan6Status.{{ $index }}'
                     skip_values: 1
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}37'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}37'
                     state_name: nbsCmmcChassisFanStatus
                     states:
                         - { value: 1, descr: notSupported, graph: 0, generic: 3 }
@@ -270,13 +269,13 @@ modules:
                         - { value: 3, descr: good, graph: 1, generic: 0 }
                         - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisFan7Status
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisFan7Status
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.38.{{ $index }}'
                     descr: 'Chassis {{ $index }} Fan 7'
                     index: 'nbsCmmcChassisFan7Status.{{ $index }}'
                     skip_values: 1
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}38'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}38'
                     state_name: nbsCmmcChassisFanStatus
                     states:
                         - { value: 1, descr: notSupported, graph: 0, generic: 3 }
@@ -284,13 +283,13 @@ modules:
                         - { value: 3, descr: good, graph: 1, generic: 0 }
                         - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
                 -
-                    oid: nbsCmmcChassisTable
-                    value: nbsCmmcChassisFan8Status
+                    oid: NBS-CMMC-MIB::nbsCmmcChassisTable
+                    value: NBS-CMMC-MIB::nbsCmmcChassisFan8Status
                     num_oid: '.1.3.6.1.4.1.629.200.6.1.1.39.{{ $index }}'
                     descr: 'Chassis {{ $index }} Fan 8'
                     index: 'nbsCmmcChassisFan8Status.{{ $index }}'
                     skip_values: 1
-                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}39'
+                    entPhysicalIndex: '{{ NBS-CMMC-MIB::nbsCmmcChassisIfIndex }}39'
                     state_name: nbsCmmcChassisFanStatus
                     states:
                         - { value: 1, descr: notSupported, graph: 0, generic: 3 }

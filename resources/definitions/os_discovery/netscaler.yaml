@@ -1,4 +1,3 @@
-mib: NS-ROOT-MIB
 modules:
     mempools:
         data:
@@ -14,16 +13,16 @@ modules:
     processors:
         data:
             -
-                oid: nsCPUTable
-                value: nsCPUusage
+                oid: NS-ROOT-MIB::nsCPUTable
+                value: NS-ROOT-MIB::nsCPUusage
                 num_oid: '.1.3.6.1.4.1.5951.4.1.1.41.6.1.2.{{ $index }}'
-                index: nsCPUname
-                descr: nsCPUname
+                index: NS-ROOT-MIB::nsCPUname
+                descr: NS-ROOT-MIB::nsCPUname
     sensors:
         state:
             data:
                 -
-                    oid: haCurStatus
+                    oid: NS-ROOT-MIB::haCurStatus
                     num_oid: '.1.3.6.1.4.1.5951.4.1.1.23.23.{{ $index }}'
                     index: 'haCurStatus.{{ $index }}'
                     descr: Configured for HA
@@ -32,7 +31,7 @@ modules:
                         - { value: 0, generic: 0, graph: 1, descr: no }
                         - { value: 1, generic: 0, graph: 1, descr: yes }
                 -
-                    oid: sysHighAvailabilityMode
+                    oid: NS-ROOT-MIB::sysHighAvailabilityMode
                     num_oid: '.1.3.6.1.4.1.5951.4.1.1.6.{{ $index }}'
                     index: 'sysHighAvailabilityMode.{{ $index }}'
                     descr: Current HA mode
@@ -43,7 +42,7 @@ modules:
                         - { value: 2, generic: 0, graph: 1, descr: secondary }
                         - { value: 3, generic: 3, graph: 1, descr: unknown }
                 -
-                    oid: haCurState
+                    oid: NS-ROOT-MIB::haCurState
                     num_oid: '.1.3.6.1.4.1.5951.4.1.1.23.24.{{ $index }}'
                     index: 'haCurState.{{ $index }}'
                     descr: Current HA state
@@ -62,7 +61,7 @@ modules:
                         - { value: 10, generic: 2, graph: 1, descr: PARTIALFAILSSL }
                         - { value: 11, generic: 2, graph: 1, descr: ROUTEMONITORFAIL }
                 -
-                    oid: haPeerState
+                    oid: NS-ROOT-MIB::haPeerState
                     num_oid: '.1.3.6.1.4.1.5951.4.1.1.23.3.{{ $index }}'
                     index: 'haPeerState.{{ $index }}'
                     descr: Peer HA mode
@@ -75,22 +74,22 @@ modules:
         count:
             data:
                 -
-                    oid: sslTotTransactionsRate
+                    oid: NS-ROOT-MIB::sslTotTransactionsRate
                     num_oid: '.1.3.6.1.4.1.5951.4.1.1.47.333.{{ $index }}'
                     index: 'sslTotTransactionsRate.{{ $index }}'
                     descr: SSL Total Transactions Rate
                 -
-                    oid: httpTotRequestsRate
+                    oid: NS-ROOT-MIB::httpTotRequestsRate
                     num_oid: '.1.3.6.1.4.1.5951.4.1.1.48.76.{{ $index }}'
                     index: 'httpTotRequestsRate.{{ $index }}'
                     descr: HTTP Total Requests Rate
                 -
-                    oid: tcpCurClientConnEstablished
+                    oid: NS-ROOT-MIB::tcpCurClientConnEstablished
                     num_oid: '.1.3.6.1.4.1.5951.4.1.1.46.12.{{ $index }}'
                     index: 'tcpCurClientConnEstablished.{{ $index }}'
                     descr: Current TCP Client Connections Established
                 -
-                    oid: tcpCurServerConnEstablished
+                    oid: NS-ROOT-MIB::tcpCurServerConnEstablished
                     num_oid: '.1.3.6.1.4.1.5951.4.1.1.46.10.{{ $index }}'
                     index: 'tcpCurServerConnEstablished.{{ $index }}'
                     descr: Current TCP Server Connections Established

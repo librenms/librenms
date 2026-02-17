@@ -1,0 +1,252 @@
+PACKETFLUX-POWERCONTROL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    packetfluxFeatureSpecific
+        FROM PACKETFLUX-SMI
+    Fixed1DecimalDigit, Fixed6DecimalDigits
+        FROM PACKETFLUX-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    ;
+
+packetfluxPowerControl MODULE-IDENTITY
+    LAST-UPDATED  "201807071256Z" -- July 07, 2018
+    ORGANIZATION
+        "PacketFlux Technologies"
+    CONTACT-INFO
+        "custsvc@packetflux.com http://www.packetflux.com"
+    DESCRIPTION
+        "MIB for PacketFlux Devices containing one or more Ports with
+         Power Control such as PowerControl Ports or PDU's"
+    REVISION      "201807071256Z" -- July 07, 2018
+    DESCRIPTION
+        "Initial version of the mib"
+    ::= { packetfluxFeatureSpecific 3 }
+
+TimingPulseStyleEnum ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        ""
+    SYNTAX        INTEGER {
+        -- The port does not support timing pulse injection.
+        notsupported(1),
+        -- Unknown Sync Pulse Style
+        unknown(2),
+        -- The traditional sync over power pulse needed by earlier cambium
+        -- radios (450i and earlier)
+        canopy(3),
+        -- The sync over power pulse needed by current (450i/450m) cambium
+        -- radios.
+        cambium(4)
+    }
+
+powerControlPortsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF PowerControlPortsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Contains data about the power injection ports installed in the
+         device."
+    ::= { packetfluxPowerControl 1 }
+
+powerControlPortsEntry OBJECT-TYPE
+    SYNTAX        PowerControlPortsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A single row of the injectionPorts table"
+    INDEX
+        { portSlotNumber, portPortNumber }
+    ::= { powerControlPortsTable 1 }
+
+PowerControlPortsEntry ::= SEQUENCE
+{
+    portSlotNumber                Unsigned32,
+    portPortNumber                Unsigned32,
+    portDescription               DisplayString,
+    portPowerEnabled              TruthValue,
+    portPowerTripped              TruthValue,
+    portCycleTimeout              Fixed1DecimalDigit,
+    portPowerEnabledAtReset       TruthValue,
+    portTimingPulseEnabled        TruthValue,
+    portTimingPulseEnabledAtReset TruthValue,
+    portTimingPulseStyle          TimingPulseStyleEnum,
+    portOutputVoltage             Fixed6DecimalDigits,
+    portCurrent                   Fixed6DecimalDigits,
+    portNumberOfPowerTransitions  Counter32,
+    portNumberOfTripEvents        Counter32
+}
+
+
+portSlotNumber OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The slot this injection port is installed in."
+    ::= { powerControlPortsEntry 1 }
+
+portPortNumber OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The port number in the slot which corresponds to this
+         injection port."
+    ::= { powerControlPortsEntry 2 }
+
+portDescription OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The user-settable description for this port. This should be
+         used to label the port so it is easier for humans to identify
+         what is attached to the port."
+    ::= { powerControlPortsEntry 3 }
+
+portPowerEnabled OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Whether the power is enabled for this port."
+    ::= { powerControlPortsEntry 4 }
+
+portPowerTripped OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Whether the power has been shut down due to the detection of
+         an overcurrent or other fault. This value overrides the
+         powerEnabled value when true, ensuring that a port is shut down
+         on fault. Write a '0'(false) to this OID to reset the trip."
+    ::= { powerControlPortsEntry 5 }
+
+portCycleTimeout OBJECT-TYPE
+    SYNTAX        Fixed1DecimalDigit
+    UNITS         "S"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The number of seconds which remain in a port Cycle. Write a
+         timer value to this OID to either start a cycle on the port (if
+         this value is currently zero), or to change the amount of time
+         left in the cycle (if a cycle is already in progress). A cycle
+         will always toggle the current state of the port. So if the
+         power on a port is disabled, writing a value to this OID will
+         turn the port on, then back off which may not be what the
+         operator desires."
+    ::= { powerControlPortsEntry 6 }
+
+portPowerEnabledAtReset OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The power status for this port after a card power cycle or
+         reset."
+    ::= { powerControlPortsEntry 7 }
+
+portTimingPulseEnabled OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Some power control points permit the injection of a timing
+         pulse.   This OID shows whether that pulse is enabled (if the
+         port supports it)."
+    ::= { powerControlPortsEntry 8 }
+
+portTimingPulseEnabledAtReset OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Some power control points permit the injection of a timing
+         pulse.   This OID shows whether that pulse is enabled (if the
+         port supports it) after a power cycle or reset."
+    ::= { powerControlPortsEntry 9 }
+
+portTimingPulseStyle OBJECT-TYPE
+    SYNTAX        TimingPulseStyleEnum
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Some power control points permit the injection of a timing
+         pulse.   This OID shows the type of timing pulse supported by
+         this port."
+    ::= { powerControlPortsEntry 10 }
+
+portOutputVoltage OBJECT-TYPE
+    SYNTAX        Fixed6DecimalDigits
+    UNITS         "V"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The output voltage for this port. Depending on the
+         architecture of the injection card, this value may reflect
+         either the switched or non-switched voltage."
+    ::= { powerControlPortsEntry 11 }
+
+portCurrent OBJECT-TYPE
+    SYNTAX        Fixed6DecimalDigits
+    UNITS         "A"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current draw of the device attached to the port. It may
+         also include some power consumed by the injection port itself.
+
+         Note that this is reported from the controller with 6 fixed
+         decimal digits which is enough to correctly represent mA and uA
+         ranges.  Some SNMP tools will automatically put the decimal in
+         the right spot. If not, you will need to divide this value by
+         1,000,000 to get the value in Amps.   If you'd prefer this
+         report in mA, you will need to either multiply or divide the
+         value by 1000, depending on whether your SNMP tool correctly
+         places the decimal point for Amps or not."
+    ::= { powerControlPortsEntry 12 }
+
+portNumberOfPowerTransitions OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of times that the power has been turned from on to
+         off or from off to on on this port
+         (A power cycle will count as two)."
+    ::= { powerControlPortsEntry 13 }
+
+portNumberOfTripEvents OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of times which the port has transitioned from a
+         normal to a tripped state."
+    ::= { powerControlPortsEntry 14 }
+
+packetfluxPowerControlConformance OBJECT IDENTIFIER ::= { packetfluxPowerControl 127 }
+
+packetfluxPowerControlGroups OBJECT IDENTIFIER ::= { packetfluxPowerControlConformance 1 }
+
+packetfluxPowerControlAllObjects OBJECT-GROUP
+    OBJECTS
+        { portCurrent, portCycleTimeout, portDescription,
+        portNumberOfPowerTransitions, portNumberOfTripEvents,
+        portOutputVoltage, portPowerEnabled, portPowerEnabledAtReset,
+        portPowerTripped, portTimingPulseEnabled,
+        portTimingPulseEnabledAtReset, portTimingPulseStyle }
+    STATUS        current
+    DESCRIPTION
+        "This automatically created object group contains all those
+         objects that do not belong to any other OBJECT-GROUP"
+    ::= { packetfluxPowerControlGroups 1 }
+
+END

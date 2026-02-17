@@ -1,0 +1,1633 @@
+G6-HARDWARE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32, enterprises,NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	DisplayString, MacAddress
+		FROM SNMPv2-TC
+	g6	FROM MICROSENS-G6-MIB
+	;
+
+device MODULE-IDENTITY --Category
+	LAST-UPDATED "202302141127Z"
+	ORGANIZATION "MICROSENS GmbH & Co. KG"
+	CONTACT-INFO
+		"Kueferstrasse 16
+		D-59067 Hamm
+		Germany
+		support@microsens.de
+		http://www.microsens.de"
+	DESCRIPTION
+		"Microsens private MIB for Generation 6 Ethernet Switches"
+
+	REVISION "202302141127Z"
+	DESCRIPTION
+		"File creation"
+	::= { g6 1 }
+
+hardware  OBJECT IDENTIFIER ::= { device 31 }
+
+
+
+-- *************************** CONFIGURATION SECTION ********************************
+
+
+hardwareLedTest OBJECT-TYPE   -- led_test
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Runs a LED test whereby all LED light up in all possible colors for checking their function. The tests terminates within a few seconds."
+	::= { hardware 1 }
+
+
+hardwareLedMode OBJECT-TYPE   -- led_mode
+	SYNTAX INTEGER 
+		{
+		dynamic (0),
+		static (1),
+		quiet (2),
+		dark (3),
+		lightshow (4)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"The LED display can be configured to be less intrusive."
+	::= { hardware 2 }
+
+
+hardwarePowerSupply1Monitored OBJECT-TYPE   -- power_supply_1_monitored
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When disabled a missing power supply 1 will not turn the associated led red on failure. Do this when single power supply 2 operation is used or when the device is powered solely by PoE. This feature only applies to industrial switches."
+	::= { hardware 3 }
+
+
+hardwarePowerSupply2Monitored OBJECT-TYPE   -- power_supply_2_monitored
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When disabled a missing power supply 2 will not turn the associated led red on failure. Do this when single power supply 1 operation is used or when the device is powered solely by PoE. This feature only applies to industrial switches."
+	::= { hardware 4 }
+
+
+hardwareFactoryResetButton OBJECT-TYPE   -- factory_reset_button
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When disabled the factory button will trigger the factory reset function when pressed for a long time. The IP discover function upon a short button click is not affected. "
+	::= { hardware 5 }
+
+
+-- ******************* Begin of cableTestConfigTable *************************
+
+cableTestConfigTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF CableTestConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The cable tester allows for detection of copper cable faults and can even detect where the fault is located. By using a OTDR SFP, measurements can also be done on fiber ports"
+	::= { hardware 6 }
+
+cableTestConfigEntry	OBJECT-TYPE
+	SYNTAX CableTestConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { cableTestConfigPortIndex }
+	::= { cableTestConfigTable 1 }
+
+
+	CableTestConfigEntry ::= SEQUENCE {
+	cableTestConfigPortIndex INTEGER,
+	cableTestConfigEnableAutoCableTest INTEGER ,
+	cableTestConfigEventGeneration INTEGER ,
+	cableTestConfigReflectionThreshold Integer32 ,
+	cableTestConfigReflectionHysteresis Integer32 ,
+	cableTestConfigStartTestNow DisplayString,
+	cableTestConfigCreateReference DisplayString,
+	cableTestConfigReferenceData DisplayString
+	}
+
+cableTestConfigPortIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..24)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { cableTestConfigEntry 1 }
+
+cableTestConfigEnableAutoCableTest OBJECT-TYPE   -- enable_auto_cable_test
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When enabled a cable test is performed each time the link goes down. The test is only performed for copper ports, dual media ports in copper mode or when an OTDR SFP is detected."
+	::= { cableTestConfigEntry 2 }
+
+cableTestConfigEventGeneration OBJECT-TYPE   -- event_generation
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		anyChange (1),
+		connectionsOnly (2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When the cable termination status changes or a change in the fiber is detected an event can be raised."
+	::= { cableTestConfigEntry 3 }
+
+cableTestConfigReflectionThreshold OBJECT-TYPE   -- reflection_threshold
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Select a value up to 508 which is used to decide between a connected cable and a remotely disconnected cable. With actively terminated data ports, the detection is difficult and precise setup is required. Please refer to cable_test_status.reflection_value for further details. Applies to copper only."
+	::= { cableTestConfigEntry 4 }
+
+cableTestConfigReflectionHysteresis OBJECT-TYPE   -- reflection_hysteresis
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Choose value to prevent oscillation when reflection value is slightly shifting. For OTDR measurement, the value is interpreted as minimum meters of change in a reflection for it to be considered a different reflection."
+	::= { cableTestConfigEntry 5 }
+
+cableTestConfigStartTestNow OBJECT-TYPE   -- start_test_now
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"May be used to manually start a cable test. ATTENTION: If the port is in link up status it will be forced to link down first. This will disrupt the current data traffic. Therefore, type start_test_now = CONFIRM."
+	::= { cableTestConfigEntry 6 }
+
+cableTestConfigCreateReference OBJECT-TYPE   -- create_reference
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Is used to start a OTDR reference measurement. Only applies to optical cables with the required SFP installed. Type create_reference = CONFIRM."
+	::= { cableTestConfigEntry 7 }
+
+cableTestConfigReferenceData OBJECT-TYPE   -- reference_data
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"The content of this field is created with the create_reference action command and should not be edited manually."
+	::= { cableTestConfigEntry 8 }
+
+
+-- ********************* End of cableTestConfigTable ***********************
+
+
+-- ******************* Begin of ioSignalConfigTable *************************
+
+ioSignalConfigTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF IoSignalConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	::= { hardware 7 }
+
+ioSignalConfigEntry	OBJECT-TYPE
+	SYNTAX IoSignalConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { ioSignalConfigIndex }
+	::= { ioSignalConfigTable 1 }
+
+
+	IoSignalConfigEntry ::= SEQUENCE {
+	ioSignalConfigIndex INTEGER,
+	ioSignalConfigSignalMode INTEGER ,
+	ioSignalConfigInput1Mode INTEGER ,
+	ioSignalConfigInput1Name DisplayString,
+	ioSignalConfigInput2Mode INTEGER ,
+	ioSignalConfigInput2Name DisplayString,
+	ioSignalConfigOutput1Trigger INTEGER ,
+	ioSignalConfigOutput1Name DisplayString,
+	ioSignalConfigOutput2Trigger INTEGER ,
+	ioSignalConfigOutput2Name DisplayString
+	}
+
+ioSignalConfigIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { ioSignalConfigEntry 1 }
+
+ioSignalConfigSignalMode OBJECT-TYPE   -- signal_mode
+	SYNTAX INTEGER 
+		{
+		static (0),
+		ledBlink (1),
+		relayBlink (2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Permit setting of I/O signal LEDs and relays to static or blink  mode for increased visualization."
+	::= { ioSignalConfigEntry 2 }
+
+ioSignalConfigInput1Mode OBJECT-TYPE   -- input_1_mode
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		alarmWhenHigh (1),
+		alarmWhenLow (2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When this function is activated the external alarm input 1 is monitored. Note: alarm inputs are not available in all product versions. "
+	::= { ioSignalConfigEntry 3 }
+
+ioSignalConfigInput1Name OBJECT-TYPE   -- input_1_name
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"A customer specific name can be specified for input 1. This name will appear in the associated event messages. The name (up to the first blank) determines the attribute used in SmartOffice context."
+	::= { ioSignalConfigEntry 4 }
+
+ioSignalConfigInput2Mode OBJECT-TYPE   -- input_2_mode
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		alarmWhenHigh (1),
+		alarmWhenLow (2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When this function is activated the external alarm input 2 is monitored. Note: alarm inputs are not available in all product versions. "
+	::= { ioSignalConfigEntry 5 }
+
+ioSignalConfigInput2Name OBJECT-TYPE   -- input_2_name
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"A customer specific name can be specified for input 2. This name will appear in the associated event messages. The name (up to the first blank) determines the attribute used in SmartOffice context."
+	::= { ioSignalConfigEntry 6 }
+
+ioSignalConfigOutput1Trigger OBJECT-TYPE   -- output_1_trigger
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		whileRunning (1),
+		redundancyFail (2),
+		highTemp (3),
+		off (4),
+		on (5),
+		smartOffice (6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Defines on which condition the alarm relay 1 is activated. Note: alarm relays are not available in all product versions."
+	::= { ioSignalConfigEntry 7 }
+
+ioSignalConfigOutput1Name OBJECT-TYPE   -- output_1_name
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"A customer specific name can be specified for alarm output 1. This name will appear in the associated event messages. The name (up to the first blank) determines the attribute used in SmartOffice context."
+	::= { ioSignalConfigEntry 8 }
+
+ioSignalConfigOutput2Trigger OBJECT-TYPE   -- output_2_trigger
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		whileRunning (1),
+		redundancyFail (2),
+		highTemp (3),
+		off (4),
+		on (5),
+		smartOffice (6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Defines on which condition the alarm relay 2 is activated. Note: alarm relays are not available in all product versions."
+	::= { ioSignalConfigEntry 9 }
+
+ioSignalConfigOutput2Name OBJECT-TYPE   -- output_2_name
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"A customer specific name can be specified for alarm output 2. This name will appear in the associated event messages. The name (up to the first blank) determines the attribute used in SmartOffice context."
+	::= { ioSignalConfigEntry 10 }
+
+
+-- ********************* End of ioSignalConfigTable ***********************
+
+
+
+-- ****************************** STATUS SECTION ********************************
+
+
+hardwarePowerSupply1Status OBJECT-TYPE   -- power_supply_1_status
+	SYNTAX INTEGER 
+		{
+		ok (0),
+		overload (1),
+		inputLow (2),
+		fuseFail (3),
+		notApplicable (4),
+		unmanaged (5),
+		notInstalled (6)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Displays state of primary supply or only supply for single supply systems."
+	::= { hardware 100 }
+
+
+hardwarePowerSupply2Status OBJECT-TYPE   -- power_supply_2_status
+	SYNTAX INTEGER 
+		{
+		ok (0),
+		overload (1),
+		inputLow (2),
+		fuseFail (3),
+		notApplicable (4),
+		unmanaged (5),
+		notInstalled (6)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Displays state of secondary supply if available."
+	::= { hardware 101 }
+
+
+hardwareRunningOnPoe OBJECT-TYPE   -- running_on_poe
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"When set the unit currently operates on the PD input via PoE."
+	::= { hardware 102 }
+
+
+hardwareFanStatus OBJECT-TYPE   -- fan_status
+	SYNTAX INTEGER 
+		{
+		unused (0),
+		ok (1),
+		degraded (2),
+		fail (3),
+		missing (4)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Displays state of cooling fan. Indicates UNUSED in fanless devices."
+	::= { hardware 103 }
+
+
+hardwareSdCardStatus OBJECT-TYPE   -- sd_card_status
+	SYNTAX INTEGER 
+		{
+		empty (0),
+		inserted (1),
+		writeProtected (2),
+		writing (3)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Current status of SD-card."
+	::= { hardware 104 }
+
+
+hardwareNumOfPorts OBJECT-TYPE   -- num_of_ports
+	SYNTAX Integer32 (0..255)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Total number of Ethernet ports this hardware offers."
+	::= { hardware 105 }
+
+
+hardwareMaskOfExistingPorts OBJECT-TYPE   -- mask_of_existing_ports
+	SYNTAX OCTET STRING (SIZE (0..4))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Set bit for each port that physically existing and could be in use."
+	::= { hardware 106 }
+
+
+hardwareMaskOfSfpPorts OBJECT-TYPE   -- mask_of_sfp_ports
+	SYNTAX OCTET STRING (SIZE (0..4))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Marks which ports support SFPs."
+	::= { hardware 107 }
+
+
+hardwareMaskOfPoePorts OBJECT-TYPE   -- mask_of_poe_ports
+	SYNTAX OCTET STRING (SIZE (0..4))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Marks which ports support PoE output."
+	::= { hardware 108 }
+
+
+-- ******************* Begin of moduleInfoTable *************************
+
+moduleInfoTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF ModuleInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This section indicates which modules are inserted in the optional extension slots."
+	::= { hardware 109 }
+
+moduleInfoEntry	OBJECT-TYPE
+	SYNTAX ModuleInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { moduleInfoIndex }
+	::= { moduleInfoTable 1 }
+
+
+	ModuleInfoEntry ::= SEQUENCE {
+	moduleInfoIndex INTEGER,
+	moduleInfoUnitType INTEGER ,
+	moduleInfoArticleNumber DisplayString,
+	moduleInfoSerialNumber DisplayString,
+	moduleInfoHardwareVersion DisplayString,
+	moduleInfoProjectNumber DisplayString,
+	moduleInfoOccupiedSlots DisplayString,
+	moduleInfoDescription DisplayString
+	}
+
+moduleInfoIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..3)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { moduleInfoEntry 1 }
+
+moduleInfoUnitType OBJECT-TYPE   -- unit_type
+	SYNTAX INTEGER 
+		{
+		notPresent (0),
+		baseUnit (1),
+		expansion (2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Identifies the general type of module."
+	::= { moduleInfoEntry 2 }
+
+moduleInfoArticleNumber OBJECT-TYPE   -- article_number
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The article number of the module in this slot."
+	::= { moduleInfoEntry 3 }
+
+moduleInfoSerialNumber OBJECT-TYPE   -- serial_number
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The serial number of the module in this slot."
+	::= { moduleInfoEntry 4 }
+
+moduleInfoHardwareVersion OBJECT-TYPE   -- hardware_version
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This device hardware revision number."
+	::= { moduleInfoEntry 5 }
+
+moduleInfoProjectNumber OBJECT-TYPE   -- project_number
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"MICROSENS project number."
+	::= { moduleInfoEntry 6 }
+
+moduleInfoOccupiedSlots OBJECT-TYPE   -- occupied_slots
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Lists all slots contained in this module."
+	::= { moduleInfoEntry 7 }
+
+moduleInfoDescription OBJECT-TYPE   -- description
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Feature summary of the module."
+	::= { moduleInfoEntry 8 }
+
+
+-- ********************* End of moduleInfoTable ***********************
+
+
+-- ******************* Begin of slotInfoTable *************************
+
+slotInfoTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF SlotInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This section indicates which modules are inserted in the optional extension slots."
+	::= { hardware 110 }
+
+slotInfoEntry	OBJECT-TYPE
+	SYNTAX SlotInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { slotInfoIndex }
+	::= { slotInfoTable 1 }
+
+
+	SlotInfoEntry ::= SEQUENCE {
+	slotInfoIndex INTEGER,
+	slotInfoBoardType INTEGER ,
+	slotInfoBoardId Unsigned32,
+	slotInfoVersionBits Integer32 
+	}
+
+slotInfoIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..7)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { slotInfoEntry 1 }
+
+slotInfoBoardType OBJECT-TYPE   -- board_type
+	SYNTAX INTEGER 
+		{
+		notPresent (0),
+		undefined (1),
+		power (2),
+		cpu (3),
+		port (4),
+		io (5),
+		ms10gPort (6)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"General type of board function"
+	::= { slotInfoEntry 2 }
+
+slotInfoBoardId OBJECT-TYPE   -- board_id
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This identifies the board type for internal operation."
+	::= { slotInfoEntry 3 }
+
+slotInfoVersionBits OBJECT-TYPE   -- version_bits
+	SYNTAX Integer32 (0..255)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Version bits from hardware or backplane."
+	::= { slotInfoEntry 4 }
+
+
+-- ********************* End of slotInfoTable ***********************
+
+
+-- ******************* Begin of portInfoTable *************************
+
+portInfoTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF PortInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Used to map physical to logical port ids."
+	::= { hardware 111 }
+
+portInfoEntry	OBJECT-TYPE
+	SYNTAX PortInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { portInfoPortIndex }
+	::= { portInfoTable 1 }
+
+
+	PortInfoEntry ::= SEQUENCE {
+	portInfoPortIndex INTEGER,
+	portInfoSystemSlot Integer32 ,
+	portInfoSwitchPort Integer32 ,
+	portInfoUserSlot Integer32 ,
+	portInfoUserPort Integer32 ,
+	portInfoSnmpPort Integer32 ,
+	portInfoSnmpInstance Integer32 ,
+	portInfoHardwarePort Integer32 ,
+	portInfoInterfaceType INTEGER ,
+	portInfoProperties BITS 
+	}
+
+portInfoPortIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..24)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { portInfoEntry 1 }
+
+portInfoSystemSlot OBJECT-TYPE   -- system_slot
+	SYNTAX Integer32 (0..255)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Describes on which system slot this port index is located."
+	::= { portInfoEntry 2 }
+
+portInfoSwitchPort OBJECT-TYPE   -- switch_port
+	SYNTAX Integer32 (0..255)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Describes on which switch port this port index is located."
+	::= { portInfoEntry 3 }
+
+portInfoUserSlot OBJECT-TYPE   -- user_slot
+	SYNTAX Integer32 (0..255)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Slot number as seen by customer."
+	::= { portInfoEntry 4 }
+
+portInfoUserPort OBJECT-TYPE   -- user_port
+	SYNTAX Integer32 (0..255)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Port number as seen by customer."
+	::= { portInfoEntry 5 }
+
+portInfoSnmpPort OBJECT-TYPE   -- snmp_port
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Slot and port representation as used in SNMP. Formula is Slot*100 + Port."
+	::= { portInfoEntry 6 }
+
+portInfoSnmpInstance OBJECT-TYPE   -- snmp_instance
+	SYNTAX Integer32 (0..255)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Port instance counting from 0 to number of ports"
+	::= { portInfoEntry 7 }
+
+portInfoHardwarePort OBJECT-TYPE   -- hardware_port
+	SYNTAX Integer32 (0..255)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Port number as used internally. Ports may not be in sequential order."
+	::= { portInfoEntry 8 }
+
+portInfoInterfaceType OBJECT-TYPE   -- interface_type
+	SYNTAX INTEGER 
+		{
+		copper (0),
+		optical (1),
+		dualMedia (2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Identifies port as copper or optical. Also used for snmp ifType definition"
+	::= { portInfoEntry 9 }
+
+portInfoProperties OBJECT-TYPE   -- properties
+	SYNTAX BITS 
+		{
+		internal (0),
+		ms10Mb (1),
+		ms100Mb (2),
+		ms1000Mb (3),
+		rj45 (4),
+		sfp (5),
+		ms1x9 (6),
+		poe (7),
+		poePlus (8),
+		pd (9),
+		dualMedia (10),
+		linkPort (11),
+		csfp (12)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Describes which functions the port can support."
+	::= { portInfoEntry 10 }
+
+
+-- ********************* End of portInfoTable ***********************
+
+
+-- ******************* Begin of portNamesTable *************************
+
+portNamesTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF PortNamesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table contains additional port information names suitable for use in snmp."
+	::= { hardware 112 }
+
+portNamesEntry	OBJECT-TYPE
+	SYNTAX PortNamesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { portNamesPortIndex }
+	::= { portNamesTable 1 }
+
+
+	PortNamesEntry ::= SEQUENCE {
+	portNamesPortIndex INTEGER,
+	portNamesCliName DisplayString,
+	portNamesPortDescription DisplayString
+	}
+
+portNamesPortIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..24)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { portNamesEntry 1 }
+
+portNamesCliName OBJECT-TYPE   -- cli_name
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Port name as used in cli and as required for ifName (read only)"
+	::= { portNamesEntry 2 }
+
+portNamesPortDescription OBJECT-TYPE   -- port_description
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Port name as required for ifDescription (read only)"
+	::= { portNamesEntry 3 }
+
+
+-- ********************* End of portNamesTable ***********************
+
+
+-- ******************* Begin of portLedsTable *************************
+
+portLedsTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF PortLedsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This section indicates the state of all port related LEDs."
+	::= { hardware 113 }
+
+portLedsEntry	OBJECT-TYPE
+	SYNTAX PortLedsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { portLedsPortIndex }
+	::= { portLedsTable 1 }
+
+
+	PortLedsEntry ::= SEQUENCE {
+	portLedsPortIndex INTEGER,
+	portLedsEthernetColor INTEGER ,
+	portLedsEthernetBlinking INTEGER ,
+	portLedsPoeColor INTEGER ,
+	portLedsPoeBlinking INTEGER 
+	}
+
+portLedsPortIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..31)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { portLedsEntry 1 }
+
+portLedsEthernetColor OBJECT-TYPE   -- ethernet_color
+	SYNTAX INTEGER 
+		{
+		off (0),
+		blue (1),
+		green (2),
+		red (3),
+		orange (4),
+		cyan (5),
+		magenta (6),
+		white (7),
+		noLed (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Ethernet Link LED."
+	::= { portLedsEntry 2 }
+
+portLedsEthernetBlinking OBJECT-TYPE   -- ethernet_blinking
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Ethernet Link LED."
+	::= { portLedsEntry 3 }
+
+portLedsPoeColor OBJECT-TYPE   -- poe_color
+	SYNTAX INTEGER 
+		{
+		off (0),
+		blue (1),
+		green (2),
+		red (3),
+		orange (4),
+		cyan (5),
+		magenta (6),
+		white (7),
+		noLed (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Power over Ethernet LED. For optical ports this indicates signal detect status."
+	::= { portLedsEntry 4 }
+
+portLedsPoeBlinking OBJECT-TYPE   -- poe_blinking
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Power over Ethernet LED. For optical ports this indicates signal detect status."
+	::= { portLedsEntry 5 }
+
+
+-- ********************* End of portLedsTable ***********************
+
+
+-- ******************* Begin of deviceLedsTable *************************
+
+deviceLedsTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF DeviceLedsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This section indicates the state of all LEDs which are not port related. Please note: Not every unit offers all LEDs."
+	::= { hardware 114 }
+
+deviceLedsEntry	OBJECT-TYPE
+	SYNTAX DeviceLedsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { deviceLedsIndex }
+	::= { deviceLedsTable 1 }
+
+
+	DeviceLedsEntry ::= SEQUENCE {
+	deviceLedsIndex INTEGER,
+	deviceLedsSystem1Color INTEGER ,
+	deviceLedsSystem1Blinking INTEGER ,
+	deviceLedsSystem2Color INTEGER ,
+	deviceLedsSystem2Blinking INTEGER ,
+	deviceLedsPowerOn1Color INTEGER ,
+	deviceLedsPowerOn1Blinking INTEGER ,
+	deviceLedsPowerOn2Color INTEGER ,
+	deviceLedsPowerOn2Blinking INTEGER ,
+	deviceLedsRing1Color INTEGER ,
+	deviceLedsRing1Blinking INTEGER ,
+	deviceLedsRing2Color INTEGER ,
+	deviceLedsRing2Blinking INTEGER ,
+	deviceLedsSignalIn1Color INTEGER ,
+	deviceLedsSignalIn1Blinking INTEGER ,
+	deviceLedsSignalIn2Color INTEGER ,
+	deviceLedsSignalIn2Blinking INTEGER ,
+	deviceLedsSignalOut1Color INTEGER ,
+	deviceLedsSignalOut1Blinking INTEGER ,
+	deviceLedsSignalOut2Color INTEGER ,
+	deviceLedsSignalOut2Blinking INTEGER 
+	}
+
+deviceLedsIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { deviceLedsEntry 1 }
+
+deviceLedsSystem1Color OBJECT-TYPE   -- system_1_color
+	SYNTAX INTEGER 
+		{
+		off (0),
+		blue (1),
+		green (2),
+		red (3),
+		orange (4),
+		cyan (5),
+		magenta (6),
+		white (7),
+		noLed (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This status corresponds to 'sys' LED on some devices."
+	::= { deviceLedsEntry 2 }
+
+deviceLedsSystem1Blinking OBJECT-TYPE   -- system_1_blinking
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This status corresponds to 'sys' LED on some devices."
+	::= { deviceLedsEntry 3 }
+
+deviceLedsSystem2Color OBJECT-TYPE   -- system_2_color
+	SYNTAX INTEGER 
+		{
+		off (0),
+		blue (1),
+		green (2),
+		red (3),
+		orange (4),
+		cyan (5),
+		magenta (6),
+		white (7),
+		noLed (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Displays external management activity."
+	::= { deviceLedsEntry 4 }
+
+deviceLedsSystem2Blinking OBJECT-TYPE   -- system_2_blinking
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Displays external management activity."
+	::= { deviceLedsEntry 5 }
+
+deviceLedsPowerOn1Color OBJECT-TYPE   -- power_on_1_color
+	SYNTAX INTEGER 
+		{
+		off (0),
+		blue (1),
+		green (2),
+		red (3),
+		orange (4),
+		cyan (5),
+		magenta (6),
+		white (7),
+		noLed (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This status corresponds to 'on' LED on some devices."
+	::= { deviceLedsEntry 6 }
+
+deviceLedsPowerOn1Blinking OBJECT-TYPE   -- power_on_1_blinking
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This status corresponds to 'on' LED on some devices."
+	::= { deviceLedsEntry 7 }
+
+deviceLedsPowerOn2Color OBJECT-TYPE   -- power_on_2_color
+	SYNTAX INTEGER 
+		{
+		off (0),
+		blue (1),
+		green (2),
+		red (3),
+		orange (4),
+		cyan (5),
+		magenta (6),
+		white (7),
+		noLed (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Alternative power input LED."
+	::= { deviceLedsEntry 8 }
+
+deviceLedsPowerOn2Blinking OBJECT-TYPE   -- power_on_2_blinking
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Alternative power input LED."
+	::= { deviceLedsEntry 9 }
+
+deviceLedsRing1Color OBJECT-TYPE   -- ring_1_color
+	SYNTAX INTEGER 
+		{
+		off (0),
+		blue (1),
+		green (2),
+		red (3),
+		orange (4),
+		cyan (5),
+		magenta (6),
+		white (7),
+		noLed (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This LED is used when ring protection is enabled."
+	::= { deviceLedsEntry 10 }
+
+deviceLedsRing1Blinking OBJECT-TYPE   -- ring_1_blinking
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This LED is used when ring protection is enabled."
+	::= { deviceLedsEntry 11 }
+
+deviceLedsRing2Color OBJECT-TYPE   -- ring_2_color
+	SYNTAX INTEGER 
+		{
+		off (0),
+		blue (1),
+		green (2),
+		red (3),
+		orange (4),
+		cyan (5),
+		magenta (6),
+		white (7),
+		noLed (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This LED is used when ring protection is enabled."
+	::= { deviceLedsEntry 12 }
+
+deviceLedsRing2Blinking OBJECT-TYPE   -- ring_2_blinking
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"This LED is used when ring protection is enabled."
+	::= { deviceLedsEntry 13 }
+
+deviceLedsSignalIn1Color OBJECT-TYPE   -- signal_in_1_color
+	SYNTAX INTEGER 
+		{
+		off (0),
+		blue (1),
+		green (2),
+		red (3),
+		orange (4),
+		cyan (5),
+		magenta (6),
+		white (7),
+		noLed (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates status of alarm input 1."
+	::= { deviceLedsEntry 14 }
+
+deviceLedsSignalIn1Blinking OBJECT-TYPE   -- signal_in_1_blinking
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates status of alarm input 1."
+	::= { deviceLedsEntry 15 }
+
+deviceLedsSignalIn2Color OBJECT-TYPE   -- signal_in_2_color
+	SYNTAX INTEGER 
+		{
+		off (0),
+		blue (1),
+		green (2),
+		red (3),
+		orange (4),
+		cyan (5),
+		magenta (6),
+		white (7),
+		noLed (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates status of alarm input 2."
+	::= { deviceLedsEntry 16 }
+
+deviceLedsSignalIn2Blinking OBJECT-TYPE   -- signal_in_2_blinking
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates status of alarm input 2."
+	::= { deviceLedsEntry 17 }
+
+deviceLedsSignalOut1Color OBJECT-TYPE   -- signal_out_1_color
+	SYNTAX INTEGER 
+		{
+		off (0),
+		blue (1),
+		green (2),
+		red (3),
+		orange (4),
+		cyan (5),
+		magenta (6),
+		white (7),
+		noLed (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates status of alarm relay output 1."
+	::= { deviceLedsEntry 18 }
+
+deviceLedsSignalOut1Blinking OBJECT-TYPE   -- signal_out_1_blinking
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates status of alarm relay output 1."
+	::= { deviceLedsEntry 19 }
+
+deviceLedsSignalOut2Color OBJECT-TYPE   -- signal_out_2_color
+	SYNTAX INTEGER 
+		{
+		off (0),
+		blue (1),
+		green (2),
+		red (3),
+		orange (4),
+		cyan (5),
+		magenta (6),
+		white (7),
+		noLed (8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates status of alarm relay output 2."
+	::= { deviceLedsEntry 20 }
+
+deviceLedsSignalOut2Blinking OBJECT-TYPE   -- signal_out_2_blinking
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates status of alarm relay output 2."
+	::= { deviceLedsEntry 21 }
+
+
+-- ********************* End of deviceLedsTable ***********************
+
+
+-- ******************* Begin of cableTestStatusTable *************************
+
+cableTestStatusTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF CableTestStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table display the result of the last cable test. Values are only available for copper ports while a link is down and if  the cable test function is enabled or for optical ports with an OTDR SFP present"
+	::= { hardware 115 }
+
+cableTestStatusEntry	OBJECT-TYPE
+	SYNTAX CableTestStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { cableTestStatusPortIndex }
+	::= { cableTestStatusTable 1 }
+
+
+	CableTestStatusEntry ::= SEQUENCE {
+	cableTestStatusPortIndex INTEGER,
+	cableTestStatusUpdateTimeStamp DisplayString,
+	cableTestStatusPair0State INTEGER ,
+	cableTestStatusPair0DistanceToFault Integer32 ,
+	cableTestStatusPair1State INTEGER ,
+	cableTestStatusPair1DistanceToFault Integer32 ,
+	cableTestStatusPair2State INTEGER ,
+	cableTestStatusPair2DistanceToFault Integer32 ,
+	cableTestStatusPair3State INTEGER ,
+	cableTestStatusPair3DistanceToFault Integer32 ,
+	cableTestStatusReflectionValue Integer32 ,
+	cableTestStatusCableStatus INTEGER ,
+	cableTestStatusCurrentOtdrReflections DisplayString
+	}
+
+cableTestStatusPortIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..24)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { cableTestStatusEntry 1 }
+
+cableTestStatusUpdateTimeStamp OBJECT-TYPE   -- update_time_stamp
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates the time when this record was last updated."
+	::= { cableTestStatusEntry 2 }
+
+cableTestStatusPair0State OBJECT-TYPE   -- pair_0_state
+	SYNTAX INTEGER 
+		{
+		notAvailable (0),
+		pairOk (1),
+		pairOpen (2),
+		samePairShort (3),
+		crossPairShort (4),
+		terminationLow (5),
+		terminationHigh (6)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates line termination test results for wire pair 0 (Pins 1/2). Applies to copper only."
+	::= { cableTestStatusEntry 3 }
+
+cableTestStatusPair0DistanceToFault OBJECT-TYPE   -- pair_0_distance_to_fault
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Distance to fault on wire pair 0 in centimeters. Indicates 0 when no fault is detected or the function is unused. Applies to copper only."
+	::= { cableTestStatusEntry 4 }
+
+cableTestStatusPair1State OBJECT-TYPE   -- pair_1_state
+	SYNTAX INTEGER 
+		{
+		notAvailable (0),
+		pairOk (1),
+		pairOpen (2),
+		samePairShort (3),
+		crossPairShort (4),
+		terminationLow (5),
+		terminationHigh (6)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates line termination test results for wire pair 1 (Pins 3/6). Applies to copper only."
+	::= { cableTestStatusEntry 5 }
+
+cableTestStatusPair1DistanceToFault OBJECT-TYPE   -- pair_1_distance_to_fault
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Distance to fault on wire pair 1 in centimeters. Indicates 0 when no fault is detected or the function is unused. Applies to copper only."
+	::= { cableTestStatusEntry 6 }
+
+cableTestStatusPair2State OBJECT-TYPE   -- pair_2_state
+	SYNTAX INTEGER 
+		{
+		notAvailable (0),
+		pairOk (1),
+		pairOpen (2),
+		samePairShort (3),
+		crossPairShort (4),
+		terminationLow (5),
+		terminationHigh (6)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates line termination test results for wire pair 2 (Pins 4/5). Applies to copper only."
+	::= { cableTestStatusEntry 7 }
+
+cableTestStatusPair2DistanceToFault OBJECT-TYPE   -- pair_2_distance_to_fault
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Distance to fault on wire pair 2 in centimeters. Indicates 0 when no fault is detected or the function is unused. Applies to copper only."
+	::= { cableTestStatusEntry 8 }
+
+cableTestStatusPair3State OBJECT-TYPE   -- pair_3_state
+	SYNTAX INTEGER 
+		{
+		notAvailable (0),
+		pairOk (1),
+		pairOpen (2),
+		samePairShort (3),
+		crossPairShort (4),
+		terminationLow (5),
+		terminationHigh (6)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates line termination test results for wire pair 3 (Pins 7/8). Applies to copper only."
+	::= { cableTestStatusEntry 9 }
+
+cableTestStatusPair3DistanceToFault OBJECT-TYPE   -- pair_3_distance_to_fault
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Distance to fault on wire pair 3 in centimeters. Indicates 0 when no fault is detected or the function is unused. Applies to copper only."
+	::= { cableTestStatusEntry 10 }
+
+cableTestStatusReflectionValue OBJECT-TYPE   -- reflection_value
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"A unitless value that indicates a measure of reflection level. For difficult to detect actively terminated devices perform a measurement with remotely plugged-in and then unplugged cable. Note the reflection values an choose a value in the middle as reflection_threshold configuration value. Applies to copper only."
+	::= { cableTestStatusEntry 11 }
+
+cableTestStatusCableStatus OBJECT-TYPE   -- cable_status
+	SYNTAX INTEGER 
+		{
+		notAvailable (0),
+		noCable (1),
+		pluggedInLocally (2),
+		pluggedInRemotely (3),
+		terminatedCable (4),
+		terminationTooLow (5),
+		defective (6)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates the concluded status summary. Applies to copper only."
+	::= { cableTestStatusEntry 12 }
+
+cableTestStatusCurrentOtdrReflections OBJECT-TYPE   -- current_otdr_reflections
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Number and location of currently detected reflections for an active OTDR SFP on this port."
+	::= { cableTestStatusEntry 13 }
+
+
+-- ********************* End of cableTestStatusTable ***********************
+
+
+-- ******************* Begin of ioSignalStatusTable *************************
+
+ioSignalStatusTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF IoSignalStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This section is only used for devices which offer external signal inputs and outputs."
+	::= { hardware 116 }
+
+ioSignalStatusEntry	OBJECT-TYPE
+	SYNTAX IoSignalStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { ioSignalStatusIndex }
+	::= { ioSignalStatusTable 1 }
+
+
+	IoSignalStatusEntry ::= SEQUENCE {
+	ioSignalStatusIndex INTEGER,
+	ioSignalStatusInput1AlarmActive INTEGER ,
+	ioSignalStatusInput2AlarmActive INTEGER ,
+	ioSignalStatusOutput1RelayActive INTEGER ,
+	ioSignalStatusOutput2RelayActive INTEGER 
+	}
+
+ioSignalStatusIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { ioSignalStatusEntry 1 }
+
+ioSignalStatusInput1AlarmActive OBJECT-TYPE   -- input_1_alarm_active
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates true when the input 1 is logically active."
+	::= { ioSignalStatusEntry 2 }
+
+ioSignalStatusInput2AlarmActive OBJECT-TYPE   -- input_2_alarm_active
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates true when the input 2 is logically active."
+	::= { ioSignalStatusEntry 3 }
+
+ioSignalStatusOutput1RelayActive OBJECT-TYPE   -- output_1_relay_active
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates true when the output 1 relay is activated."
+	::= { ioSignalStatusEntry 4 }
+
+ioSignalStatusOutput2RelayActive OBJECT-TYPE   -- output_2_relay_active
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates true when the output 2 relay is activated."
+	::= { ioSignalStatusEntry 5 }
+
+
+-- ********************* End of ioSignalStatusTable ***********************
+
+
+-- ******************* Begin of tcamStatusTable *************************
+
+tcamStatusTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF TcamStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The TCAM is a programmable wire speed packet filter. The filter is controlled by the system automatically. This table indicates which filters have been set."
+	::= { hardware 117 }
+
+tcamStatusEntry	OBJECT-TYPE
+	SYNTAX TcamStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { tcamStatusIndex }
+	::= { tcamStatusTable 1 }
+
+
+	TcamStatusEntry ::= SEQUENCE {
+	tcamStatusIndex INTEGER,
+	tcamStatusControlFile DisplayString,
+	tcamStatusDescription DisplayString
+	}
+
+tcamStatusIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..255)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { tcamStatusEntry 1 }
+
+tcamStatusControlFile OBJECT-TYPE   -- control_file
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Reflects the name of the control file associated with this tam entry."
+	::= { tcamStatusEntry 2 }
+
+tcamStatusDescription OBJECT-TYPE   -- description
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Descriptive text what explains what this TCAM entry will do. "
+	::= { tcamStatusEntry 3 }
+
+
+-- ********************* End of tcamStatusTable ***********************
+
+
+-- ******************* Begin of memoryUtilizationTable *************************
+
+memoryUtilizationTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF MemoryUtilizationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The table indicates memory usage"
+	::= { hardware 118 }
+
+memoryUtilizationEntry	OBJECT-TYPE
+	SYNTAX MemoryUtilizationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { memoryUtilizationIndex }
+	::= { memoryUtilizationTable 1 }
+
+
+	MemoryUtilizationEntry ::= SEQUENCE {
+	memoryUtilizationIndex INTEGER,
+	memoryUtilizationFlashFreeMegabyte Unsigned32,
+	memoryUtilizationFlashUsedPercent Unsigned32,
+	memoryUtilizationRamDiskFreeMegabyte Unsigned32,
+	memoryUtilizationRamDiskUsedPercent Unsigned32
+	}
+
+memoryUtilizationIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { memoryUtilizationEntry 1 }
+
+memoryUtilizationFlashFreeMegabyte OBJECT-TYPE   -- flash_free_megabyte
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Amount of free flash memory in MB"
+	::= { memoryUtilizationEntry 2 }
+
+memoryUtilizationFlashUsedPercent OBJECT-TYPE   -- flash_used_percent
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Amount of flash memory used up in percent"
+	::= { memoryUtilizationEntry 3 }
+
+memoryUtilizationRamDiskFreeMegabyte OBJECT-TYPE   -- ram_disk_free_megabyte
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Amount of free ram disk memory in MB"
+	::= { memoryUtilizationEntry 4 }
+
+memoryUtilizationRamDiskUsedPercent OBJECT-TYPE   -- ram_disk_used_percent
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Amount of ram disk memory used up in percent"
+	::= { memoryUtilizationEntry 5 }
+
+
+-- ********************* End of memoryUtilizationTable ***********************
+
+
+
+END
+

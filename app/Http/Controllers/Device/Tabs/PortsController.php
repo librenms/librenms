@@ -89,6 +89,7 @@ class PortsController implements DeviceTab
             'type' => 'in:bits,upkts,nupkts,errors,etherlike',
             'from' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
             'to' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
+            'searchPort' => 'nullable|string|max:255',
         ]);
 
         $this->loadSettings($request);
@@ -131,9 +132,10 @@ class PortsController implements DeviceTab
         }
 
         /** @var Collection<Port>|LengthAwarePaginator<Port> $ports */
-        $ports = $this->getFilteredPortsQuery($device, $relationships)
+        $ports = $this->getFilteredPortsQuery($device, $relationships, $request)
             ->paginate(fn ($total) => $this->settings['perPage'] == 'all' ? $total : (int) $this->settings['perPage']) // @phpstan-ignore-line missing closure type
-            ->appends('perPage', $this->settings['perPage']);
+            ->appends('perPage', $this->settings['perPage'])
+            ->appends('searchPort', $request->input('searchPort'));
 
         $data = [
             'ports' => $ports,
@@ -249,8 +251,8 @@ class PortsController implements DeviceTab
     private function graphData(Device $device, Request $request): array
     {
         return [
-            'graph_type' => 'port_' . $request->get('type'),
-            'ports' => $this->getFilteredPortsQuery($device)->get(),
+            'graph_type' => 'port_' . $request->input('type'),
+            'ports' => $this->getFilteredPortsQuery($device, [], $request)->get(),
         ];
     }
 
@@ -384,7 +386,7 @@ class PortsController implements DeviceTab
         }
     }
 
-    private function getFilteredPortsQuery(Device $device, array $relationships = []): Builder
+    private function getFilteredPortsQuery(Device $device, array $relationships = [], ?Request $request = null): Builder
     {
         $orderBy = match ($this->settings['sort']) {
             'traffic' => \DB::raw('ports.ifInOctets_rate + ports.ifOutOctets_rate'),
@@ -395,6 +397,9 @@ class PortsController implements DeviceTab
             default => 'ifIndex',
         };
 
+        // Get search parameter
+        $searchPort = $request?->input('searchPort');
+
         return Port::where('device_id', $device->device_id)
             ->isNotDeleted()
             ->hasAccess(Auth::user())->with($relationships)
@@ -402,6 +407,11 @@ class PortsController implements DeviceTab
             ->when(! $this->settings['ignored'], fn (Builder $q, $disabled) => $q->where('ignore', 0))
             ->when($this->settings['admin'] != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $this->settings['admin']))
             ->when($this->settings['status'] != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $this->settings['status']))
+            ->when($searchPort, fn (Builder $q) => $q->where(function (Builder $q) use ($searchPort): void {
+                $q->where('ifName', 'LIKE', '%' . $searchPort . '%')
+                    ->orWhere('ifDescr', 'LIKE', '%' . $searchPort . '%')
+                    ->orWhere('ifAlias', 'LIKE', '%' . $searchPort . '%');
+            }))
             ->when($this->settings['sort'] == 'port', fn (Builder $q, $sort) => $q
                 ->orderByRaw('SOUNDEX(ifName) ' . $this->settings['order'])
                 ->orderByRaw('CHAR_LENGTH(ifName) ' . $this->settings['order'])

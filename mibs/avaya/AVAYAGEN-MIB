@@ -2,7 +2,7 @@
 --
 -- MIB      : AvayaGen  Avaya Inc.
 --
--- Version  : 1.4.0    27 January 2004
+-- Version  : 1.5.0    9 May 2005
 -- ========================================================
 --- This AVAYA SNMP Management Information Base Specification (Specification) 
 -- embodies AVAYA confidential and Proprietary intellectual property.  
@@ -23,7 +23,7 @@ AVAYAGEN-MIB DEFINITIONS ::= BEGIN
 	enterprises,MODULE-IDENTITY
 	FROM SNMPv2-SMI;
 avaya  MODULE-IDENTITY
-LAST-UPDATED 	"0401270900Z" -- 27 January 2004  
+LAST-UPDATED 	"0505090900Z"   
 ORGANIZATION 	"Avaya Inc."
 CONTACT-INFO 
 				"Avaya Customer Services
@@ -43,6 +43,13 @@ DESCRIPTION
        group OID.
     b. Import the definition of their Organization OID from this MIB.
     "
+REVISION 	"0505090900Z" -- 9 May 2005
+DESCRIPTION
+    "Rev 1.5.0 - Meir Deutsch. 
+    Solve compiler naming errors:
+    rename avayaProducts to products
+  	rename avayaMibs to mibs" 
+
 REVISION 	"0401270900Z" -- 27 January 2004
 DESCRIPTION
     "Rev 1.4.0 - Meir Deutsch.

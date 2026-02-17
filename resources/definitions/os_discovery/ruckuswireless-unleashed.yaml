@@ -1,4 +1,3 @@
-mib: RUCKUS-UNLEASHED-SYSTEM-MIB
 modules:
     mempools:
         data:
@@ -15,6 +14,6 @@ modules:
     processors:
         data:
             -
-                oid: ruckusUnleashedSystemStatsCPUUtil
+                oid: RUCKUS-UNLEASHED-SYSTEM-MIB::ruckusUnleashedSystemStatsCPUUtil
                 num_oid: '.1.3.6.1.4.1.25053.1.15.1.1.1.15.13.{{ $index }}'
                 type: ruckuswireless

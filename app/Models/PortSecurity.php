@@ -26,9 +26,9 @@ class PortSecurity extends DeviceRelatedModel implements Keyable
         'sticky_enable',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): int
     {
-        return $this->port_id;
+        return (int) $this->port_id;
     }
 
     public function port(): BelongsTo

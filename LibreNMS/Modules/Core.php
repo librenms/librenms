@@ -26,9 +26,11 @@
 
 namespace LibreNMS\Modules;
 
+use App\Events\OsChangedEvent;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
+use App\Observers\DeviceObserver;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
@@ -70,13 +72,26 @@ class Core implements Module
             'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? null,
         ]);
 
-        foreach ($device->getDirty() as $attribute => $value) {
-            Eventlog::log($value . ' -> ' . $device->$attribute, $device, 'system', Severity::Notice);
-            $os->getDeviceArray()[$attribute] = $value; // update device array
+        foreach (['sysObjectID', 'sysName', 'sysDescr'] as $attribute) {
+            if ($device->isDirty($attribute)) {
+                $message = DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute));
+                Eventlog::log($message, $device, 'system', Severity::Notice);
+                $os->getDeviceArray()[$attribute] = $device->$attribute; // update device array
+            }
         }
 
         // detect OS
         $device->os = self::detectOS($device, false);
+
+        // Set type to a predefined type for the OS if it's not user set (still could be overridden later by os discovery)
+        if (! $device->getAttrib('override_device_type')) {
+            $device->type = LibrenmsConfig::getOsSetting($device->os, 'type');
+            $os->getDeviceArray()['type'] = $device->type;
+        }
+
+        if ($device->isDirty('os')) {
+            OsChangedEvent::dispatch($device);
+        }
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
