@@ -39,7 +39,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Source\Fping;
-use LibreNMS\Data\Source\FpingResponse;
+use LibreNMS\Data\Source\FpingAliveResponse;
 use LibreNMS\Enum\AvailabilitySource;
 
 class PingCheck implements ShouldQueue
@@ -62,7 +62,7 @@ class PingCheck implements ShouldQueue
      *
      * @param  array  $groups  List of distributed poller groups to check
      */
-    public function __construct(private string $source, private array $groups = [])
+    public function __construct(private array $groups = [])
     {
         $this->deferred = new Collection;
         $this->waiting_on = new Collection;
@@ -76,12 +76,6 @@ class PingCheck implements ShouldQueue
      */
     public function handle(): void
     {
-        if (! Fping::wantStats($this->source)) {
-            Log::info("Ping stats are disabled for $this->source. Change the config option schedule_type.ping to set the correct source fast ping stats, or add -f to any command to run manually.");
-
-            return;
-        }
-
         $ping_start = microtime(true);
 
         $ordered_hostname_list = $this->orderHostnames($this->fetchDevices());
@@ -165,9 +159,9 @@ class PingCheck implements ShouldQueue
     /**
      * Record the data and run alerts if all parents have been processed
      */
-    public function handleResponse(FpingResponse $response): void
+    public function handleResponse(FpingAliveResponse $response): void
     {
-        Log::debug("Attempting to record data for $response->host");
+        Log::debug("Received response for $response->host");
 
         $device = $this->devices->get($response->host);
 
@@ -187,9 +181,6 @@ class PingCheck implements ShouldQueue
         // mark up only if snmp is not down too
         $changed = app(SetDeviceAvailability::class)->execute($device, $response->success(), AvailabilitySource::ICMP, true);
 
-        // save last_ping_timetaken and rrd data
-        $response->saveStats($device);
-
         // mark as processed
         $this->processed->put($device->device_id, true);
         Log::debug("Recorded data for $device->hostname");
@@ -199,7 +190,7 @@ class PingCheck implements ShouldQueue
             Log::debug("Device $device->hostname changed status to $type, running alerts");
 
             if (count($waiting_on) === 0) {
-                Action::execute(RunAlertRulesAction::class, $device);
+                $this->runAlerts($device->device_id);
             } else {
                 Log::debug('Alerts Deferred');
 
