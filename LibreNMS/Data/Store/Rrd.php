@@ -519,7 +519,7 @@ class Rrd extends BaseDatastore
             $command = $this->buildCommand('graph', '-', $options);
 
             $this->init(300);
-            $image = $this->rrd->run('"' . implode('" "', $command));
+            $image = $this->rrd->run('"' . implode('" "', $command) . '"');
             $this->rrd->stop();
 
             return $image;
