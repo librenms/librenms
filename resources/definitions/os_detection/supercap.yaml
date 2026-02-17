@@ -11,5 +11,5 @@ discovery:
             - '/^$/'
         snmpget:
             oid: SUPERCAPBATTERY-MIB::BMS01-AmbientTemperature
-            op: '>='
-            value: '0'
+            op: 'regex'
+            value: '/^\d+$/'
