@@ -98,7 +98,7 @@ class Fping
             '-t',
             $this->timeout,
             '-r',
-            $this->count,
+            $this->retries,
             '-O',
             $this->tos,
         ]]);
