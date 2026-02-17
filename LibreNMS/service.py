@@ -132,19 +132,6 @@ class ServiceConfig(DBConfig):
         self.master_timeout = config.get(
             "service_master_timeout", ServiceConfig.master_timeout
         )
-        self.poller.workers = config.get(
-            "poller_service_workers", ServiceConfig.poller.workers
-        )
-        self.poller.frequency = config.get(
-            "poller_service_poll_frequency", ServiceConfig.poller.frequency
-        )
-        self.discovery.frequency = config.get(
-            "poller_service_discover_frequency", ServiceConfig.discovery.frequency
-        )
-        self.down_retry = config.get(
-            "poller_service_down_retry", ServiceConfig.down_retry
-        )
-        self.log_level = config.get("poller_service_loglevel", ServiceConfig.log_level)
 
         # new options
         self.poller.enabled = (
