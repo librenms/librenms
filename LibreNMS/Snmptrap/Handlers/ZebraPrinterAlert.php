@@ -44,7 +44,7 @@ class ZebraPrinterAlert implements SnmptrapHandler
         $message = $trap->getOidData('ESI-MIB::psOutput.7');
         $severity = $this->getSeverity($message);
 
-        $trap->log('SNMP Trap: Zebra Printer ' . $device->displayName() . ' - ' . $message, $severity, 'printer');
+        $trap->log('Zebra Printer: ' . $device->displayName() . ' - ' . $message, $severity, 'printer');
     }
 
     private function getSeverity(string $message): Severity
