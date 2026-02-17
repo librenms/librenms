@@ -241,8 +241,8 @@ class PollerCluster extends Model
             ],
             [
                 'name' => 'ping_frequency',
-                'default' => \App\Facades\LibrenmsConfig::get('ping_rrd_step'),
-                'value' => $this->ping_frequency ?? \App\Facades\LibrenmsConfig::get('ping_rrd_step'),
+                'default' => \App\Facades\LibrenmsConfig::get('service_ping_frequency'),
+                'value' => $this->ping_frequency ?? \App\Facades\LibrenmsConfig::get('service_ping_frequency'),
                 'type' => 'integer',
                 'units' => 'seconds',
                 'advanced' => true,
