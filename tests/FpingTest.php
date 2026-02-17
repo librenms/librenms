@@ -28,7 +28,7 @@ namespace LibreNMS\Tests;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Source\Fping;
-use LibreNMS\Data\Source\FpingResponse;
+use LibreNMS\Data\Source\FpingAliveResponse;
 use Symfony\Component\Process\Process;
 
 final class FpingTest extends TestCase
@@ -154,7 +154,7 @@ OUT;
 
         // make call
         $calls = 0;
-        app()->make(Fping::class)->bulkPing($hosts, function (FpingResponse $response) use ($expected, &$calls): void {
+        app()->make(Fping::class)->bulkPing($hosts, function (FpingAliveResponse $response) use ($expected, &$calls): void {
             $calls++;
 
             $this->assertArrayHasKey($response->host, $expected);
