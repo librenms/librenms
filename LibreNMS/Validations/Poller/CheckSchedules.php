@@ -39,10 +39,8 @@ class CheckSchedules implements \LibreNMS\Interfaces\Validation
     {
         // First make sure the dispatcher service is allowed to run, otherwise we would need to check crontabs
         if (LibrenmsConfig::get('schedule_type.poller') == 'legacy' || LibrenmsConfig::get('schedule_type.poller') == 'dispatcher') {
-
             // Then check if the dispatcher polling schedule has been overridden, otherwise it is guaranteed to match the RRD step
             if (LibrenmsConfig::get('service_poller_frequency') != null) {
-
                 // Return an appropriate error if the polling schedule is different from the RRD step
                 if (LibrenmsConfig::get('service_poller_frequency') > LibrenmsConfig::get('rrd.step')) {
                     return ValidationResult::fail(trans('validation.validations.poller.CheckSchedules.dispatcher_poll_slow'));
