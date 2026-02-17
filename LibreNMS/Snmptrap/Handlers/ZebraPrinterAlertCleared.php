@@ -45,5 +45,4 @@ class ZebraPrinterAlertCleared implements SnmptrapHandler
 
         $trap->log('SNMP Trap: Zebra Printer - ' . $message, Severity::Ok, 'printer');
     }
-
 }

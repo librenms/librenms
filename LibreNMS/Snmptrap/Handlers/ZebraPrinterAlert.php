@@ -63,5 +63,4 @@ class ZebraPrinterAlert implements SnmptrapHandler
 
         return Severity::Warning;
     }
-
 }

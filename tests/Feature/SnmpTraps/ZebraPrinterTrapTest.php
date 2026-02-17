@@ -110,5 +110,4 @@ TRAP,
             [Severity::Ok, 'printer'],
         );
     }
-
 }
