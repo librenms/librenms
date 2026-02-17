@@ -89,47 +89,18 @@ class Fping
         return $response;
     }
 
-    /**
-     * Run fping against a hostname/ip and check for success.
-     */
-    public function alive(string $host, AddressFamily $address_family = AddressFamily::IPv4): bool
-    {
-        $measure = Measurement::start('alive');
-
-        // build the command
-        $cmd = array_merge(LibrenmsConfig::fpingCommand($address_family), [
-            '-r',
-            $this->count,
-            '-t',
-            $this->timeout,
-            '-O',
-            $this->tos,
-            '-B',
-            '1.0',
-            $host,
-        ]);
-
-        $process = app()->make(Process::class, ['command' => $cmd]);
-        Log::debug('[FPING] ' . $process->getCommandLine() . PHP_EOL);
-        $process->disableOutput();
-        $process->run();
-        $measure->manager()->recordFping($measure->end());
-
-        Log::debug('response: ' . ($process->isSuccessful() ? 'success' : 'fail'));
-
-        return $process->isSuccessful();
-    }
-
     public function bulkPing(array $hosts, callable $callback): void
     {
         $process = app()->make(Process::class, ['command' => [
             LibrenmsConfig::get('fping', 'fping'),
-            '-f', '-',
-            '-e',
-            '-t', $this->timeout,
-            '-r', $this->retries,
-            '-O', $this->tos,
-            '-c', $this->count,
+            '-f',
+            '-',
+            '-t',
+            $this->timeout,
+            '-r',
+            $this->count,
+            '-O',
+            $this->tos,
         ]]);
 
         // twice polling interval
@@ -139,66 +110,36 @@ class Fping
 
         Log::debug('[FPING] ' . $process->getCommandLine() . PHP_EOL);
 
-        $partial = '';
-        $process->run(function ($type, $output) use ($callback, &$partial): void {
+        $partialerr = '';
+        $partialout = '';
+        $process->run(function ($type, $output) use ($callback, &$partialerr, &$partialout): void {
             // stdout contains individual ping responses, stderr contains summaries
-            if ($type == Process::ERR) {
-                $lines = explode(PHP_EOL, $output);
-                foreach ($lines as $index => $line) {
-                    if ($line) {
-                        Log::debug("Fping OUTPUT|$line PARTIAL|$partial");
+            $lines = explode(PHP_EOL, $output);
+            foreach ($lines as $index => $line) {
+                if ($line) {
+                    if ($type == Process::ERR) {
+                        Log::debug("Fping OUTPUT|$line PARTIAL|$partialerr");
                         try {
-                            $response = FpingResponse::parseLine($partial . $line);
+                            $response = FpingAliveResponse::parseLine($partialerr . $line);
                             call_user_func($callback, $response);
-                            $partial = '';
+                            $partialerr = '';
                         } catch (FpingUnparsableLine $e) {
                             // handle possible partial line (only save it if it is the last line of output)
-                            $partial = $index === array_key_last($lines) ? $e->unparsedLine : '';
+                            $partialerr = $index === array_key_last($lines) ? $e->unparsedLine : '';
+                        }
+                    } elseif ($type == Process::OUT) {
+                        Log::debug("Fping OUTPUT|$line PARTIAL|$partialout");
+                        try {
+                            $response = FpingAliveResponse::parseLine($partialout . $line);
+                            call_user_func($callback, $response);
+                            $partialout = '';
+                        } catch (FpingUnparsableLine $e) {
+                            // handle possible partial line (only save it if it is the last line of output)
+                            $partialout = $index === array_key_last($lines) ? $e->unparsedLine : '';
                         }
                     }
                 }
             }
         });
-    }
-
-    /**
-     * Check if we want a given scheduler to run pings
-     */
-    public static function runPing(string $source): bool
-    {
-        // Don't run any pings if icmp checks are disabled
-        if (! LibrenmsConfig::get('icmp_check')) {
-            return false;
-        }
-
-        return match (LibrenmsConfig::get('schedule_type.ping', 'legacy')) {
-            // For legacy config, always run pings
-            'legacy' => true,
-            'disabled' => $source == 'poller',
-            'cron' => $source == 'cron',
-            'dispatcher' => $source == 'dispatcher',
-            default => throw new \UnhandledMatchError(LibrenmsConfig::get('schedule_type.ping', 'legacy')),
-        };
-    }
-
-    /**
-     * Check if we want a given scheduler to generate stats
-     */
-    public static function wantStats(string $source): bool
-    {
-        // Always run if the force option has been given to a command
-        if ($source === 'force') {
-            return true;
-        }
-
-        return match (LibrenmsConfig::get('schedule_type.ping', 'legacy')) {
-            // For legacy config, if the normal and ping rrd steps are the same use the poller, else use cron/dispatcher
-            'legacy' => (LibrenmsConfig::get('rrd.step') <= LibrenmsConfig::get('ping_rrd_step') ? $source == 'poller' : $source != 'poller'),
-            // If the fast ping process has been disabled, get stats from the poller
-            'disabled' => $source == 'poller',
-            'cron' => $source == 'cron',
-            'dispatcher' => $source == 'dispatcher',
-            default => throw new \UnhandledMatchError(LibrenmsConfig::get('schedule_type.ping', 'legacy')),
-        };
     }
 }
