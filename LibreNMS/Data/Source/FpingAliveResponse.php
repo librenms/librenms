@@ -51,8 +51,9 @@ class FpingAliveResponse
         $matched = preg_match('/^(\S+) is (alive|unreachable)$/', $output, $parsed);
         if ($matched) {
             [, $host, $result] = array_pad($parsed, 3, 0);
+
             return new static(
-                ($result == 'alive' ? self::SUCCESS : self::UNREACHABLE),
+                $result == 'alive' ? self::SUCCESS : self::UNREACHABLE,
                 $host,
             );
         }
@@ -63,10 +64,10 @@ class FpingAliveResponse
 
             try {
                 $ret_code = match ($result) {
-                   'Name or service not known' => self::INVALID_HOST,
-                   'Temporary failure in name resolution' => self::SYS_CALL_FAIL,
+                    'Name or service not known' => self::INVALID_HOST,
+                    'Temporary failure in name resolution' => self::SYS_CALL_FAIL,
                 };
-            } catch (\UnhandledMatchError $e) {
+            } catch (\UnhandledMatchError) {
                 throw new FpingUnparsableLine($output);
             }
 
@@ -78,6 +79,7 @@ class FpingAliveResponse
 
         throw new FpingUnparsableLine($output);
     }
+
     /**
      * Ping result was successful.
      * fping didn't have an error and we got at least one ICMP packet back.
