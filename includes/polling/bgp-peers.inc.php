@@ -588,6 +588,7 @@ if (! empty($peers)) {
 
                     $ip_ver = $peer_ip->getFamily();
 
+                    // Try the new OIDs first
                     $snmp_raw = SnmpQuery::enumStrings()->cache()->walk([
                         'CISCO-BGP4-MIB::cbgpPeer2AcceptedPrefixes',
                         'CISCO-BGP4-MIB::cbgpPeer2DeniedPrefixes',
@@ -597,14 +598,6 @@ if (! empty($peers)) {
                         'CISCO-BGP4-MIB::cbgpPeer2AdvertisedPrefixes',
                         'CISCO-BGP4-MIB::cbgpPeer2SuppressedPrefixes',
                         'CISCO-BGP4-MIB::cbgpPeer2WithdrawnPrefixes',
-                        'CISCO-BGP4-MIB::cbgpPeerAcceptedPrefixes',
-                        'CISCO-BGP4-MIB::cbgpPeerDeniedPrefixes',
-                        'CISCO-BGP4-MIB::cbgpPeerPrefixAdminLimit',
-                        'CISCO-BGP4-MIB::cbgpPeerPrefixThreshold',
-                        'CISCO-BGP4-MIB::cbgpPeerPrefixClearThreshold',
-                        'CISCO-BGP4-MIB::cbgpPeerAdvertisedPrefixes',
-                        'CISCO-BGP4-MIB::cbgpPeerSuppressedPrefixes',
-                        'CISCO-BGP4-MIB::cbgpPeerWithdrawnPrefixes',
                     ])->table(4);
 
                     if (isset($snmp_raw[$ip_ver])) {
@@ -619,6 +612,18 @@ if (! empty($peers)) {
                             'CISCO-BGP4-MIB::cbgpPeerWithdrawnPrefixes' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2WithdrawnPrefixes'] ?? null,
                         ];
                     } else {
+                        // Use the legacy OIDs if we don't get a result above
+                        $snmp_raw = SnmpQuery::enumStrings()->cache()->walk([
+                            'CISCO-BGP4-MIB::cbgpPeerAcceptedPrefixes',
+                            'CISCO-BGP4-MIB::cbgpPeerDeniedPrefixes',
+                            'CISCO-BGP4-MIB::cbgpPeerPrefixAdminLimit',
+                            'CISCO-BGP4-MIB::cbgpPeerPrefixThreshold',
+                            'CISCO-BGP4-MIB::cbgpPeerPrefixClearThreshold',
+                            'CISCO-BGP4-MIB::cbgpPeerAdvertisedPrefixes',
+                            'CISCO-BGP4-MIB::cbgpPeerSuppressedPrefixes',
+                            'CISCO-BGP4-MIB::cbgpPeerWithdrawnPrefixes',
+                        ])->table(4);
+
                         $cbgp_data = $snmp_raw[$bgp_peer_ident][$afi][$safi];
                     }
                     d_echo($cbgp_data);
