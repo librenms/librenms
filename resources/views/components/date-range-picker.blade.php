@@ -2,7 +2,6 @@
     'start' => '',
     'end' => '',
     'outputFormat' => '', // iso, timestamp, or format string
-    'timezone' => '',
     'presets' => true,
     'placeholder' => 'Select date range...',
     'class' => 'tw:w-full tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md'
@@ -15,7 +14,6 @@
      data-end="{{ $end }}"
      data-presets=" {{ is_array($presets) ? implode(',', $presets) : (string) $presets }}"
      data-output-format="{{ $outputFormat }}"
-     data-timezone="{{ $timezone }}"
      data-placeholder="{{ $placeholder }}">
     <div
         x-text="displayText"
@@ -189,7 +187,7 @@
 
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
                 if (this.$el.dataset.outputFormat) this.outputFormat = this.$el.dataset.outputFormat;
-                this.timeZone = this.$el.dataset.timezone;
+                this.timeZone = window.tz;
 
                 this.setRange(this.$el.dataset.start, this.$el.dataset.end);
             },

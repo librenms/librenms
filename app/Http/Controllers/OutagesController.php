@@ -37,7 +37,6 @@ class OutagesController extends Controller
             'selected_device' => $selected_device,
             'from' => $from,
             'to' => $to,
-            'tz' => session('preferences.timezone'),
             'status' => $request->input('status', 'current'),
             'preset' => $request->input('preset', true),
             'show_device_list' => true, // when html is shared with device tab
