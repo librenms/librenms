@@ -6,8 +6,9 @@ We now have support for polling data at intervals to fit your needs.
 
 - If you just want faster up/down alerts, [Fast Ping](../Extensions/Fast-Ping-Check.md) is a much
   easier path to that goal.
-- You must also change your cron entry for `poller-wrapper.py` for
-  this to work (if you change from the default 300 seconds).
+- If you are still using the cron wrapper, you must also change your
+  cron entry for `poller-wrapper.py` for this to work (if you change
+  from the default 300 seconds).
 - Your polling _MUST_ complete in the time you configure for the
   heartbeat step value. See `/poller` in your WebUI for
   your current value.
@@ -31,6 +32,11 @@ for step and heartbeat intervals:
   minute polling then this should be 60.
 - Heartbeat is how long to wait for data before registering a null
   value, i.e 120 seconds.
+
+If you are using the dispatcher service, you also need to navigate to
+`/settings/poller/dispatcherservice/` within your WebUI. And either
+set the poller frequency to null, or at least the same value as the
+RRD step setting above (60 for 1 minute polling).
 
 ## Converting existing RRD files
 
