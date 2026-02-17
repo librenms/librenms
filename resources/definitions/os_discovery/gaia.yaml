@@ -6,7 +6,7 @@ modules:
     processors:
             data:
                 -
-                    oid: .1.3.6.1.4.1.2620.1.6.7.5.1
+                    oid: CHECKPOINT-MIB::multiProcTable
                     value: CHECKPOINT-MIB::multiProcUsage
                     num_oid: .1.3.6.1.4.1.2620.1.6.7.5.1.5.{{ $index }}
                     type: cpu
