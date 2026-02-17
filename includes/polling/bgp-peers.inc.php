@@ -104,7 +104,7 @@ if (! empty($peers)) {
         try {
             $peer_ip = IP::parse($peer['bgpPeerIdentifier']);
 
-            echo "Checking BGP peer $peer_ip ";
+            d_echo("Checking BGP peer $peer_ip ");
 
             // --- Collect BGP data ---
             // If a Cisco device has BGP peers in VRF(s),
@@ -115,7 +115,7 @@ if (! empty($peers)) {
             // ($peer_data_check isn't used in the Cisco code path,)
             if (count($peer_data_check) > 0 || $cisco_with_vrf) {
                 if ($generic) {
-                    echo "\nfallback to default mib";
+                    d_echo("\nfallback to default mib");
 
                     $peer_identifier = $peer['bgpPeerIdentifier'];
                     $mib = 'BGP4-MIB';
@@ -167,7 +167,7 @@ if (! empty($peers)) {
                     }
                     d_echo("State = {$peer_data['bgpPeerState']} - AdminStatus: {$peer_data['bgpPeerAdminStatus']}\n");
                 } elseif ($device['os'] == 'vrp') {
-                    echo "\nCaching Oids VRP...";
+                    d_echo("\nCaching Oids VRP...");
                     if (! isset($bgpPeers)) {
                         //if not available, we timeout each time, to be fixed when split
                         $bgpPeersCache = snmpwalk_cache_oid($device, 'hwBgpPeerEntry', [], 'HUAWEI-BGP-VPN-MIB', 'huawei');
@@ -827,7 +827,7 @@ if (! empty($peers)) {
                 app('Datastore')->put($device, 'cbgp', $tags, $fields);
             } //end foreach
         } //end if
-        echo "\n";
+        d_echo("\n");
     } //end foreach
 } //end if
 
