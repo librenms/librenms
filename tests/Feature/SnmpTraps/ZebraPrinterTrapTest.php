@@ -10,12 +10,12 @@ final class ZebraPrinterTrapTest extends SnmpTrapTestCase
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
-UDP: [{{ ip }}]:161->[192.0.2.1]:162
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
 ESI-MIB::psOutput.7 ERROR CONDITION: HEAD OPEN
 TRAP,
-            'SNMP Trap: Zebra Printer {{ hostname }} - ERROR CONDITION: HEAD OPEN',
+            'SNMP Trap: Zebra Printer - ERROR CONDITION: HEAD OPEN',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 HEAD OPEN',
             [Severity::Warning, 'printer'],
         );
@@ -25,12 +25,12 @@ TRAP,
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
-UDP: [{{ ip }}]:161->[192.0.2.1]:162
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
 ESI-MIB::psOutput.7 ALERT: PAPER OUT
 TRAP,
-            'SNMP Trap: Zebra Printer {{ hostname }} - ALERT: PAPER OUT',
+            'SNMP Trap: Zebra Printer - ALERT: PAPER OUT',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 PAPER OUT',
             [Severity::Error, 'printer'],
         );
@@ -40,12 +40,12 @@ TRAP,
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
-UDP: [{{ ip }}]:161->[192.0.2.1]:162
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
 ESI-MIB::psOutput.7 ALERT: RIBBON OUT
 TRAP,
-            'SNMP Trap: Zebra Printer {{ hostname }} - ALERT: RIBBON OUT',
+            'SNMP Trap: Zebra Printer - ALERT: RIBBON OUT',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 RIBBON OUT',
             [Severity::Error, 'printer'],
         );
@@ -55,12 +55,12 @@ TRAP,
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
-UDP: [{{ ip }}]:161->[192.0.2.1]:162
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
 ESI-MIB::psOutput.7 ALERT: MEDIA LOW
 TRAP,
-            'SNMP Trap: Zebra Printer {{ hostname }} - ALERT: MEDIA LOW',
+            'SNMP Trap: Zebra Printer - ALERT: MEDIA LOW',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 MEDIA LOW',
             [Severity::Warning, 'printer'],
         );
@@ -70,12 +70,12 @@ TRAP,
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
-UDP: [{{ ip }}]:161->[192.0.2.1]:162
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
 ESI-MIB::psOutput.7 ALERT: PQ JOB COMPLETED
 TRAP,
-            'SNMP Trap: Zebra Printer {{ hostname }} - ALERT: PQ JOB COMPLETED',
+            'SNMP Trap: Zebra Printer - ALERT: PQ JOB COMPLETED',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 PQ JOB COMPLETED',
             [Severity::Info, 'printer'],
         );
@@ -85,12 +85,12 @@ TRAP,
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
-UDP: [{{ ip }}]:161->[192.0.2.1]:162
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
 ESI-MIB::psOutput.7 ALERT: CUTTER JAM
 TRAP,
-            'SNMP Trap: Zebra Printer {{ hostname }} - ALERT: CUTTER JAM',
+            'SNMP Trap: Zebra Printer - ALERT: CUTTER JAM',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 CUTTER JAM',
             [Severity::Error, 'printer'],
         );
@@ -100,14 +100,15 @@ TRAP,
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
-UDP: [{{ ip }}]:161->[192.0.2.1]:162
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:37.14
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.2
 ESI-MIB::psOutput.7 ERROR CLEARED: HEAD OPEN
 TRAP,
-            'SNMP Trap: Zebra Printer {{ hostname }} - ERROR CLEARED: HEAD OPEN',
+            'SNMP Trap: Zebra Printer - ERROR CLEARED: HEAD OPEN',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.2 alert cleared',
             [Severity::Ok, 'printer'],
         );
     }
+
 }

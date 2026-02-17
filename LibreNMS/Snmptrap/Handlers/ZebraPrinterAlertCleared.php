@@ -43,6 +43,7 @@ class ZebraPrinterAlertCleared implements SnmptrapHandler
     {
         $message = $trap->getOidData('ESI-MIB::psOutput.7');
 
-        $trap->log('SNMP Trap: Zebra Printer ' . $device->displayName() . ' - ' . $message, Severity::Ok, 'printer');
+        $trap->log('SNMP Trap: Zebra Printer - ' . $message, Severity::Ok, 'printer');
     }
+
 }
