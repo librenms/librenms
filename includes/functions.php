@@ -15,7 +15,6 @@ use App\Models\StateTranslation;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Util\Clean;
 use LibreNMS\Util\Time;
 
 /**
