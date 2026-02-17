@@ -12,4 +12,4 @@ discovery:
         snmpget:
             oid: SUPERCAPBATTERY-MIB::BMS01-AmbientTemperature
             op: 'regex'
-            value: "/^\\d+$/"
+            value: '/^\d+$/'
