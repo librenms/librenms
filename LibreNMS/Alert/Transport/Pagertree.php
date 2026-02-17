@@ -40,11 +40,11 @@ class Pagertree extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-$event_type = match ($alert_data['state']) {
-    0 => 'resolve',
-    2 => 'acknowledge',
-    default => 'create',
-};
+        $event_type = match ($alert_data['state']) {
+        0 => 'resolve',
+        2 => 'acknowledge',
+        default => 'create',
+        };
 
         $event = [
             'event_type' => $event_type,
