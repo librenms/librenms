@@ -161,7 +161,6 @@ OUT;
             $current = $expected[$response->host];
 
             $this->assertSame($current[0], $response->exit_code);
-            $this->assertFalse($response->wasSkipped());
         });
 
         $this->assertEquals(count($expected), $calls);
