@@ -252,6 +252,16 @@ class LdapAuthorizer extends AuthorizerBase
      */
     protected function getFullDn($username): string
     {
+        if (LibrenmsConfig::get('auth_ldap_use_dn_autodiscovery')) {
+            // if dn autodiscovery is on, lookup user object in ldap and find dn of object.
+            $userobj = '';
+            $userobj = $this->getUser($this->getUserid($username));
+            if (! empty($userobj)) {
+                return $userobj['dn'];
+            }
+        }
+
+        // if dn autodiscovery is off or dn cannot be found in ldap response, construct dn from ldap prefix, username and ldap suffix. this is default.
         return LibrenmsConfig::get('auth_ldap_prefix', '') . $username . LibrenmsConfig::get('auth_ldap_suffix', '');
     }
 
@@ -326,6 +336,7 @@ class LdapAuthorizer extends AuthorizerBase
             'username' => $entry['uid'][0] ?? null,
             'realname' => $entry['cn'][0] ?? null,
             'user_id' => $entry[$uid_attr][0] ?? null,
+            'dn' => $entry['dn'] ?? null,
             'email' => $entry[LibrenmsConfig::get('auth_ldap_emailattr', 'mail')][0] ?? null,
         ];
     }
