@@ -153,7 +153,7 @@ class GraphParameters implements \Stringable
             $options[] = '--full-size-mode';
         }
 
-        if ($this->imageFormat === ImageFormat::svg) {
+        if ($this->imageFormat === ImageFormat::Svg) {
             $options[] = '--imgformat=SVG';
             if ($this->width < self::MEDIUM) {
                 array_push($options, '-m', 0.75, '-R', 'light');

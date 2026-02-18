@@ -15,7 +15,7 @@
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\MaintenanceBehavior;
 
-if (\Auth::user()->hasGlobalAdmin()) {
+if (Auth::user()->hasGlobalAdmin()) {
     $default_behavior = MaintenanceBehavior::tryFrom((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'));
     ?>
 
@@ -116,13 +116,13 @@ if (\Auth::user()->hasGlobalAdmin()) {
                         <label for='behavior' class='col-sm-4 control-label'>Behavior <exp>*</exp> </label>
                         <div class="col-sm-8">
                             <select id="behavior" name="behavior" class="form-control">
-                                <option value='<?= MaintenanceBehavior::SKIP_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::SKIP_ALERTS ? 'selected' : '' ?>>
+                                <option value='<?= MaintenanceBehavior::SkipAlerts->value; ?>' <?= $default_behavior === MaintenanceBehavior::SkipAlerts ? 'selected' : '' ?>>
                                     <?= __('alerting.maintenance.behavior.options.skip_alerts') ?>
                                 </option>
-                                <option value='<?= MaintenanceBehavior::MUTE_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::MUTE_ALERTS ? 'selected' : '' ?>>
+                                <option value='<?= MaintenanceBehavior::MuteAlerts->value; ?>' <?= $default_behavior === MaintenanceBehavior::MuteAlerts ? 'selected' : '' ?>>
                                     <?= __('alerting.maintenance.behavior.options.mute_alerts') ?>
                                 </option>
-                                <option value='<?= MaintenanceBehavior::RUN_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::RUN_ALERTS ? 'selected' : '' ?>>
+                                <option value='<?= MaintenanceBehavior::RunAlerts->value; ?>' <?= $default_behavior === MaintenanceBehavior::RunAlerts ? 'selected' : '' ?>>
                                     <?= __('alerting.maintenance.behavior.options.run_alerts') ?>
                                 </option>
                             </select>
