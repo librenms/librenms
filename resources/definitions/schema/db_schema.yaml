@@ -857,6 +857,7 @@ ipsec_tunnels:
   Columns:
     - { Field: tunnel_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: tunnel_index, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: peer_port, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: peer_addr, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: local_addr, Type: varchar(64), 'Null': false, Extra: '' }
@@ -865,7 +866,7 @@ ipsec_tunnels:
     - { Field: tunnel_status, Type: varchar(11), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [tunnel_id], Unique: true, Type: BTREE }
-    ipsec_tunnels_device_id_peer_addr_unique: { Name: ipsec_tunnels_device_id_peer_addr_unique, Columns: [device_id, peer_addr], Unique: true, Type: BTREE }
+    ipsec_tunnels_device_id_peer_addr_tunnel_index_unique: { Name: ipsec_tunnels_device_id_peer_addr_tunnel_index_unique, Columns: [device_id, peer_addr, tunnel_index], Unique: true, Type: BTREE }
 ipv4_addresses:
   Columns:
     - { Field: ipv4_address_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

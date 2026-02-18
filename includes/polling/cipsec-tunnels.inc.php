@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\IpsecTunnel;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 
@@ -16,7 +17,8 @@ if ($device['os_group'] == 'cisco') {
             dbDelete('ipsec_tunnels', '`tunnel_id` = ?', [$tunnel['tunnel_id']]);
         }
 
-        $tunnels[$tunnel['peer_addr']] = $tunnel;
+        $tunnel_index = $tunnel['tunnel_index'] ?? 0;
+        $tunnels[$tunnel['peer_addr'] . '_' . $tunnel_index] = $tunnel;
     }
 
     $valid_tunnels = [];
@@ -68,9 +70,12 @@ if ($device['os_group'] == 'cisco') {
             'cikeTunLocalValue' => 'local_addr',
         ];
 
-        if (! isset($tunnels[$address]) && ! empty($address)) {
+        $tunnel_index = 0;
+        $tunnel_key = $address . '_' . $tunnel_index;
+        if (! isset($tunnels[$tunnel_key]) && ! empty($address)) {
             $tunnel_id = dbInsert([
                 'device_id' => $device['device_id'],
+                'tunnel_index' => $tunnel_index,
                 'peer_addr' => $address,
                 'local_addr' => $tunnel_full['cikeTunLocalValue'],
                 'tunnel_name' => $tunnel_full['cikeTunLocalName'],
@@ -81,14 +86,14 @@ if ($device['os_group'] == 'cisco') {
                 $db_update[$db_value] = $tunnel_full[$db_oid] ?? '';
             }
 
-            if (! empty($tunnels[$address]['tunnel_id'])) {
+            if (! empty($tunnels[$tunnel_key]['tunnel_id'])) {
                 $updated = dbUpdate(
                     $db_update,
                     'ipsec_tunnels',
                     '`tunnel_id` = ?',
-                    [$tunnels[$address]['tunnel_id']]
+                    [$tunnels[$tunnel_key]['tunnel_id']]
                 );
-                $valid_tunnels[] = $tunnels[$address]['tunnel_id'];
+                $valid_tunnels[] = $tunnels[$tunnel_key]['tunnel_id'];
             }
         }
 
@@ -186,6 +191,7 @@ if ($device['os_group'] == 'firebrick') {
         ) {
             $tunnel_id = dbInsert([
                 'device_id' => $device['device_id'],
+                'tunnel_index' => 0,
                 'peer_addr' => $tunnel['fbIPsecConnectionPeerAddress'],
                 'local_addr' => $device['hostname'],
                 'tunnel_name' => $tunnel['fbIPsecConnectionName'],
@@ -221,6 +227,133 @@ if ($device['os_group'] == 'firebrick') {
             array_merge([$device['device_id']], $valid_tunnels)
         );
     }
+}
+
+if ($device['os'] == 'junos') {
+    $mib = 'JUNIPER-IPSEC-FLOW-MON-MIB';
+    $ipsec_array = SnmpQuery::mibDir('junos')->walk([
+        $mib . '::jnxIpSecTunMonLocalGwAddr',
+        $mib . '::jnxIpSecTunMonLocalGwAddrType',
+        $mib . '::jnxIpSecTunMonVpnName',
+        $mib . '::jnxIpSecTunMonInDecryptedBytes',
+        $mib . '::jnxIpSecTunMonInDecryptedPkts',
+        $mib . '::jnxIpSecTunMonOutEncryptedBytes',
+        $mib . '::jnxIpSecTunMonOutEncryptedPkts',
+        $mib . '::jnxIpSecTunMonReplayDropPkts',
+        $mib . '::jnxIpSecTunMonEspAuthFails',
+        $mib . '::jnxIpSecTunMonDecryptFails',
+    ])->valuesByIndex();
+    if (! is_array($ipsec_array)) {
+        $ipsec_array = [];
+    }
+
+    $sa_state = SnmpQuery::mibDir('junos')->walk($mib . '::jnxIpSecSaMonState')->valuesByIndex();
+    if (is_array($sa_state)) {
+        $sa_state_key = $mib . '::jnxIpSecSaMonState';
+        foreach ($sa_state as $sa_index => $sa_row) {
+            $state = (int) ($sa_row[$sa_state_key] ?? 0);
+            if (preg_match('/^(.+)\.\d+$/', (string) $sa_index, $m)) {
+                $tunnel_index_key = $m[1];
+                if (isset($ipsec_array[$tunnel_index_key])) {
+                    $ipsec_array[$tunnel_index_key][$sa_state_key] = $state;
+                }
+            }
+        }
+    }
+
+    $tunnels_db = IpsecTunnel::where('device_id', $device['device_id'])->get();
+    $tunnels = [];
+    foreach ($tunnels_db as $tunnel) {
+        if (empty($tunnel->peer_addr) && empty($tunnel->local_addr)) {
+            $tunnel->delete();
+            continue;
+        }
+
+        $tunnel_index = $tunnel->tunnel_index ?? 0;
+        $tunnels[$tunnel->peer_addr . '_' . $tunnel_index] = $tunnel;
+    }
+
+    $valid_tunnels = [];
+
+    $sa_state_key = $mib . '::jnxIpSecSaMonState';
+    foreach ($ipsec_array as $oid_index => $tunnel) {
+        $peer_addr = null;
+        $tunnel_index = 0;
+        if (preg_match('/^ipv4\."([^"]+)"\.(\d+)$/', (string) $oid_index, $m)) {
+            $peer_addr = $m[1];
+            $tunnel_index = (int) $m[2];
+        } elseif (preg_match('/^ipv6\."([^"]+)"\.(\d+)$/', (string) $oid_index, $m)) {
+            $peer_addr = $m[1];
+            $tunnel_index = (int) $m[2];
+        } else {
+            continue;
+        }
+
+        $local_addr = $tunnel[$mib . '::jnxIpSecTunMonLocalGwAddr'] ?? '';
+        $tunnel_name = trim($tunnel[$mib . '::jnxIpSecTunMonVpnName'] ?? '') ?: 'Phase2-' . $tunnel_index;
+        $tunnel_status = ((int) ($tunnel[$sa_state_key] ?? 0) === 1) ? 'active' : 'inactive';
+
+        $tunnel_key = $peer_addr . '_' . $tunnel_index;
+        if (! isset($tunnels[$tunnel_key])) {
+            $newTunnel = IpsecTunnel::create([
+                'device_id' => $device['device_id'],
+                'tunnel_index' => $tunnel_index,
+                'peer_port' => 0,
+                'peer_addr' => $peer_addr,
+                'local_addr' => $local_addr,
+                'local_port' => 0,
+                'tunnel_name' => $tunnel_name,
+                'tunnel_status' => $tunnel_status,
+            ]);
+            $valid_tunnels[] = $newTunnel->tunnel_id;
+            $tunnels[$tunnel_key] = $newTunnel;
+        } else {
+            $tunnels[$tunnel_key]->update([
+                'local_addr' => $local_addr,
+                'tunnel_name' => $tunnel_name,
+                'tunnel_status' => $tunnel_status,
+            ]);
+            $valid_tunnels[] = $tunnels[$tunnel_key]->tunnel_id;
+        }
+
+        $rrd_key = $tunnel_index > 0 ? $peer_addr . '_' . $tunnel_index : $peer_addr;
+        $rrd_name = ['ipsectunnel', $rrd_key];
+        $rrd_def = new RrdDefinition();
+        $rrd_def->disableNameChecking();
+        $rrd_def->addDataset('TunInOctets', 'COUNTER', null, 1000000000000);
+        $rrd_def->addDataset('TunOutOctets', 'COUNTER', null, 1000000000000);
+        $rrd_def->addDataset('TunInPkts', 'COUNTER', null, 1000000000);
+        $rrd_def->addDataset('TunOutPkts', 'COUNTER', null, 1000000000);
+        $rrd_def->addDataset('TunInReplayDropPkts', 'COUNTER', null, 1000000000);
+        $rrd_def->addDataset('TunEspAuthFails', 'COUNTER', null, 1000000000);
+        $rrd_def->addDataset('TunDecryptFails', 'COUNTER', null, 1000000000);
+
+        $fields = [
+            'TunInOctets' => $tunnel[$mib . '::jnxIpSecTunMonInDecryptedBytes'] ?? 0,
+            'TunOutOctets' => $tunnel[$mib . '::jnxIpSecTunMonOutEncryptedBytes'] ?? 0,
+            'TunInPkts' => $tunnel[$mib . '::jnxIpSecTunMonInDecryptedPkts'] ?? 0,
+            'TunOutPkts' => $tunnel[$mib . '::jnxIpSecTunMonOutEncryptedPkts'] ?? 0,
+            'TunInReplayDropPkts' => $tunnel[$mib . '::jnxIpSecTunMonReplayDropPkts'] ?? 0,
+            'TunEspAuthFails' => $tunnel[$mib . '::jnxIpSecTunMonEspAuthFails'] ?? 0,
+            'TunDecryptFails' => $tunnel[$mib . '::jnxIpSecTunMonDecryptFails'] ?? 0,
+        ];
+        foreach (array_keys($fields) as $k) {
+            if (! is_numeric($fields[$k])) {
+                $fields[$k] = 0;
+            }
+        }
+
+        $tags = ['address' => $rrd_key, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+        app('Datastore')->put($device, 'ipsectunnel', $tags, $fields);
+    }
+
+    if (! empty($valid_tunnels)) {
+        IpsecTunnel::where('device_id', $device['device_id'])
+            ->whereNotIn('tunnel_id', $valid_tunnels)
+            ->delete();
+    }
+
+    unset($ipsec_array, $sa_state, $tunnels_db, $valid_tunnels, $rrd_name, $rrd_def, $fields);
 }
 
 unset(

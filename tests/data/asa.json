@@ -11292,6 +11292,7 @@
         "poller": {
             "ipsec_tunnels": [
                 {
+                    "tunnel_index": 0,
                     "peer_port": 0,
                     "peer_addr": "<private>",
                     "local_port": 0,
