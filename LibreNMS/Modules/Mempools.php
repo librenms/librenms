@@ -173,9 +173,15 @@ class Mempools implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'mempools' => $device->mempools()->orderBy('mempool_type')->orderBy('mempool_id')
+            'mempools' => $device->mempools()
+                ->orderByColumns($this->getSortColumns('mempools'))
                 ->get()->map->makeHidden(['device_id', 'mempool_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['mempool_type', 'mempool_id'];
     }
 
     /**

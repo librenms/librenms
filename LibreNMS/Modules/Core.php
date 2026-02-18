@@ -142,6 +142,11 @@ class Core implements Module
         return null; // all data here is stored in the devices table and covered by the os module
     }
 
+    public function getSortColumns(string $table): array
+    {
+        return [];
+    }
+
     /**
      * Detect the os of the given device.
      *

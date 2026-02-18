@@ -125,13 +125,20 @@ class Xdsl implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'ports_adsl' => $device->portsAdsl()->orderBy('ifIndex')
+            'ports_adsl' => $device->portsAdsl()
+                ->orderByColumns($this->getSortColumns('ports_adsl'))
                 ->select(['ports_adsl.*', 'ifIndex'])
                 ->get()->map->makeHidden(['laravel_through_key', 'port_adsl_updated', 'port_id']),
-            'ports_vdsl' => $device->portsVdsl()->orderBy('ifIndex')
+            'ports_vdsl' => $device->portsVdsl()
+                ->orderByColumns($this->getSortColumns('ports_vdsl'))
                 ->select(['ports_vdsl.*', 'ifIndex'])
                 ->get()->map->makeHidden(['laravel_through_key', 'port_vdsl_updated', 'port_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['ifIndex'];
     }
 
     /**

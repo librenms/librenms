@@ -198,9 +198,17 @@ class Wireless implements Module
     {
         return [
             'wireless_sensors' => $device->wirelessSensors()
-                ->orderBy('sensor_class')->orderBy('sensor_type')->orderBy('sensor_index')
+                ->orderByColumns($this->getSortColumns('wireless_sensors'))
                 ->get()->map->makeHidden(['device_id', 'sensor_id', 'access_point_id', 'lastupdate']),
         ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSortColumns(string $table): array
+    {
+        return ['sensor_class', 'sensor_type', 'sensor_index'];
     }
 
     protected function updateSensor(WirelessSensor $sensor, OS $os, DataStorageInterface $datastore): void

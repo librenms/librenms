@@ -200,8 +200,14 @@ class Qos implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'qos' => $device->qos()->orderBy('title')->orderBy('snmp_idx')
+            'qos' => $device->qos()
+                ->orderByColumns($this->getSortColumns('qos'))
                 ->get()->map->makeHidden(['qos_id', 'created_at', 'updated_at', 'device_id', 'port_id', 'parent_id', 'last_polled']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['title', 'snmp_idx'];
     }
 }

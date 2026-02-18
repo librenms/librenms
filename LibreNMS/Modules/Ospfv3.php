@@ -249,19 +249,29 @@ class Ospfv3 implements Module
             'ospfv3_ports' => $device->ospfv3Ports()
                 ->leftJoin('ports', 'ospfv3_ports.port_id', 'ports.port_id')
                 ->select(['ospfv3_ports.*', 'ifIndex'])
-                ->orderBy('ospfv3IfInstId')->orderBy('ospfv3IfIndex')->orderBy('context_name')
+                ->orderByColumns($this->getSortColumns('ospfv3_ports'))
                 ->get()->map->makeHidden(['id', 'device_id', 'port_id', 'ospfv3_instance_id', 'ospfv3_area_id']),
             'ospfv3_instances' => $device->ospfv3Instances()
-                ->orderBy('context_name')
+                ->orderByColumns($this->getSortColumns('ospfv3_instances'))
                 ->get()->map->makeHidden(['id', 'device_id']),
             'ospfv3_areas' => $device->ospfv3Areas()
-                ->orderBy('ospfv3AreaId')->orderBy('context_name')
+                ->orderByColumns($this->getSortColumns('ospfv3_areas'))
                 ->get()->map->makeHidden(['id', 'device_id', 'ospfv3_instance_id']),
             'ospfv3_nbrs' => $device->ospfv3Nbrs()
-                ->orderBy('ospfv3NbrIfIndex')->orderBy('ospfv3NbrIfInstId')
-                ->orderBy('ospfv3NbrRtrId')->orderBy('context_name')
+                ->orderByColumns($this->getSortColumns('ospfv3_nbrs'))
                 ->get()->map->makeHidden(['id', 'device_id', 'ospfv3_instance_id', 'port_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return match ($table) {
+            'ospfv3_ports' => ['ospfv3IfInstId', 'ospfv3IfIndex', 'context_name'],
+            'ospfv3_instances' => ['context_name'],
+            'ospfv3_areas' => ['ospfv3AreaId', 'context_name'],
+            'ospfv3_nbrs' => ['ospfv3NbrIfIndex', 'ospfv3NbrIfInstId', 'ospfv3NbrRtrId', 'context_name'],
+            default => [],
+        };
     }
 
     protected function parseNeighborAddress(array $ospf_nbr): IP|string

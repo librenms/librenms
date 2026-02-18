@@ -146,9 +146,14 @@ class UcdDiskio implements Module
     {
         return [
             'disks' => $device->diskIo()
-                ->orderBy('diskio_descr')
+                ->orderByColumns($this->getSortColumns('disks'))
                 ->get()->map->makeHidden(['diskio_id', 'device_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['diskio_descr'];
     }
 
     private function valid_disk($os, $disk): bool

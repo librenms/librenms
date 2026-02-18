@@ -90,9 +90,14 @@ class Ipv6Nd implements Module
     {
         return [
             'ipv6_nd' => $device->nd()
-                ->orderBy('context_name')->orderBy('ipv6_address')->orderBy('mac_address')
+                ->orderByColumns($this->getSortColumns('ipv6_nd'))
                 ->get()->map->makeHidden(['id', 'created_at', 'updated_at', 'device_id', 'port_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['context_name', 'ipv6_address', 'mac_address'];
     }
 
     private function discoverNeighborsFromIpMib(Device $device): Collection

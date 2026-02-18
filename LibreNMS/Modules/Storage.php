@@ -151,9 +151,14 @@ class Storage implements Module
     {
         return [
             'storage' => $device->storage()
-                ->orderBy('type')->orderBy('storage_index')
+                ->orderByColumns($this->getSortColumns('storage'))
                 ->get()->map->makeHidden(['device_id', 'storage_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['type', 'storage_index'];
     }
 
     private function printStorage(\App\Models\Storage $storage): void

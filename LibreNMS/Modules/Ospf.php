@@ -270,17 +270,28 @@ class Ospf implements Module
             'ospf_ports' => $device->ospfPorts()
                 ->leftJoin('ports', 'ospf_ports.port_id', 'ports.port_id')
                 ->select(['ospf_ports.*', 'ifIndex'])
-                ->orderBy('ospf_port_id')->orderBy('context_name')
+                ->orderByColumns($this->getSortColumns('ospf_ports'))
                 ->get()->map->makeHidden(['id', 'device_id', 'port_id']),
             'ospf_instances' => $device->ospfInstances()
-                ->orderBy('ospf_instance_id')->orderBy('context_name')
+                ->orderByColumns($this->getSortColumns('ospf_instances'))
                 ->get()->map->makeHidden(['id', 'device_id']),
             'ospf_areas' => $device->ospfAreas()
-                ->orderBy('ospfAreaId')->orderBy('context_name')
+                ->orderByColumns($this->getSortColumns('ospf_areas'))
                 ->get()->map->makeHidden(['id', 'device_id']),
             'ospf_nbrs' => $device->ospfNbrs()
-                ->orderBy('ospf_nbr_id')->orderBy('context_name')
+                ->orderByColumns($this->getSortColumns('ospf_nbrs'))
                 ->get()->map->makeHidden(['id', 'device_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return match ($table) {
+            'ospf_ports' => ['ospf_port_id', 'context_name'],
+            'ospf_instances' => ['ospf_instance_id', 'context_name'],
+            'ospf_areas' => ['ospfAreaId', 'context_name'],
+            'ospf_nbrs' => ['ospf_nbr_id', 'context_name'],
+            default => [],
+        };
     }
 }

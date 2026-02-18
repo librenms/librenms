@@ -132,8 +132,13 @@ class PortsStack implements Module
 
         return [
             'ports_stack' => $device->portsStack()
-                ->orderBy('high_ifIndex')->orderBy('low_ifIndex')
+                ->orderByColumns($this->getSortColumns('ports_stack'))
                 ->get(['high_ifIndex', 'low_ifIndex', 'ifStackStatus']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['high_ifIndex', 'low_ifIndex'];
     }
 }

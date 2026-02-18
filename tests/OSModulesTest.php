@@ -29,14 +29,13 @@ namespace LibreNMS\Tests;
 use App\Facades\LibrenmsConfig;
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Arr;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\Tests\Traits\ManipulatesModuleTestData;
 use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
-use LibreNMS\Util\Number;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -46,9 +45,12 @@ use PHPUnit\Util\Color;
 final class OSModulesTest extends DBTestCase
 {
     use DatabaseTransactions;
+    use ManipulatesModuleTestData;
 
     private $discoveryModules;
     private $pollerModules;
+
+    private array $uniqueKeys = [];
 
     protected function setUp(): void
     {
@@ -196,18 +198,10 @@ final class OSModulesTest extends DBTestCase
                 ? $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
                 : $helper->getPollerOutput($phpunit_debug ? null : $module));
 
-            // convert to dot notation so the array is flat and easier to compare visually
-            $expected = Arr::dot($expected);
-            $actual = Arr::dot($actual);
+            [$expected, $actual] = $this->prepareDataForDisplay($expected, $actual, $module);
+            dump($expected, $actual);
 
-            // json will store 43.0 as 43, Number::cast will change those to integers too
-            foreach ($actual as $index => $value) {
-                if (is_float($value)) {
-                    $actual[$index] = Number::cast($value);
-                }
-            }
-
-            $this->assertSame($expected, $actual, $message);
+            $this->assertEquals($expected, $actual, $message);
         }
     }
 }

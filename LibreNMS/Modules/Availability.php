@@ -124,8 +124,14 @@ class Availability implements Module
         }
 
         return [
-            'availability' => $device->availability()->orderBy('duration')
+            'availability' => $device->availability()
+                ->orderByColumns($this->getSortColumns('availability'))
                 ->get()->map->makeHidden(['availability_id', 'device_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['duration'];
     }
 }
