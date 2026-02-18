@@ -167,14 +167,14 @@ class Rrd extends BaseDatastore
         $rrd_name = $meta['rrd_name'] ?? $measurement;
         $step = $meta['rrd_step'] ?? $this->step;
         if (! empty($meta['rrd_oldname'])) {
-            self::renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
+            $this->renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
         }
 
         if (isset($meta['rrd_proxmox_name'])) {
             $pmxvars = $meta['rrd_proxmox_name'];
-            $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
+            $rrd = $this->proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
         } else {
-            $rrd = self::name($device_model->hostname, $rrd_name);
+            $rrd = $this->name($device_model->hostname, $rrd_name);
         }
 
         if (isset($meta['rrd_def'])) {
@@ -340,8 +340,8 @@ class Rrd extends BaseDatastore
      */
     public function renameFile(Device $device, $oldname, $newname): bool
     {
-        $oldrrd = self::name($device->hostname, $oldname);
-        $newrrd = self::name($device->hostname, $newname);
+        $oldrrd = $this->name($device->hostname, $oldname);
+        $newrrd = $this->name($device->hostname, $newname);
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
                 Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', Severity::Ok);
@@ -404,7 +404,7 @@ class Rrd extends BaseDatastore
         $output = null;
 
         try {
-            $cmd = self::buildCommand($command, $filename, $options);
+            $cmd = $this->buildCommand($command, $filename, $options);
         } catch (FileExistsException) {
             Log::debug("RRD[%g$filename already exists%n]", ['color' => true]);
 
@@ -446,6 +446,33 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Determine whether we need to use rrdcached
+     */
+    private function useRrdCached(string $command): bool
+    {
+        if ($this->rrdcached &&
+            ! ($command == 'create' && version_compare($this->version, '1.5.5', '<')) &&
+            ! ($command == 'tune' && version_compare($this->version, '1.5', '<'))
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Add rrdcached options to the options array
+     */
+    private function fixRrdCachedOptions(array $options = [], ?string $command = null, ?string $filename = null): array
+    {
+        if ($command != null && $filename != null) {
+            return [$command, str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename), '--daemon', $this->rrdcached, ...str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options)];
+        }
+
+        return ['--daemon', $this->rrdcached, ...str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options)];
+    }
+
+    /**
      * Build a command array for rrdtool
      * Shortens the filename as needed
      * Determines if --daemon should be used
@@ -470,15 +497,8 @@ class Rrd extends BaseDatastore
             }
         }
 
-        if ($this->rrdcached &&
-            ! ($command == 'create' && version_compare($this->version, '1.5.5', '<')) &&
-            ! ($command == 'tune' && version_compare($this->version, '1.5', '<'))
-        ) {
-            // only relative paths if using rrdcached
-            $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
-            $options = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options);
-
-            return [$command, $filename, '--daemon', $this->rrdcached, ...$options];
+        if ($this->useRrdCached($command)) {
+            return $this->fixRrdCachedOptions($options, $command, $filename);
         }
 
         return [$command, $filename, ...$options];
@@ -583,7 +603,7 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Generates a graph file at $graph_file using $options
+     * Returns a generated graph from $options using the rrdtool command
      * Graphs are a single command per run, so this just runs rrdtool
      *
      * @param  array  $options
@@ -592,7 +612,7 @@ class Rrd extends BaseDatastore
      *
      * @throws RrdGraphException
      */
-    public function graph(array $options, ?array $env = null): string
+    private function graphRrdtool(array $options, ?array $env = null): string
     {
         $process = new Process([$this->rrdtool_executable, '-'], $this->rrd_dir, $env);
         $process->setTimeout(300);
@@ -633,6 +653,57 @@ class Rrd extends BaseDatastore
         // only error text was returned
         $error = trim($process->getOutput() . PHP_EOL . $process->getErrorOutput());
         throw new RrdGraphException($error, null, null, null, $process->getExitCode());
+    }
+
+    /**
+     * Returns a generated graph from $options using the php-rrd module
+     *
+     * @param  array  $options
+     * @param  array|null  $env
+     * @return string
+     *
+     * @throws RrdGraphException
+     */
+    private function graphPhprrd(array $options, ?array $env = null): string
+    {
+        // Set environment if required
+        if ($env != null) {
+            foreach ($env as $k => $v) {
+                putenv("$k=$v");
+            }
+        }
+
+        $rrd = new \RRDGraph('-');
+        if ($this->useRrdCached('graph')) {
+            $options = $this->fixRrdCachedOptions($options);
+        }
+        $rrd->setOptions($options);
+        try {
+            $data = $rrd->saveVerbose();
+        } catch (\Exception $e) {
+            throw new RrdGraphException($e->getMessage());
+        }
+
+        return $data['image'];
+    }
+
+    /**
+     * Returns a generated graph from $options using the php-rrd module if available, otherwise it will run rrdtool
+     *
+     * @param  array  $options
+     * @param  array|null  $env
+     * @return string
+     *
+     * @throws RrdGraphException
+     */
+    public function graph(array $options, ?array $env = null): string
+    {
+        // Use php-rrd if it is installed
+        if (class_exists('\RRDGraph')) {
+            return $this->graphPhprrd($options, $env);
+        }
+
+        return $this->graphRrdtool($options, $env);
     }
 
     /**
