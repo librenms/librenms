@@ -128,12 +128,9 @@ class ServiceConfig(DBConfig):
             config.get("distributed_poller_group", ServiceConfig.group)
         )
 
-        # backward compatible options
         self.master_timeout = config.get(
             "service_master_timeout", ServiceConfig.master_timeout
         )
-
-        # new options
         self.poller.enabled = (
             config.get("service_poller_enabled", True)
             if config.get("schedule_type").get("poller", "legacy") == "legacy"
