@@ -85,6 +85,9 @@ Route::middleware(['auth'])->group(function (): void {
     // pages
     Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', DeviceGroupController::class);
+    Route::any('eventlog', App\Http\Controllers\EventlogController::class)->name('eventlog');
+    Route::any('syslog', App\Http\Controllers\SyslogController::class)->name('syslog');
+    Route::any('graylog', App\Http\Controllers\GraylogController::class)->name('graylog');
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
     Route::get('outages', [OutagesController::class, 'index'])->name('outages');
@@ -306,6 +309,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('device/export', [Table\DeviceController::class, 'export']);
             Route::post('edit-ports', Table\EditPortsController::class);
             Route::post('eventlog', Table\EventlogController::class)->name('table.eventlog');
+            Route::get('eventlog/export', [Table\EventlogController::class, 'export']);
             Route::post('fdb-tables', Table\FdbTablesController::class);
             Route::post('graylog', Table\GraylogController::class)->name('table.graylog');
             Route::post('inventory', Table\InventoryController::class)->name('table.inventory');
@@ -328,6 +332,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('storages', Table\StoragesController::class)->name('table.storages');
             Route::get('storages/export', [Table\StoragesController::class, 'export']);
             Route::post('syslog', Table\SyslogController::class)->name('table.syslog');
+            Route::get('syslog/export', [Table\SyslogController::class, 'export']);
             Route::post('printer-supply', Table\PrinterSupplyController::class)->name('table.printer-supply');
             Route::post('tnmsne', Table\TnmsneController::class)->name('table.tnmsne');
             Route::post('wireless', Table\WirelessSensorController::class)->name('table.wireless');

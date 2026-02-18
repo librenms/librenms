@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -40,7 +41,24 @@ class GraylogController extends Controller
             'stream' => 'nullable|string',
             'range' => 'nullable|int',
             'loglevel' => 'nullable|int',
+            'to' => 'nullable|string',
+            'level' => 'nullable|string',
         ]);
+        $graylog_filter = [
+            'field' => 'stream',
+            'device' => $device->device_id,
+        ];
+
+        $format = LibrenmsConfig::get('dateformat.byminute', 'Y-m-d H:i');
+        $now = Carbon::now();
+        $defaultFrom = (clone $now)->subDays(7);
+        $fromInput = $request->input('from');
+        $toInput = $request->input('to');
+
+        if (empty($fromInput) && empty($toInput)) {
+            $fromInput = $defaultFrom->format($format);
+            $toInput = $now->format($format);
+        }
 
         return view('device.tabs.logs.graylog', [
             'device' => $device,
@@ -50,6 +68,11 @@ class GraylogController extends Controller
             'stream' => $request->input('stream', ''),
             'range' => $request->input('range', '0'),
             'loglevel' => $request->input('loglevel', ''),
+            'from' => $fromInput,
+            'to' => $toInput,
+            'default_date' => $defaultFrom->format($format),
+            'now' => $now->format($format),
+            'graylog_filter' => $graylog_filter,
         ]);
     }
 }

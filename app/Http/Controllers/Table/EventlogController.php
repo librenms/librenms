@@ -41,6 +41,8 @@ class EventlogController extends TableController
             'device' => 'nullable|int',
             'device_group' => 'nullable|int',
             'eventtype' => 'nullable|string',
+            'to' => 'nullable|date',
+            'from' => 'nullable|date',
             'age' => 'nullable|int',
             'message' => 'nullable|string',
         ];
@@ -48,7 +50,7 @@ class EventlogController extends TableController
 
     public function searchFields($request)
     {
-        return ['message'];
+        return ['type', 'message', 'username'];
     }
 
     protected function filterFields($request)
@@ -61,7 +63,7 @@ class EventlogController extends TableController
 
     protected function sortFields($request)
     {
-        return ['datetime', 'type', 'device_id', 'message', 'username'];
+        return ['label', 'datetime', 'type', 'device_id', 'message', 'username'];
     }
 
     /**
@@ -77,6 +79,12 @@ class EventlogController extends TableController
             ->when($request->device_group, function ($query) use ($request): void {
                 $query->inDeviceGroup($request->device_group);
             })
+            ->when($request->from, function ($query, $from): void {
+                $query->where('datetime', '>=', $from);
+            })
+            ->when($request->to, function ($query, $to): void {
+                $query->where('datetime', '<=', $to);
+            })
             ->when($request->message, function ($query) use ($request): void {
                 $query->where('message', 'like', '%' . $request->message . '%');
             })
@@ -91,7 +99,10 @@ class EventlogController extends TableController
     public function formatItem($eventlog)
     {
         return [
-            'datetime' => $this->formatDatetime($eventlog),
+            'label' => $this->setLabel($eventlog),
+            'datetime' => (new Carbon($eventlog->datetime))
+                ->setTimezone(session('preferences.timezone'))
+                ->format(LibrenmsConfig::get('dateformat.compact')),
             'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $eventlog->device]),
             'type' => $this->formatType($eventlog),
             'message' => htmlspecialchars((string) $eventlog->message),
@@ -122,12 +133,12 @@ class EventlogController extends TableController
         return htmlspecialchars((string) $eventlog->type);
     }
 
-    private function formatDatetime($eventlog)
+    private function setLabel($eventlog)
     {
         $output = "<span class='alert-status ";
         $output .= $this->severityLabel($eventlog->severity);
-        $output .= " eventlog-status'></span>";
-        $output .= (new Carbon($eventlog->datetime))->setTimezone(session('preferences.timezone'))->format(LibrenmsConfig::get('dateformat.compact'));
+        $output .= "'>";
+        $output .= '</span>';
 
         return $output;
     }
@@ -146,5 +157,38 @@ class EventlogController extends TableController
             Severity::Error => 'label-danger',
             default => 'label-default', // Unknown
         };
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Timestamp',
+            'Device',
+            'Type',
+            'Message',
+            'User',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  EventLog  $eventlog
+     * @return array
+     */
+    protected function formatExportRow($eventlog)
+    {
+        return [
+            Carbon::createFromTimestamp($eventlog->datetime)->toISOString(),
+            $eventlog->device ? $eventlog->device->displayName() : '',
+            $eventlog->type,
+            (string) $eventlog->message,
+            $eventlog->username ?: 'System',
+        ];
     }
 }

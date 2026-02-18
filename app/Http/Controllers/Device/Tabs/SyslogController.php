@@ -40,19 +40,41 @@ class SyslogController extends Controller
         $request->validate([
             'program' => 'nullable|string',
             'priority' => 'nullable|string',
+            'device' => 'nullable|int',
             'from' => 'nullable|string',
             'to' => 'nullable|string',
+            'level' => 'nullable|string',
         ]);
+        $syslog_program_filter = [
+            'field' => 'program',
+            'device' => $device->device_id,
+        ];
+        $syslog_priority_filter = [
+            'field' => 'priority',
+            'device' => $device->device_id,
+        ];
+
+        $format = LibrenmsConfig::get('dateformat.byminute', 'Y-m-d H:i');
+        $now = Carbon::now();
+        $defaultFrom = (clone $now)->subDays(7);
+        $fromInput = $request->input('from');
+        $toInput = $request->input('to');
+
+        if (empty($fromInput) && empty($toInput)) {
+            $fromInput = $defaultFrom->format($format);
+            $toInput = $now->format($format);
+        }
 
         return view('device.tabs.logs.syslog', [
             'device' => $device,
-            'filter_device' => false,
-            'now' => Carbon::now()->format(LibrenmsConfig::get('dateformat.byminute', 'Y-m-d H:i')),
-            'default_date' => Carbon::now()->subDay()->format(LibrenmsConfig::get('dateformat.byminute', 'Y-m-d H:i')),
+            'now' => $now->format($format),
+            'default_date' => $defaultFrom->format($format),
             'program' => $request->input('program', ''),
             'priority' => $request->input('priority', ''),
-            'from' => $request->input('from', ''),
-            'to' => $request->input('to', ''),
+            'from' => $fromInput,
+            'to' => $toInput,
+            'syslog_program_filter' => $syslog_program_filter,
+            'syslog_priority_filter' => $syslog_priority_filter,
         ]);
     }
 }

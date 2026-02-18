@@ -29,8 +29,7 @@ namespace App\Http\Controllers\Table;
 use App\ApiClients\GraylogApi;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use DateInterval;
-use DateTime;
+use Carbon\Carbon;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
@@ -59,6 +58,8 @@ class GraylogController extends SimpleTableController
             'device' => 'nullable|int',
             'range' => 'nullable|int',
             'loglevel' => 'nullable|int|min:0|max:7',
+            'from' => 'nullable|date_format:Y-m-d H:i',
+            'to' => 'nullable|date_format:Y-m-d H:i',
         ]);
 
         $search = $request->input('searchPhrase');
@@ -70,8 +71,19 @@ class GraylogController extends SimpleTableController
         $offset = (int) (($page - 1) * $limit);
         $loglevel = $request->input('loglevel') ?? LibrenmsConfig::get('graylog.loglevel');
 
+        $from = null;
+        $to = null;
+        $fromInput = $request->get('from');
+        $toInput = $request->get('to');
+        $userTz = $this->timezone ? $this->timezone->getName() : (session('preferences.timezone') ?: config('app.timezone'));
+
+        if ($range === 0 && $fromInput && $toInput) {
+            $from = Carbon::createFromFormat('Y-m-d H:i', (string) $fromInput, $userTz);
+            $to = Carbon::createFromFormat('Y-m-d H:i', (string) $toInput, $userTz);
+        }
+
         $query = $api->buildSimpleQuery($search, $device) .
-            ($loglevel !== null ? ' AND level: <=' . $loglevel : '');
+            ($loglevel !== null ? ' AND level:[0 TO ' . (int) $loglevel . ']' : '');
 
         $sort = null;
         foreach ($request->input('sort', []) as $field => $direction) {
@@ -82,7 +94,22 @@ class GraylogController extends SimpleTableController
         $filter = $stream ? "streams:$stream" : null;
 
         try {
-            $data = $api->query($query, $range, $limit, $offset, $sort, $filter);
+            if ($from && $to) {
+                $fromUtc = $from->clone()->setTimezone('UTC')->format('Y-m-d\TH:i:s.v\Z');
+                $toUtc = $to->clone()->setTimezone('UTC')->format('Y-m-d\TH:i:s.v\Z');
+
+                $data = $api->queryAbsolute(
+                    $query,
+                    $fromUtc,
+                    $toUtc,
+                    $limit,
+                    $offset,
+                    $sort,
+                    $filter
+                );
+            } else {
+                $data = $api->queryRelative($query, $range, $limit, $offset, $sort, $filter);
+            }
             $messages = $data['messages'] ?? [];
 
             return $this->formatResponse(
@@ -102,16 +129,11 @@ class GraylogController extends SimpleTableController
 
     private function formatMessage($message)
     {
-        if ($this->timezone) {
-            $graylogTime = new DateTime($message['message']['timestamp']);
-            $offset = $this->timezone->getOffset($graylogTime);
+        $displayTz = $this->timezone ? $this->timezone->getName() : (session('preferences.timezone') ?: config('app.timezone'));
 
-            $timeInterval = DateInterval::createFromDateString((string) $offset . 'seconds');
-            $graylogTime->add($timeInterval);
-            $displayTime = $graylogTime->format('Y-m-d H:i:s');
-        } else {
-            $displayTime = $message['message']['timestamp'];
-        }
+        $displayTime = Carbon::parse($message['message']['timestamp'])
+            ->setTimezone($displayTz)
+            ->format(LibrenmsConfig::get('dateformat.compact'));
 
         $level = $message['message']['level'] ?? '';
         $facility = $message['message']['facility'] ?? '';

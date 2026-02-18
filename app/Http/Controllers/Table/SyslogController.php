@@ -26,7 +26,9 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Syslog;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Enum\SyslogSeverity;
 
@@ -36,7 +38,6 @@ class SyslogController extends TableController
     {
         return [
             'device' => 'nullable|int',
-            'device_group' => 'nullable|int',
             'program' => 'nullable|string',
             'priority' => 'nullable|string',
             'to' => 'nullable|date',
@@ -47,7 +48,7 @@ class SyslogController extends TableController
 
     public function searchFields($request)
     {
-        return ['msg'];
+        return ['program', 'msg'];
     }
 
     public function filterFields($request)
@@ -100,7 +101,9 @@ class SyslogController extends TableController
     {
         return [
             'label' => $this->setLabel($syslog),
-            'timestamp' => $syslog->timestamp,
+            'timestamp' => (new Carbon($syslog->timestamp))
+                ->setTimezone(session('preferences.timezone'))
+                ->format(LibrenmsConfig::get('dateformat.compact')),
             'level' => htmlentities((string) $syslog->level),
             'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $syslog->device]),
             'program' => htmlentities((string) $syslog->program),
@@ -138,5 +141,31 @@ class SyslogController extends TableController
         };
     }
 
-    // end syslog_priority
+    protected function getExportHeaders()
+    {
+        return [
+            'Timestamp',
+            'Level',
+            'Device',
+            'Program',
+            'Message',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Syslog  $syslog
+     * @return array
+     */
+    protected function formatExportRow($syslog)
+    {
+        return [
+            Carbon::createFromTimestamp($syslog->timestamp)->toISOString(),
+            $syslog->priority,
+            $syslog->device ? $syslog->device->displayName() : '',
+            (string) $syslog->program,
+            (string) $syslog->msg,
+        ];
+    }
 }
