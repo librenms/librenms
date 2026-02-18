@@ -25,7 +25,7 @@ The transport uses the system `snmptrap` binary (configurable under
 | Destination Port | `162` | UDP/TCP port on the receiver |
 | Transport | `UDP` | `UDP` or `TCP` |
 | Community | `public` | SNMPv2c community string |
-| Trap OID | `LIBRENMS-NOTIFICATIONS-MIB::lnmsDefaultAlertEvent` | Notification OID defined in the MIB |
+| Trap OID | `LIBRENMS-NOTIFICATIONS-MIB::defaultAlertEvent` | Notification OID defined in the MIB |
 | PDU Type | `TRAPv2` | `TRAPv2` (one-way) or `INFORM` (acknowledged) |
 | MIB Directory | `/opt/librenms/mibs/librenms` | Directory containing the MIB file(s) |
 
@@ -37,7 +37,7 @@ The transport uses the system `snmptrap` binary (configurable under
 | Destination Port | 162 |
 | Transport | UDP |
 | Community | monitoring |
-| Trap OID | LIBRENMS-NOTIFICATIONS-MIB::lnmsDefaultAlertEvent |
+| Trap OID | LIBRENMS-NOTIFICATIONS-MIB::defaultAlertEvent |
 | PDU Type | TRAPv2 |
 | MIB Directory | /opt/librenms/mibs/librenms |
 
@@ -58,36 +58,36 @@ containing spaces.  Lines beginning with `#` are treated as comments.
 
 Create an alert template with the name **SNMP Trap — Default** and the
 following body.  Assign it to transports that reference
-`LIBRENMS-NOTIFICATIONS-MIB::lnmsDefaultAlertEvent`.
+`LIBRENMS-NOTIFICATIONS-MIB::defaultAlertEvent`.
 
 ```
-lnmsDaTitle s "{{ $alert->title }}"
-lnmsDaAlertID i {{ $alert->id }}
-lnmsDaEventID i {{ $alert->uid }}
-lnmsDaState i {{ $alert->state }}
-lnmsDaSeverity s "{{ $alert->severity }}"
-lnmsDaRuleID i {{ $alert->rule_id }}
-lnmsDaRuleName s "{{ $alert->name }}"
-lnmsDaProcedure s "{{ $alert->proc }}"
-lnmsDaTimestamp s "{{ $alert->timestamp }}"
+defaultAlertTitle s "{{ $alert->title }}"
+defaultAlertID i {{ $alert->id }}
+defaultAlertEventID i {{ $alert->uid }}
+defaultAlertState i {{ $alert->state }}
+defaultAlertSeverity s "{{ $alert->severity }}"
+defaultAlertRuleID i {{ $alert->rule_id }}
+defaultAlertRuleName s "{{ $alert->name }}"
+defaultAlertProcedure s "{{ $alert->proc }}"
+defaultAlertTimestamp s "{{ $alert->timestamp }}"
 @if ($alert->state == 0)
-lnmsDaTimeElapsed s "{{ $alert->elapsed }}"
+defaultAlertTimeElapsed s "{{ $alert->elapsed }}"
 @endif
-lnmsDaDeviceID i {{ $alert->device_id }}
-lnmsDaDevHostname s "{{ $alert->hostname }}"
-lnmsDaDevSysName s "{{ $alert->sysName }}"
-lnmsDaDevMgmtIP s "{{ $alert->ip }}"
-lnmsDaDevOS s "{{ $alert->os }}"
-lnmsDaDevType s "{{ $alert->type }}"
-lnmsDaDevHardware s "{{ $alert->hardware }}"
-lnmsDaDevVersion s "{{ $alert->version }}"
-lnmsDaDevLocation s "{{ $alert->location }}"
-lnmsDaDevUptime t {{ $alert->uptime }}
-lnmsDaDevShortUptime s "{{ $alert->uptime_short }}"
-lnmsDaACKNotes s "{{ $alert->alert_notes }}"
+defaultAlertDeviceID i {{ $alert->device_id }}
+defaultAlertDevHostname s "{{ $alert->hostname }}"
+defaultAlertDevSysName s "{{ $alert->sysName }}"
+defaultAlertDevMgmtIP s "{{ $alert->ip }}"
+defaultAlertDevOS s "{{ $alert->os }}"
+defaultAlertDevType s "{{ $alert->type }}"
+defaultAlertDevHardware s "{{ $alert->hardware }}"
+defaultAlertDevVersion s "{{ $alert->version }}"
+defaultAlertDevLocation s "{{ $alert->location }}"
+defaultAlertDevUptime t {{ $alert->uptime }}
+defaultAlertDevShortUptime s "{{ $alert->uptime_short }}"
+defaultAlertACKNotes s "{{ $alert->alert_notes }}"
 @if ($alert->faults)
 @foreach ($alert->faults as $key => $value)
-lnmsDaFaultDetail.{{ $key }} s "{{ $value['string'] }}"
+defaultAlertFaultDetail.{{ $key }} s "{{ $value['string'] }}"
 @endforeach
 @endif
 ```

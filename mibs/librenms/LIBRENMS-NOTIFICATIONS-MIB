@@ -12,7 +12,7 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
             FROM SNMPv2-CONF;
 
 
-    lnmsNotifications MODULE-IDENTITY
+    notifications MODULE-IDENTITY
     LAST-UPDATED "202602170000Z"
     ORGANIZATION "LibreNMS"
     CONTACT-INFO
@@ -35,11 +35,11 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
             LibreNMS alert template variables.
     "
 
-    ::= { lnmsAlerting 1 }
+    ::= { alerting 1 }
 
 
     librenms     OBJECT IDENTIFIER ::= { enterprises 60652 }
-    lnmsAlerting OBJECT IDENTIFIER ::= { librenms 1 }
+    alerting OBJECT IDENTIFIER ::= { librenms 1 }
 
 --------------------------------
 --
@@ -47,12 +47,12 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
 --
 --------------------------------
 
-    lnmsDefaultAlert OBJECT IDENTIFIER
-    ::= { lnmsNotifications 1 }
+    defaultAlert OBJECT IDENTIFIER
+    ::= { notifications 1 }
 
     -- Alert identification
 
-    lnmsDaTitle OBJECT-TYPE
+    defaultAlertTitle OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -60,9 +60,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Human-readable alert title."
     REFERENCE
     "$alert->title"
-    ::= { lnmsDefaultAlert 1 }
+    ::= { defaultAlert 1 }
 
-    lnmsDaAlertID OBJECT-TYPE
+    defaultAlertID OBJECT-TYPE
     SYNTAX     Integer32
     MAX-ACCESS read-only
     STATUS     current
@@ -71,27 +71,27 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     events (state changes) related to a single alert occurrence."
     REFERENCE
     "$alert->id"
-    ::= { lnmsDefaultAlert 2 }
+    ::= { defaultAlert 2 }
 
-    lnmsDaEventID OBJECT-TYPE
+    defaultAlertEventID OBJECT-TYPE
     SYNTAX     Integer32
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
     "Unique identifier for the individual event (state change).
-    Multiple events may share the same lnmsDaAlertID."
+    Multiple events may share the same defaultAlertID."
     REFERENCE
     "$alert->uid"
-    ::= { lnmsDefaultAlert 3 }
+    ::= { defaultAlert 3 }
 
-    lnmsDaState OBJECT-TYPE
+    defaultAlertState OBJECT-TYPE
     SYNTAX     INTEGER
     {
-        lnmsCLEAR(0),
-        lnmsACTIVE(1),
-        lnmsACKNOWLEDGED(2),
-        lnmsWORSE(3),
-        lnmsBETTER(4)
+        stateClear(0),
+        stateActive(1),
+        stateAcknowledged(2),
+        stateWorse(3),
+        stateBetter(4)
     }
     MAX-ACCESS read-only
     STATUS     current
@@ -104,9 +104,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
         BETTER            = 4"
     REFERENCE
     "$alert->state"
-    ::= { lnmsDefaultAlert 4 }
+    ::= { defaultAlert 4 }
 
-    lnmsDaSeverity OBJECT-TYPE
+    defaultAlertSeverity OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -115,9 +115,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
         ok, info, notice, warning, error, critical."
     REFERENCE
     "$alert->severity"
-    ::= { lnmsDefaultAlert 5 }
+    ::= { defaultAlert 5 }
 
-    lnmsDaRuleID OBJECT-TYPE
+    defaultAlertRuleID OBJECT-TYPE
     SYNTAX     Integer32
     MAX-ACCESS read-only
     STATUS     current
@@ -125,9 +125,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Internal identifier of the alert rule that triggered this alert."
     REFERENCE
     "$alert->rule_id"
-    ::= { lnmsDefaultAlert 6 }
+    ::= { defaultAlert 6 }
 
-    lnmsDaRuleName OBJECT-TYPE
+    defaultAlertRuleName OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -135,9 +135,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Human-readable name of the alert rule."
     REFERENCE
     "$alert->name"
-    ::= { lnmsDefaultAlert 7 }
+    ::= { defaultAlert 7 }
 
-    lnmsDaProcedure OBJECT-TYPE
+    defaultAlertProcedure OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -145,9 +145,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Optional URL linking to a documented remediation procedure (http/https)."
     REFERENCE
     "$alert->proc"
-    ::= { lnmsDefaultAlert 8 }
+    ::= { defaultAlert 8 }
 
-    lnmsDaACKNotes OBJECT-TYPE
+    defaultAlertACKNotes OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -155,9 +155,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Notes recorded when the alert was acknowledged."
     REFERENCE
     "$alert->alert_notes"
-    ::= { lnmsDefaultAlert 9 }
+    ::= { defaultAlert 9 }
 
-    lnmsDaTimestamp OBJECT-TYPE
+    defaultAlertTimestamp OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -166,25 +166,25 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     Format: YYYY-MM-DD HH:mm:ss (LibreNMS server timezone)."
     REFERENCE
     "$alert->timestamp"
-    ::= { lnmsDefaultAlert 10 }
+    ::= { defaultAlert 10 }
 
-    lnmsDaTimeElapsed OBJECT-TYPE
+    defaultAlertTimeElapsed OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
     "Human-readable elapsed time since the alert triggered.
-    Only meaningful on recovery (lnmsDaState = 0)."
+    Only meaningful on recovery (defaultAlertState = 0)."
     REFERENCE
     "$alert->elapsed"
-    ::= { lnmsDefaultAlert 11 }
+    ::= { defaultAlert 11 }
 
     -- Device information
 
-    lnmsDaDevice OBJECT IDENTIFIER
-    ::= { lnmsDefaultAlert 12 }
+    defaultAlertDevice OBJECT IDENTIFIER
+    ::= { defaultAlert 12 }
 
-    lnmsDaDeviceID OBJECT-TYPE
+    defaultAlertDeviceID OBJECT-TYPE
     SYNTAX     Integer32
     MAX-ACCESS read-only
     STATUS     current
@@ -192,9 +192,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Internal LibreNMS device identifier."
     REFERENCE
     "$alert->device_id"
-    ::= { lnmsDaDevice 1 }
+    ::= { defaultAlertDevice 1 }
 
-    lnmsDaDevHostname OBJECT-TYPE
+    defaultAlertDevHostname OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -202,9 +202,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Device hostname as stored in LibreNMS."
     REFERENCE
     "$alert->hostname"
-    ::= { lnmsDaDevice 2 }
+    ::= { defaultAlertDevice 2 }
 
-    lnmsDaDevSysName OBJECT-TYPE
+    defaultAlertDevSysName OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -212,9 +212,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Device sysName as reported by the device via SNMP."
     REFERENCE
     "$alert->sysName"
-    ::= { lnmsDaDevice 3 }
+    ::= { defaultAlertDevice 3 }
 
-    lnmsDaDevSysDescr OBJECT-TYPE
+    defaultAlertDevSysDescr OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -222,9 +222,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "System description (sysDescr) as reported by the device."
     REFERENCE
     "$alert->sysDescr"
-    ::= { lnmsDaDevice 4 }
+    ::= { defaultAlertDevice 4 }
 
-    lnmsDaDevMgmtIP OBJECT-TYPE
+    defaultAlertDevMgmtIP OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -232,9 +232,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Management IP address of the device."
     REFERENCE
     "$alert->ip"
-    ::= { lnmsDaDevice 5 }
+    ::= { defaultAlertDevice 5 }
 
-    lnmsDaDevOS OBJECT-TYPE
+    defaultAlertDevOS OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -242,9 +242,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Operating system identifier as known by LibreNMS."
     REFERENCE
     "$alert->os"
-    ::= { lnmsDaDevice 6 }
+    ::= { defaultAlertDevice 6 }
 
-    lnmsDaDevType OBJECT-TYPE
+    defaultAlertDevType OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -252,9 +252,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Device type classification (e.g. router, switch, server)."
     REFERENCE
     "$alert->type"
-    ::= { lnmsDaDevice 7 }
+    ::= { defaultAlertDevice 7 }
 
-    lnmsDaDevHardware OBJECT-TYPE
+    defaultAlertDevHardware OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -262,9 +262,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Hardware platform as reported by the device."
     REFERENCE
     "$alert->hardware"
-    ::= { lnmsDaDevice 8 }
+    ::= { defaultAlertDevice 8 }
 
-    lnmsDaDevVersion OBJECT-TYPE
+    defaultAlertDevVersion OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -272,9 +272,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Firmware or software version as reported by the device."
     REFERENCE
     "$alert->version"
-    ::= { lnmsDaDevice 9 }
+    ::= { defaultAlertDevice 9 }
 
-    lnmsDaDevFeatures OBJECT-TYPE
+    defaultAlertDevFeatures OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -282,9 +282,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Additional software feature information."
     REFERENCE
     "$alert->features"
-    ::= { lnmsDaDevice 10 }
+    ::= { defaultAlertDevice 10 }
 
-    lnmsDaDevSerial OBJECT-TYPE
+    defaultAlertDevSerial OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -292,9 +292,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Device serial number."
     REFERENCE
     "$alert->serial"
-    ::= { lnmsDaDevice 11 }
+    ::= { defaultAlertDevice 11 }
 
-    lnmsDaDevLocation OBJECT-TYPE
+    defaultAlertDevLocation OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -302,9 +302,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Physical location of the device."
     REFERENCE
     "$alert->location"
-    ::= { lnmsDaDevice 12 }
+    ::= { defaultAlertDevice 12 }
 
-    lnmsDaDevUptime OBJECT-TYPE
+    defaultAlertDevUptime OBJECT-TYPE
     SYNTAX     TimeTicks
     MAX-ACCESS read-only
     STATUS     current
@@ -312,9 +312,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Device uptime as reported by sysUpTime (hundredths of a second)."
     REFERENCE
     "$alert->uptime"
-    ::= { lnmsDaDevice 13 }
+    ::= { defaultAlertDevice 13 }
 
-    lnmsDaDevShortUptime OBJECT-TYPE
+    defaultAlertDevShortUptime OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -322,9 +322,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Uptime in compact human-readable form (e.g. 2d 3h 10m 5s)."
     REFERENCE
     "$alert->uptime_short"
-    ::= { lnmsDaDevice 14 }
+    ::= { defaultAlertDevice 14 }
 
-    lnmsDaDevLongUptime OBJECT-TYPE
+    defaultAlertDevLongUptime OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -332,9 +332,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Uptime in long human-readable form (e.g. 2 days 3 hours 10 minutes 5 seconds)."
     REFERENCE
     "$alert->uptime_long"
-    ::= { lnmsDaDevice 15 }
+    ::= { defaultAlertDevice 15 }
 
-    lnmsDaDevPurpose OBJECT-TYPE
+    defaultAlertDevPurpose OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -342,9 +342,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Free-text description / purpose of the device."
     REFERENCE
     "$alert->description"
-    ::= { lnmsDaDevice 16 }
+    ::= { defaultAlertDevice 16 }
 
-    lnmsDaDevNotes OBJECT-TYPE
+    defaultAlertDevNotes OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -352,11 +352,11 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Operator notes stored against the device in LibreNMS."
     REFERENCE
     "$alert->notes"
-    ::= { lnmsDaDevice 17 }
+    ::= { defaultAlertDevice 17 }
 
     -- Ping statistics (available when ICMP monitoring is enabled)
 
-    lnmsDaDevPingLoss OBJECT-TYPE
+    defaultAlertDevPingLoss OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -364,9 +364,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Percentage of ICMP echo requests that received no reply."
     REFERENCE
     "$alert->ping_loss"
-    ::= { lnmsDaDevice 18 }
+    ::= { defaultAlertDevice 18 }
 
-    lnmsDaDevPingMin OBJECT-TYPE
+    defaultAlertDevPingMin OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -374,9 +374,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Minimum round-trip time for ICMP echo (ms)."
     REFERENCE
     "$alert->ping_min"
-    ::= { lnmsDaDevice 19 }
+    ::= { defaultAlertDevice 19 }
 
-    lnmsDaDevPingMax OBJECT-TYPE
+    defaultAlertDevPingMax OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -384,9 +384,9 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Maximum round-trip time for ICMP echo (ms)."
     REFERENCE
     "$alert->ping_max"
-    ::= { lnmsDaDevice 20 }
+    ::= { defaultAlertDevice 20 }
 
-    lnmsDaDevPingAvg OBJECT-TYPE
+    defaultAlertDevPingAvg OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
@@ -394,73 +394,73 @@ LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
     "Average round-trip time for ICMP echo (ms)."
     REFERENCE
     "$alert->ping_avg"
-    ::= { lnmsDaDevice 21 }
+    ::= { defaultAlertDevice 21 }
 
     -- Fault detail table
 
-    lnmsDaFaultTable OBJECT-TYPE
-    SYNTAX     SEQUENCE OF LnmsDaFaultTableEntry
+    defaultAlertFaultTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF DefaultAlertFaultTableEntry
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
     "Table of active faults included in this alert.  The index
     corresponds to the position in the fault list and may change
     between events."
-    ::= { lnmsDefaultAlert 13 }
+    ::= { defaultAlert 13 }
 
-    lnmsDaFaultTableEntry OBJECT-TYPE
-    SYNTAX     LnmsDaFaultTableEntry
+    defaultAlertFaultTableEntry OBJECT-TYPE
+    SYNTAX     DefaultAlertFaultTableEntry
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
     "A single fault entry."
-    INDEX { lnmsDaFaultTableEntryID }
-    ::= { lnmsDaFaultTable 1 }
+    INDEX { defaultAlertFaultEntryID }
+    ::= { defaultAlertFaultTable 1 }
 
-    LnmsDaFaultTableEntry ::=
+    DefaultAlertFaultTableEntry ::=
     SEQUENCE
     {
-        lnmsDaFaultTableEntryID     Unsigned32,
-        lnmsDaFaultDetail           OCTET STRING
+        defaultAlertFaultEntryID     Unsigned32,
+        defaultAlertFaultDetail           OCTET STRING
     }
 
-    lnmsDaFaultTableEntryID OBJECT-TYPE
+    defaultAlertFaultEntryID OBJECT-TYPE
     SYNTAX     Unsigned32
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
     "Table row index.  Not a stable fault identifier."
-    ::= { lnmsDaFaultTableEntry 1 }
+    ::= { defaultAlertFaultTableEntry 1 }
 
-    lnmsDaFaultDetail OBJECT-TYPE
+    defaultAlertFaultDetail OBJECT-TYPE
     SYNTAX     OCTET STRING
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
     "Full detail string for this fault entry."
-    ::= { lnmsDaFaultTableEntry 2 }
+    ::= { defaultAlertFaultTableEntry 2 }
 
     -- Notification definition
 
-    lnmsDefaultAlertEvent NOTIFICATION-TYPE
+    defaultAlertEvent NOTIFICATION-TYPE
     OBJECTS
     {
-        lnmsDaTitle, lnmsDaAlertID, lnmsDaEventID, lnmsDaState,
-        lnmsDaSeverity, lnmsDaRuleID, lnmsDaRuleName, lnmsDaProcedure,
-        lnmsDaACKNotes, lnmsDaTimestamp, lnmsDaTimeElapsed,
-        lnmsDaDeviceID, lnmsDaDevHostname, lnmsDaDevSysName,
-        lnmsDaDevSysDescr, lnmsDaDevMgmtIP, lnmsDaDevOS, lnmsDaDevType,
-        lnmsDaDevHardware, lnmsDaDevVersion, lnmsDaDevFeatures,
-        lnmsDaDevSerial, lnmsDaDevLocation, lnmsDaDevUptime,
-        lnmsDaDevShortUptime, lnmsDaDevLongUptime,
-        lnmsDaDevPurpose, lnmsDaDevNotes,
-        lnmsDaDevPingLoss, lnmsDaDevPingMin, lnmsDaDevPingMax, lnmsDaDevPingAvg,
-        lnmsDaFaultDetail
+        defaultAlertTitle, defaultAlertID, defaultAlertEventID, defaultAlertState,
+        defaultAlertSeverity, defaultAlertRuleID, defaultAlertRuleName, defaultAlertProcedure,
+        defaultAlertACKNotes, defaultAlertTimestamp, defaultAlertTimeElapsed,
+        defaultAlertDeviceID, defaultAlertDevHostname, defaultAlertDevSysName,
+        defaultAlertDevSysDescr, defaultAlertDevMgmtIP, defaultAlertDevOS, defaultAlertDevType,
+        defaultAlertDevHardware, defaultAlertDevVersion, defaultAlertDevFeatures,
+        defaultAlertDevSerial, defaultAlertDevLocation, defaultAlertDevUptime,
+        defaultAlertDevShortUptime, defaultAlertDevLongUptime,
+        defaultAlertDevPurpose, defaultAlertDevNotes,
+        defaultAlertDevPingLoss, defaultAlertDevPingMin, defaultAlertDevPingMax, defaultAlertDevPingAvg,
+        defaultAlertFaultDetail
     }
     STATUS  current
     DESCRIPTION
     "Notification generated by the LibreNMS SNMP Trap transport for any
     alert using the default catch-all template."
-    ::= { lnmsNotifications 2 }
+    ::= { notifications 2 }
 
 END

@@ -202,9 +202,9 @@ class Snmptrap extends Transport
                 [
                     'title' => 'Trap OID',
                     'name' => 'snmptrap-definition',
-                    'descr' => 'Trap notification OID, e.g. LIBRENMS-NOTIFICATIONS-MIB::lnmsDefaultAlertEvent',
+                    'descr' => 'Trap notification OID, e.g. LIBRENMS-NOTIFICATIONS-MIB::defaultAlertEvent',
                     'type' => 'text',
-                    'default' => 'LIBRENMS-NOTIFICATIONS-MIB::lnmsDefaultAlertEvent',
+                    'default' => 'LIBRENMS-NOTIFICATIONS-MIB::defaultAlertEvent',
                 ],
                 [
                     'title' => 'PDU Type',
