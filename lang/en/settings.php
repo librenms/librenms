@@ -2101,7 +2101,7 @@ return [
         ],
         'service_poller_frequency' => [
             'description' => 'Poller Frequency (Warning!)',
-            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! This should normally be null to match the rrd step option, otherwise you may break graphs. See docs for more info.',
+            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! This should normally be blank/null to match the rrd step option, otherwise you may break graphs. See docs for more info.',
         ],
         'service_poller_down_retry' => [
             'description' => 'Device Down Retry',
