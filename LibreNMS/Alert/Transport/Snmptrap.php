@@ -28,6 +28,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use App\Facades\LibrenmsConfig;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use Symfony\Component\Process\Process;
@@ -72,12 +73,14 @@ class Snmptrap extends Transport
             $cmd[] = $arg;
         }
 
-        $process = new Process(
-            $cmd,
-            null,
-            ['SNMP_PERSISTENT_FILE' => sys_get_temp_dir() . '/snmpapp.conf']
-        );
+        /** @var Process $process */
+        $process = app()->make(Process::class, ['command' => $cmd]);
+        $process->setEnv(['SNMP_PERSISTENT_FILE' => sys_get_temp_dir() . '/snmpapp.conf']);
+        $process->setTimeout(30);
+
+        Log::debug('[SNMPTRAP] ' . $process->getCommandLine());
         $process->run();
+        Log::debug('[SNMPTRAP] exit=' . $process->getExitCode() . ' ' . $process->getErrorOutput());
 
         if (! $process->isSuccessful()) {
             throw new AlertTransportDeliveryException(
@@ -223,7 +226,7 @@ class Snmptrap extends Transport
                 ],
             ],
             'validation' => [
-                'snmptrap-destination-host' => 'required|string',
+                'snmptrap-destination-host' => 'required|ip_or_hostname',
                 'snmptrap-destination-port' => 'nullable|integer|between:1,65535',
                 'snmptrap-transport' => 'in:UDP,TCP',
                 'snmptrap-community' => 'required|string',
