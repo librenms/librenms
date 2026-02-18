@@ -24,7 +24,7 @@ if (is_array($oids)) {
 
             create_state_index($descr, $states);
 
-            discover_sensor(null, 'state', $device, $cur_oid . $index, $index, 'dellme', $descr, '1', '1', null, null, null, null, $value);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid . $index, $index, 'dellme', $descr, '1', '1', null, null, null, null, $value);
         }
     }
 }

@@ -51,7 +51,7 @@ if (is_array($statuses)) {
 
         discover_sensor(
             null,
-            'state',
+            $sensor_class,
             $device,
             $oid,
             $index,
@@ -99,7 +99,7 @@ if (is_array($statuses)) {
 
         discover_sensor(
             null,
-            'state',
+            $sensor_class,
             $device,
             $oid,
             $index,

@@ -36,7 +36,7 @@ if (! empty($pre_cache['raspberry_pi_sensors'])) {
             ];
             create_state_index($state_name, $states);
 
-            discover_sensor(null, 'state', $device, $oid . $codec, $codec, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $codec);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $oid . $codec, $codec, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $codec);
         } else {
             break;
         }

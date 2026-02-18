@@ -13,6 +13,7 @@
  */
 
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Util\Number;
 
 $oids = snmp_walk($device, 'eqlMemberHealthStatus', '-OQne', 'EQLMEMBER-MIB', 'equallogic');
@@ -61,7 +62,7 @@ if (! empty($oids)) {
             $index = (int) Number::cast($num_index);
             $low_limit = 0.5;
             $high_limit = 2.5;
-            discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, $low_limit, $low_limit, $high_limit, $high_limit, $current, 'snmp', $index);
+            discover_sensor(null, SensorEnum::STATE, $device, $oid, $index, $state_name, $descr, 1, 1, $low_limit, $low_limit, $high_limit, $high_limit, $current, 'snmp', $index);
         }
     }
 }
@@ -114,7 +115,7 @@ if (! empty($oids1)) {
                 $index = (100 + $index);
                 $low_limit = 0.5;
                 $high_limit = 1.5;
-                discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, $low_limit, $low_limit, $high_limit, $high_limit, $pstatus, 'snmp', $index);
+                discover_sensor(null, SensorEnum::STATE, $device, $oid, $index, $state_name, $descr, 1, 1, $low_limit, $low_limit, $high_limit, $high_limit, $pstatus, 'snmp', $index);
             }
         }//end if
     }//end foreach
@@ -157,7 +158,7 @@ if (! empty($oids_disks)) {
                 $index = 'eqlDiskStatus.' . $disk_index;
                 $low_limit = 0.5;
                 $high_limit = 1.5;
-                discover_sensor(null, 'state', $device, $oid, $index, $state_name, "Disk $disk_index - $descr", 1, 1, $low_limit, $low_limit, $high_limit, $high_limit, $pstatus, 'snmp', $index);
+                discover_sensor(null, SensorEnum::STATE, $device, $oid, $index, $state_name, "Disk $disk_index - $descr", 1, 1, $low_limit, $low_limit, $high_limit, $high_limit, $pstatus, 'snmp', $index);
                 unset(
                     $index,
                     $low_limit,

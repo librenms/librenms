@@ -65,7 +65,7 @@ if (Arr::exists($teracom_devices, $device['hardware'])) {
             $low_limit = $t_data[1]['MINInt'];
             $current = $t_data[1]['Int'];
 
-            discover_sensor(null, 'humidity', $device, $oid, $index, 'teracom', $t_data['description'], $divisor, '1', $low_limit, null, null, $high_limit, $current);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::HUMIDITY, $device, $oid, $index, 'teracom', $t_data['description'], $divisor, '1', $low_limit, null, null, $high_limit, $current);
         }
     }
 }

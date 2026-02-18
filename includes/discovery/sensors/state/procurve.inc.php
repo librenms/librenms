@@ -39,5 +39,5 @@ foreach (snmpwalk_cache_oid($device, 'hpicfSensorTable', [], 'HP-ICF-CHASSIS', n
     ];
     create_state_index($state_name, $states);
 
-    discover_sensor(null, 'state', $device, $state_oid . $index, $state_index, $state_name, $state_descr, '1', '1', null, null, null, null, $state);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $state_oid . $index, $state_index, $state_name, $state_descr, '1', '1', null, null, null, null, $state);
 }

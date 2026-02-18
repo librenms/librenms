@@ -3,7 +3,7 @@
 use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Util\Html;
 
-$sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_class)->where('group', '!=', 'transceiver')->sortBy([
+$sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', SensorEnum::from($sensor_class))->where('group', '!=', 'transceiver')->sortBy([
     ['group', 'asc'],
     ['sensor_descr', 'asc'],
 ]); // cache all sensors on device and exclude transceivers

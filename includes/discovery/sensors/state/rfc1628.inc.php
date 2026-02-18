@@ -27,7 +27,7 @@ if (is_numeric($state)) {
     $sensor_index = 0;
     discover_sensor(
         null,
-        'state',
+        $sensor_class,
         $device,
         '.1.3.6.1.2.1.33.1.2.1.0',
         $sensor_index,
@@ -66,7 +66,7 @@ if (is_numeric($state)) {
     $sensor_index = 0;
     discover_sensor(
         null,
-        'state',
+        $sensor_class,
         $device,
         '.1.3.6.1.2.1.33.1.4.1.0',
         $sensor_index,
@@ -104,7 +104,7 @@ if (is_numeric($state)) {
     $sensor_index = 0;
     discover_sensor(
         null,
-        'state',
+        $sensor_class,
         $device,
         '.1.3.6.1.2.1.33.1.7.3.0',
         $sensor_index,

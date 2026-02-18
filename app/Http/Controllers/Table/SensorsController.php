@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Validation\Rule;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Url;
@@ -49,9 +50,9 @@ class SensorsController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
-        $class = $request->input('class');
+        $class = SensorEnum::tryFrom($request->input('class'));
         $relations = [];
-        if ($class == 'state') {
+        if ($class === SensorEnum::STATE) {
             $relations[] = 'translations';
         }
 
@@ -79,7 +80,7 @@ class SensorsController extends TableController
         ];
 
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $sensor->device]);
-        $link = Url::generate(['page' => 'device', 'device' => $sensor['device_id'], 'tab' => 'health', 'metric' => $sensor->sensor_class]);
+        $link = Url::generate(['page' => 'device', 'device' => $sensor['device_id'], 'tab' => 'health', 'metric' => $sensor->sensor_class->value]);
         $descr = Url::graphPopup($graph_array, $sensor->sensor_descr, $link);
         $mini_graph = Url::graphPopup($graph_array);
         $sensor_current = Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
@@ -137,7 +138,7 @@ class SensorsController extends TableController
             $sensor->formatValue(),
             $sensor->formatValue('sensor_limit_low'),
             $sensor->formatValue('sensor_limit'),
-            $sensor->sensor_class,
+            $sensor->sensor_class->value,
             $sensor->sensor_type,
         ];
     }

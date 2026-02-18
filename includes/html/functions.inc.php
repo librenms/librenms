@@ -614,7 +614,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     }
 
     if (isset($tmp_alerts['sensor_id'])) {
-        if ($tmp_alerts['sensor_class'] == 'state') {
+        if ($tmp_alerts['sensor_class'] == \LibreNMS\Enum\Sensor::STATE->value) {
             // Give more details for a state (textual form)
             $details = 'State: ' . ($tmp_alerts['state_descr'] ?? '') . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
         } else {

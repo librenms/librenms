@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 for ($i = 1; $i <= 3; $i++) {
     $current_oid = ".1.3.6.1.4.1.6050.5.4.1.1.3.$i";
     $descr = "Input Phase $i";
@@ -11,7 +13,7 @@ for ($i = 1; $i <= 3; $i++) {
     $warnlimit = null;
     $limit = null;
 
-    discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', $lowlimit, null, null, null, $current);
+    discover_sensor(null, SensorEnum::CURRENT, $device, $current_oid, $index, $type, $descr, '1', '1', $lowlimit, null, null, null, $current);
 }
 
 for ($i = 1; $i <= 3; $i++) {
@@ -25,5 +27,5 @@ for ($i = 1; $i <= 3; $i++) {
     $warnlimit = null;
     $limit = null;
 
-    discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', $lowlimit, null, null, null, $current);
+    discover_sensor(null, SensorEnum::CURRENT, $device, $current_oid, $index, $type, $descr, '1', '1', $lowlimit, null, null, null, $current);
 }

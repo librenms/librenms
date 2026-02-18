@@ -6,6 +6,7 @@
  */
 
 use Illuminate\Support\Str;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 $sensor_oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.1';
 $value = snmp_get($device, $sensor_oid, '-Oqve');
@@ -13,7 +14,7 @@ $value = trim($value, '"');
 if (is_numeric($value)) {
     $sensor_type = 'raspberry_temp';
     $descr = 'CPU Temp';
-    discover_sensor(null, 'temperature', $device, $sensor_oid, 1, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
+    discover_sensor(null, SensorEnum::TEMPERATURE, $device, $sensor_oid, 1, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
 }
 
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.232.')) {
@@ -37,7 +38,7 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.232.')) {
             $threshold = snmp_get($device, $threshold_oid, '-Oqv', '');
 
             if (! empty($temperature)) {
-                discover_sensor(null, 'temperature', $device, $temperature_oid, $oid, 'hpilo', $descr, '1', '1', null, null, null, $threshold, $temperature);
+                discover_sensor(null, SensorEnum::TEMPERATURE, $device, $temperature_oid, $oid, 'hpilo', $descr, '1', '1', null, null, null, $threshold, $temperature);
             }
         }
     }
@@ -54,7 +55,7 @@ if (preg_match('/(Linux).+(ntc)/', (string) $device['sysDescr'])) {
     $index = '116.1';
     $value = snmp_get($device, $oid . $index, '-Oqv');
     if (is_numeric($value)) {
-        discover_sensor(null, 'temperature', $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+        discover_sensor(null, SensorEnum::TEMPERATURE, $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
 }
 

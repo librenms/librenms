@@ -10,7 +10,7 @@ if (is_numeric($secs_on_battery)) {
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'runtime', $secs_on_battery_oid);
     discover_sensor(
         null,
-        'runtime',
+        $sensor_class,
         $device,
         $secs_on_battery_oid,
         100,
@@ -34,7 +34,7 @@ if (is_numeric($est_battery_time)) {
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'runtime', $est_battery_time_oid);
     discover_sensor(
         null,
-        'runtime',
+        $sensor_class,
         $device,
         $est_battery_time_oid,
         200,

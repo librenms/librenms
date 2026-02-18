@@ -29,6 +29,6 @@ if (is_array($temp)) {
     foreach ($temp as $index => $entry) {
         $descr = $temp[$index]['trpzSysPowerSupplyDescr'];
         //Discover Sensors
-        discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index]['trpzSysPowerSupplyStatus'], 'snmp', $index);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index]['trpzSysPowerSupplyStatus'], 'snmp', $index);
     }
 }

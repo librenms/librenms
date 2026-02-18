@@ -35,6 +35,6 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         $entPhysicalIndex_measured = 'ports';
 
         $descr = $port->getShortLabel() . ' Bias Current';
-        discover_sensor(null, 'current', $device, $oid, 'bias-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
+        discover_sensor(null, \LibreNMS\Enum\Sensor::CURRENT, $device, $oid, 'bias-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 }

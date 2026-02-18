@@ -41,7 +41,7 @@ foreach ($oids as $index => $sensor) {
         $limit_low_warn = $sensor['externalSensorLowerCriticalThreshold'] / $divisor;
         $offset++;
         if (is_numeric($hum_current) && $hum_current >= 0) {
-            discover_sensor(null, 'humidity', $device, $oid, $offset, 'raritan', $descr, $divisor, $multiplier, $limit_low, $limit_low_warn, $limit_high_warn, $limit_high, $hum_current);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::HUMIDITY, $device, $oid, $offset, 'raritan', $descr, $divisor, $multiplier, $limit_low, $limit_low_warn, $limit_high_warn, $limit_high, $hum_current);
         }
     }
 }

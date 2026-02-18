@@ -53,7 +53,7 @@ if ($in_phaseNum == '1') {
 
         discover_sensor(
             null,
-            'frequency',
+            $sensor_class,
             $device,
             $in_frequency_oid,
             $index,
@@ -85,7 +85,7 @@ if ($in_phaseNum == '1') {
 
         discover_sensor(
             null,
-            'frequency',
+            $sensor_class,
             $device,
             $out_frequency_oid,
             $index,
@@ -121,7 +121,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'frequency',
+            $sensor_class,
             $device,
             $in_frequency_oid,
             $index,
@@ -153,7 +153,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'frequency',
+            $sensor_class,
             $device,
             $in_frequency_oid,
             $index,
@@ -185,7 +185,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'frequency',
+            $sensor_class,
             $device,
             $in_frequency_oid,
             $index,

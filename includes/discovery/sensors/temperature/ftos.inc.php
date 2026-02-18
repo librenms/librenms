@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 // Force10 S-Series
 // F10-S-SERIES-CHASSIS-MIB::chStackUnitTemp.1 = Gauge32: 47
 // F10-S-SERIES-CHASSIS-MIB::chStackUnitModelID.1 = STRING: S25-01-GE-24V
@@ -13,7 +15,7 @@ if (is_array($oids)) {
         $descr = 'Unit ' . $index . ' ' . $entry['chStackUnitSysType'];
         $oid = '.1.3.6.1.4.1.6027.3.10.1.2.2.1.14.' . $index;
         $current = $entry['chStackUnitTemp'];
-        discover_sensor(null, 'temperature', $device, $oid, $index, 'ftos-sseries', $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::TEMPERATURE, $device, $oid, $index, 'ftos-sseries', $descr, '1', '1', null, null, null, null, $current);
     }
 }
 
@@ -23,7 +25,7 @@ if (is_array($oids)) {
         $entry['descr'] = 'Slot ' . $index;
         $entry['oid'] = '.1.3.6.1.4.1.6027.3.8.1.2.1.1.5.' . $index;
         $entry['current'] = $entry['chSysCardTemp'];
-        discover_sensor(null, 'temperature', $device, $entry['oid'], $index, 'ftos-cseries', $entry['descr'], '1', '1', null, null, null, null, $entry['current']);
+        discover_sensor(null, SensorEnum::TEMPERATURE, $device, $entry['oid'], $index, 'ftos-cseries', $entry['descr'], '1', '1', null, null, null, null, $entry['current']);
     }
 }
 
@@ -37,6 +39,6 @@ if (is_array($oids)) {
         $oid = '.1.3.6.1.4.1.6027.3.1.1.2.3.1.8.' . $index;
         $current = $entry['chSysCardUpperTemp'];
 
-        discover_sensor(null, 'temperature', $device, $oid, $index, 'ftos-eseries', $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::TEMPERATURE, $device, $oid, $index, 'ftos-eseries', $descr, '1', '1', null, null, null, null, $current);
     }
 }

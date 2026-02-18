@@ -36,7 +36,7 @@ foreach ((array) $temp as $index => $entry) {
         (isset($entry['voltageProbeUpperNonCriticalThreshold'])) ? $warnlimit = $entry['voltageProbeUpperNonCriticalThreshold'] / $divisor : $warnlimit = null;
         (isset($entry['voltageProbeUpperCriticalThreshold'])) ? $limit = $entry['voltageProbeUpperCriticalThreshold'] / $divisor : $limit = null;
 
-        discover_sensor(null, 'voltage', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::VOLTAGE, $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
     }
 
     unset(

@@ -13,7 +13,7 @@ if (is_array($oids)) {
             $oid = '.1.3.6.1.4.1.4874.2.2.2.1.9.4.1.3.' . $index;
             $current = $entry['juniSystemTempValue'];
 
-            discover_sensor(null, 'temperature', $device, $oid, $index, 'junose', $descr, '1', '1', null, null, null, null, $current);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $oid, $index, 'junose', $descr, '1', '1', null, null, null, null, $current);
         }
     }
 }

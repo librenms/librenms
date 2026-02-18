@@ -57,7 +57,7 @@ foreach ($sensors as $sensor) {
         create_state_index($state_name, $states);
 
         $descr = $sensor['descr'];
-        discover_sensor(null, 'state', $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp);
     }
 }
 

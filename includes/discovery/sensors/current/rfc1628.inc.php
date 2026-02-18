@@ -13,7 +13,7 @@ if (is_numeric($battery_current)) {
 
     discover_sensor(
         null,
-        'current',
+        $sensor_class,
         $device,
         $oid,
         500,
@@ -51,7 +51,7 @@ foreach ($output_current as $index => $data) {
 
     discover_sensor(
         null,
-        'current',
+        $sensor_class,
         $device,
         $oid,
         $index,
@@ -89,7 +89,7 @@ foreach ($input_current as $index => $data) {
 
     discover_sensor(
         null,
-        'current',
+        $sensor_class,
         $device,
         $oid,
         100 + $index,
@@ -127,7 +127,7 @@ foreach ($bypass_current as $index => $data) {
 
     discover_sensor(
         null,
-        'current',
+        $sensor_class,
         $device,
         $oid,
         200 + $index,

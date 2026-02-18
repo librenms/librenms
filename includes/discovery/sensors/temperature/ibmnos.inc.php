@@ -21,7 +21,7 @@ if (strstr((string) $device['sysDescr'], 'IBM Flex System Fabric')) {
             $divisor = '1';
             $multiplier = '1';
             $type = 'ibmnos';
-            discover_sensor(null, 'temperature', $device, $obj, $index, $type, $descr, $divisor, $multiplier, null, null, null, null, $current);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $obj, $index, $type, $descr, $divisor, $multiplier, null, null, null, null, $current);
         }
     }
 }

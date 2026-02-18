@@ -31,7 +31,7 @@ foreach ($load_data as $index => $data) {
 
     discover_sensor(
         null,
-        'load',
+        $sensor_class,
         $device,
         $load_oid,
         500 + $index,

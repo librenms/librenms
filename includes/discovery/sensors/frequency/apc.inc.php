@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.8.5.3.2.1.4', '-OsqnU', '');
 d_echo($oids . "\n");
 
@@ -17,7 +19,7 @@ foreach (explode("\n", (string) $oids) as $data) {
         $index = $split_oid[count($split_oid) - 1];
         $oid = '.1.3.6.1.4.1.318.1.1.8.5.3.2.1.4.' . $index;
         $descr = 'Input Feed ' . chr(64 + $index);
-        discover_sensor(null, 'frequency', $device, $oid, "3.2.1.4.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::FREQUENCY, $device, $oid, "3.2.1.4.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
     }
 }
 
@@ -42,7 +44,7 @@ foreach (explode("\n", (string) $oids) as $data) {
             $descr .= " $index";
         }
 
-        discover_sensor(null, 'frequency', $device, $oid, "4.2.1.4.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::FREQUENCY, $device, $oid, "4.2.1.4.$index", $type, $descr, $divisor, '1', null, null, null, null, $current);
     }
 }
 
@@ -65,7 +67,7 @@ if ($oids) {
     [$oid,$current] = explode(' ', $oids);
     $type = 'apc';
     $descr = 'Input';
-    discover_sensor(null, 'frequency', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
+    discover_sensor(null, SensorEnum::FREQUENCY, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
 }
 
 // upsHighPrecOutputFrequency
@@ -87,5 +89,5 @@ if ($oids) {
     [$oid,$current] = explode(' ', $oids);
     $type = 'apc';
     $descr = 'Output';
-    discover_sensor(null, 'frequency', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
+    discover_sensor(null, SensorEnum::FREQUENCY, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
 }

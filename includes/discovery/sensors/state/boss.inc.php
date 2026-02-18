@@ -53,7 +53,7 @@ if ($device['os'] === 'boss') {
                 $descr = "BOSS Unit $unit: $entry[s5ChasComDescr]";
             }
             //Discover Sensors
-            discover_sensor(null, 'state', $device, $cur_oid . $index, "s5ChasComOperState.$index", $state_name, $descr, 1, 1, null, null, null, null, $entry['s5ChasComOperState']);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $cur_oid . $index, "s5ChasComOperState.$index", $state_name, $descr, 1, 1, null, null, null, null, $entry['s5ChasComOperState']);
             $temp_unit = $unit;
         }
     }

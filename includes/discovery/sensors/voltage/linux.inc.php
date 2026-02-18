@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 /*
  * voltages for raspberry pi
  * requires snmp extend agent script from librenms-agent
@@ -24,7 +26,7 @@ if (! empty($pre_cache['raspberry_pi_sensors'])) {
         }
         $value = current($pre_cache['raspberry_pi_sensors']['raspberry.' . $volt]);
         if (is_numeric($value)) {
-            discover_sensor(null, 'voltage', $device, $oid . $volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
+            discover_sensor(null, SensorEnum::VOLTAGE, $device, $oid . $volt, $volt, $sensor_type, $descr, '1', '1', null, null, null, null, $value);
         } else {
             break;
         }
@@ -62,7 +64,7 @@ foreach (explode("\n", $oids) as $data) {
             $descr = trim(str_ireplace('Voltage', '', $descr));
 
             if ($monitor == 'true') {
-                discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', $lowlimit, null, null, $limit, $current);
+                discover_sensor(null, SensorEnum::VOLTAGE, $device, $volt_oid, $index, $type, $descr, $divisor, '1', $lowlimit, null, null, $limit, $current);
             }
         }
     }//end if
@@ -79,13 +81,13 @@ if (preg_match('/(Linux).+(ntc)/', (string) $device['sysDescr'])) {
     $index = '116.2';
     $value = snmp_get($device, $oid . $index, '-Oqv');
     if (is_numeric($value)) {
-        discover_sensor(null, 'voltage', $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+        discover_sensor(null, SensorEnum::VOLTAGE, $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
     $descr = 'VBUS voltage';
     $index = '116.4';
     $value = snmp_get($device, $oid . $index, '-Oqv');
     if (is_numeric($value)) {
-        discover_sensor(null, 'voltage', $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+        discover_sensor(null, SensorEnum::VOLTAGE, $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
     $lowlimit = 2.75;
     $lowwarnlimit = 2.8;
@@ -95,6 +97,6 @@ if (preg_match('/(Linux).+(ntc)/', (string) $device['sysDescr'])) {
     $index = '116.6';
     $value = snmp_get($device, $oid . $index, '-Oqv');
     if (is_numeric($value)) {
-        discover_sensor(null, 'voltage', $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+        discover_sensor(null, SensorEnum::VOLTAGE, $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
 }

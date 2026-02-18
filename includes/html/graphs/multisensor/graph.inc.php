@@ -38,7 +38,7 @@ if ($stacked_mode) {
 $sensor_class = $sensors[0]->sensor_class;
 foreach ($sensors as $sensor) {
     if ($sensor->sensor_class !== $sensor_class) {
-        throw new RrdGraphException('All sensors must be of the same type. Mixed types: ' . $sensor_class . ' and ' . $sensor->sensor_class);
+        throw new RrdGraphException('All sensors must be of the same type. Mixed types: ' . $sensor_class->value . ' and ' . $sensor->sensor_class->value);
     }
 }
 

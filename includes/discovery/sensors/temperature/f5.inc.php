@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $f5_chassis = [];
 // Get the Chassis Temperature values
 //Pull the sysChassisTempTable table from the snmpwalk
@@ -14,7 +16,7 @@ if (is_array($f5_chassis)) {
         $sensorType = 'f5';
         $oid = '.1.3.6.1.4.1.3375.2.1.3.2.3.2.1.2.' . $index;
 
-        discover_sensor(null, 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, '1', '1', null, null, null, null, $current);
     }
 }
 
@@ -33,6 +35,6 @@ if (is_array($f5cpu)) {
         $sensorType = 'f5';
         $oid = '.1.3.6.1.4.1.3375.2.1.3.6.2.1.2.' . $index;
 
-        discover_sensor(null, 'temperature', $device, $oid, $index, $sensorType, $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::TEMPERATURE, $device, $oid, $index, $sensorType, $descr, '1', '1', null, null, null, null, $current);
     }
 }

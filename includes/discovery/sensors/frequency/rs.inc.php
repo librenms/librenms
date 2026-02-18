@@ -11,6 +11,6 @@ foreach ($oids as $id => $data) {
     $descr = (count($oids) > 1) ? 'Frequency ' . $id : 'Frequency';
     $type = 'rs';
     $current = $data['cmdExcFrequency'];
-    discover_sensor(null, 'frequency', $device, $num_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::FREQUENCY, $device, $num_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
     $count++;
 }

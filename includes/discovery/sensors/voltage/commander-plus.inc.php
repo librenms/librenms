@@ -30,4 +30,4 @@ $multiplier = 1;
 $limit_low = 24;
 $limit = 57;
 $current = snmp_get($device, 'rectifierFloatVoltage.0', '-Oqv', 'CCPOWER-MIB');
-discover_sensor(null, 'voltage', $device, $oid, 'rectifierFloatVoltage', 'commander-plus', $descr, $divisor, $multiplier, $limit_low, null, null, $limit, $current);
+discover_sensor(null, \LibreNMS\Enum\Sensor::VOLTAGE, $device, $oid, 'rectifierFloatVoltage', 'commander-plus', $descr, $divisor, $multiplier, $limit_low, null, null, $limit, $current);

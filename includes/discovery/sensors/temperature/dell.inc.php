@@ -24,7 +24,7 @@ if (is_array($temp)) {
         (isset($temp[$index]['temperatureProbeUpperNonCriticalThreshold'])) ? $warnlimit = $temp[$index]['temperatureProbeUpperNonCriticalThreshold'] / $divisor : $warnlimit = null;
         (isset($temp[$index]['temperatureProbeUpperCriticalThreshold'])) ? $limit = $temp[$index]['temperatureProbeUpperCriticalThreshold'] / $divisor : $limit = null;
 
-        discover_sensor(null, 'temperature', $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::TEMPERATURE, $device, $cur_oid . $index, $index, 'dell', $descr, $divisor, '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $value, 'snmp', $index);
 
         unset(
             $descr,

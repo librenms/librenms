@@ -55,7 +55,7 @@ foreach ($snmp_data['nokiaIsamEqpBoardTable'] as $index => $data) {
         }
 
         //Discover Sensors
-        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current, 'snmp', null, null, null, $group);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current, 'snmp', null, null, null, $group);
     }
 }
 

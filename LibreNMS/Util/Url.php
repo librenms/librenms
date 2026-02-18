@@ -229,7 +229,7 @@ class Url
 
         $content .= "<div style=\'width: 850px\'>";
         $graph_array = [
-            'type' => $type ?: 'sensor_' . $sensor->sensor_class,
+            'type' => $type ?: 'sensor_' . $sensor->sensor_class->value,
             'legend' => 'yes',
             'height' => 100,
             'width' => 340,
@@ -280,7 +280,7 @@ class Url
 
     public static function sensorUrl($sensor, $vars = [])
     {
-        return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health', 'metric' => $sensor->sensor_class], $vars);
+        return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health', 'metric' => $sensor->sensor_class->value], $vars);
     }
 
     /**

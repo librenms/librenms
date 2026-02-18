@@ -26,13 +26,14 @@
 
 namespace App\Models\Traits;
 
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Enum\Severity;
 
 trait HasThresholds
 {
     public function currentStatus(): Severity
     {
-        if ($this->sensor_class == 'state' && $this instanceof \App\Models\Sensor) {
+        if ($this instanceof \App\Models\Sensor && $this->sensor_class === SensorEnum::STATE) {
             return $this->currentTranslation()?->severity() ?? Severity::Unknown;
         }
 
@@ -73,29 +74,34 @@ trait HasThresholds
 
     public function guessLimits(bool $high, bool $low): void
     {
+        // Convert to enum for matching (supports both Sensor with enum cast and WirelessSensor with string)
+        $class = $this->sensor_class instanceof SensorEnum ? $this->sensor_class : SensorEnum::tryFrom($this->sensor_class);
+
         if ($high) {
-            $this->sensor_limit = match ($this->sensor_class) {
-                'temperature' => $this->sensor_current + 20,
-                'voltage' => $this->sensor_current * 1.15,
-                'humidity' => 70,
-                'fanspeed' => $this->sensor_current * 1.80,
-                'power_factor' => 1,
-                'signal' => -30,
-                'load' => 80,
-                'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 1.05,
+            $this->sensor_limit = match ($class) {
+                SensorEnum::TEMPERATURE => $this->sensor_current + 20,
+                SensorEnum::VOLTAGE => $this->sensor_current * 1.15,
+                SensorEnum::HUMIDITY => 70,
+                SensorEnum::FANSPEED => $this->sensor_current * 1.80,
+                SensorEnum::POWER_FACTOR => 1,
+                SensorEnum::SIGNAL => -30,
+                SensorEnum::LOAD => 80,
+                SensorEnum::AIRFLOW, SensorEnum::SNR, SensorEnum::FREQUENCY,
+                SensorEnum::PRESSURE, SensorEnum::COOLING => $this->sensor_current * 1.05,
                 default => null,
             };
         }
 
         if ($low) {
-            $this->sensor_limit_low = match ($this->sensor_class) {
-                'temperature' => $this->sensor_current - 10,
-                'voltage' => $this->sensor_current * 0.85,
-                'humidity' => 30,
-                'fanspeed' => $this->sensor_current * 0.80,
-                'power_factor' => -1,
-                'signal' => -80,
-                'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 0.95,
+            $this->sensor_limit_low = match ($class) {
+                SensorEnum::TEMPERATURE => $this->sensor_current - 10,
+                SensorEnum::VOLTAGE => $this->sensor_current * 0.85,
+                SensorEnum::HUMIDITY => 30,
+                SensorEnum::FANSPEED => $this->sensor_current * 0.80,
+                SensorEnum::POWER_FACTOR => -1,
+                SensorEnum::SIGNAL => -80,
+                SensorEnum::AIRFLOW, SensorEnum::SNR, SensorEnum::FREQUENCY,
+                SensorEnum::PRESSURE, SensorEnum::COOLING => $this->sensor_current * 0.95,
                 default => null,
             };
         }

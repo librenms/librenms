@@ -7,7 +7,7 @@
  *
 */
 
-$class = 'load';
+$class = $sensor_class;
 $multiplier = 100;
 $low_limit = null;
 $low_warn_limit = null;

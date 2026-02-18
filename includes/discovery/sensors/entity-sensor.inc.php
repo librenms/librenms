@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 echo ' ENTITY-SENSOR: ';
 echo 'Caching OIDs:';
@@ -40,15 +41,15 @@ if (! empty($entity_array)) {
 
 if (! empty($entity_oids)) {
     $entitysensor = [
-        'voltsDC' => 'voltage',
-        'voltsAC' => 'voltage',
-        'amperes' => 'current',
-        'watts' => 'power',
-        'hertz' => 'freq',
-        'percentRH' => 'humidity',
-        'rpm' => 'fanspeed',
-        'celsius' => 'temperature',
-        'dBm' => 'dbm',
+        'voltsDC' => SensorEnum::VOLTAGE,
+        'voltsAC' => SensorEnum::VOLTAGE,
+        'amperes' => SensorEnum::CURRENT,
+        'watts' => SensorEnum::POWER,
+        'hertz' => SensorEnum::FREQUENCY,
+        'percentRH' => SensorEnum::HUMIDITY,
+        'rpm' => SensorEnum::FANSPEED,
+        'celsius' => SensorEnum::TEMPERATURE,
+        'dBm' => SensorEnum::DBM,
     ];
 
     foreach ($entity_oids as $index => $entry) {
@@ -71,7 +72,7 @@ if (! empty($entity_oids)) {
 
         // Fix for Cisco ASR920, 15.5(2)S
         if ($entry['entPhySensorType'] == 'other' && Str::contains($entity_array[$index]['entPhysicalName'], ['Rx Power Sensor', 'Tx Power Sensor'])) {
-            $entitysensor['other'] = 'dbm';
+            $entitysensor['other'] = SensorEnum::DBM;
         }
         if (isset($entitysensor[$entry['entPhySensorType']]) && isset($entry['entPhySensorValue']) && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
             $entPhysicalIndex = $index;
@@ -137,7 +138,7 @@ if (! empty($entity_oids)) {
             }
 
             $current = ($current * $multiplier / $divisor);
-            if ($type == 'temperature') {
+            if ($type === SensorEnum::TEMPERATURE) {
                 if ($current > '200') {
                     $valid_sensor = false;
                 }
@@ -146,13 +147,13 @@ if (! empty($entity_oids)) {
 
             // Fix for FortiSwitch - ALL FortiSwitches as of 14/2/2024 output fan speeds as percentages while entPhySensorType is RPM.
             if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'rpm') {
-                $type = 'percent';
+                $type = SensorEnum::PERCENT;
                 $divisor = 1;
                 $current *= 10;
             }
 
             if ($device['os'] == 'rittal-lcp') {
-                if ($type == 'voltage') {
+                if ($type === SensorEnum::VOLTAGE) {
                     $divisor = 1000;
                 }
                 if ($descr == 'Temperature.Value') {
@@ -161,7 +162,7 @@ if (! empty($entity_oids)) {
                 if ($descr == 'System.Temperature.Value') {
                     $divisor = 1000;
                 }
-                if ($type == 'humidity' && $current == '0') {
+                if ($type === SensorEnum::HUMIDITY && $current == '0') {
                     $valid_sensor = false;
                 }
             }
@@ -177,10 +178,10 @@ if (! empty($entity_oids)) {
                 $valid_sensor = false;
             }
 
-            if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", [$device['device_id'], $type, $index]) == '0') {
+            if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", [$device['device_id'], $type->value, $index]) == '0') {
                 // Check to make sure we've not already seen this sensor via cisco's entity sensor mib
-                if ($type == 'power' && $device['os'] == 'arista_eos' && preg_match('/DOM (R|T)x Power/i', (string) $descr)) {
-                    $type = 'dbm';
+                if ($type === SensorEnum::POWER && $device['os'] == 'arista_eos' && preg_match('/DOM (R|T)x Power/i', (string) $descr)) {
+                    $type = SensorEnum::DBM;
                     $current = round(10 * log10($entry['entPhySensorValue'] / 10000), 3);
                     $multiplier = 1;
                     $divisor = 1;

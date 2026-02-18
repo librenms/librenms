@@ -46,6 +46,6 @@ if (is_array($fan_trays)) {
         ];
         create_state_index($state_name, $states);
 
-        discover_sensor(null, 'state', $device, $current_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current_value);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::STATE, $device, $current_oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current_value);
     }
 }

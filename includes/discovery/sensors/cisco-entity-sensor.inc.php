@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 if ($device['os_group'] == 'cisco') {
     echo ' CISCO-ENTITY-SENSOR: ';
@@ -49,16 +50,16 @@ if ($device['os_group'] == 'cisco') {
 
     d_echo($oids);
 
-    $entitysensor['voltsDC'] = 'voltage';
-    $entitysensor['voltsAC'] = 'voltage';
-    $entitysensor['amperes'] = 'current';
-    $entitysensor['watt'] = 'power';
-    $entitysensor['hertz'] = 'freq';
-    $entitysensor['percentRH'] = 'humidity';
-    $entitysensor['rpm'] = 'fanspeed';
-    $entitysensor['celsius'] = 'temperature';
-    $entitysensor['watts'] = 'power';
-    $entitysensor['dBm'] = 'dbm';
+    $entitysensor['voltsDC'] = SensorEnum::VOLTAGE;
+    $entitysensor['voltsAC'] = SensorEnum::VOLTAGE;
+    $entitysensor['amperes'] = SensorEnum::CURRENT;
+    $entitysensor['watt'] = SensorEnum::POWER;
+    $entitysensor['hertz'] = SensorEnum::FREQUENCY;
+    $entitysensor['percentRH'] = SensorEnum::HUMIDITY;
+    $entitysensor['rpm'] = SensorEnum::FANSPEED;
+    $entitysensor['celsius'] = SensorEnum::TEMPERATURE;
+    $entitysensor['watts'] = SensorEnum::POWER;
+    $entitysensor['dBm'] = SensorEnum::DBM;
 
     if (is_array($oids)) {
         foreach ($oids as $index => $entry) {
@@ -130,7 +131,7 @@ if ($device['os_group'] == 'cisco') {
                         // Skip invalid treshold values
                         if (! isset($key['entSensorThresholdValue']) || $key['entSensorThresholdValue'] == '-32768' || $key['entSensorThresholdValue'] == '2147483647') {
                             continue;
-                        } elseif ($type == 'fanspeed' && $key['entSensorThresholdValue'] == '-1') {
+                        } elseif ($type === SensorEnum::FANSPEED && $key['entSensorThresholdValue'] == '-1') {
                             continue;
                         }
                         // Critical Limit
@@ -172,7 +173,7 @@ if ($device['os_group'] == 'cisco') {
 
                 // If temperature sensor, set low thresholds to -1 and -5. Many sensors don't return low thresholds, therefore LibreNMS takes the runtime low
                 // Also changing 0 values (not just null) as Libre loses these somewhere along the line and shows an empty value in the Web UI
-                if ($type == 'temperature') {
+                if ($type === SensorEnum::TEMPERATURE) {
                     if ($warn_limit_low == 0) {
                         $warn_limit_low = -1;
                     }
@@ -241,10 +242,10 @@ if ($device['os_group'] == 'cisco') {
 
                     discover_sensor(null, $type, $device, $oid, $index, 'cisco-entity-sensor', ucwords($descr), $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
                     //Cisco IOS-XR : add a fake sensor to graph as dbm
-                    if ($type == 'power' and $device['os'] == 'iosxr' and (preg_match('/power (R|T)x/i', $descr) or preg_match('/(R|T)x Power/i', $descr) or preg_match('/(R|T)x Lane/i', $descr))) {
+                    if ($type === SensorEnum::POWER and $device['os'] == 'iosxr' and (preg_match('/power (R|T)x/i', $descr) or preg_match('/(R|T)x Power/i', $descr) or preg_match('/(R|T)x Lane/i', $descr))) {
                         // convert Watts to dbm
                         $user_func = 'mw_to_dbm';
-                        $type = 'dbm';
+                        $type = SensorEnum::DBM;
                         $multiplier = 1000;
                         $limit_low = isset($limit_low) ? round(mw_to_dbm($limit_low * $multiplier), 3) : null;
                         $warn_limit_low = isset($limit_low) ? round(mw_to_dbm($warn_limit_low * $multiplier), 3) : null;
@@ -265,7 +266,5 @@ if ($device['os_group'] == 'cisco') {
         $entity_array
     );
 
-    foreach (array_flip($entitysensor) as $type) {
-        app('sensor-discovery')->sync(sensor_class: $type, poller_type: 'snmp');
-    }
+    // sync is handled by the sensors() loop for each sensor type
 }//end if

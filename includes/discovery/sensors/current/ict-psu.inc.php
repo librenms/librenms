@@ -36,5 +36,5 @@ if (! empty($outputCurrent)) {
     $type = 'ict-psu';
     $currentValue = $outputCurrent / $divisor;
 
-    discover_sensor(null, 'current', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::CURRENT, $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $currentValue);
 }

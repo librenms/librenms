@@ -35,6 +35,6 @@ foreach ($pre_cache['raritan_inletTable'] as $index => $raritan_data) {
         $warn_limit = $raritan_data['inletVoltageLowerWarning'] / $divisor;
         $high_limit = $raritan_data['inletVoltageLowerCritical'] / $divisor;
         $current = $pre_cache['raritan_inletPoleTable'][$index][$x]['inletPoleVoltage'] / $divisor;
-        discover_sensor(null, 'voltage', $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::VOLTAGE, $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_limit, $warn_limit, $high_limit, $current);
     }
 }

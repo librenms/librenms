@@ -31,7 +31,7 @@ foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
 
         discover_sensor(
             null,
-            'dbm',
+            $sensor_class,
             $device,
             $oidRX,
             'pmSnapshotCurrentInputPower' . $index,
@@ -54,7 +54,7 @@ foreach ($pre_cache['adva_fsp3kr7'] as $index => $entry) {
 
         discover_sensor(
             null,
-            'dbm',
+            $sensor_class,
             $device,
             $oidTX,
             'pmSnapshotCurrentOutputPower' . $index,
