@@ -30,18 +30,20 @@ class EltexMes24xx extends OS implements TransceiverDiscovery, Ipv6AddressDiscov
         $oidSfp = SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-PHY-MIB::eltexPhyTransceiverInfoTable')->table(1);
         $ifIndexToEntIndexMap = array_flip($this->getIfIndexEntPhysicalMap());
 
+        $moduleIndex = $inventory->where('entPhysicalClass', 'module')->value('entPhysicalIndex');
         foreach ($oidSfp as $ifIndex => $data) {
             $inventory->push(new EntPhysical([
-                'entPhysicalIndex' => 1000000 + $ifIndex,
+                'entPhysicalIndex' => $ifIndexToEntIndexMap[$ifIndex],
                 'entPhysicalSerialNum' => $data['eltexPhyTransceiverInfoSerialNumber'],
                 'entPhysicalModelName' => $data['eltexPhyTransceiverInfoPartNumber'],
                 'entPhysicalName' => $data['eltexPhyTransceiverInfoConnectorType'],
                 'entPhysicalDescr' => $data['eltexPhyTransceiverInfoType'],
                 'entPhysicalClass' => 'sfp-cage',
-                'entPhysicalContainedIn' => $ifIndexToEntIndexMap[$ifIndex] ?? 0,
+                'entPhysicalContainedIn' => $moduleIndex,
                 'entPhysicalMfgName' => $data['eltexPhyTransceiverInfoVendorName'],
                 'entPhysicalHardwareRev' => $data['eltexPhyTransceiverInfoVendorRevision'],
                 'entPhysicalIsFRU' => 'true',
+                'entPhysicalParentRelPos' => $ifIndex,
                 'ifIndex' => $ifIndex,
             ]));
         }
@@ -51,19 +53,31 @@ class EltexMes24xx extends OS implements TransceiverDiscovery, Ipv6AddressDiscov
 
     public function discoverTransceivers(): Collection
     {
-        return SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-PHY-MIB::eltexPhyTransceiverInfoTable')
-            ->mapTable(fn ($data, $ifIndex) => new Transceiver([
-                'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
-                'index' => $ifIndex,
-                'connector' => $data['eltexPhyTransceiverInfoConnectorType'] ? strtoupper((string) $data['eltexPhyTransceiverInfoConnectorType']) : null,
-                'distance' => $data['eltexPhyTransceiverInfoTransferDistance'] ?? null,
-                'model' => $data['eltexPhyTransceiverInfoPartNumber'] ?? null,
-                'revision' => $data['eltexPhyTransceiverInfoVendorRevision'] ?? null,
-                'serial' => $data['eltexPhyTransceiverInfoSerialNumber'] ?? null,
-                'vendor' => $data['eltexPhyTransceiverInfoVendorName'] ?? null,
-                'wavelength' => $data['eltexPhyTransceiverInfoWaveLength'] ?? null,
-                'entity_physical_index' => $ifIndex,
-            ]));
+        $trans = new Collection;
+
+        $ifIndexToEntIndexMap = array_flip($this->getIfIndexEntPhysicalMap());
+
+        $trans = SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-PHY-MIB::eltexPhyTransceiverInfoTable')
+            ->mapTable(function ($data, $ifIndex) use ($ifIndexToEntIndexMap) {
+                if ($data['eltexPhyTransceiverInfoType'] == 'unknown') {
+                    return false;
+                }
+
+                return new Transceiver([
+                    'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                    'index' => $ifIndex,
+                    'connector' => $data['eltexPhyTransceiverInfoConnectorType'] ? strtoupper((string) $data['eltexPhyTransceiverInfoConnectorType']) : null,
+                    'distance' => $data['eltexPhyTransceiverInfoTransferDistance'] ?? null,
+                    'model' => $data['eltexPhyTransceiverInfoPartNumber'] ?? null,
+                    'revision' => $data['eltexPhyTransceiverInfoVendorRevision'] ?? null,
+                    'serial' => $data['eltexPhyTransceiverInfoSerialNumber'] ?? null,
+                    'vendor' => $data['eltexPhyTransceiverInfoVendorName'] ?? null,
+                    'wavelength' => $data['eltexPhyTransceiverInfoWaveLength'] ?? null,
+                    'entity_physical_index' => $ifIndexToEntIndexMap[$ifIndex],
+                ]);
+            })->filter();
+
+        return $trans;
     }
 
     public function discoverIpv6Addresses(): Collection
@@ -80,6 +94,7 @@ class EltexMes24xx extends OS implements TransceiverDiscovery, Ipv6AddressDiscov
                             'ipv6_prefixlen' => $prefixLen ?? '',
                             'ipv6_origin' => $data['IP-MIB::ipAddressPrefixOrigin'] ?? 'unknown',
                             'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                            'context_name' => '',
                         ]);
                     } catch (InvalidIpException $e) {
                         Log::error('Failed to parse IP: ' . $e->getMessage());

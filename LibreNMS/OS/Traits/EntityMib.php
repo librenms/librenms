@@ -58,7 +58,7 @@ trait EntityMib
     /**
      * @return array<int, int>
      */
-    protected function getIfIndexEntPhysicalMap(): array
+    public function getIfIndexEntPhysicalMap(): array
     {
         $mapping = \SnmpQuery::cache()->walk('ENTITY-MIB::entAliasMappingIdentifier')->table(2);
         $map = [];
@@ -67,6 +67,16 @@ trait EntityMib
             $id = $data[0]['ENTITY-MIB::entAliasMappingIdentifier'] ?? $data[1]['ENTITY-MIB::entAliasMappingIdentifier'] ?? null;
             if ($id && preg_match('/ifIndex[\[.](\d+)/', (string) $id, $matches)) {
                 $map[(int) $entityPhysicalIndex] = (int) $matches[1];
+            }
+        }
+
+        if (empty($map)) {
+            $tmp = \SnmpQuery::cache()->walk('ENTITY-MIB::entLPMappingTable')->table();
+            if (isset($tmp['ENTITY-MIB::entLPPhysicalIndex']) && is_array($tmp['ENTITY-MIB::entLPPhysicalIndex'])) {
+                $tmp = $tmp['ENTITY-MIB::entLPPhysicalIndex'];
+                foreach ($tmp as $phyInd => $data) {
+                    $map[array_key_first($data)] = $phyInd;
+                }
             }
         }
 

@@ -19,28 +19,34 @@
  * @package    LibreNMS
  * @link       https://www.librenms.org
  *
- * @copyright  2024 Peca Nesovanovic
+ * @copyright  2025 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
+use LibreNMS\OS;
 use LibreNMS\Util\Oid;
 
-echo 'eltexPhyTransceiverDiagnosticTable' . PHP_EOL;
-$snmpData = SnmpQuery::cache()->hideMib()->walk('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticTable')->table(3);
-if (! empty($snmpData)) {
-    foreach ($snmpData as $index => $typeData) {
-        foreach ($typeData as $type => $data) {
-            $eltexPhyTransceiverDiagnosticTable[$type][$index] = array_shift($data);
-        }
-    }
+if (empty($os)) {
+    $os = OS::make($device);
 }
 
-$divisor = 1;
-$multiplier = 1;
-if (! empty($eltexPhyTransceiverDiagnosticTable['temperature'])) {
-    foreach ($eltexPhyTransceiverDiagnosticTable['temperature'] as $ifIndex => $data) {
-        $value = $data['eltexPhyTransceiverDiagnosticCurrentValue'] / $divisor;
-        if ($value) {
+if ($os instanceof \LibreNMS\OS\EltexMes24xx) {
+    $map = array_flip($os->getIfIndexEntPhysicalMap()); // map ifindex -> entphy index
+    $snmpData = SnmpQuery::cache()->hideMib()->walk('ELTEX-PHY-MIB::eltexPhyTransceiverDiagnosticTable')->table(3);
+    if (! empty($snmpData)) {
+        foreach ($snmpData as $index => $typeData) {
+            foreach ($typeData as $type => $data) {
+                $eltexPhyTransceiverDiagnosticTable[$type][$index] = array_shift($data);
+            }
+        }
+    }
+
+    $divisor = 1;
+    $multiplier = 1;
+
+    foreach ($eltexPhyTransceiverDiagnosticTable['temperature'] ?? [] as $ifIndex => $data) {
+        if (! empty($data['eltexPhyTransceiverDiagnosticUnits'])) {
+            $value = $data['eltexPhyTransceiverDiagnosticCurrentValue'] / $divisor;
             $high_limit = $data['eltexPhyTransceiverDiagnosticHighAlarmThreshold'];
             $high_warn_limit = $data['eltexPhyTransceiverDiagnosticHighWarningThreshold'];
             $low_warn_limit = $data['eltexPhyTransceiverDiagnosticLowWarningThreshold'];
@@ -54,7 +60,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['temperature'])) {
                 'sensor_class' => 'temperature',
                 'sensor_oid' => $oid,
                 'sensor_index' => 'SfpTemp' . $ifIndex,
-                'sensor_type' => 'ELTEX-PHY-MIB',
+                'sensor_type' => 'eltex-mes24xx',
                 'sensor_descr' => 'SfpTemp-' . $descr,
                 'sensor_divisor' => $divisor,
                 'sensor_multiplier' => $multiplier,
@@ -63,7 +69,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['temperature'])) {
                 'sensor_limit_warn' => $high_warn_limit,
                 'sensor_limit' => $high_limit,
                 'sensor_current' => $value,
-                'entPhysicalIndex' => $ifIndex,
+                'entPhysicalIndex' => $map[$ifIndex], //map ifindex -> entphy index
                 'entPhysicalIndex_measured' => 'port',
                 'user_func' => null,
                 'group' => 'transceiver',
