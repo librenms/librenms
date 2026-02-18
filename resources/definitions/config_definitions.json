@@ -6757,7 +6757,6 @@
             "units": "Workers"
         },
         "service_poller_frequency": {
-            "default": null,
             "group": "poller",
             "section": "dispatcherservice",
             "order": 7,
