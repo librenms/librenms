@@ -81,15 +81,15 @@ class DevicePoll extends LnmsCommand
     private function dispatchWork(): int
     {
         $modules = ModuleList::fromUserOverrides($this->option('modules'));
-        $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
+        $devices = Device::whereDeviceSpec($this->argument('device spec'))->select('device_id', 'poller_group')->get();
 
         if (\config('queue.default') == 'sync') {
             $this->error('Queue driver is sync, work will run in process.');
             sleep(1);
         }
 
-        foreach ($devices as $device_id) {
-            PollDevice::dispatch($device_id, $modules);
+        foreach ($devices as $device) {
+            PollDevice::dispatch($device->device_id, $modules, $this->getOutput()->getVerbosity())->onQueue('poller-' . $device->poller_group);
         }
 
         $this->line('Submitted work for ' . $devices->count() . ' devices');

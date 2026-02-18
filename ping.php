@@ -41,4 +41,4 @@ if (isset($options['g'])) {
     $groups = [];
 }
 
-PingCheck::dispatchSync($groups);
+PingCheck::dispatch($groups);
