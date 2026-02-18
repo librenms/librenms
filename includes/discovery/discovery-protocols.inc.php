@@ -355,11 +355,19 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 
     foreach ($lldp_array as $lldp_if_array) {
         foreach ($lldp_if_array as $entry_key => $lldp_instance) {
+            $ifIndex = null;
+            $ifName = null;
+
             if ($device['os'] == 'aos7') {
-                if (! isset($lldp_local[$entry_key]['lldpLocPortDesc'])) {
+                $locPortId = $lldp_local[$entry_key]['lldpLocPortId'] ?? '';
+                if (is_numeric($locPortId)) {
+                    $ifIndex = $locPortId;
+                    $ifName = null;
+                } elseif (isset($lldp_local[$entry_key]['lldpLocPortDesc'])) {
+                    $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
+                } else {
                     continue;
                 }
-                $ifName = $lldp_local[$entry_key]['lldpLocPortDesc'];
             } elseif ($device['os'] == 'routeros') {
                 $ifIndex = $entry_key;
             } elseif (isset($dot1d_array) && isset($dot1d_array[$entry_key]) && is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex'])) {
@@ -367,8 +375,10 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             } else {
                 $ifIndex = $entry_key;
             }
+
             if ($device['os'] == 'aos7') {
-                $local_port_id = find_port_id($ifName, null, $device['device_id']);
+                // Explicitly pass variables. ifName will be null if ifIndex was found.
+                $local_port_id = find_port_id($ifName, $ifIndex, $device['device_id']);
             } else {
                 $local_port_id = find_port_id($lldp_ports[$entry_key]['lldpLocPortId'] ?? null, $ifIndex, $device['device_id']);
             }
@@ -379,6 +389,10 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             if (! is_array($lldp_instance)) {
                 continue;
             }
+
+            // CRITICAL FIX: Unset the remote device variable to prevent it from leaking
+            // from the previous iteration to the current one if the current neighbor has no hostname.
+            unset($remote_device);
 
             foreach ($lldp_instance as $lldp) {
                 // If lldpRemPortIdSubtype is 5 and lldpRemPortId is hex, convert it to ASCII.
