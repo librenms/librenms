@@ -7163,6 +7163,13 @@
             "default": false,
             "type": "boolean"
         },
+        "syslog_file": {
+            "default": null,
+            "type": "text",
+            "group": "external",
+            "section": "syslog",
+            "order": 1
+        },
         "syslog_filter": {
             "default": [
                 "last message repeated",
@@ -7171,6 +7178,13 @@
                 "diskio.c"
             ],
             "type": "array"
+        },
+        "syslog_log_unmatched": {
+            "default": false,
+            "type": "boolean",
+            "group": "external",
+            "section": "syslog",
+            "order": 2
         },
         "syslog_purge": {
             "default": 30,

@@ -10365,7 +10365,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 6
+			count: 7
 			path: includes/syslog.php
 
 		-

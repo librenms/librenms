@@ -1,6 +1,8 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Syslog\CefParser;
 
 function get_cache($host, $value)
 {
@@ -9,12 +11,12 @@ function get_cache($host, $value)
     if (! isset($dev_cache[$host][$value])) {
         switch ($value) {
             case 'device_id':
-                // Try by hostname
+                // Try by hostname (case-insensitive for sysName)
                 $ip = inet_pton($host);
                 if (inet_ntop($ip) === false) {
-                    $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR `sysName` = ?', [$host, $host]);
+                    $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR LOWER(`sysName`) = LOWER(?)', [$host, $host]);
                 } else {
-                    $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR `sysName` = ? OR `ip` = ?', [$host, $host, $ip]);
+                    $dev_cache[$host]['device_id'] = dbFetchCell('SELECT `device_id` FROM devices WHERE `hostname` = ? OR LOWER(`sysName`) = LOWER(?) OR `ip` = ?', [$host, $host, $ip]);
                 }
                 // If failed, try by IP
                 if (! is_numeric($dev_cache[$host]['device_id'])) {
@@ -32,6 +34,10 @@ function get_cache($host, $value)
 
             case 'hostname':
                 $dev_cache[$host]['hostname'] = dbFetchCell('SELECT `hostname` FROM devices WHERE `device_id` = ?', [get_cache($host, 'device_id')]);
+                break;
+
+            case 'sysName':
+                $dev_cache[$host]['sysName'] = dbFetchCell('SELECT `sysName` FROM devices WHERE `device_id` = ?', [get_cache($host, 'device_id')]);
                 break;
 
             default:
@@ -57,7 +63,25 @@ function process_syslog($entry, $update)
     if (! empty($syslog_xlate[$entry['host']])) {
         $entry['host'] = $syslog_xlate[$entry['host']];
     }
+
+    // Parse CEF (Common Event Format) messages before device lookup
+    $msg_to_parse = $entry['program'] . ': ' . ($entry['msg'] ?? '');
+    if (CefParser::isCef($msg_to_parse)) {
+        $cef = CefParser::parse($msg_to_parse);
+        if ($cef !== null) {
+            $entry['program'] = $cef->getProgram();
+            $cef_msg = $cef->getMessage();
+            $entry['msg'] = $cef_msg ? $cef->name . ': ' . $cef_msg : $cef->name;
+            $cef_host = $cef->getDeviceHostname();
+            if ($cef_host !== null) {
+                $entry['host'] = $cef_host;
+            }
+        }
+    }
+
     $entry['device_id'] = get_cache($entry['host'], 'device_id');
+    $hostname = null;
+
     if ($entry['device_id']) {
         $os = get_cache($entry['host'], 'os');
         $hostname = get_cache($entry['host'], 'hostname');
@@ -166,7 +190,31 @@ function process_syslog($entry, $update)
         }
 
         unset($os);
+    } else {
+        // Log unmatched host if configured
+        if (LibrenmsConfig::get('syslog_log_unmatched')) {
+            Log::warning('Syslog received from unmatched host: ' . $entry['host']);
+        }
     }//end if
+
+    // Write syslog to file if configured (runs for both matched and unmatched hosts)
+    $syslog_file = LibrenmsConfig::get('syslog_file');
+    if (! empty($syslog_file)) {
+        $timestamp = $entry['timestamp'] ?? date('Y-m-d H:i:s');
+        $syslog_timestamp = date('M j H:i:s', strtotime($timestamp));
+        // Use sysName if device matched, otherwise use the entry host
+        $log_host = $entry['device_id'] ? (get_cache($entry['host'], 'sysName') ?: $hostname) : $entry['host'];
+        $log_msg = stripslashes($entry['msg'] ?? '');
+
+        $file_line = sprintf(
+            "%s %s %s: %s\n",
+            $syslog_timestamp,
+            $log_host,
+            $entry['program'] ?? '-',
+            $log_msg
+        );
+        @file_put_contents($syslog_file, $file_line, FILE_APPEND | LOCK_EX);
+    }
 
     return $entry;
 }//end process_syslog()
