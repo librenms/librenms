@@ -1,4 +1,3 @@
-mib: POLYCOM-ENDPOINT-MIB:POLYCOM-BASE-MIB
 modules:
     os:
         hardware: POLYCOM-ENDPOINT-MIB::identityDeviceModel.0
@@ -8,8 +7,8 @@ modules:
         state:
             data:
                 -
-                    oid: identity
-                    value: identityStatus
+                    oid: POLYCOM-ENDPOINT-MIB::identity
+                    value: POLYCOM-ENDPOINT-MIB::identityStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.1.6.{{ $index }}'
                     descr: 'Overall System status'
                     index: "identityStatus.{{ $index }}"
@@ -19,8 +18,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: serviceH323
-                    value: serviceH323Status
+                    oid: POLYCOM-ENDPOINT-MIB::serviceH323
+                    value: POLYCOM-ENDPOINT-MIB::serviceH323Status
                     num_oid: '.1.3.6.1.4.1.13885.101.1.2.7.1.{{ $index }}'
                     descr: 'H323 Status'
                     index: "serviceH323Status.{{ $index }}"
@@ -30,8 +29,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: serviceH323
-                    value: serviceH323RegistrationStatus
+                    oid: POLYCOM-ENDPOINT-MIB::serviceH323
+                    value: POLYCOM-ENDPOINT-MIB::serviceH323RegistrationStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.2.7.2.{{ $index }}'
                     descr: 'H323 Status'
                     index: "serviceH323RegistrationStatus.{{ $index }}"
@@ -41,8 +40,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: serviceSip
-                    value: serviceSipStatus
+                    oid: POLYCOM-ENDPOINT-MIB::serviceSip
+                    value: POLYCOM-ENDPOINT-MIB::serviceSipStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.2.8.1.{{ $index }}'
                     descr: 'Sip overall Status'
                     index: "serviceSipStatus.{{ $index }}"
@@ -52,8 +51,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: serviceSipRegistrationTable
-                    value: serviceSipRegistrationStatus
+                    oid: POLYCOM-ENDPOINT-MIB::serviceSipRegistrationTable
+                    value: POLYCOM-ENDPOINT-MIB::serviceSipRegistrationStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.2.8.3.1.2.{{ $index }}'
                     descr: 'Sip Status Line {{ $index }}'
                     index: "serviceSipRegistrationStatus.{{ $index }}"
@@ -63,8 +62,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: serviceIsdn
-                    value: serviceIsdnStatus
+                    oid: POLYCOM-ENDPOINT-MIB::serviceIsdn
+                    value: POLYCOM-ENDPOINT-MIB::serviceIsdnStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.2.9.1.{{ $index }}'
                     descr: 'ISDN Status'
                     index: "serviceIsdnStatus.{{ $index }}"
@@ -74,8 +73,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: hardware
-                    value: hardwareOverallStatus
+                    oid: POLYCOM-ENDPOINT-MIB::hardware
+                    value: POLYCOM-ENDPOINT-MIB::hardwareOverallStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.3.1.{{ $index }}'
                     descr: 'Hardware Status'
                     index: "hardwareOverallStatus.{{ $index }}"
@@ -85,8 +84,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: hardwareMicrophone
-                    value: hardwareMicrophoneStatus
+                    oid: POLYCOM-ENDPOINT-MIB::hardwareMicrophone
+                    value: POLYCOM-ENDPOINT-MIB::hardwareMicrophoneStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.3.5.1.{{ $index }}'
                     descr: 'Microphone Status'
                     index: "hardwareMicrophoneStatus.{{ $index }}"
@@ -96,8 +95,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: hardwareCamera
-                    value: hardwareCameraStatus
+                    oid: POLYCOM-ENDPOINT-MIB::hardwareCamera
+                    value: POLYCOM-ENDPOINT-MIB::hardwareCameraStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.3.6.1.{{ $index }}'
                     descr: 'Camera Status'
                     index: "hardwareCameraStatus.{{ $index }}"
@@ -107,8 +106,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: hardwareNIC
-                    value: hardwareNICStatus
+                    oid: POLYCOM-ENDPOINT-MIB::hardwareNIC
+                    value: POLYCOM-ENDPOINT-MIB::hardwareNICStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.3.10.1.{{ $index }}'
                     descr: 'NIC Status'
                     index: "hardwareNICStatus.{{ $index }}"
@@ -118,8 +117,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: hardwarePTC
-                    value: hardwarePTCStatus
+                    oid: POLYCOM-ENDPOINT-MIB::hardwarePTC
+                    value: POLYCOM-ENDPOINT-MIB::hardwarePTCStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.3.11.1.{{ $index }}'
                     descr: 'PTC Status'
                     index: "hardwarePTCStatus.{{ $index }}"
@@ -129,8 +128,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: hardwareUcBoard
-                    value: hardwareUcBoardStatus
+                    oid: POLYCOM-ENDPOINT-MIB::hardwareUcBoard
+                    value: POLYCOM-ENDPOINT-MIB::hardwareUcBoardStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.3.12.1.{{ $index }}'
                     descr: 'Uc Board Status'
                     index: "hardwareUcBoardStatus.{{ $index }}"
@@ -140,8 +139,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: externalIntegrationPresence
-                    value:  externalIntegrationPresenceStatus
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationPresence
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationPresenceStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.7.1.{{ $index }}'
                     descr: 'Poly Presence Service Status'
                     index: "externalIntegrationPresenceStatus.{{ $index }}"
@@ -151,8 +150,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: externalIntegrationCDR
-                    value:  externalIntegrationCDRStatus
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationCDR
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationCDRStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.8.1.{{ $index }}'
                     descr: 'Poly CDR Service Status'
                     index: "externalIntegrationCDRStatus.{{ $index }}"
@@ -162,8 +161,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: externalIntegrationSyslog
-                    value:  externalIntegrationSyslogStatus
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationSyslog
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationSyslogStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.9.1.{{ $index }}'
                     descr: 'Syslog Service Status'
                     index: "externalIntegrationSyslogStatus.{{ $index }}"
@@ -173,8 +172,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: externalIntegrationSoftwareUpdate
-                    value:  externalIntegrationSoftwareUpdateStatus
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationSoftwareUpdate
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationSoftwareUpdateStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.10.1.{{ $index }}'
                     descr: 'Poly Software Update Status'
                     index: "externalIntegrationSoftwareUpdateStatus.{{ $index }}"
@@ -184,8 +183,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: externalIntegrationProvisioning
-                    value:  externalIntegrationProvisioningStatus
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationProvisioning
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationProvisioningStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.11.1.{{ $index }}'
                     descr: 'Poly Provisioning Status'
                     index: "externalIntegrationProvisioningStatus.{{ $index }}"
@@ -195,8 +194,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: externalIntegrationExchange
-                    value:  externalIntegrationExchangeStatus
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationExchange
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationExchangeStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.12.1.{{ $index }}'
                     descr: 'Exchange Integration Status'
                     index: "externalIntegrationExchangeStatus.{{ $index }}"
@@ -206,8 +205,8 @@ modules:
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
                         - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
-                    oid: externalIntegrationDirectorySvcs
-                    value:  externalIntegrationDirectorySvcsStatus
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationDirectorySvcs
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationDirectorySvcsStatus
                     num_oid: '.1.3.6.1.4.1.13885.101.1.6.13.1.{{ $index }}'
                     descr: 'Directory Integration Status'
                     index: "externalIntegrationDirectorySvcsStatus.{{ $index }}"

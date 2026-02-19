@@ -3,7 +3,7 @@
 -- 
 -- Description: HUAWEI NVO3 MIB
 -- Reference:
--- Version: V1.14
+-- Version: V1.15
 -- History: V1.0 gaoyuan, 2014-07-02,publish
 -- created 2014-7-2
 -- ==================================================================
@@ -25,7 +25,7 @@
 				FROM IPV6-TC;
 
         hwNvo3Mgmt MODULE-IDENTITY 
-            LAST-UPDATED "202210251648Z"        -- Oct 25, 2022 at 16:48GMT
+            LAST-UPDATED "202212151658Z"        -- Dec 15, 2022 at 16:58GMT
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -38,6 +38,10 @@
                    "
             DESCRIPTION 
                 "The MIB module for nvo3 management." 
+
+            REVISION "202212151658Z"        -- Dec 15, 2022 at 16:58GMT
+            DESCRIPTION 
+                "V1.15 The modify revision of this MIB module."
 
             REVISION "202210251648Z"        -- Oct 25, 2022 at 16:48GMT
             DESCRIPTION 
@@ -884,21 +888,21 @@
              }
         hwEvplIndex  OBJECT-TYPE
           SYNTAX Unsigned32
-          MAX-ACCESS read-only
+          MAX-ACCESS accessible-for-notify
           STATUS current
           DESCRIPTION
               "The evpl instance index."
           ::= { hwEvplCccEntry 1 } 
         hwEvplCccIfname1  OBJECT-TYPE
           SYNTAX InterfaceIndex
-          MAX-ACCESS read-only
+          MAX-ACCESS accessible-for-notify
           STATUS current
           DESCRIPTION
               "The name of the interface1."
           ::= { hwEvplCccEntry 2 } 
         hwEvplCccIfname2  OBJECT-TYPE
           SYNTAX InterfaceIndex
-          MAX-ACCESS read-only
+          MAX-ACCESS accessible-for-notify
           STATUS current
           DESCRIPTION
               "The name of the interface2."

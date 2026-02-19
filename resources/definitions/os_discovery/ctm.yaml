@@ -1,4 +1,3 @@
-mib: CTMMIBCUSTOM
 modules:
     os:
         sysDescr_regex: '/(?<hardware>.*)/'
@@ -7,28 +6,36 @@ modules:
         state:
             data:
                 -
-                    oid:  pwrP
+                    oid: CTMMIBCUSTOM::pwrP
+                    value: CTMMIBCUSTOM::pwrP
                     num_oid: '.1.3.6.1.4.1.25868.1.6.{{ $index }}'
+                    state_name: 'pwrP'
                     descr: 'Master Primary Power'
                     states:
                         - { descr: Power OK, graph: 0, value: 1, generic: 0 }
                         - { descr: Power off or Low, graph: 0, value: 0, generic: 2 }
                 -
-                    oid:  pwrS
+                    oid: CTMMIBCUSTOM::pwrS
+                    value: CTMMIBCUSTOM::pwrS
+                    state_name: 'pwrS'
                     num_oid: '.1.3.6.1.4.1.25868.1.7.{{ $index }}'
                     descr: 'Master Secondary Power'
                     states:
                         - { descr: Power OK, graph: 0, value: 1, generic: 0 }
                         - { descr: Power off or Low, graph: 0, value: 0, generic: 2 }
                 -
-                    oid:  pwrSP
+                    oid: CTMMIBCUSTOM::pwrSP
+                    value: CTMMIBCUSTOM::pwrSP
+                    state_name: 'pwrSP'
                     num_oid: '.1.3.6.1.4.1.25868.1.23.{{ $index }}'
                     descr: 'Slave Primary Power'
                     states:
                         - { descr: Power OK, graph: 0, value: 1, generic: 0 }
                         - { descr: Power off or Low, graph: 0, value: 0, generic: 2 }
                 -
-                    oid:  pwrSS
+                    oid: CTMMIBCUSTOM::pwrSS
+                    value: CTMMIBCUSTOM::pwrSS
+                    state_name: 'pwrSS'
                     num_oid: '.1.3.6.1.4.1.25868.1.24.{{ $index }}'
                     descr: 'Slave Secondary Power'
                     states:
@@ -40,113 +47,134 @@ modules:
                 divisor: 10
             data:
                 -
-                    oid: voltsM1
+                    oid: CTMMIBCUSTOM::voltsM1
+                    value: CTMMIBCUSTOM::voltsM1
                     num_oid: '.1.3.6.1.4.1.25868.1.10.{{ $index }}'
                     descr: 'Master Primary Voltage'
-                    index: portPwrM1.0
+                    index: 'portPwrM1.{{ $index }}'
                 -
-                    oid: voltsM2
+                    oid: CTMMIBCUSTOM::voltsM2
+                    value: CTMMIBCUSTOM::voltsM2
                     num_oid: '.1.3.6.1.4.1.25868.1.11.{{ $index }}'
                     descr: 'Master Secondary Voltage'
-                    index: portPwrM2.0
+                    index: 'portPwrM2.{{ $index }}'
                 -
-                    oid: voltsS1
+                    oid: CTMMIBCUSTOM::voltsS1
+                    value: CTMMIBCUSTOM::voltsS1
                     num_oid: '.1.3.6.1.4.1.25868.1.27.{{ $index }}'
                     descr: 'Slave Primary Voltage'
-                    index: portPwrS1.0
+                    index: 'portPwrS1.{{ $index }}'
                 -
-                    oid: voltsS2
+                    oid: CTMMIBCUSTOM::voltsS2
+                    value: CTMMIBCUSTOM::voltsS2
                     num_oid: '.1.3.6.1.4.1.25868.1.28.{{ $index }}'
                     descr: 'Slave Secondary Voltage'
-                    index: portPwrS2.0
+                    index: 'portPwrS2.{{ $index }}'
         temperature:
             data:
                 -
-                    oid: tempC
+                    oid: CTMMIBCUSTOM::tempC
+                    value: CTMMIBCUSTOM::tempC
                     num_oid: '.1.3.6.1.4.1.25868.1.9.{{ $index }}'
-                    index: tempC.0
+                    index: 'tempC.{{ $index }}'
                     descr: 'Temperature'
         power:
             options:
                 divisor: 10
             data:
                 -
-                    oid: portPwrM1
+                    oid: CTMMIBCUSTOM::portPwrM1
+                    value: CTMMIBCUSTOM::portPwrM1
                     num_oid: '.1.3.6.1.4.1.25868.1.14.{{ $index }}'
                     descr: 'Port Power Master 1'
-                    index: portPwrM1.0
+                    index: 'portPwrM1.{{ $index }}'
                 -
-                    oid: portPwrM2
+                    oid: CTMMIBCUSTOM::portPwrM2
+                    value: CTMMIBCUSTOM::portPwrM2
                     num_oid: '.1.3.6.1.4.1.25868.1.15.{{ $index }}'
                     descr: 'Port Power Master 2'
-                    index: portPwrM2.0
+                    index: 'portPwrM2.{{ $index }}'
                 -
-                    oid: portPwrM3
+                    oid: CTMMIBCUSTOM::portPwrM3
+                    value: CTMMIBCUSTOM::portPwrM3
                     num_oid: '.1.3.6.1.4.1.25868.1.16.{{ $index }}'
                     descr: 'Port Power Master 3'
-                    index: portPwrM3.0
+                    index: 'portPwrM3.{{ $index }}'
                 -
-                    oid: portPwrM4
+                    oid: CTMMIBCUSTOM::portPwrM4
+                    value: CTMMIBCUSTOM::portPwrM4
                     num_oid: '.1.3.6.1.4.1.25868.1.17.{{ $index }}'
                     descr: 'Port Power Master 4'
-                    index: portPwrM4.0
+                    index: 'portPwrM4.{{ $index }}'
                 -
-                    oid: portPwrM5
+                    oid: CTMMIBCUSTOM::portPwrM5
+                    value: CTMMIBCUSTOM::portPwrM5
                     num_oid: '.1.3.6.1.4.1.25868.1.18.{{ $index }}'
                     descr: 'Port Power Master 5'
-                    index: portPwrM5.0
+                    index: 'portPwrM5.{{ $index }}'
                 -
-                    oid: portPwrM6
+                    oid: CTMMIBCUSTOM::portPwrM6
+                    value: CTMMIBCUSTOM::portPwrM6
                     num_oid: '.1.3.6.1.4.1.25868.1.19.{{ $index }}'
                     descr: 'Port Power Master 6'
-                    index: portPwrM6.0
+                    index: 'portPwrM6.{{ $index }}'
                 -
-                    oid: portPwrM7
+                    oid: CTMMIBCUSTOM::portPwrM7
+                    value: CTMMIBCUSTOM::portPwrM7
                     num_oid: '.1.3.6.1.4.1.25868.1.20.{{ $index }}'
                     descr: 'Port Power Master 7'
-                    index: portPwrM7.0
+                    index: 'portPwrM7.{{ $index }}'
                 -
-                    oid: portPwrM8
+                    oid: CTMMIBCUSTOM::portPwrM8
+                    value: CTMMIBCUSTOM::portPwrM8
                     num_oid: '.1.3.6.1.4.1.25868.1.21.{{ $index }}'
                     descr: 'Port Power Master 8'
-                    index: portPwrM8.0
+                    index: 'portPwrM8.{{ $index }}'
                 -
-                    oid: portPwrS1
+                    oid: CTMMIBCUSTOM::portPwrS1
+                    value: CTMMIBCUSTOM::portPwrS1
                     num_oid: '.1.3.6.1.4.1.25868.1.31.{{ $index }}'
                     descr: 'Port Power Slave 1'
-                    index: portPwrS1.0
+                    index: 'portPwrS1.{{ $index }}'
                 -
-                    oid: portPwrS2
+                    oid: CTMMIBCUSTOM::portPwrS2
+                    value: CTMMIBCUSTOM::portPwrS2
                     num_oid: '.1.3.6.1.4.1.25868.1.32.{{ $index }}'
                     descr: 'Port Power Slave 2'
-                    index: portPwrS2.0
+                    index: 'portPwrS2.{{ $index }}'
                 -
-                    oid: portPwrS3
+                    oid: CTMMIBCUSTOM::portPwrS3
+                    value: CTMMIBCUSTOM::portPwrS3
                     num_oid: '.1.3.6.1.4.1.25868.1.33.{{ $index }}'
                     descr: 'Port Power Slave 3'
-                    index: portPwrS3.0
+                    index: 'portPwrS3.{{ $index }}'
                 -
-                    oid: portPwrS4
+                    oid: CTMMIBCUSTOM::portPwrS4
+                    value: CTMMIBCUSTOM::portPwrS4
                     num_oid: '.1.3.6.1.4.1.25868.1.34.{{ $index }}'
                     descr: 'Port Power Slave 4'
-                    index: portPwrS4.0
+                    index: 'portPwrS4.{{ $index }}'
                 -
-                    oid: portPwrS5
+                    oid: CTMMIBCUSTOM::portPwrS5
+                    value: CTMMIBCUSTOM::portPwrS5
                     num_oid: '.1.3.6.1.4.1.25868.1.35.{{ $index }}'
                     descr: 'Port Power Slave 5'
-                    index: portPwrS5.0
+                    index: 'portPwrS5.{{ $index }}'
                 -
-                    oid: portPwrS6
+                    oid: CTMMIBCUSTOM::portPwrS6
+                    value: CTMMIBCUSTOM::portPwrS6
                     num_oid: '.1.3.6.1.4.1.25868.1.36.{{ $index }}'
                     descr: 'Port Power Slave 6'
-                    index: portPwrS6.0
+                    index: 'portPwrS6.{{ $index }}'
                 -
-                    oid: portPwrS7
+                    oid: CTMMIBCUSTOM::portPwrS7
+                    value: CTMMIBCUSTOM::portPwrS7
                     num_oid: '.1.3.6.1.4.1.25868.1.37.{{ $index }}'
                     descr: 'Port Power Slave 7'
-                    index: portPwrS7.0
+                    index: 'portPwrS7.{{ $index }}'
                 -
-                    oid: portPwrS8
+                    oid: CTMMIBCUSTOM::portPwrS8
+                    value: CTMMIBCUSTOM::portPwrS8
                     num_oid: '.1.3.6.1.4.1.25868.1.38.{{ $index }}'
                     descr: 'Port Power Slave 8'
-                    index: portPwrS8.0
+                    index: 'portPwrS8.{{ $index }}'

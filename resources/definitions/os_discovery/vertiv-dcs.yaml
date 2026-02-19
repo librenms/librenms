@@ -1,0 +1,1106 @@
+modules:
+    os:
+        location: DCS-MIB::systemLoaction.0
+        version: SNMPv2-MIB::sysDescr.0
+        version_regex: '/\S*\s*\S*\s(?<version>\S*).*/'
+    sensors:
+        state:
+            data:
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom2ProductType
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.2.{{ $index }}'
+                    descr: 'PDU {{ $index }} Type'
+                    index: 'mpduMpscom2ProductType.{{ $index }}'
+                    state_name: mpduMpscom2ProductType
+                    states:
+                        - { descr: 'undefined',                graph: 1, value: 0, generic: 3 }
+                        - { descr: 'totalcurrentcommeter',     graph: 1, value: 1, generic: 0 }
+                        - { descr: 'totalcurrentcomswitch',    graph: 1, value: 2, generic: 0 }
+                        - { descr: 'totalcurrentipmeter',      graph: 1, value: 3, generic: 0 }
+                        - { descr: 'totalcurrentipswitch',     graph: 1, value: 4, generic: 0 }
+                        - { descr: 'bitcurrentcommeter',       graph: 1, value: 5, generic: 0 }
+                        - { descr: 'bitcurrentcomswitch',      graph: 1, value: 6, generic: 0 }
+                        - { descr: 'bitcurrentipmeter',        graph: 1, value: 7, generic: 0 }
+                        - { descr: 'bitcurrentipswitch',       graph: 1, value: 1, generic: 0 }
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom51CommunicateStatus
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.51.{{ $index }}'
+                    descr: 'PDU {{ $index }} Status'
+                    index: 'mpduMpscom51CommunicateStatus.{{ $index }}'
+                    state_name: mpduMpscom51CommunicateStatus
+                    states:
+                        - { descr: 'normal',    graph: 1, value: 0, generic: 0 }
+                        - { descr: 'alarm',     graph: 1, value: 1, generic: 2 }
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom52Outlet1Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.52.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 01 Status'
+                    index: 'mpduMpscom52Outlet1Status.{{ $index }}'
+                    state_name: mpduMpscom52Outlet1Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom52Outlet1Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom53Outlet2Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.53.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 02 Status'
+                    index: 'mpduMpscom53Outlet2Status.{{ $index }}'
+                    state_name: mpduMpscom53Outlet2Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom53Outlet2Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom54Outlet3Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.54.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 03 Status'
+                    index: 'mpduMpscom54Outlet3Status.{{ $index }}'
+                    state_name: mpduMpscom54Outlet3Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom54Outlet3Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom55Outlet4Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.55.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 04 Status'
+                    index: 'mpduMpscom55Outlet4Status.{{ $index }}'
+                    state_name: mpduMpscom55Outlet4Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom55Outlet4Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom56Outlet5Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.56.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 05 Status'
+                    index: 'mpduMpscom56Outlet5Status.{{ $index }}'
+                    state_name: mpduMpscom56Outlet5Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom56Outlet5Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom57Outlet6Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.57.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 06 Status'
+                    index: 'mpduMpscom57Outlet6Status.{{ $index }}'
+                    state_name: mpduMpscom57Outlet6Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom57Outlet6Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom58Outlet7Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.58.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 07 Status'
+                    index: 'mpduMpscom58Outlet7Status.{{ $index }}'
+                    state_name: mpduMpscom58Outlet7Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom58Outlet7Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom59Outlet8Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.59.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 08 Status'
+                    index: 'mpduMpscom59Outlet8Status.{{ $index }}'
+                    state_name: mpduMpscom59Outlet8Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom59Outlet8Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom60Outlet9Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.60.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 09 Status'
+                    index: 'mpduMpscom60Outlet9Status.{{ $index }}'
+                    state_name: mpduMpscom60Outlet9Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom60Outlet9Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom61Outlet10Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.61.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 10 Status'
+                    index: 'mpduMpscom61Outlet10Status.{{ $index }}'
+                    state_name: mpduMpscom61Outlet10Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom61Outlet10Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom62Outlet11Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.62.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 11 Status'
+                    index: 'mpduMpscom62Outlet11Status.{{ $index }}'
+                    state_name: mpduMpscom62Outlet11Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom62Outlet11Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom63Outlet12Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.63.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 12 Status'
+                    index: 'mpduMpscom63Outlet12Status.{{ $index }}'
+                    state_name: mpduMpscom63Outlet12Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom63Outlet12Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom64Outlet13Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.64.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 13 Status'
+                    index: 'mpduMpscom64Outlet13Status.{{ $index }}'
+                    state_name: mpduMpscom64Outlet13Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom64Outlet13Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom65Outlet14Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.65.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 14 Status'
+                    index: 'mpduMpscom65Outlet14Status.{{ $index }}'
+                    state_name: mpduMpscom65Outlet14Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom65Outlet14Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom66Outlet15Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.66.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 15 Status'
+                    index: 'mpduMpscom66Outlet15Status.{{ $index }}'
+                    state_name: mpduMpscom66Outlet15Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom66Outlet15Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom67Outlet16Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.67.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 16 Status'
+                    index: 'mpduMpscom67Outlet16Status.{{ $index }}'
+                    state_name: mpduMpscom67Outlet16Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom67Outlet16Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom68Outlet17Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.68.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 17 Status'
+                    index: 'mpduMpscom68Outlet17Status.{{ $index }}'
+                    state_name: mpduMpscom68Outlet17Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom68Outlet17Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom69Outlet18Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.69.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 18 Status'
+                    index: 'mpduMpscom69Outlet18Status.{{ $index }}'
+                    state_name: mpduMpscom69Outlet18Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom69Outlet18Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom70Outlet19Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.70.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 19 Status'
+                    index: 'mpduMpscom70Outlet19Status.{{ $index }}'
+                    state_name: mpduMpscom70Outlet19Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom70Outlet19Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom71Outlet20Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.71.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 20 Status'
+                    index: 'mpduMpscom71Outlet20Status.{{ $index }}'
+                    state_name: mpduMpscom71Outlet20Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom71Outlet20Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom72Outlet21Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.72.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 21 Status'
+                    index: 'mpduMpscom72Outlet21Status.{{ $index }}'
+                    state_name: mpduMpscom72Outlet21Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom72Outlet21Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom73Outlet22Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.73.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 22 Status'
+                    index: 'mpduMpscom73Outlet22Status.{{ $index }}'
+                    state_name: mpduMpscom73Outlet22Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom73Outlet22Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom74Outlet23Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.74.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 23 Status'
+                    index: 'mpduMpscom74Outlet23Status.{{ $index }}'
+                    state_name: mpduMpscom74Outlet23Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom74Outlet23Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom75Outlet24Status
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.75.{{ $index }}'
+                    descr: 'PDU {{ $index }} Outlet 24 Status'
+                    index: 'mpduMpscom75Outlet24Status.{{ $index }}'
+                    state_name: mpduMpscom75Outlet24Status
+                    states:
+                        - { descr: 'poweroff',    graph: 1, value: 0, generic: 1 }
+                        - { descr: 'poweron',     graph: 1, value: 1, generic: 0 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom75Outlet24Status
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::acOuTable
+                    value: DCS-MIB::acOu72CommunicateStatus
+                    num_oid: '.1.3.6.1.4.1.13400.3.3.3031.1.1.72.{{ $index }}'
+                    descr: 'AC Comm Status'
+                    index: 'acOu72CommunicateStatus.{{ $index }}'
+                    state_name: acOu72CommunicateStatus
+                    states:
+                        - { descr: 'normal',    graph: 1, value: 0, generic: 0 }
+                        - { descr: 'alarm',     graph: 1, value: 1, generic: 2 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::acOu72CommunicateStatus
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::acOuTable
+                    value: DCS-MIB::acOu75Airconditioningrunningstatus
+                    num_oid: '.1.3.6.1.4.1.13400.3.3.3031.1.1.75.{{ $index }}'
+                    descr: 'AC Running Status'
+                    index: 'acOu75Airconditioningrunningstatus.{{ $index }}'
+                    state_name: acOu75Airconditioningrunningstatus
+                    states:
+                        - { descr: 'on',    graph: 1, value: 0, generic: 0 }
+                        - { descr: 'off',   graph: 1, value: 1, generic: 2 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::acOu75Airconditioningrunningstatus
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::acOuTable
+                    value: DCS-MIB::acOu111Filtermaintenance
+                    num_oid: '.1.3.6.1.4.1.13400.3.3.3031.1.1.111.{{ $index }}'
+                    descr: 'AC Filter Maintenance'
+                    index: 'acOu111Filtermaintenance.{{ $index }}'
+                    state_name: acOu111Filtermaintenance
+                    states:
+                        - { descr: 'no',    graph: 1, value: 0, generic: 0 }
+                        - { descr: 'yes',   graph: 1, value: 1, generic: 2 }
+                    skip_values:
+                    -
+                      oid: DCS-MIB::acOu111Filtermaintenance
+                      op: '!='
+                      value: 1 | 0
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com75PowerSupply
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.75.{{ $index }}'
+                    descr: 'UPS Power Supply Status'
+                    index: 'upsIta2com75PowerSupply.{{ $index }}'
+                    state_name: upsIta2com75PowerSupply
+                    states:
+                        - { descr: 'upsshutdown',     graph: 1, value: 0, generic: 1 }
+                        - { descr: 'utilityonline',   graph: 1, value: 1, generic: 0 }
+                        - { descr: 'onbypass',        graph: 1, value: 2, generic: 1 }
+                        - { descr: 'upsonunionmode',  graph: 1, value: 3, generic: 0 }
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com76InputPowerStatus
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.76.{{ $index }}'
+                    descr: 'UPS Input Power Status'
+                    index: 'upsIta2com76InputPowerStatus.{{ $index }}'
+                    state_name: upsIta2com76InputPowerStatus
+                    states:
+                        - { descr: 'utilityonline',    graph: 1, value: 0, generic: 0 }
+                        - { descr: 'onbat',            graph: 1, value: 1, generic: 1 }
+                        - { descr: 'upsonunionmode',   graph: 1, value: 2, generic: 0 }
+                        - { descr: 'upsshutdown',      graph: 1, value: 3, generic: 2 }
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com77BatStatus
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.77.{{ $index }}'
+                    descr: 'UPS Battery Status'
+                    index: 'upsIta2com77BatStatus.{{ $index }}'
+                    state_name: upsIta2com77BatStatus
+                    states:
+                        - { descr: 'idle',                 graph: 1, value: 0, generic: 0 }
+                        - { descr: 'floatcharging',        graph: 1, value: 1, generic: 0 }
+                        - { descr: 'equalizationcharging', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'discharging',          graph: 1, value: 3, generic: 1 }
+                        - { descr: 'selftesting',          graph: 1, value: 4, generic: 0 }
+                        - { descr: 'nobat',                graph: 1, value: 5, generic: 2 }
+                        - { descr: 'full',                 graph: 1, value: 6, generic: 0 }
+                        - { descr: 'precharge',            graph: 1, value: 7, generic: 0 }
+                        - { descr: 'fastcharging',         graph: 1, value: 8, generic: 0 }
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com79ChargerStatus
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.79.{{ $index }}'
+                    descr: 'UPS Charger Status'
+                    index: 'upsIta2com79ChargerStatus.{{ $index }}'
+                    state_name: upsIta2com79ChargerStatus
+                    states:
+                        - { descr: 'chargeron',      graph: 1, value: 0, generic: 0 }
+                        - { descr: 'chargeroff',     graph: 1, value: 1, generic: 0 }
+                -
+                    oid: DCS-MIB::envTdicomEntry
+                    value: DCS-MIB::envTdicom4FrontDoor
+                    num_oid: '.1.3.6.1.4.1.13400.3.5.541.1.1.4.{{ $index }}'
+                    descr: 'ENV Front Door Status'
+                    index: 'envTdicom4FrontDoor.{{ $index }}'
+                    state_name: envTdicom4FrontDoor
+                    states:
+                        - { descr: 'close',          graph: 1, value: 0, generic: 0 }
+                        - { descr: 'open',           graph: 1, value: 1, generic: 1 }
+                        - { descr: 'uninstalled',    graph: 1, value: 2, generic: 1 }
+                        - { descr: 'leave',          graph: 1, value: 3, generic: 3 }
+                -
+                    oid: DCS-MIB::envTdicomEntry
+                    value: DCS-MIB::envTdicom5RearDoor
+                    num_oid: '.1.3.6.1.4.1.13400.3.5.541.1.1.5.{{ $index }}'
+                    descr: 'ENV Rear Door Status'
+                    index: 'envTdicom5RearDoor.{{ $index }}'
+                    state_name: envTdicom5RearDoor
+                    states:
+                        - { descr: 'close',          graph: 1, value: 0, generic: 0 }
+                        - { descr: 'open',           graph: 1, value: 1, generic: 1 }
+                        - { descr: 'uninstalled',    graph: 1, value: 2, generic: 1 }
+                        - { descr: 'leave',          graph: 1, value: 3, generic: 3 }
+                -
+                    oid: DCS-MIB::envTdicomEntry
+                    value: DCS-MIB::envTdicom6Water
+                    num_oid: '.1.3.6.1.4.1.13400.3.5.541.1.1.6.{{ $index }}'
+                    descr: 'ENV Water Status'
+                    index: 'envTdicom6Water.{{ $index }}'
+                    state_name: envTdicom6Water
+                    states:
+                        - { descr: 'normal',         graph: 1, value: 0, generic: 0 }
+                        - { descr: 'alarm',          graph: 1, value: 1, generic: 1 }
+                        - { descr: 'uninstalled',    graph: 1, value: 2, generic: 1 }
+                        - { descr: 'leave',          graph: 1, value: 3, generic: 3 }
+                -
+                    oid: DCS-MIB::envFirefightingTable
+                    value: DCS-MIB::envFirefighting2FireAlarmStatus
+                    num_oid: '.1.3.6.1.4.1.13400.3.5.559.1.1.2.{{ $index }}'
+                    descr: 'ENV Fire Alarm Status'
+                    index: 'envFirefighting2FireAlarmStatus.{{ $index }}'
+                    state_name: envFirefighting2FireAlarmStatus
+                    states:
+                        - { descr: 'normal',         graph: 1, value: 0, generic: 0 }
+                        - { descr: 'alarm',          graph: 1, value: 1, generic: 2 }
+                        - { descr: 'uninstalled',    graph: 1, value: 2, generic: 2 }
+                        - { descr: 'leave',          graph: 1, value: 3, generic: 3 }
+                -
+                    oid: DCS-MIB::envFirefightingTable
+                    value: DCS-MIB::envFirefighting3FireSensor4DICommStatus
+                    num_oid: '.1.3.6.1.4.1.13400.3.5.559.1.1.2.{{ $index }}'
+                    descr: 'ENV Fire Alarm DI Comm Status'
+                    index: 'envFirefighting3FireSensor4DICommStatus.{{ $index }}'
+                    state_name: envFirefighting3FireSensor4DICommStatus
+                    states:
+                        - { descr: 'normal',         graph: 1, value: 0, generic: 0 }
+                        - { descr: 'failure',        graph: 1, value: 1, generic: 2 }
+        voltage:
+            data:
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom3Voltage
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.3.{{ $index }}'
+                    descr: 'PDU {{ $index }} Voltage'
+                    index: 'mpduMpscom3Voltage.{{ $index }}'
+                    low_limit: DCS-MIB::mpduMpscom76LoadVoltageLowLimit
+                    high_limit: DCS-MIB::mpduMpscom77LoadVoltageHighLimit
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom3Voltage
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::acOuTable
+                    value: DCS-MIB::acOu64Powervoltage
+                    num_oid: '.1.3.6.1.4.1.13400.3.3.3031.1.1.64.{{ $index }}'
+                    descr: 'AC Voltage'
+                    index: 'acOu64Powervoltage.{{ $index }}'
+                    divisor: 100
+                    skip_values:
+                    -
+                      oid: DCS-MIB::acOu64Powervoltage
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com2PhaseAInputVoltage
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.2.{{ $index }}'
+                    descr: 'UPS Phase A Input Voltage'
+                    index: 'upsIta2com2PhaseAInputVoltage.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com2PhaseAInputVoltage
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com3PhaseBInputVoltage
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.3.{{ $index }}'
+                    descr: 'UPS Phase B Input Voltage'
+                    index: 'upsIta2com3PhaseBInputVoltage.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com3PhaseBInputVoltage
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com4PhaseCInputVoltage
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.4.{{ $index }}'
+                    descr: 'UPS Phase C Input Voltage'
+                    index: 'upsIta2com4PhaseCInputVoltage.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com4PhaseCInputVoltage
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com5PhaseAOutputVoltage
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.5.{{ $index }}'
+                    descr: 'UPS Phase A Output Voltage'
+                    index: 'upsIta2com5PhaseAOutputVoltage.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com5PhaseAOutputVoltage
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com6PhaseBOutputVoltage
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.6.{{ $index }}'
+                    descr: 'UPS Phase B Output Voltage'
+                    index: 'upsIta2com6PhaseBOutputVoltage.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com6PhaseBOutputVoltage
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com7PhaseCOutputVoltage
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.7.{{ $index }}'
+                    descr: 'UPS Phase C Output Voltage'
+                    index: 'upsIta2com7PhaseCOutputVoltage.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com7PhaseCOutputVoltage
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com23BypassAVoltageA
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.23.{{ $index }}'
+                    descr: 'UPS Phase A Bypass Voltage'
+                    index: 'upsIta2com23BypassAVoltageA.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com23BypassAVoltageA
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com24BypassBVoltageB
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.24.{{ $index }}'
+                    descr: 'UPS Phase B Bypass Voltage'
+                    index: 'upsIta2com24BypassBVoltageB.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com24BypassBVoltageB
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com25BypassCVoltageC
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.25.{{ $index }}'
+                    descr: 'UPS Phase C Bypass Voltage'
+                    index: 'upsIta2com25BypassCVoltageC.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com25BypassCVoltageC
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com30BusvoltageP
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.30.{{ $index }}'
+                    descr: 'UPS Bus Voltage Positive'
+                    index: 'upsIta2com30BusvoltageP.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com30BusvoltageP
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com31BusvoltageN
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.31.{{ $index }}'
+                    descr: 'UPS Bus Voltage Negative'
+                    index: 'upsIta2com31BusvoltageN.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com31BusvoltageN
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com59BatVoltage
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.59.{{ $index }}'
+                    descr: 'UPS Battery Voltage'
+                    index: 'upsIta2com59BatVoltage.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com59BatVoltage
+                      op: '=='
+                      value: -9999
+        current:
+            data:
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom4TotalCurrent
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.4.{{ $index }}'
+                    descr: 'PDU {{ $index }} Total Current'
+                    index: 'mpduMpscom4TotalCurrent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom4TotalCurrent
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom5Branch1Current
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.5.{{ $index }}'
+                    descr: 'PDU {{ $index }} Branch 1 Current'
+                    index: 'mpduMpscom5Branch1Current.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom5Branch1Current
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom6Branch2Current
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.6.{{ $index }}'
+                    descr: 'PDU {{ $index }} Branch 2 Current'
+                    index: 'mpduMpscom6Branch2Current.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom6Branch2Current
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom7Branch3Current
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.7.{{ $index }}'
+                    descr: 'PDU {{ $index }} Branch 3 Current'
+                    index: 'mpduMpscom7Branch3Current.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom7Branch3Current
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com8PhaseAOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.8.{{ $index }}'
+                    descr: 'UPS Phase A Output Current'
+                    index: 'upsIta2com8PhaseAOutputCurrent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com8PhaseAOutputCurrent
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com9PhaseBOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.9.{{ $index }}'
+                    descr: 'UPS Phase B Output Current'
+                    index: 'upsIta2com9PhaseBOutputCurrent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com9PhaseBOutputCurrent
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com10PhaseCOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.10.{{ $index }}'
+                    descr: 'UPS Phase C Output Current'
+                    index: 'upsIta2com10PhaseCOutputCurrent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com10PhaseCOutputCurrent
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com16PhaseAInputCurrent
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.16.{{ $index }}'
+                    descr: 'UPS Phase A Input Current'
+                    index: 'upsIta2com16PhaseAInputCurrent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com16PhaseAInputCurrent
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com17PhaseBInputCurrent
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.17.{{ $index }}'
+                    descr: 'UPS Phase B Input Current'
+                    index: 'upsIta2com17PhaseBInputCurrent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com17PhaseBInputCurrent
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com18PhaseCInputCurrent
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.18.{{ $index }}'
+                    descr: 'UPS Phase C Input Current'
+                    index: 'upsIta2com18PhaseCInputCurrent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com18PhaseCInputCurrent
+                      op: '=='
+                      value: -9999
+        power:
+            data:
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom8ActivePower
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.8.{{ $index }}'
+                    descr: 'PDU {{ $index }} Active Power'
+                    index: 'mpduMpscom8ActivePower.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom8ActivePower
+                      op: '=='
+                      value: -9999
+        frequency:
+            data:
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom11Frequency
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.11.{{ $index }}'
+                    descr: 'PDU {{ $index }} Frequency'
+                    index: 'mpduMpscom11Frequency.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::acOu65Powerfrequency
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.65.{{ $index }}'
+                    descr: 'AC Frequency'
+                    index: 'acOu65Powerfrequency.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com11OutputFrequency
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.11.{{ $index }}'
+                    descr: 'UPS Output Frequency'
+                    index: 'upsIta2com11OutputFrequency.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com19SystemInputFrequency
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.19.{{ $index }}'
+                    descr: 'UPS Input Frequency'
+                    index: 'upsIta2com19SystemInputFrequency.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com29BypassFrequency
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.29.{{ $index }}'
+                    descr: 'UPS Bypass Frequency'
+                    index: 'upsIta2com29BypassFrequency.{{ $index }}'
+                    divisor: 10
+        load:
+            data:
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom12LoadCurrent
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.12.{{ $index }}'
+                    descr: 'PDU {{ $index }} Load'
+                    index: 'mpduMpscom12LoadCurrent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::mpduMpscom12LoadCurrent
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::acOuTable
+                    value: DCS-MIB::acOu76Compressorcapacityactualvalu
+                    num_oid: '.1.3.6.1.4.1.13400.3.3.3031.1.1.76.{{ $index }}'
+                    descr: 'AC Compressor Load'
+                    index: 'acOu76Compressorcapacityactualvalu.{{ $index }}'
+                    divisor: 100
+                    skip_values:
+                    -
+                      oid: DCS-MIB::acOu76Compressorcapacityactualvalu
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com45LPhaseAOutputLoadPercent
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.45.{{ $index }}'
+                    descr: 'UPS Phase A Load'
+                    index: 'upsIta2com45LPhaseAOutputLoadPercent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com45LPhaseAOutputLoadPercent
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com46LPhaseBOutputLoadPercent
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.46.{{ $index }}'
+                    descr: 'UPS Phase B Load'
+                    index: 'upsIta2com46LPhaseBOutputLoadPercent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com46LPhaseBOutputLoadPercent
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com47LPhaseCOutputLoadPercent
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.47.{{ $index }}'
+                    descr: 'UPS Phase C Load'
+                    index: 'upsIta2com47LPhaseCOutputLoadPercent.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com47LPhaseCOutputLoadPercent
+                      op: '=='
+                      value: -9999
+        power_consumed:
+            data:
+                -
+                    oid: DCS-MIB::mpduMpscomTable
+                    value: DCS-MIB::mpduMpscom13PowerConsumption
+                    num_oid: '.1.3.6.1.4.1.13400.3.2.225.1.1.13.{{ $index }}'
+                    descr: 'PDU {{ $index }} Power Consumption'
+                    index: 'mpduMpscom13PowerConsumption.{{ $index }}'
+                    divisor: 1000
+        temperature:
+            data:
+                -
+                    oid: DCS-MIB::acOuTable
+                    value: DCS-MIB::acOu56Supplyairtemperature
+                    num_oid: '.1.3.6.1.4.1.13400.3.3.3031.1.1.56.{{ $index }}'
+                    descr: 'AC Supply Air Temperature'
+                    index: 'acOu56Supplyairtemperature.{{ $index }}'
+                    divisor: 100
+                    skip_values:
+                    -
+                      oid: DCS-MIB::acOu56Supplyairtemperature
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::acOuTable
+                    value: DCS-MIB::acOu57Returnairtemperature
+                    num_oid: '.1.3.6.1.4.1.13400.3.3.3031.1.1.57.{{ $index }}'
+                    descr: 'AC Return Air Temperature'
+                    index: 'acOu57Returnairtemperature.{{ $index }}'
+                    divisor: 100
+                    skip_values:
+                    -
+                      oid: DCS-MIB::acOu57Returnairtemperature
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::acOuTable
+                    value: DCS-MIB::acOu58Outsidetemperature
+                    num_oid: '.1.3.6.1.4.1.13400.3.3.3031.1.1.58.{{ $index }}'
+                    descr: 'AC Outside Air Temperature'
+                    index: 'acOu58Outsidetemperature.{{ $index }}'
+                    divisor: 100
+                    skip_values:
+                    -
+                      oid: DCS-MIB::acOu58Outsidetemperature
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::acOuTable
+                    value: DCS-MIB::acOu59Exhausttemperature
+                    num_oid: '.1.3.6.1.4.1.13400.3.3.3031.1.1.59.{{ $index }}'
+                    descr: 'AC Exhaust Air Temperature'
+                    index: 'acOu59Exhausttemperature.{{ $index }}'
+                    divisor: 100
+                    skip_values:
+                    -
+                      oid: DCS-MIB::acOu59Exhausttemperature
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com67Ambienttemp
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.67.{{ $index }}'
+                    descr: 'UPS Ambient Temperature'
+                    index: 'upsIta2com67Ambienttemp.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::upsIta2com67Ambienttemp
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::envTdicomTable
+                    value: DCS-MIB::envTdicom2FrontTemp
+                    num_oid: '.1.3.6.1.4.1.13400.3.5.541.1.1.2.{{ $index }}'
+                    descr: 'ENV Front Temperature'
+                    index: 'envTdicom2FrontTemp.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::envTdicom2FrontTemp
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::envTdicomTable
+                    value: DCS-MIB::envTdicom3RearTemp
+                    num_oid: '.1.3.6.1.4.1.13400.3.5.541.1.1.3.{{ $index }}'
+                    descr: 'ENV Rear Temperature'
+                    index: 'envTdicom3RearTemp.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::envTdicom3RearTemp
+                      op: '=='
+                      value: -9999
+                -
+                    oid: DCS-MIB::envTdicomTable
+                    value: DCS-MIB::envTdicom19OutsideCabinetTemp
+                    num_oid: '.1.3.6.1.4.1.13400.3.5.541.1.1.19.{{ $index }}'
+                    descr: 'ENV Outside Cabinet Temperature'
+                    index: 'envTdicom19OutsideCabinetTemp.{{ $index }}'
+                    divisor: 10
+                    skip_values:
+                    -
+                      oid: DCS-MIB::envTdicom19OutsideCabinetTemp
+                      op: '=='
+                      value: -9999
+        humidity:
+            data:
+                -
+                    oid: DCS-MIB::envTdicomTable
+                    value: DCS-MIB::envTdicom20OutsideCabinetHum
+                    num_oid: '.1.3.6.1.4.1.13400.3.5.541.1.1.20.{{ $index }}'
+                    descr: 'ENV Outside Cabinet'
+                    index: 'envTdicom20OutsideCabinetHum.{{ $index }}'
+                    divisor: 10
+        percent:
+            data:
+                -
+                    oid: DCS-MIB::acOuTable
+                    value: DCS-MIB::acOu77Fanspeed
+                    num_oid: '.1.3.6.1.4.1.13400.3.3.3031.1.1.77.{{ $index }}'
+                    descr: 'AC Fan Speed'
+                    index: 'acOu77Fanspeed.{{ $index }}'
+                    divisor: 100
+                -
+                    oid: DCS-MIB::acOuTable
+                    value: DCS-MIB::acOu78Expansionvalveopening
+                    num_oid: '.1.3.6.1.4.1.13400.3.3.3031.1.1.78.{{ $index }}'
+                    descr: 'AC Expansion Valve Opening'
+                    index: 'acOu78Expansionvalveopening.{{ $index }}'
+                    divisor: 100
+        runtime:
+            data:
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com65BatBackupTime
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.65.{{ $index }}'
+                    descr: 'UPS Runtime'
+                    index: 'upsIta2com65BatBackupTime.{{ $index }}'
+                    divisor: 10
+
+        charge:
+            data:
+                -
+                    oid: DCS-MIB::upsIta2comTable
+                    value: DCS-MIB::upsIta2com68BatCurrentCapacity
+                    num_oid: '.1.3.6.1.4.1.13400.3.4.491.1.1.68.{{ $index }}'
+                    descr: 'UPS Battery Charge'
+                    index: 'upsIta2com68BatCurrentCapacity.{{ $index }}'
+                    divisor: 10

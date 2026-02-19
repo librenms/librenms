@@ -25,7 +25,7 @@ Route: `/api/v0/logs/alertlog/:hostname`
 
 ### `list_authlog`
 
-Route: `/api/v0/logs/authlog/:hostname`
+Route: `/api/v0/logs/authlog`
 
 Example:
 
@@ -78,7 +78,7 @@ Output:
 
 ### `syslogsink`
 
-Route: `/api/v0/logs/syslogsink`
+Route: `/api/v0/syslogsink`
 
 Accept any json messages and passes to further syslog processing. single messages or an array of multiple messages is accepted. see [Syslog](../Extensions/Syslog.md) for more details and logstash integration
 

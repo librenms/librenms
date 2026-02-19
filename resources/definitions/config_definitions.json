@@ -392,47 +392,80 @@
             "type": "array"
         },
         "apps.powerdns-recursor.api-key": {
-            "type": "text"
+            "type": "text",
+            "group": "apps",
+            "section": "powerdns-recursor",
+            "order": 0
         },
         "apps.powerdns-recursor.https": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "powerdns-recursor",
+            "order": 1
         },
         "apps.powerdns-recursor.port": {
             "default": 8082,
-            "type": "integer"
+            "type": "integer",
+            "group": "apps",
+            "section": "powerdns-recursor",
+            "order": 2
         },
         "apps.oslv_monitor.seen_age": {
             "default": 604800,
-            "type": "integer"
+            "type": "integer",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 0
         },
         "apps.oslv_monitor.linux_pg_memory_stats": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 1
         },
         "apps.oslv_monitor.misc_linux_memory_stats": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 2
         },
         "apps.oslv_monitor.zswap_size": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 3
         },
         "apps.oslv_monitor.zswap_activity": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 4
         },
         "apps.oslv_monitor.workingset_stats": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 5
         },
         "apps.oslv_monitor.thp_activity": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "oslv_monitor",
+            "order": 6
         },
         "apps.sneck.polling_time_diff": {
             "default": false,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "apps",
+            "section": "sneck",
+            "order": 0
         },
         "astext": {
             "default": {
@@ -469,8 +502,7 @@
             "group": "auth",
             "section": "ad",
             "order": 4,
-            "type": "text",
-            "default": null
+            "type": "text"
         },
         "auth_ad_require_groupmembership": {
             "group": "auth",
@@ -749,7 +781,6 @@
             }
         },
         "auth_ldap_port": {
-            "default": null,
             "group": "auth",
             "section": "ldap",
             "order": 1,
@@ -949,7 +980,6 @@
             }
         },
         "bad_entity_sensor_regex": {
-            "default": null,
             "type": "array",
             "validate": {
                 "value": "array",
@@ -1095,18 +1125,15 @@
             "type": "text"
         },
         "callback_proxy": {
-            "default": null,
             "type": "text"
         },
         "collectd_dir": {
-            "default": null,
             "type": "directory",
             "group": "external",
             "section": "collectd",
             "order": 0
         },
         "collectd_sock": {
-            "default": null,
             "type": "text",
             "group": "external",
             "section": "collectd",
@@ -1167,7 +1194,6 @@
             }
         },
         "custom_map.background_data.layer": {
-            "default": null,
             "type": "select",
             "group": "webui",
             "section": "custom-map",
@@ -1256,7 +1282,6 @@
             "order": 2
         },
         "custom_map.legend_colours": {
-            "default": null,
             "type": "array",
             "validate": {
                  "value": "array",
@@ -1438,7 +1463,6 @@
             "group": "webui",
             "section": "device",
             "order": 1,
-            "default": null,
             "type": "select",
             "options": {
                 "{{ $hostname }}": "hostname",
@@ -1560,14 +1584,12 @@
             }
         },
         "disabled_sensors": {
-            "default": null,
             "type": "array",
             "group": "discovery",
             "section": "sensors",
             "order": 1
         },
         "disabled_sensors_regex": {
-            "default": null,
             "type": "array",
             "validate": {
                 "value": "array",
@@ -1975,10 +1997,6 @@
             "default": false,
             "type": "boolean"
         },
-        "dot": {
-            "default": "/usr/bin/dot",
-            "type": "executable"
-        },
         "email_auto_tls": {
             "default": true,
             "group": "alerting",
@@ -2053,7 +2071,6 @@
             }
         },
         "email_from": {
-            "default": null,
             "group": "alerting",
             "section": "email",
             "order": 2,
@@ -2290,7 +2307,6 @@
             "type": "boolean"
         },
         "error_font": {
-            "default": null,
             "type": "text"
         },
         "eventlog_purge": {
@@ -2383,7 +2399,6 @@
             "order": 3
         },
         "gateone.server": {
-            "default": null,
             "type": "text"
         },
         "gateone.use_librenms_user": {
@@ -2471,7 +2486,6 @@
             "type": "text"
         },
         "good_if": {
-            "default": null,
             "type": "array",
             "group": "discovery",
             "section": "ports",
@@ -5186,7 +5200,6 @@
             "order": 2
         },
         "libvirt_username": {
-            "default": null,
             "type": "text",
             "group": "discovery",
             "section": "virtualization",
@@ -5221,7 +5234,6 @@
             "type": "color"
         },
         "location_map": {
-            "default": null,
             "type": "array",
             "validate": {
                 "value": "array",
@@ -5232,7 +5244,6 @@
             "order": 9
         },
         "location_map_regex": {
-            "default": null,
             "type": "array",
             "validate": {
                 "value": "array",
@@ -5243,7 +5254,6 @@
             "order": 10
         },
         "location_map_regex_sub": {
-            "default": null,
             "type": "array",
             "validate": {
                 "value": "array",
@@ -5300,7 +5310,6 @@
             "type": "executable"
         },
         "mtu_options.bytes": {
-            "default": null,
             "group": "poller",
             "section": "mtu",
             "order": 1,
@@ -5339,7 +5348,6 @@
             "type": "boolean"
         },
         "network_map_dependencymap_vis_options": {
-            "default": null,
             "type": "text"
         },
         "network_map_items": {
@@ -5595,7 +5603,6 @@
             "type": "boolean"
         },
         "opentsdb.co": {
-            "default": null,
             "type": "boolean",
             "group": "poller",
             "section": "opentsdb",
@@ -5787,11 +5794,9 @@
             "type": "integer"
         },
         "radius.hostname": {
-            "default": null,
             "type": "text"
         },
         "radius.port": {
-            "default": null,
             "type": "integer"
         },
         "radius.users_purge": {
@@ -5800,11 +5805,9 @@
             "type": "integer"
         },
         "radius.secret": {
-            "default": null,
             "type": "text"
         },
         "radius.suffix": {
-            "default": null,
             "type": "text"
         },
         "rrd.enable": {
@@ -5901,7 +5904,6 @@
             "type": "boolean"
         },
         "php_memory_limit": {
-            "default": null,
             "type": "integer"
         },
         "ping": {
@@ -6460,7 +6462,6 @@
             "order": 2
         },
         "rancid_repo_url": {
-            "default": null,
             "type": "text",
             "group": "external",
             "section": "rancid",
@@ -6598,7 +6599,6 @@
             "type": "boolean"
         },
         "rrdtool_version": {
-            "default": null,
             "group": "poller",
             "section": "rrdtool",
             "order": 12,
@@ -6824,13 +6824,6 @@
             "order": 26,
             "type": "boolean"
         },
-        "sfdp": {
-            "default": "/usr/bin/sfdp",
-            "group": "external",
-            "section": "binaries",
-            "order": 7,
-            "type": "executable"
-        },
         "shorthost_target_length": {
             "group": "webui",
             "section": "graph",
@@ -7042,35 +7035,30 @@
             "order": 0
         },
         "sso.descr_attr":{
-            "default": null,
             "type": "text",
             "group": "auth",
             "section": "sso",
             "order": 1
         },
         "sso.email_attr":{
-            "default": null,
             "type": "text",
             "group": "auth",
             "section": "sso",
             "order": 2
         },
         "sso.group_attr":{
-            "default": null,
             "type": "text",
             "group": "auth",
             "section": "sso",
             "order": 3
         },
         "sso.group_delimiter":{
-            "default": null,
             "type": "text",
             "group": "auth",
             "section": "sso",
             "order": 4
         },
         "sso.group_filter":{
-            "default": null,
             "type": "text",
             "group": "auth",
             "section": "sso",
@@ -7093,7 +7081,6 @@
             "order": 6
         },
         "sso.group_strategy": {
-            "default": null,
             "type": "select",
             "options": {
                 "attribute": "attribute",
@@ -7105,7 +7092,6 @@
             "order": 7
         },
         "sso.level_attr":{
-            "default": null,
             "type": "text",
             "group": "auth",
             "section": "sso",
@@ -7123,14 +7109,12 @@
             "order": 9
         },
         "sso.realname_attr":{
-            "default": null,
             "type": "text",
             "group": "auth",
             "section": "sso",
             "order": 10
         },
         "sso.static_level":{
-            "default": null,
             "type": "integer",
             "group": "auth",
             "section": "sso",
@@ -7334,6 +7318,34 @@
             "section": "general",
             "type": "boolean",
             "order": 4
+        },
+        "webui.alert_map_box_size": {
+            "default": 165,
+            "group": "webui",
+            "section": "alert-map",
+            "order": 3,
+            "type": "text"
+        },
+        "webui.alert_map_compact": {
+            "default": false,
+            "group": "webui",
+            "section": "alert-map",
+            "order": 0,
+            "type": "boolean"
+        },
+        "webui.alert_map_sort_status": {
+            "default": false,
+            "group": "webui",
+            "section": "alert-map",
+            "order": 1,
+            "type": "boolean"
+        },
+        "webui.alert_map_use_device_groups": {
+            "default": false,
+            "group": "webui",
+            "section": "alert-map",
+            "order": 2,
+            "type": "boolean"
         },
         "webui.availability_map_box_size": {
             "default": 165,

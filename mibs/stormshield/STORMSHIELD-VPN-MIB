@@ -1,0 +1,24 @@
+STORMSHIELD-VPN-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      stormshieldMIB FROM STORMSHIELD-SMI-MIB;
+
+   snsVPN MODULE-IDENTITY
+      LAST-UPDATED  "202008200000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield VPN MIBS"
+      REVISION      "202008200000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 1 }
+
+END

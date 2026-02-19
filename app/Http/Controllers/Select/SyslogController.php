@@ -49,7 +49,7 @@ class SyslogController extends SelectController
      */
     protected function searchFields($request)
     {
-        return [$request->get('field')];
+        return [$request->input('field')];
     }
 
     /**
@@ -62,9 +62,9 @@ class SyslogController extends SelectController
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = \App\Models\Syslog::hasAccess($request->user())
-            ->select($request->get('field'))->distinct();
+            ->select($request->input('field'))->distinct();
 
-        if ($device_id = $request->get('device')) {
+        if ($device_id = $request->input('device')) {
             $query->where('device_id', $device_id);
         }
 

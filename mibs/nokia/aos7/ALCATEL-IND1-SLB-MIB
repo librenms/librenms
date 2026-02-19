@@ -1,4 +1,4 @@
-ALCATEL-IND1-SLB-MIB DEFINITIONS ::= BEGIN
+ ALCATEL-IND1-SLB-MIB DEFINITIONS ::= BEGIN
 
   IMPORTS
     MODULE-IDENTITY,
@@ -28,34 +28,27 @@ ALCATEL-IND1-SLB-MIB DEFINITIONS ::= BEGIN
 --
 
 alcatelIND1SLBMIB MODULE-IDENTITY
-   LAST-UPDATED    "201005130000Z"
-   ORGANIZATION    "Alcatel-Lucent"
-   CONTACT-INFO
-       "Please consult with Customer Service to ensure the most appropriate
-        version of this document is used with the products in question:
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                   Alcatel-Lucent, Enterprise Solutions Division
-                  (Formerly Alcatel Internetworking, Incorporated)
-                          26801 West Agoura Road
-                       Agoura Hills, CA  91301-5122
-                         United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-       Telephone:               North America  +1 800 995 2696
-                                Latin America  +1 877 919 9526
-                                Europe         +31 23 556 0100
-                                Asia           +65 394 7933
-                                All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-       Electronic Mail:         support@ind.alcatel.com
-       World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-       File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
-
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
    DESCRIPTION
        "This module describes an authoritative enterprise-specific Simple
         Network Management Protocol (SNMP) Management Information Base (MIB):
 
-            For the Birds Of Prey Product Line
+            For the OmniSwitch Product Line
             Configuration and monitoring of the Server Load Balancing feature
 
         The right to make changes in specification and other information
@@ -69,13 +62,17 @@ alcatelIND1SLBMIB MODULE-IDENTITY
         non-exclusive license to use this specification in connection with
         management of the products for which it is intended to be used.
 
-                    Copyright (C) 1995-2007 Alcatel-Lucent
-                        ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "201911270000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
 
     REVISION      "201005130000Z"
     DESCRIPTION
         "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
-
    ::= { softentIND1Slb 1 }
 
 --
@@ -198,14 +195,18 @@ SlbServerOperState ::= TEXTUAL-CONVENTION
                                considered in service.
                 'discovery'  : The server is currently being tested to
                                get its MAC address. The server is considered
-                               out of service."
+                               out of service.
+                'waitToRestore'  : Server is in switchover period when become 
+                                   active again, so the server is considered
+                                   out of service."
         SYNTAX INTEGER {
                 inService(1),
                 linkDown(2),
                 noAnswer(3),
                 disabled(4),
                 retrying(5),
-                discovery(6)
+                discovery(6),
+                waitToRestore(7)
         }
 
 --
@@ -304,7 +305,10 @@ SlbClusterTableEntry ::= SEQUENCE {
         slbClusterPackets                 Counter64,
         slbClusterCondition               SnmpAdminString,
         slbClusterType                    INTEGER,
-        slbClusterHashType                SlbHashSelector
+        slbClusterHashType                SlbHashSelector,
+        slbClusterAutoBypassAdminState          SlbAdminState,
+        slbClusterAutoBypassInactiveServer      Integer32,
+        slbClusterWaitToRestore           Integer32
 }
 
 slbClusterName          OBJECT-TYPE
@@ -463,6 +467,79 @@ slbClusterHashType   OBJECT-TYPE
                                by the cluster."
         DEFVAL                { useEcmp }
         ::= { slbClusterTableEntry 17 }
+
+slbClusterAutoBypassAdminState OBJECT-TYPE
+        SYNTAX          SlbAdminState
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "To disable/enable the auto-bypass."
+        DEFVAL          { disable }
+        ::= { slbClusterTableEntry 18 }
+
+slbClusterAutoBypassInactiveServer OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Set the number of inactive servers that would trigger auto-bypass."
+        ::= { slbClusterTableEntry 19 }
+
+slbClusterWaitToRestore OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Set wtr time (in second) for slb cluster."
+        ::= { slbClusterTableEntry 20 }
+
+
+
+slbClusterConditionTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SlbClusterConditionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This is a table of clusters rule condition."
+        ::= { slbClusters 3 }
+
+slbClusterConditionEntry    OBJECT-TYPE
+        SYNTAX          SlbClusterConditionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Entry of this table."
+        INDEX   { slbClusterName, slbClusterConditionName }
+        ::= { slbClusterConditionTable 1 }
+
+SlbClusterConditionEntry ::= SEQUENCE {
+        slbClusterConditionName              SnmpAdminString,
+        slbClusterConditionRowStatus         RowStatus,
+        slbClusterConditionHashType          SlbHashSelector
+}
+
+slbClusterConditionName        OBJECT-TYPE
+        SYNTAX             SnmpAdminString (SIZE (0..23))
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+                "The Condition name rule.
+                 Mutually exclusive with VIP"
+        ::= { slbClusterConditionEntry 1 }
+
+slbClusterConditionRowStatus        OBJECT-TYPE
+        SYNTAX             RowStatus
+        MAX-ACCESS         read-create
+        STATUS             current
+        DESCRIPTION
+                "Row status of this entry."
+        ::= { slbClusterConditionEntry 2 }
+
+slbClusterConditionHashType   OBJECT-TYPE
+        SYNTAX  SlbHashSelector
+        MAX-ACCESS            read-create
+        STATUS                current
+        DESCRIPTION           "The load balancing hashing algorithm
+                               by the cluster."
+        DEFVAL                { useEcmp }
+        ::= { slbClusterConditionEntry 3 }
 
 --
 -- SLB Server Table
@@ -1236,7 +1313,12 @@ slbClustersGroup OBJECT-GROUP
       slbClusterPackets,
       slbClusterCondition,
       slbClusterType,
-      slbClusterHashType
+      slbClusterHashType,
+      slbClusterAutoBypassAdminState,
+      slbClusterAutoBypassInactiveServer,
+      slbClusterConditionRowStatus,
+      slbClusterConditionHashType,
+      slbClusterWaitToRestore
    }
    STATUS current
    DESCRIPTION

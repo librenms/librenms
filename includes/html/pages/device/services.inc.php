@@ -92,7 +92,7 @@ if (count($services) > '0') {
         echo '<td class="col-sm-1 text-muted">' . nl2br(htmlentities((string) $service['service_ip'])) . '</td>';
         echo '<td class="col-sm-4">' . nl2br(htmlentities(trim((string) $service['service_message']))) . '</td>';
         echo '<td class="col-sm-2 text-muted">' . htmlentities((string) $service['service_desc']) . '</td>';
-        echo '<td class="col-sm-1 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</td>';
+        echo '<td class="col-sm-1 text-muted">' . ($service['service_changed'] ? \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) : 'Waiting for first service check') . '</td>';
         echo '<td class="col-sm-1">';
         if (Auth::user()->hasGlobalAdmin()) {
             echo '<div class="pull-right">';
@@ -118,15 +118,19 @@ if (count($services) > '0') {
 
             $graphs = json_decode($service['service_ds'], true);
             foreach ($graphs as $k => $v) {
+                $graph_title = $k;
+                if (isset($v['full_name'])) {
+                    $graph_title = htmlentities((string) $v['full_name']);
+                }
                 $graph_array['device'] = $device['device_id'];
                 $graph_array['type'] = 'service_graph';
                 $graph_array['id'] = $service['service_id'];
                 $graph_array['ds'] = $k;
 
                 echo '<tr>';
-                echo '<td colspan="7">';
+                echo '<td colspan="7" style="padding: 0">';
 
-                include 'includes/html/print-graphrow.inc.php';
+                include 'includes/html/print-device-graph.php';
 
                 echo '</td>';
                 echo '</tr>';

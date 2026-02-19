@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2021 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: The mib is used for VAP.
 -- Reference: 
--- Version: V1.22
+-- Version: V1.31
 -- ============================================================================
 -- Module definition
 
@@ -20,7 +20,7 @@
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.17
 		hwWlanVap MODULE-IDENTITY
-			LAST-UPDATED "202007081651Z"		                      -- Jul 08, 2020 at 16:51 GMT			
+			LAST-UPDATED "202108171030Z"		                      -- Aug 17, 2021 at 10:30 GMT				
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -30,6 +30,35 @@
 				   People's Republic of China
 				   Website: http://www.huawei.com
 				   Email: support@huawei.com"
+
+			DESCRIPTION
+				"V1.31 add node hwWlanSsid6gStaCnt."
+				REVISION "202108171030Z" -- Aug 17, 2021 at 10:30 GMT	
+			DESCRIPTION
+				"V1.30 modify the node hwWlanVapAuthType type."
+				REVISION "202102101055Z" -- Feb 10, 2021 at 10:55 GMT				   
+			DESCRIPTION
+				"V1.29, add node hwWlanVapApZone."
+                        REVISION "202101121450Z"                               -- January 12, 2021 at 14:50 GMT
+			DESCRIPTION
+				"V1.28, modify the node of hwVapNumReachWarningRestoreTrap."				
+			REVISION "202012301404Z"
+			DESCRIPTION
+				"V1.27, modify the node of hwWlanVapAuthType."				
+			REVISION "202012211236Z"
+			DESCRIPTION
+				"V1.26, modify the node of hwWlanVapAuthType."				
+			REVISION "202012210936Z"
+			DESCRIPTION
+				"V1.25, modify the node of hwWlanVapStatus."				
+			REVISION "202009181734Z"		                      -- September 18, 2020 at 17:34 GMT
+			DESCRIPTION
+				"V1.24, Add enumerations value of hwWlanVapAuthType."				
+			REVISION "202009032004Z"		                      -- September 03, 2020 at 20:04 GMT
+			DESCRIPTION
+				"V1.23, Add the nodes of  hwVapNumReachWarningTrap, hwVapNumReachWarningRestoreTrap and hwVapCurNum."
+				
+			REVISION "202008211730Z"		                      -- Aug 21, 2020 at 17:30 GMT 
 			DESCRIPTION
 				"V1.22, Modify the nodes of  hwWlanVapAuthType and hwWlanNaviVapAuthType."
 				
@@ -193,7 +222,9 @@
 				hwWlanVapStatus
 					INTEGER,
 				hwWlanVapApId
-					Unsigned32
+					Unsigned32,
+				hwWlanVapApZone
+					OCTET STRING
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.17.1.1.1.1
@@ -263,6 +294,7 @@
 		hwWlanVapAuthType OBJECT-TYPE
 			SYNTAX INTEGER
 				{
+				unConfig(0),
 				wepOpenSystem(1),
 				wepOpenSystemMac(2),
 				wepOpenSystem8021X(3),
@@ -319,7 +351,17 @@
 				wpa2PskWpa3Sae(54),
 				wpa2PskWpa3SaePortal(55),
 				wpa2PskWpa3SaePortalMac(56),
-				wpa2PskWpa3SaeMac(57)
+				wpa2PskWpa3SaeMac(57),
+				wpaDpsk(58),
+                wpaDpskMac(59),
+                wpa2Dpsk(60),
+                wpa2DpskMac(61),
+                wpaWpa2Dpsk(62),
+                wpaWpa2DpskMac(63),
+				owe(64),
+				oweMac(65),
+				owePortal(66),
+				owePortalMac(67)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -341,7 +383,8 @@
 			SYNTAX INTEGER
 				{
 				up(1),
-				down(2)
+				down(2),
+				invalid(255)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -359,6 +402,14 @@
 				"This object indicates the AP ID."
 			::= { hwWlanVapInfoEntry 11 }
 
+		 --1.3.6.1.4.1.2011.6.139.17.1.1.1.12
+		hwWlanVapApZone OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..35))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP zone name."
+			::= { hwWlanVapInfoEntry 12 }
 		
 		-- 1.3.6.1.4.1.2011.6.139.17.1.2
 		hwWlanSsidStatisticTable OBJECT-TYPE
@@ -413,7 +464,9 @@
 				hwWlanSsidSendRate
 					Counter64,
 				hwWlanSsidRecvRate
-					Counter64
+					Counter64,
+				hwWlanSsid6gStaCnt
+					Integer32
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.1
@@ -562,6 +615,14 @@
 				"This object indicates the rate of bits in packets received at the wireless side."
 			::= { hwWlanSsidStatisticEntry 16 }
 
+		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.17
+		hwWlanSsid6gStaCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of users at 6G frequency band."
+			::= { hwWlanSsidStatisticEntry 17 }
 		
 		-- 1.3.6.1.4.1.2011.6.139.17.1.3
 		hwWlanRfSsidStatisticTable OBJECT-TYPE
@@ -1204,7 +1265,17 @@
 				wpa2PskWpa3Sae(54),
 				wpa2PskWpa3SaePortal(55),
 				wpa2PskWpa3SaePortalMac(56),
-				wpa2PskWpa3SaeMac(57)
+				wpa2PskWpa3SaeMac(57),
+				wpaDpsk(58),
+				wpaDpskMac(59),
+				wpa2Dpsk(60),
+				wpa2DpskMac(61),
+				wpaWpa2Dpsk(62),
+				wpaWpa2DpskMac(63),
+				owe(64),
+				oweMac(65),
+				owePortal(66),
+				owePortalMac(67)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -1427,6 +1498,22 @@
 			DESCRIPTION 
 				"The number of VAP on the card is less than the maximum specifications."
 			::= { hwWlanVapTrap 7 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.17.2.1.8
+		hwVapNumReachWarningTrap NOTIFICATION-TYPE
+			OBJECTS { hwVapMaxNum, hwVapCurNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of VAP more than the 80% of the maximum specifications."
+			::= { hwWlanVapTrap 8 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.2.1.9
+		hwVapNumReachWarningRestoreTrap NOTIFICATION-TYPE
+			OBJECTS { hwVapMaxNum, hwVapCurNum }
+			STATUS current
+			DESCRIPTION 
+				"The number of VAP less than the 75% of the maximum specifications."
+			::= { hwWlanVapTrap 9 }	
 
 		-- 1.3.6.1.4.1.2011.6.139.17.2.2
 		hwWlanVapTrapObjects OBJECT IDENTIFIER ::= { hwWlanVapTrapInfo 2 }
@@ -1475,6 +1562,15 @@
 			DESCRIPTION
 				"Slot"
 			::= { hwWlanVapTrapObjects 5 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.17.2.2.6
+		hwVapCurNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The number of current vap."
+			::= { hwWlanVapTrapObjects 6 }
 
 		-- 1.3.6.1.4.1.2011.6.139.17.3
 		hwWlanVapConformance OBJECT IDENTIFIER ::= { hwWlanVap 3 }
@@ -1497,7 +1593,7 @@
 		-- 1.3.6.1.4.1.2011.6.139.17.3.2.1
 		hwWlanVapInfoGroup OBJECT-GROUP
 			OBJECTS {hwWlanVapProfileName, hwWlanVapBssid, 
-			hwWlanVapSSID, hwWlanVapApName, hwWlanVapAuthType, hwWlanVapStaOnlineCnt, hwWlanVapStatus, hwWlanVapApId }
+			hwWlanVapSSID, hwWlanVapApName, hwWlanVapAuthType, hwWlanVapStaOnlineCnt, hwWlanVapStatus, hwWlanVapApId, hwWlanVapApZone }
 			STATUS current
 			DESCRIPTION 
 				"Description."

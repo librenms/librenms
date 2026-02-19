@@ -3,49 +3,50 @@ FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB DEFINITIONS ::= BEGIN
 IMPORTS
 	MODULE-IDENTITY, OBJECT-TYPE,IpAddress, Counter32, TimeTicks,Counter64,Integer32
 			FROM SNMPv2-SMI
-
+			
 	switch
 		FROM FOUNDRY-SN-ROOT-MIB
-
+			
 	TEXTUAL-CONVENTION
 		FROM SNMPv2-TC
-
+			
 	PhysAddress
 		FROM FOUNDRY-SN-SWITCH-GROUP-MIB
-
+	
 	DisplayString
 		FROM FOUNDRY-SN-AGENT-MIB;
-
+			
 snL4 MODULE-IDENTITY
-    LAST-UPDATED "201006020000Z"  -- 04 June 2010
-    ORGANIZATION "Brocade Communications Systems, Inc."
-    CONTACT-INFO
-             "Technical Support Center
-              130 Holger Way,
-              San Jose, CA  95134
-              Email:  ipsupport@brocade.com
-              Phone: 1-800-752-8061
-              URL:  www.brocade.com"
-    DESCRIPTION
-             "Copyright 1996-2010 Brocade Communications Systems, Inc.
-              All rights reserved.
-              This Brocade Communications Systems SNMP Management Information Base Specification
-              embodies Brocade Communications Systems' confidential and proprietary
-              intellectual property. Brocade Communications Systems retains all
-              title and ownership in the Specification, including any revisions.
-
-              This Specification is supplied AS IS, and Brocade Communications Systems makes
-              no warranty, either express or implied, as to the use,
-              operation, condition, or performance of the specification, and any unintended
-              consequence it may on the user environment."
-
-    REVISION        "201006020000Z"  -- 04 June 2010
-    DESCRIPTION
-        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
-
-    REVISION     "200909300000Z" -- September 30, 2009
-    DESCRIPTION
+	LAST-UPDATED "201708070000Z" -- Aug 7, 2017
+	ORGANIZATION "Ruckus Wireless, Inc."
+	CONTACT-INFO
+			"
+			Technical Support Center, Ruckus Wireless, Inc,
+			350 West Java Drive,
+			Sunnyvale, CA 94089, USA
+			Support URL: https://support.ruckuswireless.com
+			Phone: +1-855-782-5871
+			"
+	DESCRIPTION
+			"
+			Copyright 1996-2017 Ruckus Wireless, Inc..
+			All rights reserved.
+			This Ruckus Wireless, Inc SNMP Management Information Base Specification
+			embodies Ruckus Wireless, Inc' confidential and proprietary
+			intellectual property. Ruckus Wireless, Inc retains all
+			title and ownership in the Specification, including any
+			revisions.
+			
+			This Specification is supplied AS IS, and Ruckus Wireless, Inc makes
+			no warranty, either express or implied, as to the use,
+			operation, condition, or performance of the Specification.			
+			"        
+	REVISION     "200909300000Z" -- September 30, 2009
+	DESCRIPTION
 			"convert from SMIv1 to SMIv2"
+	REVISION     "201708070000Z" -- Aug 7, 2017
+	DESCRIPTION
+         	    "Modified contact Info, Organization and Description"
    ::= { switch 4}
 
 	-- textual conventions
@@ -61,7 +62,7 @@ snL4 MODULE-IDENTITY
 							delete(3),
 							create(4),
 							modify(5)
-						}
+						}		
 
 	L4Status ::= TEXTUAL-CONVENTION
 		STATUS	  current
@@ -78,7 +79,7 @@ snL4 MODULE-IDENTITY
 			L4 Server Name
 			"
 		SYNTAX	OCTET STRING (SIZE(1..32))
-
+		
 	L4Flag ::= TEXTUAL-CONVENTION
 		STATUS	  current
 		DESCRIPTION
@@ -146,7 +147,7 @@ snL4History						OBJECT IDENTIFIER 	  ::= { snL4 28 }
 
 
 -- L4 General MIBs
-
+				
 snL4MaxSessionLimit 		OBJECT-TYPE
 	SYNTAX	INTEGER	(0..1000000)
 	MAX-ACCESS  read-write
@@ -482,7 +483,7 @@ snL4EnableBecomeActiveTrap                  OBJECT-TYPE
 	::= { snL4Gen 38 }
 
 snL4slbRouterInterfacePortMask 	OBJECT-TYPE
-	SYNTAX   Integer32
+	SYNTAX   Integer32	
 	MAX-ACCESS  read-write
 	STATUS  deprecated
 	DESCRIPTION
@@ -694,7 +695,7 @@ snL4VirtualServerDeleteState	OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Delete operation state."
+		"Delete operation state." 
 	::= { snL4VirtualServerEntry 7 }
 
 
@@ -797,7 +798,7 @@ snL4RealServerDeleteState	OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Delete operation state."
+		"Delete operation state." 
 	::= { snL4RealServerEntry 8 }
 
 
@@ -879,7 +880,7 @@ snL4VirtualServerPortAdminStatus		       OBJECT-TYPE
  snL4VirtualServerPortSticky       OBJECT-TYPE
 	 SYNTAX  INTEGER {
 			disabled(0),
-			enabled(1)
+			enabled(1)       
 			}
 	MAX-ACCESS  read-write
 	STATUS  current
@@ -891,7 +892,7 @@ snL4VirtualServerPortAdminStatus		       OBJECT-TYPE
  snL4VirtualServerPortConcurrent       OBJECT-TYPE
 	 SYNTAX  INTEGER {
 			disabled(0),
-			enabled(1)
+			enabled(1)       
 			}
 	MAX-ACCESS  read-write
 	STATUS  current
@@ -901,7 +902,7 @@ snL4VirtualServerPortAdminStatus		       OBJECT-TYPE
 
 
  snL4VirtualServerPortRowStatus	 	       OBJECT-TYPE
-	SYNTAX L4RowSts
+	SYNTAX L4RowSts	
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -913,7 +914,7 @@ snL4VirtualServerPortDeleteState	OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Delete operation state."
+		"Delete operation state." 
 	::= { snL4VirtualServerPortEntry 8 }
 
 
@@ -987,7 +988,7 @@ snL4RealServerPortAdminStatus		       OBJECT-TYPE
 	::= { snL4RealServerPortEntry 4 }
 
  snL4RealServerPortRowStatus	 	       OBJECT-TYPE
-	SYNTAX L4RowSts
+	SYNTAX L4RowSts	
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -999,7 +1000,7 @@ snL4RealServerPortDeleteState	OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Delete operation state."
+		"Delete operation state." 
 	::= { snL4RealServerPortEntry 6 }
 
 
@@ -1151,7 +1152,7 @@ snL4VirtualServerStatusReceivePkts  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatusEntry 3 }
 
 snL4VirtualServerStatusTransmitPkts  OBJECT-TYPE
@@ -1159,7 +1160,7 @@ snL4VirtualServerStatusTransmitPkts  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatusEntry 4 }
 
 snL4VirtualServerStatusTotalConnections  OBJECT-TYPE
@@ -1167,7 +1168,7 @@ snL4VirtualServerStatusTotalConnections  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatusEntry 5 }
 
 
@@ -1748,7 +1749,7 @@ SnL4PolicyPortAccessEntry ::= SEQUENCE {
 	}
 
 snL4PolicyPortAccessPort	     OBJECT-TYPE
-	SYNTAX   Integer32
+	SYNTAX   Integer32	
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
@@ -1936,7 +1937,7 @@ snL4WebCacheDeleteState	OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Delete operation state."
+		"Delete operation state." 
 	::= { snL4WebCacheEntry 7 }
 
 
@@ -2001,8 +2002,8 @@ snL4WebCacheGroupWebCacheIpList
 	STATUS  current
 	DESCRIPTION
 		"A list of the Server Cache Group Real Server IP Address.
-		 The number of IP Address is from 1 (4 OCTETs) to the
-		 snL4MaxNumServersPerWebCacheGroup, maximum number of
+		 The number of IP Address is from 1 (4 OCTETs) to the 
+		 snL4MaxNumServersPerWebCacheGroup, maximum number of 
 		 server IP Address allowed in the list."
 	::= { snL4WebCacheGroupEntry 3 }
 
@@ -2024,7 +2025,7 @@ snL4WebCacheGroupSrcMask 	OBJECT-TYPE
 
 snL4WebCacheGroupAdminStatus OBJECT-TYPE
 	SYNTAX  INTEGER {
-		disabled(0),
+		disabled(0),             
 		enabled(1)
 		}
 	MAX-ACCESS  read-write
@@ -2032,7 +2033,7 @@ snL4WebCacheGroupAdminStatus OBJECT-TYPE
 	DESCRIPTION
 		"The WEB Cache Group is set either
 		 enabled(1)...........activated.
-		 disabled(0)..........disabled."
+		 disabled(0)..........disabled."  
 	::= { snL4WebCacheGroupEntry 6 }
 
  snL4WebCacheGroupRowStatus OBJECT-TYPE
@@ -2044,7 +2045,7 @@ snL4WebCacheGroupAdminStatus OBJECT-TYPE
 	::= { snL4WebCacheGroupEntry 7 }
 
 
--- Web Cache Traffic Statistics Table
+-- Web Cache Traffic Statistics Table 
 
 snL4WebCacheTrafficStatsTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4WebCacheTrafficStatsEntry
@@ -2153,10 +2154,10 @@ snL4WebCachePortState	OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Web Cache Port state."
+		"Web Cache Port state." 
 	::= { snL4WebCacheTrafficStatsEntry 9 }
 
--- Web Uncached Traffic Statistics Table
+-- Web Uncached Traffic Statistics Table 
 
 snL4WebUncachedTrafficStatsTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4WebUncachedTrafficStatsEntry
@@ -2195,7 +2196,7 @@ SnL4WebUncachedTrafficStatsEntry ::= SEQUENCE {
 	}
 
 snL4WebServerPort 			OBJECT-TYPE
-	SYNTAX  Integer32
+	SYNTAX  Integer32 
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
@@ -2203,7 +2204,7 @@ snL4WebServerPort 			OBJECT-TYPE
 	::= { snL4WebUncachedTrafficStatsEntry 1 }
 
 snL4WebClientPort 			OBJECT-TYPE
-	SYNTAX  Integer32
+	SYNTAX  Integer32 
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
@@ -2317,7 +2318,7 @@ snL4WebCachePortAdminStatus		       OBJECT-TYPE
 	::= { snL4WebCachePortEntry 3 }
 
  snL4WebCachePortRowStatus	 	       OBJECT-TYPE
-	SYNTAX 	L4RowSts
+	SYNTAX 	L4RowSts	
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2329,10 +2330,10 @@ snL4WebCachePortDeleteState	OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Delete operation state."
+		"Delete operation state." 
 	::= { snL4WebCachePortEntry 5 }
 
--- Real Server Configuration table
+-- Real Server Configuration table 
 
 snL4RealServerCfgTable  OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SnL4RealServerCfgEntry
@@ -2420,7 +2421,7 @@ snL4RealServerCfgDeleteState	OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Delete operation state."
+		"Delete operation state." 
 	::= { snL4RealServerCfgEntry 7 }
 
 
@@ -2493,7 +2494,7 @@ snL4RealServerPortCfgAdminStatus		       OBJECT-TYPE
 	::= { snL4RealServerPortCfgEntry 4 }
 
  snL4RealServerPortCfgRowStatus	 	       OBJECT-TYPE
-	SYNTAX L4RowSts
+	SYNTAX L4RowSts	
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2505,7 +2506,7 @@ snL4RealServerPortCfgDeleteState	OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Delete operation state."
+		"Delete operation state." 
 	::= { snL4RealServerPortCfgEntry 6 }
 
 
@@ -2594,7 +2595,7 @@ snL4VirtualServerCfgDeleteState	OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Delete operation state."
+		"Delete operation state." 
 	::= { snL4VirtualServerCfgEntry 6 }
 
 
@@ -2674,7 +2675,7 @@ snL4VirtualServerPortCfgAdminStatus		       OBJECT-TYPE
  snL4VirtualServerPortCfgSticky       OBJECT-TYPE
 	 SYNTAX  INTEGER {
 			disabled(0),
-			enabled(1)
+			enabled(1)       
 			}
 	MAX-ACCESS  read-write
 	STATUS  current
@@ -2686,7 +2687,7 @@ snL4VirtualServerPortCfgAdminStatus		       OBJECT-TYPE
  snL4VirtualServerPortCfgConcurrent       OBJECT-TYPE
 	 SYNTAX  INTEGER {
 			disabled(0),
-			enabled(1)
+			enabled(1)       
 			}
 	MAX-ACCESS  read-write
 	STATUS  current
@@ -2696,7 +2697,7 @@ snL4VirtualServerPortCfgAdminStatus		       OBJECT-TYPE
 
 
  snL4VirtualServerPortCfgRowStatus	 	       OBJECT-TYPE
-	SYNTAX L4RowSts
+	SYNTAX L4RowSts	
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2708,7 +2709,7 @@ snL4VirtualServerPortCfgDeleteState	OBJECT-TYPE
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"Delete operation state."
+		"Delete operation state." 
 	::= { snL4VirtualServerPortCfgEntry 8 }
 
 
@@ -2733,7 +2734,7 @@ snL4VirtualServerStatisticEntry  OBJECT-TYPE
 	::= { snL4VirtualServerStatisticTable 1 }
 
 SnL4VirtualServerStatisticEntry ::= SEQUENCE {
-	snL4VirtualServerStatisticIP
+	snL4VirtualServerStatisticIP 
 		IpAddress,
 	snL4VirtualServerStatisticName
 		L4ServerName,
@@ -2786,7 +2787,7 @@ snL4VirtualServerStatisticReceivePkts  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatisticEntry 3 }
 
 snL4VirtualServerStatisticTransmitPkts  OBJECT-TYPE
@@ -2794,7 +2795,7 @@ snL4VirtualServerStatisticTransmitPkts  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatisticEntry 4 }
 
 snL4VirtualServerStatisticTotalConnections  OBJECT-TYPE
@@ -2802,7 +2803,7 @@ snL4VirtualServerStatisticTotalConnections  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatisticEntry 5 }
 
 snL4VirtualServerStatisticReceiveBytes  OBJECT-TYPE
@@ -2810,7 +2811,7 @@ snL4VirtualServerStatisticReceiveBytes  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatisticEntry 6 }
 
 snL4VirtualServerStatisticTransmitBytes  OBJECT-TYPE
@@ -2818,7 +2819,7 @@ snL4VirtualServerStatisticTransmitBytes  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatisticEntry 7 }
 
 snL4VirtualServerStatisticSymmetricState  OBJECT-TYPE
@@ -2826,7 +2827,7 @@ snL4VirtualServerStatisticSymmetricState  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatisticEntry 8 }
 
 snL4VirtualServerStatisticSymmetricPriority  OBJECT-TYPE
@@ -2834,7 +2835,7 @@ snL4VirtualServerStatisticSymmetricPriority  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatisticEntry 9 }
 
 snL4VirtualServerStatisticSymmetricKeep  OBJECT-TYPE
@@ -2842,7 +2843,7 @@ snL4VirtualServerStatisticSymmetricKeep  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatisticEntry 10 }
 
 snL4VirtualServerStatisticSymmetricActivates  OBJECT-TYPE
@@ -2850,7 +2851,7 @@ snL4VirtualServerStatisticSymmetricActivates  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatisticEntry 11 }
 
 snL4VirtualServerStatisticSymmetricInactives  OBJECT-TYPE
@@ -2858,7 +2859,7 @@ snL4VirtualServerStatisticSymmetricInactives  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatisticEntry 12 }
 
 snL4VirtualServerStatisticSymmetricBestStandbyMacAddr  OBJECT-TYPE
@@ -2866,7 +2867,7 @@ snL4VirtualServerStatisticSymmetricBestStandbyMacAddr  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatisticEntry 13 }
 
 snL4VirtualServerStatisticSymmetricActiveMacAddr  OBJECT-TYPE
@@ -2874,7 +2875,7 @@ snL4VirtualServerStatisticSymmetricActiveMacAddr  OBJECT-TYPE
 	MAX-ACCESS	read-only
 	STATUS  current
 	DESCRIPTION
-		""
+		"" 
 	::= { snL4VirtualServerStatisticEntry 14 }
 
 
@@ -2898,7 +2899,7 @@ snL4RealServerStatisticEntry  OBJECT-TYPE
 	::= { snL4RealServerStatisticTable 1 }
 
 SnL4RealServerStatisticEntry ::= SEQUENCE {
-	snL4RealServerStatisticRealIP
+	snL4RealServerStatisticRealIP 
 		IpAddress,
 	snL4RealServerStatisticName
 		L4ServerName,
@@ -3305,7 +3306,7 @@ snL4GslbSiteRemoteServerIronTable	       OBJECT-TYPE
 	::= { snL4GslbSiteRemoteServerIrons 1 }
 
 snL4GslbSiteRemoteServerIronEntry	       OBJECT-TYPE
-	SYNTAX	SnL4GslbSiteRemoteServerIronEntry
+	SYNTAX	SnL4GslbSiteRemoteServerIronEntry	
 	MAX-ACCESS  not-accessible
 	STATUS  current
 	DESCRIPTION
@@ -3391,19 +3392,19 @@ snL4RealServerHistoryControlEntry OBJECT-TYPE
 	::= { snL4RealServerHistoryControlTable 1 }
 
 	SnL4RealServerHistoryControlEntry ::= SEQUENCE {
-		snL4RealServerHistoryControlIndex
+		snL4RealServerHistoryControlIndex			 
 			INTEGER ,
-		snL4RealServerHistoryControlDataSource
+		snL4RealServerHistoryControlDataSource		
 			OBJECT IDENTIFIER,
 		snL4RealServerHistoryControlBucketsRequested
 			INTEGER ,
-		snL4RealServerHistoryControlBucketsGranted
+		snL4RealServerHistoryControlBucketsGranted	
 			INTEGER ,
-		snL4RealServerHistoryControlInterval
+		snL4RealServerHistoryControlInterval		
 			INTEGER ,
-		snL4RealServerHistoryControlOwner
+		snL4RealServerHistoryControlOwner			 
 			DisplayString,
-		snL4RealServerHistoryControlStatus
+		snL4RealServerHistoryControlStatus			
 			INTEGER
 	}
 
@@ -3427,12 +3428,12 @@ snL4RealServerHistoryControlDataSource OBJECT-TYPE
 		which historical data was collected and
 		placed in a media-specific table on behalf of this
 		snL4RealServerHistoryControlEntry.This source can be any
-		real/virtual server and real/virtual server port on
+		real/virtual server and real/virtual server port on 
 		this ServerIron.  In order to identify
 		a particular instance, this object shall identify
-		the instance of the object, defined in the above
+		the instance of the object, defined in the above 
 		statistics tables.
-
+	
 		This object may not be modified if the associated
 		snL4RealServerHistoryControlStatus object is equal to valid(1)."
 	::= { snL4RealServerHistoryControlEntry 2 }
@@ -3446,7 +3447,7 @@ snL4RealServerHistoryControlBucketsRequested OBJECT-TYPE
 		over which data is to be saved in the part of the
 		media-specific table associated with this
 		snL4RealServerHistoryControlEntry.
-
+	
 		When this object is created or modified, the probe
 		should set snL4RealServerHistoryControlBucketsGranted as closely to
 		this object as is possible for the particular probe
@@ -3463,7 +3464,7 @@ snL4RealServerHistoryControlBucketsGranted OBJECT-TYPE
 		over which data shall be saved in the part of
 		the media-specific table associated with this
 		snL4RealServerHistoryControlEntry.
-
+	
 		When the associated snL4RealServerHistoryControlBucketsRequested
 		object is created or modified, the probe
 		should set this object as closely to the requested
@@ -3472,19 +3473,19 @@ snL4RealServerHistoryControlBucketsGranted OBJECT-TYPE
 		probe must not lower this value except as a result
 		of a modification to the associated
 		snL4RealServerHistoryControlBucketsRequested object.
-
+	
 		There will be times when the actual number of
 		buckets associated with this entry is less than
 		the value of this object.In this case, at the
 		end of each sampling interval, a new bucket will
 		be added to the media-specific table.
-
+	
 		When the number of buckets reaches the value of
 		this object and a new bucket is to be added to the
 		media-specific table, the oldest bucket associated
 		with this snL4RealServerHistoryControlEntry shall be deleted by
 		the agent so that the new bucket can be added.
-
+	
 		When the value of this object changes to a value less
 		than the current value, entries are deleted
 		from the media-specific table associated with this
@@ -3492,7 +3493,7 @@ snL4RealServerHistoryControlBucketsGranted OBJECT-TYPE
 		entries shall be deleted by the agent so that their
 		number remains less than or equal to the new value of
 		this object.
-
+	
 		When the value of this object changes to a value
 		greater than the current value, the number of
 		associated media- specific entries may be allowed to
@@ -3510,7 +3511,7 @@ snL4RealServerHistoryControlInterval OBJECT-TYPE
 		snL4RealServerHistoryControlEntry.This interval can
 		be set to any number of seconds between 1 and
 		3600 (1 hour).
-
+	
 		Because the counters in a bucket may overflow at their
 		maximum value with no indication, a prudent manager
 		will take into account the possibility of overflow
@@ -3520,7 +3521,7 @@ snL4RealServerHistoryControlInterval OBJECT-TYPE
 		the snL4RealServerHistoryControlInterval object to a value less
 		than this interval.This is typically most
 		important for the 'octets' counter in any
-		media-specific table.
+		media-specific table.	
 		This object may not be modified if the associated
 		snL4RealServerHistoryControlStatus object is equal to valid(1)."
 	DEFVAL { 1800 }
@@ -3536,7 +3537,7 @@ snL4RealServerHistoryControlOwner OBJECT-TYPE
 	::= { snL4RealServerHistoryControlEntry 6 }
 
 snL4RealServerHistoryControlStatus OBJECT-TYPE
-	SYNTAX INTEGER {
+	SYNTAX INTEGER { 
 				valid(1),
 				createRequest(2),
 				underCreation(3),
@@ -3580,11 +3581,11 @@ snL4RealServerHistoryEntry OBJECT-TYPE
 	::= { snL4RealServerHistoryTable 1 }
 
 SnL4RealServerHistoryEntry ::= SEQUENCE {
-	snL4RealServerHistoryIndex
+	snL4RealServerHistoryIndex                 
 		INTEGER ,
-	snL4RealServerHistorySampleIndex
+	snL4RealServerHistorySampleIndex           
 		INTEGER ,
-	snL4RealServerHistoryIntervalStart
+	snL4RealServerHistoryIntervalStart         
 		TimeTicks,
 	snL4RealServerHistoryReceivePkts
 		Counter32,
@@ -3716,19 +3717,19 @@ snL4RealServerPortHistoryControlEntry OBJECT-TYPE
 	::= { snL4RealServerPortHistoryControlTable 1 }
 
 	SnL4RealServerPortHistoryControlEntry ::= SEQUENCE {
-		snL4RealServerPortHistoryControlIndex
+		snL4RealServerPortHistoryControlIndex			 
 			INTEGER ,
-		snL4RealServerPortHistoryControlDataSource
+		snL4RealServerPortHistoryControlDataSource		
 			OBJECT IDENTIFIER,
 		snL4RealServerPortHistoryControlBucketsRequested
 			INTEGER ,
-		snL4RealServerPortHistoryControlBucketsGranted
+		snL4RealServerPortHistoryControlBucketsGranted	
 			INTEGER,
-		snL4RealServerPortHistoryControlInterval
+		snL4RealServerPortHistoryControlInterval		
 			INTEGER ,
-		snL4RealServerPortHistoryControlOwner
+		snL4RealServerPortHistoryControlOwner			 
 			DisplayString,
-		snL4RealServerPortHistoryControlStatus
+		snL4RealServerPortHistoryControlStatus			
 			INTEGER
 	}
 
@@ -3752,12 +3753,12 @@ snL4RealServerPortHistoryControlDataSource OBJECT-TYPE
 		which historical data was collected and
 		placed in a media-specific table on behalf of this
 		snL4RealServerPortHistoryControlEntry.This source can be any
-		real/virtual server and real/virtual server port on
+		real/virtual server and real/virtual server port on 
 		this ServerIron.  In order to identify
 		a particular instance, this object shall identify
-		the instance of the object, defined in the above
+		the instance of the object, defined in the above 
 		statistics tables.
-
+	
 		This object may not be modified if the associated
 		snL4RealServerPortHistoryControlStatus object is equal to valid(1)."
 	::= { snL4RealServerPortHistoryControlEntry 2 }
@@ -3771,7 +3772,7 @@ snL4RealServerPortHistoryControlBucketsRequested OBJECT-TYPE
 		over which data is to be saved in the part of the
 		media-specific table associated with this
 		snL4RealServerPortHistoryControlEntry.
-
+	
 		When this object is created or modified, the probe
 		should set snL4RealServerPortHistoryControlBucketsGranted as closely to
 		this object as is possible for the particular probe
@@ -3788,7 +3789,7 @@ snL4RealServerPortHistoryControlBucketsGranted OBJECT-TYPE
 		over which data shall be saved in the part of
 		the media-specific table associated with this
 		snL4RealServerPortHistoryControlEntry.
-
+	
 		When the associated snL4RealServerPortHistoryControlBucketsRequested
 		object is created or modified, the probe
 		should set this object as closely to the requested
@@ -3797,19 +3798,19 @@ snL4RealServerPortHistoryControlBucketsGranted OBJECT-TYPE
 		probe must not lower this value except as a result
 		of a modification to the associated
 		snL4RealServerPortHistoryControlBucketsRequested object.
-
+	
 		There will be times when the actual number of
 		buckets associated with this entry is less than
 		the value of this object.In this case, at the
 		end of each sampling interval, a new bucket will
 		be added to the media-specific table.
-
+	
 		When the number of buckets reaches the value of
 		this object and a new bucket is to be added to the
 		media-specific table, the oldest bucket associated
 		with this snL4RealServerPortHistoryControlEntry shall be deleted by
 		the agent so that the new bucket can be added.
-
+	
 		When the value of this object changes to a value less
 		than the current value, entries are deleted
 		from the media-specific table associated with this
@@ -3817,7 +3818,7 @@ snL4RealServerPortHistoryControlBucketsGranted OBJECT-TYPE
 		entries shall be deleted by the agent so that their
 		number remains less than or equal to the new value of
 		this object.
-
+	
 		When the value of this object changes to a value
 		greater than the current value, the number of
 		associated media- specific entries may be allowed to
@@ -3835,7 +3836,7 @@ snL4RealServerPortHistoryControlInterval OBJECT-TYPE
 		snL4RealServerPortHistoryControlEntry.This interval can
 		be set to any number of seconds between 1 and
 		3600 (1 hour).
-
+	
 		Because the counters in a bucket may overflow at their
 		maximum value with no indication, a prudent manager
 		will take into account the possibility of overflow
@@ -3845,7 +3846,7 @@ snL4RealServerPortHistoryControlInterval OBJECT-TYPE
 		the snL4RealServerPortHistoryControlInterval object to a value less
 		than this interval.This is typically most
 		important for the 'octets' counter in any
-		media-specific table.
+		media-specific table.	
 		This object may not be modified if the associated
 		snL4RealServerPortHistoryControlStatus object is equal to valid(1)."
 	DEFVAL { 1800 }
@@ -3861,7 +3862,7 @@ snL4RealServerPortHistoryControlOwner OBJECT-TYPE
 	::= { snL4RealServerPortHistoryControlEntry 6 }
 
 snL4RealServerPortHistoryControlStatus OBJECT-TYPE
-	SYNTAX INTEGER {
+	SYNTAX INTEGER { 
 				valid(1),
 				createRequest(2),
 				underCreation(3),
@@ -3905,11 +3906,11 @@ snL4RealServerPortHistoryEntry OBJECT-TYPE
 	::= { snL4RealServerPortHistoryTable 1 }
 
 SnL4RealServerPortHistoryEntry ::= SEQUENCE {
-	snL4RealServerPortHistoryIndex
+	snL4RealServerPortHistoryIndex                 
 		INTEGER ,
-	snL4RealServerPortHistorySampleIndex
+	snL4RealServerPortHistorySampleIndex           
 		INTEGER ,
-	snL4RealServerPortHistoryIntervalStart
+	snL4RealServerPortHistoryIntervalStart         
 		TimeTicks,
 	snL4RealServerPortHistoryReceivePkts
 		Counter32,
@@ -4041,19 +4042,19 @@ snL4VirtualServerHistoryControlEntry OBJECT-TYPE
 	::= { snL4VirtualServerHistoryControlTable 1 }
 
 	SnL4VirtualServerHistoryControlEntry ::= SEQUENCE {
-		snL4VirtualServerHistoryControlIndex
+		snL4VirtualServerHistoryControlIndex			 
 			INTEGER ,
-		snL4VirtualServerHistoryControlDataSource
+		snL4VirtualServerHistoryControlDataSource		
 			OBJECT IDENTIFIER,
 		snL4VirtualServerHistoryControlBucketsRequested
 			INTEGER ,
-		snL4VirtualServerHistoryControlBucketsGranted
+		snL4VirtualServerHistoryControlBucketsGranted	
 			INTEGER ,
-		snL4VirtualServerHistoryControlInterval
+		snL4VirtualServerHistoryControlInterval		
 			INTEGER ,
-		snL4VirtualServerHistoryControlOwner
+		snL4VirtualServerHistoryControlOwner			 
 			DisplayString,
-		snL4VirtualServerHistoryControlStatus
+		snL4VirtualServerHistoryControlStatus			
 			INTEGER
 	}
 
@@ -4077,12 +4078,12 @@ snL4VirtualServerHistoryControlDataSource OBJECT-TYPE
 		which historical data was collected and
 		placed in a media-specific table on behalf of this
 		snL4VirtualServerHistoryControlEntry.This source can be any
-		real/virtual server and real/virtual server port on
+		real/virtual server and real/virtual server port on 
 		this ServerIron.  In order to identify
 		a particular instance, this object shall identify
-		the instance of the object, defined in the above
+		the instance of the object, defined in the above 
 		statistics tables.
-
+	
 		This object may not be modified if the associated
 		snL4VirtualServerHistoryControlStatus object is equal to valid(1)."
 	::= { snL4VirtualServerHistoryControlEntry 2 }
@@ -4096,7 +4097,7 @@ snL4VirtualServerHistoryControlBucketsRequested OBJECT-TYPE
 		over which data is to be saved in the part of the
 		media-specific table associated with this
 		snL4VirtualServerHistoryControlEntry.
-
+	
 		When this object is created or modified, the probe
 		should set snL4VirtualServerHistoryControlBucketsGranted as closely to
 		this object as is possible for the particular probe
@@ -4113,7 +4114,7 @@ snL4VirtualServerHistoryControlBucketsGranted OBJECT-TYPE
 		over which data shall be saved in the part of
 		the media-specific table associated with this
 		snL4VirtualServerHistoryControlEntry.
-
+	
 		When the associated snL4VirtualServerHistoryControlBucketsRequested
 		object is created or modified, the probe
 		should set this object as closely to the requested
@@ -4122,19 +4123,19 @@ snL4VirtualServerHistoryControlBucketsGranted OBJECT-TYPE
 		probe must not lower this value except as a result
 		of a modification to the associated
 		snL4VirtualServerHistoryControlBucketsRequested object.
-
+	
 		There will be times when the actual number of
 		buckets associated with this entry is less than
 		the value of this object.In this case, at the
 		end of each sampling interval, a new bucket will
 		be added to the media-specific table.
-
+	
 		When the number of buckets reaches the value of
 		this object and a new bucket is to be added to the
 		media-specific table, the oldest bucket associated
 		with this snL4VirtualServerHistoryControlEntry shall be deleted by
 		the agent so that the new bucket can be added.
-
+	
 		When the value of this object changes to a value less
 		than the current value, entries are deleted
 		from the media-specific table associated with this
@@ -4142,7 +4143,7 @@ snL4VirtualServerHistoryControlBucketsGranted OBJECT-TYPE
 		entries shall be deleted by the agent so that their
 		number remains less than or equal to the new value of
 		this object.
-
+	
 		When the value of this object changes to a value
 		greater than the current value, the number of
 		associated media- specific entries may be allowed to
@@ -4160,7 +4161,7 @@ snL4VirtualServerHistoryControlInterval OBJECT-TYPE
 		snL4VirtualServerHistoryControlEntry.This interval can
 		be set to any number of seconds between 1 and
 		3600 (1 hour).
-
+	
 		Because the counters in a bucket may overflow at their
 		maximum value with no indication, a prudent manager
 		will take into account the possibility of overflow
@@ -4170,7 +4171,7 @@ snL4VirtualServerHistoryControlInterval OBJECT-TYPE
 		the snL4VirtualServerHistoryControlInterval object to a value less
 		than this interval.This is typically most
 		important for the 'octets' counter in any
-		media-specific table.
+		media-specific table.	
 		This object may not be modified if the associated
 		snL4VirtualServerHistoryControlStatus object is equal to valid(1)."
 	DEFVAL { 1800 }
@@ -4186,7 +4187,7 @@ snL4VirtualServerHistoryControlOwner OBJECT-TYPE
 	::= { snL4VirtualServerHistoryControlEntry 6 }
 
 snL4VirtualServerHistoryControlStatus OBJECT-TYPE
-	SYNTAX INTEGER {
+	SYNTAX INTEGER { 
 				valid(1),
 				createRequest(2),
 				underCreation(3),
@@ -4230,11 +4231,11 @@ snL4VirtualServerHistoryEntry OBJECT-TYPE
 	::= { snL4VirtualServerHistoryTable 1 }
 
 SnL4VirtualServerHistoryEntry ::= SEQUENCE {
-	snL4VirtualServerHistoryIndex
+	snL4VirtualServerHistoryIndex                 
 		INTEGER,
-	snL4VirtualServerHistorySampleIndex
+	snL4VirtualServerHistorySampleIndex           
 		INTEGER,
-	snL4VirtualServerHistoryIntervalStart
+	snL4VirtualServerHistoryIntervalStart         
 		TimeTicks,
 	snL4VirtualServerHistoryReceivePkts
 		Counter32,
@@ -4357,19 +4358,19 @@ snL4VirtualServerPortHistoryControlEntry OBJECT-TYPE
 	::= { snL4VirtualServerPortHistoryControlTable 1 }
 
 	SnL4VirtualServerPortHistoryControlEntry ::= SEQUENCE {
-		snL4VirtualServerPortHistoryControlIndex
+		snL4VirtualServerPortHistoryControlIndex			 
 			INTEGER,
-		snL4VirtualServerPortHistoryControlDataSource
+		snL4VirtualServerPortHistoryControlDataSource		
 			OBJECT IDENTIFIER,
 		snL4VirtualServerPortHistoryControlBucketsRequested
 			INTEGER,
-		snL4VirtualServerPortHistoryControlBucketsGranted
+		snL4VirtualServerPortHistoryControlBucketsGranted	
 			INTEGER,
-		snL4VirtualServerPortHistoryControlInterval
+		snL4VirtualServerPortHistoryControlInterval		
 			INTEGER,
-		snL4VirtualServerPortHistoryControlOwner
+		snL4VirtualServerPortHistoryControlOwner			 
 			DisplayString,
-		snL4VirtualServerPortHistoryControlStatus
+		snL4VirtualServerPortHistoryControlStatus			
 			INTEGER
 	}
 
@@ -4393,12 +4394,12 @@ snL4VirtualServerPortHistoryControlDataSource OBJECT-TYPE
 		which historical data was collected and
 		placed in a media-specific table on behalf of this
 		snL4VirtualServerPortHistoryControlEntry.This source can be any
-		real/virtual server and real/virtual server port on
+		real/virtual server and real/virtual server port on 
 		this ServerIron.  In order to identify
 		a particular instance, this object shall identify
-		the instance of the object, defined in the above
+		the instance of the object, defined in the above 
 		statistics tables.
-
+	
 		This object may not be modified if the associated
 		snL4VirtualServerPortHistoryControlStatus object is equal to valid(1)."
 	::= { snL4VirtualServerPortHistoryControlEntry 2 }
@@ -4412,7 +4413,7 @@ snL4VirtualServerPortHistoryControlBucketsRequested OBJECT-TYPE
 		over which data is to be saved in the part of the
 		media-specific table associated with this
 		snL4VirtualServerPortHistoryControlEntry.
-
+	
 		When this object is created or modified, the probe
 		should set snL4VirtualServerPortHistoryControlBucketsGranted as closely to
 		this object as is possible for the particular probe
@@ -4429,7 +4430,7 @@ snL4VirtualServerPortHistoryControlBucketsGranted OBJECT-TYPE
 		over which data shall be saved in the part of
 		the media-specific table associated with this
 		snL4VirtualServerPortHistoryControlEntry.
-
+	
 		When the associated snL4VirtualServerPortHistoryControlBucketsRequested
 		object is created or modified, the probe
 		should set this object as closely to the requested
@@ -4438,19 +4439,19 @@ snL4VirtualServerPortHistoryControlBucketsGranted OBJECT-TYPE
 		probe must not lower this value except as a result
 		of a modification to the associated
 		snL4VirtualServerPortHistoryControlBucketsRequested object.
-
+	
 		There will be times when the actual number of
 		buckets associated with this entry is less than
 		the value of this object.In this case, at the
 		end of each sampling interval, a new bucket will
 		be added to the media-specific table.
-
+	
 		When the number of buckets reaches the value of
 		this object and a new bucket is to be added to the
 		media-specific table, the oldest bucket associated
 		with this snL4VirtualServerPortHistoryControlEntry shall be deleted by
 		the agent so that the new bucket can be added.
-
+	
 		When the value of this object changes to a value less
 		than the current value, entries are deleted
 		from the media-specific table associated with this
@@ -4458,7 +4459,7 @@ snL4VirtualServerPortHistoryControlBucketsGranted OBJECT-TYPE
 		entries shall be deleted by the agent so that their
 		number remains less than or equal to the new value of
 		this object.
-
+	
 		When the value of this object changes to a value
 		greater than the current value, the number of
 		associated media- specific entries may be allowed to
@@ -4476,7 +4477,7 @@ snL4VirtualServerPortHistoryControlInterval OBJECT-TYPE
 		snL4VirtualServerPortHistoryControlEntry.This interval can
 		be set to any number of seconds between 1 and
 		3600 (1 hour).
-
+	
 		Because the counters in a bucket may overflow at their
 		maximum value with no indication, a prudent manager
 		will take into account the possibility of overflow
@@ -4486,7 +4487,7 @@ snL4VirtualServerPortHistoryControlInterval OBJECT-TYPE
 		the snL4VirtualServerPortHistoryControlInterval object to a value less
 		than this interval.This is typically most
 		important for the 'octets' counter in any
-		media-specific table.
+		media-specific table.	
 		This object may not be modified if the associated
 		snL4VirtualServerPortHistoryControlStatus object is equal to valid(1)."
 	DEFVAL { 1800 }
@@ -4502,7 +4503,7 @@ snL4VirtualServerPortHistoryControlOwner OBJECT-TYPE
 	::= { snL4VirtualServerPortHistoryControlEntry 6 }
 
 snL4VirtualServerPortHistoryControlStatus OBJECT-TYPE
-	SYNTAX INTEGER {
+	SYNTAX INTEGER { 
 				valid(1),
 				createRequest(2),
 				underCreation(3),
@@ -4546,11 +4547,11 @@ snL4VirtualServerPortHistoryEntry OBJECT-TYPE
 	::= { snL4VirtualServerPortHistoryTable 1 }
 
 SnL4VirtualServerPortHistoryEntry ::= SEQUENCE {
-	snL4VirtualServerPortHistoryIndex
+	snL4VirtualServerPortHistoryIndex                 
 		INTEGER ,
-	snL4VirtualServerPortHistorySampleIndex
+	snL4VirtualServerPortHistorySampleIndex           
 		INTEGER,
-	snL4VirtualServerPortHistoryIntervalStart
+	snL4VirtualServerPortHistoryIntervalStart         
 		TimeTicks,
 	snL4VirtualServerPortHistoryReceivePkts
 		Counter32,

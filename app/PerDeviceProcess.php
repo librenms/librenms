@@ -46,6 +46,8 @@ class PerDeviceProcess
         private readonly string $job,
         private readonly string $completionEvent,
         private readonly ModuleList $moduleList,
+        private readonly ?string $os = null,
+        private readonly ?string $deviceType = null,
     ) {
         $this->results = new Result;
     }
@@ -62,7 +64,15 @@ class PerDeviceProcess
         });
         $dispatcher = app(Dispatcher::class);
 
-        foreach (Device::whereDeviceSpec($this->deviceSpec)->pluck('device_id') as $device_id) {
+        $query = Device::whereDeviceSpec($this->deviceSpec);
+        if ($this->os) {
+            $query->where('os', $this->os);
+        }
+        if ($this->deviceType) {
+            $query->where('type', $this->deviceType);
+        }
+
+        foreach ($query->pluck('device_id') as $device_id) {
             $this->current_device_id = $device_id;
             $this->results->markAttempted();
             $dispatcher->dispatchSync(new $this->job($device_id, $this->moduleList));

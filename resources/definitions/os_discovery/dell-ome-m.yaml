@@ -1,4 +1,3 @@
-mib: DELL-MM-MIB-SMIv2
 modules:
     os:
         hardware: DELL-MM-MIB-SMIv2::dmmProductName.0
@@ -8,9 +7,10 @@ modules:
         state:
             data:
                 -
-                    oid: dmmGlobalSystemStatus
-                    value: dmmGlobalSystemStatus
+                    oid: DELL-MM-MIB-SMIv2::dmmGlobalSystemStatus
+                    value: DELL-MM-MIB-SMIv2::dmmGlobalSystemStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.6.2.1.{{ $index }}'
+                    state_name: dmmGlobalSystemStatus
                     descr: 'Global System Status'
                     index: 'dmmGlobalSystemStatus.{{ $index }}'
                     states:
@@ -21,11 +21,12 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: dmmIOMCurrStatus
-                    value: dmmIOMCurrStatus
+                    oid: DELL-MM-MIB-SMIv2::dmmIOMCurrStatus
+                    value: DELL-MM-MIB-SMIv2::dmmIOMCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.1.{{ $index }}'
                     descr: 'IOM Status'
                     index: 'dmmIOMCurrStatus.{{ $index }}'
+                    state_name: dmmIOMCurrStatus
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
                         - { value: 2, descr: unknown, graph: 1, generic: 3 }
@@ -34,11 +35,12 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: dmmRedCurrStatus
-                    value: dmmRedCurrStatus
+                    oid: DELL-MM-MIB-SMIv2::dmmRedCurrStatus
+                    value: DELL-MM-MIB-SMIv2::dmmRedCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.2.{{ $index }}'
                     descr: 'Redundancy Status'
                     index: 'dmmRedCurrStatus.{{ $index }}'
+                    state_name: dmmRedCurrStatus
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
                         - { value: 2, descr: unknown, graph: 1, generic: 3 }
@@ -47,11 +49,12 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: dmmPowerCurrStatus
-                    value: dmmPowerCurrStatus
+                    oid: DELL-MM-MIB-SMIv2::dmmPowerCurrStatus
+                    value: DELL-MM-MIB-SMIv2::dmmPowerCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.3.{{ $index }}'
                     descr: 'Power Status'
                     index: 'dmmPowerCurrStatus.{{ $index }}'
+                    state_name: dmmPowerCurrStatus
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
                         - { value: 2, descr: unknown, graph: 1, generic: 3 }
@@ -60,10 +63,11 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: dmmPSUTable
-                    value: dmmPSUCurrStatus
+                    oid: DELL-MM-MIB-SMIv2::dmmPSUTable
+                    value: DELL-MM-MIB-SMIv2::dmmPSUCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.6.4.2.1.8.{{ $index }}'
-                    descr: 'Chassis {{ $dmmPSUChassisIndex }} PS-{{ $dmmPSUIndex }} Status'
+                    descr: 'Chassis {{ DELL-MM-MIB-SMIv2::dmmPSUChassisIndex }} PS-{{ DELL-MM-MIB-SMIv2::dmmPSUIndex }} Status'
+                    state_name: dmmPSUTable
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
                         - { value: 2, descr: unknown, graph: 1, generic: 3 }
@@ -72,11 +76,12 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: dmmFanCurrStatus
-                    value: dmmFanCurrStatus
+                    oid: DELL-MM-MIB-SMIv2::dmmFanCurrStatus
+                    value: DELL-MM-MIB-SMIv2::dmmFanCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.4.{{ $index }}'
                     descr: 'FAN Status'
                     index: 'dmmFanCurrStatus.{{ $index }}'
+                    state_name: dmmFanCurrStatus
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
                         - { value: 2, descr: unknown, graph: 1, generic: 3 }
@@ -85,10 +90,12 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: dmmBladeCurrStatus
+                    oid: DELL-MM-MIB-SMIv2::dmmBladeCurrStatus
+                    value: DELL-MM-MIB-SMIv2::dmmBladeCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.5.{{ $index }}'
                     descr: 'Blade Status'
                     index: 'dmmBladeCurrStatus.{{ $index }}'
+                    state_name: dmmBladeCurrStatus
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
                         - { value: 2, descr: unknown, graph: 1, generic: 3 }
@@ -97,10 +104,12 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: dmmTempCurrStatus
+                    oid: DELL-MM-MIB-SMIv2::dmmTempCurrStatus
+                    value: DELL-MM-MIB-SMIv2::dmmTempCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.6.{{ $index }}'
                     descr: 'Temperature Status'
                     index: 'dmmTempCurrStatus.{{ $index }}'
+                    state_name: dmmTempCurrStatus
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
                         - { value: 2, descr: unknown, graph: 1, generic: 3 }
@@ -109,10 +118,12 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
-                    oid: dmmMMCurrStatus
+                    oid: DELL-MM-MIB-SMIv2::dmmMMCurrStatus
+                    value: DELL-MM-MIB-SMIv2::dmmMMCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.7.{{ $index }}'
                     descr: 'MM Status'
                     index: 'dmmMMCurrStatus.{{ $index }}'
+                    state_name: dmmMMCurrStatus
                     states:
                         - { value: 1, descr: other, graph: 1, generic: 3 }
                         - { value: 2, descr: unknown, graph: 1, generic: 3 }
@@ -123,49 +134,49 @@ modules:
         temperature:
             data:
                 -
-                    oid: dmmChassisFrontPanelAmbientTemperature
-                    value: dmmChassisFrontPanelAmbientTemperature
+                    oid: DELL-MM-MIB-SMIv2::dmmChassisFrontPanelAmbientTemperature
+                    value: DELL-MM-MIB-SMIv2::dmmChassisFrontPanelAmbientTemperature
                     num_oid: '.1.3.6.1.4.1.674.10892.6.3.1.8.{{ $index }}'
                     index: 'dmmChassisFrontPanelAmbientTemperature.{{ $index }}'
                     descr: 'Chassis {{ $dmmChassisIndex }} Front Panel Temperature'
         power:
             data:
                 -
-                    oid: dmmPowerTable
-                    value: dmmPowerIdlePower
+                    oid: DELL-MM-MIB-SMIv2::dmmPowerTable
+                    value: DELL-MM-MIB-SMIv2::dmmPowerIdlePower
                     num_oid: '.1.3.6.1.4.1.674.10892.6.4.1.1.2.{{ $index }}'
                     index: 'dmmPowerIdlePower.{{ $index }}'
-                    descr: 'Chassis {{ $dmmPowerChassisIndex }} Idle Power'
+                    descr: 'Chassis {{ DELL-MM-MIB-SMIv2::dmmPowerChassisIndex }} Idle Power'
                 -
-                    oid: dmmPowerTable
-                    value: dmmPowerWattsPeakUsage
+                    oid: DELL-MM-MIB-SMIv2::dmmPowerTable
+                    value: DELL-MM-MIB-SMIv2::dmmPowerWattsPeakUsage
                     num_oid: '.1.3.6.1.4.1.674.10892.6.4.1.1.5.{{ $index }}'
                     index: 'dmmPowerWattsPeakUsage.{{ $index }}'
-                    descr: 'Chassis {{ $dmmPowerChassisIndex }} Peak Usage'
+                    descr: 'Chassis {{ DELL-MM-MIB-SMIv2::dmmPowerChassisIndex }} Peak Usage'
                 -
-                    oid: dmmPowerTable
-                    value: dmmPowerWattsMinUsage
+                    oid: DELL-MM-MIB-SMIv2::dmmPowerTable
+                    value: DELL-MM-MIB-SMIv2::dmmPowerWattsMinUsage
                     num_oid: '.1.3.6.1.4.1.674.10892.6.4.1.1.7.{{ $index }}'
                     index: 'dmmPowerWattsMinUsage.{{ $index }}'
-                    descr: 'Chassis {{ $dmmPowerChassisIndex }} Min Usage'
+                    descr: 'Chassis {{ DELL-MM-MIB-SMIv2::dmmPowerChassisIndex }} Min Usage'
                 -
-                    oid: dmmPowerTable
-                    value: dmmPowerWattsReading
+                    oid: DELL-MM-MIB-SMIv2::dmmPowerTable
+                    value: DELL-MM-MIB-SMIv2::dmmPowerWattsReading
                     num_oid: '.1.3.6.1.4.1.674.10892.6.4.1.1.9.{{ $index }}'
                     index: 'dmmPowerWattsReading.{{ $index }}'
-                    descr: 'Chassis {{ $dmmPowerChassisIndex }}'
+                    descr: 'Chassis {{ DELL-MM-MIB-SMIv2::dmmPowerChassisIndex }}'
         power_consumed:
             data:
                 -
-                    oid: dmmPowerTable
-                    value: dmmPowerKWhCumulative
+                    oid: DELL-MM-MIB-SMIv2::dmmPowerTable
+                    value: DELL-MM-MIB-SMIv2::dmmPowerKWhCumulative
                     num_oid: '.1.3.6.1.4.1.674.10892.6.4.1.1.3.{{ $index }}'
                     index: 'dmmPowerKWhCumulative.{{ $index }}'
-                    descr: 'Chassis {{ $dmmPowerChassisIndex }}'
+                    descr: 'Chassis {{ DELL-MM-MIB-SMIv2::dmmPowerChassisIndex }}'
         voltage:
             data:
                 -
-                    oid: dmmPSUTable
-                    value: dmmPSUVoltage
+                    oid: DELL-MM-MIB-SMIv2::dmmPSUTable
+                    value: DELL-MM-MIB-SMIv2::dmmPSUVoltage
                     num_oid: '.1.3.6.1.4.1.674.10892.6.4.2.1.7.{{ $index }}'
-                    descr: 'Chassis {{ $dmmPSUChassisIndex }} PS-{{ $dmmPSUIndex }}'
+                    descr: 'Chassis {{ DELL-MM-MIB-SMIv2::dmmPSUChassisIndex }} PS-{{ DELL-MM-MIB-SMIv2::dmmPSUIndex }}'

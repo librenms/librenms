@@ -1,5 +1,5 @@
 --
---  Copyright(C) 2003-2017 Server Technology, Inc.
+--  Copyright(C) 2003-2023 Server Technology
 --
 
     Sentry4-MIB DEFINITIONS ::= BEGIN
@@ -12,20 +12,35 @@
 
 
     sentry4 MODULE-IDENTITY
-        LAST-UPDATED "201706151830Z" -- 15 June 2017
-        ORGANIZATION "Server Technology, Inc."
+        LAST-UPDATED "202303101100Z" -- 10 March 2023
+        ORGANIZATION "Server Technology"
         CONTACT-INFO
-            "Server Technology, Inc.
+            "Server Technology
              1040 Sandhill Road
              Reno, NV 89521
              Tel: (775) 284-2000
              Fax: (775) 284-2065
-             Email: mibmaster@servertech.com"
+             Email: support@servertech.com"
         DESCRIPTION
-            "This is the MIB module for the fourth generation of the
-             Sentry product family.  This includes the PRO1 and PRO2
-             series of Smart and Switched Cabinet Distribution Unit (CDU)
-             and Power Distribution Unit (PDU) products."
+            "This is the MIB module for the fourth generation of the Sentry
+             product family.  This includes the PRO1 and PRO2 series of Smart
+             and Switched Power Distribution Unit (PDU), Cabinet Distribution
+             Unit (CDU), Universal Power Distribution Unit (UPDU), and Inline
+             Meter products."
+        REVISION "202303101100Z" -- 10 March 2023
+        DESCRIPTION
+            "Added the st4SystemUptime object."
+        REVISION "202104121535Z" -- 12 April 2021
+        DESCRIPTION
+            "Renamed the first enumeration of st4UnitType to 'primary' from
+            'master'."
+        REVISION "202007021900Z" -- 2 July 2020
+        DESCRIPTION
+            "Increased st4SystemLocation maximum size to 80."
+        REVISION "201708251530Z" -- 25 August 2017
+        DESCRIPTION
+            "Added the st4OutletSocketAdapter object.  Renamed the first two
+             enumerations of st4UnitType to just 'master' and 'link'."
         REVISION "201706151830Z" -- 15 June 2017
         DESCRIPTION
             "Added support for fan sensors, including objects for installed
@@ -131,7 +146,7 @@
         ::= { st4SystemConfig 1 }
 
     st4SystemLocation OBJECT-TYPE
-        SYNTAX      DisplayString(SIZE(0..63))
+        SYNTAX      DisplayString(SIZE(0..80))
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
@@ -180,6 +195,15 @@
         DESCRIPTION
             "The product series."
         ::= { st4SystemConfig 7 }
+
+    st4SystemUptime OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..48))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The time in days, hours, minutes, and seconds since the network
+             management portion of the system was last re-initialized."
+        ::= { st4SystemConfig 8 }
 
     st4SystemFeatures OBJECT-TYPE
         SYNTAX      BITS {
@@ -319,8 +343,8 @@
 
     st4UnitType OBJECT-TYPE
         SYNTAX      INTEGER {
-                        masterPdu(0),
-                        linkPdu(1),
+                        primary(0),
+                        link(1),
                         controller(2),
                         emcu(3)
                     }
@@ -2126,6 +2150,7 @@
         st4OutletSocketType            DisplayString,
         st4OutletCurrentCapacity       Integer32,
         st4OutletPowerCapacity         Integer32,
+        st4OutletSocketAdapter         INTEGER,
         st4OutletWakeupState           INTEGER,
         st4OutletPostOnDelay           Integer32,
         st4OutletPhaseID               DisplayString,
@@ -2194,6 +2219,19 @@
             "The power capacity of the outlet in Volt-Amps.  For DC products,
              this is identical to power capacity in Watts."
         ::= { st4OutletConfigEntry 8 }
+
+    st4OutletSocketAdapter OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        none(0),
+                        c13(1),
+                        c19(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The manually-selected or automatically-detected socket adapter
+             of the outlet."
+        ::= { st4OutletConfigEntry 9 }
 
     st4OutletWakeupState OBJECT-TYPE
         SYNTAX      INTEGER {
@@ -3481,9 +3519,9 @@
         ::= { st4FanSensorConfigTable 1 }
 
     St4FanSensorConfigEntry ::= SEQUENCE {
-        st4FanSensorIndex                Integer32,
-        st4FanSensorID                   DisplayString,
-        st4FanSensorName                 DisplayString
+        st4FanSensorIndex                 Integer32,
+        st4FanSensorID                    DisplayString,
+        st4FanSensorName                  DisplayString
     }
 
     st4FanSensorIndex OBJECT-TYPE
@@ -3530,8 +3568,8 @@
         ::= { st4FanSensorMonitorTable 1 }
 
     St4FanSensorMonitorEntry ::= SEQUENCE {
-        st4FanSensorValue                 Integer32,
-        st4FanSensorStatus                DeviceStatus
+        st4FanSensorValue                  Integer32,
+        st4FanSensorStatus                 DeviceStatus
     }
 
     st4FanSensorValue OBJECT-TYPE
@@ -3571,11 +3609,11 @@
         ::= { st4FanSensorEventConfigTable 1 }
 
     St4FanSensorEventConfigEntry ::= SEQUENCE {
-        st4FanSensorNotifications             EventNotificationMethods,
-        st4FanSensorLowAlarm                  Integer32,
-        st4FanSensorLowWarning                Integer32,
-        st4FanSensorHighWarning               Integer32,
-        st4FanSensorHighAlarm                 Integer32
+        st4FanSensorNotifications              EventNotificationMethods,
+        st4FanSensorLowAlarm                   Integer32,
+        st4FanSensorLowWarning                 Integer32,
+        st4FanSensorHighWarning                Integer32,
+        st4FanSensorHighAlarm                  Integer32
     }
 
     st4FanSensorNotifications OBJECT-TYPE
@@ -4330,6 +4368,7 @@
             st4SystemNICSerialNumber,
             st4SystemNICHardwareInfo,
             st4SystemProductSeries,
+            st4SystemUptime,
             st4SystemFeatures,
             st4SystemFeatureKey,
             st4SystemConfigModifiedCount,
@@ -4534,6 +4573,7 @@
             st4OutletSocketType,
             st4OutletCurrentCapacity,
             st4OutletPowerCapacity,
+            st4OutletSocketAdapter,
             st4OutletWakeupState,
             st4OutletPostOnDelay,
             st4OutletPhaseID,

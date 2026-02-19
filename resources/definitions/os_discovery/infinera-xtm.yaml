@@ -1,5 +1,3 @@
-mib: LUM-EQUIPMENT-MIB:LUM-IFBASIC-MIB:LUM-IFOTN-MIB:LUM-IFOTNMON-MIB:LUM-OA-MIB:LUM-OCM-MIB:LUM-REG:LUM-SYSTEM-MIB:LUM-IFPERF-MIB:LUM-IFPHYSICAL-MIB:LUM-SYSINFO-MIB:LUM-WDM-MIB
-
 modules:
     os:
         version: LUM-SYSTEM-MIB::sysNodeVersion.0
@@ -18,25 +16,25 @@ modules:
     processors:
         data:
             -
-                oid: sysinfoBoardLoadTable
-                value: sysinfoBoardLoadLoad1Min
+                oid: LUM-SYSINFO-MIB::sysinfoBoardLoadTable
+                value: LUM-SYSINFO-MIB::sysinfoBoardLoadLoad1Min
                 num_oid: '.1.3.6.1.4.1.8708.2.71.2.2.1.1.3.{{ $index }}'
-                descr: '{{ $sysinfoBoardLoadName }} {{ $count }}'
+                descr: '{{ LUM-SYSINFO-MIB::sysinfoBoardLoadName }} {{ $count }}'
 
     sensors:
         additional_oids:
             data:
                 -
                     oid:
-                        - equipmentSubrackTempThreshold
-                        - equipmentBoardTempThreshold
-                        - equipmentBoardTempLowThreshold
+                        - LUM-EQUIPMENT-MIB::equipmentSubrackTempThreshold
+                        - LUM-EQUIPMENT-MIB::equipmentBoardTempThreshold
+                        - LUM-EQUIPMENT-MIB::equipmentBoardTempLowThreshold
 
         state:
             data:
                 -
-                    oid: equipmentSubrackTable
-                    value:  equipmentSubrackOperStatus
+                    oid: LUM-EQUIPMENT-MIB::equipmentSubrackTable
+                    value:  LUM-EQUIPMENT-MIB::equipmentSubrackOperStatus
                     num_oid: '.1.3.6.1.4.1.8708.2.11.2.2.1.1.19.{{ $index }}'
                     descr: 'Operational State Subrack {{ $index }}'
                     group: Subrack Operational States
@@ -48,8 +46,8 @@ modules:
                         - { descr: up, graph: 0, value: 3, generic: 0 }
 
                 -
-                    oid: equipmentSubrackTable
-                    value: equipmentSubrackTempHighExceeded
+                    oid: LUM-EQUIPMENT-MIB::equipmentSubrackTable
+                    value: LUM-EQUIPMENT-MIB::equipmentSubrackTempHighExceeded
                     num_oid: '.1.3.6.1.4.1.8708.2.11.2.2.1.1.12.{{ $index }}'
                     descr: 'Temperature High Alarm Subrack {{ $index }}'
                     group: Subrack Temperature States
@@ -60,10 +58,10 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
-                    oid: equipmentBoardTable
-                    value:  equipmentBoardOperStatus
+                    oid: LUM-EQUIPMENT-MIB::equipmentBoardTable
+                    value:  LUM-EQUIPMENT-MIB::equipmentBoardOperStatus
                     num_oid: '.1.3.6.1.4.1.8708.2.11.2.3.1.1.12.{{ $index }}'
-                    descr: '{{ $equipmentBoardName }} - {{ $equipmentBoardDescr }}'
+                    descr: '{{ LUM-EQUIPMENT-MIB::equipmentBoardName }} - {{ LUM-EQUIPMENT-MIB::equipmentBoardDescr }}'
                     group: Board Operational States
                     entPhysicalIndex: 'board-{{ $index }}'
                     state_name: BoardOperStatus
@@ -73,14 +71,14 @@ modules:
                         - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
-                            oid: equipmentBoardAdminStatus
+                            oid: LUM-EQUIPMENT-MIB::equipmentBoardAdminStatus
                             op: '='
                             value: 1
                 -
-                    oid: equipmentBoardTable
-                    value: equipmentBoardTempHighExceeded
+                    oid: LUM-EQUIPMENT-MIB::equipmentBoardTable
+                    value: LUM-EQUIPMENT-MIB::equipmentBoardTempHighExceeded
                     num_oid: '.1.3.6.1.4.1.8708.2.11.2.3.1.1.17.{{ $index }}'
-                    descr: 'Temperature High Alarm {{ $equipmentBoardName }}'
+                    descr: 'Temperature High Alarm {{ LUM-EQUIPMENT-MIB::equipmentBoardName }}'
                     group: Board Temperature States
                     entPhysicalIndex: 'board-{{ $index }}'
                     state_name: BoardTempHighExceeded
@@ -89,10 +87,10 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
-                    oid: equipmentPowerTable
-                    value:  equipmentPowerPowerFailed
+                    oid: LUM-EQUIPMENT-MIB::equipmentPowerTable
+                    value: LUM-EQUIPMENT-MIB::equipmentPowerPowerFailed
                     num_oid: '.1.3.6.1.4.1.8708.2.11.2.4.1.1.21.{{ $index }}'
-                    descr: 'PSU Status {{ $equipmentPowerName }}, Type: {{ $equipmentPowerType }}'
+                    descr: 'PSU Status {{ LUM-EQUIPMENT-MIB::equipmentPowerName }}, Type: {{ LUM-EQUIPMENT-MIB::equipmentPowerType }}'
                     group: PSU States
                     entPhysicalIndex: 'psu-{{ $index }}'
                     state_name: PSUOperStatus
@@ -101,10 +99,10 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
-                    oid:  equipmentFanTable
-                    value: equipmentFanMainUnitFailed
+                    oid: LUM-EQUIPMENT-MIB::equipmentFanTable
+                    value: LUM-EQUIPMENT-MIB::equipmentFanMainUnitFailed
                     num_oid: '.1.3.6.1.4.1.8708.2.11.2.5.1.1.10.{{ $index }}'
-                    descr: 'Fan Status {{ $equipmentFanName }}'
+                    descr: 'Fan Status {{ LUM-EQUIPMENT-MIB::equipmentFanName }}'
                     group: Fan States
                     entPhysicalIndex: 'fan-{{ $index }}'
                     state_name: FanOperStatus
@@ -113,10 +111,10 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
-                    oid: oaIfTable
-                    value: oaIfOperStatus
+                    oid: LUM-OA-MIB::oaIfTable
+                    value: LUM-OA-MIB::oaIfOperStatus
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.10.{{ $index }}'
-                    descr: '{{ $oaIfName }} - {{ $oaIfDescr }}'
+                    descr: '{{ LUM-OA-MIB::oaIfName }} - {{ LUM-OA-MIB::oaIfDescr }}'
                     group: Amplifier Operational States
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmpOperStatus
@@ -126,15 +124,15 @@ modules:
                         - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
-                            oid: oaIfAdminStatus
+                            oid: LUM-OA-MIB::oaIfAdminStatus
                             op: '='
                             value: 1
 
                 -
-                    oid: oaIfTable
-                    value: oaIfSaturationFault
+                    oid: LUM-OA-MIB::oaIfTable
+                    value: LUM-OA-MIB::oaIfSaturationFault
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.52.{{ $index }}'
-                    descr: 'Amplifier Saturation Fault {{ $oaIfSubrack }}:{{ $oaIfName }}'
+                    descr: 'Amplifier Saturation Fault {{ LUM-OA-MIB::oaIfSubrack }}:{{ LUM-OA-MIB::oaIfName }}'
                     group: Amplifier Signal States
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmpSaturationFault
@@ -143,14 +141,14 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                     skip_values:
                         -
-                            oid: oaIfAdminStatus
+                            oid: LUM-OA-MIB::oaIfAdminStatus
                             op: '='
                             value: 1
                 -
-                    oid: oaIfTable
-                    value: oaIfLaserTempOutOfRange
+                    oid: LUM-OA-MIB::oaIfTable
+                    value: LUM-OA-MIB::oaIfLaserTempOutOfRange
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.57.{{ $index }}'
-                    descr: 'Temperature Amplifier {{ $oaIfSubrack }}:{{ $oaIfName }}'
+                    descr: 'Temperature Amplifier {{ LUM-OA-MIB::oaIfSubrack }}:{{ LUM-OA-MIB::oaIfName }}'
                     group: Amplifier Temperature States
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmpTempExceeded
@@ -159,15 +157,15 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                     skip_values:
                         -
-                            oid: oaIfAdminStatus
+                            oid: LUM-OA-MIB::oaIfAdminStatus
                             op: '='
                             value: 1
 
                 -
-                    oid: oaIfTable
-                    value: oaIfLossOfSignal
+                    oid: LUM-OA-MIB::oaIfTable
+                    value: LUM-OA-MIB::oaIfLossOfSignal
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.26.{{ $index }}'
-                    descr: 'Amplifier LoS {{ $oaIfSubrack }}:{{ $oaIfName }}'
+                    descr: 'Amplifier LoS {{ LUM-OA-MIB::oaIfSubrack }}:{{ LUM-OA-MIB::oaIfName }}'
                     group: Amplifier Signal States
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmpLoS
@@ -176,15 +174,15 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                     skip_values:
                         -
-                            oid: oaIfAdminStatus
+                            oid: LUM-OA-MIB::oaIfAdminStatus
                             op: '='
                             value: 1
 
                 -
-                    oid: oaIfTable
-                    value: oaIfTxSignalStatus
+                    oid: LUM-OA-MIB::oaIfTable
+                    value: LUM-OA-MIB::oaIfTxSignalStatus
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.59.{{ $index }}'
-                    descr: 'Amplifier Tx Signals {{ $oaIfSubrack }}:{{ $oaIfName }}'
+                    descr: 'Amplifier Tx Signals {{ LUM-OA-MIB::oaIfSubrack }}:{{ LUM-OA-MIB::oaIfName }}'
                     group: Amplifier Signal States
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmplifierTxSignalStatus
@@ -194,15 +192,15 @@ modules:
                         - { descr: ok, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
-                            oid: oaIfAdminStatus
+                            oid: LUM-OA-MIB::oaIfAdminStatus
                             op: '='
                             value: 1
 
                 -
-                    oid: oaIfTable
-                    value: oaIfRxSignalStatus
+                    oid: LUM-OA-MIB::oaIfTable
+                    value: LUM-OA-MIB::oaIfRxSignalStatus
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.60.{{ $index }}'
-                    descr: 'Amplifier Rx Signals {{ $oaIfSubrack }}:{{ $oaIfName }}'
+                    descr: 'Amplifier Rx Signals {{ LUM-OA-MIB::oaIfSubrack }}:{{ LUM-OA-MIB::oaIfName }}'
                     group: Amplifier Signal States
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmplifierRxSignalStatus
@@ -212,15 +210,15 @@ modules:
                         - { descr: ok, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
-                            oid: oaIfAdminStatus
+                            oid: LUM-OA-MIB::oaIfAdminStatus
                             op: '='
                             value: 1
 
                 -
-                    oid: oaIfTable
-                    value: oaIfOutputPowerFail
+                    oid: LUM-OA-MIB::oaIfTable
+                    value: LUM-OA-MIB::oaIfOutputPowerFail
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.61.{{ $index }}'
-                    descr: 'Amplifier Output Power {{ $oaIfSubrack }}:{{ $oaIfName }}'
+                    descr: 'Amplifier Output Power {{ LUM-OA-MIB::oaIfSubrack }}:{{ LUM-OA-MIB::oaIfName }}'
                     group: Amplifier Signal States
                     entPhysicalIndex: 'oa-{{ $index }}'
                     state_name: AmpLoS
@@ -229,15 +227,15 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                     skip_values:
                         -
-                            oid: oaIfAdminStatus
+                            oid: LUM-OA-MIB::oaIfAdminStatus
                             op: '='
                             value: 1
 
                 -
-                    oid: oaVoaClientIfTable
-                    value: oaVoaClientIfOperStatus
+                    oid: LUM-OA-MIB::oaVoaClientIfTable
+                    value: LUM-OA-MIB::oaVoaClientIfOperStatus
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.5.1.1.10.{{ $index }}'
-                    descr: '{{ $oaVoaClientIfName }} - {{ $oaVoaClientIfDescr }}'
+                    descr: '{{ LUM-OA-MIB::oaVoaClientIfName }} - {{ LUM-OA-MIB::oaVoaClientIfDescr }}'
                     group: oaVoa Operational States
                     state_name: OaVoaOperStatus
                     states:
@@ -246,15 +244,15 @@ modules:
                         - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
-                            oid: oaVoaClientIfAdminStatus
+                            oid: LUM-OA-MIB::oaVoaClientIfAdminStatus
                             op: '='
                             value: 1
 
                 -
-                    oid: oaVoaLineIfTable
-                    value: oaVoaLineIfOperStatus
+                    oid: LUM-OA-MIB::oaVoaLineIfTable
+                    value: LUM-OA-MIB::oaVoaLineIfOperStatus
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.6.1.1.10.{{ $index }}'
-                    descr: '{{ $oaVoaLineIfName }} - {{ $oaVoaLineIfDescr }}'
+                    descr: '{{ LUM-OA-MIB::oaVoaLineIfName }} - {{ LUM-OA-MIB::oaVoaLineIfDescr }}'
                     group: oaVoa Operational States
                     state_name: OaVoaOperStatus
                     states:
@@ -263,15 +261,15 @@ modules:
                         - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
-                            oid: oaVoaLineIfAdminStatus
+                            oid: LUM-OA-MIB::oaVoaLineIfAdminStatus
                             op: '='
                             value: 1
 
                 -
-                    oid: ocmIfTable
-                    value: ocmIfOperStatus
+                    oid: LUM-OCM-MIB::ocmIfTable
+                    value: LUM-OCM-MIB::ocmIfOperStatus
                     num_oid: '.1.3.6.1.4.1.8708.2.33.2.2.1.1.9.{{ $index }}'
-                    descr: '{{ $ocmIfName }} - {{ $ocmIfDescr }}'
+                    descr: '{{ LUM-OCM-MIB::ocmIfName }} - {{ LUM-OCM-MIB::ocmIfDescr }}'
                     group: OCM Operational States
                     entPhysicalIndex: 'ocm-{{ $index }}'
                     state_name: OCMOperStatus
@@ -281,15 +279,15 @@ modules:
                         - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
-                            oid: ocmIfAdminStatus
+                            oid: LUM-OCM-MIB::ocmIfAdminStatus
                             op: '='
                             value: 1
 
                 -
-                    oid: ocmIfTable
-                    value: ocmIfSwitchFailure
+                    oid: LUM-OCM-MIB::ocmIfTable
+                    value: LUM-OCM-MIB::ocmIfSwitchFailure
                     num_oid: '.1.3.6.1.4.1.8708.2.33.2.2.1.1.22.{{ $index }}'
-                    descr: 'OCM Switch Status {{ $ocmIfSubrack }}:{{ $ocmIfName }}'
+                    descr: 'OCM Switch Status {{ LUM-OCM-MIB::ocmIfSubrack }}:{{ LUM-OCM-MIB::ocmIfName }}'
                     group: OCM Module States
                     entPhysicalIndex: 'ocm-{{ $index }}'
                     state_name: OCMSwitch
@@ -298,10 +296,10 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
-                    oid: ocmIfTable
-                    value: ocmIfModuleFailure
+                    oid: LUM-OCM-MIB::ocmIfTable
+                    value: LUM-OCM-MIB::ocmIfModuleFailure
                     num_oid: '.1.3.6.1.4.1.8708.2.33.2.2.1.1.25.{{ $index }}'
-                    descr: 'OCM Module Status {{ $ocmIfSubrack }}:{{ $ocmIfName }}'
+                    descr: 'OCM Module Status {{ LUM-OCM-MIB::ocmIfSubrack }}:{{ LUM-OCM-MIB::ocmIfName }}'
                     group: OCM Module States
                     entPhysicalIndex: 'ocm-{{ $index }}'
                     state_name: OCMModule
@@ -310,10 +308,10 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
-                    oid: ifOtnOtuTable
-                    value: ifOtnOtuLossOfFrame
+                    oid: LUM-IFOTN-MIB::ifOtnOtuTable
+                    value: LUM-IFOTN-MIB::ifOtnOtuLossOfFrame
                     num_oid: '.1.3.6.1.4.1.8708.2.50.2.2.1.1.6.{{ $index }}'
-                    descr: 'OTN Loss of Frame {{ $ifOtnOtuName }}'
+                    descr: 'OTN Loss of Frame {{ LUM-IFOTN-MIB::ifOtnOtuName }}'
                     group: OTN Port States
                     entPhysicalIndex: 'otn-{{ $index }}'
                     state_name: OTNLoF
@@ -322,10 +320,10 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
-                    oid: ifOtnOtuTable
-                    value: ifOtnOtuLossOfMultiframe
+                    oid: LUM-IFOTN-MIB::ifOtnOtuTable
+                    value: LUM-IFOTN-MIB::ifOtnOtuLossOfMultiframe
                     num_oid: '.1.3.6.1.4.1.8708.2.50.2.2.1.1.8.{{ $index }}'
-                    descr: 'OTN Loss of Multiframe {{ $ifOtnOtuName }}'
+                    descr: 'OTN Loss of Multiframe {{ LUM-IFOTN-MIB::ifOtnOtuName }}'
                     group: OTN Port States
                     entPhysicalIndex: 'otn-{{ $index }}'
                     state_name: OTNLoMF
@@ -334,10 +332,10 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
-                    oid: ifOtnOtuTable
-                    value: ifOtnOtuRxAlarmIndicationSignal
+                    oid: LUM-IFOTN-MIB::ifOtnOtuTable
+                    value: LUM-IFOTN-MIB::ifOtnOtuRxAlarmIndicationSignal
                     num_oid: '.1.3.6.1.4.1.8708.2.50.2.2.1.1.7.{{ $index }}'
-                    descr: 'OTN Indication Signal {{ $ifOtnOtuName }}'
+                    descr: 'OTN Indication Signal {{ LUM-IFOTN-MIB::ifOtnOtuName }}'
                     group: OTN Port States
                     entPhysicalIndex: 'otn-{{ $index }}'
                     state_name: OTNIndicationSignal
@@ -346,10 +344,10 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
-                    oid: ifOtnMonSmTable
-                    value: ifOtnMonSmBackwardDefectIndication
+                    oid: LUM-IFOTNMON-MIB::ifOtnMonSmTable
+                    value: LUM-IFOTNMON-MIB::ifOtnMonSmBackwardDefectIndication
                     num_oid: '.1.3.6.1.4.1.8708.2.55.2.2.1.1.6.{{ $index }}'
-                    descr: 'OTN BDI {{ $ifOtnMonSmName }}'
+                    descr: 'OTN BDI {{ LUM-IFOTNMON-MIB::ifOtnMonSmName }}'
                     group: OTN Port States
                     entPhysicalIndex: 'otnmon-{{ $index }}'
                     state_name: OTNBDIState
@@ -358,10 +356,10 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
-                    oid: ifOtnMonSmTable
-                    value: ifOtnMonSmIncomingAlignmentError
+                    oid: LUM-IFOTNMON-MIB::ifOtnMonSmTable
+                    value: LUM-IFOTNMON-MIB::ifOtnMonSmIncomingAlignmentError
                     num_oid: '.1.3.6.1.4.1.8708.2.55.2.2.1.1.7.{{ $index }}'
-                    descr: 'OTN IAE {{ $ifOtnMonSmName }}'
+                    descr: 'OTN IAE {{ LUM-IFOTNMON-MIB::ifOtnMonSmName }}'
                     group: OTN Port States
                     entPhysicalIndex: 'otnmon-{{ $index }}'
                     state_name: OTNIAEState
@@ -370,10 +368,10 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
-                    oid: ifOtnMonSmTable
-                    value: ifOtnMonSmBackwardIncomingAlignmentError
+                    oid: LUM-IFOTNMON-MIB::ifOtnMonSmTable
+                    value: LUM-IFOTNMON-MIB::ifOtnMonSmBackwardIncomingAlignmentError
                     num_oid: '.1.3.6.1.4.1.8708.2.55.2.2.1.1.8.{{ $index }}'
-                    descr: 'OTN BIAE {{ $ifOtnMonSmName }}'
+                    descr: 'OTN BIAE {{ LUM-IFOTNMON-MIB::ifOtnMonSmName }}'
                     group: OTN Port States
                     entPhysicalIndex: 'otnmon-{{ $index }}'
                     state_name: OTNBIAEState
@@ -382,10 +380,10 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
 
                 -
-                    oid: wdmCtrlChannelTable
-                    value: wdmCtrlChannelStatus
+                    oid: LUM-WDM-MIB::wdmCtrlChannelTable
+                    value: LUM-WDM-MIB::wdmCtrlChannelStatus
                     num_oid: '.1.3.6.1.4.1.8708.2.4.2.8.1.1.16.{{ $index }}'
-                    descr: 'WDM Channel Status {{ $wdmCtrlChannelName }}'
+                    descr: 'WDM Channel Status {{ LUM-WDM-MIB::wdmCtrlChannelName }}'
                     group: WDM Channel States
                     state_name: WDMChannelStatus
                     states:
@@ -398,15 +396,15 @@ modules:
                         - { descr: waiting, graph: 0, value: 7, generic: 1 }
                     skip_values:
                         -
-                            oid: wdmCtrlChannelAdminStatus
+                            oid: LUM-WDM-MIB::wdmCtrlChannelAdminStatus
                             op: '='
                             value: 1
 
                 -
-                    oid: wdmCtrlChannelTable
-                    value: wdmCtrlChannelLossOfSignal
+                    oid: LUM-WDM-MIB::wdmCtrlChannelTable
+                    value: LUM-WDM-MIB::wdmCtrlChannelLossOfSignal
                     num_oid: '.1.3.6.1.4.1.8708.2.4.2.8.1.1.22.{{ $index }}'
-                    descr: 'WDM Channel LoS {{ $wdmCtrlChannelName }}'
+                    descr: 'WDM Channel LoS {{ LUM-WDM-MIB::wdmCtrlChannelName }}'
                     group: WDM Channel States
                     state_name: WDMChannelLoSStatus
                     states:
@@ -414,15 +412,15 @@ modules:
                         - { descr: ok, graph: 0, value: 1, generic: 0 }
                     skip_values:
                         -
-                            oid: wdmCtrlChannelAdminStatus
+                            oid: LUM-WDM-MIB::wdmCtrlChannelAdminStatus
                             op: '='
                             value: 1
 
                 -
-                    oid: ifBasicAdminTable
-                    value: ifBasicAdminOperStatus
+                    oid: LUM-IFBASIC-MIB::ifBasicAdminTable
+                    value: LUM-IFBASIC-MIB::ifBasicAdminOperStatus
                     num_oid: '.1.3.6.1.4.1.8708.2.46.2.3.1.1.9.{{ $index }}'
-                    descr: '{{ $ifBasicAdminName }} {{ $ifBasicAdminDescr }}'
+                    descr: '{{ LUM-IFBASIC-MIB::ifBasicAdminName }} {{ LUM-IFBASIC-MIB::ifBasicAdminDescr }}'
                     group: Physical Port States
                     entPhysicalIndex: 'physport-{{ $index }}'
                     state_name: PhysPortState
@@ -432,15 +430,15 @@ modules:
                         - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
-                            oid: ifBasicAdminAdminStatus
+                            oid: LUM-IFBASIC-MIB::ifBasicAdminAdminStatus
                             op: '='
                             value: 1
 
                 -
-                    oid: dcnIfTable
-                    value: dcnIfOperStatus
+                    oid: LUM-DCN-MIB::dcnIfTable
+                    value: LUM-DCN-MIB::dcnIfOperStatus
                     num_oid: '.1.3.6.1.4.1.8708.2.20.2.2.1.1.13.{{ $index }}'
-                    descr: '{{ $dcnIfName }} - {{ $dcnIfDescr }}'
+                    descr: '{{ LUM-DCN-MIB::dcnIfName }} - {{ LUM-DCN-MIB::dcnIfDescr }}'
                     group: DCN Port States
                     state_name: DCNPortState
                     states:
@@ -449,7 +447,7 @@ modules:
                         - { descr: up, graph: 0, value: 3, generic: 0 }
                     skip_values:
                         -
-                            oid: dcnIfAdminStatus
+                            oid: LUM-DCN-MIB::dcnIfAdminStatus
                             op: '='
                             value: 1
 
@@ -457,133 +455,122 @@ modules:
         temperature:
             data:
                 -
-                    oid: equipmentSubrackTable
-                    value: equipmentSubrackTemp
+                    oid: LUM-EQUIPMENT-MIB::equipmentSubrackTable
+                    value: LUM-EQUIPMENT-MIB::equipmentSubrackTemp
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.11.2.2.1.1.11.{{ $index }}'
                     descr: 'Subrack Temperature {{ $index }}'
                     group: Subrack Temperature
                     entPhysicalIndex: 'sr-{{ $index }}'
-                    high_limit:  equipmentSubrackTempThreshold
+                    high_limit: LUM-EQUIPMENT-MIB::equipmentSubrackTempThreshold
                     low_limit: 3
 
                 -
-                    oid: equipmentBoardTable
-                    value: equipmentBoardTemp
+                    oid: LUM-EQUIPMENT-MIB::equipmentBoardTable
+                    value: LUM-EQUIPMENT-MIB::equipmentBoardTemp
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.11.2.3.1.1.8.{{ $index }}'
-                    descr: 'Temperature {{ $equipmentBoardSubrack }}:{{ $equipmentBoardName }}'
+                    descr: 'Temperature {{ LUM-EQUIPMENT-MIB::equipmentBoardSubrack }}:{{ LUM-EQUIPMENT-MIB::equipmentBoardName }}'
                     group: Board Temperature
                     entPhysicalIndex: 'board-{{ $index }}'
-                    high_limit: equipmentBoardTempThreshold
-                    low_limit: equipmentBoardTempLowThreshold
+                    high_limit: LUM-EQUIPMENT-MIB::equipmentBoardTempThreshold
+                    low_limit: LUM-EQUIPMENT-MIB::equipmentBoardTempLowThreshold
 
                 -
-                    oid: oaIfTable
-                    value: oaIfActualLaserTemp
+                    oid: LUM-OA-MIB::oaIfTable
+                    value: LUM-OA-MIB::oaIfActualLaserTemp
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.43.{{ $index }}'
-                    descr: 'Temperature {{ $oaIfSubrack }}:{{ $oaIfName }}'
+                    descr: 'Temperature {{ LUM-OA-MIB::oaIfSubrack }}:{{ LUM-OA-MIB::oaIfName }}'
                     group: Amplifier Laser Temperature
                     entPhysicalIndex: 'oa-{{ $index }}'
 
                 -
-                    oid:  ifPhysicalTrxTable
-                    value: ifPhysicalTrxLaserTemp
+                    oid: LUM-IFPHYSICAL-MIB::ifPhysicalTrxTable
+                    value: LUM-IFPHYSICAL-MIB::ifPhysicalTrxLaserTemp
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.47.2.2.1.1.5.{{ $index }}'
-                    descr: 'Laser Temperature {{ $ifPhysicalTrxName }}'
+                    descr: 'Laser Temperature {{ LUM-IFPHYSICAL-MIB::ifPhysicalTrxName }}'
                     group: Laser Temperature
                     entPhysicalIndex: 'laser-{{ $index }}'
                     skip_values: [2147483646, 2147483647, -2147483648]
-
-
-
-
         dbm:
             options:
                 skip_values: 0
             data:
                 -
-                    oid: oaIfTable
-                    value: oaIfRxPowerLevel
+                    oid: LUM-OA-MIB::oaIfTable
+                    value: LUM-OA-MIB::oaIfRxPowerLevel
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.20.{{ $index }}'
-                    descr: 'Amplifier Rx {{ $oaIfSubrack }}:{{ $oaIfName }}'
+                    descr: 'Amplifier Rx {{ LUM-OA-MIB::oaIfSubrack }}:{{ LUM-OA-MIB::oaIfName }}'
                     group: Amplifier Laser dBm
                     index: oa-rx-dbm.{{ $index }}
                     entPhysicalIndex: 'oa-{{ $index }}'
-
                 -
-                    oid: oaIfTable
-                    value: oaIfTxPowerLevel
+                    oid: LUM-OA-MIB::oaIfTable
+                    value: LUM-OA-MIB::oaIfTxPowerLevel
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.19.{{ $index }}'
-                    descr: 'Amplifier Tx {{ $oaIfSubrack }}:{{ $oaIfName }}'
+                    descr: 'Amplifier Tx {{ LUM-OA-MIB::oaIfSubrack }}:{{ LUM-OA-MIB::oaIfName }}'
                     group: Amplifier Laser dBm
                     index: oa-tx-dbm.{{ $index }}
                     entPhysicalIndex: 'oa-{{ $index }}'
-
                 -
-                    oid: oaIfTable
-                    value: oaIfActualGain
+                    oid: LUM-OA-MIB::oaIfTable
+                    value: LUM-OA-MIB::oaIfActualGain
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.51.{{ $index }}'
-                    descr: 'Amplifier Gain {{ $oaIfSubrack }}:{{ $oaIfName }}'
+                    descr: 'Amplifier Gain {{ LUM-OA-MIB::oaIfSubrack }}:{{ LUM-OA-MIB::oaIfName }}'
                     group: Amplifier Laser Gain dBm
                     index: oa-gain-dbm.{{ $index }}
                     entPhysicalIndex: 'oa-{{ $index }}'
-
                 -
-                    oid: ifPerfL0Table
-                    value: ifPerfL0RxPower
+                    oid: LUM-IFPERF-MIB::ifPerfL0Table
+                    value: LUM-IFPERF-MIB::ifPerfL0RxPower
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.56.2.6.1.1.4.{{ $index }}'
-                    descr: 'Laser Rx {{ $ifPerfL0Name }}'
+                    descr: 'Laser Rx {{ LUM-IFPERF-MIB::ifPerfL0Name }}'
                     group: Laser dBm
                     index: laser-rx-dbm.{{ $index }}
                     entPhysicalIndex: 'laser-{{ $index }}'
                     skip_values: [2147483646, -2147483648]
-
                 -
-                    oid: ifPerfL0Table
-                    value: ifPerfL0TxPower
+                    oid: LUM-IFPERF-MIB::ifPerfL0Table
+                    value: LUM-IFPERF-MIB::ifPerfL0TxPower
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.8708.2.56.2.6.1.1.5.{{ $index }}'
-                    descr: 'Laser Tx {{ $ifPerfL0Name }}'
+                    descr: 'Laser Tx {{ LUM-IFPERF-MIB::ifPerfL0Name }}'
                     group: Laser dBm
                     index: laser-tx-dbm.{{ $index }}
                     entPhysicalIndex: 'laser-{{ $index }}'
                     skip_values: [2147483646, -2147483648]
-
         current:
             data:
                 -
-                    oid: oaIfTable
-                    value: oaIfLaserBias
+                    oid: LUM-OA-MIB::oaIfTable
+                    value: LUM-OA-MIB::oaIfLaserBias
                     divisor: 10000
                     num_oid: '.1.3.6.1.4.1.8708.2.19.2.2.1.1.22.{{ $index }}'
-                    descr: 'Amplifier current {{ $oaIfSubrack }}:{{ $oaIfName }}'
+                    descr: 'Amplifier current {{ LUM-OA-MIB::oaIfSubrack }}:{{ LUM-OA-MIB::oaIfName }}'
                     group: Amplifier Laser Current
                     entPhysicalIndex: 'oa-{{ $index }}'
-
                 -
-                    oid:  ifPhysicalTrxTable
-                    value: ifPhysicalTrxLaserBias
+                    oid: LUM-IFPHYSICAL-MIB::ifPhysicalTrxTable
+                    value: LUM-IFPHYSICAL-MIB::ifPhysicalTrxLaserBias
                     divisor: 10000
                     num_oid: '.1.3.6.1.4.1.8708.2.47.2.2.1.1.4.{{ $index }}'
-                    descr: 'Laser current {{ $ifPhysicalTrxName }}'
+                    descr: 'Laser current {{ LUM-IFPHYSICAL-MIB::ifPhysicalTrxName }}'
                     group: Laser Current
                     entPhysicalIndex: 'laser-{{ $index }}'
                     skip_values: [2147483646, 2147483647, -2147483648, 4294967293, 4294967294, 2147483648]
-
         chromatic_dispersion:
             data:
                 -
-                    oid: ifPerfL0Table
-                    value: ifPerfL0ChromaticDispersion
+                    oid: LUM-IFPERF-MIB::ifPerfL0Table
+                    value: LUM-IFPERF-MIB::ifPerfL0ChromaticDispersion
                     num_oid: '.1.3.6.1.4.1.8708.2.56.2.6.1.1.7.{{ $index }}'
-                    descr: 'Laser CD {{ $ifPerfL0Name }}'
+                    descr: 'Laser CD {{ LUM-IFPERF-MIB::ifPerfL0Name }}'
                     group: Laser Chromatic Dispersion
                     index: laser-cd.{{ $index }}
                     entPhysicalIndex: 'laser-{{ $index }}'
