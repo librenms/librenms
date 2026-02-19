@@ -1,0 +1,19 @@
+os: aios
+text: 'MONITORAPP AIWAF'
+type: appliance
+icon: monitorapp-aiwaf
+group: monitorapp
+
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+
+discovery:
+    -
+        sysDescr_regex:
+            - '/^Linux .*#*-AIOS/'
+        snmpwalk:
+            oid: NET-SNMP-EXTEND-MIB::nsExtendCommand
+            op: 'contains'
+            value: '/monitorapp/aiwaf/bin/snmp_extend.sh'

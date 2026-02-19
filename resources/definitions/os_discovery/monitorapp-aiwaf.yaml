@@ -1,0 +1,197 @@
+mib: NET-SNMP-EXTEND-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: cpu_temp
+                    descr: 'CPU Temperature'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.48.49' }
+        percent:
+            data:
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: cpu_usage
+                    descr: 'CPU Usage'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.48.48' }
+                -
+                    oid: nsExtendOutput1Line
+                    percent_used: nsExtendOutput1Line
+                    index: mem_usage
+                    descr: 'Memory Usage'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.48.50' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: disk_usage
+                    descr: 'Disk Usage'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.48.53' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: disk_partition_usage_total
+                    descr: 'Disk Partition Usage (Total)'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.48.54' }
+        state:
+            data:
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: fan_status
+                    descr: 'Fan Status'
+                    state_name: monitorappAiWafStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'NOT OK' }
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.48.55' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: power_status
+                    descr: 'Power Status'
+                    state_name: monitorappAiWafStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'NOT OK' }
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.48.56' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: raid_status
+                    descr: 'RAID Status'
+                    state_name: monitorappAiWafStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'NOT OK' }
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.48.57' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: ssl_qat_status
+                    descr: 'SSL QAT Status'
+                    state_name: monitorappAiWafStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'NOT OK' }
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.49.48' }
+        bitrate:
+            data:
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: total_bps
+                    descr: 'Total Throughput'
+                    multiplier: 1000000
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.49.50' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: http_bps
+                    descr: 'HTTP Throughput'
+                    multiplier: 1000000
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.49.51' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: https_bps
+                    descr: 'HTTPS Throughput'
+                    multiplier: 1000000
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.49.52' }
+        count:
+            data:
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: total_cps
+                    descr: 'Total CPS'
+                    group: 'Connections Per Second'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.49.53' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: http_cps
+                    descr: 'HTTP CPS'
+                    group: 'Connections Per Second'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.49.54' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: https_cps
+                    descr: 'HTTPS CPS'
+                    group: 'Connections Per Second'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.49.55' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: total_tps
+                    descr: 'Total TPS'
+                    group: 'Transaction Per Second'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.49.56' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: http_tps
+                    descr: 'HTTP TPS'
+                    group: 'Transaction Per Second' 
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.49.57' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: https_tps
+                    descr: 'HTTPS TPS'
+                    group: 'Transaction Per Second'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.50.48' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: total_open_conn
+                    descr: 'Total Open Connections'
+                    group: 'Open Connections'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.50.49' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: http_open_conn
+                    descr: 'HTTP Open Connections'
+                    group: 'Open Connections'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.50.50' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: https_open_conn
+                    descr: 'HTTPS Open Connections'
+                    group: 'Open Connections'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.50.51' }
+
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
+                    index: detect_count
+                    descr: 'Detect Count'
+                    group: 'Detect'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.50.52' }
