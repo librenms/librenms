@@ -44,21 +44,25 @@ class ZebraPrinterAlert implements SnmptrapHandler
         $message = $trap->getOidData('ESI-MIB::psOutput.7');
         $severity = $this->getSeverity($message);
 
-        $trap->log('SNMP Trap: Zebra Printer - ' . $message, $severity, 'printer');
+        $trap->log($message, $severity, 'printer');
     }
 
     private function getSeverity(string $message): Severity
     {
-        if (preg_match('/PAPER OUT|RIBBON OUT|CUTTER JAM|HEAD ELEMENT BAD|REPLACE HEAD/', $message)) {
+        if (preg_match('/PAPER OUT|RIBBON OUT|CUTTER JAM|HEAD ELEMENT BAD|REPLACE HEAD|MOTOR OVERTEMP|PRINTHEAD SHUTDOWN|THERMISTOR FAULT|INVALID HEAD|MEDIA CARTRIDGE LOAD FAILURE|PAPER ERROR|RIBBON AUTH ERROR/', $message)) {
             return Severity::Error;
         }
 
-        if (preg_match('/HEAD OPEN|HEAD TOO HOT|HEAD COLD|SUPPLY TOO HOT|MEDIA LOW|RIBBON LOW|BATTERY LOW|CLEAN PRINTHEAD|RFID ERROR|REWIND/', $message)) {
+        if (preg_match('/HEAD OPEN|HEAD TOO HOT|HEAD COLD|SUPPLY TOO HOT|MEDIA LOW|RIBBON LOW|BATTERY LOW|CLEAN PRINTHEAD|RFID ERROR|REWIND|NO READER PRESENT|BATTERY MISSING|MEDIA CARTRIDGE EJECT FAILURE|MEDIA CARTRIDGE FORCED EJECT|RIBBON TENSION|COVER OPEN|CLEAN CUTTER|DUPLICATE IP|BASIC FORCED|COUNTRY CODE ERROR/', $message)) {
             return Severity::Warning;
         }
 
-        if (preg_match('/PQ JOB COMPLETED|LABEL READY|POWER ON|COLD START|RIBBON IN|PRINTER PAUSED/', $message)) {
+        if (preg_match('/PRINTER PAUSED|BASIC RUNTIME|SGD SET|SHUTTING DOWN|RESTARTING|PMCU DOWNLOAD|COUNTRY CODE|MEDIA CARTRIDGE|CLEANING MODE/', $message)) {
             return Severity::Info;
+        }
+
+        if (preg_match('/PQ JOB COMPLETED|LABEL READY|POWER ON|COLD START|RIBBON IN|Druckauftr Fertg/', $message)) {
+            return Severity::Ok;
         }
 
         return Severity::Warning;
