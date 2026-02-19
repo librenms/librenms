@@ -1,4 +1,4 @@
-yes<?php
+<?php
 
 /**
  * ZebraPrinterAlertCleared.php
