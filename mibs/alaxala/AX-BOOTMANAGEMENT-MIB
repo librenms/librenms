@@ -1,0 +1,91 @@
+--
+-- All Rights Reserved, Copyright (c) 2013, ALAXALA Networks Corp.
+--
+-- AX-BOOTMANAGEMENT-MIB.my axBootManagement group MIB file.
+--
+
+AX-BOOTMANAGEMENT-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,OBJECT-GROUP
+            FROM SNMPv2-CONF
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axBootManagement MODULE-IDENTITY
+    LAST-UPDATED    "201303060000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module to provide the boot management information."
+
+    REVISION        "201303060000Z"
+    DESCRIPTION
+        "Initial release."
+::= { axMib 51 }
+
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+--
+--  axBootManagement
+--
+
+axBootReason OBJECT-TYPE
+    SYNTAX INTEGER {
+                      powerOn(1),
+                      operationRestart(2),
+                      fatalErrorRestart(3),
+                      resetSwitchRestart(5),
+                      achSwitchRestart(6),
+                      defaultRestart(7),
+                      autoRestart(8)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason of system start."
+    ::= {axBootManagement 1}
+
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Conformance identifier
+--
+
+axBootManagementConformance       OBJECT IDENTIFIER ::= { axBootManagement 1000 }
+axBootManagementCompliances       OBJECT IDENTIFIER ::= { axBootManagementConformance 1 }
+axBootManagementGroups            OBJECT IDENTIFIER ::= { axBootManagementConformance 2 }
+
+--
+-- Compliance
+--
+
+axBootManagementCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "AX Boot Management"
+    MODULE        -- this module
+        MANDATORY-GROUPS { axBootManagementGroup }
+    ::= { axBootManagementCompliances 1 }
+
+--
+-- Object Group
+--
+
+axBootManagementGroup OBJECT-GROUP
+    OBJECTS     { axBootReason }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects which are used to provide
+         axBootManagement group."
+    ::= { axBootManagementGroups 1 }
+
+END

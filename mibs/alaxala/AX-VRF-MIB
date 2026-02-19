@@ -1,0 +1,1135 @@
+--
+-- All Rights Reserved, Copyright (c) 2013, 2014, ALAXALA Networks Corp.
+--
+-- AX-VRF-MIB.my: axVrf group MIB file.
+--
+
+AX-VRF-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,Integer32,
+        IpAddress, Unsigned32                               FROM SNMPv2-SMI
+        DisplayString,
+        TruthValue, PhysAddress, TimeStamp                  FROM SNMPv2-TC
+        Ipv6AddressPrefix, Ipv6Address                      FROM IPV6-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP                     FROM SNMPv2-CONF
+        axMib                                               FROM AX-SMI-MIB;
+
+axVrf MODULE-IDENTITY
+    LAST-UPDATED    "201405070000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+            "The MIB module for VRF information."
+
+    REVISION        "201405070000Z"
+    DESCRIPTION
+        "Modified index of axVrfIpNetToMediaTable."
+    REVISION        "201310030000Z"
+    DESCRIPTION
+        "Updated header comment."
+    REVISION        "201306240000Z"
+    DESCRIPTION
+        "Initial release."
+    ::= { axMib 11 }
+
+--
+-- MIB groups
+--
+axVrfIp           OBJECT IDENTIFIER ::= {axVrf 1}
+axVrfIpForward    OBJECT IDENTIFIER ::= {axVrf 2}
+axVrfIpv6         OBJECT IDENTIFIER ::= {axVrf 3}
+axVrfIpv6Forward  OBJECT IDENTIFIER ::= {axVrf 4}
+
+--
+-- axVrfIpAddrTable
+--
+axVrfIpAddrTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxVrfIpAddrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of addressing information relevant to this entity's IP addresses."
+    ::= {axVrfIp 1}
+
+axVrfIpAddrEntry OBJECT-TYPE
+    SYNTAX AxVrfIpAddrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The addressing information for one of this entity's IP addresses."
+    INDEX { axVrfIpAddrVrfIndex,
+            axVrfIpAdEntAddr }
+    ::= {axVrfIpAddrTable 1}
+
+AxVrfIpAddrEntry ::= SEQUENCE {
+    axVrfIpAddrVrfIndex         Integer32,
+    axVrfIpAdEntAddr            IpAddress,
+    axVrfIpAdEntIfIndex         Integer32,
+    axVrfIpAdEntNetMask         IpAddress,
+    axVrfIpAdEntBcastAddr       Integer32,
+    axVrfIpAdEntReasmMaxSize    Integer32,
+    axVrfIpAdEntDescr           DisplayString
+}
+
+axVrfIpAddrVrfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies VRF number."
+    ::= {axVrfIpAddrEntry 1}
+
+axVrfIpAdEntAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP address to which this entry's addressing information pertains."
+    ::= {axVrfIpAddrEntry 2}
+
+axVrfIpAdEntIfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which uniquely identifies the interface to which this entry is applicable."
+    ::= {axVrfIpAddrEntry 3}
+
+axVrfIpAdEntNetMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The subnet mask associated with the IP address of this entry."
+    ::= {axVrfIpAddrEntry 4}
+
+axVrfIpAdEntBcastAddr OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of the least-significant bit in the IP broadcast address used for sending datagrams on the (logical) interface associated with the IP address of this entry."
+    ::= {axVrfIpAddrEntry 5}
+
+axVrfIpAdEntReasmMaxSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The size of the largest IP datagram which this entity can re-assemble from incoming IP fragmented datagrams received on this interface."
+    ::= {axVrfIpAddrEntry 6}
+
+axVrfIpAdEntDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Description of VRF. The VRF identification which user setting."
+    ::= {axVrfIpAddrEntry 7}
+
+--
+-- axVrfIpNetToMediaTable
+--
+axVrfIpNetToMediaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxVrfIpNetToMediaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The IP Address Translation table used for mapping from IP addresses to physical addresses."
+    ::= {axVrfIp 2}
+
+axVrfIpNetToMediaEntry OBJECT-TYPE
+    SYNTAX AxVrfIpNetToMediaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains one IpAddress to physical address equivalence."
+    INDEX { axVrfIpNetMediaVrfIndex,
+            axVrfIpNetToMediaIfIndex,
+            axVrfIpNetToMediaNetAddress }
+    ::= {axVrfIpNetToMediaTable 1}
+
+AxVrfIpNetToMediaEntry ::= SEQUENCE {
+    axVrfIpNetMediaVrfIndex         Integer32,
+    axVrfIpNetToMediaIfIndex        Integer32,
+    axVrfIpNetToMediaPhysAddress    PhysAddress,
+    axVrfIpNetToMediaNetAddress     IpAddress,
+    axVrfIpNetToMediaType           INTEGER,
+    axVrfIpNetToMediaDescr          DisplayString
+}
+
+axVrfIpNetMediaVrfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies VRF number."
+    ::= {axVrfIpNetToMediaEntry 1}
+
+axVrfIpNetToMediaIfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The interface on which this entry's equivalence is effective. This index is same value of ifIndex."
+    ::= {axVrfIpNetToMediaEntry 2}
+
+axVrfIpNetToMediaPhysAddress OBJECT-TYPE
+    SYNTAX PhysAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The media-dependent `physical' address."
+    ::= {axVrfIpNetToMediaEntry 3}
+
+axVrfIpNetToMediaNetAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IpAddress corresponding to the media-dependent `physical' address."
+    ::= {axVrfIpNetToMediaEntry 4}
+
+axVrfIpNetToMediaType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       other(1),
+                       invalid(2),
+                       dynamic(3),
+                       static(4)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of mapping."
+    ::= {axVrfIpNetToMediaEntry 5}
+
+axVrfIpNetToMediaDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Description of VRF. The VRF identification which user setting."
+    ::= {axVrfIpNetToMediaEntry 6}
+
+--
+-- axVrfIpFwNoTable
+--
+axVrfIpFwNoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxVrfIpFwNoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This entity's number of IP Routing table about VRF."
+    ::= {axVrfIpForward 1}
+
+axVrfIpFwNoEntry OBJECT-TYPE
+    SYNTAX AxVrfIpFwNoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This entity's IP Routing table about VRF."
+    INDEX { axVrfIpFwNoVRFIndex }
+    ::= {axVrfIpFwNoTable 1}
+
+AxVrfIpFwNoEntry ::= SEQUENCE {
+    axVrfIpFwNoVRFIndex    Integer32,
+    axVrfIpFwNo            Integer32,
+    axVrfIpFwNoDescr       DisplayString
+}
+
+axVrfIpFwNoVRFIndex OBJECT-TYPE
+    SYNTAX Integer32(1..1023)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies VRF number."
+    ::= {axVrfIpFwNoEntry 1}
+
+axVrfIpFwNo OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of entry that is IP Routing table."
+    ::= {axVrfIpFwNoEntry 2}
+
+axVrfIpFwNoDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Description of VRF. The VRF identification which user setting."
+    ::= {axVrfIpFwNoEntry 3}
+
+--
+-- axVrfIpFwTable
+--
+axVrfIpFwTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxVrfIpFwEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This entity's IP Routing table."
+    ::= {axVrfIpForward 2}
+
+axVrfIpFwEntry OBJECT-TYPE
+    SYNTAX AxVrfIpFwEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A particular route to a particular destination, under a particular policy."
+    INDEX { axVrfIpFwVRFIndex,
+            axVrfIpFwDest,
+            axVrfIpFwProto,
+            axVrfIpFwPolicy,
+            axVrfIpFwNextHop }
+    ::= {axVrfIpFwTable 1}
+
+AxVrfIpFwEntry ::= SEQUENCE {
+    axVrfIpFwVRFIndex     Integer32,
+    axVrfIpFwDest         IpAddress,
+    axVrfIpFwMask         IpAddress,
+    axVrfIpFwPolicy       Integer32,
+    axVrfIpFwNextHop      IpAddress,
+    axVrfIpFwIfIndex      Integer32,
+    axVrfIpFwType         INTEGER,
+    axVrfIpFwProto        INTEGER,
+    axVrfIpFwAge          Integer32,
+    axVrfIpFwInfo         OBJECT IDENTIFIER,
+    axVrfIpFwNextHopAS    Integer32,
+    axVrfIpFwMetric1      Integer32,
+    axVrfIpFwMetric2      Integer32,
+    axVrfIpFwMetric3      Integer32,
+    axVrfIpFwMetric4      Integer32,
+    axVrfIpFwMetric5      Integer32,
+    axVrfIpFwDescr        DisplayString
+}
+
+axVrfIpFwVRFIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..1023)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies VRF number."
+    ::= {axVrfIpFwEntry 1}
+
+axVrfIpFwDest OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The destination IP address of this route."
+    ::= {axVrfIpFwEntry 2}
+
+axVrfIpFwMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicate the mask to be logical-ANDed with the destination address before being compared to the value in the ipForwardDest field."
+    ::= {axVrfIpFwEntry 3}
+
+axVrfIpFwPolicy OBJECT-TYPE
+    SYNTAX Integer32 (0)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The general set of conditions that would cause the selection of one multipath route (set of next hops for a given destination) is referred to as 'policy'."
+    ::= {axVrfIpFwEntry 4}
+
+axVrfIpFwNextHop OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "On remote routes, the address of the next system en route."
+    ::= {axVrfIpFwEntry 5}
+
+axVrfIpFwIfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ifIndex value which identifies the local interface through which the next hop of this route should be reached."
+    ::= {axVrfIpFwEntry 6}
+
+axVrfIpFwType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       other(1),
+                       invalid(2),
+                       local(3),
+                       remote(4)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of route."
+    ::= {axVrfIpFwEntry 7}
+
+axVrfIpFwProto OBJECT-TYPE
+    SYNTAX INTEGER {
+                       other(1),
+                       local(2),
+                       netmgmt(3),
+                       rip(8),
+                       ospf(13),
+                       bgp(14)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The routing mechanism via which this route was learned."
+    ::= {axVrfIpFwEntry 8}
+
+axVrfIpFwAge OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of seconds since this route was last updated or otherwise determined to be correct."
+    ::= {axVrfIpFwEntry 9}
+
+axVrfIpFwInfo OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A reference to MIB definitions specific to the particular routing protocol which is responsible for this route, as determined by the value specified in the route's ipForwardProto value. Its value be set to the OBJECT IDENTIFIER { 0 0 }."
+    ::= {axVrfIpFwEntry 10}
+
+axVrfIpFwNextHopAS OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Autonomous System Number of the Next Hop."
+    ::= {axVrfIpFwEntry 11}
+
+axVrfIpFwMetric1 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The primary routing metric for this route."
+    ::= {axVrfIpFwEntry 12}
+
+axVrfIpFwMetric2 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "An alternate routing metric for this route. Its value is set to -1."
+    ::= {axVrfIpFwEntry 13}
+
+axVrfIpFwMetric3 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "An alternate routing metric for this route. Its value is set to -1."
+    ::= {axVrfIpFwEntry 14}
+
+axVrfIpFwMetric4 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "An alternate routing metric for this route. Its value is set to -1."
+    ::= {axVrfIpFwEntry 15}
+
+axVrfIpFwMetric5 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "An alternate routing metric for this route. Its value is set to -1."
+    ::= {axVrfIpFwEntry 16}
+
+axVrfIpFwDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Description of VRF. The VRF identification which user setting."
+    ::= {axVrfIpFwEntry 17}
+
+--
+-- axVrfIpv6AddrTable
+--
+axVrfIpv6AddrTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxVrfIpv6AddrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of addressing information relevant to this node's interface IPv6 addresses per VRF."
+    ::= {axVrfIpv6 1}
+
+axVrfIpv6AddrEntry OBJECT-TYPE
+    SYNTAX AxVrfIpv6AddrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The addressing information for one of this entity's IPv6 addresses per VRF."
+    INDEX { axVrfIpv6AddrVrfIndex,
+            axVrfIpv6AddrIfIndex,
+            axVrfIpv6AddrAddress }
+    ::= {axVrfIpv6AddrTable 1}
+
+AxVrfIpv6AddrEntry ::= SEQUENCE {
+    axVrfIpv6AddrVrfIndex       Integer32,
+    axVrfIpv6AddrIfIndex        Integer32,
+    axVrfIpv6AddrAddress        Ipv6Address,
+    axVrfIpv6AddrPfxLength      Integer32,
+    axVrfIpv6AddrType           INTEGER,
+    axVrfIpv6AddrAnycastFlag    TruthValue,
+    axVrfIpv6AddrStatus         INTEGER,
+    axVrfIpv6AddrDescr          DisplayString
+}
+
+axVrfIpv6AddrVrfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies VRF number."
+    ::= {axVrfIpv6AddrEntry 1}
+
+axVrfIpv6AddrIfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which uniquely identifies the interface to which this entry is applicable."
+    ::= {axVrfIpv6AddrEntry 2}
+
+axVrfIpv6AddrAddress OBJECT-TYPE
+    SYNTAX Ipv6Address
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IPv6 address to which this entry's addressing information pertains."
+    ::= {axVrfIpv6AddrEntry 3}
+
+axVrfIpv6AddrPfxLength OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The length of the prefix (in bits) associated with the IPv6 address of this entry."
+    ::= {axVrfIpv6AddrEntry 4}
+
+axVrfIpv6AddrType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       stateless(1),
+                       stateful(2),
+                       unknown(3)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of address. Note that 'stateless(1)' refers to an address that was statelessly autoconfigured; 'stateful(2)' refers to a address which was acquired by via a stateful protocol (e.g. DHCPv6, manual configuration)."
+    ::= {axVrfIpv6AddrEntry 5}
+
+axVrfIpv6AddrAnycastFlag OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object has the value 'true(1)', if this address is an anycast address and the value 'false(2)' otherwise."
+    ::= {axVrfIpv6AddrEntry 6}
+
+axVrfIpv6AddrStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                       preferred(1),
+                       deprecated(2),
+                       invalid(3),
+                       inaccessible(4),
+                       unknown(5)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Address status.  The preferred(1) state indicates that this is a valid address that can appear as the destination or source address of a packet. The deprecated(2) state indicates that this is a valid but deprecated address that should no longer be used as a source address in new communications, but packets addressed to such an address are processed as expected. The invalid(3) state indicates that this is not valid address which should not appear as the destination or source address of a packet. The inaccessible(4) state indicates that the address is not accessible because the interface to which this address is assigned is not operational."
+    ::= {axVrfIpv6AddrEntry 7}
+
+axVrfIpv6AddrDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Description of VRF. The VRF identification which user setting."
+    ::= {axVrfIpv6AddrEntry 8}
+
+--
+-- axVrfIpv6AddrPrefixTable
+--
+
+axVrfIpv6AddrPrefixTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxVrfIpv6AddrPrefixEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The list of IPv6 address prefixes of IPv6 interfaces."
+    ::= {axVrfIpv6 2}
+
+axVrfIpv6AddrPrefixEntry OBJECT-TYPE
+    SYNTAX AxVrfIpv6AddrPrefixEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An interface entry containing objects of a particular IPv6 address prefix."
+    INDEX { axVrfIpv6AddrPrefixVrfIndex,
+            axVrfIpv6AddrPrefixIfIndex,
+            axVrfIpv6AddrPrefix,
+            axVrfIpv6AddrPrefixLength }
+    ::= {axVrfIpv6AddrPrefixTable 1}
+
+AxVrfIpv6AddrPrefixEntry ::= SEQUENCE {
+    axVrfIpv6AddrPrefixVrfIndex                Integer32,
+    axVrfIpv6AddrPrefixIfIndex                 Integer32,
+    axVrfIpv6AddrPrefix                        Ipv6AddressPrefix,
+    axVrfIpv6AddrPrefixLength                  Integer32,
+    axVrfIpv6AddrPrefixOnLinkFlag              TruthValue,
+    axVrfIpv6AddrPrefixAutonomousFlag          TruthValue,
+    axVrfIpv6AddrPrefixAdvPreferredLifetime    Unsigned32,
+    axVrfIpv6AddrPrefixAdvValidLifetime        Unsigned32
+}
+
+axVrfIpv6AddrPrefixVrfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies VRF number."
+    ::= {axVrfIpv6AddrPrefixEntry 1}
+
+axVrfIpv6AddrPrefixIfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The index value which uniquely identifies the interface to which this entry is applicable."
+    ::= {axVrfIpv6AddrPrefixEntry 2}
+
+axVrfIpv6AddrPrefix OBJECT-TYPE
+    SYNTAX Ipv6AddressPrefix
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The prefix associated with the this interface."
+    ::= {axVrfIpv6AddrPrefixEntry 3}
+
+axVrfIpv6AddrPrefixLength OBJECT-TYPE
+    SYNTAX Integer32 (0..128)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The length of the prefix (in bits)."
+    ::= {axVrfIpv6AddrPrefixEntry 4}
+
+axVrfIpv6AddrPrefixOnLinkFlag OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object has the value 'true(1)', if this prefix can be used  for on-link determination and the value 'false(2)' otherwise."
+    ::= {axVrfIpv6AddrPrefixEntry 5}
+
+axVrfIpv6AddrPrefixAutonomousFlag OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Autonomous address configuration flag. When true(1), indicates that this prefix can be used for autonomous address configuration (i.e. can be used to form a local interface address). If false(2), it is not used to autoconfigure a local interface address."
+    ::= {axVrfIpv6AddrPrefixEntry 6}
+
+axVrfIpv6AddrPrefixAdvPreferredLifetime OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "It is the length of time in seconds that this prefix will remain preferred, i.e. time until deprecation.  A value of 4,294,967,295 represents infinity.The address generated from a deprecated prefix should no longer be used as a source address in new communications, but packets received on such an interface are processed as expected."
+    ::= {axVrfIpv6AddrPrefixEntry 7}
+
+axVrfIpv6AddrPrefixAdvValidLifetime OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "It is the length of time in seconds that this prefix will remain valid, i.e. time until invalidation.  A value of 4,294,967,295 represents infinity. The address generated from an invalidated prefix should not appear as the destination or source address of a packet."
+    ::= {axVrfIpv6AddrPrefixEntry 8}
+
+--
+-- axVrfIpv6NetToMediaTable
+--
+axVrfIpv6NetToMediaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxVrfIpv6NetToMediaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The IPv6 Address Translation table used for mapping from IPv6 addresses to physical addresses per VRF. The IPv6 address translation table contain the Ipv6Address to `physical' address equivalencies. Some interfaces do not use translation tables for determining address equivalencies; if all interfaces are of this type, then the Address Translation table is empty, i.e., has zero entries."
+    ::= {axVrfIpv6 3}
+
+axVrfIpv6NetToMediaEntry OBJECT-TYPE
+    SYNTAX AxVrfIpv6NetToMediaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains one IPv6 address to `physical' address equivalence per VRF."
+    INDEX { axVrfIpv6NetToMediaVrfIndex,
+            axVrfIpv6NetToMediaIfIndex,
+            axVrfIpv6NetToMediaNetAddress }
+    ::= {axVrfIpv6NetToMediaTable 1}
+
+AxVrfIpv6NetToMediaEntry ::= SEQUENCE {
+    axVrfIpv6NetToMediaVrfIndex         Integer32,
+    axVrfIpv6NetToMediaIfIndex          Integer32,
+    axVrfIpv6NetToMediaNetAddress       Ipv6Address,
+    axVrfIpv6NetToMediaPhysAddress      PhysAddress,
+    axVrfIpv6NetToMediaType             INTEGER,
+    axVrfIpv6IfNetToMediaState          INTEGER,
+    axVrfIpv6IfNetToMediaLastUpdated    TimeStamp,
+    axVrfIpv6NetToMediaValid            TruthValue,
+    axVrfIpv6NetToMediaDescr            DisplayString
+}
+
+axVrfIpv6NetToMediaVrfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies VRF number."
+    ::= {axVrfIpv6NetToMediaEntry 1}
+
+axVrfIpv6NetToMediaIfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which uniquely identifies the interface to which this entry is applicable."
+    ::= {axVrfIpv6NetToMediaEntry 2}
+
+axVrfIpv6NetToMediaNetAddress OBJECT-TYPE
+    SYNTAX Ipv6Address
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IPv6 Address corresponding to the media-dependent `physical' address."
+    ::= {axVrfIpv6NetToMediaEntry 3}
+
+axVrfIpv6NetToMediaPhysAddress OBJECT-TYPE
+    SYNTAX PhysAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The media-dependent `physical' address."
+    ::= {axVrfIpv6NetToMediaEntry 4}
+
+axVrfIpv6NetToMediaType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       other(1),
+                       dynamic(2),
+                       static(3),
+                       local(4)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of the mapping. The 'dynamic(2)' type indicates that the IPv6 address to physical addresses mapping has been dynamically resolved using the IPv6 Neighbor Discovery protocol. The static(3)' types indicates that the mapping has been statically configured. The local(4) indicates that the mapping is provided for an entity's own interface address."
+    ::= {axVrfIpv6NetToMediaEntry 5}
+
+axVrfIpv6IfNetToMediaState OBJECT-TYPE
+    SYNTAX INTEGER {
+                      reachable(1),
+                      stale(2),
+                      delay(3),
+                      probe(4),
+                      invalid(5),
+                      unknown(6)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Neighbor Unreachability Detection [8] state for the interface when the address mapping in this entry is used."
+    ::= {axVrfIpv6NetToMediaEntry 6}
+
+axVrfIpv6IfNetToMediaLastUpdated OBJECT-TYPE
+    SYNTAX TimeStamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of sysUpTime at the time this entry was last updated.  If this entry was updated prior to the last re-initialization of the local network management subsystem, then this object contains a zero value."
+    ::= {axVrfIpv6NetToMediaEntry 7}
+
+axVrfIpv6NetToMediaValid OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Setting this object to the value 'false(2)' has the effect of invalidating the corresponding entry in the ipv6NetToMediaTable.  That is, it effectively disassociates the interface identified with said entry from the mapping identified with said entry. It is an implementation-specific matter as to whether the agent removes an invalidated entry from the table.  Accordingly, management stations must be prepared to receive tabular information from agents that corresponds to entries not currently in use.  Proper interpretation of such entries requires examination of the relevant ipv6NetToMediaValid object."
+    ::= {axVrfIpv6NetToMediaEntry 8}
+
+axVrfIpv6NetToMediaDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Description of VRF. The VRF identification which user setting."
+    ::= {axVrfIpv6NetToMediaEntry 9}
+
+--
+-- axVrfIpv6FwNoTable
+--
+axVrfIpv6FwNoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxVrfIpv6FwNoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This entity's number of IPv6 Routing table about VRF."
+    ::= {axVrfIpv6Forward 1}
+
+axVrfIpv6FwNoEntry OBJECT-TYPE
+    SYNTAX AxVrfIpv6FwNoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This entity's IPv6 Routing table about VRF."
+    INDEX { axVrfIpv6FwNoVRFIndex }
+    ::= {axVrfIpv6FwNoTable 1}
+
+AxVrfIpv6FwNoEntry ::= SEQUENCE {
+    axVrfIpv6FwNoVRFIndex    Integer32,
+    axVrfIpv6FwNo            Integer32,
+    axVrfIpv6FwNoDescr       DisplayString
+}
+
+axVrfIpv6FwNoVRFIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies VRF number."
+    ::= {axVrfIpv6FwNoEntry 1}
+
+axVrfIpv6FwNo OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of entry that is IPv6 Routing table."
+    ::= {axVrfIpv6FwNoEntry 2}
+
+axVrfIpv6FwNoDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Description of VRF. The VRF identification which user setting."
+    ::= {axVrfIpv6FwNoEntry 3}
+
+--
+-- axVrfIpv6FwTable
+--
+axVrfIpv6FwTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AxVrfIpv6FwEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This entity's IPv6 Routing table."
+    ::= {axVrfIpv6Forward 2}
+
+axVrfIpv6FwEntry OBJECT-TYPE
+    SYNTAX AxVrfIpv6FwEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A particular route to a particular destination, under a particular policy."
+    INDEX { axVrfIpv6FwVrfIndex,
+            axVrfIpv6FwDest,
+            axVrfIpv6FwProto,
+            axVrfIpv6FwPolicy,
+            axVrfIpv6FwNextHop }
+    ::= {axVrfIpv6FwTable 1}
+
+AxVrfIpv6FwEntry ::= SEQUENCE {
+    axVrfIpv6FwVrfIndex     Integer32,
+    axVrfIpv6FwDest         Ipv6Address,
+    axVrfIpv6FwPfxLength    Integer32,
+    axVrfIpv6FwPolicy       Integer32,
+    axVrfIpv6FwNextHop      Ipv6Address,
+    axVrfIpv6FwIfIndex      Integer32,
+    axVrfIpv6FwType         INTEGER,
+    axVrfIpv6FwProto        INTEGER,
+    axVrfIpv6FwAge          Integer32,
+    axVrfIpv6FwInfo         OBJECT IDENTIFIER,
+    axVrfIpv6FwNextHopAS    Integer32,
+    axVrfIpv6FwMetric1      Integer32,
+    axVrfIpv6FwMetric2      Integer32,
+    axVrfIpv6FwMetric3      Integer32,
+    axVrfIpv6FwMetric4      Integer32,
+    axVrfIpv6FwMetric5      Integer32,
+    axVrfIpv6FwDescr        DisplayString
+}
+
+axVrfIpv6FwVrfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies VRF number."
+    ::= {axVrfIpv6FwEntry 1}
+
+axVrfIpv6FwDest OBJECT-TYPE
+    SYNTAX Ipv6Address
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The destination IPv6 address of this route."
+    ::= {axVrfIpv6FwEntry 2}
+
+axVrfIpv6FwPfxLength OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The length of the prefix (in bits) associated with the IPv6 address of this entry."
+    ::= {axVrfIpv6FwEntry 3}
+
+axVrfIpv6FwPolicy OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The general set of conditions that would cause the selection of one multipath route (set of next hops for a given destination) is referred to as 'policy'."
+    ::= {axVrfIpv6FwEntry 4}
+
+axVrfIpv6FwNextHop OBJECT-TYPE
+    SYNTAX Ipv6Address
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "On remote routes, the address of the next system en route."
+    ::= {axVrfIpv6FwEntry 5}
+
+axVrfIpv6FwIfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ifIndex value which identifies the local interface through which the next hop of this route should be reached."
+    ::= {axVrfIpv6FwEntry 6}
+
+axVrfIpv6FwType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       other(1),
+                       invalid(2),
+                       local(3),
+                       remote(4)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of route."
+    ::= {axVrfIpv6FwEntry 7}
+
+axVrfIpv6FwProto OBJECT-TYPE
+    SYNTAX INTEGER {
+                       other(1),
+                       local(2),
+                       netmgmt(3),
+                       rip(8),
+                       ospf(13),
+                       bgp(14)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The routing mechanism via which this route was learned."
+    ::= {axVrfIpv6FwEntry 8}
+
+axVrfIpv6FwAge OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of seconds since this route was last updated or otherwise determined to be correct."
+    ::= {axVrfIpv6FwEntry 9}
+
+axVrfIpv6FwInfo OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A reference to MIB definitions specific to the particular routing protocol which is responsible for this route, as determined by the value specified in the route's axVrfIpv6FwProto value. Its value be set to the OBJECT IDENTIFIER { 0 0 }."
+    ::= {axVrfIpv6FwEntry 10}
+
+axVrfIpv6FwNextHopAS OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Autonomous System Number of the Next Hop."
+    ::= {axVrfIpv6FwEntry 11}
+
+axVrfIpv6FwMetric1 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The primary routing metric for this route."
+    ::= {axVrfIpv6FwEntry 12}
+
+axVrfIpv6FwMetric2 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "An alternate routing metric for this route. Its value is set to -1."
+    ::= {axVrfIpv6FwEntry 13}
+
+axVrfIpv6FwMetric3 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "An alternate routing metric for this route. Its value is set to -1."
+    ::= {axVrfIpv6FwEntry 14}
+
+axVrfIpv6FwMetric4 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "An alternate routing metric for this route. Its value is set to -1."
+    ::= {axVrfIpv6FwEntry 15}
+
+axVrfIpv6FwMetric5 OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "An alternate routing metric for this route. Its value is set to -1."
+    ::= {axVrfIpv6FwEntry 16}
+
+axVrfIpv6FwDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Description of VRF. The VRF identification which user setting."
+    ::= {axVrfIpv6FwEntry 17}
+
+--
+-- Conformance Statements
+--
+
+-- Conformance identifier
+
+axVrfConformance               OBJECT IDENTIFIER ::= { axVrf 1000 }
+axVrfCompliances               OBJECT IDENTIFIER ::= { axVrfConformance 1 }
+axVrfGroups                    OBJECT IDENTIFIER ::= { axVrfConformance 2 }
+
+--
+-- Compliance
+--
+
+    axVrfCompliance MODULE-COMPLIANCE
+        STATUS    current
+        DESCRIPTION
+            "AX Vrf Object"
+        MODULE
+            MANDATORY-GROUPS { axVrfGroup }
+        ::= { axVrfCompliances 1 }
+
+--
+-- Object Group
+--
+    axVrfGroup OBJECT-GROUP
+        OBJECTS     {
+                        axVrfIpAddrVrfIndex,
+                        axVrfIpAdEntAddr,
+                        axVrfIpAdEntIfIndex,
+                        axVrfIpAdEntNetMask,
+                        axVrfIpAdEntBcastAddr,
+                        axVrfIpAdEntReasmMaxSize,
+                        axVrfIpAdEntDescr,
+                        axVrfIpNetMediaVrfIndex,
+                        axVrfIpNetToMediaIfIndex,
+                        axVrfIpNetToMediaPhysAddress,
+                        axVrfIpNetToMediaNetAddress,
+                        axVrfIpNetToMediaType,
+                        axVrfIpNetToMediaDescr,
+                        axVrfIpFwNoVRFIndex,
+                        axVrfIpFwNo,
+                        axVrfIpFwNoDescr,
+                        axVrfIpFwVRFIndex,
+                        axVrfIpFwDest,
+                        axVrfIpFwMask,
+                        axVrfIpFwPolicy,
+                        axVrfIpFwNextHop,
+                        axVrfIpFwIfIndex,
+                        axVrfIpFwType,
+                        axVrfIpFwProto,
+                        axVrfIpFwAge,
+                        axVrfIpFwInfo,
+                        axVrfIpFwNextHopAS,
+                        axVrfIpFwMetric1,
+                        axVrfIpFwMetric2,
+                        axVrfIpFwMetric3,
+                        axVrfIpFwMetric4,
+                        axVrfIpFwMetric5,
+                        axVrfIpFwDescr,
+                        axVrfIpv6AddrVrfIndex,
+                        axVrfIpv6AddrIfIndex,
+                        axVrfIpv6AddrAddress,
+                        axVrfIpv6AddrPfxLength,
+                        axVrfIpv6AddrType,
+                        axVrfIpv6AddrAnycastFlag,
+                        axVrfIpv6AddrStatus,
+                        axVrfIpv6AddrDescr,
+                        axVrfIpv6AddrPrefixOnLinkFlag,
+                        axVrfIpv6AddrPrefixAutonomousFlag,
+                        axVrfIpv6AddrPrefixAdvPreferredLifetime,
+                        axVrfIpv6AddrPrefixAdvValidLifetime,
+                        axVrfIpv6AddrPrefixOnLinkFlag,
+                        axVrfIpv6AddrPrefixAutonomousFlag,
+                        axVrfIpv6AddrPrefixAdvPreferredLifetime,
+                        axVrfIpv6AddrPrefixAdvValidLifetime,
+                        axVrfIpv6NetToMediaVrfIndex,
+                        axVrfIpv6NetToMediaIfIndex,
+                        axVrfIpv6NetToMediaNetAddress,
+                        axVrfIpv6NetToMediaPhysAddress,
+                        axVrfIpv6NetToMediaType,
+                        axVrfIpv6IfNetToMediaState,
+                        axVrfIpv6IfNetToMediaLastUpdated,
+                        axVrfIpv6NetToMediaValid,
+                        axVrfIpv6NetToMediaDescr,
+                        axVrfIpv6FwNoVRFIndex,
+                        axVrfIpv6FwNo,
+                        axVrfIpv6FwNoDescr,
+                        axVrfIpv6FwVrfIndex,
+                        axVrfIpv6FwDest,
+                        axVrfIpv6FwPfxLength,
+                        axVrfIpv6FwPolicy,
+                        axVrfIpv6FwNextHop,
+                        axVrfIpv6FwIfIndex,
+                        axVrfIpv6FwType,
+                        axVrfIpv6FwProto,
+                        axVrfIpv6FwAge,
+                        axVrfIpv6FwInfo,
+                        axVrfIpv6FwNextHopAS,
+                        axVrfIpv6FwMetric1,
+                        axVrfIpv6FwMetric2,
+                        axVrfIpv6FwMetric3,
+                        axVrfIpv6FwMetric4,
+                        axVrfIpv6FwMetric5,
+                        axVrfIpv6FwDescr
+                    }
+        STATUS      current
+        DESCRIPTION
+            "axVrfIpFwNoTableGroup."
+        ::= { axVrfGroups 1 }
+
+END
+

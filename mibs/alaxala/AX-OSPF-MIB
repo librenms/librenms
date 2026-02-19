@@ -1,0 +1,1900 @@
+--
+-- All Rights Reserved, Copyright (c) 2013, 2014, ALAXALA Networks Corp.
+--
+-- AX-OSPF-MIB.my: axOspf group MIB file.
+--
+
+AX-OSPF-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+         Counter32, Gauge32, Integer32, IpAddress           FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, RowStatus                       FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP,
+        NOTIFICATION-GROUP                                  FROM SNMPv2-CONF
+        axMib                                               FROM AX-SMI-MIB;
+
+axOspf MODULE-IDENTITY
+    LAST-UPDATED    "201412030000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+            "The MIB module for the Multi-backbone OSPF.
+             This MIB module is based on a part of the standard MIB defined in RFC 4750."
+    REVISION        "201412030000Z"
+    DESCRIPTION
+        "To support area scope (type-10) LSAs, the enumeration areaOpaqueLink (10) was added to axOspfLsdbType in the axOspfLsdbTable."
+    REVISION        "201310030000Z"
+    DESCRIPTION
+        "Updated header comment."
+    REVISION        "201306280000Z"
+    DESCRIPTION
+        "Initial release."
+    ::= { axMib 14 }
+
+--
+-- Textual Conventions
+--
+InterfaceIndexOrZero ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "This textual convention is an extension of the
+            InterfaceIndex convention.  The latter defines a greater
+            than zero value used to identify an interface or interface
+            sub-layer in the managed system.  This extension permits the
+            additional value of zero.  the value zero is object-specific
+            and must therefore be defined as part of the description of
+            any object which uses this syntax.  Examples of the usage of
+            zero might include situations where interface was unknown,
+            or when none or all interfaces need to be referenced."
+    SYNTAX       Integer32 (0..2147483647)
+
+Status ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "This textual convention is an extension of the
+            InterfaceIndex convention.  The latter defines a greater
+            than zero value used to identify an interface or interface
+            sub-layer in the managed system.  This extension permits the
+            additional value of zero.  the value zero is object-specific
+            and must therefore be defined as part of the description of
+            any object which uses this syntax.  Examples of the usage of
+            zero might include situations where interface was unknown,
+            or when none or all interfaces need to be referenced."
+    SYNTAX       Integer32 (0..2147483647)
+
+--
+-- MIB groups
+--
+
+axOspfTrap  OBJECT IDENTIFIER ::= {axOspf 16}
+axOspfTraps OBJECT IDENTIFIER ::= {axOspfTrap 2}
+
+--
+-- axOspfGeneralTable
+--
+
+axOspfGeneralTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfGeneralEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of OSPF information."
+    ::= {axOspf 1}
+
+axOspfGeneralEntry OBJECT-TYPE
+    SYNTAX AxOspfGeneralEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of OSPF information."
+    INDEX { axOspfGeneralDomainNumber }
+    ::= {axOspfGeneralTable 1}
+
+AxOspfGeneralEntry ::= SEQUENCE {
+    axOspfGeneralDomainNumber    Integer32,
+    axOspfRouterId               IpAddress,
+    axOspfAdminStat              Status,
+    axOspfVersionNumber          INTEGER,
+    axOspfAreaBdrRtrStatus       INTEGER,
+    axOspfASBdrRtrStatus         INTEGER,
+    axOspfExternLsaCount         Gauge32,
+    axOspfExternLsaCksumSum      Integer32,
+    axOspfTOSSupport             INTEGER,
+    axOspfOriginateNewLsas       Counter32,
+    axOspfRxNewLsas              Counter32,
+    axOspfExtLsdbLimit           Integer32,
+    axOspfMulticastExtensions    Integer32
+}
+
+axOspfGeneralDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Domain number in the Autonomous System."
+    ::= {axOspfGeneralEntry 1}
+
+axOspfRouterId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A integer uniquely identifying the router in the Autonomous System."
+    ::= {axOspfGeneralEntry 2}
+
+axOspfAdminStat OBJECT-TYPE
+    SYNTAX Status
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The  administrative  status  of  OSPF  in  the router."
+    ::= {axOspfGeneralEntry 3}
+
+axOspfVersionNumber OBJECT-TYPE
+    SYNTAX INTEGER {
+                       version(2)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current version number of the OSPF protocol is 2."
+    ::= {axOspfGeneralEntry 4}
+
+axOspfAreaBdrRtrStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                       true(1),
+                       false(2)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A flag to note whether this router is an area border router."
+    ::= {axOspfGeneralEntry 5}
+
+axOspfASBdrRtrStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                       true(1),
+                       false(2)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A flag to note whether this router is  configured as an Autonomous System border router."
+    ::= {axOspfGeneralEntry 6}
+
+axOspfExternLsaCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of external (LS type 5)  link-state advertisements in the link-state database."
+    ::= {axOspfGeneralEntry 7}
+
+axOspfExternLsaCksumSum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The 32-bit unsigned sum of the LS checksums of the  external  link-state  advertisements  contained in the link-state  database."
+    ::= {axOspfGeneralEntry 8}
+
+axOspfTOSSupport OBJECT-TYPE
+    SYNTAX INTEGER {
+                       true(1),
+                       false(2)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The router's support for type-of-service routing. This value of false(2)."
+    ::= {axOspfGeneralEntry 9}
+
+axOspfOriginateNewLsas OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of  new  link-state  advertisements that have been originated."
+    ::= {axOspfGeneralEntry 10}
+
+axOspfRxNewLsas OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of  link-state  advertisements  received determined  to  be  new instantiations."
+    ::= {axOspfGeneralEntry 11}
+
+axOspfExtLsdbLimit OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of non-default AS-external-LSAs entries that can be stored in the link-state database.
+         If the value is -1,  then there is no limit. This value is -1"
+    ::= {axOspfGeneralEntry 12}
+
+axOspfMulticastExtensions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A Bit Mask indicating whether  the  router  is forwarding  IP  multicast  (Class  D) datagrams based on the algorithms defined in  the  Multicast Extensions to OSPF."
+    ::= {axOspfGeneralEntry 13}
+
+--
+-- axOspfAreaTable
+--
+
+axOspfAreaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfAreaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The router's support for demand routing."
+    ::= { axOspf 2 }
+
+axOspfAreaEntry OBJECT-TYPE
+    SYNTAX AxOspfAreaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This entry contain ospf area information."
+    INDEX { axOspfAreaDomainNumber, axOspfAreaId }
+    ::= {axOspfAreaTable 1}
+
+AxOspfAreaEntry ::= SEQUENCE {
+    axOspfAreaDomainNumber    Integer32,
+    axOspfAreaId              IpAddress,
+    axOspfAuthType            INTEGER,
+    axOspfImportAsExtern      INTEGER,
+    axOspfSpfRuns             Counter32,
+    axOspfAreaBdrRtrCount     Gauge32,
+    axOspfAsBdrRtrCount       Gauge32,
+    axOspfAreaLsaCount        Gauge32,
+    axOspfAreaLsaCksumSum     Integer32,
+    axOspfAreaSummary         INTEGER,
+    axOspfAreaStatus          RowStatus
+}
+
+axOspfAreaDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "An uniquely identifying number of domain."
+    ::= { axOspfAreaEntry 1 }
+
+axOspfAreaId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A 32-bit integer uniquely identifying an area."
+    ::= {axOspfAreaEntry 2}
+
+axOspfAuthType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       none(0),
+                       simplePassword(1),
+                       md5(2)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The authentication type specified for an area."
+    ::= {axOspfAreaEntry 3}
+
+axOspfImportAsExtern OBJECT-TYPE
+    SYNTAX INTEGER {
+                      importExternal(1),
+                      importNoExternal(2),
+                      importNssa(3)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The area's support for importing  AS  external link- state advertisements."
+    ::= {axOspfAreaEntry 4}
+
+axOspfSpfRuns OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of times that the intra-area  route table  has  been  calculated  using this area's link-state database."
+    ::= {axOspfAreaEntry 5}
+
+axOspfAreaBdrRtrCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of area border routers reachable within this area."
+    ::= {axOspfAreaEntry 6}
+
+axOspfAsBdrRtrCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of AS area border routers reachable within this area."
+    ::= {axOspfAreaEntry 7}
+
+axOspfAreaLsaCount OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of LSA(link-state  advertisements) in this area. Excluding AS External LSA's"
+    ::= {axOspfAreaEntry 8}
+
+axOspfAreaLsaCksumSum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The sum of LSA's  LS  checksums  contained in this area's link-state database."
+    ::= {axOspfAreaEntry 9}
+
+axOspfAreaSummary OBJECT-TYPE
+    SYNTAX INTEGER {
+                       noAreaSummary(1),
+                       sendAreaSummary(2)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "he variable axOspfAreaSummary controls the import of summary LSAs into stub areas. Value is only sendAreaSummary(2)."
+    ::= {axOspfAreaEntry 10}
+
+axOspfAreaStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object permits management of the table by facilitating actions such as row creation, construction, and destruction."
+    ::= {axOspfAreaEntry 11}
+
+
+--
+-- axOspfStubAreaTable
+--
+
+axOspfStubAreaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfStubAreaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The set of metrics that will be advertised  by a default Area Border Router into a stub area."
+    ::= {axOspf 3}
+
+axOspfStubAreaEntry OBJECT-TYPE
+    SYNTAX AxOspfStubAreaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The metric for a given Type  of  Service  that will be advertised by a default Area Border Router into a stub area."
+    INDEX { axOspfStubDomainNumber,
+            axOspfStubAreaId,
+            axOspfStubTOS }
+    ::= {axOspfStubAreaTable 1}
+AxOspfStubAreaEntry ::= SEQUENCE {
+    axOspfStubDomainNumber    Integer32,
+    axOspfStubAreaId          IpAddress,
+    axOspfStubTOS             Integer32,
+    axOspfStubMetric          Integer32,
+    axOspfStubStatus          RowStatus,
+    axOspfStubMetricType      INTEGER
+}
+
+axOspfStubDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The domain identifier for the Stub  Area."
+    ::= {axOspfStubAreaEntry 1}
+
+axOspfStubAreaId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The identifier for the Stub  Area."
+    ::= {axOspfStubAreaEntry 2}
+
+axOspfStubTOS OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Type of Service associated with the metric. Value is only 0."
+    ::= {axOspfStubAreaEntry 3}
+
+axOspfStubMetric OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The metric value applied at the indicated type of service."
+    ::= {axOspfStubAreaEntry 4}
+
+axOspfStubStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This variable displays the status of the entry. This value is only valid(1)."
+    ::= {axOspfStubAreaEntry 5}
+
+axOspfStubMetricType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       ospfMetric(1),
+                       comparableCost(2),
+                       nonComparable(3)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "his variable displays the type of metric advertised as a default route."
+    ::= {axOspfStubAreaEntry 6}
+
+--
+-- axOspfLsdbTable
+--
+
+axOspfLsdbTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfLsdbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The OSPF Process's Link State Database."
+    ::= {axOspf 4}
+
+axOspfLsdbEntry OBJECT-TYPE
+    SYNTAX AxOspfLsdbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A single Link State Advertisement."
+    INDEX{ axOspfLsdbDomainNumber,
+           axOspfLsdbAreaId,
+           axOspfLsdbType,
+           axOspfLsdbLsid,
+           axOspfLsdbRouterId }
+    ::= {axOspfLsdbTable 1}
+
+AxOspfLsdbEntry ::= SEQUENCE {
+    axOspfLsdbDomainNumber     Integer32,
+    axOspfLsdbAreaId           IpAddress,
+    axOspfLsdbType             INTEGER,
+    axOspfLsdbLsid             IpAddress,
+    axOspfLsdbRouterId         IpAddress,
+    axOspfLsdbSequence         Integer32,
+    axOspfLsdbAge              Integer32,
+    axOspfLsdbChecksum         Integer32,
+    axOspfLsdbAdvertisement    OCTET STRING
+}
+
+axOspfLsdbDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The identifier of the domain from  which the LSA was received."
+    ::= {axOspfLsdbEntry 1}
+
+axOspfLsdbAreaId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The 32 bit identifier of the Area  from  which the LSA was received."
+    ::= {axOspfLsdbEntry 2}
+
+axOspfLsdbType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       routerLink(1),
+                       networkLink(2),
+                       summaryLink(3),
+                       asSummaryLink(4),
+                       asExternalLink(5),
+                       multicastLink(6),
+                       nssaExternalLink(7),
+                       areaOpaqueLink(10)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type  of  the  link  state  advertisement."
+    ::= {axOspfLsdbEntry 3}
+
+axOspfLsdbLsid OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Link State ID . It identifies the piece of the routing domain that is being described by the advertisement."
+    ::= {axOspfLsdbEntry 4}
+
+axOspfLsdbRouterId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number that uniquely identifies the originating router in the Autonomous System."
+    ::= {axOspfLsdbEntry 5}
+
+axOspfLsdbSequence OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The sequence number field is a  signed  32-bit integer."
+    ::= {axOspfLsdbEntry 6}
+
+axOspfLsdbAge OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This the age of the link state adver-tisement in seconds."
+    ::= {axOspfLsdbEntry 7}
+
+axOspfLsdbChecksum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This field is the  checksum  of  the  complete contents  of  the  advertisement, excepting the age field."
+    ::= {axOspfLsdbEntry 8}
+
+axOspfLsdbAdvertisement OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The entire Link State Advertisement, including its header."
+    ::= {axOspfLsdbEntry 9}
+
+--
+-- axOspfAreaRangeTable
+--
+
+axOspfAreaRangeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfAreaRangeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A range if IP addresses  specified  by  an  IP address/IP  network  mask  pair."
+    ::= {axOspf 5}
+
+axOspfAreaRangeEntry OBJECT-TYPE
+    SYNTAX AxOspfAreaRangeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A range if IP addresses specified by an IP address/IP network mask pair."
+    INDEX { axOspfAreaRangeDomainNumber,
+            axOspfAreaRangeAreaId,
+            axOspfAreaRangeNet }
+    ::= {axOspfAreaRangeTable 1}
+
+AxOspfAreaRangeEntry ::= SEQUENCE {
+    axOspfAreaRangeDomainNumber    Integer32,
+    axOspfAreaRangeAreaId          IpAddress,
+    axOspfAreaRangeNet             IpAddress,
+    axOspfAreaRangeMask            IpAddress,
+    axOspfAreaRangeStatus          RowStatus,
+    axOspfAreaRangeEffect          INTEGER
+}
+
+axOspfAreaRangeDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Domain number of the Area."
+    ::= {axOspfAreaRangeEntry 1}
+
+axOspfAreaRangeAreaId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The area that the address range is to be found within.
+"
+    ::= {axOspfAreaRangeEntry 2}
+
+axOspfAreaRangeNet OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP Address of the Net or Subnet  indicated by the range."
+    ::= {axOspfAreaRangeEntry 3}
+
+axOspfAreaRangeMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Subnet Mask that pertains to  the  Net  or Subnet."
+    ::= {axOspfAreaRangeEntry 4}
+
+axOspfAreaRangeStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object permits management of the table by facilitating actions such as row creation, construction, and destruction."
+    ::= {axOspfAreaRangeEntry 5}
+
+axOspfAreaRangeEffect OBJECT-TYPE
+    SYNTAX INTEGER {
+                       advertiseMatching(1),
+                       doNotAdvertiseMatching(2)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Subnets subsumed by ranges either trigger  the advertisement  of the indicated summary (advertiseMatching), or result in  the  subnet's  not being advertised at all outside the area."
+    ::= {axOspfAreaRangeEntry 6}
+
+--
+-- axOspfIfTable
+--
+
+axOspfIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The OSPF Interface Table describes the interfaces from the viewpoint of OSPF."
+    ::= {axOspf 7}
+
+axOspfIfEntry OBJECT-TYPE
+    SYNTAX AxOspfIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The OSPF Interface Entry describes one  interface from the viewpoint of OSPF."
+    INDEX { axOspfIfDomainNumber,
+            axOspfIfIpAddress,
+            axOspfAddressLessIf }
+    ::= {axOspfIfTable 1}
+
+AxOspfIfEntry ::= SEQUENCE {
+    axOspfIfDomainNumber               Integer32,
+    axOspfIfIpAddress                  IpAddress,
+    axOspfAddressLessIf                InterfaceIndexOrZero,
+    axOspfIfAreaId                     IpAddress,
+    axOspfIfType                       INTEGER,
+    axOspfIfAdminStat                  Status,
+    axOspfIfRtrPriority                Integer32,
+    axOspfIfTransitDelay               Integer32,
+    axOspfIfRetransInterval            Integer32,
+    axOspfIfHelloInterval              Integer32,
+    axOspfIfRtrDeadInterval            Integer32,
+    axOspfIfPollInterval               Integer32,
+    axOspfIfState                      INTEGER,
+    axOspfIfDesignatedRouter           IpAddress,
+    axOspfIfBackupDesignatedRouter     IpAddress,
+    axOspfIfEvents                     Counter32,
+    axOspfIfAuthKey                    OCTET STRING,
+    axOspfIfStatus                     RowStatus,
+    axOspfIfMulticastForwarding        INTEGER
+}
+
+axOspfIfDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The domain number of this OSPF interface."
+    ::= {axOspfIfEntry 1}
+
+axOspfIfIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP address of this OSPF interface."
+    ::= {axOspfIfEntry 2}
+
+axOspfAddressLessIf OBJECT-TYPE
+    SYNTAX InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "For the purpose of easing  the  instancing  of addressed   and  addressless  interfaces;  This variable takes the value 0 on  interfaces  with IP  Addresses,  and  the corresponding value of ifIndex for interfaces having no IP Address."
+    ::= {axOspfIfEntry 3}
+
+axOspfIfAreaId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A integer uniquely identifying the area to which the interface connects."
+    ::= {axOspfIfEntry 4}
+
+axOspfIfType OBJECT-TYPE
+    SYNTAX INTEGER {
+                      broadcast(1),
+                      nbma (2),
+                      pointToPoint(3),
+                      pointToMultipoint(5)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The OSPF interface type."
+    ::= {axOspfIfEntry 5}
+
+axOspfIfAdminStat OBJECT-TYPE
+    SYNTAX Status
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The OSPF  interface's  administrative  status."
+    ::= {axOspfIfEntry 6}
+
+axOspfIfRtrPriority OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The priority of this interface."
+    ::= {axOspfIfEntry 7}
+
+axOspfIfTransitDelay OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The estimated number of seconds  it  takes  to transmit  a  link state update packet over this interface."
+    ::= {axOspfIfEntry 8}
+
+axOspfIfRetransInterval OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of seconds between link-state ad-vertisement retransmissions, for adjacencies belonging to this  interface."
+    ::= {axOspfIfEntry 9}
+
+axOspfIfHelloInterval OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The length of time, in  seconds,  between the Hello  packets that the router sends on the interface."
+    ::= {axOspfIfEntry 10}
+
+axOspfIfRtrDeadInterval OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of seconds that  a  router's  Hello packets  have  not been seen before it's neighbors declare the router down."
+    ::= {axOspfIfEntry 11}
+
+axOspfIfPollInterval OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The larger time interval, in seconds,  between the  Hello  packets  sent  to  an inactive non- broadcast multi- access neighbor."
+    ::= {axOspfIfEntry 12}
+
+axOspfIfState OBJECT-TYPE
+    SYNTAX INTEGER {
+                       down(1),
+                       loopback(2),
+                       waiting(3),
+                       pointToPoint(4),
+                       designatedRouter(5),
+                       backupDesignatedRouter(6),
+                       otherDesignatedRouter(7)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The OSPF Interface State."
+    ::= {axOspfIfEntry 13}
+
+axOspfIfDesignatedRouter OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP Address of the Designated Router."
+    ::= {axOspfIfEntry 14}
+
+axOspfIfBackupDesignatedRouter OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP Address of the Backup Designated Router."
+    ::= {axOspfIfEntry 15}
+
+axOspfIfEvents OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of times this  OSPF  interface  has changed its state, or an error has occurred."
+    ::= {axOspfIfEntry 16}
+
+axOspfIfAuthKey OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Authentication Key."
+    ::= {axOspfIfEntry 17}
+
+axOspfIfStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object permits management of the table by facilitating actions such as row creation, construction, and destruction."
+    ::= {axOspfIfEntry 18}
+
+axOspfIfMulticastForwarding OBJECT-TYPE
+    SYNTAX INTEGER {
+                       blocked(1),   -- no multicast forwarding
+                       multicast(2), -- using multicast address
+                       unicast(3)    -- to each OSPF neighbor
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The way multicasts should  forwarded  on  this interface;  not  forwarded,  forwarded  as data link multicasts, or forwarded as data link unicasts."
+    ::= {axOspfIfEntry 19}
+
+--
+-- axOspfIfMetricTable
+--
+
+axOspfIfMetricTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfIfMetricEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The TOS metrics for a non-virtual interface identified by the interface index."
+    ::= { axOspf 8 }
+
+axOspfIfMetricEntry OBJECT-TYPE
+    SYNTAX AxOspfIfMetricEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A particular TOS metric for a non-virtual interface identified by the interface index."
+    INDEX { axOspfIfMetricDomainNumber,
+            axOspfIfMetricIpAddress,
+            axOspfIfMetricAddressLessIf,
+            axOspfIfMetricTOS }
+    ::= { axOspfIfMetricTable 1 }
+
+AxOspfIfMetricEntry ::= SEQUENCE {
+    axOspfIfMetricDomainNumber     Integer32,
+    axOspfIfMetricIpAddress        IpAddress,
+    axOspfIfMetricAddressLessIf    InterfaceIndexOrZero,
+    axOspfIfMetricTOS              Integer32,
+    axOspfIfMetricValue            Integer32,
+    axOspfIfMetricStatus           RowStatus
+}
+
+axOspfIfMetricDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The domain number of this OSPF interface."
+    ::= {axOspfIfMetricEntry 1}
+
+axOspfIfMetricIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP address of this OSPF interface."
+    ::= {axOspfIfMetricEntry 2}
+
+axOspfIfMetricAddressLessIf OBJECT-TYPE
+    SYNTAX InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "For the purpose of easing  the  instancing  of addressed   and  addressless  interfaces;  This variable takes the value 0 on  interfaces  with IP  Addresses, and the value of ifIndex for interfaces having no IP Address."
+    ::= {axOspfIfMetricEntry 3}
+
+axOspfIfMetricTOS OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of service metric  being  referenced. this value is only 0."
+    ::= {axOspfIfMetricEntry 4}
+
+axOspfIfMetricValue OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The metric of using this type  of  service  on this interface."
+    ::= {axOspfIfMetricEntry 5}
+
+axOspfIfMetricStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object permits management of the table by facilitating actions such as row creation,  construction, and destruction."
+    ::= {axOspfIfMetricEntry 6}
+
+--
+-- axOspfVirtIfTable
+--
+
+axOspfVirtIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfVirtIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about this router's virtual interfaces."
+    ::= {axOspf 9}
+
+axOspfVirtIfEntry OBJECT-TYPE
+    SYNTAX AxOspfVirtIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about a single Virtual Interface."
+    INDEX { axOspfVirtIfDomainNumber,
+            axOspfVirtIfAreaId,
+            axOspfVirtIfNeighbor }
+    ::= {axOspfVirtIfTable 1}
+
+AxOspfVirtIfEntry ::= SEQUENCE {
+    axOspfVirtIfDomainNumber       Integer32,
+    axOspfVirtIfAreaId             IpAddress,
+    axOspfVirtIfNeighbor           IpAddress,
+    axOspfVirtIfTransitDelay       Integer32,
+    axOspfVirtIfRetransInterval    Integer32,
+    axOspfVirtIfHelloInterval      Integer32,
+    axOspfVirtIfRtrDeadInterval    Integer32,
+    axOspfVirtIfState              INTEGER,
+    axOspfVirtIfEvents             Counter32,
+    axOspfVirtIfAuthKey            OCTET STRING,
+    axOspfVirtIfStatus             RowStatus
+}
+
+axOspfVirtIfDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The domain number for this  Virtual Interface"
+    ::= {axOspfVirtIfEntry 1}
+
+axOspfVirtIfAreaId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Transit Area that the Virtual Link traverses."
+    ::= {axOspfVirtIfEntry 2}
+
+axOspfVirtIfNeighbor OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Router ID of the Virtual Neighbor."
+    ::= {axOspfVirtIfEntry 3}
+
+axOspfVirtIfTransitDelay OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The estimated number of seconds  it  takes  to transmit  a link- state update packet over this interface."
+    ::= {axOspfVirtIfEntry 4}
+
+axOspfVirtIfRetransInterval OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of seconds between link-state advertisement retransmissions, for adjacencies belonging to this interface."
+    ::= {axOspfVirtIfEntry 5}
+
+axOspfVirtIfHelloInterval OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The length of time, in  seconds, between the Hello  packets that the router sends on the interface."
+    ::= {axOspfVirtIfEntry 6}
+
+axOspfVirtIfRtrDeadInterval OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of seconds that  a  router's  Hello packets  have  not been seen before it's neighbors declare the router down."
+    ::= {axOspfVirtIfEntry 7}
+
+axOspfVirtIfState OBJECT-TYPE
+    SYNTAX INTEGER {
+                       down(1),        -- these use the same encoding
+                       pointToPoint(4) -- as the axOspfIfTable
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "OSPF virtual interface states."
+    ::= {axOspfVirtIfEntry 8}
+
+axOspfVirtIfEvents OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of state changes or error events on this Virtual Link"
+    ::= {axOspfVirtIfEntry 9}
+
+axOspfVirtIfAuthKey OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication key of this interface."
+    ::= {axOspfVirtIfEntry 10}
+
+axOspfVirtIfStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object permits management of the table by facilitating actions such as row creation, construction, and destruction."
+    ::= {axOspfVirtIfEntry 11}
+
+--
+-- axOspfNbrTable
+--
+
+axOspfNbrTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfNbrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table describing all non-virtual neighbors in the locality of the OSPF router."
+    ::= {axOspf 10}
+
+axOspfNbrEntry OBJECT-TYPE
+    SYNTAX AxOspfNbrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The information regarding a single neighbor."
+    INDEX { axOspfNbrDomainNumber,
+            axOspfNbrIpAddr,
+            axOspfNbrAddressLessIndex }
+    ::= {axOspfNbrTable 1}
+
+AxOspfNbrEntry ::= SEQUENCE {
+    axOspfNbrDomainNumber        Integer32,
+    axOspfNbrIpAddr              IpAddress,
+    axOspfNbrAddressLessIndex    InterfaceIndexOrZero,
+    axOspfNbrRtrId               IpAddress,
+    axOspfNbrOptions             Integer32,
+    axOspfNbrPriority            Integer32,
+    axOspfNbrState               INTEGER,
+    axOspfNbrEvents              Counter32,
+    axOspfNbrLsRetransQLen       Gauge32,
+    axOspfNbmaNbrStatus          RowStatus,
+    axOspfNbmaNbrPermanence      INTEGER
+}
+
+axOspfNbrDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "OSPF domain number of this neighbor."
+    ::= {axOspfNbrEntry 1}
+
+axOspfNbrIpAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP address this neighbor is using  in  its IP  Source  Address."
+    ::= {axOspfNbrEntry 2}
+
+axOspfNbrAddressLessIndex OBJECT-TYPE
+    SYNTAX InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "On an interface having an  IP  Address,  zero. On  addressless  interfaces,  the corresponding value of ifIndex in the Internet Standard  MIB."
+    ::= {axOspfNbrEntry 3}
+
+axOspfNbrRtrId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The integer uniquely identifying the neighboring router in the Autonomous System."
+    ::= {axOspfNbrEntry 4}
+
+axOspfNbrOptions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A Bit Mask corresponding to the neighbor's options field."
+    ::= {axOspfNbrEntry 5}
+
+axOspfNbrPriority OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The priority of this neighbor in the designated router election algorithm."
+    ::= {axOspfNbrEntry 6}
+
+axOspfNbrState OBJECT-TYPE
+    SYNTAX INTEGER {
+                       down(1),
+                       attempt(2),
+                       init(3),
+                       twoWay(4),
+                       exchangeStart(5),
+                       exchange(6),
+                       loading(7),
+                       full(8)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of the relationship with this neighbor."
+    ::= {axOspfNbrEntry 7}
+
+axOspfNbrEvents OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of times this neighbor relationship has changed state, or an error has occurred."
+    ::= {axOspfNbrEntry 8}
+
+axOspfNbrLsRetransQLen OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current length of the retransmission queue."
+    ::= {axOspfNbrEntry 9}
+
+axOspfNbmaNbrStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This variable displays the status of the entry. This entry value is only valid(1). And enable to response this entry when axOspfIfType is nbma."
+    ::= {axOspfNbrEntry 10}
+
+axOspfNbmaNbrPermanence OBJECT-TYPE
+    SYNTAX INTEGER {
+                       dynamic(1),  -- learned through protocol
+                       permanent(2) -- configured address
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This variable displays the status of the entry;   'dynamic' and 'permanent' refer to how the neighbor  became known."
+    ::= {axOspfNbrEntry 11}
+
+--
+-- axOspfVirtNbrTable
+--
+
+axOspfVirtNbrTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfVirtNbrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of virtual neighbor information."
+    ::= {axOspf 11}
+
+axOspfVirtNbrEntry OBJECT-TYPE
+    SYNTAX AxOspfVirtNbrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Virtual neighbor information."
+    INDEX { axOspfVirtNbrDomainNumber,
+            axOspfVirtNbrArea,
+            axOspfVirtNbrRtrId }
+    ::= {axOspfVirtNbrTable 1}
+
+AxOspfVirtNbrEntry ::= SEQUENCE {
+    axOspfVirtNbrDomainNumber     Integer32,
+    axOspfVirtNbrArea             IpAddress,
+    axOspfVirtNbrRtrId            IpAddress,
+    axOspfVirtNbrIpAddr           IpAddress,
+    axOspfVirtNbrOptions          Integer32,
+    axOspfVirtNbrState            INTEGER,
+    axOspfVirtNbrEvents           Counter32,
+    axOspfVirtNbrLsRetransQLen    Gauge32
+}
+
+axOspfVirtNbrDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The domain number."
+    ::= {axOspfVirtNbrEntry 1}
+
+axOspfVirtNbrArea OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Transit Area Identifier."
+    ::= {axOspfVirtNbrEntry 2}
+
+axOspfVirtNbrRtrId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A integer  uniquely  identifying  the neighboring router in the Autonomous System."
+    ::= {axOspfVirtNbrEntry 3}
+
+axOspfVirtNbrIpAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP address this Virtual Neighbor is using."
+    ::= {axOspfVirtNbrEntry 4}
+
+axOspfVirtNbrOptions OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A Bit Mask corresponding to the neighbor's options field.
+         Bit 1, if set, indicates that the  system  will operate on Type of Service metrics other than TOS 0. If zero,
+         the neighbor will  ignore  all metrics except the TOS 0 metric.
+         Bit 2, if set, indica"
+    ::= {axOspfVirtNbrEntry 5}
+
+axOspfVirtNbrState OBJECT-TYPE
+    SYNTAX INTEGER {
+                       down(1),
+                       attempt(2),
+                       init(3),
+                       twoWay(4),
+                       exchangeStart(5),
+                       exchange(6),
+                       loading(7),
+                       full(8)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of the  Virtual  Neighbor  Relationship."
+    ::= {axOspfVirtNbrEntry 6}
+
+axOspfVirtNbrEvents OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of times this virtual link has changed its state, or an error has occurred."
+    ::= {axOspfVirtNbrEntry 7}
+
+axOspfVirtNbrLsRetransQLen OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current length of the retransmission queue."
+    ::= {axOspfVirtNbrEntry 8}
+
+--
+-- axOspfExtLsdbTable
+--
+
+axOspfExtLsdbTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfExtLsdbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The OSPF Process's Links State Database."
+    ::= {axOspf 12}
+
+axOspfExtLsdbEntry OBJECT-TYPE
+    SYNTAX AxOspfExtLsdbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A single Link State Advertisement."
+    INDEX { axOspfExtLsdbDomainNumber,
+            axOspfExtLsdbType,
+            axOspfExtLsdbLsid,
+            axOspfExtLsdbRouterId }
+    ::= {axOspfExtLsdbTable 1}
+
+AxOspfExtLsdbEntry ::= SEQUENCE {
+    axOspfExtLsdbDomainNumber     Integer32,
+    axOspfExtLsdbType             INTEGER,
+    axOspfExtLsdbLsid             IpAddress,
+    axOspfExtLsdbRouterId         IpAddress,
+    axOspfExtLsdbSequence         Integer32,
+    axOspfExtLsdbAge              Integer32,
+    axOspfExtLsdbChecksum         Integer32,
+    axOspfExtLsdbAdvertisement    OCTET STRING
+}
+
+axOspfExtLsdbDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "OSPF domain number."
+    ::= {axOspfExtLsdbEntry 1}
+
+axOspfExtLsdbType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       asExternalLink(5)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type  of  the  link  state  advertisement."
+    ::= {axOspfExtLsdbEntry 2}
+
+axOspfExtLsdbLsid OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Link State ID is an LS Type Specific field containing either a Router ID or an IP Address; it identifies the piece of the  routing  domain that is being described by the advertisement."
+    ::= {axOspfExtLsdbEntry 3}
+
+axOspfExtLsdbRouterId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The 32 bit number that uniquely identifies the originating router in the Autonomous System."
+    ::= {axOspfExtLsdbEntry 4}
+
+axOspfExtLsdbSequence OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The sequence number field is a  signed  32-bit integer."
+    ::= {axOspfExtLsdbEntry 5}
+
+axOspfExtLsdbAge OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The age of the link state advertisement in seconds."
+    ::= {axOspfExtLsdbEntry 6}
+
+axOspfExtLsdbChecksum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This field is the  checksum  of  the  complete contents  of  the  advertisement, excepting the age field.  The age field is excepted  so  that an   advertisement's  age  can  be  incremented without updating the  checksum."
+    ::= {axOspfExtLsdbEntry 7}
+
+axOspfExtLsdbAdvertisement OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The entire Link State Advertisement, including its header."
+    ::= {axOspfExtLsdbEntry 8}
+
+--
+-- axOspfAreaAggregateTable
+--
+
+axOspfAreaAggregateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfAreaAggregateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A range of IP addresses  specified  by  an  IP address/IP  network  mask  pair."
+    ::= {axOspf 14}
+
+axOspfAreaAggregateEntry OBJECT-TYPE
+    SYNTAX AxOspfAreaAggregateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A range of IP addresses  specified  by  an  IP address/IP  network  mask  pair."
+    INDEX { axOspfAreaAggregateDomainNumber,
+            axOspfAreaAggregateAreaID,
+            axOspfAreaAggregateLsdbType,
+            axOspfAreaAggregateNet,
+            axOspfAreaAggregateMask }
+    ::= {axOspfAreaAggregateTable 1}
+
+AxOspfAreaAggregateEntry ::= SEQUENCE {
+    axOspfAreaAggregateDomainNumber    Integer32,
+    axOspfAreaAggregateAreaID          IpAddress,
+    axOspfAreaAggregateLsdbType        INTEGER,
+    axOspfAreaAggregateNet             IpAddress,
+    axOspfAreaAggregateMask            IpAddress,
+    axOspfAreaAggregateStatus          RowStatus,
+    axOspfAreaAggregateEffect          INTEGER
+}
+
+axOspfAreaAggregateDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "OSPF domain number."
+    ::= {axOspfAreaAggregateEntry 1}
+
+axOspfAreaAggregateAreaID OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Area the Address Aggregate is to be found within."
+    ::= {axOspfAreaAggregateEntry 2}
+
+axOspfAreaAggregateLsdbType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       summaryLink(3),
+                       nssaExternalLink(7)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of the address aggregate.  This field specifies the Lsdb type that this address aggregate applies to."
+    ::= {axOspfAreaAggregateEntry 3}
+
+axOspfAreaAggregateNet OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP Address of the Net or Subnet indicated by the range."
+    ::= {axOspfAreaAggregateEntry 4}
+
+axOspfAreaAggregateMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Subnet Mask that pertains to the Net or Subnet."
+    ::= {axOspfAreaAggregateEntry 5}
+
+axOspfAreaAggregateStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object permits management of the table by facilitating actions such as row creation, construction, and destruction."
+    ::= {axOspfAreaAggregateEntry 6}
+
+axOspfAreaAggregateEffect OBJECT-TYPE
+    SYNTAX INTEGER {
+                       advertiseMatching(1),
+                       doNotAdvertiseMatching(2)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Subnets subsumed by ranges either trigger the advertisement of the indicated aggregate(advertiseMatching) or result in the subnet's not being advertised at all outside the area."
+    ::= {axOspfAreaAggregateEntry 7}
+
+--
+-- axOspfTrapControlTable
+--
+
+axOspfTrapControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxOspfTrapControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table about trap information."
+    ::= {axOspfTrap 1}
+
+axOspfTrapControlEntry OBJECT-TYPE
+    SYNTAX AxOspfTrapControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Entry about trap information."
+    INDEX { axOspfTrapDomainNumber }
+    ::= {axOspfTrapControlTable 1}
+
+AxOspfTrapControlEntry ::= SEQUENCE {
+    axOspfTrapDomainNumber    Integer32,
+    axOspfSetTrap             OCTET STRING,
+    axOspfConfigErrorType     INTEGER,
+    axOspfPacketType          INTEGER,
+    axOspfPacketSrc           IpAddress
+}
+
+axOspfTrapDomainNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "axOspfTrap domain number."
+    ::= {axOspfTrapControlEntry 1}
+
+axOspfSetTrap OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A four-octet string serving as a bit  map  for the trap events defined by the OSPF traps. This object is used to enable and  disable  specific OSPF   traps   where  a  1  in  the  bit  field represents enabled.  The right-most bit  (least significant) rep"
+    ::= {axOspfTrapControlEntry 2}
+
+axOspfConfigErrorType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       badVersion (1),
+                       areaMismatch (2),
+                       unknownNbmaNbr (3),
+                       unknownVirtualNbr (4),
+                       authTypeMismatch(5),
+                       authFailure (6),
+                       netMaskMismatch (7),
+                       helloIntervalMismatch (8),
+                       deadIntervalMismatch (9),
+                       optionMismatch (10),
+                       mtuMismatch (11),
+                       duplicateRouterId (12),
+                       noError (13)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Potential types  of  configuration  conflicts. Used  by the ospfConfigError and ospfConfigVir-tError traps. When the last value of a trap using this object is needed, but no traps of that type have been sent, this value pertaining to this object should be returned as noError."
+    ::= {axOspfTrapControlEntry 3}
+
+axOspfPacketType OBJECT-TYPE
+    SYNTAX INTEGER {
+                       hello(1),
+                       dbDescript(2),
+                       lsReq(3),
+                       lsUpdate(4),
+                       lsAck(5),
+                       nullPacket(6)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "OSPF packet types. When the last value of a trap using this object is needed, but no traps of that type have been sent, this value pertaining to this object should be returned as nullPacket."
+    ::= {axOspfTrapControlEntry 4}
+
+axOspfPacketSrc OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP address of an inbound packet that  can-not be identified by a neighbor instance."
+    ::= {axOspfTrapControlEntry 5}
+
+--
+-- Notification Type definitions
+--
+
+axOspfTrapsPrefix               OBJECT IDENTIFIER ::= { axOspfTraps 0 }
+
+--
+-- axOspfTraps
+--
+axOspfVirtIfStateChange  NOTIFICATION-TYPE
+    OBJECTS       {
+                    axOspfVirtIfDomainNumber,
+                    axOspfRouterId,
+                    axOspfVirtIfAreaId,
+                    axOspfVirtIfNeighbor,
+                    axOspfVirtIfState
+                  }
+    STATUS        current
+    DESCRIPTION
+             "This trap signifies that there has been a change in the state of an OSPF virtual interface."
+    ::= { axOspfTrapsPrefix 1 }
+
+axOspfNbrStateChange  NOTIFICATION-TYPE
+    OBJECTS       {
+                    axOspfNbrDomainNumber,
+                    axOspfRouterId,
+                    axOspfNbrIpAddr,
+                    axOspfNbrAddressLessIndex,
+                    axOspfNbrRtrId,
+                    axOspfNbrState
+                  }
+    STATUS        current
+    DESCRIPTION
+             "This trap signifies that there has been a change in the state of a non-virtual OSPF neighbor."
+    ::= { axOspfTrapsPrefix 2 }
+
+axOspfVirtNbrStateChange  NOTIFICATION-TYPE
+    OBJECTS       {
+                    axOspfVirtNbrDomainNumber,
+                    axOspfRouterId,
+                    axOspfVirtNbrArea,
+                    axOspfVirtNbrRtrId,
+                    axOspfVirtNbrState
+                  }
+    STATUS        current
+    DESCRIPTION
+             "This trap signifies that there has been a change in the state of an OSPF virtual neighbor."
+    ::= { axOspfTrapsPrefix 3 }
+
+axOspfIfStateChange  NOTIFICATION-TYPE
+    OBJECTS       {
+                    axOspfIfDomainNumber,
+                    axOspfRouterId,
+                    axOspfIfIpAddress,
+                    axOspfAddressLessIf,
+                    axOspfIfState
+                  }
+    STATUS        current
+    DESCRIPTION
+             "This trap signifies that there has been a change in the state of a non-virtual OSPF interface."
+    ::= { axOspfTrapsPrefix 16 }
+
+axOspfIfConfigError  NOTIFICATION-TYPE
+    OBJECTS       {
+                    axOspfIfDomainNumber,
+                    axOspfRouterId,
+                    axOspfIfIpAddress,
+                    axOspfAddressLessIf,
+                    axOspfPacketSrc,
+                    axOspfConfigErrorType,
+                    axOspfPacketType
+                  }
+    STATUS        current
+    DESCRIPTION
+             "This trap signifies that a packet has been received on a non-virtual interface from a router whose configuration parameters conflict with this router's configuration parameters."
+    ::= { axOspfTrapsPrefix 4 }
+
+axOspfVirtIfConfigError  NOTIFICATION-TYPE
+    OBJECTS       {
+                    axOspfVirtIfDomainNumber,
+                    axOspfRouterId,
+                    axOspfVirtIfAreaId,
+                    axOspfVirtIfNeighbor,
+                    axOspfConfigErrorType,
+                    axOspfPacketType
+                  }
+    STATUS        current
+    DESCRIPTION
+             "This trap signifies that a packet has been received on a virtual interface from a router whose configuration parameters conflict with this router's configuration parameters."
+    ::= { axOspfTrapsPrefix 5 }
+
+axOspfIfAuthFailure  NOTIFICATION-TYPE
+    OBJECTS       {
+                    axOspfIfDomainNumber,
+                    axOspfRouterId,
+                    axOspfIfIpAddress,
+                    axOspfAddressLessIf,
+                    axOspfPacketSrc,
+                    axOspfConfigErrorType,
+                    axOspfPacketType
+                  }
+    STATUS        current
+    DESCRIPTION
+             "This trap signifies that a packet has been received on a non-virtual interface from a router whose authentication key or authentication type conflicts with this router's authentication key or authentication type."
+    ::= { axOspfTrapsPrefix 6 }
+
+axOspfVirtIfAuthFailure  NOTIFICATION-TYPE
+    OBJECTS       {
+                    axOspfVirtIfDomainNumber,
+                    axOspfRouterId,
+                    axOspfVirtIfAreaId,
+                    axOspfVirtIfNeighbor,
+                    axOspfConfigErrorType,
+                    axOspfPacketType
+                  }
+    STATUS        current
+    DESCRIPTION
+             "This trap signifies that a packet has been received on a virtual interface from a router whose authentication key or authentication type conflicts with this router's authentication key or authentication type."
+    ::= { axOspfTrapsPrefix 7 }
+
+
+--
+-- Conformance Statements
+--
+
+-- Conformance identifier
+
+axOspfConformance               OBJECT IDENTIFIER ::= { axOspf 1000 }
+axOspfCompliances               OBJECT IDENTIFIER ::= { axOspfConformance 1 }
+axOspfGroups                    OBJECT IDENTIFIER ::= { axOspfConformance 2 }
+
+--
+-- Compliance
+--
+
+    axOspfCompliance MODULE-COMPLIANCE
+        STATUS    current
+        DESCRIPTION
+            "AX Ospf Object"
+        MODULE
+            MANDATORY-GROUPS { axOspfGroup,
+                               axOspfTrapNotificationGroup }
+        ::= { axOspfCompliances 1 }
+
+--
+-- Object Group
+--
+    axOspfGroup OBJECT-GROUP
+        OBJECTS     {
+                        axOspfGeneralDomainNumber,
+                        axOspfRouterId,
+                        axOspfAdminStat,
+                        axOspfVersionNumber,
+                        axOspfAreaBdrRtrStatus,
+                        axOspfASBdrRtrStatus,
+                        axOspfExternLsaCount,
+                        axOspfExternLsaCksumSum,
+                        axOspfTOSSupport,
+                        axOspfOriginateNewLsas,
+                        axOspfRxNewLsas,
+                        axOspfExtLsdbLimit,
+                        axOspfMulticastExtensions,
+                        axOspfAreaDomainNumber,
+                        axOspfAreaId,
+                        axOspfAuthType,
+                        axOspfImportAsExtern,
+                        axOspfSpfRuns,
+                        axOspfAreaBdrRtrCount,
+                        axOspfAsBdrRtrCount,
+                        axOspfAreaLsaCount,
+                        axOspfAreaLsaCksumSum,
+                        axOspfAreaSummary,
+                        axOspfAreaStatus,
+                        axOspfStubDomainNumber,
+                        axOspfStubAreaId,
+                        axOspfStubTOS,
+                        axOspfStubMetric,
+                        axOspfStubStatus,
+                        axOspfStubMetricType,
+                        axOspfLsdbDomainNumber,
+                        axOspfLsdbAreaId,
+                        axOspfLsdbType,
+                        axOspfLsdbLsid,
+                        axOspfLsdbRouterId,
+                        axOspfLsdbSequence,
+                        axOspfLsdbAge,
+                        axOspfLsdbChecksum,
+                        axOspfLsdbAdvertisement,
+                        axOspfAreaRangeDomainNumber,
+                        axOspfAreaRangeAreaId,
+                        axOspfAreaRangeNet,
+                        axOspfAreaRangeMask,
+                        axOspfAreaRangeStatus,
+                        axOspfAreaRangeEffect,
+                        axOspfIfDomainNumber,
+                        axOspfIfIpAddress,
+                        axOspfAddressLessIf,
+                        axOspfIfAreaId,
+                        axOspfIfType,
+                        axOspfIfAdminStat,
+                        axOspfIfRtrPriority,
+                        axOspfIfTransitDelay,
+                        axOspfIfRetransInterval,
+                        axOspfIfHelloInterval,
+                        axOspfIfRtrDeadInterval,
+                        axOspfIfPollInterval,
+                        axOspfIfState,
+                        axOspfIfDesignatedRouter,
+                        axOspfIfBackupDesignatedRouter,
+                        axOspfIfEvents,
+                        axOspfIfAuthKey,
+                        axOspfIfStatus,
+                        axOspfIfMulticastForwarding,
+                        axOspfIfMetricDomainNumber,
+                        axOspfIfMetricIpAddress,
+                        axOspfIfMetricAddressLessIf,
+                        axOspfIfMetricTOS,
+                        axOspfIfMetricValue,
+                        axOspfIfMetricStatus,
+                        axOspfVirtIfDomainNumber,
+                        axOspfVirtIfAreaId,
+                        axOspfVirtIfNeighbor,
+                        axOspfVirtIfTransitDelay,
+                        axOspfVirtIfRetransInterval,
+                        axOspfVirtIfHelloInterval,
+                        axOspfVirtIfRtrDeadInterval,
+                        axOspfVirtIfState,
+                        axOspfVirtIfEvents,
+                        axOspfVirtIfAuthKey,
+                        axOspfVirtIfStatus,
+                        axOspfNbrDomainNumber,
+                        axOspfNbrIpAddr,
+                        axOspfNbrAddressLessIndex,
+                        axOspfNbrRtrId,
+                        axOspfNbrOptions,
+                        axOspfNbrPriority,
+                        axOspfNbrState,
+                        axOspfNbrEvents,
+                        axOspfNbrLsRetransQLen,
+                        axOspfNbmaNbrStatus,
+                        axOspfNbmaNbrPermanence,
+                        axOspfVirtNbrDomainNumber,
+                        axOspfVirtNbrArea,
+                        axOspfVirtNbrRtrId,
+                        axOspfVirtNbrIpAddr,
+                        axOspfVirtNbrOptions,
+                        axOspfVirtNbrState,
+                        axOspfVirtNbrEvents,
+                        axOspfVirtNbrLsRetransQLen,
+                        axOspfExtLsdbDomainNumber,
+                        axOspfExtLsdbType,
+                        axOspfExtLsdbLsid,
+                        axOspfExtLsdbRouterId,
+                        axOspfExtLsdbSequence,
+                        axOspfExtLsdbAge,
+                        axOspfExtLsdbChecksum,
+                        axOspfExtLsdbAdvertisement,
+                        axOspfAreaAggregateDomainNumber,
+                        axOspfAreaAggregateAreaID,
+                        axOspfAreaAggregateLsdbType,
+                        axOspfAreaAggregateNet,
+                        axOspfAreaAggregateMask,
+                        axOspfAreaAggregateStatus,
+                        axOspfAreaAggregateEffect,
+                        axOspfTrapDomainNumber,
+                        axOspfSetTrap,
+                        axOspfConfigErrorType,
+                        axOspfPacketType,
+                        axOspfPacketSrc
+                    }
+        STATUS      current
+        DESCRIPTION
+            "axOspf General Group"
+        ::= { axOspfGroups 1 }
+
+--
+-- Notification Group
+--
+axOspfTrapNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        axOspfVirtIfStateChange,
+                        axOspfNbrStateChange,
+                        axOspfVirtNbrStateChange,
+                        axOspfIfStateChange,
+                        axOspfIfConfigError,
+                        axOspfVirtIfConfigError,
+                        axOspfIfAuthFailure,
+                        axOspfVirtIfAuthFailure
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of notifications of axOspfTrap."
+    ::= { axOspfGroups 100 }
+
+END
