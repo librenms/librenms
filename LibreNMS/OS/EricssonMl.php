@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -53,9 +54,9 @@ class EricssonMl extends OS implements
     {
         return [
             // PT-RADIOLINK-MIB::txFrequency.0
-            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.193.223.2.7.1.1.10.110101', 'eric-tx', 1, 'TX Frequency', null, 1, 1000),
+            new WirelessSensor(WirelessSensorType::Frequency, $this->getDeviceId(), '.1.3.6.1.4.1.193.223.2.7.1.1.10.110101', 'eric-tx', 1, 'TX Frequency', null, 1, 1000),
             // PT-RADIOLINK-MIB::rxFrequency.0
-            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.193.223.2.7.1.1.13.110101', 'eric-rx', 1, 'RX Frequency', null, 1, 1000),
+            new WirelessSensor(WirelessSensorType::Frequency, $this->getDeviceId(), '.1.3.6.1.4.1.193.223.2.7.1.1.13.110101', 'eric-rx', 1, 'RX Frequency', null, 1, 1000),
         ];
     }
 
@@ -69,7 +70,7 @@ class EricssonMl extends OS implements
     {
         return [
             // PT-RADIOLINK-MIB::actualOutputPower.0
-            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.193.223.2.7.1.1.2.110101', 'eric-pow-cur', 1, 'Tx Power Current'),
+            new WirelessSensor(WirelessSensorType::Power, $this->getDeviceId(), '.1.3.6.1.4.1.193.223.2.7.1.1.2.110101', 'eric-pow-cur', 1, 'Tx Power Current'),
         ];
     }
 
@@ -84,7 +85,7 @@ class EricssonMl extends OS implements
         $oid = '.1.3.6.1.4.1.193.223.2.7.1.1.1.110101'; // PT-RADIOLINK-MIB::actualInputPower.0
 
         return [
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'eric', 1, 'RSSI', null, 1, 1),
+            new WirelessSensor(WirelessSensorType::Rssi, $this->getDeviceId(), $oid, 'eric', 1, 'RSSI', null, 1, 1),
         ];
     }
 
@@ -99,7 +100,7 @@ class EricssonMl extends OS implements
         $oid = '.1.3.6.1.4.1.193.223.2.7.1.1.43.110101'; //PT-RADIOLINK-MIB::actualSnir.0
 
         return [
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'eric', 1, 'CINR', null, 1, 1),
+            new WirelessSensor(WirelessSensorType::Snr, $this->getDeviceId(), $oid, 'eric', 1, 'CINR', null, 1, 1),
         ];
     }
 
@@ -114,7 +115,7 @@ class EricssonMl extends OS implements
         $oid_bitrate = '.1.3.6.1.4.1.193.223.2.7.1.1.46.110101'; // PT-RADIOLINK-MIB::actualTxCapacity.0
 
         return [
-            new WirelessSensor('rate', $this->getDeviceId(), $oid_bitrate, 'eric-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
+            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), $oid_bitrate, 'eric-netBitrate', 1, 'Net Bitrate', null, 1000, 1),
         ];
     }
 }

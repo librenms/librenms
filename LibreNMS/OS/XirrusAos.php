@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -93,7 +94,7 @@ class XirrusAos extends OS implements
         $oid = '.1.3.6.1.4.1.21013.1.2.12.1.2.22.0'; // XIRRUS-MIB::globalNumStations.0
 
         return [
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'xirrus', 0, 'Clients'),
+            new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), $oid, 'xirrus', 0, 'Clients'),
         ];
     }
 
@@ -105,7 +106,7 @@ class XirrusAos extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        return $this->discoverSensor('frequency', 'realtimeMonitorChannel', '.1.3.6.1.4.1.21013.1.2.24.7.1.3.');
+        return $this->discoverSensor(WirelessSensorType::Frequency, 'realtimeMonitorChannel', '.1.3.6.1.4.1.21013.1.2.24.7.1.3.');
     }
 
     /**
@@ -127,7 +128,7 @@ class XirrusAos extends OS implements
      */
     public function discoverWirelessNoiseFloor()
     {
-        return $this->discoverSensor('noise-floor', 'realtimeMonitorNoiseFloor', '.1.3.6.1.4.1.21013.1.2.24.7.1.10.');
+        return $this->discoverSensor(WirelessSensorType::NoiseFloor, 'realtimeMonitorNoiseFloor', '.1.3.6.1.4.1.21013.1.2.24.7.1.10.');
     }
 
     /**
@@ -138,7 +139,7 @@ class XirrusAos extends OS implements
      */
     public function discoverWirelessRate()
     {
-        return $this->discoverSensor('rate', 'realtimeMonitorAverageDataRate', '.1.3.6.1.4.1.21013.1.2.24.7.1.7.');
+        return $this->discoverSensor(WirelessSensorType::Rate, 'realtimeMonitorAverageDataRate', '.1.3.6.1.4.1.21013.1.2.24.7.1.7.');
     }
 
     /**
@@ -149,7 +150,7 @@ class XirrusAos extends OS implements
      */
     public function discoverWirelessRssi()
     {
-        return $this->discoverSensor('rssi', 'realtimeMonitorAverageRSSI', '.1.3.6.1.4.1.21013.1.2.24.7.1.8.');
+        return $this->discoverSensor(WirelessSensorType::Rssi, 'realtimeMonitorAverageRSSI', '.1.3.6.1.4.1.21013.1.2.24.7.1.8.');
     }
 
     /**
@@ -161,7 +162,7 @@ class XirrusAos extends OS implements
      */
     public function discoverWirelessSnr()
     {
-        return $this->discoverSensor('snr', 'realtimeMonitorSignalToNoiseRatio', '.1.3.6.1.4.1.21013.1.2.24.7.1.9.');
+        return $this->discoverSensor(WirelessSensorType::Snr, 'realtimeMonitorSignalToNoiseRatio', '.1.3.6.1.4.1.21013.1.2.24.7.1.9.');
     }
 
     /**
@@ -172,10 +173,10 @@ class XirrusAos extends OS implements
      */
     public function discoverWirelessUtilization()
     {
-        return $this->discoverSensor('utilization', 'realtimeMonitorDot11Busy', '.1.3.6.1.4.1.21013.1.2.24.7.1.11.');
+        return $this->discoverSensor(WirelessSensorType::Utilization, 'realtimeMonitorDot11Busy', '.1.3.6.1.4.1.21013.1.2.24.7.1.11.');
     }
 
-    private function discoverSensor($type, $oid, $oid_num_prefix)
+    private function discoverSensor(WirelessSensorType $type, $oid, $oid_num_prefix)
     {
         $names = $this->getCacheByIndex('realtimeMonitorIfaceName', 'XIRRUS-MIB');
         $nf = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], 'XIRRUS-MIB');
@@ -189,7 +190,7 @@ class XirrusAos extends OS implements
                 'xirrus',
                 $index,
                 $names[$index],
-                $type == 'frequency' ? WirelessSensor::channelToFrequency($entry[$oid]) : $entry[$oid]
+                $type === WirelessSensorType::Frequency ? WirelessSensor::channelToFrequency($entry[$oid]) : $entry[$oid]
             );
         }
 

@@ -25,6 +25,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
@@ -45,7 +46,7 @@ class Ligoos extends OS implements
         foreach ($data as $index => $entry) {
             $freq = $entry['ligoWiIfFrequency'] ? substr((string) $entry['ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
             $sensors[] = new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.32750.3.10.1.2.1.1.16.' . $index,
                 'ligoos',
@@ -66,7 +67,7 @@ class Ligoos extends OS implements
         foreach ($data as $index => $entry) {
             $freq = substr((string) $entry['ligoWiIfFrequency'], 0, 1) . 'G';
             $sensors[] = new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.32750.3.10.1.2.1.1.6.' . $index,
                 'ligoos',
@@ -87,7 +88,7 @@ class Ligoos extends OS implements
         foreach ($data as $index => $entry) {
             $freq = $entry['ligoWiIfFrequency'] ? substr((string) $entry['ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
             $sensors[] = new WirelessSensor(
-                'noise-floor',
+                WirelessSensorType::NoiseFloor,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.32750.3.10.1.2.1.1.15.' . $index,
                 'ligoos',
@@ -108,7 +109,7 @@ class Ligoos extends OS implements
         foreach ($data as $index => $entry) {
             $freq = $entry['ligoWiIfFrequency'] ? substr((string) $entry['ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
             $sensors[] = new WirelessSensor(
-                'quality',
+                WirelessSensorType::Quality,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.32750.3.10.1.2.1.1.12.' . $index,
                 'ligoos',

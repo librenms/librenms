@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
@@ -46,7 +47,7 @@ class Fortiextender extends OS implements
 
         $sinr = [];
         foreach ($sinr_group as $key => $sinr_entry) {
-            $sinr[] = new WirelessSensor('sinr', $this->getDeviceId(), $oid . $key, 'fortiextender', $key, 'Modem ' . $key);
+            $sinr[] = new WirelessSensor(WirelessSensorType::Sinr, $this->getDeviceId(), $oid . $key, 'fortiextender', $key, 'Modem ' . $key);
         }
 
         return $sinr;
@@ -59,7 +60,7 @@ class Fortiextender extends OS implements
 
         $rsrp = [];
         foreach ($rsrp_group as $key => $rsrp_entry) {
-            $rsrp[] = new WirelessSensor('rsrp', $this->getDeviceId(), $oid . $key, 'fortiextender', $key, 'Modem ' . $key);
+            $rsrp[] = new WirelessSensor(WirelessSensorType::Rsrp, $this->getDeviceId(), $oid . $key, 'fortiextender', $key, 'Modem ' . $key);
         }
 
         return $rsrp;
@@ -72,7 +73,7 @@ class Fortiextender extends OS implements
 
         $rsrq = [];
         foreach ($rsrq_group as $key => $rsrq_entry) {
-            $rsrq[] = new WirelessSensor('rsrq', $this->getDeviceId(), $oid . $key, 'fortiextender', $key, 'Modem ' . $key);
+            $rsrq[] = new WirelessSensor(WirelessSensorType::Rsrq, $this->getDeviceId(), $oid . $key, 'fortiextender', $key, 'Modem ' . $key);
         }
 
         return $rsrq;
@@ -85,7 +86,7 @@ class Fortiextender extends OS implements
 
         $rsrq = [];
         foreach ($rsrq_group as $key => $rsrq_entry) {
-            $rsrq[] = new WirelessSensor('rssi', $this->getDeviceId(), $oid . $key, 'fortiextender', $key, 'Modem ' . $key);
+            $rsrq[] = new WirelessSensor(WirelessSensorType::Rssi, $this->getDeviceId(), $oid . $key, 'fortiextender', $key, 'Modem ' . $key);
         }
 
         return $rsrq;

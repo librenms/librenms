@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -74,7 +75,7 @@ class Arubaos extends OS implements
         $oid = '.1.3.6.1.4.1.14823.2.2.1.1.3.2.0'; // WLSX-SWITCH-MIB::wlsxSwitchTotalNumStationsAssociated.0
 
         return [
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'arubaos', 1, 'Client Count'),
+            new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), $oid, 'arubaos', 1, 'Client Count'),
         ];
     }
 
@@ -122,7 +123,7 @@ class Arubaos extends OS implements
         }
 
         return [
-            new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'arubaos', 1, 'AP Count', $apCount, 1, 1, 'sum', null, null, $low_limit, null, $low_warn),
+            new WirelessSensor(WirelessSensorType::ApCount, $this->getDeviceId(), $oid, 'arubaos', 1, 'AP Count', $apCount, 1, 1, 'sum', null, null, $low_limit, null, $low_warn),
         ];
     }
 
@@ -135,7 +136,7 @@ class Arubaos extends OS implements
     public function discoverWirelessFrequency()
     {
         // instant
-        return $this->discoverInstantRadio('frequency', 'aiRadioChannel');
+        return $this->discoverInstantRadio(WirelessSensorType::Frequency, 'aiRadioChannel');
     }
 
     /**
@@ -147,7 +148,7 @@ class Arubaos extends OS implements
     public function discoverWirelessNoiseFloor()
     {
         // instant
-        return $this->discoverInstantRadio('noise-floor', 'aiRadioNoiseFloor');
+        return $this->discoverInstantRadio(WirelessSensorType::NoiseFloor, 'aiRadioNoiseFloor');
     }
 
     /**
@@ -159,7 +160,7 @@ class Arubaos extends OS implements
     public function discoverWirelessPower()
     {
         // instant
-        return $this->discoverInstantRadio('power', 'aiRadioTransmitPower', 'Radio %s: Tx Power');
+        return $this->discoverInstantRadio(WirelessSensorType::Power, 'aiRadioTransmitPower', 'Radio %s: Tx Power');
     }
 
     protected function decodeChannel($channel)
@@ -167,7 +168,7 @@ class Arubaos extends OS implements
         return Number::cast($channel) & 255; // mask off the channel width information
     }
 
-    private function discoverInstantRadio($type, $oid, $desc = 'Radio %s')
+    private function discoverInstantRadio(WirelessSensorType $type, $oid, $desc = 'Radio %s')
     {
         $data = SnmpQuery::numeric()->walk("AI-AP-MIB::$oid")->groupByIndex(1); // group by radio index
 
@@ -176,7 +177,7 @@ class Arubaos extends OS implements
             $value = reset($entry);
             $oid = key($entry);
 
-            if ($type == 'frequency') {
+            if ($type === WirelessSensorType::Frequency) {
                 $value = WirelessSensor::channelToFrequency($this->decodeChannel($value));
             }
 
@@ -203,7 +204,7 @@ class Arubaos extends OS implements
     public function discoverWirelessUtilization()
     {
         // instant
-        return $this->discoverInstantRadio('utilization', 'aiRadioUtilization64');
+        return $this->discoverInstantRadio(WirelessSensorType::Utilization, 'aiRadioUtilization64');
     }
 
     /**

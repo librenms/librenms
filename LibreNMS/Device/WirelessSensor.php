@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Device;
 
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Modules\Wireless;
 
 class WirelessSensor
@@ -36,7 +37,7 @@ class WirelessSensor
     /**
      * Sensor constructor. Create a new sensor to be discovered.
      *
-     * @param  string  $type  Class of this sensor, must be a supported class
+     * @param  WirelessSensorType  $type  Class of this sensor, must be a supported class
      * @param  int  $device_id  the device_id of the device that owns this sensor
      * @param  array|string  $oids  an array or single oid that contains the data for this sensor
      * @param  string  $subtype  the type of sensor an additional identifier to separate out sensors of the same class, generally this is the os name
@@ -55,7 +56,7 @@ class WirelessSensor
      * @param  int|float  $entPhysicalMeasured  the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
      */
     public function __construct(
-        protected $type,
+        protected WirelessSensorType $type,
         protected $device_id,
         $oids,
         protected $subtype,
@@ -74,7 +75,7 @@ class WirelessSensor
         protected $entPhysicalMeasured = null
     ) {
         $this->oids = (array) $oids;
-        $this->rrd_type = $this->type == 'errors' ? 'COUNTER' : 'GAUGE';
+        $this->rrd_type = $this->type === WirelessSensorType::Errors ? 'COUNTER' : 'GAUGE';
     }
 
     public function toModel(): \App\Models\WirelessSensor
@@ -197,7 +198,8 @@ class WirelessSensor
             $sensors = \App\Models\WirelessSensor::query()
                 ->when($device_id, fn ($q) => $q->where('device_id', $device_id))
                 ->groupBy('sensor_class')
-                ->pluck('sensor_class');
+                ->pluck('sensor_class')
+                ->map(fn (WirelessSensorType $class) => $class->value);
 
             return array_intersect_key($types, $sensors->flip()->all());
         }

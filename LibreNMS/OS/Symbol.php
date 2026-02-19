@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
 
@@ -47,7 +48,7 @@ class Symbol extends OS implements WirelessClientsDiscovery
             $oid = '.1.3.6.1.4.1.388.11.2.4.2.100.10.1.18.1';
 
             return [
-                new WirelessSensor('clients', $device['device_id'], $oid, 'symbol', 1, 'Clients'),
+                new WirelessSensor(WirelessSensorType::Clients, $device['device_id'], $oid, 'symbol', 1, 'Clients'),
             ];
         }
 

@@ -29,6 +29,7 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use App\Models\Location;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCapacityDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
@@ -92,7 +93,7 @@ class WisBridge extends OS implements
         $oid = '.1.3.6.1.4.1.62821.1.4.1.1.4.1'; //WIS-BRIDGE-MIB::wisRadioFreq.1
 
         return [
-            new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'wis-bridge', 1, 'Radio Frequency'),
+            new WirelessSensor(WirelessSensorType::Frequency, $this->getDeviceId(), $oid, 'wis-bridge', 1, 'Radio Frequency'),
         ];
     }
 
@@ -107,7 +108,7 @@ class WisBridge extends OS implements
         $oid = '.1.3.6.1.4.1.62821.1.4.6.1.4.1';
 
         return [
-            new WirelessSensor('capacity', $this->getDeviceId(), $oid, 'wis-bridge', 1, 'wisMax Capacity'),
+            new WirelessSensor(WirelessSensorType::Capacity, $this->getDeviceId(), $oid, 'wis-bridge', 1, 'wisMax Capacity'),
         ];
     }
 
@@ -123,7 +124,7 @@ class WisBridge extends OS implements
         $oid = '';
 
         return [
-            new WirelessSensor('ccq', $this->getDeviceId(), $oid, 'wis-bridge', 1, 'CCQ'),
+            new WirelessSensor(WirelessSensorType::Ccq, $this->getDeviceId(), $oid, 'wis-bridge', 1, 'CCQ'),
         ];
     }
 
@@ -138,7 +139,7 @@ class WisBridge extends OS implements
         $oid = '.1.3.6.1.4.1.62821.1.4.3.1.15.1'; //WIS-BRIDGE-MIB::wisWlStatStaCount.1
 
         return [
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'wis-bridge', 1, 'Clients'),
+            new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), $oid, 'wis-bridge', 1, 'Clients'),
         ];
     }
 
@@ -154,7 +155,7 @@ class WisBridge extends OS implements
         $oid = '';
 
         return [
-            new WirelessSensor('distance', $this->getDeviceId(), $oid, 'wis-bridge', 1, 'Distance', null, 1, 1000),
+            new WirelessSensor(WirelessSensorType::Distance, $this->getDeviceId(), $oid, 'wis-bridge', 1, 'Distance', null, 1, 1000),
         ];
     }
 
@@ -169,7 +170,7 @@ class WisBridge extends OS implements
         $oid = '.1.3.6.1.4.1.62821.1.4.3.1.8.1'; //WIS-BRIDGE-MIB::wisWlStatNoiseFloor.1
 
         return [
-            new WirelessSensor('noise-floor', $this->getDeviceId(), $oid, 'wis-bridge', 1, 'Noise Floor'),
+            new WirelessSensor(WirelessSensorType::NoiseFloor, $this->getDeviceId(), $oid, 'wis-bridge', 1, 'Noise Floor'),
         ];
     }
 
@@ -185,8 +186,8 @@ class WisBridge extends OS implements
         $rx_oid = '.1.3.6.1.4.1.62821.1.4.3.1.5.1'; //WIS-BRIDGE-MIB::wisWlStatSignal.1
 
         return [
-            new WirelessSensor('power', $this->getDeviceId(), $tx_oid, 'wis-bridge-tx', 1, 'Tx Power'),
-            new WirelessSensor('power', $this->getDeviceId(), $rx_oid, 'wis-bridge-rx', 1, 'Signal Level'),
+            new WirelessSensor(WirelessSensorType::Power, $this->getDeviceId(), $tx_oid, 'wis-bridge-tx', 1, 'Tx Power'),
+            new WirelessSensor(WirelessSensorType::Power, $this->getDeviceId(), $rx_oid, 'wis-bridge-rx', 1, 'Signal Level'),
         ];
     }
 
@@ -202,7 +203,7 @@ class WisBridge extends OS implements
         $oidAirMax = '';
 
         return [
-            new WirelessSensor('quality', $this->getDeviceId(), $oidAirMax, 'wis-bridge', 1, 'airMAX Quality'),
+            new WirelessSensor(WirelessSensorType::Quality, $this->getDeviceId(), $oidAirMax, 'wis-bridge', 1, 'airMAX Quality'),
         ];
     }
 
@@ -218,8 +219,8 @@ class WisBridge extends OS implements
         $rx_oid = '.1.3.6.1.4.1.62821.1.4.3.1.10.1'; //WIS-BRIDGE-MIB::wisWlStatRxRate.1
 
         return [
-            new WirelessSensor('rate', $this->getDeviceId(), $tx_oid, 'wis-bridge-tx', 1, 'Tx Rate'),
-            new WirelessSensor('rate', $this->getDeviceId(), $rx_oid, 'wis-bridge-rx', 1, 'Rx Rate'),
+            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), $tx_oid, 'wis-bridge-tx', 1, 'Tx Rate'),
+            new WirelessSensor(WirelessSensorType::Rate, $this->getDeviceId(), $rx_oid, 'wis-bridge-rx', 1, 'Rx Rate'),
         ];
     }
 
@@ -233,13 +234,13 @@ class WisBridge extends OS implements
     {
         $oid = '.1.3.6.1.4.1.62821.1.4.3.1.6.1'; //WIS-BRIDGE-MIB::wisWlStatRssi.1
         $sensors = [
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'wis-bridge', 0, 'Overall RSSI'),
+            new WirelessSensor(WirelessSensorType::Rssi, $this->getDeviceId(), $oid, 'wis-bridge', 0, 'Overall RSSI'),
         ];
 
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'wisRadioRssi', [], 'WIS-BRIDGE-MIB');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'rssi',
+                WirelessSensorType::Rssi,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.62821.1.4.2.1.2.' . $index,
                 'wis-bridge',
