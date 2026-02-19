@@ -271,7 +271,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     echo ' LLDP-MIB: ';
     $lldp_array = SnmpQuery::hideMib()->walk('LLDP-MIB::lldpRemTable')->table(3);
     if (! empty($lldp_array)) {
-        $lldp_remAddr_num = SnmpQuery::hideMib()->numeric()->walk('.1.0.8802.1.1.2.1.4.2.1.3');
+        $lldp_remAddr_num = SnmpQuery::hideMib()->numeric()->walk('.1.0.8802.1.1.2.1.4.2.1.3')->values();
         foreach ($lldp_remAddr_num as $key => $value) {
             $res = preg_match("/1\.0\.8802\.1\.1\.2\.1\.4\.2\.1\.3\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*).(([^\.]*)(\.([^\.]*))+)/", (string) $key, $matches);
             if ($res) {
