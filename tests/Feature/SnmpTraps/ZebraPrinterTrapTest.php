@@ -15,7 +15,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
 ESI-MIB::psOutput.7 ERROR CONDITION: HEAD OPEN
 TRAP,
-            'SNMP Trap: Zebra Printer - ERROR CONDITION: HEAD OPEN',
+            'ERROR CONDITION: HEAD OPEN',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 HEAD OPEN',
             [Severity::Warning, 'printer'],
         );
@@ -30,7 +30,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
 ESI-MIB::psOutput.7 ALERT: PAPER OUT
 TRAP,
-            'SNMP Trap: Zebra Printer - ALERT: PAPER OUT',
+            'ALERT: PAPER OUT',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 PAPER OUT',
             [Severity::Error, 'printer'],
         );
@@ -45,7 +45,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
 ESI-MIB::psOutput.7 ALERT: RIBBON OUT
 TRAP,
-            'SNMP Trap: Zebra Printer - ALERT: RIBBON OUT',
+            'ALERT: RIBBON OUT',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 RIBBON OUT',
             [Severity::Error, 'printer'],
         );
@@ -60,7 +60,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
 ESI-MIB::psOutput.7 ALERT: MEDIA LOW
 TRAP,
-            'SNMP Trap: Zebra Printer - ALERT: MEDIA LOW',
+            'ALERT: MEDIA LOW',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 MEDIA LOW',
             [Severity::Warning, 'printer'],
         );
@@ -75,7 +75,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
 ESI-MIB::psOutput.7 ALERT: PQ JOB COMPLETED
 TRAP,
-            'SNMP Trap: Zebra Printer - ALERT: PQ JOB COMPLETED',
+            'ALERT: PQ JOB COMPLETED',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 PQ JOB COMPLETED',
             [Severity::Info, 'printer'],
         );
@@ -90,7 +90,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
 ESI-MIB::psOutput.7 ALERT: CUTTER JAM
 TRAP,
-            'SNMP Trap: Zebra Printer - ALERT: CUTTER JAM',
+            'ALERT: CUTTER JAM',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 CUTTER JAM',
             [Severity::Error, 'printer'],
         );
@@ -105,7 +105,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:37.14
 SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.2
 ESI-MIB::psOutput.7 ERROR CLEARED: HEAD OPEN
 TRAP,
-            'SNMP Trap: Zebra Printer - ERROR CLEARED: HEAD OPEN',
+            'ERROR CLEARED: HEAD OPEN',
             'Failed to handle ZEBRA-QL-MIB::zebra.1.0.2 alert cleared',
             [Severity::Ok, 'printer'],
         );
