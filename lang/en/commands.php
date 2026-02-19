@@ -124,7 +124,9 @@ return [
             'device spec' => 'Device spec to discover: device_id, hostname, wildcard (*), odd, even, all',
         ],
         'options' => [
-            'module' => 'Specify module(s) to be run. submodules may be added with /.  Multiple values allowed.',
+            'modules' => 'Specify module(s) to be run. submodules may be added with /.  Multiple values allowed.',
+            'os' => 'Discover devices only with specified operating system',
+            'type' => 'Discover devices only with specified type',
         ],
         'errors' => [
             'none_up' => 'Device was down, unable to discover.|All devices were down, unable to discover.',
@@ -153,6 +155,8 @@ return [
         'options' => [
             'modules' => 'Specify single module to be run. Comma separate modules, submodules may be added with /',
             'no-data' => 'Do not update datastores (RRD, InfluxDB, etc)',
+            'os' => 'Poll devices only with specified operating system',
+            'type' => 'Poll devices only with specified type',
         ],
         'errors' => [
             'none_up' => 'Device was down, unable to poll.|All devices were down, unable to poll.',

@@ -26,11 +26,11 @@ namespace App\Http\Controllers\Auth;
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Config;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 use LibreNMS\Exceptions\AuthenticationException;
@@ -103,7 +103,7 @@ class SocialiteController extends Controller
             return $socialite->getServiceProviderMetadata();
         }
 
-        return abort(404);
+        abort(404);
     }
 
     private function login(string $provider): RedirectResponse

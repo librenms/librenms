@@ -52,7 +52,7 @@ class MempoolsController extends TableController
      */
     protected function baseQuery($request)
     {
-        if ($request->get('view') == 'graphs') {
+        if ($request->input('view') == 'graphs') {
             return Device::hasAccess($request->user())->has('mempools')->with('mempools');
         }
 
@@ -60,7 +60,7 @@ class MempoolsController extends TableController
             ->with(['device', 'device.location']);
 
         // join devices table to sort by hostname or search
-        if (array_key_exists('hostname', $request->get('sort', $this->default_sort)) || $request->get('searchPhrase')) {
+        if (array_key_exists('hostname', $request->input('sort', $this->default_sort)) || $request->input('searchPhrase')) {
             $query->join('devices', 'mempools.device_id', 'devices.device_id')
                 ->select('mempools.*');
         }

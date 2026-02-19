@@ -25,8 +25,6 @@ class PortTune extends LnmsCommand
      */
     public function handle(): int
     {
-        $this->configureOutputOptions();
-
         $port_spec = $this->getPortSpec();
 
         $devices = Device::whereDeviceSpec($this->argument('device spec'))->get();

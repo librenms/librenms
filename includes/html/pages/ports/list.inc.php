@@ -39,10 +39,11 @@ if (isset($vars['errors'])) {
             <thead>
                 <tr>
                     <th data-column-id="hostname" data-formatter="device">Device</th>
-                <th data-column-id="ifDescr"<?php echo $sort ?> data-formatter="port">Port</th>
+                    <th data-column-id="ifDescr"<?php echo $sort ?> data-formatter="port">Port</th>
                     <th data-column-id="secondsIfLastChange" data-converter="duration">Status Changed</th>
                     <th data-column-id="ifConnectorPresent" data-visible="false">Connected</th>
                     <th data-column-id="ifSpeed" data-converter="human-bps">Speed</th>
+					<th data-column-id="ifDuplex" data-css-class="green" data-formatter="duplex">Duplex</th>
                     <th data-column-id="ifMtu" data-visible="false">MTU</th>
                     <th data-column-id="ifInOctets_rate" data-searchable="false" data-css-class="green"
                         data-converter="human-bps">In
@@ -112,13 +113,23 @@ if (isset($vars['errors'])) {
             },
             'port': function (column, row) {
                 return row.port
+            },			
+            'duplex': function (column, row) {
+                const duplexValue = (row.ifDuplex || '').toLowerCase().trim();
+                switch (duplexValue) {
+                    case 'halfduplex':
+                        return "<i title='Half Duplex' data-toggle='tooltip' class='fa-solid fa-circle-half-stroke'></i>";
+                    case 'fullduplex':
+                        return "<i title='Full Duplex' data-toggle='tooltip' class='fa-solid fa-circle'></i>";
+                    default:
+                        return "<i title='No Duplex' data-toggle='tooltip' class='fa-regular fa-circle'></i>";
+                }
             }
         },
         templates: {
             search: "" // hide the generic search
         },
-        post: function ()
-{
+        post: function () {
             return {
                 device_id: '<?php echo htmlspecialchars($vars['device_id'] ?? ''); ?>',
                 hostname: '<?php echo htmlspecialchars($vars['hostname'] ?? ''); ?>',

@@ -45,12 +45,12 @@ class InventoryController extends SelectController
 
     protected function searchFields($request)
     {
-        return [$this->fieldToColumn($request->get('field'))];
+        return [$this->fieldToColumn($request->input('field'))];
     }
 
     protected function baseQuery($request)
     {
-        $column = $this->fieldToColumn($request->get('field'));
+        $column = $this->fieldToColumn($request->input('field'));
 
         return EntPhysical::hasAccess($request->user())
             ->select($column)

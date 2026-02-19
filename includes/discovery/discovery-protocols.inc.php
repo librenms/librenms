@@ -326,13 +326,25 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
 
     if (! empty($lldpv2_array)) {
         // map it to lldp_array
-        foreach ($lldpv2_array as $lldpV2RemTimeMark => $value) {
-            foreach ($value as $lldpV2RemLocalIfIndex => $value) {
-                foreach ($value as $lldpV2RemLocalDestMACAddress => $value) {
-                    foreach ($value as $lldpV2RemIndex => $lldpv2_array_entries) {
-                        foreach ($lldpv2_array_entries as $key => $value) {
+        foreach ($lldpv2_array as $lldpV2RemTimeMark => $timeMark_data) {
+            if (! is_array($timeMark_data)) {
+                continue;
+            }
+            foreach ($timeMark_data as $lldpV2RemLocalIfIndex => $ifIndex_data) {
+                if (! is_array($ifIndex_data)) {
+                    continue;
+                }
+                foreach ($ifIndex_data as $lldpV2RemLocalDestMACAddress => $mac_data) {
+                    if (! is_array($mac_data)) {
+                        continue;
+                    }
+                    foreach ($mac_data as $lldpV2RemIndex => $lldpv2_array_entries) {
+                        if (! is_array($lldpv2_array_entries)) {
+                            continue;
+                        }
+                        foreach ($lldpv2_array_entries as $key => $entry_value) {
                             $newKey = $mapV2toV1[$key] ?? $key;
-                            $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex][$newKey] = $value;
+                            $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex][$newKey] = $entry_value;
                         }
                         $lldp_array[$lldpV2RemTimeMark][$lldpV2RemLocalIfIndex][$lldpV2RemIndex]['lldpRemLocalDestMACAddress'] = $lldpV2RemLocalDestMACAddress;
                     }

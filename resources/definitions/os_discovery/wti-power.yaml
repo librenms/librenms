@@ -1,4 +1,3 @@
-mib: WTI-POWER-MIB
 modules:
     os:
         hardware:
@@ -7,11 +6,12 @@ modules:
         state:
             data:
                 -
-                    oid: plugTable
-                    value: plugStatus
+                    oid: WTI-POWER-MIB::plugTable
+                    value: WTI-POWER-MIB::plugStatus
                     num_oid: '.1.3.6.1.4.1.2634.3.100.200.1.3.{{ $index }}'
+                    state_name: plugTable
                     index: 'plugStatus.{{ $index }}'
-                    descr: '{{ $plugName }} State'
+                    descr: '{{ WTI-POWER-MIB::plugName }} State'
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: outletOn }
                         - { value: 0, generic: 3, graph: 0, descr: outletOff }
@@ -20,170 +20,170 @@ modules:
         temperature:
             data:
                 -
-                    oid: environmentUnitTemperature
+                    oid: WTI-POWER-MIB::environmentUnitTemperature
                     num_oid: '.1.3.6.1.4.1.2634.3.200.10.1.3.{{ $index }}'
                     index: 'environmentUnitTemperature.{{ $index }}'
                     descr: 'Unit temperature'
         voltage:
             data:
                 -
-                    oid: environmentUnitVoltageA
+                    oid: WTI-POWER-MIB::environmentUnitVoltageA
                     num_oid: '.1.3.6.1.4.1.2634.3.200.10.1.5.{{ $index }}'
                     index: 'environmentUnitVoltageA.{{ $index }}'
                     descr: 'Branch A Voltage'
                     skip_values:
                     -
-                      oid: environmentUnitVoltageA.1
+                      oid: WTI-POWER-MIB::environmentUnitVoltageA.1
                       op: '=='
                       value: "0"
                 -
-                    oid: environmentUnitVoltageB
+                    oid: WTI-POWER-MIB::environmentUnitVoltageB
                     num_oid: '.1.3.6.1.4.1.2634.3.200.10.1.8.{{ $index }}'
                     index: 'environmentUnitVoltageB.{{ $index }}'
                     descr: 'Branch B Voltage'
                     skip_values:
                     -
-                      oid: environmentUnitVoltageB.1
+                      oid: WTI-POWER-MIB::environmentUnitVoltageB.1
                       op: '=='
                       value: "0"
                 -
-                    oid: environmentUnitVoltageC
+                    oid: WTI-POWER-MIB::environmentUnitVoltageC
                     num_oid: '.1.3.6.1.4.1.2634.3.200.10.1.11.{{ $index }}'
                     index: 'environmentUnitVoltageC.{{ $index }}'
                     descr: 'Branch C Voltage'
                     skip_values:
                     -
-                      oid: environmentUnitVoltageC.1
+                      oid: WTI-POWER-MIB::environmentUnitVoltageC.1
                       op: '=='
                       value: "0"
                 -
-                    oid: environmentUnitVoltageD
+                    oid: WTI-POWER-MIB::environmentUnitVoltageD
                     num_oid: '.1.3.6.1.4.1.2634.3.200.10.1.14.{{ $index }}'
                     index: 'environmentUnitVoltageD.{{ $index }}'
                     descr: 'Branch D Voltage'
                     skip_values:
                     -
-                      oid: environmentUnitVoltageD.1
+                      oid: WTI-POWER-MIB::environmentUnitVoltageD.1
                       op: '=='
                       value: "0"
         current:
             data:
                 -
-                    oid: plugTable
-                    value: plugCurrent
+                    oid: WTI-POWER-MIB::plugTable
+                    value: WTI-POWER-MIB::plugCurrent
                     num_oid: '.1.3.6.1.4.1.2634.3.100.200.1.7.{{ $index }}'
                     index: 'plugCurrent.{{ $index }}'
-                    descr: '{{ $plugName }} Current'
+                    descr: '{{ WTI-POWER-MIB::plugName }} Current'
                     divisor: 10
                 -
-                    oid: environmentTables
-                    value: environmentSystemTotalCurrent
+                    oid: WTI-POWER-MIB::environmentTables
+                    value: WTI-POWER-MIB::environmentSystemTotalCurrent
                     num_oid: '.1.3.6.1.4.1.2634.3.200.60.{{ $index }}'
                     index: 'environmentSystemTotalCurrent.{{ $index }}'
                     descr: 'Total Unit Current'
                     divisor: 10
                 -
-                    oid: environmentTables
-                    value: environmentBranchATotalCurrent
+                    oid: WTI-POWER-MIB::environmentTables
+                    value: WTI-POWER-MIB::environmentBranchATotalCurrent
                     num_oid: '.1.3.6.1.4.1.2634.3.200.20.{{ $index }}'
                     index: 'environmentBranchATotalCurrent.{{ $index }}'
                     descr: 'Branch A Current'
                     divisor: 10
                     skip_values:
                     -
-                      oid: environmentUnitVoltageA.1
+                      oid: WTI-POWER-MIB::environmentUnitVoltageA.1
                       op: '=='
                       value: "0"
                 -
-                    oid: environmentTables
-                    value: environmentBranchBTotalCurrent
+                    oid: WTI-POWER-MIB::environmentTables
+                    value: WTI-POWER-MIB::environmentBranchBTotalCurrent
                     num_oid: '.1.3.6.1.4.1.2634.3.200.40.{{ $index }}'
                     index: 'environmentBranchBTotalCurrent.{{ $index }}'
                     descr: 'Branch B Current'
                     divisor: 10
                     skip_values:
                     -
-                      oid: environmentUnitVoltageB.1
+                      oid: WTI-POWER-MIB::environmentUnitVoltageB.1
                       op: '=='
                       value: "0"
                 -
-                    oid: environmentTables
-                    value: environmentBranchCTotalCurrent
+                    oid: WTI-POWER-MIB::environmentTables
+                    value: WTI-POWER-MIB::environmentBranchCTotalCurrent
                     num_oid: '.1.3.6.1.4.1.2634.3.200.51.{{ $index }}'
                     index: 'environmentBranchCTotalCurrent.{{ $index }}'
                     descr: 'Branch C Current'
                     divisor: 10
                     skip_values:
                     -
-                      oid: environmentUnitVoltageC.1
+                      oid: WTI-POWER-MIB::environmentUnitVoltageC.1
                       op: '=='
                       value: "0"
                 -
-                    oid: environmentTables
-                    value: environmentBranchDTotalCurrent
+                    oid: WTI-POWER-MIB::environmentTables
+                    value: WTI-POWER-MIB::environmentBranchDTotalCurrent
                     num_oid: '.1.3.6.1.4.1.2634.3.200.53.{{ $index }}'
                     index: 'environmentBranchDTotalCurrent.{{ $index }}'
                     descr: 'Branch D Current'
                     divisor: 10
                     skip_values:
                     -
-                      oid: environmentUnitVoltageD.1
+                      oid: WTI-POWER-MIB::environmentUnitVoltageD.1
                       op: '=='
                       value: "0"
         power:
             data:
                 -
-                    oid: plugTable
-                    value: plugPower
+                    oid: WTI-POWER-MIB::plugTable
+                    value: WTI-POWER-MIB::plugPower
                     num_oid: '.1.3.6.1.4.1.2634.3.100.200.1.8.{{ $index }}'
                     index: 'plugPower.{{ $index }}'
-                    descr: '{{ $plugName }} Power'
+                    descr: '{{ WTI-POWER-MIB::plugName }} Power'
                 -
-                    oid: environmentSystemTotalPower
+                    oid: WTI-POWER-MIB::environmentSystemTotalPower
                     num_oid: '.1.3.6.1.4.1.2634.3.200.70.{{ $index }}'
                     index: 'environmentSystemTotalPower.{{ $index }}'
                     descr: 'Total Unit Power'
                 -
-                    oid: environmentTables
-                    value: environmentBranchATotalPower
+                    oid: WTI-POWER-MIB::environmentTables
+                    value: WTI-POWER-MIB::environmentBranchATotalPower
                     num_oid: '.1.3.6.1.4.1.2634.3.200.30.{{ $index }}'
                     index: 'environmentBranchATotalPower.{{ $index }}'
                     descr: 'Branch A Power'
                     skip_values:
                     -
-                      oid: environmentUnitVoltageA.1
+                      oid: WTI-POWER-MIB::environmentUnitVoltageA.1
                       op: '=='
                       value: "0"
                 -
-                    oid: environmentTables
-                    value: environmentBranchBTotalPower
+                    oid: WTI-POWER-MIB::environmentTables
+                    value: WTI-POWER-MIB::environmentBranchBTotalPower
                     num_oid: '.1.3.6.1.4.1.2634.3.200.50.{{ $index }}'
                     index: 'environmentBranchBTotalPower.{{ $index }}'
                     descr: 'Branch B Power'
                     skip_values:
                     -
-                      oid: environmentUnitVoltageB.1
+                      oid: WTI-POWER-MIB::environmentUnitVoltageB.1
                       op: '=='
                       value: "0"
                 -
-                    oid: environmentTables
-                    value: environmentBranchCTotalPower
+                    oid: WTI-POWER-MIB::environmentTables
+                    value: WTI-POWER-MIB::environmentBranchCTotalPower
                     num_oid: '.1.3.6.1.4.1.2634.3.200.52.{{ $index }}'
                     index: 'environmentBranchCTotalPower.{{ $index }}'
                     descr: 'Branch C Power'
                     skip_values:
                     -
-                      oid: environmentUnitVoltageC.1
+                      oid: WTI-POWER-MIB::environmentUnitVoltageC.1
                       op: '=='
                       value: "0"
                 -
-                    oid: environmentTables
-                    value: environmentBranchDTotalPower
+                    oid: WTI-POWER-MIB::environmentTables
+                    value: WTI-POWER-MIB::environmentBranchDTotalPower
                     num_oid: '.1.3.6.1.4.1.2634.3.200.54.{{ $index }}'
                     index: 'environmentBranchDTotalPower.{{ $index }}'
                     descr: 'Branch D Power'
                     skip_values:
                     -
-                      oid: environmentUnitVoltageD.1
+                      oid: WTI-POWER-MIB::environmentUnitVoltageD.1
                       op: '=='
                       value: "0"

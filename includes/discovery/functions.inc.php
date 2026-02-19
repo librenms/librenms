@@ -12,7 +12,6 @@
  * See COPYING for more details.
  */
 
-use App\Actions\Device\CheckDeviceAvailability;
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
@@ -121,86 +120,6 @@ function discover_new_device($hostname, $device, $method, $interface = null)
     return false;
 }
 //end discover_new_device()
-
-/**
- * @param  array  $device  The device to poll
- * @param  bool  $force_module  Ignore device module overrides
- * @return bool if the device was discovered or skipped
- */
-function discover_device(&$device, $force_module = false)
-{
-    DeviceCache::setPrimary($device['device_id']);
-    App::forgetInstance('sensor-discovery');
-
-    if ($device['snmp_disable'] == '1') {
-        return true;
-    }
-
-    global $valid;
-
-    $valid = [];
-
-    // Start counting device poll time
-    echo $device['hostname'] . ' ' . $device['device_id'] . ' ' . $device['os'] . ' ';
-
-    if (! app(CheckDeviceAvailability::class)->execute(DeviceCache::getPrimary())) {
-        Log::error('%RDOWN%n', ['color' => true]);
-
-        return false;
-    }
-
-    $discovery_modules = ['core' => true] + LibrenmsConfig::get('discovery_modules', []);
-
-    /** @var \App\Polling\Measure\MeasurementManager $measurements */
-    $measurements = app(\App\Polling\Measure\MeasurementManager::class);
-    $measurements->checkpoint(); // don't count previous stats
-
-    foreach ($discovery_modules as $module => $module_status) {
-        $os_module_status = LibrenmsConfig::getOsSetting($device['os'], "discovery_modules.$module");
-        $device_module_status = DeviceCache::getPrimary()->getAttrib('discover_' . $module);
-        Log::debug('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
-        Log::debug('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
-        Log::debug('Device' . ($device_module_status !== null ? ($device_module_status ? '+ ' : '- ') : '  '));
-        if ($force_module === true ||
-            $device_module_status ||
-            ($os_module_status && $device_module_status === null) ||
-            ($module_status && ! isset($os_module_status) && $device_module_status === null)
-        ) {
-            $module_start = microtime(true);
-            $start_memory = memory_get_usage();
-            echo "\n#### Load disco module $module ####\n";
-
-            try {
-                include "includes/discovery/$module.inc.php";
-            } catch (Throwable $e) {
-                // Re-throw exception if we're in running tests
-                if (defined('PHPUNIT_RUNNING')) {
-                    throw $e;
-                }
-
-                // isolate module exceptions so they don't disrupt the polling process
-                Eventlog::log("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Severity::Error);
-                report($e);
-            }
-
-            $module_time = microtime(true) - $module_start;
-            $module_time = substr($module_time, 0, 5);
-            $module_mem = (memory_get_usage() - $start_memory);
-            printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
-            $measurements->printChangedStats();
-            echo "#### Unload disco module $module ####\n\n";
-        } elseif ($device_module_status == '0') {
-            echo "Module [ $module ] disabled on host.\n\n";
-        } elseif (isset($os_module_status) && $os_module_status == '0') {
-            echo "Module [ $module ] disabled on os.\n\n";
-        } else {
-            echo "Module [ $module ] disabled globally.\n\n";
-        }
-    }
-
-    return true;
-}
-//end discover_device()
 
 // Discover sensors
 function discover_sensor($unused, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE'): bool
@@ -609,17 +528,18 @@ function sensors($types, $os, $pre_cache = [])
     $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
         echo ucfirst((string) $sensor_class) . ': ';
-        $dir = LibrenmsConfig::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
 
-        if (isset($device['os_group']) && is_file($dir . $device['os_group'] . '.inc.php')) {
-            include $dir . $device['os_group'] . '.inc.php';
+        if (isset($device['os_group']) && is_file(base_path("includes/discovery/sensors/$sensor_class/{$device['os_group']}.inc.php"))) {
+            include base_path("includes/discovery/sensors/$sensor_class/{$device['os_group']}.inc.php");
         }
-        if (is_file($dir . $device['os'] . '.inc.php')) {
-            include $dir . $device['os'] . '.inc.php';
+        $os_file = base_path("includes/discovery/sensors/$sensor_class/{$device['os']}.inc.php");
+        if (is_file($os_file)) {
+            include $os_file;
         }
         if (LibrenmsConfig::getOsSetting($device['os'], 'rfc1628_compat', false)) {
-            if (is_file($dir . '/rfc1628.inc.php')) {
-                include $dir . '/rfc1628.inc.php';
+            $ups_file = base_path("includes/discovery/sensors/$sensor_class/rfc1628.inc.php");
+            if (is_file($ups_file)) {
+                include $ups_file;
             }
         }
         discovery_process($os, $sensor_class, $pre_cache);

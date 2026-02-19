@@ -626,9 +626,6 @@ return [
             'description' => 'Tune alle RRD port Dateien zur Nutzung maximaler Werte',
             'help' => 'Automatisches Tuning auf maximale Werte für RRD port Dateien',
         ],
-        'sfdp' => [
-            'description' => 'Pfad zu sfdp',
-        ],
         'shorthost_target_length' => [
             'description' => 'Verkürzt einen Hostnamen auf diese maximale Länge',
             'help' => 'Kürzt einen Hostnamen auf diese maximale Länge, aber beinhaltet immer die maximal mögliche Subdomain',

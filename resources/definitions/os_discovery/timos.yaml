@@ -1,4 +1,3 @@
-mib: TIMETRA-SYSTEM-MIB:TIMETRA-CHASSIS-MIB:TIMETRA-SUBSCRIBER-MGMT-MIB:TIMETRA-CELLULAR-MIB:IF-MIB:ALU-MICROWAVE-MIB
 modules:
     mempools:
         data:
@@ -15,7 +14,7 @@ modules:
     processors:
         data:
             -
-                oid: sgiCpuUsage
+                oid: TIMETRA-SYSTEM-MIB::sgiCpuUsage
                 num_oid: '.1.3.6.1.4.1.6527.3.1.2.1.1.1.{{ $index }}'
 
     sensors:
@@ -23,17 +22,17 @@ modules:
             data:
                 -
                     oid:
-                        - ifName
-                        - tmnxCellPdnApn
-                        - tmnxPortAdminStatus
-                        - tmnxPortSFPNumLanes
+                        - IF-MIB::ifName
+                        - TIMETRA-CELLULAR-MIB::tmnxCellPdnApn
+                        - TIMETRA-PORT-MIB::tmnxPortAdminStatus
+                        - TIMETRA-PORT-MIB::tmnxPortSFPNumLanes
         state:
             data:
                 -
-                    oid: tmnxHwTable
-                    value: tmnxHwAlarmState
+                    oid: TIMETRA-CHASSIS-MIB::tmnxHwTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxHwAlarmState
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.8.1.24.{{ $index }}'
-                    descr: '{{ $tmnxHwName }} {{ $tmnxHwSerialNumber }} {{ $tmnxHwFailureReason }}'
+                    descr: '{{ TIMETRA-CHASSIS-MIB::tmnxHwName }} {{ TIMETRA-CHASSIS-MIB::tmnxHwSerialNumber }} {{ TIMETRA-CHASSIS-MIB::tmnxHwFailureReason }}'
                     index: 'tmnxHwID.{{ $index }}'
                     state_name: tmnxHwAlarmState
                     states:
@@ -41,8 +40,8 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: alarmActive }
                         - { value: 2, generic: 0, graph: 0, descr: alarmCleared }
                 -
-                    oid: tmnxChassisTable
-                    value: tmnxChassisCriticalLEDState
+                    oid: TIMETRA-CHASSIS-MIB::tmnxChassisTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxChassisCriticalLEDState
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.3.1.12.{{ $index }}'
                     descr: 'Critical LED'
                     state_name: tmnxChassisCriticalLEDState
@@ -59,8 +58,8 @@ modules:
                         - { value: 8, generic: 0, graph: 0, descr: GreenBlink }
                         - { value: 9, generic: 2, graph: 0, descr: RedBlink }
                 -
-                    oid: tmnxChassisTable
-                    value: tmnxChassisMajorLEDState
+                    oid: TIMETRA-CHASSIS-MIB::tmnxChassisTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxChassisMajorLEDState
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.3.1.13.{{ $index }}'
                     descr: 'Major LED'
                     state_name: tmnxChassisMajorLEDState
@@ -77,8 +76,8 @@ modules:
                         - { value: 8, generic: 0, graph: 0, descr: GreenBlink }
                         - { value: 9, generic: 2, graph: 0, descr: RedBlink }
                 -
-                    oid: tmnxChassisTable
-                    value: tmnxChassisMinorLEDState
+                    oid: TIMETRA-CHASSIS-MIB::tmnxChassisTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxChassisMinorLEDState
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.3.1.14.{{ $index }}'
                     state_name: tmnxChassisMinorLEDState
                     descr: 'Minor LED'
@@ -95,8 +94,8 @@ modules:
                         - { value: 8, generic: 0, graph: 0, descr: GreenBlink }
                         - { value: 9, generic: 2, graph: 0, descr: RedBlink }
                 -
-                    oid: tmnxChassisTable
-                    value: tmnxChassisOverTempState
+                    oid: TIMETRA-CHASSIS-MIB::tmnxChassisTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxChassisOverTempState
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.3.1.24.{{ $index }}'
                     descr: 'Chassis Over Temp'
                     index: 'tmnxChassisOverTempState.1'
@@ -105,9 +104,9 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: Ok }
                         - { value: 2, generic: 2, graph: 0, descr: OverTemp }
                 -
-                    oid: tmnxCellPortRegistrationStatus
+                    oid: TIMETRA-CELLULAR-MIB::tmnxCellPortRegistrationStatus
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.2.{{ $index }}'
-                    descr: 'Registration state {{ ifName }}'
+                    descr: 'Registration state {{ IF-MIB::ifName }}'
                     index: 'tmnxCellPortRegistrationStatus.{{ $index }}'
                     state_name: tmnxCellPortRegistrationStatus
                     states:
@@ -124,9 +123,9 @@ modules:
                         - { value: 10, generic: 0, graph: 0, descr: Csfb-not-preferred-roaming }
                     group: 'Cellular status'
                 -
-                    oid: tmnxCellPortWirelessTechnology
+                    oid: TIMETRA-CELLULAR-MIB::tmnxCellPortWirelessTechnology
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.3.{{ $index }}'
-                    descr: 'Wireless technology {{ ifName }}'
+                    descr: 'Wireless technology {{ IF-MIB::ifName }}'
                     index: 'tmnxCellPortWirelessTechnology.{{ $index }}'
                     state_name: tmnxCellPortWirelessTechnology
                     states:
@@ -136,9 +135,9 @@ modules:
                         - { value: 3, generic: 0, graph: 0, descr: Gsm }
                     group: 'Cellular status'
                 -
-                    oid: tmnxCellSimCardEquipped
+                    oid: TIMETRA-CELLULAR-MIB::tmnxCellSimCardEquipped
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.3.1.1.{{ $index }}'
-                    descr: 'Simcard {{ ifName:0 }}'
+                    descr: 'Simcard {{ IF-MIB::ifName:0 }}'
                     index: 'tmnxCellSimCardEquipped.{{ $index }}'
                     state_name: tmnxCellSimCardEquipped
                     states:
@@ -147,9 +146,9 @@ modules:
                     group: 'Cellular status'
                 -
 
-                    oid: tmnxCellPdnConnectionState
+                    oid: TIMETRA-CELLULAR-MIB::tmnxCellPdnConnectionState
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.4.1.1.{{ $index }}'
-                    descr: 'Pdn state {{ ifName:0 }} {{ $tmnxCellPdnApn }}'
+                    descr: 'Pdn state {{ IF-MIB::ifName:0 }} {{ TIMETRA-CELLULAR-MIB::tmnxCellPdnApn }}'
                     index: 'tmnxCellPdnConnectionState.{{ $index }}'
                     state_name: tmnxCellPdnConnectionState
                     states:
@@ -157,8 +156,8 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: Connected }
                     group: 'Cellular status'
                 -
-                    oid: tmnxPhysChassisFanEntry
-                    value: tmnxPhysChassisFanOperStatus
+                    oid: TIMETRA-CHASSIS-MIB::tmnxPhysChassisFanEntry
+                    value: TIMETRA-CHASSIS-MIB::tmnxPhysChassisFanOperStatus
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.24.1.1.2.{{ $index }}'
                     descr: 'Fan {{ $subindex2 }}'
                     index: 'tmnxPhysChassisFanOperStatus.{{ $index }}'
@@ -173,10 +172,10 @@ modules:
                         - { value: 6, generic: 1, graph: 0, descr: NotProvisioned }
                         - { value: 7, generic: 3, graph: 0, descr: NotApplicable }
                 -
-                    oid: aluMwRadioTable
-                    value: aluMwRadioAlarmState
+                    oid: ALU-MICROWAVE-MIB::aluMwRadioTable
+                    value: ALU-MICROWAVE-MIB::aluMwRadioAlarmState
                     num_oid: '.1.3.6.1.4.1.6527.6.1.2.2.7.1.2.1.12.{{ $index }}'
-                    descr: 'Current Alarm Severity {{ $aluMwRadioName }}'
+                    descr: 'Current Alarm Severity {{ ALU-MICROWAVE-MIB::aluMwRadioName }}'
                     index: 'aluMwRadioPortID.{{ $index }}'
                     state_name: 'aluMwRadioAlarmState'
                     states:
@@ -189,10 +188,10 @@ modules:
                         - { value: 6, generic: 0, graph: 0, descr: Unsupported }
                         - { value: 7, generic: 3, graph: 0, descr: Unknown }
                 -
-                    oid: aluMwRadioTable
-                    value: aluMwRadioTxMuted
+                    oid: ALU-MICROWAVE-MIB::aluMwRadioTable
+                    value: ALU-MICROWAVE-MIB::aluMwRadioTxMuted
                     num_oid: '.1.3.6.1.4.1.6527.6.1.2.2.7.1.2.1.20.{{ $index }}'
-                    descr: 'Tx Mute {{ $aluMwRadioName }}'
+                    descr: 'Tx Mute {{ ALU-MICROWAVE-MIB::aluMwRadioName }}'
                     index: 'aluMwRadioPortID.{{ $index }}'
                     state_name: 'aluMwRadioTxMuted'
                     states:
@@ -200,376 +199,720 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: None }
                         - { value: 2, generic: 1, graph: 0, descr: Manual }
                         - { value: 3, generic: 0, graph: 0, descr: Auto }
+                # ESA (Extended Services Appliance) Sensors
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsOperState
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.1.{{ $index }}'
+                    descr: 'ESA {{ $index }} Oper State'
+                    index: 'tmnxEsaStatsOperState.{{ $index }}'
+                    state_name: tmnxEsaStatsOperState
+                    group: 'ESA Status'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: inService }
+                        - { value: 3, generic: 1, graph: 0, descr: outOfService }
+                        - { value: 4, generic: 1, graph: 0, descr: booting }
+                        - { value: 5, generic: 2, graph: 0, descr: failed }
+                        - { value: 6, generic: 1, graph: 0, descr: provisioned }
+                        - { value: 7, generic: 1, graph: 0, descr: unprovisioned }
+                        - { value: 8, generic: 1, graph: 0, descr: upgrade }
+                        - { value: 9, generic: 1, graph: 0, descr: fwUpgrade }
+                        - { value: 10, generic: 1, graph: 0, descr: fwUpgradeNic }
+                        - { value: 11, generic: 1, graph: 0, descr: fwUpgradeSps }
+                        - { value: 12, generic: 1, graph: 0, descr: fwUpgradeSystemRom }
+                        - { value: 13, generic: 1, graph: 0, descr: fwUpgradeSetting }
+                        - { value: 14, generic: 1, graph: 0, descr: fwUpgradeBmc }
+                        - { value: 15, generic: 1, graph: 0, descr: fwUpgradeBmcSetting }
+                        - { value: 16, generic: 1, graph: 0, descr: fwUpgradeIe }
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsHardwareStatus
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.14.{{ $index }}'
+                    descr: 'ESA {{ $index }} Hardware Status'
+                    index: 'tmnxEsaStatsHardwareStatus.{{ $index }}'
+                    state_name: tmnxEsaStatsHardwareStatus
+                    group: 'ESA Status'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: ok }
+                        - { value: 3, generic: 1, graph: 0, descr: degraded }
+                        - { value: 4, generic: 2, graph: 0, descr: critical }
+                        - { value: 5, generic: 3, graph: 0, descr: unsupported }
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsPowerSupply1Status
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.15.{{ $index }}'
+                    descr: 'ESA {{ $index }} Power Supply 1'
+                    index: 'tmnxEsaStatsPowerSupply1Status.{{ $index }}'
+                    state_name: tmnxEsaDeviceState
+                    group: 'ESA Status'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: ok }
+                        - { value: 3, generic: 1, graph: 0, descr: degraded }
+                        - { value: 4, generic: 2, graph: 0, descr: failed }
+                        - { value: 5, generic: 3, graph: 0, descr: unsupported }
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsPowerSupply2Status
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.16.{{ $index }}'
+                    descr: 'ESA {{ $index }} Power Supply 2'
+                    index: 'tmnxEsaStatsPowerSupply2Status.{{ $index }}'
+                    state_name: tmnxEsaDeviceState
+                    group: 'ESA Status'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: ok }
+                        - { value: 3, generic: 1, graph: 0, descr: degraded }
+                        - { value: 4, generic: 2, graph: 0, descr: failed }
+                        - { value: 5, generic: 3, graph: 0, descr: unsupported }
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsFanStatus
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.20.{{ $index }}'
+                    descr: 'ESA {{ $index }} Fan Status'
+                    index: 'tmnxEsaStatsFanStatus.{{ $index }}'
+                    state_name: tmnxEsaDeviceState
+                    group: 'ESA Status'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: ok }
+                        - { value: 3, generic: 1, graph: 0, descr: degraded }
+                        - { value: 4, generic: 2, graph: 0, descr: failed }
+                        - { value: 5, generic: 3, graph: 0, descr: unsupported }
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTemperatureStatus
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.23.{{ $index }}'
+                    descr: 'ESA {{ $index }} Temperature Status'
+                    index: 'tmnxEsaStatsTemperatureStatus.{{ $index }}'
+                    state_name: tmnxEsaDeviceState
+                    group: 'ESA Status'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: unknown }
+                        - { value: 2, generic: 0, graph: 0, descr: ok }
+                        - { value: 3, generic: 1, graph: 0, descr: degraded }
+                        - { value: 4, generic: 2, graph: 0, descr: failed }
+                        - { value: 5, generic: 3, graph: 0, descr: unsupported }
+                # NAT ISA Member State Sensors
+                -
+                    oid: TIMETRA-NAT-MIB::tmnxNatIsaMemberTable
+                    value: TIMETRA-NAT-MIB::tmnxNatIsaMemberMdaState
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.65.1.1.3.2.1.2.{{ $index }}'
+                    descr: 'NAT ISA {{ $index }} State'
+                    index: 'tmnxNatIsaMemberMdaState.{{ $index }}'
+                    state_name: tmnxNatIsaMemberMdaState
+                    group: 'NAT ISA Status'
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: inactive }
+                        - { value: 2, generic: 0, graph: 0, descr: active }
+                        - { value: 3, generic: 1, graph: 0, descr: needsReset }
+                        - { value: 4, generic: 1, graph: 0, descr: resetting }
+                        - { value: 5, generic: 1, graph: 0, descr: needsReconcile }
+                        - { value: 6, generic: 1, graph: 0, descr: reconciling }
+                        - { value: 7, generic: 1, graph: 0, descr: needsAudit }
+                        - { value: 8, generic: 1, graph: 0, descr: auditing }
+                        - { value: 9, generic: 2, graph: 0, descr: failedBypass }
+                        - { value: 10, generic: 1, graph: 0, descr: activeBypass }
+                -
+                    oid: TIMETRA-NAT-MIB::tmnxNatIsaMemberTable
+                    value: TIMETRA-NAT-MIB::tmnxNatIsaMemberSessionUsageHi
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.65.1.1.3.2.1.9.{{ $index }}'
+                    descr: 'NAT ISA {{ $index }} Session High'
+                    index: 'tmnxNatIsaMemberSessionUsageHi.{{ $index }}'
+                    state_name: tmnxNatIsaMemberSessionUsageHi
+                    group: 'NAT ISA Status'
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: 'true' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'false' }
         temperature:
             data:
                 -
-                    oid: tmnxHwTable
-                    value: tmnxHwTemperature
+                    oid: TIMETRA-CHASSIS-MIB::tmnxHwTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxHwTemperature
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.8.1.18.{{ $index }}'
-                    descr: '{{ $tmnxHwName }}'
+                    descr: '{{ TIMETRA-CHASSIS-MIB::tmnxHwName }}'
                     index: 'tmnxHwID.{{ $index }}'
-                    high_limit: tmnxHwTempThreshold
+                    high_limit: TIMETRA-CHASSIS-MIB::tmnxHwTempThreshold
                     skip_values:
                         -
-                            oid: tmnxHwTempSensor
+                            oid: TIMETRA-CHASSIS-MIB::tmnxHwTempSensor
                             op: '='
                             value: 2
                 -
-                    oid: tmnxDigitalDiagMonitorTable
-                    value: tmnxDDMTemperature
+                    oid: TIMETRA-PORT-MIB::tmnxDigitalDiagMonitorTable
+                    value: TIMETRA-PORT-MIB::tmnxDDMTemperature
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.31.1.1.{{ $index }}'
-                    descr: '{{ ifName:1 }}'
+                    descr: '{{ IF-MIB::ifName:1 }}'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
                     index: '{{ $index }}'
-                    high_limit: tmnxDDMTempHiAlarm
-                    warn_limit: tmnxDDMTempHiWarning
-                    low_limit: tmnxDDMTempLowAlarm
-                    low_warn_limit: tmnxDDMTempLowWarning
+                    high_limit: TIMETRA-PORT-MIB::tmnxDDMTempHiAlarm
+                    warn_limit: TIMETRA-PORT-MIB::tmnxDDMTempHiWarning
+                    low_limit: TIMETRA-PORT-MIB::tmnxDDMTempLowAlarm
+                    low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMTempLowWarning
                     divisor: 256
+                    group: 'transceiver'
                 -
-                    oid: aluMwRadioInfoTable
-                    value: aluMwRadioTemperature
+                    oid: ALU-MICROWAVE-MIB::aluMwRadioInfoTable
+                    value: ALU-MICROWAVE-MIB::aluMwRadioTemperature
                     num_oid: '.1.3.6.1.4.1.6527.6.1.2.2.7.1.6.1.12.{{ $index }}'
-                    descr: 'RFU Temp {{ $aluMwRadioSerialNumber }}'
+                    descr: 'RFU Temp {{ ALU-MICROWAVE-MIB::aluMwRadioSerialNumber }}'
                     index: 'aluMwRadioPortID.{{ $index }}'
                     high_limit: '50'
                     low_limit: '-20'
+                -
+                    oid: TIMETRA-PORT-MIB::tmnxDDMLaneTable
+                    value: TIMETRA-PORT-MIB::tmnxDDMLaneTemperature
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.66.1.2.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName:1 }} Lane {{ $subindex2 }}'
+                    entPhysicalIndex: '{{ $subindex1 }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'tmnxDDMLaneTemperature.{{ $index }}'
+                    high_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTempHiAlarm
+                    warn_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTempHiWarn
+                    low_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTempLowAlarm
+                    low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTempLowWarn
+                    divisor: 256
+                    group: 'transceiver'
+                    skip_values:
+                        -
+                            oid: TIMETRA-PORT-MIB::tmnxDDMLaneTemperature
+                            op: '='
+                            value: 0
+                        -
+                            oid: TIMETRA-PORT-MIB::tmnxPortAdminStatus
+                            op: '='
+                            value: 3
+                # ESA Temperature Sensors
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsCpu1Temperature
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.24.{{ $index }}'
+                    descr: 'ESA {{ $index }} CPU 1'
+                    index: 'tmnxEsaStatsCpu1Temperature.{{ $index }}'
+                    high_limit: TIMETRA-CHASSIS-MIB::tmnxEsaStatsCpu1TempThreshold
+                    group: 'ESA Temperature'
+                    skip_values:
+                        -
+                            oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsCpu1Temperature
+                            op: '='
+                            value: 0
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsCpu2Temperature
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.25.{{ $index }}'
+                    descr: 'ESA {{ $index }} CPU 2'
+                    index: 'tmnxEsaStatsCpu2Temperature.{{ $index }}'
+                    high_limit: TIMETRA-CHASSIS-MIB::tmnxEsaStatsCpu2TempThreshold
+                    group: 'ESA Temperature'
+                    skip_values:
+                        -
+                            oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsCpu2Temperature
+                            op: '='
+                            value: 0
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsNic1Temperature
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.35.{{ $index }}'
+                    descr: 'ESA {{ $index }} NIC 1'
+                    index: 'tmnxEsaStatsNic1Temperature.{{ $index }}'
+                    high_limit: TIMETRA-CHASSIS-MIB::tmnxEsaStatsNic1TempThreshold
+                    group: 'ESA Temperature'
+                    skip_values:
+                        -
+                            oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsNic1Temperature
+                            op: '='
+                            value: 0
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsNic2Temperature
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.36.{{ $index }}'
+                    descr: 'ESA {{ $index }} NIC 2'
+                    index: 'tmnxEsaStatsNic2Temperature.{{ $index }}'
+                    high_limit: TIMETRA-CHASSIS-MIB::tmnxEsaStatsNic2TempThreshold
+                    group: 'ESA Temperature'
+                    skip_values:
+                        -
+                            oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsNic2Temperature
+                            op: '='
+                            value: 0
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsPowerSupply1Temp
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.17.{{ $index }}'
+                    descr: 'ESA {{ $index }} Power Supply 1'
+                    index: 'tmnxEsaStatsPowerSupply1Temp.{{ $index }}'
+                    group: 'ESA Temperature'
+                    skip_values:
+                        -
+                            oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsPowerSupply1Temp
+                            op: '='
+                            value: 0
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsPowerSupply2Temp
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.18.{{ $index }}'
+                    descr: 'ESA {{ $index }} Power Supply 2'
+                    index: 'tmnxEsaStatsPowerSupply2Temp.{{ $index }}'
+                    group: 'ESA Temperature'
+                    skip_values:
+                        -
+                            oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsPowerSupply2Temp
+                            op: '='
+                            value: 0
 
         current:
             data:
                 -
-                    oid: tmnxDigitalDiagMonitorTable
-                    value: tmnxDDMTxBiasCurrent
+                    oid: TIMETRA-PORT-MIB::tmnxDigitalDiagMonitorTable
+                    value: TIMETRA-PORT-MIB::tmnxDDMTxBiasCurrent
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.31.1.11.{{ $index }}'
-                    descr: '{{ ifName:1 }} Tx Bias'
+                    descr: '{{ IF-MIB::ifName:1 }} Tx Bias'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'tx-bias-{{ $index }}'
+                    index: 'tmnxDDMTxBiasCurrent.{{ $index }}'
                     divisor: 500000
-                    high_limit: tmnxDDMTxBiasCurrentHiAlarm
-                    warn_limit: tmnxDDMTxBiasCurrentHiWarning
-                    low_limit: tmnxDDMTxBiasCurrentLowAlarm
-                    low_warn_limit: tmnxDDMTxBiasCurrentLowWarning
+                    high_limit: TIMETRA-PORT-MIB::tmnxDDMTxBiasCurrentHiAlarm
+                    warn_limit: TIMETRA-PORT-MIB::tmnxDDMTxBiasCurrentHiWarning
+                    low_limit: TIMETRA-PORT-MIB::tmnxDDMTxBiasCurrentLowAlarm
+                    low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMTxBiasCurrentLowWarning
+                    group: 'transceiver'
                     skip_values:
                         -
-                            oid: tmnxDDMRxOpticalPower
+                            oid: TIMETRA-PORT-MIB::tmnxDDMRxOpticalPower
                             op: '<='
                             value: 0
                         -
-                            oid: tmnxPortAdminStatus
+                            oid: TIMETRA-PORT-MIB::tmnxPortAdminStatus
                             op: '='
                             value: 3
                 -
-                    oid: tmnxDDMLaneTable
-                    value: tmnxDDMLaneTxBiasCurrent
+                    oid: TIMETRA-PORT-MIB::tmnxDDMLaneTable
+                    value: TIMETRA-PORT-MIB::tmnxDDMLaneTxBiasCurrent
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.66.1.7.{{ $index }}'
-                    descr: '{{ ifName:1 }} Lane {{ $subindex2 }} Tx Bias'
+                    descr: '{{ IF-MIB::ifName:1 }} Lane {{ $subindex2 }} Tx Bias'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'tx-bias-{{ $index }}'
+                    index: 'tmnxDDMLaneTxBiasCurrent.{{ $index }}'
                     divisor: 500000
-                    high_limit: tmnxDDMLaneTxBiasCurrentHiAlarm
-                    warn_limit: tmnxDDMLaneTxBiasCurrentHiWarning
-                    low_limit: tmnxDDMLaneTxBiasCurrentLowAlarm
-                    low_warn_limit: tmnxDDMLaneTxBiasCurrentLowWarning
-                    group: '{{ ifName:1 }}'
+                    high_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxBiasCurrentHiAlarm
+                    warn_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxBiasCurrentHiWarning
+                    low_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxBiasCurrentLowAlarm
+                    low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxBiasCurrentLowWarning
+                    group: 'transceiver'
                     skip_values:
                         -
-                            oid: tmnxDDMLaneTxBiasCurrent
+                            oid: TIMETRA-PORT-MIB::tmnxDDMLaneTxBiasCurrent
                             op: '<='
                             value: 0
                         -
-                            oid: tmnxPortAdminStatus
+                            oid: TIMETRA-PORT-MIB::tmnxPortAdminStatus
                             op: '='
                             value: 3
         dbm:
             data:
                 -
-                    oid: tmnxDigitalDiagMonitorTable
-                    value: tmnxDDMRxOpticalPower
+                    oid: TIMETRA-PORT-MIB::tmnxDigitalDiagMonitorTable
+                    value: TIMETRA-PORT-MIB::tmnxDDMRxOpticalPower
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.31.1.21.{{ $index }}'
-                    descr: '{{ ifName:1 }} Rx'
+                    descr: '{{ IF-MIB::ifName:1 }} Rx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'rx-{{ $index }}'
+                    index: 'tmnxDDMRxOpticalPower.{{ $index }}'
                     divisor: 10
-                    high_limit: tmnxDDMRxOpticalPowerHiAlarm
-                    warn_limit: tmnxDDMRxOpticalPowerHiWarning
-                    low_limit: tmnxDDMRxOpticalPowerLowAlarm
-                    low_warn_limit: tmnxDDMRxOpticalPowerLowWarning
+                    high_limit: TIMETRA-PORT-MIB::tmnxDDMRxOpticalPowerHiAlarm
+                    warn_limit: TIMETRA-PORT-MIB::tmnxDDMRxOpticalPowerHiWarning
+                    low_limit: TIMETRA-PORT-MIB::tmnxDDMRxOpticalPowerLowAlarm
+                    low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMRxOpticalPowerLowWarning
                     user_func: 'uw_to_dbm'
-                    group: '{{ ifName:1 }}'
+                    group: 'transceiver'
                     skip_values:
                         -
-                            oid: tmnxPortAdminStatus
+                            oid: TIMETRA-PORT-MIB::tmnxPortAdminStatus
                             op: '='
                             value: 3
                         -
-                            oid: tmnxPortSFPNumLanes
+                            oid: TIMETRA-PORT-MIB::tmnxPortSFPNumLanes
                             op: '>'
                             value: 0
                 -
-                    oid: tmnxDigitalDiagMonitorTable
-                    value: tmnxDDMTxOutputPower
+                    oid: TIMETRA-PORT-MIB::tmnxDigitalDiagMonitorTable
+                    value: TIMETRA-PORT-MIB::tmnxDDMTxOutputPower
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.31.1.16.{{ $index }}'
-                    descr: '{{ ifName:1 }} Tx'
+                    descr: '{{ IF-MIB::ifName:1 }} Tx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'tx-{{ $index }}'
+                    index: 'tmnxDDMTxOutputPower.{{ $index }}'
                     divisor: 10
-                    high_limit: tmnxDDMTxOutputPowerHiAlarm
-                    warn_limit: tmnxDDMTxOutputPowerHiWarning
-                    low_limit: tmnxDDMTxOutputPowerLowAlarm
-                    low_warn_limit: tmnxDDMTxOutputPowerLowWarning
+                    high_limit: TIMETRA-PORT-MIB::tmnxDDMTxOutputPowerHiAlarm
+                    warn_limit: TIMETRA-PORT-MIB::tmnxDDMTxOutputPowerHiWarning
+                    low_limit: TIMETRA-PORT-MIB::tmnxDDMTxOutputPowerLowAlarm
+                    low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMTxOutputPowerLowWarning
                     user_func: 'uw_to_dbm'
-                    group: '{{ ifName:1 }}'
+                    group: 'transceiver'
                     skip_values:
                         -
-                            oid: tmnxPortAdminStatus
+                            oid: TIMETRA-PORT-MIB::tmnxPortAdminStatus
                             op: '='
                             value: 3
                         -
-                            oid: tmnxPortSFPNumLanes
+                            oid: TIMETRA-PORT-MIB::tmnxPortSFPNumLanes
                             op: '>'
                             value: 0
                 -
-                    oid: tmnxDDMLaneTable
-                    value: tmnxDDMLaneRxOpticalPower
+                    oid: TIMETRA-PORT-MIB::tmnxDDMLaneTable
+                    value: TIMETRA-PORT-MIB::tmnxDDMLaneRxOpticalPower
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.66.1.17.{{ $index }}'
-                    descr: '{{ ifName:1 }} Lane {{ $subindex2 }} Rx'
+                    descr: '{{ IF-MIB::ifName:1 }} Lane {{ $subindex2 }} Rx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'lane-rx-{{ $index }}'
+                    index: 'tmnxDDMLaneRxOpticalPower.{{ $index }}'
                     user_func: 'uw_to_dbm'
                     divisor: 10
-                    group: '{{ ifName:1 }}'
-                    high_limit: tmnxDDMLaneRxOpticalPwrHiAlarm
-                    warn_limit: tmnxDDMLaneRxOpticalPwrHiWarn
-                    low_limit: tmnxDDMLaneRxOpticalPwrLowAlarm
-                    low_warn_limit: tmnxDDMLaneRxOpticalPwrLowWarn
+                    group: 'transceiver'
+                    high_limit: TIMETRA-PORT-MIB::tmnxDDMLaneRxOpticalPwrHiAlarm
+                    warn_limit: TIMETRA-PORT-MIB::tmnxDDMLaneRxOpticalPwrHiWarn
+                    low_limit: TIMETRA-PORT-MIB::tmnxDDMLaneRxOpticalPwrLowAlarm
+                    low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMLaneRxOpticalPwrLowWarn
                     skip_values:
                         -
-                            oid: tmnxPortAdminStatus
+                            oid: TIMETRA-PORT-MIB::tmnxPortAdminStatus
                             op: '='
                             value: 3
                 -
-                    oid: tmnxDDMLaneTable
-                    value: tmnxDDMLaneTxOutputPower
+                    oid: TIMETRA-PORT-MIB::tmnxDDMLaneTable
+                    value: TIMETRA-PORT-MIB::tmnxDDMLaneTxOutputPower
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.66.1.12.{{ $index }}'
-                    descr: '{{ ifName:1 }} Lane {{ $subindex2 }} Tx'
+                    descr: '{{ IF-MIB::ifName:1 }} Lane {{ $subindex2 }} Tx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'lane-tx-{{ $index }}'
+                    index: 'tmnxDDMLaneTxOutputPower.{{ $index }}'
                     user_func: 'uw_to_dbm'
                     divisor: 10
-                    group: '{{ ifName:1 }}'
-                    high_limit: tmnxDDMLaneTxOutputPowerHiAlarm
-                    warn_limit: tmnxDDMLaneTxOutputPowerHiWarn
-                    low_limit: tmnxDDMLaneTxOutputPowerLowAlarm
-                    low_warn_limit: tmnxDDMLaneTxOutputPowerLowWarn
+                    group: 'transceiver'
+                    high_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxOutputPowerHiAlarm
+                    warn_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxOutputPowerHiWarn
+                    low_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxOutputPowerLowAlarm
+                    low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMLaneTxOutputPowerLowWarn
                     skip_values:
                         -
-                            oid: tmnxPortAdminStatus
+                            oid: TIMETRA-PORT-MIB::tmnxPortAdminStatus
                             op: '='
                             value: 3
+                -
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortStatsTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortRxPower
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.26.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName:1 }} Rx'
+                    entPhysicalIndex: '{{ $subindex1 }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'tmnxCohOptPortRxPower.{{ $index }}'
+                    divisor: 100
+                    group: 'transceiver'
+                -
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortStatsTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortTxPower
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.30.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName:1 }} Tx'
+                    entPhysicalIndex: '{{ $subindex1 }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'tmnxCohOptPortTxPower.{{ $index }}'
+                    divisor: 100
+                    group: 'transceiver'
         voltage:
             data:
                 -
-                    oid: tmnxDigitalDiagMonitorTable
-                    value: tmnxDDMSupplyVoltage
+                    oid: TIMETRA-PORT-MIB::tmnxDigitalDiagMonitorTable
+                    value: TIMETRA-PORT-MIB::tmnxDDMSupplyVoltage
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.31.1.6.{{ $index }}'
-                    descr: '{{ ifName:1 }}'
+                    descr: '{{ IF-MIB::ifName:1 }}'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: '{{ $index }}'
-                    high_limit: tmnxDDMSupplyVoltageHiAlarm
-                    warn_limit: tmnxDDMSupplyVoltageHiWarning
-                    low_limit: tmnxDDMSupplyVoltageLowAlarm
-                    low_warn_limit: tmnxDDMSupplyVoltageLowWarning
+                    index: 'tmnxDDMSupplyVoltage.{{ $index }}'
+                    high_limit: TIMETRA-PORT-MIB::tmnxDDMSupplyVoltageHiAlarm
+                    warn_limit: TIMETRA-PORT-MIB::tmnxDDMSupplyVoltageHiWarning
+                    low_limit: TIMETRA-PORT-MIB::tmnxDDMSupplyVoltageLowAlarm
+                    low_warn_limit: TIMETRA-PORT-MIB::tmnxDDMSupplyVoltageLowWarning
                     divisor: 10000
+                    group: 'transceiver'
 
         percent:
             data:
                 -
-                    oid: tmnxPhysChassisFanTable
-                    value: tmnxPhysChassisFanSpeedPercent
+                    oid: TIMETRA-CHASSIS-MIB::tmnxPhysChassisFanTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxPhysChassisFanSpeedPercent
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.24.1.1.5.{{ $index }}'
                     descr: 'Fan {{ $subindex2 }}'
                     group: 'Chassis {{ $subindex0 }}-{{ $subindex1 }}'
                     warn_limit: 90
                     high_limit: 95
                     low_limit: 0
-                    index: '{{ $index }}'
+                    index: 'tmnxPhysChassisFanSpeedPercent.{{ $index }}'
+                # NAT ISA Session Usage
+                -
+                    oid: TIMETRA-NAT-MIB::tmnxNatIsaMemberTable
+                    value: TIMETRA-NAT-MIB::tmnxNatIsaMemberSessionUsage
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.65.1.1.3.2.1.8.{{ $index }}'
+                    descr: 'NAT ISA {{ $index }} Session Usage'
+                    index: 'tmnxNatIsaMemberSessionUsage.{{ $index }}'
+                    group: 'NAT ISA Usage'
+                    high_limit: 95
+                    warn_limit: 80
+                # NAT Pool LSN Member Block Usage - moved to PHP for proper pool name parsing
         count:
             data:
                 -
-                    oid: tmnxSubMgmtSystStatsTable
-                    value: tmnxSubMgmtSystSSubscribers
+                    oid: TIMETRA-SUBSCRIBER-MGMT-MIB::tmnxSubMgmtSystStatsTable
+                    value: TIMETRA-SUBSCRIBER-MGMT-MIB::tmnxSubMgmtSystSSubscribers
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.33.1.107.1.65.{{ $index }}'
                     descr: 'Active subscribers on this system'
                     index: 'tmnxSubMgmtSystSSubscribers.{{ $index }}'
                     group: 'Subscribers'
                 -
-                    oid: tmnxSubMgmtSystStatsTable
-                    value: tmnxSubMgmtSystSV4
+                    oid: TIMETRA-SUBSCRIBER-MGMT-MIB::tmnxSubMgmtSystStatsTable
+                    value: TIMETRA-SUBSCRIBER-MGMT-MIB::tmnxSubMgmtSystSV4
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.33.1.107.1.25.{{ $index }}'
                     descr: 'V4 hosts on this system'
                     index: 'tmnxSubMgmtSystSV4.{{ $index }}'
                     group: 'Subscribers'
                 -
-                    oid: tmnxSubMgmtSystStatsTable
-                    value: tmnxSubMgmtSystSV6
+                    oid: TIMETRA-SUBSCRIBER-MGMT-MIB::tmnxSubMgmtSystStatsTable
+                    value: TIMETRA-SUBSCRIBER-MGMT-MIB::tmnxSubMgmtSystSV6
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.33.1.107.1.27.{{ $index }}'
                     descr: 'V6 hosts on this system'
                     index: 'tmnxSubMgmtSystSV6.{{ $index }}'
                     group: 'Subscribers'
                 -
-                    oid: tmnxSubMgmtSystStatsTable
-                    value: tmnxSubMgmtSystSTotal
+                    oid: TIMETRA-SUBSCRIBER-MGMT-MIB::tmnxSubMgmtSystStatsTable
+                    value: TIMETRA-SUBSCRIBER-MGMT-MIB::tmnxSubMgmtSystSTotal
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.33.1.107.1.33.{{ $index }}'
                     descr: 'Total hosts on this system'
                     index: 'tmnxSubMgmtSystSTotal.{{ $index }}'
                     group: 'Subscribers'
                 - 
-                    oid: tFPResTable
-                    value: tFPResEgrUserQueueAlloc
+                    oid: TIMETRA-CHASSIS-MIB::tFPResTable
+                    value: TIMETRA-CHASSIS-MIB::tFPResEgrUserQueueAlloc
                     index: 'tFPResEgrUserQueueAlloc.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.46.1.105.{{ $index }}'
                     group: 'Resource Usage'
                     descr: 'Card {{ $subindex1 }} Egress User Queues'
                 - 
-                    oid: tFPResTable
-                    value: tFPResSapIngQosPolAlloc
+                    oid: TIMETRA-CHASSIS-MIB::tFPResTable
+                    value: TIMETRA-CHASSIS-MIB::tFPResSapIngQosPolAlloc
                     index: 'tFPResSapIngQosPolAlloc.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.46.1.2.{{ $index }}'
                     group: 'Resource Usage'
                     descr: 'Card {{ $subindex1 }} Ingress QoS Policies'
                 - 
-                    oid: tFPResTable
-                    value: tFPResIngQueueAlloc
+                    oid: TIMETRA-CHASSIS-MIB::tFPResTable
+                    value: TIMETRA-CHASSIS-MIB::tFPResIngQueueAlloc
                     index: 'tFPResIngQueueAlloc.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.46.1.8.{{ $index }}'
                     group: 'Resource Usage'
                     descr: 'Card {{ $subindex1 }} Ingress Queues'
                 - 
-                    oid: tFPResTable
-                    value: tFPResMacFdbRecAlloc
+                    oid: TIMETRA-CHASSIS-MIB::tFPResTable
+                    value: TIMETRA-CHASSIS-MIB::tFPResMacFdbRecAlloc
                     index: 'tFPResMacFdbRecAlloc.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.46.1.70.{{ $index }}'
                     group: 'Resource Usage'
                     descr: 'Card {{ $subindex1 }} FDB Records'
                 - 
-                    oid: tFPResTable
-                    value: tFPResSapInstanceAlloc
+                    oid: TIMETRA-CHASSIS-MIB::tFPResTable
+                    value: TIMETRA-CHASSIS-MIB::tFPResSapInstanceAlloc
                     index: 'tFPResSapInstanceAlloc.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.46.1.90.{{ $index }}'
                     group: 'Resource Usage'
                     descr: 'Card {{ $subindex1 }} SAP Instances'
                 - 
-                    oid: tFPResTable
-                    value: tFPResPortForwardingIdAlloc
+                    oid: TIMETRA-CHASSIS-MIB::tFPResTable
+                    value: TIMETRA-CHASSIS-MIB::tFPResPortForwardingIdAlloc
                     index: 'tFPResPortForwardingIdAlloc.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.46.1.185.{{ $index }}'
                     group: 'Resource Usage'
                     descr: 'Card {{ $subindex1 }} Port Forwarding IDs'
                     skip_values:
                     -
-                        oid: tFPResPortForwardingIdTotal
+                        oid: TIMETRA-CHASSIS-MIB::tFPResPortForwardingIdTotal
                         op: '='
                         value: 0
                 -
-                    oid: tmnxCellPortFrequencyBand
+                    oid: TIMETRA-CELLULAR-MIB::tmnxCellPortFrequencyBand
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.4.{{ $index }}'
-                    descr: 'Interface {{ ifName }}'
+                    descr: 'Interface {{ IF-MIB::ifName }}'
                     index: 'tmnxCellPortFrequencyBand.{{ $index }}'
                     group: 'Frequency band'
                 -
-                    oid: tmnxCellularPortBearerTable
-                    value: tmnxCellPortBearerQci
+                    oid: TIMETRA-CELLULAR-MIB::tmnxCellularPortBearerTable
+                    value: TIMETRA-CELLULAR-MIB::tmnxCellPortBearerQci
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.5.1.3.{{ $index }}'
-                    descr: 'Interface {{ ifName:0 }}'
+                    descr: 'Interface {{ IF-MIB::ifName:0 }}'
                     index: 'tmnxCellularPortBearerTable.{{ $index }}'
                     group: 'QoS Class Identifier'
+                # ESA Resource Counts
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsCoresAvailable
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.2.{{ $index }}'
+                    descr: 'ESA {{ $index }} Cores Available'
+                    index: 'tmnxEsaStatsCoresAvailable.{{ $index }}'
+                    group: 'ESA Resources'
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsCoresAllocated
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.3.{{ $index }}'
+                    descr: 'ESA {{ $index }} Cores Allocated'
+                    index: 'tmnxEsaStatsCoresAllocated.{{ $index }}'
+                    group: 'ESA Resources'
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsMemoryAvailable
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.4.{{ $index }}'
+                    descr: 'ESA {{ $index }} Memory Available (GB)'
+                    index: 'tmnxEsaStatsMemoryAvailable.{{ $index }}'
+                    group: 'ESA Resources'
+                -
+                    oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
+                    value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsMemoryAllocated
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.74.1.5.{{ $index }}'
+                    descr: 'ESA {{ $index }} Memory Allocated (GB)'
+                    index: 'tmnxEsaStatsMemoryAllocated.{{ $index }}'
+                    group: 'ESA Resources'
+                # NAT ISA Member Counts
+                -
+                    oid: TIMETRA-NAT-MIB::tmnxNatIsaMemberTable
+                    value: TIMETRA-NAT-MIB::tmnxNatIsaMemberIpAddrReserved
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.65.1.1.3.2.1.6.{{ $index }}'
+                    descr: 'NAT ISA {{ $index }} IP Addresses Reserved'
+                    index: 'tmnxNatIsaMemberIpAddrReserved.{{ $index }}'
+                    group: 'NAT ISA Resources'
+                -
+                    oid: TIMETRA-NAT-MIB::tmnxNatIsaMemberTable
+                    value: TIMETRA-NAT-MIB::tmnxNatIsaMemberBlocksReserved
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.65.1.1.3.2.1.7.{{ $index }}'
+                    descr: 'NAT ISA {{ $index }} Port Blocks Reserved'
+                    index: 'tmnxNatIsaMemberBlocksReserved.{{ $index }}'
+                    group: 'NAT ISA Resources'
+                -
+                    oid: TIMETRA-NAT-MIB::tmnxNatIsaMemberTable
+                    value: TIMETRA-NAT-MIB::tmnxNatIsaMemberSessionsPrio
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.65.1.1.3.2.1.10.{{ $index }}'
+                    descr: 'NAT ISA {{ $index }} Prioritized Sessions'
+                    index: 'tmnxNatIsaMemberSessionsPrio.{{ $index }}'
+                    group: 'NAT ISA Resources'
         frequency:
             data:
                 -
-                    oid: aluMwRadioTable
-                    value: aluMwRadioFrequency
+                    oid: ALU-MICROWAVE-MIB::aluMwRadioTable
+                    value: ALU-MICROWAVE-MIB::aluMwRadioFrequency
                     num_oid: '.1.3.6.1.4.1.6527.6.1.2.2.7.1.2.1.11.{{ $index }}'
-                    descr: 'RFU Frequency Band {{ $aluMwRadioName }}'
+                    descr: 'RFU Frequency Band {{ ALU-MICROWAVE-MIB::aluMwRadioName }}'
                     multiplier: 1000000
                     index: 'aluMwRadioPortID.{{ $index }}'
                 -
-                    oid: tmnxCohOptPortStatsTable
-                    value: tmnxCohOptPortRxFreqOffset
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortStatsTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortRxFreqOffset
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.18.{{ $index }}'
-                    descr: 'Interface {{ ifName:1 }}'
+                    descr: 'Interface {{ IF-MIB::ifName:1 }}'
                     group: 'Rx Frequency Offset'
                     multiplier: 1000000
                     index: 'tmnxCohOptPortRxFreqOffset.{{ $index }}'
         ber:
             data:
                 -
-                    oid: tmnxCohOptPortStatsTable
-                    value: tmnxCohOptPortRxBER
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortStatsTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortRxBER
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.2.{{ $index }}'
-                    descr:  'Interface {{ ifName:1 }}'
+                    descr:  'Interface {{ IF-MIB::ifName:1 }}'
                     group: 'Rx Pre-FEC Bit Error Rate'
                     index: 'tmnxCohOptPortRxBER.{{ $index }}'
                     user_func: 'ieee754_to_decimal'
         snr:
             data:
                 -
-                    oid: tmnxCohOptPortStatsTable
-                    value: tmnxCohOptPortRxSNR
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortStatsTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortRxSNR
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.6.{{ $index }}'
-                    descr:  'Interface {{ ifName:1 }}'
+                    descr:  'Interface {{ IF-MIB::ifName:1 }}'
                     group: 'Rx Signal-to-Noise Ratio'
                     index: 'tmnxCohOptPortRxSNR.{{ $index }}'
                     divisor: 10
                 -
-                    oid: tmnxCohOptPortStatsTable
-                    value: tmnxCohOptPortRxOSNR
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortStatsTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortRxOSNR
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.34.{{ $index }}'
-                    descr:  'Interface {{ ifName:1 }}'
+                    descr:  'Interface {{ IF-MIB::ifName:1 }}'
                     group: 'Rx Optical Signal-to-Noise Ratio'
                     index: 'tmnxCohOptPortRxOSNR.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortOperTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortRxSNRXPolar
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.73.1.7.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName:1 }} X-Polarization'
+                    group: 'Rx Signal-to-Noise Ratio'
+                    index: 'tmnxCohOptPortRxSNRXPolar.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortOperTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortRxSNRYPolar
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.73.1.8.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName:1 }} Y-Polarization'
+                    group: 'Rx Signal-to-Noise Ratio'
+                    index: 'tmnxCohOptPortRxSNRYPolar.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortOperTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortRxOSNRXPolar
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.73.1.10.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName:1 }} X-Polarization'
+                    group: 'Rx Optical Signal-to-Noise Ratio'
+                    index: 'tmnxCohOptPortRxOSNRXPolar.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortOperTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortRxOSNRYPolar
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.73.1.11.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName:1 }} Y-Polarization'
+                    group: 'Rx Optical Signal-to-Noise Ratio'
+                    index: 'tmnxCohOptPortRxOSNRYPolar.{{ $index }}'
                     divisor: 10
         chromatic_dispersion:
             data:
                 -
-                    oid: tmnxCohOptPortStatsTable
-                    value: tmnxCohOptPortRxChromaticDisp
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortStatsTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortRxChromaticDisp
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.10.{{ $index }}'
-                    descr: 'Interface {{ ifName:1 }}'
+                    descr: 'Interface {{ IF-MIB::ifName:1 }}'
                     group: 'Rx Chromatic Dispersion'
                     index: 'tmnxCohOptPortRxChromaticDisp.{{ $index }}'
         delay:
             data:
                 -
-                    oid: tmnxCohOptPortStatsTable
-                    value: tmnxCohOptPortRxDiffGrpDly
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortStatsTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortRxDiffGrpDly
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.14.{{ $index }}'
-                    descr: 'Interface {{ ifName:1 }}'
+                    descr: 'Interface {{ IF-MIB::ifName:1 }}'
                     group: 'Rx Differential Group Delay'
                     index: 'tmnxCohOptPortRxDiffGrpDly.{{ $index }}'
                     divisor: 1000000000000
         quality_factor:
             data:
                 -
-                    oid: tmnxCohOptPortStatsTable
-                    value: tmnxCohOptPortRxQ
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortStatsTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortRxQ
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.22.{{ $index }}'
-                    descr: 'Interface {{ ifName:1 }} Q-Factor'
+                    descr: 'Interface {{ IF-MIB::ifName:1 }} Q-Factor'
                     group: 'Rx Quality Factor'
                     index: 'tmnxCohOptPortRxQ.{{ $index }}'
                     divisor: 10
                 -
-                    oid: tmnxCohOptPortOperTable
-                    value: tmnxCohOptPortRxQMargin
+                    oid: TIMETRA-PORT-MIB::tmnxCohOptPortOperTable
+                    value: TIMETRA-PORT-MIB::tmnxCohOptPortRxQMargin
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.73.1.9.{{ $index }}'
-                    descr: 'Interface {{ ifName:1 }} Q-Margin'
+                    descr: 'Interface {{ IF-MIB::ifName:1 }} Q-Margin'
                     group: 'Rx Quality Margin'
                     index: 'tmnxCohOptPortRxQMargin.{{ $index }}'
                     divisor: 10

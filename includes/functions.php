@@ -64,21 +64,6 @@ function parse_modules($type, $options)
     return $override;
 }
 
-function logfile($string)
-{
-    $file = LibrenmsConfig::get('log_file');
-    $fd = fopen($file, 'a');
-
-    if ($fd === false) {
-        print_error("Error: Could not write to log file: $file");
-
-        return;
-    }
-
-    fwrite($fd, $string . "\n");
-    fclose($fd);
-}
-
 function renamehost($id, $new, $source = 'console')
 {
     $host = gethostbyid($id);
@@ -142,37 +127,6 @@ function isDomainResolves($domain)
     $records = dns_get_record($domain);  // returns array or false
 
     return ! empty($records);
-}
-
-function match_network($nets, $ip, $first = false)
-{
-    $return = false;
-    if (! is_array($nets)) {
-        $nets = [$nets];
-    }
-    foreach ($nets as $net) {
-        $rev = (preg_match("/^\!/", (string) $net)) ? true : false;
-        $net = preg_replace("/^\!/", '', (string) $net);
-        $ip_arr = explode('/', (string) $net);
-        $net_long = ip2long($ip_arr[0]);
-        $x = ip2long($ip_arr[1]);
-        $mask = long2ip($x) == $ip_arr[1] ? $x : 0xFFFFFFFF << (32 - $ip_arr[1]);
-        $ip_long = ip2long($ip);
-        if ($rev) {
-            if (($ip_long & $mask) == ($net_long & $mask)) {
-                return false;
-            }
-        } else {
-            if (($ip_long & $mask) == ($net_long & $mask)) {
-                $return = true;
-            }
-            if ($first && $return) {
-                return true;
-            }
-        }
-    }
-
-    return $return;
 }
 
 // FIXME port to LibreNMS\Util\IPv6 class

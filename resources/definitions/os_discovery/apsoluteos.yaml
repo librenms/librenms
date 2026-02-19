@@ -1,16 +1,16 @@
-mib: RADWARE-MIB
 modules:
     processors:
         data:
             -
-                oid: rsWSDRSResourceUtilization
+                oid: RADWARE-MIB::rsWSDRSResourceUtilization
+                value: RADWARE-MIB::rsWSDRSResourceUtilization
                 num_oid: '.1.3.6.1.4.1.89.35.1.54.{{ $index }}'
     sensors:
         temperature:
             data:
                 -
-                    oid: rsHWCPUTemperatureTable
-                    value: rsHWCPUTemperatureValue
+                    oid: RADWARE-MIB::rsHWCPUTemperatureTable
+                    value: RADWARE-MIB::rsHWCPUTemperatureValue
                     num_oid: '.1.3.6.1.4.1.89.35.1.165.1.2.{{ $index }}'
                     descr: CPU {{ $index }}
                     index: '{{ $index }}'

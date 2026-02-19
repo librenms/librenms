@@ -1,16 +1,15 @@
-mib: XMUX4-PLUS
 modules:
     sensors:
         additional_oids:
             data:
                 -
                     oid:
-                        - muxLeftPowerIdenti
-                        - muxRightPowerIdenti
+                        - XMUX4-PLUS::muxLeftPowerIdenti
+                        - XMUX4-PLUS::muxRightPowerIdenti
         temperature:
             data:
                 -
-                    oid: muxFanTemp
+                    oid: XMUX4-PLUS::muxFanTemp
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.4.{{ $index }}'
                     descr: 'Fan Temperature'
                     index: 'muxFanTemp.{{ $index }}'
@@ -19,7 +18,7 @@ modules:
                     low_warn_limit: 0
                     warn_limit: 40
                 -
-                    oid: muxInteriorTemp
+                    oid: XMUX4-PLUS::muxInteriorTemp
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.5.{{ $index }}'
                     descr: 'Internal Temperature'
                     index: 'muxInteriorTemp.{{ $index }}'
@@ -30,26 +29,26 @@ modules:
         voltage:
             data:
                 -
-                    oid: muxVolt3v3
+                    oid: XMUX4-PLUS::muxVolt3v3
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.6.{{ $index }}'
                     descr: 'Channel s 3,3 voltage'
                     index: 'muxVolt3v3.{{ $index }}'
                 -
-                    oid: muxVolt2v5
+                    oid: XMUX4-PLUS::muxVolt2v5
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.7.{{ $index }}'
                     descr: 'Channel s 2,5 voltage'
                     index: 'muxVolt2v5.{{ $index }}'
                 -
-                    oid: muxVolt1v2
+                    oid: XMUX4-PLUS::muxVolt1v2
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.8.{{ $index }}'
                     descr: 'Channel s 1,2 voltage'
                     index: 'muxVolt1v2.{{ $index }}'
         state:
             data:
                 -
-                    oid: muxLeftPower
+                    oid: XMUX4-PLUS::muxLeftPower
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.9.{{ $index }}'
-                    descr: 'Left power -  {{ $muxLeftPowerIdenti }}'
+                    descr: 'Left power -  {{ XMUX4-PLUS::muxLeftPowerIdenti }}'
                     index: 'muxLeftPower.{{ $index }}'
                     state_name: muxLeftPower
                     states:
@@ -57,10 +56,10 @@ modules:
                         - { descr: PowerOff, graph: 0, value: 1, generic: 2 }
                         - { descr: Unknown, graph: 0, value: 8, generic: 3 }
                 -
-                    oid: muxRightPower
-                    value: muxRightPower
+                    oid: XMUX4-PLUS::muxRightPower
+                    value: XMUX4-PLUS::muxRightPower
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.10.{{ $index }}'
-                    descr: 'Right power - {{ $muxRightPowerIdenti }}'
+                    descr: 'Right power - {{ XMUX4-PLUS::muxRightPowerIdenti }}'
                     index: 'muxRightPower.{{ $index }}'
                     state_name: muxRightPower
                     states:
@@ -68,8 +67,8 @@ modules:
                         - { descr: PowerOff, graph: 0, value: 1, generic: 2 }
                         - { descr: Unknown, graph: 0, value: 8, generic: 3 }
                 -
-                    oid: channelTable
-                    value: channelPresent
+                    oid: XMUX4-PLUS::channelTable
+                    value: XMUX4-PLUS::channelPresent
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.3.{{ $index }}'
                     descr: 'Channel {{ $subindex1 }} present'
                     index: 'channelPresent.{{ $index }}'
@@ -79,8 +78,8 @@ modules:
                         - { descr: Missing, graph: 0, value: 0, generic: 1 }
                         - { descr: Present, graph: 0, value: 1, generic: 0 }
                 -
-                    oid: channelTable
-                    value: channelLocalTx
+                    oid: XMUX4-PLUS::channelTable
+                    value: XMUX4-PLUS::channelLocalTx
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.4.{{ $index }}'
                     descr: 'Channel {{ $subindex1 }} Local TX'
                     index: 'channelLocalTx.{{ $index }}'
@@ -91,8 +90,8 @@ modules:
                         - { descr: On, graph: 0, value: 1, generic: 0 }
                         - { descr: Unknown, graph: 0, value: 8, generic: 3 }
                 -
-                    oid: channelTable
-                    value: channelLocalRx
+                    oid: XMUX4-PLUS::channelTable
+                    value: XMUX4-PLUS::channelLocalRx
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.5.{{ $index }}'
                     descr: 'Channel {{ $subindex1 }} Local RX'
                     index: 'channelLocalRx.{{ $index }}'
@@ -103,8 +102,8 @@ modules:
                         - { descr: On, graph: 0, value: 1, generic: 0 }
                         - { descr: Unknown, graph: 0, value: 8, generic: 3 }
                 -
-                    oid: channelTable
-                    value: channelRemoteTx
+                    oid: XMUX4-PLUS::channelTable
+                    value: XMUX4-PLUS::channelRemoteTx
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.6.{{ $index }}'
                     descr: 'Channel {{ $subindex1 }} Remote TX'
                     index: 'channelRemoteTx.{{ $index }}'
@@ -115,8 +114,8 @@ modules:
                         - { descr: On, graph: 0, value: 1, generic: 0 }
                         - { descr: Unknown, graph: 0, value: 8, generic: 3 }
                 -
-                    oid: channelTable
-                    value: channelRemoteRx
+                    oid: XMUX4-PLUS::channelTable
+                    value: XMUX4-PLUS::channelRemoteRx
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.7.{{ $index }}'
                     descr: 'Channel {{ $subindex1 }} Remote RX'
                     index: 'channelRemoteRx.{{ $index }}'
@@ -127,8 +126,8 @@ modules:
                         - { descr: On, graph: 0, value: 1, generic: 0 }
                         - { descr: Unknown, graph: 0, value: 8, generic: 3 }
                 -
-                    oid: channelTable
-                    value: channelLocalSfpPresent
+                    oid: XMUX4-PLUS::channelTable
+                    value: XMUX4-PLUS::channelLocalSfpPresent
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.8.{{ $index }}'
                     descr: 'Channel {{ $subindex1 }} Local SFP present'
                     index: 'channelLocalSfpPresent.{{ $index }}'
@@ -138,8 +137,8 @@ modules:
                         - { descr: Missing, graph: 0, value: 0, generic: 1 }
                         - { descr: Present, graph: 0, value: 1, generic: 0 }
                 -
-                    oid: channelTable
-                    value: channelRemoteXfpPresent
+                    oid: XMUX4-PLUS::channelTable
+                    value: XMUX4-PLUS::channelRemoteXfpPresent
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.9.{{ $index }}'
                     descr: 'Channel {{ $subindex1 }} Remote XFP present'
                     index: 'channelRemoteXfpPresent.{{ $index }}'
@@ -149,8 +148,8 @@ modules:
                         - { descr: Missing, graph: 0, value: 0, generic: 1 }
                         - { descr: Present, graph: 0, value: 1, generic: 0 }
                 -
-                    oid: channelTable
-                    value: channelLocalByPass
+                    oid: XMUX4-PLUS::channelTable
+                    value: XMUX4-PLUS::channelLocalByPass
                     num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.11.{{ $index }}'
                     descr: 'Channel {{ $subindex1 }} Local bypass'
                     index: 'channelLocalByPass.{{ $index }}'

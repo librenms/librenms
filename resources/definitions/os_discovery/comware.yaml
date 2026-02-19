@@ -1,4 +1,3 @@
-mib: HH3C-LswDEVM-MIB:HH3C-ENTITY-EXT-MIB
 modules:
     os:
         sysDescr_regex: '/Version (?<version>[0-9.]+).*(Release|ESS) (?<features>[R0-9P]+).*[\n ](HPE |HPE FF |HP |H3C )(?<hardware>.*)[\r ][\n ]/'
@@ -7,12 +6,13 @@ modules:
             data:
                 -
                     oid:
-                        - entPhysicalName
+                        - ENTITY-MIB::entPhysicalName
         state:
             data:
                 -
-                    oid: hh3cdevMFanStatusTable
-                    value: hh3cDevMFanStatus
+                    oid: HH3C-LswDEVM-MIB::hh3cdevMFanStatusTable
+                    value: HH3C-LswDEVM-MIB::hh3cDevMFanStatus
+                    state_name: 'hh3cdevMFanStatusTable'
                     num_oid: '.1.3.6.1.4.1.25506.8.35.9.1.1.1.2.{{ $index }}'
                     descr: 'Fan {{ $index }}'
                     index: '{{ $index }}'
@@ -22,8 +22,9 @@ modules:
                         - { value: 3, descr: not-install, graph: 1, generic: 3 }
                         - { value: 4, descr: unsupport, graph: 1, generic: 1 }
                 -
-                    oid: hh3cdevMPowerStatusTable
-                    value: hh3cDevMPowerStatus
+                    oid: HH3C-LswDEVM-MIB::hh3cdevMPowerStatusTable
+                    value: HH3C-LswDEVM-MIB::hh3cDevMPowerStatus
+                    state_name: 'hh3cdevMPowerStatusTable'
                     num_oid: '.1.3.6.1.4.1.25506.8.35.9.1.2.1.2.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
                     index: '{{ $index }}'
@@ -35,10 +36,10 @@ modules:
         power:
             data:
                 -
-                    oid: hh3cEntityExtPowerEntry
-                    value: hh3cEntityExtCurrentPower
+                    oid: HH3C-ENTITY-EXT-MIB::hh3cEntityExtPowerEntry
+                    value: HH3C-ENTITY-EXT-MIB::hh3cEntityExtCurrentPower
                     num_oid: '.1.3.6.1.4.1.25506.2.6.1.3.1.1.3.{{ $index }}'
-                    descr: '{{ $entPhysicalName }} Power Usage'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }} Power Usage'
                     index: 'hh3cEntityExtCurrentPower.{{ $index }}'
                     divisor: 1000
                     skip_values: 0

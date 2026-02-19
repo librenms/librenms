@@ -1,11 +1,12 @@
-mib: BISON-ROUTER-MIB
 modules:
     sensors:
         state:
             data:
                 -
-                    oid: licStatus
+                    oid: BISON-ROUTER-MIB::licStatus
+                    value: BISON-ROUTER-MIB::licStatus
                     num_oid: '.1.3.6.1.4.1.2238.240.1.9.1.{{ $index }}'
+                    state_name: licStatus
                     descr: License Status
                     index: '{{ $index }}'
                     states:

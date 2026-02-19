@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 class PortsController extends TableController
 {
@@ -89,6 +90,7 @@ class PortsController extends TableController
             'ifAlias',
             'ifMtu',
             'ifSpeed',
+            'ifDuplex',
         ];
     }
 
@@ -97,16 +99,16 @@ class PortsController extends TableController
         $query = Port::hasAccess($request->user())
             ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
-            ->where('deleted', $request->get('deleted', 0)) // always filter deleted
-            ->when($request->get('hostname'), function (Builder $query, $hostname): void {
+            ->where('deleted', $request->input('deleted', 0)) // always filter deleted
+            ->when($request->input('hostname'), function (Builder $query, $hostname): void {
                 $query->where(function (Builder $query) use ($hostname): void {
                     $query->where('devices.hostname', 'like', "%$hostname%")
                         ->orWhere('devices.sysName', 'like', "%$hostname%");
                 });
             })
-            ->when($request->get('ifAlias'), fn (Builder $query, $ifAlias) => $query->where('ifAlias', 'like', "%$ifAlias%"))
-            ->when($request->get('errors'), fn (Builder $query) => $query->hasErrors())
-            ->when($request->get('state'), fn (Builder $query, $state) => match ($state) {
+            ->when($request->input('ifAlias'), fn (Builder $query, $ifAlias) => $query->where('ifAlias', 'like', "%$ifAlias%"))
+            ->when($request->input('errors'), fn (Builder $query) => $query->hasErrors())
+            ->when($request->input('state'), fn (Builder $query, $state) => match ($state) {
                 'down' => $query->isDown(),
                 'up' => $query->isUp(),
                 'admindown' => $query->isShutdown(),
@@ -118,7 +120,7 @@ class PortsController extends TableController
             'hostname',
         ];
 
-        if (array_key_exists('secondsIfLastChange', Arr::wrap($request->get('sort')))) {
+        if (array_key_exists('secondsIfLastChange', Arr::wrap($request->input('sort')))) {
             // for sorting
             $select[] = DB::raw('`devices`.`uptime` - `ports`.`ifLastChange` / 100 as secondsIfLastChange');
         }
@@ -138,11 +140,12 @@ class PortsController extends TableController
 
         return [
             'status' => $status,
-            'device' => Blade::render('<x-device-link :device="$device" />', ['device' => $port->device]),
+            'device' => Url::modernDeviceLink($port->device),
             'port' => Blade::render('<x-port-link :port="$port"/>', ['port' => $port]),
             'secondsIfLastChange' => ceil($port->device?->uptime - ($port->ifLastChange / 100)),
             'ifConnectorPresent' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no',
             'ifSpeed' => $port->ifSpeed,
+            'ifDuplex' => $port->ifDuplex,
             'ifMtu' => $port->ifMtu,
             'ifInOctets_rate' => $port->ifInOctets_rate * 8,
             'ifOutOctets_rate' => $port->ifOutOctets_rate * 8,
@@ -172,6 +175,7 @@ class PortsController extends TableController
             'ifIndex',
             'Status',
             'Admin Status',
+            'Duplex',
             'Speed',
             'MTU',
             'Type',
@@ -201,11 +205,12 @@ class PortsController extends TableController
 
         return [
             'device_id' => $port->device_id,
-            'hostname' => $port->device->displayName(),
+            'hostname' => $port->device?->displayName(),
             'port' => $port->ifName ?: $port->ifDescr,
             'ifindex' => $port->ifIndex,
             'status' => $status,
             'admin_status' => $adminStatus,
+            'ifDuplex' => $port->ifDuplex,
             'speed' => $speed,
             'mtu' => $port->ifMtu,
             'type' => Rewrite::normalizeIfType($port->ifType),

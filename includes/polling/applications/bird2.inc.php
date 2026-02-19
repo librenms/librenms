@@ -67,7 +67,7 @@ foreach ($protocolSegments as $protocolSegment) {
 
         // Process the Ip channel (v4/v6)
         $IpVersion = 4;
-        if (filter_var($protocolData['neighbor_address'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        if (isset($protocolData['neighbor_address']) && filter_var($protocolData['neighbor_address'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             $IpVersion = 6;
         }
 
@@ -137,16 +137,22 @@ $deviceObj->save();
 $bgpPeerIds = [];
 
 foreach ($protocolsData as $protocol) {
+    // Skip peers that don't have neighbor_address (incomplete BGP handshakes/errors)
+    if (! isset($protocol['neighbor_address']) || ! isset($protocol['neighbor_as'])) {
+        echo PHP_EOL . $name . ': Skipped peer ' . $protocol['name'] . ' (incomplete BGP data)';
+        continue;
+    }
+
     $bgpPeer = BgpPeer::firstOrNew([
         'device_id' => $device['device_id'],
         'bgpPeerRemoteAs' => $protocol['neighbor_as'],
-        'bgpLocalAddr' => $protocol['source_address'] ?: '0.0.0.0',
+        'bgpLocalAddr' => $protocol['source_address'] ?? '0.0.0.0',
         'bgpPeerRemoteAddr' => $protocol['neighbor_address'],
     ]);
 
     $bgpPeer->device_id = $device['device_id'];
     $bgpPeer->astext = \LibreNMS\Util\AutonomousSystem::get($protocol['neighbor_as'])->name();
-    $bgpPeer->bgpPeerIdentifier = $protocol['neighbor_id'] ?: '0.0.0.0';
+    $bgpPeer->bgpPeerIdentifier = $protocol['neighbor_id'] ?? '0.0.0.0';
     $bgpPeer->bgpPeerRemoteAs = $protocol['neighbor_as'];
     $bgpPeer->bgpPeerState = strtolower((string) $protocol['bgp_state']);
     $bgpPeer->bgpPeerAdminStatus = str_replace('up', 'start', strtolower((string) $protocol['protocol_state']));
@@ -162,16 +168,16 @@ foreach ($protocolsData as $protocol) {
             }
         }
 
-        $bgpPeer->bgpPeerLastErrorText = $protocol['neighbor_id'] ?: '0.0.0.0';
+        $bgpPeer->bgpPeerLastErrorText = $protocol['neighbor_id'] ?? '0.0.0.0';
     }
 
-    $bgpPeer->bgpLocalAddr = $protocol['source_address'] ?: '0.0.0.0';
+    $bgpPeer->bgpLocalAddr = $protocol['source_address'] ?? '0.0.0.0';
     $bgpPeer->bgpPeerRemoteAddr = $protocol['neighbor_address'];
     $bgpPeer->bgpPeerDescr = $protocol['description'] ?: $protocol['name'];
-    $bgpPeer->bgpPeerInUpdates = intval($protocol['route_change_stats']['import_updates']['accepted']);
-    $bgpPeer->bgpPeerOutUpdates = intval($protocol['route_change_stats']['export_updates']['accepted']);
-    $bgpPeer->bgpPeerInTotalMessages = intval($protocol['route_change_stats']['import_updates']['received']);
-    $bgpPeer->bgpPeerOutTotalMessages = intval($protocol['route_change_stats']['export_updates']['received']);
+    $bgpPeer->bgpPeerInUpdates = intval($protocol['route_change_stats']['import_updates']['accepted'] ?? 0);
+    $bgpPeer->bgpPeerOutUpdates = intval($protocol['route_change_stats']['export_updates']['accepted'] ?? 0);
+    $bgpPeer->bgpPeerInTotalMessages = intval($protocol['route_change_stats']['import_updates']['received'] ?? 0);
+    $bgpPeer->bgpPeerOutTotalMessages = intval($protocol['route_change_stats']['export_updates']['received'] ?? 0);
 
     $bgpPeer->bgpPeerFsmEstablishedTime = (int) Carbon::parse($protocol['since'])->diffInSeconds(Carbon::now(), true);
     $bgpPeer->bgpPeerInUpdateElapsedTime = (int) Carbon::parse($protocol['since'])->diffInSeconds(Carbon::now(), true);

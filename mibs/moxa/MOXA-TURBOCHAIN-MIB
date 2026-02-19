@@ -1,0 +1,141 @@
+-- ****************************************************************
+-- *  Moxa Switching - TurboChain PRIVATE MIB
+-- *
+-- *  Copyright (c) 2019 by Moxa Inc.
+-- *  All rights reserved.
+-- *****************************************************************
+
+MOXA-TURBOCHAIN-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, IpAddress
+        	FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DateAndTime, MacAddress, DisplayString, TruthValue
+        	FROM SNMPv2-TC
+        layer2Redundancy
+          FROM MOXA-SWITCHING-MIB;
+
+    mxTurboChain MODULE-IDENTITY
+        LAST-UPDATED "202202170000Z"
+        ORGANIZATION "Moxa Inc."
+        CONTACT-INFO
+            "
+            Postal: Moxa Inc.
+            13F., No. 3, Sec. 4, New Taipei Blvd.
+            Xinzhuang Dist., New Taipei City 242032, Taiwan, R.O.C.
+
+            Tel: +866-2-89191230
+            Web: http://www.moxa.com/
+            "
+        DESCRIPTION
+            "The MIB module for Moxa TurboChain feature."
+
+        REVISION    "202202170000Z"
+        DESCRIPTION "update CONTACT-INFO"
+
+        REVISION    "201906300000Z"
+        DESCRIPTION "Initial Revision"
+
+	    ::= { layer2Redundancy 5 }
+
+-- -------------------------------------------------------------
+-- groups in the MOXA-TURBOCHAIN-MIB MIB
+-- -------------------------------------------------------------
+
+  -- turboChainNotification		 OBJECT IDENTIFIER ::= { mxTurboChain 0 }
+  turboChainConfiguration		 OBJECT IDENTIFIER ::= { mxTurboChain 1 }
+  turboChainStatus		       OBJECT IDENTIFIER ::= { mxTurboChain 2 }
+  -- turboChainExtensions		   OBJECT IDENTIFIER ::= { mxTurboChain 3 }
+
+-- -------------------------------------------------------------
+-- configuration group
+-- -------------------------------------------------------------
+    turboChainConfigEnable OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "The administrative module status requested by management for the TurboChain
+            Module. This enables or disables TurboChain in the system. "
+        ::= { turboChainConfiguration 1 }
+
+    turboChainConfigRole OBJECT-TYPE
+        SYNTAX  INTEGER
+            {
+            head(1),
+            member(2),
+            tail(3)
+            }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "The role of Turbo Chain."
+        ::= { turboChainConfiguration 2 }
+
+
+    turboChainConfigInterface OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "The value configures two Turbo Chain ports at the same time.
+             The first octet string is the Turbo Chain primary interface.
+             The second octet string is the Turbo Chain secondary interface.
+             If Turbo Chain role of this switch is Turbo Chain Head, primary
+             interface is Head port. If Turbo Chain role of this switch is
+             Turbo Chain Tail, primary interface is Tail port. For example, if
+             users want to configure ifIndex 19 as the Turbo Chain head port,
+             and ifIndex 20 as the Turbo Chain member port. The octet string
+             shall be 0x13 0x14."
+        ::= { turboChainConfiguration 3 }
+
+-- -------------------------------------------------------------
+-- status group
+-- -------------------------------------------------------------
+    turboChainStatPrimaryInterfaceStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            initiated(0),
+            linkDown(1),
+            listening(2),
+            blocking(3),
+            forwarding(4),
+            disabled(5)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "TurboChain port status.
+             initiated means the port is just initiated.
+             linkDown means the physical link status is down.
+             listening means the port is checking the link status with
+             its Turbo Chain partner port.
+             blocking means the port does not forward networking data to prevent
+             looping.
+             forwarding means the port is forwarding networking data.
+             disabled means Turbo Chain is not enabled."
+        ::= { turboChainStatus 1 }
+
+    turboChainStatSecondaryInterfaceStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            initiated(0),
+            linkDown(1),
+            listening(2),
+            blocking(3),
+            forwarding(4),
+            disabled(5)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "TurboChain port status.
+             initiated means the port is just initiated.
+             linkDown means the physical link status is down.
+             listening means the port is checking the link status with
+             its Turbo Chain partner port.
+             blocking means the port does not forward networking data to prevent
+             looping.
+             forwarding means the port is forwarding networking data.
+             disabled means Turbo Chain is not activated on this port."
+        ::= { turboChainStatus 2 }
+END

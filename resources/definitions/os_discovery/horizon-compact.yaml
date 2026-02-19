@@ -1,4 +1,3 @@
-mib: HORIZON-ODU-MIB
 modules:
     os:
         version: HORIZON-ODU-MIB::hzOduSystemOmniVersionNo.0
@@ -8,7 +7,7 @@ modules:
         temperature:
             data:
                 -
-                    oid: hzOduRadio1Temperature
+                    oid: HORIZON-ODU-MIB::hzOduRadio1Temperature
                     num_oid: '.1.3.6.1.4.1.7262.2.2.5.1.3.6.{{ $index }}'
                     index: 'hzOduRadio1Temperature.{{ $index }}'
                     divisor: 10
@@ -16,40 +15,45 @@ modules:
         state:
             data:
                 -
-                    oid: hzOduModem1RxLossOfSignal
+                    oid: HORIZON-ODU-MIB::hzOduModem1RxLossOfSignal
                     num_oid: '.1.3.6.1.4.1.7262.2.2.8.4.4.1.{{ $index }}'
+                    state_name: hzOduModem1RxLossOfSignal
                     index: 'hzOduModem1RxLossOfSignal.{{ $index }}'
                     descr: 'Modem1 Rx Loss of Signal'
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: 'No' }
                         - { value: 2, generic: 2, graph: 0, descr: 'Yes' }
                 -
-                    oid: hzOduEnetPort1EthernetLinkDown
+                    oid: HORIZON-ODU-MIB::hzOduEnetPort1EthernetLinkDown
                     num_oid: '.1.3.6.1.4.1.7262.2.2.8.3.1.9.{{ $index }}'
+                    state_name: hzOduEnetPort1EthernetLinkDown
                     index: 'hzOduEnetPort1EthernetLinkDown.{{ $index }}'
                     descr: 'Enet Port1 Link State'
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: 'Up' }
                         - { value: 2, generic: 2, graph: 0, descr: 'Down' }
                 -
-                    oid: hzOduEnetPort2EthernetLinkDown
+                    oid: HORIZON-ODU-MIB::hzOduEnetPort2EthernetLinkDown
                     num_oid: '.1.3.6.1.4.1.7262.2.2.8.3.2.1.{{ $index }}'
+                    state_name: hzOduEnetPort2EthernetLinkDown
                     index: 'hzOduEnetPort2EthernetLinkDown.{{ $index }}'
                     descr: 'Enet Port2 Link State'
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: 'Up' }
                         - { value: 2, generic: 2, graph: 0, descr: 'Down' }
                 -
-                    oid: hzOduRadio1TemperatureOutOfLimit
+                    oid: HORIZON-ODU-MIB::hzOduRadio1TemperatureOutOfLimit
                     num_oid: '.1.3.6.1.4.1.7262.2.2.8.4.5.9.{{ $index }}'
+                    state_name: hzOduRadio1TemperatureOutOfLimit
                     index: 'hzOduRadio1TemperatureOutOfLimit.{{ $index }}'
                     descr: 'Radio1 Temp Out of Limit'
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: 'No' }
                         - { value: 2, generic: 2, graph: 0, descr: 'Yes' }
                 -
-                    oid: hzOduModem1ModulationType
+                    oid: HORIZON-ODU-MIB::hzOduModem1ModulationType
                     num_oid: '.1.3.6.1.4.1.7262.2.2.5.1.2.5.{{ $index }}'
+                    state_name: hzOduModem1ModulationType
                     index: 'hzOduModem1ModulationType.{{ $index }}'
                     descr: 'Modem1 Modulation'
                     states:
@@ -64,42 +68,42 @@ modules:
         count:
             data:
                 -
-                    oid: hzOduModem1RxLossOfSignalCount
+                    oid: HORIZON-ODU-MIB::hzOduModem1RxLossOfSignalCount
                     num_oid: '.1.3.6.1.4.1.7262.2.2.8.4.4.2.{{ $index }}'
                     index: 'hzOduModem1RxLossOfSignalCount.{{ $index }}'
                     descr: 'Modem1 Rx Loss of Signals'
                 -
-                    oid: hzOduEnetPort1EthernetLinkDownActivatedCount
+                    oid: HORIZON-ODU-MIB::hzOduEnetPort1EthernetLinkDownActivatedCount
                     num_oid: '.1.3.6.1.4.1.7262.2.2.8.3.1.10.{{ $index }}'
                     index: 'hzOduEnetPort1EthernetLinkDownActivatedCount.{{ $index }}'
                     descr: 'Enet Port1 Link Downs'
                 -
-                    oid: hzOduEnetPort2EthernetLinkDownActivatedCount
+                    oid: HORIZON-ODU-MIB::hzOduEnetPort2EthernetLinkDownActivatedCount
                     num_oid: '.1.3.6.1.4.1.7262.2.2.8.3.2.2.{{ $index }}'
                     index: 'hzOduEnetPort2EthernetLinkDownActivatedCount.{{ $index }}'
                     descr: 'Enet Port2 Link Downs'
                 -
-                    oid: hzOduRadio1TemperatureOutOfLimitCount
+                    oid: HORIZON-ODU-MIB::hzOduRadio1TemperatureOutOfLimitCount
                     num_oid: '.1.3.6.1.4.1.7262.2.2.8.4.5.10.{{ $index }}'
                     index: 'hzOduRadio1TemperatureOutOfLimitCount.{{ $index }}'
                     descr: 'Radio1 Temp Out Of Limits'
                 -
-                    oid: hzOduEnetPort1RxFramesInError
+                    oid: HORIZON-ODU-MIB::hzOduEnetPort1RxFramesInError
                     num_oid: '.1.3.6.1.4.1.7262.2.2.4.1.4.5.{{ $index }}'
                     index: 'hzOduEnetPort1RxFramesInError.{{ $index }}'
                     descr: 'Enet Port1 Input Error'
                 -
-                    oid: hzOduEnetPort1RxFramesCRCError
+                    oid: HORIZON-ODU-MIB::hzOduEnetPort1RxFramesCRCError
                     num_oid: '.1.3.6.1.4.1.7262.2.2.4.1.4.6.{{ $index }}'
                     index: 'hzOduEnetPort1RxFramesCRCError.{{ $index }}'
                     descr: 'Enet Port1 CRC Error'
                 -
-                    oid: hzOduEnetPort2RxFramesInError
+                    oid: HORIZON-ODU-MIB::hzOduEnetPort2RxFramesInError
                     num_oid: '.1.3.6.1.4.1.7262.2.2.4.2.4.5.{{ $index }}'
                     index: 'hzOduEnetPort2RxFramesInError.{{ $index }}'
                     descr: 'Enet Port2 Input Error'
                 -
-                    oid: hzOduEnetPort2RxFramesCRCError
+                    oid: HORIZON-ODU-MIB::hzOduEnetPort2RxFramesCRCError
                     num_oid: '.1.3.6.1.4.1.7262.2.2.4.2.4.6.{{ $index }}'
                     index: 'hzOduEnetPort2RxFramesCRCError.{{ $index }}'
                     descr: 'Enet Port2 CRC Error'

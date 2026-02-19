@@ -12,11 +12,14 @@
 */
 
 Route::prefix('v0')->group(function (): void {
+    Route::get('ping', fn () => response()->json(['message' => 'pong']))->name('ping');
     Route::get('system', [App\Api\Controllers\LegacyApiController::class, 'server_info'])->name('server_info');
     Route::get('', [App\Api\Controllers\LegacyApiController::class, 'show_endpoints']);
 
     // global read only access required
     Route::middleware(['can:global-read'])->group(function (): void {
+        Route::get('pollers', [App\Api\Controllers\LegacyApiController::class, 'list_pollers'])->name('list_pollers');
+        Route::get('pollers/log', [App\Api\Controllers\LegacyApiController::class, 'list_poller_log'])->name('list_poller_log');
         Route::get('bgp', [App\Api\Controllers\LegacyApiController::class, 'list_bgp'])->name('list_bgp');
         Route::get('bgp/{id}', [App\Api\Controllers\LegacyApiController::class, 'get_bgp'])->name('get_bgp');
         Route::get('ospf', [App\Api\Controllers\LegacyApiController::class, 'list_ospf'])->name('list_ospf');

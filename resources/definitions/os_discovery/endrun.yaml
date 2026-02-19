@@ -1,4 +1,3 @@
-mib: TEMPUSLXUNISON-MIB::MERIDIAN2-MIB::SONOMA-MIB
 modules:
     os:
         version_regex: '/(?<hardware>(.+)) v (?<version>(.+)) -/'

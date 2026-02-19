@@ -49,7 +49,7 @@ class EditPortsController extends TableController
 
     protected function baseQuery($request)
     {
-        return \App\Models\Port::where('device_id', $request->get('device_id'))
+        return \App\Models\Port::where('device_id', $request->input('device_id'))
             ->with('groups');
     }
 

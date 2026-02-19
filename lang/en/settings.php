@@ -6,6 +6,7 @@ return [
     'groups' => [
         'alerting' => 'Alerting',
         'api' => 'API',
+        'apps' => 'Applications',
         'auth' => 'Authentication',
         'authorization' => 'Authorization',
         'external' => 'External',
@@ -26,6 +27,11 @@ return [
         ],
         'api' => [
             'cors' => ['name' => 'CORS'],
+        ],
+        'apps' => [
+            'powerdns-recursor' => ['name' => 'PowerDNS Recursor'],
+            'oslv_monitor' => ['name' => 'OSLV Monitor'],
+            'sneck' => ['name' => 'Sneck'],
         ],
         'auth' => [
             'general' => ['name' => 'General Authentication Settings'],
@@ -294,6 +300,42 @@ return [
                 'port' => [
                     'description' => 'PowerDNS Recursor port',
                     'help' => 'TCP port to use for the PowerDNS Recursor app when connecting directly',
+                ],
+            ],
+            'oslv_monitor' => [
+                'seen_age' => [
+                    'description' => 'Seen age threshold',
+                    'help' => 'Age in seconds after which items are considered stale',
+                ],
+                'linux_pg_memory_stats' => [
+                    'description' => 'Linux page memory stats',
+                    'help' => 'Enable Linux page memory statistics collection',
+                ],
+                'misc_linux_memory_stats' => [
+                    'description' => 'Misc Linux memory stats',
+                    'help' => 'Enable miscellaneous Linux memory statistics collection',
+                ],
+                'zswap_size' => [
+                    'description' => 'ZSwap size stats',
+                    'help' => 'Enable ZSwap size statistics collection',
+                ],
+                'zswap_activity' => [
+                    'description' => 'ZSwap activity stats',
+                    'help' => 'Enable ZSwap activity statistics collection',
+                ],
+                'workingset_stats' => [
+                    'description' => 'Working set stats',
+                    'help' => 'Enable working set statistics collection',
+                ],
+                'thp_activity' => [
+                    'description' => 'THP activity stats',
+                    'help' => 'Enable Transparent Huge Pages activity statistics collection',
+                ],
+            ],
+            'sneck' => [
+                'polling_time_diff' => [
+                    'description' => 'Polling time difference',
+                    'help' => 'Enable polling time difference tracking for Sneck',
                 ],
             ],
         ],
@@ -2115,9 +2157,6 @@ return [
         'service_health_file' => [
             'description' => 'Service Health File',
             'help' => 'Path to health file to ensure the dispatcher service is running',
-        ],
-        'sfdp' => [
-            'description' => 'Path to sfdp',
         ],
         'shorthost_target_length' => [
             'description' => 'Shortened hostname maximum length',
