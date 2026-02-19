@@ -1238,7 +1238,8 @@ return [
                 'description' => 'Change the rrd heartbeat value (default 600)',
             ],
             'step' => [
-                'description' => 'Change the rrd step value (default 300)',
+                'description' => 'Change the rrd step value (default 300)  (Warning!)',
+                'help' => 'Warning! Changing this without fixing rrd files and changing your polling schedule will break graphs. See docs for more info.',
             ],
         ],
         'rrd_dir' => [
@@ -1274,7 +1275,7 @@ return [
         ],
         'service_poller_frequency' => [
             'description' => 'Poller Frequency (Warning!)',
-            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! Changing this without fixing rrd files will break graphs. See docs for more info.',
+            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! This should normally be blank/null to match the rrd step option, otherwise you may break graphs. See docs for more info.',
         ],
         'service_poller_down_retry' => [
             'description' => 'Device Down Retry',
