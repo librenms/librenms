@@ -124,7 +124,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.110.1.1.1.4.24",
                     "sensor_index": "24",
-                    "sensor_type": "fsIfPoeTable",
+                    "sensor_type": "FS-POE-MIB::fsIfPoeTable",
                     "sensor_descr": "PoE Port 24 Status",
                     "group": null,
                     "sensor_divisor": 1,
@@ -141,7 +141,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "fsIfPoeTable"
+                    "state_name": "FS-POE-MIB::fsIfPoeTable"
                 },
                 {
                     "sensor_deleted": 0,
@@ -149,7 +149,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.1.1.18.1.2.1",
                     "sensor_index": "1",
-                    "sensor_type": "fsSystemElectricalSourceIsNormalTable",
+                    "sensor_type": "FS-SYSTEM-MIB::fsSystemElectricalSourceIsNormalTable",
                     "sensor_descr": "Power supply 1",
                     "group": null,
                     "sensor_divisor": 1,
@@ -166,7 +166,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "fsSystemElectricalSourceIsNormalTable"
+                    "state_name": "FS-SYSTEM-MIB::fsSystemElectricalSourceIsNormalTable"
                 },
                 {
                     "sensor_deleted": 0,
@@ -174,7 +174,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.1.1.18.1.2.2",
                     "sensor_index": "2",
-                    "sensor_type": "fsSystemElectricalSourceIsNormalTable",
+                    "sensor_type": "FS-SYSTEM-MIB::fsSystemElectricalSourceIsNormalTable",
                     "sensor_descr": "Power supply 2",
                     "group": null,
                     "sensor_divisor": 1,
@@ -191,7 +191,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "fsSystemElectricalSourceIsNormalTable"
+                    "state_name": "FS-SYSTEM-MIB::fsSystemElectricalSourceIsNormalTable"
                 },
                 {
                     "sensor_deleted": 0,
@@ -199,7 +199,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.1.1.21.1.2.1",
                     "sensor_index": "1",
-                    "sensor_type": "fsSystemFanIsNormalTable",
+                    "sensor_type": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable",
                     "sensor_descr": "fan1",
                     "group": null,
                     "sensor_divisor": 1,
@@ -216,7 +216,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "fsSystemFanIsNormalTable"
+                    "state_name": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable"
                 },
                 {
                     "sensor_deleted": 0,
@@ -224,7 +224,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.1.1.21.1.2.2",
                     "sensor_index": "2",
-                    "sensor_type": "fsSystemFanIsNormalTable",
+                    "sensor_type": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable",
                     "sensor_descr": "fan2",
                     "group": null,
                     "sensor_divisor": 1,
@@ -241,7 +241,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "fsSystemFanIsNormalTable"
+                    "state_name": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable"
                 },
                 {
                     "sensor_deleted": 0,
@@ -321,91 +321,91 @@
             ],
             "state_indexes": [
                 {
-                    "state_name": "fsIfPoeTable",
+                    "state_name": "FS-POE-MIB::fsIfPoeTable",
                     "state_descr": "On",
                     "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "fsIfPoeTable",
+                    "state_name": "FS-POE-MIB::fsIfPoeTable",
                     "state_descr": "Off",
                     "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
-                    "state_name": "fsSystemElectricalSourceIsNormalTable",
+                    "state_name": "FS-SYSTEM-MIB::fsSystemElectricalSourceIsNormalTable",
                     "state_descr": "Unknown",
                     "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
-                    "state_name": "fsSystemElectricalSourceIsNormalTable",
+                    "state_name": "FS-SYSTEM-MIB::fsSystemElectricalSourceIsNormalTable",
                     "state_descr": "Green",
                     "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "fsSystemElectricalSourceIsNormalTable",
+                    "state_name": "FS-SYSTEM-MIB::fsSystemElectricalSourceIsNormalTable",
                     "state_descr": "Yellow",
                     "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
-                    "state_name": "fsSystemElectricalSourceIsNormalTable",
+                    "state_name": "FS-SYSTEM-MIB::fsSystemElectricalSourceIsNormalTable",
                     "state_descr": "Not present",
                     "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "fsSystemElectricalSourceIsNormalTable",
+                    "state_name": "FS-SYSTEM-MIB::fsSystemElectricalSourceIsNormalTable",
                     "state_descr": "Normal",
                     "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "fsSystemElectricalSourceIsNormalTable",
+                    "state_name": "FS-SYSTEM-MIB::fsSystemElectricalSourceIsNormalTable",
                     "state_descr": "Abnormal",
                     "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "fsSystemFanIsNormalTable",
+                    "state_name": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable",
                     "state_descr": "Unknown",
                     "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
-                    "state_name": "fsSystemFanIsNormalTable",
+                    "state_name": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable",
                     "state_descr": "Green",
                     "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "fsSystemFanIsNormalTable",
+                    "state_name": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable",
                     "state_descr": "Yellow",
                     "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
-                    "state_name": "fsSystemFanIsNormalTable",
+                    "state_name": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable",
                     "state_descr": "Normal",
                     "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "fsSystemFanIsNormalTable",
+                    "state_name": "FS-SYSTEM-MIB::fsSystemFanIsNormalTable",
                     "state_descr": "Abnormal",
                     "state_draw_graph": 0,
                     "state_value": 5,
