@@ -74,7 +74,7 @@ class Mail
         if (is_array($emails) || ($emails = self::parseEmails($emails))) {
             d_echo("Attempting to email $subject to: " . implode('; ', array_keys($emails)) . PHP_EOL);
             $mail = new PHPMailer(true);
-            $mail->Hostname = php_uname('n');
+            $mail->Hostname = gethostbyaddr(gethostbyname(gethostname()));
 
             foreach (self::parseEmails((string) LibrenmsConfig::get('email_from')) as $from => $from_name) {
                 $mail->setFrom($from, $from_name);
