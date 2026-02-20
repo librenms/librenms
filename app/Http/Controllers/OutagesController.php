@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -31,7 +30,6 @@ class OutagesController extends Controller
         $from = $request->input('from');
         $to = $request->input('to');
 
-        $tz = $request->session()->get('preferences.timezone');
         $date_format = LibrenmsConfig::get('dateformat.byminute', 'Y-m-d H:i');
 
         return view('outages.index', [
@@ -41,8 +39,6 @@ class OutagesController extends Controller
             'to' => $to,
             'status' => $request->input('status', 'current'),
             'preset' => $request->input('preset', true),
-            'default_start_date' => Carbon::now($tz)->subMonth()->format($date_format),
-            'default_end_date' => Carbon::now($tz)->format($date_format),
             'show_device_list' => true, // when html is shared with device tab
         ]);
     }
