@@ -8,7 +8,7 @@
             <th data-column-id="interface">Port</th>
             <th data-column-id="description" data-formatter="tooltip">Description</th>
             <th data-column-id="vlan" data-width="60px">Vlan</th>
-            <th data-column-id="dnsname" data-sortable="false" data-visible="false" data-formatter="tooltip">DNS Name</th>
+            <th data-column-id="dnsname" data-sortable="false" data-visible="true" data-formatter="tooltip">DNS Name</th>
             <th data-column-id="first_seen" data-width="165px">First seen</th>
             <th data-column-id="last_seen" data-width="165px">Last seen</th>
         </tr>

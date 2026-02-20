@@ -46,8 +46,8 @@ if (! Auth::user()->hasGlobalRead()) {
     $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }
-
-$sql .= " WHERE M.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname`, `D`.`sysName` ORDER BY `hostname`";
+$order_by = str_contains(\App\Facades\LibrenmsConfig::get('device_display_default', '{{ $hostname }}'),"sysName")?"sysname":"hostname";
+$sql .= " WHERE M.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname`, `D`.`sysName` ORDER BY `". $order_by ."`";
 foreach (dbFetchRows($sql, $param) as $data) {
     echo '"<option value=\"' . $data['device_id'] . '\""+';
     if ($data['device_id'] == $device_id) {
