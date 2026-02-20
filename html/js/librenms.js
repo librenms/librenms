@@ -284,6 +284,12 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                     var currentUrl = $(this).attr('href');
                     var urlParams = [];
 
+                    // Get dynamic params from data-params attribute
+                    var dataParams = grid.data('params');
+                    if (dataParams) {
+                        urlParams.push(dataParams);
+                    }
+
                     var searchPhrase = $('.search-field').val();
                     if (searchPhrase) {
                         urlParams.push('searchPhrase=' + encodeURIComponent(searchPhrase));

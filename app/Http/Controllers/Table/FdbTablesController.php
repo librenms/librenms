@@ -98,6 +98,9 @@ class FdbTablesController extends TableController
                 case 'vendor':
                     $vendor_ouis = $this->ouisFromVendor($search);
 
+                    if (count($vendor_ouis) == 0) {
+                        $vendor_ouis[]="not found";
+                    }
                     return $this->findPortsByOui($vendor_ouis, $query);
                 default:
                     return $query->where(function ($query) use ($search, $mac_search): void {
@@ -209,9 +212,7 @@ class FdbTablesController extends TableController
         $port_id = \Request::get('port_id');
         $device_id = \Request::get('device_id');
 
-        return Ipv4Mac::where('ipv4_address', 'like', "%$ip%")
-            ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
-            ->when($port_id, fn ($query) => $query->where('port_id', $port_id))
+        return Ipv4Mac::where('ipv4_address', 'like', "$ip")
             ->pluck('mac_address');
     }
 
@@ -241,7 +242,7 @@ class FdbTablesController extends TableController
         $port_id = \Request::get('port_id');
         $device_id = \Request::get('device_id');
 
-        return Port::where('ifAlias', 'like', "%$ifAlias%")
+        return Port::where('ifAlias', 'like', "$ifAlias")
             ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
             ->when($port_id, fn ($query) => $query->where('port_id', $port_id))
             ->pluck('port_id');
@@ -304,5 +305,65 @@ class FdbTablesController extends TableController
         });
 
         return $query; // Return the query builder instance
+    }
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device',
+            'MAC Address',
+            'Vendor',
+            'IPv4 Address',
+            'Port',
+            'Vlan',
+            'Description',
+            'DNS Name',
+            'First seen',
+            'Last seen',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  PortsFdb  $fdb_entry
+     * @return array
+     */
+    protected function formatExportRow($fdb_entry)
+    {
+        $mac = Mac::parse($fdb_entry->mac_address);
+        $ips = $fdb_entry->ipv4Addresses->pluck('ipv4_address');
+
+        $item = [
+            $fdb_entry->device ? $fdb_entry->device->displayName() : '',
+            $mac->readable(),
+            $mac->vendor(),
+            $ips->implode(', '),
+            'interface' => '',
+            'vlan' => $fdb_entry->vlan ? $fdb_entry->vlan->vlan_vlan : '',
+            'description' => '',
+            'dnsname' => $this->resolveDns($ips),
+            'first_seen' => 'unknown',
+            'last_seen' => 'unknown',
+        ];
+        
+        // diffForHumans and doDateTimeString are not safe
+        if ($fdb_entry->updated_at) {
+            $item['last_seen'] = $fdb_entry->updated_at->diffForHumans();
+        }
+        if ($fdb_entry->created_at) {
+            $item['first_seen'] = $fdb_entry->created_at->toDateTimeString();
+        }
+
+        if ($fdb_entry->port) {
+            $item['interface'] = $fdb_entry->port->getShortLabel();
+            $item['description'] = $fdb_entry->port->ifAlias;
+        }
+
+        return $item;
     }
 }

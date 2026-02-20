@@ -307,6 +307,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('edit-ports', Table\EditPortsController::class);
             Route::post('eventlog', Table\EventlogController::class)->name('table.eventlog');
             Route::post('fdb-tables', Table\FdbTablesController::class);
+            Route::get('fdb-tables/export', [Table\FdbTablesController::class, 'export']);
             Route::post('graylog', Table\GraylogController::class)->name('table.graylog');
             Route::post('inventory', Table\InventoryController::class)->name('table.inventory');
             Route::get('inventory/export', [Table\InventoryController::class, 'export']);

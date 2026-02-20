@@ -2,7 +2,7 @@
     <div class="panel-heading">
         <strong>FDB Entries</strong>
     </div>
-    <table id="fdb-search" class="table table-hover table-condensed table-striped">
+    <table id="fdb-tables" class="table table-hover table-condensed table-striped" data-url="<?php echo url('/ajax/table/fdb-tables'); ?>">
         <thead>
             <tr>
                 <th data-column-id="device">Device</th>
@@ -12,7 +12,7 @@
                 <th data-column-id="interface">Port</th>
                 <th data-column-id="vlan" data-width="60px">Vlan</th>
                 <th data-column-id="description" data-formatter="tooltip">Description</th>
-                <th data-column-id="dnsname" data-sortable="false" data-visible="false" data-formatter="tooltip">DNS Name</th>
+                <th data-column-id="dnsname" data-sortable="false" data-visible="true" data-formatter="tooltip">DNS Name</th>
                 <th data-column-id="first_seen" data-width="165px">First seen</th>
                 <th data-column-id="last_seen" data-width="165px">Last seen</th>
             </tr>
@@ -22,7 +22,7 @@
 
 <script>
 
-var grid = $("#fdb-search").bootgrid({
+var grid = $("#fdb-tables").bootgrid({
     ajax: true,
     rowCount: [50, 100, 250, -1],
     templates: {
@@ -50,7 +50,8 @@ if (! Auth::user()->hasGlobalRead()) {
     $param = array_merge($param, $device_ids);
 }
 
-$sql .= " WHERE F.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname` ORDER BY `hostname`";
+$order_by = str_contains(\App\Facades\LibrenmsConfig::get('device_display_default', '{{ $hostname }}'),"sysName")?"sysname":"hostname";												 
+$sql .= " WHERE F.port_id = P.port_id AND P.device_id = D.device_id $where GROUP BY `D`.`device_id`, `D`.`hostname` ORDER BY `". $order_by ."`";
 foreach (dbFetchRows($sql, $param) as $data) {
     echo '"<option value=\"' . $data['device_id'] . '\""+';
     if ($data['device_id'] == $device_id) {
@@ -126,26 +127,47 @@ echo '"' . htmlspecialchars($searchPhrase) . '"+';
                 "</form></span></div>"+
                "<div class=\"col-sm-3 actionBar\"><p class=\"{{css.actions}}\"></p></div></div></div>"
     },
-    post: function ()
-    {
+    post: function () {
+	 
         return {
-            device_id: '<?php echo $device_id ?: ''; ?>',
-            searchby: '<?php echo htmlspecialchars($searchby); ?>',
-            searchPhrase: '<?php echo htmlspecialchars($searchPhrase); ?>',
-            dns: $("#fdb-search").bootgrid("getColumnSettings").find(col => col.id === "dnsname").visible,
+            device_id: $('#device_id').val(),
+            searchby: $('#searchby').val(),
+            searchPhrase: $('#address').val(),
+            dns: $("#fdb-tables")
+                .bootgrid("getColumnSettings")
+                .find(col => col.id === "dnsname")?.visible ?? false
         };
     },
     url: "<?php echo url('/ajax/table/fdb-tables'); ?>",
     formatters: {
-        "tooltip": function (column, row) {
-                var value = row[column.id];
-                var vendor = '';
-                if (column.id == 'mac_address' && ((vendor = row['mac_oui']) != '' )) {
-                    return "<span title=\'" + value + " (" + vendor + ")\' data-toggle=\'tooltip\'>" + value + "</span>";
-                }
-                return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
-            },
+        tooltip: function (column, row) {
+            var value = row[column.id];
+                            
+            if (column.id === 'mac_address' && row.mac_oui) {
+                return "<span title='" + value + " (" + row.mac_oui + ")'>" + value + "</span>";
+            }
+            return "<span title='" + value + "'>" + value + "</span>";
+        },
     },
 });
 
+
+$('#fdb-tables').on('loaded.rs.jquery.bootgrid', function () {
+
+    const params = {
+        device_id: $('#device_id').val(),
+        searchby: $('#searchby').val(),
+        searchPhrase: $('#address').val(),
+        dns: $("#fdb-tables")
+            .bootgrid("getColumnSettings")
+            .find(col => col.id === "dnsname")?.visible ?? false
+    };
+
+    $('#fdb-tables').data('params', $.param(params));
+});
+
+$(document).on('submit', '#fdb-tables form', function (e) {
+    e.preventDefault();
+    $("#fdb-tables").bootgrid('reload');
+});
 </script>
