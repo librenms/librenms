@@ -77,7 +77,28 @@ if (! empty($fdbPort_table)) {
         // device VLANs table should catch anything invalid.
         $vlan = $vlan_fdb_dict[$vlanIndex] ?? $vlanIndex;
 
-        foreach ($data[$data_oid] ?? [] as $mac => $dot1dBasePort) {
+        // Some SNMP agents (e.g. Cisco CBS220) encode each MAC octet as a separate OID index
+        // level (via -OX hex formatting), producing a deeply-nested array instead of the
+        // expected flat [mac_string => port] map.  Detect and flatten before iterating.
+        $macPortTable = $data[$data_oid] ?? [];
+        if (! empty($macPortTable) && is_array(reset($macPortTable))) {
+            $flatten = function (array $table, string $prefix = '') use (&$flatten): array {
+                $result = [];
+                foreach ($table as $octet => $value) {
+                    $str = (string) $octet;
+                    $hex = str_starts_with(strtolower($str), '0x')
+                        ? str_pad(strtolower(substr($str, 2)), 2, '0', STR_PAD_LEFT)
+                        : str_pad(dechex((int) $str), 2, '0', STR_PAD_LEFT);
+                    $mac = $prefix !== '' ? "$prefix:$hex" : $hex;
+                    $result += is_array($value) ? $flatten($value, $mac) : [$mac => $value];
+                }
+
+                return $result;
+            };
+            $macPortTable = $flatten($macPortTable);
+        }
+
+        foreach ($macPortTable as $mac => $dot1dBasePort) {
             if ($dot1dBasePort == 0) {
                 Log::debug("No port known for $mac\n");
                 continue;
