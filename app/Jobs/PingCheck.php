@@ -39,7 +39,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Source\Fping;
-use LibreNMS\Data\Source\FpingResponse;
+use LibreNMS\Data\Source\FpingAliveResponse;
 use LibreNMS\Enum\AvailabilitySource;
 
 class PingCheck implements ShouldQueue
@@ -159,9 +159,9 @@ class PingCheck implements ShouldQueue
     /**
      * Record the data and run alerts if all parents have been processed
      */
-    public function handleResponse(FpingResponse $response): void
+    public function handleResponse(FpingAliveResponse $response): void
     {
-        Log::debug("Attempting to record data for $response->host");
+        Log::debug("Received response for $response->host");
 
         $device = $this->devices->get($response->host);
 
@@ -180,9 +180,6 @@ class PingCheck implements ShouldQueue
 
         // mark up only if snmp is not down too
         $changed = app(SetDeviceAvailability::class)->execute($device, $response->success(), AvailabilitySource::ICMP, true);
-
-        // save last_ping_timetaken and rrd data
-        $response->saveStats($device);
 
         // mark as processed
         $this->processed->put($device->device_id, true);
