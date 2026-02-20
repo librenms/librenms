@@ -196,6 +196,7 @@ class AlertRuleController extends Controller
             'invert',
             'acknowledgement',
             'recovery',
+            'ignore_offline_devices',
         ]);
         $extra['count'] ??= '-1';
         $extra['options'] = ['override_query' => $overrideQuery];

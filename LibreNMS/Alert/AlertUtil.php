@@ -230,6 +230,14 @@ class AlertUtil
     }
 
     /**
+     * Check if device is offline
+     */
+    public static function isOffline(int $device_id): bool
+    {
+        return DeviceCache::get($device_id)->status == 0;
+    }
+
+    /**
      * Process Macros
      *
      * @param  string  $rule  Rule to process
