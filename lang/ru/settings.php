@@ -612,8 +612,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Учет',
+            'mac-accounting' => [
+                'description' => 'MAC Учет',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -1347,8 +1347,8 @@ return [
             'slas' => [
                 'description' => 'Отслеживание соглашений об уровне обслуживания',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Учет MAC Cisco',
+            'mac-accounting' => [
+                'description' => 'Учет MAC',
             ],
             'cipsec-tunnels' => [
                 'description' => 'Туннели Cipsec',

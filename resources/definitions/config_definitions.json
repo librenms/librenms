@@ -1688,11 +1688,11 @@
             "default": true,
             "type": "boolean"
         },
-        "discovery_modules.cisco-mac-accounting": {
+        "discovery_modules.mac-accounting": {
             "order": 60,
             "group": "discovery",
             "section": "discovery_modules",
-            "default": false,
+            "default": true,
             "type": "boolean"
         },
         "discovery_modules.cisco-pw": {
@@ -6149,11 +6149,11 @@
             "default": false,
             "type": "boolean"
         },
-        "poller_modules.cisco-mac-accounting": {
+        "poller_modules.mac-accounting": {
             "order": 100,
             "group": "poller",
             "section": "poller_modules",
-            "default": false,
+            "default": true,
             "type": "boolean"
         },
         "poller_modules.cipsec-tunnels": {

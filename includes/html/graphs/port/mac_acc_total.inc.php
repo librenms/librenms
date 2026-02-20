@@ -3,10 +3,16 @@
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Rewrite;
 
-$port = $vars['id'];
+$port_id = $vars['id'];
 $stat = $vars['stat'] ?: 'bits';
 $sort = in_array($vars['sort'], ['in', 'out', 'both']) ? $vars['sort'] : 'in';
-$topn = is_numeric($vars['topn']) ? $vars['topn'] : '10';
+$sort = $sort == 'out' ? 'bps_out' : ($sort == 'in' ? 'bps_in' : 'bps');
+$topn = empty($vars['topn']) ? 10 : $vars['topn'];
+
+$prefix = '';
+$rrd_options = [];
+$rrd_optionsb = [];
+$stack = '';
 
 require 'includes/html/graphs/common.inc.php';
 
@@ -16,33 +22,17 @@ if ($stat == 'pkts') {
     $multiplier = '1';
     $colours = 'purples';
     $prefix = 'P';
-    if ($sort == 'in') {
-        $sort = 'cipMacHCSwitchedPkts_input_rate';
-    } elseif ($sort == 'out') {
-        $sort = 'cipMacHCSwitchedPkts_output_rate';
-    } else {
-        $sort = 'bps_in';
-    }
 } elseif ($stat == 'bits') {
     $units = 'bps';
     $unit = 'B';
     $multiplier = '8';
     $colours = 'greens';
-    if ($sort == 'in') {
-        $sort = 'cipMacHCSwitchedBytes_input_rate';
-    } elseif ($sort == 'out') {
-        $sort = 'cipMacHCSwitchedBytes_output_rate';
-    } else {
-        $sort = 'bps_in';
-    }
 }//end if
 
 $accs = dbFetchRows(
-    'SELECT *, (M.cipMacHCSwitchedBytes_input_rate + M.cipMacHCSwitchedBytes_output_rate) AS bps,
-        (M.cipMacHCSwitchedPkts_input_rate + M.cipMacHCSwitchedPkts_output_rate) AS pps
-        FROM `mac_accounting` AS M, `ports` AS I, `devices` AS D WHERE M.port_id = ?
+    'SELECT *, (M.bps_in + M.bps_out) AS bps FROM `mac_accounting` AS M, `ports` AS I, `devices` AS D WHERE M.port_id = ?
         AND I.port_id = M.port_id AND D.device_id = I.device_id ORDER BY ? DESC LIMIT 0,?',
-    [$port, $sort, $topn]
+    [$port_id, $sort, $topn]
 );
 
 $pluses = '';

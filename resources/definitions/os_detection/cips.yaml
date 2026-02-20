@@ -8,7 +8,6 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 poller_modules:
     cisco-cef: true
-    cisco-mac-accounting: true
     cisco-remote-access-monitor: true
     slas: true
     cisco-ipsec-flow-monitor: true
@@ -17,7 +16,6 @@ poller_modules:
 discovery_modules:
     cisco-cef: true
     slas: true
-    cisco-mac-accounting: true
     cisco-otv: true
     cisco-pw: true
     vrf: true
