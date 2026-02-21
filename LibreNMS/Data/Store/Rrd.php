@@ -802,9 +802,22 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Initialise storage for a device
+     */
+    public function initStorage(Device $device): void
+    {
+        $device_dir = $this->_dirFromHost($device->hostname, true);
+
+        if (LibrenmsConfig::get('rrdcached', false) && LibrenmsConfig::get('rrd.enable', true) && ! is_dir($device_dir)) {
+            mkdir($device_dir);
+            Log::info("Created directory : $device_dir");
+        }
+    }
+
+    /**
      * Rename storage for a device
      */
-    public static function renameDevice(string $oldName, string $newName): bool
+    public function renameDevice(string $oldName, string $newName): bool
     {
         $new_rrd_dir = $this->_dirFromHost($newName, true);
 
@@ -822,7 +835,7 @@ class Rrd extends BaseDatastore
     /**
      * Delete a device
      */
-    public static function deleteDevice(string $hostname): void
+    public function deleteDevice(string $hostname): void
     {
         // delete rrd files
         $host_dir = $this->_dirFromHost($hostname, true);
