@@ -1,11 +1,10 @@
-mib: SAF-INTEGRAW-MIB
 modules:
     os:
         sysDescr_regex: '/Prod: (?<hardware>[A-Za-z-_]+);Vers: (?<version>[0-9.]+-(mux|esw));.*;S\/N: (?<serial>[0-9]+)/'
     processors:
         data:
             -
-                oid: integraWsysCPUidle
+                oid: SAF-INTEGRAW-MIB::integraWsysCPUidle
                 num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.2.4.10.{{ $index }}'
                 precision: -10
                 type: saf-integra
@@ -15,12 +14,12 @@ modules:
                 divisor: 10
             data:
                 -
-                    oid: integraWsysCPUtemperature
+                    oid: SAF-INTEGRAW-MIB::integraWsysCPUtemperature
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.2.4.2.{{ $index }}'
                     descr: System CPU
                     index: 'integraWsysCPUtemperature.{{ $index }}'
                 -
-                    oid: integraWsysBoardTemperature
+                    oid: SAF-INTEGRAW-MIB::integraWsysBoardTemperature
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.2.4.8.{{ $index }}'
                     descr: System Board
                     index: 'integraWsysBoardTemperature.{{ $index }}'
@@ -29,7 +28,7 @@ modules:
                 divisor: 1000
             data:
                 -
-                    oid: integraWsysPSUvoltage
+                    oid: SAF-INTEGRAW-MIB::integraWsysPSUvoltage
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.2.4.5.{{ $index }}'
                     descr: PSU Voltage
                     index: 'integraWsysPSUvoltage.{{ $index }}'
@@ -38,7 +37,7 @@ modules:
                 divisor: 1000
             data:
                 -
-                    oid: integraWsysPSUcurrent
+                    oid: SAF-INTEGRAW-MIB::integraWsysPSUcurrent
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.2.4.6.{{ $index }}'
                     descr: PSU Current
                     index: 'integraWsysPSUcurrent.{{ $index }}'
@@ -47,14 +46,14 @@ modules:
                 divisor: 1000
             data:
                 -
-                    oid: integraWsysPSUpower
+                    oid: SAF-INTEGRAW-MIB::integraWsysPSUpower
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.2.4.7.{{ $index }}'
                     descr: PSU Power
                     index: 'integraWsysPSUpower.{{ $index }}'
         state:
             data:
                 -
-                    oid: integraWsysLicenseGenStatus
+                    oid: SAF-INTEGRAW-MIB::integraWsysLicenseGenStatus
                     num_oid: '.1.3.6.1.4.1.7571.100.1.1.7.2.4.4.{{ $index }}'
                     descr: License Status
                     index: 'integraWsysLicenseGenStatus.{{ $index }}'

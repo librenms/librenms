@@ -20,7 +20,7 @@
  *  down(3),
  *  notpresent(4)
  */
-$voss_fan = snmpwalk_cache_multi_oid($device, 'rcVossSystemFanInfoOperStatus', [], 'RAPID-CITY');
+$voss_fan = snmpwalk_cache_multi_oid($device, 'rcVossSystemFanInfoOperStatus', [], 'RAPID-CITY', null, '-OeQUs');
 $fan = snmpwalk_cache_multi_oid($device, 'rcChasFanOperStatus', [], 'RAPID-CITY');
 
 if (is_array($voss_fan)) {
@@ -71,7 +71,7 @@ if (is_array($voss_fan)) {
  *  down(4)
 */
 
-$power_supply = snmpwalk_cache_multi_oid($device, 'rcChasPowerSupplyOperStatus', [], 'RAPID-CITY');
+$power_supply = snmpwalk_cache_multi_oid($device, 'rcChasPowerSupplyOperStatus', [], 'RAPID-CITY', null, '-OeQUs');
 
 if (is_array($power_supply)) {
     foreach ($power_supply as $oid => $array) {

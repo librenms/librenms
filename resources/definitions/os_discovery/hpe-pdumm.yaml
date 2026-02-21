@@ -1,4 +1,3 @@
-mib: CPQPOWER-MIB
 modules:
     os:
         sysDescr_regex: '/firmware version (?<version>[\d.]+)/'
@@ -6,8 +5,8 @@ modules:
         current:
             data:
                 -
-                    oid: pduOutputBreakerTable
-                    value: breakerCurrent
+                    oid: CPQPOWER-MIB::pduOutputBreakerTable
+                    value: CPQPOWER-MIB::breakerCurrent
                     num_oid: '.1.3.6.1.4.1.232.165.2.3.2.1.3.{{ $index }}'
                     index: 'breakerCurrent.{{ $index }}'
                     descr: 'PDU {{ $subindex0 }} Phase {{ $subindex1 }}'
@@ -15,15 +14,15 @@ modules:
         load:
             data:
                 -
-                    oid: pduOutputBreakerTable
-                    value: breakerPercentLoad
+                    oid: CPQPOWER-MIB::pduOutputBreakerTable
+                    value: CPQPOWER-MIB::breakerPercentLoad
                     num_oid: '.1.3.6.1.4.1.232.165.2.3.2.1.4.{{ $index }}'
                     index: 'breakerPercentLoad.{{ $index }}'
                     descr: 'PDU {{ $subindex0 }} Phase {{ $subindex1 }}'
                     skip_values: -1
                 -
-                    oid: pduOutputTable
-                    value: pduOutputLoad
+                    oid: CPQPOWER-MIB::pduOutputTable
+                    value: CPQPOWER-MIB::pduOutputLoad
                     num_oid: '.1.3.6.1.4.1.232.165.2.3.1.1.2.{{ $index }}'
                     index: 'pduOutputLoad.{{ $index }}'
                     descr: 'PDU {{ $index }}'
@@ -32,8 +31,8 @@ modules:
         voltage:
             data:
                 -
-                    oid: pduOutputBreakerTable
-                    value: breakerVoltage
+                    oid: CPQPOWER-MIB::pduOutputBreakerTable
+                    value: CPQPOWER-MIB::breakerVoltage
                     num_oid: '.1.3.6.1.4.1.232.165.2.3.2.1.2.{{ $index }}'
                     index: 'breakerVoltage.{{ $index }}'
                     descr: 'PDU {{ $subindex0 }} Phase {{ $subindex1 }}'
@@ -41,8 +40,8 @@ modules:
         power:
             data:
                 -
-                    oid: pduOutputTable
-                    value: pduOutputPower
+                    oid: CPQPOWER-MIB::pduOutputTable
+                    value: CPQPOWER-MIB::pduOutputPower
                     num_oid: '.1.3.6.1.4.1.232.165.2.3.1.1.4.{{ $index }}'
                     index: 'pduOutputPower.{{ $index }}'
                     descr: 'PDU {{ $index }}'
@@ -50,9 +49,10 @@ modules:
         state:
             data:
                 -
-                    oid: pduIdentTable
-                    value: pduStatus
+                    oid: CPQPOWER-MIB::pduIdentTable
+                    value: CPQPOWER-MIB::pduStatus
                     num_oid: '.1.3.6.1.4.1.232.165.2.1.2.1.8.{{ $index }}'
+                    state_name: pduIdentTable
                     descr: 'PDU {{ $index }}'
                     states:
                         - { value: 1, generic: 3, descr: other, graph: 0 }

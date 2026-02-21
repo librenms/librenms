@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import _ from 'lodash';
+import _ from "lodash";
 
 export default {
         name: "LibrenmsSetting",
@@ -81,7 +81,9 @@ export default {
                     .catch((error) => {
                         this.feedback = 'has-error';
                         this.updateStatus = 'error';
-                        toastr.error(error.response.data.message);
+                        let span = document.createElement('span');
+                        span.textContent = error.response.data.message;
+                        toastr.error(span);
 
                         // don't reset certain types back to actual value on error
                         const ignore = [
