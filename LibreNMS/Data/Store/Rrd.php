@@ -799,4 +799,22 @@ class Rrd extends BaseDatastore
     {
         return ($type == 'update' || $type == 'create') ? $type : 'other';
     }
+
+    /**
+     * Rename a host
+     */
+    public static function renameHost(string $oldName, string $newName): bool
+    {
+        $new_rrd_dir = $this->_dirFromHost($newName, true);
+
+        if (is_dir($new_rrd_dir)) {
+            throw new RrdException("Renaming of $host failed due to existing RRD folder for $newName");
+        }
+
+        if (! is_dir($new_rrd_dir) && rename($this->_dirFromHost($oldName, true), $new_rrd_dir) === true) {
+            return true;
+        }
+
+        return false;
+    }
 }
