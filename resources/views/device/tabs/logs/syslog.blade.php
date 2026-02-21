@@ -63,7 +63,7 @@
             '<select name="program" id="program" class="form-control">' +
                 '<option value="">All Programs&nbsp;&nbsp;</option>' +
             @if($program)
-                '<option value=\"' + @json($program) + '\">' + @json($program) + '</option>' +";
+                '<option value=\"' + @json($program) + '\">' + @json($program) + '</option>' +
             @endif
             '</select>' +
             '</div>' +
@@ -71,7 +71,7 @@
             '<select name="priority" id="priority" class="form-control">' +
                 '<option value="">All Priorities</option>' +
             @if($priority)
-                '<option value=\"' + @json($priority) + '\">' + @json($priority) + '</option>' +";
+                '<option value=\"' + @json($priority) + '\">' + @json($priority) + '</option>' +
             @endif
             '</select>' +
             '</div>' +
