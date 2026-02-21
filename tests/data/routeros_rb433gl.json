@@ -4325,5 +4325,33 @@
                 }
             ]
         }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "mkt202.hemiko",
+                    "remote_port": "trunk: Silos (wifi1) (6c3b6bada229)",
+                    "remote_platform": "",
+                    "remote_version": "MikroTik RouterOS 7.18.2 (stable) 2025-03-11 11:59:04 RBDynaDishG-5HacDr3",
+                    "ifAlias": "trunk: Crkva (wifi1)",
+                    "ifDescr": "trunk: Crkva (wifi1)",
+                    "ifName": "trunk: Crkva (wifi1)"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "sw72.hemiko",
+                    "remote_port": "trunk: mkt71 (5c628b37a587)",
+                    "remote_platform": "",
+                    "remote_version": "Omada 10-Port Gigabit Smart Switch with 8-Port PoE+",
+                    "ifAlias": "trunk: sw72 (eth2)",
+                    "ifDescr": "trunk: sw72 (eth2)",
+                    "ifName": "trunk: sw72 (eth2)"
+                }
+            ]
+        }
     }
 }

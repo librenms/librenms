@@ -22,8 +22,10 @@
  *
  * @copyright  2019 Vitali Kari
  * @copyright  2019 Tony Murray
+ * @copyright  2025 Peca Nesovanovic
  * @author     Vitali Kari <vitali.kari@gmail.com>
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS;
@@ -31,6 +33,7 @@ namespace LibreNMS\OS;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\EntPhysical;
+use App\Models\Link;
 use App\Models\MplsLsp;
 use App\Models\MplsLspPath;
 use App\Models\MplsSap;
@@ -43,6 +46,7 @@ use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Interfaces\Discovery\LinkDiscovery;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -57,7 +61,17 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use SnmpQuery;
 
-class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscovery, WirelessPowerDiscovery, WirelessSnrDiscovery, WirelessRsrqDiscovery, WirelessRssiDiscovery, WirelessRsrpDiscovery, WirelessChannelDiscovery
+class Timos extends OS implements
+    LinkDiscovery,
+    MplsDiscovery,
+    MplsPolling,
+    TransceiverDiscovery,
+    WirelessPowerDiscovery,
+    WirelessSnrDiscovery,
+    WirelessRsrqDiscovery,
+    WirelessRssiDiscovery,
+    WirelessRsrpDiscovery,
+    WirelessChannelDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -1085,5 +1099,40 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
                 'channels' => $data['TIMETRA-PORT-MIB::tmnxPortSFPNumLanes'] ?? null,
             ]);
         })->filter();
+    }
+
+    public function discoverLinks(): Collection
+    {
+        $links = new Collection;
+
+        $lldp_array = SnmpQuery::hideMib()->walk('TIMETRA-LLDP-MIB::tmnxLldpRemoteSystemsData')->table(4);
+        foreach ($lldp_array as $sub_lldp_1) {
+            foreach ($sub_lldp_1 as $ifIndex => $sub_lldp_2) {
+                foreach ($sub_lldp_2 as $sub_lldp_3) {
+                    foreach ($sub_lldp_3 as $data) {
+                        $port = PortCache::getByIfIndex($ifIndex, $this->getDeviceId());
+                        $port_id = $port?->port_id;
+                        $remote_device_id = find_device_id($data['tmnxLldpRemSysName']);
+
+                        if (! empty($port_id) && $data['tmnxLldpRemSysName'] && $data['tmnxLldpRemPortId']) {
+                            $remote_port_id = find_port_id($data['tmnxLldpRemPortDesc'], $data['tmnxLldpRemPortId'], $remote_device_id);
+                            $links->push(new Link([
+                                'local_port_id' => $port_id,
+                                'remote_hostname' => $data['tmnxLldpRemSysName'],
+                                'remote_device_id' => $remote_device_id,
+                                'remote_port_id' => $remote_port_id,
+                                'active' => 1,
+                                'protocol' => 'lldp',
+                                'remote_port' => $data['tmnxLldpRemPortId'],
+                                'remote_platform' => null,
+                                'remote_version' => $data['tmnxLldpRemSysDesc'] ?? '',
+                            ]));
+                        }
+                    }
+                }
+            }
+        }
+
+        return $links->filter();
     }
 }

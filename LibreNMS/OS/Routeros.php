@@ -29,6 +29,7 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\Link;
 use App\Models\PortVlan;
 use App\Models\Qos;
 use App\Models\Transceiver;
@@ -36,6 +37,7 @@ use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\LinkDiscovery;
 use LibreNMS\Interfaces\Discovery\QosDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -55,7 +57,9 @@ use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Routeros extends OS implements
@@ -75,7 +79,8 @@ class Routeros extends OS implements
     WirelessRsrqDiscovery,
     WirelessRsrpDiscovery,
     WirelessSinrDiscovery,
-    WirelessQualityDiscovery
+    WirelessQualityDiscovery,
+    LinkDiscovery
 {
     private Collection $qosIdxToParent;
 
@@ -746,5 +751,80 @@ class Routeros extends OS implements
         }
 
         return $ports;
+    }
+
+    public function discoverLinks(): Collection
+    {
+        $links = new Collection;
+
+        $lldp_ports = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->table();
+        $lldp_ports_num = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrNeighborInterfaceID')->table();
+
+        if (empty($lldp_ports) || empty($lldp_ports_num)) {
+            return $links;
+        }
+
+        $lldp_array = SnmpQuery::hideMib()->walk([
+            'LLDP-MIB::lldpRemEntry',
+            'LLDP-MIB::lldpRemManAddrEntry',
+        ])->table(3);
+
+        // mikrotik broken LLDP implementation v6/v7
+        $lldpRows = [];
+        if (! empty($lldp_array)) {
+            foreach ($lldp_array as $key => $data) {
+                if (isset($data['lldpRemChassisIdSubtype'])) {
+                    $lldpRows[$key] = $data;
+                } else {
+                    foreach ($data as $key1 => $data1) {
+                        if (isset($data1['lldpRemChassisIdSubtype'])) {
+                            $lldpRows[$key1] = $data1;
+                        } else {
+                            foreach ($data1 as $key2 => $data2) {
+                                if (isset($data2['lldpRemChassisIdSubtype'])) {
+                                    $lldpRows[$key2] = $data2;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (! empty($lldpRows)) {
+            foreach ($lldpRows as $key => $data) {
+                $data['lldpRemSysName'] = StringHelpers::linksRemSysName($data['lldpRemSysName']);
+                $data['lldpRemPortId'] = StringHelpers::linksRemPortName($data['lldpRemSysDesc'], $data['lldpRemPortId']);
+                $local_port_ifName = $lldp_ports['mtxrInterfaceStatsName'][hexdec((string) $lldp_ports_num['mtxrNeighborInterfaceID'][$key])];
+                $local_port_id = PortCache::getIdFromIfName($local_port_ifName);
+                $interface = PortCache::get($local_port_id);
+                $remote_port_mac = '';
+
+                if ($data['lldpRemPortIdSubtype'] == 3) { // 3 = macaddress
+                    $remote_port_mac = Mac::parse($data['lldpRemPortId'] ?? '')->hex();
+                }
+
+                $remote_device_id = find_device_id($data['lldpRemSysName'] ?? '', $data['lldpRemManAddr'] ?? '', $remote_port_mac);
+                $remote_chassis_id = Mac::parse($data['lldpRemChassisId'] ?? '')->hex();
+
+                if ($interface['port_id'] && $data['lldpRemSysName'] && $data['lldpRemPortId']) {
+                    $sufix = (! empty($data['lldpRemManAddr'])) ? '#' . $data['lldpRemManAddr'] : '';
+                    $remote_port_id = find_port_id($data['lldpRemPortDesc'] ?? '', $data['lldpRemPortId'], $remote_device_id, $remote_chassis_id);
+                    $links->push(new Link([
+                        'local_port_id' => $interface['port_id'],
+                        'remote_hostname' => $data['lldpRemSysName'],
+                        'remote_device_id' => $remote_device_id,
+                        'remote_port_id' => $remote_port_id,
+                        'active' => 1,
+                        'protocol' => 'lldp' . $sufix,
+                        'remote_port' => $data['lldpRemPortId'],
+                        'remote_platform' => null,
+                        'remote_version' => $data['lldpRemSysDesc'] ?? '',
+                    ]));
+                }
+            }
+        }
+
+        return $links;
     }
 }
