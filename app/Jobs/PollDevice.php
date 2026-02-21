@@ -188,7 +188,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         try {
             Rrd::initStorage($this->device);
         } catch (\ErrorException $e) {
-            Eventlog::log("Failed to create rrd directory: $host_rrd", $this->device);
+            Eventlog::log('Failed to create rrd directory for ' . $this->device->hostname, $this->device);
             Log::error($e);
         }
     }

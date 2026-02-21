@@ -96,9 +96,9 @@ class DeviceObserver
             } catch (\Exception $e) {
                 Log::error("Could not delete RRD files for: $device->hostname", [$e]);
             }
-
-            Eventlog::log('Device ' . ($device->hostname ?: $device->device_id) . ' has been removed', 0, 'system', Severity::Notice);
         }
+
+        Eventlog::log('Device ' . ($device->hostname ?: $device->device_id) . ' has been removed', 0, 'system', Severity::Notice);
 
         (new Oxidized)->reloadNodes();
     }
