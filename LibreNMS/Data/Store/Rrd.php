@@ -43,6 +43,7 @@ use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
 use Log;
+use SplFileInfo;
 use Symfony\Component\Process\Process;
 
 class Rrd extends BaseDatastore
@@ -841,6 +842,34 @@ class Rrd extends BaseDatastore
         $host_dir = $this->_dirFromHost($hostname, true);
         if (! File::deleteDirectory($host_dir)) {
             throw new RrdException("Could not delete RRD files for: $hostname");
+        }
+    }
+
+    /**
+     * Get storage stats for a device
+     */
+    public function getStorageSize(Device $device): array
+    {
+        $directory = $this->_dirFromHost($device->hostname, true);
+
+        if (! File::isDirectory($directory) || ! File::isReadable($directory)) {
+            return [0, 0];
+        }
+
+        try {
+            $files = collect(File::allFiles($directory));
+
+            $size = $files->sum(function (SplFileInfo $file): int {
+                try {
+                    return $file->getSize();
+                } catch (Throwable) {
+                    return 0;
+                }
+            });
+
+            return [$size, $files->count()];
+        } catch (Throwable) {
+            return [0, 0];
         }
     }
 }
