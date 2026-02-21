@@ -376,7 +376,7 @@ class Rrd extends BaseDatastore
     {
         $partname = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
 
-        return implode('/', [$this->_dirFromHost($host, $forceabsolute), $partname]);
+        return implode('/', [$this->dirFromHost($host, $forceabsolute), $partname]);
     }
 
     /**
@@ -419,7 +419,7 @@ class Rrd extends BaseDatastore
         if ($this->rrdcached) {
             // getRrdFiles only returns filenames for rrdcached - glob match on filename and prepend directory
             $globtest = self::safeName(is_array($extra) ? implode('-', $extra) : $extra) . $globmatch;
-            $prepend = $this->_dirFromHost($host) . '/';
+            $prepend = $this->dirFromHost($host) . '/';
         } else {
             // getRrdFiles only returns absolute filenames - glob match on path and no prepend
             $globtest = $this->partname($host, $extra) . $globmatch;
@@ -440,24 +440,13 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Generates an absolute path based on the hostname (or IP)
-     *
-     * @param  string  $host  Host name
-     * @return string the name of the rrd directory for $host
-     */
-    public function dirFromHost($host): string
-    {
-        return $this->_dirFromHost($host, true);
-    }
-
-    /**
      * Generates a path based on the hostname (or IP)
      *
      * @param  string  $host  Host name
      * @param  bool  $forceabsolute  Do we always want an absolute directory name
      * @return string the name of the rrd directory for $host
      */
-    private function _dirFromHost($host, $forceabsolute = false): string
+    private function dirFromHost($host, $forceabsolute = false): string
     {
         $host = self::safeName(trim($host, '[]'));
 
@@ -807,7 +796,7 @@ class Rrd extends BaseDatastore
      */
     public function initStorage(Device $device): void
     {
-        $device_dir = $this->_dirFromHost($device->hostname, true);
+        $device_dir = $this->dirFromHost($device->hostname, true);
 
         if (LibrenmsConfig::get('rrdcached', false) && LibrenmsConfig::get('rrd.enable', true) && ! is_dir($device_dir)) {
             mkdir($device_dir);
@@ -820,13 +809,13 @@ class Rrd extends BaseDatastore
      */
     public function renameDevice(string $oldName, string $newName): bool
     {
-        $new_rrd_dir = $this->_dirFromHost($newName, true);
+        $new_rrd_dir = $this->dirFromHost($newName, true);
 
         if (is_dir($new_rrd_dir)) {
             throw new RrdException("Renaming of $oldName failed due to existing RRD folder for $newName");
         }
 
-        if (! is_dir($new_rrd_dir) && rename($this->_dirFromHost($oldName, true), $new_rrd_dir) === true) {
+        if (! is_dir($new_rrd_dir) && rename($this->dirFromHost($oldName, true), $new_rrd_dir) === true) {
             return true;
         }
 
@@ -839,7 +828,7 @@ class Rrd extends BaseDatastore
     public function deleteDevice(string $hostname): void
     {
         // delete rrd files
-        $host_dir = $this->_dirFromHost($hostname, true);
+        $host_dir = $this->dirFromHost($hostname, true);
         if (! File::deleteDirectory($host_dir)) {
             throw new RrdException("Could not delete RRD files for: $hostname");
         }
@@ -850,7 +839,7 @@ class Rrd extends BaseDatastore
      */
     public function getStorageSize(Device $device): array
     {
-        $directory = $this->_dirFromHost($device->hostname, true);
+        $directory = $this->dirFromHost($device->hostname, true);
 
         if (! File::isDirectory($directory) || ! File::isReadable($directory)) {
             return [0, 0];
