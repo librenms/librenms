@@ -15,6 +15,7 @@ use App\Models\StateTranslation;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Util\Time;
 
 /**
@@ -67,24 +68,23 @@ function parse_modules($type, $options)
 function renamehost($id, $new, $source = 'console')
 {
     $host = gethostbyid($id);
-    $new_rrd_dir = Rrd::dirFromHost($new);
 
-    if (is_dir($new_rrd_dir)) {
-        Eventlog::log("Renaming of $host failed due to existing RRD folder for $new", $id, 'system', Severity::Error);
+    try {
+        if (! Rrd::renameDevice($host, $new)) {
+            Eventlog::log("Renaming of $host failed", $id, 'system', Severity::Error);
 
-        return "Renaming of $host failed due to existing RRD folder for $new\n";
+            return "Renaming of $host failed\n";
+        }
+    } catch (RrdException $e) {
+        Eventlog::log($e->getMsssage(), $id, 'system', Severity::Error);
+
+        return $e->getMessage() . "\n";
     }
 
-    if (! is_dir($new_rrd_dir) && rename(Rrd::dirFromHost($host), $new_rrd_dir) === true) {
-        dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
-        Eventlog::log("Hostname changed -> $new ($source)", $id, 'system', Severity::Notice);
+    dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
+    Eventlog::log("Hostname changed -> $new ($source)", $id, 'system', Severity::Notice);
 
-        return '';
-    }
-
-    Eventlog::log("Renaming of $host failed", $id, 'system', Severity::Error);
-
-    return "Renaming of $host failed\n";
+    return '';
 }
 
 function device_discovery_trigger($id)
