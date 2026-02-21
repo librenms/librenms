@@ -67,7 +67,7 @@ class DeviceObserver
             $old_name = $device->getOriginal('hostname');
 
             try {
-                if (! Rrd::renameHost($old_name, $new_name)) {
+                if (! Rrd::renameDevice($old_name, $new_name)) {
                     $device->hostname = $old_name;
                     Eventlog::log("Renaming of $old_name failed", $device, 'system', Severity::Error);
 
@@ -90,17 +90,10 @@ class DeviceObserver
      */
     public function deleted(Device $device): void
     {
-        // delete rrd files
-        $host_dir = Rrd::dirFromHost($device->hostname);
         try {
-            $result = File::deleteDirectory($host_dir);
-
-                if (! $result) {
-                    Log::debug("Could not delete RRD files for: $device->hostname");
-                }
-            } catch (\Exception $e) {
-                Log::error("Could not delete RRD files for: $device->hostname", [$e]);
-            }
+            Rrd::deleteDevice($device->hostname);
+        } catch (\Exception $e) {
+            Log::error("Could not delete RRD files for: $device->hostname", [$e]);
         }
 
         Eventlog::log('Device ' . ($device->hostname ?: $device->device_id) . ' has been removed', 0, 'system', Severity::Notice);

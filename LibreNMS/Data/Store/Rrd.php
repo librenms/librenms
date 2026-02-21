@@ -31,6 +31,7 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use Exception;
+use File;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Enum\Severity;
@@ -801,14 +802,14 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Rename a host
+     * Rename storage for a device
      */
-    public static function renameHost(string $oldName, string $newName): bool
+    public static function renameDevice(string $oldName, string $newName): bool
     {
         $new_rrd_dir = $this->_dirFromHost($newName, true);
 
         if (is_dir($new_rrd_dir)) {
-            throw new RrdException("Renaming of $host failed due to existing RRD folder for $newName");
+            throw new RrdException("Renaming of $oldName failed due to existing RRD folder for $newName");
         }
 
         if (! is_dir($new_rrd_dir) && rename($this->_dirFromHost($oldName, true), $new_rrd_dir) === true) {
@@ -816,5 +817,17 @@ class Rrd extends BaseDatastore
         }
 
         return false;
+    }
+
+    /**
+     * Delete a device
+     */
+    public static function deleteDevice(string $hostname): void
+    {
+        // delete rrd files
+        $host_dir = $this->_dirFromHost($hostname, true);
+        if (! File::deleteDirectory($host_dir)) {
+            throw new RrdException("Could not delete RRD files for: $hostname");
+        }
     }
 }

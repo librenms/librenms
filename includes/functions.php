@@ -70,7 +70,7 @@ function renamehost($id, $new, $source = 'console')
     $host = gethostbyid($id);
 
     try {
-        if (! Rrd::renameHost($host, $new)) {
+        if (! Rrd::renameDevice($host, $new)) {
             Eventlog::log("Renaming of $host failed", $id, 'system', Severity::Error);
 
             return "Renaming of $host failed\n";
