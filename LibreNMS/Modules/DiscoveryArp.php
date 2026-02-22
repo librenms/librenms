@@ -5,7 +5,6 @@ namespace LibreNMS\Modules;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
-use App\Models\Ipv4Mac;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -49,7 +48,7 @@ class DiscoveryArp implements Module
     public function discover(OS $os): void
     {
         // Find all IPv4 addresses in the MAC table that haven't been discovered on monitored devices.
-        $entries = Ipv4Mac::query()
+        $entries = $os->getDevice()->macs()
             ->select(['id', 'ipv4_address', 'port_id'])
             ->whereHas('port', function (Builder $query): void {
                 /** @phpstan-ignore method.notFound */

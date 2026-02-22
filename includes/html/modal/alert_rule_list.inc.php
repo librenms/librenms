@@ -59,8 +59,8 @@ if (! Auth::user()->hasGlobalAdmin()) {
                             }
                             echo "
                                 <tr>
-                                    <td>" . e(strip_tags((string)$rule['name'])) . "</td>
-                                    <td><i>" . e($rule_display) . "</i></td>
+                                    <td>" . e(strip_tags((string) $rule['name'])) . "</td>
+                                    <td><i>" . e(strip_tags((string) $rule_display)) . "</i></td>
                                     <td>{$rule['severity']}</td>
                                     <td>{$rule['id']}</td>
                                 </tr>
