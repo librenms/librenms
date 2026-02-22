@@ -19,8 +19,6 @@
  * This is commonly used for thermal_zone sensors on ARM SoCs.
  */
 
-use LibreNMS\Util\SnmpQuery;
-
 if ($device['os'] === 'openwrt') {
     // Query temperature values directly (entire Entry walk times out)
     $temps = SnmpQuery::walk('LM-SENSORS-MIB::lmTempSensorsValue')->table(1);
@@ -32,14 +30,15 @@ if ($device['os'] === 'openwrt') {
         $names = SnmpQuery::walk('LM-SENSORS-MIB::lmTempSensorsDevice')->table(1);
 
         foreach ($temps as $index => $entry) {
-            $current = $entry['lmTempSensorsValue'] ?? null;
+            // SnmpQuery returns keys with MIB prefix
+            $current = $entry['LM-SENSORS-MIB::lmTempSensorsValue'] ?? null;
             
             if (!is_numeric($current) || $current <= 0) {
                 continue;
             }
 
             $oid = '.1.3.6.1.4.1.2021.13.16.2.1.3.' . $index;
-            $descr = $names[$index]['lmTempSensorsDevice'] ?? 'Sensor ' . $index;
+            $descr = $names[$index]['LM-SENSORS-MIB::lmTempSensorsDevice'] ?? 'Sensor ' . $index;
             
             // LM-SENSORS-MIB returns temperature in millidegrees
             $divisor = 1000;
@@ -48,24 +47,28 @@ if ($device['os'] === 'openwrt') {
             // High limit defaults to 100°C
             $limit_celsius = 100;
 
-            discover_sensor(
-                $valid['sensor'],
-                'temperature',
-                $device,
-                $oid,
-                $index,
-                'lm-sensors',
-                $descr,
-                $divisor,
-                1,
-                null,
-                null,
-                null,
-                $limit_celsius,
-                $current_celsius
-            );
+            // Use modern sensor discovery method
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'temperature',
+                'sensor_oid' => $oid,
+                'sensor_index' => $index,
+                'sensor_type' => 'lm-sensors',
+                'sensor_descr' => $descr,
+                'sensor_divisor' => $divisor,
+                'sensor_multiplier' => 1,
+                'sensor_limit_low' => null,
+                'sensor_limit_low_warn' => null,
+                'sensor_limit_warn' => null,
+                'sensor_limit' => $limit_celsius,
+                'sensor_current' => $current_celsius,
+                'entPhysicalIndex' => null,
+                'entPhysicalIndex_measured' => null,
+                'user_func' => null,
+                'group' => null,
+            ]));
         }
     }
 }
 
-unset($temps, $names, $index, $entry, $current, $oid, $descr, $divisor, $limit_celsius);
+unset($temps, $names, $index, $entry, $current, $oid, $descr, $divisor, $limit_celsius, $current_celsius);
