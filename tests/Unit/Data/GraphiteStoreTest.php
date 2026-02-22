@@ -69,7 +69,7 @@ final class GraphiteStoreTest extends TestCase
 
     public function testSocketWriteError(): void
     {
-        $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
+        $mockSocket = \Mockery::mock(Socket::class);
         $graphite = $this->mockGraphite($mockSocket);
 
         $mockSocket->shouldReceive('write')
@@ -80,7 +80,7 @@ final class GraphiteStoreTest extends TestCase
 
     public function testSimpleWrite(): void
     {
-        $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
+        $mockSocket = \Mockery::mock(Socket::class);
         $graphite = $this->mockGraphite($mockSocket);
 
         $measurement = 'testmeasure';

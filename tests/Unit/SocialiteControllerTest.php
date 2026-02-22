@@ -139,8 +139,7 @@ final class SocialiteControllerTest extends TestCase
     public function testSetRolesFromClaimSaml2Admin(): void
     {
         // we don't import LightSaml\Model\Assertion\Attribute for testing
-        $attr = new class
-        {
+        $attr = new class {
             public function getName(): string
             {
                 return 'http://schemas.microsoft.com/ws/2008/06/identity/claims/groups';
@@ -167,8 +166,7 @@ final class SocialiteControllerTest extends TestCase
     public function testSetRolesFromClaimSaml2GlobalRead(): void
     {
         // we don't import LightSaml\Model\Assertion\Attribute for testing
-        $attr = new class
-        {
+        $attr = new class {
             public function getName(): string
             {
                 return 'http://schemas.microsoft.com/ws/2008/06/identity/claims/groups';
