@@ -975,6 +975,11 @@ class Cisco extends OS implements
 
         return SnmpQuery::enumStrings()->walk('CISCO-VTP-MIB::vtpVlanTable')
             ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain) {
+                // Skip Cisco reserved VLANs (1002-1005: fddi-default, token-ring-default, fddinet-default, trnet-default)
+                if ($vlan_id >= 1002 && $vlan_id <= 1005) {
+                    return null;
+                }
+
                 if ($current_domain != $vtpdomain_id) {
                     $current_domain = $vtpdomain_id;
                     Log::info('VTP Domain ' . $vtpdomain_id . ' ' . ($vtpdomains[$vtpdomain_id] ?? 'none'));
@@ -987,7 +992,8 @@ class Cisco extends OS implements
                     'vlan_type' => $vlan['CISCO-VTP-MIB::vtpVlanType'] ?? '',
                     'vlan_state' => isset($vlan['CISCO-VTP-MIB::vtpVlanState']) && $vlan['CISCO-VTP-MIB::vtpVlanState'] == 'operational',
                 ]);
-            });
+            })
+            ->filter(); // Remove null values from reserved VLANs
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection
@@ -1045,8 +1051,7 @@ class Cisco extends OS implements
         foreach ($vlans as $vlan) {
             $vlan_id = (int) $vlan->vlan_vlan;
 
-            // Ignore reserved VLAN IDs
-            if ($vlan->vlan_state && $vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
+            if ($vlan->vlan_state && $vlan_id) {
                 // collect BRIDGE-MIB in vlan context
                 $tmp_vlan_data = SnmpQuery::context($vlan_id === 1 ? '' : (string) $vlan_id, 'vlan-')
                     ->enumStrings()

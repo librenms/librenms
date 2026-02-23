@@ -20,7 +20,7 @@ foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
             $vlans_dict[$vlan_raw] = $newvlan_id;
         }
 
-        if (($vlan['vtpVlanState'] === '1') && ($vlan_raw < 1002 || $vlan_raw > 1005)) {
+        if ($vlan['vtpVlanState'] === '1') {
             $fdbPort_table = SnmpQuery::context($vlan_raw, 'vlan-')->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
 
             $portid_dict = [];
