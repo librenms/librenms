@@ -102,7 +102,7 @@ class Notifications
             }
 
             if (is_file($url)) {
-                file_get_contents($url);
+                $data = file_get_contents($url);
             } else {
                 $data = Http::client()->get($url)->body();
             }
