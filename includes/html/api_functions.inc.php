@@ -1424,7 +1424,7 @@ function add_edit_alert_template(Illuminate\Http\Request $request)
     $rules = $vars['alert_rules'];
     // explode(',', $vars['alert_rules'] ?? '');
     $status = 'error';
-    
+
     try {
         // create some test data to check the template
         $test_data = [
@@ -1447,10 +1447,10 @@ function add_edit_alert_template(Illuminate\Http\Request $request)
         Blade::render($vars['template'], $test_data);
         Blade::render($vars['title'], $test_data);
         Blade::render($vars['title_rec'], $test_data);
-        } 
-    catch (Exception $e) {
+    } catch (Exception $e) {
         $message = 'Template failed to be parsed, please check the syntax. ';
         $message .= $e->getMessage();
+
         return api_error(400, $message);
     }
 
@@ -1461,7 +1461,7 @@ function add_edit_alert_template(Illuminate\Http\Request $request)
     if (empty($name)) {
         return api_error(400, 'name variable must be set');
     }
-    if(! isset($vars['template']) || empty($vars['template'])){
+    if (! isset($vars['template']) || empty($vars['template'])) {
         return api_error(400, 'template variable must be set');
     }
     if (isset($vars['template_id']) && is_numeric($vars['template_id'])) {
@@ -1485,11 +1485,10 @@ function add_edit_alert_template(Illuminate\Http\Request $request)
             $template->title = $vars['title'];
             $template->title_rec = $vars['title_rec'];
 
-
             $template->save();
             $template->fresh();
             $template_id = $template->id;
-            if ($template_id != NULL) {
+            if ($template_id != null) {
                 $status = 'ok';
             } else {
                 $message = 'Could not create alert template';
@@ -1519,20 +1518,16 @@ function add_edit_alert_template(Illuminate\Http\Request $request)
             $message = 'Alert template has been ' . ($create ? 'created' : 'updated') . ' but some attached rules have not been updated.';
         }
     }
-    
 
     $response = ['status' => $status, 'message' => htmlentities((string) $message), 'id' => $template_id ?? null];
-    if($status == 'error'){
+    if ($status == 'error') {
         return api_error(400, $message);
     }
-    if($create){
+    if ($create) {
         return response()->json($response, 201, [], JSON_PRETTY_PRINT);
     }
 
     return response()->json($response, 200, [], JSON_PRETTY_PRINT);
-
-
-    
 }
 
 /**
