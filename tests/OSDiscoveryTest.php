@@ -36,8 +36,10 @@ use LibreNMS\Util\Debug;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
 
 #[Group('os')]
+#[TestDox('OS Discovery')]
 final class OSDiscoveryTest extends TestCase
 {
     private static $unchecked_files;
@@ -51,6 +53,7 @@ final class OSDiscoveryTest extends TestCase
         self::$unchecked_files = array_flip(array_filter(array_map(fn ($file) => basename($file, '.snmprec'), glob($glob)), fn ($file) => ! Str::contains($file, '@')));
     }
 
+    #[TestDox('Valid OS names')]
     public function testValidOSNames(): void
     {
         $os = array_keys(self::osProvider());
@@ -88,6 +91,7 @@ final class OSDiscoveryTest extends TestCase
      * @param  string  $os_name
      */
     #[DataProvider('osProvider')]
+    #[TestDox('OS detection')]
     public function testOSDetection($os_name): void
     {
         if (! getenv('SNMPSIM')) {

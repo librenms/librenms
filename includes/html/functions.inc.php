@@ -736,21 +736,6 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     return $fault_detail;
 }
 
-function dynamic_override_config($type, $name, $device)
-{
-    $attrib_val = get_dev_attrib($device, $name);
-    if ($attrib_val == 'true') {
-        $checked = 'checked';
-    } else {
-        $checked = '';
-    }
-    if ($type == 'checkbox') {
-        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="' . htmlentities((string) $name) . '" data-device_id="' . $device['device_id'] . '" data-size="small" ' . $checked . '>';
-    } elseif ($type == 'text') {
-        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . htmlentities((string) $name) . '" data-device_id="' . $device['device_id'] . '" value="' . htmlentities((string) $attrib_val) . '">';
-    }
-}//end dynamic_override_config()
-
 /**
  * Return the rows from 'ports' for all ports of a certain type as parsed by port_descr_parser.
  * One or an array of strings can be provided as an argument; if an array is passed, all ports matching

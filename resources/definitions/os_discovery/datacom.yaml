@@ -1,4 +1,3 @@
-mib: DMswitch-MIB
 modules:
     os:
         hardware: DMswitch-MIB::swChassisModel.0
@@ -7,7 +6,8 @@ modules:
     processors:
         data:
             -
-                oid: swCpuUsage
+                oid: DMswitch-MIB::swCpuUsage
+                value: DMswitch-MIB::swCpuUsage
                 num_oid: '.1.3.6.1.4.1.3709.3.5.201.1.1.10.{{ $index }}'
                 precision: 100
     sensors:
@@ -15,7 +15,7 @@ modules:
             data:
                 -
                     oid:
-                        - ifDescr
+                        - IF-MIB::ifDescr
         temperature:
             data:
                 -
@@ -30,7 +30,7 @@ modules:
                     oid: DMswitch-MIB::ddTransceiversTable
                     value: DMswitch-MIB::ddTransceiversRxPower
                     num_oid: '.1.3.6.1.4.1.3709.3.5.201.1.28.1.1.4.{{ $index }}'
-                    descr: '{{ $ifDescr }} Rx Power'
+                    descr: '{{ IF-MIB::ifDescr }} Rx Power'
                     index: 'rx-{{ $index }}'
                     high_limit: 2.5
                     warn_limit: -3
@@ -42,7 +42,7 @@ modules:
                     oid: DMswitch-MIB::ddTransceiversTable
                     value: DMswitch-MIB::ddTransceiversTxPower
                     num_oid: '.1.3.6.1.4.1.3709.3.5.201.1.28.1.1.5.{{ $index }}'
-                    descr: '{{ $ifDescr }} Tx Power'
+                    descr: '{{ IF-MIB::ifDescr }} Tx Power'
                     index: 'tx-{{ $index }}'
                     high_limit: 2.5
                     warn_limit: -3

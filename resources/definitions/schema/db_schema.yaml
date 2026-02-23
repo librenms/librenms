@@ -2355,7 +2355,7 @@ stp:
     - { Field: protocolSpecification, Type: varchar(16), 'Null': false, Extra: '' }
     - { Field: priority, Type: mediumint, 'Null': false, Extra: '' }
     - { Field: timeSinceTopologyChange, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: topChanges, Type: mediumint, 'Null': false, Extra: '' }
+    - { Field: topChanges, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: designatedRoot, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: rootCost, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: rootPort, Type: int, 'Null': true, Extra: '' }

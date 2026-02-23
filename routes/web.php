@@ -120,6 +120,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::middleware('can:admin')->group(function (): void {
         Route::get('/device/{device}/edit', [Device\EditDeviceController::class, 'index'])->name('device.edit');
         Route::put('/device/{device}/edit', [Device\EditDeviceController::class, 'update'])->name('device.edit.update');
+        Route::get('/device/{device}/edit/misc', [Device\EditMiscController::class, 'index'])->name('device.edit.misc');
+        Route::put('/device/{device}/edit/misc', [Device\EditMiscController::class, 'update'])->name('device.edit.misc.update');
         Route::post('/device/{device}/rediscover', [DeviceController::class, 'rediscover'])->name('device.rediscover');
     });
 
@@ -338,6 +340,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::prefix('dash')->group(function (): void {
             Route::post('alerts', Widgets\AlertsController::class);
             Route::post('alertlog', Widgets\AlertlogController::class);
+            Route::post('alert-map', Widgets\AlertMapController::class);
             Route::post('alertlog-stats', Widgets\AlertlogStatsController::class);
             Route::post('availability-map', Widgets\AvailabilityMapController::class);
             Route::post('component-status', Widgets\ComponentStatusController::class);
