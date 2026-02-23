@@ -2898,26 +2898,6 @@
             ]
         }
     },
-    "ipv4-addresses": {
-        "discovery": {
-            "ipv4_addresses": [
-                {
-                    "ipv4_address": "10.0.9.206",
-                    "ipv4_prefixlen": 22,
-                    "context_name": "",
-                    "ipv4_network": "10.0.8.0/22",
-                    "ifIndex": 129
-                },
-                {
-                    "ipv4_address": "127.0.0.1",
-                    "ipv4_prefixlen": 8,
-                    "context_name": "",
-                    "ipv4_network": "127.0.0.0/8",
-                    "ifIndex": 130
-                }
-            ]
-        }
-    },
     "sensors": {
         "discovery": {
             "sensors": [
@@ -3483,23 +3463,6 @@
         },
         "poller": "matches discovery"
     },
-    "discovery-protocols": {
-        "discovery": {
-            "links": [
-                {
-                    "active": 1,
-                    "protocol": "lldp",
-                    "remote_hostname": "EDS-SW01",
-                    "remote_port": "10 (0090e8a01234)",
-                    "remote_platform": null,
-                    "remote_version": "EDS Switch",
-                    "ifAlias": "Ethernet Port G3",
-                    "ifDescr": "Ethernet Port G3",
-                    "ifName": "Ethernet Port G3"
-                }
-            ]
-        }
-    },
     "vlans": {
         "discovery": {
             "vlans": [
@@ -3559,5 +3522,42 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.0.9.206",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "10.0.8.0/22",
+                    "ifIndex": 129
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 130
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "EDS-SW01",
+                    "remote_port": "10 (0090e8a01234)",
+                    "remote_platform": null,
+                    "remote_version": "EDS Switch",
+                    "ifAlias": "Ethernet Port G3",
+                    "ifDescr": "Ethernet Port G3",
+                    "ifName": "Ethernet Port G3"
+                }
+            ]
+        }
     }
 }
