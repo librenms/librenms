@@ -26,9 +26,9 @@ modules:
                 used: MOXA-EDSP510A8POE-MIB::usedMemory
                 free: MOXA-EDSP510A8POE-MIB::freeMemory
             -
-                total: MOXA-EDSG512E8POE-MIB::totalMemory
-                used: MOXA-EDSG512E8POE-MIB::usedMemory
-                free: MOXA-EDSG512E8POE-MIB::freeMemory
+                total: MOXA-EDSG512EPoE-MIB::totalMemory
+                used: MOXA-EDSG512EPoE-MIB::usedMemory
+                free: MOXA-EDSG512EPoE-MIB::freeMemory
             -
                 total: MOXA-PT7528V2-MIB::totalMemory
                 used: MOXA-PT7528V2-MIB::usedMemory
@@ -49,7 +49,7 @@ modules:
             - MOXA-EDSG516E-MIB::switchModel.0
             - MOXA-EDSP506E-MIB::switchModel.0
             - MOXA-EDSP510A8POE-MIB::switchModel.0
-            - MOXA-EDSG512E8POE-MIB::switchModel
+            - MOXA-EDSG512EPoE-MIB::switchModel
             - MOXA-PT7528V2-MIB::switchModel.0
             - MOXA-IKS6728A-8POE-MIB::switchModel.0
             - MOXA-IKS6728A-MIB::switchModel.0
@@ -60,7 +60,7 @@ modules:
             - MOXA-EDSG516E-MIB::firmwareVersion.0
             - MOXA-EDSP506E-MIB::firmwareVersion.0
             - MOXA-EDSP510A8POE-MIB::firmwareVersion.0
-            - MOXA-EDSG512E8POE-MIB::firmwareVersion
+            - MOXA-EDSG512EPoE-MIB::firmwareVersion
             - MOXA-PT7528V2-MIB::firmwareVersion.0
             - MOXA-IKS6728A-8POE-MIB::firmwareVersion.0
             - MOXA-IKS6728A-MIB::firmwareVersion.0
@@ -69,7 +69,7 @@ modules:
             - MOXA-EDSG512E-MIB::serialNumber.0
             - MOXA-EDSG516E-MIB::serialNumber.0
             - MOXA-EDSP506E-MIB::serialNumber.0
-            - MOXA-EDSG512E8POE-MIB::serialNumber
+            - MOXA-EDSG512EPoE-MIB::serialNumber
             - MOXA-IKS6728A-8POE-MIB::serialNumber.0
             - MOXA-IKS6728A-MIB::serialNumber.0
     sensors:
@@ -112,13 +112,13 @@ modules:
                     index: 'poePortConsumption.{{ $index }}'
                     high_limit: 36.0
                 -
-                    oid: MOXA-EDSG512E8POE-MIB::powerConsumption
+                    oid: MOXA-EDSG512EPoE-MIB::powerConsumption
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.8.{{ $index }}'
                     descr: 'Power Consumption'
                     index: 'powerConsumption.{{ $index }}'
                     high_limit: 240.0
                 -
-                    oid: MOXA-EDSG512E8POE-MIB::poePortConsumption
+                    oid: MOXA-EDSG512EPoE-MIB::poePortConsumption
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.40.6.1.2.{{ $index }}'
                     descr: '{{ IF-MIB::ifDescr }} PoE Consumption'
                     index: 'poePortConsumption.{{ $index }}'
@@ -153,8 +153,8 @@ modules:
                     low_limit: -40.0
                     high_limit: 85.0
                 -
-                    oid: MOXA-EDSG512E8POE-MIB::monitorFiberCheckTable
-                    value: MOXA-EDSG512E8POE-MIB::fiberTemperature
+                    oid: MOXA-EDSG512EPoE-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSG512EPoE-MIB::fiberTemperature
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.11.1.5.{{ $index }}'
                     descr: '{{ IF-MIB::ifDescr }} SFP module temperature'
                     index: 'fiberTemperature.{{ $index }}'
@@ -212,8 +212,8 @@ modules:
                     low_limit: 3.13
                     high_limit: 3.47
                 -
-                    oid: MOXA-EDSG512E8POE-MIB::monitorFiberCheckTable
-                    value: MOXA-EDSG512E8POE-MIB::fiberVoltage
+                    oid: MOXA-EDSG512EPoE-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSG512EPoE-MIB::fiberVoltage
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.11.1.4.{{ $index }}'
                     descr: '{{ IF-MIB::ifDescr }} SFP module Supply Voltage'
                     index: 'fiberVoltage.{{ $index }}'
@@ -279,16 +279,16 @@ modules:
                     low_limit: -21.0
                     high_limit: -3.0
                 -
-                    oid: MOXA-EDSG512E8POE-MIB::monitorFiberCheckTable
-                    value: MOXA-EDSG512E8POE-MIB::fiberTxPower
+                    oid: MOXA-EDSG512EPoE-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSG512EPoE-MIB::fiberTxPower
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.11.1.7.{{ $index }}'
                     descr: '{{ IF-MIB::ifDescr }} SFP module Transmit Power'
                     index: 'fiberTxPower.{{ $index }}'
                     low_limit: -9.0
                     high_limit: -3.0
                 -
-                    oid: MOXA-EDSG512E8POE-MIB::monitorFiberCheckTable
-                    value: MOXA-EDSG512E8POE-MIB::fiberRxPower
+                    oid: MOXA-EDSG512EPoE-MIB::monitorFiberCheckTable
+                    value: MOXA-EDSG512EPoE-MIB::fiberRxPower
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.11.1.9.{{ $index }}'
                     descr: '{{ IF-MIB::ifDescr }} SFP module Receive Power'
                     index: 'fiberRxPower.{{ $index }}'
@@ -414,7 +414,7 @@ modules:
                         - { value:  0, generic: 2, graph: 0, descr: not present }
                         - { value:  1, generic: 0, graph: 0, descr: present }
                 -
-                    oid: MOXA-EDSG512E8POE-MIB::power1InputStatus
+                    oid: MOXA-EDSG512EPoE-MIB::power1InputStatus
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.1.{{ $index }}'
                     descr: 'Power Input 1 Status'
                     index: 'powerInputStatus.1'
@@ -423,7 +423,7 @@ modules:
                         - { value:  0, generic: 2, graph: 0, descr: not present }
                         - { value:  1, generic: 0, graph: 0, descr: present }
                 -
-                    oid: MOXA-EDSG512E8POE-MIB::power2InputStatus
+                    oid: MOXA-EDSG512EPoE-MIB::power2InputStatus
                     num_oid: '.1.3.6.1.4.1.8691.7.108.1.10.2.{{ $index }}'
                     descr: 'Power Input 2 Status'
                     index: 'powerInputStatus.2'
