@@ -1183,7 +1183,7 @@ PortList ::= TEXTUAL-CONVENTION
         ::= { mirroring 3 }    
 
     RspanVlanid OBJECT-TYPE
-        SYNTAX INTEGER (0...4094)
+        SYNTAX INTEGER (0..4094)
         MAX-ACCESS read-write               
         STATUS current
         DESCRIPTION
@@ -1191,7 +1191,7 @@ PortList ::= TEXTUAL-CONVENTION
         ::= { mirroring 4 } 
 
     ReflectPort OBJECT-TYPE
-        SYNTAX INTEGER (1-base Port Number)
+        SYNTAX INTEGER
         MAX-ACCESS read-write               
         STATUS current
         DESCRIPTION
