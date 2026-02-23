@@ -31,7 +31,6 @@ namespace LibreNMS\Util;
 use App\Facades\LibrenmsConfig;
 use App\Models\Notification;
 use Illuminate\Support\Arr;
-use LibreNMS\Util\Http;
 
 class Notifications
 {
