@@ -31,6 +31,7 @@ namespace LibreNMS\Util;
 use App\Facades\LibrenmsConfig;
 use App\Models\Notification;
 use Illuminate\Support\Arr;
+use LibreNMS\Util\Http;
 
 class Notifications
 {
@@ -101,7 +102,13 @@ class Notifications
                 $url = str_starts_with($url, '/') ? $url : base_path($url);
             }
 
-            $feed = json_decode(json_encode(simplexml_load_string(file_get_contents($url))), true);
+            if (is_file($url)) {
+                file_get_contents($url);
+            } else {
+                $data = Http::client()->get($url)->body();
+            }
+
+            $feed = json_decode(json_encode(simplexml_load_string($data)), true);
             $feed = isset($feed['channel']) ? self::parseRss($feed) : self::parseAtom($feed);
 
             array_walk($feed, function (&$items, $key, $url): void {
