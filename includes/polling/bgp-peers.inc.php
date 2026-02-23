@@ -446,10 +446,12 @@ if (! empty($peers)) {
             } elseif (empty($peer_data) && isset($peer_identifiers, $oid_map)) {
                 d_echo("Walking data... \n");
 
-                $snmp_raw = SnmpQuery::enumStrings()->cache()->walk(array_keys($oid_map))->table(count($peer_identifiers));
+                if (! isset($bgp_cache)) {
+                    $bgp_cache = SnmpQuery::enumStrings()->walk(array_keys($oid_map))->table(count($peer_identifiers));
+                }
 
                 // Fetch the snmp item related to this peer
-                $peer_data_raw = array_reduce($peer_identifiers, fn ($ret, $item) => $ret[$item] ?? [], $snmp_raw);
+                $peer_data_raw = array_reduce($peer_identifiers, fn ($ret, $item) => $ret[$item] ?? [], $bgp_cache);
             }
 
             // --- Fill in peer data if raw data has been fetched ---
@@ -588,43 +590,47 @@ if (! empty($peers)) {
 
                     $ip_ver = $peer_ip->getFamily();
 
-                    // Try the new OIDs first
-                    $snmp_raw = SnmpQuery::enumStrings()->cache()->walk([
-                        'CISCO-BGP4-MIB::cbgpPeer2AcceptedPrefixes',
-                        'CISCO-BGP4-MIB::cbgpPeer2DeniedPrefixes',
-                        'CISCO-BGP4-MIB::cbgpPeer2PrefixAdminLimit',
-                        'CISCO-BGP4-MIB::cbgpPeer2PrefixThreshold',
-                        'CISCO-BGP4-MIB::cbgpPeer2PrefixClearThreshold',
-                        'CISCO-BGP4-MIB::cbgpPeer2AdvertisedPrefixes',
-                        'CISCO-BGP4-MIB::cbgpPeer2SuppressedPrefixes',
-                        'CISCO-BGP4-MIB::cbgpPeer2WithdrawnPrefixes',
-                    ])->table(4);
+                    if (! isset($cbgp_cache)) {
+                        // Try the new OIDs first
+                        $cbgp_cache = SnmpQuery::enumStrings()->walk([
+                            'CISCO-BGP4-MIB::cbgpPeer2AcceptedPrefixes',
+                            'CISCO-BGP4-MIB::cbgpPeer2DeniedPrefixes',
+                            'CISCO-BGP4-MIB::cbgpPeer2PrefixAdminLimit',
+                            'CISCO-BGP4-MIB::cbgpPeer2PrefixThreshold',
+                            'CISCO-BGP4-MIB::cbgpPeer2PrefixClearThreshold',
+                            'CISCO-BGP4-MIB::cbgpPeer2AdvertisedPrefixes',
+                            'CISCO-BGP4-MIB::cbgpPeer2SuppressedPrefixes',
+                            'CISCO-BGP4-MIB::cbgpPeer2WithdrawnPrefixes',
+                        ])->table(4);
 
-                    if (isset($snmp_raw[$ip_ver])) {
+                        if (count(array_keys($cbgp_cache)) == 0) {
+                            $cbgp_cache = SnmpQuery::enumStrings()->walk([
+                                'CISCO-BGP4-MIB::cbgpPeerAcceptedPrefixes',
+                                'CISCO-BGP4-MIB::cbgpPeerDeniedPrefixes',
+                                'CISCO-BGP4-MIB::cbgpPeerPrefixAdminLimit',
+                                'CISCO-BGP4-MIB::cbgpPeerPrefixThreshold',
+                                'CISCO-BGP4-MIB::cbgpPeerPrefixClearThreshold',
+                                'CISCO-BGP4-MIB::cbgpPeerAdvertisedPrefixes',
+                                'CISCO-BGP4-MIB::cbgpPeerSuppressedPrefixes',
+                                'CISCO-BGP4-MIB::cbgpPeerWithdrawnPrefixes',
+                            ])->table(4);
+                        }
+                    }
+
+                    if (isset($cbgp_cache[$ip_ver])) {
                         $cbgp_data = [
-                            'CISCO-BGP4-MIB::cbgpPeerAcceptedPrefixes' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2AcceptedPrefixes'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerDeniedPrefixes' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2DeniedPrefixes'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerPrefixAdminLimit' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2PrefixAdminLimit'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerPrefixThreshold' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2PrefixThreshold'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerPrefixClearThreshold' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2PrefixClearThreshold'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerAdvertisedPrefixes' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2AdvertisedPrefixes'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerSuppressedPrefixes' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2SuppressedPrefixes'] ?? null,
-                            'CISCO-BGP4-MIB::cbgpPeerWithdrawnPrefixes' => $snmp_raw[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2WithdrawnPrefixes'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerAcceptedPrefixes' => $cbgp_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2AcceptedPrefixes'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerDeniedPrefixes' => $cbgp_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2DeniedPrefixes'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerPrefixAdminLimit' => $cbgp_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2PrefixAdminLimit'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerPrefixThreshold' => $cbgp_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2PrefixThreshold'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerPrefixClearThreshold' => $cbgp_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2PrefixClearThreshold'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerAdvertisedPrefixes' => $cbgp_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2AdvertisedPrefixes'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerSuppressedPrefixes' => $cbgp_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2SuppressedPrefixes'] ?? null,
+                            'CISCO-BGP4-MIB::cbgpPeerWithdrawnPrefixes' => $cbgp_cache[$ip_ver][$bgp_peer_ident][$afi][$safi]['CISCO-BGP4-MIB::cbgpPeer2WithdrawnPrefixes'] ?? null,
                         ];
                     } else {
                         // Use the legacy OIDs if we don't get a result above
-                        $snmp_raw = SnmpQuery::enumStrings()->cache()->walk([
-                            'CISCO-BGP4-MIB::cbgpPeerAcceptedPrefixes',
-                            'CISCO-BGP4-MIB::cbgpPeerDeniedPrefixes',
-                            'CISCO-BGP4-MIB::cbgpPeerPrefixAdminLimit',
-                            'CISCO-BGP4-MIB::cbgpPeerPrefixThreshold',
-                            'CISCO-BGP4-MIB::cbgpPeerPrefixClearThreshold',
-                            'CISCO-BGP4-MIB::cbgpPeerAdvertisedPrefixes',
-                            'CISCO-BGP4-MIB::cbgpPeerSuppressedPrefixes',
-                            'CISCO-BGP4-MIB::cbgpPeerWithdrawnPrefixes',
-                        ])->table(4);
-
-                        $cbgp_data = $snmp_raw[$bgp_peer_ident][$afi][$safi];
+                        $cbgp_data = $cbgp_cache[$bgp_peer_ident][$afi][$safi];
                     }
                     d_echo($cbgp_data);
 
@@ -637,7 +643,7 @@ if (! empty($peers)) {
                     $cbgpPeerWithdrawnPrefixes = 0; // no use, it is a gauge32 value, only the difference between cbgpPeerAdvertisedPrefixes  and cbgpPeerWithdrawnPrefixes makes sense.
                     // CF CISCO-BGP4-MIB definition for both
                     $cbgpPeerSuppressedPrefixes = $cbgp_data['CISCO-BGP4-MIB::cbgpPeerSuppressedPrefixes'];
-                    unset($cbgp_data, $snmp_raw);
+                    unset($cbgp_data);
                 } //end if
 
                 if ($device['os'] == 'junos') {
@@ -836,4 +842,4 @@ if (! empty($peers)) {
     } //end foreach
 } //end if
 
-unset($peers, $peer_data_tmp, $j_prefixes);
+unset($peers, $peer_data_tmp, $j_prefixes, $bgp_cache, $cbgp_cache);
