@@ -35,6 +35,9 @@ foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
                     d_echo("MAC address padding failed for $mac\n");
                     continue;
                 }
+                if ((int) $dot1dBasePort === 0) {
+                    continue;
+                }
                 $port_id = $portid_dict[$dot1dBasePort];
                 $vlan_id = $vlans_dict[$vlan_raw] ?? 0;
                 $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
