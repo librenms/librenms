@@ -139,7 +139,7 @@ class OutagesController extends TableController
     private function asDuration(DeviceOutage $outage): CarbonInterval
     {
         $start = Carbon::createFromTimestamp($outage->going_down);
-        $end = $outage->up_again ? Carbon::createFromTimestamp($outage->up_again) : Time::now();
+        $end = $outage->up_again ? Carbon::createFromTimestamp($outage->up_again) : Carbon::now();
 
         return $end->diffAsCarbonInterval($start);
     }
