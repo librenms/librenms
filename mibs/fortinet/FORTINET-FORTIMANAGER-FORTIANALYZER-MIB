@@ -6,7 +6,7 @@ IMPORTS
         FROM FORTINET-CORE-MIB
     sysName
         FROM SNMPv2-MIB
-    InetPortNumber
+    InetPortNumber, InetAddress
         FROM INET-ADDRESS-MIB
     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
         FROM SNMPv2-CONF
@@ -18,70 +18,125 @@ IMPORTS
 
 
 fnFortiManagerMib MODULE-IDENTITY
-    LAST-UPDATED "201706280000Z"
-    ORGANIZATION 
+    LAST-UPDATED "202204230000Z"
+    ORGANIZATION
         "Fortinet Technologies, Inc."
-    CONTACT-INFO 
-        "
-         Technical Support
+    CONTACT-INFO
+        "Technical Support
          email: support@fortinet.com
          http://www.fortinet.com"
     DESCRIPTION
-         "Added model names faz1000E, fmg400E,
-		  faz400E, fmg300E,
-		  faz3500F,
-		  faz3000F, fmg3000F, 
-		  faz2000E, fmg2000E,
-		  faz3700F."
+        "A MIB module containing definitions of managed objects implemented by FortiManager/FortiAnalyzer products."
+    REVISION      "202204230000Z"
+    DESCRIPTION
+        "Add the following objects.
+         fmDeviceEntLogRateHour,         fmDeviceEntLogRateDay,
+         fmDeviceEntLogRateWeek,         fmDeviceEntArchiveLogUsedSpace,
+         fmAdomEntLogRateMinute,         fmAdomEntArchiveLogRetention,
+         fmAdomEntArchiveLogQuota,       fmAdomEntArchiveLogUsedSpacePercent,
+         fmAdomEntArchiveLogUsedSpace,   fmAdomEntAnalyticsLogRetention,
+         fmAdomEntAnalyticsLogQuota,     fmAdomEntAnalyticsLogUsedSpacePercent,
+         fmAdomEntAnalyticsLogUsedSpace, fmAdomEntLicGbDayToday,
+         fmAdomEntLicGbDayYesterday,     fmAdomEntLicGbDayWeekAvg,
+         fmSysLogRateHr,                 fmSysLogIndexingRate,
+         fmSysLogLagTime,                fmSysLicGbDayToday,
+         fmSysLicGbDayYesterday,         fmSysLicGbDayWeekAvg,
+         fmSysDiskInfo,                  fmSysDiskTable,
+         fmSysLogForwardInfo,            fmSysLogForwardTable."
+    REVISION    "202202040000Z"
+    DESCRIPTION
+        "Add support for UM (FDS/FGD service)."
+    REVISION    "202105130000Z"
+    DESCRIPTION
+        "Change fmDeviceEntPolicyPackageState syntax."
+    REVISION    "202002120000Z"
+    DESCRIPTION
+        "Add fmVdomNumber."
+    REVISION    "201908210000Z"
+    DESCRIPTION
+        "HW sensors."
+    REVISION    "201808070000Z"
+    DESCRIPTION
+        "NPI faz800F, fmg300F."
+    REVISION    "201710130000Z"
+    DESCRIPTION
+        "NPI faz200F, faz300F, fmg200F."
+    REVISION    "201707270000Z"
+    DESCRIPTION
+        "Added model names faz1000E, fmg400E,
+         faz400E, fmg300E,
+         faz3500F,
+         faz3000F, fmg3000F,
+         faz2000E, fmg2000E,
+         faz3700F."
     REVISION    "201706280000Z"
     DESCRIPTION
-         "Add fmSysVersion,fmSysUpTime,fmLogRate,fmAdom,fmDevice,fmRaid,fmPower,fmHa"
+        "Add fmSysVersion,fmSysUpTime,fmLogRate,fmAdom,fmDevice,fmRaid,fmPower,fmHa"
     REVISION    "201508150000Z"
     DESCRIPTION
-         "NPI faz200E, fmg200E."
+        "NPI faz200E, fmg200E."
     REVISION    "201506120000Z"
     DESCRIPTION
-         "Add model names faz3000E, fmg4000E, faz1000D, fmg1000D."
+        "Add model names faz3000E, fmg4000E, faz1000D, fmg1000D."
     REVISION    "201404220000Z"
     DESCRIPTION
-         "Added fmSysCpuUsageExcludedNice.
-          Added fmTrapCpuThresholdExcludeNice."
+        "Added fmSysCpuUsageExcludedNice.
+         Added fmTrapCpuThresholdExcludeNice."
     REVISION    "201306100000Z"
     DESCRIPTION
-         "Add support for FortiAnalyzer."
+        "Add support for FortiAnalyzer."
     REVISION    "201303270000Z"
-    DESCRIPTION 
-         "Added license gb/day and device quota trap. fmTrapLicGbDayThreshold 
-          and fmTrapLicDevQuotaThreshold"
+    DESCRIPTION
+        "Added license gb/day and device quota trap. fmTrapLicGbDayThreshold
+         and fmTrapLicDevQuotaThreshold"
     REVISION    "201211260000Z"
-    DESCRIPTION 
-         "Added commas between notifications in NOTIFICATION-GROUP.
-          Added imports from SNMPv2-SMI and SNMPv2-TC.
-          imported `OBJECT-GROUP' from module SNMPv2-CONF"
+    DESCRIPTION
+        "Added commas between notifications in NOTIFICATION-GROUP.
+         Added imports from SNMPv2-SMI and SNMPv2-TC.
+         imported `OBJECT-GROUP' from module SNMPv2-CONF"
     REVISION    "201204200000Z"
-    DESCRIPTION 
-         "Added RAID trap fmTrapRAIDStatusChange."
+    DESCRIPTION
+        "Added RAID trap fmTrapRAIDStatusChange."
     REVISION    "201103250000Z"
-    DESCRIPTION 
+    DESCRIPTION
         "Added fmSysMemUsed,fmSysMemCapacity,fmSysCpuUsage.
          Added new FortiManager models."
     REVISION    "201101190000Z"
-    DESCRIPTION 
+    DESCRIPTION
         "MIB module for Fortinet FortiManager devices."
     REVISION    "200807180000Z"
     DESCRIPTION
         "Add sysName to fmTrapHASwitch."
     REVISION    "200806260000Z"
-    DESCRIPTION 
+    DESCRIPTION
         "OID correction for fnFortiManagerMib."
     REVISION    "200806160000Z"
-    DESCRIPTION 
+    DESCRIPTION
         "Spelling corrections."
     REVISION    "200806100000Z"
-    DESCRIPTION 
+    DESCRIPTION
         "Initial version of FORTINET-FORTIMANAGER-MIB."
     ::= { fortinet 103 }
 
+--
+-- Type definition
+--
+FmTenths ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION
+        "An integer to be displayed with one decimal place,
+        e.g. 12345 displayed as 1234.5."
+    SYNTAX      Gauge32
+
+FmHundredths ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION
+        "An integer to be displayed with two decimal places,
+        e.g. 12345 displayed as 123.45."
+    SYNTAX      Gauge32
+---
 
 --
 -- fortinet.fnFortiManagerMib.fmTraps
@@ -89,7 +144,7 @@ fnFortiManagerMib MODULE-IDENTITY
 
 FmRAIDStatusCode ::= TEXTUAL-CONVENTION
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Enumerated list of RAID status codes."
     SYNTAX      INTEGER { arrayOK(1), arrayDegraded(2), arrayFailed(3),
 		    arrayRebuilding(4), arrayRebuildingStarted(5),
@@ -122,7 +177,7 @@ fmRAIDStatus OBJECT-TYPE
     SYNTAX      FmRAIDStatusCode
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "New RAID state associated with a RAID status change event."
     ::= { fmTrapObject 1 }
 
@@ -130,7 +185,7 @@ fmRAIDDevIndex OBJECT-TYPE
     SYNTAX      DisplayString (SIZE(0..32))
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Name/index of a RAID device relating to the event."
     ::= { fmTrapObject 2 }
 
@@ -138,7 +193,7 @@ fmLogRate OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Log receiving rate in number of logs per second."
     ::= { fmTrapObject 3 }
 
@@ -146,7 +201,7 @@ fmLogRateThreshold OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Threshold for log rate in number of logs per second."
     ::= { fmTrapObject 4 }
 
@@ -154,7 +209,7 @@ fmLogDataRate OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Log receiving data rate in number of KB per second."
     ::= { fmTrapObject 5 }
 
@@ -162,7 +217,7 @@ fmLogDataRateThreshold OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Threshold for log data rate in number of KB per second."
     ::= { fmTrapObject 6 }
 
@@ -170,7 +225,7 @@ fmLicGbDay OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Log data used in number of GB per day."
     ::= { fmTrapObject 7 }
 
@@ -178,7 +233,7 @@ fmLicGbDayThreshold OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Licensed threshold for log data in number of GB per day."
     ::= { fmTrapObject 8 }
 
@@ -186,7 +241,7 @@ fmLicDevQuota OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Device quota used in number of GB."
     ::= { fmTrapObject 9 }
 
@@ -194,9 +249,25 @@ fmLicDevQuotaThreshold OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Licensed threshold for device quota in number of GB."
     ::= { fmTrapObject 10 }
+
+fmSensorState OBJECT-TYPE
+    SYNTAX      FmSensorEntState
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Sensor status."
+    ::= { fmTrapObject 11 }
+
+fmSensorName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Sensor name."
+    ::= { fmTrapObject 12 }
 
 --
 -- fortinet.fnFortiManagerMib.fmModel
@@ -205,11 +276,11 @@ fmLicDevQuotaThreshold OBJECT-TYPE
 fmModel OBJECT IDENTIFIER
     ::= { fnFortiManagerMib 1 }
 
+fmgvm OBJECT IDENTIFIER
+    ::= { fmModel 64 }
+
 fmg100 OBJECT IDENTIFIER
     ::= { fmModel 1000 }
-
-fmgvm OBJECT IDENTIFIER
-    ::= { fmModel 1001 }
 
 fmg100C OBJECT IDENTIFIER
     ::= { fmModel 1003 }
@@ -220,11 +291,20 @@ fmg200D OBJECT IDENTIFIER
 fmg200E OBJECT IDENTIFIER
     ::= { fmModel 2005 }
 
+fmg200F OBJECT IDENTIFIER
+    ::= { fmModel 2006 }
+
+fmg200G OBJECT IDENTIFIER
+    ::= { fmModel 2007 }
+
 fmg300D OBJECT IDENTIFIER
     ::= { fmModel 3004 }
 
 fmg300E OBJECT IDENTIFIER
     ::= { fmModel 3005 }
+
+fmg300F OBJECT IDENTIFIER
+    ::= { fmModel 3006 }
 
 fmg400 OBJECT IDENTIFIER
     ::= { fmModel 4000 }
@@ -241,11 +321,23 @@ fmg400C OBJECT IDENTIFIER
 fmg400E OBJECT IDENTIFIER
     ::= { fmModel 4005 }
 
+fmg400G OBJECT IDENTIFIER
+    ::= { fmModel 4007 }
+
+fmg410G OBJECT IDENTIFIER
+    ::= { fmModel 4107 }
+
 fmg1000C OBJECT IDENTIFIER
     ::= { fmModel 10003 }
 
 fmg1000D OBJECT IDENTIFIER
     ::= { fmModel 10004 }
+
+fmg1000F OBJECT IDENTIFIER
+    ::= { fmModel 10006 }
+
+fmg1000G OBJECT IDENTIFIER
+    ::= { fmModel 10007 }
 
 fmg2000E OBJECT IDENTIFIER
     ::= { fmModel 20005 }
@@ -264,6 +356,17 @@ fmg3000C OBJECT IDENTIFIER
 
 fmg3000F OBJECT IDENTIFIER
     ::= { fmModel 30006 }
+
+fmg3000G OBJECT IDENTIFIER
+    ::= { fmModel 30007 }
+
+fmg3100G OBJECT IDENTIFIER
+    ::= { fmModel 31007 }
+
+fmg3700F OBJECT IDENTIFIER
+    ::= { fmModel 37006 }
+fmg3700G OBJECT IDENTIFIER
+    ::= { fmModel 37007 }
 
 fmg3900E OBJECT IDENTIFIER
     ::= { fmModel 39005 }
@@ -295,7 +398,7 @@ fmSysCpuUsage OBJECT-TYPE
     SYNTAX      Integer32 (0..100)
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Current CPU usage (percentage)"
     ::= { fmSystemInfo 1 }
 
@@ -303,7 +406,7 @@ fmSysMemUsed OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Current memory used (KB)"
     ::= { fmSystemInfo 2 }
 
@@ -311,7 +414,7 @@ fmSysMemCapacity OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Total physical and swap memory installed (KB)"
     ::= { fmSystemInfo 3 }
 
@@ -319,7 +422,7 @@ fmSysDiskUsage OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Current hard disk usage (MB)"
     ::= { fmSystemInfo 4 }
 
@@ -327,7 +430,7 @@ fmSysDiskCapacity OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Total hard disk capacity (MB)"
     ::= { fmSystemInfo 5 }
 
@@ -356,7 +459,7 @@ fmSysUpTime OBJECT-TYPE
         "The 64bit time (in hundredths of a second) since the network management portion of the system was last re-initialized."
     ::= { fmSystemInfo 8 }
 
-fmLogRate OBJECT-TYPE
+fmSysLogRate OBJECT-TYPE
     SYNTAX      Gauge32
     UNITS       "logs per second"
     MAX-ACCESS  read-only
@@ -365,25 +468,217 @@ fmLogRate OBJECT-TYPE
         "Log receiving rate in number of logs per second."
     ::= { fmSystemInfo 9 }
 
+fmSysLogRateHr OBJECT-TYPE
+    SYNTAX      FmHundredths
+    UNITS       "logs per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Log receiving rate in number of logs per second in higher resolution with two decimal places,
+        e.g., value 12345 should be interpreted as 123.45 logs per second."
+    ::= { fmSystemInfo 10 }
+
+fmSysLogIndexingRate OBJECT-TYPE
+    SYNTAX      FmHundredths
+    UNITS       "logs per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "After logs are received, they will be indexed. It shows log indexing rate in number of logs per second with two decimal places."
+    ::= { fmSystemInfo 11 }
+
+fmSysLogLagTime OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time difference between log receiving and indexing."
+    ::= { fmSystemInfo 12 }
+
+fmSysLicGbDayToday OBJECT-TYPE
+    SYNTAX      FmHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The gibi bytes (GiB) of logs received today with two decimal places."
+    ::= { fmSystemInfo 13 }
+
+fmSysLicGbDayYesterday OBJECT-TYPE
+    SYNTAX      FmHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The gibi bytes (GiB) of logs received yesterday with two decimal places."
+    ::= { fmSystemInfo 14 }
+
+fmSysLicGbDayWeekAvg OBJECT-TYPE
+    SYNTAX      FmHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The daily average gibi bytes (GiB) of logs received over last seven days with two decimal places."
+    ::= { fmSystemInfo 15 }
+
+--- fmsys disk table
+fmSysDiskInfo OBJECT IDENTIFIER
+    ::= { fmSystemInfo 16 }
+
+fmSysDiskNumber OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of disks in fmSysDiskTable."
+    ::= { fmSysDiskInfo 1 }
+
+fmSysDiskTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmSysDiskEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of disks on this device.
+        Every type of disk is an entry of this table."
+    ::= { fmSystemInfo 17 }
+
+fmSysDiskEntry OBJECT-TYPE
+    SYNTAX      FmSysDiskEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing disk detailed info."
+    INDEX       { fmSysDiskEntIndex }
+    ::= { fmSysDiskTable 1 }
+
+FmSysDiskEntry ::= SEQUENCE {
+    fmSysDiskEntIndex      FnIndex,
+    fmSysDiskEntName       DisplayString,
+    fmSysDiskEntUsage      Gauge32,
+    fmSysDiskEntCapacity   Gauge32,
+    fmSysDiskEntIOUtil     FmTenths
+}
+
+fmSysDiskEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies the disk entry."
+    ::= { fmSysDiskEntry 1 }
+
+fmSysDiskEntName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the disk."
+    ::= { fmSysDiskEntry 2 }
+
+fmSysDiskEntUsage OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current disk usage (MB)."
+    ::= { fmSysDiskEntry 3 }
+
+fmSysDiskEntCapacity OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total disk capacity (MB)."
+    ::= { fmSysDiskEntry 4 }
+
+fmSysDiskEntIOUtil OBJECT-TYPE
+    SYNTAX      FmTenths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current disk IO utilization (percentage) with one decimal place."
+    ::= { fmSysDiskEntry 5 }
+---
+
+--- fmsys log-forward table
+fmSysLogForwardInfo OBJECT IDENTIFIER
+    ::= { fmSystemInfo 18 }
+
+fmSysLogForwardNumber OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of log-forward targets in fmSysLogForwardTable."
+    ::= { fmSysLogForwardInfo 1 }
+
+fmSysLogForwardTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmSysLogForwardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of log-forward targets configured on the device."
+    ::= { fmSystemInfo 19 }
+
+fmSysLogForwardEntry OBJECT-TYPE
+    SYNTAX      FmSysLogForwardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable to a particular log-forward target."
+    INDEX       { fmSysLogForwardIndex }
+    ::= { fmSysLogForwardTable 1 }
+
+FmSysLogForwardEntry ::= SEQUENCE {
+    fmSysLogForwardIndex   FnIndex,
+    fmSysLogForwardName    DisplayString,
+    fmSysLogForwardRate    FmHundredths
+}
+
+fmSysLogForwardIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies the log-forward target."
+    ::= { fmSysLogForwardEntry 1 }
+
+fmSysLogForwardName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the log-forward target."
+    ::= { fmSysLogForwardEntry 2 }
+
+fmSysLogForwardRate OBJECT-TYPE
+    SYNTAX      FmHundredths
+    UNITS       "logs per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Log forwarding rate to the particular target in number of logs per second with two decimal places."
+    ::= { fmSysLogForwardEntry 3 }
+---
+
 fmTrapHASwitch NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "FortiManager HA cluster has been re-arranged. A new master has been selected and asserted."
     ::= { fmTrapPrefix 401 }
 
 fmTrapRAIDStatusChange NOTIFICATION-TYPE
-    OBJECTS     { fnSysSerial, sysName, 
+    OBJECTS     { fnSysSerial, sysName,
 	              fmRAIDStatus, fmRAIDDevIndex }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Trap is sent when there is a change in the status of the RAID array, if present."
     ::= { fmTrapPrefix 402 }
 
 fmTrapLogAlert NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName, fnGenTrapMsg }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Trap is sent when a log based alert has been triggered.
          Alert description included in trap."
     ::= { fmTrapPrefix 403 }
@@ -423,12 +718,47 @@ fmTrapCpuThresholdExcludeNice NOTIFICATION-TYPE
         "Indicates that the CPU usage excluding nice processes has exceeded the threshold"
     ::= { fmTrapPrefix 409 }
 
+fmTrapPowerStateChange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,
+	              fmSensorState, fmSensorName }
+    STATUS      current
+    DESCRIPTION
+        "Trap is sent when there is a change in the status of the power supply, if present."
+    ::= { fmTrapPrefix 410 }
+
+fmTrapFanStateChange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,
+	              fmSensorState, fmSensorName }
+    STATUS      current
+    DESCRIPTION
+        "Trap is sent when there is a change in the status of the fan, if present."
+    ::= { fmTrapPrefix 411 }
+
+fmTrapTemperatureStateChange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,
+	              fmSensorState, fmSensorName }
+    STATUS      current
+    DESCRIPTION
+        "Trap is sent when there is a change in the status of the temperature sensor, if present."
+    ::= { fmTrapPrefix 412 }
+
+fmTrapVoltageStateChange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName,
+	              fmSensorState, fmSensorName }
+    STATUS      current
+    DESCRIPTION
+        "Trap is sent when there is a change in the status of the voltage sensor, if present."
+    ::= { fmTrapPrefix 413 }
+
 --
 -- fortinet.fnFortiManagerMib.faModel
 --
 
 faModel OBJECT IDENTIFIER
     ::= { fnFortiManagerMib 3 }
+
+fazvm OBJECT IDENTIFIER
+    ::= { faModel 64 }
 
 faz100 OBJECT IDENTIFIER
     ::= { faModel 1000 }
@@ -442,14 +772,26 @@ faz100B OBJECT IDENTIFIER
 faz100C OBJECT IDENTIFIER
     ::= { faModel 1003 }
 
+faz150G OBJECT IDENTIFIER
+    ::= {faModel 1507 }
+
 faz200D OBJECT IDENTIFIER
     ::= { faModel 2004 }
 
 faz200E OBJECT IDENTIFIER
     ::= {faModel 2005 }
 
+faz200F OBJECT IDENTIFIER
+    ::= {faModel 2006 }
+
 faz300D OBJECT IDENTIFIER
     ::= { faModel 3004 }
+
+faz300F OBJECT IDENTIFIER
+    ::= { faModel 3006 }
+
+faz300G OBJECT IDENTIFIER
+    ::= { faModel 3007 }
 
 faz400E OBJECT IDENTIFIER
     ::= { faModel 4005 }
@@ -463,14 +805,20 @@ faz400B OBJECT IDENTIFIER
 faz400C OBJECT IDENTIFIER
     ::= { faModel 4003 }
 
-fazvm OBJECT IDENTIFIER
-    ::= { faModel 20 }
-
 faz800 OBJECT IDENTIFIER
     ::= { faModel 8000 }
 
 faz800B OBJECT IDENTIFIER
     ::= { faModel 8002 }
+
+faz800F OBJECT IDENTIFIER
+    ::= { faModel 8006 }
+
+faz800G OBJECT IDENTIFIER
+    ::= { faModel 8007 }
+
+faz810G OBJECT IDENTIFIER
+    ::= { faModel 8107 }
 
 faz1000B OBJECT IDENTIFIER
     ::= { faModel 10002 }
@@ -483,6 +831,12 @@ faz1000D OBJECT IDENTIFIER
 
 faz1000E OBJECT IDENTIFIER
     ::= { faModel 10005 }
+
+faz1000F OBJECT IDENTIFIER
+    ::= { faModel 10006 }
+
+faz1000G OBJECT IDENTIFIER
+    ::= { faModel 10007 }
 
 faz2000 OBJECT IDENTIFIER
     ::= { faModel 20000 }
@@ -505,14 +859,29 @@ faz3000E OBJECT IDENTIFIER
 faz3000F OBJECT IDENTIFIER
     ::= { faModel 30006 }
 
+faz3000G OBJECT IDENTIFIER
+    ::= { faModel 30007 }
+
+faz3100G OBJECT IDENTIFIER
+    ::= { faModel 31007 }
+
 faz3500E OBJECT IDENTIFIER
     ::= { faModel 35005 }
 
 faz3500F OBJECT IDENTIFIER
     ::= { faModel 35006 }
 
+faz3500G OBJECT IDENTIFIER
+    ::= { faModel 35007 }
+
+faz3510G OBJECT IDENTIFIER
+    ::= { faModel 35107 }
+
 faz3700F OBJECT IDENTIFIER
     ::= { faModel 37006 }
+
+faz3700G OBJECT IDENTIFIER
+    ::= { faModel 37007 }
 
 faz3900E OBJECT IDENTIFIER
     ::= { faModel 39005 }
@@ -543,7 +912,7 @@ fmIpSessTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF FmIpSessEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Information on the IP sessions active on the device"
     ::= { fmInetProtoTables 1 }
 
@@ -551,7 +920,7 @@ fmIpSessEntry OBJECT-TYPE
     SYNTAX      FmIpSessEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Information on a specific session, including source and destination"
     INDEX       { fmIpSessIndex }
     ::= { fmIpSessTable 1 }
@@ -570,7 +939,7 @@ fmIpSessIndex OBJECT-TYPE
     SYNTAX      FnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "An index value that uniquely identifies
          an IP session within the fmIpSessTable"
     ::= { fmIpSessEntry 1 }
@@ -579,7 +948,7 @@ fmIpSessProto OBJECT-TYPE
     SYNTAX      FmSessProto
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "The protocol the session is using (IP, TCP, UDP, etc.)"
     ::= { fmIpSessEntry 2 }
 
@@ -587,7 +956,7 @@ fmIpSessFromAddr OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Source IP address (IPv4 only) of the session"
     ::= { fmIpSessEntry 3 }
 
@@ -595,7 +964,7 @@ fmIpSessFromPort OBJECT-TYPE
     SYNTAX      InetPortNumber
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Source port number (UDP and TCP only) of the session"
     ::= { fmIpSessEntry 4 }
 
@@ -603,7 +972,7 @@ fmIpSessToAddr OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Destination IP address (IPv4 only) of the session"
     ::= { fmIpSessEntry 5 }
 
@@ -611,7 +980,7 @@ fmIpSessToPort OBJECT-TYPE
     SYNTAX      InetPortNumber
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Destination Port number (UDP and TCP only) of the session"
     ::= { fmIpSessEntry 6 }
 
@@ -619,7 +988,7 @@ fmIpSessExp OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Number of seconds remaining before the session expires (if idle)"
     ::= { fmIpSessEntry 7 }
 
@@ -676,15 +1045,27 @@ fmAdomEntry OBJECT-TYPE
     ::= { fmAdomTable 1 }
 
 FmAdomEntry ::= SEQUENCE {
-    fmAdomEntIndex     FnIndex,
-    fmAdomEntName      DisplayString,
-    fmAdomEntState     FnBoolState,
-    fmAdomEntMode      FmAdomEntMode,
-    fmAdomEntFgtNumber Integer32,
-    fmAdomEntPolicyPackageNumber Integer32,
-    fmAdomEntOsVersion Integer32,
-    fmAdomEntMr        Integer32,
-    fmAdomEntVpnMode   FmAdomEntVpnMode
+    fmAdomEntIndex                         FnIndex,
+    fmAdomEntName                          DisplayString,
+    fmAdomEntState                         FnBoolState,
+    fmAdomEntMode                          FmAdomEntMode,
+    fmAdomEntFgtNumber                     Integer32,
+    fmAdomEntPolicyPackageNumber           Integer32,
+    fmAdomEntOsVersion                     Integer32,
+    fmAdomEntMr                            Integer32,
+    fmAdomEntVpnMode                       FmAdomEntVpnMode,
+    fmAdomEntLogRateMinute                 FmHundredths,
+    fmAdomEntArchiveLogRetention           Gauge32,
+    fmAdomEntArchiveLogQuota               Gauge32,
+    fmAdomEntArchiveLogUsedSpace           Gauge32,
+    fmAdomEntArchiveLogUsedSpacePercent    FmTenths,
+    fmAdomEntAnalyticsLogRetention         Gauge32,
+    fmAdomEntAnalyticsLogQuota             Gauge32,
+    fmAdomEntAnalyticsLogUsedSpace         Gauge32,
+    fmAdomEntAnalyticsLogUsedSpacePercent  FmTenths,
+    fmAdomEntLicGbDayToday                 FmHundredths,
+    fmAdomEntLicGbDayYesterday             FmHundredths,
+    fmAdomEntLicGbDayWeekAvg               FmHundredths
 }
 
 fmAdomEntIndex OBJECT-TYPE
@@ -778,6 +1159,106 @@ fmAdomEntVpnMode OBJECT-TYPE
         "Adom VPN mode"
     ::= { fmAdomEntry 9 }
 
+fmAdomEntLogRateMinute OBJECT-TYPE
+    SYNTAX      FmHundredths
+    UNITS       "logs per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The adom log receiving rate in number of logs per second over last one minute with two decimal places."
+    ::= { fmAdomEntry 10 }
+
+fmAdomEntArchiveLogRetention OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "days"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of days adom archive logs will be kept according to the data policy."
+    ::= { fmAdomEntry 11 }
+
+fmAdomEntArchiveLogQuota OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum disk space (MB) allocated for adom archive logs."
+    ::= { fmAdomEntry 12 }
+
+fmAdomEntArchiveLogUsedSpace OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Disk space (MB) adom archive logs have used."
+    ::= { fmAdomEntry 13 }
+
+fmAdomEntArchiveLogUsedSpacePercent OBJECT-TYPE
+    SYNTAX      FmTenths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Disk usage percentage of quota for adom archive logs with one decimal place."
+    ::= { fmAdomEntry 14 }
+
+fmAdomEntAnalyticsLogRetention OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "days"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of days adom analytics logs will be kept according to the data policy."
+    ::= { fmAdomEntry 15 }
+
+fmAdomEntAnalyticsLogQuota OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum disk space (MB) allocated for adom analytics logs."
+    ::= { fmAdomEntry 16 }
+
+fmAdomEntAnalyticsLogUsedSpace OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Disk space (MB) adom analytics logs have used."
+    ::= { fmAdomEntry 17 }
+
+fmAdomEntAnalyticsLogUsedSpacePercent OBJECT-TYPE
+    SYNTAX      FmTenths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Disk usage percentage of quota for adom analytics logs with one decimal place."
+    ::= { fmAdomEntry 18 }
+
+fmAdomEntLicGbDayToday OBJECT-TYPE
+    SYNTAX      FmHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The gibi bytes (GiB) of adom logs received today with two decimal places."
+    ::= { fmAdomEntry 19 }
+
+fmAdomEntLicGbDayYesterday OBJECT-TYPE
+    SYNTAX      FmHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The gibi bytes (GiB) of adom logs received yesterday with two decimal places."
+    ::= { fmAdomEntry 20 }
+
+fmAdomEntLicGbDayWeekAvg OBJECT-TYPE
+    SYNTAX      FmHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The daily average gibi bytes (GiB) of adom logs received over last seven days with two decimal places."
+    ::= { fmAdomEntry 21 }
+---
+
 --
 -- fortinet.fnFortiManagerMib.fmDevice
 --
@@ -795,6 +1276,14 @@ fmDeviceNumber OBJECT-TYPE
     DESCRIPTION
         "The number of devices in fmDeviceTable"
     ::= { fmDeviceInfo 1 }
+
+fmVdomNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of VDOMS"
+    ::= { fmDeviceInfo 2 }
 
 fmDeviceTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF FmDeviceEntry
@@ -815,30 +1304,34 @@ fmDeviceEntry OBJECT-TYPE
     ::= { fmDeviceTable 1 }
 
 FmDeviceEntry ::= SEQUENCE {
-    fmDeviceEntIndex     FnIndex,
-    fmDeviceEntName      DisplayString,
-    fmDeviceEntSn        DisplayString,
-    fmDeviceEntMode      FmDeviceEntMode,
-    fmDeviceEntAdom      DisplayString,
-    fmDeviceEntIp        DisplayString,
-    fmDeviceEntOsVersion Integer32,
-    fmDeviceEntMr        Integer32,
-    fmDeviceEntBuild     Integer32,
-    fmDeviceEntHaMode    FmDeviceEntHaMode,
-    fmDeviceEntHaGroup   DisplayString,
-    fmDeviceEntConnectState FmDeviceEntConnectState,
-    fmDeviceEntDbState   FmDeviceEntDbState,
-    fmDeviceEntConfigState  FmDeviceEntConfigState,
-    fmDeviceEntState     FmDeviceEntState,
-    fmDeviceEntPlatform  DisplayString,
-    fmDeviceEntVdomEnabled  FnBoolState,
-    fmDeviceEntSupportState FmDeviceEntSupportState,
-    fmDeviceEntAvExpireDate DisplayString,
-    fmDeviceEntIpsExpireDate DisplayString,
-    fmDeviceEntWfExpireDate DisplayString,
-    fmDeviceEntAsExpireDate DisplayString,
-    fmDeviceEntPolicyPackageState FmDeviceEntPolicyPackageState,
-    fmDeviceEntDesc      DisplayString
+    fmDeviceEntIndex                FnIndex,
+    fmDeviceEntName                 DisplayString,
+    fmDeviceEntSn                   DisplayString,
+    fmDeviceEntMode                 FmDeviceEntMode,
+    fmDeviceEntAdom                 DisplayString,
+    fmDeviceEntIp                   DisplayString,
+    fmDeviceEntOsVersion            Integer32,
+    fmDeviceEntMr                   Integer32,
+    fmDeviceEntBuild                Integer32,
+    fmDeviceEntHaMode               FmDeviceEntHaMode,
+    fmDeviceEntHaGroup              DisplayString,
+    fmDeviceEntConnectState         FmDeviceEntConnectState,
+    fmDeviceEntDbState              FmDeviceEntDbState,
+    fmDeviceEntConfigState          FmDeviceEntConfigState,
+    fmDeviceEntState                FmDeviceEntState,
+    fmDeviceEntPlatform             DisplayString,
+    fmDeviceEntVdomEnabled          FnBoolState,
+    fmDeviceEntSupportState         FmDeviceEntSupportState,
+    fmDeviceEntAvExpireDate         DisplayString,
+    fmDeviceEntIpsExpireDate        DisplayString,
+    fmDeviceEntWfExpireDate         DisplayString,
+    fmDeviceEntAsExpireDate         DisplayString,
+    fmDeviceEntPolicyPackageState   DisplayString,
+    fmDeviceEntDesc                 DisplayString,
+    fmDeviceEntLogRateHour          FmHundredths,
+    fmDeviceEntLogRateDay           FmHundredths,
+    fmDeviceEntLogRateWeek          FmHundredths,
+    fmDeviceEntArchiveLogUsedSpace  Gauge32
 }
 
 fmDeviceEntIndex OBJECT-TYPE
@@ -1103,26 +1596,12 @@ fmDeviceEntAsExpireDate OBJECT-TYPE
         "The AS license of the device"
     ::= { fmDeviceEntry 22 }
 
-FmDeviceEntPolicyPackageState ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION
-        "The policy package status of the device"
-    SYNTAX      INTEGER {
-        never-installed (-1),
-        installed  (0),
-        modified (1),
-        imported (2),
-        unknown (3),
-        out-of-sync (9),
-        conflict (10)
-    }
-
 fmDeviceEntPolicyPackageState OBJECT-TYPE
-    SYNTAX      FmDeviceEntPolicyPackageState
+    SYNTAX      DisplayString
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The policy package status of the device"
+        "All the policy package status of the device"
     ::= { fmDeviceEntry 23 }
 
 fmDeviceEntDesc OBJECT-TYPE
@@ -1132,6 +1611,41 @@ fmDeviceEntDesc OBJECT-TYPE
     DESCRIPTION
         "The description of the device"
     ::= { fmDeviceEntry 24 }
+
+fmDeviceEntLogRateHour  OBJECT-TYPE
+    SYNTAX       FmHundredths
+    UNITS        "logs per second"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The device log receiving rate in number of logs per second over last one hour with two decimal places."
+    ::= { fmDeviceEntry 25}
+
+fmDeviceEntLogRateDay  OBJECT-TYPE
+    SYNTAX       FmHundredths
+    UNITS        "logs per second"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The device log receiving rate in number of logs per second over last one day with two decimal places."
+    ::= { fmDeviceEntry 26}
+
+fmDeviceEntLogRateWeek  OBJECT-TYPE
+    SYNTAX       FmHundredths
+    UNITS        "logs per second"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The device log receiving rate in number of logs per second over last seven days with two decimal places."
+    ::= { fmDeviceEntry 27}
+
+fmDeviceEntArchiveLogUsedSpace  OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Disk space (MB) device archive logs have used."
+    ::= { fmDeviceEntry 28}
 
 --
 -- fortinet.fnFortiManagerMib.fmRaid
@@ -1250,10 +1764,10 @@ FmRaidDiskEntState ::= TEXTUAL-CONVENTION
         "Raid disk status"
     SYNTAX      INTEGER {
         unavailable (0),
-        unused (1),
-        ok (2),
-        rebuilding (3),
-        failed (4),
+        failed (1),
+        unused (2),
+        ok (3),
+        rebuilding (4),
         spare (5)
     }
 
@@ -1275,60 +1789,102 @@ fmRaidDiskEntSize OBJECT-TYPE
     ::= { fmRaidDiskEntry 3 }
 
 --
--- fortinet.fnFortiManagerMib.fmPower
+-- fortinet.fnFortiManagerMib.fmSensor
 --
 
-fmPower OBJECT IDENTIFIER
+fmSensor OBJECT IDENTIFIER
     ::= { fnFortiManagerMib 8 }
 
-fmPowerTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF FmPowerEntry
+fmSensorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmSensorEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "A table of power supply status"
-    ::= { fmPower 2 }
+        "A table of sensor status"
+    ::= { fmSensor 2 }
 
-fmPowerEntry OBJECT-TYPE
-    SYNTAX      FmPowerEntry
+fmSensorEntry OBJECT-TYPE
+    SYNTAX      FmSensorEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "An entry containing information applicable
-         to a particular power supply unit"
-    INDEX       { fmPowerEntIndex }
-    ::= { fmPowerTable 1 }
+         to a particular sensor"
+    INDEX       { fmSensorEntIndex }
+    ::= { fmSensorTable 1 }
 
-FmPowerEntry ::= SEQUENCE {
-    fmPowerEntIndex      FnIndex,
-    fmPowerEntState      FmPowerEntState
+FmSensorEntry ::= SEQUENCE {
+    fmSensorEntIndex      FnIndex,
+    fmSensorEntName       DisplayString,
+    fmSensorEntVal        DisplayString,
+    fmSensorEntType       FmSensorEntType,
+    fmSensorEntState      FmSensorEntState
 }
 
-fmPowerEntIndex OBJECT-TYPE
+fmSensorEntIndex OBJECT-TYPE
     SYNTAX      FnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "An index value that uniquely identifies the entry"
-    ::= { fmPowerEntry 1 }
+    ::= { fmSensorEntry 1 }
 
-FmPowerEntState ::= TEXTUAL-CONVENTION
+FmSensorEntType ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "Power supply unit status"
+        "Sensor type"
     SYNTAX      INTEGER {
-        unknown (-1),
-        offline (0),
-        online (1)
+        power (0),
+        fan (1),
+        temperature (2),
+        voltage (3)
     }
 
-fmPowerEntState OBJECT-TYPE
-    SYNTAX      FmPowerEntState
+fmSensorEntName OBJECT-TYPE
+    SYNTAX      DisplayString
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Power supply unit status"
-    ::= { fmPowerEntry 2 }
+        "Sensor name"
+    ::= { fmSensorEntry 2 }
+
+fmSensorEntVal OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sensor value"
+    ::= { fmSensorEntry 3 }
+
+fmSensorEntType OBJECT-TYPE
+    SYNTAX      FmSensorEntType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sensor status"
+    ::= { fmSensorEntry 4 }
+
+FmSensorEntState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Sensor status"
+    SYNTAX      INTEGER {
+        ok (0),
+        failed (1),
+        out-of-range-not-critical (2),
+        out-of-range-critical (3),
+        out-of-range-not-recoverable (4),
+        input-lost (5),
+        not-present (6)
+    }
+
+fmSensorEntState OBJECT-TYPE
+    SYNTAX      FmSensorEntState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sensor status"
+    ::= { fmSensorEntry 5 }
 
 --
 -- fortinet.fnFortiManagerMib.fmHa
@@ -1473,16 +2029,29 @@ fmTrapsComplianceGroup NOTIFICATION-GROUP
                     fmTrapLogDataRateThreshold,
                     fmTrapLicGbDayThreshold,
                     fmTrapLicDevQuotaThreshold,
-                    fmTrapCpuThresholdExcludeNice }
+                    fmTrapCpuThresholdExcludeNice,
+                    fmTrapPowerStateChange,
+                    fmTrapFanStateChange,
+                    fmTrapTemperatureStateChange,
+                    fmTrapVoltageStateChange }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Event notifications"
     ::= { fmMIBConformance 1 }
 
 fmSystemObjectGroup OBJECT-GROUP
-    OBJECTS     { fmSysMemUsed, fmSysMemCapacity,
-                  fmSysCpuUsage, fmSysDiskCapacity,
-                  fmSysDiskUsage, fmSysCpuUsageExcludedNice }
+    OBJECTS     { fmSysMemUsed,         fmSysMemCapacity,
+                  fmSysCpuUsage,        fmSysDiskCapacity,
+                  fmSysDiskUsage,       fmSysCpuUsageExcludedNice,
+                  fmSysVersion,         fmSysUpTime,
+                  fmSysLogRate,         fmSysLogRateHr,
+                  fmSysLogLagTime,      fmSysLogIndexingRate,
+                  fmSysLicGbDayToday,   fmSysLicGbDayYesterday,
+                  fmSysLicGbDayWeekAvg, fmSysDiskNumber,
+                  fmSysDiskEntName,     fmSysDiskEntUsage,
+                  fmSysDiskEntCapacity, fmSysDiskEntIOUtil,
+                  fmSysLogForwardName,  fmSysLogForwardNumber, 
+                  fmSysLogForwardRate }
     STATUS      current
     DESCRIPTION
         "Objects pertaining to the system status of the device."
@@ -1493,9 +2062,10 @@ fmNotificationObjComplianceGroup OBJECT-GROUP
                   fmLogRate, fmLogRateThreshold,
                   fmLogDataRate, fmLogDataRateThreshold,
                   fmLicGbDay, fmLicGbDayThreshold,
-                  fmLicDevQuota, fmLicDevQuotaThreshold }
+                  fmLicDevQuota, fmLicDevQuotaThreshold,
+                  fmSensorState, fmSensorName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Object identifiers used in notifications"
     ::= { fmMIBConformance 3 }
 
@@ -1512,16 +2082,54 @@ fmSessionComplianceGroup OBJECT-GROUP
     DESCRIPTION "Session related instrumentation"
 	::= { fmMIBConformance 4 }
 
+fmAdomComplianceGroup OBJECT-GROUP
+    OBJECTS     { fmAdomEnabled,                  fmAdomNumber,
+                  fmAdomMax,                      fmAdomEntName,
+                  fmAdomEntState,                 fmAdomEntMode,
+                  fmAdomEntFgtNumber,             fmAdomEntPolicyPackageNumber,
+                  fmAdomEntOsVersion,             fmAdomEntMr,
+                  fmAdomEntVpnMode,               fmAdomEntLogRateMinute,
+                  fmAdomEntArchiveLogRetention,   fmAdomEntArchiveLogQuota,
+                  fmAdomEntArchiveLogUsedSpace,   fmAdomEntArchiveLogUsedSpacePercent,
+                  fmAdomEntAnalyticsLogRetention, fmAdomEntAnalyticsLogQuota,
+                  fmAdomEntAnalyticsLogUsedSpace, fmAdomEntAnalyticsLogUsedSpacePercent,
+                  fmAdomEntLicGbDayToday,         fmAdomEntLicGbDayYesterday,
+                  fmAdomEntLicGbDayWeekAvg }
+    STATUS      current
+    DESCRIPTION
+        "Adom-related configuration and statistics."
+    ::= { fmMIBConformance 5 }
+
+fmDeviceComplianceGroup OBJECT-GROUP
+    OBJECTS     { fmDeviceNumber,                 fmVdomNumber,
+                  fmDeviceEntName,                fmDeviceEntSn,
+                  fmDeviceEntMode,                fmDeviceEntAdom,
+                  fmDeviceEntIp,                  fmDeviceEntOsVersion,
+                  fmDeviceEntMr,                  fmDeviceEntBuild,
+                  fmDeviceEntHaMode,              fmDeviceEntHaGroup,
+                  fmDeviceEntConnectState,        fmDeviceEntDbState,
+                  fmDeviceEntConfigState,         fmDeviceEntState,
+                  fmDeviceEntPlatform,            fmDeviceEntVdomEnabled,
+                  fmDeviceEntSupportState,        fmDeviceEntAvExpireDate,
+                  fmDeviceEntIpsExpireDate,       fmDeviceEntWfExpireDate,
+                  fmDeviceEntAsExpireDate,        fmDeviceEntPolicyPackageState,
+                  fmDeviceEntDesc,                fmDeviceEntLogRateHour,
+                  fmDeviceEntLogRateDay,          fmDeviceEntLogRateWeek,
+                  fmDeviceEntArchiveLogUsedSpace }
+    STATUS      current
+    DESCRIPTION
+        "Device-related configuration and statistics."
+    ::= { fmMIBConformance 6 }
 
 fmMIBCompliance MODULE-COMPLIANCE
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "The compliance statement for the FortiManager FortiAnalyzer MIB."
 
     MODULE      -- this module
 
         GROUP   fmTrapsComplianceGroup
-        DESCRIPTION   
+        DESCRIPTION
               "Traps are optional. Not all models support all traps. Consult product literature to see which traps are supported."
 
         GROUP   fmSystemObjectGroup
@@ -1529,13 +2137,895 @@ fmMIBCompliance MODULE-COMPLIANCE
               "Model and feature specific."
 
         GROUP   fmNotificationObjComplianceGroup
-        DESCRIPTION   
+        DESCRIPTION
    	          "Object identifiers used in notifications. Objects are required if their containing trap is implemented."
 
         GROUP   fmSessionComplianceGroup
-        DESCRIPTION   
+        DESCRIPTION
    	          "IP session related implementation."
 
+        GROUP   fmAdomComplianceGroup
+        DESCRIPTION
+              "This group is mandatory for adom-related configuration and statistics."
+
+        GROUP   fmDeviceComplianceGroup
+        DESCRIPTION
+              "This group is mandatory for device-related configuration and statistics."
+
     ::= { fmMIBConformance 100 }
+
+--
+-- fortinet.fnFortiManagerMib.fmUm
+--
+
+fmUm OBJECT IDENTIFIER
+    ::= { fnFortiManagerMib 11 }
+
+-- fortinet.fnFortiManagerMib.fmUm.fmUmContract
+fmUmContract OBJECT IDENTIFIER
+    ::= { fmUm 1 }
+
+fmUmContractTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmUmContractEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of Contract"
+    ::= { fmUmContract 1 }
+
+fmUmContractEntry OBJECT-TYPE
+    SYNTAX      FmUmContractEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Contarct entry"
+    INDEX       { fmUmContractEntryIndex }
+    ::= { fmUmContractTable 1 }
+
+FmUmContractEntry ::= SEQUENCE {
+     fmUmContractEntryIndex  FnIndex,
+     fmUmContractEntrySerial DisplayString,
+     fmUmContractEntryData   DisplayString
+}
+
+fmUmContractEntryIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies within the fmUmContractTable"
+    ::= { fmUmContractEntry 1 }
+
+fmUmContractEntrySerial OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device Serial Number"
+    ::= { fmUmContractEntry 2 }
+
+fmUmContractEntryData OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..512))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Contract Raw Data"
+    ::= { fmUmContractEntry 3 }
+
+------------------------------------------------------------
+FmUmServiceStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Service Status"
+    SYNTAX      INTEGER {
+        unknown (0),
+        up (1),
+        down (2)
+    }
+
+FmUmBoolState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Boolean state"
+    SYNTAX      INTEGER {
+        unknown (0),
+        yes (1),
+        no (2)
+    }
+
+-- fortinet.fnFortiManagerMib.fmUm.fmUmFds
+fmUmFds OBJECT IDENTIFIER
+    ::= { fmUm 2 }
+
+-- fortinet.fnFortiManagerMib.fmUm.fmUmFds.fmUmFdsServiceFds
+fmUmFdsServiceFds OBJECT IDENTIFIER
+    ::= { fmUmFds 1 }
+
+fmUmFdsServiceFdsStatus OBJECT-TYPE
+    SYNTAX     FmUmServiceStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FDS Service Status"
+    ::= { fmUmFdsServiceFds 1 }
+
+fmUmFdsServiceFdsServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmUmFdsServiceFdsServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of server list for FDS service"
+    ::= { fmUmFdsServiceFds 2 }
+
+fmUmFdsServiceFdsServerEntry OBJECT-TYPE
+    SYNTAX      FmUmFdsServiceFdsServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "server info for FDS service"
+    INDEX       { fmUmFdsServiceFdsServerEntryIndex }
+    ::= { fmUmFdsServiceFdsServerTable 1 }
+
+FmUmFdsServiceFdsServerEntry ::= SEQUENCE {
+     fmUmFdsServiceFdsServerEntryIndex FnIndex,
+     fmUmFdsServiceFdsServerAddr       InetAddress,
+     fmUmFdsServiceFdsServerPort       InetPortNumber,
+     fmUmFdsServiceFdsServerTimeZone   Integer32,
+     fmUmFdsServiceFdsServerCurrent    FmUmBoolState
+}
+
+fmUmFdsServiceFdsServerEntryIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies within the fmUmFdsServiceFdsServerTable"
+    ::= { fmUmFdsServiceFdsServerEntry 1 }
+
+fmUmFdsServiceFdsServerAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Server's Address"
+    ::= { fmUmFdsServiceFdsServerEntry 2 }
+
+fmUmFdsServiceFdsServerPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Server's Port"
+    ::= { fmUmFdsServiceFdsServerEntry 3 }
+
+fmUmFdsServiceFdsServerTimeZone OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Server's Time Zone"
+    ::= { fmUmFdsServiceFdsServerEntry 4 }
+
+fmUmFdsServiceFdsServerCurrent OBJECT-TYPE
+    SYNTAX      FmUmBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current Server"
+    ::= { fmUmFdsServiceFdsServerEntry 5 }
+
+-- fortinet.fnFortiManagerMib.fmUm.fmUmFds.fmUmFdsServiceFct
+fmUmFdsServiceFct OBJECT IDENTIFIER
+    ::= { fmUmFds 2 }
+
+fmUmFdsServiceFctStatus OBJECT-TYPE
+    SYNTAX     FmUmServiceStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FDS Service Status"
+    ::= { fmUmFdsServiceFct 1 }
+
+fmUmFdsServiceFctServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmUmFdsServiceFctServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of server list for FDS service"
+    ::= { fmUmFdsServiceFct 2 }
+
+fmUmFdsServiceFctServerEntry OBJECT-TYPE
+    SYNTAX      FmUmFdsServiceFctServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "server info for FDS service"
+    INDEX       { fmUmFdsServiceFctServerEntryIndex }
+    ::= { fmUmFdsServiceFctServerTable 1 }
+
+FmUmFdsServiceFctServerEntry ::= SEQUENCE {
+     fmUmFdsServiceFctServerEntryIndex FnIndex,
+     fmUmFdsServiceFctServerAddr       InetAddress,
+     fmUmFdsServiceFctServerPort       InetPortNumber,
+     fmUmFdsServiceFctServerTimeZone   Integer32,
+     fmUmFdsServiceFctServerCurrent    FmUmBoolState
+}
+
+fmUmFdsServiceFctServerEntryIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies within the fmUmFdsServiceFctServerTable"
+    ::= { fmUmFdsServiceFctServerEntry 1 }
+
+fmUmFdsServiceFctServerAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Server's Address"
+    ::= { fmUmFdsServiceFctServerEntry 2 }
+
+fmUmFdsServiceFctServerPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Server's Port"
+    ::= { fmUmFdsServiceFctServerEntry 3 }
+
+fmUmFdsServiceFctServerTimeZone OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Server's Time Zone"
+    ::= { fmUmFdsServiceFctServerEntry 4 }
+
+fmUmFdsServiceFctServerCurrent OBJECT-TYPE
+    SYNTAX      FmUmBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current Server"
+    ::= { fmUmFdsServiceFctServerEntry 5 }
+
+-- fortinet.fnFortiManagerMib.fmUm.fmUmFds.fmUmPackage
+fmUmFdsPackage OBJECT IDENTIFIER
+    ::= { fmUmFds 3 }
+
+fmUmFdsObjectTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmUmFdsObjectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of server list for FDS object"
+    ::= { fmUmFdsPackage 1 }
+
+fmUmFdsObjectEntry OBJECT-TYPE
+    SYNTAX     FmUmFdsObjectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "FDS object"
+    INDEX       { fmUmFdsObjectEntryIndex }
+    ::= { fmUmFdsObjectTable 1 }
+
+FmUmFdsObjectEntry::= SEQUENCE {
+     fmUmFdsObjectEntryIndex   FnIndex,
+     fmUmFdsObjectEntryObjid   DisplayString,
+     fmUmFdsObjectEntryVersion DisplayString,
+     fmUmFdsObjectEntryDate    DisplayString,
+     fmUmFdsObjectEntrySize    Counter64,
+     fmUmFdsObjectEntryDesc    DisplayString,
+     fmUmFdsObjectEntryProduct DisplayString
+}
+
+fmUmFdsObjectEntryIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "index of fmUmFdsObjectTable"
+    ::= { fmUmFdsObjectEntry 1 }
+
+fmUmFdsObjectEntryObjid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "object id"
+    ::= { fmUmFdsObjectEntry 2 }
+
+fmUmFdsObjectEntryVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "object version"
+    ::= { fmUmFdsObjectEntry 3 }
+
+fmUmFdsObjectEntryDate OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "object date"
+    ::= { fmUmFdsObjectEntry 4 }
+
+fmUmFdsObjectEntrySize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "object size"
+    ::= { fmUmFdsObjectEntry 5 }
+
+fmUmFdsObjectEntryDesc OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "object description"
+    ::= { fmUmFdsObjectEntry 6 }
+
+fmUmFdsObjectEntryProduct OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "proudct"
+    ::= { fmUmFdsObjectEntry 7 }
+
+
+----------------------------------------------------------------------------
+-- fortinet.fnFortiManagerMib.fmUm.fmUmFds.fmUmDevice.fmUmDeviceStatus
+fmUmDevice OBJECT IDENTIFIER
+    ::= { fmUmFds 4 }
+
+fmUmDeviceStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmUmDeviceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table of device status"
+    ::= { fmUmDevice 1 }
+
+fmUmDeviceStatusEntry OBJECT-TYPE
+    SYNTAX     FmUmDeviceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "FDS object"
+    INDEX       { fmUmDeviceStatusEntryIndex }
+    ::= { fmUmDeviceStatusTable 1 }
+
+FmUmDeviceStatusEntry::= SEQUENCE {
+     fmUmDeviceStatusEntryIndex      FnIndex,
+     fmUmDeviceStatusEntrySerial     DisplayString,
+     fmUmDeviceStatusEntryStatus     DisplayString,
+     fmUmDeviceStatusEntryUpdateTime Counter64
+}
+
+fmUmDeviceStatusEntryIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "index of fmUmDeviceStatusTable"
+    ::= { fmUmDeviceStatusEntry 1 }
+
+fmUmDeviceStatusEntrySerial OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device Serial Number"
+    ::= { fmUmDeviceStatusEntry 2 }
+
+fmUmDeviceStatusEntryStatus OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device update status"
+    ::= { fmUmDeviceStatusEntry 3 }
+
+fmUmDeviceStatusEntryUpdateTime OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device update time"
+    ::= { fmUmDeviceStatusEntry 4 }
+
+-- fortinet.fnFortiManagerMib.fmUm.fmUmFds.fmUmDevice.fmUmDeviceObject
+
+fmUmDeviceObjectTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmUmDeviceObjectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "table of device status"
+    ::= { fmUmDevice 2 }
+
+fmUmDeviceObjectEntry OBJECT-TYPE
+    SYNTAX     FmUmDeviceObjectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "FDS object"
+    INDEX       { fmUmDeviceObjectEntryIndex }
+    ::= { fmUmDeviceObjectTable 1 }
+
+FmUmDeviceObjectEntry::= SEQUENCE {
+     fmUmDeviceObjectEntryIndex         FnIndex,
+     fmUmDeviceObjectEntrySerial        DisplayString,
+     fmUmDeviceObjectEntryObjid         DisplayString,
+     fmUmDeviceObjectEntryDeviceVersion DisplayString,
+     fmUmDeviceObjectEntryServerVersion DisplayString,
+     fmUmDeviceObjectEntryPreferVersion DisplayString
+}
+
+fmUmDeviceObjectEntryIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "index of fmUmDeviceObjectTable"
+    ::= { fmUmDeviceObjectEntry 1 }
+
+fmUmDeviceObjectEntrySerial OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Device Serial Number"
+    ::= { fmUmDeviceObjectEntry 2 }
+
+fmUmDeviceObjectEntryObjid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(17))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "object id"
+    ::= { fmUmDeviceObjectEntry 3 }
+
+fmUmDeviceObjectEntryDeviceVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "object version"
+    ::= { fmUmDeviceObjectEntry 4 }
+
+fmUmDeviceObjectEntryServerVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "object version"
+    ::= { fmUmDeviceObjectEntry 5 }
+
+fmUmDeviceObjectEntryPreferVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "object version"
+    ::= { fmUmDeviceObjectEntry 6 }
+
+----------------------------------------------------------------------------
+
+-- fortinet.fnFortiManagerMib.fmUm.fmUmFgd
+fmUmFgd OBJECT IDENTIFIER
+    ::= { fmUm 3 }
+
+-- fortinet.fnFortiManagerMib.fmUm.fmUmFgd.fmUmFgdServiceFgd
+fmUmFgdServiceFgd OBJECT IDENTIFIER
+    ::= { fmUmFgd 1 }
+
+fmUmFgdServiceFgdStatus OBJECT-TYPE
+    SYNTAX     FmUmServiceStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FGD Service Status"
+    ::= { fmUmFgdServiceFgd 1 }
+
+fmUmFgdServiceFgdServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmUmFgdServiceFgdServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of server list for FDS service"
+    ::= { fmUmFgdServiceFgd 2 }
+
+fmUmFgdServiceFgdServerEntry OBJECT-TYPE
+    SYNTAX      FmUmFgdServiceFgdServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "server info for FDS service"
+    INDEX       { fmUmFgdServiceFgdServerEntryIndex }
+    ::= { fmUmFgdServiceFgdServerTable 1 }
+
+FmUmFgdServiceFgdServerEntry ::= SEQUENCE {
+     fmUmFgdServiceFgdServerEntryIndex FnIndex,
+     fmUmFgdServiceFgdServerAddr       InetAddress,
+     fmUmFgdServiceFgdServerPort       InetPortNumber,
+     fmUmFgdServiceFgdServerTimeZone   Integer32,
+     fmUmFgdServiceFgdServerCurrent    FmUmBoolState
+}
+
+fmUmFgdServiceFgdServerEntryIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies within the fmUmFgdServiceFgdServerTable"
+    ::= { fmUmFgdServiceFgdServerEntry 1 }
+
+fmUmFgdServiceFgdServerAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Server's Address"
+    ::= { fmUmFgdServiceFgdServerEntry 2 }
+
+fmUmFgdServiceFgdServerPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Server's Port"
+    ::= { fmUmFgdServiceFgdServerEntry 3 }
+
+fmUmFgdServiceFgdServerTimeZone OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Server's Time Zone"
+    ::= { fmUmFgdServiceFgdServerEntry 4 }
+
+fmUmFgdServiceFgdServerCurrent OBJECT-TYPE
+    SYNTAX      FmUmBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current Server"
+    ::= { fmUmFgdServiceFgdServerEntry 5 }
+
+fmUmFgdServiceFgfq OBJECT IDENTIFIER
+    ::= { fmUmFgd 2 }
+
+fmUmFgdServiceFgfqStatus OBJECT-TYPE
+    SYNTAX     FmUmServiceStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FGD Service Status"
+    ::= { fmUmFgdServiceFgfq 1 }
+
+fmUmFgdServiceFgfqServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmUmFgdServiceFgfqServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of server list for FDS service"
+    ::= { fmUmFgdServiceFgfq 2 }
+
+fmUmFgdServiceFgfqServerEntry OBJECT-TYPE
+    SYNTAX      FmUmFgdServiceFgfqServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "server info for FDS service"
+    INDEX       { fmUmFgdServiceFgfqServerEntryIndex }
+    ::= { fmUmFgdServiceFgfqServerTable 1 }
+
+FmUmFgdServiceFgfqServerEntry ::= SEQUENCE {
+     fmUmFgdServiceFgfqServerEntryIndex FnIndex,
+     fmUmFgdServiceFgfqServerAddr       InetAddress,
+     fmUmFgdServiceFgfqServerPort       InetPortNumber,
+     fmUmFgdServiceFgfqServerTimeZone   Integer32,
+     fmUmFgdServiceFgfqServerCurrent    FmUmBoolState
+}
+
+fmUmFgdServiceFgfqServerEntryIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies within the fmUmFgdServiceFgfqServerTable"
+    ::= { fmUmFgdServiceFgfqServerEntry 1 }
+
+fmUmFgdServiceFgfqServerAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Server's Address"
+    ::= { fmUmFgdServiceFgfqServerEntry 2 }
+
+fmUmFgdServiceFgfqServerPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Server's Port"
+    ::= { fmUmFgdServiceFgfqServerEntry 3 }
+
+fmUmFgdServiceFgfqServerTimeZone OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Server's Time Zone"
+    ::= { fmUmFgdServiceFgfqServerEntry 4 }
+
+fmUmFgdServiceFgfqServerCurrent OBJECT-TYPE
+    SYNTAX      FmUmBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current Server"
+    ::= { fmUmFgdServiceFgfqServerEntry 5 }
+
+-- fortinet.fnFortiManagerMib.fmUm.fmUmFgd.fmUmFgdPackage
+fmUmFgdPackage OBJECT IDENTIFIER
+    ::= { fmUmFgd 3 }
+
+fmUmFgdDBVersionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmUmFgdDBVersionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of server list for fgd db version object"
+    ::= { fmUmFgdPackage 1 }
+
+fmUmFgdDBVersionEntry OBJECT-TYPE
+    SYNTAX    FmUmFgdDBVersionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "fgd db version"
+    INDEX       { fmUmFgdDBVersionEntryIndex }
+    ::= { fmUmFgdDBVersionTable 1 }
+
+FmUmFgdDBVersionEntry::= SEQUENCE {
+     fmUmFgdDBVersionEntryIndex    FnIndex,
+     fmUmFgdDBVersionEntryCategory DisplayString,
+     fmUmFgdDBVersionEntryVersion  DisplayString,
+     fmUmFgdDBVersionEntrySize     Counter64,
+     fmUmFgdDBVersionEntryDate     Counter64,
+     fmUmFgdDBVersionEntryDesc     DisplayString
+}
+
+fmUmFgdDBVersionEntryIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "index of fmUmFgdDBVersionTable"
+    ::= { fmUmFgdDBVersionEntry 1 }
+
+fmUmFgdDBVersionEntryCategory OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "category"
+    ::= { fmUmFgdDBVersionEntry 2 }
+
+fmUmFgdDBVersionEntryVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "version"
+    ::= { fmUmFgdDBVersionEntry 3 }
+
+fmUmFgdDBVersionEntrySize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "size"
+    ::= { fmUmFgdDBVersionEntry 4 }
+
+fmUmFgdDBVersionEntryDate OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "date"
+    ::= { fmUmFgdDBVersionEntry 5 }
+
+fmUmFgdDBVersionEntryDesc OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "descriptions"
+    ::= { fmUmFgdDBVersionEntry 6 }
+
+-- fortinet.fnFortiManagerMib.fmUm.fmUmFgd.fmUmFgdQueryStatistic
+fmUmFgdQueryStatistic OBJECT IDENTIFIER
+    ::= { fmUmFgd 4 }
+
+-- fortinet.fnFortiManagerMib.fmUm.fmUmFgd.fmUmFgdQueryStatistic.fmUmFgdQueryStatisticTop10SitesTable
+fmUmFgdQueryStatisticTop10SitesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmUmFgdQueryStatisticTop10SitesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Top 10 sites table"
+    ::= { fmUmFgdQueryStatistic 1 }
+
+fmUmFgdQueryStatisticTop10SitesEntry OBJECT-TYPE
+    SYNTAX    FmUmFgdQueryStatisticTop10SitesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of top 10 sites table"
+    INDEX       { fmUmFgdQueryStatisticTop10SitesEntryIndex }
+    ::= { fmUmFgdQueryStatisticTop10SitesTable 1 }
+
+FmUmFgdQueryStatisticTop10SitesEntry::= SEQUENCE {
+     fmUmFgdQueryStatisticTop10SitesEntryIndex    FnIndex,
+     fmUmFgdQueryStatisticTop10SitesEntryAddress  InetAddress,
+     fmUmFgdQueryStatisticTop10SitesEntryVisits   Counter64
+}
+
+fmUmFgdQueryStatisticTop10SitesEntryIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index"
+    ::= { fmUmFgdQueryStatisticTop10SitesEntry 1 }
+
+fmUmFgdQueryStatisticTop10SitesEntryAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Site Address"
+    ::= { fmUmFgdQueryStatisticTop10SitesEntry 2 }
+
+fmUmFgdQueryStatisticTop10SitesEntryVisits OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Site Address"
+    ::= { fmUmFgdQueryStatisticTop10SitesEntry 3 }
+
+-- fortinet.fnFortiManagerMib.fmUm.fmUmFgd.fmUmFgdQueryStatistic.fmUmFgdQueryStatisticTop10DevicesTable
+fmUmFgdQueryStatisticTop10DevicesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmUmFgdQueryStatisticTop10DevicesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Top 10 devices table"
+    ::= { fmUmFgdQueryStatistic 2 }
+
+fmUmFgdQueryStatisticTop10DevicesEntry OBJECT-TYPE
+    SYNTAX    FmUmFgdQueryStatisticTop10DevicesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of top 10 devicess table"
+    INDEX       { fmUmFgdQueryStatisticTop10DevicesEntryIndex }
+    ::= { fmUmFgdQueryStatisticTop10DevicesTable 1 }
+
+FmUmFgdQueryStatisticTop10DevicesEntry::= SEQUENCE {
+     fmUmFgdQueryStatisticTop10DevicesEntryIndex    FnIndex,
+     fmUmFgdQueryStatisticTop10DevicesEntryName     DisplayString,
+     fmUmFgdQueryStatisticTop10DevicesEntryQueries  Counter64
+}
+
+fmUmFgdQueryStatisticTop10DevicesEntryIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index"
+    ::= { fmUmFgdQueryStatisticTop10DevicesEntry 1 }
+
+fmUmFgdQueryStatisticTop10DevicesEntryName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..512))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device name"
+    ::= { fmUmFgdQueryStatisticTop10DevicesEntry 2 }
+
+fmUmFgdQueryStatisticTop10DevicesEntryQueries OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Query number of the device"
+    ::= { fmUmFgdQueryStatisticTop10DevicesEntry 3 }
+
+
+-- fortinet.fnFortiManagerMib.fmUm.fmUmFgd.fmUmFgdQueryStatistic.fmUmFgdQueryStatisticQueryHistoryTable
+fmUmFgdQueryStatisticQueryHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FmUmFgdQueryStatisticQueryHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Query history table"
+    ::= { fmUmFgdQueryStatistic 3 }
+
+fmUmFgdQueryStatisticQueryHistoryEntry OBJECT-TYPE
+    SYNTAX    FmUmFgdQueryStatisticQueryHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of Query history table"
+    INDEX       { fmUmFgdQueryStatisticQueryHistoryEntryIndex }
+    ::= { fmUmFgdQueryStatisticQueryHistoryTable 1 }
+
+FmUmFgdQueryStatisticQueryHistoryEntry::= SEQUENCE {
+     fmUmFgdQueryStatisticQueryHistoryEntryIndex         FnIndex,
+     fmUmFgdQueryStatisticQueryHistoryEntryBeginTime     Counter64,
+     fmUmFgdQueryStatisticQueryHistoryEntryEndTime       Counter64,
+     fmUmFgdQueryStatisticQueryHistoryEntryDeviceName    DisplayString,
+     fmUmFgdQueryStatisticQueryHistoryEntryDeviceAddress InetAddress,
+     fmUmFgdQueryStatisticQueryHistoryEntryQueries       Counter64,
+     fmUmFgdQueryStatisticQueryHistoryEntryHits          Counter64,
+     fmUmFgdQueryStatisticQueryHistoryEntryMisses        Counter64,
+     fmUmFgdQueryStatisticQueryHistoryEntryBandWidth     DisplayString
+}
+
+fmUmFgdQueryStatisticQueryHistoryEntryIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index"
+    ::= { fmUmFgdQueryStatisticQueryHistoryEntry 1 }
+
+fmUmFgdQueryStatisticQueryHistoryEntryBeginTime OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmUmFgdQueryStatisticQueryHistoryEntry 2 }
+
+fmUmFgdQueryStatisticQueryHistoryEntryEndTime OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmUmFgdQueryStatisticQueryHistoryEntry 3 }
+
+fmUmFgdQueryStatisticQueryHistoryEntryDeviceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..512))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device name"
+    ::= { fmUmFgdQueryStatisticQueryHistoryEntry 4 }
+
+fmUmFgdQueryStatisticQueryHistoryEntryDeviceAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device address"
+    ::= { fmUmFgdQueryStatisticQueryHistoryEntry 5 }
+
+fmUmFgdQueryStatisticQueryHistoryEntryQueries OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmUmFgdQueryStatisticQueryHistoryEntry 6 }
+
+fmUmFgdQueryStatisticQueryHistoryEntryHits OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmUmFgdQueryStatisticQueryHistoryEntry 7 }
+
+fmUmFgdQueryStatisticQueryHistoryEntryMisses OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fmUmFgdQueryStatisticQueryHistoryEntry 8 }
+
+fmUmFgdQueryStatisticQueryHistoryEntryBandWidth OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device name"
+    ::= { fmUmFgdQueryStatisticQueryHistoryEntry 9 }
 
 END -- end of module FORTINET-FORTIMANAGER-FORTIANALYZER-MIB.

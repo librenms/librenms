@@ -44,13 +44,13 @@ if (! empty($entPhysical)) {
             if (empty($state['entStateLastChanged'])) {
                 $state['entStateLastChanged'] = null;
             } else {
-                [$date, $time, $tz] = explode(',', $state['entStateLastChanged']);
+                [$date, $time, $tz] = explode(',', (string) $state['entStateLastChanged']);
                 try {
                     $lastChanged = new DateTime("$date $time", new DateTimeZone($tz));
                     $state['entStateLastChanged'] = $lastChanged
                         ->setTimezone(new DateTimeZone(date_default_timezone_get()))
                         ->format('Y-m-d H:i:s');
-                } catch (Exception $e) {
+                } catch (Exception) {
                     // no update
                 }
             }

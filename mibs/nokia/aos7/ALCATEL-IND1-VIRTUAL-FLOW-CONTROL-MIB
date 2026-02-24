@@ -13,38 +13,33 @@ IMPORTS
         OBJECT-GROUP,
         MODULE-COMPLIANCE               FROM SNMPv2-CONF
         SnmpAdminString                 FROM SNMP-FRAMEWORK-MIB
-        InterfaceIndex                  FROM IF-MIB
+        InterfaceIndex,
+        ifIndex                         FROM IF-MIB
         softentIND1Vfc                  FROM ALCATEL-IND1-BASE;
 
 
         alcatelIND1VfcMIB MODULE-IDENTITY
-                LAST-UPDATED "201003150000Z"
-                ORGANIZATION "Alcatel-Lucent"
-                CONTACT-INFO
-            "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
+            LAST-UPDATED "201911270000Z"
+            ORGANIZATION "ALE USA Inc."
+            CONTACT-INFO
+             "Please consult with Customer Service to ensure the most appropriate
+              version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                              Alcatel-Lucent Enterprise
+                                26801 West Agoura Road
+                             Agoura Hills, CA  91301-5122
+                               United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+             Telephone:          +1 800 995 2696
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+             Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+             World Wide Web:     https://www.al-enterprise.com"
 
                 DESCRIPTION
                         "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  System Capability Manager, to allow for system control and limitation setting, of
                  different, features through out the system.
                  Capability manager is a centralized process which provides hardware information and
@@ -62,10 +57,15 @@ IMPORTS
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2009 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                       Copyright (C) ALE USA Inc. 2014-2019
+                       Copyright (C) 1995-2013 Alcatel-Lucent
+                           ALL RIGHTS RESERVED WORLDWIDE"
 
-                REVISION      "201003150000Z"
+        REVISION      "201911270000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
+
+        REVISION      "201003150000Z"
         DESCRIPTION
             "Capability Manager is used to set system wide limitation."
                 ::= { softentIND1Vfc 1}
@@ -138,7 +138,24 @@ VfcQueueType ::= TEXTUAL-CONVENTION
     STATUS current
     DESCRIPTION
         "QoS characteristics of queue. SApecified in RFC 3289 as Differentiated Services Code Point values."
-    SYNTAX INTEGER
+    SYNTAX INTEGER {
+               af0 (256),
+               af1 (257),
+               af2 (258),
+               af3 (259),
+               af4 (260),
+               be  (512),
+               ef  (1024),
+               sp0 (2048),
+               sp1 (2049),
+               sp2 (2050),
+               sp3 (2051),
+               sp4 (2052),
+               sp5 (2053),
+               sp6 (2054),
+               sp7 (2055),
+               wfq (65536)
+               }
 
 VfcQsetAction ::= TEXTUAL-CONVENTION
     STATUS deprecated
@@ -194,7 +211,8 @@ VfcWfqMode ::= TEXTUAL-CONVENTION
         "WFQ Mode."
     SYNTAX INTEGER {
             werr (1),
-            wrr (2)
+            wrr (2),
+            wrr2 (3)
             }
 
 VfcProfileMode ::= TEXTUAL-CONVENTION
@@ -213,7 +231,7 @@ VfcProfileMode ::= TEXTUAL-CONVENTION
 alaVfcWREDProfileTable  OBJECT-TYPE
             SYNTAX  SEQUENCE OF AlaVfcWREDProfileEntry
             MAX-ACCESS  not-accessible
-            STATUS  current
+            STATUS  deprecated
             DESCRIPTION
                 "A table of WRED profiles."
             ::= { alaVfcConfig 1 }
@@ -221,7 +239,7 @@ alaVfcWREDProfileTable  OBJECT-TYPE
 alaVfcWREDProfileEntry  OBJECT-TYPE
         SYNTAX  AlaVfcWREDProfileEntry
         MAX-ACCESS  not-accessible
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "A WRED profile entry."
         INDEX { alaVfcWRPId }
@@ -273,7 +291,7 @@ AlaVfcWREDProfileEntry ::= SEQUENCE {
 alaVfcWRPId  OBJECT-TYPE
         SYNTAX  Unsigned32 (1..16)
         MAX-ACCESS  not-accessible
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Identifier of WRED profile."
 
@@ -294,7 +312,7 @@ alaVfcWRPAdminState  OBJECT-TYPE
 alaVfcWRPName  OBJECT-TYPE
         SYNTAX  SnmpAdminString (SIZE (0..32))
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Name of WRED profile."
 
@@ -303,7 +321,7 @@ alaVfcWRPName  OBJECT-TYPE
 alaVfcWRPGreenMinThreshold  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..100)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Minimum threshold (percentage of queue size)."
 
@@ -313,7 +331,7 @@ alaVfcWRPGreenMinThreshold  OBJECT-TYPE
 alaVfcWRPGreenMaxThreshold  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..100)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Maximum threshold (percentage of queue size)."
 
@@ -323,7 +341,7 @@ alaVfcWRPGreenMaxThreshold  OBJECT-TYPE
 alaVfcWRPGreenMaxDropProbability  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..100)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Maximum probability of a packet being dropped (percent)."
 
@@ -333,7 +351,7 @@ alaVfcWRPGreenMaxDropProbability  OBJECT-TYPE
 alaVfcWRPGreenGain  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..15)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Burst smoothing factor used for EWMA calculations."
 
@@ -343,7 +361,7 @@ alaVfcWRPGreenGain  OBJECT-TYPE
 alaVfcWRPYellowMinThreshold  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..100)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Minimum threshold (percentage of queue size)."
 
@@ -353,7 +371,7 @@ alaVfcWRPYellowMinThreshold  OBJECT-TYPE
 alaVfcWRPYellowMaxThreshold  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..100)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Maximum threshold (percentage of queue size)."
 
@@ -363,7 +381,7 @@ alaVfcWRPYellowMaxThreshold  OBJECT-TYPE
 alaVfcWRPYellowMaxDropProbability  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..100)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Maximum probability of a packet being dropped (percent)."
 
@@ -373,7 +391,7 @@ alaVfcWRPYellowMaxDropProbability  OBJECT-TYPE
 alaVfcWRPYellowGain  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..15)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Burst smoothing factor used for EWMA calculations."
 
@@ -383,7 +401,7 @@ alaVfcWRPYellowGain  OBJECT-TYPE
 alaVfcWRPRedMinThreshold  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..100)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Minimum threshold (percentage of queue size)."
 
@@ -393,7 +411,7 @@ alaVfcWRPRedMinThreshold  OBJECT-TYPE
 alaVfcWRPRedMaxThreshold  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..100)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Maximum threshold (percentage of queue size)."
 
@@ -403,7 +421,7 @@ alaVfcWRPRedMaxThreshold  OBJECT-TYPE
 alaVfcWRPRedMaxDropProbability  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..100)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Maximum probability of a packet being dropped (percent)."
 
@@ -413,7 +431,7 @@ alaVfcWRPRedMaxDropProbability  OBJECT-TYPE
 alaVfcWRPRedGain  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..15)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Burst smoothing factor used for EWMA calculations."
 
@@ -434,7 +452,7 @@ alaVfcWRPStatsAdmin  OBJECT-TYPE
 alaVfcWRPAttachmentCount  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..16384)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Number of queues and/or qsets using this profile."
         ::= { alaVfcWREDProfileEntry 17 }
@@ -442,7 +460,7 @@ alaVfcWRPAttachmentCount  OBJECT-TYPE
 alaVfcWRPMTU  OBJECT-TYPE
         SYNTAX  Unsigned32 (0..16384)
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "MTU for this profile."
         ::= { alaVfcWREDProfileEntry 18 }
@@ -450,15 +468,15 @@ alaVfcWRPMTU  OBJECT-TYPE
 alaVfcWRPLastChange  OBJECT-TYPE
         SYNTAX  DateAndTime
         MAX-ACCESS  read-only
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Time of most recent change to this entry."
         ::= { alaVfcWREDProfileEntry 19 }
 
 alaVfcWRPRowStatus  OBJECT-TYPE
         SYNTAX  RowStatus
-        MAX-ACCESS  read-only
-        STATUS  current
+        MAX-ACCESS  read-create
+        STATUS  deprecated
         DESCRIPTION
                 "alaVfcWRPRowStatus controls the creation and deletion of
                  rows in the alaVfcWREDProfileTable."
@@ -520,7 +538,11 @@ AlaVfcQsetProfileEntry ::= SEQUENCE {
         alaVfcQSPLastChange
                 DateAndTime,
         alaVfcQSPRowStatus
-                RowStatus
+                RowStatus,
+        alaVfcQSPECNProfileId
+                Unsigned32,
+        alaVfcQSPECNProfileName
+                SnmpAdminString
         }
 
 alaVfcQSPId  OBJECT-TYPE
@@ -677,12 +699,28 @@ alaVfcQSPLastChange  OBJECT-TYPE
 
 alaVfcQSPRowStatus  OBJECT-TYPE
         SYNTAX  RowStatus
-        MAX-ACCESS  read-only
+        MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
                 "alaVfcQSPRowStatus controls the creation and deletion of
                  rows in the alaVfcQsetProfileTable."
         ::= { alaVfcQsetProfileEntry 17 }
+
+alaVfcQSPECNProfileId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..16)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "Identifier of ECN profile to be used for this Qset."
+        ::= { alaVfcQsetProfileEntry 18 }
+
+alaVfcQSPECNProfileName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "Name of ECN profile to be used for this Qset."
+        ::= { alaVfcQsetProfileEntry 19 }
 
 
 -- xxxxxxxxxxxxxxxxxxx
@@ -733,7 +771,7 @@ AlaVfcQsetInstanceEntry ::= SEQUENCE {
                 Unsigned32,             -- deprecated
         alaVfcQsetWRPName
                 SnmpAdminString,        -- deprecated
-        alaVfcQsetWRPAdminState
+        alaVfcQsetWRPAdminState         -- deprecated
                 VfcEnableState,
         alaVfcQsetWRPOperState
                 VfcEnableState,
@@ -894,7 +932,7 @@ alaVfcQsetWRPName  OBJECT-TYPE
 alaVfcQsetWRPAdminState  OBJECT-TYPE
         SYNTAX  VfcEnableState
         MAX-ACCESS  read-write
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Administrative state of Qset WRED profile.  Setting this variable to
                  disabled disables the WRED profile for all objects using this Qset."
@@ -1127,15 +1165,18 @@ alaVfcQPTrafficClass  OBJECT-TYPE
 
 alaVfcQPQType  OBJECT-TYPE
         SYNTAX  VfcQueueType
-        MAX-ACCESS  read-only
+        MAX-ACCESS  read-write
         STATUS  current
         DESCRIPTION
-                "Type of the queue."
+                "Type of the queue.
+
+                read-write supported from 88 R2
+                Object used as read-only in older releases"
         ::= { alaVfcQProfileEntry 9 }
 
 alaVfcQPCIRBandwidthLimitType  OBJECT-TYPE
         SYNTAX  VfcBwLimitType
-        MAX-ACCESS  read-only
+        MAX-ACCESS  read-write
         STATUS  current
         DESCRIPTION
                 "Type of CIR bandwidth Limit to be applied to queue traffic."
@@ -1143,7 +1184,7 @@ alaVfcQPCIRBandwidthLimitType  OBJECT-TYPE
 
 alaVfcQPCIRBandwidthLimitValue  OBJECT-TYPE
         SYNTAX  Unsigned32
-        MAX-ACCESS  read-only
+        MAX-ACCESS  read-write
         STATUS  current
         DESCRIPTION
                 "CIR limit to be applied to queue traffic."
@@ -1151,7 +1192,7 @@ alaVfcQPCIRBandwidthLimitValue  OBJECT-TYPE
 
 alaVfcQPPIRBandwidthLimitType  OBJECT-TYPE
         SYNTAX  VfcBwLimitType
-        MAX-ACCESS  read-only
+        MAX-ACCESS  read-write
         STATUS  current
         DESCRIPTION
                 "Type of PIR bandwidth Limit to be applied to queue traffic."
@@ -1159,7 +1200,7 @@ alaVfcQPPIRBandwidthLimitType  OBJECT-TYPE
 
 alaVfcQPPIRBandwidthLimitValue  OBJECT-TYPE
         SYNTAX  Unsigned32
-        MAX-ACCESS  read-only
+        MAX-ACCESS  read-write
         STATUS  current
         DESCRIPTION
                 "PIR limit to be applied to queue traffic."
@@ -1202,7 +1243,7 @@ alaVfcQPLastChange  OBJECT-TYPE
 
 alaVfcQPWfqWeight  OBJECT-TYPE
         SYNTAX  Unsigned32
-        MAX-ACCESS  read-only
+        MAX-ACCESS  read-write
         STATUS  current
         DESCRIPTION
                 "WFQ Weight."
@@ -1210,7 +1251,7 @@ alaVfcQPWfqWeight  OBJECT-TYPE
 
 alaVfcQPWfqMode  OBJECT-TYPE
         SYNTAX  VfcWfqMode
-        MAX-ACCESS  read-only
+        MAX-ACCESS  read-write
         STATUS  current
         DESCRIPTION
                 "WFQ Mode."
@@ -1253,7 +1294,7 @@ AlaVfcQInstanceEntry ::= SEQUENCE {
         alaVfcQInstanceOperState
                 VfcEnableState,     -- deprecated
         alaVfcQInstanceWRPAdminState
-                VfcEnableState,
+                VfcEnableState,     -- deprecated
         alaVfcQInstanceWRPOperState
                 VfcEnableState,
         alaVfcQInstanceWRPId
@@ -1319,6 +1360,8 @@ AlaVfcQInstanceEntry ::= SEQUENCE {
         alaVfcQInstanceLastChange
                 DateAndTime,
         alaVfcQInstanceStatsClear   -- deprecated
+                VfcEnableState,
+        alaVfcQInstanceECNAdminState
                 VfcEnableState
         }
 
@@ -1400,7 +1443,7 @@ alaVfcQInstanceOperState  OBJECT-TYPE
 alaVfcQInstanceWRPAdminState  OBJECT-TYPE
         SYNTAX  VfcEnableState
         MAX-ACCESS  read-write
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
                 "Administrative state of Qset WRED profile.  Setting this variable to
                  disabled disables the WRED profile for this Queue."
@@ -1694,6 +1737,16 @@ alaVfcQInstanceStatsClear  OBJECT-TYPE
                  Deprecated - queue stats changes not allowed."
         DEFVAL {disabled}
         ::= { alaVfcQInstanceEntry 41 }
+
+alaVfcQInstanceECNAdminState  OBJECT-TYPE
+        SYNTAX  VfcEnableState
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "Administrative state of Qset ECN profile. Setting this variable to
+                 disabled disables the ECN profile for this Queue."
+        DEFVAL { disabled }
+        ::= { alaVfcQInstanceEntry 42 }
 
 -- xxxxxxxxxxxxxxxxxxxxx
 -- Qsap Table
@@ -2123,6 +2176,137 @@ alaVfcSystemDefaultQsetQSPName  OBJECT-TYPE
                 "Name of Qset profile."
         ::= { alaVfcConfig 13 }
 
+alaVfcECNProfileTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AlaVfcECNProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A table of ECN profiles."
+        ::= { alaVfcConfig 14 }
+
+alaVfcECNProfileEntry  OBJECT-TYPE
+        SYNTAX  AlaVfcECNProfileEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A ECN profile entry."
+        INDEX { alaVfcECNProfileId }
+            ::= { alaVfcECNProfileTable 1 }
+
+AlaVfcECNProfileEntry ::= SEQUENCE {
+        alaVfcECNProfileId
+                Unsigned32,
+        alaVfcECNProfileName
+                SnmpAdminString,
+        alaVfcECNProfileTemplateId
+                Unsigned32,
+        alaVfcECNProfileTemplateName
+                SnmpAdminString,
+        alaVfcECNProfileMinThreshold
+                Unsigned32,
+        alaVfcECNProfileMaxThreshold
+                Unsigned32,
+        alaVfcECNProfileRowStatus
+                RowStatus
+        }
+
+alaVfcECNProfileId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..16)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Identifier of ECN profile."
+        DEFVAL  { 1 }
+        ::= { alaVfcECNProfileEntry 1 }
+
+alaVfcECNProfileName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "Name of ECN profile."
+        ::= { alaVfcECNProfileEntry 2 }
+
+alaVfcECNProfileTemplateId  OBJECT-TYPE
+        SYNTAX  Unsigned32 (1..16)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "Identifier of ECN profile used as a template for this ECN profile."
+        DEFVAL  { 1 }
+        ::= { alaVfcECNProfileEntry 3 }
+
+alaVfcECNProfileTemplateName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "Name of ECN profile used as a template for this ECN profile."
+        ::= { alaVfcECNProfileEntry 4 }
+
+alaVfcECNProfileMinThreshold  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..100)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "Minimum threshold (percentage of queue size)."
+        ::= { alaVfcECNProfileEntry 5 }
+
+alaVfcECNProfileMaxThreshold  OBJECT-TYPE
+        SYNTAX  Unsigned32 (0..100)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "Maximum threshold (percentage of queue size)."
+        ::= { alaVfcECNProfileEntry 6 }
+
+alaVfcECNProfileRowStatus  OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+                "alaVfcECNProfileRowStatus controls the creation and deletion of
+                 rows in the alaVfcECNProfileTable."
+        ::= { alaVfcECNProfileEntry 7 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Definition of packet-buffer debug
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaVfcPacketBufferDebugTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF AlaVfcPacketBufferDebugEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of VFC packet-buffer debug definitions."
+  ::= { alaVfcConfig 15 }
+
+alaVfcPacketBufferDebugEntry OBJECT-TYPE
+  SYNTAX      AlaVfcPacketBufferDebugEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of VFC packet-buffer debug."
+  INDEX { ifIndex }
+  ::= { alaVfcPacketBufferDebugTable 1 }
+
+AlaVfcPacketBufferDebugEntry ::=
+  SEQUENCE
+  {
+    alaVfcPacketBufferDebug             INTEGER
+  }
+
+alaVfcPacketBufferDebug OBJECT-TYPE
+  SYNTAX      INTEGER
+    {
+        default (1),
+        medium (2),
+        high (3),
+        high2 (4)
+    }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "VFC packet buffer debug."
+  ::= { alaVfcPacketBufferDebugEntry 1 }
+
 -- -------------------------------------------------------------
 -- Compliance Statements
 -- -------------------------------------------------------------
@@ -2197,7 +2381,9 @@ alaVfcSystemDefaultQsetQSPName  OBJECT-TYPE
                 alaVfcQSPStatsAdmin,
                 alaVfcQSPAttachmentCount,
                 alaVfcQSPLastChange,
-                alaVfcQSPRowStatus
+                alaVfcQSPRowStatus,
+                alaVfcQSPECNProfileId,
+                alaVfcQSPECNProfileName
         }
         STATUS  current
         DESCRIPTION
@@ -2303,7 +2489,8 @@ alaVfcSystemDefaultQsetQSPName  OBJECT-TYPE
                 alaVfcQInstanceRedPacketsDropped,
                 alaVfcQInstanceRedBytesDropped,
                 alaVfcQInstanceLastChange,
-                alaVfcQInstanceStatsClear
+                alaVfcQInstanceStatsClear,
+                alaVfcQInstanceECNAdminState
         }
         STATUS  current
         DESCRIPTION
@@ -2388,5 +2575,30 @@ alaVfcSystemDefaultQsetQSPName  OBJECT-TYPE
         DESCRIPTION
             "Collection of system QSet instance Objects."
         ::= { alcatelIND1VfcMIBGroups 11 }
+
+    alaVfcECNProfileGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVfcECNProfileName,
+                alaVfcECNProfileTemplateId,
+                alaVfcECNProfileTemplateName,
+                alaVfcECNProfileMinThreshold,
+                alaVfcECNProfileMaxThreshold,
+                alaVfcECNProfileRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of ECN Profile for management of VFC."
+        ::= { alcatelIND1VfcMIBGroups 12 }
+
+    alaVfcPacketBufferDebugGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaVfcPacketBufferDebug
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of VFC for management of VFC."
+        ::= { alcatelIND1VfcMIBGroups 13 }
 
 END

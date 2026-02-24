@@ -16,14 +16,12 @@ class SettingsController extends Controller
      * @param  string  $section
      * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index(DynamicConfig $dynamicConfig, $tab = 'global', $section = '')
+    public function index(DynamicConfig $dynamicConfig, $tab = 'alerting', $section = '')
     {
         $data = [
             'active_tab' => $tab,
             'active_section' => $section,
-            'groups' => $dynamicConfig->getGroups()->reject(function ($group) {
-                return $group == 'global';
-            })->values(),
+            'groups' => $dynamicConfig->getGroups()->reject(fn ($group) => $group == 'global')->values(),
         ];
 
         return view('settings.index', $data);
@@ -39,7 +37,7 @@ class SettingsController extends Controller
      */
     public function update(DynamicConfig $config, Request $request, $id)
     {
-        $value = $request->get('value');
+        $value = $request->input('value');
 
         if (! $config->isValidSetting($id)) {
             return $this->jsonResponse($id, ':id is not a valid setting', null, 400);

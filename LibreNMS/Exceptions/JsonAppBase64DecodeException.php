@@ -7,20 +7,14 @@ use Throwable;
 class JsonAppBase64DecodeException extends JsonAppException
 {
     /**
-     * @var string
-     */
-    private $output;
-
-    /**
      * @param  string  $message  The message.
      * @param  string  $output  The return from snmpget.
      * @param  int  $code  Error code.
      * @return static
      */
-    public function __construct($message, $output, $code = 0, ?Throwable $previous = null)
+    public function __construct($message, private $output, $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        $this->output = $output;
     }
 
     /**

@@ -32,7 +32,7 @@ unset($sep);
 
 print_optionbar_end();
 
-$tools_type = basename($vars['tool']);
+$tools_type = basename((string) $vars['tool']);
 if (file_exists("includes/html/pages/tools/$tools_type.inc.php")) {
     include "includes/html/pages/tools/$tools_type.inc.php";
 } else {

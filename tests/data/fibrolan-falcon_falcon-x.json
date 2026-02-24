@@ -11436,7 +11436,7 @@
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.4467.1000.10.1.120.1.2",
+                    "processor_oid": ".1.3.6.1.4.1.4467.1000.10.1.120.1.2.201",
                     "processor_index": "201",
                     "processor_type": "fibrolan-falcon",
                     "processor_usage": 32,
@@ -11446,21 +11446,7 @@
                 }
             ]
         },
-        "poller": {
-            "processors": [
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.4467.1000.10.1.120.1.2",
-                    "processor_index": "201",
-                    "processor_type": "fibrolan-falcon",
-                    "processor_usage": 0,
-                    "processor_descr": "CPU Usage",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -12484,7 +12470,7 @@
                     "entPhysicalFirmwareRev": "1.4.4",
                     "entPhysicalSoftwareRev": "6.4.7.4",
                     "entPhysicalAlias": "None",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "",
                     "entPhysicalVendorType": "zeroDotZero",

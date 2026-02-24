@@ -26,7 +26,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class AxisVideoTrapTest extends SnmpTrapTestCase
+final class AxisVideoTrapTest extends SnmpTrapTestCase
 {
     /**
      * Test Axis Video trap handlers

@@ -30,7 +30,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
 
-class AlertingTest extends TestCase
+final class AlertingTest extends TestCase
 {
     public function testJsonAlertCollection(): void
     {
@@ -44,7 +44,7 @@ class AlertingTest extends TestCase
     public function testTransports(): void
     {
         foreach ($this->getTransportFiles() as $file => $_unused) {
-            $parts = explode('/', $file);
+            $parts = explode('/', (string) $file);
             $transport = ucfirst(str_replace('.php', '', array_pop($parts)));
             $class = 'LibreNMS\\Alert\\Transport\\' . $transport;
             $this->assertTrue(class_exists($class), "The transport $transport does not exist");

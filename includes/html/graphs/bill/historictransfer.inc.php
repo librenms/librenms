@@ -19,7 +19,7 @@ if (is_numeric($vars['bill_hist_id'])) {
 // Reformat date labels
 for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
     if ($graph_data['ticklabels'][$i]) {
-        $date = strtotime($graph_data['ticklabels'][$i]);
+        $date = strtotime((string) $graph_data['ticklabels'][$i]);
 
         if ($vars['imgtype'] === 'day') {
             $graph_data['ticklabels'][$i] = date("j\nM", $date);

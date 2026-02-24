@@ -1,5 +1,7 @@
 <?php
 
+require_once base_path('includes/services.inc.php');
+
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\ServiceTemplateController;
 
@@ -19,7 +21,7 @@ if (LibrenmsConfig::get('discover_services')) {
 
     // Services
     if ($device['type'] == 'server') {
-        $oids = trim(snmp_walk($device, '.1.3.6.1.2.1.6.13.1.1.0.0.0.0', '-Osqn'));
+        $oids = trim((string) snmp_walk($device, '.1.3.6.1.2.1.6.13.1.1.0.0.0.0', '-Osqn'));
         foreach (explode("\n", $oids) as $data) {
             $data = trim($data);
             if ($data) {
@@ -27,7 +29,7 @@ if (LibrenmsConfig::get('discover_services')) {
                 if (trim($tcpstatus) == 'listen') {
                     $split_oid = explode('.', $oid);
                     $tcp_port = $split_oid[count($split_oid) - 6];
-                    if ($known_services[$tcp_port]) {
+                    if (isset($known_services[$tcp_port])) {
                         discover_service($device, $known_services[$tcp_port]);
                     }
                 }

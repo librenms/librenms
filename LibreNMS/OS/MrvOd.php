@@ -84,7 +84,7 @@ class MrvOd extends OS
         ];
 
         foreach ($chassis_array as $nbsCmmcChassis => $chassis_contents) {
-            [$chassisHardwareRev, $chassisFirmwareRev] = explode(', ', $chassis_contents['nbsCmmcChassisHardwareRevision']);
+            [$chassisHardwareRev, $chassisFirmwareRev] = explode(', ', (string) $chassis_contents['nbsCmmcChassisHardwareRevision']);
             // Discover the chassis
             $inventory->push(new EntPhysical([
                 'entPhysicalIndex' => $chassis_contents['nbsCmmcChassisIfIndex'] . '00',
@@ -207,14 +207,14 @@ class MrvOd extends OS
                     $cardHardwareRev = $slot_contents['nbsCmmcSlotHardwareRevision'];
                     $cardFirmwareRev = null;
                     $cardOtherRev = null;
-                    $rev_explode = explode(', ', $cardHardwareRev);
+                    $rev_explode = explode(', ', (string) $cardHardwareRev);
                     if (isset($rev_explode[2])) {
                         [$cardHardwareRev, $cardFirmwareRev, $cardOtherRev] = $rev_explode;
                     }
                     // Discover the card
                     $inventory->push(new EntPhysical([
                         'entPhysicalIndex' => $slot_contents['nbsCmmcSlotIfIndex'] . '01',
-                        'entPhysicalDescr' => 'MRV ' . ucfirst($slot_contents['nbsCmmcSlotOperationType']) . ' Card',
+                        'entPhysicalDescr' => 'MRV ' . ucfirst((string) $slot_contents['nbsCmmcSlotOperationType']) . ' Card',
                         'entPhysicalClass' => 'module',
                         'entPhysicalName' => "Card $chassis_index.$nbsCmmcSlot",
                         'entPhysicalModelName' => $slot_contents['nbsCmmcSlotModel'],
@@ -275,7 +275,7 @@ class MrvOd extends OS
                         // If one runs a command like "show 1.1.1 | grep Part" on a port with a genuine pluggable transceiver,
                         // CLI output like "Part #/Rev: SFP-10GDWZR-22/0001" indicates / is considered to be the string delimiter.
                         // However, non-genuine pluggable transceivers may not adhere to this format.
-                        [$nbsCmmcPortModelName, $nbsCmmcPortHardwareRev] = explode('/', $port_contents['nbsCmmcPortPartRev']);
+                        [$nbsCmmcPortModelName, $nbsCmmcPortHardwareRev] = explode('/', (string) $port_contents['nbsCmmcPortPartRev']);
                     } else {
                         $nbsCmmcPortType = 'Built-in';
 

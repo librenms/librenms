@@ -34,8 +34,10 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS\Shared\Cisco;
 use LibreNMS\OS\Traits\CiscoCellular;
+use LibreNMS\OS\Traits\CiscoPortSecurity;
 
 class Ios extends Cisco implements
     WirelessCellDiscovery,
@@ -44,9 +46,11 @@ class Ios extends Cisco implements
     WirelessRssiDiscovery,
     WirelessRsrqDiscovery,
     WirelessRsrpDiscovery,
-    WirelessSnrDiscovery
+    WirelessSnrDiscovery,
+    PortSecurityPolling
 {
     use CiscoCellular;
+    use CiscoPortSecurity;
 
     /**
      * @return WirelessSensor[] Sensors
@@ -55,7 +59,7 @@ class Ios extends Cisco implements
     {
         $device = $this->getDevice();
 
-        if (empty($device->hardware) || (! str_starts_with($device->hardware, 'AIR-') && ! str_contains($device->hardware, 'ciscoAIR'))) {
+        if (empty($device->hardware) || (! str_starts_with((string) $device->hardware, 'AIR-') && ! str_contains((string) $device->hardware, 'ciscoAIR'))) {
             // unsupported IOS hardware
             return [];
         }
@@ -119,7 +123,7 @@ class Ios extends Cisco implements
                 $descr = $ent['ENTITY-MIB::entPhysicalDescr'];
                 unset($entPhys[$entIndex]); // only use each one once
 
-                if (str_ends_with($descr, 'Radio')) {
+                if (str_ends_with((string) $descr, 'Radio')) {
                     d_echo("Mapping entPhysicalIndex $entIndex to ifIndex $ifIndex\n");
                     $data[$ifIndex]['entPhysicalIndex'] = $entIndex;
                     $data[$ifIndex]['entPhysicalDescr'] = $descr;

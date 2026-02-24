@@ -28,7 +28,7 @@ return [
         'Http', // don't use Laravel Http facade, LibreNMS has its own wrapper
     ])->toArray(),
 
-    'charset' => env('CHARSET', ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8'),
+    'charset' => env('CHARSET', (ini_get('php.output_encoding') ?: ini_get('default_charset')) ?: 'UTF-8'),
 
     'name' => 'LibreNMS',
 ];

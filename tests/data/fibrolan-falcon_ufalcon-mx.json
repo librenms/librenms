@@ -6236,7 +6236,7 @@
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.4467.1000.10.1.120.1.2",
+                    "processor_oid": ".1.3.6.1.4.1.4467.1000.10.1.120.1.2.201",
                     "processor_index": "201",
                     "processor_type": "fibrolan-falcon",
                     "processor_usage": 63,
@@ -6246,21 +6246,7 @@
                 }
             ]
         },
-        "poller": {
-            "processors": [
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.4467.1000.10.1.120.1.2",
-                    "processor_index": "201",
-                    "processor_type": "fibrolan-falcon",
-                    "processor_usage": 0,
-                    "processor_descr": "CPU Usage",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -7034,7 +7020,7 @@
                     "entPhysicalFirmwareRev": "5.9.15",
                     "entPhysicalSoftwareRev": "7.4.35.4",
                     "entPhysicalAlias": "None",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "uFalcon-MX",
                     "entPhysicalVendorType": "enterprises.4467.1000.350",

@@ -20,7 +20,7 @@ if (! isset($vars['vm'])) {
 echo '<b> | VMs: </b>';
 $vm_links = [];
 foreach ($app->data['VMs'] as $vm) {
-    $vm = htmlspecialchars($vm);
+    $vm = htmlspecialchars((string) $vm);
     $label = $vm;
 
     if ($vars['vm'] == $vm) {
@@ -70,8 +70,8 @@ echo implode(', ', $page_links);
 if (isset($vars['vm'])) {
     echo '<br><b>Disks:</b> ';
     $disk_links = [];
-    foreach ($app->data['VMdisks'][$vars['vm']] as $index => $disk) {
-        $disk = htmlspecialchars($disk);
+    foreach ($app->data['VMdisks'][$vars['vm']] as $disk) {
+        $disk = htmlspecialchars((string) $disk);
         $label = $disk;
 
         if ($vars['vmdisk'] == $disk) {
@@ -100,7 +100,7 @@ if (isset($vars['vm'])) {
 }
 
 if (isset($vars['vmif']) and isset($vars['vm'])) {
-    $mac = htmlspecialchars($app->data['VMifs'][$vars['vm']][$vars['vmif']]['mac']);
+    $mac = htmlspecialchars((string) $app->data['VMifs'][$vars['vm']][$vars['vmif']]['mac']);
     $port = Port::with('device')->firstWhere(['ifPhysAddress' => str_replace(':', '', $mac)]);
 
     echo "\n<br>\n" .
@@ -129,7 +129,7 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
     // Mainly for CBSD
     $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $app->data['VMifs'][$vars['vm']][$vars['vmif']]['if']]);
     if (! isset($port)) {
-        echo '<b>HV if:</b> ' . htmlspecialchars($app->data['VMifs'][$vars['vm']][$vars['vmif']]['if']) . "\n";
+        echo '<b>HV if:</b> ' . htmlspecialchars((string) $app->data['VMifs'][$vars['vm']][$vars['vmif']]['if']) . "\n";
     } else {
         echo '<b>HV if:</b> ' .
             generate_port_link([

@@ -1,4 +1,3 @@
-mib: SAMLEXAMERICA-MIB
 modules:
     os:
         hardware: SAMLEXAMERICA-MIB::model.0
@@ -7,19 +6,19 @@ modules:
         temperature:
             data:
                 -
-                    oid: tempDD
+                    oid: SAMLEXAMERICA-MIB::tempDD
                     num_oid: .1.3.6.1.4.1.49075.1.3.3.8.{{ $index }}
                     index: tempDD.{{ $index }}
                     descr: DC-to-DC
                 -
-                    oid: tempDA
+                    oid: SAMLEXAMERICA-MIB::tempDA
                     num_oid: .1.3.6.1.4.1.49075.1.3.3.9.{{ $index }}
                     index: tempDA.{{ $index }}
                     descr: DC-to-AC
         state:
             data:
                 -
-                    oid: fan
+                    oid: SAMLEXAMERICA-MIB::fan
                     num_oid: '.1.3.6.1.4.1.49075.1.3.3.1.{{ $index }}'
                     descr: Fan
                     index: 'fan.{{ $index }}'
@@ -28,7 +27,7 @@ modules:
                         - { descr: off, graph: 0, value: 0, generic: 0 }
                         - { descr: on, graph: 0, value: 1, generic: 0 }
                 -
-                    oid: inverterMode
+                    oid: SAMLEXAMERICA-MIB::inverterMode
                     num_oid: '.1.3.6.1.4.1.49075.1.3.3.2.{{ $index }}'
                     descr: Inverter Mode
                     index: 'inverterMode.{{ $index }}'
@@ -37,7 +36,7 @@ modules:
                         - { descr: offline, graph: 0, value: 0, generic: 0 }
                         - { descr: online, graph: 0, value: 1, generic: 0 }
                 -
-                    oid: transferType
+                    oid: SAMLEXAMERICA-MIB::transferType
                     num_oid: '.1.3.6.1.4.1.49075.1.3.3.3.{{ $index }}'
                     descr: Transfer Type
                     index: 'transferType.{{ $index }}'
@@ -46,7 +45,7 @@ modules:
                         - { descr: synchronized, graph: 0, value: 0, generic: 0 }
                         - { descr: unsynchronized, graph: 0, value: 1, generic: 0 }
                 -
-                    oid: byPassRelay
+                    oid: SAMLEXAMERICA-MIB::byPassRelay
                     num_oid: '.1.3.6.1.4.1.49075.1.3.3.4.{{ $index }}'
                     descr: Bypass Relay
                     index: 'byPassRelay.{{ $index }}'
@@ -55,7 +54,7 @@ modules:
                         - { descr: grid, graph: 0, value: 0, generic: 0 }
                         - { descr: inverter, graph: 0, value: 1, generic: 0 }
                 -
-                    oid: gridAC
+                    oid: SAMLEXAMERICA-MIB::gridAC
                     num_oid: '.1.3.6.1.4.1.49075.1.3.3.5.{{ $index }}'
                     descr: Grid AC
                     index: 'gridAC.{{ $index }}'
@@ -67,7 +66,7 @@ modules:
                         - { descr: sync, graph: 0, value: 3, generic: 0 }
                         - { descr: wont-sync, graph: 0, value: 4, generic: 2 }
                 -
-                    oid: warningFanFault
+                    oid: SAMLEXAMERICA-MIB::warningFanFault
                     num_oid: '.1.3.6.1.4.1.49075.1.3.6.1.{{ $index }}'
                     descr: Fan Fault
                     index: 'warningFanFault.{{ $index }}'
@@ -76,7 +75,7 @@ modules:
                         - { descr: normal, graph: 0, value: 0, generic: 0 }
                         - { descr: warning, graph: 0, value: 1, generic: 1 }
                 -
-                    oid: warningOverVoltageAlarm
+                    oid: SAMLEXAMERICA-MIB::warningOverVoltageAlarm
                     num_oid: '.1.3.6.1.4.1.49075.1.3.6.2.{{ $index }}'
                     descr: Over Voltage Alarm
                     index: 'warningOverVoltageAlarm.{{ $index }}'
@@ -85,7 +84,7 @@ modules:
                         - { descr: normal, graph: 0, value: 0, generic: 0 }
                         - { descr: warning, graph: 0, value: 1, generic: 1 }
                 -
-                    oid: warningUnderVoltageAlarm
+                    oid: SAMLEXAMERICA-MIB::warningUnderVoltageAlarm
                     num_oid: '.1.3.6.1.4.1.49075.1.3.6.3.{{ $index }}'
                     descr: Under Voltage Alarm
                     index: 'warningUnderVoltageAlarm.{{ $index }}'
@@ -94,7 +93,7 @@ modules:
                         - { descr: normal, graph: 0, value: 0, generic: 0 }
                         - { descr: warning, graph: 0, value: 1, generic: 1 }
                 -
-                    oid: warningOverload
+                    oid: SAMLEXAMERICA-MIB::warningOverload
                     num_oid: '.1.3.6.1.4.1.49075.1.3.6.4.{{ $index }}'
                     descr: Overload
                     index: 'warningOverload.{{ $index }}'
@@ -103,7 +102,7 @@ modules:
                         - { descr: normal, graph: 0, value: 0, generic: 0 }
                         - { descr: warning, graph: 0, value: 1, generic: 1 }
                 -
-                    oid: warningOverTemperature
+                    oid: SAMLEXAMERICA-MIB::warningOverTemperature
                     num_oid: '.1.3.6.1.4.1.49075.1.3.6.5.{{ $index }}'
                     descr: Temperature
                     index: 'warningOverTemperature.{{ $index }}'
@@ -112,7 +111,7 @@ modules:
                         - { descr: normal, graph: 0, value: 0, generic: 0 }
                         - { descr: warning, graph: 0, value: 1, generic: 1 }
                 -
-                    oid: warningShortCircuit
+                    oid: SAMLEXAMERICA-MIB::warningShortCircuit
                     num_oid: '.1.3.6.1.4.1.49075.1.3.6.6.{{ $index }}'
                     descr: Short Circuit
                     index: 'warningShortCircuit.{{ $index }}'
@@ -121,7 +120,7 @@ modules:
                         - { descr: normal, graph: 0, value: 0, generic: 0 }
                         - { descr: warning, graph: 0, value: 1, generic: 1 }
                 -
-                    oid: warningOverVoltageProtection
+                    oid: SAMLEXAMERICA-MIB::warningOverVoltageProtection
                     num_oid: '.1.3.6.1.4.1.49075.1.3.6.7.{{ $index }}'
                     descr: Overvoltage Protection
                     index: 'warningOverVoltageProtection.{{ $index }}'
@@ -130,7 +129,7 @@ modules:
                         - { descr: normal, graph: 0, value: 0, generic: 0 }
                         - { descr: warning, graph: 0, value: 1, generic: 1 }
                 -
-                    oid: warningUnderVoltageProtection
+                    oid: SAMLEXAMERICA-MIB::warningUnderVoltageProtection
                     num_oid: '.1.3.6.1.4.1.49075.1.3.6.8.{{ $index }}'
                     descr: Undervoltage Protection
                     index: 'warningUnderVoltageProtection.{{ $index }}'
@@ -142,27 +141,33 @@ modules:
         power:
             data:
                 -
-                    oid: power
+                    oid: SAMLEXAMERICA-MIB::power
                     num_oid: '.1.3.6.1.4.1.49075.1.3.1.4.{{ $index }}'
                     descr: 'Inverter Power'
                     index: 'power.{{ $index }}'
                     divisor: 10
+                -
+                    oid: SAMLEXAMERICA-MIB::gridpower
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.1.9.{{ $index }}'
+                    descr: 'Grid Power'
+                    index: 'gridpower.{{ $index }}'
+                    divisor: 10
         frequency:
             data:
                 -
-                    oid: cfgFrequency
+                    oid: SAMLEXAMERICA-MIB::cfgFrequency
                     num_oid: '.1.3.6.1.4.1.49075.1.3.1.5.{{ $index }}'
                     descr: 'Inverter Frequency Config'
                     index: 'power.{{ $index }}'
                     divisor: 10
                 -
-                    oid: frequency
+                    oid: SAMLEXAMERICA-MIB::frequency
                     num_oid: '.1.3.6.1.4.1.49075.1.3.1.6.{{ $index }}'
                     descr: 'Inverter Output Frequency'
                     index: 'frequency.{{ $index }}'
                     divisor: 10
                 -
-                    oid: gridfrequency
+                    oid: SAMLEXAMERICA-MIB::gridfrequency
                     num_oid: '.1.3.6.1.4.1.49075.1.3.1.10.{{ $index }}'
                     descr: 'Grid Frequency'
                     index: 'gridfrequency.{{ $index }}'
@@ -171,13 +176,13 @@ modules:
         current:
             data:
                 -
-                    oid: iout
+                    oid: SAMLEXAMERICA-MIB::iout
                     num_oid: '.1.3.6.1.4.1.49075.1.3.1.3.{{ $index }}'
                     descr: 'Inverter Current'
                     index: 'iout.{{ $index }}'
                     divisor: 10
                 -
-                    oid: gridiout
+                    oid: SAMLEXAMERICA-MIB::gridiout
                     num_oid: '.1.3.6.1.4.1.49075.1.3.1.8.{{ $index }}'
                     descr: 'Grid Current'
                     index: 'vin.{{ $index }}'
@@ -186,26 +191,33 @@ modules:
         voltage:
             data:
                 -
-                    oid: cfgVout
+                    oid: SAMLEXAMERICA-MIB::cfgVout
                     num_oid: '.1.3.6.1.4.1.49075.1.3.1.1.{{ $index }}'
                     descr: 'Inverter Vout Config'
                     index: 'cfgVout.{{ $index }}'
                     divisor: 10
                 -
-                    oid: vout  
+                    oid: SAMLEXAMERICA-MIB::vout
                     num_oid: '.1.3.6.1.4.1.49075.1.3.1.2.{{ $index }}'
                     descr: 'Inverter Output Volts'
                     index: 'vout.{{ $index }}'
                     divisor: 10
                 -
-                    oid: vin
+                    oid: SAMLEXAMERICA-MIB::vin
                     num_oid: '.1.3.6.1.4.1.49075.1.3.2.1.{{ $index }}'
                     descr: 'DC Input Volts'
                     index: 'vin.{{ $index }}'
                     divisor: 10
                 -
-                    oid: gridvout
+                    oid: SAMLEXAMERICA-MIB::gridvout
                     num_oid: '.1.3.6.1.4.1.49075.1.3.1.7.{{ $index }}'
                     descr: 'Grid Input Volts'
                     index: 'gridvout.{{ $index }}'
                     divisor: 10
+        percent:
+            data:
+                -
+                    oid: SAMLEXAMERICA-MIB::olProtection
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.3.6.{{ $index }}'
+                    descr: 'Overload Protection'
+                    index: 'olProtection.{{ $index }}'

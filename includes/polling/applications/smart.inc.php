@@ -13,7 +13,7 @@ try {
 } catch (JsonAppParsingFailedException $e) {
     // Legacy script, build compatible array
     $legacy = $e->getOutput();
-    $lines = explode("\n", $legacy);
+    $lines = explode("\n", (string) $legacy);
 
     $data = ['disks' => [], 'legacy' => 1];
 

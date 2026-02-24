@@ -35,37 +35,19 @@ foreach ($components as $component_id => $tmp_component) {
      * Main container for QFP component
      * Header with system data
      */
-    switch ($tmp_component['system_state']) {
-        case 'active':
-        case 'activeSolo':
-        case 'standby':
-        case 'hotStandby':
-            $state_label = 'label-success';
-            break;
-        case 'reset':
-            $state_label = 'label-danger';
-            break;
-        case 'init':
-            $state_label = 'label-warning';
-            break;
-        default:
-            $state_label = 'label-default';
-    }
+    $state_label = match ($tmp_component['system_state']) {
+        'active', 'activeSolo', 'standby', 'hotStandby' => 'label-success',
+        'reset' => 'label-danger',
+        'init' => 'label-warning',
+        default => 'label-default',
+    };
 
-    switch ($tmp_component['traffic_direction']) {
-        case 'none':
-            $direction_label = 'label-danger';
-            break;
-        case 'ingress':
-        case 'egress':
-            $direction_label = 'label-wanring';
-            break;
-        case 'both':
-            $direction_label = 'label-success';
-            break;
-        default:
-            $direction_label = 'label-default';
-    }
+    $direction_label = match ($tmp_component['traffic_direction']) {
+        'none' => 'label-danger',
+        'ingress', 'egress' => 'label-wanring',
+        'both' => 'label-success',
+        default => 'label-default',
+    };
 
     $text_descr = $tmp_component['name'];
     echo "<div class='panel panel-default'>

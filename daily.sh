@@ -369,18 +369,14 @@ main () {
 
                 # List all tasks to do after pull in the order of execution
                 status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
-                status_run 'Updating submodules' "$DAILY_SCRIPT submodules"
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
-                status_run 'Fetching notifications' "$DAILY_SCRIPT notifications"
                 status_run 'Caching PeeringDB data' "$DAILY_SCRIPT peeringdb"
             ;;
             cleanup)
                 # Cleanups
                 options=("refresh_alert_rules"
-                               "refresh_os_cache"
                                "refresh_device_groups"
                                "recalculate_device_dependencies"
-                               "syslog"
                                "eventlog"
                                "authlog"
                                "callback"
@@ -392,16 +388,6 @@ main () {
                                "ports_nac"
                                "route"
                                "ports_purge")
-                call_daily_php "${options[@]}"
-            ;;
-            submodules)
-                # Init+Update our submodules
-                git submodule --quiet init
-                git submodule --quiet update
-            ;;
-            notifications)
-                # Get notifications
-                options=("notifications")
                 call_daily_php "${options[@]}"
             ;;
             peeringdb)

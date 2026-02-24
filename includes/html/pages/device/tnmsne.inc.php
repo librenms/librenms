@@ -27,7 +27,7 @@ $pagetitle[] = 'Hardware';
         post: function()
         {
             return {
-                device_id: '<?php echo htmlspecialchars($device['device_id']); ?>',
+                device_id: '<?php echo htmlspecialchars((string) $device['device_id']); ?>',
             };
         },
         url: "<?php echo route('table.tnmsne') ?>",

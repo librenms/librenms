@@ -42,6 +42,8 @@ class HealthCheck extends Command
             return 1;
         }
 
+        $this->okMessage($redisResult->getMessage());
+
         // check database
         $dbResult = (new CheckDatabaseConnected)->validate();
         $dbStatus = $dbResult->getStatus();
@@ -50,6 +52,8 @@ class HealthCheck extends Command
 
             return 1;
         }
+
+        $this->okMessage($dbResult->getMessage());
 
         // docker specific checks
         if (EnvHelper::librenmsDocker()) {
@@ -74,6 +78,8 @@ class HealthCheck extends Command
 
                     return 1;
                 }
+
+                $this->okMessage('Dispatcher service is live');
             } else {
                 // check webui
                 try {
@@ -89,9 +95,18 @@ class HealthCheck extends Command
 
                     return 1;
                 }
+
+                $this->okMessage('Web UI is accessible');
             }
         }
 
         return 0; // all ok
+    }
+
+    private function okMessage(string $message): void
+    {
+        if ($this->getOutput()->isVerbose()) {
+            $this->info($message);
+        }
     }
 }

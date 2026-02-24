@@ -1,0 +1,16 @@
+os: vertiv-dcs
+text: 'DCS'
+type: power
+icon: vertiv
+mib_dir: vertiv
+over:
+    - { graph: device_charge, text: 'Battery Charge' }
+    - { graph: device_runtime, text: 'Battery Runtime' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.2021.250.10
+        snmpget:
+            oid: .1.3.6.1.4.1.13400.3.1.1.0
+            op: '!='
+            value: false

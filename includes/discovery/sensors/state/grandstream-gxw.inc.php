@@ -44,8 +44,8 @@ $statuses = SnmpQuery::hideMib()->walk([
 if (is_array($statuses)) {
     foreach ($statuses as $index => $entry) {
         $status = $entry;
-        $numeric_value = isset($state_lookup[$status]) ? $state_lookup[$status] : $status;
-        preg_match('/(\d+)/', $index, $matches);
+        $numeric_value = $state_lookup[$status] ?? $status;
+        preg_match('/(\d+)/', (string) $index, $matches);
         $oid = "$status_oid.{$matches[1]}.0.0";
         $descr = "Port {$matches[1]} Hook Status";
 
@@ -92,8 +92,8 @@ $statuses = SnmpQuery::hideMib()->walk([
 if (is_array($statuses)) {
     foreach ($statuses as $index => $entry) {
         $status = $entry;
-        $numeric_value = isset($state_lookup[$status]) ? $state_lookup[$status] : $status;
-        preg_match('/(\d+)/', $index, $matches);
+        $numeric_value = $state_lookup[$status] ?? $status;
+        preg_match('/(\d+)/', (string) $index, $matches);
         $oid = "$status_oid.{$matches[1]}.0.0";
         $descr = "Port {$matches[1]} Reg Status";
 

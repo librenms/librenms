@@ -18,7 +18,7 @@ class AlertController extends Controller
             'ack_until_clear' => 'nullable|in:0,1,true,false',
         ]);
 
-        $state = $request->get('state');
+        $state = $request->input('state');
         $state_description = '';
         if ($state == 2) {
             $alert->state = 1;
@@ -31,12 +31,12 @@ class AlertController extends Controller
         }
 
         $info = $alert->info;
-        $info['until_clear'] = filter_var($request->get('ack_until_clear'), FILTER_VALIDATE_BOOLEAN);
+        $info['until_clear'] = filter_var($request->input('ack_until_clear'), FILTER_VALIDATE_BOOLEAN);
         $alert->info = $info;
 
         $timestamp = date(LibrenmsConfig::get('dateformat.long'));
         $username = $request->user()->username;
-        $ack_msg = $request->get('ack_msg');
+        $ack_msg = $request->input('ack_msg');
         $alert->note = trim($alert->note . PHP_EOL . "$timestamp - $state_description ($username) " . $ack_msg);
 
         if ($alert->save()) {

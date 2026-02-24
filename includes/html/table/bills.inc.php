@@ -95,7 +95,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $rate_average = $bill['rate_average'];
     $url = \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill['bill_id']]);
     $used95th = Number::formatSi($bill['rate_95th'], 2, 0, '') . 'bps';
-    $notes = htmlentities($bill['bill_notes']);
+    $notes = htmlentities((string) $bill['bill_notes']);
 
     if ($prev) {
         $percent = $bill['bill_percent'];
@@ -103,7 +103,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     } else {
     }
 
-    if (strtolower($bill['bill_type']) == 'cdr') {
+    if (strtolower((string) $bill['bill_type']) == 'cdr') {
         $type = 'CDR';
         $allowed = Number::formatSi($bill['bill_allowed'], 2, 0, '') . 'bps';
         $in = Number::formatSi($bill['rate_95th_in'], 2, 0, '') . 'bps';
@@ -117,7 +117,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         $used = $rate_95th;
         $tmp_used = $bill['rate_95th'];
         $rate_95th = "<b>$rate_95th</b>";
-    } elseif (strtolower($bill['bill_type']) == 'quota') {
+    } elseif (strtolower((string) $bill['bill_type']) == 'quota') {
         $type = 'Quota';
         $allowed = Billing::formatBytes($bill['bill_allowed']);
         if (! empty($prev)) {
@@ -143,18 +143,23 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $left_background = $background['left'];
     $overuse_formatted = (($overuse <= 0) ? '-' : "<span style='color: #{$background['left']}; font-weight: bold;'>$overuse_formatted</span>");
 
-    $bill_name = "<a href='$url'><span class='tw:font-bold tw:text-blue-900 tw:visited:textc-blue-900 tw:dark:text-dark-white-100 tw:dark:visited:text-dark-white-100'>" . htmlentities($bill['bill_name']) . '</span></a><br />' .
-                    date('Y-m-d', strtotime($datefrom)) . ' to ' . date('Y-m-d', strtotime($dateto));
-    $bar = print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']);
+    $bill_name = "<a href='$url'><span class='tw:font-bold tw:text-blue-900 tw:visited:textc-blue-900 tw:dark:text-dark-white-100 tw:dark:visited:text-dark-white-100'>" . htmlentities((string) $bill['bill_name']) . '</span></a><br />' .
+                    date('Y-m-d', strtotime((string) $datefrom)) . ' to ' . date('Y-m-d', strtotime((string) $dateto));
+    $bar = \LibreNMS\Util\Html::percentageBar(250, 10, $percent, null, $percent . '%', null, null, [
+        'left' => $background['left'],
+        'left_text' => null,
+        'right' => $background['right'],
+        'right_text' => null,
+    ]);
     $actions = '';
 
     if (! $prev && Auth::user()->hasGlobalAdmin()) {
         $actions .= "<a href='" . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit']) .
             "'><i class='fa fa-pencil fa-lg icon-theme' title='Edit' aria-hidden='true'></i> Edit</a> ";
     }
-    if (strtolower($bill['bill_type']) == 'cdr') {
+    if (strtolower((string) $bill['bill_type']) == 'cdr') {
         $predicted = Number::formatSi(Billing::getPredictedUsage($bill['bill_day'], $tmp_used), 2, 0, '') . 'bps';
-    } elseif (strtolower($bill['bill_type']) == 'quota') {
+    } elseif (strtolower((string) $bill['bill_type']) == 'quota') {
         $predicted = Billing::formatBytes(Billing::getPredictedUsage($bill['bill_day'], $tmp_used));
     }
 

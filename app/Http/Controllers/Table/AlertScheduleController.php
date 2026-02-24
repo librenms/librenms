@@ -75,8 +75,8 @@ class AlertScheduleController extends TableController
         };
 
         return [
-            'title' => htmlentities($schedule->title),
-            'notes' => htmlentities($schedule->notes),
+            'title' => htmlentities((string) $schedule->title),
+            'notes' => htmlentities((string) $schedule->notes),
             'behavior' => $behavior,
             'id' => $schedule->schedule_id,
             'start' => $schedule->recurring ? '' : $schedule->start->toDateTimeString('minutes'),

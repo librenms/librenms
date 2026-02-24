@@ -641,9 +641,6 @@ return [
             'description' => '调整所有 rrd 连接端口档案使用最大值',
             'help' => '自动调整 rrd 连接端口档案的最大值',
         ],
-        'sfdp' => [
-            'description' => 'sfdp 路径',
-        ],
         'shorthost_target_length' => [
             'description' => '缩短后的主机名最大长度',
             'help' => '缩短主机名至最大长度，但始终保留完整的子域名部分',

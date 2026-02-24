@@ -114,7 +114,7 @@ trait HostResources
             }
 
             $hrDeviceDescr = $this->getCacheByIndex('hrDeviceDescr', 'HOST-RESOURCES-MIB');
-        } catch (Exception $e) {
+        } catch (Exception) {
             return [];
         }
 
@@ -241,19 +241,17 @@ trait HostResources
             }
 
             return ! in_array($storage['hrStorageType'], $this->storageIgnoreTypes);
-        })->map(function ($storage) {
-            return (new Storage([
-                'type' => 'hrstorage',
-                'storage_index' => $storage['hrStorageIndex'],
-                'storage_type' => $storage['hrStorageType'],
-                'storage_descr' => $storage['hrStorageDescr'],
-                'storage_used_oid' => '.1.3.6.1.2.1.25.2.3.1.6.' . $storage['hrStorageIndex'],
-                'storage_units' => $storage['hrStorageAllocationUnits'],
-            ]))->fillUsage(
-                Number::correctIntegerOverflow($storage['hrStorageUsed'] ?? null),
-                Number::correctIntegerOverflow($storage['hrStorageSize'] ?? null),
-            );
-        });
+        })->map(fn ($storage) => (new Storage([
+            'type' => 'hrstorage',
+            'storage_index' => $storage['hrStorageIndex'],
+            'storage_type' => $storage['hrStorageType'],
+            'storage_descr' => $storage['hrStorageDescr'],
+            'storage_used_oid' => '.1.3.6.1.2.1.25.2.3.1.6.' . $storage['hrStorageIndex'],
+            'storage_units' => $storage['hrStorageAllocationUnits'],
+        ]))->fillUsage(
+            Number::correctIntegerOverflow($storage['hrStorageUsed'] ?? null),
+            Number::correctIntegerOverflow($storage['hrStorageSize'] ?? null),
+        ));
     }
 
     protected function memValid($storage): bool
@@ -276,7 +274,7 @@ trait HostResources
             return false;
         }
 
-        $hrStorageDescr = strtolower($storage['hrStorageDescr']);
+        $hrStorageDescr = strtolower((string) $storage['hrStorageDescr']);
 
         if ($storage['hrStorageType'] == 'hrStorageOther' && ! in_array($hrStorageDescr, $this->validOtherMemory)) {
             Log::debug("hrStorageIndex {$storage['hrStorageIndex']} invalid: hrStorageOther & not an exception");
@@ -304,19 +302,19 @@ trait HostResources
 
     protected function fixBadTypes($hrStorageType): string
     {
-        if (str_starts_with($hrStorageType, 'hrStorage')) {
+        if (str_starts_with((string) $hrStorageType, 'hrStorage')) {
             // fix some that set them incorrectly as scalars
-            return preg_replace('/\.0$/', '', $hrStorageType);
+            return preg_replace('/\.0$/', '', (string) $hrStorageType);
         }
 
         // if the agent returns with a bad base oid, just take the last index off the oid and manually convert it
-        if (preg_match('/\.(\d+)$/', $hrStorageType, $matches)) {
+        if (preg_match('/\.(\d+)$/', (string) $hrStorageType, $matches)) {
             if (isset($this->hrTypes[$matches[1]])) {
                 return $this->hrTypes[$matches[1]];
             }
         }
 
-        if (str_starts_with($hrStorageType, 'hr')) {
+        if (str_starts_with((string) $hrStorageType, 'hr')) {
             return $hrStorageType; // pass through other types (such as fs)
         }
 

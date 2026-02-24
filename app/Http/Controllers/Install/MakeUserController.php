@@ -30,6 +30,7 @@ use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Validation\Rules\Password;
 use LibreNMS\Interfaces\InstallerStep;
 
 class MakeUserController extends InstallationController implements InstallerStep
@@ -63,7 +64,7 @@ class MakeUserController extends InstallationController implements InstallerStep
     {
         $this->validate($request, [
             'username' => 'required',
-            'password' => 'required',
+            'password' => ['required', Password::defaults()],
         ]);
 
         $message = trans('install.user.failure');
@@ -73,7 +74,7 @@ class MakeUserController extends InstallationController implements InstallerStep
             if (! $this->complete()) {
                 $this->configureDatabase();
                 $user = new User($request->only(['username', 'password', 'email']));
-                $user->setPassword($request->get('password'));
+                $user->setPassword($request->input('password'));
                 $res = $user->save();
 
                 $user->assignRole('admin');
@@ -105,7 +106,7 @@ class MakeUserController extends InstallationController implements InstallerStep
 
                 return $exists;
             }
-        } catch (QueryException $e) {
+        } catch (QueryException) {
             //
         }
 

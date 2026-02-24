@@ -25,8 +25,6 @@ class PortTune extends LnmsCommand
      */
     public function handle(): int
     {
-        $this->configureOutputOptions();
-
         $port_spec = $this->getPortSpec();
 
         $devices = Device::whereDeviceSpec($this->argument('device spec'))->get();
@@ -38,7 +36,7 @@ class PortTune extends LnmsCommand
             }
             $this->info(__('commands.port:tune.device', ['device' => $display_name]));
 
-            $ports = $device->ports()->when($port_spec, function (Builder $query, $port_spec) {
+            $ports = $device->ports()->when($port_spec, function (Builder $query, $port_spec): void {
                 $query->where('ifName', 'like', $port_spec);
             })->get();
 

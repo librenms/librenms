@@ -81,10 +81,10 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
         $routes = $routes->merge(\SnmpQuery::hideMib()->walk(['TPLINK-STATICROUTE-MIB::tpStaticRouteConfigTable'])
         ->mapTable(function ($data) {
             // iterface name "vlan[xxx]" where xxx=ifIndex
-            if (preg_match('/^vlan([\d]+)$/i', $data['tpStaticRouteItemInterfaceName'], $intName)) { //other TP-LINKs
+            if (preg_match('/^vlan([\d]+)$/i', (string) $data['tpStaticRouteItemInterfaceName'], $intName)) { //other TP-LINKs
                 $metric = $data['tpStaticRouteItemDistance'];
             } else {
-                preg_match('/^vlan([\d]+)$/i', $data['tpStaticRouteItemDistance'], $intName); //T1600g-28TS wrong data, swapped distance/name fields
+                preg_match('/^vlan([\d]+)$/i', (string) $data['tpStaticRouteItemDistance'], $intName); //T1600g-28TS wrong data, swapped distance/name fields
                 $metric = $data['tpStaticRouteItemInterfaceName'];
             }
 
@@ -114,10 +114,10 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
         $routes = $routes->merge(\SnmpQuery::hideMib()->walk(['TPLINK-IPV6STATICROUTE-MIB::tpIPv6StaticRouteConfigTable'])
         ->mapTable(function ($data) {
             // iterface name "vlan[xxx]" where xxx=ifIndex
-            if (preg_match('/^vlan([\d]+)$/i', $data['tpIPv6StaticRouteItemInterfaceName'], $intName)) { //other TP-LINKs
+            if (preg_match('/^vlan([\d]+)$/i', (string) $data['tpIPv6StaticRouteItemInterfaceName'], $intName)) { //other TP-LINKs
                 $metric = $data['tpIPv6StaticRouteItemDistance'];
             } else {
-                preg_match('/^vlan([\d]+)$/i', $data['tpIPv6StaticRouteItemDistance'], $intName); //T1600g-28TS wrong data, swapped distance/name fields
+                preg_match('/^vlan([\d]+)$/i', (string) $data['tpIPv6StaticRouteItemDistance'], $intName); //T1600g-28TS wrong data, swapped distance/name fields
                 $metric = $data['tpIPv6StaticRouteItemInterfaceName'];
             }
             if (! empty($intName)) {
@@ -153,13 +153,11 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
         }
 
         return SnmpQuery::cache()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')
-            ->mapTable(function ($data, $vlan_id) {
-                return new Vlan([
-                    'vlan_vlan' => $vlan_id,
-                    'vlan_domain' => 1,
-                    'vlan_name' => $data['TPLINK-DOT1Q-VLAN-MIB::dot1qVlanDescription'],
-                ]);
-            });
+            ->mapTable(fn ($data, $vlan_id) => new Vlan([
+                'vlan_vlan' => $vlan_id,
+                'vlan_domain' => 1,
+                'vlan_name' => $data['TPLINK-DOT1Q-VLAN-MIB::dot1qVlanDescription'],
+            ]));
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection
@@ -179,7 +177,7 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
             $types = ['TPLINK-DOT1Q-VLAN-MIB::vlanTagPortMemberAdd' => 0, 'TPLINK-DOT1Q-VLAN-MIB::vlanUntagPortMemberAdd' => 1];
             foreach ($types as $type => $tag) {
                 $expand = $this->jetstreamExpand($data[$type] ?? []);
-                foreach ($expand as $key => $port) {
+                foreach ($expand as $port) {
                     $ifIndex = $portConfig[$port] ?? 0;
                     $ports->push(new PortVlan([
                         'vlan' => $vlan_id,
@@ -198,7 +196,7 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
     {
         $result = [];
 
-        preg_match_all('#(LAG|\d+/\d+/)(\d+)(?:-(\d+))?#', $var, $lags);
+        preg_match_all('#(LAG|\d+/\d+/)(\d+)(?:-(\d+))?#', (string) $var, $lags);
 
         foreach ($lags[2] as $index => $start) {
             $end = $lags[3][$index] ?: $start;

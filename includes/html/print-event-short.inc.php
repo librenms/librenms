@@ -32,6 +32,6 @@ if ($entry['type'] == 'interface') {
     echo '<b>' . \LibreNMS\Util\Url::portLink(Port::find($entry['reference'])) . '</b>';
 }
 
-echo '</td><td>' . htmlspecialchars($entry['message']) . '</td>';
+echo '</td><td>' . htmlspecialchars((string) $entry['message']) . '</td>';
 
 echo '</tr>';

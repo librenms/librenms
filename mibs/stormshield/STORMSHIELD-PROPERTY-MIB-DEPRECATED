@@ -1,0 +1,146 @@
+STORMSHIELD-PROPERTY-MIB-DEPRECATED DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32   FROM SNMPv2-SMI
+      DisplayString                             FROM RFC1213-MIB
+      stormshieldMIB                            FROM STORMSHIELD-SMI-MIB;
+
+   snsProductProperty MODULE-IDENTITY
+      LAST-UPDATED  "201702200000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield deprecated Product Property"
+      REVISION      "201702200000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 0 }
+
+   snsModel OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Stormshield Firewall model "
+      ::= { snsProductProperty 1 }
+
+   snsVersion OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Stormshield Firewall version"
+      ::= { snsProductProperty 2 }
+
+   snsSerialNumber OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Stormshield Firewall serial number"
+      ::= { snsProductProperty 3 }
+
+   snsSystemName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Stormshield Firewall system Name"
+      ::= { snsProductProperty 4 }
+
+   snsSystemLanguage OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Firewall language"
+      ::= { snsProductProperty 5 }
+
+   snsNbEther OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Number of Ethernet interfaces"
+      ::= { snsProductProperty 6 }
+
+   snsNbVlan OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Number of VLAN interfaces"
+      ::= { snsProductProperty 7 }
+
+   snsNbDialup OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Number of Dialup"
+      ::= { snsProductProperty 8 }
+
+   snsNbPPTP OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Number of PPTP"
+      ::= { snsProductProperty 9 }
+
+   snsNbSerial OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Number of serial ports"
+      ::= { snsProductProperty 10 }
+
+   snsNbLoopback OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Number of loopback interfaces"
+      ::= { snsProductProperty 11 }
+
+   snsWatchdog OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Watchdog"
+      ::= { snsProductProperty 12 }
+
+   snsLed OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Firewall LED"
+      ::= { snsProductProperty 13 }
+
+   snsClone OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Firewall licence 'clone' token"
+      ::= { snsProductProperty 14 }
+
+   snsHADialup OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Firewall licence 'HA-dialup' token"
+      ::= { snsProductProperty 15 }
+
+END

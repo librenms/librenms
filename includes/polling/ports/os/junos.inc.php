@@ -34,7 +34,7 @@ foreach ($junos_vcp_stats as $index => $vcp_stats) {
     // Check if index string has expected format and decompose it to form
     // dummy integer index of it.
 
-    if (preg_match('#^(\d{1,2})\.vcp-255/(\d)/(\d{1,2})$#', $index, $matches)) {
+    if (preg_match('#^(\d{1,2})\.vcp-255/(\d)/(\d{1,2})$#', (string) $index, $matches)) {
         $fpc = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
         $pic = $matches[2];
         $port = str_pad($matches[3], 2, '0', STR_PAD_LEFT);

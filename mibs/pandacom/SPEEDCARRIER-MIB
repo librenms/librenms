@@ -1,0 +1,4515 @@
+SPEEDCARRIER-MIB	DEFINITIONS	::= BEGIN
+
+
+IMPORTS
+	DisplayString	FROM SNMPv2-TC
+	Integer32, IpAddress, TimeTicks, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE FROM SNMPv2-SMI
+	panDacom, traps, descr, slot, port 	FROM PanDacom-MIB;
+
+--	SPEEDCARRIER	OBJECT IDENTIFIER ::= { panDacom 3 }
+	nmSPEEDCARRIER MODULE-IDENTITY
+		LAST-UPDATED "202001140000Z"
+		ORGANIZATION "Pan Dacom Direkt GmbH"
+		CONTACT-INFO
+			"Pan Dacom Direkt GmbH
+			Dreieich Plaza 1B
+			63303 Dreieich
+			Germany
+			Tel. : +49 6103/83483-333
+			Fax. : +49 6103/83483-444
+			email: kontakt@pandacomdirekt.de
+			web  : www.pandacomdirekt.de"
+		DESCRIPTION "This MIB module defines objects for 
+            the SPEED CARRIER and the management card"
+
+        REVISION "202001140000Z"
+		DESCRIPTION "Rev. 7.4.10
+		 	- added nmCarrierAssemblyAlarm"
+		 	
+		REVISION "201911210000Z"
+		DESCRIPTION "Rev. 7.4.7
+		 	- added SPEED-DUALLINE 16G SFP+H"
+		 	
+		REVISION "201904240000Z"
+		DESCRIPTION "Rev. 7.2.3
+		 	- integer syntax correction"
+		 	
+		REVISION "201901150000Z"
+		DESCRIPTION "Rev. 7.1.7
+		 	- emergencyShutdown trap"
+		 	
+		REVISION "201804240000Z"
+		DESCRIPTION "Rev. 7.1.0
+		 	- syslog filter changes"
+			
+		REVISION "201711300000Z"
+		DESCRIPTION "Rev. 7.0.2
+		 	- support for SPEED-NMS-4ETH
+			- syntax correction"
+
+		REVISION "201708160000Z"
+		DESCRIPTION "Rev. 7.0.0
+		 	- syntax correction"
+
+		REVISION      "201312120000Z"  
+		DESCRIPTION "Revision 5.2.0
+			- change of table indexes to slot or port
+			- IPv6 support. So changed parameters like Trapsinks, NTP
+			  and RADIUS server address from IpAddress to
+			  DisplayString
+			- new table for RADIUS server configs"
+
+		::= { panDacom 3 }
+
+
+
+	nmAgent  OBJECT IDENTIFIER ::= { nmSPEEDCARRIER 1 }
+
+
+	nmAgentGeneralInfo OBJECT IDENTIFIER ::= { nmAgent 1 }
+
+	nmARamdiskVersion OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"SPEED-NMS Ramdisk Version"
+		::= { nmAgentGeneralInfo 1 }
+
+	nmASlot OBJECT-TYPE
+		SYNTAX  Integer32 (0..20)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot in which the SPEED-NMS card is inserted"
+		::= { nmAgentGeneralInfo 2 }
+
+	nmADate OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..15))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Date of the SPEED-NMS system"
+		::= { nmAgentGeneralInfo 3 }
+
+	nmATime OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..15))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Actual Time of the SPEED-NMS system"
+		::= { nmAgentGeneralInfo 4 }
+
+	nmAUpTime OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..15))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"System uptime of the SPEED-NMS system"
+		::= { nmAgentGeneralInfo 5 }
+
+	nmATemperature OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Board temperature of the SPEED-NMS system"
+		::= { nmAgentGeneralInfo 6 }
+
+	nmAAlarmState OBJECT-TYPE
+		SYNTAX  INTEGER
+		{
+			noAlarms(0),
+			activeAlarms(1)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Alarm state of the SPEED-NMS system"
+		::= { nmAgentGeneralInfo 7 }
+
+	nmASerialNumber OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..15))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Serial number of the SPEED-NMS system"
+		::= { nmAgentGeneralInfo 8 }
+
+	nmAKernelVersion OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"SPEED-NMS Kernel Version"
+		::= { nmAgentGeneralInfo 9 }
+
+	nmASoftwareVersion OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"SPEED-NMS Software Version"
+		::= { nmAgentGeneralInfo 10 }
+
+--*************************************************************
+--	nmAgentConfig (2)
+
+	nmAgentConfig OBJECT IDENTIFIER ::= { nmAgent 2 }
+
+--*************************************************************
+--	nmAgentConfigNetwork (1)
+
+	nmAgentConfigNetwork OBJECT IDENTIFIER ::= { nmAgentConfig 1 }
+
+	nmAgentConfigNetworkIP OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"IP-address of the management boards Ethernet interface"
+		::= { nmAgentConfigNetwork 1 }
+
+	nmAgentConfigNetworkMask OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"IP-netmask of the management boards Ethernet interface"
+		::= { nmAgentConfigNetwork 2 }
+
+	nmAgentConfigNetworkGateway OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"default gateway of the management boards Ethernet interface"
+		::= { nmAgentConfigNetwork 3 }
+
+	nmAgentConfigNetworkIPv6 OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..50))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"IPv6-address of the management boards Ethernet interface"
+		::= { nmAgentConfigNetwork 5 }
+
+	nmAgentConfigNetworkGatewayv6 OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..50))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"default gatewayv6 of the management boards Ethernet interface"
+		::= { nmAgentConfigNetwork 6 }
+
+--*************************************************************
+--	nmAgentConfigSnmp (2)
+
+	nmAgentConfigSnmp OBJECT IDENTIFIER ::= { nmAgentConfig 2 }
+
+	nmAgentConfigSnmpReadCommunity OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"SNMP read community name"
+		::= { nmAgentConfigSnmp 1 }
+
+	nmAgentConfigSnmpWriteCommunity OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"SNMP write community name"
+		::= { nmAgentConfigSnmp 2 }
+
+	nmAgentConfigSnmpSysLocation OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"location of the SPEED-CARRIER system"
+		::= { nmAgentConfigSnmp 3 }
+
+	nmAgentConfigSnmpSysContact OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..255))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"administrator of the SPEED-CARRIER system"
+		::= { nmAgentConfigSnmp 4 }
+
+	nmAgentConfigSnmpTrapSink1 OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..50))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Trap destination 1 for SNMP traps. Clear value is 0.0.0.0"
+		::= { nmAgentConfigSnmp 5 }
+
+	nmAgentConfigSnmpTrapSink2 OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..50))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Trap destination 2 for SNMP traps. Clear value is 0.0.0.0"
+		::= { nmAgentConfigSnmp 6 }
+
+	nmAgentConfigSnmpTrapSink3 OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..50))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Trap destination 3 for SNMP traps. Clear value is 0.0.0.0"
+		::= { nmAgentConfigSnmp 7 }
+
+	nmAgentConfigSnmpTrapSink4 OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..50))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Trap destination 4 for SNMP traps. Clear value is 0.0.0.0"
+		::= { nmAgentConfigSnmp 8 }
+
+	nmAgentConfigSnmpTrapSink5 OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..50))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Trap destination 5 for SNMP traps. Clear value is 0.0.0.0"
+		::= { nmAgentConfigSnmp 9 }
+
+	nmAgentConfigSnmpAgent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			off(0),
+			snmpV1-V2c(1),
+			snmpV3(2),
+			notAvailable(255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"enable or disable the SNMP agent on the management board"
+		::= { nmAgentConfigSnmp 10 }
+
+-- ****************************************************
+	nmAgentConfigSNMPv3UserConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF NMAgentConfigSNMPv3UserConfigEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"SNMPv3 user configuration table"
+		::= { nmAgentConfigSnmp 11 }
+
+	nmAgentConfigSNMPv3UserConfigEntry OBJECT-TYPE
+		SYNTAX NMAgentConfigSNMPv3UserConfigEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"SNMPv3 user configuration table"
+		INDEX { nmAgentConfigSNMPv3UserConfigIndex }
+		::= { nmAgentConfigSNMPv3UserConfigTable 1 }
+
+	NMAgentConfigSNMPv3UserConfigEntry ::= SEQUENCE
+		{
+			nmAgentConfigSNMPv3UserConfigIndex Integer32,
+			nmAgentConfigSnmpv3UserConfigName DisplayString,
+			nmAgentConfigSnmpv3UserConfigUserLevel INTEGER,
+			nmAgentConfigSnmpv3UserConfigAuthType INTEGER,
+			nmAgentConfigSnmpv3UserConfigAuthPassPhrase DisplayString,
+			nmAgentConfigSnmpv3UserConfigEncType INTEGER,
+			nmAgentConfigSnmpv3UserConfigPrivPassPhrase DisplayString
+		}
+
+	nmAgentConfigSNMPv3UserConfigIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..2)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"user index"
+		::= { nmAgentConfigSNMPv3UserConfigEntry 1 }
+
+	nmAgentConfigSnmpv3UserConfigName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"user name"
+		::= { nmAgentConfigSNMPv3UserConfigEntry 2 }
+
+	nmAgentConfigSnmpv3UserConfigUserLevel OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			rouser(1),
+			rwuser(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"user rights read-only (ro) or read-write (rw)"
+		::= { nmAgentConfigSNMPv3UserConfigEntry 3 }
+
+	nmAgentConfigSnmpv3UserConfigAuthType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			mD5(1),
+			sHA(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"authentication types"
+		::= { nmAgentConfigSNMPv3UserConfigEntry 4 }
+
+	nmAgentConfigSnmpv3UserConfigAuthPassPhrase OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"authentication passphrase"
+		::= { nmAgentConfigSNMPv3UserConfigEntry 5 }
+
+	nmAgentConfigSnmpv3UserConfigEncType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			dES(1),
+			aES(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"privacy protocols"
+		::= { nmAgentConfigSNMPv3UserConfigEntry 6 }
+
+	nmAgentConfigSnmpv3UserConfigPrivPassPhrase OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"privacy passphrase"
+		::= { nmAgentConfigSNMPv3UserConfigEntry 7 }
+
+
+--*************************************************************
+--	nmAgentConfigSlotAlarms(3)
+
+	nmAgentConfigSlotAlarmsTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF NMAgentConfigSlotAlarmsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Table for Slot 'alarm relay' configuration"
+		::= { nmAgentConfig 3 }
+
+	nmAgentConfigSlotAlarmsEntry OBJECT-TYPE
+		SYNTAX NMAgentConfigSlotAlarmsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"activate or deactivate slot for 'alarm relay' configuration"
+    		INDEX   { nmAgentConfigSlotAlarmsSlotNumber }
+		::= { nmAgentConfigSlotAlarmsTable 1 }
+
+	NMAgentConfigSlotAlarmsEntry ::= SEQUENCE
+		{
+		nmAgentConfigSlotAlarmsSlotNumber	Integer32,
+		nmAgentConfigSlotAlarmsInsertedCard	DisplayString,
+		nmAgentConfigSlotAlarmsConfig		INTEGER
+		}
+
+	nmAgentConfigSlotAlarmsSlotNumber OBJECT-TYPE
+		SYNTAX Integer32 (1..20)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number for alarm relay configuration"
+		::= { nmAgentConfigSlotAlarmsEntry 1 }
+
+	nmAgentConfigSlotAlarmsInsertedCard OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..64))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Card type of inserted card in this slot"
+		::= { nmAgentConfigSlotAlarmsEntry 2 }
+
+	nmAgentConfigSlotAlarmsConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			alarmsEnabled(0),
+			alarmsDisabled(1),
+			fail(255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"set alarm reporting to 'on' or 'off' for this slot"
+		::= { nmAgentConfigSlotAlarmsEntry 3 }
+
+--*************************************************************
+--	nmAgentConfigModules (4)
+
+	nmAgentConfigSlotModulesTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF NMAgentConfigSlotModulesEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Table for card configuration"
+		::= { nmAgentConfig 4 }
+
+	nmAgentConfigSlotModulesEntry OBJECT-TYPE
+		SYNTAX NMAgentConfigSlotModulesEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Table for card configuration"
+		INDEX { nmAgentConfigModulesSlotNumber }
+		::= { nmAgentConfigSlotModulesTable 1 }
+
+	NMAgentConfigSlotModulesEntry ::= SEQUENCE
+		{
+			nmAgentConfigModulesSlotNumber Integer32,
+			nmAgentConfigModulesInstalledCard DisplayString,
+			nmAgentConfigModulesExpectedCard INTEGER,
+			nmAgentConfigModulesSlotText DisplayString,
+			nmAgentConfigModulesInstalledState DisplayString
+		}
+
+	nmAgentConfigModulesSlotNumber OBJECT-TYPE
+		SYNTAX Integer32 (1..20)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"slot number for card configuration"
+		::= { nmAgentConfigSlotModulesEntry 1 }
+
+	nmAgentConfigModulesInstalledCard OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..64))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Card type of inserted card in this slot"
+		::= { nmAgentConfigSlotModulesEntry 2 }
+
+	nmAgentConfigModulesExpectedCard OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notConfigured(0),
+			speedCWDM21(11),
+			speedCWDM41(12),
+			speedCWDM41E(13),
+			speedCWDM51(14),
+			speedCWDM81(15),
+			speedCWDM81E(16),
+			speedCWDM91(17),
+			speedADCWDM(18),
+			oneSlotPassiveCard(19),
+			twoSlotPassiveCard(20),
+			threeSlotPassiveCard(21),
+			speedNMS(50),
+			speedNMS4ETH(51),
+			speedDualline3RProt(53),
+			speedDualline3R(54),
+			speedDuallineSfp3RB(55),
+			speedDuallineSfp(56),
+			speedSinglelineSfp(57),
+			speedSinglelineXFP3R(58),
+			speedSinglelineXFP(59),
+			speedDuallineFcXFP(60),
+			speedDuallineFcSfp(61),
+			speedDualline10GXFP(62),
+			speedDualline10GSfp(63),
+			speedDualline16GXFP(64),
+            speedDualline16GSfp(65),
+            speedDualline10GXFP2R(66),
+            speedDualline16GSfpH(67),
+            speedMux200G2CFP(71),
+            speedMux200G2CFPS(72),
+            speedMux200GCFP2(74),
+            speedMux200GCFP2S(75),
+            speedDuallineSfp2R(80),
+			speedDualline10G3R(81),
+			speedSixline10G3R(83),
+			speedAmpEdfaPREAMP14(101),
+			speedAmpEdfaBOOSTER17(102),
+			speedAmpEdfaBOOSTER17OSC(103),
+			speedAmpEdfaBOOSTER23OSC(104),
+			speedAmpEdfaINLINE17OSC(105),
+			speedAmpEdfaINLINE23OSC(106),
+			speedAmpReserved1(107),
+			speedAmpReserved2(108),
+			speedAmpReserved3(109),
+			speedAmpReserved4(110),
+			speedAmpRamanSTANDALONE10(111),
+			speedAmpRamanSTANDALONE15(112),
+			speedAmpEdfaPREAMP14Ext(113),
+			speedAmpEdfaBOOSTER17Ext(114),
+			speedAmpEdfaBOOSTER17OSCExt(115),
+			speedAmpEdfaBOOSTER23OSCExt(116),
+			speedAmpEdfaINLINE17OSCExt(117),
+			speedAmpEdfaINLINE23OSCExt(118),
+			reserved(255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"set the type of card, which is inserted in slot"
+		::= { nmAgentConfigSlotModulesEntry 3 }
+
+	nmAgentConfigModulesSlotText OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"set the user defined text for passive card, which is inserted in slot"
+		::= { nmAgentConfigSlotModulesEntry 4 }
+
+	nmAgentConfigModulesInstalledState OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Check the installed module against the expected module"
+		::= { nmAgentConfigSlotModulesEntry 5 }
+
+
+--*************************************************************
+--	nmAgentConfigAgentPorts (5) (for later RELEASE)
+
+--	nmAgentConfigAgentPorts OBJECT IDENTIFIER ::= { nmAgentConfig 5 }
+
+--*************************************************************
+--	nmAgentConfig (2)
+
+
+
+	nmAgentConfigAlarmRelay OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			off(0),
+			psu(1),
+			fan(2),
+			psuFan(3),
+			slots(4),
+			psuSlots(5),
+			fanSlots(6),
+			psuFanSlots(7),
+			notAvailable(255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"configure alarm relay for different sources"
+		::= { nmAgentConfig 7 }
+
+	nmAgentConfigFAN OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			allOn(1),
+			auto(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"configure fans to 'allOn' or 'auto'"
+		::= { nmAgentConfig 8 }
+
+	nmAgentConfigNtpServer OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..50))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"IP address of the Network Time Protocol server. Clear value is '0.0.0.0'."
+		::= { nmAgentConfig 9 }
+
+	nmAgentConfigTftpServer OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			off(0),
+			on(1),
+			notAvailable(255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"enable or disable the TFTP server on the management board"
+		::= { nmAgentConfig 10 }
+
+	nmAgentConfigWebServer OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			off(0),
+			http(1),
+			https(2),
+			notAvailable(255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"enable or disable the web server on the management board"
+		::= { nmAgentConfig 11 }
+
+	nmAgentConfigMyWebView OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			pictureAndDeviceList(1),
+			pictureAndActiveAlarms(2),
+			deviceListAndActiveAlarms(3),
+			notAvailable(255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"configures the start screen of WebView for the web interface"
+		::= { nmAgentConfig 12 }
+
+
+	nmAgentConfigTimezone OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			utc(0),
+			cet(1),
+			jst(2),
+			notAvailable(255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"sets the system time zone. Has only effect after reboot"
+		::= { nmAgentConfig 15 }
+
+	nmAgentConfigAccess OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unknown(0),
+			off(1),
+			telnet(2),
+			ssh2(3),
+			sshWithPreSharedKeys(4)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"sets system access to telnet, SSH version 2 or off"
+		::= { nmAgentConfig 16 }
+
+	nmAgentConfigCliTimeout OBJECT-TYPE
+		SYNTAX Integer32 (120..3600)
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"time without user interaction before exiting CLI. Valid range 120-3600 seconds."
+		::= { nmAgentConfig 17 }
+
+	nmAgentConfigRadiusStateConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			useLocalPasswords(1),
+			useRadiusAuthentication(2)
+		}
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"local or radius, local authentication"
+		::= { nmAgentConfig 19 }
+
+	nmAgentConfigNMSState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			running(1),
+			resetSystem(2),
+			resetConfig(3)
+		}
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"running state of NMS module. Reboot is NOT traffic effecting!"
+		::= { nmAgentConfig 21 }
+
+
+
+-- ****************************************************
+	nmAgentConfigRadiusServerConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF NMAgentConfigRadiusServerConfigEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"RADIUS server configuration table"
+		::= { nmAgentConfig 26 }
+
+	nmAgentConfigRadiusServerConfigEntry OBJECT-TYPE
+		SYNTAX NMAgentConfigRadiusServerConfigEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"RADIUS server configuration table"
+		INDEX { nmAgentConfigRadiusServerConfigNumber }
+		::= { nmAgentConfigRadiusServerConfigTable 1 }
+
+	NMAgentConfigRadiusServerConfigEntry ::= SEQUENCE
+		{
+			nmAgentConfigRadiusServerConfigNumber Integer32,
+			nmAgentConfigRadiusServerConfigIPAddress DisplayString,
+			nmAgentConfigRadiusServerConfigSharedSecret DisplayString
+		}
+
+	nmAgentConfigRadiusServerConfigNumber OBJECT-TYPE
+		SYNTAX Integer32 (1..100)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"RADIUS server number"
+		::= { nmAgentConfigRadiusServerConfigEntry 1 }
+
+	nmAgentConfigRadiusServerConfigIPAddress  OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..50))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"RADIUS server IPv4 or IPv6 address"
+		::= { nmAgentConfigRadiusServerConfigEntry 2 }
+
+	nmAgentConfigRadiusServerConfigSharedSecret OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"RADIUS server shared secret"
+		::= { nmAgentConfigRadiusServerConfigEntry 3 }
+
+-- ****************************************************
+	nmAgentConfigSyslogServerIPAddress  OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..50))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Syslog server IPv4 or IPv6 address"
+		::= { nmAgentConfig 27 }
+
+	nmAgentConfigSyslogSeverity OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			error(3),
+			warning(4),
+			notice(5),
+			informational(6),
+			debug(7)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"configures the syslog severity"
+		::= { nmAgentConfig 28 }
+
+	nmAgentConfigSyslogFacility OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			userLevelMessages(1),
+			all(16)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"configures the syslog facility"
+		::= { nmAgentConfig 29 }
+
+--*************************************************************
+	nmAgentPorts OBJECT IDENTIFIER ::= { nmAgent 3 }
+
+--*************************************************************
+--	nmAgentPortsPortOverviewTable (1)
+
+--*************************************************************
+	nmAgentPortsPortOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF NmAgentPortsPortOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port overview table"
+		::= { nmAgentPorts 1 }
+
+	nmAgentPortsPortOverviewEntry OBJECT-TYPE
+		SYNTAX NmAgentPortsPortOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port overview entries"
+		INDEX { nmAgentPortsIndex }
+		::= { nmAgentPortsPortOverviewTable 1 }
+
+	NmAgentPortsPortOverviewEntry ::=
+		SEQUENCE
+		{
+			nmAgentPortsIndex Integer32,
+			nmAgentPortsSlot Integer32,
+			nmAgentPortsPort Integer32,
+			nmAgentPortsAdminConfig INTEGER,
+			nmAgentPortsOperStateSFP INTEGER,
+			nmAgentPortsAlarmState INTEGER,
+			nmAgentPortsPortType  DisplayString,
+			nmAgentPortsPortDescription  DisplayString,
+			nmAgentPortsOperStateCopper INTEGER
+		}
+
+	nmAgentPortsIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Index"
+		::= { nmAgentPortsPortOverviewEntry 1 }
+
+	nmAgentPortsSlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { nmAgentPortsPortOverviewEntry 2 }
+
+	nmAgentPortsPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Port number"
+		::= { nmAgentPortsPortOverviewEntry 3 }
+
+	nmAgentPortsAdminConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			adminDown(1),
+			hdx10(2),
+			fdx10(3),
+			hdx100(4),
+			fdx100(5),
+			adminAutoneg(6),
+			x1000(7),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Port admin config"
+		::= { nmAgentPortsPortOverviewEntry 4 }
+
+	nmAgentPortsOperStateSFP OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			notInserted(1),
+			up(2),
+			down(3),
+			txFault(4),
+			txDisabled(5),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"SFP Ports operational state"
+		::= { nmAgentPortsPortOverviewEntry 5 }
+
+	nmAgentPortsAlarmState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			inactive(1),
+			active(2),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Port alarm state"
+		::= { nmAgentPortsPortOverviewEntry 6 }
+
+	nmAgentPortsPortType OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Port type"
+		::= { nmAgentPortsPortOverviewEntry 7 }
+
+	nmAgentPortsPortDescription OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Port description"
+		::= { nmAgentPortsPortOverviewEntry 8 }
+
+	nmAgentPortsOperStateCopper OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			down(0),
+			up10hdx(1),
+			up10fdx(2),
+			up100hdx(3),
+			up100fdx(4),
+            up1000x(5),
+			notAvailable(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Copper Ports operational state"
+		::= { nmAgentPortsPortOverviewEntry 9 }
+
+--*************************************************************
+--	nmAgentPortsSFPOverviewTable (2)
+
+--*************************************************************
+
+	nmAgentPortsSFPOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF NmAgentPortsSFPOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SFP overview table"
+		::= { nmAgentPorts 2 }
+
+	nmAgentPortsSFPOverviewEntry OBJECT-TYPE
+		SYNTAX NmAgentPortsSFPOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module transceiver overview entries"
+		INDEX { nmAgentPortsSFPIndex }
+		::= { nmAgentPortsSFPOverviewTable 1 }
+
+	NmAgentPortsSFPOverviewEntry ::=
+		SEQUENCE
+		{
+			nmAgentPortsSFPIndex Integer32,
+			nmAgentPortsSFPSlot Integer32,
+			nmAgentPortsSFPPort Integer32,
+			nmAgentPortsSFPState INTEGER,
+			nmAgentPortsDMIState Integer32,
+			nmAgentPortsVendorName DisplayString,
+			nmAgentPortsVendorPartNumber DisplayString,
+			nmAgentPortsVendorSerialNumber DisplayString,
+			nmAgentPortsWavelength Integer32
+		}
+		
+	nmAgentPortsSFPIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Index"
+		::= { nmAgentPortsSFPOverviewEntry 1 }
+
+	nmAgentPortsSFPSlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { nmAgentPortsSFPOverviewEntry 2 }
+
+	nmAgentPortsSFPPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Port number"
+		::= { nmAgentPortsSFPOverviewEntry 3 }
+
+	nmAgentPortsSFPState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			sfpRemoved (1),
+			sfpInstalled (2),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"SFP state"
+		::= { nmAgentPortsSFPOverviewEntry 4 }
+
+	nmAgentPortsDMIState OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"DMI state"
+		::= { nmAgentPortsSFPOverviewEntry 5 }
+
+	nmAgentPortsVendorName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver vendor name"
+		::= { nmAgentPortsSFPOverviewEntry 6 }
+
+	nmAgentPortsVendorPartNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver part number"
+		::= { nmAgentPortsSFPOverviewEntry 7 }
+
+	nmAgentPortsVendorSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver serial number"
+		::= { nmAgentPortsSFPOverviewEntry 8 }
+
+	nmAgentPortsWavelength OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver supported wavelength (nm)"
+		::= { nmAgentPortsSFPOverviewEntry 9 }
+
+--*************************************************************
+--	nmAgentPortsSFPMeassurementTable (3)
+
+--*************************************************************
+
+	nmAgentPortsSFPMeassurementTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF NmAgentPortsSFPMeassurementEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SFP DMI meassurement table"
+		::= { nmAgentPorts 3 }
+
+	nmAgentPortsSFPMeassurementEntry OBJECT-TYPE
+		SYNTAX NmAgentPortsSFPMeassurementEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module transceiver DMI meassurement entries"
+		INDEX { nmAgentPortsSFPMIndex }
+		::= { nmAgentPortsSFPMeassurementTable 1 }
+
+	NmAgentPortsSFPMeassurementEntry ::=
+		SEQUENCE
+		{
+			nmAgentPortsSFPMIndex Integer32,
+			nmAgentPortsSFPMSlot Integer32,
+			nmAgentPortsSFPMPort Integer32,
+			nmAgentPortsSFPDMIRxLevel Integer32,
+			nmAgentPortsSFPDMITxLevel Integer32,
+			nmAgentPortsSFPDMITxBias Integer32,
+			nmAgentPortsSFPDMIVcc Integer32,
+			nmAgentPortsSFPDMITemp Integer32
+		}
+		
+	nmAgentPortsSFPMIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Index"
+		::= { nmAgentPortsSFPMeassurementEntry 1 }
+
+	nmAgentPortsSFPMSlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { nmAgentPortsSFPMeassurementEntry 2 }
+
+	nmAgentPortsSFPMPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Port number"
+		::= { nmAgentPortsSFPMeassurementEntry 3 }
+
+	nmAgentPortsSFPDMIRxLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"optical receive level (dBm value * 100)"
+		::= { nmAgentPortsSFPMeassurementEntry 4 }
+
+	nmAgentPortsSFPDMITxLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"optical transmit level (dBm value * 100)"
+		::= { nmAgentPortsSFPMeassurementEntry 5 }
+
+	nmAgentPortsSFPDMITxBias OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver hardware parameter: bias current (mA)"
+		::= { nmAgentPortsSFPMeassurementEntry 6 }
+
+	nmAgentPortsSFPDMIVcc OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver hardware parameter: supply voltage"
+		::= { nmAgentPortsSFPMeassurementEntry 7 }
+
+	nmAgentPortsSFPDMITemp OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver hardware parameter: temperature (degree Celsius)"
+		::= { nmAgentPortsSFPMeassurementEntry 8 }
+
+--*************************************************************
+--	nmAgentPortsSFPAlarmTable (4)
+
+--*************************************************************
+	nmAgentPortsSFPAlarmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF NmAgentPortsSFPAlarmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SFP alarm table"
+		::= { nmAgentPorts 4 }
+
+	nmAgentPortsSFPAlarmEntry OBJECT-TYPE
+		SYNTAX NmAgentPortsSFPAlarmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module transceiver alarm entries"
+		INDEX { nmAgentPortsSFPAIndex }
+		::= { nmAgentPortsSFPAlarmTable 1 }
+
+	NmAgentPortsSFPAlarmEntry ::=
+		SEQUENCE
+		{
+			nmAgentPortsSFPAIndex Integer32,
+			nmAgentPortsSFPASlot Integer32,
+			nmAgentPortsSFPAPort Integer32,
+			nmAgentPortsSFPDMIRxLowWarningEvent INTEGER,
+			nmAgentPortsSFPDMIRxLowAlarmEvent INTEGER,
+			nmAgentPortsSFPDMITxPowerAlarm INTEGER,
+			nmAgentPortsSFPDMIBiasAlarmEvent INTEGER,
+			nmAgentPortsSFPDMIRxHighAlarmEvent INTEGER,
+			nmAgentPortsSFPDWDMTECAlarmEvent INTEGER,
+			nmAgentPortsSFPTempAlarmEvent INTEGER
+		}
+		
+	nmAgentPortsSFPAIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Index"
+		::= { nmAgentPortsSFPAlarmEntry 1 }
+
+	nmAgentPortsSFPASlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { nmAgentPortsSFPAlarmEntry 2 }
+
+	nmAgentPortsSFPAPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Port number"
+		::= { nmAgentPortsSFPAlarmEntry 3 }
+
+		
+	nmAgentPortsSFPDMIRxLowWarningEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			inactive (1),
+			active (2),
+			notimplemented (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver RX power event"
+		::= { nmAgentPortsSFPAlarmEntry 4 }
+
+	nmAgentPortsSFPDMIRxLowAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			inactive (1),
+			active (2),
+			notimplemented (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver RX power event"
+		::= { nmAgentPortsSFPAlarmEntry 5 }
+
+	nmAgentPortsSFPDMITxPowerAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			inactive (1),
+			active (2),
+			notimplemented (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver TX power event"
+		::= { nmAgentPortsSFPAlarmEntry 6 }
+
+	nmAgentPortsSFPDMIBiasAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			inactive (1),
+			active (2),
+			notimplemented (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver bias current event"
+		::= { nmAgentPortsSFPAlarmEntry 7 }
+
+	nmAgentPortsSFPDMIRxHighAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			inactive (1),
+			active (2),
+			notimplemented (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver RX power event"
+		::= { nmAgentPortsSFPAlarmEntry 8 }
+
+	nmAgentPortsSFPDWDMTECAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			inactive (1),
+			active (2),
+			notimplemented (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver DWDM TEC alarm event"
+		::= { nmAgentPortsSFPAlarmEntry 9 }
+
+	nmAgentPortsSFPTempAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			inactive (1),
+			active (2),
+			notimplemented (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver temperature alarm event"
+		::= { nmAgentPortsSFPAlarmEntry 10 }
+
+
+--*************************************************************
+--	nmCarrier (2)
+
+	nmCarrier OBJECT IDENTIFIER ::= { nmSPEEDCARRIER 2 }
+
+--*************************************************************
+--	nmCarrierGerneralInfo (1)
+
+	nmCarrierGerneralInfo OBJECT IDENTIFIER ::= { nmCarrier 1 }
+
+	nmCarrierName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..64))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"name or location of the SPEED-CARRIER system. Allowed characters are 0-9 a-z A-Z '-' and '_'"
+		::= { nmCarrierGerneralInfo 1 }
+
+	nmCarrierType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unknown (0),
+			carrier4U (1),
+			carrier1U (2),
+			carrier45U (3),
+			carrier5U (4),
+			carrier5UHighPower (5)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Type of SPEED-CARRIER system (1U / 4 slots, 4U or 4,5U with 17 slots)"
+		::= { nmCarrierGerneralInfo 2 }
+
+	nmPSU1Status OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notInstalled (0),
+			fail (1),
+			temperatureWarning (2),
+			pass (3)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Status of PSU 1"
+		::= { nmCarrierGerneralInfo 3 }
+
+	nmPSU2Status OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notInstalled (0),
+			fail (1),
+			temperatureWarning (2),
+			pass (3)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Status of PSU 2"
+		::= { nmCarrierGerneralInfo 4 }
+
+	nmFanState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			pass (3),
+			fail (4),
+			notInstalled (5)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Fan state of the SPEED-CARRIER system"
+		::= { nmCarrierGerneralInfo 5 }
+
+	nmCarrierPSU1Type OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notConfigured(0),
+			psu230VAC75W(1),
+			psu230VAC160W(2),
+			psu48VDC75W(3),
+			psu48VDC150W(4),
+			psu48VDC60W(5),
+			psu230VAC60W(6),
+			psu48VDC250W(7),
+			psu230VAC250W(8),
+			psu48VDC1100W(9),
+			psu230VAC1100W(10),
+			notAvailable(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"type of PSU 1"
+		::= { nmCarrierGerneralInfo 6 }
+
+	nmCarrierPSU2Type OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notConfigured(0),
+			psu230VAC75W(1),
+			psu230VAC160W(2),
+			psu48VDC75W(3),
+			psu48VDC150W(4),
+			psu48VDC60W(5),
+			psu230VAC60W(6),
+			psu48VDC250W(7),
+			psu230VAC250W(8),
+			psu48VDC1100W(9),
+			psu230VAC1100W(10),
+			notAvailable(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"type of PSU 2"
+		::= { nmCarrierGerneralInfo 7 }
+
+	nmCarrierPSU1Text OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"PSU 1 customer description"
+		::= { nmCarrierGerneralInfo 8 }
+
+	nmCarrierPSU2Text OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"PSU 2 customer description"
+		::= { nmCarrierGerneralInfo 9 }
+
+	nmCarrierPSU3Text OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"PSU 3 customer description"
+		::= { nmCarrierGerneralInfo 10 }
+
+	nmCarrierPSU3Type OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notConfigured(0),
+			psu230VAC75W(1),
+			psu230VAC160W(2),
+			psu48VDC75W(3),
+			psu48VDC150W(4),
+			psu48VDC60W(5),
+			psu230VAC60W(6),
+			psu48VDC250W(7),
+			psu230VAC250W(8),
+			notAvailable(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"type of PSU 3"
+		::= { nmCarrierGerneralInfo 11 }
+
+	nmPSU3Status OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notInstalled (0),
+			fail (1),
+			temperatureWarning (2),
+			pass (3),
+			notAvailable(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Status of PSU 3"
+		::= { nmCarrierGerneralInfo 12 }
+
+	nmCarrierSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..12))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"serial number of the SPEED-CARRIER system."
+		::= { nmCarrierGerneralInfo 13 }
+
+	nmCarrierAssemblyAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+        {
+            notAvailable(0),
+            noAlarm(1),
+            activeAlarm(3)
+        }
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"One or more Module Cards are expected but not installed"
+		::= { nmCarrierGerneralInfo 14 }
+		
+--*************************************************************
+--	nmCarrierSlotOverviewTable (2)
+
+	nmCarrierSlotOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF NMCarrierSlotOverviewEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Carrier slot overview table"
+		::= { nmCarrier 2  }
+
+	nmCarrierSlotOverviewEntry OBJECT-TYPE
+		SYNTAX NMCarrierSlotOverviewEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Carrier slot overview"
+		INDEX { nmCarrierSlotNumber }
+		::= { nmCarrierSlotOverviewTable 1 }
+
+	NMCarrierSlotOverviewEntry ::= SEQUENCE
+		{
+		nmCarrierSlotNumber	Integer32,
+		nmCarrierSlotType	DisplayString,
+		nmCarrierSlotPassiveText	DisplayString
+		}
+
+ 	nmCarrierSlotNumber OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot Number 1..17 for 4,xU Carrier, 1..16 for 5U Carrier, 1..19 for 5U High Power Carrier or 1..4 for 1U Carrier"
+		::= { nmCarrierSlotOverviewEntry 1 }
+
+	nmCarrierSlotType OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"installed card type in this slot"
+		::= { nmCarrierSlotOverviewEntry 2 }
+
+	nmCarrierSlotPassiveText OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"user defined text for passive cards. Is only available, if passive card is configured"
+		::= { nmCarrierSlotOverviewEntry 3 }
+
+--*************************************************************
+--	nmFanOverview(3)
+
+ 	nmFanOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF NMFanOverviewEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Fan overview table"
+		::= { nmCarrier 3 }
+
+	nmFanOverviewEntry OBJECT-TYPE
+		SYNTAX NMFanOverviewEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Fan overview table"
+		INDEX { nmFanGroupNumber }
+		::= { nmFanOverviewTable 1 }
+
+	NMFanOverviewEntry ::= SEQUENCE
+		{
+		nmFanGroupNumber	Integer32,
+		nmFanGroupStatus	INTEGER
+		}
+
+	nmFanGroupNumber OBJECT-TYPE
+		SYNTAX Integer32 (1..10)
+		MAX-ACCESS read-only
+		STATUS  current
+		DESCRIPTION
+			"Fan group number"
+		::= { nmFanOverviewEntry 1 }
+
+	nmFanGroupStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			on (1),
+			off (2),
+			pass (3),
+			fail (4),
+			notInstalled (5),
+			auto(6)
+		}
+		MAX-ACCESS read-only
+		STATUS  current
+		DESCRIPTION
+			"For 1U Carrier group1 is the front fan and group2 the rear fan
+			For 4.5U Carrier: group 1 and 2 are PSU 1 and 2. group 3 is the
+			front fan below the slots and group 4 the rear fans."
+		::= { nmFanOverviewEntry 2 }
+
+--**********************
+--	nmCarrierFWUpdate(4)
+
+	nmCarrierFWUpdate OBJECT IDENTIFIER ::= { nmCarrier 4 }
+
+	nmCarrierFWUpdateFilename OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"filename for copying to slots"
+		::= { nmCarrierFWUpdate 1 }
+
+	nmCarrierFirmwareTransferConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			idle(1),
+			startTransfer(2),
+			transferReady(3),
+			transferActive(4),
+			transferFailure(5),
+			abortTransfer(6)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Control and status of upload procedure"
+		::= { nmCarrierFWUpdate 2 }
+
+	nmCarrierFWTransferProgress OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"copy progress in percent"
+		::= { nmCarrierFWUpdate 3 }
+
+	nmCarrierFWUpdateConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			idle(1),
+			updateRunning(2),
+			updateReady(3),
+			copyToFlash(4),
+			copyToFlashAndRestart(5),
+			restartOnly(6),
+			updateFailure(7)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"copy and activates SW-images after next restart"
+		::= { nmCarrierFWUpdate 4 }
+
+--**********************
+
+ 	nmCarrierFWUpdatePolicyTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF NMCarrierFWUpdatePolicyEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"update policy table"
+		::= { nmCarrier 5 }
+
+	nmCarrierFWUpdatePolicyEntry OBJECT-TYPE
+		SYNTAX NMCarrierFWUpdatePolicyEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"update policy"
+		INDEX { nmCarrierFWUpdatePolicySlot }
+		::= { nmCarrierFWUpdatePolicyTable 1 }
+
+	NMCarrierFWUpdatePolicyEntry ::= SEQUENCE
+		{
+			nmCarrierFWUpdatePolicySlot	Integer32,
+			nmCarrierFWUpdatePolicyCardName	DisplayString,
+			nmCarrierFWUpdatePolicyConfig	INTEGER,
+			nmCarrierFWUpdatePolicyTransferState	INTEGER
+		}
+
+	nmCarrierFWUpdatePolicySlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"slot address"
+		::= { nmCarrierFWUpdatePolicyEntry 1 }
+
+	nmCarrierFWUpdatePolicyCardName OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"card name"
+		::= { nmCarrierFWUpdatePolicyEntry 2 }
+
+	nmCarrierFWUpdatePolicyConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			updatesEnabled(1),
+			updatesDisabled(2),
+			notApplicable(3)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"enable or disable updates for this slot"
+		::= { nmCarrierFWUpdatePolicyEntry 3 }
+
+	nmCarrierFWUpdatePolicyTransferState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			idle(1),
+			running(2),
+			ready(3),
+			fail(7)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"file transfer state"
+		::= { nmCarrierFWUpdatePolicyEntry 4 }
+
+--**********************
+
+	nmCarrierConfigTransferTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF NMCarrierConfigTransferEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"update policy table"
+		::= { nmCarrier 6 }
+
+	nmCarrierConfigTransferEntry OBJECT-TYPE
+		SYNTAX NMCarrierConfigTransferEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"update policy"
+		INDEX { nmCarrierConfigSlot }
+		::= { nmCarrierConfigTransferTable 1 }
+
+	NMCarrierConfigTransferEntry ::= SEQUENCE
+		{
+			nmCarrierConfigSlot Integer32,
+			nmCarrierConfigModuleName DisplayString,
+			nmCarrierConfigTransferState INTEGER,
+			nmCarrierConfigTransfer INTEGER,
+			nmCarrierConfigFilename DisplayString,
+			nmCarrierConfigActivation INTEGER
+		}
+
+	nmCarrierConfigSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Module slot index"
+		::= { nmCarrierConfigTransferEntry 1 }
+
+	nmCarrierConfigModuleName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Module name"
+		::= { nmCarrierConfigTransferEntry 2 }
+
+	nmCarrierConfigTransferState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			upToDate (1),
+			fileUpdateScheduled (2),
+			updating (3),
+			invalidConfigFile (4),
+			error (5)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"config state"
+		::= { nmCarrierConfigTransferEntry 3 }
+
+	nmCarrierConfigTransfer OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			idle(1),
+			pushToSlot(2),
+			updateFromSlot(3),
+			transferReady(4),
+			transferRunning(5),
+			transferERROR(6),
+			abortTransfer(7)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"config command for transfering files"
+		::= { nmCarrierConfigTransferEntry 4 }
+
+	nmCarrierConfigFilename OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..256))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"actual stored config file or filename to be send"
+		::= { nmCarrierConfigTransferEntry 5 }
+
+	nmCarrierConfigActivation OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			idle(1),
+			activating(2),
+			ready(3),
+			copyToFlash(4),
+			copyToFlashAndRestart(5),
+			restartOnly(6),
+			failure(7)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"config file activation at slot"
+		::= { nmCarrierConfigTransferEntry 6 }
+
+
+--*************************************************************
+--	nmCarrierInventoryTable (7)
+
+	nmCarrierInventoryTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF NMCarrierInventoryEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Carrier inventory table"
+		::= { nmCarrier 7  }
+
+	nmCarrierInventoryEntry OBJECT-TYPE
+		SYNTAX NMCarrierInventoryEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Carrier inventory"
+		INDEX { nmCarrierInventoryIndex }
+		::= { nmCarrierInventoryTable 1 }
+
+	NMCarrierInventoryEntry ::= SEQUENCE
+		{
+		nmCarrierInventoryIndex		Integer32,
+		nmCarrierInventorySlotNumber	Integer32,
+		nmCarrierInventoryPort		DisplayString,
+		nmCarrierInventoryModuleName	DisplayString,
+		nmCarrierInventoryPartNumber	DisplayString,
+		nmCarrierInventorySerialNumber	DisplayString,
+		nmCarrierInventoryFirmwareRelease	DisplayString,
+		nmCarrierInventoryKernelLoader	DisplayString
+		}
+
+	nmCarrierInventoryIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..18000)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION  "Inventory Index"
+		::= { nmCarrierInventoryEntry 1 }
+
+ 	nmCarrierInventorySlotNumber OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot Number 1..17 for 4,xU Carrier, 1..16 for 5U Carrier, 1..19 for 5U High Power Carrier or 1..4 for 1U Carrier"
+		::= { nmCarrierInventoryEntry 2 }
+
+	nmCarrierInventoryPort OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"port number in this slot"
+		::= { nmCarrierInventoryEntry 3 }
+
+	nmCarrierInventoryModuleName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..64))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"name of the module"
+		::= { nmCarrierInventoryEntry 4 }
+
+	nmCarrierInventoryPartNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"part number"
+		::= { nmCarrierInventoryEntry 5 }
+
+	nmCarrierInventorySerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"serial number"
+		::= { nmCarrierInventoryEntry 6 }
+
+	nmCarrierInventoryFirmwareRelease OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"firmware release of the module"
+		::= { nmCarrierInventoryEntry 7 }
+
+	nmCarrierInventoryKernelLoader OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Kernel/Loader version of the module"
+		::= { nmCarrierInventoryEntry 8 }
+
+
+--*******************************************************************
+	converter		OBJECT IDENTIFIER ::= { nmSPEEDCARRIER 3 }
+	multiplexer		OBJECT IDENTIFIER ::= { nmSPEEDCARRIER 4 }
+	amplifier		OBJECT IDENTIFIER ::= { nmSPEEDCARRIER 5 }
+	convSPEEDDUALLINE	OBJECT IDENTIFIER ::= { converter 1 }
+--*******************************************************************
+
+	convSxLModuleOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLModuleOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEEDDUALLINE module overview table"
+		::= { convSPEEDDUALLINE 1 }
+
+	convSxLModuleOverviewEntry OBJECT-TYPE
+		SYNTAX ConvSxLModuleOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"Module overview entries"
+		INDEX { convSxLMSlot }
+		::= { convSxLModuleOverviewTable 1 }
+
+	ConvSxLModuleOverviewEntry ::=
+		SEQUENCE
+		{
+			convSxLMSlot		Integer32,
+			convSxLMDevice		INTEGER,
+			convSxLMStatus		INTEGER,
+			convSxLMSysUpTime	TimeTicks,
+			convSxLMTemp		Integer32,
+			convSxLMAlarmState	INTEGER,
+			convSxLMBootSWVersion	DisplayString,
+			convSxLMAppSWVersion	DisplayString,
+			convSxLMHWVersion	DisplayString,
+			convSxLMPLDVersion	DisplayString,
+			convSxLMSerialNumber	DisplayString
+		}
+
+	convSxLMSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Slot No. in Carrier"
+		::= { convSxLModuleOverviewEntry 2 }
+
+	convSxLMDevice OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			devSPEEDSINGLELINE (0),
+			devSPEEDDUALLINE (1),
+			devSPEEDDUALLINE3R (2),
+			devSPEEDPROTECT3R (3),
+			devunknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Module DeviceType"
+		::= { convSxLModuleOverviewEntry 3 }
+
+	convSxLMStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			running (0),
+			resetHardware (1),
+			resetConfig (2),
+			resetCAN (3),
+			resetSoftware (4),
+			unknown (255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Status of inserted module. resetSoftware does not affect traffic"
+		::= { convSxLModuleOverviewEntry 4 }
+
+	convSxLMSysUpTime OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"System uptime in seconds"
+		::= { convSxLModuleOverviewEntry 5 }
+
+	convSxLMTemp OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Module temperature"
+		::= { convSxLModuleOverviewEntry 6 }
+
+	convSxLMAlarmState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			noAlarm (0),
+			activeAlarms (1),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Module alarm states, if they are active see Event-Table"
+		::= { convSxLModuleOverviewEntry 7 }
+
+	convSxLMBootSWVersion OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..4))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Module bootloader software version"
+		::= { convSxLModuleOverviewEntry 8 }
+
+	convSxLMAppSWVersion OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..4))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Module application software Version"
+		::= { convSxLModuleOverviewEntry 9 }
+
+	convSxLMHWVersion OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..4))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Module board hardware version"
+		::= { convSxLModuleOverviewEntry 10 }
+
+	convSxLMPLDVersion OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..4))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Module firmware version"
+		::= { convSxLModuleOverviewEntry 11 }
+
+	convSxLMSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Modules serial number"
+		::= { convSxLModuleOverviewEntry 12 }
+
+--************************Table**************************************
+	convSxLSWImagesOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLSWImagesOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SPEEDDUALLINE software images Overview Table"
+		::= { convSPEEDDUALLINE 2 }
+
+	convSxLSWImagesOverviewEntry OBJECT-TYPE
+		SYNTAX ConvSxLSWImagesOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module overview entries"
+		INDEX { convSxLSWSlot }
+		::= { convSxLSWImagesOverviewTable 1 }
+
+	ConvSxLSWImagesOverviewEntry ::=
+		SEQUENCE
+		{
+			convSxLSWSlot		Integer32,
+			convSxLSWBootImage	DisplayString,
+			convSxLSWAppImage1	DisplayString,
+			convSxLSWAppImage2	DisplayString,
+			convSxLSWUploadStatus	INTEGER,
+			convSxLSWUpdateStatus	INTEGER
+		}
+
+	convSxLSWSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot No. in Carrier"
+		::= { convSxLSWImagesOverviewEntry 2 }
+
+	convSxLSWBootImage OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..36))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Identification of bootimage"
+		::= { convSxLSWImagesOverviewEntry 3 }
+
+	convSxLSWAppImage1 OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..36))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Identification of application image1"
+		::= { convSxLSWImagesOverviewEntry 4 }
+
+	convSxLSWAppImage2 OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..36))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Identification of application image2"
+		::= { convSxLSWImagesOverviewEntry 5 }
+
+	convSxLSWUploadStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			ready (0),
+			startUpload (1),
+			uploadActive (2),
+			uploadFailure (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Control and status of upload procedure"
+		::= { convSxLSWImagesOverviewEntry 6 }
+
+	convSxLSWUpdateStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			idle (0),
+			activateImage1 (1),
+			activateImage2 (2),
+			invalidImages (3)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"activates SW-image after next reset"
+		::= { convSxLSWImagesOverviewEntry 7 }
+
+--************************Table**************************************
+	convSxLModuleConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLModuleConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SPEEDDUALLINE config table"
+		::= { convSPEEDDUALLINE 3 }
+
+	convSxLModuleConfigEntry OBJECT-TYPE
+		SYNTAX ConvSxLModuleConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module config entries"
+		INDEX { convSxLMCSlot  }
+		::= { convSxLModuleConfigTable 1 }
+
+	ConvSxLModuleConfigEntry ::=
+		SEQUENCE
+		{
+			convSxLMCSlot Integer32,
+			convSxLMIpAddress IpAddress,
+			convSxLMIpNetmask IpAddress,
+			convSxLMIpGateway IpAddress,
+			convSxLMIpTftpServer IpAddress,
+			convSxLMIpTrapSink IpAddress,
+			convSxLMSNMPReadCommunity DisplayString,
+			convSxLMSNMPWriteCommunity DisplayString,
+			convSxLMTempWarningLevel Integer32,
+			convSxLMTempAlarmLevel Integer32,
+			convSxLMAlarmReport INTEGER,
+			convSxLMEthPortConfig INTEGER,
+			convSxLMEthPortState INTEGER,
+			convSxLMCliUserTimeout Integer32
+		}
+
+    convSxLMCSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Slot No. in Carrier"
+		::= { convSxLModuleConfigEntry 2 }
+
+
+	convSxLMIpAddress OBJECT-TYPE
+		SYNTAX	IpAddress
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Module IP address"
+		::= { convSxLModuleConfigEntry 3 }
+
+	convSxLMIpNetmask OBJECT-TYPE
+		SYNTAX	IpAddress
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Module netmask"
+		::= { convSxLModuleConfigEntry 4 }
+
+	convSxLMIpGateway OBJECT-TYPE
+		SYNTAX	IpAddress
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Default gateway"
+		::= { convSxLModuleConfigEntry 5 }
+
+	convSxLMIpTftpServer OBJECT-TYPE
+		SYNTAX	IpAddress
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"TFTP server address for SW-Update"
+		::= { convSxLModuleConfigEntry 6 }
+
+	convSxLMIpTrapSink OBJECT-TYPE
+		SYNTAX	IpAddress
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"SNMP TrapSink-address"
+		::= { convSxLModuleConfigEntry 7 }
+
+	convSxLMSNMPReadCommunity OBJECT-TYPE
+		SYNTAX	DisplayString  (SIZE (0..17))
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"SNMP ReadCommunity"
+		::= { convSxLModuleConfigEntry 8 }
+
+	convSxLMSNMPWriteCommunity OBJECT-TYPE
+		SYNTAX	DisplayString   (SIZE (0..17))
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"SNMP WriteCommunity"
+		::= { convSxLModuleConfigEntry 9 }
+
+	convSxLMTempWarningLevel OBJECT-TYPE
+		SYNTAX	Integer32(0..60)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"Warning level for module ambient temperature (0 - 60 degree Celsius)"
+		::= { convSxLModuleConfigEntry 10 }
+
+	convSxLMTempAlarmLevel OBJECT-TYPE
+		SYNTAX	Integer32
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Alarm level for module ambient temperature"
+		::= { convSxLModuleConfigEntry 11 }
+
+	convSxLMAlarmReport OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+			disable (0),
+			toNMA   (1),
+			toETH   (2),
+			toNMAandETH (3),
+			notavailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Controls alarm signaling modes of module"
+		::= { convSxLModuleConfigEntry 12 }
+
+	convSxLMEthPortConfig OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+			unknown (0),
+			portDown (1),
+			portUp (2),
+			notavailable (255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Module Ethernet Port config"
+		::= { convSxLModuleConfigEntry 13 }
+
+	convSxLMEthPortState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unknown (0),
+			portDown (1),
+			portUp (2),
+			notavailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Module Ethernet Port state"
+		::= { convSxLModuleConfigEntry 14 }
+
+	convSxLMCliUserTimeout OBJECT-TYPE
+		SYNTAX Integer32(120..3600)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Module CLI User Timeout"
+		::= { convSxLModuleConfigEntry 15 }
+
+--************************Table**************************************
+	convSxLModuleProtectionTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLModuleProtectionEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SPEEDDUALLINE protection table"
+		::= { convSPEEDDUALLINE 4 }
+
+	convSxLModuleProtectionEntry OBJECT-TYPE
+		SYNTAX ConvSxLModuleProtectionEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Protection table entries"
+		INDEX { convSxLMPSlot  }
+		::= { convSxLModuleProtectionTable 1 }
+
+	ConvSxLModuleProtectionEntry ::=
+		SEQUENCE
+		{
+			convSxLMPSlot Integer32,
+			convSxLMLinkProtectionConfig INTEGER,
+			convSxLMLinkProtectionStatus INTEGER,
+			convSxLMLinkProtectionFallback Integer32
+		}
+		
+	convSxLMPSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Slot No. in Carrier"
+		::= { convSxLModuleProtectionEntry 2 }
+
+
+	convSxLMLinkProtectionConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unknown(0),
+			fallbackPort1(1),
+			fallbackPort2(2),
+			staticPort1(3),
+			staticPort2(4),
+			protectionOFF(5),
+			notAvailable(255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Status of protection module"
+		::= { convSxLModuleProtectionEntry 3 }
+
+	convSxLMLinkProtectionStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unknown(0),
+			port1active(1),
+			port2active(2),
+			testing(3),
+			noneActive(4),
+			notAvailable(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Status of protection functionality regarding the link port. The link port are always port1 (main) and port2 (backup). The local port is port4"
+		::= { convSxLModuleProtectionEntry 4 }
+
+	convSxLMLinkProtectionFallback OBJECT-TYPE
+		SYNTAX Integer32(5..65535)
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Fallback time of errorfree seconds before switching back to MainPath. If there is an error during the Fallback-Time the timer will be restarted again"
+		::= { convSxLModuleProtectionEntry 5 }
+
+--************************Table**************************************
+	convSxLPortOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLPortOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port status table"
+		::= { convSPEEDDUALLINE 5 }
+
+	convSxLPortOverviewEntry OBJECT-TYPE
+		SYNTAX ConvSxLPortOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port status entries"
+		INDEX { convSxLPortIndex }
+		::= { convSxLPortOverviewTable 1 }
+
+	ConvSxLPortOverviewEntry ::=
+		SEQUENCE
+		{
+			convSxLPortIndex Integer32,
+			convSxLSlot Integer32,
+			convSxLPort Integer32,
+			convSxLDescription DisplayString,
+			convSxLAdminState INTEGER,
+			convSxLOperState INTEGER,
+			convSxLSFPState INTEGER,
+			convSxLLLCFState INTEGER,
+			convSxLLoopState INTEGER,
+			convSxLSpeed INTEGER,
+			convSxLTxPortConnection INTEGER,
+			convSxLAlarmState INTEGER,
+			convSxLDMIState INTEGER
+		}
+
+	convSxLPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Port Index"
+		::= { convSxLPortOverviewEntry 1 }
+
+	convSxLSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number"
+		::= { convSxLPortOverviewEntry 2 }
+
+	convSxLPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port number"
+		::= { convSxLPortOverviewEntry 3 }
+
+	convSxLDescription OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..31))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Port desription string"
+		::= { convSxLPortOverviewEntry 4 }
+
+	convSxLAdminState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			adminDown (0),
+			adminUp (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port configuration mode"
+		::= { convSxLPortOverviewEntry 5 }
+
+	convSxLOperState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			down(0),
+			up(1),
+			loop(2),
+			downLLCF(3),
+			downTxFault(4),
+			downRxLevel(5),
+			downTxLevel(6),
+		        notAvailable(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port operational state"
+		::= { convSxLPortOverviewEntry 6 }
+
+	convSxLSFPState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			sfpRemoved (0),
+			sfpInstalled (1),
+			sfpTxFault (2),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"SFP-Port state"
+		::= { convSxLPortOverviewEntry 7 }
+
+	convSxLLLCFState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			off (0),
+			on (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Status of linkloss configuration"
+		::= { convSxLPortOverviewEntry 8 }
+
+	convSxLLoopState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			off (0),
+			on (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Status of loop configuration"
+		::= { convSxLPortOverviewEntry 9 }
+
+	convSxLSpeed OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			speedTransparent (0),
+			speedSTM1-155Mbit (1),
+			speedSTM4-622Mbit (2),
+			speedSTM16-2488Mbit (3),
+			sSTM16FEC2666Mbit (4),
+			sFastEthernet125Mbit (5),
+			sGigabitEthernet1250Mbit (6),
+			sFibreChannel133Mbit (7),
+			sFibreChannel266Mbit (8),
+			sFibreChannel531Mbit (9),
+			sFibreChannel1062Mbit (10),
+			sFibreChannel2125Mbit (11),
+			sESCON200Mbit (12),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"TxPort 3R regeneration speed and protocol"
+		::= { convSxLPortOverviewEntry 10 }
+
+	convSxLTxPortConnection OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notConnected (0),
+			toPort1 (1),
+			toPort2 (2),
+			toPort3 (3),
+			toPort4 (4),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Status of port to port connection"
+		::= { convSxLPortOverviewEntry 11 }
+
+	convSxLAlarmState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			noAlarm (0),
+			alarmLOS (1),
+			alarmCDR (2),
+			alarmTxFault (3),
+			alarmRxLevel (4),
+			warningRxLevel (5),
+			warningTxLevel (6),
+			activeAlarms (16),
+			activeWarnigs (32),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port warning / alarm states"
+		::= { convSxLPortOverviewEntry 12 }
+
+	convSxLDMIState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			sff-8472Rev9-3 (1),
+			sff-8472Rev9-4 (2)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Availability or version of Diagnostic Monitoring Information (DMI)"
+		::= { convSxLPortOverviewEntry 13 }
+
+--************************Table**************************************
+	convSxLPortConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLPortConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port config table"
+		::= { convSPEEDDUALLINE 6 }
+
+	convSxLPortConfigEntry OBJECT-TYPE
+		SYNTAX ConvSxLPortConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port config entry"
+		INDEX { convSxLCPortIndex }
+		::= { convSxLPortConfigTable 1 }
+
+	ConvSxLPortConfigEntry ::=
+		SEQUENCE
+		{
+			convSxLCPortIndex Integer32,
+			convSxLCSlot Integer32,
+			convSxLCPort Integer32,
+			convSxLAdminConfig INTEGER,
+			convSxLLLCFConfig INTEGER,
+			convSxLLoopConfig INTEGER,
+			convSxLSpeedConfig INTEGER,
+			convSxLPortConnection INTEGER,
+			convSxLPortAlarmDeactivation INTEGER,
+			convSxLPortAlarmSchedule  Integer32
+		}
+		
+	convSxLCPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Port Index"
+		::= { convSxLPortConfigEntry 1 }
+
+	convSxLCSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number"
+		::= { convSxLPortConfigEntry 2 }
+
+	convSxLCPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port number"
+		::= { convSxLPortConfigEntry 3 }
+
+	convSxLAdminConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			adminDown (0),
+			adminUp (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Admin configuration of a specific port"
+		::= { convSxLPortConfigEntry 4 }
+
+	convSxLLLCFConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			off (0),
+			on (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Configuration of Link Loss Carry Forward (LLCF) function. If a link down event occurs on the link port the local port will be disabled to signal the error state to the locally connected device e.g. router"
+		::= { convSxLPortConfigEntry 5 }
+
+	convSxLLoopConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			off (0),
+			on (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Setup of loops. After a reset, all loops will be switched off"
+		::= { convSxLPortConfigEntry 6 }
+
+	convSxLSpeedConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			speedTransparent (0),
+			speedSTM1-155Mbit (1),
+			speedSTM4-622Mbit (2),
+			speedSTM16-2488Mbit (3),
+			sSTM16FEC2666Mbit (4),
+			sFastEthernet125Mbit (5),
+			sGigabitEthernet1250Mbit (6),
+			sFibreChannel133Mbit (7),
+			sFibreChannel266Mbit (8),
+			sFibreChannel531Mbit (9),
+			sFibreChannel1062Mbit (10),
+			sFibreChannel2125Mbit (11),
+			sESCON200Mbit (12),
+			sVIDEO143Mbit (13),
+			sVIDEO177Mbit (14),
+			sVIDEO270Mbit (15),
+			sVIDEO360Mbit (16),
+			sVIDEO540Mbit (17),
+			sVIDEO1001Mbit (18),
+			sVIDEO1485Mbit (19),
+			sVIDEO2970Mbit (20),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"TxPort 3R regeneration speed and protocol"
+		::= { convSxLPortConfigEntry 7 }
+
+	convSxLPortConnection OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			noConnection (0),
+			fromPort1 (1),
+			fromPort2 (2),
+			fromPort3 (3),
+			fromPort4 (4),
+			notPossible (255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Setup of connections. toPortx means a connection between Rx-input to Tx-output"
+		::= { convSxLPortConfigEntry 8 }
+
+	convSxLPortAlarmDeactivation OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			alarmReportingEnabled(1),
+			alarmReportingDisabledbySchedule(2),
+			alarmReportingDisabledPermanent(3),
+			unknown(255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Port alarm deactivation schedule"
+		::= { convSxLPortConfigEntry 9 }
+
+	convSxLPortAlarmSchedule OBJECT-TYPE
+		SYNTAX Integer32 (0..1200)
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Port alarm deactivation schedule. Value in hours. After this time has elapsed, the alarms are active again. Valid range: 1..1200. 0 means less then 1 hour"
+		::= { convSxLPortConfigEntry 10 }
+
+--*******************************************************************
+	convSxSFPIdentifikation    OBJECT IDENTIFIER ::= { convSPEEDDUALLINE 7 }
+--************************Table**************************************
+	convSXLSFPDescriptionTable  OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSXLSFPDescriptionEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Optical transceiver parameter table"
+		::= { convSxSFPIdentifikation 1 }
+
+	convSXLSFPDescriptionEntry OBJECT-TYPE
+		SYNTAX ConvSXLSFPDescriptionEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Talbe entries"
+		INDEX { convSxLSFPPortIndex }
+		::= { convSXLSFPDescriptionTable 1 }
+
+	ConvSXLSFPDescriptionEntry ::=
+		SEQUENCE
+		{
+			convSxLSFPPortIndex Integer32,
+			convSxLSFPSlot Integer32,
+			convSxLSFPPort Integer32,
+			convSxLSFPVendor DisplayString,
+			convSxLSFPVendorOUI DisplayString,
+			convSxLSFPVendorCode DisplayString,
+			convSxLSFPVendorRevisionCode DisplayString,
+			convSxLSFPVendorDateCode DisplayString,
+			convSxLSFPVendorSerialNumber DisplayString,
+			convSxLSFPType INTEGER,
+			convSxLSFPConnector INTEGER,
+			convSxLSFPWavelength DisplayString
+		}
+
+	convSxLSFPPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Port Index"
+		::= { convSXLSFPDescriptionEntry 1 }
+
+	convSxLSFPSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number"
+		::= { convSXLSFPDescriptionEntry 2 }
+
+	convSxLSFPPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port number"
+		::= { convSXLSFPDescriptionEntry 3 }
+
+	convSxLSFPVendor OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..255))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"SFP vendor name"
+		::= { convSXLSFPDescriptionEntry 4 }
+
+	convSxLSFPVendorOUI OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..3))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Vendor specific IEEE-OUI"
+		::= { convSXLSFPDescriptionEntry 5 }
+
+	convSxLSFPVendorCode OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Part identification code, vendor specific"
+		::= { convSXLSFPDescriptionEntry 6 }
+
+	convSxLSFPVendorRevisionCode OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..5))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Parts revision code, vendor specific"
+		::= { convSXLSFPDescriptionEntry 7 }
+
+	convSxLSFPVendorDateCode OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..9))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The vendor date code for the transceiver. The date code is specified in the following format: YYYY.MM.DD/LL;   YYYY = year;   MM = month;   DD = day of month;   LL   = vendor lot code"
+		::= { convSXLSFPDescriptionEntry 8 }
+
+	convSxLSFPVendorSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Parts serial number "
+		::= { convSXLSFPDescriptionEntry 9 }
+
+	convSxLSFPType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unspecified (0),
+			tGBIC       (1),
+			tModuleSolderedToMotherboard (2),
+			tSFPTransceiver (3),
+			tDWDMSFPTransceiver (11),
+			tCopperSFPTransceiver(254),
+			vendorSpecific (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Physical type of device"
+		::= { convSXLSFPDescriptionEntry 10 }
+
+	convSxLSFPConnector OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unspecified (0),
+			cSC (1),
+			cFibreChannelStyle1CopperConnector (2),
+			cFibreChannelStyle2CopperConnector (3),
+			cBncTnc (4),
+			cFibreChannerCoaxialHeader (5),
+			cFibreJack (6),
+			cLC (7),
+			cMTRJ (8),
+			cMU (9),
+			cSG (10),
+			cOpticalPigtail(11),
+			cHSSDCII (32),
+			cCopperPigtail (33),
+			cRJ45 (34),
+			unknown(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The connector value indicates the external connector provided on the interface."
+		::= { convSXLSFPDescriptionEntry 11 }
+
+	convSxLSFPWavelength OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..8))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The laser wavelength is the nominal transmitter output wavelength at room temperature. The value is in nanometers [nm]. This field allows the user to read the laser wavelength directly, so it is not necessary to infer it from the transceiver 'Code for Electronic Compatibility'."
+		::= { convSXLSFPDescriptionEntry 12 }
+
+--************************Table**************************************
+	convSxLSFPBitrateTable  OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLSFPBitrateEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Optical transceiver bitrate table"
+		::= { convSxSFPIdentifikation 2 }
+
+	convSxLSFPBitrateEntry OBJECT-TYPE
+		SYNTAX ConvSxLSFPBitrateEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Transceiver bitrate"
+		INDEX { convSxLSFPBitratePortIndex }
+		::= { convSxLSFPBitrateTable 1 }
+
+	ConvSxLSFPBitrateEntry ::=
+		SEQUENCE
+		{
+			convSxLSFPBitratePortIndex Integer32,
+			convSxLSFPBitrateSlot Integer32,
+			convSxLSFPBitratePort Integer32,
+			convSxLSFPBitrateNominal INTEGER,
+			convSxLSFPBitrateMax INTEGER,
+			convSxLSFPBitrateMin INTEGER
+		}
+
+	convSxLSFPBitratePortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Port Index"
+		::= { convSxLSFPBitrateEntry 1 }
+
+	convSxLSFPBitrateSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number"
+		::= { convSxLSFPBitrateEntry 2 }
+
+	convSxLSFPBitratePort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port number"
+		::= { convSxLSFPBitrateEntry 3 }
+
+	convSxLSFPBitrateNominal OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The nominal bit rate is specified in units of 1 Megabit per second, rounded up to the next 100 Megabits per second. The bit rate includes those bits necessary to encode and delimit the signal as well as those bits carrying data information. A value of 0 indicates that the bit rate is not specified and must be determined from the transceiver technology. The actual information transfer rate will depend on the data encoding defined by the encoding value."
+		::= { convSxLSFPBitrateEntry 4 }
+
+	convSxLSFPBitrateMax OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The upper bit rate limit at which the SFP transceiver will still meet its specifications is specified in units of 1 Megabit per second. A value of 0 indicates that this field is not specified."
+		::= { convSxLSFPBitrateEntry 5 }
+
+	convSxLSFPBitrateMin OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The lower bit rate limit at which the SFP transceiver will still meet its specifications is specified in units of 1 Megabit per second. A value of 0 indicates that this field is not specified."
+		::= { convSxLSFPBitrateEntry 6 }
+
+--************************Table**************************************
+	convSxLSFPLengthTable  OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLSFPLengthEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Optical Transceiver Length Table"
+		::= { convSxSFPIdentifikation 3 }
+
+	convSxLSFPLengthEntry OBJECT-TYPE
+		SYNTAX ConvSxLSFPLengthEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Optical Transceiver Length Coding Entries"
+		INDEX { convSxLSFPLengthPortIndex }
+		::= { convSxLSFPLengthTable 1 }
+
+	ConvSxLSFPLengthEntry ::=
+		SEQUENCE
+		{
+			convSxLSFPLengthPortIndex Integer32,
+			convSxLSFPLengthSlot Integer32,
+			convSxLSFPLengthPort Integer32,
+			convSxLSFPLength9km INTEGER,
+			convSxLSFPLength9m INTEGER,
+			convSxLSFPLength50 INTEGER,
+			convSxLSFPLength62 INTEGER,
+			convSxLSFPLengthCopper INTEGER
+		}
+
+	convSxLSFPLengthPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Port Index"
+		::= { convSxLSFPLengthEntry 1 }
+
+	convSxLSFPLengthSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number"
+		::= { convSxLSFPLengthEntry 2 }
+
+	convSxLSFPLengthPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port number"
+		::= { convSxLSFPLengthEntry 3 }
+
+	convSxLSFPLength9km OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			grater254km(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"This value specifies the link length that is supported by the SFP transceiver while operating in compliance with the applicable standards using single mode fiber. The value is in units of kilometers. A value of 255 means that the transceiver supports a link greater than 254 km. A value of 0 means that the transceiver does not support single mode fiber or that the length information must be determined from the transceiver technology."
+		::= { convSxLSFPLengthEntry 4 }
+
+	convSxLSFPLength9m OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			greater25km(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"This value specifies the link length that is supported by the SFP transceiver while operating in compliance with the applicable standards using single mode fiber. The value is in units of 100 meters. A value of 255 means that the transceiver supports a link greater than 25.4 km. A value of 0 means that the transceiver does not support single mode fiber or that the length information must be determined from the transceiver technology."
+		::= { convSxLSFPLengthEntry 5 }
+
+	convSxLSFPLength50 OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			greater2540m(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"This value specifies the link length that is supported by the SFP transceiver while operating in compliance with the applicable standards using 50 micron multi mode fiber. The value is in units of 10 meters. A value of 255 means that the transceiver supports a link greater than 2.54 km. A value of 0 means that the transceiver does not support 50 micron multi mode fiber or that the length information must be determined from the transceiver technology."
+		::= { convSxLSFPLengthEntry 6 }
+
+	convSxLSFPLength62 OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			greater2540m(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"This value specifies the link length that is supported	by the SFP transceiver while operating in compliance with the applicable standards using 62.5 micron multi mode fiber. The value is in units of 10 meters. A value of 255 means that the transceiver supports a link greater than 2.54 km. A value of 0 means that the transceiver does not support 62.5 micron multi mode fiber or that the length information must be determined from the transceiver technology."
+		::= { convSxLSFPLengthEntry 7 }
+
+	convSxLSFPLengthCopper OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			greater254m(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"This value specifies the link length that is supported by the SFP transceiver while operating in compliance with the applicable standards using copper cable. The value is in units of 1 meter. A value of 255 means that the transceiver supports a link greater than 254 m. A value of 0 means that the transceiver does not support copper cable or that the length information must be determined from the transceiver technology. Further information about the cable design, equalization, and connectors is usually required to guarantee meeting of particular length information."
+		::= { convSxLSFPLengthEntry 8 }
+
+--************************Table**************************************
+       convSxLSFPCompCodes    OBJECT IDENTIFIER ::= { convSxSFPIdentifikation 4 }
+
+--************************Table**************************************
+	convSxLSFPCompCodeSonetTable  OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLSFPCompCodeSonetEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Optical transceiver sonet compatibility table"
+		::= { convSxLSFPCompCodes 1 }
+
+	convSxLSFPCompCodeSonetEntry OBJECT-TYPE
+		SYNTAX ConvSxLSFPCompCodeSonetEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Transceiver compatibility code entries"
+		INDEX { convSxLSFPCSPortIndex }
+		::= { convSxLSFPCompCodeSonetTable 1 }
+
+	ConvSxLSFPCompCodeSonetEntry ::=
+		SEQUENCE
+		{
+			convSxLSFPCSPortIndex Integer32,
+			convSxLSFPCSSlot Integer32,
+			convSxLSFPCSPort Integer32,
+			convSxLSFPCSProtocol INTEGER,
+			convSxLSFPCSRange INTEGER,
+			convSxLSFPCSFiberType INTEGER
+		}
+
+	convSxLSFPCSPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Port Index"
+		::= { convSxLSFPCompCodeSonetEntry 1 }
+
+	convSxLSFPCSSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number"
+		::= { convSxLSFPCompCodeSonetEntry 2 }
+
+	convSxLSFPCSPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port number"
+		::= { convSxLSFPCompCodeSonetEntry 3 }
+
+	convSxLSFPCSProtocol OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notSupported (0),
+			sOC3 (1),
+			sOC12 (2),
+			sOC48 (3)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Supported protocol"
+		::= { convSxLSFPCompCodeSonetEntry 4 }
+
+	convSxLSFPCSRange OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notSupported (0),
+			short         (1),
+			intermediate  (2),
+			long          (3)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Optical transceivers range"
+		::= { convSxLSFPCompCodeSonetEntry 5 }
+
+	convSxLSFPCSFiberType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notSupported (0),
+			multimode     (1),
+			singlemode    (4)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Supported fiber type"
+		::= { convSxLSFPCompCodeSonetEntry 6 }
+
+--************************Table**************************************
+	convSxLSFPCompCodeGigabitEthernetTable  OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLSFPCompCodeGigabitEthernetEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Optical transceiver gigabit Ethernet compatibility table"
+		::= { convSxLSFPCompCodes 2 }
+
+	convSxLSFPCompCodeGigabitEthernetEntry OBJECT-TYPE
+		SYNTAX ConvSxLSFPCompCodeGigabitEthernetEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table entries"
+		INDEX { convSxLSFPCGPortIndex }
+		::= { convSxLSFPCompCodeGigabitEthernetTable 1 }
+
+	ConvSxLSFPCompCodeGigabitEthernetEntry ::=
+		SEQUENCE
+		{
+			convSxLSFPCGPortIndex Integer32,
+			convSxLSFPCGSlot Integer32,
+			convSxLSFPCGPort Integer32,
+			convSxLSFPCGType INTEGER
+		}
+
+	convSxLSFPCGPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Port Index"
+		::= { convSxLSFPCompCodeGigabitEthernetEntry 1 }
+
+	convSxLSFPCGSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number"
+		::= { convSxLSFPCompCodeGigabitEthernetEntry 2 }
+
+	convSxLSFPCGPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port number"
+		::= { convSxLSFPCompCodeGigabitEthernetEntry 3 }
+
+	convSxLSFPCGType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notSupported (0),
+			g1000BASE-SX (1),
+			g1000BASE-LX (2),
+			g1000BASE-CX (4),
+			g1000BASE-T (8),
+			g100Base-Fx (32),
+			g100Base-Fx-LX (48)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Supported protocol"
+		::= { convSxLSFPCompCodeGigabitEthernetEntry 4 }
+
+--************************Table**************************************
+	convSxLSFPCompCodeFibreChannelTable  OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLSFPCompCodeFibreChannelEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Optical transceiver fibre channel compatibility table"
+		::= { convSxLSFPCompCodes 3 }
+
+	convSxLSFPCompCodeFibreChannelEntry OBJECT-TYPE
+		SYNTAX ConvSxLSFPCompCodeFibreChannelEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table entries"
+		INDEX { convSxLSFPCFcPortIndex }
+		::= { convSxLSFPCompCodeFibreChannelTable 1 }
+
+	ConvSxLSFPCompCodeFibreChannelEntry ::=
+		SEQUENCE
+		{
+			convSxLSFPCFcPortIndex Integer32,
+			convSxLSFPCFcSlot Integer32,
+			convSxLSFPCFcPort Integer32,
+			convSxLSFPCFcMedia INTEGER,
+			convSxLSFPCFcTech INTEGER,
+			convSxLSFPCFcLinkLength INTEGER,
+			convSxLSFPCFcSpeed INTEGER
+		}
+
+	convSxLSFPCFcPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Port Index"
+		::= { convSxLSFPCompCodeFibreChannelEntry 1 }
+
+	convSxLSFPCFcSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number"
+		::= { convSxLSFPCompCodeFibreChannelEntry 2 }
+
+	convSxLSFPCFcPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port number"
+		::= { convSxLSFPCompCodeFibreChannelEntry 3 }
+
+	convSxLSFPCFcMedia OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			mnotSupported (0),
+			mSingleMode (1),
+			reserved (2),
+			mMultiMode50 (4),
+			mMultiMode62-5 (8),
+			mMultiMode50m-62-5m(12),
+			mVideoCoax (16),
+			mMiniatureCoax (32),
+			mShieldedTwistedPair (64),
+			mTwinAxialPair (128)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Supported media types"
+		::= { convSxLSFPCompCodeFibreChannelEntry 4 }
+
+	convSxLSFPCFcTech OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notSupported (0),
+			tLongwaveLaserLL (10),
+			tLongwaveLaserLC (11),
+			tShortwaveLaserW-OFC (12),
+			tShortwaveLaserW-O-OFC (13),
+			tElectricalInterenclosure (20),
+			tElectricalIntraenclosure (21)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Transmitter technology"
+		::= { convSxLSFPCompCodeFibreChannelEntry 5 }
+
+	convSxLSFPCFcLinkLength OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notSupported (0),
+			longDistance (16),
+			intermediateDistance (32),
+			shortDistance (64),
+			verylongDistance (128)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Link length supported by transceiver"
+		::= { convSxLSFPCompCodeFibreChannelEntry 6 }
+
+	convSxLSFPCFcSpeed OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notSupported(0),
+			fcSpeed100MByte(1),
+			fcSpeed200MByte(4),
+			fcSpeed100-200MByte(5),
+			fcSpeed400MByte(16),
+			fcSpeed100-200-400MByte(21)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Fibre channel speed"
+		::= { convSxLSFPCompCodeFibreChannelEntry 7 }
+
+--************************Table**************************************
+	convSxLCopperSFPTable  OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLCopperSFPEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Overview and configuration of copper SFP table"
+		::= { convSxSFPIdentifikation 5 }
+
+	convSxLCopperSFPEntry OBJECT-TYPE
+		SYNTAX ConvSxLCopperSFPEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Transceiver overview and configuration entries"
+		INDEX { convSxLCuSFPPortIndex }
+		::= { convSxLCopperSFPTable 1 }
+
+	ConvSxLCopperSFPEntry ::=
+		SEQUENCE
+		{
+			convSxLCuSFPPortIndex Integer32,
+			convSxLCuSFPSlot Integer32,
+			convSxLCuSFPPort Integer32,
+			convSxLConfigSpeed INTEGER,
+			convSxLConfigDuplex INTEGER,
+			convSxLCuPhyId INTEGER,
+			convSxLCuSFPLink INTEGER,
+			convSxLCuSFPSpeed INTEGER,
+			convSxLCuSFPDuplex INTEGER,
+			convSxLCuSFPAutoMDIx INTEGER,
+			convSxLCuSFPConfigMode INTEGER
+		}
+		
+	convSxLCuSFPPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Port Index"
+		::= { convSxLCopperSFPEntry 1 }
+
+	convSxLCuSFPSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number"
+		::= { convSxLCopperSFPEntry 2 }
+
+	convSxLCuSFPPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port number"
+		::= { convSxLCopperSFPEntry 3 }
+
+	convSxLConfigSpeed OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			s10Mbit (1),
+			s100Mbit (2),
+			s1000Mbit (3),
+			notSupported (255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"User defined configuration of speed"
+		::= { convSxLCopperSFPEntry 4 }
+
+	convSxLConfigDuplex OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			halfduplex (1),
+			fullduplex (2),
+			notSupported (255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"User defined configuration of duplex mode"
+		::= { convSxLCopperSFPEntry 5 }
+
+	convSxLCuPhyId OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unknown (0),
+			marvellPhy (1),
+			notSupported (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Physical transceiver installed in SFP, if unkown the transceiver is not supported"
+		::= { convSxLCopperSFPEntry 6 }
+
+	convSxLCuSFPLink OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			down (0),
+			up (1),
+			notSupported (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Link status of internal physical in copper SFP"
+		::= { convSxLCopperSFPEntry 7 }
+
+	convSxLCuSFPSpeed OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			down (0),
+			s10Mbit (1),
+			s100Mbit (2),
+			s1000Mbit (3),
+			notSupported (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"actual speed status of internal physical in copper SFP"
+		::= { convSxLCopperSFPEntry 8 }
+
+	convSxLCuSFPDuplex OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			down (0),
+			halfduplex (1),
+			fullduplex (2),
+			notSupported (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"actual duplex mode status of internal physical in copper SFP"
+		::= { convSxLCopperSFPEntry 9 }
+
+	convSxLCuSFPAutoMDIx OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			on (0),
+			off (1),
+			notSupported (255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"actual of status MDI-connection in copper SFP"
+		::= { convSxLCopperSFPEntry 10 }
+
+	convSxLCuSFPConfigMode OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unknown (0),
+			auto (1),
+			forced (2),
+			notSupported (255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"actual config mode in copper SFP"
+		::= { convSxLCopperSFPEntry 11 }
+
+--************************Table**************************************
+	convSxLDWDMSFPTable  OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLDWDMSFPEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Overview and configuration of DWDM SFP table"
+		::= { convSxSFPIdentifikation 6 }
+
+	convSxLDWDMSFPEntry OBJECT-TYPE
+		SYNTAX ConvSxLDWDMSFPEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Transceiver overview and configuration entries"
+		INDEX { convSxLDWDMPortIndex }
+		::= { convSxLDWDMSFPTable 1 }
+
+	ConvSxLDWDMSFPEntry ::=
+		SEQUENCE
+		{
+			convSxLDWDMPortIndex Integer32,
+			convSxLDWDMSlot Integer32,
+			convSxLDWDMPort Integer32,
+			convSxLDWDMPowerClass INTEGER,
+			convSxLDWDMMaxSupplyCurrent Integer32,
+			convSxLChannelSpacing INTEGER,
+			convSxLNumberofChannels Integer32
+		}
+
+	convSxLDWDMPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Port Index"
+		::= { convSxLDWDMSFPEntry 1 }
+
+	convSxLDWDMSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number"
+		::= { convSxLDWDMSFPEntry 2 }
+
+	convSxLDWDMPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port number"
+		::= { convSxLDWDMSFPEntry 3 }
+
+	convSxLDWDMPowerClass OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			p-upto1W (0),
+			p-between1Wand1-5W (1),
+			p-morethan1-5W (2),
+			notSupported (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Power class of installed DWDM-SFP "
+		::= { convSxLDWDMSFPEntry 4 }
+
+	convSxLDWDMMaxSupplyCurrent OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Defines the maximum supply current the module will consume under worst conditions in units of 4mA"
+		::= { convSxLDWDMSFPEntry 5 }
+
+	convSxLChannelSpacing OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			g200GHz (0),
+			g100GHz (1),
+			g50GHz (2),
+			notSupported (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Identifies the densest channel spacing the module is compatible with"
+		::= { convSxLDWDMSFPEntry 6 }
+
+	convSxLNumberofChannels OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Identifies the number of channels over which the module may be tuned by user command. If not tunable the number is 1"
+		::= { convSxLDWDMSFPEntry 7 }
+
+
+--************************Table**************************************
+	convSxLSFPDMIParamTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLSFPDMIParamEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Optical transceiver measurement parameter table"
+		::= { convSPEEDDUALLINE 8 }
+
+	convSxLSFPDMIParamEntry OBJECT-TYPE
+		SYNTAX ConvSxLSFPDMIParamEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table entries"
+		INDEX { convSxLSFPDMIPortIndex }
+		::= { convSxLSFPDMIParamTable 1 }
+
+	ConvSxLSFPDMIParamEntry ::=
+		SEQUENCE
+		{
+			convSxLSFPDMIPortIndex Integer32,
+			convSxLSFPDMISlot Integer32,
+			convSxLSFPDMIPort Integer32,
+			convSxLSFPDMIRxLevel Integer32,
+			convSxLSFPDMIRxHighAlarm INTEGER,
+			convSxLSFPDMITxLevel Integer32,
+			convSxLSFPDMITxBias Integer32,
+			convSxLSFPDMIVcc Integer32,
+			convSxLSFPDMITemp Integer32
+		}
+
+	convSxLSFPDMIPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port Index"
+		::= { convSxLSFPDMIParamEntry 1 }
+
+	convSxLSFPDMISlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number"
+		::= { convSxLSFPDMIParamEntry 2 }
+
+	convSxLSFPDMIPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port number"
+		::= { convSxLSFPDMIParamEntry 3 }
+
+	convSxLSFPDMIRxLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Optical receive power "
+		::= { convSxLSFPDMIParamEntry 4 }
+
+	convSxLSFPDMIRxHighAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Status of receive optical power, active when overloaded"
+		::= { convSxLSFPDMIParamEntry 5 }
+
+	convSxLSFPDMITxLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Optical transmit power "
+		::= { convSxLSFPDMIParamEntry 6 }
+
+	convSxLSFPDMITxBias OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Transceiver hardware parameter: laser bias current"
+		::= { convSxLSFPDMIParamEntry 7 }
+
+	convSxLSFPDMIVcc OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Transceiver hardware parameter: supply voltage"
+		::= { convSxLSFPDMIParamEntry 8 }
+
+	convSxLSFPDMITemp OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Transceiver hardware parameter: temperature value"
+		::= { convSxLSFPDMIParamEntry 9 }
+
+--************************Table**************************************
+	convSxLSFPDMIThresholdTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLSFPDMIThresholdEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Optical transceiver measurement threshold table"
+		::= { convSPEEDDUALLINE 9 }
+
+	convSxLSFPDMIThresholdEntry OBJECT-TYPE
+		SYNTAX ConvSxLSFPDMIThresholdEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Measurement parameter overview"
+		INDEX { convSxLSFPDMITPortIndex }
+		::= { convSxLSFPDMIThresholdTable 1 }
+
+	ConvSxLSFPDMIThresholdEntry ::=
+		SEQUENCE
+		{
+			convSxLSFPDMITPortIndex Integer32,
+			convSxLSFPDMITSlot Integer32,
+			convSxLSFPDMITPort Integer32,
+			convSxLSFPDMITRxLowThresholdWarningLevel Integer32,
+			convSxLSFPDMITRxLowThresholdAlarmLevel Integer32,
+			convSxLSFPDMITTxLowThresholdWarningLevel Integer32,
+			convSxLSFPDMITTxLowThresholdAlarmLevel Integer32,
+			convSxLSFPDMITThresholdsUsage INTEGER
+		}
+
+	convSxLSFPDMITPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Port Index"
+		::= { convSxLSFPDMIThresholdEntry 1 }
+
+	convSxLSFPDMITSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number"
+		::= { convSxLSFPDMIThresholdEntry 2 }
+
+	convSxLSFPDMITPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port number"
+		::= { convSxLSFPDMIThresholdEntry 3 }
+
+	convSxLSFPDMITRxLowThresholdWarningLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Optical receive power warning level. Value display and set is dBm/100"
+		::= { convSxLSFPDMIThresholdEntry 4 }
+
+	convSxLSFPDMITRxLowThresholdAlarmLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Optical receive power alarm level. Value display is dBm/100"
+		::= { convSxLSFPDMIThresholdEntry 5 }
+
+	convSxLSFPDMITTxLowThresholdWarningLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Optical transmit power warning level. Value display and set is dBm/100"
+		::= { convSxLSFPDMIThresholdEntry 6 }
+
+	convSxLSFPDMITTxLowThresholdAlarmLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Optical transmit power alarm level. Value display is dBm/100"
+		::= { convSxLSFPDMIThresholdEntry 7 }
+
+	convSxLSFPDMITThresholdsUsage OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			userDefinedThresholds (0),
+			sFPVendorThresholds(1),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Set threshold usage. Activate user defined or vendor defined thresholds"
+		::= { convSxLSFPDMIThresholdEntry 8 }
+
+--************************Table**************************************
+	convSxLPortEventTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLPortEventEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port event Table"
+		::= { convSPEEDDUALLINE 10 }
+
+	convSxLPortEventEntry OBJECT-TYPE
+		SYNTAX ConvSxLPortEventEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port event table entries"
+		INDEX { convSxLSFPEPortIndex }
+		::= { convSxLPortEventTable 1 }
+
+	ConvSxLPortEventEntry ::=
+		SEQUENCE
+		{
+			convSxLSFPEPortIndex Integer32,
+			convSxLSFPESlot Integer32,
+			convSxLSFPEPort Integer32,
+			convSxLSFPDMIRxLowWarningEvent INTEGER,
+			convSxLSFPDMIRxLowAlarmEvent INTEGER,
+			convSxLSFPDMITxLowWarningEvent INTEGER,
+			convSxLSFPDMITxLowAlarmEvent INTEGER,
+			convSxLSFPDMIBiasAlarmEvent INTEGER,
+			convSxLSFPDMIRxHighAlarmEvent INTEGER,
+			convSxLSFPDWDMLaserTHighAlarmEvent INTEGER,
+			convSxLSFPDWDMLaserTLowAlarmEvent INTEGER,
+			convSxLSFPDWDMTECHighAlarmEvent INTEGER,
+			convSxLSFPDWDMTECLowAlarmEvent INTEGER,
+			convSxLSFPDMITempHighWarningEvent INTEGER,
+			convSxLSFPDMITempHighAlarmEvent INTEGER
+		}
+
+	convSxLSFPEPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Port Index"
+		::= { convSxLPortEventEntry 1 }
+
+	convSxLSFPESlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot number"
+		::= { convSxLPortEventEntry 2 }
+
+	convSxLSFPEPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port number"
+		::= { convSxLPortEventEntry 3 }
+
+	convSxLSFPDMIRxLowWarningEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notimplemented (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Receive power - low warning"
+		::= { convSxLPortEventEntry 4 }
+
+	convSxLSFPDMIRxLowAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notimplemented (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Receive power - low alarm"
+		::= { convSxLPortEventEntry 5 }
+
+	convSxLSFPDMITxLowWarningEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notimplemented (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Output power - low warning"
+		::= { convSxLPortEventEntry 6 }
+
+	convSxLSFPDMITxLowAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notimplemented (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Output power - low alarm"
+		::= { convSxLPortEventEntry 7 }
+
+	convSxLSFPDMIBiasAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notimplemented (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Transmitter bias current is low"
+		::= { convSxLPortEventEntry 8 }
+
+	convSxLSFPDMIRxHighAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notimplemented (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Receiver input power is high"
+		::= { convSxLPortEventEntry 9 }
+
+	convSxLSFPDWDMLaserTHighAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notimplemented (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Set when laser temperature or wavelength exceeds high alarm level."
+		::= { convSxLPortEventEntry 10 }
+
+	convSxLSFPDWDMLaserTLowAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notimplemented (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Set when laser temperature or wavelength exceeds low alarm level."
+		::= { convSxLPortEventEntry 11 }
+
+	convSxLSFPDWDMTECHighAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notimplemented (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Set when TEC current exceeds high alarm level (cooling problem)"
+		::= { convSxLPortEventEntry 12 }
+
+	convSxLSFPDWDMTECLowAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notimplemented (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Set when TEC current exceeds low alarm level (heating problem)"
+		::= { convSxLPortEventEntry 13 }
+
+	convSxLSFPDMITempHighWarningEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notimplemented (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver DMI temperature high warning event"
+		::= { convSxLPortEventEntry 14 }
+
+	convSxLSFPDMITempHighAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notimplemented (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver DMI temperature high alarm event"
+		::= { convSxLPortEventEntry 15 }
+
+--************************Table**************************************
+	convSxLInventoryTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSxLInventoryEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table of all serial numbers installed in module"
+		::= { convSPEEDDUALLINE 11 }
+
+	convSxLInventoryEntry OBJECT-TYPE
+		SYNTAX ConvSxLInventoryEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table entries"
+		INDEX { convSxLInvSlot }
+		::= { convSxLInventoryTable 1 }
+
+	ConvSxLInventoryEntry ::=
+		SEQUENCE
+		{
+			convSxLInvSlot Integer32,
+			convSxLModuleSerialNumber DisplayString,
+			convSxLSFPPort1SerialNumber  DisplayString,
+			convSxLSFPPort2SerialNumber  DisplayString,
+			convSxLSFPPort3SerialNumber  DisplayString,
+			convSxLSFPPort4SerialNumber  DisplayString
+		}
+
+	convSxLInvSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Slot No. in Carrier"
+		::= { convSxLInventoryEntry 2 }
+
+	convSxLModuleSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Serial number of module "
+		::= { convSxLInventoryEntry 3 }
+
+	convSxLSFPPort1SerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Serial number of installed transceiver"
+		::= { convSxLInventoryEntry 4 }
+
+	convSxLSFPPort2SerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Serial number of installed transceiver"
+		::= { convSxLInventoryEntry 5 }
+
+	convSxLSFPPort3SerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Serial number of installed transceiver"
+		::= { convSxLInventoryEntry 6 }
+
+	convSxLSFPPort4SerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Serial number of installed transceiver"
+		::= { convSxLInventoryEntry 7 }
+
+--*****************************************************************
+--*************   Trap's   ****************************************
+
+	coldStart NOTIFICATION-TYPE
+		OBJECTS { descr, slot }
+		STATUS current
+		DESCRIPTION "ColdStart"
+		::= { traps 40 }
+
+	reboot NOTIFICATION-TYPE
+		OBJECTS { descr, slot }
+		STATUS current
+		DESCRIPTION "Reboot"
+		::= { traps 41 }
+
+	fanError NOTIFICATION-TYPE
+		OBJECTS { descr, slot }
+		STATUS current
+		DESCRIPTION "FANError"
+		::= { traps 42 }
+
+	fanOK NOTIFICATION-TYPE
+		OBJECTS { descr, slot }
+		STATUS current
+		DESCRIPTION "FANOK"
+		::= { traps 43 }
+
+	powerFailure NOTIFICATION-TYPE
+		OBJECTS { descr, slot }
+		STATUS current
+		DESCRIPTION "PowerFailure"
+		::= { traps 44 }
+
+	powerOK NOTIFICATION-TYPE
+		OBJECTS { descr, slot }
+		STATUS current
+		DESCRIPTION "PowerOK"
+		::= { traps 45 }
+
+	highTemp NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "HighTemp"
+		::= { traps 46 }
+
+	tempOK NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "TempOK"
+		::= { traps 47 }
+
+	transceiverRemoved NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "SFPRemoved"
+		::= { traps 48 }
+
+	transceiverInserted NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "SFPInserted"
+		::= { traps 49 }
+
+	moduleInserted NOTIFICATION-TYPE
+		OBJECTS { descr, slot }
+		STATUS current
+		DESCRIPTION "ModuleInserted"
+		::= { traps 50 }
+
+	moduleRemoved NOTIFICATION-TYPE
+		OBJECTS { descr, slot }
+		STATUS current
+		DESCRIPTION "ModuleRemoved"
+		::= { traps 51 }
+
+	portTxUp NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "PortTxUp"
+		::= { traps 52 }
+
+	portTxDown NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "PortTxDown"
+		::= { traps 53 }
+
+	portUp NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "PortUp"
+		::= { traps 54 }
+
+	portDown NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "PortDown"
+		::= { traps 55 }
+
+	txFault NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "TxFault"
+		::= { traps 56 }
+
+	badPasswd NOTIFICATION-TYPE
+		OBJECTS { descr, slot }
+		STATUS current
+		DESCRIPTION "BadPasswd"
+		::= { traps 57 }
+
+	softwareUpdateReady NOTIFICATION-TYPE
+		OBJECTS { descr, slot }
+		STATUS current
+		DESCRIPTION "SoftwareUpdateReady"
+		::= { traps 58 }
+
+	hardwareTrap NOTIFICATION-TYPE
+		OBJECTS { descr, slot }
+		STATUS current
+		DESCRIPTION "HardwareTrap"
+		::= { traps 59 }
+
+	cdrAlarm NOTIFICATION-TYPE
+		OBJECTS { descr, slot }
+		STATUS current
+		DESCRIPTION "CDRAlarm"
+		::= { traps 60 }
+
+	protectionMain NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "ProtectionMain"
+		::= { traps 61 }
+
+	protectionBackup NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "ProtectionBackup"
+		::= { traps 62 }
+
+	optRxLevelWarning NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "OptRxLevelWarning"
+		::= { traps 63 }
+
+	optRxLevelAlarm NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "OptRxLevelAlarm"
+		::= { traps 64 }
+
+	optRxLevelOK NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current 
+		DESCRIPTION "OptRxLevelOK"
+		::= { traps 65 }
+
+	optTxLevelWarning NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "OptTxLevelWarning"
+		::= { traps 66 }
+
+	optTxLevelAlarm NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "OptTxLevelAlarm"
+		::= { traps 67 }
+
+	optTxLevelOK NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "OptTxLevelOK"
+		::= { traps 68 }
+
+	optTxBiasAlarm NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "TX Bias Alarm"
+		::= { traps 69 }
+
+	optTxBiasOK NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "TX Bias OK"
+		::= { traps 70 }
+
+	optRxPowerOverload NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "High optical input power Alarm"
+		::= { traps 71 }
+
+	configError NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION
+			"Configuration error. An set command or config file transfer was not successful."
+		::= { traps 72 }
+
+	configuration NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "Configuration file information"
+		::= { traps 73 }
+
+	maintenance NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "Maintennance Change"
+		::= { traps 74 }
+
+	ampFail NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "AMP error is occured"
+		::= { traps 75 }
+
+	ampOk NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "AMP error is cleared"
+		::= { traps 76 }
+
+	dwdmAlarm NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "DWDM transceiver alarm occured"
+		::= { traps 77 }
+
+	dwdmOk NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "DWDM transceiver alarm cleared"
+		::= { traps 78 }
+
+	firmwareError NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "firmware or kernel transfer or flashing error"
+		::= { traps 79 }
+
+	tuningError NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "transceiver tuning error"
+		::= { traps 80 }
+		
+	encryption NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "encryption error"
+		::= { traps 81 }
+		
+	emergencyShutdown NOTIFICATION-TYPE
+		OBJECTS { descr, slot }
+		STATUS current
+		DESCRIPTION "Carrier Emergency Shutdown"
+		::= { traps 82 }	
+		
+	unspecified NOTIFICATION-TYPE
+		OBJECTS { descr, slot, port }
+		STATUS current
+		DESCRIPTION "Unspecified"
+		::= { traps 255 }
+
+END

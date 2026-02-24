@@ -73,7 +73,7 @@ if (! empty($entity_oids)) {
         if ($entry['entPhySensorType'] == 'other' && Str::contains($entity_array[$index]['entPhysicalName'], ['Rx Power Sensor', 'Tx Power Sensor'])) {
             $entitysensor['other'] = 'dbm';
         }
-        if (isset($entitysensor[$entry['entPhySensorType']]) && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
+        if (isset($entitysensor[$entry['entPhySensorType']]) && isset($entry['entPhySensorValue']) && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
             $entPhysicalIndex = $index;
             $oid = '.1.3.6.1.2.1.99.1.1.1.4.' . $index;
             $current = $entry['entPhySensorValue'];
@@ -85,8 +85,8 @@ if (! empty($entity_oids)) {
                     $card = $card[0] . $card[1] . '00';
                 }
                 $descr = ucwords($entity_array[$card]['entPhysicalName'] ?? '') . ' ' . ucwords($entity_array[$index]['entPhysicalDescr'] ?? '');
-            } elseif ($device['os'] === 'xos' && str_starts_with($entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier'], 'mib-2.2.2.1.1.')) {
-                $xof_ifindex = explode('.', $entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier']);
+            } elseif ($device['os'] === 'xos' && str_starts_with((string) $entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier'], 'mib-2.2.2.1.1.')) {
+                $xof_ifindex = explode('.', (string) $entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier']);
                 $xos_ifindex = end($xof_ifindex);
                 $xos_portname = $xos_ifname[$xos_ifindex]['ifName'];
                 $descr = ucwords($xos_portname . ' ' . str_replace(' Sensor', '', $entity_array[$index]['entPhysicalDescr']));
@@ -99,17 +99,17 @@ if (! empty($entity_oids)) {
                 // Better sensor names for Arista EOS. Remove some redundancy and improve them so they reflect to which unit they belong.
                 if ($device['os'] === 'arista_eos') {
                     $descr = $entity_array[$index]['entPhysicalDescr'];
-                    if (preg_match('/(Input|Output) (voltage|current) sensor/i', $descr) || Str::startsWith($descr, 'Power supply') || preg_match('/^(Power Supply|Hotspot|Inlet|Board)/i', $descr)) {
+                    if (preg_match('/(Input|Output) (voltage|current) sensor/i', (string) $descr) || Str::startsWith($descr, 'Power supply') || preg_match('/^(Power Supply|Hotspot|Inlet|Board)/i', (string) $descr)) {
                         $descr = ucwords($entity_array[substr_replace($index, '000', -3)]['entPhysicalDescr'] ?? '')
                                  . ' '
                                  . preg_replace(
                                      '/(Voltage|Current|Power Supply) Sensor$/i',
                                      '',
-                                     ucwords($entity_array[$index]['entPhysicalDescr'])
+                                     ucwords((string) $entity_array[$index]['entPhysicalDescr'])
                                  );
                     }
-                    if (preg_match('/(temp|temperature) sensor$/i', $descr)) {
-                        $descr = preg_replace('/(temp|temperature) sensor$/i', '', $descr);
+                    if (preg_match('/(temp|temperature) sensor$/i', (string) $descr)) {
+                        $descr = preg_replace('/(temp|temperature) sensor$/i', '', (string) $descr);
                     }
                 }
                 // End better sensor names for Arista EOS.
@@ -141,14 +141,14 @@ if (! empty($entity_oids)) {
                 if ($current > '200') {
                     $valid_sensor = false;
                 }
-                $descr = preg_replace('/[T|t]emperature[|s]/', '', $descr);
+                $descr = preg_replace('/[T|t]emperature[|s]/', '', (string) $descr);
             }
 
             // Fix for FortiSwitch - ALL FortiSwitches as of 14/2/2024 output fan speeds as percentages while entPhySensorType is RPM.
             if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'rpm') {
                 $type = 'percent';
                 $divisor = 1;
-                $current = $current * 10;
+                $current *= 10;
             }
 
             if ($device['os'] == 'rittal-lcp') {
@@ -179,7 +179,7 @@ if (! empty($entity_oids)) {
 
             if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", [$device['device_id'], $type, $index]) == '0') {
                 // Check to make sure we've not already seen this sensor via cisco's entity sensor mib
-                if ($type == 'power' && $device['os'] == 'arista_eos' && preg_match('/DOM (R|T)x Power/i', $descr)) {
+                if ($type == 'power' && $device['os'] == 'arista_eos' && preg_match('/DOM (R|T)x Power/i', (string) $descr)) {
                     $type = 'dbm';
                     $current = round(10 * log10($entry['entPhySensorValue'] / 10000), 3);
                     $multiplier = 1;
@@ -221,20 +221,20 @@ if (! empty($entity_oids)) {
                     }
                     // Grouping sensors
                     $group = null;
-                    if (preg_match('/DOM /i', $descr)) {
+                    if (preg_match('/DOM /i', (string) $descr)) {
                         $group = 'SFPs';
-                    } elseif (preg_match('/PwrCon/', $descr)) {
-                        $string = explode(' ', $descr);
+                    } elseif (preg_match('/PwrCon/', (string) $descr)) {
+                        $string = explode(' ', (string) $descr);
                         if (preg_match('/PwrCon[0-9]/', $string[0])) {
                             $group = $string[0];
                         } else {
                             $group = preg_replace('/PwrCon/i', '', $string[0]);
                         }
-                        $descr = preg_replace('/^.*?(PwrCon)[0-9]*/i', '', $descr);
-                    } elseif (preg_match('/^(Trident.*|Jericho[0-9]|FM6000)/i', $descr)) {
+                        $descr = preg_replace('/^.*?(PwrCon)[0-9]*/i', '', (string) $descr);
+                    } elseif (preg_match('/^(Trident.*|Jericho[0-9]|FM6000)/i', (string) $descr)) {
                         // I only know replies for Trident|Jericho|FM6000 platform. If you have another please add to the preg_match
                         $group = 'Platform';
-                    } elseif (preg_match('/^(Power|PSU)/i', $descr)) {
+                    } elseif (preg_match('/^(Power|PSU)/i', (string) $descr)) {
                         $group = 'PSUs';
                     } else {
                         $group = 'System';
@@ -242,7 +242,7 @@ if (! empty($entity_oids)) {
                     }
                     // End grouping sensors
                 }
-                $descr = trim($descr);
+                $descr = trim((string) $descr);
                 discover_sensor(null, $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
             }
         }//end if

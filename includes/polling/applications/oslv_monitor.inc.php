@@ -163,7 +163,7 @@ if (isset($data['has']) && is_array($data['has'])) {
 
 // process total stats, .data.totals
 if (isset($data['totals']) && is_array($data['totals'])) {
-    foreach ($stat_vars as $key => $stat) {
+    foreach ($stat_vars as $stat) {
         if (isset($data['totals'][$stat])) {
             $var_name = 'totals_' . $stat;
             $value = $data['totals'][$stat];
@@ -190,7 +190,7 @@ if (isset($data['oslvms']) && is_array($data['oslvms'])) {
         $metrics['running_' . $oslvms_key] = 1;
 
         $oslvms[] = $oslvms_key;
-        foreach ($stat_vars as $key => $stat) {
+        foreach ($stat_vars as $stat) {
             if (isset($oslvms_stats[$stat])) {
                 $var_name = 'oslvm___' . $oslvms_key . '___' . $stat;
                 $value = $oslvms_stats[$stat];

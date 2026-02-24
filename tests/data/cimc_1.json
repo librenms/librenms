@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "cimc",
-                    "type": "server",
+                    "type": "management",
                     "serial": "WMP2224X0KR",
                     "icon": "cisco.svg"
                 }

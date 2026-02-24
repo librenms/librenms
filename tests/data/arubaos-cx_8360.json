@@ -15512,9 +15512,9 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 70.875,
-                    "sensor_limit": 90.875,
+                    "sensor_limit": 73.625,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 60.875,
+                    "sensor_limit_low": 44.125,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -15537,9 +15537,9 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 34.5,
-                    "sensor_limit": 54.5,
+                    "sensor_limit": 35.5,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24.5,
+                    "sensor_limit_low": 22,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -15562,9 +15562,9 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 27,
-                    "sensor_limit": 47,
+                    "sensor_limit": 28,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 17,
+                    "sensor_limit_low": 22,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -15587,9 +15587,9 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 65.687,
-                    "sensor_limit": 85.687,
+                    "sensor_limit": 68.562,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 55.687,
+                    "sensor_limit_low": 34.187,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -15612,9 +15612,9 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 41.625,
-                    "sensor_limit": 61.625,
+                    "sensor_limit": 44.75,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 31.625,
+                    "sensor_limit_low": 34.5,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -15637,9 +15637,9 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 38,
-                    "sensor_limit": 58,
+                    "sensor_limit": 41,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 28,
+                    "sensor_limit_low": 32,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -15662,9 +15662,9 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 38,
-                    "sensor_limit": 58,
+                    "sensor_limit": 39,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 28,
+                    "sensor_limit_low": 30,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -15687,9 +15687,9 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 38,
-                    "sensor_limit": 58,
+                    "sensor_limit": 39,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 28,
+                    "sensor_limit_low": 32,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -15712,9 +15712,9 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 38,
-                    "sensor_limit": 58,
+                    "sensor_limit": 40,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 28,
+                    "sensor_limit_low": 32,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -15737,9 +15737,9 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 39,
-                    "sensor_limit": 59,
+                    "sensor_limit": 40,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 29,
+                    "sensor_limit_low": 32,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -15762,9 +15762,9 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 34.25,
-                    "sensor_limit": 54.25,
+                    "sensor_limit": 34.5,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 24.25,
+                    "sensor_limit_low": 25.25,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -15787,9 +15787,9 @@
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 19.537,
-                    "sensor_limit": 39.537,
+                    "sensor_limit": 20.287,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 9.537,
+                    "sensor_limit_low": 16.6,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -15878,6 +15878,48 @@
                     "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 3
+                },
+                {
+                    "state_name": "arubaWiredPowerSupplyTable",
+                    "state_descr": "Empty",
+                    "state_draw_graph": 1,
+                    "state_value": 12,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "arubaWiredPowerSupplyTable",
+                    "state_descr": "Fault Airflow",
+                    "state_draw_graph": 1,
+                    "state_value": 13,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "arubaWiredPowerSupplyTable",
+                    "state_descr": "Fault Redundancy",
+                    "state_draw_graph": 1,
+                    "state_value": 14,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "arubaWiredPowerSupplyTable",
+                    "state_descr": "Fault Mixed Input",
+                    "state_draw_graph": 1,
+                    "state_value": 15,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "arubaWiredPowerSupplyTable",
+                    "state_descr": "Over Voltage",
+                    "state_draw_graph": 1,
+                    "state_value": 16,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "arubaWiredPowerSupplyTable",
+                    "state_descr": "Under Voltage",
+                    "state_draw_graph": 1,
+                    "state_value": 17,
+                    "state_generic_value": 2
                 },
                 {
                     "state_name": "arubaWiredVsxIslOperState",
@@ -16346,6 +16388,55 @@
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 33554432
+                }
+            ]
+        }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 196608,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 9
+                },
+                {
+                    "hrDeviceIndex": 196609,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 8
+                },
+                {
+                    "hrDeviceIndex": 196610,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 6
+                },
+                {
+                    "hrDeviceIndex": 196611,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 8
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "ec:67:94:50:4d:00",
+                    "ipv6_address": "fe80:0000:0000:0000:ec67:9483:f650:4d00",
+                    "context_name": ""
                 }
             ]
         }

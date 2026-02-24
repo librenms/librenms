@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
-class MplsLsp extends Model implements Keyable
+class MplsLsp extends DeviceRelatedModel implements Keyable
 {
     protected $primaryKey = 'lsp_id';
     public $timestamps = false;
@@ -38,20 +38,24 @@ class MplsLsp extends Model implements Keyable
 
     /**
      * Get a string that can identify a unique instance of this model
-     *
-     * @return string
      */
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->vrf_oid . '-' . $this->lsp_oid;
     }
 
     // ---- Define Relationships ----
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MplsLspPath, $this>
+     * @return HasMany<MplsLspPath, $this>
      */
     public function paths(): HasMany
     {
         return $this->hasMany(MplsLspPath::class, 'lsp_id');
+    }
+
+    public function vrf(): BelongsTo
+    {
+        return $this->belongsTo(Vrf::class, 'vrf_oid', 'vrf_oid')
+            ->whereColumn('mpls_lsps.device_id', 'vrfs.device_id');
     }
 }

@@ -70,7 +70,7 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, VlanDiscovery,
 
         // Is this a 5500 series or 5600 series stack?
         $stack = snmp_walk($this->getDeviceArray(), '.1.3.6.1.4.1.45.1.6.3.3.1.1.6.8', '-OsqnU');
-        $stack = explode("\n", $stack);
+        $stack = explode("\n", (string) $stack);
         $stack_size = count($stack);
         if ($stack_size > 1) {
             $device->features = "Stack of $stack_size units";
@@ -113,13 +113,11 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, VlanDiscovery,
         }
 
         return SnmpQuery::walk('RC-VLAN-MIB::rcVlanName')
-            ->mapTable(function ($vlan, $vlan_id) {
-                return new Vlan([
-                    'vlan_vlan' => $vlan_id,
-                    'vlan_name' => $vlan['RC-VLAN-MIB::rcVlanName'] ?? '',
-                    'vlan_domain' => 1,
-                ]);
-            });
+            ->mapTable(fn ($vlan, $vlan_id) => new Vlan([
+                'vlan_vlan' => $vlan_id,
+                'vlan_name' => $vlan['RC-VLAN-MIB::rcVlanName'] ?? '',
+                'vlan_domain' => 1,
+            ]));
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection

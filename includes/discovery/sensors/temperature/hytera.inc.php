@@ -8,7 +8,7 @@ if ($oids !== false) {
 $divisor = 1;
 $type = 'hytera';
 
-foreach (explode("\n", $oids) as $data) {
+foreach (explode("\n", (string) $oids) as $data) {
     $data = trim($data);
     if ($data) {
         [$oid,$descr] = explode(' ', $data, 2);

@@ -75,7 +75,7 @@ if ($device['os'] == 'netscaler') {
 
     d_echo($vsvrs);
 
-    foreach ($vsvr_array as $index => $vsvr) {
+    foreach ($vsvr_array as $vsvr) {
         if (isset($vsvr['vsvrFullName'])) {
             $vsvr_exist[$vsvr['vsvrFullName']] = 1;
             $rrd_name = 'netscaler-vsvr-' . $vsvr['vsvrFullName'];
@@ -86,7 +86,7 @@ if ($device['os'] == 'netscaler') {
                 if (is_numeric($vsvr[$oid])) {
                     $fields[$oid_ds] = $vsvr[$oid];
                 } else {
-                    $fields[$oid_ds] = 'U';
+                    $fields[$oid_ds] = null;
                 }
             }
 
@@ -97,8 +97,8 @@ if ($device['os'] == 'netscaler') {
             ];
             app('Datastore')->put($device, 'netscaler-vsvr', $tags, $fields);
 
-            echo str_pad($vsvr['vsvrFullName'], 25) . ' | ' . str_pad($vsvr['vsvrType'], 5) . ' | ' . str_pad($vsvr['vsvrState'], 6) . ' | ' . str_pad($vsvr['vsvrIpAddress'], 16) . ' | ' . str_pad($vsvr['vsvrPort'], 5);
-            echo ' | ' . str_pad($vsvr['vsvrRequestRate'], 8) . ' | ' . str_pad($vsvr['vsvrRxBytesRate'] . 'B/s', 8) . ' | ' . str_pad($vsvr['vsvrTxBytesRate'] . 'B/s', 8);
+            echo str_pad($vsvr['vsvrFullName'], 25) . ' | ' . str_pad((string) $vsvr['vsvrType'], 5) . ' | ' . str_pad((string) $vsvr['vsvrState'], 6) . ' | ' . str_pad((string) $vsvr['vsvrIpAddress'], 16) . ' | ' . str_pad((string) $vsvr['vsvrPort'], 5);
+            echo ' | ' . str_pad((string) $vsvr['vsvrRequestRate'], 8) . ' | ' . str_pad($vsvr['vsvrRxBytesRate'] . 'B/s', 8) . ' | ' . str_pad($vsvr['vsvrTxBytesRate'] . 'B/s', 8);
 
             $db_update = [
                 'vsvr_ip' => $vsvr['vsvrIpAddress'],

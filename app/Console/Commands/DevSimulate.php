@@ -119,12 +119,12 @@ class DevSimulate extends LnmsCommand
     private function queueRemoval($device_id): void
     {
         if (function_exists('pcntl_signal')) {
-            pcntl_signal(SIGINT, function () {
+            pcntl_signal(SIGINT, function (): void {
                 exit; // exit normally on SIGINT
             });
         }
 
-        register_shutdown_function(function () use ($device_id) {
+        register_shutdown_function(function () use ($device_id): void {
             Device::findOrNew($device_id)->delete();
             $this->info(trans('commands.dev:simulate.removed', ['id' => $device_id]));
             exit;
@@ -134,11 +134,7 @@ class DevSimulate extends LnmsCommand
     public function completeArgument($name, $value)
     {
         if ($name == 'file') {
-            return collect(glob(base_path('tests/snmpsim/*.snmprec')))->map(function ($file) {
-                return basename($file, '.snmprec');
-            })->filter(function ($snmprec) use ($value) {
-                return ! $value || Str::startsWith($snmprec, $value);
-            })->all();
+            return collect(glob(base_path('tests/snmpsim/*.snmprec')))->map(fn ($file) => basename($file, '.snmprec'))->filter(fn ($snmprec) => ! $value || Str::startsWith($snmprec, $value))->all();
         }
 
         return false;

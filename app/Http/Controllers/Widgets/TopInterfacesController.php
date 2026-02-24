@@ -50,7 +50,7 @@ class TopInterfacesController extends WidgetController
     {
         $data = $this->getSettings();
 
-        $query = Port::hasAccess($request->user())->with(['device' => function ($query) {
+        $query = Port::hasAccess($request->user())->with(['device' => function ($query): void {
             $query->select('device_id', 'hostname', 'sysName', 'status', 'os', 'display');
         }])
             ->isValid()
@@ -58,14 +58,8 @@ class TopInterfacesController extends WidgetController
             ->groupBy('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
             ->where('poll_time', '>', Carbon::now()->subMinutes($data['time_interval'])->timestamp)
             ->isUp()
-            ->when($data['device_group'], function ($query) use ($data) {
-                return $query->inDeviceGroup($data['device_group']);
-            }, function ($query) {
-                return $query->has('device');
-            })
-            ->when($data['port_group'], function ($query) use ($data) {
-                return $query->inPortGroup($data['port_group']);
-            })
+            ->when($data['device_group'], fn ($query) => $query->inDeviceGroup($data['device_group']), fn ($query) => $query->has('device'))
+            ->when($data['port_group'], fn ($query) => $query->inPortGroup($data['port_group']))
             ->orderByRaw('SUM(LEAST(ifInOctets_rate, 9223372036854775807) + LEAST(ifOutOctets_rate, 9223372036854775807)) DESC')
             ->limit($data['interface_count']);
 

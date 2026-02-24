@@ -23,7 +23,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
             $rds = snmp_walk($device, 'mplsVpnVrfRouteDistinguisher', '-Osqn', 'MPLS-VPN-MIB', null);
 
             // Cisco Catalyst C800 Routers does not correct answer on SNMP OID 'mplsVpnVrfRouteDistinguisher'
-            if ((empty($rds) || (substr($device['hardware'], 0, 2) == 'C8' && $device['os'] == 'ios')) && $device['os_group'] == 'cisco') {
+            if ((empty($rds) || (str_starts_with((string) $device['hardware'], 'C8') && $device['os'] == 'ios')) && $device['os_group'] == 'cisco') {
                 // Use CISCO-VRF-MIB if others don't work
                 $rds = snmp_walk($device, 'cvVrfName', '-Osqn', 'CISCO-VRF-MIB', null);
                 $rds = str_replace('.1.3.6.1.4.1.9.9.711.1.1.1.1.2.', '', $rds);
@@ -133,9 +133,9 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                 echo "\n  [VRF $vrf_name] DESC  - " . ($descr_table[$vrf_oid] ?? null);
 
                 if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
-                    dbUpdate(['vrf_name' => $vrf_name, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? null, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
+                    dbUpdate(['vrf_name' => $vrf_name, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? '', 'mplsVpnVrfRouteDistinguisher' => $vrf_rd], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
                 } else {
-                    dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? null, 'device_id' => $device['device_id']], 'vrfs');
+                    dbInsert(['vrf_oid' => $vrf_oid, 'vrf_name' => $vrf_name, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => $descr_table[$vrf_oid] ?? '', 'device_id' => $device['device_id']], 'vrfs');
                 }
 
                 $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
@@ -145,6 +145,12 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                 if (isset($port_table[$vrf_oid])) {
                     foreach ($port_table[$vrf_oid] as $if_id) {
                         $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_id]);
+                        if (! $interface) {
+                            echo "Interface $if_id not found for $vrf_name\n";
+
+                            continue;
+                        }
+
                         echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
                         dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                         $if = $interface['port_id'];
@@ -239,7 +245,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
             ];
 
             if (dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid])) {
-                dbUpdate(['vrf_name' => $vrf_name, 'bgpLocalAs' => $vrf_as, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => null], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
+                dbUpdate(['vrf_name' => $vrf_name, 'bgpLocalAs' => $vrf_as, 'mplsVpnVrfRouteDistinguisher' => $vrf_rd, 'mplsVpnVrfDescription' => ''], 'vrfs', 'device_id=? AND vrf_oid=?', [$device['device_id'], $vrf_oid]);
             } else {
                 dbInsert($vrfs, 'vrfs');
             }
@@ -256,7 +262,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                 dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                 $if = $interface['port_id'];
                 $valid_vrf_if[$vrf_id][$if] = 1;
-            } catch (Exception $e) {
+            } catch (Exception) {
                 continue;
             }
         }

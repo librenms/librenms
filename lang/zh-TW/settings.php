@@ -796,9 +796,6 @@ return [
             'description' => '調整所有 rrd 連接埠檔案使用最大值',
             'help' => '自動調整 rrd 連接埠檔案的最大值',
         ],
-        'sfdp' => [
-            'description' => 'sfdp 路徑',
-        ],
         'shorthost_target_length' => [
             'description' => 'Shortened hostname maximum length',
             'help' => 'Shrinks hostname to maximum length, but always complete subdomain parts',

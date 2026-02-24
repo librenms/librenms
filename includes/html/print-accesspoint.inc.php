@@ -5,7 +5,7 @@ use App\Facades\LibrenmsConfig;
 if ($int_colour) {
     $row_colour = $int_colour;
 } else {
-    if (! is_integer($i / 2)) {
+    if (! is_int($i / 2)) {
         $row_colour = LibrenmsConfig::get('list_colour.even');
     } else {
         $row_colour = LibrenmsConfig::get('list_colour.odd');

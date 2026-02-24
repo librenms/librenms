@@ -28,13 +28,14 @@ namespace LibreNMS\Polling;
 
 use App\Models\Device;
 
-class ModuleStatus
+class ModuleStatus implements \Stringable
 {
     public function __construct(
         public ?bool $global,
         public ?bool $os = null,
         public ?bool $device = null,
         public ?bool $manual = null,
+        public ?array $submodules = null,
     ) {
     }
 
@@ -83,6 +84,11 @@ class ModuleStatus
         }
 
         return $this->isEnabled() && $device->status;
+    }
+
+    public function hasSubModules(): bool
+    {
+        return ! empty($this->submodules);
     }
 
     public function __toString(): string

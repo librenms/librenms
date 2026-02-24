@@ -1,0 +1,80 @@
+modules:
+    os:
+        hardware: .1.3.6.1.2.1.1.1.0
+        hardware_regex: '/(?<hardware>\w*\s\w*)\s(?<version>\S*)\s.*/'
+        version: .1.3.6.1.2.1.1.1.0
+        version_regex: '/(?<hardware>\w*\s\w*)\s(?<version>\S*)\s.*/'
+    sensors:
+        state:
+            data:
+                -
+                    oid: ALPHACOM-MIB::nodeState
+                    value: ALPHACOM-MIB::nodeState
+                    num_oid: '.1.3.6.1.4.1.26122.1.1.1.{{ $index }}'
+                    descr: 'Node State'
+                    index: 'nodeState.{{ $index }}'
+                    states:
+                        - { descr: 'Disabled', graph: 1, value: 0, generic: 2 }
+                        - { descr: 'Enabled', graph: 1, value: 1, generic: 0 }
+
+        runtime:
+            data:
+                -
+                    oid: ALPHACOM-MIB::rtpStatisticsTable
+                    value: ALPHACOM-MIB::rtpStreamTime
+                    num_oid: '.1.3.6.1.4.1.26122.1.2.1.1.4.{{ $index }}'
+                    descr: 'RTP Stream Time'
+                    index: 'rtpStreamTime.{{ $index }}'
+                    divisor: 60
+                    group: 'RTP Stream {{ $index }}'
+        count:
+            data:
+                -
+                    oid: ALPHACOM-MIB::rtpStatisticsTable
+                    value: ALPHACOM-MIB::rtpConnectons
+                    num_oid: '.1.3.6.1.4.1.26122.1.2.1.1.5.{{ $index }}'
+                    descr: 'Number of Connections'
+                    index: 'rtpConnectons.{{ $index }}'
+                    group: 'RTP Stream {{ $index }}'
+                -
+                    oid: ALPHACOM-MIB::rtpStatisticsTable
+                    value: ALPHACOM-MIB::rtpTxPackets
+                    num_oid: '.1.3.6.1.4.1.26122.1.2.1.1.6.{{ $index }}'
+                    descr: 'Tx Packets'
+                    index: 'rtpTxPackets.{{ $index }}'
+                    group: 'RTP Stream {{ $index }}'
+                -
+                    oid: ALPHACOM-MIB::rtpStatisticsTable
+                    value: ALPHACOM-MIB::rtpRxPackets
+                    num_oid: '.1.3.6.1.4.1.26122.1.2.1.1.7.{{ $index }}'
+                    descr: 'Rx Packets'
+                    index: 'rtpRxPackets.{{ $index }}'
+                    group: 'RTP Stream {{ $index }}'
+                -
+                    oid: ALPHACOM-MIB::rtpStatisticsTable
+                    value: ALPHACOM-MIB::rtpRxLate
+                    num_oid: '.1.3.6.1.4.1.26122.1.2.1.1.8.{{ $index }}'
+                    descr: 'Rx Late Packets'
+                    index: 'rtpRxLate.{{ $index }}'
+                    group: 'RTP Stream {{ $index }}'
+                -
+                    oid: ALPHACOM-MIB::rtpStatisticsTable
+                    value: ALPHACOM-MIB::rtpRxLost
+                    num_oid: '.1.3.6.1.4.1.26122.1.2.1.1.9.{{ $index }}'
+                    descr: 'Rx Lost Packets'
+                    index: 'rtpRxLost.{{ $index }}'
+                    group: 'RTP Stream {{ $index }}'
+                -
+                    oid: ALPHACOM-MIB::rtpStatisticsTable
+                    value: ALPHACOM-MIB::rtpJitter
+                    num_oid: '.1.3.6.1.4.1.26122.1.2.1.1.10.{{ $index }}'
+                    descr: 'Average Jitter in ms'
+                    index: 'rtpJitter.{{ $index }}'
+                    group: 'RTP Stream {{ $index }}'
+                -
+                    oid: ALPHACOM-MIB::rtpStatisticsTable
+                    value: ALPHACOM-MIB::rtpDelay
+                    num_oid: '.1.3.6.1.4.1.26122.1.2.1.1.11.{{ $index }}'
+                    descr: 'Average Delay in ms'
+                    index: 'rtpDelay.{{ $index }}'
+                    group: 'RTP Stream {{ $index }}'

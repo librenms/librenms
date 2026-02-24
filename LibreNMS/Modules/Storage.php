@@ -124,12 +124,12 @@ class Storage implements Module
 
         $data = \SnmpQuery::numeric()->get($oids)->values();
 
-        return $storages->each(function (\App\Models\Storage $storage) use ($data) {
+        return $storages->each(function (\App\Models\Storage $storage) use ($data): void {
             $storage->fillUsage(
-                $data[$storage->storage_used_oid] ?? null,
+                $data[(string) $storage->storage_used_oid] ?? null,
                 $storage->storage_units ? $storage->storage_size / $storage->storage_units : null,
-                $data[$storage->storage_free_oid] ?? null,
-                $data[$storage->storage_perc_oid] ?? null,
+                $data[(string) $storage->storage_free_oid] ?? null,
+                $data[(string) $storage->storage_perc_oid] ?? null,
             );
         });
     }

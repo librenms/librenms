@@ -25,30 +25,13 @@ function bulk_sensor_snmpget($device, $sensors)
     $sensors = array_chunk($sensors, $oid_per_pdu);
     $cache = [];
     foreach ($sensors as $chunk) {
-        $oids = array_map(function ($data) {
-            return $data['sensor_oid'];
-        }, $chunk);
+        $oids = array_map(fn ($data) => $data['sensor_oid'], $chunk);
         $oids = implode(' ', $oids);
         $multi_response = snmp_get_multi_oid($device, $oids, '-OUQntea');
         $cache = array_merge($cache, $multi_response);
     }
 
     return $cache;
-}
-
-/**
- * @param  $device
- * @param  string  $type  type/class of sensor
- * @return array
- */
-function sensor_precache($device, $type)
-{
-    $sensor_cache = [];
-    if (file_exists(LibrenmsConfig::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php')) {
-        include LibrenmsConfig::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php';
-    }
-
-    return $sensor_cache;
 }
 
 function poll_sensor($device, $class)
@@ -68,8 +51,6 @@ function poll_sensor($device, $class)
     }
 
     $snmp_data = bulk_sensor_snmpget($device, $sensors);
-
-    $sensor_cache = sensor_precache($device, $class);
 
     foreach ($sensors as $sensor) {
         Log::info('Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... ');
@@ -100,7 +81,10 @@ function poll_sensor($device, $class)
                     }
                 }
             }//end if
-            unset($mib);
+            if (isset($mib)) {
+                // @phpstan-ignore unset.variable
+                unset($mib);
+            }
             unset($mibdir);
             $sensor['new_value'] = $sensor_value;
             $all_sensors[] = $sensor;
@@ -110,6 +94,7 @@ function poll_sensor($device, $class)
     foreach ($misc_sensors as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
             if (isset($agent_sensors)) {
+                // @phpstan-ignore variable.undefined
                 $sensor_value = $agent_sensors[$class][$sensor['sensor_type']][$sensor['sensor_index']]['current'];
                 $sensor['new_value'] = $sensor_value;
                 $all_sensors[] = $sensor;
@@ -147,11 +132,11 @@ function record_sensor_data($device, $all_sensors)
         }
 
         if ($sensor['sensor_divisor'] && $sensor_value !== 0) {
-            $sensor_value = ($sensor_value / $sensor['sensor_divisor']);
+            $sensor_value /= $sensor['sensor_divisor'];
         }
 
         if ($sensor['sensor_multiplier']) {
-            $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
+            $sensor_value *= $sensor['sensor_multiplier'];
         }
 
         if (isset($sensor['user_func'])) {

@@ -5,7 +5,7 @@ if (Auth::user()->hasGlobalRead()) {
         if (Auth::user()->hasGlobalAdmin()) {
             $updated = '1';
 
-            $service_id = add_service($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], $vars['ignore'], $vars['disabled'], 0, $vars['name']);
+            $service_id = add_service($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], $vars['ignore'] ?? 0, $vars['disabled'] ?? 0, 0, strip_tags((string) $vars['name']));
             if ($service_id) {
                 $message .= $message_break . 'Service added (' . $service_id . ')!';
                 $message_break .= '<br />';
@@ -15,7 +15,7 @@ if (Auth::user()->hasGlobalRead()) {
 
     // Build the types list.
     foreach (scandir(\App\Facades\LibrenmsConfig::get('nagios_plugins')) as $file) {
-        if (substr($file, 0, 6) === 'check_') {
+        if (str_starts_with($file, 'check_')) {
             $check_name = substr($file, 6);
             $servicesform .= "<option value='$check_name'>$check_name</option>";
         }

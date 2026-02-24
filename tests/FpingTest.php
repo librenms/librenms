@@ -31,7 +31,7 @@ use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use Symfony\Component\Process\Process;
 
-class FpingTest extends TestCase
+final class FpingTest extends TestCase
 {
     public function testUpPing(): void
     {
@@ -121,9 +121,7 @@ OUT;
         $process->shouldReceive('getErrorOutput')->andReturn($output);
         $process->shouldReceive('getExitCode')->andReturn($exitCode);
 
-        $this->app->bind(Process::class, function ($app, $params) use ($process) {
-            return $process;
-        });
+        $this->app->bind(Process::class, fn ($app, $params) => $process);
 
         return $process;
     }
@@ -152,13 +150,11 @@ OUT;
             return true;
         });
 
-        $this->app->bind(Process::class, function ($app, $params) use ($process) {
-            return $process;
-        });
+        $this->app->bind(Process::class, fn ($app, $params) => $process);
 
         // make call
         $calls = 0;
-        app()->make(Fping::class)->bulkPing($hosts, function (FpingResponse $response) use ($expected, &$calls) {
+        app()->make(Fping::class)->bulkPing($hosts, function (FpingResponse $response) use ($expected, &$calls): void {
             $calls++;
 
             $this->assertArrayHasKey($response->host, $expected);

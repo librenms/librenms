@@ -35,9 +35,17 @@ class Ipv4Mac extends PortRelatedModel implements Keyable
         return $this->belongsTo(Port::class, 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Ipv4Address, $this>
+     */
+    public function ipv4Address(): BelongsTo
+    {
+        return $this->belongsTo(Ipv4Address::class, 'ipv4_address', 'ipv4_address');
+    }
+
     // Ports in NMS with a matching MAC address and IP address.
     // This can match multiple ports if you have multiple sub-interfaces with the same
-    // IP address (e.g. different VRFs, or mutiple point to point links on Mikrotik)
+    // IP address (e.g. different VRFs, or multiple point to point links on Mikrotik)
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\Port, Ipv4Mac, $this>
      */
@@ -45,7 +53,7 @@ class Ipv4Mac extends PortRelatedModel implements Keyable
     {
         // Join onto this class first because we need both the mac_address and ipv4_address columns
         return $this->hasManyThrough(Port::class, Ipv4Mac::class, 'id', 'ifPhysAddress', 'id', 'mac_address')
-            ->join('ipv4_addresses', function ($j) {
+            ->join('ipv4_addresses', function ($j): void {
                 $j->on('ipv4_mac.ipv4_address', 'ipv4_addresses.ipv4_address');
                 $j->on('ports.port_id', 'ipv4_addresses.port_id');
             })

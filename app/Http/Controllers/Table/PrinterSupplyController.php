@@ -30,6 +30,7 @@ class PrinterSupplyController extends TableController
     {
         return [
             'hostname',
+            'display',
             'supply_descr',
             'supply_type',
         ];
@@ -43,7 +44,7 @@ class PrinterSupplyController extends TableController
         return PrinterSupply::query()
             ->hasAccess($request->user())
             ->with('device')
-            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'printer_supplies.device_id'))
+            ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'printer_supplies.device_id'))
             ->withAggregate('device', 'hostname');
     }
 
@@ -83,7 +84,7 @@ class PrinterSupplyController extends TableController
         $colors = Color::percentage(100 - $percent); // supply, not usage
         $right = $supply->supply_capacity == 100 ? '' : $supply->supply_capacity;
 
-        $bar = Html::percentageBar(400, 20, $percent, $supply->supply_current, $right, colors: $colors);
+        $bar = Html::percentageBar(400, 10, $percent, $supply->supply_current, $right, colors: $colors);
 
         return [
             'device_hostname' => $hostname,

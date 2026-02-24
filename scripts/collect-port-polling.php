@@ -2,6 +2,7 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
@@ -35,23 +36,25 @@ if (isset($options['help'])) {
     exit(0);
 }
 
-$where = '';
-$params = [];
+$devices = Device::query()->isActive()->orderBy('hostname', 'ASC');
 if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
-        $where = 'AND `device_id` = ?';
-        $params = [$options['h']];
+        $devices->where('device_id', $options['h']);
     } elseif (Str::contains($options['h'], ',')) {
-        $device_ids = array_map('trim', explode(',', $options['h']));
-        $device_ids = array_filter($device_ids, 'is_numeric');
-        $where = 'AND `device_id` in ' . dbGenPlaceholders(count($device_ids));
-        $params = $device_ids;
+        $device_ids = array_map(trim(...), explode(',', $options['h']));
+        $device_ids = array_filter($device_ids, is_numeric(...));
+        $devices->whereIn('device_id', $device_ids);
     } else {
-        $where = 'AND `hostname` LIKE ?';
-        $params = [str_replace('*', '%', $options['h'])];
+        $devices->where('hostname', 'like', str_replace('*', '%', $options['h']));
     }
 }
-$devices = dbFetchRows("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY `hostname` ASC", $params);
+
+$devices = $devices->withCount([
+    'ports',
+    'ports as inactive_count' => fn ($q) => $q->where('deleted', 1)->orWhere('ifAdminStatus', '!=', 'up')->orWhere('disabled', 1),
+]);
+
+$devices = $devices->get()->toArray();
 
 if (isset($options['e'])) {
     if (! is_numeric($options['e']) || $options['e'] < 0) {
@@ -95,14 +98,7 @@ echo PHP_EOL;
 $inactive_sql = "`deleted` = 1 OR `ifAdminStatus` != 'up' OR `disabled` = 1";
 $set_count = 0;
 foreach ($devices as &$device) {
-    $count = dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE `device_id`=?', [$device['device_id']]);
-    $inactive = dbFetchCell(
-        "SELECT COUNT(*) FROM `ports` WHERE `device_id`=? AND ($inactive_sql)",
-        [$device['device_id']]
-    );
-
-    $device['port_count'] = $count;
-    $device['inactive_ratio'] = ($inactive == 0 ? 0 : ($inactive / $count));
+    $device['inactive_ratio'] = ($device['inactive_count'] == 0 ? 0 : ($device['inactive_count'] / $device['ports_count']));
     $device['diff_sec'] = $device['selective_time_sec'] - $device['full_time_sec'];
     $device['diff_perc'] = Number::calculatePercent($device['diff_sec'], $device['full_time_sec']);
 
@@ -137,7 +133,7 @@ $stats = [
 
 echo PHP_EOL;
 $header = "| %9.9s | %-11.11s | %10.10s | %14.14s | %10.10s | %14.14s | %8.10s | %5.9s | %5.5s |\n";
-call_user_func_array('printf', array_merge([$header], $stats));
+call_user_func_array(printf(...), array_merge([$header], $stats));
 
 $mask = "| %9.9s | %-11.11s | %10.10s | %14.3f | %9.3fs | %13.3fs | %s%+7.3fs\e[0m | %s%+4.0f%%\e[0m | %5.5s |\n";
 foreach ($devices as $device) {

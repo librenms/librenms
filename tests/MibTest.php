@@ -38,7 +38,7 @@ use SplFileInfo;
 /**
  * Class MibTest
  */
-class MibTest extends TestCase
+final class MibTest extends TestCase
 {
     /**
      * Test mib file in a directory for errors

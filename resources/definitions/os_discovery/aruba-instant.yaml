@@ -1,7 +1,6 @@
-mib: AI-AP-MIB
 modules:
     mempools:
-        pre-cache:
+        additional_oids:
             oids:
                 - AI-AP-MIB::aiAPSerialNum
                 - AI-AP-MIB::aiAPName
@@ -14,30 +13,29 @@ modules:
     os:
         sysDescr_regex: '/\(MODEL: (?<hardware>\S+)\), Version (?<version>\S+)/'
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
-                        - aiAPName
-                        - aiAPSerialNum
-                    snmp_flags: '-OteQUsb'
+                        - AI-AP-MIB::aiAPName
+                        - AI-AP-MIB::aiAPSerialNum
         state:
             data:
                 -
-                    oid: aiAPStatus
+                    oid: AI-AP-MIB::aiAPStatus
+                    value: AI-AP-MIB::aiAPStatus
                     num_oid: '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.11.{{ $index }}'
-                    snmp_flags: '-OteQUsb'
-                    descr: '{{ $aiAPName }} ({{ $aiAPSerialNum }})'
+                    descr: '{{ AI-AP-MIB::aiAPName }} ({{ AI-AP-MIB::aiAPSerialNum }})'
                     group: 'Cluster APs'
                     state_name: aiAPStatus
                     states:
                           - { value:  1, generic: 0, graph: 0, descr: up }
                           - { value:  2, generic: 2, graph: 0, descr: down }
                 -
-                    oid: aiRadioStatus
+                    oid: AI-AP-MIB::aiRadioStatus
+                    value: AI-AP-MIB::aiRadioStatus
                     num_oid: '.1.3.6.1.4.1.14823.2.3.3.1.2.2.1.20.{{ $index }}'
-                    snmp_flags: '-OteQUsb'
-                    descr: '{{ $aiAPName:0-5 }} ({{ $aiAPSerialNum:0-5 }}) Radio {{ $subindex6 }}'
+                    descr: '{{ AI-AP-MIB::aiAPName:0-5 }} ({{ AI-AP-MIB::aiAPSerialNum:0-5 }}) Radio {{ $subindex6 }}'
                     group: 'Cluster Radios'
                     state_name: aiRadioStatus
                     states:

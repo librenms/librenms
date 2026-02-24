@@ -755,7 +755,7 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
 }
 
 // zero any rrds for existing packages
-foreach ($current_packages as $index => $current_package) {
+foreach ($current_packages as $current_package) {
     $pkg = str_replace('pkg-dropped_files___-___-', '', $current_package);
 
     if (! isset($found_packages[$current_package])) {

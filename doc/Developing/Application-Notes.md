@@ -75,7 +75,7 @@ When you call update_application() the `$app` model will be saved along with
 any changes to the data field.
 
 ```
-// set the varaible data to $foo
+// set the variable data to $foo
 $app->data = [
     'item_A' => 123,
     'item_B' => 4.5,

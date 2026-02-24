@@ -1,10 +1,10 @@
 --  ============================================================================
--- Copyright (C)2011  by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2019 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  The MIB module defines MIB objects which include Environment Monitor Unit,
 --				 Analog Environment data, Digital Environment data, Out data and
 --				 Fan data Monitor management MIB interfaces.
 -- Reference:  
--- Version: V3.53
+-- Version: V3.95
 -- ============================================================================
 
 	HUAWEI-ENVIRONMENT-MIB DEFINITIONS ::= BEGIN
@@ -13,7 +13,7 @@
 		
 			huaweiUtility			
 				FROM HUAWEI-MIB			
-			Integer32, BITS, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE			
+			Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE			
 				FROM SNMPv2-SMI			
 			DisplayString, RowStatus			
 				FROM SNMPv2-TC
@@ -22,8 +22,8 @@
 
 
 		hwEnvironment MODULE-IDENTITY
-			LAST-UPDATED "201306170900Z"
-			ORGANIZATION "Fix-Net DepT, Huawei Technologies Co.,Ltd."
+			LAST-UPDATED "201909250000Z"
+			ORGANIZATION "Huawei Technologies Co.,Ltd."
 			CONTACT-INFO                                 
 			             "Huawei Industrial Base         
 			              Bantian, Longgang              
@@ -39,6 +39,211 @@
 				"
 		
 --  Revision history
+            REVISION	"201909250000Z"
+            DESCRIPTION "V3.95, modified the value list of hwFailureCause."
+            
+            REVISION	"201812260000Z"
+            DESCRIPTION "V3.94, modified the value list of hwEnvEmuPower."
+			
+            REVISION	"201808220000Z"
+            DESCRIPTION "V3.93, add hwOpticalModuleAbsenceTrap"
+
+            REVISION    "201808160000Z" 
+            DESCRIPTION "V3.92, add the leaf of hwORCH0CurrentInputVoltage1, hwORCH0CurrentInputVoltage2, hwORCH1CurrentInputVoltage1, hwORCH1CurrentInputVoltage2, 
+                                hwOTCH0CurrentInputVoltage1, hwOTCH0CurrentInputVoltage2, hwOTCH1CurrentInputVoltage1, hwOTCH1CurrentInputVoltage2.
+                                add the leaf of hwOpticalDevType for the hwOpticalModuleEntry.
+                                add the object of hwOpticalDevType for the hwOpticalModuleTypeMismatchTrap.
+                                add the object of hwOpticalDevType for the hwOpticalModuleTypeMismatchRestoreTrap."
+								
+            REVISION    "201807250000Z" 
+            DESCRIPTION "V3.91, add hwORRFPowerChangeThreshold, hwORCHN0RFPowerReferenceValue, hwORCHN0RFPowerChangeValue.
+                                add hwORCHN1RFPowerReferenceValue, hwORCHN1RFPowerChangeValue."
+
+            REVISION    "201806070000Z" 
+            DESCRIPTION "V3.90, add hwORRFPowerRefValueTrap, hwORRFPowerChangeValueTrap, hwOpticalReceiverRfChangeFaultTrap."
+	    
+            REVISION    "201806050000Z" 
+            DESCRIPTION "V3.89, add the leaf of hwEmmDoorLockOpenLockTrap, add the parameter of hwUnlockMode, hwUnlockSN, hwUnlockTime"
+
+            REVISION    "201804110000Z" 
+            DESCRIPTION "V3.88, add the leaf of hwONCfgOpticalWorkMode, hwONRuninfoOpticalWorkMode, hwONSmartCapability.
+			                    add the leaf of hwOTCh0RuninfoOpticalLowPassFilter, hwOTCh1RuninfoOpticalLowPassFilter for the Optical transmitter.
+			                    modify the optical state in hwORCh0OnlineState, hwORCh1OnlineState, hwOTCh0OnlineState and hwOTCh1OnlineState leaf node."
+
+            REVISION    "201803200000Z" 
+	    	DESCRIPTION "V3.87, modified the description of hwElockRightRowStatus and hwElockRightExpireTime."
+
+            REVISION    "201802070000Z" 
+	    	DESCRIPTION "V3.86, add table hwSirenTable, hwElockTable, hwElockRightTable
+								add the leaf of hwEmmDoorLockCommFailTrap, hwEmmDoorLockCommRecoverTrap for door lock communication fial alarm .
+								add the leaf of hwEmmDoorLockAbnormalUnlockTrap, hwEmmDoorLockAbnormalUnlockRecoverTrap for door lock unlocked abnormally alarm "
+								
+            REVISION    "201801310000Z" 
+            DESCRIPTION "V3.85, add hwOpticalModuleTypeMismatchTrap and hwOpticalModuleTypeMismatchRestoreTrap.
+			                    add hwOpticalModuleTable, hwOpticalModuleEntry and hwOpticalModuleType. "
+            
+            REVISION    "201801160000Z" 
+            DESCRIPTION "V3.84, add the leaf of hwOTCH0RFAttValue, hwOTCH1RFAttValue for the Optical transmitter.
+			                    add hwORCh0OnlineState, hwORCh1OnlineState, hwOTCh0OnlineState, hwOTCh1OnlineState. "
+            
+            REVISION    "201801030000Z" 
+            DESCRIPTION "V3.83, add opticaltransmitter and dualchannelopticaltransmitter type in hwORType."
+			
+            REVISION    "201711270000Z" 
+            DESCRIPTION "V3.82, add the leaf of hwOTCfgOpticalWorkMode, hwOTRuninfoOpticalWorkMode for the Optical transmitter."
+			
+            REVISION    "201707170000Z" 
+            DESCRIPTION "V3.81, add the leaf of hwEmmDigAcInputPowerOffTrap and hwEmmDigAcInputPowerRecoverTrap for digital alarm."
+
+            REVISION    "201705170000Z" 
+            DESCRIPTION "V3.80, add the leaf of hwOTCH1WaveLength for the Optical transmitter.
+                                          modified the mib node name and description of hwON5VVoltage.
+	                    modified the mib node name and description of hwON24VVoltage."
+
+            REVISION    "201703240000Z" 
+            DESCRIPTION "V3.79, add the leaf of hwEmmDigFanSpeedAbnormalTrap and hwEmmDigFanSpeedRecoverTrap for fan digital alarm."
+
+            REVISION    "201608310000Z" 
+            DESCRIPTION "V3.78, modify the description of hwFanUnitSpeed node"
+   			 
+            REVISION    "201607180000Z" 
+            DESCRIPTION "V3.77, add protect-switch channel policy(combiner) for dual-channel optical receiver.
+                         add hwORRFCH1PowerValue, hwORRFCH1PowerAlarmState leaf node, 
+			             add hwModuleOpticalCombinerRFPowerFailTrap, hwModuleOpticalCombinerRFPowerRecoverTrap for optical trap.
+   			 add hwFanUnitTable, HwFanUnitEntry, hwFanUnitIndex, hwFanUnitSpeed for fan speed querry"
+ 
+            REVISION    "201606240000Z" 
+            DESCRIPTION "V3.76, add hwORCfgChannel0AGCMode,hwORCfgChannel1AGCMode,hwORRuninfoChannel0AGCMode,hwORRuninfoChannel1AGCMode."
+
+            REVISION    "201602140000Z" 
+            DESCRIPTION "V3.75, add optical type(Shutdown) in hwONCOMState leaf node."
+			
+            REVISION    "201602010000Z"
+            DESCRIPTION "V3.74, Delete BITS from HUAWEI-ENVIRONMENT-MIB DEFINITIONS"
+
+		REVISION    "201601290000Z"
+		    DESCRIPTION "V3.73, modified the Description of hwORRFPowerLowThreshold."
+
+	    REVISION    "201512170000Z"  
+            DESCRIPTION "V3.72, modified the Description of hwORRFPowerLowThreshold.
+                                modified the Description of hwORRFPowerHighThreshold."
+
+ 
+            REVISION    "201511120000Z"  
+            DESCRIPTION "V3.71, Correct the node hwOpticalPowerValue from Integer32 to OCTET STRING.
+                                Correct the node hwOpticalChnIndex, hwOpticalPowerValue, hwOpticalBiasValue from read-only to accessible-for-notify."
+
+            REVISION    "201509070000Z"  
+            DESCRIPTION "V3.70, modified the Description of hwEnvEmuPower.
+      	                        modified the Description of hwEnvEmuTypeName.
+      	                        added enum elabel(invalid:-1) in hwFanControlMode leaf node.
+      	                        modified the Description of hwFanTypeDescription.
+      	                        modified the Description of hwTcuHeatExchangerType."
+
+	    REVISION    "201508271000Z"
+	    DESCRIPTION "V3.69, add emu type(emub:47) in hwEnvEmuType leaf node.
+			add the hwAnaSignalHigh and hwAnaSignalLow in hwAnaChannelEntry leaf node."
+			
+            REVISION    "201508241000Z"  
+      	    DESCRIPTION "V3.68, modified the Description of hwONModelNumber, hwONHardwareVer, hwONSoftwareVer, hwOROpticalPowerValue,
+      	                        hwOROpticalPowerAlarmState, hwOROpticalPowerLowThreshold, hwOROpticalPowerHighThreshold, hwOROpticalAGCStart,
+      	                        hwORRFPowerValue, hwON5VVoltage, hwON24VVoltage, hwORAGCRange, hwOTOpticalOutputPowerValue,
+      	                        hwOTOpticalOutputPowerAlarmState, hwOTOpticalOutputPowerLowThreshold, hwOTOpticalOutputPowerHighThreshold,
+      	                        hwOTBiasValue, hwOTBiasAlarmState, hwOTBiasLowThreshold, hwOTBiasHighThreshold, hwOTWaveLength,
+      	                        hwOROpticalActiveChannel, hwOROpticalCH1PowerValue, hwOROpticalCH1PowerAlarmState, hwOROpticalCH1PowerLowThreshold,
+      	                        hwOROpticalCH1PowerHighThreshold, hwOROpticalCH1AGCStart, hwORAGCCH1Range, hwOTOpticalOutputCH1PowerValue,
+				hwOTOpticalOutputCH1PowerAlarmState, hwOTOpticalOutputCH1PowerLowThreshold, hwOTOpticalOutputCH1PowerHighThreshold,
+				hwOTCH1BiasValue, hwOTCH1BiasAlarmState, hwOTCH1BiasLowThreshold, hwOTCH1BiasHighThreshold."
+
+	    REVISION    "201508131000Z"  
+      	    DESCRIPTION "V3.67, modified the Description of hwTcuInternalFanRev.
+      	                        modified the Description of hwTcuExternalFanRev.
+			                    modified the Description of hwTcuStartHeatTemp.
+			                    modified the Description of hwTcuStopHeatTemp.
+			                    modified the Description of hwCurrentTemp.
+			                    modified the Description of hwAnaCurrentValue.
+			                    modified the Description of hwEnvVersion."
+			                    
+            REVISION    "201508121200Z"
+			DESCRIPTION "V3.67, add hwOTOpticalOutputCH1PowerValue, hwOTOpticalOutputCH1PowerAlarmState, 
+			                        hwOTOpticalOutputCH1PowerLowThreshold, hwOTOpticalOutputCH1PowerHighThreshold
+			                        hwOTCH1BiasValue, hwOTCH1BiasAlarmState, hwOTCH1BiasLowThreshold, hwOTCH1BiasHighThreshold for Dual channel Optical-transmitter.
+                                modified hwOTWaveLength, hwORType for Dual channel Optical-transmitter."
+					    
+            REVISION    "201507281200Z"
+			DESCRIPTION "V3.66, add hwModuleOpticalTransmitterPowerFailTrap, hwModuleOpticalTransmitterPowerRecoverTrap, 
+			                        hwModuleOpticalTransmitterBiasRecoverTrap, hwModuleOpticalTransmitterBiasFailTrap for optical trap.
+			                    modified hwOpticalReceiverPowerFailTrap, hwOpticalReceiverPowerRecoverTrap for Dual channel Optical-Receiver."
+
+			REVISION    "201504231200Z"
+			DESCRIPTION "V3.65, modified the size of hwONProductDate."
+
+            REVISION    "201503281200Z"
+			DESCRIPTION "V3.64, modified the parameter of hwOpticalReceiverDualChnPowerFailTrap, hwOpticalReceiverDualChnPowerRecoverTrap, 
+			                             hwOpticalReceiverPowerFailTrap, hwOpticalReceiverPowerRecoverTrap, hwOpticalReceiverRFPowerFailTrap,
+			                             hwOpticalReceiverRFPowerRecoverTrap, hwOpticalTransmitterPowerFailTrap and hwOpticalTransmitterPowerRecoverTrap.
+			                    modified the description of hwOROpticalWorkMode and hwOROpticalActiveChannel.
+			                    add hwOpticalPowerTable, hwOpticalParaEntry, hwOpticalChnIndex and hwOpticalPowerValue for Optical node.
+			                    add hwOROpticalPowerValueTrap, hwORRFPowerValueTrap adn hwOTOpticalOutputPowerValueTrap for optical trap.
+			                    add invalid type in hwORType.
+			                    delete the mib node hwOROpticalFailChannelId."
+			                    
+            REVISION    "201502271000Z"
+			DESCRIPTION "V3.63, modified the mib node name of hwOpticalNodeTable.
+			                    add hwOROpticalWorkMode, hwOROpticalActiveChannel, hHwOROpticalCH1PowerValue, 
+			                        hwOROpticalCH1PowerAlarmState, hwOROpticalCH1PowerLowThreshold, hwOROpticalCH1PowerHighThreshold, 
+			                        hwOROpticalCH1AGCStart, hwORAGCCH1Range, hwORType, hwOpticalDualChnProtectSwitchTrap, 
+			                        hwOROpticalFailChannelId for Dual channel Optical-Receiver.
+			                    
+			                    modify hwOpticalReceiverPowerFailTrap, hwOpticalReceiverPowerRecoverTrap for Dual channel Optical-Receiver."
+			                    
+			REVISION    "201502051150Z"
+			DESCRIPTION "V3.62, add hwAnaMonitorState node for power(smu power4830) analog alarm monitor,
+			             add hwDigMonitorState node for power(smu power4830) default digital alarm monitor"
+			
+			REVISION    "201412162050Z"
+			DESCRIPTION "V3.61, Correct the node hwEnvRowStatus, hwAnaRowStatus,hwDigRowStatus,
+			             hwControlOutRowStatus,hwFanRowStatus from read-write to read-create."
+			
+			REVISION    "201411292050Z"
+			DESCRIPTION "V3.60, add emu type(rpsr:46) in hwEnvEmuType leaf node."
+
+			REVISION    "201410092030Z"
+			DESCRIPTION "V3.59 correct the description of hwAnaType and hwAnaAlarmID value list."
+
+            REVISION    "201406040900Z"
+			DESCRIPTION "V3.58, add emu type(h901VESC:45) in hwEnvEmuType leaf node.
+			             modified the trap parameter hwAnaAlarmID to hwAnaChannelIndex, include:
+			             hwEmmAnaUnnamedFaultTrap
+                         hwEmmAnaCurrentFaultTrap
+                         hwEmmAnaHumyFaultTrap
+                         hwEmmAnaTempFaultTrap
+                         hwEmmAnaVoltFaultTrap
+                         hwEmmAnaUnnamedRecoverTrap
+                         hwEmmAnaCurrentRecoverTrap
+                         hwEmmAnaHumyRecoverTrap
+                         hwEmmAnaTempRecoverTrap
+                         hwEmmAnaVoltRecoverTrap"
+
+            REVISION    "201404010900Z"
+			DESCRIPTION "V3.57, modified the mib node name of hwOpticalreceiverTable.
+			                    add hwOTOpticalOutputPowerValue, hwOTOpticalOutputPowerAlarmState,
+			                        hwOTOpticalOutputPowerLowThreshold, hwOTOpticalOutputPowerHighThreshold,
+			                        hwOTBiasValue, hwOTBiasAlarmState, hwOTBiasLowThreshold, hwOTBiasHighThreshold,
+			                        hwOTWaveLength for Optical-transmitter.
+			                    
+			                    add hwOpticalTransmitterPowerFailTrap, hwOpticalTransmitterPowerRecoverTrap
+			                        hwOpticalTransmitterBiasFailTrap, hwOpticalTransmitterBiasRecoverTrap for Optical-transmitter."
+			
+			REVISION    "201402270900Z"
+			DESCRIPTION "V3.56, correct the description of hwEnvEmuType's value list."
+
+			REVISION    "201402110900Z"
+			DESCRIPTION "V3.55, modified the rf power unit from dBuV to dBmV."
+
+			REVISION    "201308050900Z"
+			DESCRIPTION "V3.54, modified the descriptions of hwEmmEmuHardwareFaultTrap."
+			                    
 			REVISION    "201306170900Z"
 			DESCRIPTION "V3.53, modified the range of hwORRFPowerLowThreshold and hwORRFPowerHighThreshold for Optical-Receiver in hwEnvironmentInfoTable leaf node."
 			                    
@@ -262,6 +467,9 @@
 			h801VESC(42),
 			leadAcidBattery(43),
 			h801PMU(44),
+			h901VESC(45),
+			rpsr(46),
+			emub(47),
 			other(255)
 			}
 			MAX-ACCESS read-write
@@ -270,48 +478,52 @@
 				"
 				Type of the physical monitoring devices associated with the environment monitoring unit. 
 				Options: 
-				1.h302ESC(1)        -Type of the physical monitoring devices is H302ESC
-				2.h303ESC(2)        -Type of the physical monitoring devices is H303ESC
-				3.h4875(3)          -Type of the physical monitoring devices is 4875 power monitoring frame
-				4.h301ESC(4)        -Type of the physical monitoring devices is H301ESC
-				5.switch(5)         -Distribute monitoring frame
-				6.fanEscFrame(6)    -ESC monitoring fan frame
-				7.fanFrame(7)       -monitoring fan frame
-				8.h4845(8)          -4845 power monitoring
-				9.fanFCBFrame(9)    -FCB monitoring fan frame
-				10.fanFDMUFrame(10) -FDMU monitoring fan frame
-				11.h304ESC(11)      -provides the management function of battery 
-				12.pwma(12)         -Type of the physical monitoring devices is pwma
-				13.h561esc(13)      -H561ESC
-				14.h801esc(14)      -H801Esc
-				15.h612pwbp(15)     -H612pwbp  
-				16.pse158(16)       -pse158
-				17.h4805(19)        -h4805
-				18.pdu(20)          -pdu
-				19.acrmu(21)       -ac_rmu
-				20.acfan(22)       -ac_fan
-				21.dcfan(23)       -dc_fan
-				22.rmun1509(24)     -rmun1509
-				23.onps150(25)      -onps150
-				24.h801pmix(26)     -h801pmix
-				25.h4875L(27)       -h4875L
-				26.miniESC(28)      -miniESC
-				27.h831VESC(29)     -H831VESC
-				28.h601VESC(30)     -H601VESC
-				29.h4830L(31)       -h4830L
-				30.h801citx(32)     -h801citx
-				31.h801citd(33)     -h801citd
-				32.h831ccuh(34)     -h831ccuh
-				33.h831pmu(35)      -h831pmu
-				34.pwr3000(36)      -a type of power named power 3000, supports 12 rectifier modules
-				35.tcu(37)          -tcu
-				36.liFeBattery(38)  -liFeBattery
-				37.transemu(39)     -a type of emu for transport environment information to managment center
-				38.smu(40)          -site monitoring unit
-				39.vpea(41)         -vector monitoring unit
-				40.h801VESC(42)     -H801VESC
-				41.h801PMU(44)      -H801PMU	
-				42.other(255)       -other
+				1.h302ESC(1)           -Type of the physical monitoring devices is H302ESC
+				2.h303ESC(2)           -Type of the physical monitoring devices is H303ESC
+				3.h4875(3)             -Type of the physical monitoring devices is 4875 power monitoring frame
+				4.h301ESC(4)           -Type of the physical monitoring devices is H301ESC
+				5.switch(5)            -Distribute monitoring frame
+				6.fanEscFrame(6)       -ESC monitoring fan frame
+				7.fanFrame(7)          -FAN
+				8.h4845(8)             -Pwr4845
+				9.fanFCBFrame(9)       -FCB monitoring fan frame
+				10.fanFDMUFrame(10)    -FDMU monitoring fan frame
+				11.h304ESC(11)         -provides the management function of battery 
+				12.pwma(12)            -Type of the physical monitoring devices is pwma
+				13.h561esc(13)         -H561ESC
+				14.h801esc(14)         -H801ESC
+				15.h612pwbp(15)        -H612pwbp  
+				16.pse158(16)          -pse158
+				17.h4805(19)           -h4805
+				18.pdu(20)             -pdu
+				19.acrmu(21)           -ac_rmu
+				20.acfan(22)           -ac_fan
+				21.dcfan(23)           -dc_fan
+				22.rmun1509(24)        -rmun1509
+				23.onps150(25)         -onps150
+				24.h801pmix(26)        -h801pmix
+				25.h4875L(27)          -Pwr4875L
+				26.miniESC(28)         -MINIESC
+				27.h831VESC(29)        -H831VESC
+				28.h601VESC(30)        -H601VESC
+				29.h4830L(31)          -Pwr4830L
+				30.h801citx(32)        -H801CITX
+				31.h801citd(33)        -H801CITD
+				32.h831ccuh(34)        -h831ccuh
+				33.h831pmu(35)         -h831pmu
+				34.pwr3000(36)         -Pwr3000
+				35.tcu(37)             -TCU
+				36.liFeBattery(38)     -liFeBattery
+				37.transemu(39)        -a type of emu for transport environment information to managment center
+				38.smu(40)             -SMU
+				39.vpea(41)            -VPEA
+				40.h801VESC(42)        -H801VESC
+				41.leadAcidBattery(43) -LeadBattery
+				42.h801PMU(44)         -H801PMU	
+				43.h901VESC(45)         -H901VESC	
+				44.rpsr(46)            -Remote Power System RemoteUnit
+				45.emub(47)            -EMUB
+				46.other(255)          -Unknow
 				"
 			::= { hwEnvironmentInfoEntry 2 }
 		
@@ -354,7 +566,7 @@
 -- 1.3.6.1.4.1.2011.6.1.1.1.1.5
 		hwEnvRowStatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
 				"
@@ -371,6 +583,7 @@
 			DESCRIPTION
 				"
 				Version information of the environment monitoring unit.
+				invalid(zero-length)
 				"
 			::= { hwEnvironmentInfoEntry 6 }
 			
@@ -458,13 +671,14 @@
 				
 -- 1.3.6.1.4.1.2011.6.1.1.1.1.12
 		hwEnvEmuPower OBJECT-TYPE
-			SYNTAX Integer32 (0..255)
+			SYNTAX Integer32 (-1..255)
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
 				"
 				Power of the environment monitoring equipment associated with the 
 				environment monitoring unit. Unit: Watt. 
+				Invalid:-1.
 				"
 			::= { hwEnvironmentInfoEntry 12 }
 			
@@ -476,6 +690,7 @@
 			DESCRIPTION
 				"
 	                        Name of the environment type. 
+				Invalid: null string.
 				"
 			::= { hwEnvironmentInfoEntry 13 }
 						
@@ -536,7 +751,13 @@
 				hwAnaRowStatus
 					RowStatus,
 				hwAnaAlarmID
-					INTEGER
+					INTEGER,
+				hwAnaMonitorState
+				  INTEGER,
+				hwAnaSignalHigh
+					Integer32,
+				hwAnaSignalLow
+					Integer32
 				}
 	
 -- 1.3.6.1.4.1.2011.6.1.1.2.1.1
@@ -568,7 +789,7 @@
 			{
 			invalid(-1),
 			voltage(1),
-			current(2)
+			electriccurrent(2)
 			}
 			MAX-ACCESS read-write
 			STATUS current
@@ -579,7 +800,7 @@
 				Options:
 				1.invalid(-1) -there is no valid sensor
 				2.voltage(1)  -voltage sensor currently
-				3.current(2)  -current sensor currently
+				3.electriccurrent(2)  -electric current sensor currently
 				"
 			::= { hwAnaChannelEntry 3 }
 			
@@ -650,6 +871,7 @@
 				"
 				The actual measurement value of the present analog.
 				Unit: milli
+				invalid: 0x7fffffff
 				"
 			::= { hwAnaChannelEntry 9 }
 			
@@ -681,7 +903,7 @@
 -- 1.3.6.1.4.1.2011.6.1.1.2.1.11
 		hwAnaRowStatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
 				"
@@ -697,7 +919,7 @@
 			temperature(1),
 			humidity(2),
 			voltage(3),
-			current(4),
+			electriccurrent(4),
 			userDefinedAlarm0(100),
 			userDefinedAlarm1(101),
 			userDefinedAlarm2(102),
@@ -725,7 +947,7 @@
 		        1.temperature(1)           -temperature alarm
 		        2.humidity(2)              -humidity alarm
 		        3.voltage(3)               -voltage alarm
-		        4.current(4)               -current alarm
+		        4.electriccurrent(4)               -electric current alarm
 		        5.userDefinedAlarm0(100)   -analog user-defined alarm 0        
 		        6.userDefinedAlarm1(101)   -analog user-defined alarm 1                                            
 		        7.userDefinedAlarm2(102)   -analog user-defined alarm 2                                            
@@ -745,6 +967,47 @@
 		        21.default(65535) -default analog alarm
 		        "
 			::= { hwAnaChannelEntry 12 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.13
+		hwAnaMonitorState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			enable(1),
+			disable(2),
+			invalid(-1)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				analog alarm(temperature,humidity,battery temperature) monitor flag value, 
+				The value 1 enable monitor, value 2 disable monitor.
+				"
+			::= { hwAnaChannelEntry 13 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.14
+		hwAnaSignalHigh OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				High limit of the analog signal.
+				invalid: 0x7fffffff.
+				"
+			::= { hwAnaChannelEntry 14 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.2.1.15
+		hwAnaSignalLow OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Low limit of the analog signal.
+				invalid: 0x7fffffff.
+				"
+			::= { hwAnaChannelEntry 15 }
 			
 -- 1.3.6.1.4.1.2011.6.1.1.3
 		hwDigChannelTable OBJECT-TYPE
@@ -791,6 +1054,8 @@
 				hwDigRowStatus
 					RowStatus,
 				hwDigAlarmID
+					INTEGER,
+				hwDigMonitorState
 					INTEGER
 				}
 	
@@ -860,7 +1125,7 @@
 -- 1.3.6.1.4.1.2011.6.1.1.3.1.5
 		hwDigRowStatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
 				"
@@ -895,7 +1160,7 @@
 			arrester(20),
 			dcvoltage(21),
 			outputswitch(22),
-			hard-fault(23),
+			hardFault(23),
 			userDefinedAlarm0(100),
 			userDefinedAlarm1(101),
 			userDefinedAlarm2(102),
@@ -958,7 +1223,7 @@
 		        20.arrester(20)           -arrester alarm 
 		        21.dcvoltage(21)          -dc voltage
 		        22.outputswitch(22)       -output swith       
-		        23.hard-fault(23)         -hard-fault       
+		        23.hardFault(23)         -hard-fault       
 		        24.userDefinedAlarm0(100)  -digital user-defined alarm 0     
 		        25.userDefinedAlarm1(101)  -digital user-defined alarm 1     
 		        26.userDefinedAlarm2(102)  -digital user-defined alarm 2     
@@ -994,6 +1259,24 @@
 		        56.default(65535)          -digital alarm                   
 		        "
 			::= { hwDigChannelEntry 6 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.3.1.7
+		hwDigMonitorState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			enable(1),
+			disable(2),
+			invalid(-1)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				default digital alarm(Door,Water,Smoke,Wiring) monitor flag value, 
+				The value 1 enable monitor, value 2 disable monitor.
+				"
+			::= { hwDigChannelEntry 7 }
+
 			      
 -- 1.3.6.1.4.1.2011.6.1.1.4
 		hwControlOutTable OBJECT-TYPE
@@ -1083,7 +1366,7 @@
 -- 1.3.6.1.4.1.2011.6.1.1.4.1.4
 		hwControlOutRowStatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
 				"
@@ -1159,6 +1442,7 @@
 		hwFanControlMode OBJECT-TYPE
 			SYNTAX INTEGER
 			{
+			invalid(-1),
 			manual(1),
 			emuAuto(2),
 			fixed(3),
@@ -1176,6 +1460,7 @@
 				3.fixed(3)         -indicates that the fan is in the fixed mode, and adjusting its speed is not allowed                    
 				4.mainboardAuto(4) -indicates that the fan is in the automatic mode, and can be automatically 
 				                    controlled depending on the temperature of the boards in the frame 
+				5.invalid(-1)      -indicates that the fan control mode is invalid.
 				"
 			::= { hwFanEntry 2 }
 			
@@ -1244,7 +1529,7 @@
 -- 1.3.6.1.4.1.2011.6.1.1.5.1.6
 		hwFanRowStatus OBJECT-TYPE
 			SYNTAX RowStatus
-			MAX-ACCESS read-write
+			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
 				"
@@ -1259,7 +1544,9 @@
 			STATUS current
 			DESCRIPTION
 				"
-				The present temperature value, in unit of cent-centigrade
+				The present temperature value 
+				Unit: 0.01 degree
+				invalid: 0x7fffffff
 				"
 			::= { hwFanEntry 7 }
 			
@@ -1307,8 +1594,8 @@
 			STATUS current
 			DESCRIPTION
 				"
-				Fan Type Description. The values 1 and 2 are supported currently. 
-				1 indicates the activation status, and 2 indicates the non-activation status.
+				Fan Type Description.
+				Invalid: null string.
 				"
 			::= { hwFanEntry 10 }
 				
@@ -1362,6 +1649,7 @@
 			DESCRIPTION
 				"
 				Heat Exchanger Type Description.
+				Invalid: null string.
 				"
 			::= { hwTcuEntry 1 }
 				
@@ -1372,7 +1660,8 @@
 			STATUS current
 			DESCRIPTION
 				"
-				The rev of Heat Exchanger outer fan, in unit of RMP (rotate per minite)
+				The rev of Heat Exchanger outer fan, in unit of RMP (rotate per minite),
+				invalid(-1)
 				"
 			::= { hwTcuEntry 2 }
 				
@@ -1383,7 +1672,8 @@
 			STATUS current
 			DESCRIPTION
 				"
-				The rev of Heat Exchanger inner fan, in unit of RMP (rotate per minite)
+				The rev of Heat Exchanger inner fan, in unit of RMP (rotate per minite),
+				invalid(-1)
 				"
 			::= { hwTcuEntry 3 }
 				
@@ -1394,7 +1684,8 @@
 			STATUS current
 			DESCRIPTION
 				"
-				The temperature of Heat Exchanger starts to heat up, in unit of Celsius
+				The temperature of Heat Exchanger starts to heat up, in unit of Celsius.
+				default: 5
 				"
 			::= { hwTcuEntry 4 }
 				
@@ -1405,48 +1696,49 @@
 			STATUS current
 			DESCRIPTION
 				"
-				The temperature of Heat Exchanger stops heating, in unit of Celsius
+				The temperature of Heat Exchanger stops heating, in unit of Celsius.
+				default: 25
 				"
 			::= { hwTcuEntry 5 }
 			
 -- 1.3.6.1.4.1.2011.6.1.1.7
-		hwOpticalreceiverTable OBJECT-TYPE
-			SYNTAX SEQUENCE OF HwOpticalreceiverEntry
+		hwOpticalNodeTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwOpticalNodeEntry
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
 				"
-				Information table of optical receiver unit. 
+				Information table of optical node unit. 
 				The index of this table is  hwFrameIndex that comes from hwFrameTable. 
-				 hwFrameIndex is the index of the optical receiver unit whose optical receiver type is optical receiver unit.
+				hwFrameIndex is the index of the optical node unit whose optical node type is optical node unit.
 				"
 			::= { hwEnvironmentMon 7 }
 			
 -- 1.3.6.1.4.1.2011.6.1.1.7.1
-		hwOpticalreceiverEntry OBJECT-TYPE
-			SYNTAX HwOpticalreceiverEntry
+		hwOpticalNodeEntry OBJECT-TYPE
+			SYNTAX HwOpticalNodeEntry
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
 				"
-				Information table of optical receiver unit. 
-				interface optical receiver config mode.
+				Information table of optical node unit. 
+				interface optical node config mode.
 				"
 			INDEX { hwFrameIndex }
-			::= { hwOpticalreceiverTable 1 }
+			::= { hwOpticalNodeTable 1 }
 			
-			HwOpticalreceiverEntry ::=
+			HwOpticalNodeEntry ::=
 				SEQUENCE 
 				{ 
-				hwORCOMState
+				hwONCOMState
 					INTEGER,
-				hwORModelNumber
+				hwONModelNumber
 					DisplayString,
-				hwORHardwareVer
+				hwONHardwareVer
 					DisplayString,
-				hwORSoftwareVer 
+				hwONSoftwareVer 
 					DisplayString,
-				hwORProductDate
+				hwONProductDate
 					OCTET STRING,
 			  hwOROpticalPowerValue 
 					Integer32,
@@ -1470,83 +1762,206 @@
 					Integer32,
 			  hwORRFSwitch 
 					INTEGER,
-				hwORBarcode 
+				hwONBarcode 
 					DisplayString,
-				hwOR5VVoltage
+				hwONCurrentInputVoltage1
 				  Integer32,
-				hwOR24VVoltage
+				hwONCurrentInputVoltage2
 				  Integer32,
 				hwORAGCRange
-				  DisplayString
+				        DisplayString,
+				hwOTOpticalOutputPowerValue
+				        Integer32,
+				hwOTOpticalOutputPowerAlarmState 
+				        INTEGER,
+				hwOTOpticalOutputPowerLowThreshold
+				        Integer32,
+				hwOTOpticalOutputPowerHighThreshold
+				        Integer32,
+				hwOTBiasValue
+				        Integer32,
+				hwOTBiasAlarmState
+				        INTEGER,
+				hwOTBiasLowThreshold
+				        Integer32,
+				hwOTBiasHighThreshold
+				        Integer32,
+				hwOTWaveLength
+				        Integer32,
+				hwOROpticalWorkMode 
+					    INTEGER,
+				hwOROpticalActiveChannel 
+					    Integer32, 
+				hwOROpticalCH1PowerValue 
+					    Integer32, 
+				hwOROpticalCH1PowerAlarmState 
+					    INTEGER, 
+				hwOROpticalCH1PowerLowThreshold 
+					    Integer32, 
+				hwOROpticalCH1PowerHighThreshold 
+					    Integer32, 
+				hwOROpticalCH1AGCStart 
+					    Integer32, 
+				hwORAGCCH1Range 
+					    DisplayString, 
+				hwORType 
+					    INTEGER,
+		    hwOTOpticalOutputCH1PowerValue
+		          Integer32, 
+		    hwOTOpticalOutputCH1PowerAlarmState
+		          INTEGER,
+		    hwOTOpticalOutputCH1PowerLowThreshold
+		          Integer32,
+		    hwOTOpticalOutputCH1PowerHighThreshold
+		          Integer32,
+		    hwOTCH1BiasValue
+		          Integer32,
+		    hwOTCH1BiasAlarmState
+		          INTEGER,
+		    hwOTCH1BiasLowThreshold
+		          Integer32,
+		    hwOTCH1BiasHighThreshold
+		          Integer32,
+		    hwORCfgChannel0AGCMode
+		          INTEGER,
+		    hwORCfgChannel1AGCMode
+		          INTEGER,
+		    hwORRuninfoChannel0AGCMode
+		          INTEGER,
+		    hwORRuninfoChannel1AGCMode
+		          INTEGER, 
+		    hwORRFCH1PowerValue
+		          Integer32,
+		    hwORRFCH1PowerAlarmState
+		          INTEGER,
+	            hwOTCH1WaveLength
+		         Integer32,
+		    hwOTCfgOpticalWorkMode
+		         INTEGER,
+		    hwOTRuninfoOpticalWorkMode
+		         INTEGER,
+	        hwOTCH0RFAttValue
+		         Integer32,
+	        hwOTCH1RFAttValue
+		         Integer32,
+	        hwORCh0OnlineState
+		         INTEGER,
+	        hwORCh1OnlineState
+		         INTEGER,
+	        hwOTCh0OnlineState
+		         INTEGER,
+	        hwOTCh1OnlineState
+		         INTEGER,
+	        hwONCfgOpticalWorkMode
+		         INTEGER,
+	        hwONRuninfoOpticalWorkMode
+		         INTEGER,
+	        hwOTCh0RuninfoOpticalLowPassFilter
+		         Integer32,
+	        hwOTCh1RuninfoOpticalLowPassFilter
+		         Integer32,
+	        hwONSmartCapability
+		         BITS,
+		    hwORRFPowerChangeThreshold
+		         Integer32,
+		    hwORCHN0RFPowerReferenceValue
+		         Integer32, 
+		    hwORCHN0RFPowerChangeValue
+		         Integer32,
+		    hwORCHN1RFPowerReferenceValue
+		         Integer32, 
+		    hwORCHN1RFPowerChangeValue
+		         Integer32,
+	        hwORCH0CurrentInputVoltage1
+		         Integer32,
+	        hwORCH0CurrentInputVoltage2
+		         Integer32,
+	        hwORCH1CurrentInputVoltage1
+		         Integer32,
+	        hwORCH1CurrentInputVoltage2
+		         Integer32,
+	        hwOTCH0CurrentInputVoltage1
+		         Integer32,
+	        hwOTCH0CurrentInputVoltage2
+		         Integer32,
+	        hwOTCH1CurrentInputVoltage1
+		         Integer32,
+	        hwOTCH1CurrentInputVoltage2
+		         Integer32
 				}
 				 
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.1
-		hwORCOMState OBJECT-TYPE
+		hwONCOMState OBJECT-TYPE
 			SYNTAX INTEGER
 			{
 			online(1),
-			offline(2)
+			offline(2),
+			shutdown(3)
 			}
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
 				"
-				The state of Optical receiver
-				The Optical receiver can be used only when it is online.
+				The state of Optical node
+				The Optical node can be used only when it is online.
 				Options: 
 				1.online(1)   -  indicates that Optical state is online
-				2.offline(2)  -  indicates that Optical state is offline
+				2.offline(2)  -  indicates that Optical state is offline  
+				3.shutdown(3) -  indicates that Optical state is shutdown
 				"
-			::= { hwOpticalreceiverEntry 1 }
+			::= { hwOpticalNodeEntry 1 }
 				
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.2
-		hwORModelNumber OBJECT-TYPE
+		hwONModelNumber OBJECT-TYPE
 			SYNTAX DisplayString
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
 				"
-				The model number of Optical receiver
+				The model number of Optical node
+				invalid(zero-length)
 				"
-			::= { hwOpticalreceiverEntry 2 }
+			::= { hwOpticalNodeEntry 2 }
 				
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.3
-		hwORHardwareVer OBJECT-TYPE
+		hwONHardwareVer OBJECT-TYPE
 			SYNTAX DisplayString
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
 				"
-				The hard version of Optical receiver
+				The hard version of Optical node
+				invalid(zero-length)
 				"
-			::= { hwOpticalreceiverEntry 3 }
+			::= { hwOpticalNodeEntry 3 }
 				
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.4
-		hwORSoftwareVer OBJECT-TYPE
+		hwONSoftwareVer OBJECT-TYPE
 			SYNTAX DisplayString
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
 				"
-				The software version of Optical receiver
+				The software version of Optical node
+				invalid(zero-length)
 				"
-			::= { hwOpticalreceiverEntry 4 }
+			::= { hwOpticalNodeEntry 4 }
 				
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.5
-		hwORProductDate OBJECT-TYPE
-			SYNTAX OCTET STRING (SIZE (4))
+		hwONProductDate OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0 | 8))
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
 				"
-				The product date of Optical receiver
+				The product date of Optical node
 				field  octets  contents                  range
  				-----  ------  --------                  -----
- 	  			1        1-2   year                      0..65536
- 	  			2         3    month                     1..12
- 	  			3         4    day                       1..31
+ 	  			1        1-4   year                      0..65536
+ 	  			2        5-6   month                     1..12
+ 	  			3        7-8   day                       1..31
 				"
-			::= { hwOpticalreceiverEntry 5 }
+			::= { hwOpticalNodeEntry 5 }
 			
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.6
 		hwOROpticalPowerValue OBJECT-TYPE
@@ -1555,12 +1970,14 @@
 			STATUS current
 			DESCRIPTION
 				"
-				The optical power value of Optical receiver
+				This is the power of the only channel for the single-channel optical receiver.
+				This is the power of channel 0 for the dual-channel optical receiver.
 				Its unit is dbm,its real accuracy is 0.01.
 				SNMP uses it which has been enlarged 100 by host.
 				user uses it which has been lessened 100 by SNMP.
+				invalid: 0x7fffffff.
 				"
-			::= { hwOpticalreceiverEntry 6 }
+			::= { hwOpticalNodeEntry 6 }
 				
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.7
 		hwOROpticalPowerAlarmState OBJECT-TYPE
@@ -1574,14 +1991,15 @@
 			STATUS current
 			DESCRIPTION
 				"
-				The optical power alarm state of Optical receiver
+			    This is the power alarm state of the only channel for the single-channel optical receiver.
+			    This is the power alarm state of channel 0 for the dual-channel optical receiver.
 				The Optical receiver can be used only when it is normal.
 				Options: 
 				1.normal(1)   -  indicates that Optical power alarm state is normal
 				2.low(2)      -  indicates that Optical power alarm state is low
 				3.high(3)     -  indicates that Optical power alarm state is high
 				"
-			::= { hwOpticalreceiverEntry 7 }
+			::= { hwOpticalNodeEntry 7 }
 				
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.8
 		hwOROpticalPowerLowThreshold OBJECT-TYPE
@@ -1589,14 +2007,15 @@
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
-				"
-				The optical power low threshold of Optical receiver
+				"  
+				This is the low power threshold of the only channel for the single-channel optical receiver.
+				This is the low power threshold of channel 0 for the dual-channel optical receiver. 
 				Its unit is dbm,its real accuracy is 0.01.
 				SNMP uses it which has been enlarged 100 by host.
 				user uses it which has been lessened 100 by SNMP.
 				Its real range is -10dbm~3dbm,mib range is -1000dbm~300dbm.
 				"
-			::= { hwOpticalreceiverEntry 8 }
+			::= { hwOpticalNodeEntry 8 }
 				
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.9
 		hwOROpticalPowerHighThreshold OBJECT-TYPE
@@ -1604,14 +2023,15 @@
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
-				"
-				The optical power high threshold of Optical receiver
+				"  
+				This is the high power threshold of the only channel for the single-channel optical receiver.
+				This is the high power threshold of channel 0 for the dual-channel optical receiver. 
 				Its unit is dbm,its real accuracy is 0.01.
 				SNMP uses it which has been enlarged 100 by host.
 				user uses it which has been lessened 100 by SNMP.
 				Its real range is -10dbm~3dbm,mib range is -1000dbm~300dbm.
 				"
-			::= { hwOpticalreceiverEntry 9 }
+			::= { hwOpticalNodeEntry 9 }
 				
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.10
 		hwOROpticalAGCStart OBJECT-TYPE
@@ -1620,10 +2040,11 @@
 			STATUS current
 			DESCRIPTION
 				"
-				The optical AGC start of Optical receiver
+				This is the start value of the AGC range of the only channel for the single-channel optical receiver.
+				This is the start value of the AGC range of channel 0 for the dual-channel optical receiver. 
 				Its unit is dBm,its real range is -4dBm~3dBm.
 				"
-			::= { hwOpticalreceiverEntry 10 }
+			::= { hwOpticalNodeEntry 10 }
 			
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.11
 		hwORRFPowerValue OBJECT-TYPE
@@ -1632,12 +2053,13 @@
 			STATUS current
 			DESCRIPTION
 				"
-				The RF power value of Optical receiver
-				Its unit is dBuV,its real accuracy is 0.1.
+				The RF power value of Optical receiver. When the dual-channel optical receiver works in combination mode, this leaf indicates the RF power of channel 0.
+				Its unit is dBmV,its real accuracy is 0.1.
 				SNMP uses it which has been enlarged 10 by host.
 				user uses it which has been lessened 10 by SNMP.
+				invalid: 0x7fffffff.
 				"
-			::= { hwOpticalreceiverEntry 11 }
+			::= { hwOpticalNodeEntry 11 }
 				
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.12
 		hwORRFPowerAlarmState OBJECT-TYPE
@@ -1651,14 +2073,14 @@
 			STATUS current
 			DESCRIPTION
 				"
-				The RF power alarm state of Optical receiver
+				The RF power alarm state of Optical receiver. When the dual-channel optical receiver works in combination mode, this leaf indicates the RF power alarm status of channel 0.
 				The Optical receiver can be used only when it is normal.
 				Options: 
 				1.normal(1)   -  indicates that RF power alarm state is normal
 				2.low(2)      -  indicates that RF power alarm state is low
 				3.high(3)     -  indicates that RF power alarm state is high
 				"
-			::= { hwOpticalreceiverEntry 12 }
+			::= { hwOpticalNodeEntry 12 }
 				
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.13
 		hwORRFPowerLowThreshold OBJECT-TYPE
@@ -1668,12 +2090,14 @@
 			DESCRIPTION
 				"
 				The RF power low threshold of Optical receiver
-				Its unit is dBuV,its real accuracy is 0.1.
+				Its unit is dBmV,its real accuracy is 0.1.
 				SNMP uses it which has been enlarged 10 by host.
 				user uses it which has been lessened 10 by SNMP.
-				Its real range is 85dBuV~130dBuV,mib range is 850dBuV~1300dBuV.
+				Lower threshold for RF alarms(optical transceiver modularization:-15;
+				other optical transceiver:25;unit:dBmV).
+				Its real range is -15dBmV~70dBmV,mib range is -150dBmV~700dBmV.
 				"
-			::= { hwOpticalreceiverEntry 13 }
+			::= { hwOpticalNodeEntry 13 }
 				
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.14
 		hwORRFPowerHighThreshold OBJECT-TYPE
@@ -1683,12 +2107,12 @@
 			DESCRIPTION
 				"
 				The RF power high threshold of Optical receiver
-				Its unit is dBuV,its real accuracy is 0.1.
+				Its unit is dBmV,its real accuracy is 0.1.
 				SNMP uses it which has been enlarged 10 by host.
 				user uses it which has been lessened 10 by SNMP.
-				Its real range is 85dBuV~130dBuV,mib range is 850dBuV~1300dBuV.
+				Its real range is -15dBmV~70dBmV,mib range is -150dBmV~700dBmV.
 				"
-			::= { hwOpticalreceiverEntry 14 }
+			::= { hwOpticalNodeEntry 14 }
 				
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.15
 		hwORRFAttValue OBJECT-TYPE
@@ -1699,9 +2123,9 @@
 				"
 				The RF ATT value of Optical receiver
 				Its unit is db.
-				Its range is 0db~20db.
+				Its range is 0db~10db.
 				"
-			::= { hwOpticalreceiverEntry 15 }
+			::= { hwOpticalNodeEntry 15 }
 			
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.16
 		hwORRFSwitch OBJECT-TYPE
@@ -1720,48 +2144,51 @@
 				1.off(1)   -  indicates that RF Switch state is off
 				2.on(2)    -  indicates that RF Switch state is on
 				"
-			::= { hwOpticalreceiverEntry 16 }
+			::= { hwOpticalNodeEntry 16 }
 				
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.17
-		hwORBarcode OBJECT-TYPE
+		hwONBarcode OBJECT-TYPE
 			SYNTAX DisplayString
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
 				"
-				The barcode of Optical receiver 
+				The barcode of Optical node
+				invalid(zero-length) 
 				"
-			::= { hwOpticalreceiverEntry 17 }
+			::= { hwOpticalNodeEntry 17 }
 
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.18
-		hwOR5VVoltage OBJECT-TYPE
+		hwONCurrentInputVoltage1 OBJECT-TYPE
 			SYNTAX Integer32
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
 				"
-				The current input voltage of Optical receiver.
+				The current input voltage1 of Optical node.
 				Its unit is V,its real accuracy is 0.1.
 				SNMP uses it which has been enlarged 10 by host.
 				user uses it which has been lessened 10 by SNMP.
-				+5V is positive voltage.
+				The current input voltage1 is positive voltage.
+				invalid: 0x7fffffff.
 				"
-			::= { hwOpticalreceiverEntry 18 }
+			::= { hwOpticalNodeEntry 18 }
 			
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.19
-		hwOR24VVoltage OBJECT-TYPE
+		hwONCurrentInputVoltage2 OBJECT-TYPE
 			SYNTAX Integer32
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
 				"
-				The current input voltage of Optical receiver.
+				The current input voltage2 of Optical node.
 				Its unit is V,its real accuracy is 0.1.
 				SNMP uses it which has been enlarged 10 by host.
 				user uses it which has been lessened 10 by SNMP.
-				+24V is positive voltage.
+				The current input voltage2 is positive voltage.
+				invalid: 0x7fffffff.
 				"
-			::= { hwOpticalreceiverEntry 19 }
+			::= { hwOpticalNodeEntry 19 }
 
 -- 1.3.6.1.4.1.2011.6.1.1.7.1.20
 		hwORAGCRange OBJECT-TYPE
@@ -1769,11 +2196,1605 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
+				" 
+				This is the AGC range of the only channel for the single-channel optical receiver.
+				This is the AGC range of channel 0 for the dual-channel optical receiver.
 				"
-				Start value of the AGC range for optical paths of Optical receiver.
+			::= { hwOpticalNodeEntry 20 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.21
+		hwOTOpticalOutputPowerValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" 
+				This is the power of the only channel for the single-channel optical transmitter.
+				This is the power of channel 0 for the dual-channel optical transmitter. 
+				Its unit is 0.01dbm.
+				invalid: 0x7fffffff.
 				"
-			::= { hwOpticalreceiverEntry 20 }
-							
+			::= { hwOpticalNodeEntry 21 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.22
+		hwOTOpticalOutputPowerAlarmState  OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			normal(1),
+			low(2),
+			high(3)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" 
+				This is the power alarm state of the only channel for the single-channel optical transmitter.
+				This is the power alarm state of channel 0 for the dual-channel optical transmitter.
+		    	The optical transmitter can be used only when it is normal.
+				Options: 
+				1.normal(1)   -  The optical power alarm state is normal when the transmit power value between low alarm threshold and high alarm threshold.
+				2.low(2)      -  The optical power alarm state is low when the transmit power value is lower than the low alarm threshold.
+				3.high(3)     -  The optical power alarm state is high when the transmit power value is higher than the high alarm threshold.
+				"
+			::= { hwOpticalNodeEntry 22 }	
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.23
+		hwOTOpticalOutputPowerLowThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				" 
+				This is the low power threshold of the only channel for the single-channel optical transmitter.
+				This is the low power threshold of channel 0 for the dual-channel optical transmitter. 
+				The alarm is produced when the optical transmit power value is lower than this value.
+				Its unit is 0.01dbm.
+				Its range is 0dbm~6dbm.
+				"
+
+			::= { hwOpticalNodeEntry 23 }	
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.24
+		hwOTOpticalOutputPowerHighThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"    
+				This is the high power threshold of the only channel for the single-channel optical transmitter.
+				This is the high power threshold of channel 0 for the dual-channel optical transmitter. 				
+				The alarm is produced when the optical transmit power value is higher than this value.
+				Its unit is 0.01dbm.
+				Its range is 0dbm~6dbm.
+				"
+			::= { hwOpticalNodeEntry 24 }	
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.25
+		hwOTBiasValue OBJECT-TYPE
+            SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" 
+				This is the bias current value of the only channel for the single-channel optical transmitter.
+				This is the bias current value of channel 0 for the dual-channel optical transmitter.
+				Its unit is mA,its normal range is 1mA~100mA.
+				invalid(-1)
+				"
+			::= { hwOpticalNodeEntry 25 }	
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.26
+		hwOTBiasAlarmState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			normal(1),
+			low(2),
+			high(3)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" 
+				This is the bias current alarm state of the only channel for the single-channel optical transmitter.
+				This is the bias current alarm state of channel 0 for the dual-channel optical transmitter. 
+		    	The optical transmitter can be used only when it is normal.
+				Options: 
+				1.normal(1)   -  The bias current alarm state is normal when the bias current value between low alarm threshold and high alarm threshold.
+				2.low(2)      -  The bias current alarm state is low when the bias current value is lower than the low alarm threshold.
+				3.high(3)     -  The bias current alarm state is high when the bias current value is higher than the high alarm threshold.
+				"
+			::= { hwOpticalNodeEntry 26 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.27
+		hwOTBiasLowThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				This is the low bias current threshold of the only channel for the single-channel optical transmitter.  
+                This is the low bias current threshold of channel 0 for the dual-channel optical transmitter.   
+				The alarm is produced when the bias current value is lower than this value.
+				Its unit is mA.
+				Its range is 1mA~100mA,default value is 10mA.
+				"
+			::= { hwOpticalNodeEntry 27 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.28
+		hwOTBiasHighThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				" 
+				This is the high bias current threshold of the only channel for the single-channel optical transmitter.  
+                This is the high bias current threshold of channel 0 for the dual-channel optical transmitter.
+                The alarm is produced when the bias current value is higher than this value.
+				Its unit is mA.
+				Its range is 1mA~100mA,default value is 60mA.
+				"
+			::= { hwOpticalNodeEntry 28 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.29
+		hwOTWaveLength OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The wave length of Optical transmitter.
+				Its unit is nm.
+				Its value is 1310nm or 1550nm or 1610nm.
+				invalid(-1)
+				"
+			::= { hwOpticalNodeEntry 29 }	
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.30
+		hwOROpticalWorkMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			forcechannel0(1),
+			forcechannel1(2),
+			preferchannel0(3),
+			preferchannel1(4),
+			combiner(5)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				The protect-switch channel policy of dual-channel optical receiver.
+				Options: 
+				1.force-channel0(1)   -  Force channel 0 as working channel, and forbid switching channel.
+				2.force-channel1(2)   -  Force channel 1 as working channel, and forbid switching channel.
+				3.prefer-channel0(3)  -  Prefer channel 0 as working channel priority and permit switch when channel 0 failed.
+				4.prefer-channel1(4)  -  Prefer channel 1 as working channel priority and permit switch when channel 1 failed.
+				5.combiner(5)         -  Combination mode. Both channel 0 and channel 1 are working.
+				"
+			::= { hwOpticalNodeEntry 30 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.31
+		hwOROpticalActiveChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The working channel of dual-channel optical receiver.
+				invalid(-1).
+				"
+			::= { hwOpticalNodeEntry 31 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.32
+		hwOROpticalCH1PowerValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				This is the power of channel 1 for the dual-channel optical receiver.
+				Its unit is dbm,its real accuracy is 0.01.
+				SNMP uses it which has been enlarged 100 by host.
+				user uses it which has been lessened 100 by SNMP.
+				invalid: 0x7fffffff.
+				"
+			::= { hwOpticalNodeEntry 32 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.33
+		hwOROpticalCH1PowerAlarmState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			normal(1),
+			low(2),
+			high(3)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" 
+				This is the power alarm state of channel 1 for the dual-channel optical receiver.
+				The optical receiver can be used only when it is normal.
+				Options: 
+				1.normal(1)   -  indicates that Optical power alarm state is normal
+				2.low(2)      -  indicates that Optical power alarm state is low
+				3.high(3)     -  indicates that Optical power alarm state is high
+				"
+			::= { hwOpticalNodeEntry 33 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.34
+		hwOROpticalCH1PowerLowThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				This is the low power threshold of channel 1 for the dual-channel optical receiver.
+				Its unit is dbm,its real accuracy is 0.01.
+				SNMP uses it which has been enlarged 100 by host.
+				user uses it which has been lessened 100 by SNMP.
+				Its real range is -10dbm~3dbm,mib range is -1000dbm~300dbm.
+				"
+			::= { hwOpticalNodeEntry 34 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.35
+		hwOROpticalCH1PowerHighThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				" 
+				This is the high power threshold of channel 1 for the dual-channel optical receiver.
+				Its unit is dbm,its real accuracy is 0.01.
+				SNMP uses it which has been enlarged 100 by host.
+				user uses it which has been lessened 100 by SNMP.
+				Its real range is -10dbm~3dbm,mib range is -1000dbm~300dbm.
+				"
+			::= { hwOpticalNodeEntry 35 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.36
+		hwOROpticalCH1AGCStart OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				This is the start value of the AGC range of channel 1 for the dual-channel optical receiver.
+				Its unit is dBm,its real range is -4dBm~3dBm.
+				"
+			::= { hwOpticalNodeEntry 36 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.37
+		hwORAGCCH1Range OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" 
+				This is the AGC range of channel 1 for the dual-channel optical receiver.
+				"
+			::= { hwOpticalNodeEntry 37 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.38
+		hwORType OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			opticalreceiver(1),
+			opticalreceivertransmitter(2),
+			dualchannelopticalreceiver(3),
+			opticalreceiverdualchannelopticaltransmitter(4),
+			dualchannelopticalreceiverdualchannelopticaltransmitter(5),
+			dualchannelopticalreceiveropticaltransmitter(6),
+			opticaltransmitter(7),
+			dualchannelopticaltransmitter(8),
+			invalid(99)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The optical type of optical node.
+				Options: 
+				1.optical-receiver(1) 
+				2.optical-receiver/optical-transmitter(2)
+				3.dual-channel optical-receiver(3)
+				4.optical-receiver/dual-channel optical-transmitter(4)
+				5.dual-channel optical-receiver/dual-channel optical-transmitter(5)
+				6.dual-channel optical-receiver/optical-transmitter(6)
+				7.optical-transmitter(7)
+				8.dual-channel optical-transmitter(8)
+				9.invalid type(99)
+				"
+			::= { hwOpticalNodeEntry 38 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.39
+		hwOTOpticalOutputCH1PowerValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				" 
+				This is the power of channel 1 for the dual-channel optical transmitter.
+				Its unit is dbm,its real accuracy is 0.01.
+				SNMP uses it which has been enlarged 100 by host.
+				user uses it which has been lessened 100 by SNMP. 
+				invalid: 0x7fffffff.
+				"
+			::= { hwOpticalNodeEntry 39 } 
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.40
+		hwOTOpticalOutputCH1PowerAlarmState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			normal(1),
+			low(2),
+			high(3)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"  
+				This is the power alarm state of channel 1 for the dual-channel optical transmitter.
+				The optical transmitter can be used only when it is normal.
+				Options: 
+				1.normal(1)   -  indicates that Optical power alarm state is normal
+				2.low(2)      -  indicates that Optical power alarm state is low
+				3.high(3)     -  indicates that Optical power alarm state is high
+				"
+			::= { hwOpticalNodeEntry 40 }
+			
+ -- 1.3.6.1.4.1.2011.6.1.1.7.1.41
+                 hwOTOpticalOutputCH1PowerLowThreshold OBJECT-TYPE
+                       	SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				" 
+				This is the low power threshold of channel 1 for the dual-channel optical transmitter.
+				Its unit is dbm,its real accuracy is 0.01.
+				SNMP uses it which has been enlarged 100 by host.
+				user uses it which has been lessened 100 by SNMP.
+				Its range is 0dbm~6dbm.
+				"
+			::= { hwOpticalNodeEntry 41 }
+
+ -- 1.3.6.1.4.1.2011.6.1.1.7.1.42
+                 hwOTOpticalOutputCH1PowerHighThreshold OBJECT-TYPE
+                        SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"    
+				This is the high power threshold of channel 1 for the dual-channel optical transmitter.
+				Its unit is dbm,its real accuracy is 0.01.
+				SNMP uses it which has been enlarged 100 by host.
+				user uses it which has been lessened 100 by SNMP.
+				Its range is 0dbm~6dbm.
+				"
+			::= { hwOpticalNodeEntry 42 }
+			
+ -- 1.3.6.1.4.1.2011.6.1.1.7.1.43
+                 hwOTCH1BiasValue OBJECT-TYPE
+                        SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				This is the bias current value of channel 1 for the dual-channel optical transmitter.
+				Its unit is mA,its normal range is 1mA~100mA.
+				invalid(-1)
+				"
+			::= { hwOpticalNodeEntry 43 } 
+
+ -- 1.3.6.1.4.1.2011.6.1.1.7.1.44
+                 hwOTCH1BiasAlarmState OBJECT-TYPE
+                        SYNTAX INTEGER
+			{
+			normal(1),
+			low(2),
+			high(3)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"  
+				This is the bias current alarm state of channel 1 for the dual-channel optical transmitter.
+				The optical transmitter can be used only when it is normal.
+				Options: 
+				1.normal(1)   -  The bias current alarm state is normal when the bias current value between low alarm threshold and high alarm threshold.
+				2.low(2)      -  The bias current alarm state is low when the bias current value is lower than the low alarm threshold.
+				3.high(3)     -  The bias current alarm state is high when the bias current value is higher than the high alarm threshold.
+				"
+			::= { hwOpticalNodeEntry 44 }
+ 
+ -- 1.3.6.1.4.1.2011.6.1.1.7.1.45
+                 hwOTCH1BiasLowThreshold OBJECT-TYPE
+                	SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"  
+				This is the low bias current threshold of channel 1 for the dual-channel optical transmitter.
+				The alarm is produced when the bias current value is lower than this value.
+				Its unit is mA.
+				Its range is 1mA~100mA,default value is 10mA.
+				"
+			::= { hwOpticalNodeEntry 45 } 
+			
+ -- 1.3.6.1.4.1.2011.6.1.1.7.1.46
+                 hwOTCH1BiasHighThreshold OBJECT-TYPE
+         	        SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				" 
+				This is the high bias current threshold of channel 1 for the dual-channel optical transmitter.
+				The alarm is produced when the bias current value is higher than this value.
+				Its unit is mA.
+				Its range is 1mA~100mA,default value is 60mA.
+				"
+			::= { hwOpticalNodeEntry 46 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.47
+		hwORCfgChannel0AGCMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			off(2),
+			minus6to2dBm(3),
+			minus4to2dBm(4),
+			minus2to2dBm(5)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Indicates the configuration information about the AGC gain on channel 0 for the optical receiver.
+				Options: 
+				1.off(2)              -  indicates that AGC gain is off
+				2.minus6to2dBm(3)     -  indicates that the range of AGC gain is -6dBm to +2dBm
+				3.minus4to2dBm(4)     -  indicates that the range of AGC gain is -4dBm to +2dBm
+				4.minus2to2dBm(5)     -  indicates that the range of AGC gain is -2dBm to +2dBm
+				default is minus6to2dBm(3).
+				"
+	::= { hwOpticalNodeEntry 47 }
+		
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.48
+		hwORCfgChannel1AGCMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			off(2),
+			minus6to2dBm(3),
+			minus4to2dBm(4),
+			minus2to2dBm(5)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Indicates the configuration information about the AGC gain on channel 1 for the optical receiver.
+				Options: 
+				1.off(2)              -  indicates that AGC gain is off
+				2.minus6to2dBm(3)     -  indicates that the range of AGC gain is -6dBm to +2dBm
+				3.minus4to2dBm(4)     -  indicates that the range of AGC gain is -4dBm to +2dBm
+				4.minus2to2dBm(5)     -  indicates that the range of AGC gain is -2dBm to +2dBm
+				default is minus6to2dBm(3).
+				"
+			::= { hwOpticalNodeEntry 48 }
+		
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.49
+		hwORRuninfoChannel0AGCMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			invalid(1),
+			off(2),
+			minus6to2dBm(3),
+			minus4to2dBm(4),
+			minus2to2dBm(5)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Indicates the running information about the AGC gain on channel 0 for the optical receiver.
+				Options: 
+				1.invalid(1)          -  indicates that AGC gain is not supported for the optical receiver 
+				                         or the optical receiver is not online
+				2.off(2)              -  indicates that AGC gain is off
+				3.minus6to2dBm(3)     -  indicates that the range of AGC gain is -6dBm to +2dBm
+				4.minus4to2dBm(4)     -  indicates that the range of AGC gain is -4dBm to +2dBm
+				5.minus2to2dBm(5)     -  indicates that the range of AGC gain is -2dBm to +2dBm
+				default is minus6to2dBm(3).s
+				"
+			::= { hwOpticalNodeEntry 49 }
+		
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.50
+		hwORRuninfoChannel1AGCMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			invalid(1),
+			off(2),
+			minus6to2dBm(3),
+			minus4to2dBm(4),
+			minus2to2dBm(5)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Indicates the running information about the AGC gain on channel 1 for the optical receiver.
+				Options: 
+				1.invalid(1)          -  indicates that AGC gain is not supported for the optical receiver 
+				                         or the optical receiver is not online
+				2.off(2)              -  indicates that AGC gain is off
+				3.minus6to2dBm(3)     -  indicates that the range of AGC gain is -6dBm to +2dBm
+				4.minus4to2dBm(4)     -  indicates that the range of AGC gain is -4dBm to +2dBm
+				5.minus2to2dBm(5)     -  indicates that the range of AGC gain is -2dBm to +2dBm
+				default is minus6to2dBm(3).
+				"
+			::= { hwOpticalNodeEntry 50 } 
+ 
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.51
+        hwORRFCH1PowerValue OBJECT-TYPE
+        	SYNTAX Integer32
+        	MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			    " 
+			    When the dual-channel optical receiver works in combination mode, this leaf takes effect and it indicates the RF power of channel 1.
+			    Its unit is dBmV,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				invalid: 0x7fffffff. 
+			    "
+			::= { hwOpticalNodeEntry 51 }     
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.52
+        hwORRFCH1PowerAlarmState OBJECT-TYPE
+         	SYNTAX INTEGER 
+         	{
+		normal(1),
+		low(2),
+		high(3)
+		}
+         	MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+			    " 	
+			    When the dual-channel optical receiver works in combination mode, this leaf takes effect and it indicates the RF power alarm status of channel 1. 
+			    The Optical receiver can be used only when it is normal.
+				Options: 
+				1.normal(1)   -  indicates that RF power alarm state is normal
+				2.low(2)      -  indicates that RF power alarm state is low
+				3.high(3)     -  indicates that RF power alarm state is high 
+			    " 
+			::= { hwOpticalNodeEntry 52 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.53
+		hwOTCH1WaveLength OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The wave length of channel 1 for the Optical transmitter .
+				Its unit is nm.
+				Its value is 1310nm or 1550nm or 1610nm.
+				invalid(-1)
+				"
+			::= { hwOpticalNodeEntry 53 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.54
+		hwOTCfgOpticalWorkMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			singleSGsingleTX(2),
+			singleSGdoubleTX(3),
+			doubleSGdoubleTX(4)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Indicates the configuration information about the work mode for the optical transmitter.
+				Options: 
+				2.singleSGsingleTX(2)     -  indicates the working mode is single SG(service group), single TX(optical transmitter)
+				3.singleSGdoubleTX(3)     -  indicates the working mode is single SG(service group), double TX(optical transmitter)
+				4.doubleSGdoubleTX(4)     -  indicates the working mode is double SG(service group), double TX(optical transmitter)
+				default is doubleSGdoubleTX(4).
+				"
+			::= { hwOpticalNodeEntry 54 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.55
+		hwOTRuninfoOpticalWorkMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			invalid(1),
+			singleSGsingleTX(2),
+			singleSGdoubleTX(3),
+			doubleSGdoubleTX(4)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Indicates the running information about the work mode for the optical transmitter.				
+				1.invalid(1)        -  indicates the working mode is not supported for the optical transmitter 
+				                       or the optical transmitter is not online
+				2.singleSGsingleTX(2)     -  indicates the working mode is single SG(service group), single TX(optical transmitter)
+				3.singleSGdoubleTX(3)     -  indicates the working mode is single SG(service group), double TX(optical transmitter)
+				4.doubleSGdoubleTX(4)     -  indicates the working mode is double SG(service group), double TX(optical transmitter)
+				default is doubleSGdoubleTX(4).
+				"
+			::= { hwOpticalNodeEntry 55 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.56
+		hwOTCH0RFAttValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				This is the rf attenuation current value of channel 0 for the dual-channel optical transmitter.
+				Its unit is dB,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				Its range is 0.0dB~20.0dB.
+				invalid(-1)
+				"
+			::= { hwOpticalNodeEntry 56 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.57
+		hwOTCH1RFAttValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				This is the rf attenuation current value of channel 1 for the dual-channel optical transmitter.
+				Its unit is dB,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				Its range is 0.0dB~20.0dB.
+				invalid(-1)
+				"
+			::= { hwOpticalNodeEntry 57 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.58
+		hwORCh0OnlineState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			normal(1),
+			offline(2),
+			fault(3),
+			config(4),
+			autoload(5),
+			manualshutdown(6),
+			mismatch(7)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The state of channel 0 for the optical receiver.
+				Options: 
+				1.normal(1)   -  indicates that optical receiver channel 0 is normal
+				2.offline(2)  -  indicates that optical receiver channel 0 is offline  
+				3.fault(3)    -  indicates that optical receiver channel 0 is fault 
+				4.config(4)   -  indicates that optical receiver channel 0 is config
+				5.autoload(5) -  indicates that optical receiver channel 0 is autoload
+				6.manualshutdown(6)  -  indicates that optical receiver channel 0 is manualshutdown
+				7.mismatch(7) -  indicates that optical receiver channel 0 is mismatch
+				"
+			::= { hwOpticalNodeEntry 58 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.59
+		hwORCh1OnlineState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			normal(1),
+			offline(2),
+			fault(3),
+			config(4),
+			autoload(5),
+			manualshutdown(6),
+			mismatch(7)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The state of channel 1 for the optical receiver.
+				Options: 
+				1.normal(1)   -  indicates that optical receiver channel 1 is normal
+				2.offline(2)  -  indicates that optical receiver channel 1 is offline  
+				3.fault(3)    -  indicates that optical receiver channel 1 is fault 
+				4.config(4)   -  indicates that optical receiver channel 1 is config
+				5.autoload(5) -  indicates that optical receiver channel 1 is autoload
+				6.manualshutdown(6)  -  indicates that optical receiver channel 1 is manualshutdown
+				7.mismatch(7) -  indicates that optical receiver channel 1 is mismatch  
+				"
+			::= { hwOpticalNodeEntry 59 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.60
+		hwOTCh0OnlineState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			normal(1),
+			offline(2),
+			fault(3),
+			config(4),
+			autoload(5),
+			manualshutdown(6),
+			mismatch(7)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The state of channel 0 for the optical transmitter.
+				Options: 
+				1.normal(1)   -  indicates that optical transmitter channel 0 is normal
+				2.offline(2)  -  indicates that optical transmitter channel 0 is offline  
+				3.fault(3)    -  indicates that optical transmitter channel 0 is fault 
+				4.config(4)   -  indicates that optical transmitter channel 0 is config
+				5.autoload(5) -  indicates that optical transmitter channel 0 is autoload
+				6.manualshutdown(6)  -  indicates that optical transmitter channel 0 is manualshutdown
+				7.mismatch(7) -  indicates that optical transmitter channel 0 is mismatch  
+				"
+			::= { hwOpticalNodeEntry 60 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.61
+		hwOTCh1OnlineState OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			normal(1),
+			offline(2),
+			fault(3),
+			config(4),
+			autoload(5),
+			manualshutdown(6),
+			mismatch(7)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The state of channel 1 for the optical transmitter.
+				Options: 
+				1.normal(1)   -  indicates that optical transmitter channel 1 is normal
+				2.offline(2)  -  indicates that optical transmitter channel 1 is offline  
+				3.fault(3)    -  indicates that optical transmitter channel 1 is fault 
+				4.config(4)   -  indicates that optical transmitter channel 1 is config
+				5.autoload(5) -  indicates that optical transmitter channel 1 is autoload
+				6.manualshutdown(6)  -  indicates that optical transmitter channel 1 is manualshutdown
+				7.mismatch(7) -  indicates that optical transmitter channel 1 is mismatch   
+				"
+			::= { hwOpticalNodeEntry 61 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.62
+		hwONCfgOpticalWorkMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			invalid(1),
+			singleRXdoubleTX(2),
+			doubleRXsingleTX(3)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+				Indicates the configuration information about the work mode for the optical node.
+				Options: 
+				1.invalid(1)        -  indicates the working mode is not supported for the optical node 
+				                       or the optical node is not online
+				2.singleRXdoubleTX(2)     -  indicates the working mode is single RX(optical receiver), double TX(optical transmitter)
+				3.doubleRXsingleTX(3)     -  indicates the working mode is double RX(optical receiver), single TX(optical transmitter)
+				default is singleRXdoubleTX(2).
+				"
+			::= { hwOpticalNodeEntry 62 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.63
+		hwONRuninfoOpticalWorkMode OBJECT-TYPE
+			SYNTAX INTEGER
+			{
+			invalid(1),
+			singleRXdoubleTX(2),
+			doubleRXsingleTX(3)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				Indicates the configuration information about the work mode for the optical node.
+				Options: 
+				1.invalid(1)        -  indicates the working mode is not supported for the optical node 
+				                       or the optical node is not online
+				2.singleRXdoubleTX(2)     -  indicates the working mode is single RX(optical receiver), double TX(optical transmitter)
+				3.doubleRXsingleTX(3)     -  indicates the working mode is double RX(optical receiver), single TX(optical transmitter)
+				default is singleRXdoubleTX(2).
+				"
+			::= { hwOpticalNodeEntry 63 }
+						
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.64
+		hwOTCh0RuninfoOpticalLowPassFilter OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The low pass filter of channel 0 for the Optical transmitter .
+				Its unit is MHz.
+				Its value is 42MHz or 65MHz or 85MHz or 204MHz.
+				invalid(-1)
+				"
+			::= { hwOpticalNodeEntry 64 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.65
+		hwOTCh1RuninfoOpticalLowPassFilter OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The low pass filter of channel 1 for the Optical transmitter .
+				Its unit is MHz.
+				Its value is 42MHz or 65MHz or 85MHz or 204MHz.
+				invalid(-1)
+				"
+			::= { hwOpticalNodeEntry 65 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.66
+		hwONSmartCapability OBJECT-TYPE
+			SYNTAX BITS
+			{
+			setOTCHRFAttValue(0),
+			setONCfgOpticalWorkMode(1),
+			setOTCfgOpticalWorkMode(2)
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"
+				This MIB node is used to query the function of the optical node, which is represented by bits. 
+				Functions of each bit are as follows:
+				1: setOTCHRFAttValue(0)   - indicates whether the RF attenuation of the optical transmitter channel is supported.
+				2: setONCfgOpticalWorkMode(1)  - indicates whether the multiplexing mode of the optical receiver or transmitter node is supported.
+				3: setOTCfgOpticalWorkMode(2)  - indicates whether the protection mode of the optical transmitter is supported.
+				From left to right, each bit indicates whether the function is supported.
+				If this bit is 1, the function is supported.
+				If this bit is 0, the function is not supported.
+				"
+			::= { hwOpticalNodeEntry 66 } 
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.67
+		hwORRFPowerChangeThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"
+                The RF power change threshold of Optical receiver
+				Its unit is dBmV,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				Its real range is 3dBmV~15dBmV,mib range is 30dBmV~150dBmV.
+				"
+			::= { hwOpticalNodeEntry 67 } 
+			
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.68
+		hwORCHN0RFPowerReferenceValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+                The RF power reference value of Optical receiver. When the dual-channel optical receiver works in combination mode, this leaf indicates the RF power reference value of channel 0.
+			    Its unit is dBmV,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				invalid: 0x7fffffff."
+			::= { hwOpticalNodeEntry 68 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.69
+		hwORCHN0RFPowerChangeValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+                The RF power change value of Optical receiver. When the dual-channel optical receiver works in combination mode, this leaf indicates the RF power change value of channel 0.
+			    Its unit is dBmV,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				invalid: 0x7fffffff."
+			::= { hwOpticalNodeEntry 69 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.70
+		hwORCHN1RFPowerReferenceValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+                When the dual-channel optical receiver works in combination mode, this leaf takes effect and it indicates the RF power reference value of channel 1.
+			    Its unit is dBmV,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				invalid: 0x7fffffff."
+			::= { hwOpticalNodeEntry 70 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.71
+		hwORCHN1RFPowerChangeValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+                When the dual-channel optical receiver works in combination mode, this leaf takes effect and it indicates the RF power change value of channel 1.
+			    Its unit is dBmV,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				invalid: 0x7fffffff."
+			::= { hwOpticalNodeEntry 71 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.72
+		hwORCH0CurrentInputVoltage1 OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The RX CH0 current input voltage1 of Optical node.
+				Its unit is V,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				The RX CH0 current input voltage1 is positive voltage.
+				invalid: 0x7fffffff.
+				"
+			::= { hwOpticalNodeEntry 72 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.73
+		hwORCH0CurrentInputVoltage2 OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The RX CH0 current input voltage2 of Optical node.
+				Its unit is V,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				The RX CH0 current input voltage2 is positive voltage.
+				invalid: 0x7fffffff.
+				"
+			::= { hwOpticalNodeEntry 73 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.74
+		hwORCH1CurrentInputVoltage1 OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The RX CH1 current input voltage1 of Optical node.
+				Its unit is V,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				The RX CH1 current input voltage1 is positive voltage.
+				invalid: 0x7fffffff.
+				"
+			::= { hwOpticalNodeEntry 74 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.75
+		hwORCH1CurrentInputVoltage2 OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The RX CH1 current input voltage2 of Optical node.
+				Its unit is V,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				The RX CH1 current input voltage2 is positive voltage.
+				invalid: 0x7fffffff.
+				"
+			::= { hwOpticalNodeEntry 75 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.76
+		hwOTCH0CurrentInputVoltage1 OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The TX CH0 current input voltage1 of Optical node.
+				Its unit is V,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				The TX CH0 current input voltage1 is positive voltage.
+				invalid: 0x7fffffff.
+				"
+			::= { hwOpticalNodeEntry 76 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.77
+		hwOTCH0CurrentInputVoltage2 OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The TX CH0 current input voltage2 of Optical node.
+				Its unit is V,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				The TX CH0 current input voltage2 is positive voltage.
+				invalid: 0x7fffffff.
+				"
+			::= { hwOpticalNodeEntry 77 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.78
+		hwOTCH1CurrentInputVoltage1 OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The TX CH1 current input voltage1 of Optical node.
+				Its unit is V,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				The TX CH1 current input voltage1 is positive voltage.
+				invalid: 0x7fffffff.
+				"
+			::= { hwOpticalNodeEntry 78 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.7.1.79
+		hwOTCH1CurrentInputVoltage2 OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The TX CH1 current input voltage2 of Optical node.
+				Its unit is V,its real accuracy is 0.1.
+				SNMP uses it which has been enlarged 10 by host.
+				user uses it which has been lessened 10 by SNMP.
+				The TX CH1 current input voltage2 is positive voltage.
+				invalid: 0x7fffffff.
+				"
+			::= { hwOpticalNodeEntry 79 }
+			
+ -- 1.3.6.1.4.1.2011.6.1.1.8
+		hwOpticalPowerTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwOpticalPowerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				The indexes of this entry are hwFrameIndex and hwOpticalChnIndex.
+				The index of this table is hwFrameIndex that comes from hwFrameTable. 
+				"
+			::= { hwEnvironmentMon 8 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.8.1
+		hwOpticalPowerEntry OBJECT-TYPE
+			SYNTAX HwOpticalPowerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				The indexes of this entry are hwFrameIndex and hwOpticalChnIndex.
+				The index of this table is hwFrameIndex that comes from hwFrameTable.  
+				"
+			INDEX { hwFrameIndex, hwOpticalChnIndex }
+			::= { hwOpticalPowerTable 1 }
+			
+			HwOpticalPowerEntry ::=
+				SEQUENCE 
+				{ 
+				hwOpticalChnIndex
+					    Integer32, 
+				hwOpticalPowerValue 
+					    OCTET STRING, 
+			    hwOpticalBiasValue
+			            Integer32
+				}
+				
+-- 1.3.6.1.4.1.2011.6.1.1.8.1.1
+		hwOpticalChnIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"
+				The channel id of optical node.
+				"
+			::= { hwOpticalPowerEntry 1 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.8.1.2
+		hwOpticalPowerValue OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"
+				The optical power value of optical node
+				Its unit is dbm,its real accuracy is 0.01.
+				"
+			::= { hwOpticalPowerEntry 2 } 
+			
+-- 1.3.6.1.4.1.2011.6.1.1.8.1.3 
+	   hwOpticalBiasValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"
+				The optical Bias value of optical node
+				Its unit is mA.
+				"
+			::= { hwOpticalPowerEntry 3 } 
+
+-- 1.3.6.1.4.1.2011.6.1.1.9
+		hwFanUnitTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwFanUnitEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Fan unit table. 
+				The index of this table are hwEnvEmuIndex that comes from hwEnvironmentInfoTable and hwFanUnitIndex. 
+				hwEnvEmuIndex is the index of the monitoring unit whose monitoring type is temperature control unit,
+				and hwFanUnitIndex is the index of fan unit that is monitored by the fan.
+				"
+			::= { hwEnvironmentMon 9 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.9.1
+		hwFanUnitEntry OBJECT-TYPE
+			SYNTAX HwFanUnitEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Fan unit table. 
+				The index of this table are hwEnvEmuIndex that comes from hwEnvironmentInfoTable and hwFanUnitIndex. 
+				hwEnvEmuIndex is the index of the monitoring unit whose monitoring type is temperature control unit,
+				and hwFanUnitIndex is the index of fan unit that is monitored by the fan.
+				"
+			INDEX { hwEnvEmuIndex, hwFanUnitIndex }
+			::= { hwFanUnitTable 1 }
+			
+			HwFanUnitEntry ::=
+				SEQUENCE 
+				{ 
+				hwFanUnitIndex
+					Integer32,
+				hwFanUnitSpeed
+					Integer32
+				}
+				 
+-- 1.3.6.1.4.1.2011.6.1.1.9.1.1
+		hwFanUnitIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The index of fan unit.
+				"
+			::= { hwFanUnitEntry 1 }
+				
+-- 1.3.6.1.4.1.2011.6.1.1.9.1.2
+		hwFanUnitSpeed OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The speed of fan unit
+				Its unit is round per minute,
+				invalid: -1.
+				"
+			::= { hwFanUnitEntry 2 }
+-- 1.3.6.1.4.1.2011.6.1.1.10
+		hwSirenTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwSirenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				" siren config table"
+			::= { hwEnvironmentMon 10 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.10.1
+		hwSirenEntry OBJECT-TYPE
+			SYNTAX HwSirenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"siren config table"
+			INDEX { hwEnvEmuIndex }
+			::= { hwSirenTable 1 }
+			
+			HwSirenEntry ::=
+			SEQUENCE { 
+				hwSirenSwitch
+					INTEGER,
+				hwSirenHowlerDelay
+					Integer32,
+				hwSirenHowlerDuration
+					Integer32,
+				hwSirenSlientDuration
+					Integer32
+			}
+
+-- 1.3.6.1.4.1.2011.6.1.1.10.1.1
+		hwSirenSwitch OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			enable(1),
+			disable(2),
+			invalid(-1)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			enabe and disable the siren.
+			1:enable
+			2:disable
+			-1:invalid
+			"
+		DEFVAL { disable }
+		::= { hwSirenEntry 1 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.10.1.2
+		hwSirenHowlerDelay OBJECT-TYPE
+		SYNTAX Integer32 (0..1440)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"the howler-delay of the siren.The default value is 30,the unit is minute.
+			invalid: -1."
+		DEFVAL { 30 }
+		::= { hwSirenEntry 2 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.10.1.3
+		hwSirenHowlerDuration OBJECT-TYPE
+		SYNTAX Integer32 (0..1440)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"the howler-duration of the siren.The default value is 3,the unit is minute.
+			invalid: -1."
+		DEFVAL { 3 }
+		::= { hwSirenEntry 3 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.10.1.4
+		hwSirenSlientDuration OBJECT-TYPE
+		SYNTAX Integer32 (0..1440)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"the slient-duration of the siren.The default value is 60,the unit is minute.
+			 invalid(-1)."
+		DEFVAL { 60 }
+		::= { hwSirenEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.6.1.1.11
+		hwElockTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwElockEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				" 
+				Electronic lock table. 
+				The index of this table are hwEnvEmuIndex that comes from hwEnvironmentInfoTable and hwElockIndex. 
+				hwEnvEmuIndex is the index of the monitoring unit whose monitoring type is door lock unit,
+				and hwElockIndex is the index of door lock that is smu.
+				"
+			::= { hwEnvironmentMon 11 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.11.1
+		hwElockEntry OBJECT-TYPE
+			SYNTAX HwElockEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Electronic lock table. 
+				The index of this table are hwEnvEmuIndex that comes from hwEnvironmentInfoTable and hwElockIndex. 
+				hwEnvEmuIndex is the index of the monitoring unit whose monitoring type is electric lock unit,
+				and hwElockIndex is the index of electronic lock.
+				"
+			INDEX { hwEnvEmuIndex, hwElockIndex }
+			::= { hwElockTable 1 }
+			
+			HwElockEntry ::=
+			SEQUENCE { 
+				hwElockIndex
+					Integer32,
+				hwElockName
+					DisplayString,
+				hwElockEnableFlag
+					INTEGER,
+				hwElockCommStatus
+					INTEGER,
+				hwElockCtrStatus
+					INTEGER
+			}
+			
+-- 1.3.6.1.4.1.2011.6.1.1.11.1.1
+		hwElockIndex OBJECT-TYPE
+		SYNTAX Integer32 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			The index of electronic lock.
+			"
+		::= { hwElockEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.6.1.1.11.1.2
+		hwElockName OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			Electronic lock type:
+			Ammeter-Compartment,
+			Device-Compartment,
+			Device1-Compartment,
+			Device2-Compartment,
+			HEX-Compartment,
+			MDF-Compartment,
+			MDF1-Compartment,
+			MDF2-Compartment,
+			"
+		::= { hwElockEntry 2 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.11.1.3
+		hwElockEnableFlag OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			enable(1),
+			disable(2),
+			invalid(-1)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			Enable/Disable a electronic lock.
+			Enable(1),
+			Disable(2),
+			invalid(-1)
+			"
+		::= { hwElockEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.6.1.1.11.1.4
+		hwElockCommStatus OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			unconfigured(2),
+			normal(9),
+			faulty(10),
+			invalid(-1)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			The state of the communication of the electric lock with the host.
+			unconfigured(2):The electronic has not been configured.
+			normal(9):The communication of the electronic with the host is normal.
+			faulty(10):The communication of the electronic with the host is abnormal.
+			invalid: -1.
+			"
+		::= { hwElockEntry 4 }
+
+-- 1.3.6.1.4.1.2011.6.1.1.11.1.5
+		hwElockCtrStatus OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			statusOpen(1),
+			statusClose(0),
+			statusNoElock(255),
+			invalid(-1)
+			}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			The status of electric lock.
+			statusOpen(1):The electronic door lock is open.
+			statusClose(0):The electronic door lock is closed.
+			statusNoElock(255):The electronic has not been enabled.
+			invalid: -1.
+			"
+		::= { hwElockEntry 5 }
+					          -- 1.3.6.1.4.1.2011.6.1.1.12
+		hwElockRightTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HwElockRightEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				" 
+				Electronic right card table. 
+				The index of this table are hwEnvEmuIndex that comes from hwEnvironmentInfoTable and hwElockRightCardId. 
+				hwEnvEmuIndex is the index of the monitoring unit whose monitoring type is door lock unit,
+				and hwElockRightCardId is the ID of right card.
+				"
+			::= { hwEnvironmentMon 12 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.12.1
+		hwElockRightEntry OBJECT-TYPE
+			SYNTAX HwElockRightEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				Electronic right card table.  
+				The index of this table are hwEnvEmuIndex that comes from hwEnvironmentInfoTable and hwElockRightCardId. 
+				hwEnvEmuIndex is the index of the monitoring unit whose monitoring type is door lock unit,
+				and hwElockRightCardId is the index of door lock.
+				"
+			INDEX { hwEnvEmuIndex, hwElockRightCardId }
+			::= { hwElockRightTable 1 }
+			
+			HwElockRightEntry ::=
+			SEQUENCE { 
+				hwElockRightCardId
+					Integer32,
+				hwElockRightElockIndexMask
+					OCTET STRING,
+				hwElockRightRowStatus
+					RowStatus,
+				hwElockRightStartTime
+					OCTET STRING,
+				hwElockRightExpireTime
+					OCTET STRING
+			}
+			
+-- 1.3.6.1.4.1.2011.6.1.1.12.1.1
+		hwElockRightCardId OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			The id of eletronic lock right card.
+			"
+		::= { hwElockRightEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.6.1.1.12.1.2
+		hwElockRightElockIndexMask OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (0 | 3))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+				000:indicates that the right card can not open any elock.
+				001:indicates that the right card can open the first elock.
+				010:indicates that the right card can open the second elock.
+				100:indicates that the right card can open the third elock.
+				011:indicates that the right card can open the first and the second elock.
+				101:indicates that the right card can open the first and the third elock.
+				110:indicates that the right card can open the second and the third elock.
+				111:indicates that the right card can open all elocks.
+			"
+		::= { hwElockRightEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.6.1.1.12.1.3
+		hwElockRightRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"
+		    Indicates the row status. To create an right card, 
+ 			set this leaf to createAndGo(4). To delete an right card, 
+ 			set this leaf to destroy(6). 
+ 			When this leaf is queried, the value is fixed to active(1).
+ 			Options: 
+ 			1. active(1)      -indicates the query operation.
+ 			2. createAndGo(4) -indicates creating an right card.
+ 			3. destroy(6)     -indicates deleting an right card.
+ 			"
+		::= { hwElockRightEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.6.1.1.12.1.4
+		hwElockRightStartTime OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (0 | 14))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			The start time of the door card authority.
+			field	octets	contents	range
+			-----	------	--------	-----
+			1	    1-4	    year		0..9999
+			2	    5-6	    month		1..12
+			3	    7-8	    day		    1..31
+			4	    9-10	hour		0..24
+			5	    11-12	minute		0..60
+			6	    13-14	second		0..60
+			For example, if the start time is 2017-12-20 10:20:30, the input o output is 20171220102030"
+		::= { hwElockRightEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.6.1.1.12.1.5
+		hwElockRightExpireTime OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (0 | 14))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"
+			The expire time of the door card authority.
+			field	octets	contents	range
+			-----	------	--------	-----
+			1	    1-4	    year		0..9999
+			2	    5-6	    month		1..12
+			3	    7-8	    day		    1..31
+			4	    9-10	hour		0..24
+			5	    11-12	minute		0..60
+			6	    13-14	second		0..60
+			For example, if the expire time is 2017-12-30 10:20:30, the input o output is 20171230102030"
+		::= { hwElockRightEntry 5 }	
+																						
+ -- 1.3.6.1.4.1.2011.6.1.1.13
+		hwOpticalModuleTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwOpticalModuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				The indexes of this table are hwFrameIndex, hwOpticalModuleType, hwOpticalChnIndex and hwOpticalDevType.
+				The index hwFrameIndex comes from hwFrameTable.
+				"
+			::= { hwEnvironmentMon 13 }  
+			
+-- 1.3.6.1.4.1.2011.6.1.1.13.1
+		hwOpticalModuleEntry OBJECT-TYPE
+			SYNTAX HwOpticalModuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"
+				The indexes of this entry are hwFrameIndex, hwOpticalModuleType, hwOpticalChnIndex and hwOpticalDevType.
+				The index hwFrameIndex comes from hwFrameTable.
+				"
+			INDEX { hwFrameIndex, hwOpticalModuleType, hwOpticalChnIndex }
+			::= { hwOpticalModuleTable 1 }
+			
+			HwOpticalModuleEntry ::=
+				SEQUENCE 
+				{ 
+				hwOpticalModuleType OCTET STRING,
+				hwOpticalDevType OCTET STRING
+				}
+				
+-- 1.3.6.1.4.1.2011.6.1.1.13.1.1
+		hwOpticalModuleType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"
+				The module type of optical node.
+				"
+			::= { hwOpticalModuleEntry 1 }
+			
+-- 1.3.6.1.4.1.2011.6.1.1.13.1.2
+		hwOpticalDevType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"
+				The dev type of optical node.
+				"
+			::= { hwOpticalModuleEntry 2 }
+		
 -- 1.3.6.1.4.1.2011.6.1.2
 		snmpTrapsDef OBJECT IDENTIFIER ::= { hwEnvironment 2 }
 		
@@ -2101,8 +4122,12 @@
 			}
 			STATUS      current
 			DESCRIPTION    
-			 "The agent generates this trap when the
-			 a Hardware exception occurs.
+			 "The agent generates this trap when the following two faults occurs:
+			 1. Power fault, which involves the following three scenarios:
+			    1) Only one power board is installed on the MSAN.
+			    2) Two power boards are detected on the device but only one power board is connected to the power supply.
+			    3) Two power boards are detected on the device but one of them is faulty and cannot supply power.
+			 2. Read temperature fault, which occurs when the fan temperature sensor is faulty.
 			 "
 			::= { hwEnvironEmuAlarmTrapsPrefix 3 }
 		    
@@ -2156,7 +4181,7 @@
 			::= { hwEnvironEmuAlarmTrapsPrefix 6 }			    	    	    		
 		    
 -- 1.3.6.1.4.1.2011.6.1.4.2.1.0.7
-		hwOpticalReceiverFailTrap NOTIFICATION-TYPE
+		hwOpticalNodeFailTrap NOTIFICATION-TYPE
 			OBJECTS
 			{
 			hwFrameIndex
@@ -2164,13 +4189,13 @@
 			STATUS      current
 			DESCRIPTION    
 			 "The agent generates this trap when the
-			 communication of the OpticalReceiver with the host
+			 communication of the OpticalNode with the host
 			 is abnormal.
 			 "
 			::= { hwEnvironEmuAlarmTrapsPrefix 7 }			    	    	    		
 		    
 -- 1.3.6.1.4.1.2011.6.1.4.2.1.0.8
-		hwOpticalReceiverRecoverTrap NOTIFICATION-TYPE
+		hwOpticalNodeRecoverTrap NOTIFICATION-TYPE
 			OBJECTS
 			{
 			hwFrameIndex
@@ -2178,7 +4203,7 @@
 			STATUS      current
 			DESCRIPTION    
 			"The agent generates this trap when the
-			communication of the OpticalReceiver with the host 
+			communication of the OpticalNode with the host 
 			recovers.
 			"
 			::= { hwEnvironEmuAlarmTrapsPrefix 8 }			    	    	    		
@@ -2188,7 +4213,7 @@
 			OBJECTS
 			{
 			hwFrameIndex,
-			hwOROpticalPowerValue
+			hwOROpticalPowerValueTrap
 			}
 			STATUS      current
 			DESCRIPTION    
@@ -2202,12 +4227,12 @@
 			OBJECTS
 			{
 			hwFrameIndex,
-			hwOROpticalPowerValue
+			hwOROpticalPowerValueTrap
 			}
 			STATUS      current
 			DESCRIPTION    
 			 "The agent generates this trap when 
-			 the optical power of OpticalReceiver recovers to normal rage.
+			 the optical power of OpticalReceiver recovers to normal range.
 			 "
 			::= { hwEnvironEmuAlarmTrapsPrefix 10 }			    	    	    		
 		    
@@ -2216,7 +4241,7 @@
 			OBJECTS
 			{
 			hwFrameIndex,
-			hwORRFPowerValue
+			hwORRFPowerValueTrap
 			}
 			STATUS      current
 			DESCRIPTION    
@@ -2230,15 +4255,341 @@
 			OBJECTS
 			{
 			hwFrameIndex,
-			hwORRFPowerValue
+			hwORRFPowerValueTrap
 			}
 			STATUS      current
 			DESCRIPTION    
 			 "The agent generates this trap when 
-			 the RF power of OpticalReceiver recovers to normal rage.
+			 the RF power of OpticalReceiver recovers to normal range.
 			 "
-			::= { hwEnvironEmuAlarmTrapsPrefix 12 }			    	    	    		
+			::= { hwEnvironEmuAlarmTrapsPrefix 12 }	
 
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.13
+		hwOpticalTransmitterPowerFailTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwOTOpticalOutputPowerValueTrap
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the optical power of OpticalTransmitter is abnormal.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 13 }						    	    	    		
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.14
+		hwOpticalTransmitterPowerRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwOTOpticalOutputPowerValueTrap
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the optical power of OpticalTransmitter recovers to normal range.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 14 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.15
+		hwOpticalTransmitterBiasFailTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwOTBiasValue
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the optical bias of OpticalTransmitter is abnormal.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 15 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.16
+		hwOpticalTransmitterBiasRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwOTBiasValue
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the optical bias of OpticalTransmitter recovers to normal range.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 16 }	
+			
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.17
+		hwOpticalDualChnProtectSwitchTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the dual-channel optical occur protect-switch channel.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 17 }	
+			
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.18
+		hwOpticalReceiverDualChnPowerFailTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwOpticalChnIndex,
+			hwOpticalPowerValue
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the optical power of dual-channel OpticalReceiver is abnormal.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 18 }	
+			
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.19
+		hwOpticalReceiverDualChnPowerRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwOpticalChnIndex,
+			hwOpticalPowerValue
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the optical power of dual-channel OpticalReceiver recovers to normal range.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 19 }	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.20
+	    hwModuleOpticalTransmitterPowerFailTrap NOTIFICATION-TYPE
+		    OBJECTS
+		    {  
+		    hwFrameIndex,
+		    hwOpticalChnIndex,
+		    hwOpticalPowerValue
+		    }
+		    STATUS      current
+		    DESCRIPTION 
+		    "The agent generates this trap when 
+		    the optical power of OpticalTransmitter is abnormal.
+		    "
+		    ::= { hwEnvironEmuAlarmTrapsPrefix 20 }  
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.21
+		hwModuleOpticalTransmitterPowerRecoverTrap NOTIFICATION-TYPE
+		    OBJECTS
+		    { 
+		    hwFrameIndex,
+		    hwOpticalChnIndex,
+            hwOpticalPowerValue	    
+		    }
+		    STATUS      current
+		    DESCRIPTION
+		    "The agent generates this trap when
+		    the optical power of OpticalTransmitter recovers to normal range.
+		    " 
+		    ::= { hwEnvironEmuAlarmTrapsPrefix 21 }
+		   
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.22
+       hwModuleOpticalTransmitterBiasRecoverTrap NOTIFICATION-TYPE
+           OBJECTS
+		    { 
+		    hwFrameIndex,
+		    hwOpticalChnIndex,
+		    hwOpticalBiasValue
+		    }
+		    STATUS      current
+		    DESCRIPTION
+		    "The agent generates this trap when 
+		    the optical bias of OpticalTransmitter recovers to normal range.
+		    "
+		    ::= { hwEnvironEmuAlarmTrapsPrefix 22 } 
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.23		    
+       hwModuleOpticalTransmitterBiasFailTrap NOTIFICATION-TYPE
+           OBJECTS
+           { 
+           hwFrameIndex,
+		   hwOpticalChnIndex,
+		   hwOpticalBiasValue
+           } 
+           STATUS      current
+		   DESCRIPTION 
+		   "The agent generates this trap when
+		   the optical bias of OpticalTransmitter is abnormal.
+		   "
+		   ::= { hwEnvironEmuAlarmTrapsPrefix 23 }  
+		   
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.24     
+       hwModuleOpticalCombinerRFPowerFailTrap NOTIFICATION-TYPE
+           OBJECTS
+           {         
+           hwFrameIndex,
+		   hwOpticalChnIndex,
+		   hwORRFPowerValueTrap
+           }
+           STATUS      current
+		   DESCRIPTION 
+		   "The agent generates this trap when the dual-channel OpticalReceiver use the combiner protect-switch channel policy and
+           the RF power of dual-channel OpticalReceiver is abnormal.
+           "
+		   ::= { hwEnvironEmuAlarmTrapsPrefix 24 }    
+		   
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.25
+       hwModuleOpticalCombinerRFPowerRecoverTrap NOTIFICATION-TYPE
+           OBJECTS
+           {         
+           hwFrameIndex,
+		   hwOpticalChnIndex,
+		   hwORRFPowerValueTrap
+           }
+           STATUS      current
+		   DESCRIPTION 
+		   "The agent generates this trap when the dual-channel OpticalReceiver use the combiner protect-switch channel policy and
+           the RF power of dual-channel OpticalReceiver recovers to normal range .
+           "
+		   ::= { hwEnvironEmuAlarmTrapsPrefix 25 }
+		   
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.26
+       hwEmmDoorLockCommFailTrap NOTIFICATION-TYPE
+           OBJECTS
+           {         
+           hwFrameIndex,
+		   hwEnvEmuIndex,
+		   hwElockIndex
+           }
+           STATUS      current
+		   DESCRIPTION 
+		   "The agent generates this trap when the door lock cannot communicate with the main board.
+           "
+		   ::= { hwEnvironEmuAlarmTrapsPrefix 26 }
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.27
+       hwEmmDoorLockCommRecoverTrap NOTIFICATION-TYPE
+           OBJECTS
+           {         
+           hwFrameIndex,
+		   hwEnvEmuIndex,
+		   hwElockIndex
+           }
+           STATUS      current
+		   DESCRIPTION 
+		   "The agent generates this trap when the door lock recover to communicate with the main board.
+           "
+		   ::= { hwEnvironEmuAlarmTrapsPrefix 27 } 		   
+		   
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.28
+       hwEmmDoorLockAbnormalUnlockTrap NOTIFICATION-TYPE
+           OBJECTS
+           {         
+           hwFrameIndex,
+		   hwEnvEmuIndex,
+		   hwElockIndex
+           }
+           STATUS      current
+		   DESCRIPTION 
+		   "The agent generates this trap when the the door lock is abnormal unlocked.
+           "
+		   ::= { hwEnvironEmuAlarmTrapsPrefix 28 } 
+		   
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.29
+       hwEmmDoorLockAbnormalUnlockRecoverTrap NOTIFICATION-TYPE
+           OBJECTS
+           {         
+           hwFrameIndex,
+		   hwEnvEmuIndex,
+		   hwElockIndex
+           }
+           STATUS      current
+		   DESCRIPTION 
+		   "The agent generates this trap when the the door lock recover to the normal state.
+           "
+		   ::= { hwEnvironEmuAlarmTrapsPrefix 29 }		         
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.30
+		hwOpticalModuleTypeMismatchTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwOpticalModuleType,
+			hwOpticalChnIndex,
+			hwOpticalDevType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the type of the inserted optical receiver or transmitter does not match that 
+			 supported by the slot.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 30 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.31
+		hwOpticalModuleTypeMismatchRestoreTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwOpticalModuleType,
+			hwOpticalChnIndex,
+			hwOpticalDevType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when mismatch between the type of the optical receiver or transmitter and that 
+			 supported by the slot is rectified.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 31 }
+       
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.32
+		hwEmmDoorLockOpenLockTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+                        hwFrameIndex,
+			hwEnvEmuIndex,
+			hwElockIndex,
+			hwUnlockMode,
+			hwElockRightCardId,
+			hwUnlockSN,
+			hwUnlockTime
+			}
+			STATUS      current
+			DESCRIPTION
+			 "The agent generates this trap when the electronic lock is opened.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 32 }
+			
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.33
+		hwOpticalReceiverRfChangeFaultTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwOpticalChnIndex,
+			hwORRFPowerValueTrap,
+			hwORRFPowerRefValueTrap,
+			hwORRFPowerChangeValueTrap
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the RF output power change exceeds the alarm threshold.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 33 }  
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.1.0.34
+		hwOpticalModuleAbsenceTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwOpticalModuleType,
+			hwOpticalChnIndex,
+			hwOpticalDevType
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the optical module plug out.
+			 "
+			::= { hwEnvironEmuAlarmTrapsPrefix 34 }   
+				   							
 -- 1.3.6.1.4.1.2011.6.1.4.2.2
 		hwEnvironAnaAlarmTraps OBJECT IDENTIFIER ::= { hwEnvironAlarmTraps  2 }
 
@@ -2251,7 +4602,7 @@
 			{
 			hwFrameIndex,
 			hwEnvEmuIndex,
-			hwAnaAlarmID,
+			hwAnaChannelIndex,
 			hwEnvEmuType,
 			hwAnaName
 			}
@@ -2268,7 +4619,7 @@
 			{
 			hwFrameIndex,
 			hwEnvEmuIndex,
-			hwAnaAlarmID,
+			hwAnaChannelIndex,
 			hwEnvEmuType,
 			hwAnaName
 			}
@@ -2285,7 +4636,7 @@
 			{
 			hwFrameIndex,
 			hwEnvEmuIndex,
-			hwAnaAlarmID,
+			hwAnaChannelIndex,
 			hwEnvEmuType,
 			hwAnaName
 			}
@@ -2302,7 +4653,7 @@
 			{
 			hwFrameIndex,
 			hwEnvEmuIndex,
-			hwAnaAlarmID,
+			hwAnaChannelIndex,
 			hwEnvEmuType,
 			hwAnaName
 			}
@@ -2319,7 +4670,7 @@
 			{
 			hwFrameIndex,
 			hwEnvEmuIndex,
-			hwAnaAlarmID,
+			hwAnaChannelIndex,
 			hwEnvEmuType,
 			hwAnaName
 			}
@@ -2336,7 +4687,7 @@
 			{
 			hwFrameIndex,
 			hwEnvEmuIndex,
-			hwAnaAlarmID,
+			hwAnaChannelIndex,
 			hwEnvEmuType,
 			hwAnaName
 			}
@@ -2353,7 +4704,7 @@
 			{
 			hwFrameIndex,
 			hwEnvEmuIndex,
-			hwAnaAlarmID,
+			hwAnaChannelIndex,
 			hwEnvEmuType,
 			hwAnaName
 			}
@@ -2370,7 +4721,7 @@
 			{
 			hwFrameIndex,
 			hwEnvEmuIndex,
-			hwAnaAlarmID,
+			hwAnaChannelIndex,
 			hwEnvEmuType,
 			hwAnaName
 			}
@@ -2387,7 +4738,7 @@
 			{
 			hwFrameIndex,
 			hwEnvEmuIndex,
-			hwAnaAlarmID,
+			hwAnaChannelIndex,
 			hwEnvEmuType,
 			hwAnaName
 			}
@@ -2404,7 +4755,7 @@
 			{
 			hwFrameIndex,
 			hwEnvEmuIndex,
-			hwAnaAlarmID,
+			hwAnaChannelIndex,
 			hwEnvEmuType,
 			hwAnaName
 			}
@@ -3244,7 +5595,7 @@
 			 range.
 			 "
 			::= { hwEnvironDigAlarmTrapsPrefix 48 }	
-		    		    	    		    		    		    		    		    		    		    		    		    		    		    		    						
+		    		    	    		    		    		    		    		    		
 -- 1.3.6.1.4.1.2011.6.1.4.2.3.0.49
 		hwEmmFanCriticalBlockFaultTrap NOTIFICATION-TYPE
 			OBJECTS
@@ -3312,8 +5663,75 @@
 			 48V input switch is opened.
 			 "
 			::= { hwEnvironDigAlarmTrapsPrefix 52 }
-		    			    		    	    		    		    		    		    		    		    		    		    		    		    		    		    						
-	
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.53
+		hwEmmDigFanSpeedAbnormalTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when the 
+			 fan rotation speed deteriorates.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 53 }
+
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.54
+		hwEmmDigFanSpeedRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 fan rotation speed deterioration recovers.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 54 }
+			
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.55
+		hwEmmDigAcInputPowerOffTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the AC power is off.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 55 }
+		    
+-- 1.3.6.1.4.1.2011.6.1.4.2.3.0.56
+		hwEmmDigAcInputPowerRecoverTrap NOTIFICATION-TYPE
+			OBJECTS
+			{
+			hwFrameIndex,
+			hwEnvEmuIndex,
+			hwDigChannelIndex,
+			hwEnvEmuType,		        
+			hwDigChannelName
+			}
+			STATUS      current
+			DESCRIPTION    
+			 "The agent generates this trap when 
+			 the AC input power recovers.
+			 "
+			::= { hwEnvironDigAlarmTrapsPrefix 56 }	
+			
 -- 1.3.6.1.4.1.2011.6.1.5		
 		hwEmmTrapVbOids OBJECT IDENTIFIER ::= { hwEnvironment 5}
 
@@ -3340,8 +5758,11 @@
 			SYNTAX INTEGER
 			{
 			fullemu(1),
-			shelfnotsupport(2),
-			emunotsupportautofind(3)
+			emunotsupportautofind(2),
+			shelfnotsupport(3),
+			rpsrisfull(4),
+			vescisfull(5),
+			fanisfull(6)
 			}
 			MAX-ACCESS accessible-for-notify
 			STATUS current
@@ -3350,8 +5771,11 @@
 				The reason of the auto-finding failure:
 				Options: 
 				1.fullemu(1)               -No enough EMU IDs are available
-				2.shelfnotsupport(2)       -The EMU does not support the auto discovery function
-				3.emunotsupportautofind(3) -The shelf does not support the EMU of this type
+				2.emunotsupportautofind(2)       -The EMU does not support the auto discovery function
+				3.shelfnotsupport(3) -The shelf does not support the EMU of this type
+				4.rpsrisfull(4)		 -RPSR of this frame already full
+				5.vescisfull(5)		 -VESC of this frame already full
+				6.fanisfull(6)		 -FAN of this frame already full
 				"
 			::= { hwEmmTrapVbOids 2 }
 		
@@ -3388,5 +5812,94 @@
 				The board name of the auto-found EMU.
 				"
 			::= { hwEmmTrapVbOids 5 }
+			
+-- 1.3.6.1.4.1.2011.6.1.5.6
+		hwOROpticalPowerValueTrap OBJECT-TYPE
+			SYNTAX OCTET STRING				
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"				
+				The optical power value of Optical receiver.
+				"
+			::= { hwEmmTrapVbOids 6 }
 
-	END
+-- 1.3.6.1.4.1.2011.6.1.5.7
+		hwORRFPowerValueTrap OBJECT-TYPE
+			SYNTAX OCTET STRING				
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"				
+				The RF power value of Optical receiver.
+				"
+			::= { hwEmmTrapVbOids 7 }
+
+-- 1.3.6.1.4.1.2011.6.1.5.8
+		hwOTOpticalOutputPowerValueTrap OBJECT-TYPE
+			SYNTAX OCTET STRING				
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"				
+				The optical power value of Optical transmitter.
+				"
+			::= { hwEmmTrapVbOids 8 }
+
+-- 1.3.6.1.4.1.2011.6.1.5.9
+		hwUnlockMode OBJECT-TYPE
+			SYNTAX OCTET STRING				
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"				
+				The mode of opening the lock.
+				"
+			::= { hwEmmTrapVbOids 9 }			
+
+-- 1.3.6.1.4.1.2011.6.1.5.10
+		hwUnlockSN OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"				
+				The series number of the unlocked event.
+				"
+			::= { hwEmmTrapVbOids 10 }
+
+-- 1.3.6.1.4.1.2011.6.1.5.11
+		hwUnlockTime OBJECT-TYPE
+			SYNTAX OCTET STRING				
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"	
+				The time when the unlocked event happened.
+				"
+			::= { hwEmmTrapVbOids 11 }
+
+-- 1.3.6.1.4.1.2011.6.1.5.12
+		hwORRFPowerRefValueTrap OBJECT-TYPE
+			SYNTAX OCTET STRING				
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"				
+				The RF power reference value of optical receiver.
+				"
+			::= { hwEmmTrapVbOids 12 }
+			
+-- 1.3.6.1.4.1.2011.6.1.5.13
+		hwORRFPowerChangeValueTrap OBJECT-TYPE
+			SYNTAX OCTET STRING				
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"				
+				The RF power change value of optical receiver.
+				"
+			::= { hwEmmTrapVbOids 13 }
+	END 
+
+	

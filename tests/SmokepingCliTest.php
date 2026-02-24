@@ -32,7 +32,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
-class SmokepingCliTest extends DBTestCase
+final class SmokepingCliTest extends DBTestCase
 {
     use DatabaseTransactions;
 
@@ -389,7 +389,7 @@ class SmokepingCliTest extends DBTestCase
 
     public function canonicalise($input)
     {
-        $input = explode(PHP_EOL, $input);
+        $input = explode(PHP_EOL, (string) $input);
 
         $output = [];
 

@@ -14,6 +14,8 @@ AC-SYSTEM-MIB DEFINITIONS ::= BEGIN
         RowPointer				    FROM SNMPv2-TC
         Unsigned32,
 		Integer32,
+		Counter32,
+		Gauge32,
         enterprises                                 FROM SNMPv2-SMI
 		RowStatus      								FROM SNMPv2-TC
 		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
@@ -25,7 +27,7 @@ AC-SYSTEM-MIB DEFINITIONS ::= BEGIN
 
        
 acSystem  MODULE-IDENTITY       
-    LAST-UPDATED "201408200359Z"          --Wednesday, August 20 2014
+    LAST-UPDATED "202105310433Z"          --Monday, May 31 2021
     ORGANIZATION "AudioCodes Ltd"
     CONTACT-INFO
     "Postal: Support
@@ -72,7 +74,7 @@ acSystem  MODULE-IDENTITY
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the control protocol type. 
 Choose either:
@@ -595,7 +597,7 @@ AC INI-Param: N/A"
      acSysIPSubNetAddress OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Board SubNet Address.  In human readable form.
   (in host byte order e.g. 255.255.255.0 = 0xffffff00). 
@@ -609,7 +611,7 @@ AC INI-Param: N/A"
      acSysIPDefaultGatewayAddress OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Default Gateway Address.
  Board's Default Gateway IP address.  In human readable form.
@@ -628,7 +630,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Enables/disables DHCP support. 
 
@@ -658,7 +660,7 @@ AC INI-Param: DHCPEnable"
      acSysIPDHCPSpeedFactor OBJECT-TYPE
        SYNTAX Unsigned32 (0..10)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Controls the DHCP renewal speed. When set to 0, the DHCP lease
 renewal is disabled. Otherwise, the renewal time is divided
@@ -680,7 +682,7 @@ AC INI-Param: DHCPSpeedFactor"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter defines the DNS primary server's IP address type.
 Access: Offline.
@@ -692,7 +694,7 @@ AC INI-Param: N/A"
      acSysIPDnsPrimaryServer OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter defines the DNS primary server's IP address.
 Range = Legal IP address.
@@ -708,7 +710,7 @@ AC INI-Param: DNSPriServerIP"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter defines the DNS secondary server's IP address
 type.
@@ -721,7 +723,7 @@ AC INI-Param: N/A"
      acSysIPDnsSecondaryServer OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter defines the DNS secondary server's IP address.
 Range = Legal IP address.
@@ -739,7 +741,7 @@ AC INI-Param: DNSSecServerIP"
 
                   }
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Enables/disables DHCP renewal support. 
 This paramater  will only take effect if DHCPEnable = 0.
@@ -775,6 +777,18 @@ see CLI documentation for interface name formats.
 Access: Offline.
 AC INI-Param: WanInterfaceName"
        ::= {acSysIP 11}
+
+
+
+     acSysIPV6Address OBJECT-TYPE
+       SYNTAX InetAddress
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Board IP Address.
+Access: Online.
+AC INI-Param: N/A"
+       ::= {acSysIP 12}
 
 
 
@@ -878,7 +892,7 @@ AC INI-Param: EnableNTPasOAM"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Sets the location of the Stream Control Transmission Protocol
 (SCTP). If this parameter is set and the machine is functioning
@@ -1121,13 +1135,14 @@ AC INI-Param: N/A"
        acSysInterfaceName                              SnmpAdminString,
        acSysInterfacePrimaryDNSServerIPAddress         SnmpAdminString,
        acSysInterfaceSecondaryDNSServerIPAddress       SnmpAdminString,
-       acSysInterfaceUnderlyingInterface               RowPointer
+       acSysInterfaceUnderlyingInterface               RowPointer,
+       acSysInterfaceUnderlyingDevice                  RowPointer
      }
 
 
 
      acSysInterfaceIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..31)
+       SYNTAX Unsigned32 (0..100)
        MAX-ACCESS not-accessible
        STATUS current
        DESCRIPTION
@@ -1317,6 +1332,18 @@ AC INI-Param: InterfaceTable_SecondaryDNSServerIPAddress"
 Access: Offline.
 AC INI-Param: InterfaceTable_UnderlyingInterface"
        ::= {acSysInterfaceEntry 14}
+
+
+
+     acSysInterfaceUnderlyingDevice OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Pointer to the Underlying Device.
+Access: Offline.
+AC INI-Param: InterfaceTable_UnderlyingDevice"
+       ::= {acSysInterfaceEntry 15}
 
 
 
@@ -1672,13 +1699,317 @@ AC INI-Param: EtherGroupTable_Member2"
 
 
 
+     -- ****************************************
+     -- acSysStaticRoute table declaration
+     -- ****************************************
+     acSysStaticRouteTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcSysStaticRouteEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acMultipleIP 25}
+
+
+
+     -- ****************************************
+     -- acSysStaticRoute table entry
+     -- ****************************************
+     acSysStaticRouteEntry OBJECT-TYPE
+       SYNTAX AcSysStaticRouteEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acSysStaticRouteIndex}
+       ::= {acSysStaticRouteTable 1}
+
+
+
+     -- ****************************************
+     -- acSysStaticRoute TABLE
+     -- ****************************************
+     AcSysStaticRouteEntry ::= SEQUENCE {
+       acSysStaticRouteIndex                           Unsigned32,
+       acSysStaticRouteRowStatus                       RowStatus,
+       acSysStaticRouteAction                          INTEGER,
+       acSysStaticRouteActionRes                       INTEGER,
+       acSysStaticRouteInterfaceName                   SnmpAdminString,
+       acSysStaticRouteDeviceName                      RowPointer,
+       acSysStaticRouteDestination                     SnmpAdminString,
+       acSysStaticRoutePrefixLength                    Unsigned32,
+       acSysStaticRouteGateway                         SnmpAdminString,
+       acSysStaticRouteDescription                     SnmpAdminString
+     }
+
+
+
+     acSysStaticRouteIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..200)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "This parameter is used for the Power Over Ethenet (PoE) Index
+Field for line. Internal parameter.
+AC INI-Param: StaticRouteTable_Index"
+       ::= {acSysStaticRouteEntry 1}
+
+
+
+     acSysStaticRouteRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Static Route Table ROWSTATUS field for line. Internal parameter.
+Access: Online.
+AC INI-Param: StaticRouteTable_RowStatus"
+       ::= {acSysStaticRouteEntry 2}
+
+
+
+     acSysStaticRouteAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Static Route Table Mangement Field for ACTIONS. Internal parameter.
+Access: Online.
+AC INI-Param: StaticRouteTable_Action"
+       ::= {acSysStaticRouteEntry 3}
+
+
+
+     acSysStaticRouteActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Static Route Table Mangement Field for ACTIONS RESULT. Internal
+parameter.
+AC INI-Param: StaticRouteTable_ActionRes"
+       ::= {acSysStaticRouteEntry 4}
+
+
+
+     acSysStaticRouteInterfaceName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..16))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Network interface name.
+Access: Online.
+AC INI-Param: StaticRouteTable_InterfaceName"
+       ::= {acSysStaticRouteEntry 5}
+
+
+
+     acSysStaticRouteDeviceName OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Device name.
+Access: Online.
+AC INI-Param: StaticRouteTable_DeviceName"
+       ::= {acSysStaticRouteEntry 6}
+
+
+
+     acSysStaticRouteDestination OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..45))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Destination IP address.
+Access: Online.
+AC INI-Param: StaticRouteTable_Destination"
+       ::= {acSysStaticRouteEntry 7}
+
+
+
+     acSysStaticRoutePrefixLength OBJECT-TYPE
+       SYNTAX Unsigned32 (0..128)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Prefix length.
+Access: Online.
+AC INI-Param: StaticRouteTable_PrefixLength"
+       ::= {acSysStaticRouteEntry 8}
+
+
+
+     acSysStaticRouteGateway OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..45))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "IP gateway address.
+Access: Online.
+AC INI-Param: StaticRouteTable_Gateway"
+       ::= {acSysStaticRouteEntry 9}
+
+
+
+     acSysStaticRouteDescription OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..29))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Static route description.
+Access: Online.
+AC INI-Param: StaticRouteTable_Description"
+       ::= {acSysStaticRouteEntry 10}
+
+
+
+     -- ****************************************
+     -- acSysEthernetDevice table declaration
+     -- ****************************************
+     acSysEthernetDeviceTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcSysEthernetDeviceEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acMultipleIP 26}
+
+
+
+     -- ****************************************
+     -- acSysEthernetDevice table entry
+     -- ****************************************
+     acSysEthernetDeviceEntry OBJECT-TYPE
+       SYNTAX AcSysEthernetDeviceEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acSysEthernetDeviceIndex}
+       ::= {acSysEthernetDeviceTable 1}
+
+
+
+     -- ****************************************
+     -- acSysEthernetDevice TABLE
+     -- ****************************************
+     AcSysEthernetDeviceEntry ::= SEQUENCE {
+       acSysEthernetDeviceIndex                        Unsigned32,
+       acSysEthernetDeviceRowStatus                    RowStatus,
+       acSysEthernetDeviceAction                       INTEGER,
+       acSysEthernetDeviceActionRes                    INTEGER,
+       acSysEthernetDeviceVlanID                       Unsigned32,
+       acSysEthernetDeviceUnderlyingInterface          RowPointer,
+       acSysEthernetDeviceName                         SnmpAdminString
+     }
+
+
+
+     acSysEthernetDeviceIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..100)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "This parameter is used for the Power Over Ethenet (PoE) Index
+Field for line. Internal parameter.
+AC INI-Param: DeviceTable_Index"
+       ::= {acSysEthernetDeviceEntry 1}
+
+
+
+     acSysEthernetDeviceRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Ethernet Device Table ROWSTATUS field for line. Internal parameter.
+Access: Offline.
+AC INI-Param: DeviceTable_RowStatus"
+       ::= {acSysEthernetDeviceEntry 2}
+
+
+
+     acSysEthernetDeviceAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Ethernet Device Table Mangement Field for ACTIONS. Internal
+parameter.
+Access: Offline.
+AC INI-Param: DeviceTable_Action"
+       ::= {acSysEthernetDeviceEntry 3}
+
+
+
+     acSysEthernetDeviceActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Ethernet Device Table Mangement Field for ACTIONS RESULT. Internal
+parameter.
+AC INI-Param: DeviceTable_ActionRes"
+       ::= {acSysEthernetDeviceEntry 4}
+
+
+
+     acSysEthernetDeviceVlanID OBJECT-TYPE
+       SYNTAX Unsigned32 (1..4094)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Vlan ID.
+Access: Offline.
+AC INI-Param: DeviceTable_VlanID"
+       ::= {acSysEthernetDeviceEntry 5}
+
+
+
+     acSysEthernetDeviceUnderlyingInterface OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Underlying Interface.
+Access: Offline.
+AC INI-Param: DeviceTable_UnderlyingInterface"
+       ::= {acSysEthernetDeviceEntry 6}
+
+
+
+     acSysEthernetDeviceName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..16))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Name.
+Access: Offline.
+AC INI-Param: DeviceTable_DeviceName"
+       ::= {acSysEthernetDeviceEntry 7}
+
+
+
      acSyslog OBJECT IDENTIFIER ::= {acSysNetworkConfig 2}
 
 
      acSyslogServerIPAddress  OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "This parameter defines the IP address in dotted format notation.
 e.g., 192.10.1.255
@@ -1722,7 +2053,7 @@ AC INI-Param: SyslogServerPort"
      acSyslogFacility OBJECT-TYPE
        SYNTAX Unsigned32 (16..23)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "parameter to determine the facility number at syslog messages.
 can be:
@@ -1742,7 +2073,7 @@ AC INI-Param: SyslogFacility"
      acSysNTPServerIPAddress OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to define the NTP server's IP address.
 Range = Legal IP address.
@@ -1753,7 +2084,7 @@ AC INI-Param: NTPServerIP"
 
 
      acSysNTPUtcOffset OBJECT-TYPE
-       SYNTAX Integer32 (-43200..43200)
+       SYNTAX Integer32 (-86400..86400)
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
@@ -1761,7 +2092,7 @@ AC INI-Param: NTPServerIP"
 seconds.
 
 Default = 0
-Range = -43200 to +43200 seconds.
+Range = -86400 to +86400 seconds.
 Access: Instant.
 AC INI-Param: NTPServerUTCOffset"
        ::= {acSysNTP 2}
@@ -1786,12 +2117,60 @@ AC INI-Param: NTPUpdateInterval"
      acSysNTPSecondaryServerIP OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the NTP Secondary Server IP address.
 Access: Instant.
 AC INI-Param: NTPSecondaryServerIP"
        ::= {acSysNTP 4}
+
+
+
+     acSysNTPAuthKeyId OBJECT-TYPE
+       SYNTAX Integer32 (-2147483648..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "NTP authentication key identifier (0 = no authentication).
+Access: Instant.
+AC INI-Param: ntpAuthKeyId"
+       ::= {acSysNTP 5}
+
+
+
+     acSysNTPAuthMd5Key OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..31))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "NTP authentication secret key.
+Access: Instant.
+AC INI-Param: ntpAuthMd5KeyPassword"
+       ::= {acSysNTP 6}
+
+
+
+     acSysNTPPrimaryServerAddress OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..100))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the NTP Server FQDN or IP address.
+Access: Instant.
+AC INI-Param: NTPServer"
+       ::= {acSysNTP 7}
+
+
+
+     acSysNTPSecondaryServerAddress OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..100))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the NTP Secondary FQDN or Server IP address.
+Access: Instant.
+AC INI-Param: NTPSecondaryServer"
+       ::= {acSysNTP 8}
 
 
 
@@ -2033,6 +2412,36 @@ AC INI-Param: AllowWanHttps"
 
 
 
+     acSysWEBTLSClientCipherString OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..254))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Cipher-suite selection string for TLS clients.
+Access: Instant.
+AC INI-Param: TLSClientCipherString"
+       ::= {acSysWEB 11}
+
+
+
+     acSysWEBUseLdapForLogin OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines whether device uses LDAP for WEB/CLI authenticating
+management interfaces (0-not use, 1-use).
+Access: Offline.
+AC INI-Param: MGMTLDAPLOGIN"
+       ::= {acSysWEB 12}
+
+
+
      -- ****************************************
      -- acSysWEBACL table declaration
      -- ****************************************
@@ -2084,7 +2493,7 @@ AC INI-Param: N/A"
      acSysWEBACLIP OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "Allows IP addresses to connect to the Web interface. Set to
 zeroes to allow all IP addresses.
@@ -2242,6 +2651,68 @@ AC INI-Param: WebAuthMode"
      acSysNATTraversal OBJECT IDENTIFIER ::= {acSysNetworkConfig 6}
 
 
+     acSysSTUN OBJECT IDENTIFIER ::= {acSysNATTraversal 21}
+
+
+     acSysSTUNEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter is used to enable the STUN module, used for NAT
+traversal of UDP packets.
+Access: Offline.
+AC INI-Param: ENABLESTUN"
+       ::= {acSysSTUN 1}
+
+
+
+     acSysSTUNPrimaryServerIP OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Defines the primary STUN Server IP address.
+Range = Legal IP address.
+Access: Offline.
+AC INI-Param: STUNSERVERPRIMARYIP"
+       ::= {acSysSTUN 2}
+
+
+
+     acSysSTUNSecondaryServerIP OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Defines the secondary STUN server IP address.
+Range = Legal IP address.
+Access: Offline.
+AC INI-Param: STUNSERVERSECONDARYIP"
+       ::= {acSysSTUN 3}
+
+
+
+     acSysSTUNBindingLifeTime OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter is used to define the NAT binding lifetime, in
+seconds. STUN refreshes the binding information after this
+time expires.
+Range = 0 - 2592000.
+Access: Offline.
+AC INI-Param: NATBINDINGDEFAULTTIMEOUT"
+       ::= {acSysSTUN 4}
+
+
+
      acSysTelnet OBJECT IDENTIFIER ::= {acSysNetworkConfig 7}
 
 
@@ -2396,7 +2867,7 @@ AC INI-Param: WanMgmtSSHPort"
 
 
      acSysTelnetSSHMaxSessions OBJECT-TYPE
-       SYNTAX Unsigned32 (1..2)
+       SYNTAX Unsigned32 (1..5)
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
@@ -2465,6 +2936,18 @@ SSH.
 Access: Offline.
 AC INI-Param: AllowWanSSH"
        ::= {acSysTelnet 14}
+
+
+
+     acSysTelnetMaxSessions OBJECT-TYPE
+       SYNTAX Unsigned32 (1..5)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Configures the maximum allowed number of telnet sessions.
+Access: Instant.
+AC INI-Param: TelnetMaxSessions"
+       ::= {acSysTelnet 15}
 
 
 
@@ -2542,7 +3025,7 @@ AC INI-Param: CmpFileURL"
 
 
      acSysHTTPClientIniFileURL OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..254))
+       SYNTAX SnmpAdminString (SIZE (0..758))
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
@@ -2764,7 +3247,7 @@ AC INI-Param: WebLogoFileUrl"
      acSysHTTPClientVideoFontFileURL OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..254))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Indicates the URL for downloading a logo file for the web interface
 using the Automatic Update facility.
@@ -2810,6 +3293,87 @@ from a remote server.
 Access: Online.
 AC INI-Param: AmdSensitivityFileUrl"
        ::= {acSysHTTPClient 24}
+
+
+
+     acSysHTTPClientCliScriptFileUrl OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..254))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Provides a link to CLI-Script (show-run configuration) file
+to be downloaded from a remote server. Applicable to products
+that support CLI.
+Access: Online.
+AC INI-Param: CLIScriptUrl"
+       ::= {acSysHTTPClient 25}
+
+
+
+     acSysHTTPClientConfigurationPackageUrlFile OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..254))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Provides a link to Configuration Package file to be downloaded
+from a remote server.
+Access: Online.
+AC INI-Param: ConfPackageUrl"
+       ::= {acSysHTTPClient 26}
+
+
+
+     acSysHTTPClientIncrementalIniFileURL OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..254))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Provides a link to Incremental Ini File to be downloaded from
+a remote server.
+Access: Online.
+AC INI-Param: IncrementalIniFileURL"
+       ::= {acSysHTTPClient 27}
+
+
+
+     acSysHTTPClientMTCFirmwareUrlFile OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..254))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Provides a link to a M4K CMP file for targets
+ to be downloaded from a remote server.
+Access: Online.
+AC INI-Param: MTFirmwareUrl "
+       ::= {acSysHTTPClient 28}
+
+
+
+     acSysHTTPClientVMTFirmwareUrlFile OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..254))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Provides a link to a Hosted CMP file for targets
+ to be downloaded from a remote server.
+Access: Online.
+AC INI-Param: VMCFirmwareUrl"
+       ::= {acSysHTTPClient 29}
+
+
+
+     acSysHTTPClientTLSRootIncrementalFileUrl OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..254))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "URL for downloading a TLS trusted root certificate file using
+the Automatic Update facility. This file should be incremental,
+the new file will be appended to existing trusted root
+records.
+Access: Online.
+AC INI-Param: TLSIncrRootFileUrl"
+       ::= {acSysHTTPClient 30}
 
 
 
@@ -3106,6 +3670,20 @@ AC INI-Param: VLANMODE"
 
 
 
+     acSysVLANOsnNativeVlanId OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "set the OSN access VLAN.
+0 – use OAM VLAN ID
+1-4000 – use specified VLAN ID.
+Access: Instant.
+AC INI-Param: OSNACCESSVLAN"
+       ::= {acSysVLAN 16}
+
+
+
      -- ****************************************
      -- acSysVlanMap table declaration
      -- ****************************************
@@ -3227,7 +3805,7 @@ AC INI-Param: DiffServToVlanPriority_VlanPriority"
      acSysSCTPHeartBeatInterval OBJECT-TYPE
        SYNTAX Unsigned32 (0..3600)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SCTP heartbeat interval.
 
@@ -3241,7 +3819,7 @@ AC INI-Param: SCTPHBInterval"
      acSysSCTPT4SACKTimer OBJECT-TYPE
        SYNTAX Unsigned32 (1..5)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SCTP T4 SACK timer interval.
 
@@ -3260,7 +3838,7 @@ AC INI-Param: SCTPT4SAckTimer"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Stream Control Transmission Protocol  (SCTP) uses a checksum
 mechanism in order to authenticate packets on both sides (the
@@ -3279,7 +3857,7 @@ AC INI-Param: SCTPChecksumMethod"
      acSysSCTPHostName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..255))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "When this parameter is set to any value other than an empty
 string, SCTP (Stream Control Transmission Protocol) uses the
@@ -3303,7 +3881,7 @@ AC INI-Param: SCTPHOSTNAME"
      acSysSCTPAssociationsNum OBJECT-TYPE
        SYNTAX Unsigned32 (1..8)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the maximum number of Stream Control Transmission Protocol
 (SCTP) associations that can be opened.
@@ -3516,16 +4094,13 @@ AC INI-Param: POETable_PortATEnable"
        DESCRIPTION
            "Disable ICMP Redirect messages. When set to 0 ICMP Redirect
 messages are not ignored.
-Access: Instant.
+Access: Online.
 AC INI-Param: DisableICMPRedirects"
        ::= {acSysNetworkSettings 1}
 
 
 
-     acSysSTUN OBJECT IDENTIFIER ::= {acSysNATTraversal 21}
-
-
-     acSysSTUNEnable OBJECT-TYPE
+     acSysNetworkSettingsDisableICMPUnreachable OBJECT-TYPE
        SYNTAX INTEGER {
                   disable(0)
 ,
@@ -3535,52 +4110,10 @@ AC INI-Param: DisableICMPRedirects"
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
-           "This parameter is used to enable the STUN module, used for NAT
-traversal of UDP packets.
-Access: Offline.
-AC INI-Param: ENABLESTUN"
-       ::= {acSysSTUN 1}
-
-
-
-     acSysSTUNPrimaryServerIP OBJECT-TYPE
-       SYNTAX IpAddress
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Defines the primary STUN Server IP address.
-Range = Legal IP address.
-Access: Offline.
-AC INI-Param: STUNSERVERPRIMARYIP"
-       ::= {acSysSTUN 2}
-
-
-
-     acSysSTUNSecondaryServerIP OBJECT-TYPE
-       SYNTAX IpAddress
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Defines the secondary STUN server IP address.
-Range = Legal IP address.
-Access: Offline.
-AC INI-Param: STUNSERVERSECONDARYIP"
-       ::= {acSysSTUN 3}
-
-
-
-     acSysSTUNBindingLifeTime OBJECT-TYPE
-       SYNTAX Unsigned32 (0..2147483647)
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "This parameter is used to define the NAT binding lifetime, in
-seconds. STUN refreshes the binding information after this
-time expires.
-Range = 0 - 2592000.
-Access: Offline.
-AC INI-Param: NATBINDINGDEFAULTTIMEOUT"
-       ::= {acSysSTUN 4}
+           "Disable sending of ICMP unreachable messages.
+Access: Online.
+AC INI-Param: DisableICMPUnreachable"
+       ::= {acSysNetworkSettings 2}
 
 
 
@@ -3644,7 +4177,7 @@ AC INI-Param: PM_EnableThresholdAlarms"
 
 
      acSysDiagnosticsListOfActivitiesToLog OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..32))
+       SYNTAX SnmpAdminString (SIZE (0..35))
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
@@ -3661,6 +4194,7 @@ SWU - SoftWareUpdate.
 ARD - Access to Restricted Domains.
 NAA - Non Authorized Access.
 SPC - Sensitive Parameters Changes.
+AE  - Action Executed.
 Access: Online.
 AC INI-Param: ActivityListToLog"
        ::= {acSysDiagnostics 3}
@@ -3751,6 +4285,18 @@ AC INI-Param: N/A"
            "List of all avtivated features.
 AC INI-Param: N/A"
        ::= {acSysLicenseKey 2}
+
+
+
+     acSysLicenseKeyProductKey OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..40))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Product Key for SSBC.
+Access: Instant.
+AC INI-Param: ProductKey"
+       ::= {acSysLicenseKey 3}
 
 
 
@@ -4068,7 +4614,7 @@ AC INI-Param: TLS_Fips140_Mode"
 
 
      acSysSecurityGenCsrSubjectName OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..600))
+       SYNTAX SnmpAdminString (SIZE (0..1200))
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
@@ -4616,7 +5162,7 @@ AC INI-Param: IKEPOLICYAUTHENTICATIONMETHOD"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "IPsec Enable flag.
 Access: Offline.
@@ -4635,7 +5181,7 @@ AC INI-Param: ENABLEIPSEC"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "IPsec Dead Peer Detection (RFC 3706) - Mode of Operation.
 One of the following values: '0' - Disabled (Default)
@@ -4655,7 +5201,7 @@ AC INI-Param: IPSECDPDMODE"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Enables or disables certificate extension checking for IKE.
 Access: Instant.
@@ -5116,7 +5662,7 @@ AC INI-Param: IPSECPOLICYREMOTESUBNETMASK"
      acSysIPsecProposalTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSysIPsecProposalEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "IPsec Proposal table"
        ::= {acSysIPSec 22}
@@ -5129,7 +5675,7 @@ AC INI-Param: IPSECPOLICYREMOTESUBNETMASK"
      acSysIPsecProposalEntry OBJECT-TYPE
        SYNTAX AcSysIPsecProposalEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSysIPsecProposalIndex}
@@ -5155,7 +5701,7 @@ AC INI-Param: IPSECPOLICYREMOTESUBNETMASK"
      acSysIPsecProposalIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..4)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index Field for line.
 AC INI-Param: IPsecProposalTable_Index"
@@ -5166,7 +5712,7 @@ AC INI-Param: IPsecProposalTable_Index"
      acSysIPsecProposalRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS Field for line.
 AC INI-Param: IPsecProposalTable_RowStatus"
@@ -5180,7 +5726,7 @@ AC INI-Param: IPsecProposalTable_RowStatus"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mangement Field for ACTIONS.
 AC INI-Param: IPsecProposalTable_Action"
@@ -5194,7 +5740,7 @@ AC INI-Param: IPsecProposalTable_Action"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mangement Field for ACTIONS RESULT.
 AC INI-Param: IPsecProposalTable_ActionRes"
@@ -5214,7 +5760,7 @@ AC INI-Param: IPsecProposalTable_ActionRes"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Selects the encryption (privacy) algorithm to use.
 Access: Online.
@@ -5233,7 +5779,7 @@ AC INI-Param: IPsecProposalTable_EncryptionAlgorithm"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Selects the message authentication (integrity) algorithm to
 use.
@@ -5251,7 +5797,7 @@ AC INI-Param: IPsecProposalTable_AuthenticationAlgorithm"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Selects the Diffie-Hellman group to use.
 Access: Online.
@@ -5266,7 +5812,7 @@ AC INI-Param: IPsecProposalTable_DHGroup"
      acSysIPsecSATable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSysIPsecSAEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "IPsec SA table"
        ::= {acSysIPSec 23}
@@ -5279,7 +5825,7 @@ AC INI-Param: IPsecProposalTable_DHGroup"
      acSysIPsecSAEntry OBJECT-TYPE
        SYNTAX AcSysIPsecSAEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSysIPsecSAIndex}
@@ -5317,7 +5863,7 @@ AC INI-Param: IPsecProposalTable_DHGroup"
      acSysIPsecSAIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..20)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index Field for line.
 AC INI-Param: IPsecSATable_Index"
@@ -5328,7 +5874,7 @@ AC INI-Param: IPsecSATable_Index"
      acSysIPsecSARowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS Field for line.
 AC INI-Param: IPsecSATable_RowStatus"
@@ -5339,7 +5885,7 @@ AC INI-Param: IPsecSATable_RowStatus"
      acSysIPsecSAAction OBJECT-TYPE
        SYNTAX Unsigned32 (0..0)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mangement Field for ACTIONS.
 AC INI-Param: IPsecSATable_Action"
@@ -5350,7 +5896,7 @@ AC INI-Param: IPsecSATable_Action"
      acSysIPsecSAActionRes OBJECT-TYPE
        SYNTAX Unsigned32 (0..0)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mangement Field for ACTIONS RESULT.
 AC INI-Param: IPsecSATable_ActionRes"
@@ -5361,7 +5907,7 @@ AC INI-Param: IPsecSATable_ActionRes"
      acSysIPsecSARemoteEndpointAddress OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..98))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "IP address or DNS host name of the peer.
 Access: Online.
@@ -5378,7 +5924,7 @@ AC INI-Param: IPsecSATable_RemoteEndpointAddressOrName"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Selects the method used for peer authentication during IKE main
 mode.
@@ -5391,7 +5937,7 @@ AC INI-Param: IPsecSATable_AuthenticationMethod"
      acSysIPsecSASharedKey OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..79))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the pre-shared key (in textual format).
 Access: Online.
@@ -5403,7 +5949,7 @@ AC INI-Param: IPsecSATable_SharedKey"
      acSysIPsecSASourcePort OBJECT-TYPE
        SYNTAX Unsigned32 (0..65535)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the source port to which this configuration applies.
 Access: Online.
@@ -5415,7 +5961,7 @@ AC INI-Param: IPsecSATable_SourcePort"
      acSysIPsecSADestPort OBJECT-TYPE
        SYNTAX Unsigned32 (0..65535)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the destination port to which this configuration applies.
 Access: Online.
@@ -5427,7 +5973,7 @@ AC INI-Param: IPsecSATable_DestPort"
      acSysIPsecSAProtocol OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the protocol type to which this configuration applies.
 Standard IP protocol numbers should be used, e.g.:
@@ -5444,7 +5990,7 @@ AC INI-Param: IPsecSATable_Protocol"
      acSysIPsecSAPhase1SaLifetimeInSec OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Determines the duration (in seconds) for which the negotiated
 IKE SA (main mode) is valid. After the time expires, the SA
@@ -5458,7 +6004,7 @@ AC INI-Param: IPsecSATable_Phase1SaLifetimeInSec"
      acSysIPsecSAPhase2SaLifetimeInSec OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Determines the duration (in seconds) for which the negotiated
 IPSec SA (quick mode) is valid. After the time expires, the
@@ -5472,7 +6018,7 @@ AC INI-Param: IPsecSATable_Phase2SaLifetimeInSec"
      acSysIPsecSAPhase2SaLifetimeInKB OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Determines the maximum volume of traffic (in kilobytes) for
 which the negotiated IPSec SA (quick mode) is valid.
@@ -5492,7 +6038,7 @@ AC INI-Param: IPsecSATable_Phase2SaLifetimeInKB"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Controls dead peer detection (DPD) as per RFC 3706.
 Access: Online.
@@ -5509,7 +6055,7 @@ AC INI-Param: IPsecSATable_DPDmode"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Selects the IPSec mode of operation.
 0 = Transport mode (default)
@@ -5524,7 +6070,7 @@ AC INI-Param: IPsecSATable_IPsecMode"
      acSysIPsecSARemoteTunnelAddress OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..45))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "IP address of the peer router.
 Access: Online.
@@ -5536,7 +6082,7 @@ AC INI-Param: IPsecSATable_RemoteTunnelAddress"
      acSysIPsecSARemoteSubnetIPAddress OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..45))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "IP address of the remote subnetwork.
 Access: Online.
@@ -5548,7 +6094,7 @@ AC INI-Param: IPsecSATable_RemoteSubnetIPAddress"
      acSysIPsecSARemoteSubnetPrefixLength OBJECT-TYPE
        SYNTAX Unsigned32 (0..128)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Prefix length of the Remote Subnet IP Address parameter (in
 bits).
@@ -5561,7 +6107,7 @@ AC INI-Param: IPsecSATable_RemoteSubnetPrefixLength"
      acSysIPsecSAInterfaceName OBJECT-TYPE
        SYNTAX RowPointer
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Select the OID of the interface name corresponding to the one
 appearing in the interface table.
@@ -5695,7 +6241,7 @@ AC INI-Param: ACCESSLIST_Source_IP"
      acSysAccessListNetMask OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-create
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Mask for this access rule (bitwise ANDed with the source IP
 of the packet).
@@ -5994,76 +6540,6 @@ AC INI-Param: RTCPEncryptionDisableRx"
 
 
 
-     acSys802dot1x OBJECT IDENTIFIER ::= {acSysSecurity 25}
-
-
-     acSys802dot1xMode OBJECT-TYPE
-       SYNTAX INTEGER {
-                  disabled(0)
-,
-                  eapMd5(1)
-,
-                  protectedEap(2)
-,
-                  eapTls(3)
-
-                  }
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Enables support for IEEE 802.1x physical port security.
-0 = Disabled
-1 = EAP-MD5
-2 = Protected EAP (PEAP)
-3 = EAP-TLS
-.
-Access: Instant.
-AC INI-Param: 802.1xMode"
-       ::= {acSys802dot1x 1}
-
-
-
-     acSys802dot1xUsername OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..31))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Username for IEEE 802.1x support.
-Access: Instant.
-AC INI-Param: 802.1xUsername"
-       ::= {acSys802dot1x 2}
-
-
-
-     acSys802dot1xPassword OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..31))
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Password for IEEE 802.1x support.
-Access: Instant.
-AC INI-Param: 802.1xPassword"
-       ::= {acSys802dot1x 3}
-
-
-
-     acSys802dot1xVerifyPeerCertificate OBJECT-TYPE
-       SYNTAX INTEGER {
-                  disable(0)
-,
-                  enable(1)
-
-                  }
-       MAX-ACCESS read-write
-       STATUS current
-       DESCRIPTION
-           "Verify Peer Certificate for IEEE 802.1x support.
-Access: Instant.
-AC INI-Param: 802.1xVerifyPeerCertificate"
-       ::= {acSys802dot1x 4}
-
-
-
      acSysSRTP OBJECT IDENTIFIER ::= {acSysMediaEncription 21}
 
 
@@ -6082,6 +6558,341 @@ One of the following values:
 Access: Online.
 AC INI-Param: SRTPTxPacketMKISize"
        ::= {acSysSRTP 1}
+
+
+
+     acSys802dot1x OBJECT IDENTIFIER ::= {acSysSecurity 25}
+
+
+     acSys802dot1xMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disabled(0)
+,
+                  eapMd5(1)
+,
+                  protectedEap(2)
+,
+                  eapTls(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Enables support for IEEE 802.1x physical port security.
+0 = Disabled
+1 = EAP-MD5
+2 = Protected EAP (PEAP)
+3 = EAP-TLS
+.
+Access: Instant.
+AC INI-Param: 802.1xMode"
+       ::= {acSys802dot1x 1}
+
+
+
+     acSys802dot1xUsername OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..31))
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Username for IEEE 802.1x support.
+Access: Instant.
+AC INI-Param: 802.1xUsername"
+       ::= {acSys802dot1x 2}
+
+
+
+     acSys802dot1xPassword OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..31))
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Password for IEEE 802.1x support.
+Access: Instant.
+AC INI-Param: 802.1xPassword"
+       ::= {acSys802dot1x 3}
+
+
+
+     acSys802dot1xVerifyPeerCertificate OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Verify Peer Certificate for IEEE 802.1x support.
+Access: Instant.
+AC INI-Param: 802.1xVerifyPeerCertificate"
+       ::= {acSys802dot1x 4}
+
+
+
+     acSysTLSContexts OBJECT IDENTIFIER ::= {acSysSecurity 26}
+
+
+     -- ****************************************
+     -- acSysTLSContexts table declaration
+     -- ****************************************
+     acSysTLSContextsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcSysTLSContextsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "TLS Contexts information"
+       ::= {acSysTLSContexts 1}
+
+
+
+     -- ****************************************
+     -- acSysTLSContexts table entry
+     -- ****************************************
+     acSysTLSContextsEntry OBJECT-TYPE
+       SYNTAX AcSysTLSContextsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acSysTLSContextsIndex}
+       ::= {acSysTLSContextsTable 1}
+
+
+
+     -- ****************************************
+     -- acSysTLSContexts TABLE
+     -- ****************************************
+     AcSysTLSContextsEntry ::= SEQUENCE {
+       acSysTLSContextsIndex                           Unsigned32,
+       acSysTLSContextsRowStatus                       RowStatus,
+       acSysTLSContextsAction                          Unsigned32,
+       acSysTLSContextsActionResult                    Unsigned32,
+       acSysTLSContextsName                            SnmpAdminString,
+       acSysTLSContextsTlsVersion                      INTEGER,
+       acSysTLSContextsDTLSVersion                     INTEGER,
+       acSysTLSContextsCipherServer                    SnmpAdminString,
+       acSysTLSContextsCipherClient                    SnmpAdminString,
+       acSysTLSContextsCipherServer13                  SnmpAdminString,
+       acSysTLSContextsCipherClient13                  SnmpAdminString,
+       acSysTLSContextsExchangeGroups                  SnmpAdminString,
+       acSysTLSContextsStrictValidation                INTEGER,
+       acSysTLSContextsDHKeySize                       INTEGER,
+       acSysTLSContextsTlsRenegotiation                INTEGER
+     }
+
+
+
+     acSysTLSContextsIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (1..100)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index Field for line.
+AC INI-Param: Index"
+       ::= {acSysTLSContextsEntry 1}
+
+
+
+     acSysTLSContextsRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS Field for line.
+AC INI-Param: N/A"
+       ::= {acSysTLSContextsEntry 2}
+
+
+
+     acSysTLSContextsAction OBJECT-TYPE
+       SYNTAX Unsigned32 (0..0)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS.
+AC INI-Param: N/A"
+       ::= {acSysTLSContextsEntry 3}
+
+
+
+     acSysTLSContextsActionResult OBJECT-TYPE
+       SYNTAX Unsigned32 (0..0)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT.
+AC INI-Param: N/A"
+       ::= {acSysTLSContextsEntry 4}
+
+
+
+     acSysTLSContextsName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..32))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "TLS Contexts Name.
+AC INI-Param: Name"
+       ::= {acSysTLSContextsEntry 5}
+
+
+
+     acSysTLSContextsTlsVersion OBJECT-TYPE
+       SYNTAX INTEGER {
+                  anyTLS1dotx(0)
+,
+                  tLSv1dot0(1)
+,
+                  tLSv1dot1(2)
+,
+                  tLSv1dot0AndTLSv1dot1(3)
+,
+                  tLSv1dot2(4)
+,
+                  tLSv1dot1AndTLSv1dot2(6)
+,
+                  tLSv1dot0TLSv1dot1AndTLSv1dot2(7)
+,
+                  tLSv1dot3(8)
+,
+                  tLSv1dot2AndTLSv1dot3(12)
+,
+                  tLSv1dot1TLSv1dot2AndTLSv1dot3(14)
+,
+                  tLSv1dot0TLSv1dot1TLSv1dot2AndTLSv1dot3(15)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "TLS Contexts Version.
+AC INI-Param: TLSVersion"
+       ::= {acSysTLSContextsEntry 6}
+
+
+
+     acSysTLSContextsDTLSVersion OBJECT-TYPE
+       SYNTAX INTEGER {
+                  dTLSv1dot0AndDTLSv1dot2(0)
+,
+                  dTLSv1dot0(1)
+,
+                  dTLSv1dot2(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "TLS Contexts DTLS Version.
+AC INI-Param: DTLSVersion"
+       ::= {acSysTLSContextsEntry 7}
+
+
+
+     acSysTLSContextsCipherServer OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..256))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "TLS Contexts Cipher Server.
+AC INI-Param: ServerCipherString"
+       ::= {acSysTLSContextsEntry 8}
+
+
+
+     acSysTLSContextsCipherClient OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..256))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "TLS Contexts Cipher Client.
+AC INI-Param: ClientCipherString"
+       ::= {acSysTLSContextsEntry 9}
+
+
+
+     acSysTLSContextsCipherServer13 OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..256))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "TLS Contexts Cipher Server 13.
+AC INI-Param: ServerCipherTLS13String"
+       ::= {acSysTLSContextsEntry 10}
+
+
+
+     acSysTLSContextsCipherClient13 OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..256))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "TLS Contexts Cipher Client 13.
+AC INI-Param: ClientCipherTLS13String"
+       ::= {acSysTLSContextsEntry 11}
+
+
+
+     acSysTLSContextsExchangeGroups OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..256))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "TLS Contexts Exchange Groups.
+AC INI-Param: KeyExchangeGroups"
+       ::= {acSysTLSContextsEntry 12}
+
+
+
+     acSysTLSContextsStrictValidation OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "TLS Contexts Strict Validation.
+AC INI-Param: RequireStrictCert"
+       ::= {acSysTLSContextsEntry 13}
+
+
+
+     acSysTLSContextsDHKeySize OBJECT-TYPE
+       SYNTAX INTEGER {
+                  dHKeySize1024(1024)
+,
+                  dHKeySize2048(2048)
+,
+                  dHKeySize3072(3072)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "TLS Contexts DH KeySize.
+AC INI-Param: DHKeySize"
+       ::= {acSysTLSContextsEntry 14}
+
+
+
+     acSysTLSContextsTlsRenegotiation OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "TLS Contexts Tls Renegotiation.
+AC INI-Param: TlsRenegotiation"
+       ::= {acSysTLSContextsEntry 15}
 
 
 
@@ -6270,7 +7081,7 @@ AC INI-Param: N/A"
      acSysAMSProfile OBJECT-TYPE
        SYNTAX Unsigned32 (0..7)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Enable/Disable AMS Advanced IVR play functionality.
 0 = Disable
@@ -6284,7 +7095,7 @@ AC INI-Param: AMSProfile"
      acSysAMSApsIpAddress OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Sets the destination UDP port to which the Heartbeat Packets
 are sent.
@@ -6300,7 +7111,7 @@ AC INI-Param: HeartbeatDestIP"
      acSysAMSApsPort OBJECT-TYPE
        SYNTAX Unsigned32 (0..64000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Sets the destination UDP port to which the heartbeat packets
 are sent.
@@ -6313,7 +7124,7 @@ AC INI-Param: HeartbeatDestPort"
      acSysAMSPrimaryLanguage OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..3))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the Primary Language for the AMS. 
 Range = String[3] - language ISO string.
@@ -6326,7 +7137,7 @@ AC INI-Param: AMSPrimaryLanguage"
      acSysAMSSecondaryLanguage OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..3))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the Secondary Language for the AMS. 
 Range = String[3] - language ISO string.
@@ -6344,7 +7155,7 @@ AC INI-Param: AMSSecondaryLanguage"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Indicates if the system should expect to use APS bundle (vp.dat
 and segments.xml files), or if the system should expect
@@ -6365,7 +7176,7 @@ AC INI-Param: APSEnabled"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Indicates that a new audio repository (consisting of VP and
 XML files) should always be uploaded to the board regardless
@@ -6602,7 +7413,7 @@ AC INI-Param: M3KGlobalIpAddr"
      acSysHARemoteAddress OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "Defines the Maintenance IF IP address of the remote HA unit.
 Relevant to M4K and SW-SBC.
@@ -6647,7 +7458,7 @@ AC INI-Param: HAPriority"
 
 
      acSysHARedundantPriority OBJECT-TYPE
-       SYNTAX Unsigned32 (1..10)
+       SYNTAX Unsigned32 (0..10)
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
@@ -6655,6 +7466,8 @@ AC INI-Param: HAPriority"
 if unit should be in Active or Redundant state. Valid range
 is 1-10.
 Relevant to M4K and SW-SBC.
+If board doesn’t support HA or is not configured properly returns
+0.
 Access: Offline.
 AC INI-Param: N/A"
        ::= {acSysHA 5}
@@ -6683,7 +7496,7 @@ AC INI-Param: HAPingEnabled"
      acSysHAPingDestination OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "Defines the ping destination IP address of HA network monitor
 reachability module.
@@ -6981,7 +7794,7 @@ AC INI-Param: TMT1LineBuildOut"
      acSysLDAPServerIp OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "This parameter defines the IP address in dotted format notation.
 e.g., 192.10.1.255
@@ -6995,7 +7808,7 @@ AC INI-Param: LDAPSERVERIP"
      acSysLDAPServerPort OBJECT-TYPE
        SYNTAX Unsigned32 (0..65535)
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Defines the port number for the LDAP server.
 Range = Valid port number.
@@ -7008,7 +7821,7 @@ AC INI-Param: LDAPSERVERPORT"
      acSysLDAPServerMaxRespondTime OBJECT-TYPE
        SYNTAX Unsigned32 (0..86400)
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Defines the period of time the module  will wait for LDAP server
 response (seconds).
@@ -7021,7 +7834,7 @@ AC INI-Param: LDAPSERVERMAXRESPONDTIME"
      acSysLDAPServerDomainName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..255))
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to indicate the name of LDAP server.
 Access: Online.
@@ -7033,7 +7846,7 @@ AC INI-Param: LDAPSERVERDOMAINNAME"
      acSysLDAPSearchDN OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..255))
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to indicate the search DN for LDAP search
 request.
@@ -7046,7 +7859,7 @@ AC INI-Param: LDAPSEARCHDN"
      acSysLDAPPassword OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..255))
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to indicate the user password of LDAP
 server.
@@ -7059,7 +7872,7 @@ AC INI-Param: LDAPPASSWORD"
      acSysLDAPBindDN OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..255))
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to indicate the of LDAP server bind DN.
 Access: Online.
@@ -7130,6 +7943,326 @@ from cache.
 Access: Online.
 AC INI-Param: LDAPCACHEENTRYREMOVALTIMEOUT"
        ::= {acSysLDAP 11}
+
+
+
+     -- ****************************************
+     -- acSysLdapConfiguration table declaration
+     -- ****************************************
+     acSysLdapConfigurationTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcSysLdapConfigurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acSysLDAP 21}
+
+
+
+     -- ****************************************
+     -- acSysLdapConfiguration table entry
+     -- ****************************************
+     acSysLdapConfigurationEntry OBJECT-TYPE
+       SYNTAX AcSysLdapConfigurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acSysLdapConfigurationIndex}
+       ::= {acSysLdapConfigurationTable 1}
+
+
+
+     -- ****************************************
+     -- acSysLdapConfiguration TABLE
+     -- ****************************************
+     AcSysLdapConfigurationEntry ::= SEQUENCE {
+       acSysLdapConfigurationIndex                     Unsigned32,
+       acSysLdapConfigurationRowStatus                 RowStatus,
+       acSysLdapConfigurationAction                    INTEGER,
+       acSysLdapConfigurationActionRes                 INTEGER,
+       acSysLdapConfigurationServerIp                  IpAddress,
+       acSysLdapConfigurationServerPort                Unsigned32,
+       acSysLdapConfigurationMaxRespondTime            Unsigned32,
+       acSysLdapConfigurationServerDomainName          SnmpAdminString,
+       acSysLdapConfigurationPassword                  SnmpAdminString,
+       acSysLdapConfigurationBindDn                    SnmpAdminString,
+       acSysLdapConfigurationInterfaceType             Unsigned32,
+       acSysLdapConfigurationConnectionStatus          INTEGER
+     }
+
+
+
+     acSysLdapConfigurationIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..1)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index Field for line.
+AC INI-Param: LdapConfiguration_Index"
+       ::= {acSysLdapConfigurationEntry 1}
+
+
+
+     acSysLdapConfigurationRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS field for line. Internal parameter.
+AC INI-Param: N/A"
+       ::= {acSysLdapConfigurationEntry 2}
+
+
+
+     acSysLdapConfigurationAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS. Internal parameter.
+AC INI-Param: N/A"
+       ::= {acSysLdapConfigurationEntry 3}
+
+
+
+     acSysLdapConfigurationActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT. Internal parameter.
+AC INI-Param: N/A"
+       ::= {acSysLdapConfigurationEntry 4}
+
+
+
+     acSysLdapConfigurationServerIp OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS read-create
+       STATUS deprecated
+       DESCRIPTION
+           "Defines the LDAP server IP address in dotted format notation.
+e.g., 192.10.1.255.
+Access: Online.
+AC INI-Param: LdapConfiguration_LdapConfServerIp"
+       ::= {acSysLdapConfigurationEntry 5}
+
+
+
+     acSysLdapConfigurationServerPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Defines the port number for LDAP server.
+Access: Online.
+AC INI-Param: LdapConfiguration_LdapConfServerPort"
+       ::= {acSysLdapConfigurationEntry 6}
+
+
+
+     acSysLdapConfigurationMaxRespondTime OBJECT-TYPE
+       SYNTAX Unsigned32 (0..86400)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Defines the period of time the module  will wait for LDAP server
+response (seconds).
+Access: Online.
+AC INI-Param: LdapConfiguration_LdapConfServerMaxRespondTime"
+       ::= {acSysLdapConfigurationEntry 7}
+
+
+
+     acSysLdapConfigurationServerDomainName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "This parameter is used to indicate the name of LDAP server.
+Access: Online.
+AC INI-Param: LdapConfiguration_LdapConfServerDomainName"
+       ::= {acSysLdapConfigurationEntry 8}
+
+
+
+     acSysLdapConfigurationPassword OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "This parameter is used to indicate the user password of LDAP
+server.
+Access: Online.
+AC INI-Param: LdapConfiguration_LdapConfPassword"
+       ::= {acSysLdapConfigurationEntry 9}
+
+
+
+     acSysLdapConfigurationBindDn OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "This parameter is used to indicate the of LDAP server bind DN.
+Access: Online.
+AC INI-Param: LdapConfiguration_LdapConfBindDn"
+       ::= {acSysLdapConfigurationEntry 10}
+
+
+
+     acSysLdapConfigurationInterfaceType OBJECT-TYPE
+       SYNTAX Unsigned32 (0..1)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Determines what VLAN interface should be used.
+Access: Online.
+AC INI-Param: LdapConfiguration_LdapConfInterfaceType"
+       ::= {acSysLdapConfigurationEntry 11}
+
+
+
+     acSysLdapConfigurationConnectionStatus OBJECT-TYPE
+       SYNTAX INTEGER {
+                  ldapNotApplicable(0)
+,
+                  ldapConnectionBroken(1)
+,
+                  ldapConnecting(2)
+,
+                  ldapConnected(3)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "shows the ldap server Connection Status (LDAP_NOT_APPLICABLE
+= 0, LDAP_CONNECTION_BROKEN = 1, LDAP_CONNECTING = 2, LDAP_CONNECTED
+= 3).
+AC INI-Param: LdapConfiguration_ConnectionStatus"
+       ::= {acSysLdapConfigurationEntry 12}
+
+
+
+     -- ****************************************
+     -- acSysLdapServersSearchDNs table declaration
+     -- ****************************************
+     acSysLdapServersSearchDNsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcSysLdapServersSearchDNsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acSysLDAP 22}
+
+
+
+     -- ****************************************
+     -- acSysLdapServersSearchDNs table entry
+     -- ****************************************
+     acSysLdapServersSearchDNsEntry OBJECT-TYPE
+       SYNTAX AcSysLdapServersSearchDNsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acSysLdapServersSearchDNsLdapConfigurationIndex,acSysLdapServersSearchDNsInternalIndex}
+       ::= {acSysLdapServersSearchDNsTable 1}
+
+
+
+     -- ****************************************
+     -- acSysLdapServersSearchDNs TABLE
+     -- ****************************************
+     AcSysLdapServersSearchDNsEntry ::= SEQUENCE {
+       acSysLdapServersSearchDNsLdapConfigurationIndex Unsigned32,
+       acSysLdapServersSearchDNsInternalIndex          Unsigned32,
+       acSysLdapServersSearchDNsRowStatus              RowStatus,
+       acSysLdapServersSearchDNsAction                 INTEGER,
+       acSysLdapServersSearchDNsActionRes              INTEGER,
+       acSysLdapServersSearchDNsBasePath               SnmpAdminString
+     }
+
+
+
+     acSysLdapServersSearchDNsLdapConfigurationIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..1)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "The Ldap Configuration Index at LdapConfiguration table.
+AC INI-Param: LdapServersSearchDNs_LdapConfigurationIndex"
+       ::= {acSysLdapServersSearchDNsEntry 1}
+
+
+
+     acSysLdapServersSearchDNsInternalIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Search Dn Index.
+AC INI-Param: LdapServersSearchDNs_SearchDnInternalIndex"
+       ::= {acSysLdapServersSearchDNsEntry 2}
+
+
+
+     acSysLdapServersSearchDNsRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS field for line. Internal parameter.
+AC INI-Param: N/A"
+       ::= {acSysLdapServersSearchDNsEntry 3}
+
+
+
+     acSysLdapServersSearchDNsAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS. Internal parameter.
+AC INI-Param: N/A"
+       ::= {acSysLdapServersSearchDNsEntry 4}
+
+
+
+     acSysLdapServersSearchDNsActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT. Internal parameter.
+AC INI-Param: N/A"
+       ::= {acSysLdapServersSearchDNsEntry 5}
+
+
+
+     acSysLdapServersSearchDNsBasePath OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "base path (DN).
+Access: Online.
+AC INI-Param: LdapServersSearchDNs_Base_Path"
+       ::= {acSysLdapServersSearchDNsEntry 6}
 
 
 
@@ -7714,6 +8847,274 @@ AC INI-Param: NqmResponderTable_SourceInterfaceName"
 
 
 
+     acSysLicenseServer OBJECT IDENTIFIER ::= {acSystemConfiguration 17}
+
+
+     acSysLicenseServerPrimaryIP OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Defines the primary IP address for license pool server.
+Access: Online.
+AC INI-Param: LicenseServerPrimaryIP"
+       ::= {acSysLicenseServer 1}
+
+
+
+     acSysLicenseServerSecondaryIP OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Defines the secondary IP address for license pool server.
+Access: Online.
+AC INI-Param: LicenseServerSecondaryIP"
+       ::= {acSysLicenseServer 2}
+
+
+
+     acSysLicenseServerPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65536)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the port number for the license pool server.
+Access: Online.
+AC INI-Param: LicenseServerPort"
+       ::= {acSysLicenseServer 3}
+
+
+
+     acSysLicenseServerUsername OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the user name to access the license pool server.
+Access: Online.
+AC INI-Param: LicenseServerUsername"
+       ::= {acSysLicenseServer 4}
+
+
+
+     acSysLicenseServerPassword OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the password to access the license pool server.
+Access: Online.
+AC INI-Param: LicenseServerPwd"
+       ::= {acSysLicenseServer 5}
+
+
+
+     acSysLicenseServerEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables license pool server.
+Access: Online.
+AC INI-Param: LicenseServerEnable"
+       ::= {acSysLicenseServer 6}
+
+
+
+     acSysLicenseServerActionStatus OBJECT-TYPE
+       SYNTAX INTEGER {
+                  failure(0)
+,
+                  inProgress(1)
+,
+                  success(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "License server action status.
+AC INI-Param: LicensePoolEMSStatus"
+       ::= {acSysLicenseServer 7}
+
+
+
+     acSysLicenseServerPrimaryAddress OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..100))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the primary IP address for license pool server.
+IP Address (can be either IPv4 or IPv6) for this interface.
+Access: Online.
+AC INI-Param: LicenseServerPrimaryIP"
+       ::= {acSysLicenseServer 8}
+
+
+
+     acSysLicenseServerSecondaryAddress OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..100))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the secondary IP address for license pool server.
+IP Address (can be either IPv4 or IPv6) for this interface.
+Access: Online.
+AC INI-Param: LicenseServerSecondaryIP"
+       ::= {acSysLicenseServer 9}
+
+
+
+     acSysFloatingLicense OBJECT IDENTIFIER ::= {acSystemConfiguration 18}
+
+
+     acSysFloatingLicenseEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "FL: Floating License mode flag.
+Access: Offline.
+AC INI-Param: ENABLEFLOATINGLICENSE"
+       ::= {acSysFloatingLicense 1}
+
+
+
+     acSysFloatingLicensePrimaryIP OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "IP address for the Floating License server.
+Access: Instant.
+AC INI-Param: FLOATINGLICENSEPRIMARYIP"
+       ::= {acSysFloatingLicense 2}
+
+
+
+     acSysFloatingLicenseSecondaryIP OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Defines the secondary IP address of the floating license server.
+Access: Instant.
+AC INI-Param: FLOATINGLICENSEPRIMARYIP"
+       ::= {acSysFloatingLicense 3}
+
+
+
+     acSysFloatingLicensePort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65536)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The port of Floating License server.
+Access: Instant.
+AC INI-Param: FLOATINGLICENSEPORT"
+       ::= {acSysFloatingLicense 4}
+
+
+
+     acSysFloatingLicenseUsername OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Username for the Floating License server.
+Access: Instant.
+AC INI-Param: FLOATINGLICENSEUSERNAME"
+       ::= {acSysFloatingLicense 5}
+
+
+
+     acSysFloatingLicensePassword OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Password for the Floating License server.
+Access: Instant.
+AC INI-Param: FLOATINGLICENSEPASSWORD"
+       ::= {acSysFloatingLicense 6}
+
+
+
+     acSysFloatingLicenseUpdate OBJECT-TYPE
+       SYNTAX INTEGER {
+                  updateDone(0)
+,
+                  upadate(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Floating License Action.
+Access: Instant.
+AC INI-Param: N/A"
+       ::= {acSysFloatingLicense 7}
+
+
+
+     acSysFloatingLicenseServerStatus OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notApplicable(0)
+,
+                  notConnected(1)
+,
+                  rejected(2)
+,
+                  temporaryDisconnected(3)
+,
+                  connected(4)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Floating License status.
+AC INI-Param: N/A"
+       ::= {acSysFloatingLicense 8}
+
+
+
+     acSysFloatingLicenseOvocProductID OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "OVOC Product ID, SET by OVOC. It doesn't keep at persistence.
+Access: Instant.
+AC INI-Param: N/A"
+       ::= {acSysFloatingLicense 9}
+
+
+
+     acSysFloatingLicensePrimaryAddress OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..100))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "IP address for the Floating License server.
+IP Address (can be either IPv4 or IPv6) for this interface.
+Access: Instant.
+AC INI-Param: FLOATINGLICENSEPRIMARYIP"
+       ::= {acSysFloatingLicense 10}
+
+
+
      acSystemStatus OBJECT IDENTIFIER ::= {acSystem 2}
 
 
@@ -7818,11 +9219,11 @@ AC INI-Param: NqmResponderTable_SourceInterfaceName"
 ,
                   acTrunkPack-12610(66)
 ,
-                  acMediant1000-MSBG(67)
+                  acMediant1000-MSBR(67)
 ,
-                  acMediant-600-MSBG(68)
+                  acMediant-600-MSBR(68)
 ,
-                  acMediant800-MSBG(69)
+                  acMediant800-MSBR(69)
 ,
                   acMediant-4000(70)
 ,
@@ -7832,11 +9233,11 @@ AC INI-Param: NqmResponderTable_SourceInterfaceName"
 ,
                   acHosted(73)
 ,
-                  acMediant-850-MSBG(74)
+                  acMediant-800B-MSBR(74)
 ,
-                  acMediant-850-ESBC(75)
+                  acMediant-800B-ESBC(75)
 ,
-                  acMediant-500-MSBG(76)
+                  acMediant-500-MSBR(76)
 ,
                   acMediant-500-ESBC(77)
 ,
@@ -7850,11 +9251,21 @@ AC INI-Param: NqmResponderTable_SourceInterfaceName"
 ,
                   acMediant-SE-H-SBC(82)
 ,
-                  acMediant-6000-SBC(83)
+                  acMediant-9000-SBC(83)
 ,
-                  acMediant-500L-MSBG(84)
+                  acMediant-500L-MSBR(84)
 ,
                   acMediant-500L-ESBC(85)
+,
+                  acMediaPack-1288(86)
+,
+                  acMediaTranscoder(87)
+,
+                  acVirtualMediaTranscoder(88)
+,
+                  acMediant-500NG(89)
+,
+                  acMediant-3100(90)
 
                   }
        MAX-ACCESS read-only
@@ -7903,6 +9314,17 @@ AC INI-Param: N/A"
            "CPU Speed.
 AC INI-Param: N/A"
        ::= {acSysType 4}
+
+
+
+     acSysTypeOSType OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "OS Type. Applicable to Hosted only.
+AC INI-Param: N/A"
+       ::= {acSysType 5}
 
 
 
@@ -8002,6 +9424,46 @@ device is not in a dual module board, the values for asSysIdSerialNumber
 and acSysIdFirstSerialNumber are the same.
 AC INI-Param: N/A"
        ::= {acSysId 4}
+
+
+
+     acSysIdSerialNumberString OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "System's serial number represented as string.
+AC INI-Param: N/A"
+       ::= {acSysId 5}
+
+
+
+     acSysIdProductClass OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Identifier of the product class of the associated Device. An
+empty string indicates
+either that there is no associated Device that has been detected,
+or the Device does not support the use of the
+product-class parameter. Same as CWMP (TR069) ProductClass
+object. 
+INI - TR069CustomerProductClass.
+AC INI-Param: N/A"
+       ::= {acSysId 6}
+
+
+
+     acSysIdModelName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Model name of the device (human readable string). 
+Same as CWMP (TR069) ModelName object.
+AC INI-Param: N/A"
+       ::= {acSysId 7}
 
 
 
@@ -8179,6 +9641,97 @@ AC INI-Param: N/A"
 
 
 
+     acSysStateVoIpCpuUtilization OBJECT-TYPE
+       SYNTAX Unsigned32 (0..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Voice CPU usage in percentage.
+AC INI-Param: N/A"
+       ::= {acSysState 10}
+
+
+
+     acSysStateVoIpMemoryUtilization OBJECT-TYPE
+       SYNTAX Unsigned32 (0..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Voice memory usage in percentage.
+AC INI-Param: N/A"
+       ::= {acSysState 11}
+
+
+
+     acSysStateManagedByEMS OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enabled(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "EMS support indication.
+if FeatureKey exists returns the value of EMS element in FeatureKey,
+else returns disabled.
+AC INI-Param: N/A"
+       ::= {acSysState 12}
+
+
+
+     acSysStateMonitoredBySEM OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enabled(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Managed by SEM indication.
+.
+AC INI-Param: N/A"
+       ::= {acSysState 13}
+
+
+
+     acSysStateBurnFlag OBJECT-TYPE
+       SYNTAX INTEGER {
+                  burnFlagOFF(0)
+,
+                  burnFlagON(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Current configuration was changed
+ burn action is needed.
+AC INI-Param: N/A"
+       ::= {acSysState 14}
+
+
+
+     acSysStateResetFlag OBJECT-TYPE
+       SYNTAX INTEGER {
+                  resetFlagOFF(0)
+,
+                  resetFlagON(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Offline parameter was changed
+ restart action is needed.
+AC INI-Param: N/A"
+       ::= {acSysState 15}
+
+
+
      acSysNetwork OBJECT IDENTIFIER ::= {acSystemStatus 6}
 
 
@@ -8353,7 +9906,8 @@ AC INI-Param: N/A"
        acSysEthernetStatusPowerOverEthernet            INTEGER,
        acSysEthernetStatusAllocatedPower               SnmpAdminString,
        acSysEthernetStatusGroup                        SnmpAdminString,
-       acSysEthernetStatusPowerOverEthernetDetails     SnmpAdminString
+       acSysEthernetStatusPowerOverEthernetDetails     SnmpAdminString,
+       acSysEthernetStatusPortType                     INTEGER
      }
 
 
@@ -8371,7 +9925,7 @@ Index 3 – related to port 1A in PEM #1 (Control).
  Index 4 – related to port 1B in PEM #2 (Control).
 Index 5 – related to port 2A in PEM #1 (OAM).
 Index 6 – related to port 2B in PEM #2 (OAM). 
-On MSBG only:
+On MSBR only:
 1-12 LAN interfaces.
 AC INI-Param: N/A"
        ::= {acSysEthernetStatusEntry 1}
@@ -8513,6 +10067,24 @@ AC INI-Param: N/A"
 
 
 
+     acSysEthernetStatusPortType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notApplicable(0)
+,
+                  gigabitEthernet(1)
+,
+                  fastEthernet(2)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Port Type.
+AC INI-Param: N/A"
+       ::= {acSysEthernetStatusEntry 10}
+
+
+
      -- ****************************************
      -- acSysWanStatus table declaration
      -- ****************************************
@@ -8561,7 +10133,7 @@ AC INI-Param: N/A"
        STATUS current
        DESCRIPTION
            "The row's index.
-On MSBG Only.
+On MSBR Only.
 AC INI-Param: N/A"
        ::= {acSysWanStatusEntry 1}
 
@@ -8738,7 +10310,7 @@ AC INI-Param: N/A"
        STATUS current
        DESCRIPTION
            "The row's index.
-On MSBG only:
+On MSBR only:
 1-12 LAN interfaces.
 AC INI-Param: N/A"
        ::= {acSysEthernetRedundantStatusEntry 1}
@@ -8878,6 +10450,115 @@ AC INI-Param: N/A"
 
 
 
+     -- ****************************************
+     -- acSysMultiWanStatus table declaration
+     -- ****************************************
+     acSysMultiWanStatusTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcSysMultiWanStatusEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acSysEthernet 24}
+
+
+
+     -- ****************************************
+     -- acSysMultiWanStatus table entry
+     -- ****************************************
+     acSysMultiWanStatusEntry OBJECT-TYPE
+       SYNTAX AcSysMultiWanStatusEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acSysMultiWanStatusSite,acSysMultiWanStatusPort}
+       ::= {acSysMultiWanStatusTable 1}
+
+
+
+     -- ****************************************
+     -- acSysMultiWanStatus TABLE
+     -- ****************************************
+     AcSysMultiWanStatusEntry ::= SEQUENCE {
+       acSysMultiWanStatusSite                         Unsigned32,
+       acSysMultiWanStatusPort                         Unsigned32,
+       acSysMultiWanStatusType                         INTEGER,
+       acSysMultiWanStatusStatus                       INTEGER
+     }
+
+
+
+     acSysMultiWanStatusSite OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "The Site index.
+AC INI-Param: N/A"
+       ::= {acSysMultiWanStatusEntry 1}
+
+
+
+     acSysMultiWanStatusPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..3)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "The Port relative Index.
+AC INI-Param: N/A"
+       ::= {acSysMultiWanStatusEntry 2}
+
+
+
+     acSysMultiWanStatusType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  ethernet(0)
+,
+                  t1(1)
+,
+                  e1(2)
+,
+                  sHDSL(3)
+,
+                  adslVdsl(4)
+,
+                  gPON(5)
+,
+                  geSFP(6)
+,
+                  invalidPhyType(7)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "wan type of the port.
+AC INI-Param: N/A"
+       ::= {acSysMultiWanStatusEntry 3}
+
+
+
+     acSysMultiWanStatusStatus OBJECT-TYPE
+       SYNTAX INTEGER {
+                  inactive(0)
+,
+                  working(1)
+,
+                  process(2)
+,
+                  unknown(3)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "status of the wan port.
+AC INI-Param: N/A"
+       ::= {acSysMultiWanStatusEntry 4}
+
+
+
      acSysNAT OBJECT IDENTIFIER ::= {acSysNetwork 2}
 
 
@@ -8984,20 +10665,22 @@ AC INI-Param: WEBPasswordControlViaSNMP "
        acSysInterfaceStatusIPAddress                   SnmpAdminString,
        acSysInterfaceStatusPrefixLength                Unsigned32,
        acSysInterfaceStatusGateway                     SnmpAdminString,
-       acSysInterfaceStatusVlanID                      Unsigned32,
-       acSysInterfaceStatusName                        SnmpAdminString
+       acSysInterfaceStatusVlanID                      Integer32,
+       acSysInterfaceStatusName                        SnmpAdminString,
+       acSysInterfaceStatusRelatedIndex                Integer32,
+       acSysInterfaceStatusPrimaryDNSServerIPAddress   SnmpAdminString,
+       acSysInterfaceStatusSecondaryDNSServerIPAddress SnmpAdminString,
+       acSysInterfaceStatusUnderlyingDevice            SnmpAdminString
      }
 
 
 
      acSysInterfaceStatusEntryIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..31)
+       SYNTAX Unsigned32 (0..47)
        MAX-ACCESS not-accessible
        STATUS current
        DESCRIPTION
-           "Related Interface index in the interface configuration table
-(in case the table is empty - meaning there is only single
-IP the index will appear with 0).
+           "Index.
 AC INI-Param: N/A"
        ::= {acSysInterfaceStatusEntry 1}
 
@@ -9035,6 +10718,8 @@ AC INI-Param: N/A"
                   data(11)
 ,
                   maintenance(99)
+,
+                  internal(100)
 
                   }
        MAX-ACCESS read-only
@@ -9098,7 +10783,7 @@ AC INI-Param: N/A"
 
 
      acSysInterfaceStatusVlanID OBJECT-TYPE
-       SYNTAX Unsigned32 (0..4094)
+       SYNTAX Integer32 (-1..4094)
        MAX-ACCESS read-only
        STATUS current
        DESCRIPTION
@@ -9116,6 +10801,52 @@ AC INI-Param: N/A"
            "16 character string of this interface’s name.
 AC INI-Param: N/A"
        ::= {acSysInterfaceStatusEntry 9}
+
+
+
+     acSysInterfaceStatusRelatedIndex OBJECT-TYPE
+       SYNTAX Integer32 (-1..47)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Related Interface index in the interface configuration table
+(in case the table is empty - meaning there is only single
+IP the index will appear with 0).
+AC INI-Param: N/A"
+       ::= {acSysInterfaceStatusEntry 10}
+
+
+
+     acSysInterfaceStatusPrimaryDNSServerIPAddress OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..45))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Secondary DNS server IP address.
+AC INI-Param: N/A"
+       ::= {acSysInterfaceStatusEntry 11}
+
+
+
+     acSysInterfaceStatusSecondaryDNSServerIPAddress OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..45))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Primary DNS server IP address.
+AC INI-Param: N/A"
+       ::= {acSysInterfaceStatusEntry 12}
+
+
+
+     acSysInterfaceStatusUnderlyingDevice OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..17))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Underlying Device.
+AC INI-Param: N/A"
+       ::= {acSysInterfaceStatusEntry 13}
 
 
 
@@ -9469,6 +11200,676 @@ AC INI-Param: N/A"
 
 
 
+     acSysDeviceStatus OBJECT IDENTIFIER ::= {acSysNetwork 5}
+
+
+     -- ****************************************
+     -- acSysEthernetDeviceStatus table declaration
+     -- ****************************************
+     acSysEthernetDeviceStatusTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcSysEthernetDeviceStatusEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acSysDeviceStatus 21}
+
+
+
+     -- ****************************************
+     -- acSysEthernetDeviceStatus table entry
+     -- ****************************************
+     acSysEthernetDeviceStatusEntry OBJECT-TYPE
+       SYNTAX AcSysEthernetDeviceStatusEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acSysEthernetDeviceStatusIndex}
+       ::= {acSysEthernetDeviceStatusTable 1}
+
+
+
+     -- ****************************************
+     -- acSysEthernetDeviceStatus TABLE
+     -- ****************************************
+     AcSysEthernetDeviceStatusEntry ::= SEQUENCE {
+       acSysEthernetDeviceStatusIndex                  Unsigned32,
+       acSysEthernetDeviceStatusVlanID                 Unsigned32,
+       acSysEthernetDeviceStatusUnderlyingInterface    RowPointer,
+       acSysEthernetDeviceStatusDeviceName             SnmpAdminString
+     }
+
+
+
+     acSysEthernetDeviceStatusIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..47)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Device Index.
+AC INI-Param: N/A"
+       ::= {acSysEthernetDeviceStatusEntry 1}
+
+
+
+     acSysEthernetDeviceStatusVlanID OBJECT-TYPE
+       SYNTAX Unsigned32 (1..4094)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Vlan Id.
+AC INI-Param: N/A"
+       ::= {acSysEthernetDeviceStatusEntry 2}
+
+
+
+     acSysEthernetDeviceStatusUnderlyingInterface OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Underlying Interface the device points to.
+AC INI-Param: N/A"
+       ::= {acSysEthernetDeviceStatusEntry 3}
+
+
+
+     acSysEthernetDeviceStatusDeviceName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..16))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: N/A"
+       ::= {acSysEthernetDeviceStatusEntry 4}
+
+
+
+     acSysNetworkWiFiStats OBJECT IDENTIFIER ::= {acSysNetwork 6}
+
+
+     acSysNetworkWiFiStatsLinuxWatchdogTimeouts OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Linux Watchdog Timeouts.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 1}
+
+
+
+     acSysNetworkWiFiStatsSWWatchdogTimeouts OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "S/w Watchdog Timeouts.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 2}
+
+
+
+     acSysNetworkWiFiStatsHWFatalInterrupts OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Hardware Fatal Interrupts.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 3}
+
+
+
+     acSysNetworkWiFiStatsBeaconMissInterrupts OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Beacon Miss Interrupts.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 4}
+
+
+
+     acSysNetworkWiFiStatsRcvOverrunInterrupts OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Receive Overrun Interrupts.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 5}
+
+
+
+     acSysNetworkWiFiStatsRcvEolInterrupts OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Receive EOL Interrupts.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 6}
+
+
+
+     acSysNetworkWiFiStatsTxUnderrunInterrupts OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit underrun Interrupts.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 7}
+
+
+
+     acSysNetworkWiFiStatsGlobalTxTimeoutInterrupts OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Global Transmit Timeout Interrupts.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 8}
+
+
+
+     acSysNetworkWiFiStatsCarrierSenseTimeoutInterrupts OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Carrier Sense Timeout Interrupts.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 9}
+
+
+
+     acSysNetworkWiFiStatsTxFramesTailDropped OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Frames Tail Dropped.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 10}
+
+
+
+     acSysNetworkWiFiStatsTxFramesTailDroppedDueDeadLink OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Frames Tail Dropped Due to Dead Link.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 11}
+
+
+
+     acSysNetworkWiFiStatsTxDropsWrongState OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Drops In Wrong State.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 12}
+
+
+
+     acSysNetworkWiFiStatsTxFramesDiscardedDeviceGone OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Frames Discarded Because Device Gone.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 13}
+
+
+
+     acSysNetworkWiFiStatsTxQueueStoppedNoTxBuffers OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Queue Stopped because No Tx Buffers.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 14}
+
+
+
+     acSysNetworkWiFiStatsDataTxFailedNoTxBuffer OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed No Tx Buffer (Data).
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 15}
+
+
+
+     acSysNetworkWiFiStatsMgtTxFailedNoTxBuffer OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed No Tx Buffer (Management).
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 16}
+
+
+
+     acSysNetworkWiFiStatsBKTxFailedNoTxBuffer OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed No Tx Buffer (BK).
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 17}
+
+
+
+     acSysNetworkWiFiStatsBETxFailedNoTxBuffer OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed No Tx Buffer (BE).
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 18}
+
+
+
+     acSysNetworkWiFiStatsVITxFailedNoTxBuffer OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed No Tx Buffer (VI).
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 19}
+
+
+
+     acSysNetworkWiFiStatsVOTxFailedNoTxBuffer OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed No Tx Buffer (VO).
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 20}
+
+
+
+     acSysNetworkWiFiStatsTxFailedNoDescriptors OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed No Descriptors.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 21}
+
+
+
+     acSysNetworkWiFiStatsTxFailedNoDescriptorsLegacyPackets OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed No Descriptors for legacy packets.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 22}
+
+
+
+     acSysNetworkWiFiStatsTxFailedNoDescriptorsAggr OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed No Descriptors for aggregates.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 23}
+
+
+
+     acSysNetworkWiFiStatsTxFailedBadSetupLegacyPackets OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed because key setup failures for legacy packets.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 24}
+
+
+
+     acSysNetworkWiFiStatsTxFailedBadSetupAggr OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed because key setup failures for aggregates.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 25}
+
+
+
+     acSysNetworkWiFiStatsTxFailedNoSKBSLegacyEncaps OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed because no SKBS for legacy encapsulation.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 26}
+
+
+
+     acSysNetworkWiFiStatsTxFailedNoSKBSAggrEncaps OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed because no SKBS for aggregate  encapsulation.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 27}
+
+
+
+     acSysNetworkWiFiStatsTxFailedNoNode OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed because no node.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 28}
+
+
+
+     acSysNetworkWiFiStatsTxFailedFIFOUnderrunAggr OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed because FIFO underrun for aggregates.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 29}
+
+
+
+     acSysNetworkWiFiStatsTxFailedFIFOUnderrunLegacyPackets OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed because FIFO underrun for legacy packets.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 30}
+
+
+
+     acSysNetworkWiFiStatsTxFailedXmitFiter OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed because  xmit filtered.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 31}
+
+
+
+     acSysNetworkWiFiStatsTxFailedTimerExp OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed because  timer expired.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 32}
+
+
+
+     acSysNetworkWiFiStatsTxFailedTxopExceededAggr OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed because  txop exceeded for an aggregate.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 33}
+
+
+
+     acSysNetworkWiFiStatsTxFailedDescriptorCfgErrAggr OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed because descriptor cfg error for aggregates.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 34}
+
+
+
+     acSysNetworkWiFiStatsTxFailedDataUnderrunAggr OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed data underrun for an aggregates.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 35}
+
+
+
+     acSysNetworkWiFiStatsTxFailedDelimiterUnderrunAggr OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed delimiter underrun for an aggregates.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 36}
+
+
+
+     acSysNetworkWiFiStatsTxFailedInvalidBAState OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Transmit Failed invalid BA state from Hard Ware.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 37}
+
+
+
+     acSysNetworkWiFiStatsRxFailedFIFOOverrun OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Receive Failed because FIFO overrun.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 38}
+
+
+
+     acSysNetworkWiFiStatsRxDiscardedFrameTooBig OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Receive Discarded because frame is too large.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 39}
+
+
+
+     acSysNetworkWiFiStatsRxFailedNoBuff OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Receive setup failed because no sk buff.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 40}
+
+
+
+     acSysNetworkWiFiStatsRxFailedDecryption OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Receive failed because decryption.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 41}
+
+
+
+     acSysNetworkWiFiStatsRxFailedMICFailure OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Receive failed because MIC failure.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 42}
+
+
+
+     acSysNetworkWiFiStatsRxFailedDecryptBusyError OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Receive failed because decrypt busy errors.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 43}
+
+
+
+     acSysNetworkWiFiStatsRxFailedPktsBadVer OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Receive failed because packets with bad version.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 44}
+
+
+
+     acSysNetworkWiFiStatsNoBuffForBeacon OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "No buffers available for beacon.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 45}
+
+
+
+     acSysNetworkWiFiStatsBeaconStuck OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Beacon Stuck.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 46}
+
+
+
+     acSysNetworkWiFiStatsPeriodicCalibrationFail OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Periodic Calibration Failures.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 47}
+
+
+
+     acSysNetworkWiFiStatsFastChannelChangeFail OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Fast Channel Change Failures.
+AC INI-Param: N/A"
+       ::= {acSysNetworkWiFiStats 48}
+
+
+
+     acSysNetworkCell OBJECT IDENTIFIER ::= {acSysNetwork 7}
+
+
+     acSysNetworkCellCurrentNetworkTypeDescription OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..128))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Representing the Cellular dongle current network type.
+AC INI-Param: N/A"
+       ::= {acSysNetworkCell 1}
+
+
+
+     acSysNetworkCellSignalStrength OBJECT-TYPE
+       SYNTAX Integer32 (-120..-30)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Cellular modems signal strength, given in dBm's.
+AC INI-Param: N/A"
+       ::= {acSysNetworkCell 2}
+
+
+
+     acSysNetworkCellInterfaceWorkingMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  ppp(0)
+,
+                  dhcp(1)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Cellular interface working mode.
+AC INI-Param: N/A"
+       ::= {acSysNetworkCell 3}
+
+
+
+     acSysNetworkCellWanIPAddress OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "IP Address of WAN as received by the Cellular network. IPv4
+and IPv6 supported.
+AC INI-Param: N/A"
+       ::= {acSysNetworkCell 4}
+
+
+
      acSysTime OBJECT IDENTIFIER ::= {acSystemStatus 7}
 
 
@@ -9480,6 +11881,52 @@ AC INI-Param: N/A"
            "Time (in Seconds) that the board is alive.
 AC INI-Param: N/A"
        ::= {acSysTime 1}
+
+
+
+     acSysTimeLastConfig OBJECT-TYPE
+       SYNTAX TimeTicks
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The value of sysUpTime at the time the system entered its current
+configuration state.
+AC INI-Param: N/A"
+       ::= {acSysTime 2}
+
+
+
+     acSysTimeAlarmLastChange OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..50))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Last time Active Alarms Table was changed in UTC time format.
+AC INI-Param: N/A"
+       ::= {acSysTime 3}
+
+
+
+     acSysTimeSystemAvailabilityStartTime OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "System Availability Start Time.
+AC INI-Param: N/A"
+       ::= {acSysTime 4}
+
+
+
+     acSysTimeSystemAvailability OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "System availability (in per cent mille, one one-thousandth of
+a percent).
+AC INI-Param: N/A"
+       ::= {acSysTime 5}
 
 
 
@@ -9575,7 +12022,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "LDAP server status.
 AC INI-Param: N/A"
@@ -9813,6 +12260,76 @@ AC INI-Param: N/A"
 
 
 
+     acSysDataStatusFirewallIGMPConnections OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The number of IGMP firewall connections.
+AC INI-Param: N/A"
+       ::= {acSysDataStatus 4}
+
+
+
+     acSysInventory OBJECT IDENTIFIER ::= {acSystemStatus 14}
+
+
+     acSysInventoryChassis OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..128))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Parameter is relevant for Hosted products family only.
+AC INI-Param: N/A"
+       ::= {acSysInventory 1}
+
+
+
+     acSysInventoryCPU OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..128))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Parameter is relevant for Hosted products family only.
+AC INI-Param: N/A"
+       ::= {acSysInventory 2}
+
+
+
+     acSysInventoryMemory OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..128))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Parameter is relevant for Hosted products family only.
+AC INI-Param: N/A"
+       ::= {acSysInventory 3}
+
+
+
+     acSysInventoryNetworkCards OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..1024))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Parameter is relevant for Hosted products family only. Parameter
+contains multiple lines.
+AC INI-Param: N/A"
+       ::= {acSysInventory 4}
+
+
+
+     acSysInventoryVirtualEnvironment OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..128))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Parameter is relevant for Hosted products family only.
+AC INI-Param: N/A"
+       ::= {acSysInventory 5}
+
+
+
      acSystemAction OBJECT IDENTIFIER ::= {acSystem 3}
 
 
@@ -9963,7 +12480,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "To update the IPSec TLS configuration according to the provisioned
 TLS fils URL  set the value of this object to 1.
@@ -10062,6 +12579,70 @@ Note that the default is immediately parsing.
 Access: Instant.
 AC INI-Param: ApplyINImethod"
        ::= {acSysActionSet 14}
+
+
+
+     acSysActionSetLicensePoolUpdate OBJECT-TYPE
+       SYNTAX INTEGER {
+                  unset(0)
+,
+                  newPool(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Updates License Pool from License Server.
+Access: Instant.
+AC INI-Param: LicenseServerEnable"
+       ::= {acSysActionSet 15}
+
+
+
+     acSysActionSetAupdNetworkSource OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..100))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Selects the Network of AUPD.
+Access: Instant.
+AC INI-Param: AUPDNetworkSource"
+       ::= {acSysActionSet 16}
+
+
+
+     acSysActionSetLicensePoolHitless OBJECT-TYPE
+       SYNTAX INTEGER {
+                  unset(0)
+,
+                  hitlessApply(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Administrator request to apply or reset in order to use new
+License pool.
+Access: Instant.
+AC INI-Param: LicensePoolEMSAction"
+       ::= {acSysActionSet 17}
+
+
+
+     acSysActionSetLicensePoolRefreshRequest OBJECT-TYPE
+       SYNTAX INTEGER {
+                  noRequest(0)
+,
+                  request(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "License Pool Refresh Request.
+Access: Instant.
+AC INI-Param: N/A"
+       ::= {acSysActionSet 18}
 
 
 
@@ -10173,6 +12754,14 @@ AC INI-Param: N/A"
                   dataConfigurationFile(17)
 ,
                   amdSensitivityFile(18)
+,
+                  debugFile(19)
+,
+                  cliScriptFile(20)
+,
+                  cliScriptLogFile(21)
+,
+                  configurationPackageFile(22)
 
                   }
        MAX-ACCESS read-write
@@ -10202,7 +12791,7 @@ AC INI-Param: N/A"
 
 
      acSysUploadFileURI OBJECT-TYPE
-       SYNTAX SnmpAdminString (SIZE (0..254))
+       SYNTAX SnmpAdminString (SIZE (0..512))
        MAX-ACCESS read-write
        STATUS current
        DESCRIPTION
@@ -10235,6 +12824,147 @@ AC INI-Param: N/A"
 action ID.
 AC INI-Param: N/A"
        ::= {acSysUpload 6}
+
+
+
+     acSysMcUpgrade OBJECT IDENTIFIER ::= {acSysAction 4}
+
+
+     acSysMcUpgradeActionType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(-1)
+,
+                  immediateUpgrade(0)
+,
+                  hitlessUpgrade(1)
+,
+                  stopHitlessUpgrade(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Action to be carried out. Default(-1). 
+ Immediate-upgrade (0) - the cluster will be restarted. 
+ Hitless-upgrade(1) - Cluster upgrade will be done with no
+service  disturbance. 
+ StopHitlessUpgrade(2) - If the Hitless Upgrade is in process,
+the upgrade will be stop. 
+.
+Access: Instant.
+AC INI-Param: N/A"
+       ::= {acSysMcUpgrade 1}
+
+
+
+     acSysMcUpgradeMcType OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The type of the Media Component: HW based component - 'MC'.
+Software-only component - 'vMC'.
+AC INI-Param: N/A"
+       ::= {acSysMcUpgrade 2}
+
+
+
+     acSysMcUpgradeGracefulTimeout OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2000000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Cluster Graceful Timeout (sec).
+Access: Instant.
+AC INI-Param: MtcGracefulTimeout"
+       ::= {acSysMcUpgrade 3}
+
+
+
+     acSysMcUpgradeActionID OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This field is for management use and is aimed to distinguish
+different managers managing a single device.
+Access: Instant.
+AC INI-Param: N/A"
+       ::= {acSysMcUpgrade 4}
+
+
+
+     acSysMcUpgradeActionResult OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..40))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Action results in the following format – ID: Success/Failed/In
+Progress: <full description>.
+AC INI-Param: N/A"
+       ::= {acSysMcUpgrade 5}
+
+
+
+     acSysConfigurationPackageChecksum OBJECT IDENTIFIER ::= {acSysAction 5}
+
+
+     acSysConfigurationPackageChecksumActionType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+,
+                  calculate(1)
+,
+                  actionDone(10)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Action to be carried out. 
+Default(0) - no calculation in process. 
+Calculate(1) - In process of calculating current checksum.
+
+ActionDone(10) - Action done.
+Access: Instant.
+AC INI-Param: N/A"
+       ::= {acSysConfigurationPackageChecksum 1}
+
+
+
+     acSysConfigurationPackageChecksumActionID OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This field is for management use and is aimed to distinguish
+different managers managing a single device.
+Access: Instant.
+AC INI-Param: N/A"
+       ::= {acSysConfigurationPackageChecksum 2}
+
+
+
+     acSysConfigurationPackageChecksumActionResult OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..40))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Action results in the following format - ID: Success/Failed/In
+Progress.
+AC INI-Param: N/A"
+       ::= {acSysConfigurationPackageChecksum 3}
+
+
+
+     acSysConfigurationPackageChecksumValue OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of checksum.
+AC INI-Param: N/A"
+       ::= {acSysConfigurationPackageChecksum 4}
 
 
 
@@ -10339,7 +13069,8 @@ AC INI-Param: N/A"
        acSysModuleFRUaction                            INTEGER,
        acSysModuleFRUstatus                            INTEGER,
        acSysModuleNumOfPorts                           Unsigned32,
-       acSysModuleFirstPortNum                         Unsigned32
+       acSysModuleFirstPortNum                         Unsigned32,
+       acSysModuleSerialNumberString                   SnmpAdminString
      }
 
 
@@ -10461,11 +13192,35 @@ AC INI-Param: N/A"
 ,
                   acTrunkPack-8410-IpMedia(64)
 ,
-                  acMediant-800-MSBG(69)
+                  acMediant-800-MSBR(69)
 ,
-                  acMediant-500-MSBR(76)
+                  acMediant-4000(70)
+,
+                  acMediant-1000-ESBC(71)
+,
+                  acMediaPack-500-ESBC(72)
+,
+                  acMediantSW(73)
+,
+                  acMediant-800B-MSBG(74)
+,
+                  acMediant-800B-ESBC(75)
+,
+                  acMediant-500-MSBG(76)
 ,
                   acMediant-500-ESBC(77)
+,
+                  acMediant-2600(78)
+,
+                  acMediant-VE-SBC(79)
+,
+                  acMediant-VE-H-SBC(80)
+,
+                  acMediant-SE-SBC(81)
+,
+                  acMediant-SE-H-SBC(82)
+,
+                  acMediant-9000-SBC(83)
 ,
                   acMediant-500L-MSBR(84)
 ,
@@ -10559,33 +13314,41 @@ AC INI-Param: N/A"
 ,
                   acMediant4000MPModule(295)
 ,
-                  acMediant-850-MSBG(296)
+                  acMediant-800B-MSBR(296)
 ,
-                  acMediant850CPUmodule(297)
+                  acMediant800BCPUmodule(297)
 ,
-                  acMediant850IFDigitalModule(298)
+                  acMediant800BIFDigitalModule(298)
 ,
-                  acMediant850IFAnalogModule(299)
+                  acMediant800BIFAnalogModule(299)
 ,
-                  acMediant850IFBRIModule(300)
+                  acMediant800BIFBRIModule(300)
 ,
-                  acMediant850IFWANModule(301)
+                  acMediant800BIFWANModule(301)
 ,
-                  acMediant850IFWiFiModule(302)
+                  acMediant800BIFWiFiModule(302)
 ,
-                  acMediant850IPMediaModule(303)
+                  acMediant800BIPMediaModule(303)
 ,
-                  acMediant850EthernetModule(304)
+                  acMediant800BEthernetModule(304)
 ,
-                  acMediant850IFT1WANModule(305)
+                  acMediant800BIFT1WANModule(305)
 ,
-                  acMediant850IFSHDSLModule(306)
+                  acMediant800BIFSHDSLModule(306)
 ,
-                  acMediant850IFADSLModule(307)
+                  acMediant800BIFADSLModule(307)
 ,
                   acMediant2600CPUmodule(308)
 ,
                   acMediant2600MPModule(309)
+,
+                  acMediaPack1288CPUmodule(310)
+,
+                  acMediaPack1288FXSAnalogModule(311)
+,
+                  acMediant3100CPUModule(312)
+,
+                  acMediant3100IFDigitalModule(313)
 
                   }
        MAX-ACCESS read-only
@@ -10635,7 +13398,8 @@ For 6310 the serial number is the decimal form of the last
 5 characters in the MAC Address.
  SA modules return 0.
  When the modules in the table are unavailable for audit (no
-HA) (-1) is returned.
+HA) (-1) is returned. 
+ For Hosted only 32 lower bits are represented.
 AC INI-Param: N/A"
        ::= {acSysModuleEntry 6}
 
@@ -10816,6 +13580,17 @@ Since analog and digital ports can be operational at once,
 analog and digital ports may have same logical number.
 AC INI-Param: N/A"
        ::= {acSysModuleEntry 16}
+
+
+
+     acSysModuleSerialNumberString OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The module's serial number represented as string.
+AC INI-Param: N/A"
+       ::= {acSysModuleEntry 17}
 
 
 
@@ -11670,6 +14445,8 @@ AC INI-Param: HAUnitIdName"
                   device2(2)
 ,
                   standAlone(3)
+,
+                  haReady(4)
 
                   }
        MAX-ACCESS read-only
@@ -11728,7 +14505,8 @@ AC INI-Param: N/A"
        acSysRedundantModuleFRUaction                   INTEGER,
        acSysRedundantModuleFRUstatus                   INTEGER,
        acSysRedundantModuleNumOfPorts                  Unsigned32,
-       acSysRedundantModuleFirstPortNum                Unsigned32
+       acSysRedundantModuleFirstPortNum                Unsigned32,
+       acSysRedundantModuleSerialNumberString          SnmpAdminString
      }
 
 
@@ -11759,7 +14537,43 @@ AC INI-Param: N/A"
        SYNTAX INTEGER {
                   acUnknown(0)
 ,
+                  acMediantSW(73)
+,
+                  acMediant-VE-SBC(79)
+,
+                  acMediant-VE-H-SBC(80)
+,
+                  acMediant-SE-SBC(81)
+,
+                  acMediant-SE-H-SBC(82)
+,
+                  acMediant-9000-SBC(83)
+,
+                  acMediant-500L-MSBR(84)
+,
+                  acMediant-500L-ESBC(85)
+,
+                  acMediant800CPUmodule(265)
+,
+                  acMediant800IFDigitalModule(266)
+,
+                  acMediant800IFAnalogModule(267)
+,
+                  acMediant800IFBRIModule(268)
+,
+                  acMediant800EthernetModule(272)
+,
                   acMediant4000CPUmodule(280)
+,
+                  acMediant500CPUmodule(283)
+,
+                  acMediant500IFDigitalModule(284)
+,
+                  acMediant500IFAnalogModule(285)
+,
+                  acMediant500IFBRIModule(286)
+,
+                  acMediant500EthernetModule(290)
 ,
                   acMediant4000MPModule(295)
 ,
@@ -11815,7 +14629,8 @@ For 6310 the serial number is the decimal form of the last
 5 characters in the MAC Address.
  SA modules return 0.
  When the modules in the table are unavailable for audit (no
-HA) (-1) is returned.
+HA) (-1) is returned. 
+ For Hosted only 32 lower bits are represented.
 AC INI-Param: N/A"
        ::= {acSysRedundantModuleEntry 6}
 
@@ -11994,6 +14809,17 @@ Since analog and digital ports can be operational at once,
 analog and digital ports may have same logical number.
 AC INI-Param: N/A"
        ::= {acSysRedundantModuleEntry 16}
+
+
+
+     acSysRedundantModuleSerialNumberString OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..255))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The module's serial number represented as string.
+AC INI-Param: N/A"
+       ::= {acSysRedundantModuleEntry 17}
 
 
 

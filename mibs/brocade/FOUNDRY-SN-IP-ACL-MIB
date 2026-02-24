@@ -7,7 +7,7 @@ IMPORTS
 		FROM SNMPv2-TC
 	router
 		FROM FOUNDRY-SN-ROOT-MIB
-	InterfaceIndex, ifIndex
+	InterfaceIndex, ifIndex, InterfaceIndexOrZero
 		FROM IF-MIB
 	RtrStatus
 		FROM FOUNDRY-SN-IP-MIB
@@ -36,6 +36,11 @@ snAgAcl MODULE-IDENTITY
               no warranty, either express or implied, as to the use,
               operation, condition, or performance of the specification, and any unintended
               consequence it may on the user environment."
+
+    REVISION        "201401280000Z"  -- 28 January 2014
+    DESCRIPTION
+        "Changed the description of the objects snAgAclGblIfIPv4AcctClear and 
+         snAgAclGblIfIPv6AcctClear. They are supported in CES/CER platforms."
 
     REVISION        "201103020000Z"  -- 02 March 2011
     DESCRIPTION
@@ -80,12 +85,13 @@ snAgAcl MODULE-IDENTITY
 	STATUS      current
 	DESCRIPTION
 		"The Access control list number for an entry.
-		The standard Access list is in the range <1..99>.
+		The standard Access list is in the range <1-99>.
 		The extended Access list is in the range <100-199>.
-		The named standard Access list is in the range <200..299>.
+		The named standard Access list is in the range <200-299>.
 		The named extended Access list is in the range <300-399>.
-		The L2 Access list is in the range <400-599>."
-	SYNTAX  INTEGER (1..599)
+		The L2 Access list is in the range <400-1399>.
+		The IPv6 named Access list is in the range <5000-5100> "
+	SYNTAX  INTEGER (1..5100)
 
 	AclNameString ::= TEXTUAL-CONVENTION
 	STATUS      current
@@ -164,7 +170,6 @@ snAgAcl MODULE-IDENTITY
 			}
 
 
-
 snAgAclGlobal	OBJECT IDENTIFIER ::= { snAgAcl 1 }
 
 snAgAclGblCurRowIndex	OBJECT-TYPE
@@ -174,6 +179,78 @@ snAgAclGblCurRowIndex	OBJECT-TYPE
 	DESCRIPTION
 		"The current row index of the ACL table entry."
 	::= { snAgAclGlobal 1 }
+
+snAgAclGblAcctEnable	OBJECT-TYPE
+	SYNTAX			INTEGER { disabled(0), enabled(1) }
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION
+		"Specifies the administration status of the ACL accounting.
+		This object is not supported in CES/CER platforms."
+	DEFVAL			{ disabled }
+	::= { snAgAclGlobal 2 }
+
+snAgAclGblIfIPv4AcctClear	OBJECT-TYPE
+	SYNTAX			InterfaceIndexOrZero
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION
+		"Clears the IPv4 ACL accounting information for the given interface.
+		If the value is 0 then it clears IPv4 ACL accounting information for all the
+                interfaces."
+	::= { snAgAclGlobal 3 }	
+
+snAgAclGblIfIPv6AcctClear	OBJECT-TYPE
+	SYNTAX			InterfaceIndexOrZero
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION
+		"Clears the IPv6 ACL accounting information for the given interface.
+		If the value is 0 then it clears IPv6 accounting information for all the
+		interfaces."
+	::= { snAgAclGlobal 4 }	
+
+snAgAclGblRebindAclNumber		OBJECT-TYPE
+	SYNTAX		AclNumber
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The access-list number for rebind"
+	::= { snAgAclGlobal 5 }
+
+snAgAclGblRebindAclName	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"The access-list name for rebind."
+	::= { snAgAclGlobal 6 }
+
+brcdPbrAclAccntFilterAclName	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS  read-write
+	STATUS		current
+	DESCRIPTION
+		"This object can be used to control the content of brcdPbrAclAccntTable.
+      		Any ACL filter that has a full or partial match with ACL name
+      		will not be returned in the brcdPbrAclAccntTable.
+      		If not specified, the default value is null and all ACL filters will be 
+      		returned by the table."
+	::= { snAgAclGlobal 7 }
+
+brcdPbrAclAccntCounterType	OBJECT-TYPE
+	SYNTAX			INTEGER { cumulative(1), last5min(2) }
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION
+		"This contains ACL Number, ACL Name, ACL Filter Id, last five minutes and 
+		cumulative accounting data since the ACL was installed. 
+		Each field is separated by a pipe character 
+		i.e. 5MIN|CUMULATIVE|ACL Number|ACL Filter Id|ACL Name
+              Depending on the value of brcdPbrAclAccntCounterType the corresponding
+              counter will have the value while the other is zero."
+	DEFVAL { cumulative }
+	::= { snAgAclGlobal 8 }
 
 --
 -- ACL Table
@@ -257,7 +334,11 @@ SnAgAclEntry ::= SEQUENCE {
 	snAgAclIcmpCode
 		INTEGER,
 	snAgAclParameters
-		BITS
+		BITS,
+	snAgAclVlanId
+		FdryVlanIdOrNoneTC,
+	snAgAclClauseString
+		DisplayString
 	}
 
 snAgAclIndex	OBJECT-TYPE
@@ -779,6 +860,25 @@ snAgAclParameters   OBJECT-TYPE
 		"
 	::= { snAgAclEntry 31 }
 
+snAgAclVlanId 	OBJECT-TYPE
+	SYNTAX		FdryVlanIdOrNoneTC
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION
+		"Optional VLAN ID to match against that of the incoming packet.
+		By default, the VLAN ID field is ignored during the match. In this case,
+		value 0 is returned."
+	DEFVAL  { 0 }
+	::= { snAgAclEntry 32 }
+
+snAgAclClauseString	OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS  	read-only
+	STATUS			current
+	DESCRIPTION
+		"Returns the equivalent filter clause string."
+	::= { snAgAclEntry 33 }
+
 --
 -- Acl Port Table
 --
@@ -902,7 +1002,9 @@ SnAgAclIfBindEntry ::= SEQUENCE {
 	snAgAclIfBindRowStatus
 		SnRowStatus,
 	snAgAclIfBindDenyLogging
-		INTEGER
+		INTEGER,
+	snAgAclIfIpv6BindName
+		DisplayString
 	}
 
 snAgAclIfBindIndex      OBJECT-TYPE
@@ -923,24 +1025,23 @@ snAgAclIfBindDirection   OBJECT-TYPE
 
 snAgAclIfBindNum      OBJECT-TYPE
 	SYNTAX		INTEGER (0..199)
-	MAX-ACCESS  read-write
+	MAX-ACCESS  read-create
 	STATUS		current
 	DESCRIPTION
-		"Defined ACL number (0 represents named ACL)"
-
+		"The id of the IPv4 ACL bound to this Interface (0 represents named ACL)"
 	::= { snAgAclIfBindEntry 3 }
 
 snAgAclIfBindName      OBJECT-TYPE
 	SYNTAX		DisplayString (SIZE (0..255))
-	MAX-ACCESS  read-write
+	MAX-ACCESS  read-create
 	STATUS		current
 	DESCRIPTION
-		"Defined ACL name"
+		"The name of the IPv4 ACL name bound to this Interface"
 	::= { snAgAclIfBindEntry 4 }
 
 snAgAclIfBindVifPortList   OBJECT-TYPE
 	SYNTAX		OCTET STRING
-	MAX-ACCESS  read-write
+	MAX-ACCESS  read-create
 	STATUS		current
 	DESCRIPTION
 		"This object specifies the port list for binding virtual interface.
@@ -958,7 +1059,7 @@ snAgAclIfBindVifPortList   OBJECT-TYPE
 
 snAgAclIfBindRowStatus   OBJECT-TYPE
 	SYNTAX		SnRowStatus
-	MAX-ACCESS  read-write
+	MAX-ACCESS  read-create
 	STATUS		current
 	DESCRIPTION
 		"To create or delete a ACL port entry."
@@ -969,11 +1070,19 @@ snAgAclIfBindDenyLogging    OBJECT-TYPE
 					disable(0),
 					enable(1)
 				}
-	MAX-ACCESS  read-write
+	MAX-ACCESS  read-create
 	STATUS		current
 	DESCRIPTION
 		"Enable or disable deny logging."
 	::= { snAgAclIfBindEntry 7 }
+
+snAgAclIfIpv6BindName      OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..200))
+	MAX-ACCESS  read-create
+	STATUS		current
+	DESCRIPTION
+		"The name of the IPv6 ACL name bound to this Interface"
+	::= { snAgAclIfBindEntry 8 }
 
 --
 -- Acl Accounting Table
@@ -1033,14 +1142,21 @@ agAclAccntKind	OBJECT-TYPE
 	SYNTAX		INTEGER {
 					ipv4(0),
 					l2(1),
-					policyBasedRouting(2),
+				      --ipv4PolicyBasedRouting(2),
 					rateLimit(3),
-					receiveAcl(4)
+					receiveAcl(4),
+					ipv6(5),
+				      --ipv6PolicyBasedRouting(6)
+					ipv6ReceiveAcl(7)
 				}
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION
-		"Kind of ACL Accounting statistics needed."
+		"Kind of ACL Accounting statistics needed. ipv4PolicyBasedRouting(2)
+		 and ipv6PolicyBasedRouting(6) are implemented in brcdPbrAclAccntTable.
+		 Agent will fail for GET on ipv4PolicyBasedRouting(2) and
+		 ipv6PolicyBasedRouting(6) wheresas for GET_NEXT it will skip these.
+		 The enum value ipv6ReceiveAcl(7) is not supported on CES/CER devices."
 	::= { agAclAccntEntry 1 }
 
 agAclAccntIfIndex	OBJECT-TYPE
@@ -1529,6 +1645,75 @@ fdryL2AclIfBindRowStatus      OBJECT-TYPE
 		Setting this object to destroy(6) unbinds this L2 ACL from the port.
 		Other values in the enumeration are not used."
 	::= { fdryL2AclIfBindEntry 3 }
+
+--
+-- PBR ACL Accounting Table
+--
+brcdPbrAclAccntTable   OBJECT-TYPE
+	SYNTAX		SEQUENCE OF BrcdPbrAclAccntEntry
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Table of PBR ACL Accounting Statistics for router."
+	::= { snAgAcl 9 }
+
+brcdPbrAclAccntEntry       OBJECT-TYPE
+	SYNTAX		BrcdPbrAclAccntEntry
+	MAX-ACCESS  not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the PBR ACL-binding-to-port table."
+	INDEX   { brcdPbrAclAccntKind, brcdPbrAclAccntIfIndex, brcdPbrSerialNumber}
+	::= { brcdPbrAclAccntTable 1 }
+
+BrcdPbrAclAccntEntry ::= SEQUENCE {
+	brcdPbrAclAccntKind
+		INTEGER,
+	brcdPbrAclAccntIfIndex
+		InterfaceIndex,
+	brcdPbrSerialNumber
+		INTEGER,
+	brcdPbrAclAccntAclInfo
+		DisplayString
+	}
+
+brcdPbrAclAccntKind	OBJECT-TYPE
+	SYNTAX		INTEGER {
+					ipv4PolicyBasedRouting(1),
+					ipv6PolicyBasedRouting(2)
+				}
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Kind of PBR ACL Accounting statistics needed."
+	::= { brcdPbrAclAccntEntry 1 }
+
+brcdPbrAclAccntIfIndex	OBJECT-TYPE
+	SYNTAX			InterfaceIndex
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"Physical or virtual interface on which ACL accounting is desired"
+	::= { brcdPbrAclAccntEntry 2 }
+
+brcdPbrSerialNumber	OBJECT-TYPE
+	SYNTAX			INTEGER (0..2147483647)
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"This is a running number and may change if an acl or routemap is modified"
+	::= { brcdPbrAclAccntEntry 3 }
+
+brcdPbrAclAccntAclInfo OBJECT-TYPE
+	SYNTAX	       DisplayString
+	MAX-ACCESS     read-only
+	STATUS	       current
+	DESCRIPTION
+		"This contains ACL Number, ACL Name, ACL Filter Id, last five minutes and 
+		cumulative accounting data since the ACL was installed. 
+		Each field is separated by a pipe character 
+		i.e. 5MIN|CUMULATIVE|ACL Number|ACL Filter Id|ACL Name"
+	::= { brcdPbrAclAccntEntry 4 }
 
 
 END

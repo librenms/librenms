@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
+use App\Models\PortSecurity;
 use App\Models\Pseudowire;
 use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
@@ -79,7 +80,7 @@ class PortsController implements DeviceTab
         Validator::validate($request->all(), [
             'page' => 'int',
             'perPage' => ['regex:/^(\d+|all)$/'],
-            'sort' => 'in:media,mac,port,traffic,speed',
+            'sort' => 'in:media,mac,port,traffic,speed,index',
             'order' => 'in:asc,desc',
             'disabled' => 'in:0,1',
             'ignored' => 'in:0,1',
@@ -88,6 +89,7 @@ class PortsController implements DeviceTab
             'type' => 'in:bits,upkts,nupkts,errors,etherlike',
             'from' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
             'to' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
+            'searchPort' => 'nullable|string|max:255',
         ]);
 
         $this->loadSettings($request);
@@ -97,6 +99,7 @@ class PortsController implements DeviceTab
             'links' => $this->linksData($device),
             'transceivers' => $this->transceiversData($device),
             'xdsl' => $this->xdslData($device),
+            'portsecurity' => $this->portSecurityData($device),
             'graphs', 'mini_graphs' => $this->graphData($device, $request),
             default => $this->portData($device, $request),
         };
@@ -129,9 +132,10 @@ class PortsController implements DeviceTab
         }
 
         /** @var Collection<Port>|LengthAwarePaginator<Port> $ports */
-        $ports = $this->getFilteredPortsQuery($device, $relationships)
+        $ports = $this->getFilteredPortsQuery($device, $relationships, $request)
             ->paginate(fn ($total) => $this->settings['perPage'] == 'all' ? $total : (int) $this->settings['perPage']) // @phpstan-ignore-line missing closure type
-            ->appends('perPage', $this->settings['perPage']);
+            ->appends('perPage', $this->settings['perPage'])
+            ->appends('searchPort', $request->input('searchPort'));
 
         $data = [
             'ports' => $ports,
@@ -247,8 +251,8 @@ class PortsController implements DeviceTab
     private function graphData(Device $device, Request $request): array
     {
         return [
-            'graph_type' => 'port_' . $request->get('type'),
-            'ports' => $this->getFilteredPortsQuery($device)->get(),
+            'graph_type' => 'port_' . $request->input('type'),
+            'ports' => $this->getFilteredPortsQuery($device, [], $request)->get(),
         ];
     }
 
@@ -279,11 +283,16 @@ class PortsController implements DeviceTab
         return ['links' => $device->links];
     }
 
+    private function portSecurityData(Device $device): array
+    {
+        return [];
+    }
+
     private function getTabs(Device $device): array
     {
         $tabs = [
             ['name' => __('Basic'), 'url' => 'basic'],
-            ['name' => __('Detail'), 'url' => ''],
+            ['name' => __('Detail'), 'url' => 'detail'],
         ];
 
         if ($device->macs()->exists()) {
@@ -308,6 +317,10 @@ class PortsController implements DeviceTab
 
         if ($device->portsAdsl()->exists() || $device->portsVdsl()->exists()) {
             $tabs[] = ['name' => __('port.tabs.xdsl'), 'url' => 'xdsl'];
+        }
+
+        if (PortSecurity::where('device_id', $device->device_id)->exists()) {
+            $tabs[] = ['name' => __('Port Security'), 'url' => 'portsecurity'];
         }
 
         return $tabs;
@@ -373,7 +386,7 @@ class PortsController implements DeviceTab
         }
     }
 
-    private function getFilteredPortsQuery(Device $device, array $relationships = []): Builder
+    private function getFilteredPortsQuery(Device $device, array $relationships = [], ?Request $request = null): Builder
     {
         $orderBy = match ($this->settings['sort']) {
             'traffic' => \DB::raw('ports.ifInOctets_rate + ports.ifOutOctets_rate'),
@@ -384,6 +397,9 @@ class PortsController implements DeviceTab
             default => 'ifIndex',
         };
 
+        // Get search parameter
+        $searchPort = $request?->input('searchPort');
+
         return Port::where('device_id', $device->device_id)
             ->isNotDeleted()
             ->hasAccess(Auth::user())->with($relationships)
@@ -391,6 +407,11 @@ class PortsController implements DeviceTab
             ->when(! $this->settings['ignored'], fn (Builder $q, $disabled) => $q->where('ignore', 0))
             ->when($this->settings['admin'] != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $this->settings['admin']))
             ->when($this->settings['status'] != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $this->settings['status']))
+            ->when($searchPort, fn (Builder $q) => $q->where(function (Builder $q) use ($searchPort): void {
+                $q->where('ifName', 'LIKE', '%' . $searchPort . '%')
+                    ->orWhere('ifDescr', 'LIKE', '%' . $searchPort . '%')
+                    ->orWhere('ifAlias', 'LIKE', '%' . $searchPort . '%');
+            }))
             ->when($this->settings['sort'] == 'port', fn (Builder $q, $sort) => $q
                 ->orderByRaw('SOUNDEX(ifName) ' . $this->settings['order'])
                 ->orderByRaw('CHAR_LENGTH(ifName) ' . $this->settings['order'])
@@ -411,7 +432,7 @@ class PortsController implements DeviceTab
             };
         }
 
-        return $request->route('vars', 'detail'); // fourth segment is called vars to handle legacy urls
+        return $request->route('vars', LibrenmsConfig::get('ports_page_default')); // fourth segment is called vars to handle legacy urls
     }
 
     private function pageLinks(Request $request): array

@@ -251,24 +251,16 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
      */
     private function retrieveJuniperType($rtt_type)
     {
-        switch ($rtt_type) {
-            case 'enterprises.2636.3.7.2.1':
-                return 'IcmpTimeStamp';
-            case 'enterprises.2636.3.7.2.2':
-                return 'HttpGet';
-            case 'enterprises.2636.3.7.2.3':
-                return 'HttpGetMetadata';
-            case 'enterprises.2636.3.7.2.4':
-                return 'DnsQuery';
-            case 'enterprises.2636.3.7.2.5':
-                return 'NtpQuery';
-            case 'enterprises.2636.3.7.2.6':
-                return 'UdpTimestamp';
-            case 'zeroDotZero':
-                return 'twamp';
-            default:
-                return str_replace('ping', '', $rtt_type);
-        }
+        return match ($rtt_type) {
+            'enterprises.2636.3.7.2.1' => 'IcmpTimeStamp',
+            'enterprises.2636.3.7.2.2' => 'HttpGet',
+            'enterprises.2636.3.7.2.3' => 'HttpGetMetadata',
+            'enterprises.2636.3.7.2.4' => 'DnsQuery',
+            'enterprises.2636.3.7.2.5' => 'NtpQuery',
+            'enterprises.2636.3.7.2.6' => 'UdpTimestamp',
+            'zeroDotZero' => 'twamp',
+            default => str_replace('ping', '', $rtt_type),
+        };
     }
 
     /**
@@ -292,7 +284,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
         // $chassisName is known
         $name = preg_replace("/jnx($chassisName)?([^.]+).*/", '$2', $type);
-        $words = preg_split('/(^[^A-Z]+|[A-Z][^A-Z0-9]+)/', $name, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $words = preg_split('/(^[^A-Z]+|[A-Z][^A-Z0-9]+)/', (string) $name, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
         return implode(' ', $words);
     }
@@ -336,13 +328,11 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
         // could use improvement by mapping JUNIPER-IFOPTICS-MIB::jnxOpticsConfigTable for a tiny bit more info
         return SnmpQuery::cache()->walk('JUNIPER-IFOPTICS-MIB::jnxOpticsPMCurrentTable')
-            ->mapTable(function ($data, $ifIndex) {
-                return new Transceiver([
-                    'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex),
-                    'index' => $ifIndex,
-                    'entity_physical_index' => $ifIndex,
-                ]);
-            });
+            ->mapTable(fn ($data, $ifIndex) => new Transceiver([
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex),
+                'index' => $ifIndex,
+                'entity_physical_index' => $ifIndex,
+            ]));
     }
 
     private function findTransceiverEntityByPortName(array $entPhysical, ?string $ifName): array
@@ -396,28 +386,24 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
             return $QBridgeMibVlans;
         }
 
-        $vlans = SnmpQuery::enumStrings()->walk('JUNIPER-VLAN-MIB::jnxExVlanTable')->mapTable(function ($data, $vlanId) {
-            return new Vlan([
-                'vlan_vlan' => $data['JUNIPER-VLAN-MIB::jnxExVlanTag'],
-                'vlan_domain' => $data['JUNIPER-VLAN-MIB::jnxExVlanPortGroupInstance'],
-                'vlan_type' => $data['JUNIPER-VLAN-MIB::jnxExVlanType'],
-                'vlan_name' => $data['JUNIPER-VLAN-MIB::jnxExVlanName'],
-            ]);
-        });
+        $vlans = SnmpQuery::enumStrings()->walk('JUNIPER-VLAN-MIB::jnxExVlanTable')->mapTable(fn ($data, $vlanId) => new Vlan([
+            'vlan_vlan' => $data['JUNIPER-VLAN-MIB::jnxExVlanTag'],
+            'vlan_domain' => $data['JUNIPER-VLAN-MIB::jnxExVlanPortGroupInstance'],
+            'vlan_type' => $data['JUNIPER-VLAN-MIB::jnxExVlanType'],
+            'vlan_name' => $data['JUNIPER-VLAN-MIB::jnxExVlanName'],
+        ]));
 
         if ($vlans->isNotEmpty()) {
             return $vlans;
         }
 
         return SnmpQuery::enumStrings()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanTable')
-            ->mapTable(function ($data) {
-                return new Vlan([
-                    'vlan_vlan' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanTag'] ?? 0,
-                    'vlan_domain' => 1,
-                    'vlan_type' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanType'] ?? '',
-                    'vlan_name' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanName'] ?? '',
-                ]);
-            });
+            ->mapTable(fn ($data) => new Vlan([
+                'vlan_vlan' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanTag'] ?? 0,
+                'vlan_domain' => 1,
+                'vlan_type' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanType'] ?? '',
+                'vlan_name' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanName'] ?? '',
+            ]));
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection

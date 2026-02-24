@@ -46,7 +46,7 @@ if (empty($vars['template'])) {
 }
 
 $new_body = '';
-foreach (explode(PHP_EOL, $vars['template']) as $line) {
+foreach (explode(PHP_EOL, (string) $vars['template']) as $line) {
     $new_body .= convert_template($line) . PHP_EOL;
 }
 $new_title = convert_template($vars['title']);
@@ -63,7 +63,7 @@ function convert_template($line)
                 "@php\necho \\1;\n@endphp ",
                 '$value[\'\2\']',
             ],
-            $line
+            (string) $line
         );
     }
 
@@ -92,7 +92,7 @@ function convert_template($line)
         '{{ $\1[\'\2\'] }}',
         '{{ $alert->\1 }}',
     ];
-    $old1 = preg_replace($find, $replace, $old1);
+    $old1 = preg_replace($find, $replace, (string) $old1);
 
     // Revert some over-zealous changes:
     $find = [
@@ -104,7 +104,7 @@ function convert_template($line)
         '$value',
     ];
 
-    return preg_replace($find, $replace, $old1);
+    return preg_replace($find, $replace, (string) $old1);
 }
 
 exit(json_encode([

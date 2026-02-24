@@ -1,11 +1,13 @@
 -- ==================================================================
--- Copyright (C) 2007 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2019 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description:  HUAWEI VE (Virtual Ethernet) MIB
 -- Reference:
--- Version: V1.0
+-- Version: V1.02
 -- History:
--- V1.0 2007-01-20 Created by liuxuezhan 51362       
+-- V1.0 2007-01-20 Created by liuxuezhan 51362    
+-- V1.01 2015-12-12 modified by zhanghui 00334068   
+-- V1.02 2019-09-12 modified by zhuhui 00450059
 -- ==================================================================
           
     HUAWEI-VE-MIB DEFINITIONS ::= BEGIN
@@ -20,18 +22,26 @@
             DisplayString, RowStatus   
               FROM SNMPv2-TC;
                       
-          hwVe MODULE-IDENTITY 
-          LAST-UPDATED "200611221414Z"    
-          ORGANIZATION 
+      hwVe MODULE-IDENTITY 
+          LAST-UPDATED "201909121100Z"    
+          ORGANIZATION
               "Huawei Technologies Co.,Ltd."
           CONTACT-INFO 
-              "VRP Team Huawei Technologies Co.,Ltd.
-              Huawei Bld.,NO.3 Xinxi Rd., 
-              Shang-Di Information Industry Base,
-              Hai-Dian District Beijing P.R. China
-              http://www.huawei.com
-              Zip:100085
-              "  
+              "Huawei Industrial Base
+                Bantian, Longgang
+                 Shenzhen 518129
+                 People's Republic of China
+                 Website: http://www.huawei.com
+                 Email: support@huawei.com
+               "           
+            DESCRIPTION
+                "V1.02 Modify node hwVirtualEthernetGroupId DESCRIPTION."
+               REVISION     "201909121100Z"
+  
+            DESCRIPTION
+                "Add node hwL3TerminateVirtualEthernetName."
+               REVISION     "201512121100Z"
+
           DESCRIPTION 
               "The private mib file includes the general extent 
               information of the device.hwDatacomm(146).hwVirtualEthernet"
@@ -53,7 +63,8 @@
           STATUS current
           DESCRIPTION
               "Binding entry of virutal Etherent interfaces that use ID as the index. Each entry has one 
-               Layer 2 virutal Ethernet interface and one Layer 3 virtual Ethernet interface." 
+               Layer 2 virutal Ethernet interface and one Layer 3 virtual Ethernet interface or has one 
+               Layer 3 Terminate virtual Ethernet interface  and one Layer 3 virtual Ethernet interface." 
           INDEX  { hwVirtualEthernetGroupId }    
           ::= { hwVirtualEthernetTable 1 }           
     
@@ -65,7 +76,9 @@
                   DisplayString,
               hwL3VirtualEthernetName       
                   DisplayString,
-              hwVirtualEthernetGroupRowStatus      
+              hwL3TerminateVirtualEthernetName       
+                  DisplayString,
+             hwVirtualEthernetGroupRowStatus      
                   RowStatus
           }
           
@@ -74,8 +87,7 @@
           MAX-ACCESS not-accessible
           STATUS current
           DESCRIPTION
-              "Binding index of virtual Ethernet interface. The value ranges from 1 K to 8 K. 
-               The maximum value 8 K can be adjusted by using the .paf file"
+              "Binding index of virtual Ethernet interface. By default, the value is 8 K."
           ::= { hwVirtualEthernetEntry 1 }
 
       
@@ -94,6 +106,14 @@
           DESCRIPTION
             "Name of a Layer 3 virtual Ethernet interface, such as Virtual-Ethernet 3/0/0."
           ::= { hwVirtualEthernetEntry 12 }
+
+     hwL3TerminateVirtualEthernetName OBJECT-TYPE
+          SYNTAX DisplayString
+          MAX-ACCESS read-create
+          STATUS current
+          DESCRIPTION
+            "Name of a Layer 3 terminate virtual Ethernet interface, such as Virtual-Ethernet 3/0/0."
+          ::= { hwVirtualEthernetEntry 13 }
           
       hwVirtualEthernetGroupRowStatus OBJECT-TYPE
           SYNTAX RowStatus
@@ -122,7 +142,7 @@
 
         
       hwVirtualEthernetObjectGroup OBJECT-GROUP
-          OBJECTS {hwL2VirtualEthernetName, hwL3VirtualEthernetName,hwVirtualEthernetGroupRowStatus }
+          OBJECTS {hwL2VirtualEthernetName, hwL3VirtualEthernetName, hwL3TerminateVirtualEthernetName, hwVirtualEthernetGroupRowStatus }
           STATUS current       
           DESCRIPTION 
               "The VirtualEthernet attribute group."

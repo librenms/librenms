@@ -1,4 +1,5 @@
 <tr>
+    <td>{{ $port->ifIndex }}</td>
     <td>
         <div>
             <x-port-link :port="$port" class="tw:inline">
@@ -40,6 +41,11 @@
             @foreach($port->ipv6 as $ipv6)
                 <div><a class="tw:text-base" href="javascript:popUp('{{ url('ajax/netcmd?cmd=whois&query=' . $ipv6->ipv6_compressed) }}')">{{ $ipv6->ipv6_compressed }}/{{ $ipv6->ipv6_prefixlen }}</a></div>
             @endforeach
+        @endif
+        @if($port->portSecurity)
+            <span class="tw:text-sm tw:text-gray-500">
+                <i class="fa fa-lg {{ \LibreNMS\Enum\PortSecurityStatus::getIconClass($port->portSecurity->status) }}" aria-hidden='true' title="Port Security Status: {{ $port->portSecurity->status }}"></i>
+            </span>
         @endif
     </td>
     <td @if($collapsing)class="tw:hidden tw:md:table-cell"@endif>

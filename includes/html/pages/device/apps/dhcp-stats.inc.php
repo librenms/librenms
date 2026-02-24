@@ -65,7 +65,7 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
             'Value',
         ],
     ];
-    foreach ($pools as $pool_key => $pool) {
+    foreach ($pools as $pool) {
         // re-init the rows the pools detail table
         unset($pool_detail_table['rows']);
         $pool_detail_table['rows'] = [];
@@ -131,7 +131,7 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
         // look and see if we know what that mac belongs to and if so create a link for the device and port
         $mac = $lease['hw_address'];
         $mac_raw = false;
-        if (preg_match('/^[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]$/', $mac)) {
+        if (preg_match('/^[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]$/', (string) $mac)) {
             $port = Port::with('device')->firstWhere(['ifPhysAddress' => str_replace(':', '', $mac)]);
         }
         if (isset($port)) {
@@ -148,10 +148,10 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
         }
 
         if ($lease['client_hostname'] != '') {
-            $lease['client_hostname'] = base64_decode($lease['client_hostname']);
+            $lease['client_hostname'] = base64_decode((string) $lease['client_hostname']);
         }
         if ($lease['vendor_class_identifier'] != '') {
-            $lease['vendor_class_identifier'] = base64_decode($lease['vendor_class_identifier']);
+            $lease['vendor_class_identifier'] = base64_decode((string) $lease['vendor_class_identifier']);
         }
         $table_info['rows'][$key] = [
             ['data' => $lease['ip']],

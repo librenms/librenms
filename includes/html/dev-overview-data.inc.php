@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Location;
 use App\Facades\LibrenmsConfig;
+use App\Models\Location;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
@@ -41,16 +41,16 @@ echo '<div class="row">
       </div>';
 
 if (! empty($device['overwrite_ip'])) {
-    echo "<div class='row'><div class='col-sm-4'>Assigned IP</div><div class='col-sm-8'>" . htmlentities($device['overwrite_ip']) . '</div></div>';
+    echo "<div class='row'><div class='col-sm-4'>Assigned IP</div><div class='col-sm-8'>" . htmlentities((string) $device['overwrite_ip']) . '</div></div>';
 } elseif (! empty($device['ip'])) {
-    echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>" . htmlentities($device['ip']) . '</div></div>';
+    echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>" . htmlentities((string) $device['ip']) . '</div></div>';
 } else {
     try {
         $ip = (string) IP::parse($device['hostname']);
         if ($ip !== format_hostname($device)) {
             echo "<div class='row'><div class='col-sm-4'>IP Address</div><div class='col-sm-8'>" . htmlentities($ip) . '</div></div>';
         }
-    } catch (InvalidIpException $e) {
+    } catch (InvalidIpException) {
         // don't add an ip line
     }
 }
@@ -91,28 +91,51 @@ if ($device['sysObjectID']) {
 if ($device['sysContact']) {
     echo '<div class="row">
         <div class="col-sm-4">Contact</div>';
-    if (get_dev_attrib($device, 'override_sysContact_bool')) {
-        echo '
-        <div class="col-sm-8">' . Clean::html(get_dev_attrib($device, 'override_sysContact_string')) . '</div>
-      </div>
-      <div class="row">
-        <div class="col-sm-4">SNMP Contact</div>';
-    }
 
-    echo '
-        <div class="col-sm-8">' . Clean::html($device['sysContact']) . '</div>
-      </div>';
+    $contactText = get_dev_attrib($device, 'override_sysContact_bool') 
+        ? get_dev_attrib($device, 'override_sysContact_string')
+        : $device['sysContact'];
+
+    $emails = \LibreNMS\Util\Mail::parseEmails($contactText);
+    
+    if (is_array($emails) && count($emails) > 0) {
+        $email = key($emails);
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $emailLink = '<a href="mailto:' . htmlspecialchars((string) $email) . '">'
+                       . htmlspecialchars((string) $email)
+                       . '</a>';
+            $displayText = preg_replace(
+                '/(' . preg_quote((string) $email, '/') . ')/',
+                $emailLink,
+                Clean::html($contactText)
+            );
+        }
+    }
+    
+    $displayText ??= Clean::html($contactText);
+    
+    if (get_dev_attrib($device, 'override_sysContact_bool')) {
+        echo '<div class="col-sm-8">' . $displayText . '</div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">SNMP Contact</div>
+                <div class="col-sm-8">' . Clean::html($device['sysContact']) . '</div>
+            </div>';
+    } else {
+        echo '<div class="col-sm-8">' . $displayText . '</div>
+            </div>';
+    }
 }
 
-if (! empty($device['inserted']) && preg_match('/^0/', $device['inserted']) == 0) {
+if (! empty($device['inserted']) && preg_match('/^0/', (string) $device['inserted']) == 0) {
     $inserted_text = 'Device Added';
-    $inserted = (Time::formatInterval(-(time() - strtotime($device['inserted']))));
+    $inserted = (Time::formatInterval(-(time() - strtotime((string) $device['inserted']))));
     echo "<div class='row'><div class='col-sm-4'>$inserted_text</div><div class='col-sm-8' title='$inserted_text on " . $device['inserted'] . "'>$inserted</div></div>";
 }
 
 if (! empty($device['last_discovered'])) {
     $last_discovered_text = 'Last Discovered';
-    $last_discovered = (empty($device['last_discovered']) ? 'Never' : Time::formatInterval(-(time() - strtotime($device['last_discovered']))));
+    $last_discovered = (empty($device['last_discovered']) ? 'Never' : Time::formatInterval(-(time() - strtotime((string) $device['last_discovered']))));
     echo "<div class='row'><div class='col-sm-4'>$last_discovered_text</div><div class='col-sm-8' title='$last_discovered_text at " . $device['last_discovered'] . "'>$last_discovered</div></div>";
 }
 
@@ -147,11 +170,13 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
         <div class="col-sm-4">Lat / Lng</div>
         <div class="col-sm-8"><span id="coordinates-text">' . $location_coords . '</span><div class="pull-right">';
 
+    echo '<div class="btn-group" role="group" aria-label="Map actions">';
     echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> <span>View</span></button>';
     if ($location_valid) {
         echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . ',' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
     }
-    echo '</div>
+    echo '      </div>
+            </div>
         </div>
     </div>
     <div id="toggle-map" class="row collapse"><div id="location-map"></div></div>

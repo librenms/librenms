@@ -27,26 +27,22 @@
 namespace LibreNMS\Data\Source;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use Log;
 use Symfony\Component\Process\Process;
 
 class Fping
 {
-    private string $fping_bin;
-    private string|false $fping6_bin;
-    private int $count;
-    private int $timeout;
-    private int $interval;
-    private int $tos;
-    private int $retries;
+    private readonly int $count;
+    private readonly int $timeout;
+    private readonly int $interval;
+    private readonly int $tos;
+    private readonly int $retries;
 
     public function __construct()
     {
         // prep fping parameters
-        $this->fping_bin = LibrenmsConfig::get('fping', 'fping');
-        $fping6 = LibrenmsConfig::get('fping6', 'fping6');
-        $this->fping6_bin = is_executable($fping6) ? $fping6 : false;
         $this->count = max(LibrenmsConfig::get('fping_options.count', 3), 1);
         $this->interval = max(LibrenmsConfig::get('fping_options.interval', 500), 20);
         $this->timeout = max(LibrenmsConfig::get('fping_options.timeout', 500), $this->interval);
@@ -58,19 +54,13 @@ class Fping
      * Run fping against a hostname/ip in count mode and collect stats.
      *
      * @param  string  $host  hostname or ip
-     * @param  string  $address_family  ipv4 or ipv6
+     * @param  AddressFamily  $address_family  ipv4 or ipv6
      * @return FpingResponse
      */
-    public function ping($host, $address_family = 'ipv4'): FpingResponse
+    public function ping(string $host, AddressFamily $address_family = AddressFamily::IPv4): FpingResponse
     {
-        if ($address_family == 'ipv6') {
-            $cmd = $this->fping6_bin === false ? [$this->fping_bin, '-6'] : [$this->fping6_bin];
-        } else {
-            $cmd = $this->fping6_bin === false ? [$this->fping_bin, '-4'] : [$this->fping_bin];
-        }
-
         // build the command
-        $cmd = array_merge($cmd, [
+        $cmd = array_merge(LibrenmsConfig::fpingCommand($address_family), [
             '-e',
             '-q',
             '-c',
@@ -98,7 +88,7 @@ class Fping
     public function bulkPing(array $hosts, callable $callback): void
     {
         $process = app()->make(Process::class, ['command' => [
-            $this->fping_bin,
+            LibrenmsConfig::get('fping', 'fping'),
             '-f', '-',
             '-e',
             '-t', $this->timeout,
@@ -115,7 +105,7 @@ class Fping
         Log::debug('[FPING] ' . $process->getCommandLine() . PHP_EOL);
 
         $partial = '';
-        $process->run(function ($type, $output) use ($callback, &$partial) {
+        $process->run(function ($type, $output) use ($callback, &$partial): void {
             // stdout contains individual ping responses, stderr contains summaries
             if ($type == Process::ERR) {
                 $lines = explode(PHP_EOL, $output);

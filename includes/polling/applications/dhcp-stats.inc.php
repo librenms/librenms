@@ -20,7 +20,7 @@ try {
 } catch (JsonAppMissingKeysException $e) {
     $dhcpstats = $e->getParsedJson();
     $output = 'ERROR';
-} catch (JsonAppException $e) {
+} catch (JsonAppException) {
     $dhcpstats = snmp_walk($device, $oid, $options, $mib);
 }
 
@@ -37,7 +37,7 @@ if ($version == 1) {
 $metrics = [];
 $category = 'stats';
 if (intval($version) == 1) {
-    [$dhcp_total, $dhcp_active, $dhcp_expired, $dhcp_released, $dhcp_abandoned, $dhcp_reset, $dhcp_bootp, $dhcp_backup, $dhcp_free] = explode("\n", $dhcpstats);
+    [$dhcp_total, $dhcp_active, $dhcp_expired, $dhcp_released, $dhcp_abandoned, $dhcp_reset, $dhcp_bootp, $dhcp_backup, $dhcp_free] = explode("\n", (string) $dhcpstats);
 } elseif ($version >= 2) {
     $lease_data = $dhcpstats['leases'];
 

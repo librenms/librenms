@@ -7,6 +7,7 @@ if ($device['os_group'] == 'cisco') {
     $polled = time();
 
     $cefs_query = dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?', [$device['device_id']]);
+    $cefs_db = [];
     foreach ($cefs_query as $ceftmp) {
         $cef_id = $device['device_id'] . '-' . $ceftmp['entPhysicalIndex'] . '-' . $ceftmp['afi'] . '-' . $ceftmp['cef_index'];
         $cefs_db[$cef_id] = $ceftmp['cef_switching_id'];

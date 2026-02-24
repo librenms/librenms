@@ -16,14 +16,14 @@
  * @author     Rudy Broersma
  */
 
-$fgDhcpTables = SnmpQuery::hideMIB()->walk('FORTINET-FORTIGATE-MIB::fgDhcpTables')->table(0);
+$fgDhcpTables = SnmpQuery::hideMib()->walk('FORTINET-FORTIGATE-MIB::fgDhcpTables')->table(0);
 
 if (! empty($fgDhcpTables['fgDhcpLeaseUsage'])) {
     foreach ($fgDhcpTables['fgDhcpLeaseUsage'] as $vdomID => $table) {
-        $vdomName = SnmpQuery::enumStrings()->hideMIB()->get('FORTINET-FORTIGATE-MIB:fgVdEntName.' . $vdomID)->value();
+        $vdomName = SnmpQuery::enumStrings()->hideMib()->get('FORTINET-FORTIGATE-MIB:fgVdEntName.' . $vdomID)->value();
 
         foreach ($table as $index => $value) {
-            $indexSplit = explode('.', $index);
+            $indexSplit = explode('.', (string) $index);
             $fgDhcpServerID = $indexSplit[1];
 
             discover_sensor(

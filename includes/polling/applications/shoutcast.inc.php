@@ -13,7 +13,7 @@ $shoutcast = snmp_get($device, $oid, $options);
 $servers = explode("\n", $shoutcast);
 
 $metrics = [];
-foreach ($servers as $item => $server) {
+foreach ($servers as $server) {
     $server = trim($server);
 
     if (! empty($server)) {

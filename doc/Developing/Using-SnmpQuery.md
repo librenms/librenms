@@ -209,7 +209,7 @@ the index cannot be detected.
 Fetch an index to key array of the data.  You can specify an oid to get
 one column out of an SNMP table.
 
-##### Exmples
+##### Examples
 
 In this example, the table IF-MIB::ifTable is indexed by ifIndex, so when we walk the ifName column
 and call pluck, we get a nice mapping of ifIndex to ifName

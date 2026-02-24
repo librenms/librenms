@@ -8,7 +8,7 @@ import "../css/app.css";
 import "./bootstrap";
 
 import Vue from "vue";
-import { i18n } from "./plugins/i18n.js"; // translation
+import {i18n} from "./plugins/i18n.js"; // translation
 import ToggleButton from "vue-js-toggle-button";
 import VTooltip from "v-tooltip";
 import vSelect from "vue-select";
@@ -72,5 +72,5 @@ const app = new Vue({
 Alpine.data('popup', popup);
 Alpine.data('deviceLink', deviceLink);
 
-Alpine.start();
 window.Alpine = Alpine;
+Alpine.start();

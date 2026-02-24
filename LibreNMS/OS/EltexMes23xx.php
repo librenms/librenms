@@ -59,7 +59,7 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
                 'entPhysicalIndex' => 1000000 + $ifIndex,
                 'entPhysicalDescr' => $data['eltPhdTransceiverInfoType'],
                 'entPhysicalClass' => 'sfp-cage',
-                'entPhysicalName' => strtoupper($data['eltPhdTransceiverInfoConnectorType']),
+                'entPhysicalName' => strtoupper((string) $data['eltPhdTransceiverInfoConnectorType']),
                 'entPhysicalModelName' => $this->normData($data['eltPhdTransceiverInfoPartNumber']),
                 'entPhysicalSerialNum' => $data['eltPhdTransceiverInfoSerialNumber'],
                 'entPhysicalContainedIn' => $ifIndexToEntIndexMap[$ifIndex] ?? 0,
@@ -77,20 +77,18 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
     public function discoverTransceivers(): Collection
     {
         return SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverInfoTable')
-            ->mapTable(function ($data, $ifIndex) {
-                return new Transceiver([
-                    'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
-                    'index' => $ifIndex,
-                    'connector' => $data['eltPhdTransceiverInfoConnectorType'] ? strtoupper($data['eltPhdTransceiverInfoConnectorType']) : null,
-                    'distance' => $data['eltPhdTransceiverInfoTransferDistance'] ?? null,
-                    'model' => $data['eltPhdTransceiverInfoPartNumber'] ?? null,
-                    'revision' => $data['eltPhdTransceiverInfoVendorRev'] ?? null,
-                    'serial' => $data['eltPhdTransceiverInfoSerialNumber'] ?? null,
-                    'vendor' => $data['eltPhdTransceiverInfoVendorName'] ?? null,
-                    'wavelength' => $data['eltPhdTransceiverInfoWaveLength'] ?? null,
-                    'entity_physical_index' => $ifIndex,
-                ]);
-            });
+            ->mapTable(fn ($data, $ifIndex) => new Transceiver([
+                'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'index' => $ifIndex,
+                'connector' => $data['eltPhdTransceiverInfoConnectorType'] ? strtoupper((string) $data['eltPhdTransceiverInfoConnectorType']) : null,
+                'distance' => $data['eltPhdTransceiverInfoTransferDistance'] ?? null,
+                'model' => $data['eltPhdTransceiverInfoPartNumber'] ?? null,
+                'revision' => $data['eltPhdTransceiverInfoVendorRev'] ?? null,
+                'serial' => $data['eltPhdTransceiverInfoSerialNumber'] ?? null,
+                'vendor' => $data['eltPhdTransceiverInfoVendorName'] ?? null,
+                'wavelength' => $data['eltPhdTransceiverInfoWaveLength'] ?? null,
+                'entity_physical_index' => $ifIndex,
+            ]));
     }
 
     /**

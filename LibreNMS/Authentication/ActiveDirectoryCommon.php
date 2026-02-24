@@ -33,23 +33,23 @@ trait ActiveDirectoryCommon
 {
     protected function getUseridFromSid($sid)
     {
-        return preg_replace('/.*-(\d+)$/', '$1', $sid);
+        return preg_replace('/.*-(\d+)$/', '$1', (string) $sid);
     }
 
     protected function sidFromLdap($sid)
     {
-        $sidUnpacked = unpack('H*hex', $sid);
+        $sidUnpacked = unpack('H*hex', (string) $sid);
         $sidHex = array_shift($sidUnpacked);
-        $subAuths = unpack('H2/H2/n/N/V*', $sid);
+        $subAuths = unpack('H2/H2/n/N/V*', (string) $sid);
         if (PHP_INT_SIZE <= 4) {
             for ($i = 1; $i <= count($subAuths); $i++) {
                 if ($subAuths[$i] < 0) {
-                    $subAuths[$i] = $subAuths[$i] + 0x100000000;
+                    $subAuths[$i] += 0x100000000;
                 }
             }
         }
-        $revLevel = hexdec(substr($sidHex, 0, 2));
-        $authIdent = hexdec(substr($sidHex, 4, 12));
+        $revLevel = hexdec(substr((string) $sidHex, 0, 2));
+        $authIdent = hexdec(substr((string) $sidHex, 4, 12));
 
         return 'S-' . $revLevel . '-' . $authIdent . '-' . implode('-', $subAuths);
     }
@@ -165,7 +165,7 @@ trait ActiveDirectoryCommon
             'user_id' => $this->getUseridFromSid($this->sidFromLdap($entry['objectsid'][0])),
             'username' => $entry['samaccountname'][0],
             'realname' => $entry['displayname'][0],
-            'email' => isset($entry['mail'][0]) ? $entry['mail'][0] : null,
+            'email' => $entry['mail'][0] ?? null,
             'descr' => '',
             'can_modify_passwd' => 0,
         ];

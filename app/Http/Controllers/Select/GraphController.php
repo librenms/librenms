@@ -48,8 +48,8 @@ class GraphController extends Controller
         $this->validate($request, $this->rules);
 
         $data = [];
-        $search = $request->get('term');
-        $device_id = $request->get('device');
+        $search = $request->input('term');
+        $device_id = $request->input('device');
         $device = $device_id ? Device::find($device_id) : null;
 
         foreach (Graph::getTypes() as $type) {
@@ -58,9 +58,7 @@ class GraphController extends Controller
             if ($graphs->isNotEmpty()) {
                 $data[] = [
                     'text' => StringHelpers::niceCase($type),
-                    'children' => $graphs->map(function ($graph) use ($type) {
-                        return $this->formatGraph($type, $graph);
-                    })->values(),
+                    'children' => $graphs->map(fn ($graph) => $this->formatGraph($type, $graph))->values(),
                 ];
             }
         }
@@ -71,13 +69,12 @@ class GraphController extends Controller
             'core' => 'Core',
             'custom' => 'Custom',
             'ports' => 'Manual Ports',
+            'sensors' => 'Manual Sensors',
         ]), 'aggregators', $search);
         if ($aggregators->isNotEmpty()) {
             $data[] = [
                 'text' => 'Aggregators',
-                'children' => $aggregators->map(function ($text, $id) {
-                    return ['id' => $id, 'text' => $text];
-                })->values(),
+                'children' => $aggregators->map(fn ($text, $id) => ['id' => $id, 'text' => $text])->values(),
             ];
         }
 
@@ -87,9 +84,17 @@ class GraphController extends Controller
         if ($billing->isNotEmpty()) {
             $data[] = [
                 'text' => 'Bill',
-                'children' => $billing->map(function ($text, $id) {
-                    return ['id' => $id, 'text' => $text];
-                })->values(),
+                'children' => $billing->map(fn ($text, $id) => ['id' => $id, 'text' => $text])->values(),
+            ];
+        }
+
+        $customoid = $this->filterTypeGraphs(collect([
+            'customoid_customoid' => 'CustomOID Graph',
+        ]), 'customoid', $search);
+        if ($customoid->isNotEmpty()) {
+            $data[] = [
+                'text' => 'CustomOID',
+                'children' => $customoid->map(fn ($text, $id) => ['id' => $id, 'text' => $text])->values(),
             ];
         }
 
@@ -103,7 +108,7 @@ class GraphController extends Controller
     {
         $text = $graph;
         if (Str::contains('_', $graph)) {
-            [$type, $subtype] = explode('_', $graph, 2);
+            [$type, $subtype] = explode('_', (string) $graph, 2);
         } else {
             $type = $graph;
             $subtype = '';
@@ -137,15 +142,11 @@ class GraphController extends Controller
                 // search matches type, show all unless there are more terms.
                 if (! empty($terms)) {
                     $sub_search = array_shift($terms);
-                    $graphs = $graphs->filter(function ($graph) use ($sub_search) {
-                        return Str::contains(strtolower($graph), $sub_search);
-                    });
+                    $graphs = $graphs->filter(fn ($graph) => Str::contains(strtolower((string) $graph), $sub_search));
                 }
             } else {
                 // if the type matches, don't filter the sub values
-                $graphs = $graphs->filter(function ($graph) use ($search) {
-                    return Str::contains(strtolower($graph), $search);
-                });
+                $graphs = $graphs->filter(fn ($graph) => Str::contains(strtolower((string) $graph), $search));
             }
         }
 

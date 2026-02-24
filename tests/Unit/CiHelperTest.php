@@ -29,17 +29,13 @@ namespace LibreNMS\Tests\Unit;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\CiHelper;
 
-class CiHelperTest extends TestCase
+final class CiHelperTest extends TestCase
 {
     public function testSetFlags(): void
     {
         $helper = new CiHelper();
-        $allFalse = array_map(function ($flag) {
-            return false;
-        }, $this->getDefaultFlags());
-        $allTrue = array_map(function ($flag) {
-            return false;
-        }, $this->getDefaultFlags());
+        $allFalse = array_map(fn ($flag) => false, $this->getDefaultFlags());
+        $allTrue = array_map(fn ($flag) => true, $this->getDefaultFlags());
 
         $helper->setFlags($allFalse);
         $this->assertEquals($allFalse, $helper->getFlags());

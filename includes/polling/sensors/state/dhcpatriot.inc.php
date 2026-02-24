@@ -9,7 +9,7 @@
 
 if ($sensor['sensor_type'] === 'dhcpatriotServiceStatus') {
     $current_time = time();
-    $sensor_value_tmp = explode(':', $sensor_value);
+    $sensor_value_tmp = explode(':', (string) $sensor_value);
     $sensor_value = intval($sensor_value_tmp[1]);
 
     if (abs(intval($sensor_value_tmp[0]) - $current_time) > 300) {

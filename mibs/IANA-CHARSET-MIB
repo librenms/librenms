@@ -9,17 +9,16 @@ IMPORTS
             FROM SNMPv2-TC;                              -- [RFC2579]
 
 ianaCharsetMIB MODULE-IDENTITY
-    LAST-UPDATED    "200705140000Z"
+    LAST-UPDATED    "201405220000Z"
     ORGANIZATION    "IANA"
     CONTACT-INFO    "       Internet Assigned Numbers Authority
 
                     Postal: ICANN
-                            4676 Admiralty Way, Suite 330
-                            Marina del Rey, CA 90292
+                            12025 Waterfront Drive, Suite 300
+                            Los Angeles, CA 90094-2536
 
-                    Tel:    +1 310 823 9358
+                    Tel:    +1 310-301-5800
                     E-Mail: iana&iana.org"
-
     DESCRIPTION     "This MIB module defines the IANACharset
                     TEXTUAL-CONVENTION.  The IANACharset TC is used to
                     specify the encoding of string objects defined in
@@ -46,7 +45,22 @@ ianaCharsetMIB MODULE-IDENTITY
                     http://www.ietf.org/copyrights/ianamib.html."
 
     --  revision history
-    
+
+    REVISION        "201405220000Z"
+    DESCRIPTION     "Updated contact info."
+
+    REVISION        "201110300000Z"
+    DESCRIPTION     "Added missing 1004 registration."
+
+    REVISION        "201109230000Z"
+    DESCRIPTION     "Registration of new charset 2260."
+
+    REVISION        "201011040000Z"
+    DESCRIPTION     "Registration of new charset 2109."
+
+    REVISION        "201009150000Z"
+    DESCRIPTION     "Registration of new charset 2108."
+
     REVISION        "200705140000Z"
     DESCRIPTION     "Registration of new charset 2107."
 
@@ -58,7 +72,6 @@ ianaCharsetMIB MODULE-IDENTITY
     DESCRIPTION     "Original version transferred from Printer MIB,
                     generated from the IANA maintained assignments
                     http://www.iana.org/assignments/character-sets."
-
     ::= { mib-2 106 }
 
 IANACharset ::= TEXTUAL-CONVENTION
@@ -205,6 +218,7 @@ IANACharset ::= TEXTUAL-CONVENTION
         csUCS4(1001),
         csUnicodeASCII(1002),
         csUnicodeLatin1(1003),
+        csUnicodeJapanese(1004),
         csUnicodeIBM1261(1005),
         csUnicodeIBM1268(1006),
         csUnicodeIBM1276(1007),
@@ -329,6 +343,8 @@ IANACharset ::= TEXTUAL-CONVENTION
         csKOI7switched(2105),
         csBRF(2106),
         csTSCII(2107),
+        csCP51932(2108),
+        cswindows874(2109),
         cswindows1250(2250),
         cswindows1251(2251),
         cswindows1252(2252),
@@ -339,7 +355,7 @@ IANACharset ::= TEXTUAL-CONVENTION
         cswindows1257(2257),
         cswindows1258(2258),
         csTIS620(2259),
+        cs50220(2260),
         reserved(3000)
     }
 END
-

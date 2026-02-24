@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-16-00-0047
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-06-00-5005
 --
  -- CIENA-CES-MGMT-INTERFACE-MIB.my
  --
@@ -9,7 +9,7 @@
  IMPORTS        
    Integer32, Unsigned32, OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY
         FROM SNMPv2-SMI         
-   DisplayString            
+   DisplayString, TEXTUAL-CONVENTION            
         FROM SNMPv2-TC      
    InetAddressType, InetAddress ,InetAddressPrefixLength  
         FROM INET-ADDRESS-MIB  
@@ -21,19 +21,25 @@
        FROM CIENA-SMI;                      
     
  cienaCesMgmtInterfaceMIB MODULE-IDENTITY
-        LAST-UPDATED "201505150000Z"
-        ORGANIZATION "Ciena, Inc"
+        LAST-UPDATED "201706070000Z"
+        ORGANIZATION "Ciena Corp."
         CONTACT-INFO
-            "       Mib Meister
-                    115 North Sullivan Road
-                    Spokane Valley, WA 99037
-                    USA             
-                    Phone:  +1 509 242 9000
-                    Email:  support@ciena.com"                              
+        "   Mib Meister
+            7035 Ridge Road
+            Hanover, Maryland 21076
+            USA
+            Phone:  +1 800 921 1144
+            Email:  support@ciena.com"                           
         DESCRIPTION
             "This module defines the management interface details and the 
              associated notifications."
 
+        REVISION  "201706070000Z"
+        DESCRIPTION 
+            "Updated contact info."
+	    REVISION  "201701230000Z"
+	    DESCRIPTION
+	        "Added PreferredSourceAddress."
         REVISION  "201505150000Z"
         DESCRIPTION
             "Added cienaCesInetIcmpPortUnreachable."
@@ -49,6 +55,9 @@
         DESCRIPTION
             "Defined cienaCesInetTcpStack OBJECT IDENTIFIER at cienaCesMgmtInterface 4.
              Defined cienaCesInetTcpTimestamps at cienaCesInetTcpStack 1."
+        REVISION  "201411050000Z"
+        DESCRIPTION
+            "Added cienaCesServerModule and cienaCesServerModuleMgmtVlan objects."
         REVISION  "201410070000Z"
         DESCRIPTION
             "Added cienaCesInetIcmpAcceptRedirects and cienaCesInetIcmpEchoIgnoreBroadcasts."
@@ -73,6 +82,7 @@
  -- IP Interface Node
  --
  cienaCesMgmtInterface OBJECT IDENTIFIER ::= { cienaCesMgmtInterfaceMIBObjects 1 }
+ cienaCesServerModule OBJECT IDENTIFIER ::= { cienaCesMgmtInterfaceMIBObjects 2}
 
  -- Notifications 
   
@@ -87,6 +97,15 @@
  cienaCesMgmtInterfaceMIBCompliances OBJECT IDENTIFIER ::= { cienaCesMgmtInterfaceMIBConformance 1 }     
  cienaCesMgmtInterfaceMIBGroups      OBJECT IDENTIFIER ::= { cienaCesMgmtInterfaceMIBConformance 2 }
 
+ PreferredSourceAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This textual convention enumerates the possible source address
+        values."
+    SYNTAX      INTEGER {
+                    default  (1),  -- the default source path
+                    loopback (2)   -- use the loopback address  
+                   }
 
  cienaCesInetMgmtInterfaceTable OBJECT-TYPE
      SYNTAX SEQUENCE OF CienaCesInetMgmtInterfaceEntry
@@ -531,6 +550,19 @@ cienaCesInetGatewayTable OBJECT-TYPE
      DESCRIPTION
          "This object indicates the way in which traffic at the MGMT port is used."
      ::= { cienaCesInetMgmtPort 1 }
+
+ --
+ -- Server Module Items
+ --
+   
+  cienaCesServerModuleMgmtVlan OBJECT-TYPE
+    SYNTAX      Integer32 (1..24576)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows the user set/get the server module management VLAN on boards
+        that support a server module."
+    ::= { cienaCesServerModule 1 } 
 
  --
  -- notifications

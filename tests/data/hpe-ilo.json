@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "hpe-ilo",
-                    "type": "appliance",
+                    "type": "management",
                     "serial": "AB123456CD",
                     "icon": "hpe.svg"
                 }

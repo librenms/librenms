@@ -33,13 +33,13 @@ $last_index_prefix = $current_index_prefix = '';
 $unique_desc_counter = [];
 
 foreach ($cmc_iii_var_table as $index => $entry) {
-    $var_name_parts = explode('.', $entry['cmcIIIVarName']);
+    $var_name_parts = explode('.', (string) $entry['cmcIIIVarName']);
     array_pop($var_name_parts);
     $sensor_name = implode(' ', $var_name_parts);
     $var_type = $entry['cmcIIIVarType'];
     $sensor_id = count($cmc_iii_sensors);
 
-    $index_r = explode('.', $index);
+    $index_r = explode('.', (string) $index);
     if (count($index_r) > 1) {
         $current_index_prefix = $index_r[0];
     }
@@ -51,7 +51,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
             $sensor_id++;
         }
 
-        if (str_contains($sensor_name, $entry['cmcIIIVarValueStr'])) {
+        if (str_contains($sensor_name, (string) $entry['cmcIIIVarValueStr'])) {
             $sensor_desc = $entry['cmcIIIVarValueStr'];
         } else {
             $sensor_desc = "$sensor_name {$entry['cmcIIIVarValueStr']}";
@@ -83,7 +83,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
             $cmc_iii_sensors[$sensor_id]['low_limit'] = $entry['cmcIIIVarValueInt'];
             break;
         case 'logic':
-            $sensor_logic = explode(' / ', $entry['cmcIIIVarValueStr']);
+            $sensor_logic = explode(' / ', (string) $entry['cmcIIIVarValueStr']);
             $cmc_iii_sensors[$sensor_id]['logic'][0] = substr($sensor_logic[0], 2);
             $cmc_iii_sensors[$sensor_id]['logic'][1] = substr($sensor_logic[1], 2);
             break;
@@ -97,9 +97,9 @@ foreach ($cmc_iii_var_table as $index => $entry) {
             }
 
             if ($entry['cmcIIIVarScale'][0] == '-') {
-                $cmc_iii_sensors[$sensor_id]['divisor'] = substr($entry['cmcIIIVarScale'], 1);
+                $cmc_iii_sensors[$sensor_id]['divisor'] = substr((string) $entry['cmcIIIVarScale'], 1);
             } elseif ($entry['cmcIIIVarScale'][0] == '+') {
-                $cmc_iii_sensors[$sensor_id]['multiplier'] = substr($entry['cmcIIIVarScale'], 1);
+                $cmc_iii_sensors[$sensor_id]['multiplier'] = substr((string) $entry['cmcIIIVarScale'], 1);
             }
 
             // encode string to ensure that degree sign may be used properly for unit comparison
@@ -161,7 +161,7 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
     || $sensor_data['name'] == 'Memory USB-Stick'
     || $sensor_data['name'] == 'Memory SD-Card'
     || $sensor_data['name'] == 'Login'
-    || preg_match('/(Power Factor)|(Runtime)/', $sensor_data['name'])) {
+    || preg_match('/(Power Factor)|(Runtime)/', (string) $sensor_data['name'])) {
         echo "\n" . $sensor_data['name'] . " skipped!\n";
         continue;
     }
@@ -198,34 +198,34 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
 
     if (isset($sensor_data['divisor'])) {
         if (isset($sensor_data['low_limit'])) {
-            $sensor_data['low_limit'] = ($sensor_data['low_limit'] / $sensor_data['divisor']);
+            $sensor_data['low_limit'] /= $sensor_data['divisor'];
         }
         if (isset($sensor_data['low_warn_limit'])) {
-            $sensor_data['low_warn_limit'] = ($sensor_data['low_warn_limit'] / $sensor_data['divisor']);
+            $sensor_data['low_warn_limit'] /= $sensor_data['divisor'];
         }
         if (isset($sensor_data['warn_limit'])) {
-            $sensor_data['warn_limit'] = ($sensor_data['warn_limit'] / $sensor_data['divisor']);
+            $sensor_data['warn_limit'] /= $sensor_data['divisor'];
         }
         if (isset($sensor_data['high_limit'])) {
-            $sensor_data['high_limit'] = ($sensor_data['high_limit'] / $sensor_data['divisor']);
+            $sensor_data['high_limit'] /= $sensor_data['divisor'];
         }
 
-        $sensor_data['value'] = ($sensor_data['value'] / $sensor_data['divisor']);
+        $sensor_data['value'] /= $sensor_data['divisor'];
     } elseif (isset($sensor_data['multiplier'])) {
         if (isset($sensor_data['low_limit'])) {
-            $sensor_data['low_limit'] = ($sensor_data['low_limit'] * $sensor_data['multiplier']);
+            $sensor_data['low_limit'] *= $sensor_data['multiplier'];
         }
         if (isset($sensor_data['low_warn_limit'])) {
-            $sensor_data['low_warn_limit'] = ($sensor_data['low_warn_limit'] * $sensor_data['multiplier']);
+            $sensor_data['low_warn_limit'] *= $sensor_data['multiplier'];
         }
         if (isset($sensor_data['warn_limit'])) {
-            $sensor_data['warn_limit'] = ($sensor_data['warn_limit'] * $sensor_data['multiplier']);
+            $sensor_data['warn_limit'] *= $sensor_data['multiplier'];
         }
         if (isset($sensor_data['high_limit'])) {
-            $sensor_data['high_limit'] = ($sensor_data['high_limit'] * $sensor_data['multiplier']);
+            $sensor_data['high_limit'] *= $sensor_data['multiplier'];
         }
 
-        $sensor_data['value'] = ($sensor_data['value'] * $sensor_data['multiplier']);
+        $sensor_data['value'] *= $sensor_data['multiplier'];
     }
     discover_sensor(null, $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['desc'], $sensor_data['divisor'] ?? 1, $sensor_data['multiplier'] ?? 1, $sensor_data['low_limit'] ?? null, $sensor_data['low_warn_limit'] ?? null, $sensor_data['warn_limit'] ?? null, $sensor_data['high_limit'] ?? null, $sensor_data['value']);
 }

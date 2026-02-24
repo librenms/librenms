@@ -24,7 +24,7 @@ IMPORTS
       FROM ADTRAN-AOS;
 
 adGenAosMefPerUniPerfHistoryMib MODULE-IDENTITY
-   LAST-UPDATED "201409100000Z" -- September 10, 2014
+   LAST-UPDATED "201710140000Z"  -- October 14, 2017
    ORGANIZATION "ADTRAN Inc."
    CONTACT-INFO
      "Info:   www.adtran.com
@@ -39,6 +39,10 @@ adGenAosMefPerUniPerfHistoryMib MODULE-IDENTITY
       per UNI within an AOS product.
 
       Copyright (C) ADTRAN, Inc. (2014)."
+
+   REVISION    "201710140000Z"  -- October 14, 2017
+   DESCRIPTION
+     "Policer Counters Added."
 
    REVISION    "201409100000Z" -- September 10, 2014
    DESCRIPTION
@@ -95,7 +99,13 @@ AdMefPerUniPhCurEntry ::=
       adMefPerUniPhCurIngressGreenFrameDiscards1Day    HCPerfCurrentCount,
       adMefPerUniPhCurEgressGreenFrameDiscards1Day     HCPerfCurrentCount,
       adMefPerUniPhCurIngressGreenOctetDiscards1Day    HCPerfCurrentCount,
-      adMefPerUniPhCurEgressGreenOctetDiscards1Day     HCPerfCurrentCount
+      adMefPerUniPhCurEgressGreenOctetDiscards1Day     HCPerfCurrentCount,	  
+      adMefPerUniPhCurIngressYellowOctets15Min         HCPerfCurrentCount,
+      adMefPerUniPhCurIngressYellowFrames15Min         HCPerfCurrentCount,
+      adMefPerUniPhCurIngressRedFrames15Min            HCPerfCurrentCount,	  
+      adMefPerUniPhCurIngressYellowOctets1Day          HCPerfCurrentCount,
+      adMefPerUniPhCurIngressYellowFrames1Day          HCPerfCurrentCount,
+      adMefPerUniPhCurIngressRedFrames1Day             HCPerfCurrentCount
    }
 
 adMefPerUniPhCurTimeElapsed15Min OBJECT-TYPE
@@ -274,6 +284,54 @@ adMefPerUniPhCurEgressGreenOctetDiscards1Day OBJECT-TYPE
      "Count of egress green octets discarded in the current 1 day interval."
    ::= { adMefPerUniPhCurEntry 22 }
 
+adMefPerUniPhCurIngressYellowOctets15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress yellow octets in the current 15 minute interval."
+   ::= { adMefPerUniPhCurEntry 23 }
+
+adMefPerUniPhCurIngressYellowFrames15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress yellow frames in the current 15 minute interval."
+   ::= { adMefPerUniPhCurEntry 24 }
+
+adMefPerUniPhCurIngressRedFrames15Min OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress red frames in the current 15 minute interval."
+   ::= { adMefPerUniPhCurEntry 25 }
+
+adMefPerUniPhCurIngressYellowOctets1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress yellow octets in the current 1 day interval."
+   ::= { adMefPerUniPhCurEntry 26 }
+
+adMefPerUniPhCurIngressYellowFrames1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress yellow frames in the current 1 day interval."
+   ::= { adMefPerUniPhCurEntry 27 }
+
+adMefPerUniPhCurIngressRedFrames1Day OBJECT-TYPE
+   SYNTAX      HCPerfCurrentCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress red framess in the current 1 day interval."
+   ::= { adMefPerUniPhCurEntry 28 }   
+   
 ------------------------------------------------------------
 -- 15 Minute Interval Table for Interface Performance History
 --
@@ -307,7 +365,10 @@ AdMefPerUniPh15MinIntervalEntry ::=
       adMefPerUniPh15MinIngressGreenFrameDiscards      HCPerfIntervalCount,
       adMefPerUniPh15MinEgressGreenFrameDiscards       HCPerfIntervalCount,
       adMefPerUniPh15MinIngressGreenOctetDiscards      HCPerfIntervalCount,
-      adMefPerUniPh15MinEgressGreenOctetDiscards       HCPerfIntervalCount
+      adMefPerUniPh15MinEgressGreenOctetDiscards       HCPerfIntervalCount,	  
+      adMefPerUniPh15MinIngressYellowOctets            HCPerfIntervalCount,
+      adMefPerUniPh15MinIngressYellowFrames            HCPerfIntervalCount,
+      adMefPerUniPh15MinIngressRedFrames               HCPerfIntervalCount
    }
 
 adMefPerUniPh15MinIntervalNumber OBJECT-TYPE
@@ -384,6 +445,30 @@ adMefPerUniPh15MinEgressGreenOctetDiscards OBJECT-TYPE
      "Count of egress green octets discarded in the 15 minute interval."
    ::= { adMefPerUniPh15MinIntervalEntry 9 }
 
+adMefPerUniPh15MinIngressYellowOctets OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress yellow octets in the 15 minute interval."
+   ::= { adMefPerUniPh15MinIntervalEntry 10 }
+
+adMefPerUniPh15MinIngressYellowFrames OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress yellow frames in the 15 minute interval."
+   ::= { adMefPerUniPh15MinIntervalEntry 11 }
+
+adMefPerUniPh15MinIngressRedFrames OBJECT-TYPE
+   SYNTAX      HCPerfIntervalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress red frames in the 15 minute interval."
+   ::= { adMefPerUniPh15MinIntervalEntry 12 }       
+   
 ------------------------------------------------------------
 -- 1 Day Interval Table for Interface Performance History
 --
@@ -417,7 +502,10 @@ AdMefPerUniPh1DayIntervalEntry ::=
       adMefPerUniPh1DayIngressGreenFrameDiscards       HCPerfTotalCount,
       adMefPerUniPh1DayEgressGreenFrameDiscards        HCPerfTotalCount,
       adMefPerUniPh1DayIngressGreenOctetDiscards       HCPerfTotalCount,
-      adMefPerUniPh1DayEgressGreenOctetDiscards        HCPerfTotalCount
+      adMefPerUniPh1DayEgressGreenOctetDiscards        HCPerfTotalCount,	  
+      adMefPerUniPh1DayIngressYellowOctets             HCPerfTotalCount,
+      adMefPerUniPh1DayIngressYellowFrames             HCPerfTotalCount,
+      adMefPerUniPh1DayIngressRedFrames                HCPerfTotalCount
    }
 
 adMefPerUniPh1DayIntervalNumber OBJECT-TYPE
@@ -493,6 +581,30 @@ adMefPerUniPh1DayEgressGreenOctetDiscards OBJECT-TYPE
      "Count of egress green octets discarded in the 1 day interval."
    ::= { adMefPerUniPh1DayIntervalEntry 9 }
 
+adMefPerUniPh1DayIngressYellowOctets OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress yellow octets in the 1 day interval."
+   ::= { adMefPerUniPh1DayIntervalEntry 10 }
+
+adMefPerUniPh1DayIngressYellowFrames OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress yellow frames in the 1 day interval."
+   ::= { adMefPerUniPh1DayIntervalEntry 11 }
+
+adMefPerUniPh1DayIngressRedFrames OBJECT-TYPE
+   SYNTAX      HCPerfTotalCount
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+     "Count of ingress red frames in the 1 day interval."
+   ::= { adMefPerUniPh1DayIntervalEntry 12 }    
+   
 ------------------------------------------------------------
 -- Conformance information
 --
@@ -545,7 +657,13 @@ adMefPerUniPhCurGroup OBJECT-GROUP
       adMefPerUniPhCurIngressGreenFrameDiscards1Day,
       adMefPerUniPhCurEgressGreenFrameDiscards1Day,
       adMefPerUniPhCurIngressGreenOctetDiscards1Day,
-      adMefPerUniPhCurEgressGreenOctetDiscards1Day
+      adMefPerUniPhCurEgressGreenOctetDiscards1Day,	  
+      adMefPerUniPhCurIngressYellowOctets15Min,
+      adMefPerUniPhCurIngressYellowFrames15Min,
+      adMefPerUniPhCurIngressRedFrames15Min,
+      adMefPerUniPhCurIngressYellowOctets1Day,
+      adMefPerUniPhCurIngressYellowFrames1Day,
+      adMefPerUniPhCurIngressRedFrames1Day
    }
    STATUS  current
    DESCRIPTION
@@ -561,7 +679,10 @@ adMefPerUniPh15MinIntervalGroup OBJECT-GROUP
       adMefPerUniPh15MinIngressGreenFrameDiscards,
       adMefPerUniPh15MinEgressGreenFrameDiscards,
       adMefPerUniPh15MinIngressGreenOctetDiscards,
-      adMefPerUniPh15MinEgressGreenOctetDiscards
+      adMefPerUniPh15MinEgressGreenOctetDiscards,
+      adMefPerUniPh15MinIngressYellowOctets,
+      adMefPerUniPh15MinIngressYellowFrames,
+      adMefPerUniPh15MinIngressRedFrames
    }
    STATUS  current
    DESCRIPTION
@@ -577,7 +698,10 @@ adMefPerUniPh1DayIntervalGroup OBJECT-GROUP
       adMefPerUniPh1DayIngressGreenFrameDiscards,
       adMefPerUniPh1DayEgressGreenFrameDiscards,
       adMefPerUniPh1DayIngressGreenOctetDiscards,
-      adMefPerUniPh1DayEgressGreenOctetDiscards
+      adMefPerUniPh1DayEgressGreenOctetDiscards,	  
+      adMefPerUniPh1DayIngressYellowOctets,
+      adMefPerUniPh1DayIngressYellowFrames,
+      adMefPerUniPh1DayIngressRedFrames
    }
    STATUS  current
    DESCRIPTION

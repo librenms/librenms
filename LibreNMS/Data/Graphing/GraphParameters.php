@@ -33,7 +33,7 @@ use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\Time;
 
-class GraphParameters
+class GraphParameters implements \Stringable
 {
     public readonly array $visibleElements;
 
@@ -67,8 +67,18 @@ class GraphParameters
     public ?int $scale_min = null;
     public ?bool $scale_rigid = null;
     public bool $sloped = true;
+    public ?int $base = null;
+    public ?int $units_exponent = null;
+    public bool $logarithmic = false;
+    public bool $alt_y_grid = false;
 
     public int $float_precision = 2;
+
+    public ?string $right_axis = null;
+    public ?string $right_axis_label = null;
+    public ?string $left_axis_format = null;
+    public ?int $units_length = null;
+    public ?string $vertical_label = null;
 
     private const TINY = 99;
     private const SMALL = 224;
@@ -181,6 +191,19 @@ class GraphParameters
             $options[] = '--slope-mode';
         }
 
+        if ($this->alt_y_grid) {
+            $options[] = '--alt-y-grid';
+        }
+        if ($this->base !== null) {
+            array_push($options, '--base', $this->base);
+        }
+        if ($this->units_exponent !== null) {
+            array_push($options, '--units-exponent', $this->units_exponent);
+        }
+        if ($this->logarithmic) {
+            $options[] = '--logarithmic';
+        }
+
         // remove all text, height is too small
         if ($this->height < self::TINY) {
             $options[] = '--only-graph';
@@ -192,7 +215,23 @@ class GraphParameters
 
         if ($this->visible('title')) {
             // remove single quotes, because we can't drop out of the string if this is sent to rrdtool stdin
-            $options[] = '--title=' . escapeshellarg(str_replace("'", '', $this->getTitle()));
+            $options[] = '--title=' . str_replace("'", '', $this->getTitle());
+        }
+
+        if ($this->right_axis !== null) {
+            array_push($options, '--right-axis', $this->right_axis);
+        }
+        if ($this->right_axis_label !== null) {
+            array_push($options, '--right-axis-label', $this->right_axis_label);
+        }
+        if ($this->left_axis_format !== null) {
+            array_push($options, '--left-axis-format', $this->left_axis_format);
+        }
+        if ($this->units_length !== null) {
+            array_push($options, '--units-length', $this->units_length);
+        }
+        if ($this->vertical_label !== null) {
+            array_push($options, '--vertical-label', $this->vertical_label);
         }
 
         return $options;

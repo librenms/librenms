@@ -19,9 +19,9 @@ $device_id = intval($_POST['device']);
 $rows_updated = 0;
 
 foreach ($_POST as $key => $val) {
-    if (strncmp($key, 'oldign_', 7) == 0) {
+    if (str_starts_with((string) $key, 'oldign_')) {
         // Interface identifier passed as part of the field name
-        $port_id = intval(substr($key, 7));
+        $port_id = intval(substr((string) $key, 7));
 
         $oldign = intval($val) ? 1 : 0;
         $newign = $_POST['ignore_' . $port_id] ? 1 : 0;
@@ -40,9 +40,9 @@ foreach ($_POST as $key => $val) {
         }
 
         $rows_updated += $n;
-    } elseif (strncmp($key, 'olddis_', 7) == 0) {
+    } elseif (str_starts_with((string) $key, 'olddis_')) {
         // Interface identifier passed as part of the field name
-        $port_id = intval(substr($key, 7));
+        $port_id = intval(substr((string) $key, 7));
 
         $olddis = intval($val) ? 1 : 0;
         $newdis = $_POST['disabled_' . $port_id] ? 1 : 0;

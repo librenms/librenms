@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2021 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: The mib is used for defining the management of huawei AC at the side of the quality of wireless signal for AP MIB objects.
 -- Reference: 
--- Version: V1.37
+-- Version: V1.40
 -- ============================================================================
 -- Module definition
 
@@ -26,7 +26,7 @@
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.16
 		hwWlanRadio MODULE-IDENTITY
-			LAST-UPDATED "202006162107Z"		-- Jun 16, 2020 at 21:07 GMT
+			LAST-UPDATED "202111012018Z"		--  Nov 1, 2021 at 20:18 GMT
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -37,6 +37,16 @@
 				   Website: http://www.huawei.com
 				   Email: support@huawei.com
 				   "  
+
+			DESCRIPTION
+				"V1.40, add the enum of hwWlanRadioChannelChangedReason."
+			REVISION "202111012018Z"		-- Nov 1, 2021 at 20:18 GMT
+			DESCRIPTION
+				"V1.39, Add 6G value for node hwWlanRadioFreqType, add node hwWlanRadioReference3dData."
+			REVISION "202105151015Z"		-- May 15, 2021 at 10:15 GMT
+			DESCRIPTION
+				"V1.38, modify the node of hwWlanRadioRunState."
+			REVISION "202009181715Z"		-- Sep 18, 2020 at 17:15 GMT
 			DESCRIPTION
 				"V1.37, modify the node of hwRadioChannelChangedTrap, hwRadioSignalEnvDeteriorationTrap and hwRadioDownTrap, rename the node of hwWlanRadioInterfereRate hwWlanRadioInterferenceRate."
 			REVISION "202006162107Z"		-- Jun 16, 2020 at 21:07 GMT
@@ -492,7 +502,11 @@
 				config(4), 
 				calibrate(5),
 				thirdGPP(6),
-				iotCard(7)
+				iotCard(7),
+				mesh(8),
+				dfsInAc(9),
+				dfsRecover(10),
+				apSync(11)
 			}
 			MAX-ACCESS read-only
 			STATUS current
@@ -990,6 +1004,8 @@
 				hwWlanRadioReferenceDataAnalysis    
 			        INTEGER,
 				hwWlanRadioFlexibleRadioSwitch
+			        INTEGER,
+				hwWlanRadioReference3dData    
 			        INTEGER
 			 }
 
@@ -1034,7 +1050,8 @@
 			SYNTAX INTEGER
 				{
 				frequency2G(1),
-				frequency5G(2)
+				frequency5G(2),
+				frequency6G(3)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -1047,7 +1064,8 @@
 			SYNTAX INTEGER
 				{
 				up(1),
-				down(2)
+				down(2),
+				invalid(255)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -1589,6 +1607,19 @@
 				"This object indicates the status of the flexible radio switch. The default value is 2."
 			DEFVAL { enable }
 			::= { hwWlanRadioInfoEntry 59 }
+
+		-- 1.3.6.1.4.1.2011.6.139.16.1.2.1.60
+		hwWlanRadioReference3dData OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				disable(1),
+				enable(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the status of the referencing 3d-data function."
+			::= { hwWlanRadioInfoEntry 60 }
 
 --  1.3.6.1.4.1.2011.6.139.16.1.3
 		-- 1.3.6.1.4.1.2011.6.139.16.1.3

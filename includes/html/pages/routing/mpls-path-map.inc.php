@@ -97,9 +97,7 @@ $dev_mpls_tunnel_c_hops = collect(dbFetchRows('SELECT * FROM mpls_tunnel_c_hops 
 $keyed = $dev_mpls_tunnel_c_hops->keyBy('mplsTunnelCHopListIndex'); // reduce to last hops
 
 // Filter to only with final destination
-$filtered = $keyed->filter(function ($value) use ($last_node) {
-    return $value['mplsTunnelCHopRouterId'] == $last_node;
-});
+$filtered = $keyed->filter(fn ($value) => $value['mplsTunnelCHopRouterId'] == $last_node);
 // FIXME pick the last one, but it seems that the secod one could work too. On NOKIA it actually does not matter, the paths have the same hops.
 // The first one is the active route path.
 $filtered2 = $filtered->last()['mplsTunnelCHopListIndex'];

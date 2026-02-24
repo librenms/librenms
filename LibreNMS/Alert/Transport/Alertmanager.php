@@ -23,6 +23,8 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Pool;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
@@ -40,7 +42,7 @@ class Alertmanager extends Transport
         $password = $this->config['alertmanager-password'];
 
         $alertmanager_status = $alert_data['state'] == AlertState::RECOVERED ? 'endsAt' : 'startsAt';
-        $alertmanager_msg = strip_tags($alert_data['msg']);
+        $alertmanager_msg = strip_tags((string) $alert_data['msg']);
         $data = [[
             $alertmanager_status => date('c'),
             'generatorURL' => Url::deviceUrl($alert_data['device_id']),
@@ -58,30 +60,60 @@ class Alertmanager extends Transport
 
         $alertmanager_opts = $this->parseUserOptions($this->config['alertmanager-options']);
         foreach ($alertmanager_opts as $label => $value) {
-            // To allow dynamic values
-            if (preg_match('/^extra_[A-Za-z0-9_]+$/', $label) && ! empty($alert_data['faults'][1][$value])) {
-                $data[0]['labels'][$label] = strip_tags($alert_data['faults'][1][$value]);
+            if (str_starts_with((string) $label, 'stc_')) {
+                // Static label: strip the stc_ prefix and use the value as-is
+                $cleanLabel = substr((string) $label, 4);
+                $data[0]['labels'][$cleanLabel] = strip_tags((string) $value);
             } else {
-                $data[0]['labels'][$label] = strip_tags($value);
+                // Dynamic label: try to resolve value from alert data, faults, or fall back to literal
+                $resolved = $alert_data[$value] ?? current(array_filter(
+                    array_column($alert_data['faults'] ?? [], $value),
+                    fn ($v) => ! empty($v)
+                )) ?: $value;
+
+                $data[0]['labels'][$label] = strip_tags((string) $resolved);
+
+                if (str_starts_with((string) $label, 'dyn_') && $data[0]['labels'][$label] == $value) {
+                    unset($data[0]['labels'][$label]);
+                }
             }
         }
 
-        $client = Http::client()->timeout(5);
+        $urls = array_values(array_filter(array_map(trim(...), explode(',', (string) $url))));
 
-        if ($username != '' && $password != '') {
-            $client->withBasicAuth($username, $password);
-        }
+        $client = Http::client()->timeout(2);
 
-        foreach (explode(',', $url) as $am) {
-            $post_url = ($am . '/api/v2/alerts');
-            $res = $client->post($post_url, $data);
+        $responses = $client->pool(fn (Pool $pool) => array_map(function (string $baseUrl) use ($pool, $username, $password, $data) {
+            $req = $pool;
+            if ($username !== '' && $password !== '') {
+                $req = $req->withBasicAuth($username, $password);
+            }
 
-            if ($res->successful()) {
-                return true;
+            return $req->post(rtrim($baseUrl, '/') . '/api/v2/alerts', $data);
+        }, $urls));
+
+        foreach ($responses as $res) {
+            if ($res instanceof ConnectionException) {
+                throw new AlertTransportDeliveryException(
+                    $alert_data,
+                    0,
+                    $res->getMessage(),
+                    $alertmanager_msg,
+                    $data
+                );
+            }
+            if (! $res->successful()) {
+                throw new AlertTransportDeliveryException(
+                    $alert_data,
+                    $res->status(),
+                    $res->body(),
+                    $alertmanager_msg,
+                    $data
+                );
             }
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alertmanager_msg, $data);
+        return true;
     }
 
     public static function configTemplate(): array

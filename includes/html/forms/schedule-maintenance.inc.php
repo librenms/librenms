@@ -44,15 +44,13 @@ if ($sub_type == 'new-maintenance') {
     $start_recurring_hr = $_POST['start_recurring_hr'] ?? null;
     $end_recurring_hr = $_POST['end_recurring_hr'] ?? null;
     $start = $_POST['start'] ?? null;
-    [$duration_hour, $duration_min] = isset($_POST['duration']) ? explode(':', $_POST['duration']) : [null, null];
+    [$duration_hour, $duration_min] = isset($_POST['duration']) ? explode(':', (string) $_POST['duration']) : [null, null];
     $end = $_POST['end'] ?? null;
-    $behavior = isset($_POST['behavior'])
-        ? $_POST['behavior']
-        : LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
+    $behavior = $_POST['behavior'] ?? LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
     $maps = $_POST['maps'] ?? null;
 
     if (isset($duration_hour) && isset($duration_min)) {
-        $end = date('Y-m-d H:i:00', strtotime('+' . intval($duration_hour) . ' hour ' . intval($duration_min) . ' minute', strtotime($start)));
+        $end = date('Y-m-d H:i:00', strtotime('+' . intval($duration_hour) . ' hour ' . intval($duration_min) . ' minute', strtotime((string) $start)));
     }
 
     if (empty($title)) {
@@ -70,14 +68,14 @@ if ($sub_type == 'new-maintenance') {
             $message .= 'Missing start recurring date<br />';
         } else {
             // check if date is correct
-            [$ysrd, $msrd, $dsrd] = explode('-', $start_recurring_dt);
+            [$ysrd, $msrd, $dsrd] = explode('-', (string) $start_recurring_dt);
             if (! checkdate($msrd, $dsrd, $ysrd)) {
                 $message .= 'Please check start recurring date<br />';
             }
         }
         // end recurring dt not mandatory.. but if set, check if correct
         if (! empty($end_recurring_dt) && $end_recurring_dt != '0000-00-00' && $end_recurring_dt != '') {
-            [$yerd, $merd, $derd] = explode('-', $end_recurring_dt);
+            [$yerd, $merd, $derd] = explode('-', (string) $end_recurring_dt);
             if (! checkdate($merd, $derd, $yerd)) {
                 $message .= 'Please check end recurring date<br />';
             }
@@ -156,10 +154,10 @@ if ($sub_type == 'new-maintenance') {
                 $type = 'device';
                 if (Str::startsWith($target, 'l')) {
                     $type = 'location';
-                    $target = substr($target, 1);
+                    $target = substr((string) $target, 1);
                 } elseif (Str::startsWith($target, 'g')) {
                     $type = 'device_group';
-                    $target = substr($target, 1);
+                    $target = substr((string) $target, 1);
                 }
 
                 $item = dbInsert(['schedule_id' => $alert_schedule->schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $target], 'alert_schedulables');

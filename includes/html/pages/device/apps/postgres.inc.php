@@ -18,7 +18,7 @@ echo '| DBs:';
 $databases = $app->data['databases'] ?? [];
 sort($databases);
 foreach ($databases as $index => $db) {
-    $db = htmlspecialchars($db);
+    $db = htmlspecialchars((string) $db);
     $label = $vars['database'] == $db
         ? '<span class="pagemenu-selected">' . $db . '</span>'
         : $db;

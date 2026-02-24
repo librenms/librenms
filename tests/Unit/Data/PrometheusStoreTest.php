@@ -34,7 +34,7 @@ use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('datastores')]
-class PrometheusStoreTest extends TestCase
+final class PrometheusStoreTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -73,10 +73,8 @@ class PrometheusStoreTest extends TestCase
         $prometheus->write($measurement, $fields, $tags, $meta);
 
         LaravelHttp::assertSentCount(1);
-        LaravelHttp::assertSent(function (\Illuminate\Http\Client\Request $request) {
-            return $request->method() == 'POST' &&
-                $request->url() == 'http://fake:9999/metrics/job/librenms/instance/testhost/measurement/testmeasure/ifName/testifname/type/testtype' &&
-                $request->body() == "ifIn 234234\nifOut 53453\n";
-        });
+        LaravelHttp::assertSent(fn (\Illuminate\Http\Client\Request $request) => $request->method() == 'POST' &&
+            $request->url() == 'http://fake:9999/metrics/job/librenms/instance/testhost/measurement/testmeasure/ifName/testifname/type/testtype' &&
+            $request->body() == "ifIn 234234\nifOut 53453\n");
     }
 }

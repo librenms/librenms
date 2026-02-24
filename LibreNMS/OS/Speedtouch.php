@@ -39,7 +39,7 @@ class Speedtouch extends OS
         $loop = \SnmpQuery::get('IF-MIB::ifDescr.101')->value();
 
         if ($loop) {
-            preg_match('@([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)@i', $loop, $matches);
+            preg_match('@([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)@i', (string) $loop, $matches);
             $device->version = $matches[1];
         }
     }

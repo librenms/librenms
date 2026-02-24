@@ -171,9 +171,7 @@ class OS implements
         }
 
         // create missing graphs
-        $device->graphs()->saveMany($graphs->diff($device->graphs->pluck('graph'))->map(function ($graph) {
-            return new DeviceGraph(['graph' => $graph]);
-        }));
+        $device->graphs()->saveMany($graphs->diff($device->graphs->pluck('graph'))->map(fn ($graph) => new DeviceGraph(['graph' => $graph])));
     }
 
     public function preCache()
@@ -205,7 +203,7 @@ class OS implements
 
         if (! isset($this->cache['cache_oid'][$oid])) {
             $data = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], $mib, null, $snmpflags);
-            $this->cache['cache_oid'][$oid] = array_map('current', $data);
+            $this->cache['cache_oid'][$oid] = array_map(current(...), $data);
         }
 
         return $this->cache['cache_oid'][$oid];
@@ -293,7 +291,7 @@ class OS implements
         $name = $rf->getShortName();
         preg_match_all('/[A-Z][a-z]*/', $name, $segments);
 
-        return implode('-', array_map('strtolower', $segments[0]));
+        return implode('-', array_map(strtolower(...), $segments[0]));
     }
 
     /**
@@ -318,13 +316,15 @@ class OS implements
 
         $data = [];
         foreach ($oids as $id => $oid) {
-            if (isset($callback)) {
-                $channel = call_user_func($callback, $snmp_data[$oid]);
-            } else {
-                $channel = $snmp_data[$oid];
-            }
+            if (isset($snmp_data[$oid])) {
+                if (isset($callback)) {
+                    $channel = call_user_func($callback, $snmp_data[$oid]);
+                } else {
+                    $channel = $snmp_data[$oid];
+                }
 
-            $data[$id] = WirelessSensor::channelToFrequency($channel);
+                $data[$id] = WirelessSensor::channelToFrequency($channel);
+            }
         }
 
         return $data;

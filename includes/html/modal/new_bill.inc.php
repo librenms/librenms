@@ -32,7 +32,7 @@ if (Auth::user()->hasGlobalAdmin()) {
           <h4 class="modal-title" id="Create">Add Traffic Bill</h4>
         </div>
         <div class="modal-body">
-            <form method="post" role="form" action="bills/" class="form-horizontal alerts-form">
+            <form method="post" role="form" action="<?php echo url('bills') ?>" class="form-horizontal alerts-form">
                 <?php echo csrf_field() ?>
                 <input type="hidden" name="addbill" value="yes" />
 

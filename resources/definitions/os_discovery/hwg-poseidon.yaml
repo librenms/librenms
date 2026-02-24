@@ -1,4 +1,3 @@
-mib: POSEIDON-MIB
 modules:
     os:
         sysDescr_regex: '/(?<hardware>Poseidon [0-9]+) .* v(?<version>[\d.]+)/'
@@ -6,58 +5,58 @@ modules:
         temperature:
             data:
                 -
-                    oid: sensTable
-                    value: sensValue
+                    oid: POSEIDON-MIB::sensTable
+                    value: POSEIDON-MIB::sensValue
                     num_oid: '.1.3.6.1.4.1.21796.3.3.3.1.6.{{ $index }}'
                     divisor: 10
-                    descr: sensName
+                    descr: POSEIDON-MIB::sensName
                     index: 'sensTable.{{ $index }}'
                     skip_values:
                         -
-                            oid: sensUnit
+                            oid: POSEIDON-MIB::sensUnit
                             op: '!='
                             value: 0
         humidity:
             data:
                 -
-                    oid: sensTable
-                    value: sensValue
+                    oid: POSEIDON-MIB::sensTable
+                    value: POSEIDON-MIB::sensValue
                     num_oid: '.1.3.6.1.4.1.21796.3.3.3.1.6.{{ $index }}'
                     divisor: 10
-                    descr: sensName
+                    descr: POSEIDON-MIB::sensName
                     index: 'sensTable.{{ $index }}'
                     skip_values:
                         -
-                            oid: sensUnit
+                            oid: POSEIDON-MIB::sensUnit
                             op: '!='
                             value: 3
         state:
             data:
                 -
-                    oid: inpTable
-                    value: inpValue
+                    oid: POSEIDON-MIB::inpTable
+                    value: POSEIDON-MIB::inpValue
                     num_oid: '.1.3.6.1.4.1.21796.3.3.1.1.2.{{ $index }}'
-                    descr: inpName
+                    descr: POSEIDON-MIB::inpName
                     index: 'inpValue.{{ $index }}'
                     state_name: inpValue
                     states:
                         - { descr: open, graph: 0, value: 0, generic: 0 }
                         - { descr: closed, graph: 0, value: 1, generic: 2 }
                 -
-                    oid: inpTable
-                    value: inpAlarmState
+                    oid: POSEIDON-MIB::inpTable
+                    value: POSEIDON-MIB::inpAlarmState
                     num_oid: '.1.3.6.1.4.1.21796.3.3.1.1.5.{{ $index }}'
-                    descr: 'alarm : {{ $inpName }}'
+                    descr: 'alarm : {{ POSEIDON-MIB::inpName }}'
                     index: 'inpAlarmState.{{ $index }}'
                     state_name: inpAlarmState
                     states:
                         - { descr: normal, graph: 0, value: 0, generic: 0 }
                         - { descr: alarm, graph: 0, value: 1, generic: 2 }
                 -
-                    oid: sensTable
-                    value: sensState
+                    oid: POSEIDON-MIB::sensTable
+                    value: POSEIDON-MIB::sensState
                     num_oid: '.1.3.6.1.4.1.21796.3.3.3.1.4.{{ $index }}'
-                    descr: sensName
+                    descr: POSEIDON-MIB::sensName
                     index: 'sensState.{{ $index }}'
                     state_name: sensName
                     states:

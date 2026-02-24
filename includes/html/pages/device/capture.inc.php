@@ -39,10 +39,10 @@ if (! Auth::user()->hasGlobalAdmin()) {
     <div class="tab-content">
     <?php
     $tabs = [
-        'discovery' => 'ajax_output.php?id=capture&format=text&type=discovery&hostname=' . htmlentities($device['hostname']),
-        'poller'    => 'ajax_output.php?id=capture&format=text&type=poller&hostname=' . htmlentities($device['hostname']),
-        'snmp'      => 'ajax_output.php?id=capture&format=text&type=snmpwalk&hostname=' . htmlentities($device['hostname']),
-        'alerts'    => 'ajax_output.php?id=query&format=text&type=alerts&hostname=' . htmlentities($device['hostname']),
+        'discovery' => 'ajax_output.php?id=capture&format=text&type=discovery&hostname=' . htmlentities((string) $device['hostname']),
+        'poller'    => 'ajax_output.php?id=capture&format=text&type=poller&hostname=' . htmlentities((string) $device['hostname']),
+        'snmp'      => 'ajax_output.php?id=capture&format=text&type=snmpwalk&hostname=' . htmlentities((string) $device['hostname']),
+        'alerts'    => 'ajax_output.php?id=query&format=text&type=alerts&hostname=' . htmlentities((string) $device['hostname']),
     ];
 
     foreach ($tabs as $tab => $url) {

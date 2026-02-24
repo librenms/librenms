@@ -23,7 +23,7 @@ echo '<div class="row">
 $snmp_enabled = ! isset($_POST['hostname']) || isset($_POST['snmp']);
 
 if (! empty($_POST['hostname'])) {
-    $hostname = strip_tags($_POST['hostname']);
+    $hostname = strip_tags((string) $_POST['hostname']);
     if (! \LibreNMS\Util\Validate::hostname($hostname) && ! IP::isValid($hostname)) {
         print_error("Invalid hostname or IP: $hostname");
     } else {
@@ -32,19 +32,19 @@ if (! empty($_POST['hostname'])) {
         if (Auth::user()->hasGlobalRead()) {
             // Settings common to SNMPv2 & v3
             if ($_POST['port']) {
-                $new_device->port = strip_tags($_POST['port']);
+                $new_device->port = strip_tags((string) $_POST['port']);
             }
 
             if ($_POST['transport']) {
-                $new_device->transport = strip_tags($_POST['transport']);
+                $new_device->transport = strip_tags((string) $_POST['transport']);
             }
 
             $additional = [];
             if (! $snmp_enabled) {
                 $new_device->snmp_disable = 1;
-                $new_device->os = $_POST['os'] ? strip_tags($_POST['os_id']) : 'ping';
-                $new_device->hardware = strip_tags($_POST['hardware']);
-                $new_device->sysName = strip_tags($_POST['sysName']);
+                $new_device->os = $_POST['os'] ? strip_tags((string) $_POST['os']) : 'ping';
+                $new_device->hardware = strip_tags((string) $_POST['hardware']);
+                $new_device->sysName = strip_tags((string) $_POST['sysName']);
             } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
                 $new_device->snmpver = strip_tags($_POST['snmpver']);
                 $communities = LibrenmsConfig::get('snmp.community');
@@ -52,13 +52,13 @@ if (! empty($_POST['hostname'])) {
                     $new_device->community = $_POST['community'];
                     $communities = [$_POST['community']];
                 }
-                print_message('Adding host ' . htmlentities($hostname) . (count($communities) == 1 ? ' community' : ' communities') . ' ' . implode(', ', array_map('htmlspecialchars', $communities)) . ' port ' . htmlentities($new_device->port) . ' using ' . htmlentities($new_device->transport));
+                print_message('Adding host ' . htmlentities($hostname) . (count($communities) == 1 ? ' community' : ' communities') . ' ' . implode(', ', array_map(htmlspecialchars(...), $communities)) . ' port ' . htmlentities($new_device->port) . ' using ' . htmlentities($new_device->transport));
             } elseif ($_POST['snmpver'] === 'v3') {
                 $new_device->snmpver = 'v3';
-                $new_device->authlevel = strip_tags($_POST['authlevel']);
+                $new_device->authlevel = strip_tags((string) $_POST['authlevel']);
                 $new_device->authname = $_POST['authname'];
                 $new_device->authpass = $_POST['authpass'];
-                $new_device->authalgo = strip_tags($_POST['authalgo']);
+                $new_device->authalgo = strip_tags((string) $_POST['authalgo']);
                 $new_device->cryptopass = $_POST['cryptopass'];
                 $new_device->cryptoalgo = $_POST['cryptoalgo'];
 
@@ -81,7 +81,7 @@ if (! empty($_POST['hostname'])) {
             } catch (HostUnreachableException $e) {
                 print_error($e->getMessage());
                 foreach ($e->getReasons() as $reason) {
-                    print_error(htmlentities($reason));
+                    print_error(htmlentities((string) $reason));
                 }
             } catch (Exception $e) {
                 print_error($e->getMessage());
@@ -137,8 +137,7 @@ $pagetitle[] = 'Add host';
         <div class='form-group'>
             <label for='os' class='col-sm-3 control-label'>OS (optional)</label>
             <div class='col-sm-9'>
-                <input id='os' class='form-control' name='os' placeholder="OS (optional)"/>
-                <input type='hidden' id='os_id' class='form-control' name='os_id' />
+                <select id='os' class='form-control' name='os' placeholder="OS (optional)"></select>
             </div>
         </div>
     </div>
@@ -281,7 +280,7 @@ if (LibrenmsConfig::get('distributed_poller') === true) {
     ';
 
                       foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
-                          echo '<option value="' . $group['id'] . '">' . htmlentities($group['group_name']) . '</option>';
+                          echo '<option value="' . $group['id'] . '">' . htmlentities((string) $group['group_name']) . '</option>';
                       }
 
                       echo '
@@ -329,46 +328,7 @@ if (LibrenmsConfig::get('distributed_poller') === true) {
         }
     }
 
-    var os_suggestions = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        remote: {
-            url: "ajax_ossuggest.php?term=%QUERY",
-            filter: function (output) {
-                return $.map(output, function (item) {
-                    return {
-                        text: item.text,
-                        os: item.os,
-                    };
-                });
-            },
-            wildcard: "%QUERY"
-        }
-    });
-    os_suggestions.initialize();
-    $('#os').typeahead({
-            hint: true,
-            highlight: true,
-            minLength: 1,
-            classNames: {
-                menu: 'typeahead-left'
-            }
-        },
-        {
-            source: os_suggestions.ttAdapter(),
-            async: true,
-            displayKey: 'text',
-            valueKey: 'os',
-            templates: {
-                suggestion: Handlebars.compile('<p>&nbsp;{{text}}</p>')
-            },
-            limit: 20
-        });
-
-    $("#os").on("typeahead:selected typeahead:autocompleted", function(e,datum) {
-        $("#os_id").val(datum.os);
-        $("#os").html('<mark>' + datum.text + '</mark>');
-    });
+    init_select2('#os', 'os', {}, null, 'OS (optional)');
 
     $("[name='snmp']").bootstrapSwitch('offColor','danger');
     $("[name='force_add']").bootstrapSwitch();

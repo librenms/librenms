@@ -61,7 +61,7 @@ body:
       label: Discovery output
       description: |
         Paste the result of:
-        ./discovery.php -d -h HOSTNAME
+        lnms device:discover -vv HOSTNAME
       render: txt
 
   - type: textarea
@@ -71,5 +71,5 @@ body:
       label: Poller output
       description: |
         Paste the result of:
-        lnms device:poll HOSTNAME -vv --no-data
+        lnms device:poll -vv HOSTNAME --no-data
       render: txt

@@ -3,7 +3,7 @@
 $oids = snmp_walk($device, '.1.3.6.1.4.1.18928.1.1.2.14.1.2', '-Osqn', '');
 d_echo($oids . "\n");
 
-$oids = trim($oids);
+$oids = trim((string) $oids);
 if ($oids) {
     echo 'Areca Harddisk ';
 }
@@ -32,7 +32,7 @@ if ($oids) {
 
 $precision = 1;
 $type = 'areca';
-foreach (explode("\n", $oids) as $data) {
+foreach (explode("\n", (string) $oids) as $data) {
     $data = trim($data);
     if ($data) {
         [$oid,$descr] = explode(' ', $data, 2);

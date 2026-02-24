@@ -1,32 +1,37 @@
-mib: TERRAGRAPH-RADIO-MIB
 modules:
   os:
     sysDescr_regex: '/^Cambium cnWave (?<hardware>.*) (?:Client|Distribution) Node, Version (?<version>.*)$/'
   sensors:
+    additional_oids:
+      data:
+        -
+          oid:
+            - IF-MIB::ifName
     dbm:
       data:
         -
-          oid: tgRadioInterfacesTable
-          value: rssi
+          oid: TERRAGRAPH-RADIO-MIB::tgRadioInterfacesTable
+          value: TERRAGRAPH-RADIO-MIB::rssi
           num_oid: '.1.3.6.1.4.1.17713.60.1.1.1.7.{{ $index }}'
-          descr: '{{ $ifName }} RSSI'
-          group: '{{ $ifName }} [{{ $remoteMacAddr }}]'
+          descr: '{{ IF-MIB::ifName }} RSSI'
+          group: '{{ IF-MIB::ifName }} [{{ TERRAGRAPH-RADIO-MIB::remoteMacAddr }}]'
           index: 'rssi.{{ $index }}'
         -
-          oid: tgRadioInterfacesTable
-          value: snr
+          oid: TERRAGRAPH-RADIO-MIB::tgRadioInterfacesTable
+          value: TERRAGRAPH-RADIO-MIB::snr
           num_oid: '.1.3.6.1.4.1.17713.60.1.1.1.6.{{ $index }}'
-          descr: '{{ $ifName }} SNR'
-          group: '{{ $ifName }} [{{ $remoteMacAddr }}]'
+          descr: '{{ IF-MIB::ifName }} SNR'
+          group: '{{ IF-MIB::ifName }} [{{ TERRAGRAPH-RADIO-MIB::remoteMacAddr }}]'
           index: 'snr.{{ $index }}'
     state:
       data:
         - 
-          oid: tgRadioInterfacesTable
-          value: mcs
+          oid: TERRAGRAPH-RADIO-MIB::tgRadioInterfacesTable
+          value: TERRAGRAPH-RADIO-MIB::mcs
           num_oid: '.1.3.6.1.4.1.17713.60.1.1.1.5.{{ $index }}'
-          descr: '{{ $ifName }} MCS'
-          group: '{{ $ifName }} [{{ $remoteMacAddr }}]'
+          state_name: 'tgRadioInterfacesTable'
+          descr: '{{ IF-MIB::ifName }} MCS'
+          group: '{{ IF-MIB::ifName }} [{{ TERRAGRAPH-RADIO-MIB::remoteMacAddr }}]'
           index: 'mcs.{{ $index }}'
           states:
             - { value: 0, descr: mcs0, graph: 1, generic: 1 }

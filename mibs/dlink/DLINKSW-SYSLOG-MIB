@@ -24,7 +24,7 @@ DLINKSW-SYSLOG-MIB DEFINITIONS ::= BEGIN
              FROM DLINK-ID-REC-MIB;
 
     dlinkSwSyslogMIB MODULE-IDENTITY
-        LAST-UPDATED "201308270000Z"
+        LAST-UPDATED "201401170000Z"
         ORGANIZATION "D-Link Corp."
         CONTACT-INFO
             "        D-Link Corporation
@@ -36,7 +36,7 @@ DLINKSW-SYSLOG-MIB DEFINITIONS ::= BEGIN
             "
         DESCRIPTION
             "This MIB module defines objects for system log function."
-        REVISION "201303070000Z"
+        REVISION "201309140000Z"
         DESCRIPTION
             "This is the first version of the MIB file.
             "
@@ -49,8 +49,8 @@ DLINKSW-SYSLOG-MIB DEFINITIONS ::= BEGIN
 
 -- -----------------------------------------------------------------------------   
     dSyslogGeneral             OBJECT IDENTIFIER ::= { dSyslogMIBObjects 1 }
-
-    dSyslogSourceIfIndex  OBJECT-TYPE
+	
+	dSyslogSourceIfIndex  OBJECT-TYPE
         SYNTAX          InterfaceIndexOrZero
         MAX-ACCESS      read-write
         STATUS          current
@@ -61,7 +61,7 @@ DLINKSW-SYSLOG-MIB DEFINITIONS ::= BEGIN
             specified, the IP address of the closest interface will be used.
             "
         ::= { dSyslogGeneral 1 }
-     
+	    
     dSyslogDiscriminatorTable OBJECT-TYPE
         SYNTAX          SEQUENCE OF DSyslogDiscriminatorEntry
         MAX-ACCESS      not-accessible
@@ -196,7 +196,26 @@ DLINKSW-SYSLOG-MIB DEFINITIONS ::= BEGIN
              includes                      unspecified   filtered
             "
         ::= { dSyslogDiscriminatorEntry 6 }
-
+		
+	dSyslogLogOnEnabled  OBJECT-TYPE
+		SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables or disables the System Log function
+            during system runtime."
+        ::= { dSyslogGeneral 3 }
+    
+	dSyslogSourceIfType  OBJECT-TYPE
+		SYNTAX          DisplayString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of source interface.
+			The default type is vlan,when the type is default and the value of 
+			sourceIfIndex is zero, this means the source interface is not specified"
+        ::= { dSyslogGeneral 4 }
+		
 -- -----------------------------------------------------------------------------
     dSyslogLogbuffer OBJECT-IDENTITY
         STATUS          current
@@ -569,7 +588,7 @@ DLINKSW-SYSLOG-MIB DEFINITIONS ::= BEGIN
         dSyslogAttackLogUnitId         Unsigned32,
         dSyslogAttackLogIndex          Unsigned32,        
         dSyslogAttackLogDateAndTime    DateAndTime,
-        dSyslogAttackLogDescription    OCTET STRING
+        dSyslogAttackLogDescription    DisplayString
     }
 
     dSyslogAttackLogUnitId OBJECT-TYPE
@@ -598,53 +617,12 @@ DLINKSW-SYSLOG-MIB DEFINITIONS ::= BEGIN
         ::= { dSyslogAttackLogEntry 3 }
 
     dSyslogAttackLogDescription OBJECT-TYPE
-        SYNTAX          OCTET STRING
+        SYNTAX          DisplayString
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
             "The content of the attack log message."
         ::= { dSyslogAttackLogEntry 4 }
-		
--- -----------------------------------------------------------------------------  
-	dSyslogLogMonitor OBJECT-IDENTITY
-        STATUS          current
-        DESCRIPTION
-            "This object identifier represents the group of objects that are 
-            related to the logging system messages to the Monitor.
-            "
-        ::= { dSyslogMIBObjects 10 } 
-		
-    dSyslogLogMonitorEnabled OBJECT-TYPE
-        SYNTAX          TruthValue
-        MAX-ACCESS      read-write
-        STATUS          current
-        DESCRIPTION
-            "This object indicates the state of logging system messages to the
-            monitor.                       
-            "      
-        ::= { dSyslogLogMonitor 1 }
-
-    dSyslogLogMonitorSeverity OBJECT-TYPE
-        SYNTAX          SyslogSeverity
-        MAX-ACCESS      read-write
-        STATUS          current
-        DESCRIPTION
-            "This object indicates the severity level of system messages. 
-            The messages at that severity level or a more severe level will be
-            logged to the monitor.
-            "      
-        ::= { dSyslogLogMonitor 2 } 
-     
-    dSyslogLogMonitorDiscriminator OBJECT-TYPE
-        SYNTAX          DisplayString 
-        MAX-ACCESS      read-write
-        STATUS          current
-        DESCRIPTION
-            "This object indicates the name of discriminator which is used 
-            to filter the message to be sent to the monitor.
-            A zero length string indicates the discriminator is not specified.
-            "      
-        ::= { dSyslogLogMonitor 3 }  
 
 --****************************************************************************
 -- Conformance
@@ -684,11 +662,7 @@ DLINKSW-SYSLOG-MIB DEFINITIONS ::= BEGIN
         GROUP           dSyslogAttackLogGroup
         DESCRIPTION
             "Implementation of this group is optional."
-		
-		GROUP           dSyslogLogMonitorGroup
-        DESCRIPTION
-            "Implementation of this group is optional."
-			
+
         OBJECT          dSyslogSourceIfIndex        
         MIN-ACCESS      read-only
         DESCRIPTION
@@ -697,13 +671,6 @@ DLINKSW-SYSLOG-MIB DEFINITIONS ::= BEGIN
             when source interface is configurable."
 
         OBJECT          dSyslogLogConsoleDiscriminator        
-        MIN-ACCESS      read-only
-        DESCRIPTION
-            "It is compliant to implement this object as
-            read-only. The write-access is only required
-            when discriminator feature is supported."
-			
-		OBJECT          dSyslogLogMonitorDiscriminator        
         MIN-ACCESS      read-only
         DESCRIPTION
             "It is compliant to implement this object as
@@ -746,7 +713,8 @@ DLINKSW-SYSLOG-MIB DEFINITIONS ::= BEGIN
             dSyslogLogBufWriteDelay,
             dSyslogBufferTableNum,
             dSyslogBufferDateAndTime,
-            dSyslogBufferDescription 
+            dSyslogBufferDescription,
+			dSyslogLogOnEnabled	
         }
         STATUS      current
         DESCRIPTION
@@ -829,21 +797,4 @@ DLINKSW-SYSLOG-MIB DEFINITIONS ::= BEGIN
             "A collection of objects provides the management of attack log.            
             "
         ::= { dSyslogMIBGroups 6 } 
-		
-	dSyslogLogMonitorGroup OBJECT-GROUP
-        OBJECTS {
-            dSyslogLogMonitorEnabled,
-            dSyslogLogMonitorSeverity,
-            dSyslogLogMonitorDiscriminator
-        }
-        STATUS  current
-        DESCRIPTION
-            "A collection of objects provides configurations that are related
-            to the logging system messages to the monitor.
-            "
-        ::= { dSyslogMIBGroups 7 } 
 END
-
-
-
-

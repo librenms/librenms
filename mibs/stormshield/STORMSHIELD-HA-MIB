@@ -1,13 +1,14 @@
 STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
-      OBJECT-TYPE, Integer32, MODULE-IDENTITY    FROM SNMPv2-SMI
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+         Unsigned32                              FROM SNMPv2-SMI
       TruthValue                                 FROM SNMPv2-TC
       DisplayString                              FROM RFC1213-MIB
       stormshieldMIB                             FROM STORMSHIELD-SMI-MIB;
 
    snsHA MODULE-IDENTITY
-      LAST-UPDATED  "201702200000Z"
+      LAST-UPDATED  "201808270000Z"
       ORGANIZATION  "Stormshield"
       CONTACT-INFO
          "Customer Support
@@ -20,7 +21,7 @@ STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
          E-mail: support@stormshield.eu
          http://www.stormshield.eu"
       DESCRIPTION   "stormshield HA cluster"
-      REVISION      "201702200000Z"
+      REVISION      "201808270000Z"
       DESCRIPTION   "Initial"
       ::= { stormshieldMIB 11 }
 
@@ -85,11 +86,11 @@ STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
       snsHAPriority       Integer32,
       snsHAStatusForced   Integer32,
       snsHAActive         TruthValue,
-      snsUptime           Integer32
+      snsHAUptime         Integer32
    }
 
    snsNodeIndex OBJECT-TYPE
-      SYNTAX Integer32 (1..2)
+      SYNTAX Integer32 (0..1)
       MAX-ACCESS not-accessible
       STATUS current
       DESCRIPTION "Index of each line in table"
@@ -160,7 +161,7 @@ STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION "Is the firewall active ?"
       ::= { snsNode 10 }
 
-   snsUptime OBJECT-TYPE
+   snsHAUptime OBJECT-TYPE
       SYNTAX Integer32
       MAX-ACCESS read-only
       STATUS current
@@ -175,7 +176,7 @@ STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
          (1: Synced, 0: Not synced, -1: Unknown / Error)"
       ::= { snsHA 8 }
 
-   snsHAFwAdminRevison OBJECT-TYPE
+   snsHAFwAdminRevision OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
       STATUS current
@@ -199,7 +200,8 @@ STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
 
    SnsNodePowerSupplyEntry ::= SEQUENCE {
       snsNodePowerSupplyIndex      Integer32,
-      snsNodePowerSupplyPowered    TruthValue
+      snsNodePowerSupplyPowered    TruthValue,
+      snsNodePowerSupplyStatus     DisplayString
    }
 
    snsNodePowerSupplyIndex OBJECT-TYPE
@@ -216,6 +218,12 @@ STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION "Power supply is powered by electricity ?"
       ::= { snsNodePowerSupplyEntry 2 }
 
+   snsNodePowerSupplyStatus OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "What is the status of the power supply ?"
+      ::= { snsNodePowerSupplyEntry 3 }
 
    snsNodeDiskTable OBJECT-TYPE
       SYNTAX SEQUENCE OF SnsNodeDiskEntry
@@ -316,4 +324,55 @@ STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
       STATUS current
       DESCRIPTION "Temperature in Celsius degree"
       ::= { snsNodeCpuEntry 2 }
+
+   snsNodeFanTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF SnsNodeFanEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION   "Fans status of Firewalls"
+      ::= { snsHA 13 }
+
+   snsNodeFanEntry OBJECT-TYPE
+      SYNTAX        SnsNodeFanEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION   "CPU information"
+      INDEX         { snsNodeIndex, snsNodeFanIndex }
+      ::= { snsNodeFanTable 1 }
+
+   SnsNodeFanEntry ::= SEQUENCE {
+      snsNodeFanIndex   Integer32,
+      snsNodeFanName    DisplayString,
+      snsNodeFanStatus  DisplayString,
+      snsNodeFanRpm     Unsigned32
+   }
+
+   snsNodeFanIndex OBJECT-TYPE
+      SYNTAX        Integer32 (0..255)
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION   "Each line in the table"
+      ::= { snsNodeFanEntry 1 }
+
+   snsNodeFanName OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Name of the Fan"
+      ::= { snsNodeFanEntry 2 }
+
+   snsNodeFanStatus OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Status of the Fan"
+      ::= { snsNodeFanEntry 3 }
+
+   snsNodeFanRpm OBJECT-TYPE
+      SYNTAX        Unsigned32 (0..4294967295)
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Speed of the Fan"
+      ::= { snsNodeFanEntry 4 }
+
 END

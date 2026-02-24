@@ -47,6 +47,7 @@ class PollerController extends Controller
         $this->authorize('viewAny', PollerCluster::class);
 
         return view('poller.poller', [
+            'timezone' => session('preferences.timezone'),
             'current_tab' => 'poller',
             'pollers' => $this->poller(),
             'poller_cluster' => $this->pollerCluster(),
@@ -84,16 +85,12 @@ class PollerController extends Controller
 
     private function poller()
     {
-        return Poller::query()->orderBy('poller_name')->get()->map(function ($poller) {
-            return $this->pollerStatus($poller, $poller->last_polled);
-        });
+        return Poller::query()->orderBy('poller_name')->get()->map(fn ($poller) => $this->pollerStatus($poller, $poller->last_polled));
     }
 
     private function pollerCluster()
     {
-        return PollerCluster::with('stats')->orderBy('poller_name')->get()->map(function ($poller) {
-            return $this->pollerStatus($poller, $poller->last_report);
-        });
+        return PollerCluster::with('stats')->orderBy('poller_name')->get()->map(fn ($poller) => $this->pollerStatus($poller, $poller->last_report));
     }
 
     private function checkTimeSinceLastPoll($seconds)

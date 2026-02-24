@@ -3,43 +3,106 @@
 @section('title', __('validation.results.validate'))
 
 @section('content')
-    <div x-data="{results: [], listItems: 10, errorMessage: ''}" x-init="fetch('{{ route('validate.results') }}')
-                .then(response => {
-                    if (response.ok) {
+    <div x-data="{
+            groups: @js($groups),
+            listItems: 10,
+            validateGroup(group) {
+                // reset state and run/re-run the given group
+                group.loading = true;
+                group.errorMessage = '';
+                group.status = null;
+                group.statusText = '';
+                group.results = [];
+
+                const urlTemplate = '{{ route('validate.results', ['group' => ':group']) }}';
+                const url = urlTemplate.replace(':group', encodeURIComponent(group.group));
+                fetch(url)
+                    .then(response => {
+                        if (! response.ok) {
+                            group.errorMessage = '{{ trans('validation.results.backend_failed') }}';
+                            response.text().then(console.log);
+                            group.loading = false;
+                            return;
+                        }
                         response.json()
-                            .then(data => results = data)
-                            .catch(error => errorMessage = (error instanceof SyntaxError ? '{{ trans('validation.results.backend_failed') }}' : error))
-                    } else {
-                        errorMessage = '{{ trans('validation.results.backend_failed') }}';
-                        response.text().then(console.log);
+                            .then(data => {
+                                const arr = Array.isArray(data) ? data : [data];
+                                const match = arr.find(item => item.group === group.group) ?? arr[0];
+                                if (match) {
+                                    group.status = match.status;
+                                    group.statusText = match.statusText;
+                                    group.results = match.results ?? [];
+                                } else {
+                                    group.errorMessage = '{{ trans('validation.results.backend_failed') }}';
+                                }
+                            })
+                            .catch(error => {
+                                group.errorMessage = ((error instanceof SyntaxError || error instanceof TypeError) ? '{{ trans('validation.results.backend_failed') }}' : String(error));
+                            })
+                            .finally(() => { group.loading = false; });
+                    })
+                    .catch(error => { group.errorMessage = String(error); group.loading = false; });
+            },
+            init() {
+                // augment groups with state
+                this.groups = this.groups.map(g => ({
+                    ...g,
+                    loading: !!g.enabled,
+                    errorMessage: '',
+                    // If disabled, immediately mark as skipped (INFO)
+                    status: g.enabled ? null : 3,
+                    statusText: g.enabled ? '' : '{{ __('validation.results.skipped') }}',
+                    results: []
+                }));
+
+                // auto-run enabled groups with a slight stagger to avoid blocking UI on load
+                this.groups.forEach((g, i) => {
+                    if (g.enabled) {
+                        const delay = 150 + (i * 100); // start after 150ms, then stagger 100ms per group
+                        setTimeout(() => this.validateGroup(g), delay);
                     }
-                });">
-        <div class="tw:grid tw:place-items-center" style="height: 80vh" x-show="! results.length">
-            <h3 x-show="! errorMessage"><i class="fa-solid fa-spinner fa-spin"></i> {{ __('validation.results.validating') }}</h3>
-            <div x-show="errorMessage" class="panel panel-danger">
-                <div class="panel-heading">
-                    <i class="fa-solid fa-exclamation-triangle"></i> {{ __('validation.results.fetch_failed') }}
-                </div>
-                <div class="panel-body" x-text="errorMessage"></div>
-            </div>
-        </div>
-        <div x-show="results.length" class="tw:mx-10">
-            <template x-for="(group, index) in results">
+                });
+            }
+        }">
+        <div class="tw:mx-10">
+            <template x-for="(group, index) in groups" :key="group.group">
                 <div class="panel-group" style="margin-bottom: 5px">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h4 class="panel-title">
+                            <h4 class="panel-title tw:flex tw:justify-between tw:items-center">
                                 <a data-toggle="collapse" x-bind:data-target="'#body-' + group.group">
                                     <span x-text="group.name"></span>
-                                    <span class="pull-right"
-                                          x-bind:class="{'text-success': group.status === 2, 'text-warning': group.status === 1, 'text-danger': group.status === 0}"
-                                          x-text="group.statusText"></span>
                                 </a>
+                                <button type="button"
+                                        class="btn btn-default btn-sm tw:inline-flex tw:items-center tw:gap-2 tw:whitespace-nowrap"
+                                        title="{{ __('validation.results.run') }}"
+                                        x-on:click.stop="validateGroup(group)"
+                                        x-bind:disabled="group.loading"
+                                >
+                                    <i class="fa-solid" x-bind:class="group.loading ? 'fa-spinner fa-spin' : 'fa-play'"></i>
+                                    <span x-bind:class="{
+                                            'text-success': !group.loading && group.status === 2,
+                                            'text-warning': !group.loading && group.status === 1,
+                                            'text-danger': !group.loading && group.status === 0,
+                                            'text-info': !group.loading && group.status === 3
+                                        }" class="tw:font-bold">
+                                        <span x-text="group.loading ? '{{ __('validation.results.validating') }}' : (group.statusText || '{{ __('validation.results.run') }}')"></span>
+                                    </span>
+                                </button>
                             </h4>
                         </div>
-                        <div x-bind:id="'body-' + group.group" class="panel-collapse collapse" x-bind:class="{'in': group.status !== 2}">
+                        <div x-bind:id="'body-' + group.group" class="panel-collapse collapse" x-bind:class="{'in': group.loading || group.status !== 2}">
                             <div class="panel-body">
-                                <template x-for="result in group.results">
+                                <div class="tw:grid tw:place-items-center" style="min-height: 80px" x-show="group.loading">
+                                    <h4><i class="fa-solid fa-spinner fa-spin"></i> {{ __('validation.results.validating') }}</h4>
+                                </div>
+                                <div x-show="group.errorMessage && ! group.loading" class="panel panel-danger">
+                                    <div class="panel-heading">
+                                        <i class="fa-solid fa-exclamation-triangle"></i> {{ __('validation.results.fetch_failed') }}
+                                    </div>
+                                    <div class="panel-body" x-text="group.errorMessage"></div>
+                                </div>
+                                <template x-for="result in group.results" x-show="! group.loading && ! group.errorMessage">
                                     <div class="panel" x-bind:class="{'panel-info': result.status === 3, 'panel-success': result.status === 2, 'panel-warning': result.status === 1, 'panel-danger': result.status === 0}">
                                         <div class="panel-heading"
                                              x-text="result.statusText + ': ' + result.message"

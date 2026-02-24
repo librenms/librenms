@@ -37,7 +37,10 @@ class CheckRrdcachedConnectivity implements Validation
      */
     public function validate(): ValidationResult
     {
-        [$host,$port] = explode(':', LibrenmsConfig::get('rrdcached'));
+        $parts = explode(':', LibrenmsConfig::get('rrdcached'), 2);
+        $host = $parts[0];
+        $port = $parts[1] ?? '';
+
         if ($host == 'unix') {
             // Using socket, check that file exists
             if (! file_exists($port)) {
@@ -48,7 +51,7 @@ class CheckRrdcachedConnectivity implements Validation
             if (is_resource($connection)) {
                 fclose($connection);
             } else {
-                return ValidationResult::fail(trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_port', ['port' => $port]));
+                return ValidationResult::fail(trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_port', ['server' => $host, 'port' => $port]));
             }
         }
 

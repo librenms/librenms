@@ -68,7 +68,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
                 $multiplier,
             );
         } catch (InsufficientDataException|UncorrectableNegativeException $e) {
-            Log::info(get_class($e));
+            Log::info($e::class);
             Log::debug($e->getMessage());
 
             return $this;
@@ -127,7 +127,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
         $this->attributes['mempool_perc'] = is_numeric($percent) ? round($percent) : null;
     }
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return "$this->mempool_type-$this->mempool_index";
     }

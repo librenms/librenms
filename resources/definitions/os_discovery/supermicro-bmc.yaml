@@ -1,4 +1,3 @@
-mib: ATEN-IPMI-MIB
 modules:
     os:
         hardware: ATEN-IPMI-MIB::productPartNumber.0
@@ -15,165 +14,166 @@ modules:
         temperature:
             data:
                 -
-                    oid: temperature1
-                    value: temperature1
+                    oid: ATEN-IPMI-MIB::temperature1
+                    value: ATEN-IPMI-MIB::temperature1
                     num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.9.{{ $index }}'
                     descr: 'PSU {{ $index }} Temperature 1'
                     index: 'temperature1.{{ $index }}'
                     skip_values:
                         -
-                            oid: psuStatus
+                            oid: ATEN-IPMI-MIB::psuStatus
                             op: '='
                             value: 0
                 -
-                    oid: temperature2
-                    value: temperature2
+                    oid: ATEN-IPMI-MIB::temperature2
+                    value: ATEN-IPMI-MIB::temperature2
                     num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.10.{{ $index }}'
                     descr: 'PSU {{ $index }} Temperature 2'
                     index: 'temperature2.{{ $index }}'
                     skip_values:
                         -
-                            oid: psuStatus
+                            oid: ATEN-IPMI-MIB::psuStatus
                             op: '='
                             value: 0
                 -
-                    oid: sensorTable
-                    value: sensorReading
+                    oid: ATEN-IPMI-MIB::sensorTable
+                    value: ATEN-IPMI-MIB::sensorReading
                     num_oid: '.1.3.6.1.4.1.21317.1.3.1.2.{{ $index }}'
-                    descr: sensorIDString
+                    descr: ATEN-IPMI-MIB::sensorIDString
                     index: 'sensorReading.{{ $index }}'
                     skip_values:
                         -
-                            oid: sensorIDString
+                            oid: ATEN-IPMI-MIB::sensorIDString
                             op: 'not_contains'
                             value: "Temp"
                         -
-                            oid: lcThreshold
+                            oid: ATEN-IPMI-MIB::lcThreshold
                             op: '='
                             value: 0
-                    low_warn_limit: lcThreshold
-                    warn_limit: ucThreshold
-                    low_limit: lnrThreshold
-                    high_limit: unrThreshold
+                    low_warn_limit: ATEN-IPMI-MIB::lcThreshold
+                    warn_limit: ATEN-IPMI-MIB::ucThreshold
+                    low_limit: ATEN-IPMI-MIB::lnrThreshold
+                    high_limit: ATEN-IPMI-MIB::unrThreshold
         fanspeed:
             data:
                 -
-                    oid: fanRPM1
-                    value: fanRPM1
+                    oid: ATEN-IPMI-MIB::fanRPM1
+                    value: ATEN-IPMI-MIB::fanRPM1
                     num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.11.{{ $index }}'
                     descr: 'PSU {{ $index }} Fan 1'
                     index: 'fanRPM1.{{ $index }}'
                     skip_values: 0
                 -
-                    oid: fanRPM2
-                    value: fanRPM2
+                    oid: ATEN-IPMI-MIB::fanRPM2
+                    value: ATEN-IPMI-MIB::fanRPM2
                     num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.12.{{ $index }}'
                     descr: 'PSU {{ $index }} Fan 2'
                     index: 'fanRPM2.{{ $index }}'
                     skip_values: 0
                 -
-                    oid: sensorTable
-                    value: sensorReading
+                    oid: ATEN-IPMI-MIB::sensorTable
+                    value: ATEN-IPMI-MIB::sensorReading
                     num_oid: '.1.3.6.1.4.1.21317.1.3.1.2.{{ $index }}'
-                    descr: sensorIDString
+                    descr: ATEN-IPMI-MIB::sensorIDString
                     index: 'sensorReading.{{ $index }}'
                     skip_values:
                         -
-                            oid: sensorIDString
+                            oid: ATEN-IPMI-MIB::sensorIDString
                             op: 'not_contains'
                             value: "FAN"
                         -
-                            oid: lcThreshold
+                            oid: ATEN-IPMI-MIB::lcThreshold
                             op: '='
                             value: 0
-                    low_warn_limit: lcThreshold
-                    warn_limit: ucThreshold
-                    low_limit: lnrThreshold
-                    high_limit: unrThreshold
+                    low_warn_limit: ATEN-IPMI-MIB::lcThreshold
+                    warn_limit: ATEN-IPMI-MIB::ucThreshold
+                    low_limit: ATEN-IPMI-MIB::lnrThreshold
+                    high_limit: ATEN-IPMI-MIB::unrThreshold
         voltage:
             data:
                 -
-                    oid: inputVoltage
-                    value: inputVoltage
+                    oid: ATEN-IPMI-MIB::inputVoltage
+                    value: ATEN-IPMI-MIB::inputVoltage
                     num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.3.{{ $index }}'
                     descr: 'PSU {{ $index }} Input Voltage'
                     index: 'inputVoltage.{{ $index }}'
                     skip_values:
                         -
-                            oid: psuStatus
+                            oid: ATEN-IPMI-MIB::psuStatus
                             op: '='
                             value: 0
                 -
-                    oid: sensorTable
-                    value: sensorReading
+                    oid: ATEN-IPMI-MIB::sensorTable
+                    value: ATEN-IPMI-MIB::sensorReading
                     num_oid: '.1.3.6.1.4.1.21317.1.3.1.2.{{ $index }}'
-                    descr: sensorIDString
+                    descr: ATEN-IPMI-MIB::sensorIDString
                     index: 'sensorReading.{{ $index }}'
                     skip_values:
                         -
-                            oid: sensorIDString
+                            oid: ATEN-IPMI-MIB::sensorIDString
                             op: 'not_contains'
                             value: "V"
                         -
-                            oid: sensorIDString
+                            oid: ATEN-IPMI-MIB::sensorIDString
                             op: 'contains'
                             value: "Temp"
                         -
-                            oid: sensorIDString
+                            oid: ATEN-IPMI-MIB::sensorIDString
                             op: 'in_array'
                             value: ['VBAT']
-                    low_warn_limit: lcThreshold
-                    warn_limit: ucThreshold
-                    low_limit: lnrThreshold
-                    high_limit: unrThreshold
+                    low_warn_limit: ATEN-IPMI-MIB::lcThreshold
+                    warn_limit: ATEN-IPMI-MIB::ucThreshold
+                    low_limit: ATEN-IPMI-MIB::lnrThreshold
+                    high_limit: ATEN-IPMI-MIB::unrThreshold
         current:
             data:
                 -
-                    oid: inputCurrent
-                    value: inputCurrent
+                    oid: ATEN-IPMI-MIB::inputCurrent
+                    value: ATEN-IPMI-MIB::inputCurrent
                     num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.4.{{ $index }}'
                     descr: 'PSU {{ $index }} Input Current'
                     index: 'inputCurrent.{{ $index }}'
                     skip_values:
                         -
-                            oid: psuStatus
+                            oid: ATEN-IPMI-MIB::psuStatus
                             op: '='
                             value: 0
         power:
             data:
                 -
-                    oid: inputPower
-                    value: inputPower
+                    oid: ATEN-IPMI-MIB::inputPower
+                    value: ATEN-IPMI-MIB::inputPower
                     num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.5.{{ $index }}'
                     descr: 'PSU {{ $index }} Input Power'
                     index: 'inputPower.{{ $index }}'
                     skip_values:
                         -
-                            oid: psuStatus
+                            oid: ATEN-IPMI-MIB::psuStatus
                             op: '='
                             value: 0
                     
         state:
             data:
                 -
-                    oid: psuStatus
-                    value: psuStatus
+                    oid: ATEN-IPMI-MIB::psuStatus
+                    value: ATEN-IPMI-MIB::psuStatus
                     num_oid: '.1.3.6.1.4.1.21317.1.14.2.1.2.{{ $index }}'
                     descr: 'PSU {{ $index }} Status'
                     index: 'psuStatus.{{ $index }}'
+                    state_name: psuStatus
                     states:
                         - { value: 0, descr: "Not Present",  graph: 1, generic: 2 }
                         - { value: 1, descr: "Present: OK" , graph: 1, generic: 0  }
                         - { value: 3, descr: "Present: Failed" , graph: 1, generic: 2  }
                 -
-                    oid: sensorTable
-                    value: sensorReading
+                    oid: ATEN-IPMI-MIB::sensorTable
+                    value: ATEN-IPMI-MIB::sensorReading
                     num_oid: '.1.3.6.1.4.1.21317.1.3.1.2.{{ $index }}'
-                    descr: sensorIDString
+                    descr: ATEN-IPMI-MIB::sensorIDString
                     index: 'sensorReading.{{ $index }}'
                     skip_values:
                         -
-                            oid: sensorIDString
+                            oid: ATEN-IPMI-MIB::sensorIDString
                             op: '!='
                             value: "Chassis Intru"
                     state_name: "Chassis Intru"
@@ -181,14 +181,14 @@ modules:
                         - { value: 0, descr: "OK", graph: 1, generic: 0 }
                         - { value: 1, descr: "General Chassis Intrusion." , graph: 1, generic: 2  }
                 -
-                    oid: sensorTable
-                    value: sensorReading
+                    oid: ATEN-IPMI-MIB::sensorTable
+                    value: ATEN-IPMI-MIB::sensorReading
                     num_oid: '.1.3.6.1.4.1.21317.1.3.1.2.{{ $index }}'
-                    descr: sensorIDString
+                    descr: ATEN-IPMI-MIB::sensorIDString
                     index: 'sensorReading.{{ $index }}'
                     skip_values:
                         -
-                            oid: sensorIDString
+                            oid: ATEN-IPMI-MIB::sensorIDString
                             op: '!='
                             value: "VBAT"
                     state_name: "VBAT"
@@ -197,27 +197,27 @@ modules:
                         - { value: 2, descr: "Present: Failed", graph: 1, generic: 2 }
                         - { value: 4, descr: "Present: OK" , graph: 1, generic: 0  }
                 -
-                    oid: sensorTable
-                    value: sensorReading
+                    oid: ATEN-IPMI-MIB::sensorTable
+                    value: ATEN-IPMI-MIB::sensorReading
                     num_oid: '.1.3.6.1.4.1.21317.1.3.1.2.{{ $index }}'
-                    descr: sensorIDString
+                    descr: ATEN-IPMI-MIB::sensorIDString
                     index: sensorTableSensorNr.{{ $index }}
                     state_name: smSensorState
                     skip_values:
                         -
-                            oid: sensorIDString
+                            oid: ATEN-IPMI-MIB::sensorIDString
                             op: 'not_contains'
                             value: 'Status'
                         -   
-                            oid: sensorIDString
+                            oid: ATEN-IPMI-MIB::sensorIDString
                             op: 'regex'
                             value: "/^PS. Status/"
                     states:
                         - { descr: On, graph: 1, value: 1, generic: 0 }
                         - { descr: Off, graph: 1, value: 0, generic: 2 }
                 -
-                    oid: powerStatus
-                    value: powerStatus
+                    oid: ATEN-IPMI-MIB::powerStatus
+                    value: ATEN-IPMI-MIB::powerStatus
                     num_oid: '.1.3.6.1.4.1.21317.1.4.{{ $index }}'
                     descr: 'Power Status {{ $index }}'
                     index: powerStatusSensorNr.{{ $index }}

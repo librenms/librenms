@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Util;
 
-use App;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
@@ -75,7 +75,7 @@ class Laravel
 
     public static function isBooted()
     {
-        return function_exists('app') && ! empty(app()->isAlias('Illuminate\Foundation\Application')) && app()->isBooted();
+        return function_exists('app') && ! empty(app()->isAlias(\Illuminate\Foundation\Application::class)) && app()->isBooted();
     }
 
     /**

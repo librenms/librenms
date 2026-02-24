@@ -43,9 +43,7 @@ $required = [
 
 $cmm_ports = [];
 foreach ($cmm_stats as $cmm_stat) {
-    $cmm_port = array_map(function ($IfxStat) use ($cmm_stat) {
-        return $cmm_stat[$IfxStat];
-    }, $required);
+    $cmm_port = array_map(fn ($IfxStat) => $cmm_stat[$IfxStat], $required);
 
     $cmm_port['ifName'] = 'CMM Port ' . $cmm_stat['portNumber'];
     $cmm_port['ifDescr'] = 'CMM Port ' . $cmm_stat['portNumber'];

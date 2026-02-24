@@ -30,7 +30,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-class Mac
+class Mac implements \Stringable
 {
     private array $mac = [];
 
@@ -103,7 +103,7 @@ class Mac
             return $plainMac;
         }
 
-        return new static(substr(preg_replace('/[^0-9a-f]/', '', strtolower($bridge)), -12));
+        return new static(substr((string) preg_replace('/[^0-9a-f]/', '', strtolower($bridge)), -12));
     }
 
     /**
@@ -119,7 +119,7 @@ class Mac
      */
     public function hex(): string
     {
-        return implode($this->mac);
+        return implode('', $this->mac);
     }
 
     /**
@@ -135,14 +135,12 @@ class Mac
      */
     public function vendor(): string
     {
-        $oui = implode(array_slice($this->mac, 0, 3));
+        $oui = implode('', array_slice($this->mac, 0, 3));
 
-        $results = Cache::remember($oui, 21600, function () use ($oui) {
-            return DB::table('vendor_ouis')
-                ->where('oui', 'like', "$oui%") // possible matches
-                ->orderBy('oui', 'desc') // so we can check longer ones first if we have them
-                ->pluck('vendor', 'oui');
-        });
+        $results = Cache::remember($oui, 21600, fn () => DB::table('vendor_ouis')
+            ->where('oui', 'like', "$oui%") // possible matches
+            ->orderBy('oui', 'desc') // so we can check longer ones first if we have them
+            ->pluck('vendor', 'oui'));
 
         if (count($results) == 1) {
             return Arr::first($results);
@@ -151,7 +149,7 @@ class Mac
         // Then we may have a shorter prefix, so let's try them one after the other
         $mac = $this->hex();
         foreach ($results as $oui => $vendor) {
-            if (str_starts_with($mac, $oui)) {
+            if (str_starts_with($mac, (string) $oui)) {
                 return $vendor;
             }
         }
@@ -169,7 +167,7 @@ class Mac
      */
     public function oid(): string
     {
-        return implode('.', array_map('hexdec', $this->mac));
+        return implode('.', array_map(hexdec(...), $this->mac));
     }
 
     /**
@@ -182,6 +180,6 @@ class Mac
 
     public function __toString(): string
     {
-        return $this->readable();
+        return (string) $this->readable();
     }
 }

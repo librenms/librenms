@@ -1,15 +1,15 @@
 <?php
 
 $divisor = 1;
-if (strstr($device['sysDescr'], 'Cambium PTP 50650')) {
+if (strstr((string) $device['sysDescr'], 'Cambium PTP 50650')) {
     $mib = 'CAMBIUM-PTP650-MIB';
     $oid = '.1.3.6.1.4.1.17713.7.12.2.0';
     $divisor = 10;
-} elseif (strstr($device['sysDescr'], 'PTP250')) {
+} elseif (strstr((string) $device['sysDescr'], 'PTP250')) {
     $oid = '.1.3.6.1.4.1.17713.250.5.1.0';
     $mib = 'CAMBIUM-PTP250-MIB';
     $divisor = 10;
-} elseif (strstr($device['sysObjectID'], '.17713.21')) {
+} elseif (strstr((string) $device['sysObjectID'], '.17713.21')) {
     $epmp_ap = snmp_get($device, 'wirelessInterfaceMode.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
     $epmp_number = snmp_get($device, 'cambiumSubModeType.0', '-Oqv', 'CAMBIUM-PMP80211-MIB');
     if ($epmp_ap == 1) {
@@ -36,7 +36,7 @@ if (! empty($oids)) {
 $type = 'cambium';
 if (! empty($oids)) {
     [,$current] = explode(' ', $oids);
-    $current = $current / $divisor;
+    $current /= $divisor;
     $index = $oid;
     $descr = 'Signal';
     discover_sensor(null, 'signal', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);

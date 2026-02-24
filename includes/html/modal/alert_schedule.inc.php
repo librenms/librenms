@@ -198,11 +198,7 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                 $('#notes').val(output['notes']);
                 $('#behavior').find('option[value="'+output['behavior']+'"]').prop('selected', true);
                 if (output['recurring'] == 0){
-                    var start = $('#start').data("DateTimePicker");
-                    if (output['start']) {
-                        start.minDate(moment(output['start']));
-                    }
-                    start.date(moment(output['start']));
+                    $('#start').data("DateTimePicker").date(moment(output['start']));
                     $('#end').data("DateTimePicker").date(moment(output['end']));
 
                     $('#norecurringgroup').show();
@@ -307,14 +303,8 @@ $("#maps").select2({
     width: '100%',
     placeholder: "Devices, Groups or Locations",
     ajax: {
-        url: 'ajax_list.php',
-        delay: 250,
-        data: function (params) {
-            return {
-                type: 'devices_groups_locations',
-                search: params.term
-            };
-        }
+        url: '<?php echo route('ajax.select.devices-groups-locations'); ?>',
+        delay: 150
     }
 });
 
