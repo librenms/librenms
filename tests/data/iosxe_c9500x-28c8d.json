@@ -42394,61 +42394,6 @@
         },
         "poller": "matches discovery"
     },
-    "vlans": {
-        "discovery": {
-            "vlans": [
-                {
-                    "vlan_vlan": 200,
-                    "vlan_domain": 1,
-                    "vlan_name": "VLAN0200",
-                    "vlan_type": "1",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 255,
-                    "vlan_domain": 1,
-                    "vlan_name": "VLAN0255",
-                    "vlan_type": "1",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 666,
-                    "vlan_domain": 1,
-                    "vlan_name": "VLAN0666",
-                    "vlan_type": "1",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 1002,
-                    "vlan_domain": 1,
-                    "vlan_name": "fddi-default",
-                    "vlan_type": "2",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 1003,
-                    "vlan_domain": 1,
-                    "vlan_name": "token-ring-default",
-                    "vlan_type": "3",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 1004,
-                    "vlan_domain": 1,
-                    "vlan_name": "fddinet-default",
-                    "vlan_type": "4",
-                    "vlan_state": 1
-                },
-                {
-                    "vlan_vlan": 1005,
-                    "vlan_domain": 1,
-                    "vlan_name": "trnet-default",
-                    "vlan_type": "5",
-                    "vlan_state": 1
-                }
-            ]
-        }
-    },
     "applications": {
         "poller": {
             "applications": [
