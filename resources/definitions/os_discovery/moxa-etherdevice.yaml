@@ -84,6 +84,8 @@ modules:
                         - MOXA-IKS6728A-8POE-MIB::turboChainPort2
                         - MOXA-IKS6728A-MIB::turboChainPort1
                         - MOXA-IKS6728A-MIB::turboChainPort2
+                        - MOXA-EDSG512E-MIB::turboChainPort1
+                        - MOXA-EDSG512E-MIB::turboChainPort2
                         - MOXA-EDSG512EPoE-MIB::turboChainPort1
                         - MOXA-EDSG512EPoE-MIB::turboChainPort2
         power:
