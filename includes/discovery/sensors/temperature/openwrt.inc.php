@@ -2,47 +2,55 @@
 /**
  * LibreNMS
  *
+ * Copyright (c) 2025 LibreNMS Contributors
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @link       https://www.librenms.org
+ *
  * OpenWrt LM-SENSORS Temperature Sensor Discovery
+ *
+ * OpenWrt devices can provide temperature sensors via LM-SENSORS-MIB
+ * when using the snmpd 'pass' directive with a thermal sensor script.
+ * This is commonly used for thermal_zone sensors on ARM SoCs.
  */
 
-use LibreNMS\Snmp\SnmpQuery;
-
 if ($device['os'] === 'openwrt') {
-    // Initialize SnmpQuery for the device
-    $snmp_query = new SnmpQuery($device);
-    
-    // Define OID and fetch temperature values from LM-SENSORS-MIB
-    $oid_value = '.1.3.6.1.4.1.2021.13.16.2.1.3';
-    $oid_name = '.1.3.6.1.4.1.2021.13.16.2.1.2';
-    
-    // Walk the table for values and device names
-    $temps_value = $snmp_query->walk($oid_value);
-    $temps_name = $snmp_query->walk($oid_name);
+    // Query temperature values directly (entire Entry walk times out)
+    $temps = snmpwalk_cache_oid($device, 'lmTempSensorsValue', [], 'LM-SENSORS-MIB');
 
-    if (! empty($temps_value)) {
+    if (is_array($temps) && count($temps)) {
         d_echo("OpenWrt: Found LM-SENSORS-MIB temperature sensors\n");
 
-        foreach ($temps_value as $full_oid => $current) {
-            // Extract the index from the end of the full OID
-            $index = last(explode('.', $full_oid));
-            
-            if (! is_numeric($current) || $current <= 0) {
+        // Also get sensor names for better descriptions
+        $names = snmpwalk_cache_oid($device, 'lmTempSensorsDevice', [], 'LM-SENSORS-MIB');
+
+        foreach ($temps as $index => $entry) {
+            $current = $entry['lmTempSensorsValue'] ?? null;
+
+            if (!is_numeric($current) || $current <= 0) {
                 continue;
             }
 
-            // Match description from the names walk using the same index
-            $descr = $temps_name[$oid_name . '.' . $index] ?? 'Sensor ' . $index;
+            $oid = '.1.3.6.1.4.1.2021.13.16.2.1.3.' . $index;
+            $descr = $names[$index]['lmTempSensorsDevice'] ?? 'Sensor ' . $index;
 
             // LM-SENSORS-MIB returns temperature in millidegrees
             $divisor = 1000;
             $current_celsius = $current / $divisor;
+
+            // High limit defaults to 100°C
             $limit_celsius = 100;
 
             discover_sensor(
                 $valid['sensor'],
                 'temperature',
                 $device,
-                $full_oid,
+                $oid,
                 $index,
                 'lm-sensors',
                 $descr,
@@ -58,4 +66,4 @@ if ($device['os'] === 'openwrt') {
     }
 }
 
-unset($snmp_query, $oid_value, $oid_name, $temps_value, $temps_name, $index, $current, $full_oid, $descr, $divisor, $limit_celsius, $current_celsius);
+unset($temps, $names, $index, $entry, $current, $oid, $descr, $divisor, $limit_celsius);
