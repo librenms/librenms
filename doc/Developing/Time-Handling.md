@@ -19,12 +19,10 @@ Some additional noted on database fields:
 
 ## PHP Time Functions
 
-LibreNMS has a set of time functions that should be used for all point in time operations to ensure consistent handling of times.  These are in the `LibreNMS\Util\Time` class, and functions can either be called fully qualified or as shown below after adding `use LibreNMS\Util\Time;` to the top of your PHP file.
-
-The following functions all return a Carbon object representing a point in time in the PHP timezone:
-- `Time::now()` - This takes no input arguments and will return the current time.
-- `Time::fromTimestamp()` - This will take an integer representing the unix epoch as input.
-- `Time::parse()` - This will take a string as input.  This will correctly interpret:
+LibreNMS uses the Carbon library for date handling.  The following functions should be used to generate new time objects:
+- `Carbon::now()` - This takes no input arguments and will return the current time.
+- `Carbon::createFromTimestamp()` - This will take an integer representing the unix epoch as input.
+- `new Carbon($time_string)` - This will take a string as input.  This will correctly interpret:
   - ISO8601 times with "Z" at the end as UTC times
   - ISO8601 times with a UTC offset (-1200 to +1200) at the end
   - Datetime fields from the database with no UTC offset (assumes the time is in the PHP timezone)
