@@ -69,7 +69,6 @@ class DeviceController
         $init_modules = ['web', 'auth'];
         require base_path('/includes/init.php');
 
-        $vars = Url::parseLegacyPath(request()->path())->all();
         $vars['device'] = $device['device_id'];
         $vars['tab'] = $tab;
 
