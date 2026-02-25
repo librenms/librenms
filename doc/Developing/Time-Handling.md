@@ -10,11 +10,11 @@ Most times in LibreNMS are absolute points in time when data has been collected.
 - Dates being displayed in HTML pages should be converted to the timezone that the user has selected (browser timezone by default).
 - Dates being parsed from user input should be interpreted using the user's selected timezone, and converted to a JSON/URL encoded format.
 
-There will be some exceptions to the above, for example scheduled maintenance where the server timezone observes daylight savings differently to the devices being scheduled.  When this happens, we should store the timezone along with the time information so we can interpret the time correctly relative to ths server's time.
+There will be some exceptions to the above, for example scheduled maintenance where the user intends the maintenance window to start at 9pm every night.  When this happens, we should store the timezone along with the time information so we can interpret the time correctly relative to the intended timezone.
 
 Some additional noted on database fields:
 - datetime fields are not normally acceptable because they are not timezone aware. This creates issues near the boundaries of daylight savings as well as assumptions about timezone when parsing.
-- timestamp fields currently have a maximum date in 2038, and can store times with a granularity of microseconds.
+- timestamp fields currently have a maximum date in 2106, and can store times with a granularity of microseconds (seconds by default).
 - unix epoch fields have a granulariy of 1 second.
 
 ## PHP Time Functions
@@ -22,7 +22,7 @@ Some additional noted on database fields:
 LibreNMS uses the Carbon library for date handling.  The following functions should be used to generate new time objects:
 - `Carbon::now()` - This takes no input arguments and will return the current time.
 - `Carbon::createFromTimestamp()` - This will take an integer representing the unix epoch as input.
-- `new Carbon($time_string)` - This will take a string as input.  This will correctly interpret:
+- `Carbon::parse($time_string)` - This will take a string as input.  This will correctly interpret:
   - ISO8601 times with "Z" at the end as UTC times
   - ISO8601 times with a UTC offset (-1200 to +1200) at the end
   - Datetime fields from the database with no UTC offset (assumes the time is in the PHP timezone)
