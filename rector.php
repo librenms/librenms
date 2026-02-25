@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Rector\CodingStyle\Rector\Enum_\EnumCaseToPascalCaseRector;
 use Rector\Config\RectorConfig;
 
 return RectorConfig::configure()
@@ -20,4 +21,5 @@ return RectorConfig::configure()
     ->withPhpSets()
     ->withTypeCoverageLevel(0)
     ->withDeadCodeLevel(0)
-    ->withCodeQualityLevel(0);
+    ->withCodeQualityLevel(0)
+    ->withRules([EnumCaseToPascalCaseRector::class]);

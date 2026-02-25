@@ -19,17 +19,17 @@ class SetDeviceAvailability
      * @param  bool  $commit  Save changes to the database
      * @return bool true if the status changed
      */
-    public function execute(Device $device, bool $available, AvailabilitySource $source = AvailabilitySource::NONE, bool $commit = true): bool
+    public function execute(Device $device, bool $available, AvailabilitySource $source = AvailabilitySource::None, bool $commit = true): bool
     {
         // if device was down and is now up, if reason was snmp and source is icmp, ignore
-        if ($available && ! $device->status && $device->status_reason == AvailabilitySource::SNMP->value) {
-            if ($source == AvailabilitySource::ICMP) {
+        if ($available && ! $device->status && $device->status_reason == AvailabilitySource::Snmp->value) {
+            if ($source == AvailabilitySource::Icmp) {
                 return false;
             }
         }
 
         $device->status = $available;
-        $device->status_reason = $available ? AvailabilitySource::NONE->value : $source->value;
+        $device->status_reason = $available ? AvailabilitySource::None->value : $source->value;
         $changed = $device->isDirty('status');
 
         if ($commit) {

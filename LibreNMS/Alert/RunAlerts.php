@@ -581,13 +581,13 @@ class RunAlerts
 
             $maintenance_status = AlertUtil::getMaintenanceStatus($alert['device_id']);
             // Do not send alert notifications for these types of scheduled maintenance
-            if ($maintenance_status == MaintenanceStatus::MUTE_ALERTS) {
+            if ($maintenance_status == MaintenanceStatus::MuteAlerts) {
                 $noiss = true;
             }
 
             // If alert rule checks are to be skipped, ensure that this alert is
             // not to be handled again by this method again (by changing open to 0 later)
-            if ($maintenance_status == MaintenanceStatus::SKIP_ALERTS) {
+            if ($maintenance_status == MaintenanceStatus::SkipAlerts) {
                 $noiss = true;
                 $noacc = true;
             }
