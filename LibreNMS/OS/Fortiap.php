@@ -15,6 +15,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -57,7 +58,7 @@ class Fortiap extends OS implements
 
         foreach ($ssids as $ssid => $data) {
             $sensors[] = new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 $data['oids'],
                 'fortiap',
@@ -78,7 +79,7 @@ class Fortiap extends OS implements
 
         foreach ($fapRadioChannelOper as $index => $channel) {
             $sensors[] = new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.12356.120.4.1.1.14.' . $index,
                 'fortiap',
@@ -104,7 +105,7 @@ class Fortiap extends OS implements
 
         foreach ($fapRadioTxPowerOper as $index => $power) {
             $sensors[] = new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.12356.120.4.1.1.10.' . $index,
                 'fortiap',

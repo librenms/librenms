@@ -15,6 +15,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
@@ -32,7 +33,7 @@ class Merakimr extends OS implements
         foreach ($mrRadioChannelOper as $index => $channel) {
             if ($lastChannel != $channel) {
                 $sensors[] = new WirelessSensor(
-                    'frequency',
+                    WirelessSensorType::Frequency,
                     $this->getDeviceId(),
                     '.1.2.840.10036.4.5.1.1.' . $index,
                     'merakimr',
