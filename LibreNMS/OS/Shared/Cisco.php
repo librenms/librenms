@@ -972,11 +972,13 @@ class Cisco extends OS implements
 
         $vtpdomains = SnmpQuery::walk('CISCO-VTP-MIB::managementDomainName')->pluck();
         $current_domain = 0;
+        $skip_reserved_vlans = in_array($this->getDevice()->os, ['ios', 'iosxe']);
 
         return SnmpQuery::enumStrings()->walk('CISCO-VTP-MIB::vtpVlanTable')
-            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain) {
+            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain, $skip_reserved_vlans) {
                 // Skip Cisco reserved VLANs (1002-1005: fddi-default, token-ring-default, fddinet-default, trnet-default)
-                if ($vlan_id >= 1002 && $vlan_id <= 1005) {
+                // Only for IOS and IOS-XE
+                if ($skip_reserved_vlans && $vlan_id >= 1002 && $vlan_id <= 1005) {
                     return null;
                 }
 
