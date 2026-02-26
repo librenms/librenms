@@ -51,15 +51,15 @@
             <div class="tw:flex-1">
                 <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">From</label>
                 <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
-                    <input type="date" x-model="fieldStartDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
-                    <input type="time" x-model="fieldStartTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="time" x-model="startTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
                 </div>
             </div>
             <div class="tw:flex-1">
                 <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">To</label>
                 <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
-                    <input type="date" x-model="fieldEndDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
-                    <input type="time" x-model="fieldEndTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="date" x-model="endDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="time" x-model="endTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
                 </div>
             </div>
         </div>
@@ -73,16 +73,14 @@
 </div>
 
 @pushOnce('scripts')
-<script src="{{ asset('js/RrdGraphJS/moment-timezone-with-data.js') }}"></script>
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('dateRangePicker', () => ({
             open: false,
-            fieldStartDate: '',
-            fieldEndDate: '',
-            fieldStartTime: '',
-            fieldEndTime: '',
-            timeZone: '',
+            startDate: '',
+            endDate: '',
+            startTime: '',
+            endTime: '',
             placeholder: 'Select date range...',
             relativeStartSeconds: null,
             relativeEndSeconds: null,
@@ -100,33 +98,29 @@
             ],
 
             // Computed properties
-            get startDate() {
+            get start() {
                 if (this.relativeStartSeconds !== null) {
-                    return moment.tz(moment.tz(this.timeZone) - (this.relativeStartSeconds * 1000), this.timeZone);
+                    return new Date(Date.now() - (this.relativeStartSeconds * 1000));
                 }
 
-                if (this.fieldStartDate && this.fieldStartTime) {
-                    return moment.tz(`${this.fieldStartDate} ${this.fieldStartTime}`, this.timeZone);
-                }
-
-                if (this.fieldStartDate) {
-                    return moment.tz(`${this.fieldStartDate} 00:00`, this.timeZone);
+                if (this.startDate) {
+                    return new Date(`${this.startDate} ${this.startTime}`);
                 }
 
                 return null;
             },
 
-            get endDate() {
-                if (this.relativeStartSeconds !== null || !this.fieldEndDate) {
+            get end() {
+                if (this.relativeStartSeconds !== null || !this.endDate) {
                     return null
                 }
 
                 // if no end time, we want to include the entire day
-                if (!this.fieldEndTime) {
-                    return moment.tz(moment.tz(`${this.fieldEndDate} 00:00`, this.timeZone) + 86400000, this.timeZone);
+                if (!this.endTime) {
+                    return new Date(new Date(this.endDate).getTime() + 86400000);
                 }
 
-                return moment.tz(`${this.fieldEndDate} ${this.fieldEndTime}`, this.timeZone);
+                return new Date(`${this.endDate} ${this.endTime}`);
             },
 
             get outStartString() {
@@ -134,7 +128,7 @@
                     return this.toShortOffset(this.relativeStartSeconds)
                 }
 
-                return this.formatDate(this.startDate, this.outputFormat);
+                return this.formatDate(this.start, this.startTime, this.outputFormat);
             },
 
             get outEndString() {
@@ -146,11 +140,11 @@
                     return '';
                 }
 
-                return this.formatDate(this.endDate, this.outputFormat);
+                return this.formatDate(this.end, this.endTime, this.outputFormat);
             },
 
             get hasValue() {
-                return !!(this.startDate || this.endDate);
+                return !!(this.start || this.end);
             },
 
             get displayText() {
@@ -161,14 +155,14 @@
                     }
                 }
 
-                const startString = this.formatDate(this.startDate, 'local');
-                const endString = this.formatDate(this.endDate, 'local');
+                const startString = this.formatDate(this.start, this.startTime);
+                const endString = this.formatDate(this.end, this.endTime);
 
                 if (startString && endString) {
                     return `${startString} to ${endString}`;
                 } else if (startString) {
                     return `From ${startString}`;
-                } else if (endString) {
+                } else if (this.endString) {
                     return `Until ${endString}`;
                 }
 
@@ -187,7 +181,6 @@
 
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
                 if (this.$el.dataset.outputFormat) this.outputFormat = this.$el.dataset.outputFormat;
-                this.timeZone = window.tz;
 
                 this.setRange(this.$el.dataset.start, this.$el.dataset.end);
             },
@@ -217,11 +210,11 @@
                 }
 
                 if (start !== null) {
-                    [this.fieldStartDate, this.fieldStartTime, this.relativeStartSeconds] = this.parseDateTime(start);
+                    [this.startDate, this.startTime, this.relativeStartSeconds] = this.parseDateTime(start);
                 }
 
                 if (end !== null) {
-                    [this.fieldEndDate, this.fieldEndTime, this.relativeEndSeconds] = this.parseDateTime(end);
+                    [this.endDate, this.endTime, this.relativeEndSeconds] = this.parseDateTime(end);
                 }
 
                 this.closeDropdown();
@@ -229,10 +222,10 @@
             },
 
             clearRange() {
-                this.fieldStartDate = '';
-                this.fieldEndDate = '';
-                this.fieldStartTime = '';
-                this.fieldEndTime = '';
+                this.startDate = '';
+                this.endDate = '';
+                this.startTime = '';
+                this.endTime = '';
                 this.relativeStartSeconds = null;
                 this.relativeEndSeconds = null;
                 this.closeDropdown();
@@ -241,8 +234,8 @@
 
             getRange() {
                 return {
-                    start: this.outStartString,
-                    end: this.outEndString,
+                    start: this.start,
+                    end: this.end,
                     relativeStartSeconds: this.relativeStartSeconds,
                     relativeEndSeconds: this.relativeEndSeconds,
                 };
@@ -250,7 +243,7 @@
 
             parseDateTime(dateInput) {
                 // Returns [date, time, relativeSeconds]
-                if (typeof dateInput !== 'string' || ! dateInput) {
+                if (typeof dateInput !== 'string') {
                     return ['', '', null];
                 }
 
@@ -267,27 +260,25 @@
                 let d;
                 let includeTime = false;
 
-                const timestamp = Number(input);
-                if (isNaN(timestamp)) {
-                    // Non-numeric input is assumed to be a date in the correct timezone
-                    d = moment.tz(input, this.timeZone);
-                    includeTime = /\d{1,2}:\d{2}/.test(input);
-                } else {
-                    // Pure numeric input is assumed to be a timestamp
-
+                // Check for Unix timestamp
+                if (/^\d{10,}$/.test(input)) {
+                    const timestamp = parseInt(input);
                     // If less than 13 digits, it's in seconds, otherwise milliseconds
-                    d = moment.tz(input.length < 13 ? timestamp * 1000 : timestamp, this.timeZone);
+                    d = new Date(input.length < 13 ? timestamp * 1000 : timestamp);
                     // For Unix timestamps, include time unless it's midnight
-                    includeTime = !(d.hours() === 0 && d.minutes() === 0 && d.seconds() === 0);
+                    includeTime = !(d.getHours() === 0 && d.getMinutes() === 0 && d.getSeconds() === 0);
+                } else {
+                    d = new Date(input);
+                    includeTime = /\d{1,2}:\d{2}/.test(input);
                 }
 
-                if (! d.isValid()) {
-                    console.log('Invalid date time input detected');
+                if (isNaN(d.getTime())) {
                     return ['', '', null];
                 }
 
-                const date = d.format('YYYY-MM-DD');
-                const time = includeTime ? d.format('HH:mm') : '';
+                // output the correct formats for the input fields
+                const date = d.toLocaleDateString('en-CA');
+                const time = includeTime ? d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '';
                 return [date, time, null];
             },
 
@@ -354,33 +345,34 @@
             // Check if a preset is selected based on seconds value
             isPresetSelected(preset) {
                 const sec = this.parseRelativeOffset(preset);
-                return this.relativeStartSeconds !== null && sec !== null && sec === this.relativeStartSeconds && !this.fieldEndDate && !this.fieldEndTime;
+                return this.relativeStartSeconds !== null && sec !== null && sec === this.relativeStartSeconds && !this.endDate && !this.endTime;
             },
 
-            formatDate(fullDate, outputFormat) {
+            formatDate(fullDate, time, format = 'local') {
                 if (!fullDate) {
                     return '';
                 }
 
-                if (outputFormat === 'iso') {
-                    return b.toISOString();
+                if (format === 'iso') {
+                    return fullDate.toISOString();
                 }
 
-                if (outputFormat === 'timestamp') {
-                    return fullDate.unix().toString();
+                if (format === 'timestamp') {
+                    return Math.floor(fullDate.getTime() / 1000).toString();
                 }
 
-                if (outputFormat != 'local') {
-                    // Output format should be specified as something like 'YYYY-MM-DD'
-                    return fullDate.format(outputFormat);
+                let options = {
+                    month: 'numeric',
+                    day: 'numeric',
+                    year: 'numeric',
+                };
+
+                if (time) {
+                    options['hour'] = 'numeric';
+                    options['minute'] = 'numeric';
                 }
 
-                let thisFormat = 'LL';
-                if (fullDate.hours() > 0 || fullDate.minutes() > 0) {
-                    thisFormat += ' LT';
-                }
-
-                return fullDate.format(thisFormat);
+                return fullDate.toLocaleDateString(undefined, options);
             },
 
             emitChange() {
