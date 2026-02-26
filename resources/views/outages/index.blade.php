@@ -96,8 +96,8 @@ $refresh = request()->input('refresh', 30);
             return {
                 device: document.getElementById('device').value,
                 status: document.getElementById('status').value,
-                to: range.end,
-                from: range.start,
+                to: range.end?.toISOString(),
+                from: range.start?.toISOString(),
             };
         },
     }).on("loaded.rs.jquery.bootgrid", function() {
