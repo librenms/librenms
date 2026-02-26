@@ -128,7 +128,7 @@ class EventlogController extends TableController
         $output = "<span class='alert-status ";
         $output .= $this->severityLabel($eventlog->severity);
         $output .= " eventlog-status'></span>";
-        $output .= Time::format(new Carbon($eventlog->datetime), LibrenmsConfig::get('dateformat.compact'));
+        $output .= Time::format($eventlog->datetime, 'compact');
 
         return $output;
     }

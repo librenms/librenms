@@ -207,8 +207,19 @@ class Time
     /**
      * Format a timestamp for display to users in their selected timezone
      */
-    public static function format(Carbon $input, string $format): string
+    public static function format(Carbon|string|int $input, string $format): string
     {
+        if (is_string($input) {
+            $input = Carbon::parse($input);
+        } elseif (is_numeric($input)) {
+            $input = Carbon::createFromTimestamp($input);
+        }
+
+        $format = match ($format) {
+            'long', 'compact', 'byminute', 'time' => LibrenmsConfig::get("dateformat.$format"),
+            default => throw new Exception('Format needs to be one of log, compact, byminute or time'),
+        };
+
         return $input->setTimezone(session('preferences.timezone'))->format($format);
     }
 }

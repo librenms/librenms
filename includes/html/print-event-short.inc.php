@@ -17,7 +17,6 @@
 */
 
 use App\Models\Port;
-use Carbon\Carbon;
 use LibreNMS\Util\Time;
 
 unset($icon);
@@ -26,7 +25,7 @@ $icon = '<span class="alert-status ' . $severity_colour . '"></span>';
 
 echo '<tr>';
 echo '<td>' . $icon . '</td>';
-echo '<td>' . Time::format(new Carbon($entry['datetime']), LibrenmsConfig::get('dateformat.compact')) . '</td>';
+echo '<td>' . Time::format($entry['datetime'], 'compact') . '</td>';
 
 echo '<td style="white-space: nowrap;max-width: 100px;overflow: hidden;text-overflow: ellipsis;">';
 

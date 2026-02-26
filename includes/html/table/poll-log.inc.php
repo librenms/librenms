@@ -1,7 +1,6 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
-use Carbon\Carbon;
 use LibreNMS\Util\Time;
 
 $param = [];
@@ -66,7 +65,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
     }
     $response[] = [
         'hostname' => generate_device_link($device, null, ['tab' => 'graphs', 'group' => 'poller']),
-        'last_polled' => Time::format(new Carbon($device['last_polled']), LibrenmsConfig::get('dateformat.compact')),
+        'last_polled' => Time::format($device['last_polled'], 'compact'),
         'poller_group' => $device['group_name'],
         'location' => $device['location'],
         'last_polled_timetaken' => round($device['last_polled_timetaken'], 2),
