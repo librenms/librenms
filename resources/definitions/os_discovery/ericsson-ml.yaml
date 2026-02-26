@@ -1,10 +1,9 @@
-mib: PT-RADIOLINK-MIB
 modules:
     sensors:
         state:
             data:
                 -
-                    oid: actualTxAcmTC
+                    oid: PT-RADIOLINK-MIB::actualTxAcmTC
                     num_oid: '.1.3.6.1.4.1.193.223.2.7.1.1.58.{{ $index }}'
                     index: actualTxAcmTC
                     descr: Tx Modulation Rate

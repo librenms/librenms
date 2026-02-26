@@ -1,4 +1,3 @@
-mib: ELTEK-BC2000-DC-POWER-MIB
 modules:
     os:
         hardware: ELTEK-BC2000-DC-POWER-MIB::vpwrIdentModel.0
@@ -7,51 +6,51 @@ modules:
         voltage:
             data:
                 -
-                    oid: vpwrSystemParameterGroup
-                    value: vpwrSystemVoltage
+                    oid: ELTEK-BC2000-DC-POWER-MIB::vpwrSystemParameterGroup
+                    value: ELTEK-BC2000-DC-POWER-MIB::vpwrSystemVoltage
                     num_oid: '.1.3.6.1.4.1.13858.2.3.2.{{ $index }}'
                     descr: System Voltage
                     divisor: 100
         current:
             data:
                 -
-                    oid: vpwrSystemParameterGroup
-                    value: vpwrSystemCurrent
+                    oid: ELTEK-BC2000-DC-POWER-MIB::vpwrSystemParameterGroup
+                    value: ELTEK-BC2000-DC-POWER-MIB::vpwrSystemCurrent
                     num_oid: '.1.3.6.1.4.1.13858.2.3.3.{{ $index }}'
                     descr: System Current
                 -
-                    oid: vpwrSystemIdentTable
-                    value: vpwrModuleCurrent
+                    oid: ELTEK-BC2000-DC-POWER-MIB::vpwrSystemIdentTable
+                    value: ELTEK-BC2000-DC-POWER-MIB::vpwrModuleCurrent
                     num_oid: '.1.3.6.1.4.1.13858.2.1.6.1.4.{{ $index }}'
-                    high_limit: vpwrModuleCapacity
+                    high_limit: ELTEK-BC2000-DC-POWER-MIB::vpwrModuleCapacity
                     divisor: 100
-                    group: 'Shelf {{ $vpwrBayIndex }}'
-                    descr: 'Module {{ $vpwrModuleIndex }} Current'
+                    group: 'Shelf {{ ELTEK-BC2000-DC-POWER-MIB::vpwrBayIndex }}'
+                    descr: 'Module {{ ELTEK-BC2000-DC-POWER-MIB::vpwrModuleIndex }} Current'
                     skip_values:
                         -
-                            oid: vpwrModuleOID
+                            oid: ELTEK-BC2000-DC-POWER-MIB::vpwrModuleOID
                             op: '='
                             value: 'vpwrDcPowerLvd'
         temperature:
             data:
                 -
-                    oid: vpwrSystemParameterGroup
-                    value: vpwrSystemInternalTemperature
+                    oid: ELTEK-BC2000-DC-POWER-MIB::vpwrSystemParameterGroup
+                    value: ELTEK-BC2000-DC-POWER-MIB::vpwrSystemInternalTemperature
                     num_oid: '.1.3.6.1.4.1.13858.2.3.5.{{ $index }}'
                     descr: Internal Temperature
                 -
-                    oid: vpwrBatteryTempTable
-                    value: vpwrBatteryTemp
+                    oid: ELTEK-BC2000-DC-POWER-MIB::vpwrBatteryTempTable
+                    value: ELTEK-BC2000-DC-POWER-MIB::vpwrBatteryTemp
                     num_oid: '.1.3.6.1.4.1.13858.7.1.1.1.3.{{ $index }}'
-                    descr: vpwrBatteryTempName
+                    descr: ELTEK-BC2000-DC-POWER-MIB::vpwrBatteryTempName
                     index: 'battery{{ $index }}'
                     group: Batteries
                     skip_value_lt: -125
         state:
             data:
                 -
-                    oid: vpwrSystemParameterGroup
-                    value: vpwrSystemControllerState
+                    oid: ELTEK-BC2000-DC-POWER-MIB::vpwrSystemParameterGroup
+                    value: ELTEK-BC2000-DC-POWER-MIB::vpwrSystemControllerState
                     num_oid: '.1.3.6.1.4.1.13858.2.3.4.{{ $index }}'
                     descr: Controller Status
                     state_name: vpwrSystemControllerState
@@ -63,8 +62,8 @@ modules:
                         - { descr: Menu, graph: 0, value: 4, generic: 1 }
                         - { descr: IrActive, graph: 0, value: 5, generic: 1 }
                 -
-                    oid: vpwrSystemParameterGroup
-                    value: vpwrSystemTempCompensationState
+                    oid: ELTEK-BC2000-DC-POWER-MIB::vpwrSystemParameterGroup
+                    value: ELTEK-BC2000-DC-POWER-MIB::vpwrSystemTempCompensationState
                     num_oid: '.1.3.6.1.4.1.13858.2.3.6.{{ $index }}'
                     descr: Temperature Compensation
                     state_name: vpwrSystemTempCompensationState
@@ -72,11 +71,11 @@ modules:
                         - { descr: Inactive, graph: 0, value: 0, generic: 0 }
                         - { descr: Active, graph: 0, value: 1, generic: 1 }
                 -
-                    oid: vpwrSystemIdentTable
-                    value: vpwrModuleOperStatus
+                    oid: ELTEK-BC2000-DC-POWER-MIB::vpwrSystemIdentTable
+                    value: ELTEK-BC2000-DC-POWER-MIB::vpwrModuleOperStatus
                     num_oid: '.1.3.6.1.4.1.13858.2.1.6.1.5.{{ $index }}'
-                    group: 'Shelf {{ $vpwrBayIndex }}'
-                    descr: 'Module {{ $vpwrModuleIndex }} Status'
+                    group: 'Shelf {{ ELTEK-BC2000-DC-POWER-MIB::vpwrBayIndex }}'
+                    descr: 'Module {{ ELTEK-BC2000-DC-POWER-MIB::vpwrModuleIndex }} Status'
                     state_name: vpwrModuleOperStatus
                     states:
                         - { descr: Ok, graph: 0, value: 0, generic: 0 }

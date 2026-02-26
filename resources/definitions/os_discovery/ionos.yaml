@@ -1,10 +1,9 @@
-mib: EQUIPMENT-MIB
 modules:
     sensors:
         state:
             data:
                 -
-                    oid: equipStatusV2
+                    oid: EQUIPMENT-MIB::equipStatusV2
                     num_oid: '.1.3.6.1.4.1.1038.107.11.{{ $index }}'
                     descr: Status of all equipment objects
                     state_name: Severity

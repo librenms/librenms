@@ -1,4 +1,3 @@
-mib: SIAE-UNIT-MIB:SIAE-POWER-SUPPLY-MIB:SIAE-SFP-MIB
 modules:
     os:
         hardware:

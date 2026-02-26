@@ -3,11 +3,11 @@
         <table id="alertlog_{{ $id }}" class="table table-hover table-condensed alerts" data-url="{{ route('table.alertlog') }}">
             <thead>
             <tr>
-                <th data-column-id="status" data-sortable="false"></th>
+                <th data-column-id="status" data-sortable="false" data-visible-in-selection="false"></th>
                 <th data-column-id="time_logged" data-order="desc" data-converter="datetime">{{ __('Timestamp') }}</th>
-                <th data-column-id="details" data-sortable="false">&nbsp;</th>
+                <th data-column-id="details" data-sortable="false" data-visible-in-selection="false">&nbsp;</th>
                 <th data-column-id="hostname">{{ __('Device') }}</th>
-                <th data-column-id="alert">{{ __('Alert') }}</th>
+                <th data-column-id="alert_rule">{{ __('Alert') }}</th>
             </tr>
             </thead>
         </table>
@@ -28,15 +28,8 @@
             },
             converters: {
                 datetime: {
-                    from: function (value) {
-                        return new Date(value).toISOString();
-                    },
                     to: function (value) {
-                        let formatter = new Intl.DateTimeFormat(navigator.language, {
-                            dateStyle: 'medium',
-                            timeStyle: 'short'
-                        });
-                        return formatter.format(new Date(value));
+                        return LibreNMS.Time.format(value, {timeStyle: "short"});
                     }
                 }
             }

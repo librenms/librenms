@@ -1,4 +1,3 @@
-mib: CIENA-WS-XCVR-MIB:CIENA-WS-PLATFORM-PM-MIB:CIENA-WS-PLATFORM-ALARM-MIB
 modules:
     os:
         hardware: CIENA-WS-CHASSIS-MIB::cwsChassisChassisidentificationDescription.0
@@ -9,121 +8,110 @@ modules:
             data:
                 -
                     oid:
-                        - cwsXcvrTemperatureThresholdLowAlarmThreshold
-                        - cwsXcvrTemperatureThresholdHighAlarmThreshold
-                        - cwsXcvrCienaIdDescription
-                -
-                    oid:
-                        - pmOpticalPower24HrIfIndexDescr
-                        - pmOpticalPower24HrMonTypeDescr
-                        - pmOpticalPower24HrMonValue
-                        - pmOpticalPower24HrMonSupported
-                        - definedAlarmActive
-                        - definedAlarmDescription
-                        - definedAlarmInstance
-                        - definedAlarmSeverity
-                        - alarmStatisticsCount
-                        - alarmStatisticsType
+                        - CIENA-WS-XCVR-MIB::cwsXcvrTemperatureThresholdLowAlarmThreshold
+                        - CIENA-WS-XCVR-MIB::cwsXcvrTemperatureThresholdHighAlarmThreshold
+                        - CIENA-WS-XCVR-MIB::cwsXcvrCienaIdDescription
         count:
             data:
                 -
-                    oid: alarmStatisticsCount
-                    value: alarmStatisticsCount
+                    oid: CIENA-WS-PLATFORM-ALARM-MIB::alarmStatisticsTable
+                    value: CIENA-WS-PLATFORM-ALARM-MIB::alarmStatisticsCount
                     num_oid: '.1.3.6.1.4.1.1271.3.5.4.6.1.4.{{ $index }}'
-                    descr: '{{ $alarmStatisticsType }}'
+                    descr: '{{ CIENA-WS-PLATFORM-ALARM-MIB::alarmStatisticsType }}'
                     low_limit: -1
                     high_limit: 0
                     group: 'Active Alarms'
         temperature:
             data:
                 -
-                    oid: cwsXcvrTemperatureTable
-                    value: cwsXcvrTemperatureActual
+                    oid: CIENA-WS-XCVR-MIB::cwsXcvrTemperatureTable
+                    value: CIENA-WS-XCVR-MIB::cwsXcvrTemperatureActual
                     num_oid: '.1.3.6.1.4.1.1271.3.4.15.13.1.2.{{ $index }}'
-                    descr: 'Module {{ $subindex0 }} - {{ $cwsXcvrCienaIdDescription }}'
+                    descr: 'Module {{ $subindex0 }} - {{ CIENA-WS-XCVR-MIB::cwsXcvrCienaIdDescription }}'
                     index: 'cwsXcvrTemperatureTable.{{ $index }}'
                     group: 'Modules'
-                    low_limit: cwsXcvrTemperatureThresholdLowAlarmThreshold
-                    high_limit: cwsXcvrTemperatureThresholdHighAlarmThreshold
+                    low_limit: CIENA-WS-XCVR-MIB::cwsXcvrTemperatureThresholdLowAlarmThreshold
+                    high_limit: CIENA-WS-XCVR-MIB::cwsXcvrTemperatureThresholdHighAlarmThreshold
                     skip_values:
                         -
-                            oid: cwsXcvrTemperatureThresholdHighAlarmThreshold
+                            oid: CIENA-WS-XCVR-MIB::cwsXcvrTemperatureThresholdHighAlarmThreshold
                             op: '<='
                             value: 0
         dbm:
             data:
                 -
-                    oid: pmOpticalPower24HrMonValue
+                    oid: CIENA-WS-PLATFORM-PM-MIB::pmOpticalPowerCurrent24HrStatsTable
+                    value: CIENA-WS-PLATFORM-PM-MIB::pmOpticalPower24HrMonValue
                     num_oid: '.1.3.6.1.4.1.1271.3.5.22.25.1.5.{{ $index }}'
-                    descr: '24 hrs - {{ $pmOpticalPower24HrIfIndexDescr }} Lane {{ $subindex1 }} {{ $pmOpticalPower24HrMonTypeDescr }}'
+                    descr: '24 hrs - {{ CIENA-WS-PLATFORM-PM-MIB::pmOpticalPower24HrIfIndexDescr }} Lane {{ $subindex1 }} {{ CIENA-WS-PLATFORM-PM-MIB::pmOpticalPower24HrMonTypeDescr }}'
                     low_limit: -40
                     group: 'Optical Power - Last 24 Hours'
                     index: 'pmOpticalPower24HrMonValue-{{ $index }}'
                     skip_values:
                         -
-                            oid: pmOpticalPower24HrMonSupported
+                            oid: CIENA-WS-PLATFORM-PM-MIB::pmOpticalPower24HrMonSupported
                             op: '='
                             value: 0
         state:
             data:
                 -
-                    oid: definedAlarmActive
-                    value: definedAlarmActive
+                    oid: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmTable
+                    value: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmActive
                     num_oid: '.1.3.6.1.4.1.1271.3.5.4.5.1.4.{{ $index }}'
-                    descr: '{{ $definedAlarmDescription }} (Critical)'
+                    descr: '{{ CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmDescription }} (Critical)'
                     state_name: '{{ $definedAlarmActive }}-critical'
                     skip_values:
                         -
-                            oid: definedAlarmSeverity
+                            oid: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmSeverity
                             op: '!='
                             value: 3
                     states:
                         - { value: 1, generic: 2, graph: 0, descr: alarm }
                         - { value: 2, generic: 0, graph: 0, descr: ok }
-                    group: 'Alarms - {{ $definedAlarmInstance }}'
+                    group: 'Alarms - {{ CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmInstance }}'
                 -
-                    oid: definedAlarmActive
-                    value: definedAlarmActive
+                    oid: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmTable
+                    value: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmActive
                     num_oid: '.1.3.6.1.4.1.1271.3.5.4.5.1.4.{{ $index }}'
-                    descr: '{{ $definedAlarmDescription }} (Major)'
+                    descr: '{{ CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmDescription }} (Major)'
                     state_name: '{{ $definedAlarmActive }}-major'
                     skip_values:
                         -
-                            oid: definedAlarmSeverity
+                            oid: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmSeverity
                             op: '!='
                             value: 4
                     states:
                         - { value: 1, generic: 2, graph: 0, descr: alarm }
                         - { value: 2, generic: 0, graph: 0, descr: ok }
-                    group: 'Alarms - {{ $definedAlarmInstance }}'
+                    group: 'Alarms - {{ CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmInstance }}'
                 -
-                    oid: definedAlarmActive
-                    value: definedAlarmActive
+                    oid: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmActive
+                    value: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmActive
                     num_oid: '.1.3.6.1.4.1.1271.3.5.4.5.1.4.{{ $index }}'
-                    descr: '{{ $definedAlarmDescription }} (Minor)'
+                    descr: '{{ CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmDescription }} (Minor)'
                     state_name: '{{ $definedAlarmActive }}-minor'
                     skip_values:
                         -
-                            oid: definedAlarmSeverity
+                            oid: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmSeverity
                             op: '!='
                             value: 5
                     states:
                         - { value: 1, generic: 2, graph: 0, descr: alarm }
                         - { value: 2, generic: 0, graph: 0, descr: ok }
-                    group: 'Alarms - {{ $definedAlarmInstance }}'
+                    group: 'Alarms - {{ CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmInstance }}'
                 -
-                    oid: definedAlarmActive
-                    value: definedAlarmActive
+                    oid: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmTable
+                    value: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmActive
                     num_oid: '.1.3.6.1.4.1.1271.3.5.4.5.1.4.{{ $index }}'
-                    descr: '{{ $definedAlarmDescription }} (Severity {{ $definedAlarmSeverity }})'
+                    descr: '{{ CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmDescription }} (Severity {{ CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmSeverity }})'
                     state_name: '{{ $definedAlarmActive }}-other'
                     skip_values:
                         -
-                            oid: definedAlarmSeverity
+                            oid: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmSeverity
                             op: '>='
                             value: 3
                     states:
                         - { value: 1, generic: 2, graph: 0, descr: alarm }
                         - { value: 2, generic: 0, graph: 0, descr: ok }
-                    group: 'Alarms - {{ $definedAlarmInstance }}'
+                    group: 'Alarms - {{ CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmInstance }}'
 

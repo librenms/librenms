@@ -1,0 +1,11 @@
+os: packetpower-eg
+text: Packet Power Enterprise Gateway
+type: network
+icon: packetpower
+mib_dir: packetpower
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.33688.

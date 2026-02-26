@@ -1,4 +1,3 @@
-mib: TRUENAS-MIB        # Used for TrueNAS-SCALE only
 modules:
     os:
         sysDescr_regex: '/(?:TrueNAS-SCALE-)(?<version>\S*).*\. Hardware: (?<hardware>.*).*\. Software.*/'
@@ -17,131 +16,132 @@ modules:
         count:
             data:
                 -
-                    oid: zfsArcSize
-                    value: zfsArcSize
+                    oid: TRUENAS-MIB::zfsArcSize
+                    value: TRUENAS-MIB::zfsArcSize
                     num_oid: .1.3.6.1.4.1.50536.1.3.1.{{ $index }}
                     descr: 'ARC Size'
                     index: zfsArcSize.{{ $index }}
                 -
-                    oid: zfsArcMeta
-                    value: zfsArcMeta
+                    oid: TRUENAS-MIB::zfsArcMeta
+                    value: TRUENAS-MIB::zfsArcMeta
                     num_oid: .1.3.6.1.4.1.50536.1.3.2.{{ $index }}
                     descr: 'ARC Metadata'
                     index: zfsArcMeta.{{ $index }}
                 -
-                    oid: zfsArcData
-                    value: zfsArcData
+                    oid: TRUENAS-MIB::zfsArcData
+                    value: TRUENAS-MIB::zfsArcData
                     num_oid: .1.3.6.1.4.1.50536.1.3.3.{{ $index }}
                     descr: 'ARC Data'
                     index: zfsArcData.{{ $index }}
                 -
-                    oid: zfsArcHits
-                    value: zfsArcHits
+                    oid: TRUENAS-MIB::zfsArcHits
+                    value: TRUENAS-MIB::zfsArcHits
                     num_oid: .1.3.6.1.4.1.50536.1.3.4.{{ $index }}
                     descr: 'ARC Hits'
                     index: zfsArcHits_rate.{{ $index }}
                     rrd_type: COUNTER
                 -
-                    oid: zfsArcMisses
-                    value: zfsArcMisses
+                    oid: TRUENAS-MIB::zfsArcMisses
+                    value: TRUENAS-MIB::zfsArcMisses
                     num_oid: .1.3.6.1.4.1.50536.1.3.5.{{ $index }}
                     descr: 'ARC Misses'
                     index: zfsArcMisses_rate.{{ $index }}
                     rrd_type: COUNTER
                 -
-                    oid: zfsArcC
-                    value: zfsArcC
+                    oid: TRUENAS-MIB::zfsArcC
+                    value: TRUENAS-MIB::zfsArcC
                     num_oid: .1.3.6.1.4.1.50536.1.3.6.{{ $index }}
                     descr: 'ARC Target Size (C)'
                     index: zfsArcC.{{ $index }}
                 -
-                    oid: zfsArcMissPercent
-                    value: zfsArcMissPercent
+                    oid: TRUENAS-MIB::zfsArcMissPercent
+                    value: TRUENAS-MIB::zfsArcMissPercent
                     num_oid: .1.3.6.1.4.1.50536.1.3.8.{{ $index }}
                     descr: 'ARC Miss Percent'
                     index: zfsArcMissPercent.{{ $index }}
                 -
-                    oid: zfsArcCacheHitRatio
-                    value: zfsArcCacheHitRatio
+                    oid: TRUENAS-MIB::zfsArcCacheHitRatio
+                    value: TRUENAS-MIB::zfsArcCacheHitRatio
                     num_oid: .1.3.6.1.4.1.50536.1.3.9.{{ $index }}
                     descr: 'Arc Cache Hit Ratio Percentage'
                     index: zfsArcHitRatio.{{ $index }}
                 -
-                    oid: zfsArcCacheMissRatio
-                    value: zfsArcCacheMissRatio
+                    oid: TRUENAS-MIB::zfsArcCacheMissRatio
+                    value: TRUENAS-MIB::zfsArcCacheMissRatio
                     num_oid: .1.3.6.1.4.1.50536.1.3.10.{{ $index }}
                     descr: 'Arc Cache Miss Ratio Percentage'
                     index: zfsArcMissRatio.{{ $index }}
                 -
-                    oid: zfsL2ArcHits
-                    value: zfsL2ArcHits
+                    oid: TRUENAS-MIB::zfsL2ArcHits
+                    value: TRUENAS-MIB::zfsL2ArcHits
                     num_oid: .1.3.6.1.4.1.50536.1.4.1.{{ $index }}
                     descr: 'L2ARC Hits'
                     index: zfsL2ArcHits_rate.{{ $index }}
                     rrd_type: COUNTER
                 -
-                    oid: zfsL2ArcMisses
-                    value: zfsL2ArcMisses
+                    oid: TRUENAS-MIB::zfsL2ArcMisses
+                    value: TRUENAS-MIB::zfsL2ArcMisses
                     num_oid: .1.3.6.1.4.1.50536.1.4.2.{{ $index }}
                     descr: 'L2ARC Misses'
                     index: zfsL2ArcMisses_rate.{{ $index }}
                     rrd_type: COUNTER
                 -
-                    oid: zfsL2ArcRead
-                    value: zfsL2ArcRead
+                    oid: TRUENAS-MIB::zfsL2ArcRead
+                    value: TRUENAS-MIB::zfsL2ArcRead
                     num_oid: .1.3.6.1.4.1.50536.1.4.3.{{ $index }}
                     descr: 'L2ARC Reads'
                     index: zfsL2ArcRead_rate.{{ $index }}
                     rrd_type: COUNTER
                 -
-                    oid: zfsL2ArcWrite
-                    value: zfsL2ArcWrite
+                    oid: TRUENAS-MIB::zfsL2ArcWrite
+                    value: TRUENAS-MIB::zfsL2ArcWrite
                     num_oid: .1.3.6.1.4.1.50536.1.4.4.{{ $index }}
                     descr: 'L2ARC Writes'
                     index: zfsL2ArcWrite_rate.{{ $index }}
                     rrd_type: COUNTER
                 -
-                    oid: zfsL2ArcSize
-                    value: zfsL2ArcSize
+                    oid: TRUENAS-MIB::zfsL2ArcSize
+                    value: TRUENAS-MIB::zfsL2ArcSize
                     num_oid: .1.3.6.1.4.1.50536.1.4.5.{{ $index }}
                     descr: 'L2ARC Size'
                     index: zfsL2ArcSize.{{ $index }}
                 -
-                    oid: zfsZilstatOps1sec
-                    value: zfsZilstatOps1sec
+                    oid: TRUENAS-MIB::zfsZilstatOps1sec
+                    value: TRUENAS-MIB::zfsZilstatOps1sec
                     num_oid: .1.3.6.1.4.1.50536.1.5.1.{{ $index }}
                     descr: 'ZIL Operations last second'
                     index: zfsZilstatOps1sec.{{ $index }}
                 -
-                    oid: zfsZilstatOps5sec
-                    value: zfsZilstatOps5sec
+                    oid: TRUENAS-MIB::zfsZilstatOps5sec
+                    value: TRUENAS-MIB::zfsZilstatOps5sec
                     num_oid: .1.3.6.1.4.1.50536.1.5.2.{{ $index }}
                     descr: 'ZIL Operations last 5 seconds'
                     index: zfsZilstatOps5sec.{{ $index }}
                 -
-                    oid: zfsZilstatOps10sec
-                    value: zfsZilstatOps10sec
+                    oid: TRUENAS-MIB::zfsZilstatOps10sec
+                    value: TRUENAS-MIB::zfsZilstatOps10sec
                     num_oid: .1.3.6.1.4.1.50536.1.5.3.{{ $index }}
                     descr: 'ZIL Operations last 10 seconds'
                     index: zfsZilstatOps10sec.{{ $index }}
         temperature:
             data:
                 -
-                    oid: hddTempTable
-                    value: hddTempValue
+                    oid: TRUENAS-MIB::hddTempTable
+                    value: TRUENAS-MIB::hddTempValue
                     num_oid: .1.3.6.1.4.1.50536.3.1.3.{{ $index }}
                     divisor: 1000
-                    descr: '{{ $hddTempDevice }}'
+                    descr: '{{ TRUENAS-MIB::hddTempDevice }}'
                     index: hddTempValue.'{{ $index }}'
                     group: 'hdd temperature'
         state:
             data:
                 -
-                    oid: zpoolTable
-                    value: zpoolHealth
+                    oid: TRUENAS-MIB::zpoolTable
+                    value: TRUENAS-MIB::zpoolHealth
                     num_oid: .1.3.6.1.4.1.50536.1.1.1.1.3.{{ $index }}
-                    descr: 'ZPool: {{ $zpoolName }}'
+                    descr: 'ZPool: {{ TRUENAS-MIB::zpoolName }}'
                     index: zpoolHealth.{{ $index }}
+                    state_name: zpoolTable
                     states:
                         - { value: 0, descr: ONLINE, graph: 1, generic: 0 }
                         - { value: 1, descr: DEGRADED, graph: 1, generic: 1 }

@@ -1,4 +1,3 @@
-mib: OPTIX-BOARD-MANAGE-MIB
 modules:
     os:
         hardware:
@@ -10,40 +9,40 @@ modules:
             data:
                 -
                     oid:
-                        - optixPhyBoardType
+                        - OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType
                         - OPTIX-NE-MIB::optixNeName
         state:
             data:
                 -
-                    oid: optixPhyBoardTable
+                    oid: OPTIX-BOARD-MANAGE-MIB::optixPhyBoardTable
                     num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.14.1.2.1.3.{{ $index }}'
-                    value: optixPhyBoardState
-                    descr: '"{{ optixPhyBoardType:0 }}" working status'
+                    value: OPTIX-BOARD-MANAGE-MIB::optixPhyBoardState
+                    descr: '"{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}" working status'
                     index: 'optixPhyBoardType.{{ $index }}'
                     state_name: optixPhyBoardState
-                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+                    group: 'Board "{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}"'
                     states:
                         - { descr: Work, graph: 1, value: 1, generic: 0 }
                         - { descr: NotWork, graph: 1, value: 0, generic: 2 }
                 -
-                    oid: optixLogBoardTable
+                    oid: OPTIX-BOARD-MANAGE-MIB::optixLogBoardTable
                     num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.14.1.1.1.6.{{ $index }}'
-                    value: optixLogBoardBusdetect
-                    descr: '"{{ optixPhyBoardType:0 }}" status'
+                    value: OPTIX-BOARD-MANAGE-MIB::optixLogBoardBusdetect
+                    descr: '"{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}" status'
                     index: 'optixLogBoardBusdetect.{{ $index }}'
                     state_name: optixLogBoardBusdetect
-                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+                    group: 'Board "{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}"'
                     states:
                         - { descr: Enable, graph: 1, value: 1, generic: 0 }
                         - { descr: Disable, graph: 1, value: 0, generic: 2 }
                 -
-                    oid: OptixPhyBoardEntry
+                    oid: OPTIX-BOARD-MANAGE-MIB::optixPhyBoardEntry
                     num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.14.1.2.1.8.{{ $index }}'
-                    value: optixPhyBDOnlineFlag
-                    descr: '"{{ optixPhyBoardType:0 }}" Board Online Flag'
+                    value: OPTIX-BOARD-MANAGE-MIB::optixPhyBDOnlineFlag
+                    descr: '"{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}" Board Online Flag'
                     index: 'optixPhyBoardType.{{ $index }}'
                     state_name: optixPhyBDOnlineFlag
-                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+                    group: 'Board "{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}"'
                     states:
                         - { descr: offline, graph: 1, value: 0, generic: 2 }
                         - { descr: online, graph: 1, value: 1, generic: 0 }
@@ -82,46 +81,46 @@ modules:
                     oid: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduPowerTable
                     value: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduActualRxPower
                     num_oid: '.1.3.6.1.4.1.2011.2.25.4.40.4.10.30.1.9.{{ $index }}'
-                    descr: '"{{ optixPhyBoardType:0 }}" Rx Power'
+                    descr: '"{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}" Rx Power'
                     divisor: 10
                     index: 'optixRtnOduActualRxPower.{{ $index }}'
-                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+                    group: 'Board "{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}"'
                 -
                     oid: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduPowerTable
                     value: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduActualTxPower
                     num_oid: '.1.3.6.1.4.1.2011.2.25.4.40.4.10.30.1.8.{{ $index }}'
-                    descr: '"{{ optixPhyBoardType:0 }}" Tx Power'
+                    descr: '"{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}" Tx Power'
                     divisor: 10
                     index: 'optixRtnOduActualTxPower.{{ $index }}'
-                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+                    group: 'Board "{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}"'
         temperature:
             data:
                 -
-                    oid: optixLogBoardTable
-                    value: optixLogBoardCurTemp
+                    oid: OPTIX-BOARD-MANAGE-MIB::optixLogBoardTable
+                    value: OPTIX-BOARD-MANAGE-MIB::optixLogBoardCurTemp
                     num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.14.1.1.1.5.{{ $index }}'
-                    descr: '"{{ optixPhyBoardType:0 }}" current Temp (C)'
+                    descr: '"{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}" current Temp (C)'
                     index: 'optixLogBoardCurTemp.{{ $index }}'
-                    group: 'Board "{{ optixPhyBoardType:0 }}"'
-                    low_limit: optixLogBoardTempLowTh
-                    high_limit: optixLogBoardTempHighTh
+                    group: 'Board "{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}"'
+                    low_limit: OPTIX-BOARD-MANAGE-MIB::optixLogBoardTempLowTh
+                    high_limit: OPTIX-BOARD-MANAGE-MIB::optixLogBoardTempHighTh
         frequency:
             data:
                 -
                     oid: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduActualTxFreq
                     value: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduActualTxFreq
                     num_oid: '.1.3.6.1.4.1.2011.2.25.4.40.4.10.20.1.3.{{ $index }}'
-                    descr: '"{{ optixPhyBoardType:0 }}" Tx Freq RF Unit (kHz)'
+                    descr: '"{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}" Tx Freq RF Unit (kHz)'
                     multiplier: 1000
                     index: 'optixRtnOduActualTxFreq.{{ $index }}'
-                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+                    group: 'Board "{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}"'
                     low_limit: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduMinTxFreq
                     high_limit: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduMaxTxFreq
                 -
                     oid: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduActualRxFreq
                     value: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduActualRxFreq
                     num_oid: '.1.3.6.1.4.1.2011.2.25.4.40.4.10.20.1.4.{{ $index }}'
-                    descr: '"{{ optixPhyBoardType:0 }}" Rx Freq RF Unit (kHz)'
+                    descr: '"{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}" Rx Freq RF Unit (kHz)'
                     multiplier: 1000
                     index: 'optixRtnOduActualRxFreq.{{ $index }}'
-                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+                    group: 'Board "{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}"'

@@ -129,37 +129,6 @@ function isDomainResolves($domain)
     return ! empty($records);
 }
 
-function match_network($nets, $ip, $first = false)
-{
-    $return = false;
-    if (! is_array($nets)) {
-        $nets = [$nets];
-    }
-    foreach ($nets as $net) {
-        $rev = (preg_match("/^\!/", (string) $net)) ? true : false;
-        $net = preg_replace("/^\!/", '', (string) $net);
-        $ip_arr = explode('/', (string) $net);
-        $net_long = ip2long($ip_arr[0]);
-        $x = ip2long($ip_arr[1]);
-        $mask = long2ip($x) == $ip_arr[1] ? $x : 0xFFFFFFFF << (32 - $ip_arr[1]);
-        $ip_long = ip2long($ip);
-        if ($rev) {
-            if (($ip_long & $mask) == ($net_long & $mask)) {
-                return false;
-            }
-        } else {
-            if (($ip_long & $mask) == ($net_long & $mask)) {
-                $return = true;
-            }
-            if ($first && $return) {
-                return true;
-            }
-        }
-    }
-
-    return $return;
-}
-
 // FIXME port to LibreNMS\Util\IPv6 class
 function snmp2ipv6($ipv6_snmp)
 {

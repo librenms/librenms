@@ -1,4 +1,3 @@
-mib: FORCEPOINT-NGFW-ENGINE-MIB
 modules:
     mempools:
         data:

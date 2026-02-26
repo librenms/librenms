@@ -1,4 +1,3 @@
-mib: OAP-NMU
 modules:
     os:
         hardware: OAP-NMU::deviceType.0

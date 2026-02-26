@@ -1,4 +1,3 @@
-mib: SFOS-FIREWALL-MIB
 modules:
    os:
       version:
@@ -12,27 +11,29 @@ modules:
          data:
             -
                oid:
-                  - sfosIPSecVpnConnName
+                  - SFOS-FIREWALL-MIB::sfosIPSecVpnConnName
       state:
          data:
 # HA
             -
-               oid: sfosHAStatus
+               oid: SFOS-FIREWALL-MIB::sfosHAStatus
                num_oid: '.1.3.6.1.4.1.2604.5.1.4.1.{{ $index }}'
                index: 'sfosHAStatus.{{ $index }}'
                descr: 'HA status'
                group: HA
-               value: sfosHAStatus
+               value: SFOS-FIREWALL-MIB::sfosHAStatus
+               state_name: sfosHAStatus
                states:
                   - { value: 0, graph: 0, generic: 0, descr: disabled }
                   - { value: 1, graph: 1, generic: 0, descr: enabled }
             -
-               oid: sfosDeviceCurrentHAState
+               oid: SFOS-FIREWALL-MIB::sfosDeviceCurrentHAState
                num_oid: '.1.3.6.1.4.1.2604.5.1.4.4.{{ $index }}'
                index: 'sfosDeviceCurrentHAState.{{ $index }}'
                descr: 'HA local appliance state'
                group: HA
-               value: sfosDeviceCurrentHAState
+               value: SFOS-FIREWALL-MIB::sfosDeviceCurrentHAState
+               state_name: sfosDeviceCurrentHAState
                states:
                   - { value: 0, graph: 0, generic: 0, descr: notapplicable }
                   - { value: 1, graph: 1, generic: 2, descr: auxiliary }
@@ -41,12 +42,13 @@ modules:
                   - { value: 4, graph: 4, generic: 2, descr: faulty }
                   - { value: 5, graph: 5, generic: 0, descr: ready }
             -
-               oid: sfosDevicePeerHAState
+               oid: SFOS-FIREWALL-MIB::sfosDevicePeerHAState
                num_oid: '.1.3.6.1.4.1.2604.5.1.4.5.{{ $index }}'
                index: 'sfosDevicePeerHAState.{{ $index }}'
                descr: 'HA peer appliance state'
                group: HA
-               value: sfosDevicePeerHAState
+               value: SFOS-FIREWALL-MIB::sfosDevicePeerHAState
+               state_name: sfosDevicePeerHAState
                states:
                   - { value: 0, graph: 0, generic: 0, descr: notapplicable }
                   - { value: 1, graph: 1, generic: 0, descr: auxiliary }
@@ -56,12 +58,13 @@ modules:
                   - { value: 5, graph: 5, generic: 0, descr: ready }
 # Licensing
             -
-               oid: sfosNetProtectionLicRegStatus
+               oid: SFOS-FIREWALL-MIB::sfosNetProtectionLicRegStatus
                num_oid: '.1.3.6.1.4.1.2604.5.1.5.2.1.{{ $index }}'
                index: 'sfosNetProtectionLicRegStatus.{{ $index }}'
                descr: 'Network Protection registration Lic status'
                group: Licensing
-               value: sfosNetProtectionLicRegStatus
+               value: SFOS-FIREWALL-MIB::sfosNetProtectionLicRegStatus
+               state_name: sfosNetProtectionLicRegStatus
                states:
                   - { value: 0, graph: 0, generic: 0, descr: none }
                   - { value: 1, graph: 1, generic: 0, descr: evaluating }
@@ -70,12 +73,13 @@ modules:
                   - { value: 4, graph: 4, generic: 2, descr: expired }
                   - { value: 5, graph: 5, generic: 0, descr: deactivated }
             -
-               oid: sfosWebProtectionLicRegStatus
+               oid: SFOS-FIREWALL-MIB::sfosWebProtectionLicRegStatus
                num_oid: '.1.3.6.1.4.1.2604.5.1.5.3.1.{{ $index }}'
                index: 'sfosWebProtectionLicRegStatus.{{ $index }}'
                descr: 'Web Protection registration Lic status'
                group: Licensing
-               value: sfosWebProtectionLicRegStatus
+               value: SFOS-FIREWALL-MIB::sfosWebProtectionLicRegStatus
+               state_name: sfosWebProtectionLicRegStatus
                states:
                   - { value: 0, graph: 0, generic: 0, descr: none }
                   - { value: 1, graph: 1, generic: 0, descr: evaluating }
@@ -84,12 +88,13 @@ modules:
                   - { value: 4, graph: 4, generic: 2, descr: expired }
                   - { value: 5, graph: 5, generic: 0, descr: deactivated }
             -
-               oid: sfosMailProtectionLicRegStatus
+               oid: SFOS-FIREWALL-MIB::sfosMailProtectionLicRegStatus
                num_oid: '.1.3.6.1.4.1.2604.5.1.5.4.1.{{ $index }}'
                index: 'sfosMailProtectionLicRegStatus.{{ $index }}'
                descr: 'EMail Protection Lic Status'
                group: Licensing
-               value: sfosMailProtectionLicRegStatus
+               value: SFOS-FIREWALL-MIB::sfosMailProtectionLicRegStatus
+               state_name: sfosMailProtectionLicRegStatus
                states:
                   - { value: 0, graph: 0, generic: 0, descr: none }
                   - { value: 1, graph: 1, generic: 0, descr: evaluating }
@@ -98,12 +103,13 @@ modules:
                   - { value: 4, graph: 4, generic: 2, descr: expired }
                   - { value: 5, graph: 5, generic: 0, descr: deactivated }
             -
-               oid: sfosWebServerProtectionLicRegStatus
+               oid: SFOS-FIREWALL-MIB::sfosWebServerProtectionLicRegStatus
                num_oid: '.1.3.6.1.4.1.2604.5.1.5.5.1.{{ $index }}'
                index: 'sfosWebServerProtectionLicRegStatus.{{ $index }}'
                descr: 'Web Server Protection Lic status'
                group: Licensing
-               value: sfosWebServerProtectionLicRegStatus
+               value: SFOS-FIREWALL-MIB::sfosWebServerProtectionLicRegStatus
+               state_name: sfosWebServerProtectionLicRegStatus
                states:
                   - { value: 0, graph: 0, generic: 0, descr: none }
                   - { value: 1, graph: 1, generic: 0, descr: evaluating }
@@ -112,12 +118,13 @@ modules:
                   - { value: 4, graph: 4, generic: 2, descr: expired }
                   - { value: 5, graph: 5, generic: 0, descr: deactivated }
             -
-               oid: sfosSandstromLicRegStatus
+               oid: SFOS-FIREWALL-MIB::sfosSandstromLicRegStatus
                num_oid: '.1.3.6.1.4.1.2604.5.1.5.6.1.{{ $index }}'
                index: 'sfosSandstromLicRegStatus.{{ $index }}'
                descr: 'Sandstorm Protection Lic status'
                group: Licensing
-               value: sfosSandstromLicRegStatus
+               value: SFOS-FIREWALL-MIB::sfosSandstromLicRegStatus
+               state_name: sfosSandstromLicRegStatus
                states:
                   - { value: 0, graph: 0, generic: 0, descr: none }
                   - { value: 1, graph: 1, generic: 0, descr: evaluating }
@@ -126,12 +133,13 @@ modules:
                   - { value: 4, graph: 4, generic: 2, descr: expired }
                   - { value: 5, graph: 5, generic: 0, descr: deactivated }
             -
-               oid: sfosEnhancedSupportLicRegStatus
+               oid: SFOS-FIREWALL-MIB::sfosEnhancedSupportLicRegStatus
                num_oid: '.1.3.6.1.4.1.2604.5.1.5.7.1.{{ $index }}'
                index: 'sfosEnhancedSupportLicRegStatus.{{ $index }}'
                descr: 'Enhanced Support Lic Status'
                group: Licensing
-               value: sfosEnhancedSupportLicRegStatus
+               value: SFOS-FIREWALL-MIB::sfosEnhancedSupportLicRegStatus
+               state_name: sfosEnhancedSupportLicRegStatus
                states:
                   - { value: 0, graph: 0, generic: 0, descr: none }
                   - { value: 1, graph: 1, generic: 0, descr: evaluating }
@@ -140,12 +148,13 @@ modules:
                   - { value: 4, graph: 4, generic: 2, descr: expired }
                   - { value: 5, graph: 5, generic: 0, descr: deactivated }
             -
-               oid: sfosEnhancedPlusLicRegStatus
+               oid: SFOS-FIREWALL-MIB::sfosEnhancedPlusLicRegStatus
                num_oid: '.1.3.6.1.4.1.2604.5.1.5.8.1.{{ $index }}'
                index: 'sfosEnhancedPlusLicRegStatus.{{ $index }}'
                descr: 'Enhanced Plus Support Lic Status'
                group: Licensing
-               value: sfosEnhancedPlusLicRegStatus
+               value: SFOS-FIREWALL-MIB::sfosEnhancedPlusLicRegStatus
+               state_name: sfosEnhancedPlusLicRegStatus
                states:
                   - { value: 0, graph: 0, generic: 0, descr: none }
                   - { value: 1, graph: 1, generic: 0, descr: evaluating }
@@ -154,12 +163,13 @@ modules:
                   - { value: 4, graph: 4, generic: 2, descr: expired }
                   - { value: 5, graph: 5, generic: 0, descr: deactivated }
             -
-               oid: sfosCentralOrchestrationLicRegStatus
+               oid: SFOS-FIREWALL-MIB::sfosCentralOrchestrationLicRegStatus
                num_oid: '.1.3.6.1.4.1.2604.5.1.5.9.1.{{ $index }}'
                index: 'sfosCentralOrchestrationLicRegStatus.{{ $index }}'
                descr: 'Central Orchestration registration Lic Status'
                group: Licensing
-               value: sfosCentralOrchestrationLicRegStatus
+               value: SFOS-FIREWALL-MIB::sfosCentralOrchestrationLicRegStatus
+               state_name: sfosCentralOrchestrationLicRegStatus
                states:
                   - { value: 0, graph: 0, generic: 0, descr: none }
                   - { value: 1, graph: 1, generic: 0, descr: evaluating }
@@ -170,8 +180,8 @@ modules:
       count:
          data:
             -
-               oid: sfosIPSecVpnActiveTunnel
+               oid: SFOS-FIREWALL-MIB::sfosIPSecVpnActiveTunnel
                num_oid: '.1.3.6.1.4.1.2604.5.1.6.1.1.1.1.8.{{ $index }}'
                index: 'sfosIPSecVpnActiveTunnel.{{ $index }}'
-               descr: '{{ $sfosIPSecVpnConnName }} active tunnels'
+               descr: '{{ SFOS-FIREWALL-MIB::sfosIPSecVpnConnName }} active tunnels'
                group: IPSec
