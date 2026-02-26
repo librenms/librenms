@@ -1,4 +1,3 @@
-mib: RAY3-MIB
 modules:
     os:
         features: RAY3-MIB::unitType.0
@@ -14,14 +13,14 @@ modules:
     processors:
         data:
             -
-                oid: useCpu
+                oid: RAY3-MIB::useCpu
                 num_oid: '.1.3.6.1.4.1.33555.4.1.5.1.{{ $index }}'
 
     sensors:
         voltage:
             data:
                 -
-                    oid: voltageUnit
+                    oid: RAY3-MIB::voltageUnit
                     num_oid: '.1.3.6.1.4.1.33555.4.1.4.3.{{ $index }}'
                     descr: Voltage
                     divisor: 10
@@ -29,7 +28,7 @@ modules:
         temperature:
             data:
                 -
-                    oid: temperatureRadio
+                    oid: RAY3-MIB::temperatureRadio
                     num_oid: '.1.3.6.1.4.1.33555.4.1.4.2.{{ $index }}'
                     descr: Temperature
                     divisor: 100
@@ -37,7 +36,7 @@ modules:
         ber:
             data:
                 -
-                    oid: ber
+                    oid: RAY3-MIB::ber
                     num_oid: '.1.3.6.1.4.1.33555.4.3.2.11.{{ $index }}'
                     descr: BER
                     low_warn_limit: 0
@@ -46,10 +45,11 @@ modules:
         state:
             data:
                 -
-                    oid: systemStatus
-                    value: systemStatus
+                    oid: RAY3-MIB::systemStatus
+                    value: RAY3-MIB::systemStatus
                     num_oid: '.1.3.6.1.4.1.33555.4.1.3.1.{{ $index }}'
                     descr: System Status
+                    state_name: systemStatus
                     states:
                         - { value: 0, descr: Unknown, graph: 0, generic: 3 }
                         - { value: 1, descr: Ok, graph: 0, generic: 0 }
@@ -57,7 +57,7 @@ modules:
                         - { value: 3, descr: Alarm, graph: 0, generic: 3 }
 
                 -
-                    oid: txModulationIndex
+                    oid: RAY3-MIB::txModulationIndex
                     num_oid: '.1.3.6.1.4.1.33555.4.2.1.7.{{ $index }}'
                     descr: Tx Modulation Rate
                     state_name: txModulationIndex-ray3
@@ -75,7 +75,7 @@ modules:
                         - { value: 11, generic: 0, graph: 1, descr: 'QAM4096' }
 
                 -
-                    oid: rxModulationIndex
+                    oid: RAY3-MIB::rxModulationIndex
                     num_oid: '.1.3.6.1.4.1.33555.4.2.1.8.{{ $index }}'
                     descr: Rx Modulation Rate
                     state_name: rxModulationIndex-ray3

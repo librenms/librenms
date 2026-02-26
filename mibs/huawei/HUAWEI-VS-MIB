@@ -3,7 +3,7 @@
 -- 
 -- Description: HUAWEI VS MIB
 -- Reference:
--- Version: V1.03
+-- Version: V1.05
 -- History:
 -- <author>,  <date>,  <contents>
 -- xuzhen   2011-6-17
@@ -12,7 +12,7 @@
 -- ==================================================================
 -- 
 -- Varibles and types are imported
- --
+--
 -- ==================================================================
     HUAWEI-VS-MIB DEFINITIONS ::= BEGIN
  
@@ -23,13 +23,13 @@
                 FROM SNMPv2-TC
             OBJECT-GROUP, MODULE-COMPLIANCE            
                 FROM SNMPv2-CONF            
-            Integer32, OBJECT-TYPE, MODULE-IDENTITY
+            Unsigned32, Integer32, OBJECT-TYPE, MODULE-IDENTITY
                 FROM SNMPv2-SMI;
      
     
 
         hwVsMIB MODULE-IDENTITY 
-            LAST-UPDATED "201708171841Z"        
+            LAST-UPDATED "201709251541Z"        
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -43,6 +43,14 @@
             DESCRIPTION 
                 "The HUAWEI-VS-MIB which contains objects manages virtual system name and virtual system id. 
                 "
+
+       REVISION "201709251541Z"    
+         DESCRIPTION 
+            "The permission on the hwVSVsId object is changed from not-accessible to read-only."  
+       REVISION "201708301023Z"    
+         DESCRIPTION 
+            "The hwVSPhysicalResTable was added, and objects hwVSCPUUsage, hwVSMemoryUsedSize, and hwVSMemoryTotalSize were added to the hwVSPhysicalResTable.
+			 hwVSSlot was added."   
        REVISION "201708171841Z"    
          DESCRIPTION 
             "Modify the description."   
@@ -95,18 +103,12 @@
                 hwVSVsName
                     DisplayString,
                 hwVSStatus
-                    INTEGER,
-		hwVSCPUUsage
-		    Integer32, 
-		hwVSMemoryUsedSize
-		    Integer32, 
-		hwVSMemoryTotalSize
-		    Integer32
+                    INTEGER
              }
 
         hwVSVsId OBJECT-TYPE
             SYNTAX Integer32
-            MAX-ACCESS not-accessible
+            MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
                 "This object indicates the index of a VS. The index is unique in the related physical system (PS)."
@@ -138,30 +140,67 @@
 			    3. restoring (3): The virtual system is being restored.
 			    4. shutdowning(4): The virtual system is being stopped."
 	    ::= { hwVSEntry 3 }
+		
+	hwVSPhysicalResTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVSPhysicalResEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table about the physical resources of virtual system."
+            ::= { hwVSObjects 2 }
+        
+        hwVSPhysicalResEntry OBJECT-TYPE
+            SYNTAX HwVSPhysicalResEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Information about the physical resources of virtual system."
+            INDEX { hwVSVsId, hwVSSlot }
+            ::= { hwVSPhysicalResTable 1 }
+			
+	HwVSPhysicalResEntry ::=
+            SEQUENCE {
+        hwVSSlot
+                DisplayString,
+		hwVSCPUUsage
+	            Unsigned32, 
+		hwVSMemoryUsedSize
+		    Unsigned32, 
+		hwVSMemoryTotalSize
+	    	    Unsigned32
+             }
+			 
+		hwVSSlot OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The object specifies the slot information about the main control board of the virtual system."
+            ::= { hwVSPhysicalResEntry 1 }
 
         hwVSCPUUsage OBJECT-TYPE
-            SYNTAX Integer32
+            SYNTAX Unsigned32
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
                 "This object specifies the CPU usage of the virtual system."
-            ::= { hwVSEntry 4 }
+            ::= { hwVSPhysicalResEntry 2 }
 
 		hwVSMemoryUsedSize OBJECT-TYPE
-            SYNTAX Integer32
+            SYNTAX Unsigned32
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
                 "This object specifies the size of the memory used by the virtual system."
-            ::= { hwVSEntry 5 }	
+            ::= { hwVSPhysicalResEntry 3 }	
 
 		hwVSMemoryTotalSize OBJECT-TYPE
-            SYNTAX Integer32
+            SYNTAX Unsigned32
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
                 "This object specifies the total size of memory available to the virtual system."
-            ::= { hwVSEntry 6 }	
+            ::= { hwVSPhysicalResEntry 4 }	
    
    -- conformance information
 

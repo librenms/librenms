@@ -1,4 +1,3 @@
-mib: TRELLIX-SENSOR-PERF-MIB:TRELLIX-SENSOR-CONF-MIB
 modules:
     os:
         hardware: TRELLIX-SENSOR-CONF-MIB::ivSysModel.0
@@ -10,30 +9,31 @@ modules:
     processors:
         data:
             -
-                oid: 'sensorAvgLoad'
+                oid: TRELLIX-SENSOR-PERF-MIB::sensorAvgLoad
                 num_oid: '.1.3.6.1.4.1.8962.2.1.3.1.1.5.1.1.{{ $index }}'
     sensors:
         count:
             data:
                 -
-                    oid: 'sensorPerfTable'
-                    value: 'totalAlertsSentCount'
+                    oid: TRELLIX-SENSOR-PERF-MIB::sensorPerfTable
+                    value: TRELLIX-SENSOR-PERF-MIB::totalAlertsSentCount
                     num_oid: '.1.3.6.1.4.1.8962.2.1.3.1.1.5.1.7.{{ $index }}'
                     descr: 'Alerts sent to ISM'
                     index: 'totalAlertsSentCount'
                 -
-                    oid: 'malwareEngineStatsTable'
-                    value: 'totalMalwareFilesProcessed'
+                    oid: TRELLIX-SENSOR-PERF-MIB::malwareEngineStatsTable
+                    value: TRELLIX-SENSOR-PERF-MIB::totalMalwareFilesProcessed
                     num_oid: '.1.3.6.1.4.1.8962.2.1.3.1.1.11.1.1.3.{{ $index }}'
                     group: 'Malware Engine File Counters'
-                    descr: '{{ $malwareStatsEngineName }}'
-                    index: '{{ $malwareStatsEngineName }}'
+                    descr: '{{ TRELLIX-SENSOR-PERF-MIB::malwareStatsEngineName }}'
+                    index: '{{ TRELLIX-SENSOR-PERF-MIB::malwareStatsEngineName }}'
         state:
            data:
                -
-                   oid: 'l2ModeStatus'
+                   oid: TRELLIX-SENSOR-CONF-MIB::l2ModeStatus
                    num_oid: '.1.3.6.1.4.1.8962.2.1.2.1.18.2.{{ $index }}'
                    descr: 'Sensor Mode'
+                   state_name: l2ModeStatus
                    states:
                        - { value: 1, generic: 0, graph: 0, descr: 'Layer 2 Mode' }
                        - { value: 2, generic: 0, graph: 0, descr: 'IPS Mode' }

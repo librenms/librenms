@@ -220,7 +220,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
     }
 
     // store results in array cache
-    Cache::driver('array')->put('agent_data', $agent_data);
+    Cache::driver('array')->put('agent_data', $agent_data ?? null);
 
     if (! empty($agent_sensors)) {
         echo 'Sensors: ';

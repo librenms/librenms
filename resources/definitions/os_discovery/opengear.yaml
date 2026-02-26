@@ -1,4 +1,3 @@
-mib: OG-STATUSv2-MIB:OG-OMTELEM-MIB
 modules:
     os:
         hardware_mib: OG-PRODUCTS-MIB

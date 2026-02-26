@@ -1,4 +1,3 @@
-mib: ENTITY-MIB:ENTITY-SENSOR-MIB:ARUBAWIRED-VSX-MIB:ARUBAWIRED-TEMPSENSOR-MIB:ARUBAWIRED-POWERSUPPLY-MIB
 modules:
     os:
         sysDescr_regex:
@@ -19,19 +18,22 @@ modules:
             data:
                 -
                     oid:
-                        - entPhysicalName
+                        - ENTITY-MIB::entPhysicalName
+                        - ENTITY-MIB::entPhysicalSerialNum
+                        - ENTITY-MIB::entPhysicalSoftwareRev
+                        - ENTITY-MIB::entPhysicalDescr
                         - IF-MIB::ifName
                         - ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTable
         temperature:
             data:
                 -
-                    oid: arubaWiredTempSensorTable
+                    oid: ARUBAWIRED-TEMPSENSOR-MIB::arubaWiredTempSensorTable
                     num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.11.3.1.1.7.{{ $index }}'
-                    descr: arubaWiredTempSensorName
+                    descr: ARUBAWIRED-TEMPSENSOR-MIB::arubaWiredTempSensorName
                     divisor: 1000
-                    value: arubaWiredTempSensorTemperature
-                    high_limit: arubaWiredTempSensorMaxTemp
-                    low_limit: arubaWiredTempSensorMinTemp
+                    value: ARUBAWIRED-TEMPSENSOR-MIB::arubaWiredTempSensorTemperature
+                    high_limit: ARUBAWIRED-TEMPSENSOR-MIB::arubaWiredTempSensorMaxTemp
+                    low_limit: ARUBAWIRED-TEMPSENSOR-MIB::arubaWiredTempSensorMinTemp
 
                 -
                     oid: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTable
@@ -49,11 +51,11 @@ modules:
         power:
             data:
                 -
-                    oid: arubaWiredPowerSupplyTable
+                    oid: ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPowerSupplyTable
                     num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.11.2.1.1.7.{{ $index }}'
-                    descr: 'Power Supply {{ $arubaWiredPSUName }}'
-                    value: arubaWiredPSUInstantaneousPower
-                    high_limit: arubaWiredPSUMaximumPower
+                    descr: 'Power Supply {{ ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUName }}'
+                    value: ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUInstantaneousPower
+                    high_limit: ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUMaximumPower
         voltage:
             data:
                 -
@@ -111,23 +113,25 @@ modules:
         state:
             data:
                 -
-                    oid: entPhySensorTable
+                    oid: ENTITY-SENSOR-MIB::entPhySensorTable
                     num_oid: '.1.3.6.1.2.1.99.1.1.1.5.{{ $index }}'
-                    descr: entPhysicalName
-                    value: entPhySensorOperStatus
+                    descr: '{{ ENTITY-MIB::entPhysicalName }}'
+                    value: ENTITY-SENSOR-MIB::entPhySensorOperStatus
+                    state_name: entPhySensorTable
                     skip_values:
                         -
-                            oid: entPhySensorType
+                            oid: ENTITY-SENSOR-MIB::entPhySensorType
                             op: '!='
                             value: 6
                     states:
                         - { value: 1, descr: OK, graph: 1, generic: 0 }
                         - { value: 3, descr: Not OK, graph: 1, generic: 2 }
                 -
-                    oid: arubaWiredPowerSupplyTable
+                    oid: ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPowerSupplyTable
                     num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.11.2.1.1.11.{{ $index }}'
-                    descr: 'Power Supply {{ $arubaWiredPSUName }}'
-                    value: arubaWiredPSUStateEnum
+                    descr: 'Power Supply {{ ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUName }}'
+                    value: ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUStateEnum
+                    state_name: arubaWiredPowerSupplyTable 
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
                         - { value: 2, descr: Absent, graph: 1, generic: 2 }
@@ -147,10 +151,11 @@ modules:
                         - { value: 16, descr: Over Voltage, graph: 1, generic: 2 }
                         - { value: 17, descr: Under Voltage, graph: 1, generic: 2 }
                 -
-                    oid: arubaWiredVsxIslOperState
+                    oid: ARUBAWIRED-VSX-MIB::arubaWiredVsxIslOperState
                     num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.7.2.1.1.{{ $index }}'
                     descr: ISL
-                    value: arubaWiredVsxIslOperState
+                    value: ARUBAWIRED-VSX-MIB::arubaWiredVsxIslOperState
+                    state_name: arubaWiredVsxIslOperState
                     states:
                         - { value: 1, descr: init, graph: 1, generic: 3 }
                         - { value: 2, descr: out Sync, graph: 1, generic: 2 }
@@ -161,6 +166,7 @@ modules:
                     descr: 'VSF Topology'
                     value: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2Topology
                     index: 'arubaWiredVsfv2Topology.{{ $index }}'
+                    state_name: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2Topology
                     states:
                         - { value: 0, descr: standalone, graph: 1, generic: 0 }
                         - { value: 1, descr: ring, graph: 1, generic: 0 }
@@ -171,6 +177,7 @@ modules:
                     descr: 'VSF Status'
                     value: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2OperStatus
                     index: '{{ $index }}'
+                    state_name: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2OperStatus
                     states:
                         - { value: 0, descr: no_split, graph: 1, generic: 0 }
                         - { value: 1, descr: fragment_active, graph: 1, generic: 1 }
@@ -178,10 +185,11 @@ modules:
                 -
                     oid: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2MemberTable
                     num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.15.1.2.1.3.{{ $index }}'
-                    descr: 'Member {{ $ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2MemberSerialNum }} Status'
+                    descr: 'Member {{ ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2MemberSerialNum }} Status'
                     value: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2MemberStatus
                     index: '{{ $index }}'
                     group: VSF
+                    state_name: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2MemberTable
                     states:
                         - { value: 10, descr: not_present, graph: 1, generic: 2 }
                         - { value: 11, descr: booting, graph: 1, generic: 1 }

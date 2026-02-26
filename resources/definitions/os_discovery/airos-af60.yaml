@@ -1,4 +1,3 @@
-mib: UI-AF60-MIB
 modules:
     os:
         hardware: UI-AF60-MIB::af60DevModel.1
@@ -9,13 +8,13 @@ modules:
     processors:
         data:
             -
-                oid: af60CpuUsage
+                oid: UI-AF60-MIB::af60CpuUsage
                 num_oid: '.1.3.6.1.4.1.41112.1.11.1.2.6.{{ $index }}'
     sensors:
         state:
             data:
                 -
-                    oid: af60Role
+                    oid: UI-AF60-MIB::af60Role
                     num_oid: '.1.3.6.1.4.1.41112.1.11.1.1.1.{{ $index }}'
                     index: af60Role
                     descr: Radio Role
@@ -24,7 +23,7 @@ modules:
                         - { value: 0, generic: 0, graph: 0, descr: AP }
                         - { value: 1, generic: 0, graph: 0, descr: CPE }
                 -
-                    oid: af60GpsStatus
+                    oid: UI-AF60-MIB::af60GpsStatus
                     num_oid: '.1.3.6.1.4.1.41112.1.11.1.4.1.{{ $index }}'
                     index: af60GpsStatus
                     descr: GPS Status
@@ -34,7 +33,7 @@ modules:
                         - { value: 1, generic: 1, graph: 0, descr: Off }
                         - { value: 2, generic: 0, graph: 0, descr: On }
                 -
-                    oid: af60GpsFix
+                    oid: UI-AF60-MIB::af60GpsFix
                     num_oid: '.1.3.6.1.4.1.41112.1.11.1.4.2.{{ $index }}'
                     index: af60GpsFix
                     descr: GPS fix
@@ -47,12 +46,12 @@ modules:
         count:
             data:
                 -
-                    oid: af60GpsSatsVisible
+                    oid: UI-AF60-MIB::af60GpsSatsVisible
                     num_oid: '.1.3.6.1.4.1.41112.1.11.1.4.7.{{ $index }}'
                     index: af60GpsSatsVisible
                     descr: Sat visible
                 -
-                    oid: af60GpsSatsTracked
+                    oid: UI-AF60-MIB::af60GpsSatsTracked
                     num_oid: '.1.3.6.1.4.1.41112.1.11.1.4.8.{{ $index }}'
                     index: af60GpsSatsTracked
                     descr: Sat tracked

@@ -21,7 +21,7 @@ class DevicePoll extends LnmsCommand
     use ProcessesDevices;
 
     protected $name = 'device:poll';
-    protected ProcessType $processType = ProcessType::poller;
+    protected ProcessType $processType = ProcessType::Poller;
 
     /**
      * Create a new command instance.
@@ -80,7 +80,6 @@ class DevicePoll extends LnmsCommand
 
     private function dispatchWork(): int
     {
-        \Log::setDefaultDriver('stack');
         $modules = ModuleList::fromUserOverrides($this->option('modules'));
         $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
 

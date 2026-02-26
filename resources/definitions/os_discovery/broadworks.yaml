@@ -1,119 +1,141 @@
-mib: BW-BroadworksApplicationServer:BW-BroadworksMediaServer:BW-BroadworksNetworkServer:BroadworksMaintenance
 modules:
   sensors:
     count:
       data:
         -
-          oid: bwCallpCallsPerSecond
+          oid: BW-BroadworksApplicationServer::bwCallpCallsPerSecond
+          value: BW-BroadworksApplicationServer::bwCallpCallsPerSecond
           num_oid: '.1.3.6.1.4.1.6431.1.2.7.1.12.{{ $index }}'
           index: bwCallpCallsPerSecond.{{ $index }}
           descr: 'Call per second'
         -
-          oid: bwCallpEmergencyCallAttempts
+          oid: BW-BroadworksApplicationServer::bwCallpEmergencyCallAttempts
+          value: BW-BroadworksApplicationServer::bwCallpEmergencyCallAttempts
           num_oid: '.1.3.6.1.4.1.6431.1.2.7.1.7.{{ $index }}'
           index: bwCallpEmergencyCallAttempts.{{ $index }}
           descr: 'Emergency Call Attempt'
         -
-          oid: bwCallpEmergencyCallAlarms
+          oid: BW-BroadworksApplicationServer::bwCallpEmergencyCallAlarms
+          value: BW-BroadworksApplicationServer::bwCallpEmergencyCallAlarms
           num_oid: '.1.3.6.1.4.1.6431.1.2.7.1.8.{{ $index }}'
           index: bwCallpEmergencyCallAlarms.{{ $index }}
           descr: 'Emergency Call Attempt Failures'
         -
-          oid: bwSMTPTotalPrimaryEmailSendAttempts
+          oid: BW-BroadworksApplicationServer::bwSMTPTotalPrimaryEmailSendAttempts
+          value: BW-BroadworksApplicationServer::bwSMTPTotalPrimaryEmailSendAttempts
           num_oid: '.1.3.6.1.4.1.6431.1.2.8.1.1.{{ $index }}'
           index: bwSMTPTotalPrimaryEmailSendAttempts.{{ $index }}
           descr: 'Primary SMTP Server delivery failures'
         -
-          oid: bwCallpActiveCalls
+          oid: BW-BroadworksApplicationServer::bwCallpActiveCalls
+          value: BW-BroadworksApplicationServer::bwCallpActiveCalls
           num_oid: '.1.3.6.1.4.1.6431.1.2.7.1.10.{{ $index }}'
           index: bwCallpActiveCalls.{{ $index }}
           descr: 'Active callP session'
         -
-          oid: bwUserLocationRequests
+          oid: BW-BroadworksNetworkServer::bwUserLocationRequests
+          value: BW-BroadworksNetworkServer::bwUserLocationRequests
           num_oid: '.1.3.6.1.4.1.6431.1.11.1.1.1.{{ $index }}'
           index: bwUserLocationRequests.{{ $index }}
           descr: 'Total user location requests'
         -
-          oid: bwUserLocationRequestSuccess
+          oid: BW-BroadworksNetworkServer::bwUserLocationRequestSuccess
+          value: BW-BroadworksNetworkServer::bwUserLocationRequestSuccess
           num_oid: '.1.3.6.1.4.1.6431.1.11.1.1.2.{{ $index }}'
           index: bwUserLocationRequestSuccess.{{ $index }}
           descr: 'Total user location succesful requests'
         -
-          oid: bwUserLocationRequestUnknownUser
+          oid: BW-BroadworksNetworkServer::bwUserLocationRequestUnknownUser
+          value: BW-BroadworksNetworkServer::bwUserLocationRequestUnknownUser
           num_oid: '.1.3.6.1.4.1.6431.1.11.1.1.3.{{ $index }}'
           index: bwUserLocationRequestUnknownUser.{{ $index }}
           descr: 'Total unknown user location requests'
         -
-          oid: bwUserLocationRequestFailures
+          oid: BW-BroadworksNetworkServer::bwUserLocationRequestFailures
+          value: BW-BroadworksNetworkServer::bwUserLocationRequestFailures
           num_oid: '.1.3.6.1.4.1.6431.1.11.1.1.4.{{ $index }}'
           index: bwUserLocationRequestFailures.{{ $index }}
           descr: 'Total failed user location requests'
         -
-          oid: nbOfMigratedUsers
+          oid: BW-BroadworksApplicationServer::nbOfMigratedUsers
+          value: BW-BroadworksApplicationServer::nbOfMigratedUsers
           num_oid: '.1.3.6.1.4.1.6431.1.2.18.1.1.{{ $index }}'
           index: nbOfMigratedUsers.{{ $index }}
           descr: 'Migrated Users'
         -
-          oid: psOciStatsActiveSessions
+          oid: BW-BroadworksApplicationServer::psOciStatsActiveSessions
+          value: BW-BroadworksApplicationServer::psOciStatsActiveSessions
           num_oid: '.1.3.6.1.4.1.6431.1.6.8.1.9.{{ $index }}'
           index: psOciStasActiveSessions.{{ $index }}
           descr: 'Provisioning OCI Connections'
         -
-          oid: psPerNbFailedTransactions
+          oid: BW-BroadworksApplicationServer::psPerNbFailedTransactions
+          value: BW-BroadworksApplicationServer::psPerNbFailedTransactions
           num_oid: '.1.3.6.1.4.1.6431.1.6.1.1.4.{{ $index }}'
           index: psPerNbFailedTransactions.{{ $index }}
           descr: 'Provisioning Failed transactions'
         -
-          oid: psPerNbCriticalErrors
+          oid: BW-BroadworksApplicationServer::psPerNbCriticalErrors
+          value: BW-BroadworksApplicationServer::psPerNbCriticalErrors
           num_oid: '.1.3.6.1.4.1.6431.1.6.1.1.5.{{ $index }}'
           index: psPerNbCriticalErrors.{{ $index }}
           descr: 'Provisioning Critical errors'
         -
-          oid: msNoPortAvailableErrors
+          oid: BW-BroadworksMediaServer::msNoPortAvailableErrors
+          value: BW-BroadworksMediaServer::msNoPortAvailableErrors
           num_oid: '.1.3.6.1.4.1.6431.1.3.1.6.{{ $index }}'
           index: msNoPortAvailableErrors.{{ $index }}
           descr: 'No ports available'
         -
-          oid: systemNbEnterprises
+          oid: BW-BroadworksNetworkServer::systemNbEnterprises
+          value: BW-BroadworksNetworkServer::systemNbEnterprises
           num_oid: '.1.3.6.1.4.1.6431.1.9.1.7.{{ $index }}'
           index: systemNbEnterprises.{{ $index }}
           descr: 'Total number of provisioned enterprises'
         -
-          oid: systemNbGrps
+          oid: BW-BroadworksNetworkServer::systemNbGrps
+          value: BW-BroadworksNetworkServer::systemNbGrps
           num_oid: '.1.3.6.1.4.1.6431.1.9.1.1.{{ $index }}'
           index: systemNbGrps.{{ $index }}
           descr: 'Total number of provisioned groups'
         -
-          oid: systemNbDNs
+          oid: BW-BroadworksNetworkServer::systemNbDNs
+          value: BW-BroadworksNetworkServer::systemNbDNs
           num_oid: '.1.3.6.1.4.1.6431.1.9.1.2.{{ $index }}'
           index: systemNbDNs.{{ $index }}
           descr: 'Total number of provisioned numbers'
         -
-          oid: systemNbUnassignedDNs
+          oid: BW-BroadworksNetworkServer::systemNbUnassignedDNs
+          value: BW-BroadworksNetworkServer::systemNbUnassignedDNs
           num_oid: '.1.3.6.1.4.1.6431.1.9.1.8.{{ $index }}'
           index: systemNbUnassignedDNs.{{ $index }}
           descr: 'Total number of provisioned numbers which are unassigned'
         -
-          oid: msPortsInUse
+          oid: BW-BroadworksMediaServer::msPortsInUse
+          value: BW-BroadworksMediaServer::msPortsInUse
           num_oid: '.1.3.6.1.4.1.6431.1.3.1.5.{{ $index }}'
           index: msPortsInUse.{{ $index }}
           descr: 'Total ports in use'
         -
-          oid: msPrimarySmtpErrors
+          oid: BW-BroadworksMediaServer::msPrimarySmtpErrors
+          value: BW-BroadworksMediaServer::msPrimarySmtpErrors
           num_oid: '.1.3.6.1.4.1.6431.1.3.3.1.2.{{ $index }}'
           index: msPrimarySmtpErrors.{{ $index }}
           descr: 'Primary SMTP server errrors'
         -
-          oid: msRtpSessionsInUse
+          oid: BW-BroadworksMediaServer::msRtpSessionsInUse
+          value: BW-BroadworksMediaServer::msRtpSessionsInUse
           num_oid: '.1.3.6.1.4.1.6431.1.3.2.4.{{ $index }}'
           index: msRtpSessionsInUse.{{ $index }}
           descr: 'Rtp sessions in use'
     state:
       data:
         -
-          oid: bwAdminState
+          oid: BroadworksMaintenance::bwAdminState
+          value: BroadworksMaintenance::bwAdminState
           num_oid: '.1.3.6.1.4.1.6431.1.1.2.1.4.{{ $index }}'
           index: bwAdminState.{{ $index }}
+          state_name: bwAdminState
           descr: 'Broadworks lock status'
           states:
             - {value: 0, generic: 1, graph: 0, descr: 'Lock'}

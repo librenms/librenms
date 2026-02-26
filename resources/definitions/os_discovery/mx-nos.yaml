@@ -1,0 +1,426 @@
+modules:
+    os:
+        hardware:
+            - MOXA-SYSTEM-INFO-MIB::siStatProductInfoModelName.0
+            - MOXA-SYSTEM-INFO-MIB::siStatPowerModuleInfoModelName.1
+        hardware_template: '{{ MOXA-SYSTEM-INFO-MIB::siStatProductInfoModelName.0 }} ({{ MOXA-SYSTEM-INFO-MIB::siStatPowerModuleInfoModelName.1 }})'
+        version: MOXA-SYSTEM-INFO-MIB::siStatProductInfoFirmwareVersion.0
+        serial: MOXA-SYSTEM-INFO-MIB::siStatProductInfoSerialNumber.0
+    processors:
+        data:
+            -
+                oid: MOXA-SYSTEM-UTILIZATION-MIB::usStatCPUUtilization
+                num_oid: '.1.3.6.1.4.1.8691.602.1.3.2.1.{{ $index }}'
+    mempools:
+        data:
+            -
+                total: MOXA-SYSTEM-UTILIZATION-MIB::usStatMemorySize
+                percent_used: MOXA-SYSTEM-UTILIZATION-MIB::usStatMemoryUtilization
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                       - MOXA-POE-BT-MIB::poeBtStatBudgetLimit
+                       - MOXA-POE-BT-MIB::poeBtStatAllocatedPower
+                       - MOXA-PORT-MIB::portStatState
+        power:
+            data:
+                -
+                    oid: MOXA-SYSTEM-UTILIZATION-MIB::usStatPowerConsumption
+                    value: MOXA-SYSTEM-UTILIZATION-MIB::usStatPowerConsumption
+                    num_oid: '.1.3.6.1.4.1.8691.602.1.3.2.4.{{ $index }}'
+                    descr: 'System Power Consumption'
+                    index: 'usStatPowerConsumption.{{ $index }}'
+                -
+                    oid: MOXA-POE-BT-MIB::poeBtStatConsumedPower
+                    value: MOXA-POE-BT-MIB::poeBtStatConsumedPower
+                    num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.4.{{ $index }}'
+                    descr: 'Total POE Power Consumption'
+                    index: 'poeBtStatConsumedPower.{{ $index }}'
+                    high_limit: MOXA-POE-BT-MIB::poeBtStatBudgetLimit
+                    warn_limit: MOXA-POE-BT-MIB::poeBtStatAllocatedPower
+                -
+                    oid: MOXA-POE-BT-MIB::poeBtStatPortTable
+                    value: MOXA-POE-BT-MIB::poeBtStatConsumption
+                    num_oid: '.1.3.6.1.4.1.8691.602.2.2.1.6.1.6.{{ $index }}'
+                    descr: 'Port-{{ $index }} POE Consumption'
+                    index: 'poeBtStatConsumption.{{ $index }}'
+                    skip_values:
+                    -
+                      oid: MOXA-POE-BT-MIB::poeBtStatPowerOutput
+                      op: '=='
+                      value: 2
+        state:
+            data:
+                -
+                    oid: MOXA-DEVICE-IO-MIB::deviceioStatSystemPowerTable
+                    value: MOXA-DEVICE-IO-MIB::deviceioStatSystemPowerStatus
+                    num_oid: '.1.3.6.1.4.1.8691.602.8.6.2.1.1.2.{{ $index }}'
+                    descr: 'PWR {{ $index }} Status'
+                    index: 'deviceioStatSystemPowerStatus.{{ $index }}'
+                    state_name: deviceioStatSystemPowerStatus
+                    states:
+                        - { descr: 'off', graph: 1, value: 0, generic: 1 }
+                        - { descr: 'on',  graph: 1, value: 1, generic: 0 }
+                -
+                    oid: MOXA-DEVICE-IO-MIB::deviceioStatDiTable
+                    value: MOXA-DEVICE-IO-MIB::deviceioStatDiStatus
+                    num_oid: '.1.3.6.1.4.1.8691.602.8.6.2.3.1.2.{{ $index }}'
+                    descr: 'DI {{ $index }} Status'
+                    index: 'deviceioStatDiStatus.{{ $index }}'
+                    state_name: deviceioStatDiStatus
+                    states:
+                        - { descr: 'open',  graph: 1, value: 0, generic: 0 }
+                        - { descr: 'short', graph: 1, value: 1, generic: 0 }
+                -
+                    oid: MOXA-DEVICE-IO-MIB::deviceioStatRelayTable
+                    value: MOXA-DEVICE-IO-MIB::deviceioStatRelayStatus
+                    num_oid: '.1.3.6.1.4.1.8691.602.8.6.2.4.1.2.{{ $index }}'
+                    descr: 'Relay {{ $index }} Status'
+                    index: 'deviceioStatRelayStatus.{{ $index }}'
+                    state_name: deviceioStatRelayStatus
+                    states:
+                        - { descr: 'open',  graph: 1, value: 0, generic: 0 }
+                        - { descr: 'short', graph: 1, value: 1, generic: 0 }
+                -
+                    oid: MOXA-POE-BT-MIB::poeBtStatPortTable
+                    value: MOXA-POE-BT-MIB::poeBtStatPowerOutput
+                    num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.6.1.2.{{ $index }}'
+                    descr: 'Port-{{ $index }} POE Power Output'
+                    index: 'poeBtStatPowerOutput.{{ $index }}'
+                    group: 'POE Status'
+                    state_name: poeBtStatPowerOutput
+                    states:
+                        - { descr: 'Enabled',  graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Disabled', graph: 1, value: 2, generic: 0 }
+                    skip_values:
+                    -
+                      oid: MOXA-POE-BT-MIB::poeBtStatPowerOutput
+                      op: '=='
+                      value: 2
+                -
+                    oid: MOXA-POE-BT-MIB::poeBtStatPortTable
+                    value: MOXA-POE-BT-MIB::poeBtStatDeviceType
+                    num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.6.1.7.{{ $index }}'
+                    descr: 'Port-{{ $index }} POE PD Type'
+                    index: 'poeBtStatDeviceType.{{ $index }}'
+                    group: 'POE Status'
+                    state_name: poeBtStatDeviceType
+                    states:
+                        - { descr: 'notPresent',            graph: 1, value: 0, generic: 1 }
+                        - { descr: 'legacy',                graph: 1, value: 1, generic: 0 }
+                        - { descr: 'dot3af',                graph: 1, value: 2, generic: 0 }
+                        - { descr: 'dot3at',                graph: 1, value: 3, generic: 0 }
+                        - { descr: 'reserved',              graph: 1, value: 4, generic: 3 }
+                        - { descr: 'nonPdOrPdShortCircuit', graph: 1, value: 5, generic: 2 }
+                        - { descr: 'unknown',               graph: 1, value: 6, generic: 3 }
+                        - { descr: 'na',                    graph: 1, value: 7, generic: 0 }
+                        - { descr: 'dot3btss',              graph: 1, value: 8, generic: 0 }
+                        - { descr: 'dot3btds',              graph: 1, value: 9, generic: 0 }
+                    skip_values:
+                    -
+                      oid: MOXA-POE-BT-MIB::poeBtStatPowerOutput
+                      op: '=='
+                      value: 2
+                -
+                    oid: MOXA-POE-BT-MIB::poeBtStatPortTable
+                    value: MOXA-POE-BT-MIB::poeBtStatConfigSuggestion
+                    num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.6.1.8.{{ $index }}'
+                    descr: 'Port-{{ $index }} POE Config Suggestion'
+                    index: 'poeBtStatConfigSuggestion.{{ $index }}'
+                    group: 'POE Status'
+                    state_name: poeBtStatConfigSuggestion
+                    states:
+                        - { descr: 'noSuggestion',        graph: 1, value: 0, generic: 0 }
+                        - { descr: 'enablePoe',           graph: 1, value: 1, generic: 2 }
+                        - { descr: 'disablePoe',          graph: 1, value: 2, generic: 2 }
+                        - { descr: 'selectAuto',          graph: 1, value: 3, generic: 3 }
+                        - { descr: 'selectHighPower',     graph: 1, value: 4, generic: 3 }
+                        - { descr: 'selectForce',         graph: 1, value: 5, generic: 3 }
+                        - { descr: 'enableLegacy',        graph: 1, value: 6, generic: 3 }
+                        - { descr: 'raiseEpsVoltage',     graph: 1, value: 7, generic: 3 }
+                    skip_values:
+                    -
+                      oid: MOXA-POE-BT-MIB::poeBtStatConfigSuggestion
+                      op: '=='
+                      value: 0
+                -
+                    oid: MOXA-TURBOCHAIN-MIB::turboChainConfigEnable
+                    value: MOXA-TURBOCHAIN-MIB::turboChainConfigEnable
+                    num_oid: '.1.3.6.1.4.1.8691.603.3.5.1.1.{{ $index }}'
+                    descr: 'Turbo Chain Enabled'
+                    index: 'turboChainConfigEnable.{{ $index }}'
+                    group: 'Turbo Chain'
+                    state_name: turboChainConfigEnable
+                    states:
+                        - { descr: 'Enabled',  graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Disabled', graph: 1, value: 2, generic: 0 }
+                -
+                    oid: MOXA-TURBOCHAIN-MIB::turboChainConfigRole
+                    value: MOXA-TURBOCHAIN-MIB::turboChainConfigRole
+                    num_oid: '.1.3.6.1.4.1.8691.603.3.5.1.2.{{ $index }}'
+                    descr: 'Turbo Chain Role'
+                    index: 'turboChainConfigRole.{{ $index }}'
+                    group: 'Turbo Chain'
+                    state_name: turboChainConfigRole
+                    states:
+                        - { descr: 'Head',   graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Member', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'Tail',   graph: 1, value: 3, generic: 0 }
+                    skip_values:
+                    -
+                      oid: MOXA-TURBOCHAIN-MIB::turboChainConfigEnable
+                      op: '='
+                      value: 2
+                -
+                    oid: MOXA-TURBOCHAIN-MIB::turboChainStatPrimaryInterfaceStatus
+                    value: MOXA-TURBOCHAIN-MIB::turboChainStatPrimaryInterfaceStatus
+                    num_oid: '.1.3.6.1.4.1.8691.603.3.5.2.1.{{ $index }}'
+                    descr: 'Turbo Chain Primary Interface Status'
+                    index: 'turboChainStatPrimaryInterfaceStatus.{{ $index }}'
+                    group: 'Turbo Chain'
+                    state_name: turboChainStatPrimaryInterfaceStatus
+                    states:
+                        - { descr: 'initiated',   graph: 1, value: 0, generic: 3 }
+                        - { descr: 'linkDown',    graph: 1, value: 1, generic: 2 }
+                        - { descr: 'listening',   graph: 1, value: 2, generic: 3 }
+                        - { descr: 'blocking',    graph: 1, value: 3, generic: 0 }
+                        - { descr: 'forwarding',  graph: 1, value: 4, generic: 0 }
+                        - { descr: 'disabled',    graph: 1, value: 5, generic: 2 }
+                    skip_values:
+                    -
+                      oid: MOXA-TURBOCHAIN-MIB::turboChainConfigEnable
+                      op: '=='
+                      value: 2
+                -
+                    oid: MOXA-TURBOCHAIN-MIB::turboChainStatSecondaryInterfaceStatus
+                    value: MOXA-TURBOCHAIN-MIB::turboChainStatSecondaryInterfaceStatus
+                    num_oid: '.1.3.6.1.4.1.8691.603.3.5.2.1.{{ $index }}'
+                    descr: 'Turbo Chain Secondary Interface Status'
+                    index: 'turboChainStatSecondaryInterfaceStatus.{{ $index }}'
+                    group: 'Turbo Chain'
+                    state_name: turboChainStatSecondaryInterfaceStatus
+                    states:
+                        - { descr: 'initiated',   graph: 1, value: 0, generic: 3 }
+                        - { descr: 'linkDown',    graph: 1, value: 1, generic: 2 }
+                        - { descr: 'listening',   graph: 1, value: 2, generic: 3 }
+                        - { descr: 'blocking',    graph: 1, value: 3, generic: 0 }
+                        - { descr: 'forwarding',  graph: 1, value: 4, generic: 0 }
+                        - { descr: 'disabled',    graph: 1, value: 5, generic: 2 }
+                    skip_values:
+                    -
+                      oid: MOXA-TURBOCHAIN-MIB::turboChainConfigEnable
+                      op: '=='
+                      value: 2
+                -
+                    oid: MOXA-TURBORINGV2-MIB::trv2ConfigEnable
+                    value: MOXA-TURBORINGV2-MIB::trv2ConfigEnable
+                    num_oid: '.1.3.6.1.4.1.8691.603.3.4.1.1.{{ $index }}'
+                    descr: 'Turbo Ring Enabled'
+                    index: 'trv2ConfigEnable.{{ $index }}'
+                    group: 'Turbo Ring'
+                    state_name: trv2ConfigEnable
+                    states:
+                        - { descr: 'Enabled',  graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Disabled', graph: 1, value: 2, generic: 0 }
+                -
+                    oid: MOXA-TURBORINGV2-MIB::trv2StatRingTable
+                    value: MOXA-TURBORINGV2-MIB::trv2StatRingTableEntryMasterStatus
+                    num_oid: '.1.3.6.1.4.1.8691.603.3.4.2.1.1.2.{{ $index }}'
+                    descr: 'Turbo Ring {{ $index }} Master Status'
+                    index: 'trv2StatRingTableEntryMasterStatus.{{ $index }}'
+                    group: 'Turbo Ring'
+                    state_name: trv2StatRingTableEntryMasterStatus
+                    states:
+                        - { descr: 'Master',  graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Slave',   graph: 1, value: 2, generic: 0 }
+                    skip_values:
+                    -
+                      oid: MOXA-TURBORINGV2-MIB::trv2ConfigEnable.0
+                      op: '=='
+                      value: 2
+                -
+                    oid: MOXA-TURBORINGV2-MIB::trv2StatRingTable
+                    value: MOXA-TURBORINGV2-MIB::trv2StatRingTableEntryFirstRingPort
+                    num_oid: '.1.3.6.1.4.1.8691.603.3.4.2.1.1.4.{{ $index }}'
+                    descr: 'Turbo Ring {{ $index }} First Port'
+                    index: 'trv2StatRingTableEntryFirstRingPort.{{ $index }}'
+                    group: 'Turbo Ring'
+                    state_name: trv2StatRingTableEntryFirstRingPort
+                    states:
+                        - { descr: 'disabled',    graph: 1, value: 1, generic: 1 }
+                        - { descr: 'blocking',    graph: 1, value: 2, generic: 0 }
+                        - { descr: 'listening',   graph: 1, value: 3, generic: 3 }
+                        - { descr: 'learning',    graph: 1, value: 4, generic: 3 }
+                        - { descr: 'forwarding',  graph: 1, value: 5, generic: 0 }
+                        - { descr: 'linkDown',    graph: 1, value: 6, generic: 2 }
+                    skip_values:
+                    -
+                      oid: MOXA-TURBORINGV2-MIB::trv2ConfigEnable.0
+                      op: '=='
+                      value: 2
+                -
+                    oid: MOXA-TURBORINGV2-MIB::trv2StatRingTable
+                    value: MOXA-TURBORINGV2-MIB::trv2StatRingTableEntrySecondRingPort
+                    num_oid: '.1.3.6.1.4.1.8691.603.3.4.2.1.1.4.{{ $index }}'
+                    descr: 'Turbo Ring {{ $index }} Second Port'
+                    index: 'trv2StatRingTableEntrySecondRingPort.{{ $index }}'
+                    group: 'Turbo Ring'
+                    state_name: trv2StatRingTableEntrySecondRingPort
+                    states:
+                        - { descr: 'disabled',    graph: 1, value: 1, generic: 1 }
+                        - { descr: 'blocking',    graph: 1, value: 2, generic: 0 }
+                        - { descr: 'listening',   graph: 1, value: 3, generic: 3 }
+                        - { descr: 'learning',    graph: 1, value: 4, generic: 3 }
+                        - { descr: 'forwarding',  graph: 1, value: 5, generic: 0 }
+                        - { descr: 'linkDown',    graph: 1, value: 6, generic: 2 }
+                    skip_values:
+                    -
+                      oid: MOXA-TURBORINGV2-MIB::trv2ConfigEnable.0
+                      op: '=='
+                      value: 2
+                -
+                    oid: MOXA-TURBORINGV2-MIB::trv2StatRingTable
+                    value: MOXA-TURBORINGV2-MIB::trv2StatRingTableEntryBrokenStatus
+                    num_oid: '.1.3.6.1.4.1.8691.603.3.4.2.1.1.6.{{ $index }}'
+                    descr: 'Turbo Ring {{ $index }} State'
+                    index: 'trv2StatRingTableEntryBrokenStatus.{{ $index }}'
+                    group: 'Turbo Ring'
+                    state_name: trv2StatRingTableEntryBrokenStatus
+                    states:
+                        - { descr: 'NA',       graph: 1, value: 0, generic: 3 }
+                        - { descr: 'Normal',   graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Broken',   graph: 1, value: 2, generic: 2 }
+                    skip_values:
+                    -
+                      oid: MOXA-TURBORINGV2-MIB::trv2ConfigEnable.0
+                      op: '=='
+                      value: 2
+                -
+                    oid: MOXA-DUALHOMING-MIB::dualhomingConfigEnable
+                    value: MOXA-DUALHOMING-MIB::dualhomingConfigEnable
+                    num_oid: '.1.3.6.1.4.1.8691.603.3.7.1.1.{{ $index }}'
+                    descr: 'Dual Homing Enabled'
+                    index: 'dualhomingConfigEnable.{{ $index }}'
+                    group: 'Dual Homing'
+                    state_name: dualhomingConfigEnable
+                    states:
+                        - { descr: 'Enabled',  graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Disabled', graph: 1, value: 2, generic: 0 }
+                -
+                    oid: MOXA-DUALHOMING-MIB::dualhomingProtocolStatePrimary
+                    value: MOXA-DUALHOMING-MIB::dualhomingProtocolStatePrimary
+                    num_oid: '.1.3.6.1.4.1.8691.603.3.7.2.1.1.{{ $index }}'
+                    descr: 'Dual Homing Primary Port'
+                    index: 'dualhomingProtocolStatePrimary.{{ $index }}'
+                    group: 'Dual Homing'
+                    state_name: dualhomingProtocolStatePrimary
+                    states:
+                        - { descr: 'linkDown',   graph: 1, value: 0, generic: 2 }
+                        - { descr: 'blocking',   graph: 1, value: 1, generic: 0 }
+                        - { descr: 'forwarding', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'disabled',   graph: 1, value: 3, generic: 3 }
+                    skip_values:
+                    -
+                      oid: MOXA-DUALHOMING-MIB::dualhomingConfigEnable
+                      op: '=='
+                      value: 2
+                -
+                    oid: MOXA-DUALHOMING-MIB::dualhomingProtocolStateSecondary
+                    value: MOXA-DUALHOMING-MIB::dualhomingProtocolStateSecondary
+                    num_oid: '.1.3.6.1.4.1.8691.603.3.7.2.2.2.{{ $index }}'
+                    descr: 'Dual Homing Secondary Port'
+                    index: 'dualhomingProtocolStateSecondary.{{ $index }}'
+                    group: 'Dual Homing'
+                    state_name: dualhomingProtocolStateSecondary
+                    states:
+                        - { descr: 'linkDown',   graph: 1, value: 0, generic: 2 }
+                        - { descr: 'blocking',   graph: 1, value: 1, generic: 0 }
+                        - { descr: 'forwarding', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'disabled',   graph: 1, value: 3, generic: 3 }
+                    skip_values:
+                    -
+                      oid: MOXA-DUALHOMING-MIB::dualhomingConfigEnable
+                      op: '=='
+                      value: 2
+
+        voltage:
+            data:
+                -
+                    oid: MOXA-POE-BT-MIB::poeBtStatPortTable
+                    value: MOXA-POE-BT-MIB::poeBtStatVoltage
+                    num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.6.1.5.{{ $index }}'
+                    descr: 'Port-{{ $index }} POE Voltage'
+                    index: 'poeBtStatVoltage.{{ $index }}'
+                    group: 'POE Voltage'
+                    skip_values:
+                    -
+                      oid: MOXA-POE-BT-MIB::poeBtStatPowerOutput
+                      op: '=='
+                      value: 2
+                -
+                    oid: MOXA-FIBER-CHECK-MIB::fiberCheckStatPortTable
+                    value: MOXA-FIBER-CHECK-MIB::fiberCheckStatVoltage
+                    num_oid: '.1.3.6.1.4.1.8691.603.5.3.2.1.1.1.7.{{ $index }}'
+                    descr: 'Port-{{ $index }} {{ MOXA-FIBER-CHECK-MIB::fiberCheckStatModelName }} Voltage'
+                    index: 'fiberCheckStatVoltage.{{ $index }}'
+                    group: 'SFP Voltage'
+                    skip_values:
+                    -
+                      oid: MOXA-PORT-MIB::portStatState
+                      op: '=='
+                      value: 1
+        current:
+            data:
+                -
+                    oid: MOXA-POE-BT-MIB::poeBtStatPortTable
+                    value: MOXA-POE-BT-MIB::poeBtStatCurrent
+                    num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.6.1.4.{{ $index }}'
+                    descr: 'Port-{{ $index }} POE Current'
+                    index: 'poeBtStatCurrent.{{ $index }}'
+                    divisor: 100
+                    skip_values:
+                    -
+                      oid: MOXA-POE-BT-MIB::poeBtStatPowerOutput
+                      op: '=='
+                      value: 2
+
+        temperature:
+            data:
+                -
+                    oid: MOXA-FIBER-CHECK-MIB::fiberCheckStatPortTable
+                    value: MOXA-FIBER-CHECK-MIB::fiberCheckStatTemperatureC
+                    num_oid: '.1.3.6.1.4.1.8691.603.5.3.2.1.1.1.5.{{ $index }}'
+                    descr: 'Port-{{ $index }} {{ MOXA-FIBER-CHECK-MIB::fiberCheckStatModelName }} Temperature'
+                    index: 'fiberCheckStatTemperatureC.{{ $index }}'
+                    high_limit: MOXA-FIBER-CHECK-MIB::fiberCheckStatTemperatureLimitC
+                    skip_values:
+                    -
+                      oid: MOXA-PORT-MIB::portStatState
+                      op: '=='
+                      value: 1
+        dbm:
+            data:
+                -
+                    oid: MOXA-FIBER-CHECK-MIB::fiberCheckStatPortTable
+                    value: MOXA-FIBER-CHECK-MIB::fiberCheckStatTxPower
+                    num_oid: '.1.3.6.1.4.1.8691.603.5.3.2.1.1.1.8.{{ $index }}'
+                    descr: 'Port-{{ $index }} {{ MOXA-FIBER-CHECK-MIB::fiberCheckStatModelName }} TX Power'
+                    index: 'fiberCheckStatTxPower.{{ $index }}'
+                    skip_values:
+                    -
+                      oid: MOXA-PORT-MIB::portStatState
+                      op: '=='
+                      value: 1
+                -
+                    oid: MOXA-FIBER-CHECK-MIB::fiberCheckStatPortTable
+                    value: MOXA-FIBER-CHECK-MIB::fiberCheckStatRxPower
+                    num_oid: '.1.3.6.1.4.1.8691.603.5.3.2.1.1.1.9.{{ $index }}'
+                    descr: 'Port-{{ $index }} {{ MOXA-FIBER-CHECK-MIB::fiberCheckStatModelName }} RX Power'
+                    index: 'fiberCheckStatRxPower.{{ $index }}'
+                    skip_values:
+                    -
+                      oid: MOXA-PORT-MIB::portStatState
+                      op: '=='
+                      value: 1

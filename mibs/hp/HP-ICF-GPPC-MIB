@@ -15,16 +15,19 @@ HP-ICF-GPPC-MIB DEFINITIONS ::= BEGIN
             FROM HP-ICF-OID;
 
     hpicfGppcMIB MODULE-IDENTITY
-        LAST-UPDATED "200709271125Z"
-        ORGANIZATION "Hewlett Packard Company,
-                      Procurve Networking Business"
+        LAST-UPDATED "202111110105Z"
+        ORGANIZATION "HP Networking"
         CONTACT-INFO "Hewlett Packard Company
                       8000 Foothills Blvd.
                       Roseville, CA 95747"
         DESCRIPTION  "This MIB module is for HP proprietary
                      General Purpose Packet Control (GPPC)"
 
-        REVISION     "200709271125Z"
+        REVISION     "202111110105Z"
+        DESCRIPTION  "Added range restriction for the index element
+                      hpicfGppcPrRuleId."
+
+        REVISION     "200912150105Z"
         DESCRIPTION  "Initial revision."
 
         ::= { hpSwitch 41 }
@@ -33,13 +36,14 @@ HP-ICF-GPPC-MIB DEFINITIONS ::= BEGIN
 -- TEXTUAL Conventions
 -- ***********************************************
     HpicfGppcPolicyName ::= TEXTUAL-CONVENTION
-        STATUS      current
-        DESCRIPTION "Type definition for the name of a policy.
+        DISPLAY-HINT "32a"
+        STATUS       current
+        DESCRIPTION  "Type definition for the name of a policy.
 
-                    A policy name is a printable string consisting
-                    of up to 64 characters from the ASCII character
-                    set."
-        SYNTAX      OCTET STRING (SIZE(1..32))
+                     A policy name is a printable string consisting
+                     of up to 64 characters from the ASCII character
+                     set."
+        SYNTAX       OCTET STRING (SIZE(1..32))
 
 -- ***********************************************
 -- Start of MIB Objects
@@ -279,7 +283,11 @@ HP-ICF-GPPC-MIB DEFINITIONS ::= BEGIN
         ::= { hpicfGppcAppControlEntry 13 }
 
     hpicfGppcAcExpPolicy OBJECT-TYPE
-        SYNTAX      INTEGER { permanent(1) }
+        SYNTAX      INTEGER { 
+			permanent(1),
+			slot-down(2),
+			app-down(3)
+		    }
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION "Expiration policy.  This indicates whether a policy
@@ -341,7 +349,23 @@ HP-ICF-GPPC-MIB DEFINITIONS ::= BEGIN
                         gppc-cfg-no-record(54),
                         gppc-cfg-add-record-error(55),
                         gppc-cfg-invalid(56),
-                        gppc-cfg-malloc-error(57)
+                        gppc-cfg-malloc-error(57),
+            gppcTrmodeErr(70),
+            gppcTrmodeInvalidZoneNumber(71),
+            gppcTrmodeOperationNotSupported(72),
+            gppcTrmodeZoneNameTooLong(73),
+            gppcTrmodeZoneNameNotFound(74),
+            gppcTrmodeZoneNameAlreadyExists(75),
+            gppcTrmodeTooManyZoneNames(76),
+            gppcTrmodeUnknownPort(77),
+            gppcTrmodeCannotDeleteDefaultZone(78),
+            gppcTrmodeCannotDeleteZoneWithRules(79),
+            gppcTrmodeInvalidFilterNumber(80),
+            gppcTrmodeCannotFilterTrafficWithinZone(81),
+            gppcTrmodeInvalidAction(82),
+            gppcTrmodeUnicastInterceptMacaddrRequired(83),
+            gppcTrmodeCannotAllocateMirrorSession(84),
+            gppcTrmodeCannotAllocateClassifierResources(85)
                     }
         MAX-ACCESS  read-only
         STATUS      current
@@ -423,7 +447,10 @@ HP-ICF-GPPC-MIB DEFINITIONS ::= BEGIN
         ::= { hpicfGppcNamedPolicyEntry 1 }
 
     hpicfGppcNpPolicyType OBJECT-TYPE
-        SYNTAX      INTEGER { mac-based-mirroring(1) }
+        SYNTAX      INTEGER { 
+			mac-based-mirroring(1),
+			zone-intercept(2)
+		    }
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION "Type of the policy.  A policy type of
@@ -479,7 +506,7 @@ HP-ICF-GPPC-MIB DEFINITIONS ::= BEGIN
         }
 
     hpicfGppcPrRuleId OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      Integer32 (1..2147483647)
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "Numeric identifier of the rule.  The rules in a
@@ -491,7 +518,7 @@ HP-ICF-GPPC-MIB DEFINITIONS ::= BEGIN
         ::= { hpicfGppcPolicyRulesEntry 1 }
 
     hpicfGppcPrPolicyRule OBJECT-TYPE
-        SYNTAX      OCTET STRING (SIZE(0..128))
+        SYNTAX      OCTET STRING (SIZE(0..255))
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION "Rule string.  This is a string that represents one
@@ -561,3 +588,4 @@ HP-ICF-GPPC-MIB DEFINITIONS ::= BEGIN
                     GPPC."
         ::= { hpicfGppcMIBGroups 1 }
 END
+-- vim:ts=4:sw=4:sta:et:sts:tw=72

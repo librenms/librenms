@@ -1,4 +1,3 @@
-mib: SKYHIGHSECURITY-SWG-MIB
 modules:
     os:
         version: SKYHIGHSECURITY-SWG-MIB::kProductVersion.0
@@ -7,85 +6,85 @@ modules:
             data:
                 -
                     oid:
-                        - stCategoryName
+                        - SKYHIGHSECURITY-SWG-MIB::stCategoryName
         count:
             data:
                 -
-                    oid: stMalwareDetected
+                    oid: SKYHIGHSECURITY-SWG-MIB::stMalwareDetected
                     num_oid: '.1.3.6.1.4.1.59732.2.7.2.1.2.{{ $index }}'
                     descr: 'Infections detected by Antimalware'
                     index: 'stMalwareDetected{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: stConnectionsLegitimate
+                    oid: SKYHIGHSECURITY-SWG-MIB::stConnectionsLegitimate
                     num_oid: '.1.3.6.1.4.1.59732.2.7.2.1.3.{{ $index }}'
                     descr: 'Total requests'
                     index: 'stConnectionsLegitimate{{ $index }}'
                     group: Requests
                     rrd_type: COUNTER
                 -
-                    oid: stBlockedByAntiMalware
+                    oid: SKYHIGHSECURITY-SWG-MIB::stBlockedByAntiMalware
                     num_oid: '.1.3.6.1.4.1.59732.2.7.2.1.4.{{ $index }}'
                     index: 'stBlockedByAntiMalware{{ $index }}'
                     descr: 'Connections blocked by Anti-Malware'
                     rrd_type: COUNTER
                 -
-                    oid: stConnectionsBlocked
+                    oid: SKYHIGHSECURITY-SWG-MIB::stConnectionsBlocked
                     num_oid: '.1.3.6.1.4.1.59732.2.7.2.1.5.{{ $index }}'
                     descr: 'Total Connections blocked'
                     index: 'stConnectionsBlocked{{ $index }}'
                     rrd_type: COUNTER
                 -
-                    oid: stBlockedByMediaFilter
+                    oid: SKYHIGHSECURITY-SWG-MIB::stBlockedByMediaFilter
                     num_oid: '.1.3.6.1.4.1.59732.2.7.2.1.6.{{ $index }}'
                     index: 'stBlockedByMediaFilter{{ $index }}'
                     descr: 'Connections blocked by the Media-Type'
                     rrd_type: COUNTER
                 -
-                    oid: stBlockedByURLFilter
+                    oid: SKYHIGHSECURITY-SWG-MIB::stBlockedByURLFilter
                     num_oid: '.1.3.6.1.4.1.59732.2.7.2.1.7.{{ $index }}'
                     index: 'stBlockedByURLFilter{{ $index }}'
                     descr: 'Connections blocked by the URL filter'
                     rrd_type: COUNTER
                 -
-                    oid: stMimeType
+                    oid: SKYHIGHSECURITY-SWG-MIB::stMimeType
                     num_oid: '.1.3.6.1.4.1.59732.2.7.2.1.8.{{ $index }}'
                     index: 'stMimeType{{ $index }}'
                     descr: 'Media types detected by the Media Type filter'
                     rrd_type: COUNTER
                 -
-                    oid: stCategoryCount
+                    oid: SKYHIGHSECURITY-SWG-MIB::stCategoryCount
                     num_oid: '.1.3.6.1.4.1.59732.2.7.2.1.10.1.2.{{ $index }}'
-                    index: 'Blocked {{ $stCategoryName }}'
-                    descr: 'Blocked {{ $stCategoryName }}'
+                    index: 'Blocked {{ SKYHIGHSECURITY-SWG-MIB::stCategoryName }}'
+                    descr: 'Blocked {{ SKYHIGHSECURITY-SWG-MIB::stCategoryName }}'
                     group: 'Categories Blocked'
                     rrd_type: COUNTER
                 -
-                    oid: stHttpRequests
+                    oid: SKYHIGHSECURITY-SWG-MIB::stHttpRequests
                     num_oid: '.1.3.6.1.4.1.59732.2.7.2.2.1.{{ $index }}'
                     index: 'stHttpRequests{{ $index }}'
                     descr: 'HTTP requests'
                     group: Requests
                     rrd_type: COUNTER
                 -
-                    oid: stHttpsRequests
+                    oid: SKYHIGHSECURITY-SWG-MIB::stHttpsRequests
                     num_oid: '.1.3.6.1.4.1.59732.2.7.2.3.1.{{ $index }}'
                     index: 'stHttpsRequests{{ $index }}'
                     descr: 'HTTPS requests'
                     group: Requests
                     rrd_type: COUNTER
                 -
-                    oid: stClientCount
+                    oid: SKYHIGHSECURITY-SWG-MIB::stClientCount
                     num_oid: '.1.3.6.1.4.1.59732.2.7.2.5.2.{{ $index }}'
                     index: 'stClientCount.{{ $index }}'
                     descr: 'Connected clients'
                 -
-                    oid: stConnectedSockets
+                    oid: SKYHIGHSECURITY-SWG-MIB::stConnectedSockets
                     num_oid: '.1.3.6.1.4.1.59732.2.7.2.5.3.{{ $index }}'
                     index: 'stConnectedSockets.{{ $index }}'
                     descr: 'Open network sockets'
                 -
-                    oid: stResolveHostViaDNS
+                    oid: SKYHIGHSECURITY-SWG-MIB::stResolveHostViaDNS
                     num_oid: '.1.3.6.1.4.1.59732.2.7.2.5.6.{{ $index }}'
                     index: 'stResolveHostViaDNS.{{ $index }}'
                     descr: 'Time to resolve DNS (ms)'

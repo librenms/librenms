@@ -33,8 +33,8 @@ class PortAdsl extends PortRelatedModel implements Keyable
     /**
      * @inheritDoc
      */
-    public function getCompositeKey()
+    public function getCompositeKey(): int
     {
-        return $this->port_id;
+        return (int) $this->port_id;
     }
 }

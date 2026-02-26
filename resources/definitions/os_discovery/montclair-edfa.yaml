@@ -1,4 +1,3 @@
-mib: Montclair-MIB
 modules:
   os:
     serial: Montclair-MIB::deviceSerialNumber.0
@@ -10,41 +9,41 @@ modules:
       data:
         -
           oid:
-            - deviceStatus
-            - amplifierDynamic
+            - Montclair-MIB::deviceStatus
+            - Montclair-MIB::amplifierDynamic
     count:
       data:
         -
-          oid: deviceStatus
-          value: devicePowerSupplyAmount
+          oid: Montclair-MIB::deviceStatus
+          value: Montclair-MIB::devicePowerSupplyAmount
           index: 'devicePowerSupplyAmount.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.12.3.{{ $index }}'
           descr: Power Supplies
         -
-          oid: deviceStatus
-          value: 'deviceFanAmount'
+          oid: Montclair-MIB::deviceStatus
+          value: Montclair-MIB::deviceFanAmount
           index: 'deviceFanAmount.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.12.6.{{ $index }}'
           descr: Fan Count
         -
-          oid: amplifierDynamic
-          value: 'amplifierPortAmount'
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierPortAmount
           index: 'amplifierPortAmount.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.13.{{ $index }}'
           descr: Ports
     dbm:
       data:
         -
-          oid: amplifierDynamic
-          value: amplifierBackReflectionPower
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierBackReflectionPower
           index: 'amplifierBackReflectionPower.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.4.{{ $index }}'
           descr: Amplifier Reflection
           divisor: 10
           high_limit: -15
         -
-          oid: amplifierDynamic
-          value: amplifierInputPower
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierInputPower
           index: 'amplifierInputPower.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.5.{{ $index }}'
           descr: Input Power
@@ -52,8 +51,8 @@ modules:
           high_limit: 10
           low_limit: 0
         -
-          oid: amplifierDynamic
-          value: amplifierOutputPower
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierOutputPower
           index: 'amplifierOutputPower.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.11.{{ $index }}'
           descr: Output Power
@@ -61,22 +60,22 @@ modules:
           high_limit: 40
           low_limit: 28
         -
-          oid: amplifierDynamic
-          value: amplifierPortOutputPower
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierPortOutputPower
           index: 'amplifierPortOutputPower.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.14.{{ $index }}'
           descr: Port Output Power
           divisor: 10
         -
-          oid: amplifierDynamic
-          value: amplifierGain
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierGain
           index: 'amplifierGain.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.12.{{ $index }}'
           descr: Amp Gain
           divisor: 10
         -
-          oid: amplifierDynamic
-          value: amplifierPortGain
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierPortGain
           index: 'amplifierPortGain.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.15.{{ $index }}'
           descr: Port Gain
@@ -84,28 +83,28 @@ modules:
     percent:
       data:
         -
-          oid: amplifierDynamic
-          value: amplifierPrePumpCurrent
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierPrePumpCurrent
           index: 'amplifierPrePumpCurrent.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.8.{{ $index }}'
           descr: Pre-Pump Current
         -
-          oid: amplifierDynamic
-          value: amplifierPumpCurrent1
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierPumpCurrent1
           index: 'amplifierPumpCurrent1.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.9.{{ $index }}'
           descr: Pump Current 1
         -
-          oid: amplifierDynamic
-          value: amplifierPumpCurrent2
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierPumpCurrent2
           index: 'amplifierPumpCurrent2.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.10.{{ $index }}'
           descr: Pump Current 2
     temperature:
       data:
         -
-          oid: deviceStatus
-          value: deviceInternalTemperatute
+          oid: Montclair-MIB::deviceStatus
+          value: Montclair-MIB::deviceInternalTemperatute
           index: 'deviceInternalTemperatute.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.12.2.{{ $index }}'
           descr: Internal Temperature
@@ -117,16 +116,16 @@ modules:
             op: '='
             value: 0
         -
-          oid: amplifierDynamic
-          value: amplifierRadiatorTemperature
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierRadiatorTemperature
           index: 'amplifierRadiatorTemperature.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.16.{{ $index }}'
           descr: Amp Radiator Temperature
           low_limit: -33
           high_limit: 70
         -
-          oid: amplifierDynamic
-          value: amplifierPrePumpTemperature
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierPrePumpTemperature
           index: 'amplifierPrePumpTemperature.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.17.{{ $index }}'
           descr: Amp Pre-Pump Temperature
@@ -136,8 +135,8 @@ modules:
     state:
       data:
         -
-          oid: deviceStatus
-          value: devicePowerSupply1Status
+          oid: Montclair-MIB::deviceStatus
+          value: Montclair-MIB::devicePowerSupply1Status
           index: 'devicePowerSupply1Status.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.12.4.{{ $index }}'
           descr: Power Supply 1
@@ -147,8 +146,8 @@ modules:
             - { value: 3, generic: 2, graph: 0, descr: Critical }
             - { value: 7, generic: 0, graph: 0, descr: Normal }
         -
-          oid: deviceStatus
-          value: devicePowerSupply2Status
+          oid: Montclair-MIB::deviceStatus
+          value: Montclair-MIB::devicePowerSupply2Status
           index: 'devicePowerSupply2Status.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.12.5.{{ $index }}'
           descr: Power Supply 2
@@ -158,8 +157,8 @@ modules:
             - { value: 3, generic: 2, graph: 0, descr: Critical }
             - { value: 7, generic: 0, graph: 0, descr: Normal }
         -
-          oid: deviceStatus
-          value: deviceFanStatus
+          oid: Montclair-MIB::deviceStatus
+          value: Montclair-MIB::deviceFanStatus
           index: 'deviceFanStatus.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.12.7.{{ $index }}'
           descr: Fan Status
@@ -171,8 +170,8 @@ modules:
             - { value: 5, generic: 2, graph: 0, descr: Warning }
             - { value: 7, generic: 0, graph: 0, descr: Normal }
         -
-          oid: deviceStatus
-          value: deviceFanMode
+          oid: Montclair-MIB::deviceStatus
+          value: Montclair-MIB::deviceFanMode
           index: 'deviceFanMode.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.12.8.{{ $index }}'
           descr: Fan Mode
@@ -184,8 +183,8 @@ modules:
             - { value: 4, generic: 0, graph: 0, descr: Linear }
             - { value: 5, generic: 0, graph: 0, descr: High }
         -
-          oid: amplifierDynamic
-          value: amplifierEnabled
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierEnabled
           index: 'amplifierEnabled.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.6.{{ $index }}'
           descr: Amplifier
@@ -195,8 +194,8 @@ modules:
             - { value: 2, generic: 0, graph: 0, descr: Enabled }
             # The MIB seems to have this backwards...
         -
-          oid: amplifierDynamic
-          value: amplifierMode
+          oid: Montclair-MIB::amplifierDynamic
+          value: Montclair-MIB::amplifierMode
           index: 'amplifierMode.{{ $index }}'
           num_oid: '.1.3.6.1.4.1.1385.77.7.2.7.{{ $index }}'
           descr: Amp Mode

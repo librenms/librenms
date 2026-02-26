@@ -16,7 +16,7 @@ FA-EXT-MIB DEFINITIONS ::= BEGIN
       FROM FCMGMT-MIB;
 
   faExt MODULE-IDENTITY
-    LAST-UPDATED "201011221030Z"
+    LAST-UPDATED "201310291354Z" -- Oct 29, 2013 01:54pm
     ORGANIZATION "Brocade Communications Systems, Inc.,"
     CONTACT-INFO "Customer Support Group
 		  Brocade Communications Systems,
@@ -33,7 +33,12 @@ FA-EXT-MIB DEFINITIONS ::= BEGIN
 		 All rights reserved."
 	REVISION    "201011221030Z" -- Nov 22, 2010 10:30am
     DESCRIPTION	"Initial version of this module."
-
+	REVISION    "201309121030Z" -- Sep 12, 2013 10:00am
+    DESCRIPTION	"Added swConnUnitPortFECMode"
+	REVISION	"201309241355Z" -- Sep 24, 2013 01:55pm
+	DESCRIPTION	"Added swConnUnitPortFECState"
+	REVISION	"201310291354Z" -- Oct 29, 2013 01:54pm
+	DESCRIPTION	"Added notsupported value for swConnUnitPortFECState"
 	::= { sw 28 }
 
   swSfpStatTable  OBJECT-TYPE
@@ -268,7 +273,9 @@ FA-EXT-MIB DEFINITIONS ::= BEGIN
 
    SwConnUnitPortEntry ::= SEQUENCE {
 	swConnUnitPortCapableSpeeds OCTET STRING,
-	swConnUnitPortSpeedMode INTEGER
+	swConnUnitPortSpeedMode INTEGER,
+	swConnUnitPortFECMode INTEGER,
+	swConnUnitPortFECState INTEGER
   }
 
   swConnUnitPortCapableSpeeds OBJECT-TYPE
@@ -288,4 +295,29 @@ FA-EXT-MIB DEFINITIONS ::= BEGIN
 	DESCRIPTION "This represents the type of speed modes that can be configured for the particular port.
  				 The modes that can be configured are auto-negotiable and static speeds."
   ::= { swConnUnitPortEntry 2 }
+
+  swConnUnitPortFECMode OBJECT-TYPE
+    SYNTAX INTEGER {
+    unknown     (1),
+    disabled   (2),
+    enabled  (3),
+	notsupported (4)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "This represents the port Forward Error Correction Mode. FEC feature is only applicable to 10G/16G platforms."
+  ::= { swConnUnitPortEntry 3 }
+
+  swConnUnitPortFECState OBJECT-TYPE
+    SYNTAX INTEGER {
+    unknown     (0),
+    active   (1),
+	inactive (2),
+	notsupported (3)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "This represents FEC state of a port.If in link both sfp connected are of brocade vendor type
+				then state is active, else it will be inactive."
+  ::= { swConnUnitPortEntry 4 }
 END

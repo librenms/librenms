@@ -1,4 +1,3 @@
-mib: FORTINET-FORTIEXTENDER-MIB
 modules:
     mempools:
         data:
@@ -21,14 +20,14 @@ modules:
         count:
             data:
                 -
-                    oid: fextInfoModemStatusReconnectCount
+                    oid: FORTINET-FORTIEXTENDER-MIB::fextInfoModemStatusReconnectCount
                     num_oid: '.1.3.6.1.4.1.12356.121.21.3.1.1.33.{{ $index }}'
                     index: 'fextInfoModemStatusReconnectCount.{{ $index }}'
                     descr: 'Reconnect Count Modem {{ $index }}'
         runtime:
             data:
                 -
-                    oid: fextInfoModemStatusUptime
+                    oid: FORTINET-FORTIEXTENDER-MIB::fextInfoModemStatusUptime
                     num_oid: '.1.3.6.1.4.1.12356.121.21.3.1.1.35.{{ $index }}'
                     index: 'fextInfoModemStatusUptime.{{ $index }}'
                     descr: 'Online Time Modem {{ $index }}'
@@ -36,7 +35,7 @@ modules:
         dbm:
             data:
                 -
-                    oid: fextInfoModemStatusSignalStrength
+                    oid: FORTINET-FORTIEXTENDER-MIB::fextInfoModemStatusSignalStrength
                     num_oid: '.1.3.6.1.4.1.12356.121.21.3.1.1.23.{{ $index }}'
                     index: 'fextInfoModemStatusSignalStrength.{{ $index }}'
                     descr: 'Signal Strength Modem {{ $index }}'

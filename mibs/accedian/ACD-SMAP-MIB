@@ -24,16 +24,20 @@ IMPORTS
 
 acdSmap MODULE-IDENTITY
 
-    LAST-UPDATED "200810010100Z"
+    LAST-UPDATED "201305110100Z"
     ORGANIZATION "Accedian Networks, Inc."
     CONTACT-INFO
             "Accedian Technical Assistance Center
              Accedian Networks, Inc.
-             4878 Levy, suite 202
-             Saint-Laurent, Quebec Canada H4R 2P1
+             2351 Alfred-Nobel blvd., Suite N-410
+             Saint-Laurent, Quebec Canada H4S 2A9
              E-mail: support@accedian.com"
     DESCRIPTION
             "The Service mapping database for this Accedian Networks device."
+
+    REVISION "201305110100Z"        -- 11 April 2013
+    DESCRIPTION
+            "Add port cos mapping tables."
 
     REVISION "200810010100Z"        -- 1 October 2008
     DESCRIPTION
@@ -384,6 +388,118 @@ acdSmapRegSetCodePointRegulatorEnable  OBJECT-TYPE
     ::= { acdSmapRegSetCodePointEntry 3 }
 
 ---------------------------------------------------------------------------
+ -- The Port CoS to encode DEI enable configuration table
+---------------------------------------------------------------------------
+
+acdSmapPortCoSEncodeDeiTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSmapPortCoSEncodeDeiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "TBD"
+    ::= { acdSmapConfig 5 }
+
+acdSmapPortCoSEncodeDeiEntry OBJECT-TYPE
+    SYNTAX      AcdSmapPortCoSEncodeDeiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings for a code point."
+    INDEX   { acdSmapPortCoSPortID }
+    ::=  { acdSmapPortCoSEncodeDeiTable 1 }
+
+AcdSmapPortCoSEncodeDeiEntry ::= SEQUENCE {
+    acdSmapPortCoSPortID              Unsigned32,
+    acdSmapPortCoSEncodeDeiEnable     INTEGER
+}
+
+acdSmapPortCoSPortID  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each row. Based on port number."
+    ::= { acdSmapPortCoSEncodeDeiEntry 1 }
+
+acdSmapPortCoSEncodeDeiEnable  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable(0),
+                    disable(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Entry to enable/disable encode DEI on a port."
+    ::= { acdSmapPortCoSEncodeDeiEntry 2 }
+
+---------------------------------------------------------------------------
+ -- The Port CoS to Pcp mapping configuration table
+ -- This table contains all Code Point for a CoS profile entry.
+---------------------------------------------------------------------------
+
+acdSmapPortCoSMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdSmapPortCoSMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "TBD"
+    ::= { acdSmapConfig 6 }
+
+acdSmapPortCoSMapEntry OBJECT-TYPE
+    SYNTAX      AcdSmapPortCoSMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings for a code point."
+    INDEX   { acdSmapPortCoSPortID, acdSmapPortCoSMapID }
+    ::=  { acdSmapPortCoSMapTable 1 }
+
+AcdSmapPortCoSMapEntry ::= SEQUENCE {
+    acdSmapPortCoSMapID            Unsigned32,
+    acdSmapPortCoSMapCosIn         Unsigned32,
+    acdSmapPortCoSMapGreenOut      Unsigned32,
+    acdSmapPortCoSMapYellowOut     Unsigned32
+}
+
+acdSmapPortCoSMapID  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8)
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique value based on CoS value."
+    ::= { acdSmapPortCoSMapEntry 1 }
+
+acdSmapPortCoSMapCosIn  OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The CoS value for this entry."
+    ::= { acdSmapPortCoSMapEntry 2 }
+
+acdSmapPortCoSMapGreenOut  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Priority code Point value that will be used in the outgoing green
+         packets. This value is selected if the result of the bandwidth
+         regulator assigned to this entry is green or if the pre-marking
+         color is green and no bandwidth regulator is assigned to this entry."
+    ::= { acdSmapPortCoSMapEntry 3 }
+
+acdSmapPortCoSMapYellowOut  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Priority code Point value that will be used in the outgoing yellow
+         packets. This value is selected if the result of the bandwidth
+         regulator assigned to this entry is yellow or if the pre-marking
+         color is yellow and no bandwidth regulator is assigned to this entry."
+    ::= { acdSmapPortCoSMapEntry 4 }
+
+---------------------------------------------------------------------------
  -- ACD-SMAP-MIB Module - Conformance Information
 ---------------------------------------------------------------------------
 
@@ -439,6 +555,27 @@ acdSmapRegSetCodePointGroup OBJECT-GROUP
        "Objects for the Regulator Set CodePoint Group."
     ::= { acdSmapGroups 4 }
 
+acdSmapPortCoSEncodeDeiGroup OBJECT-GROUP
+    OBJECTS {
+        acdSmapPortCoSEncodeDeiEnable
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Port CoS Map DIE enable Group."
+    ::= { acdSmapGroups 5 }
+
+acdSmapPortCoSMapGroup OBJECT-GROUP
+    OBJECTS {
+        acdSmapPortCoSMapCosIn,
+        acdSmapPortCoSMapGreenOut,
+        acdSmapPortCoSMapYellowOut
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the CoS profile CodePoint Group."
+    ::= { acdSmapGroups 6 }
+
+   
 acdSmapCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION
@@ -448,8 +585,11 @@ acdSmapCompliance MODULE-COMPLIANCE
             acdSmapCoSProfGroup,
             acdSmapCoSProfCodePointGroup,
             acdSmapRegSetGroup,
-            acdSmapRegSetCodePointGroup
+            acdSmapRegSetCodePointGroup,
+            acdSmapPortCoSEncodeDeiGroup,
+            acdSmapPortCoSMapGroup
          }
+
 
     OBJECT  acdSmapCoSProfRowStatus
       SYNTAX       RowStatus { active(1) }

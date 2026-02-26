@@ -61,6 +61,16 @@ class VlanPortsController extends TableController
             ]);
     }
 
+    protected function search($search, $query, $fields)
+    {
+        if ($search) {
+            $query->leftJoin('devices', 'ports.device_id', 'devices.device_id');
+            $fields = array_merge($fields, ['devices.hostname', 'devices.display', 'devices.sysName']);
+        }
+
+        return parent::search($search, $query, $fields);
+    }
+
     /**
      * @param  Port  $model
      */

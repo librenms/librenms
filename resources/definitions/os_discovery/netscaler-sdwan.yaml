@@ -1,4 +1,3 @@
-mib: CITRIX-NetScaler-SD-WAN-MIB
 modules:
     os:
         hardware: CITRIX-NetScaler-SD-WAN-MIB::sdWANStatsApplianceName
@@ -11,7 +10,7 @@ modules:
         state:
             data:
                 -
-                    oid: sdWANStatsApplianceHAState
+                    oid: CITRIX-NetScaler-SD-WAN-MIB::sdWANStatsApplianceHAState
                     num_oid: '.1.3.6.1.4.1.3845.31.4.2.2.12.1.9{{ $noindex }}'
                     index: 'sdWANStatsApplianceHAState'
                     descr: HA State
@@ -22,7 +21,7 @@ modules:
                         - { value: 2, generic: 0, graph: 1, descr: active }
                         - { value: 3, generic: 0, graph: 1, descr: standby }
                 -
-                    oid: sdWANStatsApplianceState
+                    oid: CITRIX-NetScaler-SD-WAN-MIB::sdWANStatsApplianceState
                     num_oid: '.1.3.6.1.4.1.3845.31.4.2.2.12.1.8{{ $noindex }}'
                     index: 'sdWANStatsApplianceState'
                     descr: State

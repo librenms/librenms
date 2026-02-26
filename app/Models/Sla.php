@@ -24,7 +24,7 @@ class Sla extends DeviceRelatedModel implements Keyable
         'deleted' => 0,
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return "$this->owner-$this->tag";
     }

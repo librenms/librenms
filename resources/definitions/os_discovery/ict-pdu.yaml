@@ -1,4 +1,3 @@
-mib: ICT-PDU-MIB
 modules:
     os:
         hardware: ICT-PDU-MIB::deviceModel.0

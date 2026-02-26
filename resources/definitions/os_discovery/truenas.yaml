@@ -1,4 +1,3 @@
-mib: FREENAS-MIB        # Used for FreeNAS and TrueNAS-CORE
 modules:
     os:
         sysDescr_regex: '/(?:TrueNAS-|FreeNAS-)(?<version>\S*).*\. Hardware: (?<hardware>.*).*\. Software.*/'
@@ -26,127 +25,128 @@ modules:
         count:
             data:
                 -
-                    oid: zfsArcSize
-                    value: zfsArcSize
+                    oid: FREENAS-MIB::zfsArcSize
+                    value: FREENAS-MIB::zfsArcSize
                     num_oid: .1.3.6.1.4.1.50536.1.4.1.{{ $index }}
                     descr: 'ARC Size'
                     index: zfsArcSize.{{ $index }}
                 -
-                    oid: zfsArcMeta
-                    value: zfsArcMeta
+                    oid: FREENAS-MIB::zfsArcMeta
+                    value: FREENAS-MIB::zfsArcMeta
                     num_oid: .1.3.6.1.4.1.50536.1.4.2.{{ $index }}
                     descr: 'ARC Metadata'
                     index: zfsArcMeta.{{ $index }}
                 -
-                    oid: zfsArcData
-                    value: zfsArcData
+                    oid: FREENAS-MIB::zfsArcData
+                    value: FREENAS-MIB::zfsArcData
                     num_oid: .1.3.6.1.4.1.50536.1.4.3.{{ $index }}
                     descr: 'ARC Data'
                     index: zfsArcData.{{ $index }}
                 -
-                    oid: zfsArcHits
-                    value: zfsArcHits
+                    oid: FREENAS-MIB::zfsArcHits
+                    value: FREENAS-MIB::zfsArcHits
                     num_oid: .1.3.6.1.4.1.50536.1.4.4.{{ $index }}
                     descr: 'ARC Hits'
                     index: zfsArcHits_rate.{{ $index }}
                     rrd_type: COUNTER
                 -
-                    oid: zfsArcMisses
-                    value: zfsArcMisses
+                    oid: FREENAS-MIB::zfsArcMisses
+                    value: FREENAS-MIB::zfsArcMisses
                     num_oid: .1.3.6.1.4.1.50536.1.4.5.{{ $index }}
                     descr: 'ARC Misses'
                     index: zfsArcMisses_rate.{{ $index }}
                     rrd_type: COUNTER
                 -
-                    oid: zfsArcC
-                    value: zfsArcC
+                    oid: FREENAS-MIB::zfsArcC
+                    value: FREENAS-MIB::zfsArcC
                     num_oid: .1.3.6.1.4.1.50536.1.4.6.{{ $index }}
                     descr: 'ARC Target Size (C)'
                     index: zfsArcC.{{ $index }}
                 -
-                    oid: zfsArcP
-                    value: zfsArcP
+                    oid: FREENAS-MIB::zfsArcP
+                    value: FREENAS-MIB::zfsArcP
                     num_oid: .1.3.6.1.4.1.50536.1.4.7.{{ $index }}
                     descr: 'ARC MRU Target Size (P)'
                     index: zfsArcP.{{ $index }}
                 -
-                    oid: zfsArcMissPercent
-                    value: zfsArcMissPercent
+                    oid: FREENAS-MIB::zfsArcMissPercent
+                    value: FREENAS-MIB::zfsArcMissPercent
                     num_oid: .1.3.6.1.4.1.50536.1.4.8.{{ $index }}
                     descr: 'ARC Miss Percent'
                     index: zfsArcMissPercent.{{ $index }}
                 -
-                    oid: zfsArcCacheHitRatio
-                    value: zfsArcCacheHitRatio
+                    oid: FREENAS-MIB::zfsArcCacheHitRatio
+                    value: FREENAS-MIB::zfsArcCacheHitRatio
                     num_oid: .1.3.6.1.4.1.50536.1.4.9.{{ $index }}
                     descr: 'ARC Hit Ratio'
                     index: zfsArcCacheHitRatio.{{ $index }}
                 -
-                    oid: zfsArcMissRatio
-                    value: zfsArcMissRatio
+                    oid: FREENAS-MIB::zfsArcMissRatio
+                    value: FREENAS-MIB::zfsArcMissRatio
                     num_oid: .1.3.6.1.4.1.50536.1.4.10.{{ $index }}
                     descr: 'ARC Miss Ratio'
                     index: zfsArcMissRatio.{{ $index }}
                 -
-                    oid: zfsL2ArcHits
-                    value: zfsL2ArcHits
+                    oid: FREENAS-MIB::zfsL2ArcHits
+                    value: FREENAS-MIB::zfsL2ArcHits
                     num_oid: .1.3.6.1.4.1.50536.1.5.1.{{ $index }}
                     descr: 'L2ARC Hits'
                     index: zfsL2ArcHits_rate.{{ $index }}
                     rrd_type: COUNTER
                 -
-                    oid: zfsL2ArcMisses
-                    value: zfsL2ArcMisses
+                    oid: FREENAS-MIB::zfsL2ArcMisses
+                    value: FREENAS-MIB::zfsL2ArcMisses
                     num_oid: .1.3.6.1.4.1.50536.1.5.2.{{ $index }}
                     descr: 'L2ARC Misses'
                     index: zfsL2ArcMisses_rate.{{ $index }}
                     rrd_type: COUNTER
                 -
-                    oid: zfsL2ArcRead
-                    value: zfsL2ArcRead
+                    oid: FREENAS-MIB::zfsL2ArcRead
+                    value: FREENAS-MIB::zfsL2ArcRead
                     num_oid: .1.3.6.1.4.1.50536.1.5.3.{{ $index }}
                     descr: 'L2ARC Reads'
                     index: zfsL2ArcRead_rate.{{ $index }}
                     rrd_type: COUNTER
                 -
-                    oid: zfsL2ArcWrite
-                    value: zfsL2ArcWrite
+                    oid: FREENAS-MIB::zfsL2ArcWrite
+                    value: FREENAS-MIB::zfsL2ArcWrite
                     num_oid: .1.3.6.1.4.1.50536.1.5.4.{{ $index }}
                     descr: 'L2ARC Writes'
                     index: zfsL2ArcWrite_rate.{{ $index }}
                     rrd_type: COUNTER
                 -
-                    oid: zfsL2ArcSize
-                    value: zfsL2ArcSize
+                    oid: FREENAS-MIB::zfsL2ArcSize
+                    value: FREENAS-MIB::zfsL2ArcSize
                     num_oid: .1.3.6.1.4.1.50536.1.5.5.{{ $index }}
                     descr: 'L2ARC Size'
                     index: zfsL2ArcSize.{{ $index }}
                 -
-                    oid: zfsZilstatOps1sec
-                    value: zfsZilstatOps1sec
+                    oid: FREENAS-MIB::zfsZilstatOps1sec
+                    value: FREENAS-MIB::zfsZilstatOps1sec
                     num_oid: .1.3.6.1.4.1.50536.1.6.1.{{ $index }}
                     descr: 'ZIL Operations last second'
                     index: zfsZilstatOps1sec.{{ $index }}
                 -
-                    oid: zfsZilstatOps5sec
-                    value: zfsZilstatOps5sec
+                    oid: FREENAS-MIB::zfsZilstatOps5sec
+                    value: FREENAS-MIB::zfsZilstatOps5sec
                     num_oid: .1.3.6.1.4.1.50536.1.6.2.{{ $index }}
                     descr: 'ZIL Operations last 5 seconds'
                     index: zfsZilstatOps5sec.{{ $index }}
                 -
-                    oid: zfsZilstatOps10sec
-                    value: zfsZilstatOps10sec
+                    oid: FREENAS-MIB::zfsZilstatOps10sec
+                    value: FREENAS-MIB::zfsZilstatOps10sec
                     num_oid: .1.3.6.1.4.1.50536.1.6.3.{{ $index }}
                     descr: 'ZIL Operations last 10 seconds'
                     index: zfsZilstatOps10sec.{{ $index }}
         state:
             data:
                 -
-                    oid: zpoolTable
-                    value: zpoolHealth
+                    oid: FREENAS-MIB::zpoolTable
+                    value: FREENAS-MIB::zpoolHealth
                     num_oid: .1.3.6.1.4.1.50536.1.1.1.1.7.{{ $index }}
-                    descr: 'ZPool: {{ $zpoolDescr }}'
+                    descr: 'ZPool: {{ FREENAS-MIB::zpoolDescr }}'
                     index: zpoolHealth.{{ $index }}
+                    state_name: zpoolTable
                     states:
                         - { value: 0, descr: online, graph: 1, generic: 0 }
                         - { value: 1, descr: degraded, graph: 1, generic: 1 }

@@ -183,7 +183,7 @@ class CiHelper
      */
     public function checkUnit(): int
     {
-        $phpunit_cmd = [$this->checkPhpExec('phpunit'), '--colors=always', '--fail-on-all-issues'];
+        $phpunit_cmd = [$this->checkPhpExec('phpunit'), '--colors=always', '--fail-on-all-issues', '--testdox'];
 
         if ($this->flags['fail-fast']) {
             $phpunit_cmd[] = '--stop-on-defect';
@@ -224,6 +224,9 @@ class CiHelper
         } elseif ($this->flags['unit_svg']) {
             array_push($phpunit_cmd, '--group', 'svg');
         } elseif ($this->flags['unit_modules'] || $this->flags['os-modules-only']) {
+            if ($this->flags['os-modules-only']) {
+                array_push($phpunit_cmd, '--filter', '/::testOS /');
+            }
             $phpunit_cmd[] = 'tests/OSModulesTest.php';
         }
 

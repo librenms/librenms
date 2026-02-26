@@ -22,19 +22,22 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
     IpAddress                                   FROM SNMPv2-SMI
     InterfaceIndex                              FROM IF-MIB
-    RowStatus, TruthValue                       FROM RADLAN-SNMPv2
+    RowStatus, TruthValue,
     TEXTUAL-CONVENTION, DisplayString,
     MacAddress                                  FROM SNMPv2-TC
     PortList                                    FROM Q-BRIDGE-MIB
     rnd                                         FROM RADLAN-MIB;
 
 rlQosServ MODULE-IDENTITY
-      LAST-UPDATED "200308280024Z"  -- August 28, 2003
+      LAST-UPDATED "200602120000Z"  -- August 28, 2003
       ORGANIZATION "Radlan Computer Communication Ltd."
       CONTACT-INFO
               "radlan.com"
       DESCRIPTION
               "The MIB module describes the private MIB for QOS service mode."
+      REVISION "200602120000Z"
+      DESCRIPTION
+           "Editorial changes to support new MIB compilers."
       REVISION     "200310280024Z"  -- October 28, 2003
       DESCRIPTION
               "Initial revision"
@@ -81,7 +84,7 @@ rlQosServTemplateEntry OBJECT-TYPE
     INDEX { rlQosServTemplateIndex }
     ::= { rlQosServTemplateTable 1 }
 
-RlQosServTemplateEntry::= SEQUENCE {
+RlQosServTemplateEntry ::= SEQUENCE {
     rlQosServTemplateIndex                  INTEGER,
     rlQosServTemplateDestMac                TruthValue,
     rlQosServTemplateDestMacMask            MacAddress,
@@ -311,7 +314,7 @@ rlQosServFclEntry OBJECT-TYPE
             rlQosServFclFcePriority }
     ::= { rlQosServFclTable 1 }
 
-RlQosServFclEntry::= SEQUENCE {
+RlQosServFclEntry ::= SEQUENCE {
     rlQosServFclIndex           INTEGER,
     rlQosServFclFcePriority     INTEGER,
     rlQosServFclFceIndex        INTEGER,
@@ -377,7 +380,7 @@ rlQosServFceEntry OBJECT-TYPE
     INDEX { rlQosServFceIndex }
     ::= { rlQosServFceTable 1 }
 
-RlQosServFceEntry::= SEQUENCE {
+RlQosServFceEntry ::= SEQUENCE {
     rlQosServFceIndex               INTEGER,
     rlQosServFceErrorCode           INTEGER,
     rlQosServFceSelection           BITS,
@@ -720,7 +723,7 @@ rlQosServProfileEntry OBJECT-TYPE
     INDEX { rlQosServProfileIndex }
     ::= { rlQosServProfileTable 1 }
 
-RlQosServProfileEntry::= SEQUENCE {
+RlQosServProfileEntry ::= SEQUENCE {
     rlQosServProfileIndex               INTEGER,
     rlQosServProfileType                INTEGER,
     rlQosServProfileServiceType         INTEGER,
@@ -852,7 +855,7 @@ rlQosServServiceEntry OBJECT-TYPE
     INDEX { rlQosServServiceIndex }
     ::= { rlQosServServiceTable 1 }
 
-RlQosServServiceEntry::= SEQUENCE {
+RlQosServServiceEntry ::= SEQUENCE {
     rlQosServServiceIndex               INTEGER,
     rlQosServServicePriority            Unsigned32,
     rlQosServServiceProfilePointer      INTEGER,
@@ -984,7 +987,7 @@ rlQosServServicePriorityEntry OBJECT-TYPE
     INDEX { rlQosServServicePriorityIndex }
     ::= { rlQosServServicePriorityTable 1 }
 
-RlQosServServicePriorityEntry::= SEQUENCE {
+RlQosServServicePriorityEntry ::= SEQUENCE {
     rlQosServServicePriorityIndex       INTEGER,
     rlQosServServicePriorityPointer     INTEGER
 }
@@ -1030,7 +1033,7 @@ rlQosServServiceDefaultMappingEntry OBJECT-TYPE
     INDEX { rlQosServServiceDefaultMappingType }
     ::= { rlQosServServiceDefaultMappingTable 1 }
 
-RlQosServServiceDefaultMappingEntry::= SEQUENCE {
+RlQosServServiceDefaultMappingEntry ::= SEQUENCE {
     rlQosServServiceDefaultMappingType      INTEGER,
     rlQosServServiceDefaultMappingDscp      INTEGER,
     rlQosServServiceDefaultMappingVpt       INTEGER
@@ -1092,7 +1095,7 @@ rlQosServScalingErrorEntry OBJECT-TYPE
     INDEX { rlQosServScalingErrorIfIndex }
     ::= { rlQosServScalingErrorTable 1 }
 
-RlQosServScalingErrorEntry::= SEQUENCE {
+RlQosServScalingErrorEntry ::= SEQUENCE {
         rlQosServScalingErrorIfIndex        InterfaceIndex,
         rlQosServScalingErrorReason         INTEGER
 }

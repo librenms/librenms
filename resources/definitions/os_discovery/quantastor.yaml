@@ -1,27 +1,26 @@
-mib: QUANTASTOR-SYS-STATS:LM-SENSORS-MIB
 modules:
     sensors:
         temperature:
             data:
                 -
-                    oid: hwDiskTable
-                    value: hwDisk-DriveTemp
+                    oid: QUANTASTOR-SYS-STATS::hwDiskTable
+                    value: QUANTASTOR-SYS-STATS::hwDisk-DriveTemp
                     num_oid: '.1.3.6.1.4.1.39324.1.1.48.1.1.30.{{ $index }}'
-                    index: '{{ $hwDisk-Index }}.{{ $index }}'
-                    descr: '{{ $hwDisk-Name }}'
+                    index: '{{ QUANTASTOR-SYS-STATS::hwDisk-Index }}.{{ $index }}'
+                    descr: '{{ QUANTASTOR-SYS-STATS::hwDisk-Name }}'
                     group: 'HDD'
                 -
-                    oid: lmTempSensors
-                    value: lmTempSensorsValue
+                    oid: LM-SENSORS-MIB::lmTempSensorsTable
+                    value: LM-SENSORS-MIB::lmTempSensorsValue
                     divisor: 1000
                     num_oid: '.1.3.6.1.4.1.2021.13.16.2.1.3.{{ $index }}'
-                    descr: '{{ $lmTempSensorsDevice }}'
+                    descr: '{{ LM-SENSORS-MIB::lmTempSensorsDevice }}'
                     group: 'LM-SENSORS'
         state:
             data:
                 -
-                    oid: licenseTable
-                    value: license-State
+                    oid: QUANTASTOR-SYS-STATS::licenseTable
+                    value: QUANTASTOR-SYS-STATS::license-State
                     num_oid: '.1.3.6.1.4.1.39324.1.1.21.1.1.5.{{ $index }}'
                     descr: 'License'
                     group: 'Status'
@@ -29,49 +28,49 @@ modules:
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
-                    oid: hwDiskTable
-                    value: hwDisk-State
+                    oid: QUANTASTOR-SYS-STATS::hwDiskTable
+                    value: QUANTASTOR-SYS-STATS::hwDisk-State
                     num_oid: '.1.3.6.1.4.1.39324.1.1.48.1.1.5.{{ $index }}'
                     index: '{{ $index }}'
-                    descr: '{{ $hwDisk-Name }} SN {{ $hwDisk-SerialNum }}'
+                    descr: '{{ QUANTASTOR-SYS-STATS::hwDisk-Name }} SN {{ QUANTASTOR-SYS-STATS::hwDisk-SerialNum }}'
                     group: 'HDD'
                     state_name: hwDisk-status
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                         - { value: 1, generic: 1, graph: 1, descr: 'Rebuilding' }
                 -
-                    oid: hwUnitTable
-                    value: hwUnit-State
+                    oid: QUANTASTOR-SYS-STATS::hwUnitTable
+                    value: QUANTASTOR-SYS-STATS::hwUnit-State
                     num_oid: '.1.3.6.1.4.1.39324.1.1.49.1.1.5.{{ $index }}'
                     index: '{{ $index }}'
-                    descr: '{{ $hwUnit-Name }}'
+                    descr: '{{ QUANTASTOR-SYS-STATS::hwUnit-Name }}'
                     group: 'Array(s)'
                     state_name: hwUnit-status
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
-                    oid: hwEnclosureTable
-                    value: hwEnclosure-State
+                    oid: QUANTASTOR-SYS-STATS::hwEnclosureTable
+                    value: QUANTASTOR-SYS-STATS::hwEnclosure-State
                     num_oid: '.1.3.6.1.4.1.39324.1.1.50.1.1.5.{{ $index }}'
                     index: '{{ $index }}'
-                    descr: 'Enclosure {{ $hwEnclosure-Name }}'
+                    descr: 'Enclosure {{ QUANTASTOR-SYS-STATS::hwEnclosure-Name }}'
                     group: 'Enclosure(s)'
                     state_name: hwEnclosure-status
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
-                    oid: hwEnclosureTable
-                    value: hwEnclosure-AlarmCount
+                    oid: QUANTASTOR-SYS-STATS::hwEnclosureTable
+                    value: QUANTASTOR-SYS-STATS::hwEnclosure-AlarmCount
                     num_oid: '.1.3.6.1.4.1.39324.1.1.50.1.1.22.{{ $index }}'
                     index: '{{ $index }}'
-                    descr: 'Enclosure {{ $hwEnclosure-Name }} alarm'
+                    descr: 'Enclosure {{ QUANTASTOR-SYS-STATS::hwEnclosure-Name }} alarm'
                     group: 'Enclosure(s)'
                     state_name: hwEnclosure-alarms
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
-                    oid: fcTargetPortTable
-                    value: fcTargetPort-State
+                    oid: QUANTASTOR-SYS-STATS::fcTargetPortTable
+                    value: QUANTASTOR-SYS-STATS::fcTargetPort-State
                     num_oid: '.1.3.6.1.4.1.39324.1.1.68.1.1.5.{{ $index }}'
                     index: '{{ $index }}'
                     descr: 'FC port {{ $index }} Target state'
@@ -80,8 +79,8 @@ modules:
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
-                    oid: fcTargetPortTable
-                    value: fcTargetPort-IsTargetModeEnabled
+                    oid: QUANTASTOR-SYS-STATS::fcTargetPortTable
+                    value: QUANTASTOR-SYS-STATS::fcTargetPort-IsTargetModeEnabled
                     num_oid: '.1.3.6.1.4.1.39324.1.1.68.1.1.33.{{ $index }}'
                     index: '{{ $index }}'
                     descr: 'FC port {{ $index }} Target enabled'
@@ -90,8 +89,8 @@ modules:
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: 'Enabled' }
                 -
-                    oid: hwEnclosureTable
-                    value: hwEnclosure-TempSensorUnits
+                    oid: QUANTASTOR-SYS-STATS::hwEnclosureTable
+                    value: QUANTASTOR-SYS-STATS::hwEnclosure-TempSensorUnits
                     num_oid: '.1.3.6.1.4.1.39324.1.1.50.1.1.20.{{ $index }}'
                     index: '{{ $index }}'
                     descr: 'Temp sensor {{ $index }}'
@@ -100,8 +99,8 @@ modules:
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
-                    oid: hwEnclosureTable
-                    value: hwEnclosure-PowerSupplyUnits
+                    oid: QUANTASTOR-SYS-STATS::hwEnclosureTable
+                    value: QUANTASTOR-SYS-STATS::hwEnclosure-PowerSupplyUnits
                     num_oid: '.1.3.6.1.4.1.39324.1.1.50.1.1.21.{{ $index }}'
                     index: '{{ $index }}'
                     descr: 'PSU sensor {{ $index }}'
@@ -110,21 +109,21 @@ modules:
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
-                    oid: storagePoolTable
-                    value: storagePool-State
+                    oid: QUANTASTOR-SYS-STATS::storagePoolTable
+                    value: QUANTASTOR-SYS-STATS::storagePool-State
                     num_oid: '.1.3.6.1.4.1.39324.1.1.7.1.1.5.{{ $index }}'
                     index: '{{ $index }}'
-                    descr: 'Pool {{ $storagePool-Name }}'
+                    descr: 'Pool {{ QUANTASTOR-SYS-STATS::storagePool-Name }}'
                     group: 'Pools'
                     state_name: storagePool
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'OK' }
                 -
-                    oid: storageVolumeTable
-                    value: storageVolume-State
+                    oid: QUANTASTOR-SYS-STATS::storageVolumeTable
+                    value: QUANTASTOR-SYS-STATS::storageVolume-State
                     num_oid: '.1.3.6.1.4.1.39324.1.1.3.1.1.5.{{ $index }}'
                     index: '{{ $index }}'
-                    descr: 'Volume {{ $storageVolume-Name }}'
+                    descr: 'Volume {{ QUANTASTOR-SYS-STATS::storageVolume-Name }}'
                     group: 'Volumes'
                     state_name: storageVolume
                     states:

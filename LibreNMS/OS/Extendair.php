@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorRatioDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -51,7 +52,7 @@ class Extendair extends OS implements
 
         return [
             new WirelessSensor(
-                'error-ratio',
+                WirelessSensorType::ErrorRatio,
                 $this->getDeviceId(),
                 $oid,
                 'extendair',
@@ -77,7 +78,7 @@ class Extendair extends OS implements
 
         return [
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 $tx_oid,
                 'extendair-tx',
@@ -88,7 +89,7 @@ class Extendair extends OS implements
                 1000
             ),
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 $rx_oid,
                 'extendair-rx',
@@ -113,8 +114,8 @@ class Extendair extends OS implements
         $rx_oid = '.1.3.6.1.4.1.25651.1.2.4.3.1.3.0'; // ExaltComProducts::locCurrentRSL.0
 
         return [
-            new WirelessSensor('power', $this->getDeviceId(), $tx_oid, 'extendair-tx', 0, 'Tx Power', null, 1, 10),
-            new WirelessSensor('power', $this->getDeviceId(), $rx_oid, 'extendair-rx', 0, 'Signal Level'),
+            new WirelessSensor(WirelessSensorType::Power, $this->getDeviceId(), $tx_oid, 'extendair-tx', 0, 'Tx Power', null, 1, 10),
+            new WirelessSensor(WirelessSensorType::Power, $this->getDeviceId(), $rx_oid, 'extendair-rx', 0, 'Signal Level'),
         ];
     }
 
@@ -130,7 +131,7 @@ class Extendair extends OS implements
 
         return [
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 $oid,
                 'extendair',

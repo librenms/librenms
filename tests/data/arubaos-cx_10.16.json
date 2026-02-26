@@ -8662,7 +8662,7 @@
                     "sensor_current": -2.5672547648807,
                     "sensor_limit": 0.99991233544684,
                     "sensor_limit_warn": 0,
-                    "sensor_limit_low":  -15.003129173816,
+                    "sensor_limit_low": -15.003129173816,
                     "sensor_limit_low_warn": -14.001169279263,
                     "sensor_alert": 1,
                     "sensor_custom": "No",

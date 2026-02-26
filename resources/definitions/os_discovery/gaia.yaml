@@ -1,4 +1,3 @@
-mib: CHECKPOINT-MIB
 modules:
     os:
         hardware: CHECKPOINT-MIB::svnApplianceProductName.0
@@ -7,8 +6,8 @@ modules:
     processors:
             data:
                 -
-                    oid: .1.3.6.1.4.1.2620.1.6.7.5.1
-                    value: multiProcUsage
+                    oid: CHECKPOINT-MIB::multiProcTable
+                    value: CHECKPOINT-MIB::multiProcUsage
                     num_oid: .1.3.6.1.4.1.2620.1.6.7.5.1.5.{{ $index }}
                     type: cpu
     sensors:
@@ -16,23 +15,21 @@ modules:
             data:
                 -
                     oid:
-                        - tunnelPeerIpAddr
-                        - tunnelPeerObjName
-                        - tempertureSensorName
-                        - fanSpeedSensorName
-                        - voltageSensorName
-                        - powerSupplyIndex
-                        - fwLSConnName
-                        - mglsGWIP
-                        - vsxStatusVsName
-                    snmp_flags: ['-OQUs', '-Cc']
+                        - CHECKPOINT-MIB::tunnelPeerObjName
+                        - CHECKPOINT-MIB::tempertureSensorName
+                        - CHECKPOINT-MIB::voltageSensorName
+                        - CHECKPOINT-MIB::powerSupplyIndex
+                        - CHECKPOINT-MIB::fwLSConnName
+                        - CHECKPOINT-MIB::mglsGWIP
+                        - CHECKPOINT-MIB::vsxStatusVsName
         state:
             data:
                 -
-                    oid: tempertureSensorStatus
-                    value: tempertureSensorStatus
+                    oid: CHECKPOINT-MIB::tempertureSensorStatus
+                    value: CHECKPOINT-MIB::tempertureSensorStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.1.1.6.{{ $index }}'
-                    descr: '{{ $tempertureSensorName }}, Temperature Out Of Range'
+                    state_name: tempertureSensorStatus
+                    descr: '{{ CHECKPOINT-MIB::tempertureSensorName }}, Temperature Out Of Range'
                     index: 'tempertureSensorStatus.{{ $index }}'
                     group: Sensor Temperature
                     states:
@@ -40,10 +37,11 @@ modules:
                         - { value: 1, descr: 'true', graph: 1, generic: 2 }
                         - { value: 2, descr: 'reading error', graph: 1, generic: 3 }
                 -
-                    oid: fanSpeedSensorStatus
-                    value: fanSpeedSensorStatus
+                    oid: CHECKPOINT-MIB::fanSpeedSensorTable
+                    value: CHECKPOINT-MIB::fanSpeedSensorStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.2.1.6.{{ $index }}'
-                    descr: '{{ $fanSpeedSensorName }}, Fanspeed Out Of Range'
+                    state_name: fanSpeedSensorStatus
+                    descr: '{{ CHECKPOINT-MIB::fanSpeedSensorName }}, Fanspeed Out Of Range'
                     index: 'fanSpeedSensorStatus.{{ $index }}'
                     group: Sensor Fan Speed
                     states:
@@ -51,10 +49,11 @@ modules:
                         - { value: 1, descr: 'true', graph: 1, generic: 2 }
                         - { value: 2, descr: 'reading error', graph: 1, generic: 3 }
                 -
-                    oid: voltageSensorStatus
-                    value: voltageSensorStatus
+                    oid: CHECKPOINT-MIB::voltageSensorStatus
+                    value: CHECKPOINT-MIB::voltageSensorStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.3.1.6.{{ $index }}'
-                    descr: '{{ $voltageSensorName }}, Voltage Out Of Range'
+                    state_name: voltageSensorStatus
+                    descr: '{{ CHECKPOINT-MIB::voltageSensorName }}, Voltage Out Of Range'
                     index: 'voltageSensorStatus.{{ $index }}'
                     group: Sensor Voltage
                     states:
@@ -62,56 +61,61 @@ modules:
                         - { value: 1, descr: 'true', graph: 1, generic: 2 }
                         - { value: 2, descr: 'reading error', graph: 1, generic: 3 }
                 -
-                    oid: powerSupplyStatus
-                    value: powerSupplyStatus
+                    oid: CHECKPOINT-MIB::powerSupplyStatus
+                    value: CHECKPOINT-MIB::powerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.9.1.1.2.{{ $index }}'
-                    descr: 'PowerSupply{{ $powerSupplyIndex }}'
+                    state_name: powerSupplyStatus
+                    descr: 'PowerSupply{{ CHECKPOINT-MIB::powerSupplyIndex }}'
                     index: 'powerSupplyStatus.{{ $index }}'
                     group: Sensor PSU
                     states:
                         - { value: 0, descr: 'Up', graph: 0, generic: 0 }
                         - { value: 1, descr: 'Down', graph: 0, generic: 2 }
                 -
-                    oid: haStarted
+                    oid: CHECKPOINT-MIB::haStarted
                     num_oid: '.1.3.6.1.4.1.2620.1.5.5.{{ $index }}'
                     index: 'haStarted.{{ $index }}'
+                    state_name: haStarted
                     descr: 'Cluster mechanism started'
                     group: HA
-                    value: haStarted
+                    value: CHECKPOINT-MIB::haStarted
                     states:
                         - { value: 1, descr: yes, graph: 1, generic: 0 }
                         - { value: 0, descr: no, graph: 0, generic: 2 }
                 -
-                    oid: haState
+                    oid: CHECKPOINT-MIB::haState
                     num_oid: '.1.3.6.1.4.1.2620.1.5.6.{{ $index }}'
                     index: 'haState.{{ $index }}'
+                    state_name: haState
                     descr: 'Cluster member state'
                     group: HA
-                    value: haState
+                    value: CHECKPOINT-MIB::haState
                     states:
                         - { value: 1, descr: active , graph: 3, generic: 0 }
                         - { value: 2, descr: standby, graph: 2, generic: 0 }
                         - { value: 3, descr: 'Active Attention', graph: 1, generic: 1 }
                         - { value: 0, descr: down, graph: 0, generic: 2 }
                 -
-                    oid: haStatCode
+                    oid: CHECKPOINT-MIB::haStatCode
                     num_oid: '.1.3.6.1.4.1.2620.1.5.101.{{ $index }}'
                     index: 'haStatCode.{{ $index }}'
+                    state_name: haStatCode
                     descr: 'Cluster member status code'
                     group: HA
-                    value: haStatCode
+                    value: CHECKPOINT-MIB::haStatCode
                     states:
                         - { value: 0, descr: Up , graph: 2, generic: 0 }
                         - { value: 1, descr: Attention, graph: 1, generic: 3 }
                         - { value: 2, descr: Down, graph: 0, generic: 1 }
                 -
-                    oid: tunnelState
+                    oid: CHECKPOINT-MIB::tunnelTable
                     num_oid: '.1.3.6.1.4.1.2620.500.9002.1.3.{{ $index }}'
-                    snmp_flags: ['-OQUs', '-Cc']
+                    state_name: tunnelState
                     index: 'tunnelStateIndex.{{ $index }}'
-                    descr: "{{ $tunnelPeerObjName }} ({{ $tunnelPeerIpAddr }})"
+                    snmp_flags: ['-OteQUSab', '-Cc']
+                    descr: "{{ CHECKPOINT-MIB::tunnelPeerObjName }} ({{ CHECKPOINT-MIB::tunnelPeerIpAddr }})"
                     group: IPSEC VPN
-                    value: tunnelState
+                    value: CHECKPOINT-MIB::tunnelState
                     states:
                         - { value: 0, descr: Unknown, graph: 1, generic: 3 }
                         - { value: 3, descr: Up, graph: 1, generic: 0 }
@@ -121,44 +125,48 @@ modules:
                         - { value: 131, descr: Down, graph: 1, generic: 2 }
                         - { value: 132, descr: Init, graph: 1, generic: 1 }
                 -
-                    oid: mglsGWState
+                    oid: CHECKPOINT-MIB::mglsGWState
                     num_oid: '.1.3.6.1.4.1.2620.1.7.14.4.1.3.{{ $index }}'
+                    state_name: mglsGWState
                     index: 'mglsGWState.{{ $index }}'
-                    descr: '{{ $mglsGWIP }}'
+                    descr: CHECKPOINT-MIB::mglsGWIP
                     group: 'Management Connected Gateways'
-                    value: mglsGWState
+                    value: CHECKPOINT-MIB::mglsGWState
                     states:
                         - { value: 1, descr: Connected, graph: 1, generic: 0 }
                         - { value: 0, descr: Disconnected, graph: 0, generic: 2 }
                 -
-                    oid: fwSXLStatus
+                    oid: CHECKPOINT-MIB::fwSXLStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.36.1.1.{{ $index }}'
+                    state_name: fwSXLStatus
                     index: 'fwSXLStatus.{{ $index }}'
                     descr: 'SecureXL current status'
                     group: HA
-                    value: fwSXLStatus
+                    value: CHECKPOINT-MIB::fwSXLStatus
                     states:
                         - { value: 1, descr: Enabled , graph: 0, generic: 0 }
                         - { value: 0, descr: Disabled, graph: 1, generic: 1 }
                 -
-                    oid: raidVolumeState
+                    oid: CHECKPOINT-MIB::raidVolumeState
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.7.1.1.6.{{ $index }}'
+                    state_name: raidVolumeState
                     index: 'raidVolumeState.{{ $index }}'
                     descr: 'RAID Status'
                     group: RAID
-                    value: raidVolumeState
+                    value: CHECKPOINT-MIB::raidVolumeState
                     states:
                         - { value: 0, descr: OPTIMAL, graph: 3, generic: 0 }
                         - { value: 1, descr: DEGRADED, graph: 2, generic: 1 }
                         - { value: 2, descr: FAILED, graph: 1, generic: 2}
                         - { value: -1, descr: 'Unknown', graph: 0, generic: 3}
                 -
-                    oid: raidVolumeType
+                    oid: CHECKPOINT-MIB::raidVolumeType
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.7.1.1.3.{{ $index }}'
+                    state_name: raidVolumeType
                     index: 'raidVolumeType.{{ $index }}'
                     descr: 'RAID Type'
                     group: RAID
-                    value: raidVolumeType
+                    value: CHECKPOINT-MIB::raidVolumeType
                     states:
                         - { value: 0, descr: 'RAID-0', graph: 8, generic: 0 }
                         - { value: 1, descr: 'RAID-1E', graph: 7, generic: 0 }
@@ -170,43 +178,47 @@ modules:
                         - { value: 7, descr: 'RAID-60', graph: 1, generic: 0 }
                         - { value: 8, descr: 'RAID-50', graph: 0, generic: 0 }
                 -
-                    oid: fwLSConnOverall
+                    oid: CHECKPOINT-MIB::fwLSConnOverall
                     num_oid: '.1.3.6.1.4.1.2620.1.1.30.1.{{ $index }}'
+                    state_name: fwLSConnOverall
                     index: 'fwLSConnOverall.{{ $index }}'
                     descr: 'Log Server Connectivity'
                     group: Logging
-                    value: fwLSConnOverall
+                    value: CHECKPOINT-MIB::fwLSConnOverall
                     states:
                         - {value: 0, descr: 'Ok', graph: 2, generic: 0}
                         - {value: 1, descr: 'Warning', graph: 1, generic: 1}
                         - {value: 2, descr: 'Error', graph: 0, generic: 2}
                 -
-                    oid: fwLSConnState
+                    oid: CHECKPOINT-MIB::fwLSConnState
+                    value: CHECKPOINT-MIB::fwLSConnState
                     num_oid: '.1.3.6.1.4.1.2620.1.1.30.3.1.3.{{ $index }}'
+                    state_name: fwLSConnState
                     index: 'fwLSConnState.{{ $index }}'
-                    descr: '{{ $fwLSConnName }}, Log Server Connectivity'
+                    descr: '{{ CHECKPOINT-MIB::fwLSConnName }}, Log Server Connectivity'
                     group: Logging
-                    value: fwLSConnState
                     states:
                         - {value: 0, descr: 'Ok', graph: 2, generic: 0}
                         - {value: 1, descr: 'Error', graph: 1, generic: 2}
                         - {value: 2, descr: 'Not Active', graph: 0, generic: 2}
                 -
-                    oid: fwLocalLoggingStat
+                    oid: CHECKPOINT-MIB::fwLocalLoggingStat
                     num_oid: '.1.3.6.1.4.1.2620.1.1.30.5.{{ $index }}'
+                    state_name: fwLocalLoggingStat
                     index: 'fwLocalLoggingStat.{{ $index }}'
                     descr: 'Local Log Server Status'
                     group: Logging
-                    value: fwLocalLoggingStat
+                    value: CHECKPOINT-MIB::fwLocalLoggingStat
                     states:
                         - {value: 0, descr: 'To log servers', graph: 3, generic: 0}
                         - {value: 1, descr: 'Local configured', graph: 2, generic: 0}
                         - {value: 2, descr: 'Local due to connectivity', graph: 1, generic: 2}
                         - {value: 3, descr: 'Local due to high rate', graph: 0, generic: 2}
                 -
-                    oid: mgStatCode
+                    oid: CHECKPOINT-MIB::mgStatCode
                     num_oid: '.1.3.6.1.4.1.2620.1.7.101.{{ $index }}'
                     index: 'mgStatCode.{{ $index }}'
+                    state_name: mgStatCode
                     descr: 'Management Sync Status'
                     group: HA
                     states:
@@ -214,28 +226,31 @@ modules:
                         - { value: 1, descr: 'Attention', graph: 1, generic: 1 }
                         - { value: 2, descr: 'Problem', graph: 2, generic: 2}
                 -
-                    oid: mgActiveStatus
+                    oid: CHECKPOINT-MIB::mgActiveStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.7.5.{{ $index }}'
                     index: 'mgActiveStatus.{{ $index }}'
+                    state_name: mgActiveStatus
                     descr: 'SMS Status'
                     group: HA
                     states:
                         - { value: 1, generic: 0, graph: 1, descr: 'active' }
                         - { value: 2, generic: 0, graph: 1, descr: 'standby' }
                 -
-                    oid: mgFwmIsAlive
+                    oid: CHECKPOINT-MIB::mgFwmIsAlive
                     num_oid: '.1.3.6.1.4.1.2620.1.7.6.{{ $index }}'
                     index: 'mgFwmIsAlive.{{ $index }}'
+                    state_name: mgFwmIsAlive
                     descr: 'FWM Daemon Status'
                     group: HA
                     states:
                         - { value: 0, generic: 1, graph: 1, descr: 'Down' }
                         - { value: 1, generic: 0, graph: 1, descr: 'Up' }
                 -
-                    oid: vsxStatusHAState
+                    oid: CHECKPOINT-MIB::vsxStatusHAState
                     num_oid: '.1.3.6.1.4.1.2620.1.16.22.1.1.9.{{ $index }}'
                     index: 'vsxStatusVSId.{{ $index }}'
-                    descr: '{{ $vsxStatusVsName }}'
+                    state_name: vsxStatusHAState
+                    descr: '{{ CHECKPOINT-MIB::vsxStatusVsName }}'
                     group: High Availability Status
                     states:
                         - { value: 0, generic: 0, graph: 1, descr: 'Active' }
@@ -243,8 +258,9 @@ modules:
                         - { value: 2, generic: 0, graph: 1, descr: 'Backup' }
 #Update Status
                 -
-                    oid: advancedUrlFilteringUpdateStatus
+                    oid: CHECKPOINT-MIB::advancedUrlFilteringUpdateStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.43.2.1.{{ $index }}'
+                    state_name: advancedUrlFilteringUpdateStatus
                     index: 'advancedUrlFilteringUpdateStatus.{{ $index }}'
                     descr: 'URL Filtering Update'
                     group: Update
@@ -255,8 +271,9 @@ modules:
                         - { value: 3, generic: 1, graph: 1, descr: 'degrade' }
                         - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
-                    oid: applicationControlUpdateStatus
+                    oid: CHECKPOINT-MIB::applicationControlUpdateStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.39.2.1.{{ $index }}'
+                    state_name: applicationControlUpdateStatus
                     index: 'applicationControlUpdateStatus.{{ $index }}'
                     descr: 'Application Control Update'
                     group: Update
@@ -267,8 +284,9 @@ modules:
                         - { value: 3, generic: 1, graph: 1, descr: 'degrade' }
                         - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
-                    oid: amwAVUpdateStatus
+                    oid: CHECKPOINT-MIB::amwAVUpdateStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.46.5.1.{{ $index }}'
+                    state_name: amwAVUpdateStatus
                     index: 'amwAVUpdateStatus.{{ $index }}'
                     descr: 'Anti Virus Update'
                     group: Update
@@ -279,8 +297,9 @@ modules:
                         - { value: 3, generic: 1, graph: 1, descr: 'degrade' }
                         - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
-                    oid: amwABUpdateStatus
+                    oid: CHECKPOINT-MIB::amwABUpdateStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.46.1.1.{{ $index }}'
+                    state_name: amwABUpdateStatus
                     index: 'amwABUpdateStatus.{{ $index }}'
                     descr: 'Anti Malware Update'
                     group: Update
@@ -292,8 +311,9 @@ modules:
                         - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
 #Subscriptions
                 -
-                    oid: advancedUrlFilteringSubscriptionStatus
+                    oid: CHECKPOINT-MIB::advancedUrlFilteringSubscriptionStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.43.1.1.{{ $index }}'
+                    state_name: advancedUrlFilteringSubscriptionStatus
                     index: 'advancedUrlFilteringSubscriptionStatus.{{ $index }}'
                     descr: 'URL Filtering Subscription'
                     group: Licenses
@@ -304,8 +324,9 @@ modules:
                         - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
                         - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
-                    oid: applicationControlSubscriptionStatus
+                    oid: CHECKPOINT-MIB::applicationControlSubscriptionStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.39.1.1.{{ $index }}'
+                    state_name: applicationControlSubscriptionStatus
                     index: 'applicationControlSubscriptionStatus.{{ $index }}'
                     descr: 'Application Control Subscription'
                     group: Licenses
@@ -316,8 +337,9 @@ modules:
                         - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
                         - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
-                    oid: antiVirusSubscriptionStatus
+                    oid: CHECKPOINT-MIB::antiVirusSubscriptionStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.46.3.1.{{ $index }}'
+                    state_name: antiVirusSubscriptionStatus
                     index: 'antiVirusSubscriptionStatus.{{ $index }}'
                     descr: 'Anti Virus Subscription'
                     group: Licenses
@@ -328,8 +350,9 @@ modules:
                         - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
                         - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
-                    oid: antiBotSubscriptionStatus
+                    oid: CHECKPOINT-MIB::antiBotSubscriptionStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.46.2.1.{{ $index }}'
+                    state_name: antiBotSubscriptionStatus
                     index: 'antiBotSubscriptionStatus.{{ $index }}'
                     descr: 'Anti Bot Subscription'
                     group: Licenses
@@ -340,8 +363,9 @@ modules:
                         - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
                         - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
-                    oid: antiSpamSubscriptionStatus
+                    oid: CHECKPOINT-MIB::antiSpamSubscriptionStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.46.4.1.{{ $index }}'
+                    state_name: antiSpamSubscriptionStatus
                     index: 'antiSpamSubscriptionStatus.{{ $index }}'
                     descr: 'Anti Spam Subscription'
                     group: Licenses
@@ -354,95 +378,95 @@ modules:
         temperature:
             data:
                 -
-                    oid: tempertureSensorValue
-                    value: tempertureSensorValue
+                    oid: CHECKPOINT-MIB::tempertureSensorValue
+                    value: CHECKPOINT-MIB::tempertureSensorValue
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.1.1.3.{{ $index }}'
-                    descr: tempertureSensorName
+                    descr: CHECKPOINT-MIB::tempertureSensorName
                     index: 'tempertureSensorValue.{{ $index }}'
 
         fanspeed:
             data:
                 -
-                    oid: fanSpeedSensorValue
-                    value: fanSpeedSensorValue
+                    oid: CHECKPOINT-MIB::fanSpeedSensorTable
+                    value: CHECKPOINT-MIB::fanSpeedSensorValue
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.2.1.3.{{ $index }}'
-                    descr: fanSpeedSensorName
+                    descr: CHECKPOINT-MIB::fanSpeedSensorName
                     index: 'fanSpeedSensorValue.{{ $index }}'
         voltage:
             data:
                 -
-                    oid: voltageSensorValue
-                    value: voltageSensorValue
+                    oid: CHECKPOINT-MIB::voltageSensorValue
+                    value: CHECKPOINT-MIB::voltageSensorValue
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.3.1.3.{{ $index }}'
-                    descr: voltageSensorName
+                    descr: CHECKPOINT-MIB::voltageSensorName
                     index: 'voltageSensorValue.{{ $index }}'
         count:
             data:
 #Connections
                 -
-                    oid: fwNumConn
+                    oid: CHECKPOINT-MIB::fwNumConn
                     num_oid: '.1.3.6.1.4.1.2620.1.1.25.3.{{ $index }}'
                     index: 'fwNumConn.{{ $index }}'
                     descr: 'Number of concurrent connections'
                     group: Connections
                 -
-                    oid: fwPeakNumConn
+                    oid: CHECKPOINT-MIB::fwPeakNumConn
                     num_oid: '.1.3.6.1.4.1.2620.1.1.25.4.{{ $index }}'
                     index: 'fwPeakNumConn.{{ $index }}'
                     descr: 'Peak number of concurrent connections'
                     group: Connections
                 -
-                    oid: fwConnTableLimit
+                    oid: CHECKPOINT-MIB::fwConnTableLimit
                     num_oid: '.1.3.6.1.4.1.2620.1.1.25.10.{{ $index }}'
                     index: 'fwConnTableLimit.{{ $index }}'
                     descr: 'Limit of Connections table'
                     group: Connections
                 -
-                    oid: fwConnectionsStatConnectionRate
+                    oid: CHECKPOINT-MIB::fwConnectionsStatConnectionRate
                     num_oid: '.1.3.6.1.4.1.2620.1.1.26.11.6.{{ $index }}'
                     index: 'fwConnectionsStatConnectionRate.{{ $index }}'
                     descr: 'Connections rate'
                     group: Connections
                 -
-                    oid: fwSXLConnsExisting
+                    oid: CHECKPOINT-MIB::fwSXLConnsExisting
                     num_oid: '.1.3.6.1.4.1.2620.1.36.1.2.{{ $index }}'
                     index: 'fwSXLConnsExisting.{{ $index }}'
                     descr: 'Number of connections handled by SecureXL'
                     group: Connections
 #VPN
                 -
-                    oid: cpvIKECurrSAs
+                    oid: CHECKPOINT-MIB::cpvIKECurrSAs
                     num_oid: '.1.3.6.1.4.1.2620.1.2.9.1.1.{{ $index }}'
                     index: 'cpvIKECurrSAs.{{ $index }}'
                     descr: 'Number of IKE current SAs'
                     group: VPN
                 -
-                    oid: cpvCurrEspSAsIn
+                    oid: CHECKPOINT-MIB::cpvCurrEspSAsIn
                     num_oid: '.1.3.6.1.4.1.2620.1.2.5.2.1.{{ $index }}'
                     index: 'cpvCurrEspSAsIn.{{ $index }}'
                     descr: 'Number of IPsec current Inbound ESP SAs'
                     group: VPN
                 -
-                    oid: cpvCurrEspSAsOut
+                    oid: CHECKPOINT-MIB::cpvCurrEspSAsOut
                     num_oid: '.1.3.6.1.4.1.2620.1.2.5.2.3.{{ $index }}'
                     index: 'cpvCurrEspSAsOut.{{ $index }}'
                     descr: 'Number of IPsec current Outbound ESP SAs'
                     group: VPN
 #Logging
                 -
-                    oid: mgLSLogReceiveRate
+                    oid: CHECKPOINT-MIB::mgLSLogReceiveRate
                     num_oid: '.1.3.6.1.4.1.2620.1.7.14.1.{{ $index }}'
                     index: 'mgLSLogReceiveRate.{{ $index }}'
                     descr: 'Log Receive Rate'
                     group: Logging
                 -
-                    oid: mgLSLogReceiveRatePeak
+                    oid: CHECKPOINT-MIB::mgLSLogReceiveRatePeak
                     num_oid: '.1.3.6.1.4.1.2620.1.7.14.2.{{ $index }}'
                     index: 'mgLSLogReceiveRatePeak.{{ $index }}'
                     descr: 'Log Receive Rate Peak'
                     group: Logging
                 -
-                    oid: fwLoggingHandlingRate
+                    oid: CHECKPOINT-MIB::fwLoggingHandlingRate
                     num_oid: '.1.3.6.1.4.1.2620.1.1.30.7.{{ $index }}'
                     index: 'fwLoggingHandlingRate.{{ $index }}'
                     descr: 'Log Rate'

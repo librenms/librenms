@@ -22,6 +22,7 @@ IMPORTS
 	MODULE-COMPLIANCE	FROM SNMPv2-CONF
 
 	DisplayString	FROM SNMPv2-TC
+	TruthValue	FROM SNMPv2-TC
 	EnabledStatus	FROM  P-BRIDGE-MIB
 
 	esMgmt			FROM ZYXEL-ES-SMI
@@ -29,7 +30,7 @@ IMPORTS
 
 esSysInfo MODULE-IDENTITY
 	LAST-UPDATED	"201009200000Z"    
-	ORGANIZATION "Enterprise Solution ZyXEL"     
+	ORGANIZATION "Enterprise Solution Zyxel"     
 	CONTACT-INFO
 		""	   
 	DESCRIPTION
@@ -37,8 +38,8 @@ esSysInfo MODULE-IDENTITY
 	::= { esMgmt 1 }
 
 esSysMgmt MODULE-IDENTITY
-	LAST-UPDATED	"201009060000Z" 
-	ORGANIZATION "Enterprise Solution ZyXEL"     
+	LAST-UPDATED	"201709200000Z" 
+	ORGANIZATION "Enterprise Solution Zyxel"     
 	CONTACT-INFO
 		""	   
 	DESCRIPTION
@@ -220,6 +221,14 @@ sysActiveSessionNum OBJECT-TYPE
 	::= { esSysInfo 19 }
 
 
+sysNebulaManaged OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The status indicates if the device is being managed by Nebula."
+	::= { esSysInfo 20 }
+
 -- esSysMgmt OIDs
 
 MgmtAlarmStatus ::= TEXTUAL-CONVENTION
@@ -318,20 +327,20 @@ sysMgmtCPU5MinUsage OBJECT-TYPE
 	::= { esSysMgmt 9 }
 
 sysMgmtBootupConfigIndex OBJECT-TYPE
-	SYNTAX		INTEGER (0..100)
+	SYNTAX		INTEGER (1..100)
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION
-		""
+		"The index number of bootup configuration."
 	::= { esSysMgmt 10 }
 
 
 sysMgmtBootupImageIndex OBJECT-TYPE
-	SYNTAX		INTEGER (0..100)
+	SYNTAX		INTEGER (1..100)
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION
-		""
+		"The index number of bootup image."
 	::= { esSysMgmt 11 }
 
 -- sysMgmtAlarmStatus is obsoleted, don't use it.
@@ -370,6 +379,25 @@ sys8021QControl OBJECT-TYPE
         "System vlan status."
     ::= { esSysMgmt 15 }
 
+-- sysMgmtUsers is used for zld user info.
+sysMgmtUsers	OBJECT IDENTIFIER ::= { esSysMgmt 16 }
+
+sysUserNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of current login users"
+    ::= { sysMgmtUsers 1 }
+
+-- sysMgmtNebulaControlCenterDiscovery is used only for switch.
+sysMgmtNebulaControlCenterDiscovery OBJECT-TYPE
+    SYNTAX  	EnabledStatus
+    MAX-ACCESS 	read-write
+    STATUS  	current
+    DESCRIPTION
+        "Enable/Disable nebula control center discovery."
+    ::= { esSysMgmt 19 }        
 
 -- compliance statements for ES-COMMON
 

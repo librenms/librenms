@@ -1,4 +1,3 @@
-mib: EES-POWER-MIB
 modules:
   os:
     # Device header fields
@@ -10,66 +9,66 @@ modules:
   sensors:
     temperature:
       data:
-        - oid: psTemperatureTable
+        - oid: EES-POWER-MIB::psTemperatureTable
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.7.3.1.2.{{ $index }}'
-          value: psTemperatureMeasurement
+          value: EES-POWER-MIB::psTemperatureMeasurement
           index: 'psTemperatureMeasurement.{{ $index }}'
           divisor: 1000
-          descr: 'Ambient {{ $psTemperatureName }}'
+          descr: 'Ambient {{ EES-POWER-MIB::psTemperatureName }}'
           skip_values:
-            - { oid: psTemperatureType, op: '!=', value: '1' }
-            - { oid: psTemperatureMeasurement, op: '<', value: 0 }
+            - { oid: EES-POWER-MIB::psTemperatureType, op: '!=', value: '1' }
+            - { oid: EES-POWER-MIB::psTemperatureMeasurement, op: '<', value: 0 }
             - 2147483647
 
-        - oid: psTemperatureTable
+        - oid: EES-POWER-MIB::psTemperatureTable
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.7.3.1.2.{{ $index }}'
-          value: psTemperatureMeasurement
+          value: EES-POWER-MIB::psTemperatureMeasurement
           index: 'psTemperatureMeasurement.{{ $index }}'
           divisor: 1000
-          descr: 'Battery {{ $psTemperatureName }}'
+          descr: 'Battery {{ EES-POWER-MIB::psTemperatureName }}'
           skip_values:
-            - { oid: psTemperatureType, op: '!=', value: '2' }
-            - { oid: psTemperatureMeasurement, op: '<', value: 0 }
+            - { oid: EES-POWER-MIB::psTemperatureType, op: '!=', value: '2' }
+            - { oid: EES-POWER-MIB::psTemperatureMeasurement, op: '<', value: 0 }
             - 2147483647
 
     voltage:
       data:
-        - oid: systemVoltage
+        - oid: EES-POWER-MIB::systemVoltage
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.2.{{ $index }}'
           divisor: 1000
           index: 'systemVoltage.0'
           descr: 'System Voltage'
           skip_values: 2147483647
 
-        - oid: psBatteryVoltage
+        - oid: EES-POWER-MIB::psBatteryVoltage
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.5.1.{{ $index }}'
           divisor: 1000
           index: 'psBatteryVoltage.0'
           descr: 'Battery Voltage'
           skip_values: 2147483647
 
-        - oid: psInputLineAVoltage
+        - oid: EES-POWER-MIB::psInputLineAVoltage
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.6.1.{{ $index }}'
           divisor: 1000
           index: 'psInputLineAVoltage.0'
           descr: 'Input Line A Voltage'
           skip_values: 2147483647
 
-        - oid: psInputLineBVoltage
+        - oid: EES-POWER-MIB::psInputLineBVoltage
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.6.2.{{ $index }}'
           divisor: 1000
           index: 'psInputLineBVoltage.0'
           descr: 'Input Line B Voltage'
           skip_values: 2147483647
 
-        - oid: psInputLineCVoltage
+        - oid: EES-POWER-MIB::psInputLineCVoltage
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.6.3.{{ $index }}'
           divisor: 1000
           index: 'psInputLineCVoltage.0'
           descr: 'Input Line C Voltage'
           skip_values: 2147483647
 
-        - oid: psConverterVoltage
+        - oid: EES-POWER-MIB::psConverterVoltage
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.13.4.{{ $index }}'
           divisor: 1000
           index: 'psConverterVoltage.0'
@@ -78,49 +77,49 @@ modules:
 
     current:
       data:
-        - oid: systemCurrent
+        - oid: EES-POWER-MIB::systemCurrent
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.3.{{ $index }}'
           divisor: 1000
           index: 'systemCurrent.0'
           descr: 'System Current'
           skip_values: 2147483647
 
-        - oid: psTotalBatteryCurrent
+        - oid: EES-POWER-MIB::psTotalBatteryCurrent
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.5.2.{{ $index }}'
           divisor: 1000
           index: 'psTotalBatteryCurrent.0'
           descr: 'Battery Current'
           skip_values: 2147483647
 
-        - oid: psBatteryTable
+        - oid: EES-POWER-MIB::psBatteryTable
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.5.5.1.2.{{ $index }}'
-          value: psBatteryCurrent
+          value: EES-POWER-MIB::psBatteryCurrent
           divisor: 1000
           index: 'psBatteryTable.{{ $index }}'
-          descr: '{{ $psBatteryName }} Current'
+          descr: '{{ EES-POWER-MIB::psBatteryName }} Current'
 
-        - oid: psRectifierTable
+        - oid: EES-POWER-MIB::psRectifierTable
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.4.1.6.{{ $index }}'
-          value: psRectifierCurrent
+          value: EES-POWER-MIB::psRectifierCurrent
           divisor: 1000
           index: 'psRectifierTable.{{ $index }}'
-          descr: '{{ $psRectifierIdent }} Current'
+          descr: '{{ EES-POWER-MIB::psRectifierIdent }} Current'
 
-        - oid: psDistributionLoadTable
+        - oid: EES-POWER-MIB::psDistributionLoadTable
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.12.2.1.2.{{ $index }}'
-          value: psDistributionLoadCurrent
+          value: EES-POWER-MIB::psDistributionLoadCurrent
           divisor: 1000
           index: 'psDistributionLoadTable.{{ $index }}'
-          descr: '{{ $psDistributionLoadName }} Current'
+          descr: '{{ EES-POWER-MIB::psDistributionLoadName }} Current'
 
-        - oid: psDistributionGeneralTable
+        - oid: EES-POWER-MIB::psDistributionGeneralTable
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.12.3.1.2.{{ $index }}'
-          value: psDistributionGeneralCurrent
+          value: EES-POWER-MIB::psDistributionGeneralCurrent
           divisor: 1000
           index: 'psDistributionGeneralTable.{{ $index }}'
-          descr: '{{ $psDistributionGeneralName }} Current'
+          descr: '{{ EES-POWER-MIB::psDistributionGeneralName }} Current'
 
-        - oid: psTotalConverterCurrent
+        - oid: EES-POWER-MIB::psTotalConverterCurrent
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.13.5.{{ $index }}'
           divisor: 1000
           index: 'psTotalConverterCurrent.0'
@@ -129,19 +128,19 @@ modules:
 
     percent:
       data:
-        - oid: systemUsedCapacity
+        - oid: EES-POWER-MIB::systemUsedCapacity
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.4.{{ $index }}'
           index: 'systemUsedCapacity.0'
           descr: 'System Used Capacity'
           skip_values: 2147483647
 
-        - oid: rectifiersUsedCapacity
+        - oid: EES-POWER-MIB::rectifiersUsedCapacity
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.3.{{ $index }}'
           index: 'rectifiersUsedCapacity.0'
           descr: 'Rectifiers Used Capacity'
           skip_values: 2147483647
 
-        - oid: psBatteryCapacity
+        - oid: EES-POWER-MIB::psBatteryCapacity
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.5.3.{{ $index }}'
           index: 'psBatteryCapacity.0'
           descr: 'Battery Capacity'
@@ -149,7 +148,7 @@ modules:
 
     state:
       data:
-        - oid: systemStatus
+        - oid: EES-POWER-MIB::systemStatus
           state_name: systemStatus
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.1.{{ $index }}'
           descr: 'System Status'
@@ -166,7 +165,7 @@ modules:
             - { descr: testing,   graph: 1, value: 9,  generic: 3 }
             - { descr: disabled,  graph: 1, value: 10, generic: 1 }
 
-        - oid: psStatusCommunication
+        - oid: EES-POWER-MIB::psStatusCommunication
           state_name: psStatusCommunication
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.8.{{ $index }}'
           descr: 'Communication Status'
@@ -176,7 +175,7 @@ modules:
             - { descr: normal,    graph: 1, value: 2, generic: 0 }
             - { descr: interrupt, graph: 1, value: 3, generic: 2 }
 
-        - oid: psStatusBatteryMode
+        - oid: EES-POWER-MIB::psStatusBatteryMode
           state_name: psStatusBatteryMode
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.9.{{ $index }}'
           descr: 'Battery Status'
@@ -196,12 +195,12 @@ modules:
             - { descr: masterBC,      graph: 1, value: 12, generic: 3 }
             - { descr: masterBT,      graph: 1, value: 13, generic: 3 }
 
-        - oid: psRectifierTable
+        - oid: EES-POWER-MIB::psRectifierTable
           state_name: psRectifierFail
           num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.4.1.8.{{ $index }}'
-          value: psRectifierFail
+          value: EES-POWER-MIB::psRectifierFail
           index: 'psRectifierFail.{{ $index }}'
-          descr: '{{ $psRectifierIdent }} Fail'
+          descr: '{{ EES-POWER-MIB::psRectifierIdent }} Fail'
           states:
             - { descr: fail,   graph: 1, value: 1, generic: 2 }
             - { descr: normal, graph: 1, value: 2, generic: 0 }

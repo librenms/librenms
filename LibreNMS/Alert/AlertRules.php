@@ -48,7 +48,7 @@ class AlertRules
     public function runRules($device_id)
     {
         //Check to see if under maintenance
-        if (AlertUtil::getMaintenanceStatus($device_id) === MaintenanceStatus::SKIP_ALERTS) {
+        if (AlertUtil::getMaintenanceStatus($device_id) === MaintenanceStatus::SkipAlerts) {
             echo "Under Maintenance, skipping alert rules check.\r\n";
 
             return false;

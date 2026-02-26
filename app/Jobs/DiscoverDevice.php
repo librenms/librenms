@@ -61,7 +61,7 @@ class DiscoverDevice implements ShouldQueue
             $this->device->device_id,
             $measurement->getDuration()));
 
-        Log::channel('log_file')->alert(sprintf('INFO: device:discover %s (%s) discovered in %0.3fs',
+        Log::alert(sprintf('INFO: device:discover %s (%s) discovered in %0.3fs',
             $this->device->hostname,
             $this->device->device_id,
             $measurement->getDuration()));
@@ -110,7 +110,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
             $os = $this->handleOsChange($os);
         });
 
-        foreach ($this->moduleList->modulesWithStatus(ProcessType::discovery, $this->device) as $module => $module_status) {
+        foreach ($this->moduleList->modulesWithStatus(ProcessType::Discovery, $this->device) as $module => $module_status) {
             $should_discover = false;
             $start_memory = memory_get_usage();
             $module_start = microtime(true);
@@ -143,10 +143,13 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
             if ($should_discover) {
                 Log::info('');
                 app(MeasurementManager::class)->printChangedStats();
-                Module::savePerformance($module, ProcessType::discovery, $module_start, $start_memory);
+                Module::savePerformance($module, ProcessType::Discovery, $module_start, $start_memory);
                 Log::info("#### Unload discovery module $module ####\n");
             }
         }
+
+        // Remove listener to allow this object to be garbage collected
+        Event::forget(OsChangedEvent::class);
     }
 
     private function handleOsChange(OS $os): OS
