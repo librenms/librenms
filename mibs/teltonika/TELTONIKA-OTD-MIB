@@ -1269,7 +1269,7 @@ tagValueEntry OBJECT-TYPE
 TagValueEntry ::=
 	SEQUENCE {
 	tagValueIndex	INTEGER,
-        tagValue OCTET STRING,
+        tagValue OCTET STRING
 	}
 
 tagValueIndex OBJECT-TYPE

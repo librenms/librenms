@@ -19,7 +19,7 @@
  * @link       https://www.librenms.org
  *
  * @copyright  2025 Glenn Mattheij
- * @author     Glenn Mattheij 
+ * @author     Glenn Mattheij
  */
 
 namespace LibreNMS\OS;
