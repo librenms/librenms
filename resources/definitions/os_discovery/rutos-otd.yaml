@@ -1,8 +1,8 @@
 modules:
     os:
-        hardware: TELTONIKA-OTD-MIB::deviceName.0
-        serial: TELTONIKA-OTD-MIB::serial.0
-        version: TELTONIKA-OTD-MIB::fwVersion.0
+        hardware: .1.3.6.1.4.1.48690.1.2.0
+        serial: .1.3.6.1.4.1.48690.1.1.0
+        version: .1.3.6.1.4.1.48690.1.6.0
     sensors:
         additional_oids:
             data:
