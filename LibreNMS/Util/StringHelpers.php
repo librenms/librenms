@@ -247,4 +247,29 @@ class StringHelpers
 
         return $indices;
     }
+
+    /**
+     * Remove artefacts from LLDP remoteSysName coming from jetstream devices
+     */
+    public static function linksRemSysName($sysName = ''): string
+    {
+        $sysName = str_replace(['.MP.', '.TS.', "\n", '"'], '', $sysName);
+        $sysName = rtrim($sysName, '.');
+        $sysName = trim($sysName);
+
+        return $sysName;
+    }
+
+    /**
+     * Routeros expose parrent interface in description, ex: br0/eoip1, so use only last part as valid
+     */
+    public static function linksRemPortName($remDevice, $remPort): string
+    {
+        if (str_ireplace(['mikrotik', 'routeros'], '', $remDevice) != $remDevice) {
+            $tmp = explode('/', (string) $remPort);
+            $remPort = $tmp[max(array_keys($tmp))];
+        }
+
+        return $remPort;
+    }
 }
