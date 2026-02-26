@@ -29,7 +29,7 @@ vlan			OBJECT IDENTIFIER ::= { teltonika 8 }
 sqm			OBJECT IDENTIFIER ::= { teltonika 9 }
 port			OBJECT IDENTIFIER ::= { teltonika 10 }
 mwan3			OBJECT IDENTIFIER ::= { teltonika 12 }
-universal_gateway	OBJECT IDENTIFIER ::= { teltonika 20 }
+universalGateway	OBJECT IDENTIFIER ::= { teltonika 20 }
 
 -- Device --
 
@@ -1147,7 +1147,7 @@ tagTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION	""
-	::= { universal_gateway 1 }
+	::= { universalGateway 1 }
 
 tagEntry OBJECT-TYPE
 	SYNTAX		TagEntry
@@ -1256,7 +1256,7 @@ tagValueTable OBJECT-TYPE
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION	""
-	::= { universal_gateway 2 }
+	::= { universalGateway 2 }
 
 tagValueEntry OBJECT-TYPE
 	SYNTAX		TagValueEntry
