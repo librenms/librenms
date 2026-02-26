@@ -47,6 +47,7 @@ class PollerController extends Controller
         $this->authorize('viewAny', PollerCluster::class);
 
         return view('poller.poller', [
+            'timezone' => session('preferences.timezone'),
             'current_tab' => 'poller',
             'pollers' => $this->poller(),
             'poller_cluster' => $this->pollerCluster(),
