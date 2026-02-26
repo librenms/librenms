@@ -1163,7 +1163,7 @@ TagEntry ::=
 	tagId DisplayString,
 	tagPrettyName DisplayString,
         tagSource INTEGER,
-        tagValue OCTET STRING,
+        tagPermissions INTEGER,
         tagType INTEGER,
 	tagValueSize INTEGER (0..65535),
         tagTimestamp Unsigned32
