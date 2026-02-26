@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Carbon\Exceptions\InvalidFormatException;
@@ -217,7 +218,7 @@ class Time
 
         $format = match ($format) {
             'long', 'compact', 'byminute', 'time' => LibrenmsConfig::get("dateformat.$format"),
-            default => throw new Exception('Format needs to be one of log, compact, byminute or time'),
+            default => throw new \Exception('Format needs to be one of log, compact, byminute or time'),
         };
 
         return $input->setTimezone(session('preferences.timezone'))->format($format);
