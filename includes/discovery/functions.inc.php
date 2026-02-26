@@ -388,9 +388,24 @@ function discovery_process($os, $sensor_class, $pre_cache)
                             $user_function = 'fahrenheit_to_celsius';
                         }
                     }
-                    preg_match('/-?\d*\.?\d+/', (string) $snmp_value, $temp_response);
-                    if (! empty($temp_response[0])) {
-                        $snmp_value = $temp_response[0];
+                    if ($sensor_class === 'state' && isset($data['states'])) {
+                        // For state sensors, try to look up the string value in the states table first
+                        // before falling back to numeric extraction (avoids matching leading digits
+                        // in strings like "5G-NSA" as the integer value 5)
+                        $state_map = array_column($data['states'], 'value', 'descr');
+                        if (array_key_exists($snmp_value, $state_map)) {
+                            $snmp_value = $state_map[$snmp_value];
+                        } else {
+                            preg_match('/-?\d*\.?\d+/', (string) $snmp_value, $temp_response);
+                            if (! empty($temp_response[0])) {
+                                $snmp_value = $temp_response[0];
+                            }
+                        }
+                    } else {
+                        preg_match('/-?\d*\.?\d+/', (string) $snmp_value, $temp_response);
+                        if (! empty($temp_response[0])) {
+                            $snmp_value = $temp_response[0];
+                        }
                     }
                 }
 
