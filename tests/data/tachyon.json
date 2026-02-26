@@ -3895,7 +3895,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 1,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "wirelessPeerAntennaKit"
@@ -3920,7 +3920,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 1,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "wirelessPeerAntennaKit"
@@ -4070,7 +4070,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 1,
+                    "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
                     "state_name": "wirelessVapSecurity"
