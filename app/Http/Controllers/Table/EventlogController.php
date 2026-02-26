@@ -26,7 +26,6 @@
 
 namespace App\Http\Controllers\Table;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Blade;

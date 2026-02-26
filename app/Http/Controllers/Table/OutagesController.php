@@ -26,7 +26,6 @@
 
 namespace App\Http\Controllers\Table;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;

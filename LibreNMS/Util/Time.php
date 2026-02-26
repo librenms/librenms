@@ -209,7 +209,7 @@ class Time
      */
     public static function format(Carbon|string|int $input, string $format): string
     {
-        if (is_string($input) {
+        if (is_string($input)) {
             $input = Carbon::parse($input);
         } elseif (is_numeric($input)) {
             $input = Carbon::createFromTimestamp($input);
