@@ -123,13 +123,13 @@ final class NumberTest extends TestCase
 
     public function testCalculateRate(): void
     {
-        $this->assertEquals(100.0, Number::calculateRate('100', '200', 1.0, 2.0));
-        $this->assertEquals(101.0, Number::calculateRate('4294967295', '100', 1.0, 2.0));
-        $this->assertEquals(250.5, Number::calculateRate('18446744073709551615', '500', 1.0, 3.0, 64));
-        $this->assertEquals(0.0, Number::calculateRate('1000', '1000', 1.0, 2.0));
-        $this->assertEquals(100.0, Number::calculateRate('100', '200', 1.0, 2.0)); //32bit
-        $this->assertEquals(100.0, Number::calculateRate('5000000000', '5000000100', 1.0, 2.0)); //64bit
-        $this->assertEquals(200.0, Number::calculateRate('100', '300', 1.5, 2.5)); // 200 difference / 1.0 second
+        $this->assertSame(100.0, Number::calculateRate('100', '200', 1.0, 2.0));
+        $this->assertSame(101.0, Number::calculateRate('4294967295', '100', 1.0, 2.0));
+        $this->assertSame(250.5, Number::calculateRate('18446744073709551615', '500', 1.0, 3.0, 64));
+        $this->assertSame(0.0, Number::calculateRate('1000', '1000', 1.0, 2.0));
+        $this->assertSame(100.0, Number::calculateRate('100', '200', 1.0, 2.0)); //32bit
+        $this->assertSame(100.0, Number::calculateRate('5000000000', '5000000100', 1.0, 2.0)); //64bit
+        $this->assertSame(200.0, Number::calculateRate('100', '300', 1.5, 2.5)); // 200 difference / 1.0 second
     }
 
     public function testCalculateRateInvalidTimeThrowsException(): void
