@@ -1021,12 +1021,12 @@ mac_accounting:
     - { Field: bps_out, Type: int, 'Null': false, Extra: '' }
     - { Field: bps_in, Type: int, 'Null': false, Extra: '' }
     - { Field: bytes_in, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: bytes_in_rate, Type: int, 'Null': true, Extra: '' }
     - { Field: bytes_out, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: bytes_out_rate, Type: int, 'Null': true, Extra: '' }
     - { Field: packets_in, Type: bigint, 'Null': true, Extra: '' }
     - { Field: packets_out, Type: bigint, 'Null': true, Extra: '' }
     - { Field: last_polled, Type: 'int unsigned', 'Null': true, Extra: '' }
-    - { Field: bytes_in_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: bytes_out_rate, Type: int, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ma_id], Unique: true, Type: BTREE }
     mac_accounting_port_id_index: { Name: mac_accounting_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
