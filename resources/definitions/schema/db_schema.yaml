@@ -1013,31 +1013,18 @@ locations:
 mac_accounting:
   Columns:
     - { Field: ma_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: mac, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: in_oid, Type: varchar(128), 'Null': false, Extra: '' }
-    - { Field: out_oid, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: ifIndex, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: vlan, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: bps_out, Type: int, 'Null': false, Extra: '' }
     - { Field: bps_in, Type: int, 'Null': false, Extra: '' }
-    - { Field: cipMacHCSwitchedBytes_input, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedBytes_input_prev, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedBytes_input_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedBytes_input_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedBytes_output, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedBytes_output_prev, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedBytes_output_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedBytes_output_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedPkts_input, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedPkts_input_prev, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedPkts_input_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedPkts_input_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedPkts_output, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedPkts_output_prev, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedPkts_output_delta, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: cipMacHCSwitchedPkts_output_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: poll_time, Type: 'int unsigned', 'Null': true, Extra: '' }
-    - { Field: poll_prev, Type: 'int unsigned', 'Null': true, Extra: '' }
-    - { Field: poll_period, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: bytes_in, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: bytes_out, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: packets_in, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: packets_out, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: last_polled, Type: 'int unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ma_id], Unique: true, Type: BTREE }
     mac_accounting_port_id_index: { Name: mac_accounting_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
