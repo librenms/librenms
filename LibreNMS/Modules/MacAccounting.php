@@ -120,7 +120,13 @@ class MacAccounting implements Module
         ModuleModelObserver::observe(\App\Models\MacAccounting::class);
         $os->getDevice()->macAccounting()->saveMany($macs->each(function (\App\Models\MacAccounting $mac): void {
             $mac->port_id ??= PortCache::getIdFromIfIndex($mac->ifIndex); // ensure port_id is filled (if new)
-            $mac->last_polled = time();
+            $now = time();
+            if ($mac->last_polled) {
+                $duration = $now - $mac->last_polled;
+                $mac->bytes_in_rate = $mac->bytes_in / $duration;
+                $mac->bytes_out_rate = $mac->bytes_out / $duration;
+            }
+            $mac->last_polled = $now;
         }));
 
         $rrd_def = RrdDefinition::make()

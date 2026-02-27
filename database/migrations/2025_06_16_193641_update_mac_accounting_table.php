@@ -17,6 +17,8 @@ return new class extends Migration
             $table->unsignedInteger('vlan')->nullable()->after('ifIndex');
             $table->renameColumn('cipMacHCSwitchedBytes_input', 'bytes_in');
             $table->renameColumn('cipMacHCSwitchedBytes_output', 'bytes_out');
+            $table->renameColumn('cipMacHCSwitchedBytes_input_rate', 'bytes_in_rate');
+            $table->renameColumn('cipMacHCSwitchedBytes_output_rate', 'bytes_out_rate');
             $table->renameColumn('cipMacHCSwitchedPkts_input', 'packets_in');
             $table->renameColumn('cipMacHCSwitchedPkts_output', 'packets_out');
             $table->renameColumn('poll_prev', 'last_polled');
@@ -25,10 +27,8 @@ return new class extends Migration
                 'out_oid',
                 'cipMacHCSwitchedBytes_input_prev',
                 'cipMacHCSwitchedBytes_input_delta',
-                'cipMacHCSwitchedBytes_input_rate',
                 'cipMacHCSwitchedBytes_output_prev',
                 'cipMacHCSwitchedBytes_output_delta',
-                'cipMacHCSwitchedBytes_output_rate',
                 'cipMacHCSwitchedPkts_input_prev',
                 'cipMacHCSwitchedPkts_input_delta',
                 'cipMacHCSwitchedPkts_input_rate',
@@ -52,14 +52,14 @@ return new class extends Migration
             $table->string('out_oid', 128);
             $table->renameColumn('bytes_in', 'cipMacHCSwitchedBytes_input');
             $table->renameColumn('bytes_out', 'cipMacHCSwitchedBytes_output');
+            $table->renameColumn('bytes_in_rate', 'cipMacHCSwitchedBytes_input_rate');
+            $table->renameColumn('bytes_out_rate', 'cipMacHCSwitchedBytes_output_rate');
             $table->renameColumn('packets_in', 'cipMacHCSwitchedPkts_input');
             $table->renameColumn('packets_out', 'cipMacHCSwitchedPkts_output');
             $table->bigInteger('cipMacHCSwitchedBytes_input_prev')->nullable();
             $table->bigInteger('cipMacHCSwitchedBytes_input_delta')->nullable();
-            $table->integer('cipMacHCSwitchedBytes_input_rate')->nullable();
             $table->bigInteger('cipMacHCSwitchedBytes_output_prev')->nullable();
             $table->bigInteger('cipMacHCSwitchedBytes_output_delta')->nullable();
-            $table->integer('cipMacHCSwitchedBytes_output_rate')->nullable();
             $table->bigInteger('cipMacHCSwitchedPkts_input_prev')->nullable();
             $table->bigInteger('cipMacHCSwitchedPkts_input_delta')->nullable();
             $table->integer('cipMacHCSwitchedPkts_input_rate')->nullable();

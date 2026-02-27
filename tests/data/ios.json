@@ -12242,7 +12242,9 @@
                     "bytes_in": null,
                     "bytes_out": null,
                     "packets_in": null,
-                    "packets_out": null
+                    "packets_out": null,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "000c42d0d0e0",
@@ -12253,7 +12255,9 @@
                     "bytes_in": null,
                     "bytes_out": null,
                     "packets_in": null,
-                    "packets_out": null
+                    "packets_out": null,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "00133b167a1d",
@@ -12264,7 +12268,9 @@
                     "bytes_in": null,
                     "bytes_out": null,
                     "packets_in": null,
-                    "packets_out": null
+                    "packets_out": null,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "107beffeeb20",
@@ -12275,7 +12281,9 @@
                     "bytes_in": null,
                     "bytes_out": null,
                     "packets_in": null,
-                    "packets_out": null
+                    "packets_out": null,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "64a0e71d6847",
@@ -12286,7 +12294,9 @@
                     "bytes_in": null,
                     "bytes_out": null,
                     "packets_in": null,
-                    "packets_out": null
+                    "packets_out": null,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "b827eb65c840",
@@ -12297,7 +12307,9 @@
                     "bytes_in": null,
                     "bytes_out": null,
                     "packets_in": null,
-                    "packets_out": null
+                    "packets_out": null,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "b8a386ade0d3",
@@ -12308,7 +12320,9 @@
                     "bytes_in": null,
                     "bytes_out": null,
                     "packets_in": null,
-                    "packets_out": null
+                    "packets_out": null,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "c067af678665",
@@ -12319,7 +12333,9 @@
                     "bytes_in": null,
                     "bytes_out": null,
                     "packets_in": null,
-                    "packets_out": null
+                    "packets_out": null,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "ecf4bb437711",
@@ -12330,7 +12346,9 @@
                     "bytes_in": null,
                     "bytes_out": null,
                     "packets_in": null,
-                    "packets_out": null
+                    "packets_out": null,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "ffffffffffff",
@@ -12341,7 +12359,9 @@
                     "bytes_in": null,
                     "bytes_out": null,
                     "packets_in": null,
-                    "packets_out": null
+                    "packets_out": null,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 }
             ]
         },
@@ -12356,7 +12376,9 @@
                     "bytes_in": 162031620,
                     "bytes_out": 570,
                     "packets_in": 473780,
-                    "packets_out": 5
+                    "packets_out": 5,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "000c42d0d0e0",
@@ -12367,7 +12389,9 @@
                     "bytes_in": 132039216,
                     "bytes_out": 1876,
                     "packets_in": 398336,
-                    "packets_out": 20
+                    "packets_out": 20,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "00133b167a1d",
@@ -12378,7 +12402,9 @@
                     "bytes_in": null,
                     "bytes_out": 484,
                     "packets_in": null,
-                    "packets_out": 2
+                    "packets_out": 2,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "107beffeeb20",
@@ -12389,7 +12415,9 @@
                     "bytes_in": null,
                     "bytes_out": 139809,
                     "packets_in": null,
-                    "packets_out": 1127
+                    "packets_out": 1127,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "64a0e71d6847",
@@ -12400,7 +12428,9 @@
                     "bytes_in": 33186098,
                     "bytes_out": 33576455,
                     "packets_in": 138995,
-                    "packets_out": 140658
+                    "packets_out": 140658,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "b827eb65c840",
@@ -12411,7 +12441,9 @@
                     "bytes_in": 5832,
                     "bytes_out": null,
                     "packets_in": 36,
-                    "packets_out": null
+                    "packets_out": null,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "b8a386ade0d3",
@@ -12422,7 +12454,9 @@
                     "bytes_in": null,
                     "bytes_out": 15222,
                     "packets_in": null,
-                    "packets_out": 215
+                    "packets_out": 215,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "c067af678665",
@@ -12433,7 +12467,9 @@
                     "bytes_in": 342,
                     "bytes_out": 242,
                     "packets_in": 1,
-                    "packets_out": 1
+                    "packets_out": 1,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "ecf4bb437711",
@@ -12444,7 +12480,9 @@
                     "bytes_in": 2736,
                     "bytes_out": null,
                     "packets_in": 8,
-                    "packets_out": null
+                    "packets_out": null,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 },
                 {
                     "mac": "ffffffffffff",
@@ -12455,7 +12493,9 @@
                     "bytes_in": null,
                     "bytes_out": 342,
                     "packets_in": null,
-                    "packets_out": 1
+                    "packets_out": 1,
+                    "bytes_in_rate": null,
+                    "bytes_out_rate": null
                 }
             ]
         }
