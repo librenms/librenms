@@ -292,25 +292,64 @@ the default User Role for Authorized users.   Appropriate care should be taken.
 
 ###  Claims / Access Scopes
 
-Socialite can specify scopes that should be included with in the authentication request.
+Socialite can specify scopes that should be included within the authentication request.
 (see [Larvel docs](https://laravel.com/docs/10.x/socialite#access-scopes) )
 
-For example, if Okta is configured to expose group information it is possible to use these group
+For example, if your provider is configured to expose group information, it is possible to use these group
 names to configure User Roles.
 
-This requires configuration in Okta.  You can set the 'Groups claim type' to 'Filter' and supply
-a regex of which groups should be returned which can be mapped below.
+=== "Microsoft"
+    With Microsoft you can configure 'App roles' that can then be assigned to specific users or whole
+    groups from your organization. To do that, select 'App roles' under 'Manage'. There you can click
+    'Create app role'.
 
-![socialite-okta-1](../img/socialite-okta-4.png)
+    ![socialite-microsoft-7-create-app-role](../img/socialite-microsoft-7.png)
 
-First enable sending the 'groups' claim (along with the normal openid, profile, and email claims).
-Be aware that the scope name must match the claim name. For identity providers where the scope does
-not match (e.g. Keycloak: roles -> groups) you need to configure a custom scope.
+    Give it a name, description, value and select 'Users/Groups' under 'Allowed member types'.  
+    The value is the important part here: based on it you can setup mappings in LibrenNMS.
 
-!!! setting "settings/auth/socialite"
-    ```bash
-    lnms config:set auth.socialite.scopes.+ groups
-    ```
+    Now you need to assign a user/group to your app role. For that you have to go to
+    ["Azure Active Directory" > "Enterprise applications"](https://aad.portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/EnterpriseApps),
+    select your App and then 'Users and groups' under 'Manage'.
+
+    Here you can assign a user or group to your app and specify the associated app role:
+
+    ![socialite-microsoft-8-assign-app-role](../img/socialite-microsoft-8.png)
+
+    !!! note
+        Microsoft automatically sends the app roles via the `roles` claim.
+        You don't need to add an additional scope – in fact, Microsoft doesn't have a scope named `roles`
+
+    If you don't want to configure app roles and instead want to use existing groups from your organization directly,
+    you can do so by going to 'Token configuration' under 'Manage' inside the [App registration configuration](https://aad.portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/EnterpriseApps)
+    for your app.
+
+    There you can click 'Add groups claim', select the groups you want, choose the format and importantly select 'Emit groups as role claims'.
+
+    !!! note
+        If you want to match on just the group name later in LibreNMS, select 'sAMAccountName'
+
+    ![socialite-microsoft-9-emit-groups-as-role-claim](../img/socialite-microsoft-9.png)
+
+
+    !!! note
+        The value for 'RETURN_FROM_CLAIM' is the value you specified when creating the app role
+        – 'admin' in our case – or the name or group id if you use the group claims method
+
+=== "Okta"
+    This requires configuration in Okta.  You can set the 'Groups claim type' to 'Filter' and supply
+    a regex of which groups should be returned which can be mapped below.
+
+    ![socialite-okta-1](../img/socialite-okta-4.png)
+
+    First enable sending the 'groups' claim (along with the normal openid, profile, and email claims).
+    Be aware that the scope name must match the claim name. For identity providers where the scope does
+    not match (e.g. Keycloak: roles -> groups) you need to configure a custom scope.
+
+    !!! setting "settings/auth/socialite"
+        ```bash
+        lnms config:set auth.socialite.scopes.+ groups
+        ```
 
 Then setup mappings from the returned claim arrays to the User levels you want
 !!! setting "settings/auth/socialite"
