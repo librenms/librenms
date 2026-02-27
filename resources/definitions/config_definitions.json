@@ -5789,6 +5789,18 @@
                 "value": "url"
             }
         },
+	oxidized.config_view_permission: {
+	    default: admin,
+	    type: select,
+	    group: external,
+	    section: oxidized,
+	    order: 10,
+	    options: {
+		admin: Admin only,
+		global-read: Global Read,
+		user: Normal User
+	    }
+	},
         "radius.default_level": {
             "default": 1,
             "type": "integer"

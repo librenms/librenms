@@ -4,7 +4,17 @@
 use App\Facades\LibrenmsConfig;
 use Symfony\Component\Process\Process;
 
-if (Auth::user()->hasGlobalAdmin()) {
+$required_role = LibrenmsConfig::get('oxidized.config_view_permission', 'admin');
+
+$hasPermission = match ($required_role) {
+    'admin' => Auth::user()->hasGlobalAdmin(),
+    'global-read' => Auth::user()->can('global-read'),
+    'user' => Auth::user()->can('read'),
+    default => Auth::user()->hasGlobalAdmin(),
+};
+
+if ($hasPermission) {
+
     if (LibrenmsConfig::get('rancid_repo_type') == 'git-bare' && is_dir($rancid_path)) {
         echo '<div style="clear: both;">';
 
