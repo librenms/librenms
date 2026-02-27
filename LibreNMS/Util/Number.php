@@ -391,11 +391,11 @@ class Number
 
         // Auto-detect bit size based on both values
         if ($bitSize === null) {
-            $uint32Max = (string) IntegerType::uint32->maxValue();
+            $uint32Max = (string) IntegerType::Uint32->maxValue();
             $bitSize = (strlen($prevValue) > 10 || strcmp($prevValue, $uint32Max) > 0 ||
                 strlen($currValue) > 10 || strcmp($currValue, $uint32Max) > 0) ? 64 : 32;
         }
-        $maxValue = (string) ($bitSize === 32 ? IntegerType::uint32->maxValue() : IntegerType::uint64->maxValue());
+        $maxValue = (string) ($bitSize === 32 ? IntegerType::Uint32->maxValue() : IntegerType::Uint64->maxValue());
         $timeInterval = $currTime - $prevTime;
 
         if (extension_loaded('gmp')) {
