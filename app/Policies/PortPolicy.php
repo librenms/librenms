@@ -5,11 +5,10 @@ namespace App\Policies;
 use App\Facades\Permissions;
 use App\Models\Port;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PortPolicy
 {
-    use HandlesAuthorization;
+    use ChecksGlobalPermissions;
 
     /**
      * Determine whether the user can view any ports.
@@ -18,7 +17,7 @@ class PortPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasGlobalRead();
+        return $this->hasGlobalPermission($user, 'viewAny');
     }
 
     /**
@@ -29,7 +28,9 @@ class PortPolicy
      */
     public function view(User $user, Port $port): bool
     {
-        return $this->viewAny($user) || Permissions::canAccessDevice($port->device_id, $user) || Permissions::canAccessPort($port, $user);
+        return $this->hasGlobalPermission($user, 'view')
+            || Permissions::canAccessDevice($port->device_id, $user)
+            || Permissions::canAccessPort($port, $user);
     }
 
     /**
@@ -50,7 +51,7 @@ class PortPolicy
      */
     public function update(User $user, Port $port): bool
     {
-        return $user->hasGlobalAdmin();
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -61,7 +62,7 @@ class PortPolicy
      */
     public function delete(User $user, Port $port): bool
     {
-        return $user->hasGlobalAdmin();
+        return $this->hasGlobalPermission($user, 'delete');
     }
 
     /**
@@ -72,7 +73,7 @@ class PortPolicy
      */
     public function restore(User $user, Port $port): bool
     {
-        return $user->hasGlobalAdmin();
+        return $this->hasGlobalPermission($user, 'restore');
     }
 
     /**
@@ -83,6 +84,6 @@ class PortPolicy
      */
     public function forceDelete(User $user, Port $port): bool
     {
-        return $user->hasGlobalAdmin();
+        return $this->hasGlobalPermission($user, 'forceDelete');
     }
 }

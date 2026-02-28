@@ -5,11 +5,10 @@ namespace App\Policies;
 use App\Facades\Permissions;
 use App\Models\Device;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DevicePolicy
 {
-    use HandlesAuthorization;
+    use ChecksGlobalPermissions;
 
     /**
      * Determine whether the user can view any devices.
@@ -18,7 +17,7 @@ class DevicePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasGlobalRead();
+        return $this->hasGlobalPermission($user, 'viewAny');
     }
 
     /**
@@ -29,7 +28,8 @@ class DevicePolicy
      */
     public function view(User $user, Device $device): bool
     {
-        return $this->viewAny($user) || Permissions::canAccessDevice($device, $user);
+        return $this->hasGlobalPermission($user, 'view')
+            || Permissions::canAccessDevice($device, $user);
     }
 
     /**
@@ -39,7 +39,7 @@ class DevicePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasGlobalAdmin();
+        return $this->hasGlobalPermission($user, 'create');
     }
 
     /**
@@ -50,7 +50,7 @@ class DevicePolicy
      */
     public function update(User $user, Device $device): bool
     {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -61,29 +61,7 @@ class DevicePolicy
      */
     public function delete(User $user, Device $device): bool
     {
-        return $user->isAdmin();
-    }
-
-    /**
-     * Determine whether the user can restore the device.
-     *
-     * @param  User  $user
-     * @param  Device  $device
-     */
-    public function restore(User $user, Device $device): bool
-    {
-        return $user->hasGlobalAdmin();
-    }
-
-    /**
-     * Determine whether the user can permanently delete the device.
-     *
-     * @param  User  $user
-     * @param  Device  $device
-     */
-    public function forceDelete(User $user, Device $device): bool
-    {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'delete');
     }
 
     /**
@@ -95,7 +73,7 @@ class DevicePolicy
      */
     public function showConfig(User $user, Device $device): bool
     {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'showConfig');
     }
 
     /**
@@ -106,6 +84,6 @@ class DevicePolicy
      */
     public function updateNotes(User $user, Device $device): bool
     {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'updateNotes');
     }
 }

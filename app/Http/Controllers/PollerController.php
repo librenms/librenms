@@ -32,7 +32,7 @@ class PollerController extends Controller
 
     public function groupsTab()
     {
-        $this->authorize('manage', PollerCluster::class);
+        $this->authorize('viewAny', PollerGroup::class);
 
         return view('poller.groups', [
             'current_tab' => 'groups',
@@ -55,7 +55,7 @@ class PollerController extends Controller
 
     public function settingsTab()
     {
-        $this->authorize('manage', PollerCluster::class);
+        $this->authorize('update', PollerCluster::class);
         $pollerClusters = PollerCluster::all()->keyBy('id');
 
         return view('poller.settings', [

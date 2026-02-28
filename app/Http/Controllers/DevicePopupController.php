@@ -28,6 +28,7 @@ namespace App\Http\Controllers;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Graph;
 
 class DevicePopupController
@@ -39,9 +40,7 @@ class DevicePopupController
         }
 
         // Check access permissions
-        if (! $device->canAccess(auth()->user())) {
-            return response('Unauthorized', 403);
-        }
+        Gate::authorize('view', $device);
 
         // Build graphs HTML using existing graph-row component
         $graphs = [];

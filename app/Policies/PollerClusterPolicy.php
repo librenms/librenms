@@ -4,11 +4,10 @@ namespace App\Policies;
 
 use App\Models\PollerCluster;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PollerClusterPolicy
 {
-    use HandlesAuthorization;
+    use ChecksGlobalPermissions;
 
     /**
      * Determine whether the user can view any poller clusters.
@@ -17,7 +16,7 @@ class PollerClusterPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasGlobalAdmin();
+        return $this->hasGlobalPermission($user, 'viewAny');
     }
 
     /**
@@ -28,7 +27,7 @@ class PollerClusterPolicy
      */
     public function view(User $user, PollerCluster $pollerCluster): bool
     {
-        return $this->viewAny($user);
+        return $this->hasGlobalPermission($user, 'view');
     }
 
     /**
@@ -38,7 +37,7 @@ class PollerClusterPolicy
      */
     public function create(User $user): bool
     {
-        return $this->viewAny($user);
+        return $this->hasGlobalPermission($user, 'create');
     }
 
     /**
@@ -49,7 +48,7 @@ class PollerClusterPolicy
      */
     public function update(User $user, PollerCluster $pollerCluster): bool
     {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -60,7 +59,7 @@ class PollerClusterPolicy
      */
     public function delete(User $user, PollerCluster $pollerCluster): bool
     {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'delete');
     }
 
     /**
@@ -70,17 +69,6 @@ class PollerClusterPolicy
      * @param  PollerCluster  $pollerCluster
      */
     public function restore(User $user, PollerCluster $pollerCluster): bool
-    {
-        return $this->viewAny($user);
-    }
-
-    /**
-     * Determine whether the user can permanently delete the poller cluster.
-     *
-     * @param  User  $user
-     * @param  PollerCluster  $pollerCluster
-     */
-    public function forceDelete(User $user, PollerCluster $pollerCluster): bool
     {
         return $this->viewAny($user);
     }

@@ -12,10 +12,7 @@
  * the source code distribution for details.
  */
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    header('Content-type: text/plain');
-    exit('ERROR: You need to be admin');
-}
+Gate::authorize('poller-group.update.update');
 
 $group_id = $_POST['group_id'];
 

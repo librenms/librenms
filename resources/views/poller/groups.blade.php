@@ -31,8 +31,12 @@
             <td><a href="{{ url('devices/poller_group=' . $group->id) }}">{{ $group->devices_count }}</a></td>
             <td>{{ $group->descr }}</td>
             <td>
+                @can('poller-group.update')
                 <button type="button" class="btn btn-success btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#poller-groups">{{ __('Edit') }}</button>
+                @endcan
+                @can('poller-group.delete')
                 <button type="button" class="btn btn-danger btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#confirm-delete">{{ __('Delete') }}</button>
+                @endcan
             </td>
         @endforeach
         </tr>
@@ -109,7 +113,6 @@
 @endsection
 
 @section('scripts')
-@if(auth()->user()->isAdmin())
 <script>
 $('#confirm-delete').on('show.bs.modal', function(e) {
     group_id = $(e.relatedTarget).data('group_id');
@@ -179,6 +182,5 @@ $('#create-group').on("click", function(e) {
         }
     });
 });
-@endif
 </script>
 @endsection

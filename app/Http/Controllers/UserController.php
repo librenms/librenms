@@ -56,7 +56,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $this->authorize('manage', User::class);
+        $this->authorize('viewAny', User::class);
 
         return view('user.index', [
             'users' => User::with(['preferences', 'roles'])->orderBy('username')->get(),
@@ -94,6 +94,8 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request, ToastInterface $toast)
     {
+        $this->authorize('create', User::class);
+
         $user = $request->only(['username', 'realname', 'email', 'descr', 'can_modify_passwd']);
         $user['auth_type'] = LegacyAuth::getType();
         $user['can_modify_passwd'] = $request->input('can_modify_passwd'); // checkboxes are missing when unchecked
@@ -173,6 +175,8 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user, ToastInterface $toast)
     {
+        $this->authorize('update', $user);
+
         if ($request->input('new_password') && $user->canSetPassword($request->user())) {
             $user->setPassword($request->new_password);
             /** @var User $current_user */
@@ -282,7 +286,7 @@ class UserController extends Controller
 
     public function authlog()
     {
-        $this->authorize('manage', User::class);
+        $this->authorize('view', AuthLog::class);
 
         return view('user.authlog', [
             'authlog' => AuthLog::orderBy('datetime', 'DESC')->get(),
