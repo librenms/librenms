@@ -103,7 +103,7 @@
                 updateTimezone(tz, false);
             }
         @endif
-        window.tz = '{{ \LibreNMS\Util\Time::SessionTimezone() }}';
+        window.tz = '{{ \LibreNMS\Util\Time::sessionTimezone() }}';
         </script>
         <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
     @endauth
