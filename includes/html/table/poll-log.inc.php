@@ -23,7 +23,7 @@ if (isset($searchPhrase) && ! empty($searchPhrase)) {
     $sql .= ' AND (hostname LIKE ? OR sysName LIKE ? OR IFNULL(CONVERT_TZ(last_polled, @@global.time_zone, ?),last_polled) LIKE ? OR last_polled_timetaken LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
-    $param[] = session('preferences.timezone');
+    $param[] = Time::sessionTimezone();
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
 }
