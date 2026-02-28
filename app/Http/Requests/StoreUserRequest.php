@@ -18,15 +18,7 @@ class StoreUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        if ($this->user()->can('create', User::class)) {
-            if ($this->user()->cannot('update', Role::class)) {
-                unset($this['roles']);
-            }
-
-            return true;
-        }
-
-        return false;
+        return $this->user()->can('create', User::class);
     }
 
     /**
@@ -46,7 +38,10 @@ class StoreUserRequest extends FormRequest
             'realname' => 'nullable|max:64|alpha_space',
             'email' => 'nullable|email|max:64',
             'descr' => 'nullable|max:30|alpha_space',
-            'roles' => 'array',
+            'roles' => [
+                'array',
+                Rule::when($this->user()->cannot('update', Role::class), 'size:0'),
+            ],
             'roles.*' => 'exists:roles,name',
             'new_password' => ['required', 'confirmed', Password::defaults()],
             'dashboard' => 'int',

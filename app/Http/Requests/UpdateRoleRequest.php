@@ -23,10 +23,18 @@ class UpdateRoleRequest extends FormRequest
     public function rules(): array
     {
         $role = $this->route('role');
-        return [
-            'name' => 'required|unique:roles,name,' . $role->id . '|regex:/^[a-z-]+$/',
+        $rules = [
             'permissions' => 'array',
         ];
+
+        // Do not allow renaming the Admin role
+        if (in_array(strtolower($role->name), ['admin'])) {
+            $rules['name'] = 'required|in:' . $role->name;
+        } else {
+            $rules['name'] = 'required|unique:roles,name,' . $role->id . '|regex:/^[a-z-]+$/';
+        }
+
+        return $rules;
     }
 
     /**

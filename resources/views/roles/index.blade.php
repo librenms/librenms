@@ -22,26 +22,26 @@
         <table class="tw:min-w-full tw:leading-normal">
             <thead>
                 <tr>
-                    <th class="tw:px-5 tw:py-3 tw:border-b-2 tw:border-gray-200 tw:dark:border-gray-700 tw:bg-gray-100 tw:dark:bg-gray-700 tw:text-left tw:text-sm tw:font-semibold tw:text-gray-600 tw:dark:text-gray-300 tw:uppercase tw:tracking-wider">
+                    <th class="tw:px-5 tw:py-3 tw:border-b-2 tw:border-gray-200 tw:dark:border-gray-700 tw:bg-gray-100 tw:dark:bg-gray-700 tw:text-left tw:font-semibold tw:text-gray-600 tw:dark:text-gray-300 tw:tracking-wider">
                         {{ __('permissions.rbac.role_name') }}
                     </th>
-                    <th class="tw:px-5 tw:py-3 tw:border-b-2 tw:border-gray-200 tw:dark:border-gray-700 tw:bg-gray-100 tw:dark:bg-gray-700 tw:text-left tw:text-sm tw:font-semibold tw:text-gray-600 tw:dark:text-gray-300 tw:uppercase tw:tracking-wider">
+                    <th class="tw:px-5 tw:py-3 tw:border-b-2 tw:border-gray-200 tw:dark:border-gray-700 tw:bg-gray-100 tw:dark:bg-gray-700 tw:text-left tw:font-semibold tw:text-gray-600 tw:dark:text-gray-300 tw:tracking-wider">
                         {{ __('permissions.rbac.permissions') }}
                     </th>
-                    <th class="tw:px-5 tw:py-3 tw:border-b-2 tw:border-gray-200 tw:dark:border-gray-700 tw:bg-gray-100 tw:dark:bg-gray-700 tw:text-right tw:text-sm tw:font-semibold tw:text-gray-600 tw:dark:text-gray-300 tw:uppercase tw:tracking-wider">
+                    <th class="tw:px-5 tw:py-3 tw:border-b-2 tw:border-gray-200 tw:dark:border-gray-700 tw:bg-gray-100 tw:dark:bg-gray-700 tw:text-right tw:font-semibold tw:text-gray-600 tw:dark:text-gray-300 tw:tracking-wider">
                         {{ __('permissions.rbac.actions') }}
                     </th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="tw:text-xl">
                 @foreach($roles as $role)
                 <tr class="tw:hover:bg-gray-50 tw:dark:hover:bg-gray-700 tw:transition tw:duration-150">
-                    <td class="tw:px-5 tw:py-5 tw:border-b tw:border-gray-200 tw:dark:border-gray-700 tw:text-lg">
+                    <td class="tw:px-5 tw:py-5 tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
                         <p class="tw:text-gray-900 tw:dark:text-gray-100 tw:whitespace-no-wrap tw:font-bold">
                             {{ $role->name }}
                         </p>
                     </td>
-                    <td class="tw:px-5 tw:py-5 tw:border-b tw:border-gray-200 tw:dark:border-gray-700 tw:text-lg">
+                    <td class="tw:px-5 tw:py-5 tw:border-b tw:border-gray-200 tw:dark:border-gray-700">
                         <div class="tw:flex tw:flex-wrap tw:gap-2">
                             @forelse($role->permissions as $permission)
                                 <span class="tw:bg-gray-200 tw:dark:bg-gray-600 tw:text-gray-800 tw:dark:text-gray-200 tw:px-3 tw:py-1 tw:rounded tw:text-base tw:font-medium">
@@ -55,14 +55,14 @@
                     <td class="tw:px-5 tw:py-5 tw:border-b tw:border-gray-200 tw:dark:border-gray-700 tw:text-lg tw:text-right">
                         <div class="tw:flex tw:justify-end tw:items-center tw:space-x-4">
                             <a href="{{ route('roles.edit', $role->id) }}" class="tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:transition tw:duration-200" title="{{ __('permissions.rbac.edit_role') }}">
-                                <i class="fas fa-edit tw:text-xl"></i>
+                                <i class="fas fa-xl fa-edit"></i>
                             </a>
                             @if($role->name !== 'Admin' && $role->name !== 'admin')
                                 <form action="{{ route('roles.destroy', $role->id) }}" method="POST" onsubmit="return confirm('{{ __('permissions.rbac.confirm_delete') }}');" class="tw:inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="tw:text-red-600 tw:hover:text-red-800 tw:dark:text-red-400 tw:dark:hover:text-red-300 tw:transition tw:duration-200" title="{{ __('permissions.rbac.delete_role') }}">
-                                        <i class="fas fa-trash tw:text-xl"></i>
+                                        <i class="fas fa-xl fa-trash"></i>
                                     </button>
                                 </form>
                             @endif
