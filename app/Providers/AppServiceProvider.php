@@ -234,6 +234,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function bootAuth(): void
     {
+        Gate::policy(\Spatie\Permission\Models\Role::class, \App\Policies\RolePolicy::class);
+
         Auth::provider('legacy', fn ($app, array $config) => new LegacyUserProvider());
 
         Auth::provider('token_provider', fn ($app, array $config) => new TokenUserProvider());
