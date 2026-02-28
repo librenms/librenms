@@ -31,6 +31,8 @@ class RoleController extends Controller
 
     public function store(StoreRoleRequest $request, ToastInterface $toast): RedirectResponse
     {
+        $this->authorize('create', Role::class);
+
         $validated = $request->validated();
 
         $role = Role::create(['name' => $validated['name']]);
@@ -53,6 +55,8 @@ class RoleController extends Controller
 
     public function update(UpdateRoleRequest $request, Role $role, ToastInterface $toast): RedirectResponse
     {
+        $this->authorize('update', Role::class);
+
         $validated = $request->validated();
 
         $role->update(['name' => $validated['name']]);
