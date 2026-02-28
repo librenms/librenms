@@ -48,12 +48,13 @@ class UserPolicy
      */
     public function update(User $user, ?User $target = null): bool
     {
-        // allow users to update themselves (specific fields are restricted)
-        if ($target !== null && $target->is($user)) {
-            return true;
-        }
-
         return $this->hasGlobalPermission($user, 'update');
+    }
+
+    public function updatePassword(User $user, User $target): bool
+    {
+        return $target->is($user)
+            || $this->hasGlobalPermission($user, 'update');
     }
 
     /**

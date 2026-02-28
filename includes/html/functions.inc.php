@@ -497,11 +497,6 @@ function generate_pagination($count, $limit, $page, $links = 2)
     return $return;
 }//end generate_pagination()
 
-function demo_account()
-{
-    print_error("You are logged in as a demo account, this page isn't accessible to you");
-}//end demo_account()
-
 function get_client_ip()
 {
     if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {

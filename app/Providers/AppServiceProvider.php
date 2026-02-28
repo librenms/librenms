@@ -248,10 +248,14 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('global-admin', fn (User $user) => $user->hasAnyRole('admin', 'demo'));
         Gate::define('admin', fn (User $user) => $user->hasRole('admin'));
         Gate::define('global-read', fn (User $user) => $user->hasAnyRole('admin', 'global-read'));
-        Gate::define('device', fn (User $user, $device) => $user->canAccessDevice($device));
+        Gate::define('demo', fn (User $user) => $user->hasRole('demo'));
 
         // define super admin and global read
         Gate::before(function (User $user, string $ability) {
+            if ($ability === 'demo') {
+                return null;
+            }
+
             if ($user->hasRole('admin')) {
                 return true;  // super admin
             }

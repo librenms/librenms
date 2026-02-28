@@ -33,11 +33,14 @@ groups:
         - location.update
         - location.delete
 
-    ports:
-        - ports.viewAny
-        - ports.view
-        - ports.update
-        - ports.delete
+    plugin:
+        - admin
+
+    port:
+        - port.viewAny
+        - port.view
+        - port.update
+        - port.delete
 
     role:
         - role.viewAny
@@ -54,14 +57,15 @@ groups:
         - settings.viewAny
         - settings.update
 
-    users:
-        - users.viewAny
-        - users.view
-        - users.create
-        - users.update
-        - users.delete
+    user:
+        - user.viewAny
+        - user.view
+        - user.create
+        - user.update
+        - user.delete
 
-
+hidden:
+    - user.updatePassword
 
 
 

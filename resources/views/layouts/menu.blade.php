@@ -36,7 +36,7 @@
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
-                        @if(auth()->user()->isAdmin() || $has_v1_plugins || $has_v2_plugins)
+                        @if(Gate::allows('plugin.admin') || $has_v1_plugins || $has_v2_plugins)
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> {{ __('Plugins') }}</a>
                             <ul class="dropdown-menu">
@@ -167,7 +167,7 @@
 
                         @admin
                         <li role="presentation" class="divider"></li>
-                        @can('manage', \App\Models\DeviceGroup::class)
+                        @can('viewAny', \App\Models\DeviceGroup::class)
                             <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('Manage Groups') }}
                                 </a></li>
@@ -326,7 +326,7 @@
                             <li><a href="{{ url('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
                                                               aria-hidden="true"></i> NAC</a></li>
                         @endif
-                        @if(auth()->user()->hasGlobalRead())
+                        @can('port.viewAny')
                             @if($port_groups_exist)
                                 <li role="presentation" class="divider"></li>
                                 @config('int_customers')
@@ -393,12 +393,14 @@
                                         aria-hidden="true"></i> {{ __('Disabled :port_count', ['port_count' => $port_counts['shutdown']]) }}
                                 </a></li>
 
+                            @can('port.delete')
                             @if($port_counts['deleted'])
                                 <li><a href="{{ url('ports/deleted=1') }}"><i class="fa fa-minus-circle fa-fw fa-lg"
                                                                                 aria-hidden="true"></i> {{ __('Deleted :port_count', ['port_count' => $port_counts['deleted']]) }}
                                     </a></li>
                             @endif
-                        @endif
+                            @endcan
+                        @endcan
                     </ul>
                 </li>
 {{-- Sensors --}}

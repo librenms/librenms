@@ -83,25 +83,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Test if this user is the demo user
-     */
-    public function isDemo(): bool
-    {
-        return $this->hasRole('demo');
-    }
-
-    /**
-     * Check if this user has access to a device
-     *
-     * @param  Device|int  $device  can be a device Model or device id
-     * @return bool
-     */
-    public function canAccessDevice($device): bool
-    {
-        return $this->hasGlobalRead() || Permissions::canAccessDevice($device, $this->user_id);
-    }
-
-    /**
      * Helper function to hash passwords before setting
      *
      * @param  string  $password
