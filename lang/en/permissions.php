@@ -78,6 +78,8 @@ return [
         'role_name'               => 'Role Name',
         'permissions'             => 'Permissions',
         'actions'                 => 'Actions',
+        'all_permissions'         => 'All Permissions',
+        'read_permissions'        => 'All Read-Only Permissions',
         'no_permissions'          => 'No permissions assigned',
         'confirm_delete'          => 'Are you sure you want to delete this role?',
         'role_name_placeholder'   => 'e.g., network-engineer',
