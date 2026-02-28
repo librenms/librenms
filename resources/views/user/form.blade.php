@@ -34,7 +34,7 @@
     <div class="form-group @if($errors->has('roles')) has-error @endif">
         <label for="level" class="control-label col-sm-3">{{ __('Roles') }}</label>
         <div class="col-sm-9">
-            <select class="form-control" id="roles" name="roles[]" multiple @cannot('manage', \Spatie\Permission\Models\Role::class) readonly @endcannot>
+            <select class="form-control" id="roles" name="roles[]" multiple @cannot('update', \Spatie\Permission\Models\Role::class) readonly @endcannot>
                 @foreach(\Spatie\Permission\Models\Role::query()->get() as $role)
                     <option value="{{ $role->name }}" @if(collect(old('roles', $user->getRoleNames()))->contains($role->name)) selected @endif>{{ __($role->name) }}</option>
                 @endforeach
@@ -56,11 +56,11 @@
     </div>
 </div>
 
-@if($user->canSetPassword(auth()->user()))
+@can('updatePassword', auth()->user())
     <div class="form-group @if($errors->hasAny(['old_password', 'new_password', 'new_password_confirmation'])) has-error @endif">
         <label for="password" class="control-label col-sm-3">{{ __('Password') }}</label>
         <div class="col-sm-9">
-            @if(auth()->user()->cannot('admin') || auth()->user()->is($user))
+            @if(auth()->user()->cannot('update', \App\Models\User::class) || auth()->user()->is($user))
                 <input type="password" class="form-control" id="old_password" name="old_password" placeholder="{{ __('Current Password') }}">
             @endif
             <input type="password" autocomplete="off" class="form-control" id="new_password" name="new_password" placeholder="{{ __('New Password') }}">
@@ -72,7 +72,7 @@
             </span>
         </div>
     </div>
-@endif
+@endcan
 
 @if(\LibreNMS\Authentication\LegacyAuth::get()->canUpdatePasswords())
 <div class="form-group @if($errors->has('can_modify_passwd')) has-error @endif">

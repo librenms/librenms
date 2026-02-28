@@ -26,7 +26,7 @@ class ServiceTemplateController extends Controller
      */
     public function index()
     {
-        //$this->authorize('manage', ServiceTemplate::class);
+        $this->authorize('viewAny', ServiceTemplate::class);
 
         return view(
             'service-template.index', [

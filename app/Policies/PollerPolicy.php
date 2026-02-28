@@ -4,19 +4,12 @@ namespace App\Policies;
 
 use App\Models\User;
 
-class PollerClusterPolicy
+class PollerPolicy
 {
     use ChecksGlobalPermissions;
 
-    public function __construct()
-    {
-        $this->prefix = 'poller';
-    }
-
     /**
-     * Determine whether the user can view any poller clusters.
-     *
-     * @param  User  $user
+     * Determine whether the user can view any pollers.
      */
     public function viewAny(User $user): bool
     {
@@ -24,7 +17,7 @@ class PollerClusterPolicy
     }
 
     /**
-     * Determine whether the user can view the poller cluster.
+     * Determine whether the user can view the poller.
      */
     public function view(User $user): bool
     {
@@ -32,7 +25,7 @@ class PollerClusterPolicy
     }
 
     /**
-     * Determine whether the user can update the poller cluster.
+     * Determine whether the user can update the poller.
      */
     public function update(User $user): bool
     {
@@ -40,7 +33,7 @@ class PollerClusterPolicy
     }
 
     /**
-     * Determine whether the user can delete the poller cluster.
+     * Determine whether the user can delete the poller.
      */
     public function delete(User $user): bool
     {

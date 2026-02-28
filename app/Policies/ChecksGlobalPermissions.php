@@ -7,13 +7,13 @@ use Illuminate\Support\Str;
 
 trait ChecksGlobalPermissions
 {
-    protected string $prefix;
+    protected ?string $prefix = null;
 
     protected function hasGlobalPermission(User $user, string $action): bool
     {
         // Guess prefix
-        $prefix ??= Str::kebab(Str::before(class_basename($this), 'Policy'));
+        $this->prefix ??= Str::kebab(Str::before(class_basename($this), 'Policy'));
 
-        return $user->hasPermissionTo("$prefix.$action");
+        return $user->hasPermissionTo("$this->prefix.$action");
     }
 }

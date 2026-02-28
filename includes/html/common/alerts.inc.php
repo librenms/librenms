@@ -35,6 +35,7 @@ $alert_severities = [
     'warning only' => 5,
     'critical only' => 6,
 ];
+$admin_verbose_details = '';
 if (Auth::user()->hasGlobalAdmin()) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }

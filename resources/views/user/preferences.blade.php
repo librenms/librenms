@@ -204,9 +204,9 @@
     </x-panel>
 
     <x-panel title="{{ __('Device Permissions') }}">
-        @can('device.update')
+        @can('update', \App\Models\Device::class)
             <strong class="blue">{{ __('Global Administrative Access') }}</strong>
-        @elseCan('device.viewAny')
+        @elseCan('viewAny', \App\Models\Device::class)
             <strong class="green">{{ __('Global Viewing Access') }}</strong>
         @else
             @forelse($devices as $device)

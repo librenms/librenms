@@ -9,15 +9,18 @@ groups:
         - custom-map.update
         - custom-map.delete
 
-    devices:
-        - devices.viewAny
-        - devices.view
-        - devices.create
-        - devices.update
-        - devices.delete
-        - devices.debug
-        - devices.showConfig
-        - devices.updateNotes
+    dashboard:
+        - dashboard.copy
+
+    device:
+        - device.viewAny
+        - device.view
+        - device.create
+        - device.update
+        - device.delete
+        - device.debug
+        - device.showConfig
+        - device.updateNotes
 
     device-group:
         - device-group.viewAny
@@ -35,6 +38,18 @@ groups:
 
     plugin:
         - admin
+
+    poller:
+        - poller.viewAny
+        - poller.view
+        - poller.update
+        - poller.delete
+
+    poller-group:
+        - poller-group.viewAny
+        - poller-group.create
+        - poller-group.update
+        - poller-group.delete
 
     port:
         - port.viewAny

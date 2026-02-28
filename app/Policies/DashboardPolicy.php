@@ -72,9 +72,9 @@ class DashboardPolicy
      * @param  Dashboard  $dashboard
      * @param  int  $target_user_id
      */
-    public function copy(User $user, Dashboard $dashboard, int $target_user_id): bool
+    public function copy(User $user, ?Dashboard $dashboard = null, int $target_user_id = 0): bool
     {
         return $this->hasGlobalPermission($user, 'copy')
-            || ($user->user_id == $target_user_id && $this->view($user, $dashboard));
+            || ($dashboard && $target_user_id && $user->user_id == $target_user_id && $this->view($user, $dashboard));
     }
 }

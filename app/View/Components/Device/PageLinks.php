@@ -142,7 +142,7 @@ class PageLinks extends Component
             'external' => true,
         ];
 
-        if (Gate::allows('device.debug')) {
+        if (Gate::allows('debug', \App\Models\Device::class)) {
             $device_links['capture'] = [
                 'icon' => 'fa-bug',
                 'url' => route('device', [$device->device_id, 'capture']),

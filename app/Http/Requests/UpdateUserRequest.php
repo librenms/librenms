@@ -20,17 +20,21 @@ class UpdateUserRequest extends FormRequest
     {
         /** @var User|null $user */
         $user = $this->route('user');
-        if ($user && $this->user()->can('update', $user)) {
-            // normal users cannot update their roles or ability to modify a password
-            if ($this->user()->cannot('manage', Role::class)) {
+        if ($user) {
+            // normal users cannot update their roles
+            if ($this->user()->cannot('update', Role::class)) {
                 unset($this['roles']);
             }
 
+            // users cannot modify their ability to change their password or enable/disable themselves
             if ($user->is($this->user())) {
                 unset($this['can_modify_passwd']);
+                unset($this['enabled']);
+
+                return true;
             }
 
-            return true;
+            return $this->user()->can('update', User::class);
         }
 
         return false;

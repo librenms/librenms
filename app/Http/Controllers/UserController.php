@@ -35,10 +35,8 @@ use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
 use Auth;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
-use Spatie\Permission\Models\Role;
 use URL;
 
 class UserController extends Controller
@@ -176,9 +174,7 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user, ToastInterface $toast)
     {
-        $this->authorize('update', $user);
-
-        if ($request->input('new_password') && Gate::allows('updatePassword', $user)) {
+        if ($request->input('new_password')) {
             $user->setPassword($request->new_password);
             /** @var User $current_user */
             $current_user = Auth::user();
@@ -193,7 +189,7 @@ class UserController extends Controller
 
         $user->fill($request->validated());
 
-        if ($request->user()->can('update', Role::class) && $request->has('roles')) {
+        if ($request->has('roles')) {
             $user->syncRoles($request->input('roles', []));
         }
 

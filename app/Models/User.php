@@ -92,25 +92,6 @@ class User extends Authenticatable
         $this->attributes['password'] = $password ? Hash::make($password) : null;
     }
 
-    /**
-     * Check if the given user can set the password for this user
-     *
-     * @param  User  $user
-     * @return bool
-     */
-    public function canSetPassword($user)
-    {
-        if ($user && LegacyAuth::get()->canUpdatePasswords()) {
-            if ($user->isAdmin()) {
-                return true;
-            }
-
-            return $user->is($this) && $this->can_modify_passwd;
-        }
-
-        return false;
-    }
-
     public function getNotifications(?string $type = null): int|Collection
     {
         return match ($type) {

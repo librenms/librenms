@@ -6770,15 +6770,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/parse-poller-groups.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbInsert\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
