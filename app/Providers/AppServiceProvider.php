@@ -168,7 +168,7 @@ class AppServiceProvider extends ServiceProvider
 
         Validator::extend('ip_or_hostname', function ($attribute, $value, $parameters, $validator) {
             // allow prefixes too
-            if (str_contains('/', $value) && preg_match('#$(.+)/\d{1,3}$#', $value, $matches)) {
+            if (str_contains($value, '/') && preg_match('#^(.+)/\d{1,3}$#', $value, $matches)) {
                 return IP::isValid($matches[1]);
             }
 
