@@ -28,6 +28,7 @@ use App\Http\Controllers\NacController;
 use App\Http\Controllers\OuiLookupController;
 use App\Http\Controllers\OutagesController;
 use App\Http\Controllers\OverviewController;
+use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\PluginLegacyController;
 use App\Http\Controllers\PluginPageController;
 use App\Http\Controllers\PluginSettingsController;
@@ -191,6 +192,8 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('settings/{tab?}/{section?}', [SettingsController::class, 'index'])->name('settings');
         Route::put('settings/{name}', [SettingsController::class, 'update'])->name('settings.update');
         Route::delete('settings/{name}', [SettingsController::class, 'destroy'])->name('settings.destroy');
+
+        Route::resource('permissions', PermissionsController::class);
 
         Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
         Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
