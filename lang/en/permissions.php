@@ -65,5 +65,31 @@ return [
     'api' => [
         'access' => ['label' => 'API Access', 'description' => 'Access the LibreNMS REST API'],
     ],
+
+    'rbac' => [
+        'title'                   => 'Roles & Permissions',
+        'manage_users'            => 'Manage Users',
+        'manage_roles'            => 'Manage Roles',
+        'add_role'                => 'Add Role',
+        'create_role'             => 'Create Role',
+        'create_new_role'         => 'Create New Role',
+        'edit_role'               => 'Edit Role',
+        'delete_role'             => 'Delete Role',
+        'role_name'               => 'Role Name',
+        'permissions'             => 'Permissions',
+        'actions'                 => 'Actions',
+        'no_permissions'          => 'No permissions assigned',
+        'confirm_delete'          => 'Are you sure you want to delete this role?',
+        'role_name_placeholder'   => 'e.g., network-engineer',
+        'search_permissions'      => 'Search permissions...',
+        'select_all'              => 'Select All',
+        'clear_all'               => 'Clear All',
+        'save_role'               => 'Save Role',
+        'update_role'             => 'Update Role',
+        'created'                 => 'Role :name created successfully',
+        'updated'                 => 'Role :name updated successfully',
+        'deleted'                 => 'Role :name deleted successfully',
+        'role_name_regex'         => 'Role names can only contain lowercase letters and hyphens (-).',
+    ],
 ];
 
