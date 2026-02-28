@@ -725,11 +725,24 @@ class RunAlerts
             return false;
         }
 
-        $down_parent_count = dbFetchCell("SELECT count(*) from devices as d LEFT JOIN devices_attribs as a ON d.device_id=a.device_id LEFT JOIN device_relationships as r ON d.device_id=r.parent_device_id WHERE d.status=0 AND d.ignore=0 AND d.disabled=0 AND r.child_device_id=? AND (d.status_reason='icmp' OR (a.attrib_type='override_icmp_disable' AND a.attrib_value=true))", [$device]);
-        if ($down_parent_count == $parent_count) {
-            return true;
-        }
+        $down_parent_count = dbFetchCell("SELECT count(DISTINCT d.device_id)
+            FROM devices AS d
+            INNER JOIN device_relationships AS r ON d.device_id = r.parent_device_id
+            WHERE d.status = 0
+              AND d.ignore = 0
+              AND d.disabled = 0
+              AND r.child_device_id = ?
+              AND (
+                d.status_reason = 'icmp'
+                OR EXISTS (
+                    SELECT 1
+                    FROM devices_attribs AS a
+                    WHERE a.device_id = d.device_id
+                      AND a.attrib_type = 'override_icmp_disable'
+                      AND a.attrib_value = 'true'
+                )
+              )", [$device]);
 
-        return false;
+        return $down_parent_count == $parent_count;
     }
 }
