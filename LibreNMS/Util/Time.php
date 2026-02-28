@@ -223,7 +223,7 @@ class Time
 
         $timezone = session('preferences.timezone');
         if ($timezone) {
-            $input->setTimezone($timezone);
+            $input = $input->setTimezone($timezone);
         }
 
         return $input->format($format);
