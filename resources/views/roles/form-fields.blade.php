@@ -1,102 +1,124 @@
+{{-- Role Name --}}
 <div class="tw:mb-8">
-    <label for="name" class="tw:block tw:text-base tw:font-semibold tw:text-gray-700 tw:dark:text-gray-300 tw:mb-2 tw:italic">
+    <label for="name" class="tw:block tw:text-sm tw:font-semibold tw:uppercase tw:tracking-wider tw:text-slate-500 tw:dark:text-zinc-500 tw:mb-2">
         {{ __('permissions.rbac.role_name') }}
     </label>
     <input type="text" name="name" id="name" required
-           class="tw:w-full tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:focus:ring-2 tw:focus:ring-blue-500 tw:focus:border-blue-500 tw:bg-white tw:dark:bg-gray-700 tw:text-gray-900 tw:dark:text-white tw:transition tw:duration-200 tw:text-base"
+           class="tw:w-full tw:px-4 tw:py-2.5 tw:rounded-lg tw:border tw:border-slate-200 tw:dark:border-zinc-700 tw:bg-white tw:dark:bg-zinc-900/50 tw:text-slate-800 tw:dark:text-zinc-100 tw:placeholder-slate-400 tw:dark:placeholder-zinc-600 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-indigo-500 tw:dark:focus:ring-zinc-500 tw:focus:border-transparent tw:transition tw:duration-150 tw:text-base"
            placeholder="{{ __('permissions.rbac.role_name_placeholder') }}"
            value="{{ old('name', $role->name ?? '') }}"
            @if(isset($role) && in_array(strtolower($role->name), ['admin', 'global-read'])) readonly @endif>
     @error('name')
-        <p class="tw:text-red-500 tw:text-sm tw:mt-1">{{ $message }}</p>
+    <p class="tw:text-red-500 tw:dark:text-red-400 tw:text-sm tw:mt-1.5">{{ $message }}</p>
     @enderror
 </div>
 
-<div class="tw:mb-8">
-    <div class="tw:flex tw:items-center tw:justify-between tw:mb-4 tw:border-b tw:pb-2 tw:border-gray-100 tw:dark:border-gray-700">
+{{-- Permissions --}}
+<div>
+    {{-- Section header --}}
+    <div class="tw:flex tw:items-center tw:justify-between tw:mb-5 tw:pb-3 tw:border-b tw:border-slate-100 tw:dark:border-zinc-700/60">
         <div class="tw:flex tw:items-center tw:gap-4">
-            <h2 class="tw:text-2xl tw:font-bold tw:text-gray-800 tw:dark:text-gray-200">{{ __('permissions.rbac.permissions') }}</h2>
+            <span class="tw:text-lg tw:font-bold tw:text-slate-800 tw:dark:text-zinc-100">
+                {{ __('permissions.rbac.permissions') }}
+            </span>
+            {{-- Search --}}
             <div class="tw:relative">
-                <span class="tw:absolute tw:inset-y-0 tw:left-0 tw:pl-3 tw:flex tw:items-center tw:text-gray-400">
-                    <i class="fas fa-search"></i>
+                <span class="tw:absolute tw:inset-y-0 tw:left-0 tw:pl-3 tw:flex tw:items-center tw:text-slate-400 tw:dark:text-zinc-600 tw:pointer-events-none">
+                    <i class="fas fa-search tw:text-xs"></i>
                 </span>
-                <input type="text" x-model="search" placeholder="{{ __('permissions.rbac.search_permissions') }}"
-                       class="tw:pl-10 tw:pr-4 tw:py-2 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded-lg tw:bg-white tw:dark:bg-gray-700 tw:text-gray-900 tw:dark:text-white tw:focus:ring-2 tw:focus:ring-blue-500 tw:text-base">
+                <input type="text" x-model="search"
+                       placeholder="{{ __('permissions.rbac.search_permissions') }}"
+                       class="tw:pl-8 tw:pr-4 tw:py-1.5 tw:border tw:border-slate-200 tw:dark:border-zinc-700 tw:rounded-lg tw:bg-white tw:dark:bg-zinc-900/50 tw:text-slate-800 tw:dark:text-zinc-300 tw:placeholder-slate-400 tw:dark:placeholder-zinc-600 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-indigo-500 tw:dark:focus:ring-zinc-500 tw:focus:border-transparent tw:text-sm tw:transition tw:duration-150">
             </div>
         </div>
-        <div class="tw:space-x-4 tw:text-base">
-            <button type="button" @click="permissions = Array.from(document.querySelectorAll('input[name=\'permissions[]\']')).map(el => el.value)" class="tw:text-blue-600 tw:hover:text-blue-700 tw:dark:text-blue-400 tw:font-semibold">
-                <i class="fas fa-check-square tw:mr-1"></i>{{ __('permissions.rbac.select_all') }}
+        <div class="tw:flex tw:items-center tw:gap-3 tw:text-sm">
+            <button type="button"
+                    @click="permissions = Array.from(document.querySelectorAll('input[name=\'permissions[]\']')).map(el => el.value)"
+                    class="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-indigo-600 tw:dark:text-zinc-400 tw:hover:text-indigo-800 tw:dark:hover:text-zinc-200 tw:font-semibold tw:transition-colors tw:duration-150">
+                <i class="fas fa-check-square"></i>{{ __('permissions.rbac.select_all') }}
             </button>
-            <button type="button" @click="permissions = []" class="tw:text-gray-500 tw:dark:text-gray-400 tw:hover:text-gray-600 tw:font-semibold">
-                <i class="fas fa-square tw:mr-1"></i>{{ __('permissions.rbac.clear_all') }}
+            <span class="tw:text-slate-300 tw:dark:text-zinc-700">|</span>
+            <button type="button"
+                    @click="permissions = []"
+                    class="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-slate-500 tw:dark:text-zinc-500 tw:hover:text-slate-700 tw:dark:hover:text-zinc-300 tw:font-semibold tw:transition-colors tw:duration-150">
+                <i class="fas fa-square"></i>{{ __('permissions.rbac.clear_all') }}
             </button>
         </div>
     </div>
 
-    <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-8">
+    {{-- Permission groups grid --}}
+    <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
         @foreach($groups as $group => $perms)
-        @php
-            $groupPerms = array_map(function($perm) use ($labels, $group) {
-                return [
-                    'name' => $perm,
-                    'label' => $labels[$group][explode('.', $perm)[1]]['label'] ?? $perm,
-                    'description' => $labels[$group][explode('.', $perm)[1]]['description'] ?? ''
-                ];
-            }, $perms);
-        @endphp
-        <div class="tw:bg-gray-50 tw:dark:bg-gray-700 tw:p-6 tw:rounded-xl tw:border tw:border-gray-200 tw:dark:border-gray-600"
-             x-show="groupHasMatch('{{ $group }}', {{ json_encode($groupPerms) }})">
-            <h3 class="tw:font-bold tw:text-gray-700 tw:dark:text-gray-300 tw:mb-4 tw:border-b tw:border-gray-200 tw:dark:border-gray-600 tw:pb-2 tw:uppercase tw:text-base tw:tracking-wider">
-                {{ ucfirst($group) }}
-            </h3>
-            <div class="tw:space-y-4">
-                @foreach($groupPerms as $p)
-                <div class="tw:flex tw:items-start" x-show="isPermMatch('{{ $p['label'] }}', '{{ $p['description'] }}', '{{ $group }}')">
-                    <div class="tw:flex tw:items-center tw:h-6">
-                        <input type="checkbox" name="permissions[]" value="{{ $p['name'] }}" id="perm-{{ $p['name'] }}"
-                               x-model="permissions"
-                               class="tw:h-6 tw:w-6 tw:text-blue-600 tw:focus:ring-blue-500 tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:cursor-pointer tw:transition tw:duration-150">
-                    </div>
-                    <div class="tw:ml-3 tw:text-lg">
-                        <label for="perm-{{ $p['name'] }}" class="tw:font-semibold tw:text-gray-800 tw:dark:text-gray-100 tw:cursor-pointer">
-                            {{ $p['label'] }}
-                        </label>
-                        <p class="tw:text-gray-600 tw:dark:text-gray-400 tw:text-base">
-                            {{ $p['description'] }}
-                        </p>
-                    </div>
+            @php
+                $groupPerms = array_map(function($perm) use ($labels, $group) {
+                    return [
+                        'name' => $perm,
+                        'label' => $labels[$group][explode('.', $perm)[1]]['label'] ?? $perm,
+                        'description' => $labels[$group][explode('.', $perm)[1]]['description'] ?? ''
+                    ];
+                }, $perms);
+            @endphp
+            <div class="tw:rounded-xl tw:border tw:border-slate-200 tw:dark:border-zinc-700/50 tw:bg-slate-50 tw:dark:bg-zinc-900/40 tw:overflow-hidden"
+                 x-show="groupHasMatch('{{ $group }}', {{ json_encode($groupPerms) }})">
+
+                {{-- Group header --}}
+                <div class="tw:px-5 tw:py-3 tw:border-b tw:border-slate-200 tw:dark:border-zinc-700/50 tw:bg-white tw:dark:bg-zinc-800/50">
+                    <h4 class="tw:text-lg tw:font-bold tw:uppercase tw:tracking-widest tw:text-slate-500 tw:dark:text-zinc-500">
+                        {{ $group }}
+                    </h4>
                 </div>
-                @endforeach
+
+                {{-- Permissions list --}}
+                <div class="tw:px-5 tw:py-4 tw:space-y-3">
+                    @foreach($groupPerms as $p)
+                        <div class="tw:flex tw:items-start tw:gap-3"
+                             x-show="isPermMatch('{{ $p['label'] }}', '{{ $p['description'] }}', '{{ $group }}')">
+                            <div class="tw:flex-shrink-0 tw:mt-0.5">
+                                <input type="checkbox" name="permissions[]" value="{{ $p['name'] }}" id="perm-{{ $p['name'] }}"
+                                       x-model="permissions"
+                                       class="tw:h-4 tw:w-4 tw:text-indigo-600 tw:dark:text-zinc-400 tw:focus:ring-indigo-500 tw:dark:focus:ring-zinc-500 tw:border-slate-300 tw:dark:border-zinc-600 tw:rounded tw:cursor-pointer tw:bg-white tw:dark:bg-zinc-700 tw:transition tw:duration-150">
+                            </div>
+                            <div>
+                                <label for="perm-{{ $p['name'] }}" class="tw:block tw:text-sm tw:font-semibold tw:text-slate-800 tw:dark:text-zinc-200 tw:cursor-pointer tw:leading-snug">
+                                    {{ $p['label'] }}
+                                </label>
+                                @if($p['description'])
+                                    <p class="tw:text-xs tw:text-slate-500 tw:dark:text-zinc-500 tw:mt-0.5 tw:leading-snug">
+                                        {{ $p['description'] }}
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
-        </div>
         @endforeach
     </div>
 </div>
 
 @section('javascript')
-<script>
-    function roleForm(initialPermissions = []) {
-        return {
-            permissions: initialPermissions,
-            search: '',
-            isPermMatch(permLabel, permDesc, groupName) {
-                if (!this.search) return true;
-                const s = this.search.toLowerCase();
-                return permLabel.toLowerCase().includes(s) ||
-                       permDesc.toLowerCase().includes(s) ||
-                       groupName.toLowerCase().includes(s);
-            },
-            groupHasMatch(groupName, perms) {
-                if (!this.search) return true;
-                return perms.some(p => {
-                    const label = p.label.toLowerCase();
-                    const desc = p.description.toLowerCase();
+    <script>
+        function roleForm(initialPermissions = []) {
+            return {
+                permissions: initialPermissions,
+                search: '',
+                isPermMatch(permLabel, permDesc, groupName) {
+                    if (!this.search) return true;
                     const s = this.search.toLowerCase();
-                    return label.includes(s) || desc.includes(s) || groupName.toLowerCase().includes(s);
-                });
-            }
-        };
-    }
-</script>
+                    return permLabel.toLowerCase().includes(s) ||
+                        permDesc.toLowerCase().includes(s) ||
+                        groupName.toLowerCase().includes(s);
+                },
+                groupHasMatch(groupName, perms) {
+                    if (!this.search) return true;
+                    return perms.some(p => {
+                        const label = p.label.toLowerCase();
+                        const desc = p.description.toLowerCase();
+                        const s = this.search.toLowerCase();
+                        return label.includes(s) || desc.includes(s) || groupName.toLowerCase().includes(s);
+                    });
+                }
+            };
+        }
+    </script>
 @endsection
