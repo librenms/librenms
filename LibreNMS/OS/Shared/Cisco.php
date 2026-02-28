@@ -90,6 +90,7 @@ class Cisco extends OS implements
 
     private Collection $qosIdxToParent;
     protected ?string $entityVendorTypeMib = 'CISCO-ENTITY-VENDORTYPE-OID-MIB';
+    protected bool $os_requires_vlan_filtering = false;
 
     public function discoverOS(Device $device): void
     {
@@ -972,7 +973,7 @@ class Cisco extends OS implements
 
         $vtpdomains = SnmpQuery::walk('CISCO-VTP-MIB::managementDomainName')->pluck();
         $current_domain = 0;
-        $os_requires_vlan_filtering = in_array($this->getDevice()->os, ['ios', 'iosxe']);
+        $os_requires_vlan_filtering = $this->os_requires_vlan_filtering;
 
         return SnmpQuery::enumStrings()->walk('CISCO-VTP-MIB::vtpVlanTable')
             ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain, $os_requires_vlan_filtering) {

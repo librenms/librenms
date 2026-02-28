@@ -52,6 +52,7 @@ class Ios extends Cisco implements
 {
     use CiscoCellular;
     use CiscoPortSecurity;
+    protected bool $os_requires_vlan_filtering = true;
 
     /**
      * @return WirelessSensor[] Sensors

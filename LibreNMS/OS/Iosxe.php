@@ -63,6 +63,7 @@ class Iosxe extends Ciscowlc implements
     use SyncsModels;
     use CiscoCellular;
     use CiscoPortSecurity;
+    protected bool $os_requires_vlan_filtering = true;
 
     /**
      * Array of shortened ISIS codes
