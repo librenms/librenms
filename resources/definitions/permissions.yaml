@@ -1,0 +1,67 @@
+groups:
+    auth-log:
+        - auth-log.view
+
+    custom-map:
+        - custom-map.viewAny
+        - custom-map.view
+        - custom-map.create
+        - custom-map.update
+        - custom-map.delete
+
+    devices:
+        - devices.viewAny
+        - devices.view
+        - devices.create
+        - devices.update
+        - devices.delete
+        - devices.debug
+        - devices.showConfig
+        - devices.updateNotes
+
+    device-group:
+        - device-group.viewAny
+        - device-group.view
+        - device-group.create
+        - device-group.update
+        - device-group.delete
+
+    location:
+        - location.viewAny
+        - location.view
+        - location.create
+        - location.update
+        - location.delete
+
+    ports:
+        - ports.viewAny
+        - ports.view
+        - ports.update
+        - ports.delete
+
+    role:
+        - role.viewAny
+        - role.update
+
+    service-template:
+        - service-template.viewAny
+        - service-template.view
+        - service-template.create
+        - service-template.update
+        - service-template.delete
+
+    settings:
+        - settings.viewAny
+        - settings.update
+
+    users:
+        - users.viewAny
+        - users.view
+        - users.create
+        - users.update
+        - users.delete
+
+
+
+
+
