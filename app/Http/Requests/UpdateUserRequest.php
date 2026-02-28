@@ -18,18 +18,9 @@ class UpdateUserRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        /** @var User|null $user */
-        $user = $this->route('user');
-        if ($user) {
-            // normal users cannot update their roles
-            if ($this->user()->cannot('update', Role::class)) {
-                unset($this['roles']);
-            }
-
-            return $this->user()->can('update', $user);
-        }
-
-        return false;
+        /** @var User|null $target_user */
+        $target_user = $this->route('user');
+        return $target_user && $this->user()->can('update', $target_user);
     }
 
     /**
@@ -49,10 +40,16 @@ class UpdateUserRequest extends FormRequest
                 'new_password' => ['nullable', 'confirmed', Password::defaults()],
                 'new_password_confirmation' => 'nullable|same:new_password',
                 'dashboard' => 'int',
-                'roles' => 'array',
+                'roles' => [
+                    'array',
+                    Rule::when($this->user()->cannot('manage', Role::class), 'size:0'),
+                ],
                 'roles.*' => Rule::in(Role::query()->pluck('name')),
                 'enabled' => 'boolean',
-                'can_modify_passwd' => 'boolean',
+                'can_modify_passwd' => [
+                    'boolean',
+                    Rule::when($this->route('user')->is($this->user()), 'prohibited'),
+                ],
             ];
         }
 
