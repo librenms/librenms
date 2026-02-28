@@ -1,14 +1,21 @@
 @extends('layouts.librenmsv1')
 
-@section('title', __('Permissions'))
+@section('title', __('permissions.rbac.title'))
 
 @section('content')
 <div class="container tw:py-4">
     <div class="tw:flex tw:justify-between tw:items-center tw:mb-6">
-        <h1 class="tw:text-3xl tw:font-bold">{{ __('Roles & Permissions') }}</h1>
-        <a href="{{ route('permissions.create') }}" class="tw:bg-blue-600 tw:hover:bg-blue-700 tw:text-white tw:font-bold tw:py-2 tw:px-6 tw:rounded tw:shadow tw:hover:shadow-lg tw:transition tw:duration-200 tw:text-lg">
-            <i class="fas fa-plus tw:mr-2"></i>{{ __('Add Role') }}
-        </a>
+        <h1 class="tw:text-3xl tw:font-bold">{{ __('permissions.rbac.title') }}</h1>
+        <div class="tw:flex tw:gap-4">
+            @can('viewAny', \App\Models\User::class)
+                <a href="{{ route('users.index') }}" class="tw:bg-gray-600 tw:hover:bg-gray-700 tw:text-white tw:font-bold tw:py-2 tw:px-6 tw:rounded tw:shadow tw:hover:shadow-lg tw:transition tw:duration-200 tw:text-lg">
+                    <i class="fas fa-users tw:mr-2"></i>{{ __('permissions.rbac.manage_users') }}
+                </a>
+            @endcan
+            <a href="{{ route('roles.create') }}" class="tw:bg-blue-600 tw:hover:bg-blue-700 tw:text-white tw:font-bold tw:py-2 tw:px-6 tw:rounded tw:shadow tw:hover:shadow-lg tw:transition tw:duration-200 tw:text-lg">
+                <i class="fas fa-plus tw:mr-2"></i>{{ __('permissions.rbac.add_role') }}
+            </a>
+        </div>
     </div>
 
     <div class="tw:bg-white tw:dark:bg-gray-800 tw:shadow-md tw:rounded-lg tw:overflow-hidden">
@@ -16,13 +23,13 @@
             <thead>
                 <tr>
                     <th class="tw:px-5 tw:py-3 tw:border-b-2 tw:border-gray-200 tw:dark:border-gray-700 tw:bg-gray-100 tw:dark:bg-gray-700 tw:text-left tw:text-sm tw:font-semibold tw:text-gray-600 tw:dark:text-gray-300 tw:uppercase tw:tracking-wider">
-                        {{ __('Role Name') }}
+                        {{ __('permissions.rbac.role_name') }}
                     </th>
                     <th class="tw:px-5 tw:py-3 tw:border-b-2 tw:border-gray-200 tw:dark:border-gray-700 tw:bg-gray-100 tw:dark:bg-gray-700 tw:text-left tw:text-sm tw:font-semibold tw:text-gray-600 tw:dark:text-gray-300 tw:uppercase tw:tracking-wider">
-                        {{ __('Permissions') }}
+                        {{ __('permissions.rbac.permissions') }}
                     </th>
                     <th class="tw:px-5 tw:py-3 tw:border-b-2 tw:border-gray-200 tw:dark:border-gray-700 tw:bg-gray-100 tw:dark:bg-gray-700 tw:text-right tw:text-sm tw:font-semibold tw:text-gray-600 tw:dark:text-gray-300 tw:uppercase tw:tracking-wider">
-                        {{ __('Actions') }}
+                        {{ __('permissions.rbac.actions') }}
                     </th>
                 </tr>
             </thead>
@@ -41,20 +48,20 @@
                                     {{ $permission->name }}
                                 </span>
                             @empty
-                                <span class="tw:text-gray-500 tw:italic tw:text-base">{{ __('No permissions assigned') }}</span>
+                                <span class="tw:text-gray-500 tw:italic tw:text-base">{{ __('permissions.rbac.no_permissions') }}</span>
                             @endforelse
                         </div>
                     </td>
                     <td class="tw:px-5 tw:py-5 tw:border-b tw:border-gray-200 tw:dark:border-gray-700 tw:text-lg tw:text-right">
                         <div class="tw:flex tw:justify-end tw:items-center tw:space-x-4">
-                            <a href="{{ route('permissions.edit', $role->id) }}" class="tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:transition tw:duration-200" title="{{ __('Edit Role') }}">
+                            <a href="{{ route('roles.edit', $role->id) }}" class="tw:text-blue-600 tw:hover:text-blue-800 tw:dark:text-blue-400 tw:dark:hover:text-blue-300 tw:transition tw:duration-200" title="{{ __('permissions.rbac.edit_role') }}">
                                 <i class="fas fa-edit tw:text-xl"></i>
                             </a>
                             @if($role->name !== 'Admin' && $role->name !== 'admin')
-                                <form action="{{ route('permissions.destroy', $role->id) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this role?') }}');" class="tw:inline">
+                                <form action="{{ route('roles.destroy', $role->id) }}" method="POST" onsubmit="return confirm('{{ __('permissions.rbac.confirm_delete') }}');" class="tw:inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="tw:text-red-600 tw:hover:text-red-800 tw:dark:text-red-400 tw:dark:hover:text-red-300 tw:transition tw:duration-200" title="{{ __('Delete Role') }}">
+                                    <button type="submit" class="tw:text-red-600 tw:hover:text-red-800 tw:dark:text-red-400 tw:dark:hover:text-red-300 tw:transition tw:duration-200" title="{{ __('permissions.rbac.delete_role') }}">
                                         <i class="fas fa-trash tw:text-xl"></i>
                                     </button>
                                 </form>
