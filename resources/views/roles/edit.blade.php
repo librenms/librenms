@@ -3,26 +3,7 @@
 @section('title', __('permissions.rbac.edit_role'))
 
 @section('content')
-<div class="container tw:py-4" x-data="{
-    permissions: {{ json_encode($role->permissions->pluck('name')) }},
-    search: '',
-    isPermMatch(permLabel, permDesc, groupName) {
-        if (!this.search) return true;
-        const s = this.search.toLowerCase();
-        return permLabel.toLowerCase().includes(s) ||
-               permDesc.toLowerCase().includes(s) ||
-               groupName.toLowerCase().includes(s);
-    },
-    groupHasMatch(groupName, perms) {
-        if (!this.search) return true;
-        return perms.some(p => {
-            const label = p.label.toLowerCase();
-            const desc = p.description.toLowerCase();
-            const s = this.search.toLowerCase();
-            return label.includes(s) || desc.includes(s) || groupName.toLowerCase().includes(s);
-        });
-    }
-}">
+<div class="container tw:py-4" x-data="roleForm({{ json_encode($role->permissions->pluck('name')) }})">
     <div class="tw:max-w-4xl tw:mx-auto">
         <div class="tw:flex tw:items-center tw:justify-between tw:mb-6">
             <div class="tw:flex tw:items-center">
