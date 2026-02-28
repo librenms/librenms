@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Enum;
 
+use Illuminate\Support\Str;
 use LibreNMS\Traits\EnumToArray;
 
 enum Sensor: string
@@ -39,6 +40,19 @@ enum Sensor: string
     case Voltage = 'voltage';
     case Waterflow = 'waterflow';
     case SignalLoss = 'signal_loss';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Charge => 'Battery Charge',
+            self::Dbm => 'dBm',
+            self::Eer => 'Energy Efficiency Ratio',
+            self::Signal => 'Wireless',
+            self::TvSignal => 'TV Signal',
+            self::Waterflow => 'Water Flow Rate',
+            default => Str::headline($this->name),
+        };
+    }
 
     public function unit(): string
     {
@@ -110,7 +124,7 @@ enum Sensor: string
             self::TvSignal => 'signal',
             self::Voltage => 'bolt',
             self::Waterflow => 'tint',
-            self::SignalLoss => 'wave-square'
+            self::SignalLoss => 'wave-square',
         };
     }
 }
