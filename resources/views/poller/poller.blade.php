@@ -22,7 +22,7 @@
                 <td>{{ $poller['poller_name'] }}</td>
                 <td>{{ $poller['devices'] }}</td>
                 <td>{{ $poller['time_taken'] }} Seconds</td>
-                <td>{{ (new Carbon\Carbon($poller['last_polled']))->setTimezone($timezone) }}</td>
+                <td>{{ \LibreNMS\Util\Time::format($poller['last_polled'], 'compact') }}</td>
                 <td>@if( $poller['long_not_polled'] )<button type='button' class='btn btn-danger btn-sm' aria-label={{ __('Delete') }} data-toggle='modal' data-target='#confirm-delete' data-id='{{ $poller['id'] }}' data-pollertype='delete-poller' name='delete-poller'><i class='fa fa-trash' aria-hidden='true'></i></button>@endif</td>
             </tr>
             @endforeach
@@ -57,7 +57,7 @@
                     <td rowspan="{{ $poller->stats->count() }}" @if($poller->node_id == '') class="danger" @endif>{{ $poller->node_id }}</td>
                     <td rowspan="{{ $poller->stats->count() }}">{{ $poller->poller_version }}</td>
                     <td rowspan="{{ $poller->stats->count() }}">{{ $poller->poller_groups }}</td>
-                    <td rowspan="{{ $poller->stats->count() }}">{{ (new Carbon\Carbon($poller->last_report))->setTimezone($timezone) }}</td>
+                    <td rowspan="{{ $poller->stats->count() }}">{{ \LibreNMS\Util\Time::format($poller->last_report, 'compact') }}</td>
                     <td rowspan="{{ $poller->stats->count() }}">{{ __($poller->master ? 'Yes' : 'No') }}</td>
                 @endif
                     <td>{{ $stat->poller_type }}</td>

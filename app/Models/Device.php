@@ -336,7 +336,7 @@ class Device extends BaseModel
         $deviceOutage = $this->getCurrentOutage();
 
         if ($deviceOutage) {
-            return Carbon::createFromTimestamp((int) $deviceOutage->going_down, session('preferences.timezone'));
+            return Carbon::createFromTimestamp((int) $deviceOutage->going_down);
         }
 
         return $this->last_polled ?? Carbon::now();

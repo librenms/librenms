@@ -1,0 +1,134 @@
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: PACKETPOWER-EG4-MIB::readingsTable
+                    value: PACKETPOWER-EG4-MIB::reValue
+                    num_oid: '.1.3.6.1.4.1.33688.4.1.1.12.{{ $index }}'
+                    descr: PACKETPOWER-EG4-MIB::reChannelName
+                    index: 'reValue.{{ $index }}'
+                    group: PACKETPOWER-EG4-MIB::reNodeIdString
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: PACKETPOWER-EG4-MIB::reUnits
+                            op: '!='
+                            value: 'ddegC'
+                        -
+                            oid: PACKETPOWER-EG4-MIB::reValue
+                            op: '<'
+                            value: -200
+        humidity:
+            data:
+                -
+                    oid: PACKETPOWER-EG4-MIB::readingsTable
+                    value: PACKETPOWER-EG4-MIB::reValue
+                    num_oid: '.1.3.6.1.4.1.33688.4.1.1.12.{{ $index }}'
+                    descr: PACKETPOWER-EG4-MIB::reChannelName
+                    index: 'reValue.{{ $index }}'
+                    group: PACKETPOWER-EG4-MIB::reNodeIdString
+                    skip_values:
+                        -
+                            oid: PACKETPOWER-EG4-MIB::reUnits
+                            op: '!='
+                            value: '%'
+                        -
+                            oid: PACKETPOWER-EG4-MIB::reValue
+                            op: '='
+                            value: 0
+                        -
+                            oid: PACKETPOWER-EG4-MIB::reChannelName
+                            op: '='
+                            value: 'Battery'
+        voltage:
+            data:
+                -
+                    oid: PACKETPOWER-EG4-MIB::readingsTable
+                    value: PACKETPOWER-EG4-MIB::reValue
+                    num_oid: '.1.3.6.1.4.1.33688.4.1.1.12.{{ $index }}'
+                    descr: PACKETPOWER-EG4-MIB::reChannelName
+                    index: 'reValue.{{ $index }}'
+                    group: PACKETPOWER-EG4-MIB::reNodeIdString
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: PACKETPOWER-EG4-MIB::reUnits
+                            op: '!='
+                            value: 'mV'
+        percent:
+            data:
+                -
+                    oid: PACKETPOWER-EG4-MIB::readingsTable
+                    value: PACKETPOWER-EG4-MIB::reValue
+                    num_oid: '.1.3.6.1.4.1.33688.4.1.1.12.{{ $index }}'
+                    descr: PACKETPOWER-EG4-MIB::reChannelName
+                    index: 'reValue.{{ $index }}'
+                    group: PACKETPOWER-EG4-MIB::reNodeIdString
+                    skip_values:
+                        -
+                            oid: PACKETPOWER-EG4-MIB::reUnits
+                            op: '!='
+                            value: '%'
+                        -
+                            oid: PACKETPOWER-EG4-MIB::reChannelName
+                            op: '!='
+                            value: 'Battery'
+        state:
+            data:
+                -
+                    oid: PACKETPOWER-EG4-MIB::readingsTable
+                    value: PACKETPOWER-EG4-MIB::reUnits
+                    num_oid: '.1.3.6.1.4.1.33688.4.1.1.13.{{ $index }}'
+                    state_name: PACKETPOWER-EG4-MIB::status
+                    descr: PACKETPOWER-EG4-MIB::reChannelName
+                    index: 'reValue.{{ $index }}'
+                    group: PACKETPOWER-EG4-MIB::reNodeIdString
+                    skip_values:
+                        -
+                            oid: PACKETPOWER-EG4-MIB::reChannelName
+                            op: '!='
+                            value: 'Status'
+                    states:
+                        - { value: 0, descr: 'FAIL', generic: 2, graph: 1 }
+                        - { value: 1, descr: 'OK', generic: 0, graph: 1 }
+                -
+                    oid: PACKETPOWER-EG4-MIB::readingsTable
+                    value: PACKETPOWER-EG4-MIB::reValue
+                    num_oid: '.1.3.6.1.4.1.33688.4.1.1.12.{{ $index }}'
+                    state_name: PACKETPOWER-EG4-MIB::probeStatus
+                    descr: PACKETPOWER-EG4-MIB::reChannelName
+                    index: 'reValue.{{ $index }}'
+                    group: PACKETPOWER-EG4-MIB::reNodeIdString
+                    skip_values:
+                        -
+                            oid: PACKETPOWER-EG4-MIB::reChannelName
+                            op: 'not_starts'
+                            value: 'ProbeStatus'
+                        -
+                            oid: PACKETPOWER-EG4-MIB::reValue
+                            op: 'exists'
+                            value: false
+                    states:
+                        - { value: 0, descr: 'OK', generic: 0, graph: 1 }
+                        - { value: 1, descr: 'FAIL', generic: 2, graph: 1 }
+                -
+                    oid: PACKETPOWER-EG4-MIB::readingsTable
+                    value: PACKETPOWER-EG4-MIB::reValue
+                    num_oid: '.1.3.6.1.4.1.33688.4.1.1.12.{{ $index }}'
+                    state_name: PACKETPOWER-EG4-MIB::contactStatus
+                    descr: PACKETPOWER-EG4-MIB::reChannelName
+                    index: 'reValue.{{ $index }}'
+                    group: PACKETPOWER-EG4-MIB::reNodeIdString
+                    skip_values:
+                        -
+                            oid: PACKETPOWER-EG4-MIB::reChannelName
+                            op: 'not_starts'
+                            value: 'Contact'
+                        -
+                            oid: PACKETPOWER-EG4-MIB::reValue
+                            op: '<'
+                            value: 1
+                    states:
+                        - { value: 2, descr: 'OPEN', generic: 2, graph: 1 }
+                        - { value: 1, descr: 'CLOSED', generic: 0, graph: 1 }
