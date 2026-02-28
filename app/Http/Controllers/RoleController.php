@@ -18,6 +18,7 @@ class RoleController extends Controller
 
         return view('roles.index', [
             'roles' => Role::with('permissions')->get(),
+            'protected' => ['admin', 'global-read'],
         ]);
     }
 
