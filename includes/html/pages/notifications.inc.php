@@ -178,7 +178,7 @@ if ($total > 0 && ! isset($vars['archive'])) {
         }
         echo  " id='{$notif->notifications_id}'>" . htmlentities((string) $notif->title);
 
-        if (Auth::user()->isAdmin()) {
+        if (Gate::allows('notification.update')) {
             echo '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>';
         } ?>
         </h4>

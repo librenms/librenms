@@ -85,7 +85,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Blade::if('config', fn ($key, $value = true) => LibrenmsConfig::get($key) == $value);
         Blade::if('notconfig', fn ($key) => ! LibrenmsConfig::get($key));
-        Blade::if('admin', fn () => auth()->check() && auth()->user()->isAdmin());
+        Blade::if('admin', fn () => auth()->check() && auth()->user()->hasRole('admin')); // TODO remove
 
         Blade::directive('deviceUrl', fn ($arguments) => "<?php echo \LibreNMS\Util\Url::deviceUrl($arguments); ?>");
 

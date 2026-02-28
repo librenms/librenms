@@ -36,8 +36,11 @@ groups:
         - location.update
         - location.delete
 
+    notification:
+        - notification.update
+
     plugin:
-        - admin
+        - plugin.admin
 
     poller:
         - poller.viewAny
@@ -79,8 +82,7 @@ groups:
         - user.update
         - user.delete
 
-hidden:
-    - user.updatePassword
+hidden: []
 
 
 
