@@ -27,8 +27,8 @@ class UpdateRoleRequest extends FormRequest
             'permissions' => 'array',
         ];
 
-        // Do not allow renaming the Admin role
-        if (in_array(strtolower($role->name), ['admin'])) {
+        // Do not allow renaming protected roles
+        if (in_array(strtolower($role->name), ['admin', 'global-read'])) {
             $rules['name'] = 'required|in:' . $role->name;
         } else {
             $rules['name'] = 'required|unique:roles,name,' . $role->id . '|regex:/^[a-z-]+$/';

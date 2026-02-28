@@ -44,7 +44,7 @@ class RolePolicy
      */
     public function delete(User $user, Role $role): bool
     {
-        return $user->hasRole('admin') && $role->name !== 'Admin';
+        return $user->hasRole('admin') && ! in_array(strtolower($role->name), ['admin', 'global-read', 'user']);
     }
 
     /**
