@@ -47,7 +47,7 @@ class LocationPolicy
      * @param  User  $user
      * @param  Location  $location
      */
-    public function update(User $user, Location $location): bool
+    public function update(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'update');
     }
@@ -58,7 +58,7 @@ class LocationPolicy
      * @param  User  $user
      * @param  Location  $location
      */
-    public function delete(User $user, Location $location): bool
+    public function delete(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'delete');
     }
