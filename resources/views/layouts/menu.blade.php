@@ -365,7 +365,9 @@
                             @endif
 
                             <li role="presentation" class="divider"></li>
+                            @if(Gate::any(['create', 'update', 'delete'], \App\Models\PortGroup::class))
                             <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Manage Groups') }} </a></li>
+                            @endif
                             @if($port_groups->isNotEmpty())
                                 <li class="dropdown-submenu">
                                 <a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Port Groups') }}</a>
