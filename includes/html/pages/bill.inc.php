@@ -109,7 +109,7 @@ if (Gate::allows('view', $bill)) {
     if (Gate::allows('update', $bill)) {
         $menu_options['edit'] = 'Edit';
     }
-    if (Gate::allows('update', $bill)) {
+    if (Gate::allows('delete', $bill)) {
         $menu_options['delete'] = 'Delete';
     }
     if (Gate::allows('update', $bill)) {

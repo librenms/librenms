@@ -117,7 +117,7 @@ include 'includes/html/modal/new_bill.inc.php';
     <div id="{{ctx.id}}" class="{{css.header}}">
         <div class="row">
             <div class="col-sm-4">
-            <?php if (Gate::denies('create', Bill::class)) {  ?>
+            <?php if (Gate::allows('create', Bill::class)) {  ?>
                 <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create-bill"><i class="fa fa-plus"></i> Create Bill</button>
             <?php } ?>
             </div>

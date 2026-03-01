@@ -14,8 +14,8 @@
 
 header('Content-type: text/plain');
 
-if (Gate::allows('api.access')) {
-    exit('ERROR: You need to be admin');
+if (Gate::denies('api.access')) {
+    exit('ERROR: You need permission');
 }
 
 if (! is_numeric($_POST['token_id'])) {

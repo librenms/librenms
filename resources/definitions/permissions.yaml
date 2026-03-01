@@ -43,6 +43,10 @@ groups:
 
     bill:
         - bill.viewAny
+        - bill.view
+        - bill.create
+        - bill.update
+        - bill.delete
 
     component:
         - component.update
