@@ -6,8 +6,8 @@ use App\Models\AlertTemplateMap;
 
 $no_refresh = true;
 
-require_once 'includes/html/modal/alert_template.inc.php';
-require_once 'includes/html/modal/delete_alert_template.inc.php';
+include 'includes/html/modal/alert_template.inc.php';
+include 'includes/html/modal/delete_alert_template.inc.php';
 ?>
 <div class="table-responsive">
     <table id="templatetable" class="table table-hover table-condensed" width="100%">
