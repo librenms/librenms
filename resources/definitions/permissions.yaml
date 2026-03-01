@@ -89,6 +89,7 @@ groups:
 
     notification:
         - notification.update
+        - notification.create
 
     oxidized:
         - oxidized.refresh
@@ -148,6 +149,9 @@ groups:
     settings:
         - settings.viewAny
         - settings.update
+
+    syslog:
+        - syslog.delete
 
     user:
         - user.viewAny

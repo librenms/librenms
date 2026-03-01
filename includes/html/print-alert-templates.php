@@ -3,6 +3,7 @@
 use App\Models\AlertRule;
 use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
+use Illuminate\Support\Facades\Gate as Gate;
 
 $no_refresh = true;
 
@@ -67,7 +68,7 @@ $(document).ready(function() {
         templates: {
         header: '<div id="{{ctx.id}}" class="{{css.header}}"> \
                     <div class="row"> \
-<?php if (Auth::user()->hasGlobalAdmin()) { ?>
+<?php if (Gate::allows('create', AlertTemplate::class)) { ?>
                         <div class="col-sm-8 actionBar"> \
                             <span class="pull-left"> \
                             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#alert-template" data-template_id="">Create new alert template</button> \

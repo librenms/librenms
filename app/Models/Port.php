@@ -51,6 +51,7 @@ class Port extends DeviceRelatedModel
             $port->vlans()->delete();
             $port->links()->delete();
             $port->remoteLinks()->delete();
+            $port->bills()->detach();
 
             // dont have relationships yet
             DB::table('juniAtmVp')->where('port_id', $port->port_id)->delete();
@@ -306,6 +307,14 @@ class Port extends DeviceRelatedModel
     public function adsl(): HasOne
     {
         return $this->hasOne(PortAdsl::class, 'port_id');
+    }
+
+    /**
+     * @return BelongsToMany<Bill, $this>
+     */
+    public function bills(): BelongsToMany
+    {
+        return $this->belongsToMany(Bill::class, 'bill_ports', 'port_id', 'bill_id');
     }
 
     /**

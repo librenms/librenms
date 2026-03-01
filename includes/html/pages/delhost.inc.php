@@ -1,6 +1,8 @@
 <?php
 
-if (! Auth::user()->hasGlobalAdmin()) {
+use App\Models\Device;
+
+if (Gate::denies('delete', Device::class)) {
     require 'includes/html/error-no-perm.inc.php';
     exit;
 }

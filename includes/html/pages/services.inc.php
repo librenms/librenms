@@ -220,13 +220,14 @@ require_once 'includes/html/modal/delete_service.inc.php';
                         echo "<input id='" . $service_id . "' type='checkbox' name='service_status' data-orig_colour='" . $orig_colour . "' data-orig_state='" . $orig_ico . "' data-service_id='" . $service_id . "' data-service_name='" . $service_name . "' " . $service_checked . " data-size='small' data-toggle='modal'>";
                         echo '</div></td>';
 
-                        if (Auth::user()->hasGlobalAdmin()) {
-                            echo "<td>
-                                    <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
-                                    <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button>
-                                    </td>";
+                        echo '<td>';
+                        if (Gate::allows('update', \App\Models\Service::class)) {
+                            echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>";
                         }
-                        echo '</tr>';
+                        if (Gate::allows('delete', \App\Models\Service::class)) {
+                            echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button>";
+                        }
+                        echo '</td></tr>';
 
                         if ($service_iteration >= $services_count) {
                             echo '</table>';

@@ -1,19 +1,21 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use Illuminate\Support\Facades\Gate as Gate;
 use LibreNMS\Util\Time;
 
 $param = [];
 $sql = ' FROM `devices` AS D ';
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('viewAny', Device::class)) {
     $sql .= ', devices_perms AS P ';
 }
 
 $sql .= ' LEFT JOIN `locations` as L ON `D`.`location_id`=`L`.`id`';
 $sql .= ' LEFT JOIN `poller_groups` ON `D`.`poller_group`=`poller_groups`.`id`';
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('viewAny', Device::class)) {
     $sql .= " WHERE D.device_id = P.device_id AND P.user_id = '" . Auth::id() . "' AND D.ignore = '0'";
 } else {
     $sql .= ' WHERE 1';

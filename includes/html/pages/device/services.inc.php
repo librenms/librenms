@@ -16,6 +16,9 @@
  * @author     LibreNMS Contributors
 */
 
+use App\Models\Service;
+use Illuminate\Support\Facades\Gate;
+
 $pagetitle[] = 'Services';
 
 require_once 'includes/services.inc.php';
@@ -54,7 +57,7 @@ foreach ($menu_options as $option => $text) {
 }
 unset($sep);
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (Gate::allows('create', Service::class)) {
     echo '<div class="pull-right"><a data-toggle="modal" href="#create-service"><i class="fa fa-cog" style="color:green" aria-hidden="true"></i> Add Service</a></div>';
 }
 
@@ -94,12 +97,14 @@ if (count($services) > '0') {
         echo '<td class="col-sm-2 text-muted">' . htmlentities((string) $service['service_desc']) . '</td>';
         echo '<td class="col-sm-1 text-muted">' . ($service['service_changed'] ? \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) : 'Waiting for first service check') . '</td>';
         echo '<td class="col-sm-1">';
-        if (Auth::user()->hasGlobalAdmin()) {
-            echo '<div class="pull-right">';
+        echo '<div class="pull-right">';
+        if (Gate::allows('update', Service::class)) {
             echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>";
-            echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button";
-            echo '</div>';
         }
+        if (Gate::allows('delete', Service::class)) {
+            echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button";
+        }
+        echo '</div>';
         echo '</td>';
         echo '</tr>';
 

@@ -1,19 +1,23 @@
 <?php
 
 use App\Models\Bill;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Billing;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 
 $bill_id = (int) ($vars['bill_id'] ?? 0);
+$bill = Bill::find($bill_id);
 
-if (Auth::user()->hasGlobalAdmin()) {
+if ($bill === null) {
+    abort(404);
+}
+
+if (Gate::any(['update', 'delete', 'create'], $bill)) {
     include 'includes/html/pages/bill/actions.inc.php';
 }
 
-if (!Bill::where('bill_id', $bill_id)->exists()) {
-    abort(404);
-} elseif (bill_permitted($bill_id)) {
+if (Gate::allows('view', $bill)) {
     $bill_data = dbFetchRow('SELECT * FROM bills WHERE bill_id = ?', [$bill_id]);
 
     $bill_name = $bill_data['bill_name'];
@@ -102,9 +106,13 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
         'transfer' => 'Transfer Graphs',
         'history' => 'Historical Graphs',
     ];
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (Gate::allows('update', $bill)) {
         $menu_options['edit'] = 'Edit';
+    }
+    if (Gate::allows('update', $bill)) {
         $menu_options['delete'] = 'Delete';
+    }
+    if (Gate::allows('update', $bill)) {
         $menu_options['reset'] = 'Reset';
     }
     $sep = '';
@@ -126,11 +134,11 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
 
     print_optionbar_end();
 
-    if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
+    if ($vars['view'] == 'edit' && Gate::allows('update', $bill)) {
         include 'includes/html/pages/bill/edit.inc.php';
-    } elseif ($vars['view'] == 'delete' && Auth::user()->hasGlobalAdmin()) {
+    } elseif ($vars['view'] == 'delete' && Gate::allows('delete', $bill)) {
         include 'includes/html/pages/bill/delete.inc.php';
-    } elseif ($vars['view'] == 'reset' && Auth::user()->hasGlobalAdmin()) {
+    } elseif ($vars['view'] == 'reset' && Gate::allows('update', $bill)) {
         include 'includes/html/pages/bill/reset.inc.php';
     } elseif ($vars['view'] == 'history') {
         include 'includes/html/pages/bill/history.inc.php';

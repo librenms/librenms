@@ -60,14 +60,6 @@ class User extends Authenticatable
     // ---- Helper Functions ----
 
     /**
-     * Test if this user has global admin access
-     */
-    public function hasGlobalAdmin(): bool
-    {
-        return $this->can('global-admin');
-    }
-
-    /**
      * Helper function to hash passwords before setting
      *
      * @param  string  $password

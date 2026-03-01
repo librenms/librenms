@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\Bill;
 use App\Models\PortAdsl;
 use App\Models\PortsNac;
 use App\Models\PortVdsl;
 use App\Plugins\Hooks\PortTabHook;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
@@ -266,13 +268,15 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port->port
     }
 }//end if
 
-if (Auth::user()->hasGlobalAdmin() && \App\Facades\LibrenmsConfig::get('enable_billing') == 1) {
-    $bills = dbFetchRows('SELECT `bill_id` FROM `bill_ports` WHERE `port_id`=?', [$port->port_id]);
-    if (count($bills) === 1) {
-        echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bill', 'bill_id' => $bills[0]['bill_id']]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bill</a></span>";
-    } elseif (count($bills) > 1) {
+if (\App\Facades\LibrenmsConfig::get('enable_billing') == 1) {
+    if ($port->bills->count() == 1) {
+        $bill = $port->bills->first();
+        if (Gate::allows('view', $bill)) {
+            echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bill', 'bill_id' => $bill->bill_id]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bill</a></span>";
+        }
+    } elseif ($port->bills->isNotEmpty()) {
         echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bills']) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bills</a></span>";
-    } else {
+    } elseif(Gate::allows('create', Bill::class)) {
         echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bills', 'view' => 'add', 'port' => $port->port_id]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> Create Bill</a></span>";
     }
 }

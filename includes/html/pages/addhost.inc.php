@@ -10,7 +10,7 @@ use LibreNMS\Util\IP;
 
 $no_refresh = true;
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('create', Device::class)) {
     include 'includes/html/error-no-perm.inc.php';
 
     exit;

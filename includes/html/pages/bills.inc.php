@@ -1,9 +1,12 @@
 <?php
 
+use App\Models\Bill;
+use Illuminate\Support\Facades\Gate;
+
 $no_refresh = true;
 
 if (isset($_POST['addbill']) && $_POST['addbill'] == 'yes') {
-    if (! Auth::user()->hasGlobalAdmin()) {
+    if (Gate::denies('create', Bill::class)) {
         include 'includes/html/error-no-perm.inc.php';
         exit;
     }
@@ -114,7 +117,7 @@ include 'includes/html/modal/new_bill.inc.php';
     <div id="{{ctx.id}}" class="{{css.header}}">
         <div class="row">
             <div class="col-sm-4">
-            <?php if (Auth::user()->hasGlobalAdmin()) {  ?>
+            <?php if (Gate::denies('create', Bill::class)) {  ?>
                 <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create-bill"><i class="fa fa-plus"></i> Create Bill</button>
             <?php } ?>
             </div>

@@ -22,6 +22,7 @@
  */
 
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\ObjectCache;
 
 $total = Auth::user()->notifications()->count();
@@ -35,7 +36,7 @@ $total = Auth::user()->notifications()->count();
 <?php
 echo '<strong class="count-notif">' . $total . '</strong> Unread Notifications ';
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (Gate::allows('notification.update')) {
     echo '<button class="btn btn-success pull-right fa fa-plus new-notif" data-toggle="tooltip" data-placement="bottom" title="Create new notification" style="margin-top:-10px;"></button>';
 }
 
@@ -134,7 +135,7 @@ if ($total > 0 && ! isset($vars['archive'])) {
         }
         echo "<h4 class='$class' id='{$notif->notifications_id}'>" . htmlentities((string) $notif->title) . "<span class='pull-right'>";
 
-        if (Auth::user()->hasGlobalAdmin()) {
+        if (Gate::allows('notification.update')) {
             echo '<button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button>';
         } ?>
 
