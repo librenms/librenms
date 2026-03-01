@@ -29,6 +29,22 @@ GPSD is a daemon that can be used to monitor GPS devices.
     the page. If it is not, please follow the steps set out under `SNMP
     Extend` heading at the top of the page.
 
+    If you run into timeout issues with this, you may need to run it configure it like
+    below. If `time gpspipe -w -n 20` is regularly longer than what your SNMP time out is
+    for, this is required.
+
+    For cron...
+
+    ```
+    */5 * * * * /etc/snmp/gpsd 2> /dev/null > /var/cache/gpsd.snmp
+    ```
+
+    For snmpd.conf...
+
+    ```
+    extend gpsd /usr/bin/cat /var/cache/gpsd.snmp
+    ```
+
 === "Agent"
 
     [Install the agent](../Agent-Setup.md) on this device if it isn't already
