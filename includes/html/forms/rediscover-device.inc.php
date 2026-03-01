@@ -15,7 +15,7 @@
 use App\Models\Device;
 use Illuminate\Support\Facades\Gate;
 
-if (Gate::denies('viewAny', Device::class)) {
+if (Gate::denies('update', Device::class)) {
     $response = [
         'status' => 'error',
         'message' => 'Need permission',
