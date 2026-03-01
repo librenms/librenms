@@ -11,8 +11,6 @@ class LocationPolicy
 
     /**
      * Determine whether the user can view any locations.
-     *
-     * @param  User  $user
      */
     public function viewAny(User $user): bool
     {
@@ -21,9 +19,6 @@ class LocationPolicy
 
     /**
      * Determine whether the user can view the location.
-     *
-     * @param  User  $user
-     * @param  Location  $location
      */
     public function view(User $user, Location $location): bool
     {
@@ -33,8 +28,6 @@ class LocationPolicy
 
     /**
      * Determine whether the user can create locations.
-     *
-     * @param  User  $user
      */
     public function create(User $user): bool
     {
@@ -43,9 +36,6 @@ class LocationPolicy
 
     /**
      * Determine whether the user can update the location.
-     *
-     * @param  User  $user
-     * @param  Location  $location
      */
     public function update(User $user): bool
     {
@@ -54,9 +44,6 @@ class LocationPolicy
 
     /**
      * Determine whether the user can delete the location.
-     *
-     * @param  User  $user
-     * @param  Location  $location
      */
     public function delete(User $user): bool
     {
