@@ -28,7 +28,7 @@ class ServiceController extends Controller
             'service_ignore' => 'integer',
         ];
 
-        $service = Service::make(
+        $service = new Service(
             $request->only(
                 [
                     'service_name',

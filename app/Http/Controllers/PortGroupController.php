@@ -45,7 +45,7 @@ class PortGroupController extends Controller
             'name' => 'required|string|unique:port_groups',
         ]);
 
-        $portGroup = PortGroup::make($request->only(['name', 'desc']));
+        $portGroup = new PortGroup($request->only(['name', 'desc']));
         $portGroup->save();
 
         $toast->success(__('Port Group :name created', ['name' => $portGroup->name]));
