@@ -167,9 +167,12 @@ class AppServiceProvider extends ServiceProvider
         Validator::extend('alpha_space', fn ($attribute, $value) => preg_match('/^[\w\s]+$/u', (string) $value));
 
         Validator::extend('ip_or_hostname', function ($attribute, $value, $parameters, $validator) {
-            $ip = substr($value, 0, strpos($value, '/') ?: strlen($value)); // allow prefixes too
+            // allow prefixes too
+            if (str_contains($value, '/') && preg_match('#^(.+)/\d{1,3}$#', $value, $matches)) {
+                return IP::isValid($matches[1]);
+            }
 
-            return IP::isValid($ip) || Validate::hostname($value);
+            return IP::isValid($value) || Validate::hostname($value);
         });
 
         Validator::extend('is_regex', fn ($attribute, $value) => @preg_match($value, '') !== false);
