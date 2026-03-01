@@ -56,23 +56,21 @@
     </div>
 </div>
 
-@can('updatePassword', auth()->user())
-    <div class="form-group @if($errors->hasAny(['old_password', 'new_password', 'new_password_confirmation'])) has-error @endif">
-        <label for="password" class="control-label col-sm-3">{{ __('Password') }}</label>
-        <div class="col-sm-9">
-            @if(auth()->user()->cannot('update', \App\Models\User::class) || auth()->user()->is($user))
-                <input type="password" class="form-control" id="old_password" name="old_password" placeholder="{{ __('Current Password') }}">
-            @endif
-            <input type="password" autocomplete="off" class="form-control" id="new_password" name="new_password" placeholder="{{ __('New Password') }}">
-            <input type="password" autocomplete="off" class="form-control" id="new_password_confirmation" name="new_password_confirmation" placeholder="{{ __('Confirm Password') }}">
-            <span class="help-block">
-                @foreach($errors->get('*password*') as $error)
-                    {{ implode(' ', $error) }}
-                @endforeach
-            </span>
-        </div>
+<div class="form-group @if($errors->hasAny(['old_password', 'new_password', 'new_password_confirmation'])) has-error @endif">
+    <label for="password" class="control-label col-sm-3">{{ __('Password') }}</label>
+    <div class="col-sm-9">
+        @if(auth()->user()->cannot('update', \App\Models\User::class) || auth()->user()->is($user))
+            <input type="password" class="form-control" id="old_password" name="old_password" placeholder="{{ __('Current Password') }}">
+        @endif
+        <input type="password" autocomplete="off" class="form-control" id="new_password" name="new_password" placeholder="{{ __('New Password') }}">
+        <input type="password" autocomplete="off" class="form-control" id="new_password_confirmation" name="new_password_confirmation" placeholder="{{ __('Confirm Password') }}">
+        <span class="help-block">
+            @foreach($errors->get('*password*') as $error)
+                {{ implode(' ', $error) }}
+            @endforeach
+        </span>
     </div>
-@endcan
+</div>
 
 @if(\LibreNMS\Authentication\LegacyAuth::get()->canUpdatePasswords())
 <div class="form-group @if($errors->has('can_modify_passwd')) has-error @endif">

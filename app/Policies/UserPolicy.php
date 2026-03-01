@@ -16,9 +16,9 @@ class UserPolicy
     /**
      * Determine whether the user can view the user.
      */
-    public function view(User $user, User $target): bool
+    public function view(User $user, ?User $target = null): bool
     {
-        return $user->is($target) // allow users to view themselves
+        return ($target && $user->is($target)) // allow users to view themselves
             || $this->hasGlobalPermission($user, 'view');
     }
 
@@ -38,18 +38,19 @@ class UserPolicy
     /**
      * Determine whether the user can update the user.
      */
-    public function update(User $user): bool
+    public function update(User $user, ?User $target = null): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        return ($target && $user->is($target)) // allow users to update themselves
+            || $this->hasGlobalPermission($user, 'update');
     }
 
     /**
      * Determine whether the user can delete the user.
      */
-    public function delete(User $user, User $target): bool
+    public function delete(User $user, ?User $target = null): bool
     {
         // do not allow users to delete themselves
-        if ($user->is($target)) {
+        if ($target && $user->is($target)) {
             return false;
         }
 
