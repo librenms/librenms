@@ -4,12 +4,12 @@ namespace App\Policies;
 
 use App\Models\User;
 
-class DeviceGroupPolicy
+class AlertSchedulePolicy
 {
     use ChecksGlobalPermissions;
 
     /**
-     * Determine whether the user can view any device group.
+     * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
@@ -17,7 +17,7 @@ class DeviceGroupPolicy
     }
 
     /**
-     * Determine whether the user can view the device group.
+     * Determine whether the user can view the model.
      */
     public function view(User $user): bool
     {
@@ -25,7 +25,7 @@ class DeviceGroupPolicy
     }
 
     /**
-     * Determine whether the user can create device groups.
+     * Determine whether the user can create models.
      */
     public function create(User $user): bool
     {
@@ -33,7 +33,7 @@ class DeviceGroupPolicy
     }
 
     /**
-     * Determine whether the user can update the device group.
+     * Determine whether the user can update the model.
      */
     public function update(User $user): bool
     {
@@ -41,7 +41,7 @@ class DeviceGroupPolicy
     }
 
     /**
-     * Determine whether the user can delete the device group.
+     * Determine whether the user can delete the model.
      */
     public function delete(User $user): bool
     {

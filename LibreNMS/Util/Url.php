@@ -31,7 +31,6 @@ use App\Models\Device;
 use App\Models\Port;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
@@ -204,7 +203,7 @@ class Url
 
         if (! $overlib) {
             return $content;
-        } elseif ($port->canAccess(Auth::user())) {
+        } elseif (Gate::allows('view', $port)) {
             return self::overlibLink(self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
         }
 

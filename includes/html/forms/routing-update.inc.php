@@ -12,9 +12,11 @@
  * the source code distribution for details.
  */
 
+use App\Models\BgpPeer;
+
 header('Content-type: application/json');
 
-if (Gate::denies('bgp-peer.update')) {
+if (Gate::denies('update', BgpPeer::class)) {
     $response = [
         'status' => 'error',
         'message' => 'Need to be admin',

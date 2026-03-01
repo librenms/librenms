@@ -49,7 +49,7 @@ if ($prev) {
 }
 
 // Permissions check
-if (! Auth::user()->hasGlobalRead()) {
+if (Gate::denies('viewAny', \App\Models\Bill::class)) {
     $query .= ' INNER JOIN `bill_perms` AS `BP` ON `bills`.`bill_id` = `BP`.`bill_id` ';
     $wheres[] = '`BP`.`user_id`=?';
     $param[] = Auth::id();

@@ -117,7 +117,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
 
                 $host_par = [];
                 $perms_sql = null;
-                if (! Auth::user()->hasGlobalRead()) {
+                if (Gate::denies('viewAny', \App\Models\Device::class)) {
                     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
                     $perms_sql .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
                     $host_par = $device_ids;

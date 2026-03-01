@@ -6,6 +6,20 @@ groups:
         - alert.update
         - alert.delete
 
+    alert-rule:
+        - alert-rule.viewAny
+        - alert-rule.view
+        - alert-rule.create
+        - alert-rule.update
+        - alert-rule.delete
+
+    alert-schedule:
+        - alert-schedule.viewAny
+        - alert-schedule.view
+        - alert-schedule.create
+        - alert-schedule.update
+        - alert-schedule.delete
+
     alert-template:
         - alert-template.view
         - alert-template.create
@@ -27,8 +41,8 @@ groups:
     auth-log:
         - auth-log.view
 
-    bgp-peer:
-        - bgp-peer.update
+    bill:
+        - bill.viewAny
 
     component:
         - component.update
@@ -59,6 +73,9 @@ groups:
         - device-group.create
         - device-group.update
         - device-group.delete
+
+    link:
+        - link.viewAny
 
     location:
         - location.viewAny
@@ -98,12 +115,23 @@ groups:
         - port.update
         - port.delete
 
+    port-group:
+        - port-group.viewAny
+        - port-group.create
+        - port-group.update
+        - port-group.delete
+
     processor:
         - processor.update
 
     role:
         - role.viewAny
         - role.update
+
+    routing:
+        - routing.viewAny
+        - routing.view
+        - routing.update
 
     service:
         - service.view
@@ -128,11 +156,15 @@ groups:
         - user.update
         - user.delete
 
+    vlan:
+        - vlan.viewAny
+
     wireless-sensor:
         - wireless-sensor.update
         - wireless-sensor.delete
 
-hidden: []
-
-
-
+hidden:
+    - customoid.update
+    - customoid.create
+    - customoid.delete
+    - customoid.view

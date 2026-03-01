@@ -46,6 +46,7 @@ use App\Models\WirelessSensor;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Plugins\Hooks\MenuEntryHook;
@@ -167,7 +168,7 @@ class MenuComposer
         // Routing menu
         // FIXME queries use relationships to user
         $routing_menu = [];
-        if ($user->hasGlobalRead()) {
+        if (Gate::any(['routing.view', 'routing.viewAny', 'viewAny'])) {
             $routing_count = ObjectCache::routing();
 
             if ($routing_count['vrf']) {

@@ -13,7 +13,10 @@
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
+use App\Models\Bill;
+use App\Models\Device;
 use App\Models\Port;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -83,7 +86,7 @@ function generate_device_link($device, $text = null, $vars = [], $start = 0, $en
 
 function bill_permitted($bill_id)
 {
-    if (Auth::user()->hasGlobalRead()) {
+    if (Gate::allows('viewAny', Bill::class)) {
         return true;
     }
 
@@ -92,6 +95,10 @@ function bill_permitted($bill_id)
 
 function port_permitted($port_id, $device_id = null)
 {
+    if (Gate::allows('viewAny', Port::class)) {
+        return true;
+    }
+
     if (! is_numeric($device_id)) {
         $device_id = PortCache::get((int) $port_id)?->device_id;
     }
@@ -105,7 +112,7 @@ function port_permitted($port_id, $device_id = null)
 
 function device_permitted($device_id)
 {
-    if (Auth::user() && Auth::user()->hasGlobalRead()) {
+    if (Gate::allows('viewAny', Device::class)) {
         return true;
     }
 

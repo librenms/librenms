@@ -2,6 +2,8 @@
 
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Util\IP;
@@ -29,7 +31,7 @@ if (! empty($_POST['hostname'])) {
     } else {
         $new_device = new \App\Models\Device(['hostname' => $hostname]);
 
-        if (Auth::user()->hasGlobalRead()) {
+        if (Gate::allows('create', Device::class)) {
             // Settings common to SNMPv2 & v3
             if ($_POST['port']) {
                 $new_device->port = strip_tags((string) $_POST['port']);

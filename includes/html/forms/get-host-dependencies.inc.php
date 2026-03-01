@@ -13,7 +13,7 @@
  */
 
 use App\Models\Device;
-use Illuminate\Support\Facades\Gate as Gate;
+use Illuminate\Support\Facades\Gate;
 
 if (Gate::denies('update', Device::class)) {
     $status = ['status' => 1, 'message' => 'You need to be admin'];

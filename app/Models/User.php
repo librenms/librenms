@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
 use NotificationChannels\WebPush\HasPushSubscriptions;
@@ -57,14 +58,6 @@ class User extends Authenticatable
     }
 
     // ---- Helper Functions ----
-
-    /**
-     * Test if this user has global read access
-     */
-    public function hasGlobalRead(): bool
-    {
-        return $this->can('global-read');
-    }
 
     /**
      * Test if this user has global admin access
@@ -197,7 +190,7 @@ class User extends Authenticatable
     public function devices()
     {
         // pseudo relation
-        return Device::query()->when(! $this->hasGlobalRead(), fn ($query) => $query->whereIntegerInRaw('device_id', Permissions::devicesForUser($this)));
+        return Device::query()->when(Gate::denies('viewAny', Device::class), fn ($query) => $query->whereIntegerInRaw('device_id', Permissions::devicesForUser($this)));
     }
 
     /**
@@ -218,7 +211,7 @@ class User extends Authenticatable
 
     public function ports()
     {
-        if ($this->hasGlobalRead()) {
+        if (Gate::allows('viewAny', Port::class)) {
             return Port::query();
         } else {
             //FIXME we should return all ports for a device if the user has been given access to the whole device.

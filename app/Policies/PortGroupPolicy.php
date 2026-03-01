@@ -4,12 +4,12 @@ namespace App\Policies;
 
 use App\Models\User;
 
-class DeviceGroupPolicy
+class PortGroupPolicy
 {
     use ChecksGlobalPermissions;
 
     /**
-     * Determine whether the user can view any device group.
+     * Determine whether the user can view any port group.
      */
     public function viewAny(User $user): bool
     {
@@ -17,7 +17,7 @@ class DeviceGroupPolicy
     }
 
     /**
-     * Determine whether the user can view the device group.
+     * Determine whether the user can view the port group.
      */
     public function view(User $user): bool
     {
@@ -25,15 +25,7 @@ class DeviceGroupPolicy
     }
 
     /**
-     * Determine whether the user can create device groups.
-     */
-    public function create(User $user): bool
-    {
-        return $this->hasGlobalPermission($user, 'create');
-    }
-
-    /**
-     * Determine whether the user can update the device group.
+     * Determine whether the user can update the port group.
      */
     public function update(User $user): bool
     {
@@ -41,7 +33,7 @@ class DeviceGroupPolicy
     }
 
     /**
-     * Determine whether the user can delete the device group.
+     * Determine whether the user can delete the port group.
      */
     public function delete(User $user): bool
     {
