@@ -127,7 +127,7 @@ class UserControllerTest extends TestCase
         $user = User::factory()->create([
             'enabled' => 1,
             'can_modify_passwd' => 1,
-            'username' => 'testuser'
+            'username' => 'testuser',
         ]);
         $user->assignRole('user');
 
@@ -142,8 +142,8 @@ class UserControllerTest extends TestCase
 
         $user->refresh();
         $this->assertEquals('Modified Name', $user->realname);
-        $this->assertEquals(1, (int)$user->enabled, 'User should NOT be able to change their own enabled status');
-        $this->assertEquals(1, (int)$user->can_modify_passwd, 'User should NOT be able to change their own password modification permission');
+        $this->assertEquals(1, (int) $user->enabled, 'User should NOT be able to change their own enabled status');
+        $this->assertEquals(1, (int) $user->can_modify_passwd, 'User should NOT be able to change their own password modification permission');
         $this->assertFalse($user->hasRole('admin'), 'User should NOT be able to assign themselves roles');
     }
 
@@ -174,7 +174,7 @@ class UserControllerTest extends TestCase
         $targetUser = User::factory()->create([
             'enabled' => 1,
             'can_modify_passwd' => 1,
-            'username' => 'target'
+            'username' => 'target',
         ]);
 
         $response = $this->actingAs($admin)->put(route('users.update', $targetUser), [
@@ -185,8 +185,8 @@ class UserControllerTest extends TestCase
         $response->assertRedirect();
 
         $targetUser->refresh();
-        $this->assertEquals(0, (int)$targetUser->enabled);
-        $this->assertEquals(0, (int)$targetUser->can_modify_passwd);
+        $this->assertEquals(0, (int) $targetUser->enabled);
+        $this->assertEquals(0, (int) $targetUser->can_modify_passwd);
     }
 
     public function testAdminCanUncheckRestrictedFields(): void
@@ -198,7 +198,7 @@ class UserControllerTest extends TestCase
         $targetUser = User::factory()->create([
             'enabled' => 1,
             'can_modify_passwd' => 1,
-            'username' => 'target'
+            'username' => 'target',
         ]);
 
         // Sending without enabled/can_modify_passwd should uncheck them (as they are checkboxes)
@@ -209,8 +209,8 @@ class UserControllerTest extends TestCase
 
         $response->assertRedirect();
         $targetUser->refresh();
-        $this->assertEquals(0, (int)$targetUser->enabled);
-        $this->assertEquals(0, (int)$targetUser->can_modify_passwd);
+        $this->assertEquals(0, (int) $targetUser->enabled);
+        $this->assertEquals(0, (int) $targetUser->can_modify_passwd);
 
         // To explicitly set them to false.
         $response = $this->actingAs($admin)->put(route('users.update', $targetUser), [
@@ -220,7 +220,7 @@ class UserControllerTest extends TestCase
 
         $response->assertRedirect();
         $targetUser->refresh();
-        $this->assertEquals(0, (int)$targetUser->enabled);
-        $this->assertEquals(0, (int)$targetUser->can_modify_passwd);
+        $this->assertEquals(0, (int) $targetUser->enabled);
+        $this->assertEquals(0, (int) $targetUser->can_modify_passwd);
     }
 }
