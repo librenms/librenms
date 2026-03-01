@@ -30,4 +30,5 @@ class ProcessorPolicy
     public function update(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'update');
-    }}
+    }
+}

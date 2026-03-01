@@ -29,7 +29,6 @@ class BgpPeerPolicy
         return $this->hasGlobalPermission($user, 'view');
     }
 
-
     /**
      * Determine whether the user can update the model.
      */

@@ -276,7 +276,7 @@ if (\App\Facades\LibrenmsConfig::get('enable_billing') == 1) {
         }
     } elseif ($port->bills->isNotEmpty()) {
         echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bills']) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bills</a></span>";
-    } elseif(Gate::allows('create', Bill::class)) {
+    } elseif (Gate::allows('create', Bill::class)) {
         echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bills', 'view' => 'add', 'port' => $port->port_id]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> Create Bill</a></span>";
     }
 }

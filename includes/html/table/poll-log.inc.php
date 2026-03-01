@@ -2,7 +2,7 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use Illuminate\Support\Facades\Gate as Gate;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Time;
 
 $param = [];
