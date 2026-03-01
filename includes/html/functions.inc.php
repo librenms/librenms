@@ -812,7 +812,7 @@ function get_rules_from_json()
 
 function search_oxidized_config($search_in_conf_textbox)
 {
-    if (! Auth::user()->hasGlobalRead()) {
+    if (Gate::denies('oxidized.search')) {
         return false;
     }
 

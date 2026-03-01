@@ -14,8 +14,8 @@
 
 header('Content-type: text/plain');
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    exit('ERROR: You need to be admin');
+if (Gate::allows('api.access')) {
+    exit('ERROR: You need permission');
 }
 
 $token = bin2hex(openssl_random_pseudo_bytes(16));

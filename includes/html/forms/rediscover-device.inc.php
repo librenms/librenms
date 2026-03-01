@@ -12,10 +12,13 @@
  * the source code distribution for details.
  */
 
-if (! Auth::user()->hasGlobalAdmin()) {
+use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
+
+if (Gate::denies('viewAny', Device::class)) {
     $response = [
         'status' => 'error',
-        'message' => 'Need to be admin',
+        'message' => 'Need permission',
     ];
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;

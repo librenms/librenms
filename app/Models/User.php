@@ -75,14 +75,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Test if the User is an admin.
-     */
-    public function isAdmin(): bool
-    {
-        return $this->can('admin');
-    }
-
-    /**
      * Helper function to hash passwords before setting
      *
      * @param  string  $password

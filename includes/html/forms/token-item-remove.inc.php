@@ -14,7 +14,7 @@
 
 header('Content-type: text/plain');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::allows('api.access')) {
     exit('ERROR: You need to be admin');
 }
 

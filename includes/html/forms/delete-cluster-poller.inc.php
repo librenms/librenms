@@ -23,7 +23,11 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-if (! Auth::user()->hasGlobalAdmin()) {
+
+use App\Models\PollerCluster;
+use Illuminate\Support\Facades\Gate;
+
+if (Gate::denies('delete', PollerCluster::class)) {
     $status = ['status' => 1, 'message' => 'ERROR: You need to be admin to delete poller entries'];
 } else {
     $id = $vars['id'];

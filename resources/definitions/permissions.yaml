@@ -1,6 +1,37 @@
 groups:
+    alert:
+        - alert.viewAny
+        - alert.view
+        - alert.detail
+        - alert.update
+        - alert.delete
+
+    alert-template:
+        - alert-template.view
+        - alert-template.create
+        - alert-template.update
+        - alert-template.delete
+
+    alert-transport:
+        - alert-transport.view
+        - alert-transport.create
+        - alert-transport.update
+        - alert-transport.delete
+
+    api:
+        - api.access
+
+    application:
+        - application.update
+
     auth-log:
         - auth-log.view
+
+    bgp-peer:
+        - bgp-peer.update
+
+    component:
+        - component.update
 
     custom-map:
         - custom-map.viewAny
@@ -36,8 +67,15 @@ groups:
         - location.update
         - location.delete
 
+    mempool:
+        - mempool.update
+
     notification:
         - notification.update
+
+    oxidized:
+        - oxidized.refresh
+        - oxidized.search
 
     plugin:
         - plugin.admin
@@ -60,9 +98,17 @@ groups:
         - port.update
         - port.delete
 
+    processor:
+        - processor.update
+
     role:
         - role.viewAny
         - role.update
+
+    service:
+        - service.view
+        - service.create
+        - service.update
 
     service-template:
         - service-template.viewAny
@@ -81,6 +127,10 @@ groups:
         - user.create
         - user.update
         - user.delete
+
+    wireless-sensor:
+        - wireless-sensor.update
+        - wireless-sensor.delete
 
 hidden: []
 
