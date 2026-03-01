@@ -31,7 +31,7 @@ class UserControllerTest extends TestCase
         Permission::findOrCreate('user.delete');
         Permission::findOrCreate('role.update');
 
-        Password::defaults(fn() => Password::min(8));
+        Password::defaults(fn () => Password::min(8));
 
         LibrenmsConfig::set('auth_mechanism', 'mysql');
     }
