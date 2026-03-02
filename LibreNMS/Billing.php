@@ -73,6 +73,7 @@ class Billing
         $total = $end->diff($start)->format('%a');
         $since = $now->diff($start)->format('%a');
 
+        // Prevent DivisionByZeroError when short previous months cause date_sub() to overflow the start date, making $since equal to 0.
         if ($since == 0) {
             $since = 1;
         }
