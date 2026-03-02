@@ -796,10 +796,6 @@ LibreNMS.Date.format = function (value, options = {}) {
  * @return {Date}
  */
 LibreNMS.Date.inUserTz = function (date) {
-    if (window.tz) {
-        // uses en-US for reliable parsing. Notably, toLocaleString omits tz information to allow conversion.
-        return new Date(date.toLocaleString('en-US', { timeZone: window.tz }));
-    }
-
-    return date; // browser timezone matches, no conversion necessary
+    // uses en-US for reliable parsing. Notably, toLocaleString omits tz information to allow conversion.
+    return new Date(date.toLocaleString('en-US', { timeZone: window.tz }));
 };
