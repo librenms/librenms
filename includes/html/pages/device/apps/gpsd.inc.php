@@ -24,7 +24,7 @@
 $graphs = [
     'gpsd_satellites' => 'Satellites',
     'gpsd_dop' => 'Dilution of Precision',
-    'gpsd_mode' => 'Fix type',
+    'gpsd_mode' => 'Fix type :: 0=unknown, 1=no fix, 2=2D, 3=3D',
 ];
 
 foreach ($graphs as $key => $text) {
