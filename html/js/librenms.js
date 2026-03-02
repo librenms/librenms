@@ -770,16 +770,11 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 LibreNMS.Time.format = function (value, options = {}) {
-    let defaults = {
+    let compositeOptions = {
         dateStyle: "medium",
-        timeStyle: "medium"
+        timeStyle: "medium",
+        timeZone: window.tz
     };
-
-    if (window.tz) {
-        defaults.timeZone = window.tz;
-    }
-
-    let compositeOptions = {...defaults, ...options};
 
     return new Intl.DateTimeFormat(navigator.language, compositeOptions).format(new Date(value));
 };

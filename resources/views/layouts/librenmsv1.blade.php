@@ -103,7 +103,7 @@
                 updateTimezone(tz, false);
             }
         @endif
-        window.tz = '{{ session('preferences.timezone') }}';
+        window.tz = '{{ session('preferences.timezone') }}' || window.Intl.DateTimeFormat().resolvedOptions().timeZone;
         </script>
         <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
     @endauth
