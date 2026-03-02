@@ -181,7 +181,7 @@ return [
     ],
     'voltage' => [
         'short' => 'Voltage',
-        'long' => 'voltage',
+        'long' => 'Voltage',
         'unit' => 'V',
         'unit_long' => 'Volts',
     ],

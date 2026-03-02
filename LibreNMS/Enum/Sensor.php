@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Enum;
 
-use Illuminate\Support\Str;
 use LibreNMS\Traits\EnumToArray;
 
 enum Sensor: string
@@ -43,52 +42,12 @@ enum Sensor: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::Charge => 'Battery Charge',
-            self::Dbm => 'dBm',
-            self::Eer => 'Energy Efficiency Ratio',
-            self::Signal => 'Wireless',
-            self::TvSignal => 'TV Signal',
-            self::Waterflow => 'Water Flow Rate',
-            default => Str::headline($this->name),
-        };
+        return __("sensors.$this->value.long");
     }
 
     public function unit(): string
     {
-        return match ($this) {
-            self::Airflow => 'cfm',
-            self::Ber => 'ratio',
-            self::Bitrate => 'bps',
-            self::Charge => '%',
-            self::ChromaticDispersion => 'ps/nm',
-            self::Cooling => 'W',
-            self::Count => '#',
-            self::Current => 'A',
-            self::Dbm => 'dBm',
-            self::Delay => 's',
-            self::Eer => 'eer',
-            self::Fanspeed => 'rpm',
-            self::Frequency => 'Hz',
-            self::Humidity => '%',
-            self::Load => '%',
-            self::Loss => '%',
-            self::Percent => '%',
-            self::Power => 'W',
-            self::PowerConsumed => 'kWh',
-            self::PowerFactor => 'ratio',
-            self::Pressure => 'kPa',
-            self::QualityFactor => 'dB',
-            self::Runtime => 'Min',
-            self::Signal => 'dBm',
-            self::Snr => 'SNR', // TODO: dB?
-            self::State => '#',
-            self::Temperature => '°C',
-            self::TvSignal => 'dBmV',
-            self::Voltage => 'V',
-            self::Waterflow => 'l/m',
-            self::SignalLoss => 'dB',
-        };
+        return __("sensors.$this->value.unit");
     }
 
     public function icon(): string
