@@ -90,69 +90,9 @@ parameters:
 			path: LibreNMS/OS/SmOs.php
 
 		-
-			message: "#^If condition is always false\\.$#"
-			count: 2
-			path: LibreNMS/Util/CiHelper.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
-			message: "#^Variable \\$rrd_options in empty\\(\\) always exists and is always falsy\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
 			message: "#^Property App\\\\Console\\\\Commands\\\\InternalHttpRequest\\:\\:\\$app is never read, only written\\.$#"
 			count: 1
 			path: app/Console/Commands/InternalHttpRequest.php
-
-		-
-			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
-			count: 1
-			path: app/Http/Controllers/DeviceGroupController.php
-
-		-
-			message: "#^Ternary operator condition is always false\\.$#"
-			count: 1
-			path: app/Http/Controllers/LegacyController.php
-
-		-
-			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
-			count: 1
-			path: app/Http/Controllers/PortGroupController.php
-
-		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\ServiceTemplate\\:\\:hasAccess\\(\\)\\.$#"
-			count: 1
-			path: app/Http/Controllers/Select/ServiceTemplateController.php
-
-		-
-			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
-			count: 1
-			path: app/Http/Controllers/ServiceController.php
-
-		-
-			message: "#^Cannot call method only\\(\\) on array\\<string, string\\>\\.$#"
-			count: 1
-			path: app/Http/Controllers/ServiceController.php
-
-		-
-			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
-			count: 1
-			path: app/Http/Controllers/ServiceTemplateController.php
-
-		-
-			message: "#^Offset 'image_title' does not exist on null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Widgets/ImageController.php
-
-		-
-			message: "#^Offset 'image_title' on null in empty\\(\\) does not exist\\.$#"
-			count: 1
-			path: app/Http/Controllers/Widgets/ImageController.php
 
 		-
 			message: "#^Access to an undefined property App\\\\Models\\\\DeviceRelatedModel\\:\\:\\$device_id\\.$#"
@@ -164,17 +104,3 @@ parameters:
 			count: 1
 			path: app/Models/UserPref.php
 
-		-
-			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"
-			count: 2
-			path: tests/AuthSSOTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, null given\\.$#"
-			count: 2
-			path: tests/AuthSSOTest.php
-
-		-
-			message: "#^Parameter \\#2 \\$default of function set_null expects null, int given\\.$#"
-			count: 2
-			path: tests/CommonFunctionsTest.php

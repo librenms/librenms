@@ -221,6 +221,11 @@ class Time
             default => throw new \Exception('Format needs to be one of log, compact, byminute or time'),
         };
 
-        return $input->setTimezone(session('preferences.timezone'))->format($format);
+        $timezone = session('preferences.timezone');
+        if ($timezone) {
+            $input = $input->setTimezone($timezone);
+        }
+
+        return $input->format($format);
     }
 }

@@ -948,9 +948,6 @@ return [
             'description' => 'File name suffix',
             'help' => 'This is a very important bit as device names in NfSen are limited to 21 characters. This means full domain names for devices can be very problematic to squeeze in, so therefor this chunk is usually removed.',
         ],
-        'nmap' => [
-            'description' => 'Path to nmap',
-        ],
         'opentsdb' => [
             'enable' => [
                 'description' => 'Enable',
@@ -1031,9 +1028,6 @@ return [
         'bad_iftype' => [
             'description' => 'Bad Interfaces',
             'help' => 'Network Interface Types which should be ignored',
-        ],
-        'ping' => [
-            'description' => 'Path to ping',
         ],
         'ping_rrd_step' => [
             'description' => 'Ping Frequency',
@@ -1535,9 +1529,6 @@ return [
         'device_location_map_open' => [
             'description' => 'Location Map open',
             'help' => 'Location Map is shown by default',
-        ],
-        'whois' => [
-            'description' => 'Path to whois',
         ],
         'smokeping.integration' => [
             'description' => 'Enable',
