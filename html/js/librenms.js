@@ -772,8 +772,8 @@ document.addEventListener('DOMContentLoaded', function () {
 /**
  * Format a date or string into a localized string in the user's configured timezone.
  *
- * @param {string|Date} value
- * @param {Object} options
+ * @param {string|Date} value Date object or time string (ISO8601 preferred)
+ * @param {Object} options passed to Intl.DateTimeFormat()
  * @return {string}
  */
 LibreNMS.Date.format = function (value, options = {}) {
