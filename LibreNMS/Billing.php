@@ -73,6 +73,10 @@ class Billing
         $total = $end->diff($start)->format('%a');
         $since = $now->diff($start)->format('%a');
 
+        if ($since == 0) {
+            $since = 1;
+        }
+
         return $cur_used / $since * $total;
     }
 
