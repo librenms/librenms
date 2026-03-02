@@ -1,8 +1,6 @@
 <?php
 
-$class = 'count';
-$unit = '';
-$unit_long = '';
+$class = \LibreNMS\Enum\Sensor::Count;
 
 $graph_params->logarithmic = true;
 
