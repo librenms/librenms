@@ -61,7 +61,7 @@ class DeviceController extends SelectController
                         ->from('devices_perms')
                         ->where('user_id', $user_id);
                 })
-                ->distinct()
+                // hostnames are not guaranteed unique, use a stable tiebreaker
                 ->orderBy('hostname')
                 ->orderBy('device_id');
         }
@@ -69,7 +69,7 @@ class DeviceController extends SelectController
         return Device::hasAccess($request->user())
             ->when($request->input('exclude'), fn ($query, $exclude) => $query->where('device_id', '!=', $exclude))
             ->select(['device_id', 'hostname', 'sysName', 'display', 'icon'])
-            ->distinct()
+            // hostnames are not guaranteed unique, use a stable tiebreaker
             ->orderBy('hostname')
             ->orderBy('device_id');
     }
