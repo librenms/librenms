@@ -9,6 +9,11 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 icon: cisco
 mib_dir: cisco
+ignore_vlans:
+    - 1002
+    - 1003
+    - 1004
+    - 1005
 poller_modules:
     cisco-ace-serverfarms: true
     cisco-ace-loadbalancer: true

@@ -29,6 +29,7 @@
 
 namespace LibreNMS\OS\Shared;
 
+use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Models\Component;
 use App\Models\Device;
@@ -973,13 +974,13 @@ class Cisco extends OS implements
 
         $vtpdomains = SnmpQuery::walk('CISCO-VTP-MIB::managementDomainName')->pluck();
         $current_domain = 0;
-        $os_requires_vlan_filtering = $this->os_requires_vlan_filtering;
+        $os = $this->getName();
+        $ignore_vlans = (array) LibrenmsConfig::getOsSetting($os, 'ignore_vlans');
 
         return SnmpQuery::enumStrings()->walk('CISCO-VTP-MIB::vtpVlanTable')
-            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain, $os_requires_vlan_filtering) {
-                // Skip Cisco reserved VLANs (1002-1005: fddi-default, token-ring-default, fddinet-default, trnet-default)
-                // Only for IOS and IOS-XE
-                if ($os_requires_vlan_filtering && $vlan_id >= 1002 && $vlan_id <= 1005) {
+            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain, $ignore_vlans) {
+                // Skip VLANs configured to be ignored
+                if (in_array($vlan_id, $ignore_vlans)) {
                     return null;
                 }
 
@@ -996,7 +997,7 @@ class Cisco extends OS implements
                     'vlan_state' => isset($vlan['CISCO-VTP-MIB::vtpVlanState']) && $vlan['CISCO-VTP-MIB::vtpVlanState'] == 'operational',
                 ]);
             })
-            ->filter(); // Remove null values from reserved VLANs
+            ->filter(); // Remove null values from ignored VLANs
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection

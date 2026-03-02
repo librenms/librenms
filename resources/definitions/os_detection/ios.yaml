@@ -9,6 +9,11 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 icon: cisco
+ignore_vlans:
+    - 1002
+    - 1003
+    - 1004
+    - 1005
 discovery:
     -
         sysDescr:
