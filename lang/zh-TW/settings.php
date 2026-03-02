@@ -660,9 +660,6 @@ return [
             'description' => '檔案名稱首碼',
             'help' => 'This is a very important bit as device names in NfSen are limited to 21 characters. This means full domain names for devices can be very problematic to squeeze in, so therefor this chunk is usually removed.',
         ],
-        'nmap' => [
-            'description' => 'nmap 路徑',
-        ],
         'own_hostname' => [
             'description' => 'LibreNMS 主機名稱',
             'help' => 'Should be set to the hostname/ip the librenms server is added as',
@@ -975,9 +972,6 @@ return [
         'device_location_map_open' => [
             'description' => '開啟位置圖',
             'help' => 'Location Map is shown by default',
-        ],
-        'whois' => [
-            'description' => 'whois 路徑',
         ],
         'smokeping.integration' => [
             'description' => '啟用',
