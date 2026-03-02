@@ -95,44 +95,6 @@ parameters:
 			path: app/Console/Commands/InternalHttpRequest.php
 
 		-
-			message: "#^Ternary operator condition is always false\\.$#"
-			count: 1
-			path: app/Http/Controllers/LegacyController.php
-
-		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\ServiceTemplate\\:\\:hasAccess\\(\\)\\.$#"
-			count: 1
-			path: app/Http/Controllers/Select/ServiceTemplateController.php
-
-		-
-			message: "#^Cannot call method only\\(\\) on array\\<string, string\\>\\.$#"
-			count: 1
-			path: app/Http/Controllers/ServiceController.php
-
-		-
-			message: "#^Offset 'image_title' does not exist on null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Widgets/ImageController.php
-
-		-
-			message: "#^Offset 'image_title' on null in empty\\(\\) does not exist\\.$#"
-			count: 1
-			path: app/Http/Controllers/Widgets/ImageController.php
-			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
-			count: 1
-			path: app/Http/Controllers/DeviceGroupController.php
-
-		-
-			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
-			count: 1
-			path: app/Http/Controllers/PortGroupController.php
-
-		-
-			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
-			count: 1
-			path: app/Http/Controllers/ServiceTemplateController.php
-
-		-
 			message: "#^Access to an undefined property App\\\\Models\\\\DeviceRelatedModel\\:\\:\\$device_id\\.$#"
 			count: 1
 			path: app/Models/DeviceRelatedModel.php
