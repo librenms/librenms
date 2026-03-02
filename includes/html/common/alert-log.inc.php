@@ -122,7 +122,7 @@ $common_output[] = '</select> \
         },
         converters: {
             datetime: {
-              to: LibreNMS.Time.format
+              to: LibreNMS.Date.format
             }
         }
     }).on("loaded.rs.jquery.bootgrid", function () {
