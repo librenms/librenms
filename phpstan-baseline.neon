@@ -90,21 +90,6 @@ parameters:
 			path: LibreNMS/OS/SmOs.php
 
 		-
-			message: "#^If condition is always false\\.$#"
-			count: 2
-			path: LibreNMS/Util/CiHelper.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
-			message: "#^Variable \\$rrd_options in empty\\(\\) always exists and is always falsy\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
 			message: "#^Property App\\\\Console\\\\Commands\\\\InternalHttpRequest\\:\\:\\$app is never read, only written\\.$#"
 			count: 1
 			path: app/Console/Commands/InternalHttpRequest.php
