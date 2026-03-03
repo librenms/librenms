@@ -59,6 +59,8 @@ $graphs = [
 if (isset($app_data['has_location']) && $app_data['has_location']) {
     $graphs['gpsd_altitude'] = 'Altitude';
     $graphs['gpsd_location'] = 'Location';
+    $graphs['gpsd_latitude'] = 'Latitude';
+    $graphs['gpsd_longitude'] = 'longitude';
 }
 
 foreach ($graphs as $key => $text) {
