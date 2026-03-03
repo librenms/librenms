@@ -2,6 +2,8 @@
 
 require 'includes/html/graphs/common.inc.php';
 
+$scale_min = -180;
+$scale_max = 180;
 $colours = 'rainbow';
 $nototal = 1;
 
