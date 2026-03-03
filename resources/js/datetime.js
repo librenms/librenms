@@ -14,12 +14,15 @@ function parse(input) {
 
     let dt;
 
-    if (typeof input === 'string') {
-        // Backend: ISO with Z / offset → treat as an instant, then use the default zone for display
+    if (typeof input === 'number' || (typeof input === 'string' && !isNaN(input))) {
+        // Unix timestamp seconds (from URL)
+        dt = DateTime.fromSeconds(Number(input));
+    } else if (typeof input === 'string') {
+        // Backend: ISO with Z / offset => treat as an instant, then use the default zone for display
         if (input.includes('Z') || input.includes('+') || input.includes('-')) {
             dt = DateTime.fromISO(input);
         }
-        // Naive string (datetime-local style) → interpret directly in default zone
+        // Naive string (datetime-local style) => interpret directly in default zone
         else if (input.includes('T')) {
             dt = DateTime.fromISO(input);
         }
@@ -27,18 +30,11 @@ function parse(input) {
         else {
             dt = DateTime.fromJSDate(new Date(input));
         }
-    }
-    else if (typeof input === 'number' || (typeof input === 'string' && !isNaN(input))) {
-        // Unix timestamp seconds (from URL)
-        dt = DateTime.fromSeconds(Number(input));
-    }
-    else if (input instanceof Date && !isNaN(input.getTime())) {
+    } else if (input instanceof Date && !isNaN(input.getTime())) {
         dt = DateTime.fromJSDate(input);
-    }
-    else if (DateTime.isDateTime(input)) {
+    } else if (DateTime.isDateTime(input)) {
         dt = input;
-    }
-    else {
+    } else {
         dt = DateTime.invalid('unsupported input type');
     }
 
@@ -77,6 +73,8 @@ const LibreNMSDate = {
     zone() {
         return Settings.defaultZone.name;
     },
+
+    parse,
 };
 
 export default LibreNMSDate;
