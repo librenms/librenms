@@ -68,7 +68,7 @@ jobs:
         run: php artisan key:generate
 
       - name: Migrate Database
-        run: php artisan migrate --database=testing
+        run: php artisan migrate
 
       - name: Upgrade Chrome Driver
         run: php artisan dusk:chrome-driver --detect
