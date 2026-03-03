@@ -31,6 +31,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
         'sensor_type',
         'sensor_descr',
         'sensor_divisor',
+        'sensor_current',
         'sensor_multiplier',
         'sensor_limit',
         'sensor_limit_warn',
@@ -110,7 +111,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
         $user = auth()->user();
 
         return match ($this->sensor_class) {
-            'temperature' => $user && UserPref::getPref($user, 'temp_units') == 'f' ? Rewrite::celsiusToFahrenheit($value) . ' °F' : "$value °C",
+            'temperature' => $user && UserPref::getPref($user, 'temp_units') == 'f' ? Rewrite::celsiusToFahrenheit($value) . ' °F' : round($value, 2) . ' °C',
             'state' => $this->currentTranslation()->state_descr ?? 'Unknown',
             'current', 'power' => Number::formatSi($value, 3, 0, $this->unit()),
             'runtime' => Time::formatInterval($value * 60),

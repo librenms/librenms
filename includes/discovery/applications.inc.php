@@ -24,7 +24,6 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Application;
 use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
@@ -39,7 +38,7 @@ $results = snmpwalk_cache_oid($device, 'nsExtendStatus', [], 'NET-SNMP-EXTEND-MI
 // Load our list of available applications
 $applications = [];
 if ($results) {
-    foreach (glob(LibrenmsConfig::get('install_dir') . '/includes/polling/applications/*.inc.php') as $file) {
+    foreach (glob(base_path('includes/polling/applications/*.inc.php')) as $file) {
         $name = basename($file, '.inc.php');
         $applications[$name] = $name;
     }

@@ -29,9 +29,7 @@ namespace App\Console;
 use Illuminate\Console\Command;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use LibreNMS\Util\Debug;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Output\OutputInterface;
 use Validator;
 
 abstract class LnmsCommand extends Command
@@ -161,27 +159,6 @@ abstract class LnmsCommand extends Command
                 $this->error($message);
             });
             exit(1);
-        }
-    }
-
-    protected function configureOutputOptions(): void
-    {
-        $verbosity = $this->getOutput()->getVerbosity();
-
-        if ($verbosity === OutputInterface::VERBOSITY_QUIET) {
-            \Log::setDefaultDriver('stack'); // this omits stdout
-            Debug::setCliQuietOutput();
-
-            return;
-        }
-
-        \Log::setDefaultDriver('console');
-
-        if ($verbosity >= OutputInterface::VERBOSITY_VERY_VERBOSE) {
-            Debug::set();
-            if ($verbosity >= OutputInterface::VERBOSITY_DEBUG) {
-                Debug::setVerbose();
-            }
         }
     }
 

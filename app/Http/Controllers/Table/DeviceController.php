@@ -100,12 +100,12 @@ class DeviceController extends TableController
             ->withCount(['ports', 'sensors', 'wirelessSensors']);
 
         // if searching or sorting the location field, join the locations table
-        if ($request->get('searchPhrase') || in_array('location', array_keys($request->get('sort', [])))) {
+        if ($request->input('searchPhrase') || in_array('location', array_keys($request->input('sort', [])))) {
             $query->leftJoin('locations', 'locations.id', 'devices.location_id');
         }
 
         // filter device group, not sure this is the most efficient query
-        if ($group = $request->get('group')) {
+        if ($group = $request->input('group')) {
             if ($group == 'none') {
                 $query->whereDoesntHave('groups');
             } else {
@@ -115,8 +115,8 @@ class DeviceController extends TableController
             }
         }
 
-        if ($request->get('poller_group') !== null) {
-            $query->where('poller_group', $request->get('poller_group'));
+        if ($request->input('poller_group') !== null) {
+            $query->where('poller_group', $request->input('poller_group'));
         }
 
         return $query;
@@ -152,9 +152,9 @@ class DeviceController extends TableController
     {
         $deviceStatus = $device->getDeviceStatus();
         $status = match ($deviceStatus) {
-            DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED => 'down',
-            DeviceStatus::IGNORED_UP, DeviceStatus::UP => 'up',
-            DeviceStatus::IGNORED_DOWN, DeviceStatus::DISABLED => 'disabled',
+            DeviceStatus::Down, DeviceStatus::NeverPolled => 'down',
+            DeviceStatus::IgnoredUp, DeviceStatus::Up => 'up',
+            DeviceStatus::IgnoredDown, DeviceStatus::Disabled => 'disabled',
         };
 
         return [
@@ -162,11 +162,11 @@ class DeviceController extends TableController
             'status' => $status,
             'maintenance' => $device->isUnderMaintenance(),
             'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo((string) $device->icon, PATHINFO_FILENAME) . '">',
-            'hostname' => URL::modernDeviceLink($device, extra: $this->isDetailed() ? $device->name() : ''),
+            'hostname' => Url::modernDeviceLink($device, extra: $this->isDetailed() ? $device->name() : ''),
             'metrics' => $this->getMetrics($device),
             'hardware' => htmlspecialchars(Rewrite::ciscoHardware($device)),
             'os' => $this->getOsText($device),
-            'uptime' => $deviceStatus == DeviceStatus::NEVER_POLLED ? __('device.never_polled') : Time::formatInterval($device->status ? $device->uptime : (int) $device->downSince()->diffInSeconds(null, true), true),
+            'uptime' => $deviceStatus == DeviceStatus::NeverPolled ? __('device.never_polled') : Time::formatInterval($device->status ? $device->uptime : (int) $device->downSince()->diffInSeconds(null, true), true),
             'location' => htmlspecialchars($this->getLocation($device)),
             'actions' => view('device.actions', ['actions' => $this->getActions($device)])->__toString(),
             'device_id' => $device->device_id,

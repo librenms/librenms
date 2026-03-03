@@ -10,6 +10,7 @@ the values we expect to see the data in:
 | ------------------------------- | --------------------------- |
 | airflow                         | cfm                         |
 | ber                             | ratio                       |
+| bitrate                         | bps                         |
 | charge                          | %                           |
 | chromatic_dispersion            | ps/nm                       |
 | cooling                         | W                           |
@@ -23,6 +24,7 @@ the values we expect to see the data in:
 | humidity                        | %                           |
 | load                            | %                           |
 | loss                            | %                           |
+| percent                         | %                           |
 | power                           | W                           |
 | power_consumed                  | kWh                         |
 | power_factor                    | ratio                       |
@@ -34,11 +36,9 @@ the values we expect to see the data in:
 | state                           | #                           |
 | temperature                     | C                           |
 | tv_signal                       | dBmV                        |
-| bitrate                         | bps                         |
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
-| percent                         | %                           |
-| signal_loss                       | dB                          |
+| signal_loss                     | dB                          |
 
 ### Simple health discovery
 
@@ -58,7 +58,6 @@ all the data you need. We will use netbotz as an example here.
 `resources/definitions/os_discovery/netbotz.yaml`
 
 ```yaml
-mib: NETBOTZV2-MIB
 modules:
     sensors:
         airflow:
@@ -66,27 +65,24 @@ modules:
                 skip_value_lt: 0
             data:
                 -
-                    oid: airFlowSensorTable
-                    value: airFlowSensorValue
+                    oid: NETBOTZV2-MIB::airFlowSensorTable
+                    value: NETBOTZV2-MIB::airFlowSensorValue
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.5528.100.4.1.5.1.2.{{ $index }}'
-                    descr: '{{ $airFlowSensorLabel }}'
+                    descr: '{{ NETBOTZV2-MIB::airFlowSensorLabel }}'
                     index: 'airFlowSensorValue.{{ $index }}'
 ```
 
-At the top you can define one or more mibs to be used in the lookup of data:
-
-`mib: NETBOTZV2-MIB`
-For use of multiple MIB files separate them with a colon: `mib: NETBOTZV2-MIB:SECOND-MIB`
+Please ensure that you use the format MIB-NAME::OID for all references to OIDs.
 
 For `data:` you have the following options:
 
 The only sensor we have defined here is airflow. The available options
 are as follows:
 
-- `oid` (required): This is the name of the table you want to snmp walk for data.
+- `oid` (required): This is the name of the table you want to snmp walk for data, prepended by the MIB-NAME, I.e `NETBOTZV2-MIB::airFlowSensorTable`.
 - `value` (optional): This is the key within the table that contains
-  the value. If not provided will use `oid`
+  the value, prepended by the MIB-NAME, I.e: `NETBOTZV2-MIB::airFlowSensorValue`. If not provided will use `oid`.
 - `num_oid` (required for PullRequests): If not provided, this parameter should be computed
   automatically by discovery process. This parameter is still required to
   submit a pull request. This is the numerical OID that contains
@@ -145,10 +141,52 @@ For `options:` you have the following available:
 - `skip_value_gt`: If sensor value is greater than this, skip the discovery.
 
 Multiple variables can be used in the sensor's definition. The syntax
-is `{{ $variable }}`. Any oid in the current table can be used, as
+is `{{ MIB-NAME::variable }}`. Any oid in the current table can be used, as
 well as pre-fetched data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
+
+To fetch data not available to your sensor you can use `additional_oids`.
+
+!!! note
+    `additional_oids` should only be used when data is not fetched by your sensor.
+
+ `additional_oids` can also be used within a class.
+ This is the preferred way if the `additional_oids` are only used inside the class.
+ See `additional_oids` in the `temperature` class below aswell as `additional_oids` on the `sensors` level.
+ 
+!!! note
+     Only one `additional_oids` statements should be used for the same oid and this is only an example showing both cases.
+
+```
+sensors:
+    additional_oids:
+        data:
+            -
+                oid:
+                    - Stulz-WIB8000-MIB::unitsettingName
+    temperature:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - Stulz-WIB8000-MIB::unitsettingName
+        data:
+            -
+                oid: Stulz-WIB8000-MIB::unitTemperature
+                value: Stulz-WIB8000-MIB::unitTemperature
+                num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1170.{{ $index }}'
+                index: 'unitTemperature.{{ $index }}'
+                descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} temp'
+                divisor: 10
+            -
+                oid: Stulz-WIB8000-MIB::unitSupplyAirTemperature
+                value: Stulz-WIB8000-MIB::unitSupplyAirTemperature
+                num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1193.{{ $index }}'
+                index: 'unitSupplyAirTemperature.{{ $index }}'
+                descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} supply temp'
+                divisor: 10
+```
 
 If you want access a string in an index, `{{ $index_string }}` can be used,
 optionally suffixed with a format string to specify how to extract the string.
@@ -191,15 +229,15 @@ mix sensor types in a single table.
 ```yaml
                     skip_values:
                     -
-                      oid: sensUnit
+                      oid: STE2-MIB::sensUnit
                       op: '!='
                       value: 4
                     -
-                      oid: sensConfig.0
+                      oid: STE2-MIB::sensConfig.0
                       op: '!='
                       value: 1
                     -
-                      device: hardware
+                      device: STE2-MIB::hardware
                       op: 'contains'
                       value: 'rev2'
 ```
@@ -215,7 +253,7 @@ Example:
 ```yaml
                     skip_values:
                     -
-                      oid: sensorName
+                      oid: MIB-NAME::sensorName
                       op: 'not_in_array'
                       value: ['sensor1', 'sensor2']
 ```
@@ -223,22 +261,27 @@ Example:
 ```yaml
                     skip_values:
                     -
-                      oid: sensorOptionalOID
+                      oid: MIB-NAME::sensorOptionalOID
                       op: 'exists'
                       value: false
 ```
 
 ```yaml
         temperature:
+            additional_oids:
+                data:
+                    -
+                        oid:
+                            - ENTITY-MIB::entPhysicalName
             data:
                 -
-                    oid: hwOpticalModuleInfoTable
-                    value: hwEntityOpticalTemperature
-                    descr: '{{ $entPhysicalName }}'
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTemperature
+                    descr: '{{ ENTITY-MIB::entPhysicalName }}'
                     index: '{{ $index }}'
                     skip_values:
                         -
-                            oid: hwEntityOpticalMode
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode
                             op: '='
                             value: '1'
 ```
@@ -428,12 +471,12 @@ names Ethernet 1-1-1-1, 1-1-1-2, etc, and they are indexed as oid.1.1.1.1, oid.1
 the mib.
 
 Next the program checks which table the port exists in and that the connector type is 'fiber'. There
-are other port tables in the full code that were ommitted from the example for brevity. Copper
+are other port tables in the full code that were omitted from the example for brevity. Copper
 media won't have optical readings, so if the media type isn't fiber we skip discovery for that port.
 
 The next two lines build the OIDs for getting the optical receive and transmit values using the
 `$index` for the port. Using the OIDs the program gets the current receive and transmit values
-($currentRx and $currentTx repectively) to verify the values are not 0. Not all SFPs collect digital
+($currentRx and $currentTx respectively) to verify the values are not 0. Not all SFPs collect digital
 optical monitoring (DOM) data, in the case of Adva the value of both transmit and receive will be
 0 if DOM is not available. While 0 is a valid value for optical power, its extremely unlikely that
 both will be 0 if DOM is present. If DOM is not available, then the program stops discovery for

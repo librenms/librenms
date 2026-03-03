@@ -1,11 +1,10 @@
-
 --  =================================================================
--- Copyright (C) 2007 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Inner Link MIB File for inner links between 
 --                frames
 -- Reference:   
--- Version:     V1.00
+-- Version:     V2.01
 -- History: 
 -- 
 --           V1.00   2007-10-24, Create 
@@ -29,23 +28,28 @@
     
     
         hwInnerLinkMIB MODULE-IDENTITY 
-            LAST-UPDATED "200710241430Z"        -- Oct. 24, 2007 at 14:30 GMT
+            LAST-UPDATED "201801151430Z"
             ORGANIZATION 
-                "Huawei Technologies co.,Ltd."
+                  "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
-                " R&D BeiJing, Huawei Technologies co.,Ltd.
-                Huawei Bld.,NO.3 Xinxi Rd., 
-                Shang-Di Information Industry Base,
-                Hai-Dian District Beijing P.R. China
-                Zip:100085 
-                Http://www.huawei.com                                       
-                E-mail:support@huawei.com "
+                  "Huawei Industrial Base
+  Bantian, Longgang
+   Shenzhen 518129
+   People's Republic of China
+   Website: http://www.huawei.com
+   Email: support@huawei.com
+ "
             DESCRIPTION 
                 "The private mib file includes the general  
                 information of inner links between frames
                 in cluster system."
+
+                REVISION "201801151430Z"
+                DESCRIPTION "V2.01, Modify the description "
+
             ::= { hwDatacomm 158 }
-             
+
+
 --
 -- Node definitions 
 --      
@@ -97,11 +101,9 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This table contains one row per inner link entity.
-                Each inner link is composed of all physical links
-                of the same kind between two frames. 
-                 It describes the status of the inner link between
-                 frames in NE5000E Cluster system."
+                "This table describes the status of inter-chassis logical links, 
+                including the information about the left and right chassis and ports, 
+                management status, operation status, and alarm status."
             ::= { hwInnerLinkMIBObjects 2 }
         
         hwInnerLinkEntry OBJECT-TYPE
@@ -146,8 +148,7 @@
             MAX-ACCESS  not-accessible
             STATUS      current
             DESCRIPTION
-                "The index for this entry.It comprises of left frame
-                ID, right frame ID and type of the logical link."
+                "This object indicates the index of an inter-chassis logical link."
             ::= { hwInnerLinkEntry 1 }
         
         hwInnerLinkLeftFrameType OBJECT-TYPE
@@ -159,9 +160,10 @@
             MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
-                "Frame type of the link's left point. A value of centralChassis 
-                means the central frame in the system which can manage the system.
-                A value of lineChassis means a frame managed by the central frame."
+                "This object indicates the type of the chassis where the left port resides. Available options:
+                unknown(1)
+                centralChassis (2)
+                lineChassis (3)"
             ::= { hwInnerLinkEntry 2 }
             
         hwInnerLinkLeftFrameId OBJECT-TYPE
@@ -169,7 +171,7 @@
             MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
-                "Frame ID of the link's left point."
+                "This object indicates the ID of the chassis where the left port resides."
             ::= { hwInnerLinkEntry 3 }
             
         hwInnerLinkLeftPortId OBJECT-TYPE
@@ -177,7 +179,7 @@
             MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
-                "Port ID of the link's left virtual port."
+                "This object indicates the left (virtual) port ID."
             ::= { hwInnerLinkEntry 4 }
             
         hwInnerLinkRightFrameType OBJECT-TYPE
@@ -189,7 +191,10 @@
             MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
-                "Frame type of the link's right point."
+                "This object indicates the type of the chassis where the right port resides. Available options:
+                unknown(1)
+                centralChassis (2)
+                lineChassis (3)"
             ::= { hwInnerLinkEntry 5 }
             
         hwInnerLinkRightFrameId OBJECT-TYPE
@@ -197,7 +202,7 @@
             MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
-                "Frame ID of the link's right point."
+                "This object indicates the ID of the chassis where the right port resides."
             ::= { hwInnerLinkEntry 6 }
             
         hwInnerLinkRightPortId OBJECT-TYPE
@@ -205,7 +210,7 @@
             MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
-                "Port ID of the link's right virtual port."
+                "This object indicates the right (virtual) port ID."
             ::= { hwInnerLinkEntry 7 }
             
         hwInnerLinkType OBJECT-TYPE
@@ -218,12 +223,11 @@
             MAX-ACCESS  read-only
             STATUS      current
             DESCRIPTION
-                "Inner link type between the frames. A value of controlChannel
-                means a kind of logical link through which control messages're
-                transferred. A value of monitorChannel  means a kind of logical 
-                control link which only exists between the central chassises. 
-                A value of forwardChannel mean a kind of logical link which is 
-                used for data forwarding."
+                "This object indicates the type of an inter-chassis logical link. Available options:
+                unknown(1)
+                controlChannel(2)
+                monitorChannel(3)
+                dataChannel(4)"
             ::= { hwInnerLinkEntry 8 }
             
         hwInnerLinkAdminState OBJECT-TYPE
@@ -236,12 +240,11 @@
             MAX-ACCESS read-write
             STATUS     current
             DESCRIPTION
-                "The administrative state for this object, and it is possible 
-                to set the state when needed. A value of locked means the resource 
-                is administratively prohibited from use. A value of shuttingDown 
-                means that usage is administratively limited to current instances 
-                of use. A value of unlocked means the resource is not administratively 
-                prohibited from use."
+                "This object indicates the management status of an inter-chassis logical link. Available options:
+                notSupported (1)
+                locked(2)
+                shuttingDown(3)
+                unlocked(4)"
             ::= { hwInnerLinkEntry 9 }
         
         hwInnerLinkOperState OBJECT-TYPE
@@ -254,12 +257,11 @@
             MAX-ACCESS read-only
             STATUS     current
             DESCRIPTION
-                "The operational state for this object. A value of mostPhyChannelUp means
-                most of the physical links consisting of the logical link are working well.
-                It's possible that none of the physical links is wrong. A value of 
-                partPhyChannelUp means several physical links of the logical link are broken
-                down. A value of mostPhyChannelDown means most of the physical links of the
-                logical link are down. It's possible that none of the physical links is ok. "
+                "This object indicates the operation status of an inter-chassis logical link. Available options:
+                notSupported (1)
+                mostPhyChannelUp(2)
+                partPhyChannelUp(3)
+                mostPhyChannelDown(4)"
             ::= { hwInnerLinkEntry 10 }        
         
         hwInnerLinkAlarmLight OBJECT-TYPE
@@ -276,28 +278,15 @@
             MAX-ACCESS read-only
             STATUS     current
             DESCRIPTION
-                "The alarm status for this entity. It is decided by
-                the alarm status of the physical links which compose
-                the logical link.
-                
-                When no bits of this attribute are set, then none of the
-                status conditions described below are present. When the
-                value of under repair is set, the resource is currently
-                being repaired.
-                
-                When the value of critical is set, one or more critical
-                alarms are active against the resource. When the value of
-                major is set, one or more major alarms are active against
-                the resource. When the value of minor is set, one or more
-                minor alarms are active against the resource. When the
-                value of warning is set, one or more warning alarms are
-                active against the resource. When the value of
-                indeterminate is set, one or more  alarms of indeterminate
-                severity are active against the resource.
-                
-                When the value of alarm outstanding is set, one or more
-                alarms is active against the resource. The fault may or may
-                not be disabling."
+                "This object indicates the alarm status of an inter-chassis logical link. Available options:
+                notSupported(0)
+                underRepair(1)
+                critical(2)
+                major(3)
+                minor(4)
+                alarmOutstanding(5)
+                warning(6)
+                indeterminate(7)"
             ::= { hwInnerLinkEntry 11 } 
 
        hwInnerLinkTraps OBJECT IDENTIFIER ::= { hwInnerLinkMIB 2 }

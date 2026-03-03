@@ -45,7 +45,7 @@ class DeviceGroupController extends SelectController
     protected function baseQuery($request)
     {
         return DeviceGroup::hasAccess($request->user())
-            ->when($request->get('type'), fn ($query, $type) => $query->where('type', $type))
+            ->when($request->input('type'), fn ($query, $type) => $query->where('type', $type))
             ->select(['id', 'name']);
     }
 

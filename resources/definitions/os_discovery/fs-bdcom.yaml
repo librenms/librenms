@@ -2,7 +2,6 @@
 # The BDCOM SNMP enterprise ID (3320) has been replaced with the Fiberstore enterprise ID (52642)
 # If you make changes here, they probably should be made in the bdcom.yaml too.
 # Transceiver thresholds and vendorPN have been added in firmware version 2.2.0F Build 127804.
-mib: NMS-CHASSIS:NMS-FAN-TRAP:NMS-POWER-MIB:NMS-GPON-MIB:NMS-EPON-OLT-PON:NMS-IF-MIB:IF-MIB
 modules:
     mempools:
         data:
@@ -23,14 +22,14 @@ modules:
         data:
             -
                 oid:
-                 - gponOltPonPortPortIndex
-                 - ponIfIndex
-                 - gponOltPonPortPortActiveOnuNum
-                 - gponOltPonPortPortInactiveOnuNum
+                 - NMS-GPON-MIB::gponOltPonPortPortIndex
+                 - NMS-EPON-OLT-PON::ponIfIndex
+                 - NMS-GPON-MIB::gponOltPonPortPortActiveOnuNum
+                 - NMS-GPON-MIB::gponOltPonPortPortInactiveOnuNum
     processors:
         data:
             -
-                oid: nmscardCPUUtilization
+                oid: NMS-CHASSIS::nmscardCPUUtilization
                 num_oid: '.1.3.6.1.4.1.52642.3.6.10.1.11.{{ $index }}'
     sensors:
         additional_oids:
@@ -42,240 +41,241 @@ modules:
         temperature:
             data:
                 -
-                    oid: nmscardTemperature
+                    oid: NMS-CHASSIS::nmscardTemperature
                     num_oid: '.1.3.6.1.4.1.52642.3.6.10.1.13.{{ $index }}'
                     descr: 'Temperature {{ $index }}'
                 -
-                    oid: ifSfpParameterTable
-                    value: temperature
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::temperature
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.4.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} temperature'
                     index: 'ifSfpParameterTable.temperature.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 256
                     skip_values: -65535
-                    low_limit: temperatureLowAlarm
-                    low_warn_limit: temperatureLowWarning
-                    warn_limit: temperatureHighWarning
-                    high_limit: temperatureHighAlarm
+                    low_limit: NMS-IF-MIB::temperatureLowAlarm
+                    low_warn_limit: NMS-IF-MIB::temperatureLowWarning
+                    warn_limit: NMS-IF-MIB::temperatureHighWarning
+                    high_limit: NMS-IF-MIB::temperatureHighAlarm
         voltage:
             data:
                 -
-                    oid: nmscardVoltage
+                    oid: NMS-CHASSIS::nmscardVoltage
                     num_oid: '.1.3.6.1.4.1.52642.3.6.10.1.14.{{ $index }}'
                     descr: 'Voltage {{ $index }}'
                 -
-                    oid: ifSfpParameterTable
-                    value: vlotage
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::vlotage
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.5.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} voltage'
                     index: 'ifSfpParameterTable.vlotage.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 10000
                     skip_values: -65535
-                    low_limit: voltageLowAlarm
-                    low_warn_limit: voltageLowWarning
-                    warn_limit: voltageHighWarning
-                    high_limit: voltageHighAlarm
+                    low_limit: NMS-IF-MIB::voltageLowAlarm
+                    low_warn_limit: NMS-IF-MIB::voltageLowWarning
+                    warn_limit: NMS-IF-MIB::voltageHighWarning
+                    high_limit: NMS-IF-MIB::voltageHighAlarm
         current:
             data:
                 -
-                    oid: ifSfpParameterTable
-                    value: curr1
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::curr1
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.6.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} current1'
                     index: 'ifSfpParameterTable.curr1.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 500000
                     skip_values: -65535
-                    low_limit: biasLowAlarm
-                    low_warn_limit: biasLowWarning
-                    warn_limit: biasHighWarning
-                    high_limit: biasHighAlarm
+                    low_limit: NMS-IF-MIB::biasLowAlarm
+                    low_warn_limit: NMS-IF-MIB::biasLowWarning
+                    warn_limit: NMS-IF-MIB::biasHighWarning
+                    high_limit: NMS-IF-MIB::biasHighAlarm
                 -
-                    oid: ifSfpParameterTable
-                    value: curr2
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::curr2
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.10.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} current2'
                     index: 'ifSfpParameterTable.curr2.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 500000
                     skip_values: -65535
-                    low_limit: biasLowAlarm
-                    low_warn_limit: biasLowWarning
-                    warn_limit: biasHighWarning
-                    high_limit: biasHighAlarm
+                    low_limit: NMS-IF-MIB::biasLowAlarm
+                    low_warn_limit: NMS-IF-MIB::biasLowWarning
+                    warn_limit: NMS-IF-MIB::biasHighWarning
+                    high_limit: NMS-IF-MIB::biasHighAlarm
                 -
-                    oid: ifSfpParameterTable
-                    value: curr3
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::curr3
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.13.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} current3'
                     index: 'ifSfpParameterTable.curr3.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 500000
                     skip_values: -65535
-                    low_limit: biasLowAlarm
-                    low_warn_limit: biasLowWarning
-                    warn_limit: biasHighWarning
-                    high_limit: biasHighAlarm
+                    low_limit: NMS-IF-MIB::biasLowAlarm
+                    low_warn_limit: NMS-IF-MIB::biasLowWarning
+                    warn_limit: NMS-IF-MIB::biasHighWarning
+                    high_limit: NMS-IF-MIB::biasHighAlarm
                 -
-                    oid: ifSfpParameterTable
-                    value: curr4
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::curr4
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.16.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} current4'
                     index: 'ifSfpParameterTable.curr4.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 500000
                     skip_values: -65535
-                    low_limit: biasLowAlarm
-                    low_warn_limit: biasLowWarning
-                    warn_limit: biasHighWarning
-                    high_limit: biasHighAlarm
+                    low_limit: NMS-IF-MIB::biasLowAlarm
+                    low_warn_limit: NMS-IF-MIB::biasLowWarning
+                    warn_limit: NMS-IF-MIB::biasHighWarning
+                    high_limit: NMS-IF-MIB::biasHighAlarm
         dbm:
             data:
                 -
-                    oid: ifSfpParameterTable
-                    value: rxPower1
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::rxPower1
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.3.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} rxPower1'
                     index: 'ifSfpParameterTable.rxPower1.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
                     skip_values: -65535
-                    low_limit: rxPowerLowAlarm
-                    low_warn_limit: rxPowerLowWarning
-                    warn_limit: rxPowerHighWarning
-                    high_limit: rxPowerHighAlarm
+                    low_limit: NMS-IF-MIB::rxPowerLowAlarm
+                    low_warn_limit: NMS-IF-MIB::rxPowerLowWarning
+                    warn_limit: NMS-IF-MIB::rxPowerHighWarning
+                    high_limit: NMS-IF-MIB::rxPowerHighAlarm
                 -
-                    oid: ifSfpParameterTable
-                    value: rxPower2
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::rxPower2
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.9.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} rxPower2'
                     index: 'ifSfpParameterTable.rxPower2.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
                     skip_values: -65535
-                    low_limit: rxPowerLowAlarm
-                    low_warn_limit: rxPowerLowWarning
-                    warn_limit: rxPowerHighWarning
+                    low_limit: NMS-IF-MIB::rxPowerLowAlarm
+                    low_warn_limit: NMS-IF-MIB::rxPowerLowWarning
+                    warn_limit: NMS-IF-MIB::rxPowerHighWarning
                     high_limit: rxPowerHighAlarm
                 -
-                    oid: ifSfpParameterTable
-                    value: rxPower3
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::rxPower3
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.12.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} rxPower3'
                     index: 'ifSfpParameterTable.rxPower3.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
                     skip_values: -65535
-                    low_limit: rxPowerLowAlarm
-                    low_warn_limit: rxPowerLowWarning
-                    warn_limit: rxPowerHighWarning
-                    high_limit: rxPowerHighAlarm
+                    low_limit: NMS-IF-MIB::rxPowerLowAlarm
+                    low_warn_limit: NMS-IF-MIB::rxPowerLowWarning
+                    warn_limit: NMS-IF-MIB::rxPowerHighWarning
+                    high_limit: NMS-IF-MIB::rxPowerHighAlarm
                 -
-                    oid: ifSfpParameterTable
-                    value: rxPower4
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::rxPower4
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.15.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} rxPower4'
                     index: 'ifSfpParameterTable.rxPower4.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
                     skip_values: -65535
-                    low_limit: rxPowerLowAlarm
-                    low_warn_limit: rxPowerLowWarning
-                    warn_limit: rxPowerHighWarning
-                    high_limit: rxPowerHighAlarm
+                    low_limit: NMS-IF-MIB::rxPowerLowAlarm
+                    low_warn_limit: NMS-IF-MIB::rxPowerLowWarning
+                    warn_limit: NMS-IF-MIB::rxPowerHighWarning
+                    high_limit: NMS-IF-MIB::rxPowerHighAlarm
                 -
-                    oid: ifSfpParameterTable
-                    value: txPower1
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::txPower1
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.2.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} txPower1'
                     index: 'ifSfpParameterTable.txPower1.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
                     skip_values: -65535
-                    low_limit: txPowerLowAlarm
-                    low_warn_limit: txPowerLowWarning
-                    warn_limit: txPowerHighWarning
-                    high_limit: txPowerHighAlarm
+                    low_limit: NMS-IF-MIB::txPowerLowAlarm
+                    low_warn_limit: NMS-IF-MIB::txPowerLowWarning
+                    warn_limit: NMS-IF-MIB::txPowerHighWarning
+                    high_limit: NMS-IF-MIB::txPowerHighAlarm
                 -
-                    oid: ifSfpParameterTable
-                    value: txPower2
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::txPower2
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.8.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} txPower2'
                     index: 'ifSfpParameterTable.txPower2.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
                     skip_values: -65535
-                    low_limit: txPowerLowAlarm
-                    low_warn_limit: txPowerLowWarning
-                    warn_limit: txPowerHighWarning
-                    high_limit: txPowerHighAlarm
+                    low_limit: NMS-IF-MIB::txPowerLowAlarm
+                    low_warn_limit: NMS-IF-MIB::txPowerLowWarning
+                    warn_limit: NMS-IF-MIB::txPowerHighWarning
+                    high_limit: NMS-IF-MIB::txPowerHighAlarm
                 -
-                    oid: ifSfpParameterTable
-                    value: txPower3
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::txPower3
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.11.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} txPower3'
                     index: 'ifSfpParameterTable.txPower3.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
                     skip_values: -65535
                     low_limit: txPowerLowAlarm
-                    low_warn_limit: txPowerLowWarning
-                    warn_limit: txPowerHighWarning
-                    high_limit: txPowerHighAlarm
+                    low_warn_limit: NMS-IF-MIB::txPowerLowWarning
+                    warn_limit: NMS-IF-MIB::txPowerHighWarning
+                    high_limit: NMS-IF-MIB::txPowerHighAlarm
                 -
-                    oid: ifSfpParameterTable
-                    value: txPower4
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::txPower4
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.14.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} txPower4'
                     index: 'ifSfpParameterTable.txPower4.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
                     skip_values: -65535
-                    low_limit: txPowerLowAlarm
-                    low_warn_limit: txPowerLowWarning
-                    warn_limit: txPowerHighWarning
-                    high_limit: txPowerHighAlarm
+                    low_limit: NMS-IF-MIB::txPowerLowAlarm
+                    low_warn_limit: NMS-IF-MIB::txPowerLowWarning
+                    warn_limit: NMS-IF-MIB::txPowerHighWarning
+                    high_limit: NMS-IF-MIB::txPowerHighAlarm
         humidity:
             data:
                 -
-                    oid: nmsHumidity
+                    oid: NMS-CHASSIS::nmsHumidity
                     num_oid: '.1.3.6.1.4.1.52642.3.6.17.{{ $index }}'
                     descr: 'Humidity {{ $index }}'
         state:
             data:
                 -
-                    oid: nmsSysErrorNum
+                    oid: NMS-CHASSIS::nmsSysErrorNum
                     num_oid: '.1.3.6.1.4.1.52642.3.6.18.{{ $index }}'
+                    state_name: nmsSysErrorNum
                     descr: 'Sys Errors'
                     states:
                         - { descr: sys_ok, graph: 0, value: 0, generic: 0 }
@@ -290,12 +290,13 @@ modules:
                         - { descr: trap_exception, graph: 0, value: 13, generic: 2 }
                         - { descr: deadlock_software_exception, graph: 0, value: 16, generic: 2 }
                 -
-                    oid: ifSfpParameterTable
-                    value: sfpLostStatus
+                    oid: NMS-IF-MIB::ifSfpParameterTable
+                    value: NMS-IF-MIB::sfpLostStatus
                     num_oid: '.1.3.6.1.4.1.52642.9.63.1.7.1.21.{{ $index }}'
+                    state_name: ifSfpParameterTable
                     descr: '{{ IF-MIB::ifName }} LOS'
                     index: 'ifSfpParameterTable.sfpLostStatus.{{ $index }}'
-                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     states:
@@ -303,11 +304,11 @@ modules:
                         - { descr: lost, graph: 2, value: 2, generic: 2 }
                     skip_values:
                         - # skip ports with no tansceiver inserted
-                            oid: sfpPresentStatus
+                            oid: NMS-IF-MIB::sfpPresentStatus
                             op: '='
                             value: 2
                 -
-                    oid: FanStatus
+                    oid: NMS-FAN-TRAP::FanStatus
                     num_oid: '.1.3.6.1.4.1.52642.9.187.4.1.2.{{ $index }}'
                     descr: 'Fan {{ $index }} status'
                     state_name: FanStatus
@@ -316,9 +317,10 @@ modules:
                         - { descr: Stop, graph: 1, value: 2, generic: 2 }
                         - { descr: Unused, graph: 1, value: 3, generic: 1 }
                 -
-                    oid: powerStatus
+                    oid: NMS-POWER-MIB::powerStatus
                     num_oid: '.1.3.6.1.4.1.52642.9.189.1.{{ $index }}'
                     descr: 'Power status'
+                    state_name: powerStatus
                     states:
                         - { descr: power-A-normal, graph: 1, value: 1, generic: 2 }
                         - { descr: power-B-normal, graph: 1, value: 2, generic: 2 }
@@ -327,43 +329,43 @@ modules:
         count:
             data:
                 -
-                    oid: gponOltPonPortConfigTable
-                    value: gponOltPonPortPortActiveOnuNum
+                    oid: NMS-GPON-MIB::gponOltPonPortConfigTable
+                    value: NMS-GPON-MIB::gponOltPonPortPortActiveOnuNum
                     num_oid: '.1.3.6.1.4.1.52642.10.2.1.1.4.{{ $index }}'
                     group: "GPON Active Onu Num"
-                    descr: "{{ $gponOltPonPortPortIndex }}"
+                    descr: "{{ NMS-GPON-MIB::gponOltPonPortPortIndex }}"
                     index: "gponOltPonPortPortActiveOnuNum.{{ $index }}"
                     low_limit: 0
                     warn_limit: 120
                     high_limit: 128
                 -
-                    oid: gponOltPonPortConfigTable
-                    value: gponOltPonPortPortInactiveOnuNum
+                    oid: NMS-GPON-MIB::gponOltPonPortConfigTable
+                    value: NMS-GPON-MIB::gponOltPonPortPortInactiveOnuNum
                     num_oid: '.1.3.6.1.4.1.52642.10.2.1.1.5.{{ $index }}'
                     group: "GPON Inactive Onu Num"
-                    descr: "{{ $gponOltPonPortPortIndex }}"
+                    descr: "{{ NMS-GPON-MIB::gponOltPonPortPortIndex }}"
                     index: "gponOltPonPortPortInactiveOnuNum.{{ $index }}"
                 -
-                    oid: nmseponoltponTable
-                    value: activeOnuNum
+                    oid: NMS-EPON-OLT-PON::nmseponoltponTable
+                    value: NMS-EPON-OLT-PON::activeOnuNum
                     num_oid: '.1.3.6.1.4.1.52642.101.6.1.1.21.{{ $index }}'
                     group: "EPON Active Onu Num"
-                    descr: "{{ $ponIfIndex }}"
+                    descr: "{{ NMS-EPON-OLT-PON::ponIfIndex }}"
                     index: "activeOnuNum.{{ $index }}"
                     low_limit: 0
                     warn_limit: 60
                     high_limit: 64
                 -
-                    oid: nmseponoltponTable
-                    value: inactiveOnuNum
+                    oid: NMS-EPON-OLT-PON::nmseponoltponTable
+                    value: NMS-EPON-OLT-PON::inactiveOnuNum
                     num_oid: '.1.3.6.1.4.1.52642.101.6.1.1.22.{{ $index }}'
                     group: "EPON Inactive Onu Num"
-                    descr: "{{ $ponIfIndex }}"
+                    descr: "{{ NMS-EPON-OLT-PON::ponIfIndex }}"
                     index: "inactiveOnuNum.{{ $index }}"
 
         fanspeed:
             data:
                 -
-                    oid: FanSpeed
+                    oid: NMS-FAN-TRAP::FanSpeed
                     num_oid: '.1.3.6.1.4.1.52642.9.187.4.1.3.{{ $index }}'
                     descr: 'Fan {{ $index }} speed'

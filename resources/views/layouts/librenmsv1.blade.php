@@ -41,7 +41,7 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
-    <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=10092025" rel="stylesheet">
+    <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=02132026" rel="stylesheet">
     <link href="{{ asset('css/tw_dark.css?ver=19112025') }}" rel="stylesheet">
     @if(!in_array(session('applied_site_style', 'light'), ['light', 'dark']))
     <link href="{{ asset('css/' . session('applied_site_style') . '.css?ver=732417643') }}" rel="stylesheet">
@@ -77,7 +77,7 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=14102025') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=03022026') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
@@ -96,14 +96,15 @@
         });
     </script>
     @auth
-        @if(session('preferences.timezone_static') == null || ! session('preferences.timezone_static'))
         <script>
+        @if(session('preferences.timezone_static') === null || ! session('preferences.timezone_static'))
             var tz = window.Intl.DateTimeFormat().resolvedOptions().timeZone;
             if(tz !== '{{ session('preferences.timezone') }}') {
                 updateTimezone(tz, false);
             }
-        </script>
         @endif
+        window.tz = '{{ session('preferences.timezone') }}';
+        </script>
         <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
     @endauth
     @yield('javascript')

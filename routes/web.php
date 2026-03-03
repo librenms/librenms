@@ -37,6 +37,8 @@ use App\Http\Controllers\PollerSettingsController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\PortGroupController;
 use App\Http\Controllers\PushNotificationController;
+use App\Http\Controllers\RealtimeDataController;
+use App\Http\Controllers\RealtimeGraphController;
 use App\Http\Controllers\Search\PortSecuritySearchController;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
@@ -118,6 +120,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::middleware('can:admin')->group(function (): void {
         Route::get('/device/{device}/edit', [Device\EditDeviceController::class, 'index'])->name('device.edit');
         Route::put('/device/{device}/edit', [Device\EditDeviceController::class, 'update'])->name('device.edit.update');
+        Route::get('/device/{device}/edit/misc', [Device\EditMiscController::class, 'index'])->name('device.edit.misc');
+        Route::put('/device/{device}/edit/misc', [Device\EditMiscController::class, 'update'])->name('device.edit.misc.update');
         Route::post('/device/{device}/rediscover', [DeviceController::class, 'rediscover'])->name('device.rediscover');
     });
 
@@ -127,7 +131,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
         Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
-        Route::get('popup', \App\Http\Controllers\DevicePopupController::class)->name('popup');
+        Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
         Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
@@ -232,6 +236,9 @@ Route::middleware(['auth'])->group(function (): void {
         Route::delete('{user}', [Auth\TwoFactorManagementController::class, 'destroy'])->name('2fa.delete');
     });
 
+    Route::get('realtime/graph/{port}', RealtimeGraphController::class)->name('realtime.graph');
+    Route::get('realtime/data/{port}', RealtimeDataController::class)->name('realtime.data');
+
     // Ajax routes
     Route::prefix('ajax')->group(function (): void {
         // page ajax controllers
@@ -282,10 +289,16 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('poller-group', Select\PollerGroupController::class)->name('ajax.select.poller-group');
             Route::get('port', Select\PortController::class)->name('ajax.select.port');
             Route::get('port-field', Select\PortFieldController::class)->name('ajax.select.port-field');
+            Route::get('sensor', Select\SensorController::class)->name('ajax.select.sensor');
         });
 
         // jquery bootgrid data controllers
         Route::prefix('table')->group(function (): void {
+            Route::post('address-search/ipv4', Table\Ipv4AddressSearchController::class)->name('search.ipv4');
+            Route::post('address-search/ipv6', Table\Ipv6AddressSearchController::class)->name('search.ipv6');
+            Route::post('address-search/mac', Table\MacSearchController::class)->name('search.mac');
+            Route::post('alertlog', Table\AlertLogController::class)->name('table.alertlog');
+            Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
             Route::post('alert-schedule', Table\AlertScheduleController::class);
             Route::post('customers', Table\CustomersController::class);
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
@@ -327,6 +340,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::prefix('dash')->group(function (): void {
             Route::post('alerts', Widgets\AlertsController::class);
             Route::post('alertlog', Widgets\AlertlogController::class);
+            Route::post('alert-map', Widgets\AlertMapController::class);
             Route::post('alertlog-stats', Widgets\AlertlogStatsController::class);
             Route::post('availability-map', Widgets\AvailabilityMapController::class);
             Route::post('component-status', Widgets\ComponentStatusController::class);

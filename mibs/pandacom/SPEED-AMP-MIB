@@ -1,0 +1,1802 @@
+SPEED-AMP-MIB DEFINITIONS ::= BEGIN
+
+--                             SPEED-AMPLIFIER
+--*****************************************************************************************
+
+IMPORTS
+	DisplayString	FROM SNMPv2-TC
+	Integer32, IpAddress, TimeTicks, MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+	amplifier	FROM SPEEDCARRIER-MIB
+; -- END of IMPORTS
+
+--*******************************************************************
+
+	speedAmp MODULE-IDENTITY
+        LAST-UPDATED "202010070000Z"
+        ORGANIZATION "Pan Dacom Direkt GmbH"
+        CONTACT-INFO
+            "Pan Dacom Direkt GmbH
+            Dreieich Plaza 1B
+            63303 Dreieich
+            Germany
+            Tel. : +49 6103/932-333
+            Fax. : +49 6103/932-444
+            email: kontakt@pandacomdirekt.de
+            web  : www.pandacomdirekt.de"
+        DESCRIPTION "This MIB defines objects for the SPEED-Amplifier family"
+
+        REVISION "202010070000Z"
+        DESCRIPTION "Rev. 7.5.3
+        - added SPEED-AMP long HP module cards"
+                
+        REVISION "201904250000Z"
+        DESCRIPTION "Rev. 7.2.3
+            - integer syntax correction"
+            
+        REVISION "201712070000Z"
+        DESCRIPTION "Rev. 7.0.2
+                - syntax correction"
+
+        REVISION "201708160000Z"
+        DESCRIPTION "Rev. 7.0.0
+                - syntax correction"
+        
+        REVISION "201312120000Z"
+        DESCRIPTION "Revision 5.2.0
+            - change of table indexes
+            - corrective actions "
+        ::= { amplifier 1 }
+
+--*******************************************************************
+
+	speedAmpModuleOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedAmpModuleOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Speed-Amplifier Module Overview Table"
+		::= { speedAmp 1 }
+
+	speedAmpModuleOverviewEntry OBJECT-TYPE
+		SYNTAX SpeedAmpModuleOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module Overview Entries"
+		INDEX { speedAmpMSlot }
+		::= { speedAmpModuleOverviewTable 1 }
+
+	SpeedAmpModuleOverviewEntry ::=
+		SEQUENCE
+		{
+			speedAmpMSlot Integer32,
+			speedAmpMDevice INTEGER,
+			speedAmpMStatus INTEGER,
+			speedAmpMSysUpTime TimeTicks,
+			speedAmpMTemp Integer32,
+			speedAmpMAlarmState INTEGER,
+			speedAmpMSerialNumber DisplayString
+		}
+
+	speedAmpMSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  "Slot number in Carrier"
+		::= { speedAmpModuleOverviewEntry 2 }
+
+	speedAmpMDevice OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			other(1),
+			preamp14(2),
+			booster17(3),
+			booster17OSC(4),
+			booster23OSC(5),
+			inline17(6),
+			inline23(7),
+			ramanMaster10(8),
+			ramanMaster15(9),
+			ramanSlave10(10),
+			ramanSlave15(11),
+			ramanStandalone10(12),
+			ramanStandalone15(13),
+			preamp14ext(14),
+			booster17ext(15),
+			booster17OSCext(16),
+			booster23OSCext(17),
+			inline17ext(18),
+			inline23ext(19),
+			preamp14H(20),
+            preamp14extH(21),
+			booster17H(22),
+			booster17extH(23),
+			booster20H(24),
+			booster20extH(25),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  "Module DeviceType"
+		::= { speedAmpModuleOverviewEntry 3 }
+		
+	speedAmpMStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			running (1),
+			resetSoftware (2),
+			resetConfig (3),
+			resetCAN (4),
+			resetHardware (5),
+			resetStatistic(6),
+			unknown (255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION  "Reset States of Module"
+		::= { speedAmpModuleOverviewEntry 4 }
+
+	speedAmpMSysUpTime OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"System Up Time in Seconds"
+		::= { speedAmpModuleOverviewEntry 5 }
+
+	speedAmpMTemp OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Module Temperature"
+		::= { speedAmpModuleOverviewEntry 6 }
+
+	speedAmpMAlarmState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			noAlarm (1),
+			activeAlarms (2),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Module Alarm States, if there are active see Event-Table"
+		::= { speedAmpModuleOverviewEntry 7 }
+
+	speedAmpMSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Modules Serial Number"
+		::= { speedAmpModuleOverviewEntry 8 }
+
+-- *********************************
+-- speedAmpModuleImagesOverview
+
+	speedAmpModuleImagesOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedAmpModuleImagesOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-AMPLIFIER Module Images Table"
+		::= { speedAmp 2 }
+
+	speedAmpModuleImagesOverviewEntry OBJECT-TYPE
+		SYNTAX SpeedAmpModuleImagesOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"Module Images Overview Entries"
+		INDEX { speedAmpSWSlot }
+		::= { speedAmpModuleImagesOverviewTable 1 }
+
+	SpeedAmpModuleImagesOverviewEntry ::=
+		SEQUENCE
+		{
+			speedAmpSWSlot			Integer32,
+			speedAmpSwKernelImage		DisplayString,
+			speedAmpSwAppImage		DisplayString,
+			speedAmpSwUploadStatus		INTEGER,
+			speedAmpSwUpdateStatus		INTEGER,
+			speedAmpHwVersion		DisplayString
+		}
+
+	speedAmpSWSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  "Slot number in Carrier"
+		::= { speedAmpModuleImagesOverviewEntry 2 }
+
+	speedAmpSwKernelImage OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Identification of Bootimage"
+		::= { speedAmpModuleImagesOverviewEntry 3 }
+
+	speedAmpSwAppImage OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Identification of Application Image1"
+		::= { speedAmpModuleImagesOverviewEntry 4 }
+
+	speedAmpSwUploadStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			ready (1),
+			startUpload (2),
+			uploadActive (3),
+			uploadFailure (4),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Control and Status of UploadProcedure"
+		::= { speedAmpModuleImagesOverviewEntry 5 }
+
+
+	speedAmpSwUpdateStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			idle (1),
+			activateKernel (2),
+			activateApplication (3),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"activates SW-Image after netxt reset"
+		::= { speedAmpModuleImagesOverviewEntry 6 }
+
+	speedAmpHwVersion OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Identification of Hardware Version"
+		::= { speedAmpModuleImagesOverviewEntry 7 }
+
+-- *********************************
+-- SpeedAmpModuleBoardConfig
+
+	speedAmpModuleBoardConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedAmpModuleBoardConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SPEED-AMPLIFIER Module config Table"
+		::= { speedAmp 3 }
+
+	speedAmpModuleBoardConfigEntry OBJECT-TYPE
+		SYNTAX SpeedAmpModuleBoardConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module Overview Entries"
+		INDEX { speedAmpTemperatureSlot }
+		::= { speedAmpModuleBoardConfigTable 1 }
+
+	SpeedAmpModuleBoardConfigEntry ::=
+		SEQUENCE
+		{
+			speedAmpTemperatureSlot Integer32,
+			speedAmpTemperatureHighWarning Integer32,
+			speedAmpTemperatureHighAlarm Integer32
+		}
+
+	speedAmpTemperatureSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  "Slot number in Carrier"
+		::= { speedAmpModuleBoardConfigEntry 2 }
+
+	speedAmpTemperatureHighWarning OBJECT-TYPE
+		SYNTAX Integer32 (5..60)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"Warning Level for Module ambient Temperature (5 - 60 degree Celsius)"
+		::= { speedAmpModuleBoardConfigEntry 3 }
+
+	speedAmpTemperatureHighAlarm OBJECT-TYPE
+		SYNTAX	Integer32
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"Alarm Level for Module ambient Temperature"
+		::= { speedAmpModuleBoardConfigEntry 4 }
+
+-- ****************************
+
+	speedAmpModuleNetworkParameterTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedAmpModuleNetworkParameterEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-AMPLIFIER Module Network Parameter Table"
+		::= { speedAmp 4 }
+
+	speedAmpModuleNetworkParameterEntry OBJECT-TYPE
+		SYNTAX SpeedAmpModuleNetworkParameterEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"Module Network Parameter Entries"
+		INDEX { speedAmpMNetworkSlot }
+		::= { speedAmpModuleNetworkParameterTable 1 }
+
+	SpeedAmpModuleNetworkParameterEntry ::=
+		SEQUENCE
+		{
+			speedAmpMNetworkSlot Integer32,
+			speedAmpMNetworkAdress IpAddress,
+			speedAmpMNetworkMask IpAddress,
+			speedAmpMNetworkGateway IpAddress,
+			speedAmpMNetworkSnmpTrapSink1 IpAddress,
+			speedAmpMNetworkSnmpTrapSink2 IpAddress,
+			speedAmpMNetworkSnmpTrapSink3 IpAddress,
+			speedAmpMNetworkSnmpTrapSink4 IpAddress,
+			speedAmpMNetworkSnmpTrapSink5 IpAddress,
+			speedAmpMNetworkSnmpReadCommunity DisplayString,
+			speedAmpMNetworkSnmpWriteCommunity DisplayString,
+			speedAmpMNetworkSysLocation DisplayString,
+			speedAmpMNetworkSnmpAgentStatus INTEGER,
+			speedAmpMNetworkHttpServerStatus INTEGER,
+			speedAmpMNetworkSysname DisplayString,
+			speedAmpNNetworkSyscontact DisplayString,
+			speedAmpMNetworkUserTimeout Integer32,
+			speedAmpMNetworkAccess INTEGER
+		}
+
+	speedAmpMNetworkSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  "Slot number in Carrier"
+		::= { speedAmpModuleNetworkParameterEntry 2 }
+
+	speedAmpMNetworkAdress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"IP-address of the Ethernet interface"
+		DEFVAL { 'c0a80065'H }	-- 192.168.0.101
+		::= { speedAmpModuleNetworkParameterEntry 3 }
+
+	speedAmpMNetworkMask OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"IP-netmask of the Ethernet interface"
+		DEFVAL { 'ffffff00'H }	-- 255.255.255.0
+		::= { speedAmpModuleNetworkParameterEntry 4 }
+
+	speedAmpMNetworkGateway OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"default gateway of the Ethernet interface"
+		DEFVAL { '00000000'H }
+		::= { speedAmpModuleNetworkParameterEntry 5 }
+
+	speedAmpMNetworkSnmpTrapSink1 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Trap destination 1 for SNMP traps. Clear value is 0.0.0.0"
+		DEFVAL { '00000000'H }
+		::= { speedAmpModuleNetworkParameterEntry 6 }
+
+	speedAmpMNetworkSnmpTrapSink2 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Trap destination 2 for SNMP traps. Clear value is 0.0.0.0"
+		DEFVAL { '00000000'H }
+		::= { speedAmpModuleNetworkParameterEntry 7 }
+
+	speedAmpMNetworkSnmpTrapSink3 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Trap destination 3 for SNMP traps. Clear value is 0.0.0.0"
+		DEFVAL { '00000000'H }
+		::= { speedAmpModuleNetworkParameterEntry 8 }
+
+	speedAmpMNetworkSnmpTrapSink4 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Trap destination 4 for SNMP traps. Clear value is 0.0.0.0"
+		DEFVAL { '00000000'H }
+		::= { speedAmpModuleNetworkParameterEntry 9 }
+
+	speedAmpMNetworkSnmpTrapSink5 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Trap destination 5 for SNMP traps. Clear value is 0.0.0.0"
+		DEFVAL { '00000000'H }
+		::= { speedAmpModuleNetworkParameterEntry 10 }
+
+	speedAmpMNetworkSnmpReadCommunity OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"SNMP read community name"
+		DEFVAL { "public" }
+		::= { speedAmpModuleNetworkParameterEntry 11 }
+
+	speedAmpMNetworkSnmpWriteCommunity OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"SNMP write community name"
+		DEFVAL { "private" }
+		::= { speedAmpModuleNetworkParameterEntry 12 }
+
+	speedAmpMNetworkSysLocation OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"location of the SPEED-Amplifier System"
+		DEFVAL { "serverroom" }
+		::= { speedAmpModuleNetworkParameterEntry 13 }
+
+	speedAmpMNetworkSnmpAgentStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			down(1),
+			up(2),
+			notImplemented(254),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Module Snmp-Agent operational status"
+		::= { speedAmpModuleNetworkParameterEntry 14 }
+
+	speedAmpMNetworkHttpServerStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			down(1),
+			up(2),
+			notImplemented(254),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Module Snmp-Agent operational status"
+		::= { speedAmpModuleNetworkParameterEntry 15 }
+
+	speedAmpMNetworkSysname OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"location of the SPEED-Amplifier System"
+		DEFVAL { "serverroom" }
+		::= { speedAmpModuleNetworkParameterEntry 16 }
+
+	speedAmpNNetworkSyscontact OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"location of the SPEED-Amplifier System"
+		DEFVAL { "serverroom" }
+		::= { speedAmpModuleNetworkParameterEntry 17 }
+
+	speedAmpMNetworkUserTimeout OBJECT-TYPE
+		SYNTAX Integer32 (120..3600)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Command line access mode"
+		::= { speedAmpModuleNetworkParameterEntry 18 }
+
+	speedAmpMNetworkAccess OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notavailable(0),
+			off(1),
+			telnet(2),
+			ssh2(3),
+			notImplemented(254),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Command line access mode"
+		::= { speedAmpModuleNetworkParameterEntry 19 }
+
+-- ****************************
+-- SpeedAmpModuleEthPortOverview
+	speedAmpModuleEthPortOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedAmpModuleEthPortOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SPEED-AMPLIFIER Module Ethernet port overview table"
+		::= { speedAmp 5 }
+
+	speedAmpModuleEthPortOverviewEntry OBJECT-TYPE
+		SYNTAX SpeedAmpModuleEthPortOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"port overview entries"
+		INDEX { speedAmpMEthIndex }
+		::= { speedAmpModuleEthPortOverviewTable 1 }
+
+	SpeedAmpModuleEthPortOverviewEntry ::=
+		SEQUENCE
+		{
+			speedAmpMEthIndex Integer32,
+			speedAmpMEthSlot Integer32,
+			speedAmpMEthPort Integer32,
+			speedAmpMEthPortname DisplayString,
+			speedAmpMEthPortAdminState INTEGER,
+			speedAmpMEthPortOperState INTEGER,
+			speedAmpMEthPortMode INTEGER,
+			speedAmpMEthSFPState INTEGER,
+			speedAmpMEthPortRxPackets Integer32,
+			speedAmpMEthPortTxPackets Integer32,
+			speedAmpMEthErrors Integer32
+		}
+
+	speedAmpMEthIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION  "SPEED AMP Module Index"
+		::= { speedAmpModuleEthPortOverviewEntry 1 }
+
+	speedAmpMEthSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"number of Module Eth port"
+		::= { speedAmpModuleEthPortOverviewEntry 2 }
+
+	speedAmpMEthPort OBJECT-TYPE
+		SYNTAX Integer32 (0..5)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"number of Module Eth port"
+		::= { speedAmpModuleEthPortOverviewEntry 3 }
+
+	speedAmpMEthPortname OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Port description or port name."
+		::= { speedAmpModuleEthPortOverviewEntry 4 }
+
+	speedAmpMEthPortAdminState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			adminDown(1),
+			adminUp(2),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"administrativ port status"
+		::= { speedAmpModuleEthPortOverviewEntry 5 }
+
+	speedAmpMEthPortOperState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			down(1),
+			up(2),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Module Eth Port operational status"
+		::= { speedAmpModuleEthPortOverviewEntry 6 }
+
+	speedAmpMEthPortMode OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			autoneg(1),
+			hdx10(2),
+			fdx10(3),
+			hdx100(4),
+			fdx100(5),
+			hdlc(6),
+			rmii(7),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Module Eth Port Configuration Mode."
+		::= { speedAmpModuleEthPortOverviewEntry 7 }
+
+	speedAmpMEthSFPState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			sfpOperDown(1),
+			sfpOperUp(2),
+			sfpTxFault(3),
+			sfpInstalled(4),
+			sfpRemoved(5),
+			sfpNotPossible(6),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"SFP installed / alarm status"
+		::= { speedAmpModuleEthPortOverviewEntry 8 }
+
+	speedAmpMEthPortRxPackets OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Module Eth Port received Packets"
+		::= { speedAmpModuleEthPortOverviewEntry 9 }
+
+	speedAmpMEthPortTxPackets OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Module Eth Port transmitted Packets"
+		::= { speedAmpModuleEthPortOverviewEntry 10 }
+
+	speedAmpMEthErrors OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Module Eth Port received Errors"
+		::= { speedAmpModuleEthPortOverviewEntry 11 }
+
+
+--********************************************
+-- SpeedAmpModuleEthPortConfig
+
+	speedAmpMEthPortConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedAmpMEthPortConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-Amplifier Module Ethernet port config table"
+		::= { speedAmp 6 }
+
+	speedAmpMEthPortConfigEntry OBJECT-TYPE
+		SYNTAX SpeedAmpMEthPortConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"port config Entries"
+		INDEX { speedAmpMEthPCfgIndex }
+		::= { speedAmpMEthPortConfigTable 1 }
+
+	SpeedAmpMEthPortConfigEntry ::=
+		SEQUENCE
+		{
+            speedAmpMEthPCfgIndex Integer32,
+			speedAmpMEthPCfgSlot		Integer32,
+			speedAmpMEthPCfgPort 		Integer32,
+			speedAmpMEthPCfgAdminConfig 	INTEGER,
+			speedAmpMEthPCfgDescription 	DisplayString,
+			speedAmpMEthPCfgMode 		INTEGER,
+			speedAmpMEthPCfgAlarmReporting	INTEGER,
+			speedAmpMEthPCfgAlarmSchedule	Integer32
+		}
+
+	speedAmpMEthPCfgIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION  "SPEED AMP Module Index"
+		::= { speedAmpMEthPortConfigEntry 1 }
+
+	speedAmpMEthPCfgSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"number of Module Eth port"
+		::= { speedAmpMEthPortConfigEntry 2 }
+
+	speedAmpMEthPCfgPort OBJECT-TYPE
+		SYNTAX Integer32 (0..5)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"number of Module Eth port"
+		::= { speedAmpMEthPortConfigEntry 3 }
+
+	speedAmpMEthPCfgAdminConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			adminDown(1),
+			adminUp(2),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Module Ethernet port administrative configuration. Only ports 1..4 are configurable."
+		::= { speedAmpMEthPortConfigEntry 4 }
+
+	speedAmpMEthPCfgDescription OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Module Ethernet port description. Only ports 1..3 are configurable."
+		::= { speedAmpMEthPortConfigEntry 5 }
+
+	speedAmpMEthPCfgMode OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			autoneg(1),
+			fix10HDX(2),
+			fix10FDX(3),
+			fix100HDX(4),
+			fix100FDX(5),
+			fixhdlc(6),
+			fixrmii(7),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Module Ethernet Port Configuration. Only ports 1 and 2 are configurable."
+		::= { speedAmpMEthPortConfigEntry 6 }
+
+	speedAmpMEthPCfgAlarmReporting OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			alarmReportingEnabled(1),
+			alarmReportingDisabledbySchedule(2),
+			alarmReportingDisabledPermanent(3),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Ethernet port alarm deactivation. Only applicable for user SFP!"
+		::= { speedAmpMEthPortConfigEntry 7 }
+
+	speedAmpMEthPCfgAlarmSchedule OBJECT-TYPE
+		SYNTAX Integer32 (0..1200)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Ethernet port alarm deactivation schedule. Value in hours. After this time has elapsed, the alarms are active again. Only applicable for user SFP!"
+		::= { speedAmpMEthPortConfigEntry 8 }
+
+--***************************************
+-- SpeedAmpModuleGeneralSFPInfos
+
+	speedAmpModuleGeneralSFPInfosTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedAmpModuleGeneralSFPInfosEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-AMPLIFIER SFP general information table"
+		::= { speedAmp 7 }
+
+	speedAmpModuleGeneralSFPInfosEntry OBJECT-TYPE
+		SYNTAX SpeedAmpModuleGeneralSFPInfosEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"Module SFP general information Entries"
+		INDEX { speedAmpSFPIndex }
+		::= { speedAmpModuleGeneralSFPInfosTable 1 }
+
+	SpeedAmpModuleGeneralSFPInfosEntry ::=
+		SEQUENCE
+		{
+            speedAmpSFPIndex Integer32,
+			speedAmpSFPSlot		Integer32,
+			speedAmpSFPPort		Integer32,
+			speedAmpSFPVendorName		DisplayString,
+			speedAmpSFPPartNumber		DisplayString,
+			speedAmpSFPSerialNumber		DisplayString,
+			speedAmpSFPWavelength		Integer32,
+			speedAmpSFPDMIMode		INTEGER,
+			speedAmpSFPPortType		INTEGER
+		}
+
+	speedAmpSFPIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION  "SPEED AMP Module Index"
+		::= { speedAmpModuleGeneralSFPInfosEntry 1 }
+
+	speedAmpSFPSlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+				"SFP slot"
+		::= { speedAmpModuleGeneralSFPInfosEntry 2 }
+
+	speedAmpSFPPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+				"SFP port"
+		::= { speedAmpModuleGeneralSFPInfosEntry 3 }
+
+	speedAmpSFPVendorName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"SFP vendor name"
+		::= { speedAmpModuleGeneralSFPInfosEntry 4 }
+
+	speedAmpSFPPartNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"SFP part number"
+		::= { speedAmpModuleGeneralSFPInfosEntry 5 }
+
+	speedAmpSFPSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"SFP serial number"
+		::= { speedAmpModuleGeneralSFPInfosEntry 6 }
+
+	speedAmpSFPWavelength OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"SFP wavelength in units of 100*(value of 1nm)"
+		::= { speedAmpModuleGeneralSFPInfosEntry 7 }
+
+	speedAmpSFPDMIMode OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			sff8472V93(1),
+			sff8472V95(2),
+			sff8472V102(3),
+			sffVother(4),
+			notImplemented(254),
+			unknown(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"SFP DMI Type "
+		::= { speedAmpModuleGeneralSFPInfosEntry 8 }
+
+	speedAmpSFPPortType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			osc(1),
+			user(2),
+			unknown(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"SFP Port Type "
+		::= { speedAmpModuleGeneralSFPInfosEntry 9 }
+
+-- ****************************************
+-- SpeedAmpModuleSFPMessurement
+
+	speedAmpModuleSFPMessurementTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedAmpModuleSFPMessurementEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-AMPLIFIER SFP messurement table"
+		::= { speedAmp 8 }
+
+	speedAmpModuleSFPMessurementEntry OBJECT-TYPE
+		SYNTAX SpeedAmpModuleSFPMessurementEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SFP messurement Entries"
+		INDEX { speedAmpMSFPIndex }
+		::= { speedAmpModuleSFPMessurementTable 1 }
+
+	SpeedAmpModuleSFPMessurementEntry ::=
+		SEQUENCE
+		{
+            speedAmpMSFPIndex Integer32,
+			speedAmpMSFPSlot	Integer32,
+			speedAmpMSFPPort	Integer32,
+			speedAmpMSFPRXPower	Integer32,
+			speedAmpMSFPTXPower	Integer32,
+			speedAmpMSFPTXBias	Integer32,
+			speedAmpMSFPTemp	Integer32,
+			speedAmpMSFPPortType	INTEGER
+		}
+		
+	speedAmpMSFPIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION  "SPEED AMP Module Index"
+		::= { speedAmpModuleSFPMessurementEntry 1 }
+
+	speedAmpMSFPSlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+				"SFP slot"
+		::= { speedAmpModuleSFPMessurementEntry 2 }
+
+	speedAmpMSFPPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+				"SFP port"
+		::= { speedAmpModuleSFPMessurementEntry 3 }
+
+	speedAmpMSFPRXPower OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"SFP optical receive power in units of 10*(value of 1dbm)"
+		::= { speedAmpModuleSFPMessurementEntry 4 }
+
+	speedAmpMSFPTXPower OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"SFP optical transmit power in units of 10*(value of 1dbm)"
+		::= { speedAmpModuleSFPMessurementEntry 5 }
+
+	speedAmpMSFPTXBias OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"SFP TX Bias in units of  1mA "
+		::= { speedAmpModuleSFPMessurementEntry 6 }
+
+	speedAmpMSFPTemp OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"SFP temperature in units of 1degree Centigrade"
+		::= { speedAmpModuleSFPMessurementEntry 7 }
+
+	speedAmpMSFPPortType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			osc(1),
+			user(2),
+			unknown(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"SFP Port Type "
+		::= { speedAmpModuleSFPMessurementEntry 8 }
+
+--***************************************
+-- SpeedAmpDeviceGeneralInfos
+
+	speedAmpDevGeneralInfosTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedAmpDevGeneralInfosEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-AMPLIFIER Amplifier device general information table"
+		::= { speedAmp 9 }
+
+	speedAmpDevGeneralInfosEntry OBJECT-TYPE
+		SYNTAX SpeedAmpDevGeneralInfosEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"Amplifier device general information Entries"
+		INDEX { speedAmpDevSlot }
+		::= { speedAmpDevGeneralInfosTable 1 }
+
+	SpeedAmpDevGeneralInfosEntry ::=
+		SEQUENCE
+		{
+			speedAmpDevSlot			 Integer32,
+			speedAmpDevSerialNumber		 DisplayString,
+			speedAmpDevConfiguration	 INTEGER,
+			speedAmpDevModuletype		 INTEGER,
+			speedAmpDevVersion		 DisplayString,
+			speedAmpDevVendor		 Integer32,
+			speedAmpDevLinePortDescription	 DisplayString,
+			speedAmpDevClientPortDescription DisplayString
+		}
+
+	speedAmpDevSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  "Slot number in Carrier"
+		::= { speedAmpDevGeneralInfosEntry 2 }
+
+	speedAmpDevSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Device Serial Number"
+		::= { speedAmpDevGeneralInfosEntry 3 }
+
+	speedAmpDevConfiguration OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			confConstantPower(3),
+			confConstantGain(4),
+			confOFF(5),
+			confOther(6),
+			unknown(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Device Configuration"
+		::= { speedAmpDevGeneralInfosEntry 4 }
+
+	speedAmpDevModuletype OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			other(1),
+			preamp14(2),
+			booster17(3),
+			booster17OSC(4),
+			booster23OSC(5),
+			inline17(6),
+			inline23(7),
+			ramanMaster10(8),
+			ramanMaster15(9),
+			ramanSlave10(10),
+			ramanSlave15(11),
+			ramanStandalone10(12),
+			ramanStandalone15(13),
+			preamp14ext(14),
+			booster17ext(15),
+			booster17OSCext(16),
+			booster23OSCext(17),
+			inline17ext(18),
+			inline23ext(19),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Device Type"
+		::= { speedAmpDevGeneralInfosEntry 5 }
+
+	speedAmpDevVersion OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Device Version Code "
+		::= { speedAmpDevGeneralInfosEntry 6 }
+
+	speedAmpDevVendor OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Device Vendor Code"
+		::= { speedAmpDevGeneralInfosEntry 7 }
+
+	speedAmpDevLinePortDescription OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Optical Line Port Description String "
+		::= { speedAmpDevGeneralInfosEntry 8 }
+
+	speedAmpDevClientPortDescription OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Optical Client Port Description String "
+		::= { speedAmpDevGeneralInfosEntry 9 }
+
+--***************************************
+-- SpeedAmpDeviceOverview
+
+	speedAmpDevOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedAmpDevOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-AMPLIFIER Amplifier device Overview table"
+		::= { speedAmp 10 }
+
+	speedAmpDevOverviewEntry OBJECT-TYPE
+		SYNTAX SpeedAmpDevOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"Amplifier device Overview Entries"
+		INDEX { speedAmpDevMSlot }
+		::= { speedAmpDevOverviewTable 1 }
+
+	SpeedAmpDevOverviewEntry ::=
+		SEQUENCE
+		{
+			speedAmpDevMSlot			Integer32,
+			speedAmpDevGain			Integer32,
+			speedAmpDevPumpCurrent		Integer32,
+			speedAmpDevPumpPower		Integer32,
+			speedAmpDevMode			INTEGER,
+			speedAmpDevModeShutdown		INTEGER,
+			speedAmpDevLosInputThreshold	Integer32,
+			speedAmpDevHighOutputThreshold	Integer32,
+			speedAmpDevAlarm		INTEGER,
+			speedAmpDevCaseTemperature	Integer32,
+			speedAmpDevClientInputPower	Integer32,
+			speedAmpDevLineOutputPower	Integer32,
+			speedAmpDevBackreflectionThreshold	Integer32,
+			speedAmpDevShutdownThreshold	Integer32,
+			speedAmpDevBackreflectionRatio	Integer32
+		}
+
+	speedAmpDevMSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  "Slot number in Carrier"
+		::= { speedAmpDevOverviewEntry 2 }
+
+	speedAmpDevGain OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier optical Gain in units of 100*(value of 1db)"
+		::= { speedAmpDevOverviewEntry 3 }
+
+	speedAmpDevPumpCurrent OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Pump Current in units of 10*(value of 1mA)"
+		::= { speedAmpDevOverviewEntry 4 }
+
+	speedAmpDevPumpPower OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Pump Power in units of 10*(value of 1mW)"
+		::= { speedAmpDevOverviewEntry 5 }
+
+	speedAmpDevMode OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			confConstantPower(3),
+			confConstantGain(4),
+			confOFF(5),
+			confOther(6),
+			unknown(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Working Mode"
+		::= { speedAmpDevOverviewEntry 6 }
+
+	speedAmpDevModeShutdown OBJECT-TYPE
+		SYNTAX	INTEGER
+		{
+			notAvailable (0),
+			cfgAutoLaserShutdownOff (1),
+			cfgAutoLaserShutdownOn (2),
+			unknown (255)
+		}
+		MAX-ACCESS	read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Shutdown Mode"
+		::= { speedAmpDevOverviewEntry 7 }
+
+	speedAmpDevLosInputThreshold OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Loss of Input Power Threshold in units of 100*(value of 1dbm). Range: -45.00 to 0.00 dBm"
+		::= { speedAmpDevOverviewEntry 8 }
+
+	speedAmpDevHighOutputThreshold OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Output High Power Threshold in units of 100*(value of 1dbm)"
+		::= { speedAmpDevOverviewEntry 9 }
+
+	speedAmpDevAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			noAlarm (0),
+			unknown (254)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Alarm Status - Error code from amp module"
+		::= { speedAmpDevOverviewEntry 10 }
+
+	speedAmpDevCaseTemperature OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier module case temperature (value of 1degree Centigrade)"
+		::= { speedAmpDevOverviewEntry 11 }
+
+	speedAmpDevClientInputPower OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier optical client Input Power in units of 100*(value of 1dbm)"
+		::= { speedAmpDevOverviewEntry 12 }
+
+	speedAmpDevLineOutputPower OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier optical line Output Power in units of 100*(value of 1dbm)"
+		::= { speedAmpDevOverviewEntry 13 }
+
+	speedAmpDevBackreflectionThreshold OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"this value is only available for RAMAN Amplifier"
+		::= { speedAmpDevOverviewEntry 14 }
+
+
+	speedAmpDevShutdownThreshold OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"this value is only available for RAMAN Amplifier"
+		::= { speedAmpDevOverviewEntry 15 }
+
+
+	speedAmpDevBackreflectionRatio OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"this value is only available for RAMAN Amplifier"
+		::= { speedAmpDevOverviewEntry 16 }
+
+-- *********************************
+-- SpeedAmpDeviceConfig
+
+	speedAmpDevConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedAmpDevConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SPEED-AMPLIFIER Dev Config Table"
+		::= { speedAmp 11 }
+
+	speedAmpDevConfigEntry OBJECT-TYPE
+		SYNTAX SpeedAmpDevConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Device Configuration Entries"
+		INDEX { speedAmpDevCfgSlot }
+		::= { speedAmpDevConfigTable 1 }
+
+	SpeedAmpDevConfigEntry ::=
+		SEQUENCE
+		{
+			speedAmpDevCfgSlot				Integer32,
+			speedAmpDevCfgGainValue			Integer32,
+			speedAmpDevCfgPoutValue			Integer32,
+			speedAmpDevCfgPumpPwr			Integer32,
+			speedAmpDevCfgModeValue			INTEGER,
+			speedAmpDevCfgPowerSafetyModeValue	INTEGER,
+			speedAmpDevCfgLosInputThresholdValue	Integer32,
+			speedAmpDevCfgLinePortDescription	DisplayString,
+			speedAmpDevCfgClientPortDescription	DisplayString,
+			speedAmpDevCfgAlarmReporting		INTEGER,
+			speedAmpDevCfgAlarmSchedule		Integer32,
+			speedAmpDevCfgBackreflectionThresholdValue	Integer32
+		}
+
+	speedAmpDevCfgSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  "Slot number in Carrier"
+		::= { speedAmpDevConfigEntry 2 }
+
+	speedAmpDevCfgGainValue OBJECT-TYPE
+		SYNTAX	Integer32
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"Amplifier optical Gain Value in units of 100*(value of 1db)"
+		::= { speedAmpDevConfigEntry 3}
+
+	speedAmpDevCfgPoutValue OBJECT-TYPE
+		SYNTAX	Integer32
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"Amplifier Optical Output Power in units of 100*(value of 1dbm)"
+		::= { speedAmpDevConfigEntry 4}
+
+	speedAmpDevCfgPumpPwr OBJECT-TYPE
+		SYNTAX	Integer32 (0..660)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"Only applicable for RAMAN amplifiers. Pump power in
+			units of mW. For RAMAN-10 amplifiers the valid range
+			is 0..440 mW."
+		::= { speedAmpDevConfigEntry 5}
+
+	speedAmpDevCfgModeValue OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			confConstantPower(3),
+			confConstantGain(4),
+			confOFF(5),
+			confOther(6),
+			unknown(255)
+		}
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"Amplifier Working Mode"
+		::= { speedAmpDevConfigEntry 6}
+
+	speedAmpDevCfgPowerSafetyModeValue OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			cfgAutoLaserShutdownOff (1),
+			cfgAutoLaserShutdownOn (2),
+			unknown (255)
+		}
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"Amplifier Power Safety Mode. On EDFA amplifiers an power shutdown will be forced, if the input threshold is blow the limit. On RAMAN modules the power will be reduced, if the backreflectioon is to high."
+		::= { speedAmpDevConfigEntry 7}
+
+	speedAmpDevCfgLosInputThresholdValue OBJECT-TYPE
+		SYNTAX	Integer32
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"Amplifier optical Input Value LOS Threshold in units of 100*(value of 1dbm)"
+		::= { speedAmpDevConfigEntry 8}
+
+	speedAmpDevCfgLinePortDescription OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Optical Line Port Description String "
+		::= { speedAmpDevConfigEntry 9}
+
+	speedAmpDevCfgClientPortDescription OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Optical Client Port Description String "
+		::= { speedAmpDevConfigEntry 10}
+
+	speedAmpDevCfgAlarmReporting OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			alarmReportingEnabled(1),
+			alarmReportingDisabledbySchedule(2),
+			alarmReportingDisabledPermanent(3),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Amp module alarm deactivation"
+		::= { speedAmpDevConfigEntry 11 }
+
+	speedAmpDevCfgAlarmSchedule OBJECT-TYPE
+		SYNTAX Integer32 (0..1200)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Amp module alarm deactivation schedule. Value in hours. After this time has elapsed, the alarms are active again."
+		::= { speedAmpDevConfigEntry 12 }
+
+	speedAmpDevCfgBackreflectionThresholdValue OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"this value is only available for RAMAN Amplifier"
+		::= { speedAmpDevConfigEntry 13 }
+
+--***************************************
+-- SpeedAmpDeviceAlarmTable
+
+	speedAmpDevAlarmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedAmpDevAlarmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-AMPLIFIER Amplifier device Alarm table"
+		::= { speedAmp 12 }
+
+	speedAmpDevAlarmEntry OBJECT-TYPE
+		SYNTAX SpeedAmpDevAlarmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"Amplifier device Alarm Entries"
+		INDEX { speedAmpDevAlarmSlot }
+		::= { speedAmpDevAlarmTable 1 }
+
+	SpeedAmpDevAlarmEntry ::=
+		SEQUENCE
+		{
+			speedAmpDevAlarmSlot				Integer32,
+			speedAmpDevAlarmOpticalInput		INTEGER,
+			speedAmpDevAlarmOpticalOutput		INTEGER,
+			speedAmpDevAlarmModuleTemperature	INTEGER,
+			speedAmpDevAlarmPumpTemperature		INTEGER,
+			speedAmpDevAlarmPumpDriveCurrent	INTEGER,
+			speedAmpDevAlarmSupplyVoltage		INTEGER,
+			speedAmpDevAlarmAutoshutdown		INTEGER,
+			speedAmpDevAlarmSecurityMonitor		INTEGER,
+			speedAmpDevAlarmBackref			INTEGER
+		}
+
+	speedAmpDevAlarmSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  "Slot number in Carrier"
+		::= { speedAmpDevAlarmEntry 2 }
+
+	speedAmpDevAlarmOpticalInput OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable (0),
+			noAlarm(1),
+			activeAlarm(2),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier optical Input Value is under specified Threshold Value"
+		::= { speedAmpDevAlarmEntry 3 }
+
+	speedAmpDevAlarmOpticalOutput OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable (0),
+			noAlarm(1),
+			activeAlarm(2),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier optical Input Value is over specified Threshold Value"
+		::= { speedAmpDevAlarmEntry 4 }
+
+	speedAmpDevAlarmModuleTemperature OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable (0),
+			noAlarm(1),
+			activeAlarm(2),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Temperature Value is over specified Threshold Value"
+		::= { speedAmpDevAlarmEntry 5 }
+
+	speedAmpDevAlarmPumpTemperature OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable (0),
+			noAlarm(1),
+			activeAlarm(2),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Pump Temperature is out of specified Range"
+		::= { speedAmpDevAlarmEntry 6 }
+
+	speedAmpDevAlarmPumpDriveCurrent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable (0),
+			noAlarm(1),
+			activeAlarm(2),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Pump Drive Current is out of specified Range"
+		::= { speedAmpDevAlarmEntry 7 }
+
+	speedAmpDevAlarmSupplyVoltage OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable (0),
+			noAlarm(1),
+			activeAlarm(2),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Supply voltage is out of specified Range"
+		::= { speedAmpDevAlarmEntry 8 }
+
+	speedAmpDevAlarmAutoshutdown OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable (0),
+			noAlarm(1),
+			activeAlarm(2),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Device Autoshutdown activated"
+		::= { speedAmpDevAlarmEntry 9 }
+
+	speedAmpDevAlarmSecurityMonitor OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable(0),
+			secmonready(1),
+			secmonhalted(2),
+			secmonfailure(3),
+			unknown(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Status of SecurityMonitor"
+		::= { speedAmpDevAlarmEntry 10 }
+
+	speedAmpDevAlarmBackref OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable (0),
+			noAlarm(1),
+			activeAlarm(2),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Amplifier Device Alarm Backreflection"
+		::= { speedAmpDevAlarmEntry 11 }
+
+--***************************************
+-- SpeedAmpModuleSFPAlarmTable
+
+	speedAmpModuleSFPAlarmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedAmpModuleSFPAlarmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-AMPLIFIER Module SFP Alarm table"
+		::= { speedAmp 13 }
+
+	speedAmpModuleSFPAlarmEntry OBJECT-TYPE
+		SYNTAX SpeedAmpModuleSFPAlarmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"Module SFP Alarm Entries"
+		INDEX { speedAmpMSFPAIndex }
+		::= { speedAmpModuleSFPAlarmTable 1 }
+
+	SpeedAmpModuleSFPAlarmEntry ::=
+		SEQUENCE
+		{
+			speedAmpMSFPAIndex			Integer32,
+            speedAmpMSFPASlot			Integer32,
+			speedAmpMSFPAPort			Integer32,
+			speedAmpMSFPARxPowerAlarm		INTEGER,
+			speedAmpMSFPATxPowerAlarm		INTEGER,
+			speedAmpMSFPATxBiasAlarm			INTEGER,
+			speedAmpMSFPATemperatureAlarm		INTEGER,
+			speedAmpMSFPADWDMAlarm			INTEGER
+		}
+		
+	speedAmpMSFPAIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..1900)
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION  "SPEED AMP Module Index"
+		::= { speedAmpModuleSFPAlarmEntry 1 }
+
+	speedAmpMSFPASlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+				"SFP slot"
+		::= { speedAmpModuleSFPAlarmEntry 2 }
+
+	speedAmpMSFPAPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+				"SFP port"
+		::= { speedAmpModuleSFPAlarmEntry 3 }
+
+
+	speedAmpMSFPARxPowerAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable(0),
+			noAlarm(1),
+			rxLowAlarm(2),
+			rxHighAlarm(3),
+			unknown(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Module SFP optical Rx Power is out of specified Range"
+		::= { speedAmpModuleSFPAlarmEntry 4 }
+
+	speedAmpMSFPATxPowerAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable(0),
+			noAlarm(1),
+			activeAlarm(2),
+			unknown(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Module SFP optical Tx Power is out of specified Range"
+		::= { speedAmpModuleSFPAlarmEntry 5 }
+
+	speedAmpMSFPATxBiasAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable(0),
+			noAlarm(1),
+			activeAlarm(2),
+			unknown(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Module SFP Bias Current is out of specified Range"
+		::= { speedAmpModuleSFPAlarmEntry 6 }
+
+	speedAmpMSFPATemperatureAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable(0),
+			noAlarm(1),
+			highWarning(2),
+			highAlarm(3),
+			unknown(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Module SFP Temperature is out of specified Range"
+		::= { speedAmpModuleSFPAlarmEntry 7 }
+
+	speedAmpMSFPADWDMAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable(0),
+			noAlarm(1),
+			activeAlarm(2),
+			unknown(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"DWDM SFP - DWDM Alarm"
+		::= { speedAmpModuleSFPAlarmEntry 8 }
+
+
+END

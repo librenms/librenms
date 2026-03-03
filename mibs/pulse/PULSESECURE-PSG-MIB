@@ -8,13 +8,13 @@ PULSESECURE-PSG-MIB DEFINITIONS ::= BEGIN
         		FROM RFC1155-SMI;
         
 pulsesecure-gateway MODULE-IDENTITY
-    LAST-UPDATED "201607071610Z"
+    LAST-UPDATED "202205091633Z"
     ORGANIZATION "Pulse Secure"
     CONTACT-INFO    
 	 "Internet: https://www.pulsesecure.net"
     DESCRIPTION
 	"This file defines the private Pulse Secure MIB extensions."
-    REVISION     "201607071610Z"
+    REVISION     "202205091633Z"
     DESCRIPTION
 	"Initial Version"
     ::= { enterprises 12532 }
@@ -79,19 +79,10 @@ productVersion OBJECT-TYPE
 fileName OBJECT-TYPE
     SYNTAX      OCTET STRING
     MAX-ACCESS  accessible-for-notify
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
         "File name"
     ::= { pulsesecure-gateway 8 }
-    
-meetingUserCount OBJECT-TYPE
-    SYNTAX	Gauge32
-    MAX-ACCESS	accessible-for-notify
-    STATUS	current
-    DESCRIPTION  
-	"the number of concurrent meeting users"
-    ::= { pulsesecure-gateway 9 } 
-
     
 iveCpuUtil OBJECT-TYPE
     SYNTAX	Gauge32
@@ -182,22 +173,6 @@ iveNCHits OBJECT-TYPE
 	"The Total number of NC(Network Connect) hits of since last reboot"
     ::= { pulsesecure-gateway 20 } 
 
-meetingHits OBJECT-TYPE
-    SYNTAX      Counter64	
-    MAX-ACCESS	read-only
-    STATUS	current
-    DESCRIPTION  
-	"The Total number of Meeting hits of since last reboot"
-    ::= { pulsesecure-gateway 21 } 
-
-meetingCount OBJECT-TYPE
-    SYNTAX	Gauge32
-    MAX-ACCESS	accessible-for-notify
-    STATUS	current
-    DESCRIPTION  
-	"the number of concurrent meetings"
-    ::= { pulsesecure-gateway 22 } 
-
 logName OBJECT-TYPE
     SYNTAX      OCTET STRING
     MAX-ACCESS  accessible-for-notify
@@ -284,14 +259,6 @@ logDescription OBJECT-TYPE
 	    "The actual log message string."
     ::= { pulsesecure-gateway 29 }
 
-ivsName OBJECT-TYPE
-    SYNTAX      OCTET STRING
-    MAX-ACCESS  accessible-for-notify
-    STATUS      deprecated
-    DESCRIPTION
-        "Virtual System name"
-    ::= { pulsesecure-gateway 30 }
-
 ocspResponderURL OBJECT-TYPE
     SYNTAX      OCTET STRING
     MAX-ACCESS  accessible-for-notify
@@ -302,7 +269,7 @@ ocspResponderURL OBJECT-TYPE
  
 fanDescription OBJECT-TYPE
     SYNTAX      OCTET STRING
-    MAX-ACCESS  accessible-for-notify
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
 	    "The status of the fans"
@@ -310,7 +277,7 @@ fanDescription OBJECT-TYPE
 
 psDescription OBJECT-TYPE
     SYNTAX      OCTET STRING
-    MAX-ACCESS  accessible-for-notify
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
 	    "The status of the power supplies"
@@ -381,7 +348,7 @@ nicEvent OBJECT-TYPE
 
 nodeName OBJECT-TYPE
     SYNTAX	OCTET STRING
-    MAX-ACCESS  accessible-for-notify
+    MAX-ACCESS  read-only
     STATUS	current
     DESCRIPTION  
 	"Node Name"
@@ -445,8 +412,8 @@ iveTotalSignedInUsers OBJECT-TYPE
     ::= { pulsesecure-gateway 48 } 
 
 vpnACLSPercentage OBJECT-TYPE
-    SYNTAX      Gauge32
-    MAX-ACCESS  accessible-for-notify
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The percentage of system ACL entries reached"
@@ -454,7 +421,7 @@ vpnACLSPercentage OBJECT-TYPE
 
 vpnACLSCount OBJECT-TYPE
     SYNTAX      Gauge32
-    MAX-ACCESS  accessible-for-notify
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The number of system ACL entries reached"
@@ -467,6 +434,38 @@ blockedIPv6 OBJECT-TYPE
     DESCRIPTION  
         "IPv6 Address that is blocked due to consecutive failed login attempts"
     ::= { pulsesecure-gateway 51 }
+
+iveNamedUsers OBJECT-TYPE
+    SYNTAX	Gauge32
+    MAX-ACCESS	accessible-for-notify
+    STATUS	current
+    DESCRIPTION
+	"The Total number of Named user Licenses used for the IVE Node"
+    ::= { pulsesecure-gateway 52 }
+
+namedUserStorePercent OBJECT-TYPE
+    SYNTAX	Gauge32
+    MAX-ACCESS	accessible-for-notify
+    STATUS	current
+    DESCRIPTION
+	"The storage space occupied in the named users store"
+    ::= { pulsesecure-gateway 53 }
+
+pclsRemainingGracePeriod OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of days remaining in grace period for contacting PCLS"
+    ::= { pulsesecure-gateway 54 }
+
+iveMaxConcurrentUsersLicenseCapacity OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total licensed concurrent users capacity"
+    ::= { pulsesecure-gateway 55 }
 
 iveTraps OBJECT IDENTIFIER ::= { pulsesecure-gateway 251 }
 
@@ -546,26 +545,11 @@ archiveFileTransferFailed NOTIFICATION-TYPE
 	"Could not store file on archive server"
     ::= { iveTraps 14 }
     
-    
-meetingUserLimit NOTIFICATION-TYPE
-    OBJECTS { meetingUserCount }
-    STATUS	current
-    DESCRIPTION
-	"Concurrent user count over license limit"
-    ::= { iveTraps 15 }
-
 iveRestart NOTIFICATION-TYPE
     STATUS	current
     DESCRIPTION
 	"IVE has restarted under administrator's instruction."
     ::= { iveTraps 16 }
-
-meetingLimit NOTIFICATION-TYPE
-    OBJECTS { meetingCount }
-    STATUS	current
-    DESCRIPTION
-	"Concurrent meeting count over license limit"
-    ::= { iveTraps 17 }
 
 iveDiskNearlyFull NOTIFICATION-TYPE
     OBJECTS { diskFullPercent }
@@ -607,13 +591,6 @@ swapUtilNotify NOTIFICATION-TYPE
     DESCRIPTION
 	"IVE swap utilization above threshold"
     ::= { iveTraps 23 }
-
-iveMaxConcurrentUsersVirtualSystem NOTIFICATION-TYPE
-    OBJECTS { ivsName }
-    STATUS	deprecated
-    DESCRIPTION
-	"Maximum number of concurrent Virtual System users signed in"
-    ::= { iveTraps 24 }
 
 ocspResponderConnectionFailed NOTIFICATION-TYPE
     OBJECTS { ocspResponderURL }
@@ -738,12 +715,59 @@ iveTooManyFailedLoginAttemptsIPv6 NOTIFICATION-TYPE
 	"Too many failed login attempts from IPv6 address"
     ::= { iveTraps 41 }
 
+iveMaxNamedUsersSignedIn NOTIFICATION-TYPE
+    OBJECTS { iveNamedUsers }
+    STATUS	current
+    DESCRIPTION
+	"Maximum number of named users signed in"
+    ::= { iveTraps 42 }
+
+iveNamedUsersStoreNearlyFull NOTIFICATION-TYPE
+    OBJECTS { namedUserStorePercent }
+    STATUS	current
+    DESCRIPTION
+	"Named user storage reached the limit"
+    ::= { iveTraps 43 }
+
+
 -- Product Name
 iveSAProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 252 }
 iveICProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 253 }
 iveMAGProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 254 }
 iveVAProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 255 }
 ivePSAProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 256 }
+iveISAProduct OBJECT IDENTIFIER ::= { pulsesecure-gateway 257 }
+
+--SA platform
+iveProductSA700   OBJECT IDENTIFIER ::= {iveSAProduct 1}
+iveProductSA2000  OBJECT IDENTIFIER ::= {iveSAProduct 2 }
+iveProductSA2500  OBJECT IDENTIFIER ::= {iveSAProduct 3 }
+iveProductSA4000  OBJECT IDENTIFIER ::= {iveSAProduct 4 }
+iveProductSA4500  OBJECT IDENTIFIER ::= {iveSAProduct 5 }
+iveProductSA6000 OBJECT IDENTIFIER ::= {iveSAProduct 6 }
+iveProductSA6500 OBJECT IDENTIFIER ::= {iveSAProduct 7 }
+iveSA700   OBJECT IDENTIFIER ::= {iveProductSA700 1}
+iveSA2000   OBJECT IDENTIFIER ::= {iveProductSA2000 1}
+iveSA2500   OBJECT IDENTIFIER ::= {iveProductSA2500 1}
+iveSA4000   OBJECT IDENTIFIER ::= {iveProductSA4000 1}
+iveSA4500   OBJECT IDENTIFIER ::= {iveProductSA4500 1}
+iveSA4000FIPS  OBJECT IDENTIFIER ::= {iveProductSA4000 2}
+iveSA4500FIPS   OBJECT IDENTIFIER ::= {iveProductSA4500 2}
+iveSA6000   OBJECT IDENTIFIER ::= {iveProductSA6000 1}
+iveSA6500   OBJECT IDENTIFIER ::= {iveProductSA6500 1}
+iveSA6000FIPS  OBJECT IDENTIFIER ::= {iveProductSA6000 2}
+iveSA6500FIPS   OBJECT IDENTIFIER ::= {iveProductSA6500 2}
+
+--IC platform
+iveProductIC4000  OBJECT IDENTIFIER ::= {iveICProduct 1 }
+iveProductIC4500  OBJECT IDENTIFIER ::= {iveICProduct 2 }
+iveProductIC6000 OBJECT IDENTIFIER ::= {iveICProduct 3 }
+iveProductIC6500 OBJECT IDENTIFIER ::= {iveICProduct 4 }
+iveIC4000   OBJECT IDENTIFIER ::= {iveProductIC4000 1}
+iveIC6000   OBJECT IDENTIFIER ::= {iveProductIC6000 1}
+iveIC4500   OBJECT IDENTIFIER ::= {iveProductIC4500 1}
+iveIC6500   OBJECT IDENTIFIER ::= {iveProductIC6500 1}
+iveIC6000FIPS OBJECT IDENTIFIER ::= {iveProductIC6000 2}
 
 --MAG platform
 iveProductMAG2600  OBJECT IDENTIFIER ::= {iveMAGProduct 1 }
@@ -759,9 +783,14 @@ iveProductVADTE  OBJECT IDENTIFIER ::= {iveVAProduct 2 }
 iveProductPSA300    OBJECT IDENTIFIER ::= {ivePSAProduct 1 }
 iveProductPSA3000   OBJECT IDENTIFIER ::= {ivePSAProduct 2 }
 iveProductPSA5000   OBJECT IDENTIFIER ::= {ivePSAProduct 3 }
-iveProductPSA7000f  OBJECT IDENTIFIER ::= {ivePSAProduct 4 }
-iveProductPSA7000c  OBJECT IDENTIFIER ::= {ivePSAProduct 5 }
+iveProductPSA7000c  OBJECT IDENTIFIER ::= {ivePSAProduct 4 }
+iveProductPSA7000f  OBJECT IDENTIFIER ::= {ivePSAProduct 5 }
 iveProductPSA10000  OBJECT IDENTIFIER ::= {ivePSAProduct 6 }
+
+--ISA platform
+iveProductISA6000   OBJECT IDENTIFIER ::= {iveISAProduct 1 }
+iveProductISA8000c  OBJECT IDENTIFIER ::= {iveISAProduct 2 }
+iveProductISA8000f  OBJECT IDENTIFIER ::= {iveISAProduct 3 }
 
 --MAG platform incase we have other rev
 iveMAG2600  OBJECT IDENTIFIER ::= {iveProductMAG2600 1}
@@ -777,8 +806,12 @@ iveVADTE OBJECT IDENTIFIER ::= {iveProductVADTE 1}
 ivePSA300    OBJECT IDENTIFIER ::= {iveProductPSA300 1 }
 ivePSA3000   OBJECT IDENTIFIER ::= {iveProductPSA3000 1 }
 ivePSA5000   OBJECT IDENTIFIER ::= {iveProductPSA5000 1 }
-ivePSA7000f  OBJECT IDENTIFIER ::= {iveProductPSA7000f 1 }
 ivePSA7000c  OBJECT IDENTIFIER ::= {iveProductPSA7000c 1 }
+ivePSA7000f  OBJECT IDENTIFIER ::= {iveProductPSA7000f 1 }
 ivePSA10000  OBJECT IDENTIFIER ::= {iveProductPSA10000 1 }
 
+--ISA platform incase we have other rev
+iveISA6000   OBJECT IDENTIFIER ::= {iveProductISA6000 1 }
+iveISA8000c  OBJECT IDENTIFIER ::= {iveProductISA8000c 1 }
+iveISA8000f  OBJECT IDENTIFIER ::= {iveProductISA8000f 1 }
 END

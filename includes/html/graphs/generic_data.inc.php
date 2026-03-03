@@ -30,11 +30,15 @@ $rrd_filename_in ??= $rrd_filename ?? '';
 if ($inverse) {
     $in = 'out';
     $out = 'in';
-    [$ingress_speed, $egress_speed] = PortCache::get($port['port_id'])->getSpeeds();
+    if ($port) {
+        [$ingress_speed, $egress_speed] = PortCache::get($port['port_id'])->getSpeeds();
+    }
 } else {
     $in = 'in';
     $out = 'out';
-    [$egress_speed, $ingress_speed] = PortCache::get($port['port_id'])->getSpeeds();
+    if ($port) {
+        [$egress_speed, $ingress_speed] = PortCache::get($port['port_id'])->getSpeeds();
+    }
 }
 $stacked = generate_stacked_graphs(($egress_speed || $ingress_speed) && ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom')));
 

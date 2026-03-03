@@ -1,7 +1,7 @@
 ## PagerDuty
 
 LibreNMS can make use of PagerDuty, this is done by utilizing an API
-key and Integraton Key.
+key and Integration Key.
 
 API Keys can be found under 'API Access' in the PagerDuty portal.
 

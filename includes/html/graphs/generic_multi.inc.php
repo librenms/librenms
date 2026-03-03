@@ -44,6 +44,8 @@ $i = 0;
 $iter = 0;
 $ids = [];
 
+$rrd_optionsb = [];
+$rrd_optionsc = [];
 foreach ($rrd_list as $rrd) {
     if (isset($rrd['colour'])) {
         $colour = $rrd['colour'];
@@ -108,6 +110,6 @@ if ($print_total) {
 
 array_push($rrd_options, ...$rrd_optionsb);
 $rrd_options[] = 'HRULE:0#555555';
-$rrd_options += $rrd_optionsc;
+array_push($rrd_options, ...$rrd_optionsc);
 
 unset($stacked);

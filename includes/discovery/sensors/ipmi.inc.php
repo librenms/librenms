@@ -35,7 +35,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
             Log::debug('Trying IPMI type: ' . $ipmi_type);
             $results = explode(PHP_EOL, (string) external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
 
-            $results = array_values(array_filter($results, fn ($line) => ! Str::contains($line, 'discrete') && trim($line) !== ''));
+            $results = array_values(array_filter($results, fn ($line) => ! Str::contains($line, 'discrete') && trim((string) $line) !== ''));
 
             if (! empty($results)) {
                 set_dev_attrib($device, 'ipmi_type', $ipmi_type);

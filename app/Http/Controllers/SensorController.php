@@ -34,8 +34,8 @@ class SensorController
     public function index(Request $request, string $metric = '', string $legacyview = ''): View
     {
         $metric = str_replace('metric=', '', $metric);
-        $view = str_replace('view=', '', $legacyview) ?: $request->get('view', 'detail');
-        $status = $request->get('status', 'all');
+        $view = str_replace('view=', '', $legacyview) ?: $request->input('view', 'detail');
+        $status = $request->input('status', 'all');
 
         $metrics = $this->getMetrics($request);
         $metric = $metric ?: array_key_first($metrics);

@@ -22,11 +22,11 @@ class CheckDeviceAvailability
 
         if ($ping_response->success()) {
             $is_up_snmp = ! ConnectivityHelper::snmpIsAllowed($device) || $this->deviceIsSnmpable->execute($device);
-            $this->setDeviceAvailability->execute($device, $is_up_snmp, AvailabilitySource::SNMP, $commit);
+            $this->setDeviceAvailability->execute($device, $is_up_snmp, AvailabilitySource::Snmp, $commit);
 
             $device->mtu_status = $this->deviceMtuTest->execute($device);
         } else { // icmp down
-            $this->setDeviceAvailability->execute($device, false, AvailabilitySource::ICMP, $commit);
+            $this->setDeviceAvailability->execute($device, false, AvailabilitySource::Icmp, $commit);
         }
 
         if ($commit) {

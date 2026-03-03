@@ -41,6 +41,13 @@ discovery:
             - IOSXE
             - LINUX_IOSD
             - CAT3K_CAA
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.9.1.2683 # ciscoIE32008T2S
+            - .1.3.6.1.4.1.9.1.2684 # ciscoIE32008P2S
+            - .1.3.6.1.4.1.9.1.2685 # ciscoIE33008T2S
+            - .1.3.6.1.4.1.9.1.2686 # ciscoIE33008P2S
+            - .1.3.6.1.4.1.9.1.2687 # ciscoIE34008P2S
 bad_iftype:
     - macSecControlledIF
     - macSecUncontrolledIF

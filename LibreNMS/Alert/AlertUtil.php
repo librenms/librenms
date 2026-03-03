@@ -28,6 +28,7 @@ namespace LibreNMS\Alert;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\DeviceGroup;
 use App\Models\User;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Builder;
@@ -173,6 +174,8 @@ class AlertUtil
         return User::whereNot('email', '')->where(function (Builder $query) use ($results): void {
             if ($device_ids = array_filter(Arr::pluck($results, 'device_id'))) {
                 $query->orWhereHas('devicesOwned', fn ($q) => $q->whereIn('devices_perms.device_id', $device_ids));
+                // Find all device groups that users have been granted access to where the device group also contains at least one device that we are looking for
+                $query->orWhereHas('deviceGroups', fn ($q) => $q->whereIn('device_groups.id', DeviceGroup::WhereHas('devices', fn ($dq) => $dq->whereIn('devices.device_id', $device_ids))->pluck('device_groups.id')));
             }
             if ($port_ids = array_filter(Arr::pluck($results, 'port_id'))) {
                 $query->orWhereHas('portsOwned', fn ($q) => $q->whereIn('ports_perms.port_id', $port_ids));

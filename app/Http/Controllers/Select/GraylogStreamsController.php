@@ -47,7 +47,7 @@ class GraylogStreamsController extends Controller
             'page' => 'int',
             'term' => 'nullable|string',
         ]);
-        $search = strtolower((string) $request->get('term'));
+        $search = strtolower((string) $request->input('term'));
 
         $streams = [];
         try {

@@ -5,7 +5,7 @@ if (! isset($vars['nfs_os'])) {
     $vars['nfs_os'] = '';
 }
 
-include 'includes/nfs-shared.inc.php';
+require base_path('includes/nfs-shared.inc.php');
 
 $name = 'nfs';
 $app_id = $app['app_id'];

@@ -1,1759 +1,1955 @@
 -- *******************************************************************
--- CISCO-DOT11-ASSOCIATION-MIB.my: 
+-- CISCO-DOT11-ASSOCIATION-MIB.my:
 -- CISCO DOT11 ASSOCIATION MIB file
---
--- April 2002, Francis Pang 
---
--- Copyright (c) 2002-2007 by Cisco Systems, Inc.
+--   
+-- April 2002, Francis Pang
+--   
+-- Copyright (c) 2002-2005, 2006-2007, 2016 by Cisco Systems Inc.
 -- All rights reserved.
--- *******************************************************************
---
+-- ******************************************************************
+
 CISCO-DOT11-ASSOCIATION-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-        MODULE-IDENTITY, 
-        OBJECT-TYPE,
-        Gauge32, 
-        Counter32,
-        Integer32,
-        Unsigned32                            
-                FROM SNMPv2-SMI
-        MODULE-COMPLIANCE, 
-        OBJECT-GROUP       
-                FROM SNMPv2-CONF
-        TEXTUAL-CONVENTION,
-        MacAddress, 
-        TruthValue                
-                FROM SNMPv2-TC
-        ifIndex,                               
-        InterfaceIndex 
-                FROM IF-MIB
-        InetAddressType,
-        InetAddress
-                FROM INET-ADDRESS-MIB
-        SnmpAdminString
-                FROM SNMP-FRAMEWORK-MIB
-        cd11IfAuxSsid,
-        CDot11IfVlanIdOrZero, 
-        CDot11IfCipherType
-                FROM CISCO-DOT11-IF-MIB
-        ciscoMgmt                             
-                FROM CISCO-SMI;
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Gauge32,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    MacAddress,
+    TruthValue
+        FROM SNMPv2-TC
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+    InetAddressType,
+    InetAddress
+        FROM INET-ADDRESS-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    cd11IfAuxSsid,
+    CDot11IfVlanIdOrZero,
+    CDot11IfCipherType
+        FROM CISCO-DOT11-IF-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
 
 
---********************************************************************
---*  MODULE IDENTITY
---********************************************************************
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
 
 ciscoDot11AssociationMIB MODULE-IDENTITY
-        LAST-UPDATED    "200701050000Z"
-        ORGANIZATION    "Cisco Systems Inc."
-        CONTACT-INFO  
-                "       Cisco Systems
-                        Customer Service
+    LAST-UPDATED    "201612060000Z"
+    ORGANIZATION    "Cisco Systems Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
 
-                Postal: 170 West Tasman Drive,
-                        San Jose CA 95134-1706.
-                        USA
+            Postal: 170 West Tasman Drive,
+            San Jose CA 95134-1706.
+            USA
 
-                   Tel: +1 800 553-NETS
+            Tel: +1 800 553-NETS
 
-                E-mail: cs-dot11@cisco.com"
-        DESCRIPTION
-                "This MIB module provides network management 
-                information on IEEE 802.11 wireless device 
-                association management and data packet forwarding 
-                configuration and statistics.  This MIB is an
-                extension to the IEEE802dot11-MIB and provides
-                per client based information.  
+            E-mail: cs-dot11@cisco.com"
+    DESCRIPTION
+        "This MIB module provides network management
+        information on IEEE 802.11 wireless device 
+        association management and data packet forwarding 
+        configuration and statistics.  This MIB is an
+        extension to the IEEE802dot11-MIB and provides
+        per client based information.  
 
-                The IEEE802dot11-MIB is defined in the IEEE Std 
-                802.11-Jan 14 1999, Wireless LAN Medium Access 
-                Control and Physical Layer Specifications, by the
-                LAN MAN Standards Committee of the IEEE Computer
-                Society.
-
-
-                          GLOSSARY and ACRONYMS 
-
-                
-                Access point (AP)   
-                    Transmitter/receiver (transceiver) device
-                    that commonly connects and transports data 
-                    between a wireless network and a wired network.
-                
-                AES
-                    Advanced Encryption Standard
-
-                Association
-                    The service used to establish access point
-                    or station mapping and enable STA invocation
-                    of the distribution system serivces.
-                    (Wireless clients attempt to connect to 
-                    access points.)
-                
-                Bridge    
-                    Device that connects two or more segments 
-                    and reduces traffic by analyzing the 
-                    destination address, filtering the frame,
-                    and forwarding the frame to all connected 
-                    segments.
-                
-                Bridge AP 
-                    It is an AP that functions as a transparent 
-                    bridge between 2 wired LAN segments.  
-                
-                Bridge Host     
-                    This is also known as Work Group Bridge.  This
-                    is a non-root bridge that is connected to a
-                    remote LAN segment and will only communicate 
-                    with repeaters or root bridges.  It does not 
-                    accept association from other wireless devices.
-
-                BSS
-                    IEEE 802.11 Basic Service Set (Radio Cell).  The
-                    BSS of an AP comprises of the stations directly 
-                    associated with the AP.
-
-                CCX 
-                    Cisco Compatible eXtensions
-
-                    A set of specifications which when implemented
-                    would make a client radio interoperable with a
-                    Cisco WLAN infrastructure and make best use of the
-                    innovations for enhanced security, mobility,
-                    quality of service and network management.
-
-                CCMP
-                    Code Mode/CBC Mac Protocol
-
-                Client (Client Station)    
-                    A wireless device in a wireless network 
-                    associated with an access point.
-
-                Direct Sequence Spread Sprectrum ( DSSS )
-
-                    DSSS is a method to send data where the 
-                    transmitting and receiving systems operate at
-                    frequencies as wide as 22MHz.  The wide channels
-                    help the participating systems to send more
-                    information at higher data rates than the FSSS
-                    systems.
-
-                EAP
-                    Extensible Authentication Protocol
-
-                EAP-TLS
-                    Extensible Authentication Protocol-Transport
-                    Layer Security
-
-                Frequency Hopping Spread Spectrum ( FSSS )
-
-                    FSSS systems hop from one frequency to another in
-                    the allowed band of frequencies during the data
-                    transmission.  83 MHz is specified as the allowed
-                    band of frequencies in the 2.4 GHz spectrum.
-
-                IEEE 802.11    
-                    Standard to encourage interoperability among 
-                    wireless networking equipment.
-               
-                IEEE 802.11b
-
-                    The IEEE 802.11b standard describes DSSS systems
-                    that operate in the 2.4 GHz ISM band at data
-                    rates of 1, 2, 5,5 and 11 Mbps.
-
-                IEEE 802.11a
-
-                    The IEEE 802.11a standard describes wireless LAN
-                    operation in the 5 GHz UNII band at data rates
-                    of 6, 9, 12, 18, 24, 36, 48 and 54 Mbps.
-
-                IEEE 802.11g
-
-                    This standard specifies operation in 2.4 GHz ISM
-                    band at data rates of 6, 9, 12, 18. 24, 36, 48 and
-                    54 Mbps.
-
-                Industrial, Scientific and Medical band (ISM)
-
-                    A license-free band specified by the Federal
-                    Communications Commission for use by the wireless
-                    LAN systems.  The ISM bands are located starting
-                    at 902 MHz, 2.4GHz and 5.8 GHz.
- 
-                MIC
-                    Message Integrity Check.  A MIC can, optionally, 
-                    be added to WEP-encrypted 802.11 frames.
-                
-                Non-Root Bridge   
-                    This wireless bridge does not connect to the main
-                    wired LAN segment.  It connects to a remote wired 
-                    LAN segment and can associate to root bridges and
-                    other non-root bridges that accept client 
-                    associations.  It also can accept associations 
-                    from other non-root bridges, repeater access 
-                    points, and client devices.
-
-                PCI
-                    Peripheral Component Interconnect
-
-                    A local bus standard developed by Intel
-                    Corporation. Most modern PCs include a PCI bus.
-                    PCI is a 64-bit bus, though it is usually
-                    implemented as a 32-bit bus. It can run at clock
-                    speeds of 33 or 66 MHz. At 32 bits and 33 MHz, it
-                    yields a throughput rate of 133 MBps.
-                
-                Repeater    
-                    Device that connects multiple segments, listening 
-                    to each and repeating signal on one to every other 
-                    connected one; regenerates each transmission 
-                    so that it can travel farther.
-                
-                Repeater or Non-root Access Point    
-                    The repeater access point is not connected 
-                    to the wired LAN.  The Repeater is a wireless 
-                    LAN transceiver that transfers data between 
-                    a client and another access point, another 
-                    repeater, or between two bridges.  The repeater 
-                    is placed within radio range of an access point 
-                    connected to the wired LAN, another repeater, or 
-                    an non-root bridge to extend the range of the 
-                    infrastructure.
-                
-                Root Access Point    
-                    This access point connects clients to the main 
-                    wired LAN.
-                
-                Root Wireless Bridge    
-                    This wireless bridge is connected to the main 
-                    wired LAN.  This wireless bridge can communicate
-                    with non-root wireless bridges, repeater access
-                    points, and client devices but not with another 
-                    wireless root bridge.  Only one wireless bridge
-                    in a wireless LAN can be set as the wireless 
-                    root bridge.  
-
-                SSID
-                    Radio Service Set ID.  It is used for identification
-                    during association.
-                
-                STA (WSTA)
-                    A non-AP 802.11 wireless station.
-
-                TKIP      
-                    WPA Temporal Key encryption.
-
-                Unlicensed National Information Infrastucture (UNII)
-
-                    The UNII bands are in the 5 GHz range and are 100
-                    MHz wide.  These bands are used by 802.11a-compliant
-                    devices. 
-
-                WEP
-                    Wired Equivalent Privacy.  'WEP' is generally used
-                    to refer to 802.11 encryption.
-                
-                WPA
-                    WiFi Protected Access
-
-                Work Group Bridges (WGB)
-                    See bridge host."
-        REVISION      "200701050000Z"
-        DESCRIPTION
-                "The changes made are as follows.
-
-                 - Added more explanations on the kind of entries 
-                   populated for cDot11ClientConfigInfoTable, on
-                   infrastructure clients like repeaters, non-root
-                   bridges and workgroup bridges. 
-
-                 - Added cDot11ClientNewKeyManagement object
-                   to the cDot11ClientConfigInfoTable. " 
-
-        REVISION      "200606120000Z"
-        DESCRIPTION
-                "The changes made are as follows.
-
-                 - Added the following enumerations to
-                   CDot11ClientRadioType.
-
-                   - 'cb21ag'
-                   - 'ccxClient'
-                   - 'unknown'
-                 
-                 -  Added 'unknown' to CDot11ClientDevType.
-
-                 -  Added cDot11ClientDevObjectID to
-                    cDot11ClientConfigInfoTable. "
- 
-        REVISION      "200503080000Z"
-        DESCRIPTION
-                "Updated CDot11ClientDevType to include a new device
-                type. Updated CDot11ClientRadioType to include new
-                radio types." 
-        REVISION      "200411280000Z"
-        DESCRIPTION
-                "Correct spelling of CDot11AuthenicationMethod to 
-                CDot11AuthenticationMethod."
-        REVISION      "200410180000Z"
-        DESCRIPTION
-                "Added new client VLAN, sub-interface ifIndex, key
-                management type, authentication type, and cipher
-                type information." 
-        REVISION      "200402190000Z"
-        DESCRIPTION
-                "Added new cd11IfCipherStatsTable for radio interface
-                AES, TKIP, and security tempering attempts statistics."
-        REVISION      "200307270000Z"
-        DESCRIPTION
-                "Added new IEEE 802.11g radio type to 
-                CDot11ClientRadioType and new AP device type to 
-                CDot11ClientDevType."
-        REVISION      "200304110000Z"
-        DESCRIPTION
-                "Added new objects for client software version, IP 
-                address, name, and association or authentication state."
-        REVISION      "200301290000Z"
-        DESCRIPTION
-                "Added new 5GHz radio type to CDot11ClientRadioType
-                and new client types to CDot11ClientDevType."
-        REVISION      "200207150000Z"
-        DESCRIPTION
-                "Corrected the unit of cDot11ClientBytesReceived."
-        REVISION      "200204170000Z"
-        DESCRIPTION
-                "Added a new index cd11IfAuxSsid and a new object 
-                cDot11ClientParentAddress to the 
-                cDot11ClientConfigInfoTable."
-        REVISION      "200203060000Z"
-        DESCRIPTION
-                "Initial version of this MIB module."
-        ::= { ciscoMgmt 273 }
+        The IEEE802dot11-MIB is defined in the IEEE Std 
+        802.11-Jan 14 1999, Wireless LAN Medium Access 
+        Control and Physical Layer Specifications, by the
+        LAN MAN Standards Committee of the IEEE Computer
+        Society.
 
 
-ciscoDot11AssocMIBObjects OBJECT IDENTIFIER 
-        ::= { ciscoDot11AssociationMIB 1 }
+                  GLOSSARY and ACRONYMS 
 
-cDot11AssociationGlobal OBJECT IDENTIFIER 
-        ::= { ciscoDot11AssocMIBObjects 1 }
 
-cDot11ClientConfiguration OBJECT IDENTIFIER
-        ::= { ciscoDot11AssocMIBObjects 2 }
+        Access point (AP)   
+            Transmitter/receiver (transceiver) device
+            that commonly connects and transports data 
+            between a wireless network and a wired network.
 
-cDot11ClientStatistics OBJECT IDENTIFIER
-        ::= { ciscoDot11AssocMIBObjects 3 }
+        AES
+            Advanced Encryption Standard
+
+        Association
+            The service used to establish access point
+            or station mapping and enable STA invocation
+            of the distribution system serivces.
+            (Wireless clients attempt to connect to 
+            access points.)
+
+        Bridge    
+            Device that connects two or more segments 
+            and reduces traffic by analyzing the 
+            destination address, filtering the frame,
+            and forwarding the frame to all connected 
+            segments.
+
+        Bridge AP 
+            It is an AP that functions as a transparent 
+            bridge between 2 wired LAN segments.  
+
+        Bridge Host     
+            This is also known as Work Group Bridge.  This
+            is a non-root bridge that is connected to a
+            remote LAN segment and will only communicate 
+            with repeaters or root bridges.  It does not 
+            accept association from other wireless devices.
+
+        BSS
+            IEEE 802.11 Basic Service Set (Radio Cell).  The
+            BSS of an AP comprises of the stations directly 
+            associated with the AP.
+
+        CCX 
+            Cisco Compatible eXtensions
+
+            A set of specifications which when implemented
+            would make a client radio interoperable with a
+            Cisco WLAN infrastructure and make best use of the
+            innovations for enhanced security, mobility,
+            quality of service and network management.
+
+        CCMP
+            Code Mode/CBC Mac Protocol
+
+        Client (Client Station)    
+            A wireless device in a wireless network 
+            associated with an access point.
+
+        Direct Sequence Spread Sprectrum ( DSSS )
+
+            DSSS is a method to send data where the 
+            transmitting and receiving systems operate at
+            frequencies as wide as 22MHz.  The wide channels
+            help the participating systems to send more
+            information at higher data rates than the FSSS
+            systems.
+
+        EAP
+            Extensible Authentication Protocol
+
+        EAP-TLS
+            Extensible Authentication Protocol-Transport
+            Layer Security
+
+        Frequency Hopping Spread Spectrum ( FSSS )
+
+            FSSS systems hop from one frequency to another in
+            the allowed band of frequencies during the data
+            transmission.  83 MHz is specified as the allowed
+            band of frequencies in the 2.4 GHz spectrum.
+
+        IEEE 802.11    
+            Standard to encourage interoperability among 
+            wireless networking equipment.
+
+        IEEE 802.11b
+
+            The IEEE 802.11b standard describes DSSS systems
+            that operate in the 2.4 GHz ISM band at data
+            rates of 1, 2, 5,5 and 11 Mbps.
+
+        IEEE 802.11a
+
+            The IEEE 802.11a standard describes wireless LAN
+            operation in the 5 GHz UNII band at data rates
+            of 6, 9, 12, 18, 24, 36, 48 and 54 Mbps.
+
+        IEEE 802.11g
+
+            This standard specifies operation in 2.4 GHz ISM
+            band at data rates of 6, 9, 12, 18. 24, 36, 48 and
+            54 Mbps.
+
+        Industrial, Scientific and Medical band (ISM)
+
+            A license-free band specified by the Federal
+            Communications Commission for use by the wireless
+            LAN systems.  The ISM bands are located starting
+            at 902 MHz, 2.4GHz and 5.8 GHz.
+
+        MIC
+            Message Integrity Check.  A MIC can, optionally, 
+            be added to WEP-encrypted 802.11 frames.
+
+        Non-Root Bridge   
+            This wireless bridge does not connect to the main
+            wired LAN segment.  It connects to a remote wired 
+            LAN segment and can associate to root bridges and
+            other non-root bridges that accept client 
+            associations.  It also can accept associations 
+            from other non-root bridges, repeater access 
+            points, and client devices.
+
+        PCI
+            Peripheral Component Interconnect
+
+            A local bus standard developed by Intel
+            Corporation. Most modern PCs include a PCI bus.
+            PCI is a 64-bit bus, though it is usually
+            implemented as a 32-bit bus. It can run at clock
+            speeds of 33 or 66 MHz. At 32 bits and 33 MHz, it
+            yields a throughput rate of 133 MBps.
+
+        Repeater    
+            Device that connects multiple segments, listening 
+            to each and repeating signal on one to every other 
+            connected one; regenerates each transmission 
+            so that it can travel farther.
+
+        Repeater or Non-root Access Point    
+            The repeater access point is not connected 
+            to the wired LAN.  The Repeater is a wireless 
+            LAN transceiver that transfers data between 
+            a client and another access point, another 
+            repeater, or between two bridges.  The repeater 
+            is placed within radio range of an access point 
+            connected to the wired LAN, another repeater, or 
+            an non-root bridge to extend the range of the 
+            infrastructure.
+
+        Root Access Point    
+            This access point connects clients to the main 
+            wired LAN.
+
+        Root Wireless Bridge    
+            This wireless bridge is connected to the main 
+            wired LAN.  This wireless bridge can communicate
+            with non-root wireless bridges, repeater access
+            points, and client devices but not with another 
+            wireless root bridge.  Only one wireless bridge
+            in a wireless LAN can be set as the wireless 
+            root bridge.  
+
+        SSID
+            Radio Service Set ID.  It is used for identification
+            during association.
+
+        STA (WSTA)
+            A non-AP 802.11 wireless station.
+
+        TKIP      
+            WPA Temporal Key encryption.
+
+        Unlicensed National Information Infrastucture (UNII)
+
+            The UNII bands are in the 5 GHz range and are 100
+            MHz wide.  These bands are used by 802.11a-compliant
+            devices. 
+
+        WEP
+            Wired Equivalent Privacy.  'WEP' is generally used
+            to refer to 802.11 encryption.
+
+        WPA
+            WiFi Protected Access
+
+        Work Group Bridges (WGB)
+            See bridge host."
+    REVISION        "201612060000Z"
+    DESCRIPTION
+        "Added ciscoDot11StationStatusTrap to
+        indicate wireless client status change
+        like associate to AP or disassociate 
+        from AP"
+    REVISION        "200701050000Z"
+    DESCRIPTION
+        "The changes made are as follows.
+
+        - Added more explanations on the kind of entries 
+          populated for cDot11ClientConfigInfoTable, on
+          infrastructure clients like repeaters, non-root
+          bridges and workgroup bridges. 
+
+        - Added cDot11ClientNewKeyManagement object
+          to the cDot11ClientConfigInfoTable."
+    REVISION        "200606120000Z"
+    DESCRIPTION
+        "The changes made are as follows.
+
+        - Added the following enumerations to
+          CDot11ClientRadioType.
+
+          - 'cb21ag'
+          - 'ccxClient'
+          - 'unknown'
+
+        -  Added 'unknown' to CDot11ClientDevType.
+
+        -  Added cDot11ClientDevObjectID to
+           cDot11ClientConfigInfoTable."
+    REVISION        "200503080000Z"
+    DESCRIPTION
+        "Updated CDot11ClientDevType to include a new device
+        type. Updated CDot11ClientRadioType to include new
+        radio types."
+    REVISION        "200411280000Z"
+    DESCRIPTION
+        "Correct spelling of CDot11AuthenicationMethod to
+        CDot11AuthenticationMethod."
+    REVISION        "200410180000Z"
+    DESCRIPTION
+        "Added new client VLAN, sub-interface ifIndex, key
+        management type, authentication type, and cipher
+        type information."
+    REVISION        "200402190000Z"
+    DESCRIPTION
+        "Added new cd11IfCipherStatsTable for radio interface
+        AES, TKIP, and security tempering attempts statistics."
+    REVISION        "200307270000Z"
+    DESCRIPTION
+        "Added new IEEE 802.11g radio type to
+        CDot11ClientRadioType and new AP device type to 
+        CDot11ClientDevType."
+    REVISION        "200304110000Z"
+    DESCRIPTION
+        "Added new objects for client software version, IP
+        address, name, and association or authentication state."
+    REVISION        "200301290000Z"
+    DESCRIPTION
+        "Added new 5GHz radio type to CDot11ClientRadioType
+        and new client types to CDot11ClientDevType."
+    REVISION        "200207150000Z"
+    DESCRIPTION
+        "Corrected the unit of cDot11ClientBytesReceived."
+    REVISION        "200204170000Z"
+    DESCRIPTION
+        "Added a new index cd11IfAuxSsid and a new object
+        cDot11ClientParentAddress to the 
+        cDot11ClientConfigInfoTable."
+    REVISION        "200203060000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 273 }
+
+
+ciscoDot11AssocMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoDot11AssociationMIB 1 }
+
+cDot11AssociationGlobal  OBJECT IDENTIFIER
+    ::= { ciscoDot11AssocMIBObjects 1 }
+
+cDot11ClientConfiguration  OBJECT IDENTIFIER
+    ::= { ciscoDot11AssocMIBObjects 2 }
+
+cDot11ClientStatistics  OBJECT IDENTIFIER
+    ::= { ciscoDot11AssocMIBObjects 3 }
+
+ciscoDot11StationTraps  OBJECT IDENTIFIER
+    ::= { ciscoDot11AssocMIBObjects 4 }
 
 
 -- Textual Conventions
 
 CDot11ClientRoleClassType ::= TEXTUAL-CONVENTION
-        STATUS     current
-        DESCRIPTION
-                "This defines the type of role of a wireless device.  
-                The device types are:
-                    clientStation(0)  - client station,
-                    repeater(1)       - repeater access point,
-                    accessPoint(2)    - access point,
-                    bridgeHost(3)     - bridge host (WGB),
-                    bridge(4)         - bridge,
-                    bridgeRoot(5)     - root bridge
-                    ethernetClient(6) - Ethernet client through WGB."
-        SYNTAX     INTEGER {
-                clientStation(0), 
-                repeater(1),
-                accessPoint(2),
-                bridgeHost(3), 
-                bridge(4),
-                bridgeRoot(5),
-                ethernetClient(6) } 
+    STATUS          current
+    DESCRIPTION
+        "This defines the type of role of a wireless device.
+        The device types are:
+            clientStation(0)  - client station,
+            repeater(1)       - repeater access point,
+            accessPoint(2)    - access point,
+            bridgeHost(3)     - bridge host (WGB),
+            bridge(4)         - bridge,
+            bridgeRoot(5)     - root bridge
+            ethernetClient(6) - Ethernet client through WGB."
+    SYNTAX          INTEGER  {
+                        clientStation(0),
+                        repeater(1),
+                        accessPoint(2),
+                        bridgeHost(3),
+                        bridge(4),
+                        bridgeRoot(5),
+                        ethernetClient(6)
+                    }
 
 CDot11ClientDevType ::= TEXTUAL-CONVENTION
-        STATUS     current
-        DESCRIPTION
-                "This defines the classifications of wireless client
-                device.  The devices are classified by their Ethernet
-                connection, serial connection, and the type of radio 
-                it uses.  The device classifications are: 
-                    unknown(1)              - unknown,
-                    ethernetAP(76)          - Ethernet access point,
-                    ethernetBridge(77)      - Ethernet bridge,
-                    pc3000Client(84)        - client with a 3000 radio,
-                    serialUC(85)            - serial port universal 
-                                              client,
-                    ethernetUC(86)          - Ethernet universal 
-                                              client,
-                    pc3500Client(101)       - client with a 5300 radio,
-                    pc4500Client(102)       - client with a 4500 radio,
-                    generic80211Client(104) - client of an unknown 
-                                              radio type and non-Cisco
-                                              device, 
-                    pc4800Client(109)       - client with a 4800 radio,
-                    pc3100Client(110)       - client with a 3100 radio,
-                    mc(111)                 - multiple client Ethernet,
-                                              universal client,
-                    ethernetClient(112)     - Ethernet client of a WGB,
-                    pc4800bClient(117)      - client with a 4800b radio,
-                    wgbNoDiversity(123)     - WGB with one antenna,
-                    wgb(124)                - WGB with two antennas,
-                    series350Client(127)    - client with 350 series 
-                                              radio,
-                    series370Client(128)    - client with 370 series 
-                                              dot11A radio,
-                    c1100SeriesAP(129)      - Cisco 1100 series AP, 
-                    c1410SeriesBridge(130)  - Cisco 1410 series bridge, 
-                    c1200SeriesAP(132)      - Cisco 1200 series AP,
-                    mp2xClient(133)         - client with MP2x IEEE
-                                              802.11g radio,
-                    c350SeriesAP(134)       - Cisco IOS 350 series AP, 
-                    cb21agClient(135)       - Cisco CB21AG/PI21AG 
-                                              IEEE 802.lla/b/g client,
-                    radioKodiak(136)        - Cisco IEEE 802.11a 
-                                              AIR-RM21A-x-K9 and 
-                                              AIR-RM22A-x-K9 radio, 
-                    c1130SeriesAP(137)      - Cisco 1130 series AP,
-                    c1310SeriesBridge(138)  - Cisco 1310 series bridge,
-                    c7920phone(139)         - Cisco 7920 series phone,
-                    c1240SeriesAP(140)      - Cisco 1240 series AP. "
-
-
-        SYNTAX     INTEGER {
-                unknown(1), 
-                ethernetAP(76),
-                ethernetBridge(77),
-                pc3000Client(84),
-                serialUC(85),
-                ethernetUC(86),
-                pc3500Client(101),
-                pc4500Client(102),
-                generic80211Client(104),
-                pc4800Client(109),
-                pc3100Client(110),
-                mc(111),
-                ethernetClient(112),
-                pc4800bClient(117),
-                wgbNoDiversity(123),
-                wgb(124),
-                series350Client(127), 
-                series370Client(128),   
-                c1100SeriesAP(129),  
-                c1410SeriesBridge(130),
-                c1200SeriesAP(132),   
-                mp2xClient(133),         
-                c350SeriesAP(134),
-                cb21agClient(135),       
-                radioKodiak(136),
-                c1130SeriesAP(137),
-                c1310SeriesBridge(138),
-                c7920phone(139),
-                c1240SeriesAP(140)
-                           } 
+    STATUS          current
+    DESCRIPTION
+        "This defines the classifications of wireless client
+        device.  The devices are classified by their Ethernet
+        connection, serial connection, and the type of radio 
+        it uses.  The device classifications are: 
+            unknown(1)              - unknown,
+            ethernetAP(76)          - Ethernet access point,
+            ethernetBridge(77)      - Ethernet bridge,
+            pc3000Client(84)        - client with a 3000 radio,
+            serialUC(85)            - serial port universal 
+                                      client,
+            ethernetUC(86)          - Ethernet universal 
+                                      client,
+            pc3500Client(101)       - client with a 5300 radio,
+            pc4500Client(102)       - client with a 4500 radio,
+            generic80211Client(104) - client of an unknown 
+                                      radio type and non-Cisco
+                                      device, 
+            pc4800Client(109)       - client with a 4800 radio,
+            pc3100Client(110)       - client with a 3100 radio,
+            mc(111)                 - multiple client Ethernet,
+                                      universal client,
+            ethernetClient(112)     - Ethernet client of a WGB,
+            pc4800bClient(117)      - client with a 4800b radio,
+            wgbNoDiversity(123)     - WGB with one antenna,
+            wgb(124)                - WGB with two antennas,
+            series350Client(127)    - client with 350 series 
+                                      radio,
+            series370Client(128)    - client with 370 series 
+                                      dot11A radio,
+            c1100SeriesAP(129)      - Cisco 1100 series AP, 
+            c1410SeriesBridge(130)  - Cisco 1410 series bridge, 
+            c1200SeriesAP(132)      - Cisco 1200 series AP,
+            mp2xClient(133)         - client with MP2x IEEE
+                                      802.11g radio,
+            c350SeriesAP(134)       - Cisco IOS 350 series AP, 
+            cb21agClient(135)       - Cisco CB21AG/PI21AG 
+                                      IEEE 802.lla/b/g client,
+            radioKodiak(136)        - Cisco IEEE 802.11a 
+                                      AIR-RM21A-x-K9 and 
+                                      AIR-RM22A-x-K9 radio, 
+            c1130SeriesAP(137)      - Cisco 1130 series AP,
+            c1310SeriesBridge(138)  - Cisco 1310 series bridge,
+            c7920phone(139)         - Cisco 7920 series phone,
+            c1240SeriesAP(140)      - Cisco 1240 series AP."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        ethernetAP(76),
+                        ethernetBridge(77),
+                        pc3000Client(84),
+                        serialUC(85),
+                        ethernetUC(86),
+                        pc3500Client(101),
+                        pc4500Client(102),
+                        generic80211Client(104),
+                        pc4800Client(109),
+                        pc3100Client(110),
+                        mc(111),
+                        ethernetClient(112),
+                        pc4800bClient(117),
+                        wgbNoDiversity(123),
+                        wgb(124),
+                        series350Client(127),
+                        series370Client(128),
+                        c1100SeriesAP(129),
+                        c1410SeriesBridge(130),
+                        c1200SeriesAP(132),
+                        mp2xClient(133),
+                        c350SeriesAP(134),
+                        cb21agClient(135),
+                        radioKodiak(136),
+                        c1130SeriesAP(137),
+                        c1310SeriesBridge(138),
+                        c7920phone(139),
+                        c1240SeriesAP(140)
+                    }
 
 CDot11ClientRadioType ::= TEXTUAL-CONVENTION
-        STATUS     current
-        DESCRIPTION
-                "This defines the radio classifications of wireless
-                stations.  It indicates the model number of the radio
-                in the remote unit.  The radio classifications are: 
-                    unknown(1)     - unknown,
-                    ccxClient(2)   - CCX-compatible radio,
-                    pc3500(3)      - Cisco 3500 radio,
-                    pc3000(4)      - Cisco 3000 radio,
-                    pc4500(6)      - Cisco 4500 radio,
-                    pc4800(12)     - Cisco 4800 radio,
-                    pc3100(13)     - Cisco 3100 radio,
-                    series340(33)  - Cisco 340 series radio,
-                    series350(34)  - Cisco 350 series radio,
-                    series370(35)  - Cisco 370 series dot11A radio,
-                    bridge1410(36) - Cisco 1410 bridge 5GHz radio,
-                    mp2xSeries(37) - Cisco 11g MP2x series radio,
-                    rm2xSeries(38) - Cisco 11a RM2x series radio,
-                    rm2gSeries(39) - Cisco 11g RM2x series radio,
-                    mp2xMAR(40)    - Cisco 3210 MAR 11g MP2x radio,
-                    cb21ag(46)     - Cisco CB21AG/PI21AG 
-                                     IEEE 802.11a/b/g radio. "
-        SYNTAX     INTEGER { 
-                unknown(1),
-                ccxClient(2),
-                pc3500(3),
-                pc3000(4),
-                pc4500(6),
-                pc4800(12),
-                pc3100(13),
-                series340(33), 
-                series350(34), 
-                series370(35),
-                bridge1410(36), 
-                mp2xSeries(37),
-                rm2xSeries(38), 
-                rm2gSeries(39), 
-                mp2xMAR(40),
-                cb21ag(46)
-                           }
+    STATUS          current
+    DESCRIPTION
+        "This defines the radio classifications of wireless
+        stations.  It indicates the model number of the radio
+        in the remote unit.  The radio classifications are: 
+            unknown(1)     - unknown,
+            ccxClient(2)   - CCX-compatible radio,
+            pc3500(3)      - Cisco 3500 radio,
+            pc3000(4)      - Cisco 3000 radio,
+            pc4500(6)      - Cisco 4500 radio,
+            pc4800(12)     - Cisco 4800 radio,
+            pc3100(13)     - Cisco 3100 radio,
+            series340(33)  - Cisco 340 series radio,
+            series350(34)  - Cisco 350 series radio,
+            series370(35)  - Cisco 370 series dot11A radio,
+            bridge1410(36) - Cisco 1410 bridge 5GHz radio,
+            mp2xSeries(37) - Cisco 11g MP2x series radio,
+            rm2xSeries(38) - Cisco 11a RM2x series radio,
+            rm2gSeries(39) - Cisco 11g RM2x series radio,
+            mp2xMAR(40)    - Cisco 3210 MAR 11g MP2x radio,
+            cb21ag(46)     - Cisco CB21AG/PI21AG 
+                             IEEE 802.11a/b/g radio."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        ccxClient(2),
+                        pc3500(3),
+                        pc3000(4),
+                        pc4500(6),
+                        pc4800(12),
+                        pc3100(13),
+                        series340(33),
+                        series350(34),
+                        series370(35),
+                        bridge1410(36),
+                        mp2xSeries(37),
+                        rm2xSeries(38),
+                        rm2gSeries(39),
+                        mp2xMAR(40),
+                        cb21ag(46)
+                    }
 
 CDot11AuthenticationMethod ::= TEXTUAL-CONVENTION
-        STATUS     current
-        DESCRIPTION
-                "These are the IEEE 802.11 supported 
-                authentication methods for wireless devices:
-                    open(1)         - Open System
-                    sharedKey(2)    - Shared Key
-                    networkEap(129) - Network EAP."
-        REFERENCE
-                "IEEE Std 802.11-Jan 14 1999, Wireless LAN Medium
-                Access Control and Physical Layer Specifications,
-                LAN MAN Standards Committee of the IEEE Computer
-                Society, IEEE802dot11-MIB, 
-                dot11AuthenticationAlgorithm."
-        SYNTAX     INTEGER {
-                    open(1),
-                    sharedKey(2),
-                    networkEap(129)
-                           }
+    STATUS          current
+    DESCRIPTION
+        "These are the IEEE 802.11 supported
+        authentication methods for wireless devices:
+            open(1)         - Open System
+            sharedKey(2)    - Shared Key
+            networkEap(129) - Network EAP."
 
- 
+    REFERENCE
+        "IEEE Std 802.11-Jan 14 1999, Wireless LAN Medium
+        Access Control and Physical Layer Specifications,
+        LAN MAN Standards Committee of the IEEE Computer
+        Society, IEEE802dot11-MIB, 
+        dot11AuthenticationAlgorithm."
+    SYNTAX          INTEGER  {
+                        open(1),
+                        sharedKey(2),
+                        networkEap(129)
+                    }
+
 CDot11AdditionalAuthenMethod ::= TEXTUAL-CONVENTION
-        STATUS     current
-        DESCRIPTION
-                "These are the additional authentications that can 
-                be performed after IEEE 802.11 Open System or Shared
-                Key authentication is completed successfully:
-                    mac(0) - MAC address authentication   
-                    eap(1) - EAP authentication."  
-        SYNTAX     BITS {
-                    mac(0),
-                    eap(1)
-                        }
+    STATUS          current
+    DESCRIPTION
+        "These are the additional authentications that can
+        be performed after IEEE 802.11 Open System or Shared
+        Key authentication is completed successfully:
+            mac(0) - MAC address authentication   
+            eap(1) - EAP authentication."
+    SYNTAX          BITS {
+                        mac(0),
+                        eap(1)
+                    }
 
-CDot11Dot1xAuthenMethod ::= TEXTUAL-CONVENTION 
-        STATUS     current                    
-        DESCRIPTION                          
-                "These are the IEEE 802.1x authentication methods
-                performed between the IEEE 802.11 wireless clients
-                and the authentication server.  Depending on the
-                server and client configuration, more than one
-                authentication methods can be performed for any
-                IEEE 802.11 association.  The IEEE 802.1x 
-                authentication methods are:
-                    md5(0)     - Message-digest algorithm
-                    leap(1)    - Cisco Light-weight EAP 
-                    peap(2)    - Protected EAP
-                    eapTls(3)  - EAP Transport Layer Security 
-                    eapSim(4)  - EAP Enhanced GSM Authentication
-                    eapFast(5) - Cisco EAP Fast."
-        SYNTAX     BITS {
-                    md5(0),
-                    leap(1),
-                    peap(2),
-                    eapTls(3),
-                    eapSim(4), 
-                    eapFast(5) 
-                        }  
+CDot11Dot1xAuthenMethod ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "These are the IEEE 802.1x authentication methods
+        performed between the IEEE 802.11 wireless clients
+        and the authentication server.  Depending on the
+        server and client configuration, more than one
+        authentication methods can be performed for any
+        IEEE 802.11 association.  The IEEE 802.1x 
+        authentication methods are:
+            md5(0)     - Message-digest algorithm
+            leap(1)    - Cisco Light-weight EAP 
+            peap(2)    - Protected EAP
+            eapTls(3)  - EAP Transport Layer Security 
+            eapSim(4)  - EAP Enhanced GSM Authentication
+            eapFast(5) - Cisco EAP Fast."
+    SYNTAX          BITS {
+                        md5(0),
+                        leap(1),
+                        peap(2),
+                        eapTls(3),
+                        eapSim(4),
+                        eapFast(5)
+                    }
 
-CDot11KeyManagementMethod ::= TEXTUAL-CONVENTION 
-        STATUS     deprecated                          
-        DESCRIPTION                                
-                "These are the encryption key management methods
-                for IEEE 802.11 wireless frame encryption. The key 
-                management methods are:
-                    wpa(0)   - Wi-Fi Protected Access
-                    cckm(1)  - Cisco proprietary key management." 
-        SYNTAX     BITS {
-                    wpa(0),
-                    cckm(1) 
-                        }  
+CDot11KeyManagementMethod ::= TEXTUAL-CONVENTION
+    STATUS          deprecated
+    DESCRIPTION
+        "These are the encryption key management methods
+        for IEEE 802.11 wireless frame encryption. The key 
+        management methods are:
+            wpa(0)   - Wi-Fi Protected Access
+            cckm(1)  - Cisco proprietary key management."
+    SYNTAX          BITS {
+                        wpa(0),
+                        cckm(1)
+                    }
 
 CDot11NewKeyManagementMethod ::= TEXTUAL-CONVENTION
-        STATUS     current
-        DESCRIPTION
-                "These are the encryption key management methods
-                for IEEE 802.11 wireless frame encryption. The key
-                management methods are:
-                    cckm(0)  - Cisco proprietary key management
-                    wpa1(1)  - Wi-Fi Protected Access version 1
-                    wpa2(2)  - Wi-Fi Protected Access version 2."
-        SYNTAX     BITS {
-                    cckm(0),
-                    wpa1(1),
-                    wpa2(2)
-                        }
+    STATUS          current
+    DESCRIPTION
+        "These are the encryption key management methods
+        for IEEE 802.11 wireless frame encryption. The key
+        management methods are:
+            cckm(0)  - Cisco proprietary key management
+            wpa1(1)  - Wi-Fi Protected Access version 1
+            wpa2(2)  - Wi-Fi Protected Access version 2."
+    SYNTAX          BITS {
+                        cckm(0),
+                        wpa1(1),
+                        wpa2(2)
+                    }
+-- ********************************************************************
+-- *  dot11 association global parameters
+-- ********************************************************************
 
---********************************************************************
---*  dot11 association global parameters  
---********************************************************************
+ciscoDot11StationInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CiscoDot11StationInfoEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Station Information parameters."
+    ::= { ciscoDot11AssocMIBObjects 5 }
+
+ciscoDot11StationInfoEntry OBJECT-TYPE
+    SYNTAX          CiscoDot11StationInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Status and parameter values for the wireless client."
+    INDEX           { ifIndex } 
+    ::= { ciscoDot11StationInfoTable 1 }
+
+CiscoDot11StationInfoEntry ::= SEQUENCE {
+		clientMacAddr			MacAddress,
+		clientDeviceType		CDot11ClientRoleClassType,
+		clientDeviceName		SnmpAdminString,
+        clientIpv4Address    	InetAddress,
+        clientIpv6Address    	InetAddress,
+        apMacAddr				MacAddress,
+        apIpv4Address        	InetAddress,
+        apIpv6Address        	InetAddress,
+        clientStationState   	INTEGER,
+        clientDisassocReasonStr SnmpAdminString
+}
+
+clientMacAddr OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Indicates wireless client mac address." 
+    ::= { ciscoDot11StationInfoEntry 1 }
+   
+clientDeviceType OBJECT-TYPE
+    SYNTAX          CDot11ClientRoleClassType
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Indicates wireless client device type.
+        possible types are client, ethernet, AP,
+        Bridge, Repeater, WGB" 
+    ::= { ciscoDot11StationInfoEntry 2 }
+
+clientDeviceName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Indicates Cisco IOS device hostname ." 
+    ::= { ciscoDot11StationInfoEntry 3 }
+            
+clientIpv4Address OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Indicates wireless client IPv4 address." 
+    ::= { ciscoDot11StationInfoEntry 4 }
+
+clientIpv6Address OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Indicates wireless client IPv6 address." 
+    ::= { ciscoDot11StationInfoEntry 5 }
+
+apMacAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Indicates AP mac address which client associated." 
+    ::= { ciscoDot11StationInfoEntry 6 }
+    
+apIpv4Address OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Indicates AP IPv4 address that wireless client associates." 
+    ::= { ciscoDot11StationInfoEntry 7 }
+
+apIpv6Address OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Indicates AP IPv6 address that wireless client associates." 
+    ::= { ciscoDot11StationInfoEntry 8 }
+
+clientStationState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        associated(1),
+                        disAssociated(2),
+                        run(3)
+                    }
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the state of the authentication
+        and association process between the two parties:
+        associated(1) - client associates to AP
+        disAssociated(2) - client disassociates to AP
+        run(3) - client passes authentication and gets IP address"
+   ::= { ciscoDot11StationInfoEntry 9 }
+
+clientDisassocReasonStr OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "This attribute holds the most recently
+        transmitted Reason in a Disassociation frame." 
+    ::= { ciscoDot11StationInfoEntry 10 }
+ 
+
+
+ciscoDot11StationStatusTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        ifIndex,
+                        clientMacAddr,
+                        clientDeviceType,
+                        clientDeviceName,
+                        clientIpv4Address,
+                        clientIpv6Address,
+                        apMacAddr,
+                        apIpv4Address,
+                        apIpv6Address,
+                        clientStationState,
+                        clientDisassocReasonStr
+                    }
+    STATUS          current
+    DESCRIPTION
+        "ciscoDot11StationStatusTrap is generated when wireless client
+        status change :
+        1. associate to AP 
+        2. disassociate from AP
+        3. run state : client passes authentication and gets IP address"
+   ::= { ciscoDot11StationTraps 1 }
+
 cDot11ParentAddress OBJECT-TYPE
-        SYNTAX     MacAddress
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the MAC address of the parent access point
-                or root bridge for this device.  The value is zero
-                if this is a root access point or bridge."
-        ::= { cDot11AssociationGlobal 1 }
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the MAC address of the parent access point
+        or root bridge for this device.  The value is zero
+        if this is a root access point or bridge." 
+    ::= { cDot11AssociationGlobal 1 }
 
 cDot11ActiveDevicesTable OBJECT-TYPE
-        SYNTAX     SEQUENCE OF CDot11ActiveDevicesEntry
-        MAX-ACCESS not-accessible
-        STATUS     current
-        DESCRIPTION 
-                "This table contains the list of active devices 
-                currently associated with this device on each of 
-                the IEEE 802.11 interfaces.  This table has a 
-                sparse dependent relationship on the ifTable."
-        ::= { cDot11AssociationGlobal 2 }
+    SYNTAX          SEQUENCE OF CDot11ActiveDevicesEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the list of active devices
+        currently associated with this device on each of 
+        the IEEE 802.11 interfaces.  This table has a 
+        sparse dependent relationship on the ifTable."
+    ::= { cDot11AssociationGlobal 2 }
 
 cDot11ActiveDevicesEntry OBJECT-TYPE
-        SYNTAX     CDot11ActiveDevicesEntry
-        MAX-ACCESS not-accessible
-        STATUS     current
-        DESCRIPTION
-                "An entry represents a currently active device
-                associated with this device.  These active devices 
-                include: wireless clients, repeaters, and bridges."
-        INDEX      { ifIndex }
-        ::= { cDot11ActiveDevicesTable 1 }
+    SYNTAX          CDot11ActiveDevicesEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry represents a currently active device
+        associated with this device.  These active devices 
+        include: wireless clients, repeaters, and bridges."
+    INDEX           { ifIndex } 
+    ::= { cDot11ActiveDevicesTable 1 }
 
-CDot11ActiveDevicesEntry ::=
-        SEQUENCE   { 
-                cDot11ActiveWirelessClients  Gauge32,
-                cDot11ActiveBridges          Gauge32,
-                cDot11ActiveRepeaters        Gauge32 
-                   }
+CDot11ActiveDevicesEntry ::= SEQUENCE {
+        cDot11ActiveWirelessClients Gauge32,
+        cDot11ActiveBridges         Gauge32,
+        cDot11ActiveRepeaters       Gauge32
+}
 
 cDot11ActiveWirelessClients OBJECT-TYPE
-        SYNTAX     Gauge32 (0..2007)
-        UNITS      "Device" 
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION 
-                "This is the number of wireless clients 
-                currently associating with this device on this
-                interface."
-        ::= { cDot11ActiveDevicesEntry 1 }
+    SYNTAX          Gauge32 (0..2007)
+    UNITS           "Device"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the number of wireless clients
+        currently associating with this device on this
+        interface." 
+    ::= { cDot11ActiveDevicesEntry 1 }
 
 cDot11ActiveBridges OBJECT-TYPE
-        SYNTAX     Gauge32 (0..2007)
-        UNITS      "Device" 
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION 
-                "This is the number of bridges currently 
-                associating with this device on this interface."
-        ::= { cDot11ActiveDevicesEntry 2 }
+    SYNTAX          Gauge32 (0..2007)
+    UNITS           "Device"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the number of bridges currently
+        associating with this device on this interface." 
+    ::= { cDot11ActiveDevicesEntry 2 }
 
 cDot11ActiveRepeaters OBJECT-TYPE
-        SYNTAX     Gauge32 (0..2007)
-        UNITS      "Device" 
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the number of repeaters currently 
-                associating with this device on this interface."
-        ::= { cDot11ActiveDevicesEntry 3 }
+    SYNTAX          Gauge32 (0..2007)
+    UNITS           "Device"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the number of repeaters currently
+        associating with this device on this interface." 
+    ::= { cDot11ActiveDevicesEntry 3 }
+ 
+
 
 cDot11AssociationStatsTable OBJECT-TYPE
-        SYNTAX     SEQUENCE OF CDot11AssociationStatsEntry
-        MAX-ACCESS not-accessible
-        STATUS     current
-        DESCRIPTION 
-                "This table contains statistics for various 
-                devices associated with this device on each 
-                of the IEEE 802.11 interfaces since it was 
-                last re-started.  These devices include: wireless 
-                clients, repeaters, and bridges.  This table has
-                a sparse dependent relationship on the ifTable."
-        ::= { cDot11AssociationGlobal 3 }
+    SYNTAX          SEQUENCE OF CDot11AssociationStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains statistics for various
+        devices associated with this device on each 
+        of the IEEE 802.11 interfaces since it was 
+        last re-started.  These devices include: wireless 
+        clients, repeaters, and bridges.  This table has
+        a sparse dependent relationship on the ifTable."
+    ::= { cDot11AssociationGlobal 3 }
 
 cDot11AssociationStatsEntry OBJECT-TYPE
-        SYNTAX     CDot11AssociationStatsEntry
-        MAX-ACCESS not-accessible
-        STATUS     current
-        DESCRIPTION
-                "Each entry provides association statistics of 
-                various devices interacting with this device on 
-                each of the IEEE 802.11 interfaces."
-        INDEX      { ifIndex }
-        ::= { cDot11AssociationStatsTable 1 }
+    SYNTAX          CDot11AssociationStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry provides association statistics of
+        various devices interacting with this device on 
+        each of the IEEE 802.11 interfaces."
+    INDEX           { ifIndex } 
+    ::= { cDot11AssociationStatsTable 1 }
 
-CDot11AssociationStatsEntry ::=
-        SEQUENCE   { 
-                cDot11AssStatsAssociated       Counter32,
-                cDot11AssStatsAuthenticated    Counter32,
-                cDot11AssStatsRoamedIn         Counter32,
-                cDot11AssStatsRoamedAway       Counter32,
-                cDot11AssStatsDeauthenticated  Counter32,
-                cDot11AssStatsDisassociated    Counter32 
-                   }
+CDot11AssociationStatsEntry ::= SEQUENCE {
+        cDot11AssStatsAssociated      Counter32,
+        cDot11AssStatsAuthenticated   Counter32,
+        cDot11AssStatsRoamedIn        Counter32,
+        cDot11AssStatsRoamedAway      Counter32,
+        cDot11AssStatsDeauthenticated Counter32,
+        cDot11AssStatsDisassociated   Counter32
+}
 
 cDot11AssStatsAssociated OBJECT-TYPE
-        SYNTAX     Counter32 
-        UNITS      "client"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION 
-                "This object counts the number of stations 
-                associated with this device on this interface 
-                since device re-started."
-        ::= { cDot11AssociationStatsEntry 1 }
+    SYNTAX          Counter32
+    UNITS           "client"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object counts the number of stations
+        associated with this device on this interface 
+        since device re-started." 
+    ::= { cDot11AssociationStatsEntry 1 }
 
 cDot11AssStatsAuthenticated OBJECT-TYPE
-        SYNTAX     Counter32 
-        UNITS      "client"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION 
-                "This object counts the number of stations 
-                authenticated with this device on this interface
-                since device re-started."
-        ::= { cDot11AssociationStatsEntry 2 }
+    SYNTAX          Counter32
+    UNITS           "client"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object counts the number of stations
+        authenticated with this device on this interface
+        since device re-started." 
+    ::= { cDot11AssociationStatsEntry 2 }
 
 cDot11AssStatsRoamedIn OBJECT-TYPE
-        SYNTAX     Counter32 
-        UNITS      "client"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION 
-                "This object counts the number of stations 
-                roamed from another device to this device on 
-                this interface since device re-started."
-        ::= { cDot11AssociationStatsEntry 3 }
+    SYNTAX          Counter32
+    UNITS           "client"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object counts the number of stations
+        roamed from another device to this device on 
+        this interface since device re-started." 
+    ::= { cDot11AssociationStatsEntry 3 }
 
 cDot11AssStatsRoamedAway OBJECT-TYPE
-        SYNTAX     Counter32 
-        UNITS      "client"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION 
-                "This object counts the number of stations 
-                roamed away from this device on this interface 
-                since device re-started."
-        ::= { cDot11AssociationStatsEntry 4 }
+    SYNTAX          Counter32
+    UNITS           "client"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object counts the number of stations
+        roamed away from this device on this interface 
+        since device re-started." 
+    ::= { cDot11AssociationStatsEntry 4 }
 
 cDot11AssStatsDeauthenticated OBJECT-TYPE
-        SYNTAX     Counter32 
-        UNITS      "client"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION 
-                "This object counts the number of stations 
-                deauthenticated with this device on this 
-                interface since device re-started."
-        ::= { cDot11AssociationStatsEntry 5 }
+    SYNTAX          Counter32
+    UNITS           "client"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object counts the number of stations
+        deauthenticated with this device on this 
+        interface since device re-started." 
+    ::= { cDot11AssociationStatsEntry 5 }
 
 cDot11AssStatsDisassociated OBJECT-TYPE
-        SYNTAX     Counter32 
-        UNITS      "client"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION 
-                "This object counts the number of stations 
-                disassociated with this device on this 
-                interface since device re-started."
-        ::= { cDot11AssociationStatsEntry 6 }
+    SYNTAX          Counter32
+    UNITS           "client"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object counts the number of stations
+        disassociated with this device on this 
+        interface since device re-started." 
+    ::= { cDot11AssociationStatsEntry 6 }
+ 
 
 
 cd11IfCipherStatsTable OBJECT-TYPE
-        SYNTAX     SEQUENCE OF Cd11IfCipherStatsEntry
-        MAX-ACCESS not-accessible
-        STATUS     current
-        DESCRIPTION
-                "This table includes AES, TKIP, and security tempering
-                attempts statistics collected by the IEEE 802.11 radio
-                interfaces and system management.  This table has a
-                sparse dependent relationship on the ifTable.  For
-                each entry in this table, there exists an entry in the
-                ifTable of ifType ieee80211(71)."
-        ::= { cDot11AssociationGlobal 4 }
+    SYNTAX          SEQUENCE OF Cd11IfCipherStatsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table includes AES, TKIP, and security tempering
+        attempts statistics collected by the IEEE 802.11 radio
+        interfaces and system management.  This table has a
+        sparse dependent relationship on the ifTable.  For
+        each entry in this table, there exists an entry in the
+        ifTable of ifType ieee80211(71)."
+    ::= { cDot11AssociationGlobal 4 }
 
 cd11IfCipherStatsEntry OBJECT-TYPE
-        SYNTAX     Cd11IfCipherStatsEntry
-        MAX-ACCESS not-accessible
-        STATUS     current
-        DESCRIPTION
-                "Each entry provides cipher related statistics  
-                collected on each of the IEEE 802.11 interfaces."
-        INDEX      { ifIndex }
-        ::= { cd11IfCipherStatsTable 1 }
+    SYNTAX          Cd11IfCipherStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry provides cipher related statistics
+        collected on each of the IEEE 802.11 interfaces."
+    INDEX           { ifIndex } 
+    ::= { cd11IfCipherStatsTable 1 }
 
-Cd11IfCipherStatsEntry ::=
-        SEQUENCE   {
-            cd11IfCipherMicFailClientAddress   MacAddress,
-            cd11IfCipherTkipLocalMicFailures   Counter32,
-            cd11IfCipherTkipRemotMicFailures  Counter32,
-            cd11IfCipherTkipCounterMeasInvok  Counter32,
-            cd11IfCipherCcmpReplaysDiscarded   Counter32,
-            cd11IfCipherTkipReplaysDetected    Counter32
-                    }
+Cd11IfCipherStatsEntry ::= SEQUENCE {
+        cd11IfCipherMicFailClientAddress MacAddress,
+        cd11IfCipherTkipLocalMicFailures Counter32,
+        cd11IfCipherTkipRemotMicFailures Counter32,
+        cd11IfCipherTkipCounterMeasInvok Counter32,
+        cd11IfCipherCcmpReplaysDiscarded Counter32,
+        cd11IfCipherTkipReplaysDetected  Counter32
+}
 
 cd11IfCipherMicFailClientAddress OBJECT-TYPE
-        SYNTAX     MacAddress
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is MAC address of the client attached to 
-                this radio interface that caused the most recent
-                MIC failure."
-        ::= { cd11IfCipherStatsEntry 1 }
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is MAC address of the client attached to
+        this radio interface that caused the most recent
+        MIC failure." 
+    ::= { cd11IfCipherStatsEntry 1 }
 
 cd11IfCipherTkipLocalMicFailures OBJECT-TYPE
-        SYNTAX     Counter32
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This object counts the number of MIC failures 
-                encountered on this radio interface since device 
-                re-started."  
-        ::= { cd11IfCipherStatsEntry 2 }
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object counts the number of MIC failures
+        encountered on this radio interface since device 
+        re-started." 
+    ::= { cd11IfCipherStatsEntry 2 }
 
 cd11IfCipherTkipRemotMicFailures OBJECT-TYPE
-        SYNTAX     Counter32
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This object counts the number of MIC failures 
-                reported by clients on this radio interface
-                since device re-started."
-        ::= { cd11IfCipherStatsEntry 3 }
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object counts the number of MIC failures
+        reported by clients on this radio interface
+        since device re-started." 
+    ::= { cd11IfCipherStatsEntry 3 }
 
 cd11IfCipherTkipCounterMeasInvok OBJECT-TYPE
-        SYNTAX     Counter32
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This object counts the number of TKIP Counter 
-                Measures invoked on this interface since 
-                device re-started."
-        ::= { cd11IfCipherStatsEntry 4 }
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object counts the number of TKIP Counter
+        Measures invoked on this interface since 
+        device re-started." 
+    ::= { cd11IfCipherStatsEntry 4 }
 
 cd11IfCipherCcmpReplaysDiscarded OBJECT-TYPE
-        SYNTAX     Counter32
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This object counts the number of received 
-                unicast fragments discarded by replay mechanism 
-                on this interface since device re-started."
-        ::= { cd11IfCipherStatsEntry 5 }
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object counts the number of received
+        unicast fragments discarded by replay mechanism 
+        on this interface since device re-started." 
+    ::= { cd11IfCipherStatsEntry 5 }
 
 cd11IfCipherTkipReplaysDetected OBJECT-TYPE
-        SYNTAX     Counter32
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This object counts the number of TKIP replay 
-                errors detected on this interface since device 
-                re-started."
-        ::= { cd11IfCipherStatsEntry 6 }
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object counts the number of TKIP replay
+        errors detected on this interface since device 
+        re-started." 
+    ::= { cd11IfCipherStatsEntry 6 }
+ 
 
+-- ********************************************************************
+-- *  dot11 client configuration
+-- ********************************************************************
 
---********************************************************************
---*  dot11 client configuration 
---********************************************************************
-        
 cDot11ClientConfigInfoTable OBJECT-TYPE
-        SYNTAX     SEQUENCE OF CDot11ClientConfigInfoEntry
-        MAX-ACCESS not-accessible
-        STATUS     current
-        DESCRIPTION
-                "This table contains configuration information of 
-                client devices.  Entries on this table are created
-                by the device radio driver when clients establish
-                association with the device.  Entries are removed
-                when clients disassociate with the device.  These 
-                clients include: wireless clients, repeaters, 
-                and bridges.  On Infrastructure clients like
-                repeaters, non-root bridges and workgroup bridges,
-                this table also has an entry for the parent device
-                they are associated to."
-        ::= { cDot11ClientConfiguration 1 }
+    SYNTAX          SEQUENCE OF CDot11ClientConfigInfoEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains configuration information of
+        client devices.  Entries on this table are created
+        by the device radio driver when clients establish
+        association with the device.  Entries are removed
+        when clients disassociate with the device.  These 
+        clients include: wireless clients, repeaters, 
+        and bridges.  On Infrastructure clients like
+        repeaters, non-root bridges and workgroup bridges,
+        this table also has an entry for the parent device
+        they are associated to."
+    ::= { cDot11ClientConfiguration 1 }
 
 cDot11ClientConfigInfoEntry OBJECT-TYPE
-        SYNTAX     CDot11ClientConfigInfoEntry
-        MAX-ACCESS not-accessible
-        STATUS     current
-        DESCRIPTION
-                "Each entry is the device specification of a client
-                of this device on the IEEE 802.11 radio interfaces.
-                Clients are grouped according to the SSIDs of the
-                interfaces they use for associations and the MAC
-                address of their parent devices if the clients are 
-                repeat APs."
-        INDEX      { 
-                ifIndex, 
-                cd11IfAuxSsid, 
-                cDot11ClientAddress 
-                   }
-        ::= { cDot11ClientConfigInfoTable 1 }
+    SYNTAX          CDot11ClientConfigInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry is the device specification of a client
+        of this device on the IEEE 802.11 radio interfaces.
+        Clients are grouped according to the SSIDs of the
+        interfaces they use for associations and the MAC
+        address of their parent devices if the clients are 
+        repeat APs."
+    INDEX           {
+                        ifIndex,
+                        cd11IfAuxSsid,
+                        cDot11ClientAddress
+                    } 
+    ::= { cDot11ClientConfigInfoTable 1 }
 
-CDot11ClientConfigInfoEntry ::=
-        SEQUENCE   {
-                cDot11ClientAddress           MacAddress,
-                cDot11ClientParentAddress     MacAddress,
-                cDot11ClientRoleClassType     CDot11ClientRoleClassType,
-                cDot11ClientDevType           CDot11ClientDevType,
-                cDot11ClientRadioType         CDot11ClientRadioType,
-                cDot11ClientWepEnabled        TruthValue,
-                cDot11ClientWepKeyMixEnabled  TruthValue,
-                cDot11ClientMicEnabled        TruthValue,
-                cDot11ClientPowerSaveMode     INTEGER,
-                cDot11ClientAid               Unsigned32,
-                cDot11ClientDataRateSet       OCTET STRING,
-                cDot11ClientSoftwareVersion   SnmpAdminString,
-                cDot11ClientName              SnmpAdminString, 
-                cDot11ClientAssociationState  INTEGER, 
-                cDot11ClientIpAddressType     InetAddressType, 
-                cDot11ClientIpAddress         InetAddress, 
-                cDot11ClientVlanId            CDot11IfVlanIdOrZero, 
-                cDot11ClientSubIfIndex        InterfaceIndex, 
-                cDot11ClientAuthenAlgorithm   
-                        CDot11AuthenticationMethod, 
-                cDot11ClientAdditionalAuthen  
-                        CDot11AdditionalAuthenMethod,
-                cDot11ClientDot1xAuthenAlgorithm  
-                        CDot11Dot1xAuthenMethod,
-                cDot11ClientKeyManagement         
-                        CDot11KeyManagementMethod,
-                cDot11ClientUnicastCipher
-                        CDot11IfCipherType,
-                cDot11ClientMulticastCipher
-                        CDot11IfCipherType,
-                cDot11ClientDevObjectID OBJECT IDENTIFIER,
-                cDot11ClientNewKeyManagement
-                        CDot11NewKeyManagementMethod 
-                   }
+CDot11ClientConfigInfoEntry ::= SEQUENCE {
+        cDot11ClientAddress              MacAddress,
+        cDot11ClientParentAddress        MacAddress,
+        cDot11ClientRoleClassType        CDot11ClientRoleClassType,
+        cDot11ClientDevType              CDot11ClientDevType,
+        cDot11ClientRadioType            CDot11ClientRadioType,
+        cDot11ClientWepEnabled           TruthValue,
+        cDot11ClientWepKeyMixEnabled     TruthValue,
+        cDot11ClientMicEnabled           TruthValue,
+        cDot11ClientPowerSaveMode        INTEGER,
+        cDot11ClientAid                  Unsigned32,
+        cDot11ClientDataRateSet          OCTET STRING,
+        cDot11ClientSoftwareVersion      SnmpAdminString,
+        cDot11ClientName                 SnmpAdminString,
+        cDot11ClientAssociationState     INTEGER,
+        cDot11ClientIpAddressType        InetAddressType,
+        cDot11ClientIpAddress            InetAddress,
+        cDot11ClientVlanId               CDot11IfVlanIdOrZero,
+        cDot11ClientSubIfIndex           InterfaceIndex,
+        cDot11ClientAuthenAlgorithm      CDot11AuthenticationMethod,
+        cDot11ClientAdditionalAuthen     CDot11AdditionalAuthenMethod,
+        cDot11ClientDot1xAuthenAlgorithm CDot11Dot1xAuthenMethod,
+        cDot11ClientKeyManagement        CDot11KeyManagementMethod,
+        cDot11ClientUnicastCipher        CDot11IfCipherType,
+        cDot11ClientMulticastCipher      CDot11IfCipherType,
+        cDot11ClientDevObjectID          OBJECT IDENTIFIER,
+        cDot11ClientNewKeyManagement     CDot11NewKeyManagementMethod
+}
 
 cDot11ClientAddress OBJECT-TYPE
-        SYNTAX     MacAddress
-        MAX-ACCESS not-accessible
-        STATUS     current
-        DESCRIPTION
-                "The MAC address of the client."
-        ::= { cDot11ClientConfigInfoEntry 1 }
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The MAC address of the client." 
+    ::= { cDot11ClientConfigInfoEntry 1 }
 
 cDot11ClientParentAddress OBJECT-TYPE
-        SYNTAX     MacAddress
-        MAX-ACCESS read-only 
-        STATUS     current
-        DESCRIPTION
-                "The MAC address of the parent of the client if the
-                client is a repeater AP.  If this client has no parent,
-                the value is '00000000'h."
-        ::= { cDot11ClientConfigInfoEntry 2 }
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The MAC address of the parent of the client if the
+        client is a repeater AP.  If this client has no parent,
+        the value is '00000000'h." 
+    ::= { cDot11ClientConfigInfoEntry 2 }
 
 cDot11ClientRoleClassType OBJECT-TYPE
-        SYNTAX     CDot11ClientRoleClassType
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "The role classification of the client."
-        ::= { cDot11ClientConfigInfoEntry 3 }
+    SYNTAX          CDot11ClientRoleClassType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The role classification of the client." 
+    ::= { cDot11ClientConfigInfoEntry 3 }
 
 cDot11ClientDevType OBJECT-TYPE
-        SYNTAX     CDot11ClientDevType
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "The device type of the client."
-        ::= { cDot11ClientConfigInfoEntry 4 }
+    SYNTAX          CDot11ClientDevType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The device type of the client." 
+    ::= { cDot11ClientConfigInfoEntry 4 }
 
 cDot11ClientRadioType OBJECT-TYPE
-        SYNTAX     CDot11ClientRadioType
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "The radio classification of the client."
-        ::= { cDot11ClientConfigInfoEntry 5 }
+    SYNTAX          CDot11ClientRadioType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The radio classification of the client." 
+    ::= { cDot11ClientConfigInfoEntry 5 }
 
 cDot11ClientWepEnabled OBJECT-TYPE
-        SYNTAX     TruthValue
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "When this object is 'true', it indicates that the 
-                WEP key mechanism is used for transmitting frames 
-                of data for this client.  The default value of this
-                object is 'false'."
-        DEFVAL     { false }
-        ::= { cDot11ClientConfigInfoEntry 6 }
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "When this object is 'true', it indicates that the
+        WEP key mechanism is used for transmitting frames 
+        of data for this client.  The default value of this
+        object is 'false'."
+    DEFVAL          { false } 
+    ::= { cDot11ClientConfigInfoEntry 6 }
 
 cDot11ClientWepKeyMixEnabled OBJECT-TYPE
-        SYNTAX     TruthValue
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "When this object is 'true', it indicates that this
-                client is using WEP key mixing."
-        DEFVAL     { false }
-        ::= { cDot11ClientConfigInfoEntry 7 }
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "When this object is 'true', it indicates that this
+        client is using WEP key mixing."
+    DEFVAL          { false } 
+    ::= { cDot11ClientConfigInfoEntry 7 }
 
 cDot11ClientMicEnabled OBJECT-TYPE
-        SYNTAX     TruthValue
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "When this object is 'true', it indicates that the 
-                MIC is enabled for this client.  The default value of
-                this object is 'false'."
-        DEFVAL     { false }
-        ::= { cDot11ClientConfigInfoEntry 8 }
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "When this object is 'true', it indicates that the
+        MIC is enabled for this client.  The default value of
+        this object is 'false'."
+    DEFVAL          { false } 
+    ::= { cDot11ClientConfigInfoEntry 8 }
 
 cDot11ClientPowerSaveMode OBJECT-TYPE
-        SYNTAX     INTEGER { 
-                active(1), 
-                powersave(2) }
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "The power management mode of this client.  The
-                two possible modes are:
-                    active(1)    - this client is not in power-save 
-                                   mode and it is actively sending or 
-                                   receiving data.
-                    powersave(2) - this client is in power-save mode and
-                                   it wakes up once a while to check for
-                                   pending data."
-        DEFVAL     { active }
-        ::= { cDot11ClientConfigInfoEntry 9 }
+    SYNTAX          INTEGER  {
+                        active(1),
+                        powersave(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The power management mode of this client.  The
+        two possible modes are:
+            active(1)    - this client is not in power-save 
+                           mode and it is actively sending or 
+                           receiving data.
+            powersave(2) - this client is in power-save mode and
+                           it wakes up once a while to check for
+                           pending data."
+    DEFVAL          { active } 
+    ::= { cDot11ClientConfigInfoEntry 9 }
 
 cDot11ClientAid OBJECT-TYPE
-        SYNTAX     Unsigned32 (0..2008)
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the association identification number of
-                clients or multicast addresses associating with this 
-                device.  For a multicast address with clients, the
-                cDot11ClientAid is '0'.  For the uplink association
-                from this device to its parent access point, the 
-                cDot11ClientAid is always '1'.  For any multicast 
-                address with no client currently known to be 
-                associated with this device, the cDot11ClientAid is 
-                '2008'."
-        ::= { cDot11ClientConfigInfoEntry 10 }
+    SYNTAX          Unsigned32 (0..2008)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the association identification number of
+        clients or multicast addresses associating with this 
+        device.  For a multicast address with clients, the
+        cDot11ClientAid is '0'.  For the uplink association
+        from this device to its parent access point, the 
+        cDot11ClientAid is always '1'.  For any multicast 
+        address with no client currently known to be 
+        associated with this device, the cDot11ClientAid is 
+        '2008'." 
+    ::= { cDot11ClientConfigInfoEntry 10 }
 
 cDot11ClientDataRateSet OBJECT-TYPE
-        SYNTAX     OCTET STRING (SIZE(1..126))
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the set of data rates at which this client 
-                can transmit and receive data.  Each client can 
-                support up to 126 rates.  Each octet contains an 
-                integer value representing one of these 126 rates.  
-                Each rate shall be within the range from 2 to 127, 
-                corresponding to data rates in increments of 500 kb/s
-                from 1 Mb/s to 63.5 Mb/s, This value is reported in 
-                transmitted Beacon, Probe Request, Probe Response, 
-                Association Request, Association Response,  
-                Reassociation Request, and Reassociation Response 
-                frames, and is used to determine whether a BSS with 
-                which the client desires to synchronize is suitable.  
-                It is also used when starting a BSS."
-        ::= { cDot11ClientConfigInfoEntry 11 }
+    SYNTAX          OCTET STRING (SIZE  (1..126))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the set of data rates at which this client
+        can transmit and receive data.  Each client can 
+        support up to 126 rates.  Each octet contains an 
+        integer value representing one of these 126 rates.  
+        Each rate shall be within the range from 2 to 127, 
+        corresponding to data rates in increments of 500 kb/s
+        from 1 Mb/s to 63.5 Mb/s, This value is reported in 
+        transmitted Beacon, Probe Request, Probe Response, 
+        Association Request, Association Response,  
+        Reassociation Request, and Reassociation Response 
+        frames, and is used to determine whether a BSS with 
+        which the client desires to synchronize is suitable.  
+        It is also used when starting a BSS." 
+    ::= { cDot11ClientConfigInfoEntry 11 }
 
 cDot11ClientSoftwareVersion OBJECT-TYPE
-        SYNTAX     SnmpAdminString
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the Cisco IOS software version if the other 
-                end of the association is a bridge, access point, or 
-                repeater. If it is a wireless client, this is the 
-                firmware version of the client card."
-        ::= { cDot11ClientConfigInfoEntry 12 }
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the Cisco IOS software version if the other
+        end of the association is a bridge, access point, or 
+        repeater. If it is a wireless client, this is the 
+        firmware version of the client card." 
+    ::= { cDot11ClientConfigInfoEntry 12 }
 
 cDot11ClientName OBJECT-TYPE
-        SYNTAX     SnmpAdminString
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the Cisco IOS device hostname if the other
-                end of the association is a bridge, access point, or 
-                repeater. If it is a wireless client, this is the 
-                configured client name."
-        ::= { cDot11ClientConfigInfoEntry 13 }
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the Cisco IOS device hostname if the other
+        end of the association is a bridge, access point, or 
+        repeater. If it is a wireless client, this is the 
+        configured client name." 
+    ::= { cDot11ClientConfigInfoEntry 13 }
 
 cDot11ClientAssociationState OBJECT-TYPE
-        SYNTAX     INTEGER {
-                       initial(1),
-                       authenNotAssociated(2),
-                       assocAndAuthenticated(3),
-                       assocNotAnuthenticated(4) 
-                           } 
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This object indicates the state of the authentication
-                and association process between the two parties:
-                    initial(1)             - association request 
-                                             received from client,
-                    authenNotAssociated(2) - 802.11 authenticated but 
-                                             not 802.11 associated,
-                    assocAndAuthenticated(3)  - 802.11 associated and 
-                                                802.1x authenticated,
-                    assocNotAnuthenticated(4) - 802.11 associated but 
-                                                802.1x not 
-                                                authenticated."
-        ::= { cDot11ClientConfigInfoEntry 14 }
+    SYNTAX          INTEGER  {
+                        initial(1),
+                        authenNotAssociated(2),
+                        assocAndAuthenticated(3),
+                        assocNotAnuthenticated(4)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the state of the authentication
+        and association process between the two parties:
+            initial(1)             - association request 
+                                     received from client,
+            authenNotAssociated(2) - 802.11 authenticated but 
+                                     not 802.11 associated,
+            assocAndAuthenticated(3)  - 802.11 associated and 
+                                        802.1x authenticated,
+            assocNotAnuthenticated(4) - 802.11 associated but 
+                                        802.1x not 
+                                        authenticated." 
+    ::= { cDot11ClientConfigInfoEntry 14 }
 
 cDot11ClientIpAddressType OBJECT-TYPE
-        SYNTAX     InetAddressType 
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the IP address type of the
-                cDot11ClientIpAddress." 
-        ::= { cDot11ClientConfigInfoEntry 15 }
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the IP address type of the
+        cDot11ClientIpAddress." 
+    ::= { cDot11ClientConfigInfoEntry 15 }
 
 cDot11ClientIpAddress OBJECT-TYPE
-        SYNTAX     InetAddress
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the static or DHCP assigned IP address of the
-                client."
-        ::= { cDot11ClientConfigInfoEntry 16 }
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the static or DHCP assigned IP address of the
+        client." 
+    ::= { cDot11ClientConfigInfoEntry 16 }
 
 cDot11ClientVlanId OBJECT-TYPE
-        SYNTAX     CDot11IfVlanIdOrZero
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the VLAN which this wireless client is 
-                assigned to when it is successfully associated to the
-                wireless station.  The value is 0 if this wireless 
-                client is not assigned to any VLAN or this wireless
-                station is not configured with any VLAN."
-        ::= { cDot11ClientConfigInfoEntry 17 }
+    SYNTAX          CDot11IfVlanIdOrZero
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the VLAN which this wireless client is
+        assigned to when it is successfully associated to the
+        wireless station.  The value is 0 if this wireless 
+        client is not assigned to any VLAN or this wireless
+        station is not configured with any VLAN." 
+    ::= { cDot11ClientConfigInfoEntry 17 }
 
 cDot11ClientSubIfIndex OBJECT-TYPE
-        SYNTAX     InterfaceIndex
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the ifIndex of the sub-interface which this
-                wireless client is assigned to when it is successfully
-                associated to the wireless station.  The value of this
-                object is 0, if this wireless station is not configured
-                with VLAN and this wireless client is assigned to the
-                radio hardware interface of this wireless station."
-        ::= { cDot11ClientConfigInfoEntry 18 }
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the ifIndex of the sub-interface which this
+        wireless client is assigned to when it is successfully
+        associated to the wireless station.  The value of this
+        object is 0, if this wireless station is not configured
+        with VLAN and this wireless client is assigned to the
+        radio hardware interface of this wireless station." 
+    ::= { cDot11ClientConfigInfoEntry 18 }
 
 cDot11ClientAuthenAlgorithm OBJECT-TYPE
-        SYNTAX     CDot11AuthenticationMethod
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the IEEE 802.11 authentication methods 
-                performed between the wireless station and this client 
-                during association."
-        ::= { cDot11ClientConfigInfoEntry 19 }
+    SYNTAX          CDot11AuthenticationMethod
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the IEEE 802.11 authentication methods
+        performed between the wireless station and this client 
+        during association." 
+    ::= { cDot11ClientConfigInfoEntry 19 }
 
 cDot11ClientAdditionalAuthen OBJECT-TYPE
-        SYNTAX     CDot11AdditionalAuthenMethod
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "These are the additional authentications that were
-                performed after IEEE 802.11 Open System or Shared
-                Key authentication had completed.  If none of the bits
-                is set, no additional MAC address or EAP authentication 
-                was performed during association."
-        ::= { cDot11ClientConfigInfoEntry 20 }
+    SYNTAX          CDot11AdditionalAuthenMethod
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "These are the additional authentications that were
+        performed after IEEE 802.11 Open System or Shared
+        Key authentication had completed.  If none of the bits
+        is set, no additional MAC address or EAP authentication 
+        was performed during association." 
+    ::= { cDot11ClientConfigInfoEntry 20 }
 
 cDot11ClientDot1xAuthenAlgorithm OBJECT-TYPE
-        SYNTAX     CDot11Dot1xAuthenMethod
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This the IEEE 802.1x authentication methods performed
-                between this wireless client and the authentication 
-                server.  If none of the bits is set, no IEEE 802.1x 
-                authentication was performed during association."
-        ::= { cDot11ClientConfigInfoEntry 21 }
+    SYNTAX          CDot11Dot1xAuthenMethod
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This the IEEE 802.1x authentication methods performed
+        between this wireless client and the authentication 
+        server.  If none of the bits is set, no IEEE 802.1x 
+        authentication was performed during association." 
+    ::= { cDot11ClientConfigInfoEntry 21 }
 
 cDot11ClientKeyManagement OBJECT-TYPE
-        SYNTAX     CDot11KeyManagementMethod
-        MAX-ACCESS read-only
-        STATUS     deprecated
-        DESCRIPTION
-                "This is the encryption key management methods
-                employed by this client for IEEE 802.11 wireless frame
-                encryption.  If none of the bits is set, no key
-                management method is employed."
-        ::= { cDot11ClientConfigInfoEntry 22 }
+    SYNTAX          CDot11KeyManagementMethod
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This is the encryption key management methods
+        employed by this client for IEEE 802.11 wireless frame
+        encryption.  If none of the bits is set, no key
+        management method is employed." 
+    ::= { cDot11ClientConfigInfoEntry 22 }
 
 cDot11ClientUnicastCipher OBJECT-TYPE
-        SYNTAX     CDot11IfCipherType
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "These are all the possible unicast data frame cipher 
-                encryption type combinations currently supported on 
-                this IEEE 802.11 client.  If none of the bits is set,
-                the client is not performing any unicast data frame 
-                encryption.
-                    aesccm      WPA AES CCMP encryption,
-                    ckip        Cisco Per packet key hashing,
-                    cmic        Cisco MMH MIC,
-                    ckip|cmic   Cisco Per packet key hashing and 
-                                Cisco MMH MIC,
-                    tkip        WPA Temporal Key encryption,
-                    wep128      128-bit WEP key,
-                    wep40       40-bit WEP key.
-                    tkip|wep128 WPA Temporal Key and 128-bit WEP,
-                    tkip|wep40  WPA Temporal Key and 40-bit WEP."
-        ::= { cDot11ClientConfigInfoEntry 23 }
+    SYNTAX          CDot11IfCipherType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "These are all the possible unicast data frame cipher
+        encryption type combinations currently supported on 
+        this IEEE 802.11 client.  If none of the bits is set,
+        the client is not performing any unicast data frame 
+        encryption.
+            aesccm      WPA AES CCMP encryption,
+            ckip        Cisco Per packet key hashing,
+            cmic        Cisco MMH MIC,
+            ckip|cmic   Cisco Per packet key hashing and 
+                        Cisco MMH MIC,
+            tkip        WPA Temporal Key encryption,
+            wep128      128-bit WEP key,
+            wep40       40-bit WEP key.
+            tkip|wep128 WPA Temporal Key and 128-bit WEP,
+            tkip|wep40  WPA Temporal Key and 40-bit WEP." 
+    ::= { cDot11ClientConfigInfoEntry 23 }
 
 cDot11ClientMulticastCipher OBJECT-TYPE
-        SYNTAX     CDot11IfCipherType
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "These are all the possible multi-cast data frame 
-                cipher encryption type combinations currently supported
-                on this IEEE 802.11 client.  If none of the bits is set,
-                the client is not performing any multi-cast data frame 
-                encryption.
-                    aesccm      WPA AES CCMP encryption,
-                    ckip        Cisco Per packet key hashing,
-                    cmic        Cisco MMH MIC,
-                    ckip|cmic   Cisco Per packet key hashing and 
-                                Cisco MMH MIC,
-                    tkip        WPA Temporal Key encryption,
-                    wep128      128-bit WEP key,
-                    wep40       40-bit WEP key.
-                    tkip|wep128 WPA Temporal Key and 128-bit WEP,
-                    tkip|wep40  WPA Temporal Key and 40-bit WEP."
-        ::= { cDot11ClientConfigInfoEntry 24 }
+    SYNTAX          CDot11IfCipherType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "These are all the possible multi-cast data frame
+        cipher encryption type combinations currently supported
+        on this IEEE 802.11 client.  If none of the bits is set,
+        the client is not performing any multi-cast data frame 
+        encryption.
+            aesccm      WPA AES CCMP encryption,
+            ckip        Cisco Per packet key hashing,
+            cmic        Cisco MMH MIC,
+            ckip|cmic   Cisco Per packet key hashing and 
+                        Cisco MMH MIC,
+            tkip        WPA Temporal Key encryption,
+            wep128      128-bit WEP key,
+            wep40       40-bit WEP key.
+            tkip|wep128 WPA Temporal Key and 128-bit WEP,
+            tkip|wep40  WPA Temporal Key and 40-bit WEP." 
+    ::= { cDot11ClientConfigInfoEntry 24 }
 
 cDot11ClientDevObjectID OBJECT-TYPE
-        SYNTAX     OBJECT IDENTIFIER
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This object indicates the authoritative
-                identification of the associated 802.11 client as
-                assigned by the respective vendor.  A value of '0.0'
-                shall be populated if no such identification exists
-                for this 802.11 client. "
-        REFERENCE
-               "sysObjectID from SNMPv2-MIB" 
-        ::= { cDot11ClientConfigInfoEntry 25 }
+    SYNTAX          OBJECT IDENTIFIER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the authoritative
+        identification of the associated 802.11 client as
+        assigned by the respective vendor.  A value of '0.0'
+        shall be populated if no such identification exists
+        for this 802.11 client."
+    REFERENCE       "sysObjectID from SNMPv2-MIB" 
+    ::= { cDot11ClientConfigInfoEntry 25 }
 
 cDot11ClientNewKeyManagement OBJECT-TYPE
-        SYNTAX     CDot11NewKeyManagementMethod
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the encryption key management methods
-                employed by this client for IEEE 802.11 wireless frame
-                encryption.  If none of the bits is set, no key
-                management method is employed."
-        ::= { cDot11ClientConfigInfoEntry 26 }
+    SYNTAX          CDot11NewKeyManagementMethod
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the encryption key management methods
+        employed by this client for IEEE 802.11 wireless frame
+        encryption.  If none of the bits is set, no key
+        management method is employed." 
+    ::= { cDot11ClientConfigInfoEntry 26 }
+ 
 
---********************************************************************
---*  dot11 client statistics 
---********************************************************************
+-- ********************************************************************
+-- *  dot11 client statistics
+-- ********************************************************************
 
 cDot11ClientStatisticTable OBJECT-TYPE
-        SYNTAX     SEQUENCE OF CDot11ClientStatisticEntry
-        MAX-ACCESS not-accessible
-        STATUS     current
-        DESCRIPTION
-                "This table contains statistics and status of all 
-                clients on the cDot11ClientConfigInfoTable.  This table 
-                has a one-to-one relationship with the 
-                cDot11ClientConfigInfoTable." 
-        ::= { cDot11ClientStatistics 1 }
+    SYNTAX          SEQUENCE OF CDot11ClientStatisticEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains statistics and status of all
+        clients on the cDot11ClientConfigInfoTable.  This table 
+        has a one-to-one relationship with the 
+        cDot11ClientConfigInfoTable."
+    ::= { cDot11ClientStatistics 1 }
 
 cDot11ClientStatisticEntry OBJECT-TYPE
-        SYNTAX     CDot11ClientStatisticEntry
-        MAX-ACCESS not-accessible
-        STATUS     current
-        DESCRIPTION
-                "Each entry contains statistics about errors, 
-                data transmitting and receiving rates and counts
-                information of a client."
-        AUGMENTS { cDot11ClientConfigInfoEntry } 
-        ::= { cDot11ClientStatisticTable 1 }
+    SYNTAX          CDot11ClientStatisticEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry contains statistics about errors,
+        data transmitting and receiving rates and counts
+        information of a client."
+    AUGMENTS           { cDot11ClientConfigInfoEntry  } 
+    ::= { cDot11ClientStatisticTable 1 }
 
-CDot11ClientStatisticEntry ::=
-        SEQUENCE {
-                cDot11ClientCurrentTxRateSet  OCTET STRING,
-                cDot11ClientUpTime            Unsigned32,
-                cDot11ClientSignalStrength    Integer32,
-                cDot11ClientSigQuality        Unsigned32,
-                cDot11ClientAgingLeft         Gauge32,
-                cDot11ClientPacketsReceived   Counter32,
-                cDot11ClientBytesReceived     Counter32,
-                cDot11ClientPacketsSent       Counter32,
-                cDot11ClientBytesSent         Counter32,
-                cDot11ClientDuplicates        Counter32,
-                cDot11ClientMsduRetries       Counter32,
-                cDot11ClientMsduFails         Counter32,
-                cDot11ClientWepErrors         Counter32,
-                cDot11ClientMicErrors         Counter32,
-                cDot11ClientMicMissingFrames  Counter32 }
-  
+CDot11ClientStatisticEntry ::= SEQUENCE {
+        cDot11ClientCurrentTxRateSet OCTET STRING,
+        cDot11ClientUpTime           Unsigned32,
+        cDot11ClientSignalStrength   Integer32,
+        cDot11ClientSigQuality       Unsigned32,
+        cDot11ClientAgingLeft        Gauge32,
+        cDot11ClientPacketsReceived  Counter32,
+        cDot11ClientBytesReceived    Counter32,
+        cDot11ClientPacketsSent      Counter32,
+        cDot11ClientBytesSent        Counter32,
+        cDot11ClientDuplicates       Counter32,
+        cDot11ClientMsduRetries      Counter32,
+        cDot11ClientMsduFails        Counter32,
+        cDot11ClientWepErrors        Counter32,
+        cDot11ClientMicErrors        Counter32,
+        cDot11ClientMicMissingFrames Counter32
+}
+
 cDot11ClientCurrentTxRateSet OBJECT-TYPE
-        SYNTAX     OCTET STRING (SIZE(1..126))
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the set current transmit data rates for 
-                this client.  Each client can transmit data at all 
-                of its configured rates.  There is a maximum of 126
-                it can configure to transmit.  Each octet contains 
-                an integer value representing one of these 126 
-                rates it is currently transmitting.  Each rate shall
-                be within the range from 2 to 127, corresponding 
-                to data rates in increments of 500 kb/s from 
-                1 Mb/s to 63.5 Mb/s.  This value is reported in 
-                transmitted Beacon, Probe Request, Probe Response, 
-                Association Request, Association Response, 
-                Reassociation Request, and Reassociation Response 
-                frames."
-        ::= { cDot11ClientStatisticEntry 1 }
+    SYNTAX          OCTET STRING (SIZE  (1..126))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the set current transmit data rates for
+        this client.  Each client can transmit data at all 
+        of its configured rates.  There is a maximum of 126
+        it can configure to transmit.  Each octet contains 
+        an integer value representing one of these 126 
+        rates it is currently transmitting.  Each rate shall
+        be within the range from 2 to 127, corresponding 
+        to data rates in increments of 500 kb/s from 
+        1 Mb/s to 63.5 Mb/s.  This value is reported in 
+        transmitted Beacon, Probe Request, Probe Response, 
+        Association Request, Association Response, 
+        Reassociation Request, and Reassociation Response 
+        frames." 
+    ::= { cDot11ClientStatisticEntry 1 }
 
 cDot11ClientUpTime OBJECT-TYPE
-        SYNTAX     Unsigned32
-        UNITS      "second"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "The time in seconds that this client has been 
-                associated with this device."
-        ::= { cDot11ClientStatisticEntry 2 }
+    SYNTAX          Unsigned32
+    UNITS           "second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The time in seconds that this client has been
+        associated with this device." 
+    ::= { cDot11ClientStatisticEntry 2 }
 
 cDot11ClientSignalStrength OBJECT-TYPE
-        SYNTAX     Integer32 (-100..0) 
-        UNITS      "dBm"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is a device-dependent measure of the signal 
-                strength of the most recently received packet from 
-                this client.  It may be normalized or unnormalized."
-        ::= { cDot11ClientStatisticEntry 3 }
+    SYNTAX          Integer32 (-100..0)
+    UNITS           "dBm"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is a device-dependent measure of the signal
+        strength of the most recently received packet from 
+        this client.  It may be normalized or unnormalized." 
+    ::= { cDot11ClientStatisticEntry 3 }
 
 cDot11ClientSigQuality OBJECT-TYPE
-        SYNTAX     Unsigned32 (0..100)
-        UNITS      "percentage"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is a device-dependent measure of the signal 
-                quality of the most recently received packet from 
-                this client."
-        ::= { cDot11ClientStatisticEntry 4 }
+    SYNTAX          Unsigned32 (0..100)
+    UNITS           "percentage"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is a device-dependent measure of the signal
+        quality of the most recently received packet from 
+        this client." 
+    ::= { cDot11ClientStatisticEntry 4 }
 
 cDot11ClientAgingLeft OBJECT-TYPE
-        SYNTAX     Gauge32
-        UNITS      "second"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "The number of seconds of aging time left for 
-                this client."
-        ::= { cDot11ClientStatisticEntry 5 }
+    SYNTAX          Gauge32
+    UNITS           "second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of seconds of aging time left for
+        this client." 
+    ::= { cDot11ClientStatisticEntry 5 }
 
 cDot11ClientPacketsReceived OBJECT-TYPE
-        SYNTAX     Counter32
-        UNITS      "packet"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "The number of packets received from this client."
-        ::= { cDot11ClientStatisticEntry 6 }
+    SYNTAX          Counter32
+    UNITS           "packet"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of packets received from this client." 
+    ::= { cDot11ClientStatisticEntry 6 }
 
 cDot11ClientBytesReceived OBJECT-TYPE
-        SYNTAX     Counter32
-        UNITS      "byte"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "The number of bytes received from this client."
-        ::= { cDot11ClientStatisticEntry 7 }
+    SYNTAX          Counter32
+    UNITS           "byte"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of bytes received from this client." 
+    ::= { cDot11ClientStatisticEntry 7 }
 
 cDot11ClientPacketsSent OBJECT-TYPE
-        SYNTAX     Counter32
-        UNITS      "packet"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "The number of packets sent to this client."
-        ::= { cDot11ClientStatisticEntry 8 }
+    SYNTAX          Counter32
+    UNITS           "packet"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of packets sent to this client." 
+    ::= { cDot11ClientStatisticEntry 8 }
 
 cDot11ClientBytesSent OBJECT-TYPE
-        SYNTAX     Counter32
-        UNITS      "byte"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "The number of bytes sent to this client."
-        ::= { cDot11ClientStatisticEntry 9 }
+    SYNTAX          Counter32
+    UNITS           "byte"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of bytes sent to this client." 
+    ::= { cDot11ClientStatisticEntry 9 }
 
-cDot11ClientDuplicates  OBJECT-TYPE
-        SYNTAX     Counter32
-        UNITS      "packet"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This counter increments when a packet for this
-                client is received and the Sequence Control field
-                in the packet header indicates the packet is a 
-                duplicate."
-        ::= { cDot11ClientStatisticEntry 10 }
-  
+cDot11ClientDuplicates OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "packet"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This counter increments when a packet for this
+        client is received and the Sequence Control field
+        in the packet header indicates the packet is a 
+        duplicate." 
+    ::= { cDot11ClientStatisticEntry 10 }
+
 cDot11ClientMsduRetries OBJECT-TYPE
-        SYNTAX     Counter32
-        UNITS      "packet"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This counter increments when an MSDU is successfully
-                transmitted after one or more retransmissions for this
-                client."
-        ::= { cDot11ClientStatisticEntry 11 }
+    SYNTAX          Counter32
+    UNITS           "packet"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This counter increments when an MSDU is successfully
+        transmitted after one or more retransmissions for this
+        client." 
+    ::= { cDot11ClientStatisticEntry 11 }
 
 cDot11ClientMsduFails OBJECT-TYPE
-        SYNTAX     Counter32
-        UNITS      "packet"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This counter increments when an MSDU is not 
-                transmitted successfully for this client due to the 
-                number of transmit attempts exceeding some limit."
-        ::= { cDot11ClientStatisticEntry 12 }
+    SYNTAX          Counter32
+    UNITS           "packet"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This counter increments when an MSDU is not
+        transmitted successfully for this client due to the 
+        number of transmit attempts exceeding some limit." 
+    ::= { cDot11ClientStatisticEntry 12 }
 
 cDot11ClientWepErrors OBJECT-TYPE
-        SYNTAX     Counter32
-        UNITS      "packet"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the number of packets received from this 
-                client which failed to be properly decrypted via 
-                the WEP security mechanism."
-        ::= { cDot11ClientStatisticEntry 13 }
+    SYNTAX          Counter32
+    UNITS           "packet"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the number of packets received from this
+        client which failed to be properly decrypted via 
+        the WEP security mechanism." 
+    ::= { cDot11ClientStatisticEntry 13 }
 
 cDot11ClientMicErrors OBJECT-TYPE
-        SYNTAX     Counter32
-        UNITS      "error"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the number of MIC errors for this client."
-        ::= { cDot11ClientStatisticEntry 14 }
+    SYNTAX          Counter32
+    UNITS           "error"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the number of MIC errors for this client." 
+    ::= { cDot11ClientStatisticEntry 14 }
 
 cDot11ClientMicMissingFrames OBJECT-TYPE
-        SYNTAX     Counter32
-        UNITS      "packet"
-        MAX-ACCESS read-only
-        STATUS     current
-        DESCRIPTION
-                "This is the number of missing MIC packets for 
-                this client."
-        ::= { cDot11ClientStatisticEntry 15 }
+    SYNTAX          Counter32
+    UNITS           "packet"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the number of missing MIC packets for
+        this client." 
+    ::= { cDot11ClientStatisticEntry 15 }
+ 
 
-                                         
 -- *****************************************************************
---   Conformance information
+-- Conformance information
 -- *****************************************************************
 
-ciscoDot11AssocMIBConformance OBJECT IDENTIFIER 
-        ::= { ciscoDot11AssociationMIB 2 }
-ciscoDot11AssocMIBCompliances OBJECT IDENTIFIER 
-        ::= { ciscoDot11AssocMIBConformance 1 }
-ciscoDot11AssocMIBGroups OBJECT IDENTIFIER 
-        ::= { ciscoDot11AssocMIBConformance 2 }
+ciscoDot11AssocMIBConformance  OBJECT IDENTIFIER
+    ::= { ciscoDot11AssociationMIB 2 }
+
+ciscoDot11AssocMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoDot11AssocMIBConformance 1 }
+
+ciscoDot11AssocMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoDot11AssocMIBConformance 2 }
 
 
---********************************************************************
---*    Compliance statements  
---********************************************************************
+-- ********************************************************************
+-- *    Compliance statements
+-- ********************************************************************
 
 ciscoDot11AssocMIBCompliance MODULE-COMPLIANCE
-        STATUS     deprecated 
-        DESCRIPTION
-                "The compliance statement for the ciscoDot11Assoc
-                group."
-        MODULE MANDATORY-GROUPS {
-                ciscoDot11AssocGlobalGroup,
-                ciscoDot11ClientConfigGroup, 
-                ciscoDot11ClientStatGroup
-                                }
-        ::= { ciscoDot11AssocMIBCompliances 1 }
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the ciscoDot11Assoc
+        group."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoDot11AssocGlobalGroup,
+                        ciscoDot11ClientConfigGroup,
+                        ciscoDot11ClientStatGroup
+                    }
+    ::= { ciscoDot11AssocMIBCompliances 1 }
 
 ciscoDot11AssocMIBComplianceRev1 MODULE-COMPLIANCE
-        STATUS     deprecated 
-        DESCRIPTION
-                "The compliance statement for the ciscoDot11Assoc
-                group.  This is deprecated in favor of the 
-                ciscoDot11AssocMIBComplianceRev2."
-        MODULE MANDATORY-GROUPS {
-                ciscoDot11AssocGlobalGroup,
-                ciscoDot11ClientConfigGroup,
-                ciscoDot11ClientStatGroup,
-                ciscoDot11ClientInfoGroup 
-                                }
-        ::= { ciscoDot11AssocMIBCompliances 2 }
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the ciscoDot11Assoc
+        group.  This is deprecated in favor of the 
+        ciscoDot11AssocMIBComplianceRev2."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoDot11AssocGlobalGroup,
+                        ciscoDot11ClientConfigGroup,
+                        ciscoDot11ClientStatGroup,
+                        ciscoDot11ClientInfoGroup
+                    }
+    ::= { ciscoDot11AssocMIBCompliances 2 }
 
 ciscoDot11AssocMIBComplianceRev2 MODULE-COMPLIANCE
-        STATUS     deprecated 
-        DESCRIPTION
-                "The compliance statement for the ciscoDot11Assoc
-                group."
-        MODULE 
-                MANDATORY-GROUPS {
-                    ciscoDot11ClientConfigGroup,
-                    ciscoDot11ClientStatGroup,
-                    ciscoDot11ClientInfoGroup,
-                    ciscoDot11IfAssocStatGroup,
-                    ciscoDot11IfCipherStatGroup
-                                 }
-                GROUP ciscoDot11ApAssocGlobalGroup 
-                DESCRIPTION
-                        "This group is required only if the platform
-                        is a IEEE 802.11 AP/repeater or bridge."
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the ciscoDot11Assoc
+        group."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoDot11ClientConfigGroup,
+                        ciscoDot11ClientStatGroup,
+                        ciscoDot11ClientInfoGroup,
+                        ciscoDot11IfAssocStatGroup,
+                        ciscoDot11IfCipherStatGroup
+                    }
 
-        ::= { ciscoDot11AssocMIBCompliances 3 }
+    GROUP           ciscoDot11ApAssocGlobalGroup
+    DESCRIPTION
+        "This group is required only if the platform
+        is a IEEE 802.11 AP/repeater or bridge."
+    ::= { ciscoDot11AssocMIBCompliances 3 }
 
 ciscoDot11AssocMIBComplianceRev3 MODULE-COMPLIANCE
-        STATUS     deprecated -- by ciscoDot11AssocMIBComplianceRev4 
-        DESCRIPTION
-                "The compliance statement for this 
-                ciscoDot11AssociationMIB module." 
-        MODULE
-                MANDATORY-GROUPS {
-                    ciscoDot11ClientConfigGroup,
-                    ciscoDot11ClientAuthenGroup, 
-                    ciscoDot11ClientStatGroup,
-                    ciscoDot11ClientInfoGroup,
-                    ciscoDot11IfAssocStatGroup,
-                    ciscoDot11IfCipherStatGroup
-                                 }
-                GROUP ciscoDot11ApAssocGlobalGroup
-                DESCRIPTION
-                        "This group is required only if the platform
-                        is a IEEE 802.11 AP/repeater or bridge."
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for this
+        ciscoDot11AssociationMIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoDot11ClientConfigGroup,
+                        ciscoDot11ClientAuthenGroup,
+                        ciscoDot11ClientStatGroup,
+                        ciscoDot11ClientInfoGroup,
+                        ciscoDot11IfAssocStatGroup,
+                        ciscoDot11IfCipherStatGroup
+                    }
 
-        ::= { ciscoDot11AssocMIBCompliances 4 }
+    GROUP           ciscoDot11ApAssocGlobalGroup
+    DESCRIPTION
+        "This group is required only if the platform
+        is a IEEE 802.11 AP/repeater or bridge."
+    ::= { ciscoDot11AssocMIBCompliances 4 }
 
 ciscoDot11AssocMIBComplianceRev4 MODULE-COMPLIANCE
-        STATUS     current
-        DESCRIPTION
-                "The compliance statement for this
-                ciscoDot11AssociationMIB module."
-        MODULE
-                MANDATORY-GROUPS {
-                    ciscoDot11ClientConfigGroup,
-                    ciscoDot11ClientAuthenGroup,
-                    ciscoDot11ClientStatGroup,
-                    ciscoDot11ClientInfoGroup,
-                    ciscoDot11IfAssocStatGroup,
-                    ciscoDot11IfCipherStatGroup,
-                    ciscoDot11ClientConfigExtGroup
-                                 }
-                GROUP ciscoDot11ApAssocGlobalGroup
-                DESCRIPTION
-                        "This group is required only if the platform
-                        is a IEEE 802.11 AP/repeater or bridge."
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for this
+        ciscoDot11AssociationMIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoDot11ClientConfigGroup,
+                        ciscoDot11ClientAuthenGroup,
+                        ciscoDot11ClientStatGroup,
+                        ciscoDot11ClientInfoGroup,
+                        ciscoDot11IfAssocStatGroup,
+                        ciscoDot11IfCipherStatGroup,
+                        ciscoDot11ClientConfigExtGroup
+                    }
 
-        ::= { ciscoDot11AssocMIBCompliances 5 }
+    GROUP           ciscoDot11ApAssocGlobalGroup
+    DESCRIPTION
+        "This group is required only if the platform
+        is a IEEE 802.11 AP/repeater or bridge."
+    ::= { ciscoDot11AssocMIBCompliances 5 }
 
 ciscoDot11AssocMIBComplianceRev5 MODULE-COMPLIANCE
-        STATUS     current
-        DESCRIPTION
-                "The compliance statement for this
-                ciscoDot11AssociationMIB module."
-        MODULE
-                MANDATORY-GROUPS {
-                    ciscoDot11ClientConfigGroup,
-                    ciscoDot11ClientAuthenGroup,
-                    ciscoDot11ClientStatGroup,
-                    ciscoDot11ClientInfoGroup,
-                    ciscoDot11IfAssocStatGroup,
-                    ciscoDot11IfCipherStatGroup,
-                    ciscoDot11ClientConfigExtGroup,
-                    ciscoDot11ClientNewAuthenGroup
-                                 }
-                GROUP ciscoDot11ApAssocGlobalGroup
-                DESCRIPTION
-                        "This group is required only if the platform
-                        is a IEEE 802.11 AP/repeater or bridge."
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for this
+        ciscoDot11AssociationMIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoDot11ClientConfigGroup,
+                        ciscoDot11ClientAuthenGroup,
+                        ciscoDot11ClientStatGroup,
+                        ciscoDot11ClientInfoGroup,
+                        ciscoDot11IfAssocStatGroup,
+                        ciscoDot11IfCipherStatGroup,
+                        ciscoDot11ClientConfigExtGroup,
+                        ciscoDot11ClientNewAuthenGroup
+                    }
 
-        ::= { ciscoDot11AssocMIBCompliances 6 }
+    GROUP           ciscoDot11ApAssocGlobalGroup
+    DESCRIPTION
+        "This group is required only if the platform
+        is a IEEE 802.11 AP/repeater or bridge."
+    ::= { ciscoDot11AssocMIBCompliances 6 }
 
+ciscoDot11AssocMIBComplianceRev6 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for this
+        ciscoDot11AssociationMIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoDot11ClientConfigGroup,
+                        ciscoDot11ClientAuthenGroup,
+                        ciscoDot11ClientStatGroup,
+                        ciscoDot11ClientInfoGroup,
+                        ciscoDot11IfAssocStatGroup,
+                        ciscoDot11IfCipherStatGroup,
+                        ciscoDot11ClientConfigExtGroup,
+                        ciscoDot11ClientNewAuthenGroup
+                    }
 
-
---********************************************************************
---*    Units of conformance  
---********************************************************************
+    GROUP           ciscoDot11ApAssocGlobalGroup
+    DESCRIPTION
+        "This group is required only if the platform
+        is a IEEE 802.11 AP/repeater or bridge."
+    GROUP			ciscoDot11ClientStatusTrapsGroup
+    DESCRIPTION 
+    	"This group is for optional wireless client 
+    	status trap in autonomous AP."  
+    ::= { ciscoDot11AssocMIBCompliances 7 }
+    
+-- ********************************************************************
+-- *    Units of conformance
+-- ********************************************************************
 
 ciscoDot11AssocGlobalGroup OBJECT-GROUP
-        OBJECTS { 
-                cDot11ParentAddress,
-                cDot11ActiveWirelessClients,
-                cDot11ActiveBridges,
-                cDot11ActiveRepeaters, 
-                cDot11AssStatsAssociated,
-                cDot11AssStatsAuthenticated,
-                cDot11AssStatsRoamedIn,
-                cDot11AssStatsRoamedAway,
-                cDot11AssStatsDeauthenticated,
-                cDot11AssStatsDisassociated 
-                }
-        STATUS     deprecated 
-        DESCRIPTION
-                "This is the device association information group.
-                This is deprecated in favor of the
-                ciscoDot11IfAssocStatGroup."
-        ::= { ciscoDot11AssocMIBGroups 1 }
+    OBJECTS         {
+                        cDot11ParentAddress,
+                        cDot11ActiveWirelessClients,
+                        cDot11ActiveBridges,
+                        cDot11ActiveRepeaters,
+                        cDot11AssStatsAssociated,
+                        cDot11AssStatsAuthenticated,
+                        cDot11AssStatsRoamedIn,
+                        cDot11AssStatsRoamedAway,
+                        cDot11AssStatsDeauthenticated,
+                        cDot11AssStatsDisassociated
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "This is the device association information group.
+        This is deprecated in favor of the
+        ciscoDot11IfAssocStatGroup."
+    ::= { ciscoDot11AssocMIBGroups 1 }
 
 ciscoDot11ClientConfigGroup OBJECT-GROUP
-        OBJECTS {
-                cDot11ClientParentAddress,
-                cDot11ClientRoleClassType,
-                cDot11ClientDevType,
-                cDot11ClientRadioType,
-                cDot11ClientWepEnabled,
-                cDot11ClientWepKeyMixEnabled,
-                cDot11ClientMicEnabled,
-                cDot11ClientPowerSaveMode,
-                cDot11ClientAid,
-                cDot11ClientDataRateSet 
-                }
-        STATUS     current
-        DESCRIPTION
-                "This is the client configuration information group." 
-        ::= { ciscoDot11AssocMIBGroups 2 }
+    OBJECTS         {
+                        cDot11ClientParentAddress,
+                        cDot11ClientRoleClassType,
+                        cDot11ClientDevType,
+                        cDot11ClientRadioType,
+                        cDot11ClientWepEnabled,
+                        cDot11ClientWepKeyMixEnabled,
+                        cDot11ClientMicEnabled,
+                        cDot11ClientPowerSaveMode,
+                        cDot11ClientAid,
+                        cDot11ClientDataRateSet
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This is the client configuration information group."
+    ::= { ciscoDot11AssocMIBGroups 2 }
 
 ciscoDot11ClientStatGroup OBJECT-GROUP
-        OBJECTS {
-                cDot11ClientCurrentTxRateSet,
-                cDot11ClientUpTime,
-                cDot11ClientSignalStrength,
-                cDot11ClientSigQuality,
-                cDot11ClientPacketsReceived,
-                cDot11ClientBytesReceived,
-                cDot11ClientPacketsSent,
-                cDot11ClientBytesSent,
-                cDot11ClientAgingLeft,
-                cDot11ClientDuplicates,
-                cDot11ClientMsduRetries,
-                cDot11ClientMsduFails,
-                cDot11ClientWepErrors,
-                cDot11ClientMicErrors,
-                cDot11ClientMicMissingFrames 
-                }
-        STATUS     current
-        DESCRIPTION
-                "This is the client statistics group." 
-        ::= { ciscoDot11AssocMIBGroups 3 }
+    OBJECTS         {
+                        cDot11ClientCurrentTxRateSet,
+                        cDot11ClientUpTime,
+                        cDot11ClientSignalStrength,
+                        cDot11ClientSigQuality,
+                        cDot11ClientPacketsReceived,
+                        cDot11ClientBytesReceived,
+                        cDot11ClientPacketsSent,
+                        cDot11ClientBytesSent,
+                        cDot11ClientAgingLeft,
+                        cDot11ClientDuplicates,
+                        cDot11ClientMsduRetries,
+                        cDot11ClientMsduFails,
+                        cDot11ClientWepErrors,
+                        cDot11ClientMicErrors,
+                        cDot11ClientMicMissingFrames
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This is the client statistics group."
+    ::= { ciscoDot11AssocMIBGroups 3 }
 
 ciscoDot11ClientInfoGroup OBJECT-GROUP
-        OBJECTS {
-                cDot11ClientSoftwareVersion,
-                cDot11ClientName,
-                cDot11ClientAssociationState,
-                cDot11ClientIpAddressType,
-                cDot11ClientIpAddress 
-                }
-        STATUS     current
-        DESCRIPTION
-                "This group provides additional client specific
-                information."
-        ::= { ciscoDot11AssocMIBGroups 4 }
+    OBJECTS         {
+                        cDot11ClientSoftwareVersion,
+                        cDot11ClientName,
+                        cDot11ClientAssociationState,
+                        cDot11ClientIpAddressType,
+                        cDot11ClientIpAddress
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group provides additional client specific
+        information."
+    ::= { ciscoDot11AssocMIBGroups 4 }
 
 ciscoDot11ApAssocGlobalGroup OBJECT-GROUP
-        OBJECTS {
-                cDot11ParentAddress
-                }
-        STATUS     current
-        DESCRIPTION
-                "This group includes per AP or bridge global 
-                configuration information."
-        ::= { ciscoDot11AssocMIBGroups 5 }
+    OBJECTS         { cDot11ParentAddress }
+    STATUS          current
+    DESCRIPTION
+        "This group includes per AP or bridge global
+        configuration information."
+    ::= { ciscoDot11AssocMIBGroups 5 }
 
 ciscoDot11IfAssocStatGroup OBJECT-GROUP
-        OBJECTS {
-                cDot11ActiveWirelessClients,
-                cDot11ActiveBridges,
-                cDot11ActiveRepeaters,
-                cDot11AssStatsAssociated,
-                cDot11AssStatsAuthenticated,
-                cDot11AssStatsRoamedIn,
-                cDot11AssStatsRoamedAway,
-                cDot11AssStatsDeauthenticated,
-                cDot11AssStatsDisassociated
-                }
-        STATUS     current
-        DESCRIPTION
-                "This group includes per IEEE 802.11 radio
-                interface association statistics."
-        ::= { ciscoDot11AssocMIBGroups 6 }
+    OBJECTS         {
+                        cDot11ActiveWirelessClients,
+                        cDot11ActiveBridges,
+                        cDot11ActiveRepeaters,
+                        cDot11AssStatsAssociated,
+                        cDot11AssStatsAuthenticated,
+                        cDot11AssStatsRoamedIn,
+                        cDot11AssStatsRoamedAway,
+                        cDot11AssStatsDeauthenticated,
+                        cDot11AssStatsDisassociated
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group includes per IEEE 802.11 radio
+        interface association statistics."
+    ::= { ciscoDot11AssocMIBGroups 6 }
 
 ciscoDot11IfCipherStatGroup OBJECT-GROUP
-        OBJECTS {
-                cd11IfCipherMicFailClientAddress,
-                cd11IfCipherTkipLocalMicFailures,
-                cd11IfCipherTkipRemotMicFailures,
-                cd11IfCipherTkipCounterMeasInvok,
-                cd11IfCipherCcmpReplaysDiscarded,
-                cd11IfCipherTkipReplaysDetected
-                }
-        STATUS     current
-        DESCRIPTION
-                "This group includes per IEEE 802.11 radio
-                interface cipher related statistics collected."
-        ::= { ciscoDot11AssocMIBGroups 7 }
+    OBJECTS         {
+                        cd11IfCipherMicFailClientAddress,
+                        cd11IfCipherTkipLocalMicFailures,
+                        cd11IfCipherTkipRemotMicFailures,
+                        cd11IfCipherTkipCounterMeasInvok,
+                        cd11IfCipherCcmpReplaysDiscarded,
+                        cd11IfCipherTkipReplaysDetected
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This group includes per IEEE 802.11 radio
+        interface cipher related statistics collected."
+    ::= { ciscoDot11AssocMIBGroups 7 }
 
 ciscoDot11ClientAuthenGroup OBJECT-GROUP
-        OBJECTS {
-                cDot11ClientVlanId,
-                cDot11ClientSubIfIndex,
-                cDot11ClientAuthenAlgorithm,
-                cDot11ClientAdditionalAuthen,
-                cDot11ClientDot1xAuthenAlgorithm,
-                cDot11ClientKeyManagement,
-                cDot11ClientUnicastCipher,
-                cDot11ClientMulticastCipher
-                }
-        STATUS     deprecated 
-        DESCRIPTION
-                "This group includes per IEEE 802.11 radio
-                interface cipher related statistics collected."
-        ::= { ciscoDot11AssocMIBGroups 8 }
+    OBJECTS         {
+                        cDot11ClientVlanId,
+                        cDot11ClientSubIfIndex,
+                        cDot11ClientAuthenAlgorithm,
+                        cDot11ClientAdditionalAuthen,
+                        cDot11ClientDot1xAuthenAlgorithm,
+                        cDot11ClientKeyManagement,
+                        cDot11ClientUnicastCipher,
+                        cDot11ClientMulticastCipher
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "This group includes per IEEE 802.11 radio
+        interface cipher related statistics collected."
+    ::= { ciscoDot11AssocMIBGroups 8 }
 
 ciscoDot11ClientConfigExtGroup OBJECT-GROUP
-        OBJECTS {
-                cDot11ClientDevObjectID
-        }
-        STATUS current
-        DESCRIPTION
-                "This group provides more configuration
-                information about a particular associated 802.11
-                client. " 
-        ::= { ciscoDot11AssocMIBGroups 9 }
+    OBJECTS         { cDot11ClientDevObjectID }
+    STATUS          current
+    DESCRIPTION
+        "This group provides more configuration
+        information about a particular associated 802.11
+        client."
+    ::= { ciscoDot11AssocMIBGroups 9 }
 
 ciscoDot11ClientNewAuthenGroup OBJECT-GROUP
-        OBJECTS {
-                cDot11ClientNewKeyManagement
-                }
-        STATUS     current
-        DESCRIPTION
-                "This group includes per IEEE 802.11 radio
-                interface cipher related statistics collected."
-        ::= { ciscoDot11AssocMIBGroups 10 }
-
---********************************************************************
---*   End of units of conformance  
---********************************************************************
+    OBJECTS         { cDot11ClientNewKeyManagement }
+    STATUS          current
+    DESCRIPTION
+        "This group includes per IEEE 802.11 radio
+        interface cipher related statistics collected."
+    ::= { ciscoDot11AssocMIBGroups 10 }
+    
+ciscoDot11ClientStatusTrapsGroup OBJECT-GROUP
+    OBJECTS         {
+    	clientMacAddr,
+    	clientDeviceType,
+    	clientDeviceName,
+    	clientIpv4Address,
+    	clientIpv6Address,
+    	apMacAddr,
+    	apIpv4Address,
+    	apIpv6Address,
+    	clientStationState,
+    	clientDisassocReasonStr 
+	}
+    STATUS          current
+    DESCRIPTION
+        "This group includes wireless client information
+        that association or disassociation trap includes."
+    ::= { ciscoDot11AssocMIBGroups 11 }    
 
 END
+
+
+
+
+
+
+
+
+
+
+
+
 

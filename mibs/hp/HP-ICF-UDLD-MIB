@@ -6,7 +6,7 @@ IMPORTS
         FROM SNMPv2-SMI
     MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
         FROM SNMPv2-CONF
-    MacAddress, TimeInterval
+    MacAddress, TruthValue
         FROM SNMPv2-TC
     ifIndex
             FROM IF-MIB
@@ -14,14 +14,21 @@ IMPORTS
         FROM HP-ICF-OID;
 
 hpicfUdldMIB MODULE-IDENTITY
-    LAST-UPDATED "200604100000Z"   --April 10, 2006
-    ORGANIZATION "Hewlett-Packard Company   
-                  ProCurve Networking Business"
+    LAST-UPDATED "201406150000Z"   --Jun 15, 2014
+    ORGANIZATION "HP Networking"
     CONTACT-INFO "Hewlett-Packard Company
                   8000 Foothills Blvd.
                   Roseville, CA 95747"
     DESCRIPTION  "This MIB module describes objects to configure 
-		              the Unidirectional Link Detection (UDLD) feature."
+                  the UniDirectional Link Detection (UDLD) feature."
+
+    REVISION     "201406150000Z"
+    DESCRIPTION  "Add hpicfUdldConfigTimeIntervalMs"
+
+    REVISION     "200908070000Z"
+    DESCRIPTION  "Added hpicfUdldStatsClearAll - used to clear 
+                  UDLD transmit, receive and state change statistics."
+    
     REVISION     "200604100000Z"
     DESCRIPTION  "Initial revision."
 
@@ -49,25 +56,50 @@ hpicfUdldConfigTimeInterval OBJECT-TYPE
     SYNTAX      Unsigned32 (10..100)
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "The interval in seconds at which the UDLD enabled ports exchange 
-                 proprietary pulse packet. Here 10 is 1 sec, 11 is 1.1 sec,
-                 and so on. The default value for hpicfUdldConfigTimeInterval 
-                 object is 5 seconds."
-
-    DEFVAL      { 50 } -- five second
-
+    DESCRIPTION "The interval in deciseconds between UDLD packets.
+                 The same interval can also be set in milliseconds with
+                 hpicfUdldConfigTimeIntervalMs."
+    DEFVAL      { 50 } -- five seconds
     ::= { hpicfUdldConfig 1 }
 
 hpicfUdldConfigMaxRetries OBJECT-TYPE
     SYNTAX      Unsigned32  (3..10)
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Maximum number of retries to wait for a response.  
-                The default value for hpicfUdldConfigMaxRetries object is
-                4."
-                 
+    DESCRIPTION "The number of unanswered UDLD packets allowed before
+                 declaring the link faulty."
     DEFVAL      { 4 }
     ::= { hpicfUdldConfig 2 }
+
+hpicfUdldConfigForwardMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                verifyThenForward(1),
+                forwardThenVerify(2)
+                }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION "The port transmission mode while UDLD verification is in
+                 progress.  The value 'verifyThenForward' will block ports
+                 until a successful UDLD exchange is established.  The value
+                 forwardThenVerify will forward traffic normally while UDLD
+                 link verification is in progress and ports will not be
+                 blocked until the UDLD retry count is exceeded."
+    DEFVAL  { forwardThenVerify }
+    ::= { hpicfUdldConfig 4 }
+
+hpicfUdldConfigTimeIntervalMs OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The interval in milliseconds between sending UDLD packets.
+                 The default is 5 seconds.  Some devices may not allow
+                 values less than 1 second due to the load it puts on the
+                 CPU.  Devices that do allow values less than 1 second
+                 may restrict the number of ports that can have UDLD
+                 enabled.  Some devices may also round the value up to
+                 a multiple of their clock granularity, for example 33ms."
+    DEFVAL      { 5000 } -- five seconds
+    ::= { hpicfUdldConfig 5 }
 
 -- Start of hpicfUdldPortConfigTable ************************************
 
@@ -227,8 +259,16 @@ hpicfUdldStatsPortStatus   OBJECT-TYPE
     DESCRIPTION
             "The  value of this object indicates whether the port is
             blocked by UDLD or not."
-    ::= { hpicfUdldPortStatsEntry 7 }     
-    
+    ::= { hpicfUdldPortStatsEntry 7 }
+
+hpicfUdldStatsClearAll    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write     
+    STATUS      current
+    DESCRIPTION "When the value of this object is set to TRUE, the
+                 UDLD transmit, receive and state change statistics are cleared.
+                 A get request for this object always returns FALSE."
+    ::= { hpicfUdldStats 2 }
 --
 -- ***********************************************************
 -- 
@@ -268,7 +308,7 @@ hpicfUdldGroups         OBJECT IDENTIFIER ::= { hpicfUdldConformance 2 }
 -- compliance statements
 
 hpicfUdldCompliance  MODULE-COMPLIANCE
-    STATUS  current
+    STATUS  deprecated
     DESCRIPTION
             "The compliance statement for SNMP entities which implement
             the UDLD MIB."
@@ -279,9 +319,31 @@ hpicfUdldCompliance  MODULE-COMPLIANCE
                            hpicfUdldNotificationGroup
                        }
       GROUP hpicfUdldNotificationGroup
-      DESCRIPTION "The notifications used for signalling link failure."
+      DESCRIPTION "The notifications used for signaling link failure."
     ::= { hpicfUdldCompliances 1 }
 
+hpicfUdldCompliance2  MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION "The compliance statement for SNMP entities that implement
+                the UDLD MIB."
+   MODULE -- this module
+     MANDATORY-GROUPS {
+                          hpicfUdldStatsGroup
+                      }
+     ::= { hpicfUdldCompliances 2 }
+
+hpicfUdldCompliance3  MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION "The compliance statement for SNMP entities that implement
+                the UDLD MIB."
+   MODULE -- this module
+     MANDATORY-GROUPS {
+                          hpicfUdldPortConfigGroup1,
+                          hpicfUdldPortStatsGroup,
+                          hpicfUdldNotificationGroup
+                      }
+     ::= { hpicfUdldCompliances 3 }
+  
 -- MIB groupings
 
 hpicfUdldPortConfigGroup    OBJECT-GROUP
@@ -291,7 +353,7 @@ hpicfUdldPortConfigGroup    OBJECT-GROUP
         hpicfUdldPortAdminStatus,
         hpicfUdldPortVlanId
     }
-    STATUS  current
+    STATUS  deprecated
     DESCRIPTION
             "The collection of objects which are used to configure the
             UDLD implementation behavior.
@@ -322,5 +384,31 @@ hpicfUdldPortStatsGroup    OBJECT-GROUP
     STATUS      current
     DESCRIPTION "Notification used for signaling change in Link state."
     ::= { hpicfUdldGroups 3 }
+
+ hpicfUdldStatsGroup        OBJECT-GROUP
+    OBJECTS {
+        hpicfUdldStatsClearAll
+     }
+    STATUS current
+    DESCRIPTION "The collection of objects that are used to perform
+                 operations on UDLD related statistics."
+     ::= { hpicfUdldGroups 4 } 
+
+hpicfUdldPortConfigGroup1    OBJECT-GROUP
+    OBJECTS {
+        hpicfUdldConfigTimeInterval,
+        hpicfUdldConfigMaxRetries,
+        hpicfUdldPortAdminStatus,
+        hpicfUdldPortVlanId,
+        hpicfUdldConfigForwardMode,
+        hpicfUdldConfigTimeIntervalMs
+    }
+    STATUS  current
+    DESCRIPTION
+            "The collection of objects which are used to configure the
+            UDLD implementation behavior.
+
+            This group is mandatory for ports which implement the UDLD."
+    ::= { hpicfUdldGroups 5 }
 
 END

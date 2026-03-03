@@ -6,7 +6,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href>
+            <a class="navbar-brand" href="{{ route('home') }}">
                 <x-logo responsive="lg" class="tw:h-full tw:max-w-[170px]" />
             </a>
         </div>
@@ -441,7 +441,7 @@
                                 class="tw:md:hidden tw:2xl:inline-block">{{ __('wireless.title') }}</span></a>
                         <ul class="dropdown-menu">
                         @foreach($wireless_menu as $wireless_menu_entry)
-                                <li><a href="{{ url('wireless/metric=' . $wireless_menu_entry->sensor_class) }}"><i class="fa fa-{{ $wireless_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $wireless_menu_entry->classDescr() }}</a></li>
+                                <li><a href="{{ url('wireless/metric=' . $wireless_menu_entry->sensor_class->value) }}"><i class="fa fa-{{ $wireless_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $wireless_menu_entry->classDescr() }}</a></li>
                         @endforeach
                         </ul>
                     </li>

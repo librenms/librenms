@@ -1328,9 +1328,6 @@ return [
             'description' => 'Log File to Watch',
             'help' => 'Default is the LibreNMS log file. Sets the default value for all nodes.',
         ],
-        'sfdp' => [
-            'description' => 'Path to sfdp',
-        ],
         'shorthost_target_length' => [
             'description' => 'Shortened hostname maximum length',
             'help' => 'Shrinks hostname to maximum length, but always complete subdomain parts',

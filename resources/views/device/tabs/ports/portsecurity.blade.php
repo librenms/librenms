@@ -26,7 +26,7 @@
             post: function () {
                 return {
                     device_id: {{ $device->device_id }},
-                    searchby: "{{ request()->get('searchby') }}"
+                    searchby: "{{ request()->input('searchby') }}"
                 };
             },
             url: "{{ url('/ajax/table/port-security') }}",

@@ -19,7 +19,7 @@ class InventoryController extends Controller
 
         $device = \App\Models\Device::hasAccess($request->user())
             ->select(['device_id', 'hostname', 'ip', 'sysName', 'display'])
-            ->firstWhere('device_id', $request->get('device'));
+            ->firstWhere('device_id', $request->input('device'));
 
         $model_filter = ['field' => 'model'];
         $device_selected = '';
@@ -32,9 +32,9 @@ class InventoryController extends Controller
             'device_selected' => $device_selected,
             'filter' => [
                 'device' => $device?->device_id,
-                'descr' => $request->get('descr'),
-                'model' => $request->get('model'),
-                'serial' => $request->get('serial'),
+                'descr' => $request->input('descr'),
+                'model' => $request->input('model'),
+                'serial' => $request->input('serial'),
             ],
             'model_filter' => $model_filter,
             'show_purge' => EntPhysical::whereDoesntHave('device')->exists(),

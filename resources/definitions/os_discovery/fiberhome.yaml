@@ -1,4 +1,3 @@
-mib: GEPON-OLT-COMMON-MIB
 modules:
     mempools:
         data:
@@ -19,21 +18,21 @@ modules:
     processors:
         data:
             -
-                oid: mgrCardInfoTable
-                value: mgrCardCpuUtil
+                oid: GEPON-OLT-COMMON-MIB::mgrCardInfoTable
+                value: GEPON-OLT-COMMON-MIB::mgrCardCpuUtil
                 num_oid: '.1.3.6.1.4.1.5875.800.3.9.8.1.1.5.{{ $index }}'
                 descr: 'Hswa {{ $index }} Processor'
                 precision: 100
                 skip_values:
                     -
-                        oid: mgrCardWorkStatus
+                        oid: GEPON-OLT-COMMON-MIB::mgrCardWorkStatus
                         op: '!='
                         value: 1
     sensors:
         temperature:
             data:
                 -
-                    oid: sysTemperature
+                    oid: GEPON-OLT-COMMON-MIB::sysTemperature
                     num_oid: '.1.3.6.1.4.1.5875.800.3.9.4.5.{{ $index }}'
                     descr: 'Internal Temperature {{ $index }}'
                     low_limit: 0
@@ -43,7 +42,7 @@ modules:
         state:
             data:
                 -
-                    oid: fanAlarmStatus
+                    oid: GEPON-OLT-COMMON-MIB::fanAlarmStatus
                     num_oid: '.1.3.6.1.4.1.5875.800.3.60.2.1.1.{{ $index }}'
                     descr: "Fan slot {{ $index }} Status"
                     state_name: fanState
@@ -51,7 +50,7 @@ modules:
                         - { descr: Normal, graph: 0, value: 1, generic: 0 }
                         - { descr: Failed, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: powerAlarmStatus
+                    oid: GEPON-OLT-COMMON-MIB::powerAlarmStatus
                     num_oid: '.1.3.6.1.4.1.5875.800.3.60.1.1.2.{{ $index }}'
                     descr: "Power slot {{ $index }} Status"
                     state_name: powerState

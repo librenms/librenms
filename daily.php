@@ -69,7 +69,7 @@ if ($options['f'] === 'rrd_purge') {
 
         if (is_numeric($rrd_purge) && $rrd_purge > 0) {
             $cmd = "find $rrd_dir -name .gitignore -prune -o -type f -mtime +$rrd_purge -print -exec rm -f {} +";
-            $purge = `$cmd`;
+            $purge = shell_exec($cmd);
             if (! empty($purge)) {
                 echo "Purged the following RRD files due to old age (over $rrd_purge days old):\n";
                 echo $purge;

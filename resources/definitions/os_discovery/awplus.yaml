@@ -1,10 +1,9 @@
-mib: AT-ENVMONv2-MIB:AT-SYSINFO-MIB
 modules:
     processors:
         data:
             -
-                oid: cpuUtilisationStackEntry
-                value: cpuUtilisationStackAvgLastMinute
+                oid: AT-SYSINFO-MIB::cpuUtilisationStackEntry
+                value: AT-SYSINFO-MIB::cpuUtilisationStackAvgLastMinute
                 num_oid: '.1.3.6.1.4.1.207.8.4.4.3.3.8.1.4.{{ $index }}'
                 descr: 'Processor {{ $index }}'
     sensors:
@@ -18,23 +17,23 @@ modules:
                 skip_values: 0
             data:
                 -
-                    oid:  atEnvMonv2FanTable
-                    value:  atEnvMonv2FanCurrentSpeed
+                    oid: AT-ENVMONv2-MIB::atEnvMonv2FanTable
+                    value: AT-ENVMONv2-MIB::atEnvMonv2FanCurrentSpeed
                     num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.1.1.5.{{ $index }}'
-                    descr: atEnvMonv2FanDescription
+                    descr: '{{ AT-ENVMONv2-MIB::atEnvMonv2FanDescription }}'
                     index: 'atEnvMonv2FanIndex.{{ $index }}'
-                    low_limit: atEnvMonv2FanLowerThreshold
+                    low_limit: AT-ENVMONv2-MIB::atEnvMonv2FanLowerThreshold
         voltage:
             data:
                 -
-                    oid: atEnvMonv2VoltageTable
-                    value: atEnvMonv2VoltageCurrent
+                    oid: AT-ENVMONv2-MIB::atEnvMonv2VoltageTable
+                    value: AT-ENVMONv2-MIB::atEnvMonv2VoltageCurrent
                     num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.2.1.5.{{ $index }}'
-                    descr: atEnvMonv2VoltageDescription
+                    descr: AT-ENVMONv2-MIB::atEnvMonv2VoltageDescription
                     index: 'atEnvMonv2VoltageIndex.{{ $index }}'
                     divisor: 1000
-                    low_limit: atEnvMonv2VoltageLowerThreshold
-                    high_limit: atEnvMonv2VoltageUpperThreshold
+                    low_limit: AT-ENVMONv2-MIB::atEnvMonv2VoltageLowerThreshold
+                    high_limit: AT-ENVMONv2-MIB::atEnvMonv2VoltageUpperThreshold
                 -
                     oid: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccTable
                     value: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagVccStatusReading
@@ -54,12 +53,12 @@ modules:
                 skip_values: [128, -128]
             data:
                 -
-                    oid:  atEnvMonv2TemperatureTable
-                    value:  atEnvMonv2TemperatureCurrent
+                    oid: AT-ENVMONv2-MIB::atEnvMonv2TemperatureTable
+                    value: AT-ENVMONv2-MIB::atEnvMonv2TemperatureCurrent
                     num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.3.1.5.{{ $index }}'
-                    descr: atEnvMonv2TemperatureDescription
+                    descr: AT-ENVMONv2-MIB::atEnvMonv2TemperatureDescription
                     index: 'atEnvMonv2TemperatureIndex.{{ $index }}'
-                    high_limit: atEnvMonv2TemperatureUpperThreshold
+                    high_limit: AT-ENVMONv2-MIB::atEnvMonv2TemperatureUpperThreshold
                 -
                     oid: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempTable
                     value: AT-PLUGGABLE-DIAGNOSTICS-MIB::atPluggableDiagTempStatusReading
@@ -125,10 +124,10 @@ modules:
         state:
             data:
                 -
-                    oid: atEnvMonv2FanTable
-                    value: atEnvMonv2FanStatus
+                    oid: AT-ENVMONv2-MIB::atEnvMonv2FanTable
+                    value: AT-ENVMONv2-MIB::atEnvMonv2FanStatus
                     num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.1.1.7.{{ $index }}'
-                    descr: atEnvMonv2FanDescription
+                    descr: '{{ AT-ENVMONv2-MIB::atEnvMonv2FanDescription }}'
                     index: 'atEnvMonv2FanIndex.{{ $index }}'
                     state_name: 'AtFanState'
                     states:
@@ -136,10 +135,10 @@ modules:
                         - { descr: failed, graph: 0, value: 1, generic: 2 }
                         - { descr: good, graph: 0, value: 2, generic: 0 }
                 -
-                    oid: atEnvMonv2VoltageTable
-                    value: atEnvMonv2VoltageStatus
+                    oid: AT-ENVMONv2-MIB::atEnvMonv2VoltageTable
+                    value: AT-ENVMONv2-MIB::atEnvMonv2VoltageStatus
                     num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.2.1.8.{{ $index }}'
-                    descr: atEnvMonv2VoltageDescription
+                    descr: AT-ENVMONv2-MIB::atEnvMonv2VoltageDescription
                     index: 'atEnvMonv2VoltageIndex.{{ $index }}'
                     state_name: 'AtVoltageState'
                     states:
@@ -147,10 +146,10 @@ modules:
                         - { descr: outOfRange, graph: 0, value: 1, generic: 2 }
                         - { descr: inRange, graph: 0, value: 2, generic: 0 }
                 -
-                    oid: atEnvMonv2TemperatureTable
-                    value: atEnvMonv2TemperatureStatus
+                    oid: AT-ENVMONv2-MIB::atEnvMonv2TemperatureTable
+                    value: AT-ENVMONv2-MIB::atEnvMonv2TemperatureStatus
                     num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.3.1.7.{{ $index }}'
-                    descr: atEnvMonv2TemperatureDescription
+                    descr: AT-ENVMONv2-MIB::atEnvMonv2TemperatureDescription
                     index: 'atEnvMonv2TemperatureIndex.{{ $index }}'
                     state_name: 'AtTemperatureState'
                     states:
@@ -158,10 +157,10 @@ modules:
                         - { descr: outOfRange, graph: 0, value: 1, generic: 2 }
                         - { descr: inRange, graph: 0, value: 2, generic: 0 }
                 -
-                    oid: atEnvMonv2PsbSensorTable
-                    value: atEnvMonv2PsbSensorStatus
+                    oid: AT-ENVMONv2-MIB::atEnvMonv2PsbSensorTable
+                    value: AT-ENVMONv2-MIB::atEnvMonv2PsbSensorStatus
                     num_oid: '.1.3.6.1.4.1.207.8.4.4.3.12.4.2.1.6.{{ $index }}'
-                    descr: atEnvMonv2PsbSensorDescription
+                    descr: AT-ENVMONv2-MIB::atEnvMonv2PsbSensorDescription
                     index: 'atEnvMonv2PsbSensorIndex.{{ $index }}'
                     state_name: 'AtPowerSupplyState'
                     states:

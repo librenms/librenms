@@ -20,7 +20,7 @@ class PrinterSupply extends DeviceRelatedModel implements Keyable
         'supply_current',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return "$this->supply_type-$this->supply_index";
     }

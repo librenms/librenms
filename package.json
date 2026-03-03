@@ -14,7 +14,7 @@
         "bootstrap": "^4.5.3",
         "jquery": "^3.5.1",
         "laravel-vite-plugin": "^1.0",
-        "lodash": "^4.17.21",
+        "lodash": "^4.17.23",
         "popper.js": "^1.16.1",
         "postcss": "^8.4.31",
         "resolve-url-loader": "^5.0.0",

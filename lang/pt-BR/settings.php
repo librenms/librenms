@@ -1808,9 +1808,6 @@ return [
             'description' => 'Arquivo de Log a ser Monitorado',
             'help' => 'O padrão é o arquivo de log do LibreNMS. Valor padrão para todos os nós.',
         ],
-        'sfdp' => [
-            'description' => 'Caminho para sfdp',
-        ],
         'shorthost_target_length' => [
             'description' => 'Comprimento máximo do nome de host encurtado',
             'help' => 'Reduz o nome de host para o comprimento máximo, mas sempre completa as partes do subdomínio',

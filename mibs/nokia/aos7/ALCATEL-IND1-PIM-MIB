@@ -19,28 +19,21 @@ IMPORTS
 		FROM ALCATEL-IND1-BASE;
 
 alcatelIND1PIMMIB MODULE-IDENTITY
-
-    LAST-UPDATED  "201505280000Z"
-    ORGANIZATION  "Alcatel-Lucent"
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
     CONTACT-INFO
-        "Please consult with Customer Service to ensure the most appropriate
-         version of this document is used with the products in question:
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
-                           26801 West Agoura Road
-                        Agoura Hills, CA  91301-5122
-                          United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -61,16 +54,23 @@ alcatelIND1PIMMIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                     Copyright (C) 1995-2007 Alcatel-Lucent
-                     Copyright (C) 2015 ALE USA, Inc.
-                         ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
 
-    REVISION      "200704030000Z"
+    REVISION      "201911270000Z"
     DESCRIPTION
-        "The latest version of this MIB Module."
+        "Updated the latest contact and Copyright information for ALE USA Inc."
+
+    REVISION      "201701270000Z"
+    DESCRIPTION
+        "Added V4/V6 pim register-rate-limit support."
     REVISION      "201505280000Z"
     DESCRIPTION
         "Added V4/V6 bidir ssm compatibility, bidir fast-join, asm fast-join and ssm-fast-join."
+    REVISION      "200704030000Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
 
     ::= { routingIND1Pim 1 }
 
@@ -480,6 +480,157 @@ alaPimsmV6SsmFastJoin     OBJECT-TYPE
     DEFVAL     { disable }
     ::= {alaPimsmGlobalConfig 26}
 
+alaPimsmRegisterRateLimit    OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    UNITS      "packets per second"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Configures the maximum number of PIM Register Packets that 
+                the Designated Router (DR) will send per second for each 
+                (S,G) entry. 
+
+                A default value of 0 indicates that no rate-limiting is
+                being performed for outgoing PIM Register messages."
+    DEFVAL     { 0 }
+    ::= { alaPimsmGlobalConfig 27 }
+
+alaPimsmV6RegisterRateLimit    OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    UNITS      "packets per second"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Configures the maximum number of IPv6 PIM Register Packets 
+                that the Designated Router (DR) will send per second for 
+                each (S,G) entry. 
+
+                A default value of 0 indicates that no rate-limiting is
+                being performed for outgoing IPv6 PIM Register messages."
+    DEFVAL     { 0 }
+    ::= { alaPimsmGlobalConfig 28 }
+
+alaPimsmRegisterMsgPackingStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2),
+                   forceEnable(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the packing of PIM
+                Null Register and Register Stop messages on this router.
+
+                The value forceEnable(3) is used to automatically pack all
+                Null Register and Register Stop messages to all RPs
+                regardless of receiving verification from the RPs that
+                null register packing is supported.  
+
+                If PIM Anycast-RP is being used, Register Message Packing 
+                should be enabled only if it is supported by all PIM anycast 
+                RP members in the RP set.  The value forceEnable(3)
+                is the recommended configuration with Anycast-RP in order to
+                eliminate the initial stage of determining whether the new register 
+                message format for packing the messages is supported or not."
+    DEFVAL     { disable }
+    ::= {alaPimsmGlobalConfig 29}
+
+alaPimsmV6RegisterMsgPackingStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2),
+                   forceEnable(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the packing of PIM IPv6
+                Null Register and Register Stop messages on this router.
+
+                The value forceEnable(3) is used to automatically pack all
+                Null Register and Register Stop messages to all RPs
+                regardless of receiving verification from the RPs that
+                null register packing is supported.  
+                
+                If PIM Anycast-RP is being used, Register Message Packing 
+                should be enabled only if it is supported by all PIM anycast 
+                RP members in the RP set.  The value forceEnable(3)
+                is the recommended configuration with Anycast-RP in order to
+                eliminate the initial stage of determining whether the new register 
+                message format for packing the messages is supported or not."
+    DEFVAL     { disable }
+    ::= {alaPimsmGlobalConfig 30}
+
+alaPimsmPackedRegisterMsgMtu     OBJECT-TYPE
+    SYNTAX     Integer32 (0..9198)
+    UNITS      "bytes"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Configures the maximum size used when sending packed PIM Null
+                Register messages and Register Stop messages. 
+                This configuration can help control the MTU size of the PIM 
+                Null Register/Register Stop packets getting sent out."
+    DEFVAL { 1500 }
+    ::= {alaPimsmGlobalConfig 31}
+
+alaPimsmV6PackedRegisterMsgMtu     OBJECT-TYPE
+    SYNTAX     Integer32 (0..9198)
+    UNITS      "bytes"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Configures the maximum size used when sending packed PIM IPv6 
+                Null Register messages and Register Stop messages. 
+                This configuration can help control the MTU size of the PIM 
+                Null Register/Register Stop packets getting sent out."
+    DEFVAL { 1500 }
+    ::= {alaPimsmGlobalConfig 32}
+
+alaPimsmPackedRegisterMsgDelay OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..32767)
+    UNITS      "milliseconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Configures the Packed Null Register Delay interval (in milliseconds).
+                This is used to delay the sending of triggered Null Register
+                messages and may be desirable to allow the packing of
+                triggered Null Register messages due to bursts of traffic. 
+                
+                This may be particularly useful when running Anycast-RP with the
+                alaPimsmRegsterMsgPackingStatus set to forceEnable(3) to allow the
+                packing of triggered Null Register messages due to the initial learning
+                of the flows which may result in subsequent bursts of triggered Null
+                Register packets to all Anycast-RP routers.
+
+                The default value of 0 implies no deferred processing and will 
+                result in no packing of triggered Null Register messages."
+    DEFVAL { 0 }
+    ::= { alaPimsmGlobalConfig 33 }
+
+alaPimsmV6PackedRegisterMsgDelay OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..32767)
+    UNITS      "milliseconds"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Configures the IPv6 Packed Null Register Delay interval (in milliseconds).
+                This is used to delay the sending of triggered Null Register
+                messages and may be desirable to allow the packing of
+                triggered Null Register messages due to bursts of traffic. 
+                
+                This may be particularly useful when running Anycast-RP with the
+                alaPimsmRegsterMsgPackingStatus set to forceEnable(3) to allow the
+                packing of triggered Null Register messages due to the initial learning
+                of the flows which may result in subsequent bursts of triggered Null
+                Register packets to all Anycast-RP routers.
+
+                The default value of 0 implies no deferred processing and will 
+                result in no packing of triggered Null Register messages."
+    DEFVAL { 0 }
+    ::= { alaPimsmGlobalConfig 34 }
 
 -- ************************************************************************
 --  PIM-DM Global Configuration
@@ -748,7 +899,9 @@ alaPimInterfaceAugEntry OBJECT-TYPE
     ::= { alaPimInterfaceAugTable 1 }
   
 AlaPimInterfaceAugEntry ::= SEQUENCE {
-    alaPimInterfaceBfdStatus INTEGER
+    alaPimInterfaceBfdStatus       INTEGER,
+    alaPimInterfaceJoinPruneMtu    Integer32,
+    alaPimInterfaceJoinPruneDelay  Unsigned32
 }  
   
 alaPimInterfaceBfdStatus OBJECT-TYPE
@@ -762,6 +915,40 @@ alaPimInterfaceBfdStatus OBJECT-TYPE
                "Enables/Disables BFD for particular interfaces of PIM."
     DEFVAL { disable }     
     ::= { alaPimInterfaceAugEntry 1 }
+
+alaPimInterfaceJoinPruneMtu OBJECT-TYPE
+    SYNTAX     Integer32 (0..9198) 
+    UNITS      "bytes"
+    MAX-ACCESS read-write
+    STATUS     current     
+    DESCRIPTION     
+               "Configures the maximum size used when sending PIM Join/Prune
+                messages on the interface. The actual maximum size used for the PIM 
+                Join/Prune messages will be the smaller of the IP MTU value of the 
+                interface and the configured alaPimInterfaceJoinPruneMtu value.  
+                This configuration can help control the MTU size of the PIM Join/Prune 
+                packets getting sent out.
+                The default value of 0 means that the IP MTU value of the interface 
+                will be used in determining the maximum size of the PIM Join/Prune
+                packets and no other limitation will be enforced."
+    DEFVAL { 0 }     
+    ::= { alaPimInterfaceAugEntry 2 }
+
+alaPimInterfaceJoinPruneDelay OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..32767)
+    UNITS      "milliseconds"
+    MAX-ACCESS read-write
+    STATUS     current     
+    DESCRIPTION     
+               "Configures the JoinPrune Delay interval (in milliseconds).
+                This is used to delay the sending of triggered Join/Prune
+                messages and may be desirable to allow the packing of
+                triggered Join/Prune messages due to bursts of protocol messages
+                which may result in subsequent bursts of triggered Join/Prune packets..
+                The default value of 0 implies no deferred processing and will 
+                result in no packing of triggered Join/Prune updates."
+    DEFVAL { 0 }     
+    ::= { alaPimInterfaceAugEntry 3 }
 
 alaPimMbrAllSourcesStatus     OBJECT-TYPE
     SYNTAX     INTEGER {
@@ -816,6 +1003,32 @@ alaPimV6BfdAllInterfaceStatus     OBJECT-TYPE
                 for all PIM IPv6 interfaces on this router."
     DEFVAL     { disable }
     ::= {alaPimGlobalConfig 9}
+
+alaPimJoinPruneMsgPackingStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the packing of PIM
+                Join/Prune messages on this router."
+    DEFVAL     { enable }
+    ::= {alaPimGlobalConfig 10}
+
+alaPimV6JoinPruneMsgPackingStatus     OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable(1),
+                   disable(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+               "Administratively enables/disables the packing of PIM
+                IPv6 Join/Prune messages on this router."
+    DEFVAL     { enable }
+    ::= {alaPimGlobalConfig 11}
 
 -- ************************************************************************
 --  PIM Notifications
@@ -883,7 +1096,11 @@ alaPimsmConfigMIBGroup OBJECT-GROUP
               alaPimsmBidirSsmCompat, alaPimsmV6BidirSsmCompat,
               alaPimsmBidirFastJoin, alaPimsmV6BidirFastJoin,
               alaPimsmAsmFastJoin, alaPimsmV6AsmFastJoin,
-              alaPimsmSsmFastJoin, alaPimsmV6SsmFastJoin
+              alaPimsmSsmFastJoin, alaPimsmV6SsmFastJoin,
+              alaPimsmRegisterRateLimit, alaPimsmV6RegisterRateLimit,
+              alaPimsmRegisterMsgPackingStatus, alaPimsmV6RegisterMsgPackingStatus,
+              alaPimsmPackedRegisterMsgMtu, alaPimsmV6PackedRegisterMsgMtu,
+              alaPimsmPackedRegisterMsgDelay, alaPimsmV6PackedRegisterMsgDelay
             }
     STATUS  current
     DESCRIPTION
@@ -909,10 +1126,14 @@ alaPimConfigMIBGroup OBJECT-GROUP
               alaPimMoFRRStatus,
               alaPimMoFRRAllRouteStatus,
               alaPimInterfaceBfdStatus,
+              alaPimInterfaceJoinPruneMtu,
+              alaPimInterfaceJoinPruneDelay,
               alaPimMbrAllSourcesStatus,
               alaPimMbrOperStatus,
               alaPimV6BfdStatus,
-              alaPimV6BfdAllInterfaceStatus
+              alaPimV6BfdAllInterfaceStatus,
+              alaPimJoinPruneMsgPackingStatus,
+              alaPimV6JoinPruneMsgPackingStatus
             }
     STATUS  current
     DESCRIPTION

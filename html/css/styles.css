@@ -1323,7 +1323,7 @@ tr.search:nth-child(odd) {
 nav.navbar-sticky-top {
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 1100;
   border-bottom-width: 2px;
   border-left-width: 0;
   border-top-width: 0;
@@ -1755,19 +1755,19 @@ label {
   padding-left:10px;
 }
 
-.widget-availability {
+.widget-availability, .widget-alert {
   float:left;
   margin:2px;
 }
 
-.widget-availability:empty {
+.widget-availability:empty, .widget-alert:empty {
   display: inline;
   min-width: 2.4em;
   min-height: 1.3em;
   max-height: 1.6em;
 }
 
-.widget-availability-host {
+.widget-availability-host, .widget-alert-totals {
   float:left;
   margin-bottom: 10px;
 }
@@ -1779,6 +1779,31 @@ label {
 .widget-availability-service {
   float:right;
   margin-bottom: 10px;
+}
+
+.widget-alert-map-compact-ok {
+  height: 12px;
+  width: 12px;
+  float: left;
+  background-color: #5CB85C;
+}
+
+.widget-alert-map-compact-warning {
+  height: 12px;
+  width: 12px;
+  float: left;
+  background-color: #F0AD4E;
+}
+
+.widget-alert-map-compact-critical {
+  height: 12px;
+  width: 12px;
+  float: left;
+  background-color: #D9534F;
+}
+
+.widget-alert-map-widget-header {
+  line-height: 34px;
 }
 
 .label-font-border {

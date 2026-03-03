@@ -1,4 +1,3 @@
-mib: TELTONIKA-MIB
 modules:
     os:
         hardware: TELTONIKA-MIB::RouterName.0
@@ -9,11 +8,11 @@ modules:
             data:
                 -
                     oid:
-                        - Operator
+                        - TELTONIKA-MIB::Operator
         temperature:
             data:
                 -
-                    oid: Temperature
+                    oid: TELTONIKA-MIB::Temperature
                     num_oid: ".1.3.6.1.4.1.48690.2.9.{{ $index }}"
                     descr: Module Temp
                     group: Modem
@@ -22,7 +21,7 @@ modules:
         state:
             data:
                 -
-                    oid: SimState
+                    oid: TELTONIKA-MIB::SimState
                     num_oid: ".1.3.6.1.4.1.48690.2.1.{{ $index }}"
                     descr: SIM State
                     group: Mobile
@@ -32,7 +31,7 @@ modules:
                         - { descr: not inserted, graph: 1, value: 1, generic: 2 }
                         - { descr: unknown, graph: 1, value: 2, generic: 3 }
                 -
-                    oid: PinState
+                    oid: TELTONIKA-MIB::PinState
                     num_oid: ".1.3.6.1.4.1.48690.2.2.{{ $index }}"
                     descr: Pin State
                     group: Mobile
@@ -43,7 +42,7 @@ modules:
                         - { descr: READY, graph: 1, value: 2, generic: 0 }
                         - { descr: unknown, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: NetState
+                    oid: TELTONIKA-MIB::NetState
                     num_oid: ".1.3.6.1.4.1.48690.2.3.{{ $index }}"
                     descr: Mobile Net State
                     group: Mobile
@@ -55,9 +54,9 @@ modules:
                         - { descr: unknown, graph: 1, value: 3, generic: 3 }
                         - { descr: unregistered, graph: 1, value: 4, generic: 2 }
                 -
-                    oid: ConnectionState
+                    oid: TELTONIKA-MIB::ConnectionState
                     num_oid: ".1.3.6.1.4.1.48690.2.7.{{ $index }}"
-                    descr: "Connection State ({{ $Operator }})"
+                    descr: "Connection State ({{ TELTONIKA-MIB::Operator }})"
                     group: Mobile
                     index: "ConnectionState.{{ $index }}"
                     state_name: ConnectionState
@@ -66,9 +65,9 @@ modules:
                         - { descr: not connected, graph: 1, value: 1, generic: 2 }
                         - { descr: disconnected, graph: 1, value: 2, generic: 2 }
                 -
-                    oid: ConnectionType
+                    oid: TELTONIKA-MIB::ConnectionType
                     num_oid: ".1.3.6.1.4.1.48690.2.8.{{ $index }}"
-                    descr: "Connection Type ({{ $Operator }})"
+                    descr: "Connection Type ({{ TELTONIKA-MIB::Operator }})"
                     group: Mobile
                     index: "ConnectionType.{{ $index }}"
                     state_name: ConnectionType
@@ -82,7 +81,7 @@ modules:
         signal:
             data:
                 -
-                    oid: Signal
+                    oid: TELTONIKA-MIB::Signal
                     num_oid: ".1.3.6.1.4.1.48690.2.4.{{ $index }}"
                     entPhysicalIndex: "{{ $index }}"
                     descr: "Signal Level"
@@ -91,7 +90,7 @@ modules:
         count:
             data:
                 -
-                    oid: SimSlot
+                    oid: TELTONIKA-MIB::SimSlot
                     num_oid: ".1.3.6.1.4.1.48690.2.15.{{ $index }}"
                     descr: "Number of SIM Slots"
                     group: Mobile
@@ -99,7 +98,7 @@ modules:
         runtime:
             data:
                 -
-                    oid: ConnectionUptime
+                    oid: TELTONIKA-MIB::ConnectionUptime
                     num_oid: ".1.3.6.1.4.1.48690.2.17.{{ $index }}"
                     descr: "Connection Uptime "
                     group: Mobile

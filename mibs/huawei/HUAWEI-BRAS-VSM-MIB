@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description:HUAWEI-BRAS-VSM-MIB DEFINITIONS
 -- Reference:
--- Version: V1.0
+-- Version: V2.19
 -- History:
 --     
 -- =================================================================
@@ -17,26 +17,63 @@
                 FROM SNMPv2-TC
             EnabledStatus            
                 FROM P-BRIDGE-MIB 
-            OBJECT-TYPE, MODULE-IDENTITY            
-                FROM SNMPv2-SMI;
+            OBJECT-TYPE, MODULE-IDENTITY, Integer32, Counter64, NOTIFICATION-TYPE, Unsigned32         
+                FROM SNMPv2-SMI
+            MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF;
             
         hwBRASVsm MODULE-IDENTITY 
-            LAST-UPDATED "200504181334Z"        -- April 18, 2005 at 13:34 GMT
+            LAST-UPDATED "201801151250Z"      
             ORGANIZATION 
-                "Huawei Technologies Co., Ltd.
-                "
+                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
-                "
-                NanJing Institute,Huawei Technologies Co.,Ltd.
-                HuiHong Mansion,No.91 BaiXia Rd.
-                NanJing, P.R. of China
-                Zipcode:210001
-                 
-                Http://www.huawei.com                                       
-                E-mail:support@huawei.com "
+		 "Huawei Industrial Base
+		  Bantian, Longgang
+		   Shenzhen 518129
+		   People's Republic of China
+		   Website: http://www.huawei.com
+		   Email: support@huawei.com
+		 "
+            
+            DESCRIPTION 
+                "Modifiy hwUserID."
+
+            REVISION    "201801151250Z"
+            DESCRIPTION 
+                "Modify  hwVsmAddedServiceTable  hwVsmEDSGApplyCarResourceFailAlarm  hwVsmEDSGApplySqResourceFailAlarm  hwVsmEDSGApplyStatResourceFailAlarm."
+            
+            REVISION    "201711241250Z"
+            DESCRIPTION 
+                "Add two mib tables, hwVsmEDSGServicePolicyTable and  hwVsmEDSGDownloadServicePolicyTable."
+            
+            REVISION    "201711101250Z"
+            DESCRIPTION 
+            "Add  hwVsmCUEDSGApplyCarResourceFailAlarm hwVsmCUEDSGApplySqResourceFailAlarm hwVsmCUEDSGApplyStatResourceFailAlarm."
+
+            REVISION    "201705101250Z"
+            DESCRIPTION 
+                "Modifiy hwVsmSlot."
+
+            REVISION    "201603151250Z"
             DESCRIPTION 
                 "The MIB contains objects of module VSM."
-            ::= { hwBRASMib 9 }
+
+            REVISION    "201512241250Z"
+            DESCRIPTION 
+            "Modify  hwVsmMibTrap hwVsmBackupActiveEDSGFailureAlarm." 
+                                                     
+            REVISION    "201508121250Z"
+            DESCRIPTION 
+            "Add  hwVsmEDSGApplyCarResourceFailAlarm,hwVsmEDSGApplySqResourceFailAlarm and hwVsmEDSGApplyStatResourceFailAlarm." 
+
+            REVISION    "201504281250Z"
+            DESCRIPTION 
+            "Add  hwVsmMibTrap hwVsmBackupActiveEDSGFailureAlarm." 
+
+            REVISION "201308042119Z"
+            DESCRIPTION "V1.0-V1.1."
+            
+                        ::= { hwBRASMib 9 }
 
 
 --
@@ -59,7 +96,7 @@
             DESCRIPTION
                 "Flow query time length."
             DEFVAL { 2 }                 
-            ::= { hwVsmSetFlowQryTLenTable 1 }        
+            ::= { hwVsmSetFlowQryTLenTable 1 }         
     --  ============== hwVsmSetFlowQryTLenTable  define end ==============         
 
     --  ============== hwVsmServicePolicyTable  define beginning ==============
@@ -79,7 +116,7 @@
                 " Service policy entry,
                 service policy name is identified as key word, direct a service policy when create, and don't allow to change.
                 Index item is hwVsmServicePolicyName node. The table is used for configuration of service policy.
-                Operation restriction description£º
+                Operation restriction description:
                 1. must input service policy name when created.
                 2. if a service is being used for users, can't be deleted.
                 3. if a service is being used by domain, can't be deleted."
@@ -134,7 +171,27 @@
                 hwVsmTariffLevel7AcctSwitch
                     EnabledStatus,
                 hwVsmTariffLevel8AcctSwitch
-                    EnabledStatus            
+                    EnabledStatus,
+                hwVsmSetUserGroup 
+                    DisplayString,
+                hwVsmSetQOSprofile
+                    DisplayString,
+               hwVsmSetTariff1IpType 
+	            INTEGER, 
+               hwVsmSetTariff2IpType 
+	            INTEGER,  
+               hwVsmSetTariff3IpType 
+	            INTEGER,  
+               hwVsmSetTariff4IpType 
+	            INTEGER,  
+               hwVsmSetTariff5IpType 
+	            INTEGER,  
+               hwVsmSetTariff6IpType 
+	            INTEGER,  
+               hwVsmSetTariff7IpType 
+	            INTEGER,  
+               hwVsmSetTariff8IpType 
+	            INTEGER                  
                                                                                
              }
 
@@ -159,7 +216,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                " In traffic policy name£¬optional, if bind, must direct an acl policy name.
+                " In traffic policy name, optional, if bind, must direct an acl policy name.
                   If the acl policy policy ACL has been bound by a service policy, it can't be bound by another service policy.
                 "
             ::= { hwVsmServicePolicyEntry 3 }
@@ -196,7 +253,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                " The out traffic policy name£¬optional, if bind, must direct an acl policy name.
+                " The out traffic policy name, optional, if bind, must direct an acl policy name.
                   If the acl policy policy ACL has been bound by a service policy, it can't be bound by another service policy.
                 "
             ::= { hwVsmServicePolicyEntry 7 }
@@ -205,14 +262,16 @@
             SYNTAX INTEGER
                     {
                     vas(0),
-                    daa(1)
+                    daa(1),
+                    bod(2)
                     }
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
                 " The service policy type :                
                   vas(0): normal policy;
-                  daa(1): destination add account policy.
+                  daa(1): destination add account policy;
+                  bod(2): bandwidth on demand service policy.
                 "
             DEFVAL { 0 }
             ::= { hwVsmServicePolicyEntry 8 }
@@ -400,8 +459,131 @@
             DEFVAL { 1 }
             ::= { hwVsmServicePolicyEntry 24 }
 
+        hwVsmSetUserGroup  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " user group."
+            ::= { hwVsmServicePolicyEntry 25 } 
+            
+         hwVsmSetQOSprofile OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " The QOS profile of BOD service policy."
+            ::= { hwVsmServicePolicyEntry 26 }
+
+         hwVsmSetTariff1IpType OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    ipv4(1),
+                    ipv6(2)                    
+                    }
+
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "  The ip type of traffic 1, default value is ipv4(1)."     
+            DEFVAL { 1 } 
+            ::= { hwVsmServicePolicyEntry 27 }   
+           hwVsmSetTariff2IpType OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    ipv4(1),
+                    ipv6(2)                    
+                    }
+
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "  The ip type of traffic 2, default value is ipv4(1)."      
+            DEFVAL { 1 }    
+            ::= { hwVsmServicePolicyEntry 28 }   
+  hwVsmSetTariff3IpType OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    ipv4(1),
+                    ipv6(2)                   
+                    }
+
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "  The ip type of traffic 3, default value is ipv4(1)."
+            DEFVAL { 1 }    
+            ::= { hwVsmServicePolicyEntry 29 }   
+  hwVsmSetTariff4IpType OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    ipv4(1),
+                    ipv6(2)                    
+                    }
+
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "  The ip type of traffic 4, default value is ipv4(1)."
+            DEFVAL { 1 }    
+            ::= { hwVsmServicePolicyEntry 30 }   
+  hwVsmSetTariff5IpType OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    ipv4(1),
+                    ipv6(2)                    
+                    }
+
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "  The ip type of traffic 5, default value is ipv4(1)."
+            DEFVAL { 1 }    
+            ::= { hwVsmServicePolicyEntry 31 }   
+  hwVsmSetTariff6IpType OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    ipv4(1),
+                    ipv6(2)                   
+                    }
+
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "  The ip type of traffic 6, default value is ipv4(1)."
+            DEFVAL { 1 }    
+            ::= { hwVsmServicePolicyEntry 32 }   
+  hwVsmSetTariff7IpType OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    ipv4(1),
+                    ipv6(2)                   
+                    }
+
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "  The ip type of traffic 7, default value is ipv4(1)."
+            DEFVAL { 1 }    
+            ::= { hwVsmServicePolicyEntry 33 }   
+  hwVsmSetTariff8IpType OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    ipv4(1),
+                    ipv6(2)                  
+                    }
+
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "  The ip type of traffic 8, default value is ipv4(1)."
+            DEFVAL { 1 }    
+            ::= { hwVsmServicePolicyEntry 34 }   
+ 
+
+            
+
     --  ============== hwVsmServicePolicyTable  define end ==============         
-                
     --  ============== hwVsmValServiceTable  define beginning ==============
     hwVsmValServiceTable OBJECT-TYPE
             SYNTAX SEQUENCE OF HwVsmValServiceEntry
@@ -680,9 +862,260 @@
                  The account server type.
                 "
             ::= { hwVsmValServiceEntry 19 }    
-    --  ============== hwVsmValServiceTable  define end ==============   
+    --  ============== hwVsmValServiceTable  define end ============== 
+     -- =============== hwVsmAddedServiceTable  define beginning =============   
+       hwVsmAddedServiceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVsmAddedServiceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " hwVsmAddedServiceTable lists VAS service information. "
+            ::= { hwBRASVsm 6 }  
+            
+            
+       hwVsmAddedServiceEntry OBJECT-TYPE
+            SYNTAX HwVsmAddedServiceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                  " The indexes of this table are hwUserID and hwTariffLevel."
+            INDEX { hwUserID , hwTariffLevel }
+            ::= { hwVsmAddedServiceTable 1 } 
+             
+            
+        HwVsmAddedServiceEntry ::=  SEQUENCE { 
+                hwUserID
+                    Integer32,
+                hwTariffLevel 
+                    Integer32,
+                hwServiceID
+                    Integer32,
+                hwServiceSource
+                    INTEGER,
+                hwServicePolicy
+                    DisplayString,
+                hwAcctMethod
+                    INTEGER,
+                hwAcctStartTime
+                    DisplayString,
+                hwAcctServerName
+                    DisplayString,
+                hwTwoLevelAcctServerName
+                    DisplayString,
+                hwPhyInfoAcctServerName
+                    DisplayString,
+                hwServiceIdleCutTime
+                    Integer32,
+                hwServiceIdleCutFlow
+                    Integer32,
+                hwUpPacketNum  
+                    Counter64,
+                hwUpByteNum   
+                    Counter64,
+                hwDownPacketNum   
+                    Counter64,
+                hwDownByteNum  
+                    Counter64
+             }  
+             
+        hwUserID OBJECT-TYPE
+            SYNTAX Integer32(0..3145727)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " This object indicates the user ID."
+            DEFVAL { 4294967295 }
+            ::= { hwVsmAddedServiceEntry 1 }  
+            
+            
+        hwTariffLevel OBJECT-TYPE
+            SYNTAX Integer32(0..32767)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " 
+                This object indicates a tariff level.
+                "
+            ::= { hwVsmAddedServiceEntry 2 }   
+            
+        hwServiceID OBJECT-TYPE
+            SYNTAX Integer32(0..32767)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " 
+                This parameter indicates a service ID.
+                "
+            ::= { hwVsmAddedServiceEntry 3 }  
+            
+        hwServiceSource OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                vsmSourceDefault(0),
+                vsmSourceSig(1),
+                vsmSourceIptn(2),
+                vsmSourceRadius(3),
+                vsmSourceBod(4),
+                vsmSourceCopsNet(5),
+                vsmSourceCopsNetPm(6),
+                vsmSourceCopsUser(7),
+                vsmSourceCopsPm(8),
+                vsmSourceBmi(9),
+                vsmSourceIpBod(10)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " This object indicates a service source:
+                  vsmSourceDefault(0):   local; 
+                  vsmSourceSig(1):       from sig server;
+                  vsmSourceIptn(2):      from IPTN server;
+                  vsmSourceRadius(3):    from Radius server;
+                  vsmSourceBod(4):       from BOD server;
+                  vsmSourceCopsNet(5):   from COPS net policy content;
+                  vsmSourceCopsNetPm(6): from cops user poicy name;
+                  vsmSourceCopsUser(7):  from COPS net policy content;
+                  vsmSourceCopsPm(8):    from COPS user policy name;
+                  vsmSourceBmi(9):       from BMI server;
+                  vsmSourceIpBod(10):    from Liangchuang BOD server."
+            ::= { hwVsmAddedServiceEntry 4 }   
+            
+            
+         hwServicePolicy OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 This object indicates the service policy.
+                "
+            ::= { hwVsmAddedServiceEntry 5 }  
+            
+            
+         hwAcctMethod OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                local(1),
+                none(2),
+                radius(3),
+                cops(4)        
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 This object indicates the accounting method.
+                "
+            ::= { hwVsmAddedServiceEntry 6 } 
+            
+            
+         hwAcctStartTime OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " 
+                 This object indicates the time when the accounting starts.
+                "
+            ::= { hwVsmAddedServiceEntry 7 }
+            
+            
+          hwAcctServerName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 This object indicates the name of the accounting server.
+                "
+            ::= { hwVsmAddedServiceEntry 8 }
+            
+        hwTwoLevelAcctServerName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 This object indicates the name of the level-2 accounting server.
+                "
+            ::= { hwVsmAddedServiceEntry 9 }
+            
+        hwPhyInfoAcctServerName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 This object indicates the name of the physical information accounting server.
+                "
+            ::= { hwVsmAddedServiceEntry 10 } 
+            
+         hwServiceIdleCutTime OBJECT-TYPE
+            SYNTAX Integer32(0..120)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 This object indicates the service idle-cut time.
+                "
+            DEFVAL { 0 }
+            ::= { hwVsmAddedServiceEntry 11 }
 
-    --  ============== hwVsmAcctServicePolicyTable  define ==============
+        hwServiceIdleCutFlow OBJECT-TYPE
+            SYNTAX Integer32 (0..768000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 This object indicates the service idle-cut traffic.
+                "
+            DEFVAL { 60 }
+            ::= { hwVsmAddedServiceEntry 12 }
+
+      
+       hwUpPacketNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 This object indicates the number of upstream packets.
+                "
+            ::= { hwVsmAddedServiceEntry 13 }
+        
+        hwUpByteNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 This object indicates the number of upstream bytes.
+                "
+            ::= { hwVsmAddedServiceEntry 14 }    
+        
+        hwDownPacketNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 This object indicates the number of downstream packets.
+                "
+            ::= { hwVsmAddedServiceEntry 15 }
+            
+        hwDownByteNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 This object indicates the number of downstream bytes.
+                "
+            ::= { hwVsmAddedServiceEntry 16}    
+                          
+   -- =============== hwVsmAddedServiceTable  define end =============
+
+   --  ============== hwVsmAcctServicePolicyTable  define ==============
         hwVsmAcctServicePolicyEnableTable OBJECT IDENTIFIER ::= { hwBRASVsm 5 }
 
         hwVsmAcctServicePolicyEnable  OBJECT-TYPE
@@ -702,8 +1135,138 @@
 
 
     --  ============== hwVsmAcctServicePolicyTable  define end ==============
-      
 
+
+    -- =============== hwVsmEDSGServicePolicyTable  define beginning =============   
+       hwVsmEDSGServicePolicyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVsmEDSGServicePolicyEntry 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " The VSM EDSG service policy detail. "
+            ::= { hwBRASVsm 7 }  
+            
+            
+       hwVsmEDSGServicePolicyEntry OBJECT-TYPE
+            SYNTAX HwVsmEDSGServicePolicyEntry 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                  " EDSG service policy detail entry,
+                      VSM EDSG service policy detail, policy name is key word."
+            INDEX { hwVsmEDSGServicePolicyName }
+            ::= { hwVsmEDSGServicePolicyTable 1 } 
+             
+            
+         HwVsmEDSGServicePolicyEntry ::=  SEQUENCE { 
+                hwVsmEDSGServicePolicyName
+                    DisplayString,
+                hwVsmEDSGServicePolicyIndex 
+                    Unsigned32 ,
+                hwVsmEDSGServicePolicyUserNumber
+                    Unsigned32 
+             }  
+             
+         hwVsmEDSGServicePolicyName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..64))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 The EDSG service policy name.
+                "
+            ::= { hwVsmEDSGServicePolicyEntry 1 }  
+            
+            
+         hwVsmEDSGServicePolicyIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 The EDSG service policy index.
+                "
+            ::= { hwVsmEDSGServicePolicyEntry 2 }     
+            
+            
+         hwVsmEDSGServicePolicyUserNumber OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 The EDSG service policy user number.
+                "
+            ::= { hwVsmEDSGServicePolicyEntry 3 } 
+                
+   -- ===============  hwVsmEDSGServicePolicyTable  define end =============      
+   
+   -- ===============  hwVsmEDSGDownloadServicePolicyTable  define beginning =============   
+        hwVsmEDSGDownloadServicePolicyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVsmEDSGDownloadServicePolicyEntry 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " The VSM EDSG download service policy detail. "
+            ::= { hwBRASVsm 8 }  
+            
+            
+       hwVsmEDSGDownloadServicePolicyEntry OBJECT-TYPE
+            SYNTAX HwVsmEDSGDownloadServicePolicyEntry 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                  " EDSG download service policy detail entry,
+                      VSM EDSG download service policy detail, policy name is key word."
+            INDEX { hwVsmEDSGDownloadServicePolicyName }
+            ::= { hwVsmEDSGDownloadServicePolicyTable 1 } 
+             
+            
+         HwVsmEDSGDownloadServicePolicyEntry ::=  SEQUENCE { 
+                hwVsmEDSGDownloadServicePolicyName
+                    DisplayString,
+                hwVsmEDSGDownloadServicePolicyIndex 
+                    Unsigned32,
+                hwVsmEDSGDownloadServicePolicyUserNumber
+                    Unsigned32
+             }  
+             
+         hwVsmEDSGDownloadServicePolicyName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..201))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 The EDSG download service policy name.
+                "
+            ::= { hwVsmEDSGDownloadServicePolicyEntry 1 }  
+            
+            
+         hwVsmEDSGDownloadServicePolicyIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 The EDSG download service policy index.
+                "
+            ::= { hwVsmEDSGDownloadServicePolicyEntry 2 }     
+            
+            
+         hwVsmEDSGDownloadServicePolicyUserNumber OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                 The EDSG download service policy user number.
+                "
+            ::= { hwVsmEDSGDownloadServicePolicyEntry 3 } 
+                
+   -- ===============   hwVsmEDSGDownloadServicePolicyTable  define end =============
+
+
+    
     --  ============== conformance information ==============
         hwVsmConformance OBJECT IDENTIFIER ::= { hwBRASVsm 4 }
         
@@ -741,7 +1304,8 @@
                       hwVsmTariffLevel2AcctSwitch,hwVsmTariffLevel3AcctSwitch,  
                       hwVsmTariffLevel4AcctSwitch, hwVsmTariffLevel5AcctSwitch,
                       hwVsmTariffLevel6AcctSwitch, hwVsmTariffLevel7AcctSwitch,    
-                      hwVsmTariffLevel8AcctSwitch }
+                      hwVsmTariffLevel8AcctSwitch,hwVsmAcctServicePolicyEnable,
+                      hwVsmAcctServicePolicyDisable, hwVsmTariffLevel8AcctSwitch }
 
             STATUS current
             DESCRIPTION 
@@ -764,7 +1328,88 @@
 
 
 
-        --  ============== conformance information define end ==============                        
+        --  ============== conformance information define end ==============        
+        --  ============== hwVsmMibTrap  define ============== 
+        hwVsmMibTrap OBJECT IDENTIFIER ::= { hwBRASVsm 250 }  
+        
+        hwVsmTrapsOid OBJECT IDENTIFIER ::= { hwVsmMibTrap 1 } 
+        
+        hwVsmActiveEDSGFailReason   OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..255))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Causes for EDSG service activation failure."
+            ::= { hwVsmTrapsOid 1 } 
+
+        hwVsmSlot OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The slot number of service."              
+            ::= { hwVsmTrapsOid 2 }    
+
+        hwVsmCUSlot OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The remote slot number of service."              
+            ::= { hwVsmTrapsOid 3 }
+        
+        hwVsmTrapsDefine OBJECT IDENTIFIER ::= { hwVsmMibTrap 2 }
+        
+        hwVsmBackupActiveEDSGFailureAlarm NOTIFICATION-TYPE
+            OBJECTS { hwVsmActiveEDSGFailReason }
+            STATUS current
+            DESCRIPTION
+                "EDSG service activation failure on the backup device."
+            ::= { hwVsmTrapsDefine 1 }
+        
+        hwVsmEDSGApplyCarResourceFailAlarm NOTIFICATION-TYPE
+            OBJECTS { hwVsmSlot }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the EDSG service fails to be activated because the board's CAR resources are insufficient."
+            ::= { hwVsmTrapsDefine 2 }
+                               
+        hwVsmEDSGApplySqResourceFailAlarm NOTIFICATION-TYPE
+            OBJECTS { hwVsmSlot }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the EDSG service fails to be activated because the board's SQ resources are insufficient."
+            ::= { hwVsmTrapsDefine 3 }
+
+        hwVsmEDSGApplyStatResourceFailAlarm NOTIFICATION-TYPE
+            OBJECTS { hwVsmSlot }
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the EDSG service fails to be activated because the board's statistical resources are insufficient."
+            ::= { hwVsmTrapsDefine 4 }
+
+        hwVsmCUEDSGApplyCarResourceFailAlarm NOTIFICATION-TYPE
+            OBJECTS { hwVsmCUSlot }
+            STATUS current
+            DESCRIPTION
+                "Failed to apply for CAR resources for the EDSG."
+            ::= { hwVsmTrapsDefine 5 }
+                               
+        hwVsmCUEDSGApplySqResourceFailAlarm NOTIFICATION-TYPE
+            OBJECTS { hwVsmCUSlot }
+            STATUS current
+            DESCRIPTION
+                "Failed to apply for user queue resources for the EDSG."
+            ::= { hwVsmTrapsDefine 6 }
+
+        hwVsmCUEDSGApplyStatResourceFailAlarm NOTIFICATION-TYPE
+            OBJECTS { hwVsmCUSlot }
+            STATUS current
+            DESCRIPTION
+                "Failed to apply for statistic resources for the EDSG."
+            ::= { hwVsmTrapsDefine 7 }
+
+        --  ============== hwVsmMibTrap  define end =============
+                
     
     END
-

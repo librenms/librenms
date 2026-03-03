@@ -39,11 +39,9 @@ acPerfMediaGateway  MODULE-IDENTITY
             acPerfSystem - performance measurements related to network element as a whole"
 
 
-    REVISION "200311200000Z"
-       DESCRIPTION
-         "Version 4.4. November 20, 2003. Made these changes:
-             o  Initial revision"
-
+    REVISION "202102160955Z"          --Tuesday, February 16 2021
+	DESCRIPTION  "obsoleted acPerfMediaGateway"
+		
     ::= {acPerformance 1}  
 
 --
@@ -95,7 +93,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfCpNumDupsForCompletedTransactions OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of times a duplicate transaction request was received
      after the initial transaction had already been completed. In this
@@ -109,7 +107,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfCpNumDupsForOutstandingTransactions OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of times a duplicate transaction request was received
      while the initial transaction was outstanding, that is, still in
@@ -123,7 +121,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfCpMessageSendSuccesses OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of times there was a success in sending
      a call control (H.248) message. Call control messages
@@ -140,7 +138,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfCpMessageSendErrors OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of times there was a failure in sending a call control
      (H.248) message. The message is sent via a datagram
@@ -156,7 +154,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfCpMessageReceiveSuccesses OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of times there was a success in receiving
      a call control (H.248) message. Call control messages
@@ -173,7 +171,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfCpMessageReceiveErrors OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of times there was a failure in receiving a call control
      ( H.248) message. Call control messages are received
@@ -190,7 +188,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfCpProtocolSyntaxErrors OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of syntax errors detected in incoming call control 
     (H.248) messages.
@@ -203,7 +201,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfCpMessageRetransmissions OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Each time the call engine times out waiting for an acknowledgement
      it retransmits the control protocol message, unless the number of
@@ -218,7 +216,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfCpMessageMaxRetransmissionsExceeded OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of times the call control message maximum retransmission count was
      exceeded. The gateway attempted several times to send a message to the call
@@ -235,7 +233,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfCpMessagesFromUntrustedSources OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of messages received from untrusted sources, that is from network
      nodes other than the node on which the call agent is running.
@@ -254,7 +252,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfRtpSenderPackets OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Total number of RTP packets sent by the system for this card.
      Products:     All IP-based products
@@ -266,7 +264,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfRtpSenderOctets OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Total number of non-header RTP octets sent by this card.
      Products:     All IP-based products
@@ -278,7 +276,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfRtpReceiverPackets OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Total number of RTP packets received by the system for this card.
      Products:     All IP-based products
@@ -290,7 +288,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfRtpReceiverOctets OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Total number of non-header RTP octets received by this card.
      Products:     All IP-based products
@@ -302,7 +300,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfRtpRcvrLostPackets OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Total number of RTP  packets lost as observed by this card.
      Products:     All IP-based products
@@ -314,7 +312,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfRtpFailedDueToLackOfResources OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "The number of times a rtp request was rejected due to lack of resources
      since the last application restart.
@@ -326,7 +324,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfRtpSimplexInSessionsTotal OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Total number of simplex input RTP sessions.
      A simplex (one-way) session would be used to play an announcement.
@@ -340,7 +338,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfRtpSimplexInSessionsCurrent OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Current number of simplex input RTP sessions.
      Products:     All IP-based products
@@ -352,7 +350,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfRtpSimplexOutSessionsTotal OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Total number of simplex output RTP sessions.
      Products:     All IP-based products
@@ -364,7 +362,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfRtpSimplexOutSessionsCurrent OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Current number of simplex output RTP sessions.
      Products:     All IP-based products
@@ -376,7 +374,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfRtpDuplexSessionsTotal OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Total number of duplex RTP sessions.
 
@@ -391,7 +389,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfRtpDuplexSessionsCurrent OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Current number of duplex RTP sessions.
      Products:     All IP-based products
@@ -409,7 +407,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfSystemPacketEndpoints OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of endpoints reserved for all packet network-related functions (conferencing, plays, etc.). This is an attribute that is derived from the type of hardware and the values of certain config parameters. Currently, its value is fixed after init-time. In the future, it's value might be impacted by configuration of online parameters. That is, its value might increase or decrease over time. For example, in a multi-card system, addition of a board would cause it to increase.
      Products:     All
@@ -422,7 +420,7 @@ acPerfMediaGateway  MODULE-IDENTITY
      acPerfSystemPacketEndpointsInUse OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Number of endpoints that the call engine is currently using for
      all packet network-related functions (conferencing, plays, etc.).

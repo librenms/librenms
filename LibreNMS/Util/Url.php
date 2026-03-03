@@ -50,9 +50,9 @@ class Url
         }
 
         $class = match ($device->getDeviceStatus()) {
-            DeviceStatus::UP, DeviceStatus::IGNORED_UP => 'device-link-up',
-            DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED, DeviceStatus::IGNORED_DOWN => 'device-link-down',
-            DeviceStatus::DISABLED => 'device-link-disabled',
+            DeviceStatus::Up, DeviceStatus::IgnoredUp => 'device-link-up',
+            DeviceStatus::Down, DeviceStatus::NeverPolled, DeviceStatus::IgnoredDown => 'device-link-down',
+            DeviceStatus::Disabled => 'device-link-disabled',
         };
 
         return sprintf('<a href="%s" class="%s" x-data="deviceLink()">%s</a>%s',
@@ -225,7 +225,7 @@ class Url
             $text = $label;
         }
 
-        $content = '<div class=list-large>' . addslashes(htmlentities($sensor->device->displayName() . ' - ' . $label)) . '</div>';
+        $content = '<div class=list-large>' . addslashes(htmlentities($sensor->device?->displayName() . ' - ' . $label)) . '</div>';
 
         $content .= "<div style=\'width: 850px\'>";
         $graph_array = [
@@ -372,6 +372,11 @@ class Url
         return LaravelUrl::signedRoute('graph', $args);
     }
 
+    public static function graphPageUrl(string $type, array $args = []): string
+    {
+        return url('graphs', ['type' => $type, ...$args]);
+    }
+
     /**
      * @param  array  $args
      * @return string
@@ -500,11 +505,11 @@ class Url
     private static function deviceLinkDisplayClass($device)
     {
         return match ($device->getDeviceStatus()) {
-            DeviceStatus::DISABLED => 'list-device-disabled',
-            DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED => 'list-device-down',
-            DeviceStatus::UP => 'list-device',
-            DeviceStatus::IGNORED_DOWN => 'list-device-ignored',
-            DeviceStatus::IGNORED_UP => 'list-device-ignored-up',
+            DeviceStatus::Disabled => 'list-device-disabled',
+            DeviceStatus::Down, DeviceStatus::NeverPolled => 'list-device-down',
+            DeviceStatus::Up => 'list-device',
+            DeviceStatus::IgnoredDown => 'list-device-ignored',
+            DeviceStatus::IgnoredUp => 'list-device-ignored-up',
         };
     }
 

@@ -22,7 +22,6 @@ $components = $components[$device['device_id']];
 
 include 'includes/html/graphs/common.inc.php';
 $graph_params->scale_min = 0;
-$graph_params->sloped_mode = true;
 $graph_params->vertical_label = 'Seconds';
 
 $rrd_options[] = 'COMMENT:Dispersion (s)         Now      Min      Max\\n';

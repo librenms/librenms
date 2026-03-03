@@ -7,6 +7,7 @@ use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\ValidationResult;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 class CheckRrdStep implements Validation
 {
@@ -23,7 +24,7 @@ class CheckRrdStep implements Validation
         $this->ping_rrd_step = (int) LibrenmsConfig::get('ping_rrd_step', self::DEFAULT_PING_RRD_STEP);
         $this->rrd_step = (int) LibrenmsConfig::get('rrd.step', self::DEFAULT_RRD_STEP);
 
-        $this->rrdtool = app(RrdProcess::class, ['timeout' => 30]);
+        $this->rrdtool = app(RrdProcess::class, ['timeout' => 120]);
     }
 
     public function enabled(): bool
@@ -36,37 +37,41 @@ class CheckRrdStep implements Validation
         $bad_step_files = [];
         $bad_files = [];
 
-        $rrd_files = $this->listFiles();
+        try {
+            $rrd_files = $this->listFiles();
 
-        foreach ($rrd_files as $rrd_file) {
-            try {
-                $step = $this->getStep($rrd_file);
-                $target_step = str_ends_with($rrd_file, '/icmp-perf.rrd') ? $this->ping_rrd_step : $this->rrd_step;
+            foreach ($rrd_files as $rrd_file) {
+                try {
+                    $step = $this->getStep($rrd_file);
+                    $target_step = str_ends_with($rrd_file, '/icmp-perf.rrd') ? $this->ping_rrd_step : $this->rrd_step;
 
-                if ($step !== $target_step) {
-                    $bad_step_files[] = __('validation.validations.rrd.CheckRrdStep.list_bad_step_item', ['file' => $rrd_file, 'step' => $step, 'target' => $target_step]);
+                    if ($step !== $target_step) {
+                        $bad_step_files[] = __('validation.validations.rrd.CheckRrdStep.list_bad_step_item', ['file' => $rrd_file, 'step' => $step, 'target' => $target_step]);
+                    }
+                } catch (\Exception $e) {
+                    $bad_files[] = $rrd_file . ': ' . $e->getMessage();
                 }
-            } catch (\Exception $e) {
-                $bad_files[] = $rrd_file . ': ' . $e->getMessage();
             }
+
+            $this->rrdtool->stop();
+
+            $total = count($rrd_files);
+
+            if (! empty($bad_step_files)) {
+                return ValidationResult::fail(__('validation.validations.rrd.CheckRrdStep.fail', ['bad' => count($bad_step_files), 'total' => $total]))
+                    ->setList(__('validation.validations.rrd.CheckRrdStep.list_bad_step_title'), $bad_step_files)
+                    ->setFix('lnms maintenance:rrd-step all');
+            }
+
+            if (! empty($bad_files)) {
+                return ValidationResult::fail(__('validation.validations.rrd.CheckRrdStep.fail_bad_files', ['bad' => count($bad_files), 'total' => $total]))
+                    ->setList(__('validation.validations.rrd.CheckRrdStep.list_bad_files_title'), $bad_files);
+            }
+
+            return ValidationResult::ok(__('validation.validations.rrd.CheckRrdStep.ok', ['total' => $total]));
+        } catch (ProcessTimedOutException) {
+            return ValidationResult::info(__('validation.validations.rrd.CheckRrdStep.timeout', ['command' => 'lnms maintenance:rrd-step all']));
         }
-
-        $this->rrdtool->stop();
-
-        $total = count($rrd_files);
-
-        if (! empty($bad_step_files)) {
-            return ValidationResult::fail(__('validation.validations.rrd.CheckRrdStep.fail', ['bad' => count($bad_step_files), 'total' => $total]))
-                ->setList(__('validation.validations.rrd.CheckRrdStep.list_bad_step_title'), $bad_step_files)
-                ->setFix('lnms maintenance:rrd-step all');
-        }
-
-        if (! empty($bad_files)) {
-            return ValidationResult::fail(__('validation.validations.rrd.CheckRrdStep.fail_bad_files', ['bad' => count($bad_files), 'total' => $total]))
-                ->setList(__('validation.validations.rrd.CheckRrdStep.list_bad_files_title'), $bad_files);
-        }
-
-        return ValidationResult::ok(__('validation.validations.rrd.CheckRrdStep.ok', ['total' => $total]));
     }
 
     /**
@@ -87,6 +92,7 @@ class CheckRrdStep implements Validation
      * @return string[]
      *
      * @throws RrdException
+     * @throws ProcessTimedOutException
      */
     private function listFiles(): array
     {

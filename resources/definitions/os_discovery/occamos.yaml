@@ -1,4 +1,3 @@
-mib: OCCAM-ENTITY-MIB:OCCAM-SENSOR-MIB
 modules:
     os:
         sysDescr_regex: '/(?<hardware>.*)/'
@@ -10,36 +9,36 @@ modules:
         temperature:
             data:
                 -
-                    oid: sensorTable
-                    value: sensorValue
+                    oid: OCCAM-SENSOR-MIB::sensorTable
+                    value: OCCAM-SENSOR-MIB::sensorValue
                     num_oid: '.1.3.6.1.4.1.6066.2.1.3.2.1.1.1.1.4.{{ $index }}'
-                    descr: '{{ $sensorName }}'
+                    descr: '{{ OCCAM-SENSOR-MIB::sensorName }}'
                     index: '{{ $index }}'
                     divisor: 1000
                     skip_values:
                         -
-                            oid: sensorType
+                            oid: OCCAM-SENSOR-MIB::sensorType
                             op: '!='
                             value: '3'
                         -
-                            oid: sensorScale
+                            oid: OCCAM-SENSOR-MIB::sensorScale
                             op: '!='
                             value: '4'
         voltage:
             data:
                 -
-                    oid: sensorTable
-                    value: sensorValue
+                    oid: OCCAM-SENSOR-MIB::sensorTable
+                    value: OCCAM-SENSOR-MIB::sensorValue
                     num_oid: '.1.3.6.1.4.1.6066.2.1.3.2.1.1.1.1.4.{{ $index }}'
-                    descr: '{{ $sensorName }}'
+                    descr: '{{ OCCAM-SENSOR-MIB::sensorName }}'
                     index: '{{ $index }}'
                     divisor: 1000
                     skip_values:
                         -
-                            oid: sensorType
+                            oid: OCCAM-SENSOR-MIB::sensorType
                             op: '!='
                             value: '2'
                         -
-                            oid: sensorScale
+                            oid: OCCAM-SENSOR-MIB::sensorScale
                             op: '!='
                             value: '3'

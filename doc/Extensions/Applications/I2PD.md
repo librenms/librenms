@@ -4,7 +4,7 @@ This is simple Python3-based SNMP extend script for monitoring I2PD routing daem
 
 Script communicates with I2PD via I2PControl protocol. Enable and configure that first.
 
-## Enabing I2PControl
+## Enabling I2PControl
 
 1. Edit i2pd.conf (usually at `/etc/i2pd/i2pd.conf`) and find `[i2pcontrol]` section
 

@@ -26,9 +26,10 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
+use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Carbon\Exceptions\InvalidFormatException;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 
 class Time
@@ -202,5 +203,24 @@ class Time
         mt_srand();
 
         return $time->format($format);
+    }
+
+    /**
+     * Format a timestamp for display to users in their selected timezone
+     */
+    public static function format(Carbon|string|int $input, string $format): string
+    {
+        if (is_string($input)) {
+            $input = Carbon::parse($input);
+        } elseif (is_numeric($input)) {
+            $input = Carbon::createFromTimestamp($input);
+        }
+
+        $format = match ($format) {
+            'long', 'compact', 'byminute', 'time' => LibrenmsConfig::get("dateformat.$format"),
+            default => throw new \Exception('Format needs to be one of log, compact, byminute or time'),
+        };
+
+        return $input->setTimezone(session('preferences.timezone'))->format($format);
     }
 }

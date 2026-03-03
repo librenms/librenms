@@ -48,7 +48,7 @@ class ValidateController extends Controller
                 },
             ],
         ]);
-        $fixer = $request->get('fixer');
+        $fixer = $request->input('fixer');
 
         return response()->json([
             'result' => (new $fixer)->fix(),

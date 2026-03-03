@@ -34436,8 +34436,8 @@
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.4.2.1.1",
-                    "processor_index": "dellNetCpuUtil1Min.2.1.1",
+                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.4.stack.1.1",
+                    "processor_index": "dellNetCpuUtil1Min.stack.1.1",
                     "processor_type": "dnos",
                     "processor_usage": 12,
                     "processor_descr": "1m Utilization",
@@ -34447,8 +34447,8 @@
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.5.2.1.1",
-                    "processor_index": "dellNetCpuUtil5Min.2.1.1",
+                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.5.stack.1.1",
+                    "processor_index": "dellNetCpuUtil5Min.stack.1.1",
                     "processor_type": "dnos",
                     "processor_usage": 8,
                     "processor_descr": "5m Utilization",
@@ -34457,7 +34457,32 @@
                 }
             ]
         },
-        "poller": "matches discovery"
+        "poller": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.4.stack.1.1",
+                    "processor_index": "dellNetCpuUtil1Min.stack.1.1",
+                    "processor_type": "dnos",
+                    "processor_usage": 0,
+                    "processor_descr": "1m Utilization",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.5.stack.1.1",
+                    "processor_index": "dellNetCpuUtil5Min.stack.1.1",
+                    "processor_type": "dnos",
+                    "processor_usage": 0,
+                    "processor_descr": "5m Utilization",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        }
     },
     "mempools": {
         "discovery": {
@@ -34471,11 +34496,11 @@
                     "mempool_descr": "Memory Usage",
                     "mempool_perc": 30,
                     "mempool_perc_oid": ".1.3.6.1.4.1.6027.3.26.1.4.4.1.6.2.1.1",
-                    "mempool_used": 644245094,
+                    "mempool_used": 31457280,
                     "mempool_used_oid": null,
-                    "mempool_free": 1503238554,
+                    "mempool_free": 73400320,
                     "mempool_free_oid": null,
-                    "mempool_total": 2147483648,
+                    "mempool_total": 104857600,
                     "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,

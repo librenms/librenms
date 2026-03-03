@@ -1,0 +1,525 @@
+
+AC-PM-ATM-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+
+        OBJECT-TYPE, 
+        MODULE-IDENTITY                             FROM SNMPv2-SMI
+        enterprises                                 FROM SNMPv2-SMI;
+	
+
+	audioCodes       OBJECT IDENTIFIER ::= {enterprises 5003}
+	acRegistrations  OBJECT IDENTIFIER ::= {audioCodes 7}
+	acGeneric        OBJECT IDENTIFIER ::= {audioCodes 8}
+	acProducts       OBJECT IDENTIFIER ::= {audioCodes 9}	
+	acPerformance    OBJECT IDENTIFIER ::= {audioCodes 10}	
+
+       
+acPMAtm  MODULE-IDENTITY       
+    LAST-UPDATED "200601261643Z"          --Thursday, January 26, 2006
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: Support
+			 AudioCodes LTD
+             1 Hayarden Street
+             Airport City 
+			 Lod, ISRAEL 70151
+     Tel:    972-3-9764000
+     Fax:    972-3-9764040
+     Email:  support@audiocodes.com
+     Web:    www.audiocodes.com"		
+		
+
+    DESCRIPTION       
+    "The AC-PM-ATM MIB offers performance monitoring
+For the ATMrelated elements in Audiocodes' devices.
+The Configuration sub-tree is for configuring the interval
+Period length for the entire AC-PM-ATM MIB, and the 
+different tables' thresholds.
+The Data sub-tree presents the tables of monitored
+elements.
+
+Note  - for the entire MIB the value (-1) means the value
+Asked for is either not supported or currently not relevant
+(this is for when values asked for are for intervals not yet
+recorded."
+
+        REVISION     "201006041528Z"          --Tuesday, April 06, 2010 
+
+        DESCRIPTION  "obsoleted acPMAtm"
+
+
+
+    ::= {acPerformance 12}  
+
+
+
+
+
+
+
+
+     acPMAtmConfiguration          OBJECT IDENTIFIER ::= {acPMAtm 1}
+
+
+     acPMAtmConfigurationPeriodLength OBJECT-TYPE
+       SYNTAX INTEGER (0..894780)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Length of monitoring intervals for entire MIB.Time is in minutes."
+       ::= {acPMAtmConfiguration 1}
+
+
+
+     acPMAtmConfigurationResetTotalCounters OBJECT-TYPE
+       SYNTAX INTEGER {
+                  resetCountersDone(1)
+,
+                  resetTotalCounters(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Total-Counters Reset.  To reset the total counters, set the
+value of this object to resetTotalCounters(2)."
+       ::= {acPMAtmConfiguration 2}
+
+
+
+     acPMAtmCellAttributes         OBJECT IDENTIFIER ::= {acPMAtmConfiguration 31}
+
+
+     acPMAtmCellAttributesTxHighThreshold OBJECT-TYPE
+       SYNTAX INTEGER (100..3000)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "High threshold."
+       ::= {acPMAtmCellAttributes 1}
+
+
+
+     acPMAtmCellAttributesTxLowThreshold OBJECT-TYPE
+       SYNTAX INTEGER (100..3000)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Low threshold."
+       ::= {acPMAtmCellAttributes 2}
+
+
+
+     acPMAtmCellAttributesRxHighThreshold OBJECT-TYPE
+       SYNTAX INTEGER (100..3000)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "High threshold."
+       ::= {acPMAtmCellAttributes 3}
+
+
+
+     acPMAtmCellAttributesRxLowThreshold OBJECT-TYPE
+       SYNTAX INTEGER (100..3000)
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Low threshold."
+       ::= {acPMAtmCellAttributes 4}
+
+
+
+     acPMAtmData                   OBJECT IDENTIFIER ::= {acPMAtm 2}
+
+
+     acPMAtmDataAcPMAtmTimeFromStartOfInterval OBJECT-TYPE
+       SYNTAX INTEGER (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "The time in seconds since the start of the current interval.
+MIB specific."
+       ::= {acPMAtmData 1}
+
+
+
+     -- ****************************************
+     -- acPMAtmCellTx table decleration
+     -- ****************************************
+     acPMAtmCellTxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMAtmCellTxEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "Atm interface transmit cells per second."
+       ::= {acPMAtmData 21}
+
+
+
+     -- ****************************************
+     -- acPMAtmCellTx table entry
+     -- ****************************************
+     acPMAtmCellTxEntry OBJECT-TYPE
+       SYNTAX AcPMAtmCellTxEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           ""
+       INDEX {acPMAtmCellTxInterface,acPMAtmCellTxInterval}
+       ::= {acPMAtmCellTxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMAtmCellTx TABLE
+     -- ****************************************
+     AcPMAtmCellTxEntry ::= SEQUENCE {
+       acPMAtmCellTxInterface                                      INTEGER,
+       acPMAtmCellTxInterval                                       INTEGER,
+       acPMAtmCellTxAverage                                        INTEGER,
+       acPMAtmCellTxMax                                            INTEGER,
+       acPMAtmCellTxMin                                            INTEGER,
+       acPMAtmCellTxVolume                                         Counter32,
+       acPMAtmCellTxTimeBelowLowThreshold                          INTEGER,
+       acPMAtmCellTxTimeBetweenThresholds                          INTEGER,
+       acPMAtmCellTxTimeAboveHighThreshold                         INTEGER,
+       acPMAtmCellTxFullDayAverage                                 INTEGER
+     }
+
+
+
+     acPMAtmCellTxInterface OBJECT-TYPE
+       SYNTAX INTEGER (0..2)
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "Atm interface 0,1 and 2."
+       ::= {acPMAtmCellTxEntry 1}
+
+
+
+     acPMAtmCellTxInterval OBJECT-TYPE
+       SYNTAX INTEGER (0..2)
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMAtmCellTxEntry 2}
+
+
+
+     acPMAtmCellTxAverage OBJECT-TYPE
+       SYNTAX INTEGER (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMAtmCellTxEntry 3}
+
+
+
+     acPMAtmCellTxMax OBJECT-TYPE
+       SYNTAX INTEGER (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMAtmCellTxEntry 4}
+
+
+
+     acPMAtmCellTxMin OBJECT-TYPE
+       SYNTAX INTEGER (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMAtmCellTxEntry 5}
+
+
+
+     acPMAtmCellTxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMAtmCellTxEntry 6}
+
+
+
+     acPMAtmCellTxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX INTEGER (-1..100)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMAtmCellTxEntry 7}
+
+
+
+     acPMAtmCellTxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX INTEGER (-1..100)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMAtmCellTxEntry 8}
+
+
+
+     acPMAtmCellTxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX INTEGER (-1..100)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMAtmCellTxEntry 9}
+
+
+
+     acPMAtmCellTxFullDayAverage OBJECT-TYPE
+       SYNTAX INTEGER (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMAtmCellTxEntry 10}
+
+
+
+     -- ****************************************
+     -- acPMAtmCellRx table decleration
+     -- ****************************************
+     acPMAtmCellRxTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMAtmCellRxEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "Atm interface recieve cells per second."
+       ::= {acPMAtmData 22}
+
+
+
+     -- ****************************************
+     -- acPMAtmCellRx table entry
+     -- ****************************************
+     acPMAtmCellRxEntry OBJECT-TYPE
+       SYNTAX AcPMAtmCellRxEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           ""
+       INDEX {acPMAtmCellRxInterface,acPMAtmCellRxInterval}
+       ::= {acPMAtmCellRxTable 1}
+
+
+
+     -- ****************************************
+     -- acPMAtmCellRx TABLE
+     -- ****************************************
+     AcPMAtmCellRxEntry ::= SEQUENCE {
+       acPMAtmCellRxInterface                                      INTEGER,
+       acPMAtmCellRxInterval                                       INTEGER,
+       acPMAtmCellRxAverage                                        INTEGER,
+       acPMAtmCellRxMax                                            INTEGER,
+       acPMAtmCellRxMin                                            INTEGER,
+       acPMAtmCellRxVolume                                         Counter32,
+       acPMAtmCellRxTimeBelowLowThreshold                          INTEGER,
+       acPMAtmCellRxTimeBetweenThresholds                          INTEGER,
+       acPMAtmCellRxTimeAboveHighThreshold                         INTEGER,
+       acPMAtmCellRxFullDayAverage                                 INTEGER
+     }
+
+
+
+     acPMAtmCellRxInterface OBJECT-TYPE
+       SYNTAX INTEGER (0..2)
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "Atm interface 0,1 and 2."
+       ::= {acPMAtmCellRxEntry 1}
+
+
+
+     acPMAtmCellRxInterval OBJECT-TYPE
+       SYNTAX INTEGER (0..2)
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMAtmCellRxEntry 2}
+
+
+
+     acPMAtmCellRxAverage OBJECT-TYPE
+       SYNTAX INTEGER (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Average value within the period time."
+       ::= {acPMAtmCellRxEntry 3}
+
+
+
+     acPMAtmCellRxMax OBJECT-TYPE
+       SYNTAX INTEGER (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Maximum value within the period time."
+       ::= {acPMAtmCellRxEntry 4}
+
+
+
+     acPMAtmCellRxMin OBJECT-TYPE
+       SYNTAX INTEGER (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Minimum value within the period time."
+       ::= {acPMAtmCellRxEntry 5}
+
+
+
+     acPMAtmCellRxVolume OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMAtmCellRxEntry 6}
+
+
+
+     acPMAtmCellRxTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX INTEGER (-1..100)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMAtmCellRxEntry 7}
+
+
+
+     acPMAtmCellRxTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX INTEGER (-1..100)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMAtmCellRxEntry 8}
+
+
+
+     acPMAtmCellRxTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX INTEGER (-1..100)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMAtmCellRxEntry 9}
+
+
+
+     acPMAtmCellRxFullDayAverage OBJECT-TYPE
+       SYNTAX INTEGER (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMAtmCellRxEntry 10}
+
+
+
+     -- ****************************************
+     -- acPMAtmCellDiscarded table decleration
+     -- ****************************************
+     acPMAtmCellDiscardedTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMAtmCellDiscardedEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "Counts the number of cells discarded in the reporting interval."
+       ::= {acPMAtmData 23}
+
+
+
+     -- ****************************************
+     -- acPMAtmCellDiscarded table entry
+     -- ****************************************
+     acPMAtmCellDiscardedEntry OBJECT-TYPE
+       SYNTAX AcPMAtmCellDiscardedEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           ""
+       INDEX {acPMAtmCellDiscardedInterface,acPMAtmCellDiscardedInterval}
+       ::= {acPMAtmCellDiscardedTable 1}
+
+
+
+     -- ****************************************
+     -- acPMAtmCellDiscarded TABLE
+     -- ****************************************
+     AcPMAtmCellDiscardedEntry ::= SEQUENCE {
+       acPMAtmCellDiscardedInterface                               INTEGER,
+       acPMAtmCellDiscardedInterval                                INTEGER,
+       acPMAtmCellDiscardedVal                                     Gauge32
+     }
+
+
+
+     acPMAtmCellDiscardedInterface OBJECT-TYPE
+       SYNTAX INTEGER (0..2)
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "Atm interface 0,1 and 2."
+       ::= {acPMAtmCellDiscardedEntry 1}
+
+
+
+     acPMAtmCellDiscardedInterval OBJECT-TYPE
+       SYNTAX INTEGER (0..2)
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMAtmCellDiscardedEntry 2}
+
+
+
+     acPMAtmCellDiscardedVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS obsolete
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMAtmCellDiscardedEntry 3}
+
+
+
+
+
+END

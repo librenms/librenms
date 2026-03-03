@@ -1,4 +1,3 @@
-mib: AC-ANALOG-MIB # Needed for audioCodes
 modules:
     os:
         hardware: AC-SYSTEM-MIB::acSysIdName.0
@@ -9,25 +8,24 @@ modules:
             data:
                 -
                     oid:
-                        - AC-GATEWAY-MIB::callerDisplayCallerDisplay
-                        - AC-GATEWAY-MIB::channelsStartingPhoneNum
+                        - AcGateway::callerDisplayCallerDisplay
+                        - AcGateway::channelsStartingPhoneNum
                         - AC-ANALOG-MIB::acAnalogFxsFxoType
                         - AC-PSTN-MIB::acTrunkDialPlanName
                         - DS1-MIB::dsx1CircuitIdentifier
-                        - AC-PM-PSTN-MIB::acPMTrunkUtilizationAttributes
         count:
             data:
                 -
-                    oid: 'audioCodes.15.3.1.1.1.2.0' # MIB not supplied by vendor
-                    value: 'audioCodes'
-                    num_oid: '.1.3.6.1.4.1.5003.15.3.1.1.1.2.{{ $index }}'
-                    index: 'audioCodes.{{ $index }}'
+                    oid: 'AC-KPI-MIB::acKpiSbcCallStatsCurrentSrdActiveCallsIn' # MIB not supplied by vendor
+                    value: 'AC-KPI-MIB::acKpiSbcCallStatsCurrentSrdActiveCallsIn'
+                    num_oid: '.1.3.6.1.4.1.5003.15.3.1.1.2.2.1.3.{{ $index }}'
+                    index: 'acKpiSbcCallStatsCurrentSrdActiveCallsIn.{{ $index }}'
                     descr: 'Active Calls'
         state:
             data:
                 -
-                    oid: AC-GATEWAY-MIB::accountTable
-                    value: AC-GATEWAY-MIB::accountRowStatus
+                    oid: AcGateway::accountTable
+                    value: AcGateway::accountRowStatus
                     num_oid: '.1.3.6.1.4.1.5003.9.10.3.1.1.22.21.1.2.{{ $index }}'
                     index: 'accountTable.{{ $index }}.2'
                     descr: 'System Account Status {{ $index }}'
@@ -72,8 +70,8 @@ modules:
                         - { descr: yes, graph: 0, value: 2, generic: 0 }
                         - { descr: notApplicable, graph: 0, value: 1, generic: 3 }
                 -
-                    oid: AC-BOARD-MIB::channelStatusTable
-                    value: AC-BOARD-MIB::rTPActive
+                    oid: AcBoard::channelStatusTable
+                    value: AcBoard::rTPActive
                     num_oid: '.1.3.6.1.4.1.5003.9.10.1.4.1.1.1.{{ $index }}'
                     descr: 'SBC SIP Channel {{ $index }} active'
                     index: 'hookStatus{{ $index }}'
@@ -85,7 +83,7 @@ modules:
                     oid: AC-ANALOG-MIB::acAnalogFxsFxoTable
                     value: AC-ANALOG-MIB::acAnalogFxsFxoHookState
                     num_oid: '.1.3.6.1.4.1.5003.9.10.1.4.1.1.18.{{ $index }}'
-                    descr: 'FXO {{ $index }} ({{ $AC-GATEWAY-MIB::callerDisplayCallerDisplay }}, {{ $AC-GATEWAY-MIB::channelsStartingPhoneNum }})'
+                    descr: 'FXO {{ $index }} ({{ AcGateway::callerDisplayCallerDisplay }}, {{ AcGateway::channelsStartingPhoneNum }})'
                     index: 'hookStatus{{ $index }}'
                     state_name: acAnalogFxsFxoHookState
                     states:
@@ -101,7 +99,7 @@ modules:
                     oid: AC-ANALOG-MIB::acAnalogFxsFxoTable
                     value: AC-ANALOG-MIB::acAnalogFxsFxoHookState
                     num_oid: '.1.3.6.1.4.1.5003.9.10.1.4.1.1.18.{{ $index }}'
-                    descr: 'FXS {{ $index }} ({{ $AC-GATEWAY-MIB::callerDisplayCallerDisplay }}, {{ $AC-GATEWAY-MIB::channelsStartingPhoneNum }})'
+                    descr: 'FXS {{ $index }} ({{ AcGateway::callerDisplayCallerDisplay }}, {{ AcGateway::channelsStartingPhoneNum }})'
                     index: 'hookStatus{{ $index }}'
                     state_name: acAnalogFxsFxoHookState
                     states:
@@ -116,7 +114,7 @@ modules:
                     oid: AC-ANALOG-MIB::acAnalogFxsFxoTable
                     value: AC-ANALOG-MIB::acAnalogFxsFxoHookState
                     num_oid: '.1.3.6.1.4.1.5003.9.10.1.4.1.1.18.{{ $index }}'
-                    descr: 'E&M {{ $index }} ({{ $AC-GATEWAY-MIB::callerDisplayCallerDisplay }}, {{ $AC-GATEWAY-MIB::channelsStartingPhoneNum }})'
+                    descr: 'E&M {{ $index }} ({{ AcGateway::callerDisplayCallerDisplay }}, {{ AcGateway::channelsStartingPhoneNum }})'
                     index: 'hookStatus{{ $index }}'
                     state_name: acAnalogFxsFxoHookState
                     states:
@@ -131,7 +129,7 @@ modules:
                     oid: AC-PSTN-MIB::acTrunkTable
                     value: AC-PSTN-MIB::acTrunkAdministrativeState
                     num_oid: '.1.3.6.1.4.1.5003.9.10.9.1.1.1.1.1.2.{{ $index }}'
-                    descr: 'Trunk {{ $index }} AdminStatus ({{ $AC-PSTN-MIB::acTrunkDialPlanName }})'
+                    descr: 'Trunk {{ $index }} AdminStatus ({{ AC-PSTN-MIB::acTrunkDialPlanName }})'
                     index: 'trunkAdminStatus{{ $index }}'
                     state_name: acTrunkAdministrativeState
                     states:
@@ -141,7 +139,7 @@ modules:
                     oid: AC-PSTN-MIB::acTrunkTable
                     value: AC-PSTN-MIB::acTrunkProtocolType
                     num_oid: '.1.3.6.1.4.1.5003.9.10.9.1.1.1.1.1.3.{{ $index }}'
-                    descr: 'Trunk {{ $index }} Type ({{ $AC-PSTN-MIB::acTrunkDialPlanName }})'
+                    descr: 'Trunk {{ $index }} Type ({{ AC-PSTN-MIB::acTrunkDialPlanName }})'
                     index: 'trunkProtocolType{{ $index }}'
                     state_name: acTrunkProtocolType
                     states:
@@ -191,20 +189,6 @@ modules:
                         - { descr: BRI-NTT, graph: 0, value: 56 , generic: 0 }
                         - { descr: BRI-IUA, graph: 0, value: 57 , generic: 0 }
                 -
-                    oid: DS1-MIB::dsx1ConfigTable
-                    value: DS1-MIB::dsx1LoopbackConfig
-                    num_oid: '.1.3.6.1.2.1.10.18.6.1.9.{{ $index }}'
-                    descr: 'DS1 LoopbackConfig ({{ $DS1-MIB::dsx1CircuitIdentifier }}){{ $index }}'
-                    index: 'DS1loopback{{ $index }}'
-                    state_name: dsx1LoopbackConfig
-                    states:
-                        - { descr: No Loop , graph: 0, value: 1 , generic: 0 }
-                        - { descr: Payload Loop , graph: 0, value: 2 , generic: 3 }
-                        - { descr: Line Loop , graph: 0, value: 3 , generic: 3 }
-                        - { descr: Other Loop , graph: 0, value: 4 , generic: 3 }
-                        - { descr: Inward Loop , graph: 0, value: 5 , generic: 3 }
-                        - { descr: Dual Loop , graph: 0, value: 6 , generic: 3 }
-                -
                     oid: AC-PSTN-MIB::acTrunkStatusTable
                     value: AC-PSTN-MIB::acTrunkStatusAlarm
                     num_oid: '.1.3.6.1.4.1.5003.9.10.9.2.1.1.1.7.{{ $index }}'
@@ -221,3 +205,17 @@ modules:
                         - { descr: Rai , graph: 0, value: 4 , generic: 2 }
                         - { descr: DChannel , graph: 0, value: 5 , generic: 2 }
                         - { descr: LowerLayerDown , graph: 0, value: 6 , generic: 2 }
+                -
+                    oid: DS1-MIB::dsx1ConfigTable
+                    value: DS1-MIB::dsx1LoopbackConfig
+                    num_oid: '.1.3.6.1.2.1.10.18.6.1.9.{{ $index }}'
+                    descr: 'DS1 LoopbackConfig ({{ DS1-MIB::dsx1CircuitIdentifier }}){{ $index }}'
+                    index: 'DS1loopback{{ $index }}'
+                    state_name: dsx1LoopbackConfig
+                    states:
+                        - { descr: No Loop , graph: 0, value: 1 , generic: 0 }
+                        - { descr: Payload Loop , graph: 0, value: 2 , generic: 3 }
+                        - { descr: Line Loop , graph: 0, value: 3 , generic: 3 }
+                        - { descr: Other Loop , graph: 0, value: 4 , generic: 3 }
+                        - { descr: Inward Loop , graph: 0, value: 5 , generic: 3 }
+                        - { descr: Dual Loop , graph: 0, value: 6 , generic: 3 }

@@ -4,7 +4,6 @@ use App\Models\Mempool;
 
 require 'includes/html/graphs/common.inc.php';
 
-$graph_params->sloped_mode = true;
 $graph_params->base = 1024;
 
 // order mempools properly

@@ -9,43 +9,38 @@ IMPORTS
     MODULE-COMPLIANCE, OBJECT-GROUP,
     NOTIFICATION-GROUP                      FROM SNMPv2-CONF
     SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
-	InterfaceIndex		       	            FROM IF-MIB
+    InterfaceIndex		       	            FROM IF-MIB
+    InetAddressType, InetAddress            FROM INET-ADDRESS-MIB
     softentIND1CapMan		FROM ALCATEL-IND1-BASE;
-		
 
-	alcatelIND1CapManMIB MODULE-IDENTITY
-		LAST-UPDATED "200911230000Z"
-		ORGANIZATION "Alcatel-Lucent"
-		CONTACT-INFO
-            "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+    alcatelIND1CapManMIB MODULE-IDENTITY
+        LAST-UPDATED "201911270000Z"
+        ORGANIZATION "ALE USA Inc."
+        CONTACT-INFO
+         "Please consult with Customer Service to ensure the most appropriate
+          version of this document is used with the products in question:
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+                          ALE USA Inc. Enterprise
+                            26801 West Agoura Road
+                         Agoura Hills, CA  91301-5122
+                           United States Of America
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+         Telephone:          +1 800 995 2696
 
-		DESCRIPTION
-			"This module describes an authoritative enterprise-specific Simple
+         Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+         World Wide Web:     https://www.al-enterprise.com"
+
+        DESCRIPTION
+            "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
-		 System Capability Manager, to allow for system control and limitation setting, of
-		 different, features through out the system.
-		 Capability manager is a centralized process which provides hardware information and
-		 capability to other processes. To optimize the system performance , certain features
-		 may be configured to a lower than the hardware limit through capability manager.
+                 For the OmniSwitch Product Line
+         System Capability Manager, to allow for system control and limitation setting, of
+         different, features through out the system.
+         Capability manager is a centralized process which provides hardware information and
+         capability to other processes. To optimize the system performance , certain features
+         may be configured to a lower than the hardware limit through capability manager.
 
              The right to make changes in specification and other information
              contained in this document without prior notice is reserved.
@@ -58,13 +53,18 @@ IMPORTS
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2009 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                       Copyright (C) ALE USA Inc. 2014-2019
+                       Copyright (C) 1995-2013 Alcatel-Lucent
+                           ALL RIGHTS RESERVED WORLDWIDE"
 
-		REVISION      "200911230000Z"
+        REVISION      "201911270000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
+
+        REVISION      "200911230000Z"
         DESCRIPTION
             "Capability Manager is used to set system wide limitation."
-     	        ::= { softentIND1CapMan 1}
+                ::= { softentIND1CapMan 1}
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -81,6 +81,7 @@ IMPORTS
         alaCapabilityMibNotifications OBJECT IDENTIFIER ::= { alcatelIND1CapManMIBObjects 0 }
 	alaCapabilityManager  OBJECT IDENTIFIER ::= { alcatelIND1CapManMIBObjects 1 }
 	alaCapManConformance  OBJECT IDENTIFIER ::= { alcatelIND1CapManMIBObjects 2 }
+	alaCapManNotificationObjects  OBJECT IDENTIFIER ::= { alcatelIND1CapManMIBObjects 3 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -372,8 +373,9 @@ alaCapManHashMode OBJECT-TYPE
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION
-            "When set to brief, Hash mode is enabled.
-             When set to Extended, Hash mode is disabled."
+            "When set to brief, Simple Hash algorithm applies on L2/L3 traffic
+             based on ASIC. When set to Extended,Advance Hash algorithm applies
+             on L2/L3 traffic based on ASIC along with L4 port enable option."
         DEFVAL { extended }
         ::= { alaCapManHashControlCommands 1 }
 
@@ -406,7 +408,48 @@ alaCapManNonUCHashControl OBJECT-TYPE
     DEFVAL { disable }
         ::= { alaCapManHashControlCommands 3 }
 
+alaCapManNonUCTunnelProtocol OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This control is used to enable/disable
+             tunnel protocol Load balance for non unicast traffic."
+    DEFVAL { disable }
+        ::= { alaCapManHashControlCommands 4 }
 
+alaCapManNonUCSourcePort OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This control is used to enable/disable
+             source port Load balance for non unicast traffic."
+    DEFVAL { disable }
+        ::= { alaCapManHashControlCommands 5 }
+
+alaCapManHashControlSpbMiMPayload OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The control is used to enable or disable Source/Destination IP addresses and
+             ports in the SPB MAC-in-MAC payload. This option is applicable only when
+             Hash mode is set to disabled (i.e. extended)."
+    DEFVAL { disable }
+        ::= { alaCapManHashControlCommands 6 }
 
 -- xxxxxxxxxxxxxxxxxxx
 -- capability Manager VC Software Licensing
@@ -440,7 +483,8 @@ alaCapManVcSwLicensingAction OBJECT-TYPE
 	SYNTAX		INTEGER {
 				default (0),
 				applyFile (1),
-				applyAfn (2)
+				applyAfn (2),
+				applyKey (3)
 				}
 	MAX-ACCESS	read-write
 	STATUS		current
@@ -473,6 +517,25 @@ alaCapManVcSwLicensingAfnStatus OBJECT-TYPE
         STATUS          current
         DESCRIPTION     "AFN related license status."
         ::= { alaCapManSwLicensingConfig 6}
+        
+alaCapManVcSwLicensingOrderID OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (8))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Argument of the software licensing action."
+        ::= { alaCapManSwLicensingConfig 7}
+
+alaCapManVcSwLicensingKeyStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                unknown(1),
+                inProgress(2),
+                completed(3),
+                failed(4)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     " Related license status."
+        ::= { alaCapManSwLicensingConfig 8}
 
 alaCapManSwLicensingInfoTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF AlaCapManSwLicensingInfoEntry	
@@ -698,7 +761,14 @@ alaMibVcLicenseFeatureId OBJECT-TYPE
                         datacenter (2),
                         xniu16 (3),
                         afn (4),
-                        poe (5)
+                        poe (5),
+                        u10G (6),
+                        macsec (7),
+                        metro (8),
+                        mpls (10),
+                        advRouting (11),
+                        mplsNode(12),
+                        u50G (13)
                 }
         MAX-ACCESS  read-only
         STATUS      current
@@ -820,6 +890,299 @@ alaCapManDcbOprMode OBJECT-TYPE
         DEFVAL { enabled }
         ::= { alaCapManFeatureControlCommands 2 }
 
+-- xxxxxxxxxxxxxxxxxxx
+-- CAPABILITY MANAGER PROFILE
+-- xxxxxxxxxxxxxxxxxxx
+
+alaCapManProfile OBJECT IDENTIFIER ::= { alaCapabilityManager 12 }
+
+alaCapManProfileMode OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        switch(1),
+                        router(2),
+                        edgeRouter(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The control is used to globally set capability profile mode."
+        DEFVAL { switch }
+        ::= { alaCapManProfile 1 }
+
+alaCapManProfileTcamMode OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        source-ipv6(1),
+                        dest-ipv6(2),
+                        source-dest-ipv6(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The control is used to globally set capability profile TCAM mode for source/destination IPv6 filtering"
+        DEFVAL { dest-ipv6 }
+        ::= { alaCapManProfile 2 }
+
+alaCapManConfiguredProfileMode OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        switch(1),
+                        router(2),
+                        edgeRouter(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The control is used to globally get current capability profile mode."
+        DEFVAL { switch }
+        ::= { alaCapManProfile 3 }
+
+--
+-- CAPABILITY MANAGER TRAP-THRESHOLD
+--
+
+alaCapManTrapThreshold OBJECT IDENTIFIER ::= { alaCapabilityManager 13 }
+
+alaCapManTrapThresholdMacLow OBJECT-TYPE
+        SYNTAX      Unsigned32 (5..90)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object presents the minimum utilization percentage of L2 MAC table for trigging SNMP trap
+             and clearing the trap."
+        DEFVAL { 90 }
+        ::= { alaCapManTrapThreshold 1 }
+
+
+alaCapManTrapThresholdMacHigh OBJECT-TYPE
+        SYNTAX      Unsigned32 (10..95)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object presents the maximum utilization percentage of L2 MAC table for trigging SNMP trap
+             and clearing the trap."
+        DEFVAL { 95 }
+        ::= { alaCapManTrapThreshold 2 }
+
+alaCapManTrapThresholdArpLow OBJECT-TYPE
+        SYNTAX      Unsigned32 (5..90)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object presents the minimum utilization percentage of L3 ARP table for trigging SNMP trap
+             and clearing the trap."
+        DEFVAL { 90 }
+        ::= { alaCapManTrapThreshold 3 }
+
+alaCapManTrapThresholdArpHigh OBJECT-TYPE
+        SYNTAX      Unsigned32 (10..95)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object presents the maximum utilization percentage of L3 ARP table for trigging SNMP trap
+             and clearing the trap."
+        DEFVAL { 95 }
+        ::= { alaCapManTrapThreshold 4 }
+
+--
+-- CAPABILITY MANAGER SHARED VLAN LEARNING
+--
+alaCapManSharedVlanLearningConfig OBJECT IDENTIFIER ::= { alaCapabilityManager 14 }
+
+alaCapManSharedVlanLearning OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to enable or disable the shared VLAN learning."
+        DEFVAL { disable }
+        ::= { alaCapManSharedVlanLearningConfig 1 }
+
+--
+-- CAPABILITY MANAGER SERVICE L3VPN
+--
+alaCapManServicel3vpnConfig OBJECT IDENTIFIER ::= { alaCapabilityManager 15 }
+
+alaCapManServicel3vpn OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to enable or disable the service l2 VPN."
+        DEFVAL { disable }
+        ::= { alaCapManServicel3vpnConfig 1 }
+
+--
+-- CAPABILITY MANAGER RTU FEATURE AGENT
+--
+alaCapManRtuAgent OBJECT IDENTIFIER ::= { alaCapabilityManager 16 }
+
+alaRtuAgentProxyAddressType  OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Integer displaying the configured address type for RTU proxy server."
+    DEFVAL { ipv4 }
+    ::= { alaCapManRtuAgent 1 }
+
+alaRtuAgentProxyAddress  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "String displaying the configured address for RTU proxy server."
+    DEFVAL { '00000000'h }  -- 0.0.0.0
+    ::= { alaCapManRtuAgent 2 }
+
+alaRtuAgentProxyPort  OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535) 
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Integer displaying the configured port for RTU proxy server."
+    DEFVAL  { 0 }
+    ::= { alaCapManRtuAgent 3 }
+
+alaRtuAgentProxyUsername  OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "String displaying the configured username for RTU proxy server."
+    DEFVAL  { "" }
+    ::= { alaCapManRtuAgent 4 }
+
+alaRtuAgentProxyPassword  OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "String displaying the configured password for RTU proxy server."
+    DEFVAL  { "" }
+    ::= { alaCapManRtuAgent 5 }
+
+--
+-- CAPABILITY MANAGER RTU FEATURE INFORMATION
+--
+alaCapManRtuFeatureInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlaCapManRtuInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Table of RTU feature information."
+    ::= { alaCapabilityManager 17 }
+
+alaCapManRtuInfoEntry  OBJECT-TYPE
+    SYNTAX          AlaCapManRtuInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Information of valid license information."
+    INDEX { alaCapabilityRtuSerialId, alaCapabilityRtuMacAddress, alaCapabilityRtuFeatureId }
+    ::= { alaCapManRtuFeatureInfoTable 1 }
+
+AlaCapManRtuInfoEntry ::=
+    SEQUENCE
+    {
+        alaCapabilityRtuSerialId            OCTET STRING,
+        alaCapabilityRtuMacAddress          MacAddress,
+        alaCapabilityRtuFeatureId           INTEGER,
+        alaCapabilityRtuRunningMode         INTEGER,
+        alaCapabilityRtuFeatureStatus       INTEGER,
+        alaCapabilityRtuFeaturePort         SnmpAdminString,
+        alaCapabilityRtuPortCount           Unsigned32,
+        alaCapabilityRtuTrialPeriod         SnmpAdminString
+    }
+
+alaCapabilityRtuSerialId  OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(25))
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION     "String displaying the serial number for which this feature is valid."
+    ::= { alaCapManRtuInfoEntry 1 }
+
+alaCapabilityRtuMacAddress  OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "String displaying the MAC address for which this feature is valid."
+    ::= { alaCapManRtuInfoEntry 2 }
+
+alaCapabilityRtuFeatureId  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        noFeature (1),
+                        u10gRtuType (6)
+                    }
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION     "Value for different features.
+                     (1) is corresponded to RTU no feature special case."
+    ::= { alaCapManRtuInfoEntry 3 }
+
+alaCapabilityRtuRunningMode  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        onTrial (1),
+                        endOfTrial (2),
+                        onPermanent (3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Current RTU running modes on the switch."
+    ::= { alaCapManRtuInfoEntry 4 }
+
+alaCapabilityRtuFeatureStatus  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable (1),
+                        disable (2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Current status for a RTU feature."
+    DEFVAL  { enable }
+    ::= { alaCapManRtuInfoEntry 5 }
+
+alaCapabilityRtuFeaturePort  OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "String displaying enabled ports used by a RTU feature."
+    DEFVAL  { "" }
+    ::= { alaCapManRtuInfoEntry 6 }
+
+alaCapabilityRtuPortCount  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Integer displaying the count of enabled ports used by a RTU feature."
+    DEFVAL  { 0 }
+    ::= { alaCapManRtuInfoEntry 7 }
+
+alaCapabilityRtuTrialPeriod  OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE(25))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "String displaying total days in trial period of a RTU feature."
+    ::= { alaCapManRtuInfoEntry 8 }
+
+--
+-- CAPABILITY MANAGER VFL-TYPE
+--
+alaCapManVflConfig OBJECT IDENTIFIER ::= { alaCapabilityManager 18 }
+
+alaCapManVflType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        standard(1),
+                        mixed(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to configure the VFL type standard or mixed."
+        ::= { alaCapManVflConfig 1 }
+
 -- -------------------------------------------------------------
 -- License Manager TRAPS
 -- -------------------------------------------------------------
@@ -832,6 +1195,95 @@ alaLicenseManagerDemoDayAlert NOTIFICATION-TYPE
     DESCRIPTION
         "Generate trap for license manager." 
     ::= {alaCapabilityMibNotifications 1}
+
+-- -------------------------------------------------------------
+-- Capability Manager Threshold TRAPS
+-- -------------------------------------------------------------
+alaHWMacCapacityExceeded NOTIFICATION-TYPE
+    OBJECTS
+    {
+        alaHWMacMaxThresholdState
+    }
+    STATUS  current
+    DESCRIPTION
+        "alaHWMacCapacityExceeded trap indicates that there has been a change in
+         the maximum HW MAC utilization on this system. When HW MAC utilization reaches 95%,
+         this trap is generated with the alaHWMacMaxThresholdState set to reached.
+         When HW MAC utilization transitions back to below 90% utilization,
+         this trap is generated again with the alaHWMacMaxThresholdState set to cleared."
+    ::= {alaCapabilityMibNotifications 2}
+
+--
+-- CAPABILITY MANAGER RTU FEATURE TRAPS
+--
+alaCapManRtuExpiryDayAlert NOTIFICATION-TYPE
+    OBJECTS 
+    {
+        alaCapabilityRtuSerialId,
+        alaCapabilityRtuFeatureId,
+        alaCapManRtuExpiredDateStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent when a RTU feature expires.
+         7 days before the expiry, 1 day before expiry, at expiry of trial period and switch enters ended trial period." 
+    ::= { alaCapabilityMibNotifications 3 }
+
+alaCapManRtuNoConnectivityAlert NOTIFICATION-TYPE
+    OBJECTS 
+    {
+        alaCapabilityRtuSerialId,
+        alaCapManRtuServerStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "This trap is sent when the switch operates in RTU mode but it cannot call-home due to connectivity issue." 
+    ::= { alaCapabilityMibNotifications 4 }
+
+-- -------------------------------------------------------------
+-- Capability Manager Trap Notification Objects
+-- -------------------------------------------------------------
+
+alaHWMacMaxThresholdState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    reached (1),
+                    cleared (2)
+                }
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Reached: This trap value indicates if the MAC table had exceeded the configured MAC high threshold limit.
+        Cleared: This trap value indicates if the MAC table had fallen below the configured MAC low threshold limit."
+    ::= { alaCapManNotificationObjects 1 }
+
+--
+-- CAPABILITY MANAGER RTU FEATURE TRAP NOTIFICATION OBJECTS
+--
+alaCapManRtuExpiredDateStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    weekBeforeExpired (1),
+                    dayBeforeExpired (2),
+                    expired (3)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "weekBeforeExpired: 7 days before a RTU feature expired.
+         dayBeforeExpired: 1 day before a RTU feature expired.
+         expired: A RTU feature comes to an expired time."
+    ::= { alaCapManNotificationObjects 2 }
+
+alaCapManRtuServerStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    noConnectivity (1),
+                    withConnectivity (2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "noConnectivity: Switch is identified as RTU but RTU Server is not reachable for the current call-home.
+         withConnectivity: Switch is identified as RTU and RTU Server is reachable."
+    ::= { alaCapManNotificationObjects 3 }
 
 -- --------------------------------------------------------------
 -- Capability Manager MIB - Conformance Information
@@ -883,7 +1335,10 @@ alaCapManHashControlGroup OBJECT-GROUP
    OBJECTS {
    alaCapManHashMode,
    alaCapManUdpTcpPortMode,
-   alaCapManNonUCHashControl
+   alaCapManNonUCHashControl,
+   alaCapManNonUCTunnelProtocol,
+   alaCapManNonUCSourcePort,
+   alaCapManHashControlSpbMiMPayload
    }
    STATUS  current
    DESCRIPTION
@@ -897,7 +1352,9 @@ alaCapManSwLicensingGroup OBJECT-GROUP
 	alaCapManVcSwLicensingAction,
 	alaCapManVcSwLicensingActionArg,
 	alaCapManVcSwLicensingAfnInfo,
-	alaCapManVcSwLicensingAfnStatus
+	alaCapManVcSwLicensingAfnStatus,
+	alaCapManVcSwLicensingOrderID,
+	alaCapManVcSwLicensingKeyStatus
   }
    STATUS      current
    DESCRIPTION
@@ -967,14 +1424,108 @@ alaMibVcLicenseCfgGroup OBJECT-GROUP
    ::= { alaCapManGroups 11 }
 
 alaCapManTrapGroup NOTIFICATION-GROUP
-   NOTIFICATIONS {
-     alaLicenseManagerDemoDayAlert 
-   }
+    NOTIFICATIONS {
+        alaLicenseManagerDemoDayAlert,
+        alaHWMacCapacityExceeded,
+        alaCapManRtuExpiryDayAlert,
+        alaCapManRtuNoConnectivityAlert
+    }
 
    STATUS      current
    DESCRIPTION
       "Traps for CapMan Manager"
    ::= { alaCapManGroups 12 }
+
+alaCapManProfileGroup OBJECT-GROUP
+   OBJECTS {
+     alaCapManProfileMode,
+     alaCapManProfileTcamMode,
+     alaCapManConfiguredProfileMode
+   }
+   STATUS      current
+   DESCRIPTION
+      "Created to keep SNMP4J compiler Happy"
+   ::= { alaCapManGroups 13 }
+
+alaCapManTrapThresholdGroup OBJECT-GROUP
+   OBJECTS {
+     alaCapManTrapThresholdMacLow,
+     alaCapManTrapThresholdMacHigh,
+     alaCapManTrapThresholdArpLow,
+     alaCapManTrapThresholdArpHigh
+   }
+   STATUS      current
+   DESCRIPTION
+      "Trap-threshold"
+   ::= { alaCapManGroups 14 }
+
+alaCapManNotificationObjectGroup OBJECT-GROUP
+    OBJECTS {
+        alaHWMacMaxThresholdState,
+        alaCapabilityRtuSerialId,
+        alaCapabilityRtuFeatureId,
+        alaCapManRtuExpiredDateStatus,
+        alaCapManRtuServerStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "Notification objects for Capability Manager."
+    ::= { alaCapManGroups 15 }
+
+alaCapManSharedVlanLearningConfigGroup OBJECT-GROUP
+    OBJECTS {
+        alaCapManSharedVlanLearning
+    }
+    STATUS      current
+    DESCRIPTION
+        "Mandatory objects for shared VLAN learning config group"
+    ::= { alaCapManGroups 16 }
+    
+alaCapManServicel3vpnConfigGroup OBJECT-GROUP
+    OBJECTS {
+        alaCapManServicel3vpn
+    }
+    STATUS      current
+    DESCRIPTION
+        "Mandatory objects for shared VLAN learning config group"
+    ::= { alaCapManGroups 17 }
+
+alaCapManRtuAgentGroup  OBJECT-GROUP
+    OBJECTS 
+    {
+        alaRtuAgentProxyAddressType,
+        alaRtuAgentProxyAddress,
+        alaRtuAgentProxyPort,
+        alaRtuAgentProxyUsername,
+        alaRtuAgentProxyPassword
+    }
+    STATUS  current
+    DESCRIPTION 
+      "Collection of objects for RTU proxy configuration."
+    ::= { alaCapManGroups 18 }
+
+alaCapManRtuInfoTableGroup  OBJECT-GROUP
+    OBJECTS 
+    {
+        alaCapabilityRtuRunningMode,
+        alaCapabilityRtuFeatureStatus,
+        alaCapabilityRtuFeaturePort,
+        alaCapabilityRtuPortCount,
+        alaCapabilityRtuTrialPeriod
+    }
+    STATUS  current
+    DESCRIPTION 
+      "Collection of objects for RTU feature information."
+    ::= { alaCapManGroups 19 }
+
+alaCapManVflConfigGroup OBJECT-GROUP
+    OBJECTS {
+        alaCapManVflType
+    }
+    STATUS      current
+    DESCRIPTION
+        "Mandatory objects for vfl config group."
+    ::= { alaCapManGroups 20 }
 
 -- --------------------------------------------------------------
 -- Compliance statements
@@ -992,7 +1543,15 @@ alaCapManCompliance MODULE-COMPLIANCE
          alaCapManHashControlGroup,
 	 alaCapManSwLicensingGroup,
 	 alaCapManSwLicensingInfoGroup,
-	 alaCapabilityIpmcMaxLimitsGroup
+	 alaCapabilityIpmcMaxLimitsGroup,
+	 alaCapManProfileGroup,
+	 alaCapManTrapThresholdGroup,
+	 alaCapManNotificationObjectGroup,
+	 alaCapManSharedVlanLearningConfigGroup,
+     alaCapManServicel3vpnConfigGroup,
+	 alaCapManRtuAgentGroup,
+	 alaCapManRtuInfoTableGroup,
+	 alaCapManVflConfigGroup
       }
    ::= { alaCapManCompliances 1 }
 -- --------------------------------------------------------------
