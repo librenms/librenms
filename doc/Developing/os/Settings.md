@@ -136,7 +136,7 @@ snmp_max_oid: 8
 #### Define custom repeater value
 
 ```yaml
-snmp_max_repeaters: 30
+snmp.max_repeaters: 30
 ```
 
 ### Storage Settings
