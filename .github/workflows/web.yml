@@ -31,21 +31,9 @@ jobs:
           APP_URL=http://127.0.0.1:8000
           APP_ENV=testing
           APP_DEBUG=true
-          DB_HOST=127.0.0.1
-          DB_DATABASE=librenms_phpunit_78hunjuybybh
-          DB_USERNAME=root
-          DB_PASSWORD=root
-          DB_TEST_HOST=127.0.0.1
-          DB_TEST_DATABASE=librenms_phpunit_78hunjuybybh
-          DB_TEST_USERNAME=root
-          DB_TEST_PASSWORD=root
+          DB_CONNECTION=testing_persistent
           MAIL_MAILER=log
           EOL
-
-      - name: Create Database
-        run: |
-          sudo systemctl start mysql
-          mysql --user="root" --password="root" -e "CREATE DATABASE \`librenms_phpunit_78hunjuybybh\` character set UTF8mb4 collate utf8mb4_bin;"
 
       - name: Setup SQLite
         run: sqlite3 database/testing.sqlite ""
