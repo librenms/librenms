@@ -138,13 +138,12 @@ if (! empty($agent_data['app'][$name])) {
         $metrics['altitude'] = $gpsd['data']['altitude'];
         $metrics['latitude'] = $gpsd['data']['latitude'];
         $metrics['longitude'] = $gpsd['data']['longitude'];
+        $gpsd['data']['has_location'] = true;
     }
 
     // save the data chunk of the return to app data
     $app->data = $gpsd['data'];
 }
-
-
 
 // Generate basic RRD def
 $basic_rrd_def = RrdDefinition::make()
