@@ -407,7 +407,7 @@
             "minimum": 1
         },
         "snmp":{
-            max_repeaters": {
+            "max_repeaters": {
             "type": "integer",
             "minimum": 1
         },
