@@ -34,7 +34,7 @@ jobs:
           DB_CONNECTION=testing_persistent
           MAIL_MAILER=log
           EOL
-          cp .env .env.dusk
+          cp .env .env.testing
 
       - name: Setup SQLite
         run: sqlite3 database/testing.sqlite ""
