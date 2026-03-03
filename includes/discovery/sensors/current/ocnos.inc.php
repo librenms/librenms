@@ -20,7 +20,7 @@ if ($os instanceof \LibreNMS\OS\Ocnos) {
 
                     app('sensor-discovery')->discover(new \App\Models\Sensor([
                         'poller_type' => 'snmp',
-                        'sensor_class' => 'current',
+                        'sensor_class' => \LibreNMS\Enum\Sensor::Current,
                         'sensor_oid' => ".1.3.6.1.4.1.36673.100.1.2.3.1.12.$cmmStackUnitIndex.$cmmTransIndex.$cmmTransChannelIndex",
                         'sensor_index' => "$cmmStackUnitIndex.$cmmTransIndex.$cmmTransChannelIndex",
                         'sensor_type' => 'ocnos',

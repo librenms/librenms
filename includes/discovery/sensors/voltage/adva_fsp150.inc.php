@@ -97,7 +97,7 @@ foreach (array_keys($pre_cache['adva_fsp150']) as $index) {
 
             discover_sensor(
                 null,
-                'voltage',
+                $sensor_class,
                 $device,
                 $oid,
                 $entry['sensor_name'] . $index,

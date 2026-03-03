@@ -19,7 +19,7 @@ if (is_array($oids)) {
             $descr = implode(':', $connUnitSensorMessage);
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'charge',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Charge,
                 'sensor_oid' => $cur_oid . $index,
                 'sensor_index' => $index,
                 'sensor_type' => 'dellme',

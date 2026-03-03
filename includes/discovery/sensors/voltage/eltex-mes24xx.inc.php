@@ -52,7 +52,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['supplyVoltage'])) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'voltage',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Voltage,
                 'sensor_oid' => $oid,
                 'sensor_index' => 'SfpVolt' . $ifIndex,
                 'sensor_type' => 'ELTEX-PHY-MIB',

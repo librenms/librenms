@@ -37,7 +37,7 @@ if (! empty($charge)) {
 
     discover_sensor(
         null,
-        'charge',
+        $sensor_class,
         $device,
         $charge_oid,
         $index,

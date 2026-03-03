@@ -73,7 +73,7 @@ if (! empty($resrcData)) {
 
                     discover_sensor(
                         null,
-                        'count',
+                        $sensor_class,
                         $device,
                         $oid,
                         "tmnxNatIsaMemberResrcVal.$index",
@@ -160,7 +160,7 @@ foreach ($vappStatsData as $oid => $value) {
 
     discover_sensor(
         null,
-        'count',
+        $sensor_class,
         $device,
         $oid,
         "tmnxNatVappPlcyStatsVal.$index",

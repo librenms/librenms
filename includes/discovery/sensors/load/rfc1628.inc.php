@@ -23,7 +23,7 @@ foreach ($load_data as $index => $data) {
         continue;
     }
 
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'load', $load_oid);
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, $sensor_class, $load_oid);
 
     if (count($load_data) > 1) {
         $descr .= " $index";
@@ -31,7 +31,7 @@ foreach ($load_data as $index => $data) {
 
     discover_sensor(
         null,
-        'load',
+        $sensor_class,
         $device,
         $load_oid,
         500 + $index,

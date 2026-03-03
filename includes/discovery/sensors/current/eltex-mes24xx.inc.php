@@ -51,7 +51,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['txBiasCurrent'])) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'current',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Current,
                 'sensor_oid' => $oid,
                 'sensor_index' => 'SfpTxBias' . $ifIndex,
                 'sensor_type' => 'ELTEX-PHY-MIB',

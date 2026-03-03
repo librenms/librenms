@@ -18,7 +18,7 @@ if ($os instanceof \LibreNMS\OS\Ocnos) {
                 if (isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransVoltage']) && $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransVoltage'] != '-100001') {
                     app('sensor-discovery')->discover(new \App\Models\Sensor([
                         'poller_type' => 'snmp',
-                        'sensor_class' => 'voltage',
+                        'sensor_class' => \LibreNMS\Enum\Sensor::Voltage,
                         'sensor_oid' => ".1.3.6.1.4.1.36673.100.1.2.3.1.7.$cmmStackUnitIndex.$cmmTransIndex.$cmmTransChannelIndex",
                         'sensor_index' => "$cmmStackUnitIndex.$cmmTransIndex",
                         'sensor_type' => 'ocnos',

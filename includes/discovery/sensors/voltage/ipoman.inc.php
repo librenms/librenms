@@ -27,7 +27,7 @@ foreach ($oidsVoltIn as $index => $entry) {
     // FIXME: iPoMan 1201 also says it has 2 inlets, at least until firmware 1.06 - wtf?
     app('sensor-discovery')->discover(new \App\Models\Sensor([
         'poller_type' => 'snmp',
-        'sensor_class' => 'voltage',
+        'sensor_class' => \LibreNMS\Enum\Sensor::Voltage,
         'sensor_oid' => $oid,
         'sensor_index' => $index,
         'sensor_type' => 'ipoman',

@@ -34,7 +34,7 @@ if (is_array($pre_cache['adva_fsp3kr7_Card'])) {
 
             discover_sensor(
                 null,
-                'voltage',
+                $sensor_class,
                 $device,
                 $oid,
                 'eqptPhysInstValuePsuVoltInp' . $index,

@@ -20,7 +20,6 @@
 // *************************************************************
 // ***** Current Sensors for Nokia PSD
 // *************************************************************
-
 if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12')) {
     d_echo('Nokia PSD DDM Current Sensors\n');
     $ifIndexToName = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
@@ -33,7 +32,7 @@ if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12'))
             $divisor = 1000000;
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'current',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Current,
                 'sensor_oid' => ".1.3.6.1.4.1.7483.2.2.7.3.1.4.1.2.$ifIndex.3",
                 'sensor_index' => "$ifIndex.3",
                 'sensor_type' => 'nokia-1830',

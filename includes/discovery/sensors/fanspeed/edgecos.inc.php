@@ -23,4 +23,4 @@
  * @copyright  2026 Frederik Kriewitz
  * @author     Frederik Kriewitz <frederik@kriewitz.eu>
  */
-$os->discoverFanSensors(['fanspeed']);
+$os->discoverFanSensors([\LibreNMS\Enum\Sensor::Fanspeed]);

@@ -24,6 +24,8 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $divisor = 1000;
 $multiplier = 1;
 
@@ -42,7 +44,7 @@ foreach ($oids as $ifIndex => $data) {
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
             'poller_type' => 'snmp',
-            'sensor_class' => 'dbm',
+            'sensor_class' => SensorEnum::Dbm,
             'sensor_oid' => $oid,
             'sensor_index' => 'txdbm' . $ifIndex,
             'sensor_type' => 'rlPhyTestTableTxOutput',
@@ -71,7 +73,7 @@ foreach ($oids as $ifIndex => $data) {
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
             'poller_type' => 'snmp',
-            'sensor_class' => 'dbm',
+            'sensor_class' => SensorEnum::Dbm,
             'sensor_oid' => $oid,
             'sensor_index' => 'rxdbm' . $ifIndex,
             'sensor_type' => 'rlPhyTestTableRxOpticalPower',

@@ -50,7 +50,7 @@ if ($in_phaseNum == '1') {
 
         discover_sensor(
             null,
-            'load',
+            $sensor_class,
             $device,
             $load_oid,
             $index,
@@ -86,7 +86,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'load',
+            $sensor_class,
             $device,
             $load_oid,
             $index,
@@ -118,7 +118,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'load',
+            $sensor_class,
             $device,
             $load_oid,
             $index,
@@ -150,7 +150,7 @@ if ($in_phaseNum == '3') {
 
         discover_sensor(
             null,
-            'load',
+            $sensor_class,
             $device,
             $load_oid,
             $index,

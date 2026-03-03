@@ -23,6 +23,7 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
+
 $divisor = 1;
 $multiplier = 1000;
 
@@ -44,7 +45,7 @@ if (is_array($oids)) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'bitrate',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Bitrate,
                 'sensor_oid' => $oid,
                 'sensor_index' => $streamid,
                 'sensor_type' => $type,

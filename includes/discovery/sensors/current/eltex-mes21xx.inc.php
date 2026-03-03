@@ -40,7 +40,7 @@ foreach ($oids as $ifIndex => $data) {
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
             'poller_type' => 'snmp',
-            'sensor_class' => 'current',
+            'sensor_class' => \LibreNMS\Enum\Sensor::Current,
             'sensor_oid' => $oid,
             'sensor_index' => 'txbias' . $ifIndex,
             'sensor_type' => 'rlPhyTestTableTxBias',

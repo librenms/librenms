@@ -30,7 +30,7 @@ foreach ($oids as $index => $ciscosb_data) {
         if (is_numeric($voltage) && ($value['rlPhyTestTableTransceiverTemp'] != 0)) {
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'voltage',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Voltage,
                 'sensor_oid' => $oid,
                 'sensor_index' => $index,
                 'sensor_type' => 'rlPhyTestTableTransceiverSupply',

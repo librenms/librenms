@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $ponTable = SnmpQuery::cache()->walk('E7-Calix-MIB::e7OltPonPortTable')->table(3);
 
 foreach ($ponTable as $e7OltPonPortShelf => $ponShelf) {
@@ -12,7 +14,7 @@ foreach ($ponTable as $e7OltPonPortShelf => $ponShelf) {
 
                 app('sensor-discovery')->discover(new \App\Models\Sensor([
                     'poller_type' => 'snmp',
-                    'sensor_class' => 'dbm',
+                    'sensor_class' => SensorEnum::Dbm,
                     'sensor_oid' => ".1.3.6.1.4.1.6321.1.2.2.2.1.6.2.1.7.$index",
                     'sensor_index' => 'tx.' . $index,
                     'sensor_type' => 'exa',
@@ -32,7 +34,7 @@ foreach ($ponTable as $e7OltPonPortShelf => $ponShelf) {
 
                 app('sensor-discovery')->discover(new \App\Models\Sensor([
                     'poller_type' => 'snmp',
-                    'sensor_class' => 'dbm',
+                    'sensor_class' => SensorEnum::Dbm,
                     'sensor_oid' => ".1.3.6.1.4.1.6321.1.2.2.2.1.6.2.1.8.$index",
                     'sensor_index' => 'rx.' . $index,
                     'sensor_type' => 'exa',
