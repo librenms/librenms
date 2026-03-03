@@ -35,12 +35,21 @@ jobs:
           APP_URL=http://127.0.0.1:8000
           APP_ENV=testing
           APP_DEBUG=true
-          DB_CONNECTION=testing_persistent
+          DB_HOST=127.0.0.1
+          DB_DATABASE=librenms_phpunit_78hunjuybybh
+          DB_USERNAME=root
+          DB_PASSWORD=root
+          DB_TEST_HOST=127.0.0.1
+          DB_TEST_DATABASE=librenms_phpunit_78hunjuybybh
+          DB_TEST_USERNAME=root
+          DB_TEST_PASSWORD=root
           MAIL_MAILER=log
           EOL
-          cp .env .env.testing
-          cp .env .env.dusk
-          cp .env .env.dusk.testing
+
+      - name: Create Database
+        run: |
+          sudo systemctl start mysql
+          mysql --user="root" --password="root" -e "CREATE DATABASE \`librenms_phpunit_78hunjuybybh\` character set UTF8mb4 collate utf8mb4_bin;"
 
       - name: Setup SQLite
         run: sqlite3 database/testing.sqlite ""
@@ -63,7 +72,7 @@ jobs:
         run: php artisan key:generate
 
       - name: Migrate Database
-        run: php artisan migrate
+        run: php artisan migrate --database=testing
 
       - name: Upgrade Chrome Driver
         run: php artisan dusk:chrome-driver --detect
@@ -72,7 +81,7 @@ jobs:
         run: ./vendor/laravel/dusk/bin/chromedriver-linux --port=9515 &
 
       - name: Run Laravel Server
-        run: php artisan serve --port=8000 --no-reload --env=testing &
+        run: php artisan serve --no-reload &
 
       - name: Run Dusk Tests
         run: php artisan dusk
@@ -90,6 +99,7 @@ jobs:
         with:
           name: console
           path: tests/Browser/console
+
       - name: Upload LibreNMS Logs
         if: failure()
         uses: actions/upload-artifact@v4
