@@ -39,6 +39,7 @@ jobs:
           MAIL_MAILER=log
           EOL
           cp .env .env.testing
+          cp .env .env.dusk
           cp .env .env.dusk.testing
 
       - name: Setup SQLite
@@ -71,7 +72,7 @@ jobs:
         run: ./vendor/laravel/dusk/bin/chromedriver-linux --port=9515 &
 
       - name: Run Laravel Server
-        run: php artisan serve --no-reload &
+        run: php artisan serve --port=8000 --no-reload --env=testing &
 
       - name: Run Dusk Tests
         run: php artisan dusk
