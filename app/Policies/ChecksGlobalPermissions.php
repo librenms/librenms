@@ -3,7 +3,9 @@
 namespace App\Policies;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 trait ChecksGlobalPermissions
 {
@@ -14,6 +16,12 @@ trait ChecksGlobalPermissions
         // Guess prefix
         $this->prefix ??= Str::kebab(Str::before(class_basename($this), 'Policy'));
 
-        return $user->hasPermissionTo("$this->prefix.$action");
+        try {
+            return $user->hasPermissionTo("$this->prefix.$action");
+        } catch (PermissionDoesNotExist $e) {
+            Log::error($e->getMessage());
+
+            return false;
+        }
     }
 }
