@@ -42,7 +42,7 @@ class ProcessorsController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
-          return Processor::query()
+        return Processor::query()
             ->hasAccess($request->user())
             ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'processors.device_id'))
             ->withAggregate('device', 'hostname')
