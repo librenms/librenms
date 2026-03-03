@@ -406,11 +406,13 @@
             "type": "integer",
             "minimum": 1
         },
-        "snmp_max_repeaters": {
+        "snmp":{
+            max_repeaters": {
             "type": "integer",
             "minimum": 1
         },
-        "syslog_hook": {
+    },
+    "syslog_hook": {
             "type": "array",
             "items": {
                 "type": "object",
