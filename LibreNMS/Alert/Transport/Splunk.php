@@ -18,6 +18,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\Facades\DeviceCache;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
@@ -29,7 +30,7 @@ class Splunk extends Transport
         $splunk_host = empty($this->config['Splunk-host']) ? '127.0.0.1' : $this->config['Splunk-host'];
         $splunk_port = empty($this->config['Splunk-port']) ? 514 : $this->config['Splunk-port'];
         $severity = 6; // Default severity is 6 (Informational)
-        $device = device_by_id_cache($alert_data['device_id']); // for event logging
+        $device = DeviceCache::get($alert_data['device_id']); // for event logging
 
         switch ($alert_data['severity']) {
             case 'critical':
@@ -60,12 +61,9 @@ class Splunk extends Transport
         }
 
         $ignore = ['attribs', 'community', 'authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo', 'snmpver', 'port'];
-        foreach ($device as $key => $val) {
-            if (in_array($key, $ignore)) {
-                continue;
-            }
-
-            $splunk_prefix .= 'device_' . $key . '="' . $val . '", ';
+        foreach ($device->except($ignore) as $key => $val) {
+            $str_val = is_bool($val) ? (int) $val : (string) $val;
+            $splunk_prefix .= 'device_' . $key . '="' . $str_val . '", ';
         }
         $splunk_prefix = substr($splunk_prefix, 0, -1);
 

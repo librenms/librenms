@@ -29,6 +29,7 @@ namespace LibreNMS\OS;
 use App\Models\EntPhysical;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessErrorsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -123,7 +124,7 @@ class SafCfm extends OS implements
         return [
             // SAF-MPMUX-MIB::cfml4radioTxFrequency
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.3.6.0',
                 'saf-cfml4-tx',
@@ -132,7 +133,7 @@ class SafCfm extends OS implements
             ),
             // SAF-MPMUX-MIB::cfml4radioRxFrequency
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.3.7.0',
                 'saf-cfml4-rx',
@@ -140,7 +141,7 @@ class SafCfm extends OS implements
                 'Radio 1 Rx Frequency'
             ),
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.4.6.0',
                 'saf-cfml4-tx',
@@ -149,7 +150,7 @@ class SafCfm extends OS implements
             ),
             // SAF-MPMUX-MIB::cfml4radioRxFrequency
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.4.7.0',
                 'saf-cfml4-rx',
@@ -170,7 +171,7 @@ class SafCfm extends OS implements
         return [
             // SAF-MPMUX-MIB::rf1TxLevel
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.3.8.0',
                 'saf-cfml4-tx-power',
@@ -179,7 +180,7 @@ class SafCfm extends OS implements
             ),
             // SAF-MPMUX-MIB::rf1RxLevel
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.3.10.0',
                 'saf-cfml4-rx-level',
@@ -188,7 +189,7 @@ class SafCfm extends OS implements
             ),
             // SAF-MPMUX-MIB::rf2TxLevel
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.4.8.0',
                 'saf-cfml4-tx-power',
@@ -197,7 +198,7 @@ class SafCfm extends OS implements
             ),
             // SAF-MPMUX-MIB::rf2RxLevel
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.4.10.0',
                 'saf-cfml4-rx-level',
@@ -218,7 +219,7 @@ class SafCfm extends OS implements
         return [
             // SAF-MPMUX-MIB::termFrameErrors
             new WirelessSensor(
-                'errors',
+                WirelessSensorType::Errors,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.1.10.0',
                 'saf-cfml4',
@@ -227,7 +228,7 @@ class SafCfm extends OS implements
             ),
             // SAF-MPMUX-MIB::termBFrameErr
             new WirelessSensor(
-                'errors',
+                WirelessSensorType::Errors,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.2.22.1.29.0',
                 'saf-cfml4',
