@@ -21,11 +21,45 @@
 *
 */
 
+$app_data = $app->data ?? [];
+
+
+
+if (isset($app_data['has_location']) && $app_data['has_location']) {
+    $fix_status='UNKNOWN';
+    if ($app_data['mode'] == 0) {
+        $fix_status = 'UNKNOWN';
+    } elseif ($app_data['mode'] == 1) {
+        $fix_status = 'NO FIX';
+    } elseif ($app_data['mode'] == 2) {
+        $fix_status = '2D';
+    } elseif ($app_data['mode'] == 3) {
+        $fix_status = '3D';
+    }
+
+    print_optionbar_start();
+    print 'Status: '.$fix_status."<br>\n";
+    // this will be blank if it is no fix, unknown, 2d
+    if (is_numeric($app_data['altitude'])) {
+        print 'Altitude: '.htmlspecialchars($app_data['altitude'])." meters<br>\n";
+    }
+    // this will be blank if it is no fix or unknown
+    if (is_numeric($app_data['latitude']) && is_numeric($app_data['longitude'])) {
+        print 'Lat / Lng: '.htmlspecialchars($app_data['latitude']).', '.htmlspecialchars($app_data['longitude'])."<br>\n";
+    }
+    print_optionbar_end();
+}
+
 $graphs = [
     'gpsd_satellites' => 'Satellites',
     'gpsd_dop' => 'Dilution of Precision',
     'gpsd_mode' => 'Fix type :: 0=unknown, 1=no fix, 2=2D, 3=3D',
 ];
+
+if (isset($app_data['has_location']) && $app_data['has_location']) {
+    $graphs['gpsd_altitude'] = 'Altitude';
+    $graphs['gpsd_location'] = 'Location';
+}
 
 foreach ($graphs as $key => $text) {
     $graph_type = $key;
