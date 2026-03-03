@@ -39,6 +39,7 @@ jobs:
           MAIL_MAILER=log
           EOL
           cp .env .env.testing
+          cp .env .env.dusk.testing
 
       - name: Setup SQLite
         run: sqlite3 database/testing.sqlite ""
