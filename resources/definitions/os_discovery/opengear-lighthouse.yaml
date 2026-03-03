@@ -1,4 +1,3 @@
-mib: OG-LIGHTHOUSE-MIB
 modules:
   os:
     version:
@@ -40,7 +39,7 @@ modules:
           index: 'lighthouse-conn.{{ $index }}'
           descr: '{{ OG-LIGHTHOUSE-MIB::ogLhNodeName }} Connection'
           group: 'Nodes'
-          state_name: ogLhNodeConnStatus
+          state_name: OG-LIGHTHOUSE-MIB::ogLhNodeConnStatus
           states:
             - { value: 0, descr: notAvailable, generic: 3, graph: 0 }
             - { value: 1, descr: connected,    generic: 0, graph: 0 }
@@ -53,7 +52,7 @@ modules:
           index: 'lighthouse-cell.{{ $index }}'
           descr: '{{ OG-LIGHTHOUSE-MIB::ogLhNodeName }} Cellular'
           group: 'Lighthouse Nodes'
-          state_name: ogLhNodeCellularHealth
+          state_name: OG-LIGHTHOUSE-MIB::ogLhNodeCellularHealth
           states:
             - { value: 0, descr: unknown,                generic: 3, graph: 0 }
             - { value: 1, descr: pending,                generic: 1, graph: 0 }
