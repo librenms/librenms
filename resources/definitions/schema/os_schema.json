@@ -407,10 +407,15 @@
             "minimum": 1
         },
         "snmp":{
-            "max_repeaters": {
-            "type": "integer",
-            "minimum": 1
-        },
+            "type": "object",
+            "properties": {
+                "max_repeaters": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            },
+            "additionalProperties": false
+        }
     },
     "syslog_hook": {
             "type": "array",
