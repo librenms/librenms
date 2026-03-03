@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 switch ($device['sysObjectID']) {
     /**
      * Operating Temperature: 0º C to 45º C
@@ -9,7 +11,7 @@ switch ($device['sysObjectID']) {
     case '.1.3.6.1.4.1.674.10895.3019': /* Dell Powerconnect 3548P */
     case '.1.3.6.1.4.1.674.10895.3028': /* Dell Powerconnect 2848 */
         $temperature = trim((string) SnmpQuery::get('.1.3.6.1.4.1.89.53.15.1.9.1')->value());
-        discover_sensor(null, 'temperature', $device, '.1.3.6.1.4.1.89.53.15.1.9.1', 0, 'powerconnect', 'Internal Temperature', '1', '1', '0', null, null, '45', $temperature);
+        discover_sensor(null, SensorEnum::Temperature, $device, '.1.3.6.1.4.1.89.53.15.1.9.1', 0, 'powerconnect', 'Internal Temperature', '1', '1', '0', null, null, '45', $temperature);
         break;
     default:
         /**
@@ -18,7 +20,7 @@ switch ($device['sysObjectID']) {
          */
         $temperature = SnmpQuery::get('FASTPATH-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorTemperature.0')->value();
         if (is_numeric($temperature)) {
-            discover_sensor(null, 'temperature', $device, '.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.8.1.4.0', 0, 'powerconnect', 'Internal Temperature', '1', '1', '0', null, null, '45', $temperature);
+            discover_sensor(null, SensorEnum::Temperature, $device, '.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.8.1.4.0', 0, 'powerconnect', 'Internal Temperature', '1', '1', '0', null, null, '45', $temperature);
         }
 }
 
@@ -38,7 +40,7 @@ foreach (explode("\n", (string) $temps) as $t) {
     if (str_ends_with($oid, '1')) {
         // This code will only pull CPU temp for each stack member, but there is no reason why the additional values couldn't be graphed
         $counter += 1;
-        discover_sensor(null, 'temperature', $device, $oid, $counter, 'dnos', 'Unit ' . $counter . ' CPU temperature', '1', '1', null, null, null, null, $val);
+        discover_sensor(null, SensorEnum::Temperature, $device, $oid, $counter, 'dnos', 'Unit ' . $counter . ' CPU temperature', '1', '1', null, null, null, null, $val);
     }
 }
 
@@ -55,6 +57,6 @@ if (is_array($oids)) {
         $descr = 'Unit ' . $index . ' ' . $entry['chStackUnitSysType'];
         $oid = '.1.3.6.1.4.1.6027.3.10.1.2.2.1.14.' . $index;
         $current = $entry['chStackUnitTemp'];
-        discover_sensor(null, 'temperature', $device, $oid, $index, 'ftos-sseries', $descr, '1', '1', null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::Temperature, $device, $oid, $index, 'ftos-sseries', $descr, '1', '1', null, null, null, null, $current);
     }
 }

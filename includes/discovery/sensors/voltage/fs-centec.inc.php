@@ -12,7 +12,7 @@ foreach ($voltageTable as $ifIndex => $current) {
         foreach (explode(',', (string) $current['FS-SWITCH-V2-MIB::voltageCurrent']) as $channel => $value) {
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'voltage',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Voltage,
                 'sensor_oid' => ".1.3.6.1.4.1.52642.1.37.1.10.3.1.5.$ifIndex",
                 'sensor_index' => "$ifIndex.$channel",
                 'sensor_type' => 'fs-centec',

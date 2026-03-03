@@ -11,6 +11,8 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $oids = SnmpQuery::cache()->hideMib()->walk('CISCOSB-PHY-MIB::rlPhyTestGetResult')->table(1);
 
 $multiplier = 1;
@@ -24,7 +26,7 @@ foreach ($oids as $index => $ciscosb_data) {
             $dbm = $value['rlPhyTestTableTxOutput'] / $divisor;
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'dbm',
+                'sensor_class' => SensorEnum::Dbm,
                 'sensor_oid' => $oid,
                 'sensor_index' => 'tx-' . $index,
                 'sensor_type' => 'rlPhyTestTableTxOutput',
@@ -50,7 +52,7 @@ foreach ($oids as $index => $ciscosb_data) {
             $dbm = $value['rlPhyTestTableRxOpticalPower'] / $divisor;
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'dbm',
+                'sensor_class' => SensorEnum::Dbm,
                 'sensor_oid' => $oid,
                 'sensor_index' => 'rx-' . $index,
                 'sensor_type' => 'rlPhyTestTableRxOpticalPower',

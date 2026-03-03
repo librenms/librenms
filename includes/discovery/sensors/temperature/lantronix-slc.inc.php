@@ -27,5 +27,5 @@ $value = trim((string) $value, 'Celsius');
 $value = trim($value, ' ');
 
 if (is_numeric($value)) {
-    discover_sensor(null, 'temperature', $device, $valueoid, 1, 'lantronix-slc', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::Temperature, $device, $valueoid, 1, 'lantronix-slc', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
 }

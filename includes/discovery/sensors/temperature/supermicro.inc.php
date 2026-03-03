@@ -24,7 +24,7 @@ if ($oids) {
                 $monitor = SnmpQuery::mibDir('supermicro')->get($monitor_oid)->value();
                 if ($monitor == 'true') {
                     $descr = trim(str_ireplace('temperature', '', $descr));
-                    discover_sensor(null, 'temperature', $device, $temperature_oid, trim($index, '.'), 'supermicro', $descr, (int) $divisor, '1', null, null, null, $limit, $temperature);
+                    discover_sensor(null, \LibreNMS\Enum\Sensor::Temperature, $device, $temperature_oid, trim($index, '.'), 'supermicro', $descr, (int) $divisor, '1', null, null, null, $limit, $temperature);
                 }
             }
         }

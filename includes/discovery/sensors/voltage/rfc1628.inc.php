@@ -8,11 +8,11 @@ echo 'RFC1628 ';
 $battery_volts = SnmpQuery::get('UPS-MIB::upsBatteryVoltage.0')->value();
 if (is_numeric($battery_volts)) {
     $volt_oid = '.1.3.6.1.2.1.33.1.2.5.0';
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'voltage', $volt_oid);
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, $sensor_class, $volt_oid);
 
     discover_sensor(
         null,
-        'voltage',
+        $sensor_class,
         $device,
         $volt_oid,
         '1.2.5.0',
@@ -31,7 +31,7 @@ if (is_numeric($battery_volts)) {
 $output_volts = snmpwalk_group($device, 'upsOutputVoltage', 'UPS-MIB');
 foreach ($output_volts as $index => $data) {
     $volt_oid = ".1.3.6.1.2.1.33.1.4.4.1.2.$index";
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'voltage', $volt_oid);
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, $sensor_class, $volt_oid);
     $descr = 'Output';
     if (count($output_volts) > 1) {
         $descr .= " Phase $index";
@@ -52,7 +52,7 @@ foreach ($output_volts as $index => $data) {
 
     discover_sensor(
         null,
-        'voltage',
+        $sensor_class,
         $device,
         $volt_oid,
         $index,
@@ -71,7 +71,7 @@ foreach ($output_volts as $index => $data) {
 $input_volts = snmpwalk_group($device, 'upsInputVoltage', 'UPS-MIB');
 foreach ($input_volts as $index => $data) {
     $volt_oid = ".1.3.6.1.2.1.33.1.3.3.1.3.$index";
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'voltage', $volt_oid);
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, $sensor_class, $volt_oid);
     $descr = 'Input';
     if (count($input_volts) > 1) {
         $descr .= " Phase $index";
@@ -91,7 +91,7 @@ foreach ($input_volts as $index => $data) {
 
     discover_sensor(
         null,
-        'voltage',
+        $sensor_class,
         $device,
         $volt_oid,
         100 + $index,
@@ -110,7 +110,7 @@ foreach ($input_volts as $index => $data) {
 $bypass_volts = snmpwalk_group($device, 'upsBypassVoltage', 'UPS-MIB');
 foreach ($bypass_volts as $index => $data) {
     $volt_oid = ".1.3.6.1.2.1.33.1.5.3.1.2.$index";
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'voltage', $volt_oid);
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, $sensor_class, $volt_oid);
     $descr = 'Bypass';
     if (count($bypass_volts) > 1) {
         $descr .= " Phase $index";
@@ -129,7 +129,7 @@ foreach ($bypass_volts as $index => $data) {
 
     discover_sensor(
         null,
-        'voltage',
+        $sensor_class,
         $device,
         $volt_oid,
         200 + $index,

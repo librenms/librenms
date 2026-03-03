@@ -7,7 +7,7 @@
  *
 */
 
-$class = 'temperature';
+$class = $sensor_class;
 $oid = '.1.3.6.1.4.1.2021.50.3.101.1';
 $index = 1;
 $type = 'dhcpatriotTempCPU';

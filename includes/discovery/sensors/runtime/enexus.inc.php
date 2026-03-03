@@ -10,7 +10,7 @@ if (! empty($battery_test_result_table)) {
     $batteryResultDuration = $numeric_results[$last_index]['batteryTestResultDuration'];
     discover_sensor(
         null,
-        'runtime',
+        $sensor_class,
         $device,
         '.1.3.6.1.4.1.12148.10.10.16.4.1.3',
         'batteryTestResultDuration',

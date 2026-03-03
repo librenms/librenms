@@ -4,6 +4,8 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 // pre-cache
 $oidsOut = SnmpQuery::cache()->hideMib()->walk([
     'IPOMANII-MIB::outletConfigDesc',
@@ -33,7 +35,7 @@ foreach ($oidsCurrIn as $index => $entry) {
     // FIXME: iPoMan 1201 also says it has 2 inlets, at least until firmware 1.06 - wtf?
     app('sensor-discovery')->discover(new \App\Models\Sensor([
         'poller_type' => 'snmp',
-        'sensor_class' => 'current',
+        'sensor_class' => SensorEnum::Current,
         'sensor_oid' => $oid,
         'sensor_index' => '1.3.1.3.' . $index,
         'sensor_type' => 'ipoman',
@@ -61,7 +63,7 @@ foreach ($oidsCurrOut as $index => $entry) {
 
     app('sensor-discovery')->discover(new \App\Models\Sensor([
         'poller_type' => 'snmp',
-        'sensor_class' => 'current',
+        'sensor_class' => SensorEnum::Current,
         'sensor_oid' => $oid,
         'sensor_index' => '2.3.1.3.' . $index,
         'sensor_type' => 'ipoman',

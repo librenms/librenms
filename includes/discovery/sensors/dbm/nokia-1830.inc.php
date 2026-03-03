@@ -17,10 +17,11 @@
  * the source code distribution for details.
  **/
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 // *************************************************************
 // ***** dBm Sensors for Nokia PSD
 // *************************************************************
-
 if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12')) {
     d_echo('Nokia PSD DDM dBm Sensors\n');
     $ifIndexToName = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
@@ -33,7 +34,7 @@ if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12'))
             $divisor = 10;
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'dbm',
+                'sensor_class' => SensorEnum::Dbm,
                 'sensor_oid' => ".1.3.6.1.4.1.7483.2.2.7.3.1.4.1.2.$ifIndex.4",
                 'sensor_index' => "$ifIndex.4",
                 'sensor_type' => 'nokia-1830',
@@ -50,7 +51,7 @@ if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12'))
             $divisor = 10;
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'dbm',
+                'sensor_class' => SensorEnum::Dbm,
                 'sensor_oid' => ".1.3.6.1.4.1.7483.2.2.7.3.1.4.1.2.$ifIndex.5",
                 'sensor_index' => "$ifIndex.5",
                 'sensor_type' => 'nokia-1830',

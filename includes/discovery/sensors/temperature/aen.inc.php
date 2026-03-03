@@ -27,5 +27,5 @@ $valueoid = '.1.3.6.1.4.1.22420.1.1.12.1.2.1'; // acdDescTsCurrentTemp.1
 $value = SnmpQuery::get($valueoid)->value();
 
 if (is_numeric($value)) {
-    discover_sensor(null, 'temperature', $device, $valueoid, 1, 'metronid', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::Temperature, $device, $valueoid, 1, 'metronid', $descr, '1', '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
 }

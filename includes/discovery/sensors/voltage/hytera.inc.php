@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $oids = snmp_walk($device, 'rptVoltage', '-OsqnU', 'HYTERA-REPEATER-MIB');
 d_echo($oids);
 if ($oids !== false) {
@@ -17,7 +19,7 @@ if ($oids !== false) {
             $descr = 'Voltage ' . $index;
             $oid = '.1.3.6.1.4.1.40297.1.2.1.2.1.' . $index;
             $voltage = hytera_h2f(str_replace('"', '', SnmpQuery::get($oid)->value()), 2);
-            discover_sensor(null, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', 11.00, 11.5, 14.5, 15, $voltage);
+            discover_sensor(null, SensorEnum::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', 11.00, 11.5, 14.5, 15, $voltage);
         }
     }
 }

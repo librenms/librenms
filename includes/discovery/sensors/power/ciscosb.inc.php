@@ -28,7 +28,7 @@ foreach ($oids as $unit => $unitData) {
 
                 app('sensor-discovery')->discover(new \App\Models\Sensor([
                     'poller_type' => 'snmp',
-                    'sensor_class' => 'power',
+                    'sensor_class' => \LibreNMS\Enum\Sensor::Power,
                     'sensor_oid' => $oid,
                     'sensor_index' => $index,
                     'sensor_type' => 'ciscosb',

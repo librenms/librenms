@@ -8,7 +8,7 @@ $value = SnmpQuery::get('UPS-MIB::upsEstimatedChargeRemaining.0')->value();
 if (is_numeric($value)) {
     discover_sensor(
         null,
-        'charge',
+        $sensor_class,
         $device,
         '.1.3.6.1.2.1.33.1.2.4.0',
         500,

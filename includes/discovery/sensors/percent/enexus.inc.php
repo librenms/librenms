@@ -10,7 +10,7 @@ if (! empty($battery_test_result_table)) {
     $batteryQualityResult = $numeric_results[$last_index]['batteryTestResultQuality'];
     discover_sensor(
         null,
-        'percent',
+        $sensor_class,
         $device,
         '.1.3.6.1.4.1.12148.10.10.16.4.1.5',
         'batteryTestResultQuality',

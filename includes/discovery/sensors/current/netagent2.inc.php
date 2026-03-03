@@ -39,7 +39,7 @@ if (! empty($battery_current) || $battery_current == 0) {
 
     discover_sensor(
         null,
-        'current',
+        $sensor_class,
         $device,
         $battery_current_oid,
         $index,

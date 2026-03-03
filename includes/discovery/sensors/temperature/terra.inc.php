@@ -10,7 +10,7 @@ if ($device['os'] === 'terra') {
         if (str_contains((string) $device['sysDescr'], $row[0])) {
             $temperature = SnmpQuery::get($row[1])->value();
             if (is_numeric($temperature)) {
-                discover_sensor(null, 'temperature', $device, $row[1], '0', $row[0], 'Internal Temperature', 1, 1, null, null, null, null, $temperature);
+                discover_sensor(null, \LibreNMS\Enum\Sensor::Temperature, $device, $row[1], '0', $row[0], 'Internal Temperature', 1, 1, null, null, null, null, $temperature);
             }
         }
     }

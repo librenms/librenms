@@ -23,4 +23,4 @@
  * @copyright  2026 Frederik Kriewitz
  * @author     Frederik Kriewitz <frederik@kriewitz.eu>
  */
-$os->discoverTransceiverSensors(['dbm']);
+$os->discoverTransceiverSensors([\LibreNMS\Enum\Sensor::Dbm]);

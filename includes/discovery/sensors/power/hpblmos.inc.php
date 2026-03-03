@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $sensor_type = 'hpblmos_psu_usage';
 $psu_oid = '.1.3.6.1.4.1.232.22.2.5.1.1.1.16';
 $psu_usage_oid = '.1.3.6.1.4.1.232.22.2.5.1.1.1.10.';
@@ -19,7 +21,7 @@ foreach (explode("\n", $psus) as $psu) {
             $descr = 'PSU ' . $current_id . ' output';
             $value = SnmpQuery::get($current_oid)->value();
             $max_value = SnmpQuery::get($psu_max_oid)->value();
-            discover_sensor(null, 'power', $device, $current_oid, $current_id, $sensor_type, $descr, 1, 1, null, null, null, $max_value, $value);
+            discover_sensor(null, SensorEnum::Power, $device, $current_oid, $current_id, $sensor_type, $descr, 1, 1, null, null, null, $max_value, $value);
         }
     }
 }

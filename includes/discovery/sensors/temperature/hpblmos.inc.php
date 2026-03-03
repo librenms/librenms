@@ -16,7 +16,7 @@ foreach (explode("\n", $temps) as $temp) {
             $current_oid = $sensor_value_oid . $current_id;
             $value = SnmpQuery::get($current_oid)->value();
             if ($value > 0) {
-                discover_sensor(null, 'temperature', $device, $current_oid, $current_id, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
+                discover_sensor(null, \LibreNMS\Enum\Sensor::Temperature, $device, $current_oid, $current_id, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
             }
         }
     }

@@ -50,7 +50,7 @@ $oids = [
     ],
 ];
 
-$class = 'state';
+$class = $sensor_class;
 $type = 'dhcpatriotServiceStatus';
 $divisor = 1;
 $multiplier = 1;

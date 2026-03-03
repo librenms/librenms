@@ -13,7 +13,7 @@ if (is_array($oids)) {
             [$value, $dump] = explode(' ', $temp_value[1]);
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'temperature',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Temperature,
                 'sensor_oid' => '.1.3.6.1.3.94.1.8.1.6.' . $index,
                 'sensor_index' => $entry['connUnitSensorIndex'],
                 'sensor_type' => 'exos',

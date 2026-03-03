@@ -11,6 +11,6 @@ if (preg_match('/(Linux).+(ntc)/', (string) $device['sysDescr'])) {
     $index = '116.8';
     $value = SnmpQuery::get($oid . $index)->value();
     if (is_numeric($value)) {
-        discover_sensor(null, 'charge', $device, $oid . $index, $index, $sensor_type, $descr, 1, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::Charge, $device, $oid . $index, $index, $sensor_type, $descr, 1, 1, $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
 }

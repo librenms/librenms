@@ -23,5 +23,5 @@
  * @copyright  2026 Frederik Kriewitz
  * @author     Frederik Kriewitz <frederik@kriewitz.eu>
  */
-$os->discoverFanSensors(['state']);
+$os->discoverFanSensors([\LibreNMS\Enum\Sensor::State]);
 $os->discoverPowerStatus();

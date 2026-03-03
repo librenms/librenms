@@ -11,7 +11,7 @@ for ($index = 1; $index < 20; $index++) { //Proxy SG Temp OID end in 1-20
         $descr = SnmpQuery::get($descr_oid)->value();
         $current = SnmpQuery::get($temp_oid)->value();
         $divisor = '1';
-        discover_sensor(null, 'temperature', $device, $temp_oid, $temp_index, 'sgos', $descr, 1, '1', null, null, null, null, $current);
+        discover_sensor(null, \LibreNMS\Enum\Sensor::Temperature, $device, $temp_oid, $temp_index, 'sgos', $descr, 1, '1', null, null, null, null, $current);
     }
     $temp_index++;
 }
