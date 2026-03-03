@@ -3,6 +3,7 @@
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 // IPMI - We can discover this on poll!
 if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
@@ -56,10 +57,11 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
         [$desc,$current,$unit,$state,$low_nonrecoverable,$low_limit,$low_warn,$high_warn,$high_limit,$high_nonrecoverable] = $values;
 
         $index++;
-        if ($current != 'na' && LibrenmsConfig::has("ipmi_unit.$unit")) {
+        $sensorClass = SensorEnum::tryFrom(LibrenmsConfig::get("ipmi_unit.$unit", ''));
+        if ($current != 'na' && $sensorClass !== null) {
             discover_sensor(
                 null,
-                LibrenmsConfig::get("ipmi_unit.$unit"),
+                $sensorClass,
                 $device,
                 $desc,
                 $index,
@@ -81,9 +83,9 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
 }
 
 $sensorDiscovery = app('sensor-discovery');
-$sensorDiscovery->sync(sensor_class: 'voltage', poller_type: 'ipmi');
-$sensorDiscovery->sync(sensor_class: 'temperature', poller_type: 'ipmi');
-$sensorDiscovery->sync(sensor_class: 'fanspeed', poller_type: 'ipmi');
-$sensorDiscovery->sync(sensor_class: 'power', poller_type: 'ipmi');
-$sensorDiscovery->sync(sensor_class: 'current', poller_type: 'ipmi');
-$sensorDiscovery->sync(sensor_class: 'load', poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: SensorEnum::Voltage, poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: SensorEnum::Temperature, poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: SensorEnum::Fanspeed, poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: SensorEnum::Power, poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: SensorEnum::Current, poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: SensorEnum::Load, poller_type: 'ipmi');

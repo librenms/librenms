@@ -66,8 +66,8 @@ if (DiskIo::where('device_id', $device['device_id'])->exists()) {
 }
 
 foreach (Sensor::where('device_id', $device['device_id'])->distinct()->pluck('sensor_class') as $sensor_class) {
-    $datas[] = $sensor_class;
-    $type_text[$sensor_class] = trans('sensors.' . $sensor_class . '.short');
+    $datas[] = $sensor_class->value;
+    $type_text[$sensor_class->value] = $sensor_class->shortLabel();
 }
 
 $type_text['overview'] = 'Overview';

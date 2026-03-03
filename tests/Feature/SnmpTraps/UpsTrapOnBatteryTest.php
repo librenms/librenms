@@ -28,6 +28,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Sensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
@@ -39,9 +40,9 @@ final class UpsTrapOnBatteryTest extends SnmpTrapTestCase
     public function testOnBattery(): void
     {
         $device = Device::factory()->create();
-        $state = Sensor::factory()->for($device)->create(['sensor_class' => 'state', 'sensor_type' => 'upsOutputSourceState', 'sensor_current' => '2']);
-        $time = Sensor::factory()->for($device)->create(['sensor_class' => 'runtime', 'sensor_index' => '100', 'sensor_type' => 'rfc1628', 'sensor_current' => '0']);
-        $remaining = Sensor::factory()->for($device)->create(['sensor_class' => 'runtime', 'sensor_index' => '200', 'sensor_type' => 'rfc1628', 'sensor_current' => '371']);
+        $state = Sensor::factory()->for($device)->create(['sensor_class' => SensorEnum::State, 'sensor_type' => 'upsOutputSourceState', 'sensor_current' => '2']);
+        $time = Sensor::factory()->for($device)->create(['sensor_class' => SensorEnum::Runtime, 'sensor_index' => '100', 'sensor_type' => 'rfc1628', 'sensor_current' => '0']);
+        $remaining = Sensor::factory()->for($device)->create(['sensor_class' => SensorEnum::Runtime, 'sensor_index' => '200', 'sensor_type' => 'rfc1628', 'sensor_current' => '371']);
 
         \Log::shouldReceive('warning')->never()->with("Snmptrap upsTrapOnBattery: Could not find matching sensor \'Estimated battery time remaining\' for device: " . $device->hostname);
         \Log::shouldReceive('warning')->never()->with("Snmptrap upsTrapOnBattery: Could not find matching sensor \'Time on battery\' for device: " . $device->hostname);

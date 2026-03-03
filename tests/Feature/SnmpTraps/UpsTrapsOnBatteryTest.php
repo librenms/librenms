@@ -28,6 +28,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use App\Models\Sensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
@@ -39,9 +40,9 @@ final class UpsTrapsOnBatteryTest extends SnmpTrapTestCase
     public function testOnBattery(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
-        $state = Sensor::factory()->make(['sensor_class' => 'state', 'sensor_type' => 'upsOutputSourceState', 'sensor_current' => '2']); /** @var Sensor $state */
-        $time = Sensor::factory()->make(['sensor_class' => 'runtime', 'sensor_index' => '100', 'sensor_type' => 'rfc1628', 'sensor_current' => '0']); /** @var Sensor $time */
-        $remaining = Sensor::factory()->make(['sensor_class' => 'runtime', 'sensor_index' => '200', 'sensor_type' => 'rfc1628', 'sensor_current' => '371']); /** @var Sensor $remaining */
+        $state = Sensor::factory()->make(['sensor_class' => SensorEnum::State, 'sensor_type' => 'upsOutputSourceState', 'sensor_current' => '2']); /** @var Sensor $state */
+        $time = Sensor::factory()->make(['sensor_class' => SensorEnum::Runtime, 'sensor_index' => '100', 'sensor_type' => 'rfc1628', 'sensor_current' => '0']); /** @var Sensor $time */
+        $remaining = Sensor::factory()->make(['sensor_class' => SensorEnum::Runtime, 'sensor_index' => '200', 'sensor_type' => 'rfc1628', 'sensor_current' => '371']); /** @var Sensor $remaining */
         $device->sensors()->save($state);
         $device->sensors()->save($time);
         $device->sensors()->save($remaining);

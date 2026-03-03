@@ -39,6 +39,16 @@ class UserPref extends BaseModel
     protected $fillable = ['user_id', 'pref', 'value'];
 
     // ---- Helper Functions ----
+    public static function fahrenheit(): bool
+    {
+        return once(function () {
+            /** @var ?User $user */
+            $user = auth()->user();
+
+            return $user && static::getPref($user, 'temp_units') == 'f';
+        });
+    }
+
     public static function getPref(User $user, $pref)
     {
         if ($user->relationLoaded('preferences')) {
