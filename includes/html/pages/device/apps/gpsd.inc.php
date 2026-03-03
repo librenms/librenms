@@ -23,10 +23,8 @@
 
 $app_data = $app->data ?? [];
 
-
-
 if (isset($app_data['has_location']) && $app_data['has_location']) {
-    $fix_status='UNKNOWN';
+    $fix_status = 'UNKNOWN';
     if ($app_data['mode'] == 0) {
         $fix_status = 'UNKNOWN';
     } elseif ($app_data['mode'] == 1) {
@@ -38,14 +36,14 @@ if (isset($app_data['has_location']) && $app_data['has_location']) {
     }
 
     print_optionbar_start();
-    print 'Status: '.$fix_status."<br>\n";
+    echo 'Status: ' . $fix_status . "<br>\n";
     // this will be blank if it is no fix, unknown, 2d
     if (is_numeric($app_data['altitude'])) {
-        print 'Altitude: '.htmlspecialchars($app_data['altitude'])." meters<br>\n";
+        echo 'Altitude: ' . htmlspecialchars($app_data['altitude']) . " meters<br>\n";
     }
     // this will be blank if it is no fix or unknown
     if (is_numeric($app_data['latitude']) && is_numeric($app_data['longitude'])) {
-        print 'Lat / Lng: '.htmlspecialchars($app_data['latitude']).', '.htmlspecialchars($app_data['longitude'])."<br>\n";
+        echo 'Lat / Lng: ' . htmlspecialchars($app_data['latitude']) . ', ' . htmlspecialchars($app_data['longitude']) . "<br>\n";
     }
     print_optionbar_end();
 }
@@ -67,7 +65,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+    $graph_array['to'] = App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 

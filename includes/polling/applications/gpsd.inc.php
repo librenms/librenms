@@ -134,7 +134,7 @@ if (! empty($agent_data['app'][$name])) {
 
     // build the metrics
     $metrics = $basic_fields;
-    if (!$legacy) {
+    if (! $legacy) {
         $metrics['altitude'] = $gpsd['data']['altitude'];
         $metrics['latitude'] = $gpsd['data']['latitude'];
         $metrics['longitude'] = $gpsd['data']['longitude'];
@@ -163,7 +163,7 @@ $basic_tags = [
 app('Datastore')->put($device, 'app', $basic_tags, $basic_fields);
 
 // if not legacy, we will have location info, save that via rrd
-if (!$legacy) {
+if (! $legacy) {
     // Generate location RRD def
     $location_rrd_def = RrdDefinition::make()
         ->addDataset('altitude', 'GAUGE')
@@ -174,7 +174,7 @@ if (!$legacy) {
     $location_tags = [
         'name' => $name,
         'app_id' => $app->app_id,
-        'rrd_name' => ['app', $name, $app->app_id,'location'],
+        'rrd_name' => ['app', $name, $app->app_id, 'location'],
         'rrd_def' => $location_rrd_def,
     ];
     app('Datastore')->put($device, 'app', $location_tags, $location_fields);
