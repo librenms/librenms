@@ -702,5 +702,5 @@ function get_device_max_repeaters($device)
 {
     $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('snmp_max_repeaters');
 
-    return $attrib ?? LibrenmsConfig::getOsSetting($device['os'], 'snmp_max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', false));
+    return $attrib ?? LibrenmsConfig::getOsSetting($device['os'], 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', false));
 }
