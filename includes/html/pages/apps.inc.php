@@ -182,6 +182,10 @@ $graphs['gpsd'] = [
     'satellites',
     'dop',
     'mode',
+    'altitude',
+    'location',
+    'latitude',
+    'longitude',
 ];
 $graphs['exim-stats'] = [
     'frozen',
