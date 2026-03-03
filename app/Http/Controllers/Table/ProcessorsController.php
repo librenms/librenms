@@ -42,13 +42,12 @@ class ProcessorsController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
-        $status = $request->input('status');
-
-        return Processor::query()
+          return Processor::query()
             ->hasAccess($request->user())
             ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'processors.device_id'))
             ->withAggregate('device', 'hostname')
-            ->when($status == 'warning', function ($q): void {
+            ->when($request->input('status') == 'warning', function ($q): void {
+                // show only entries in warning state
                 $q->where('processor_perc_warn', '>', 0)
                     ->whereColumn('processor_usage', '>=', 'processor_perc_warn');
             });

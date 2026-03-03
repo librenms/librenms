@@ -59,8 +59,6 @@ class MempoolsController extends TableController
      */
     protected function baseQuery($request)
     {
-        $status = $request->input('status');
-
         if ($request->input('view') == 'graphs') {
             $query = Device::hasAccess($request->user())->has('mempools')->with('mempools');
         } else {
@@ -74,7 +72,8 @@ class MempoolsController extends TableController
             }
         }
 
-        $query->when($status == 'warning', function ($q): void {
+        $query->when($request->input('status') == 'warning', function ($q): void {
+            // show only entries in warning state
             $q->where('mempool_perc_warn', '>', 0)
                 ->whereColumn('mempool_perc', '>=', 'mempool_perc_warn');
         });

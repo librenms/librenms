@@ -44,13 +44,12 @@ class StoragesController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
-        $status = $request->input('status');
-
         return Storage::query()
             ->hasAccess($request->user())
             ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'storage.device_id'))
             ->withAggregate('device', 'hostname')
-            ->when($status == 'warning', function ($q): void {
+            ->when($request->input('status') == 'warning', function ($q): void {
+                // show only entries in warning state
                 $q->where('storage_perc', '>', 0)
                     ->whereColumn('storage_perc', '>=', 'storage_perc_warn');
             });
