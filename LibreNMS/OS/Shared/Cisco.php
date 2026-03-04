@@ -1136,6 +1136,10 @@ class Cisco extends OS implements
                 'CISCO-IP-STAT-MIB::cipMacSwitchedBytes',
                 'CISCO-IP-STAT-MIB::cipMacSwitchedPkts',
             ]);
+
+            if (! $cip_response->isValid()) {
+                return new Collection;
+            }
         }
 
         foreach ($cip_response->table(3) as $ifIndex => $port_data) {

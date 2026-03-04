@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('mac_accounting', function (Blueprint $table) {
-            $table->unsignedBigInteger('device_id')->after('ma_id');
-            $table->unsignedInteger('ifIndex')->after('mac');
+            $table->unsignedBigInteger('device_id')->nullable()->after('ma_id');
+            $table->unsignedInteger('ifIndex')->nullable()->after('mac');
             $table->unsignedInteger('vlan')->nullable()->after('ifIndex');
             $table->renameColumn('cipMacHCSwitchedBytes_input', 'bytes_in');
             $table->renameColumn('cipMacHCSwitchedBytes_output', 'bytes_out');

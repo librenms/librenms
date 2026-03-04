@@ -93,9 +93,9 @@ class MacAccounting implements Module
         }
 
         // remove older than 1 year
-        $year_ago = now()->subYear();
+        $year_ago = now()->subYear()->timestamp;
         foreach ($existing as $key => $existing_mac) {
-            if ($existing_mac->last_polled < $year_ago) {
+            if ($existing_mac->last_polled && $existing_mac->last_polled < $year_ago) {
                 $existing_mac->delete();
                 $existing->forget($key);
             }
@@ -120,13 +120,7 @@ class MacAccounting implements Module
         ModuleModelObserver::observe(\App\Models\MacAccounting::class);
         $os->getDevice()->macAccounting()->saveMany($macs->each(function (\App\Models\MacAccounting $mac): void {
             $mac->port_id ??= PortCache::getIdFromIfIndex($mac->ifIndex); // ensure port_id is filled (if new)
-            $now = time();
-            if ($mac->last_polled) {
-                $duration = $now - $mac->last_polled;
-                $mac->bytes_in_rate = $mac->bytes_in / $duration;
-                $mac->bytes_out_rate = $mac->bytes_out / $duration;
-            }
-            $mac->last_polled = $now;
+            $mac->fillRates();
         }));
 
         $rrd_def = RrdDefinition::make()
