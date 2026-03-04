@@ -121,6 +121,9 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('/device/{device}/edit', [Device\EditDeviceController::class, 'index'])->name('device.edit');
         Route::put('/device/{device}/edit', [Device\EditDeviceController::class, 'update'])->name('device.edit.update');
         Route::get('/device/{device}/edit/health', [Device\EditHealthController::class, 'index'])->name('device.edit.health');
+        Route::post('/device/{device}/edit/health/sensor/reset', [Device\EditHealthController::class, 'reset'])->name('device.edit.health.sensor.reset');
+        Route::post('/device/{device}/edit/health/sensor/update', [Device\EditHealthController::class, 'update'])->name('device.edit.health.sensor.update');
+        Route::post('/device/{device}/edit/health/sensor/alert', [Device\EditHealthController::class, 'updateAlert'])->name('device.edit.health.sensor.alert');
         Route::get('/device/{device}/edit/misc', [Device\EditMiscController::class, 'index'])->name('device.edit.misc');
         Route::put('/device/{device}/edit/misc', [Device\EditMiscController::class, 'update'])->name('device.edit.misc.update');
         Route::post('/device/{device}/rediscover', [DeviceController::class, 'rediscover'])->name('device.rediscover');

@@ -21,7 +21,7 @@
                 @foreach ($sensors as $sensor)
                     @php
                         $alertChecked = $sensor->sensor_alert == 1;
-                        $customDisabledClass = $sensor->sensor_custom === 'No' ? 'disabled' : '';
+                        $customDisabledClass = $sensor->sensor_custom === 'Yes' ? '' : 'disabled';
                     @endphp
                     <tr>
                         <td>{{ $sensor->sensor_class }}</td>
@@ -107,7 +107,6 @@
                 <input type="hidden" name="sensor_limit_low[]" value="{{ $sensor->sensor_limit_low }}">
                 <input type="hidden" name="sensor_alert[]" value="{{ $sensor->sensor_alert }}">
             @endforeach
-            <input type="hidden" name="type" value="sensor-alert-reset">
             <button id="newThread" class="btn btn-primary btn-sm" type="submit">Reset values</button>
         </form>
     </x-device.page>
@@ -122,7 +121,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: '{{ route('device.edit.health.sensor.reset', $device) }}',
                 data: form.serialize(),
                 dataType: "json",
                 success: function(data){
@@ -157,13 +156,13 @@
             var $this = $(this);
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: '{{ route('device.edit.health.sensor.update', $device) }}',
                 data: {
-                    type: "{{ $ajaxPrefix }}-update",
                     device_id: device_id,
                     data: data,
                     sensor_id: sensor_id,
-                    value_type: value_type
+                    value_type: value_type,
+                    _token: '{{ csrf_token() }}'
                 },
                 dataType: "json",
                 success: function(data){
@@ -189,13 +188,13 @@
             var sensor_desc = $(this).data('sensor_desc');
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: '{{ route('device.edit.health.sensor.alert', $device) }}',
                 data: {
-                    type: "{{ $ajaxPrefix }}-alert-update",
                     device_id: device_id,
                     sensor_id: sensor_id,
                     sensor_desc: sensor_desc,
-                    state: state
+                    state: state,
+                    _token: '{{ csrf_token() }}'
                 },
                 dataType: "json",
                 success: function(data){
@@ -221,11 +220,11 @@
             var sensor_id = $(this).data('sensor_id');
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: '{{ route('device.edit.health.sensor.alert', $device) }}',
                 data: {
-                    type: "{{ $ajaxPrefix }}-alert-update",
                     sensor_id: sensor_id,
-                    sub_type: "remove-custom"
+                    sub_type: "remove-custom",
+                    _token: '{{ csrf_token() }}'
                 },
                 dataType: "json",
                 success: function(data){

@@ -27,24 +27,7 @@ class SensorObserver
 
     public function creating(Sensor $sensor): void
     {
-        // fix inverted warn limits
-        if ($sensor->sensor_limit_warn !== null && $sensor->sensor_limit_low_warn !== null && $sensor->sensor_limit_low_warn > $sensor->sensor_limit_warn) {
-            Log::error('Fixing swapped sensor warn limits');
-
-            // Fix high/low thresholds (i.e. on negative numbers)
-            [$sensor->sensor_limit_warn, $sensor->sensor_limit_low_warn] = [$sensor->sensor_limit_low_warn, $sensor->sensor_limit_warn];
-        }
-
-        if (LibrenmsConfig::get('sensors.guess_limits') && $sensor->sensor_current !== null) {
-            $sensor->guessLimits($sensor->sensor_limit === null, $sensor->sensor_limit_low === null);
-        }
-
-        // Fix high/low thresholds (i.e. on negative numbers)
-        if ($sensor->sensor_limit !== null && $sensor->sensor_limit_low > $sensor->sensor_limit) {
-            Log::error('Fixing swapped sensor limits');
-
-            [$sensor->sensor_limit, $sensor->sensor_limit_low] = [$sensor->sensor_limit_low, $sensor->sensor_limit];
-        }
+        self::calculateLimits($sensor);
     }
 
     /**
@@ -78,8 +61,16 @@ class SensorObserver
             $sensor->sensor_limit_warn = $sensor->getOriginal('sensor_limit_warn');
             $sensor->sensor_limit_low_warn = $sensor->getOriginal('sensor_limit_low_warn');
             $sensor->sensor_limit_low = $sensor->getOriginal('sensor_limit_low');
+        } elseif ($sensor->sensor_custom == 'Reset') {
+            self::calculateLimits($sensor);
+            $sensor->sensor_custom = 'No';
+        } elseif ($sensor->sensor_custom == 'Resetting') {
+            // transition state, but don't let discovery null-out existing limits
+            $sensor->sensor_custom = 'Reset';
+        } elseif ($sensor->sensor_custom == 'Saving') {
+            $sensor->sensor_custom = 'Yes';
         } else {
-            // change unset sensor limits to current values
+             // change unset sensor limits to current values
             $sensor->sensor_limit ??= $sensor->getOriginal('sensor_limit');
             $sensor->sensor_limit_warn ??= $sensor->getOriginal('sensor_limit_warn');
             $sensor->sensor_limit_low_warn ??= $sensor->getOriginal('sensor_limit_low_warn');
@@ -138,6 +129,28 @@ class SensorObserver
     {
         if ($this->consoleOutputEnabled) {
             echo '-';
+        }
+    }
+
+    private static function calculateLimits(Sensor $sensor): void
+    {
+        // fix inverted warn limits
+        if ($sensor->sensor_limit_warn !== null && $sensor->sensor_limit_low_warn !== null && $sensor->sensor_limit_low_warn > $sensor->sensor_limit_warn) {
+            Log::error('Fixing swapped sensor warn limits');
+
+            // Fix high/low thresholds (i.e. on negative numbers)
+            [$sensor->sensor_limit_warn, $sensor->sensor_limit_low_warn] = [$sensor->sensor_limit_low_warn, $sensor->sensor_limit_warn];
+        }
+
+        if (LibrenmsConfig::get('sensors.guess_limits') && $sensor->sensor_current !== null) {
+            $sensor->guessLimits($sensor->sensor_limit === null, $sensor->sensor_limit_low === null);
+        }
+
+        // Fix high/low thresholds (i.e. on negative numbers)
+        if ($sensor->sensor_limit !== null && $sensor->sensor_limit_low > $sensor->sensor_limit) {
+            Log::error('Fixing swapped sensor limits');
+
+            [$sensor->sensor_limit, $sensor->sensor_limit_low] = [$sensor->sensor_limit_low, $sensor->sensor_limit];
         }
     }
 }
