@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Casts\BytesMutatesRate;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
