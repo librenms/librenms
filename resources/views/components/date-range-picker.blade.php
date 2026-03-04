@@ -32,9 +32,9 @@
          x-transition:leave="tw:transition tw:ease-in tw:duration-150"
          x-transition:leave-start="tw:opacity-100 tw:transform tw:translate-y-0"
          x-transition:leave-end="tw:opacity-0 tw:transform tw:-translate-y-2"
-         style="display: none;">
+         style="    display: none;">
         @if($presets)
-            <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3 tw:dark:text-white">
+            <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3 tw:dark:text-white tw:justify-center">
                 <template x-for="(preset, idx) in presets">
                     <button type="button"
                             class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-[40px] tw:dark:text-gray-400"
@@ -45,27 +45,29 @@
                 </template>
             </div>
         @endif
-        <div class="tw:mb-3">
-            <div class="tw:flex-1">
-                <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">From</label>
-                <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
-                    <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
-                    <input type="time" x-model="startTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
-                </div>
-            </div>
-            <div class="tw:flex-1">
-                <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">To</label>
-                <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
-                    <input type="date" x-model="endDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
-                    <input type="time" x-model="endTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
-                </div>
+        <div class="tw:flex-1 tw:mb-3">
+            <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">From</label>
+            <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
+                <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
+                <input type="time" x-model="startTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
             </div>
         </div>
-        <div class="tw:flex tw:justify-between tw:dark:text-white">
+        <div class="tw:flex-1 tw:mb-4">
+            <label class="tw:block tw:text-sm tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">To</label>
+            <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
+                <input type="date" x-model="endDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
+                <input type="time" x-model="endTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
+            </div>
+        </div>
+        <div class="tw:flex tw:justify-between tw:items-center tw:gap-2">
             <button type="button" x-on:click="clearRange"
-                    class="tw:px-3 tw:py-1 tw:text-gray-500 tw:dark:text-gray-400 tw:hover:text-gray-700 tw:dark:hover:text-gray-300">Clear</button>
+                    class="tw:px-4 tw:py-1.5 tw:font-medium tw:text-gray-500 tw:dark:text-gray-400 tw:border tw:border-gray-200 tw:dark:border-gray-600 tw:rounded tw:hover:bg-gray-50 tw:dark:hover:bg-gray-800 tw:hover:text-gray-700 tw:dark:hover:text-gray-300 tw:transition-colors tw:duration-150">
+                {{ __('Clear') }}
+            </button>
             <button type="button" x-on:click="applyRange"
-                    class="tw:px-3 tw:py-1 tw:bg-blue-500 tw:text-white tw:rounded tw:hover:bg-blue-600 tw:dark:bg-blue-600 tw:dark:hover:bg-blue-700">Apply</button>
+                    class="tw:px-4 tw:py-1.5 tw:font-medium tw:text-white! tw:bg-blue-500 tw:dark:bg-blue-600 tw:rounded tw:shadow-sm tw:hover:bg-blue-600 tw:dark:hover:bg-blue-700 tw:active:scale-95 tw:transition-all tw:duration-150">
+                {{ __('Apply') }}
+            </button>
         </div>
     </div>
 </div>
