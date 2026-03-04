@@ -23,7 +23,7 @@ modules:
             data:
                 -
                     oid: G6-SYSTEM-MIB::systemTemperature.0
-                    value: G6-SYSTEM-MIB::systemTemperature.0
+                    value: G6-SYSTEM-MIB::systemTemperature
                     num_oid: '.1.3.6.1.4.1.3181.10.6.1.30.104.0{{ $noindex }}'
                     descr: 'System Temperature'
                     index: 'systemTemperature.{{ $index }}'
@@ -38,7 +38,7 @@ modules:
             data:
                 -
                     oid: G6-SYSTEM-MIB::systemClimateLevel.0
-                    value: G6-SYSTEM-MIB::systemClimateLevel.0
+                    value: G6-SYSTEM-MIB::systemClimateLevel
                     num_oid: '.1.3.6.1.4.1.3181.10.6.1.30.105.0{{ $noindex }}'
                     descr: 'System Temperature State'
                     index: 'systemClimateLevel.{{ $index }}'
@@ -54,7 +54,7 @@ modules:
                         - { descr: 'shutdown',     graph: 1, value: 7, generic: 2 }
                 -
                     oid: G6-HARDWARE-MIB::hardwarePowerSupply1Status.0
-                    value: G6-HARDWARE-MIB::hardwarePowerSupply1Status.0
+                    value: G6-HARDWARE-MIB::hardwarePowerSupply1Status
                     num_oid: '.1.3.6.1.4.1.3181.10.6.1.31.100.0{{ $noindex }}'
                     descr: 'Power Supply 1 Status'
                     index: 'hardwarePowerSupply1Status.{{ $index }}'
@@ -69,7 +69,7 @@ modules:
                         - { descr: 'notInstalled',   graph: 1, value: 6, generic: 3 }
                 -
                     oid: G6-HARDWARE-MIB::hardwarePowerSupply2Status.0
-                    value: G6-HARDWARE-MIB::hardwarePowerSupply2Status.0
+                    value: G6-HARDWARE-MIB::hardwarePowerSupply2Status
                     num_oid: '.1.3.6.1.4.1.3181.10.6.1.31.101.0{{ $noindex }}'
                     descr: 'Power Supply 2 Status'
                     index: 'hardwarePowerSupply2Status.{{ $index }}'
@@ -84,7 +84,7 @@ modules:
                         - { descr: 'notInstalled',   graph: 1, value: 6, generic: 3 }
                 -
                     oid: G6-HARDWARE-MIB::hardwareFanStatus.0
-                    value: G6-HARDWARE-MIB::hardwareFanStatus.0
+                    value: G6-HARDWARE-MIB::hardwareFanStatus
                     num_oid: '.1.3.6.1.4.1.3181.10.6.1.31.103.0{{ $noindex }}'
                     descr: 'Fan Status'
                     index: 'hardwareFanStatus.{{ $index }}'
@@ -97,7 +97,7 @@ modules:
                         - { descr: 'missing',  graph: 1, value: 4, generic: 2 }
                 -
                     oid: G6-HARDWARE-MIB::hardwareSdCardStatus.0
-                    value: G6-HARDWARE-MIB::hardwareSdCardStatus.0
+                    value: G6-HARDWARE-MIB::hardwareSdCardStatus
                     num_oid: '.1.3.6.1.4.1.3181.10.6.1.31.104.0{{ $noindex }}'
                     descr: 'SD Card Status Status'
                     index: 'hardwareSdCardStatus.{{ $index }}'
@@ -278,7 +278,7 @@ modules:
                       value: 1
                 -
                     oid: G6-POE-MIB::poeTotalPowerConsumed.0
-                    value: G6-POE-MIB::poeTotalPowerConsumed.0
+                    value: G6-POE-MIB::poeTotalPowerConsumed
                     num_oid: '.1.3.6.1.4.1.3181.10.6.1.33.100.0{{ $noindex }}'
                     descr: 'POE Total Power Consumed'
                     index: 'poeTotalPowerConsumed.{{ $index }}'
