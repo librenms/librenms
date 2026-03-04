@@ -123,11 +123,13 @@ if ($device['os'] == 'timos') {
         128 => 'vpn',
     ];
 
+    // snmpwalk_cache_oid returns indexes like: "1.ipv4.62.40.116.67"
+    // parts[0]=vrfOid, parts[1]="ipv4"/"ipv6" (string), parts[2..]=address octets
     $prefix_oids = [
         '1_1'   => [
             'recv'   => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.5',
             'sent'   => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.6',
-            'filter' => 1,    // Only accept entries where peer is IPv4
+            'filter' => 'ipv4',    // Only accept entries where peer is IPv4
         ],
         '1_2'   => [
             'recv'   => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.37',
@@ -142,7 +144,7 @@ if ($device['os'] == 'timos') {
         '2_1'   => [
             'recv'   => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.27',
             'sent'   => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.28',
-            'filter' => 2,    // Only accept entries where peer is IPv6
+            'filter' => 'ipv6',    // Only accept entries where peer is IPv6
         ],
         '2_2'   => [
             'recv'   => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.95',
@@ -173,7 +175,7 @@ if ($device['os'] == 'timos') {
                 continue;
             }
 
-            $peer_addr_type = (int) $parts[1];
+            $peer_addr_type = $parts[1];
 
             if ($oid_set['filter'] !== null && $peer_addr_type !== $oid_set['filter']) {
                 d_echo("Nokia TIMOS: Skipping index=$index (peer addr_type=$peer_addr_type, expected={$oid_set['filter']}) — Nokia firmware bug row, ignoring\n");
@@ -181,7 +183,7 @@ if ($device['os'] == 'timos') {
             }
 
             // Parse the peer IP address directly from the OID index
-            $address = implode('.', array_slice($parts, 3));
+            $address = implode('.', array_slice($parts, 2));
             if (strlen($address) > 15) {
                 try {
                     $address = IP::fromSnmpString($address)->compressed();
@@ -191,6 +193,7 @@ if ($device['os'] == 'timos') {
                 }
             }
 
+            // Build the peer array that add_cbgp_peer() needs
             $peer = ['ip' => $address];
 
             $pfxRcv  = is_array($recv_entry) ? reset($recv_entry) : ($recv_entry ?? 0);
