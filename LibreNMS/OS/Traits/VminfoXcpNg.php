@@ -59,7 +59,7 @@ trait VminfoXcpNg
                 return null;
             }
 
-            $state = match ((int) $data['xcpNgVmState'] ?? null) {
+            $state = match ((int) $data['xcpNgVmState']) {
                 1 => PowerState::ON,
                 2 => PowerState::OFF,
                 3, 4 => PowerState::SUSPENDED,
@@ -78,4 +78,3 @@ trait VminfoXcpNg
         })->filter();
     }
 }
-
