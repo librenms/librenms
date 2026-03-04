@@ -26,7 +26,6 @@
 namespace App\Http\Controllers\Device;
 
 use App\Models\Device;
-use App\Models\Sensor;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -103,7 +102,6 @@ class EditHealthController
             'sensor_limit_low_warn',
             'sensor_limit_low',
         ];
-
 
         if (! in_array($valueType, $allowedColumns, true)) {
             return response()->json([
@@ -204,12 +202,12 @@ class EditHealthController
             $stateValue = 0;
         }
 
-        $sensor->sensor_alert = $stateValue;
+        $sensor->sensor_alert = $state;
         $sensorDesc = e($request->input('sensor_desc', ''));
 
         if ($sensor->save()) {
             return response()->json([
-                'status' => $stateValue === 0 ? 'info' : 'ok',
+                'status' => $state ? 'ok' : 'info',
                 'message' => 'Alerts ' . $stateString . ' for sensor ' . $sensorDesc,
             ]);
         }
@@ -225,4 +223,3 @@ class EditHealthController
         return $value === '' ? null : $value;
     }
 }
-

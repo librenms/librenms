@@ -70,7 +70,7 @@ class SensorObserver
         } elseif ($sensor->sensor_custom == 'Saving') {
             $sensor->sensor_custom = 'Yes';
         } else {
-             // change unset sensor limits to current values
+            // change unset sensor limits to current values
             $sensor->sensor_limit ??= $sensor->getOriginal('sensor_limit');
             $sensor->sensor_limit_warn ??= $sensor->getOriginal('sensor_limit_warn');
             $sensor->sensor_limit_low_warn ??= $sensor->getOriginal('sensor_limit_low_warn');
