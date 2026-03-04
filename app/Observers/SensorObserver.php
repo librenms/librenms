@@ -64,9 +64,6 @@ class SensorObserver
         } elseif ($sensor->sensor_custom == 'Reset') {
             self::calculateLimits($sensor);
             $sensor->sensor_custom = 'No';
-        } elseif ($sensor->sensor_custom == 'Resetting') {
-            // transition state, but don't let discovery null-out existing limits
-            $sensor->sensor_custom = 'Reset';
         } elseif ($sensor->sensor_custom == 'Saving') {
             $sensor->sensor_custom = 'Yes';
         } else {

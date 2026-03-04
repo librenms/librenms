@@ -59,8 +59,8 @@ class EditHealthController
             ]);
         }
 
-        $status = 'error';
-        $message = 'Error resetting values';
+        $status = 'ok';
+        $message = 'No sensors to reset';
 
         foreach ($sensorIds as $sensorId) {
             $sensor = $device->sensors()
@@ -68,19 +68,17 @@ class EditHealthController
                 ->where('sensor_custom', '!=', 'No')
                 ->first();
 
-            if (! $sensor) {
-                $message = 'Invalid sensor id';
-                continue;
-            }
+            if ($sensor) {
+                // Clear custom flag and allow discovery to manage limits again
+                $sensor->sensor_custom = 'Reset';
 
-            // Clear custom flag and allow discovery to manage limits again
-            $sensor->sensor_custom = 'Resetting';
-
-            if ($sensor->save()) {
-                $message = 'Sensor values resetted';
-                $status = 'ok';
-            } else {
-                $message = 'Could not reset sensors values';
+                if ($sensor->saveQuietly()) {
+                    $message = 'Sensor values reset';
+                    $status = 'ok';
+                } else {
+                    $message = 'Could not reset sensors values';
+                    $status = 'error';
+                }
             }
         }
 
@@ -172,9 +170,9 @@ class EditHealthController
         }
 
         if ($subType) {
-            $sensor->sensor_custom = 'Resetting';
+            $sensor->sensor_custom = 'Reset';
 
-            if ($sensor->save()) {
+            if ($sensor->saveQuietly()) {
                 return response()->json([
                     'status' => 'ok',
                     'message' => 'Custom limit removed. New one will be set up in rediscovery',
