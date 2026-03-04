@@ -6721,7 +6721,7 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
-			path: includes/html/pages/device/edit/wireless-sensors.php
+			path: includes/html/pages/device/edit/wireless-sensors.inc.php
 
 		-
 			message: '''
