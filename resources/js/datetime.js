@@ -1,6 +1,6 @@
 // resources/js/datetime.js
 
-import {DateTime, Settings} from 'luxon';
+import { DateTime, Settings } from "luxon";
 
 Settings.defaultZone = window.tz || 'local';
 
@@ -46,7 +46,7 @@ function parse(input) {
 }
 
 const LibreNMSDate = {
-    display(input, opts = { dateStyle: 'medium', timeStyle: 'short' }) {
+    display(input, opts = { dateStyle: 'medium', timeStyle: 'medium' }) {
         const dt = parse(input);
         return dt.isValid ? dt.toLocaleString(opts) : '—';
     },
