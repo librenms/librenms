@@ -52,6 +52,8 @@ if (isset($vars['disk'])) {
             'device_model' => 'Device Model',
             'revision' => 'Revision',
             'fw_version' => 'FW Version',
+            'form_factor' => 'Form Factor',
+            'rpm' => 'RPM',
         ];
 
         foreach ($diskFields as $field => $label) {
