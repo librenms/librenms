@@ -185,13 +185,19 @@
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_with_failed_health_count",
+                    "metric": "disks_with_failed_health",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_with_failed_tests_count",
+                    "metric": "disks_with_failed_tests",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disks_with_over_temp",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
@@ -203,13 +209,19 @@
                     "app_type": "smart"
                 },
                 {
-                    "metric": "new_disks_with_failed_health_count",
+                    "metric": "new_disks_with_failed_health",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
                 {
-                    "metric": "new_disks_with_failed_tests_count",
+                    "metric": "new_disks_with_failed_tests",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "new_disks_with_over_temp",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
