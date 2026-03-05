@@ -143,10 +143,14 @@
     @config('twofactor')
     <x-panel title="{{ __('Two-Factor Authentication') }}">
         @if($twofactor)
-            <div id="twofactorqrcontainer">
-                <div id="twofactorqr"></div>
-                <script>$("#twofactorqr").qrcode({"text": "{{ $twofactor_uri }}"});</script>
-                <button class="btn btn-default" onclick="$('#twofactorkeycontainer').show(); $('#twofactorqrcontainer').hide();">{{ __('Manual') }}</button>
+            <div class="tw:text-center" id="twofactorqrcontainer">
+                <div class="tw:inline-block tw:bg-white tw:p-4 tw:pb-2 tw:rounded-lg tw:mb-2">
+                    <div id="twofactorqr"></div>
+                    <script>$("#twofactorqr").qrcode({"text": "{{ $twofactor_uri }}"});</script>
+                </div>
+                <div>
+                    <button class="btn btn-default" onclick="$('#twofactorkeycontainer').show(); $('#twofactorqrcontainer').hide();">{{ __('Manual') }}</button>
+                </div>
             </div>
             <div id="twofactorkeycontainer">
                 <form id="twofactorkey" class="form-horizontal" role="form">
