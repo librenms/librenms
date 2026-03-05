@@ -10,6 +10,11 @@ class DeviceGroupPolicy
 {
     use HandlesAuthorization;
 
+    public function allowRestify(User $user = null): bool
+    {
+        return $user !== null && $user->hasGlobalRead();
+    }
+
     public function before($user, $ability)
     {
         if ($user->isAdmin()) {

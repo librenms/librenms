@@ -11,6 +11,12 @@ class PortPolicy
 {
     use HandlesAuthorization;
 
+    public function allowRestify(User $user = null): bool
+    {
+        return $user !== null && $user->hasGlobalRead();
+    }
+
+
     /**
      * Determine whether the user can view any ports.
      *

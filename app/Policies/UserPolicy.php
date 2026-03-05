@@ -9,6 +9,12 @@ class UserPolicy
 {
     use HandlesAuthorization;
 
+    public function allowRestify(User $user = null): bool
+    {
+        return $user !== null && $user->isAdmin();
+    }
+
+
     /**
      * Determine whether the user can view the user.
      *

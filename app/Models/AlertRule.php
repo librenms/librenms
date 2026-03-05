@@ -27,12 +27,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Enum\AlertState;
 
 class AlertRule extends BaseModel
 {
+    use HasFactory;
+
     public $timestamps = false;
 
     protected static function booted(): void
