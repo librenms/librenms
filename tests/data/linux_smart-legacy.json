@@ -29,6 +29,12 @@
             ],
             "application_metrics": [
                 {
+                    "metric": "dev_error",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
                     "metric": "disk_Z304VCFY",
                     "value": 1,
                     "value_prev": null,
