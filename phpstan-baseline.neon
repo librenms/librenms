@@ -43,54 +43,6 @@ parameters:
 			path: LibreNMS/Device/Processor.php
 
 		-
-			message: '#^Variable \$lsps might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: '#^Variable \$paths might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: '#^Variable \$features on left side of \?\? is never defined\.$#'
-			identifier: nullCoalesce.variable
-			count: 1
-			path: LibreNMS/Modules/Os.php
-
-		-
-			message: '#^Variable \$hardware on left side of \?\? is never defined\.$#'
-			identifier: nullCoalesce.variable
-			count: 1
-			path: LibreNMS/Modules/Os.php
-
-		-
-			message: '#^Variable \$location in empty\(\) always exists and is always falsy\.$#'
-			identifier: empty.variable
-			count: 1
-			path: LibreNMS/Modules/Os.php
-
-		-
-			message: '#^Variable \$serial on left side of \?\? is never defined\.$#'
-			identifier: nullCoalesce.variable
-			count: 1
-			path: LibreNMS/Modules/Os.php
-
-		-
-			message: '#^Variable \$version on left side of \?\? is never defined\.$#'
-			identifier: nullCoalesce.variable
-			count: 1
-			path: LibreNMS/Modules/Os.php
-
-		-
-			message: '#^If condition is always true\.$#'
-			identifier: if.alwaysTrue
-			count: 1
-			path: LibreNMS/Modules/Ospf.php
-
-		-
 			message: '#^Variable \$multi_get_array on left side of \?\? is never defined\.$#'
 			identifier: nullCoalesce.variable
 			count: 2
