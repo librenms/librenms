@@ -191,12 +191,6 @@
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disks_with_failed_health",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
                     "metric": "disks_with_failed_tests",
                     "value": 0,
                     "value_prev": null,
@@ -210,6 +204,12 @@
                 },
                 {
                     "metric": "exit_nonzero",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "new_disks_with_dev_error",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
