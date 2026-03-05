@@ -19,30 +19,6 @@ parameters:
 			path: LibreNMS/Data/Store/Rrd.php
 
 		-
-			message: '#^Parameter \#1 \$model of static method LibreNMS\\Model\:\:onCreate\(\) expects static\(LibreNMS\\Device\\Processor\), LibreNMS\\Device\\Processor given\.$#'
-			identifier: argument.type
-			count: 1
-			path: LibreNMS/Device/Processor.php
-
-		-
-			message: '#^Parameter \#1 \$model of static method LibreNMS\\Model\:\:onDelete\(\) expects static\(LibreNMS\\Device\\Processor\), LibreNMS\\Device\\Processor given\.$#'
-			identifier: argument.type
-			count: 1
-			path: LibreNMS/Device/Processor.php
-
-		-
-			message: '#^Unsafe call to private method LibreNMS\\Device\\Processor\:\:pollProcessors\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 1
-			path: LibreNMS/Device/Processor.php
-
-		-
-			message: '#^Unsafe call to private method LibreNMS\\Device\\Processor\:\:processData\(\) through static\:\:\.$#'
-			identifier: staticClassAccess.privateMethod
-			count: 3
-			path: LibreNMS/Device/Processor.php
-
-		-
 			message: '#^Variable \$lsps might not be defined\.$#'
 			identifier: variable.undefined
 			count: 1
