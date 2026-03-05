@@ -39,7 +39,17 @@ foreach ($disks as $diskName => $diskData) {
         default => '',
     };
 
-    $driveLinks[] = generate_link($label, $baseLink, ['disk' => $diskName]) . $healthStatus . $overheatingStatus . $pollingerrorStatus;
+    $readfailureStatus = '';
+    if (isset($diskData['read_failure']) && $diskData['read_failure'] > 0) {
+        $readfailureStatus = ' (Read Failure)';
+    };
+
+    $unknownfailureStatus = '';
+    if (isset($diskData['unknown_failure']) && $diskData['unknown_failure'] > 0) {
+        $unknownfailureStatus = ' (Unknown Failure)';
+    };
+
+    $driveLinks[] = generate_link($label, $baseLink, ['disk' => $diskName]) . $healthStatus . $overheatingStatus . $pollingerrorStatus. $readfailureStatus . $unknownfailureStatus;
 }
 
 echo generate_link('All Drives', $baseLink) . ' | drives: ' . implode(', ', $driveLinks);
