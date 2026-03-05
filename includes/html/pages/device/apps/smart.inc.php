@@ -29,7 +29,17 @@ foreach ($disks as $diskName => $diskData) {
         default => '',
     };
 
-    $driveLinks[] = generate_link($label, $baseLink, ['disk' => $diskName]) . $healthStatus;
+    $overheatingStatus = match ($diskData['over_temp'] ?? null) {
+        1 => ' (Overheating)',
+        default => '',
+    };
+
+    $pollingerrorStatus = match ($diskData['dev_error'] ?? null) {
+        1 => ' (Polling Error)',
+        default => '',
+    };
+
+    $driveLinks[] = generate_link($label, $baseLink, ['disk' => $diskName]) . $healthStatus . $overheatingStatus . $pollingerrorStatus;
 }
 
 echo generate_link('All Drives', $baseLink) . ' | drives: ' . implode(', ', $driveLinks);
