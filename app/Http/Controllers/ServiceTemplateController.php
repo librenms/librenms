@@ -81,7 +81,7 @@ class ServiceTemplateController extends Controller
             ]
         );
 
-        $template = ServiceTemplate::make(
+        $template = new ServiceTemplate(
             $request->only(
                 [
                     'name',

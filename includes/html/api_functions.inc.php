@@ -15,6 +15,8 @@
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Models\AlertTemplate;
+use App\Models\AlertTemplateMap;
 use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
@@ -49,6 +51,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
 use LibreNMS\Enum\MaintenanceBehavior;
@@ -1402,6 +1405,129 @@ function list_alert_rules(Illuminate\Http\Request $request)
     );
 
     return api_success($rules->toArray($request), 'rules');
+}
+
+function list_alert_templates(Illuminate\Http\Request $request)
+{
+    $id = $request->route('id');
+
+    $templates = AlertTemplate::when($id, fn ($query) => $query->where('id', $id))
+        ->with('alert_rules')->select(['id', 'name', 'template', 'title', 'title_rec'])->get();
+
+    return api_success($templates->toArray($request), 'alert_templates');
+}
+
+function add_edit_alert_template(Illuminate\Http\Request $request)
+{
+    $vars = json_decode($request->getContent(), true);
+
+    $rules = $vars['alert_rules'];
+    // explode(',', $vars['alert_rules'] ?? '');
+    $status = 'error';
+
+    try {
+        // create some test data to check the template
+        $test_data = [
+            'id' => 0,
+            'rule' => 'test',
+            'name' => 'Test Rule',
+            'severity' => 'critical',
+            'extra' => '',
+            'disabled' => 0,
+            'query' => '',
+            'builder' => [],
+            'proc' => '',
+            'invert_map' => 0,
+            'notes' => '',
+        ];
+        $test_device = new Device(['hostname' => 'test']);
+        $test_device->device_id = 0;
+        $test_data['alert'] = new AlertData(AlertData::testData($test_device));
+
+        Blade::render($vars['template'], $test_data);
+        Blade::render($vars['title'], $test_data);
+        Blade::render($vars['title_rec'], $test_data);
+    } catch (Exception $e) {
+        $message = 'Template failed to be parsed, please check the syntax. ';
+        $message .= $e->getMessage();
+
+        return api_error(400, $message);
+    }
+
+    $template_newid = 0;
+    $create = true;
+
+    $name = strip_tags((string) $vars['name']);
+    if (empty($name)) {
+        return api_error(400, 'name variable must be set');
+    }
+    if (! isset($vars['template']) || empty($vars['template'])) {
+        return api_error(400, 'template variable must be set');
+    }
+    if (isset($vars['template_id']) && is_numeric($vars['template_id'])) {
+        // Update template
+        $create = false;
+        $template_id = $vars['template_id'];
+        $template = AlertTemplate::find($template_id);
+
+        $template->template = $vars['template'];
+        $template->name = $vars['name'];
+        $template->title = $vars['title'];
+        $template->title_rec = $vars['title_rec'];
+        $template->save();
+        $status = 'ok';
+    } else {
+        // Create template
+        if ($name != 'Default Alert Template') {
+            $template = new AlertTemplate;
+            $template->template = $vars['template'];
+            $template->name = $vars['name'];
+            $template->title = $vars['title'];
+            $template->title_rec = $vars['title_rec'];
+
+            $template->save();
+            $template->fresh();
+            $template_id = $template->id;
+            if ($template_id != null) {
+                $status = 'ok';
+            } else {
+                $message = 'Could not create alert template';
+            }
+        } else {
+            $message = 'This template name is reserved!';
+            $status = 'error';
+        }
+    }
+
+    if ($status == 'ok') {
+        $alertRulesOk = true;
+        $alertTemplatemap = AlertTemplateMap::where('alert_templates_id', $template_id)->delete();
+        foreach ($rules as $rule_id) {
+            // Check if succesfull?
+            $new_alert_template_mapping = new AlertTemplateMap;
+            $new_alert_template_mapping->alert_rule_id = $rule_id;
+            $new_alert_template_mapping->alert_templates_id = $template_id;
+            $new_alert_template_mapping->save();
+        }
+
+        if ($alertRulesOk) {
+            $status = 'ok';
+            $message = 'Alert template has been ' . ($create ? 'created' : 'updated') . ' and attached rules have been updated.';
+        } else {
+            $status = 'warning';
+            $message = 'Alert template has been ' . ($create ? 'created' : 'updated') . ' but some attached rules have not been updated.';
+        }
+    }
+
+    $response = ['status' => $status, 'message' => htmlentities((string) $message), 'id' => $template_id ?? null];
+    if ($status == 'error') {
+        return api_error(400, $message);
+    }
+    if ($create) {
+        return response()->json($response, 201, [], JSON_PRETTY_PRINT);
+    }
+
+    return response()->json($response, 200, [], JSON_PRETTY_PRINT);
 }
 
 /**

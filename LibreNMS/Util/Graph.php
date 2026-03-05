@@ -164,11 +164,11 @@ class Graph
             throw new RrdGraphException("{$type}_$subtype template missing", "{$type}_$subtype missing", $width, $height);
         }
 
-        if (empty($rrd_options)) {
+        if (empty($rrd_options)) { // @phpstan-ignore empty.variable ($rrd_options is populated by included graph templates)
             throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
         }
 
-        $rrd_options = [...$graph_params->toRrdOptions(), ...$rrd_options];
+        $rrd_options = [...$graph_params->toRrdOptions(), ...$rrd_options]; // @phpstan-ignore deadCode.unreachable
 
         // Generating the graph!
         try {

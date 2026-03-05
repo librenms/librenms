@@ -13,7 +13,7 @@ poller_modules:
     cipsec-tunnels: false
     cisco-cef: false
     cisco-ipsec-flow-monitor: false
-    cisco-mac-accounting: false
+    mac-accounting: false
     cisco-otv: false
     cisco-remote-access-monitor: false
     slas: false
@@ -25,7 +25,7 @@ poller_modules:
 discovery_modules:
     bgp-peers: false
     cisco-cef: false
-    cisco-mac-accounting: false
+    mac-accounting: false
     cisco-otv: false
     cisco-pw: false
     slas: false

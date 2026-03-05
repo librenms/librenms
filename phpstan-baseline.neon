@@ -1,180 +1,115 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Path in include\(\) "config\.php" is not a file or it does not exist\.$#'
 			identifier: include.fileNotFound
+			count: 1
 			path: LibreNMS/ComposerHelper.php
-			reportUnmatched: false
+
 		-
-			message: "#^Property LibreNMS\\\\Data\\\\Store\\\\Rrd\\:\\:\\$async_process \\(LibreNMS\\\\Proc\\) in isset\\(\\) is not nullable\\.$#"
+			message: '#^Property LibreNMS\\Data\\Store\\Rrd\:\:\$async_process \(LibreNMS\\Proc\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
 			count: 1
 			path: LibreNMS/Data/Store/Rrd.php
 
 		-
-			message: "#^Property LibreNMS\\\\Data\\\\Store\\\\Rrd\\:\\:\\$sync_process \\(LibreNMS\\\\Proc\\) in isset\\(\\) is not nullable\\.$#"
+			message: '#^Property LibreNMS\\Data\\Store\\Rrd\:\:\$sync_process \(LibreNMS\\Proc\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
 			count: 1
 			path: LibreNMS/Data/Store/Rrd.php
 
 		-
-			message: "#^Parameter \\#1 \\$model of static method LibreNMS\\\\Model\\:\\:onCreate\\(\\) expects static\\(LibreNMS\\\\Device\\\\Processor\\), LibreNMS\\\\Device\\\\Processor given\\.$#"
+			message: '#^Parameter \#1 \$model of static method LibreNMS\\Model\:\:onCreate\(\) expects static\(LibreNMS\\Device\\Processor\), LibreNMS\\Device\\Processor given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Device/Processor.php
 
 		-
-			message: "#^Parameter \\#1 \\$model of static method LibreNMS\\\\Model\\:\\:onDelete\\(\\) expects static\\(LibreNMS\\\\Device\\\\Processor\\), LibreNMS\\\\Device\\\\Processor given\\.$#"
+			message: '#^Parameter \#1 \$model of static method LibreNMS\\Model\:\:onDelete\(\) expects static\(LibreNMS\\Device\\Processor\), LibreNMS\\Device\\Processor given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/Device/Processor.php
 
 		-
-			message: "#^Unsafe call to private method LibreNMS\\\\Device\\\\Processor\\:\\:pollProcessors\\(\\) through static\\:\\:\\.$#"
+			message: '#^Unsafe call to private method LibreNMS\\Device\\Processor\:\:pollProcessors\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
 			count: 1
 			path: LibreNMS/Device/Processor.php
 
 		-
-			message: "#^Unsafe call to private method LibreNMS\\\\Device\\\\Processor\\:\\:processData\\(\\) through static\\:\\:\\.$#"
+			message: '#^Unsafe call to private method LibreNMS\\Device\\Processor\:\:processData\(\) through static\:\:\.$#'
+			identifier: staticClassAccess.privateMethod
 			count: 3
 			path: LibreNMS/Device/Processor.php
 
 		-
-			message: "#^Variable \\$lsps might not be defined\\.$#"
+			message: '#^Variable \$lsps might not be defined\.$#'
+			identifier: variable.undefined
 			count: 1
 			path: LibreNMS/Modules/Mpls.php
 
 		-
-			message: "#^Variable \\$paths might not be defined\\.$#"
+			message: '#^Variable \$paths might not be defined\.$#'
+			identifier: variable.undefined
 			count: 2
 			path: LibreNMS/Modules/Mpls.php
 
 		-
-			message: "#^Variable \\$features on left side of \\?\\? is never defined\\.$#"
+			message: '#^Variable \$features on left side of \?\? is never defined\.$#'
+			identifier: nullCoalesce.variable
 			count: 1
 			path: LibreNMS/Modules/Os.php
 
 		-
-			message: "#^Variable \\$hardware on left side of \\?\\? is never defined\\.$#"
+			message: '#^Variable \$hardware on left side of \?\? is never defined\.$#'
+			identifier: nullCoalesce.variable
 			count: 1
 			path: LibreNMS/Modules/Os.php
 
 		-
-			message: "#^Variable \\$location in empty\\(\\) always exists and is always falsy\\.$#"
+			message: '#^Variable \$location in empty\(\) always exists and is always falsy\.$#'
+			identifier: empty.variable
 			count: 1
 			path: LibreNMS/Modules/Os.php
 
 		-
-			message: "#^Variable \\$serial on left side of \\?\\? is never defined\\.$#"
+			message: '#^Variable \$serial on left side of \?\? is never defined\.$#'
+			identifier: nullCoalesce.variable
 			count: 1
 			path: LibreNMS/Modules/Os.php
 
 		-
-			message: "#^Variable \\$version on left side of \\?\\? is never defined\\.$#"
+			message: '#^Variable \$version on left side of \?\? is never defined\.$#'
+			identifier: nullCoalesce.variable
 			count: 1
 			path: LibreNMS/Modules/Os.php
 
 		-
-			message: "#^If condition is always true\\.$#"
+			message: '#^If condition is always true\.$#'
+			identifier: if.alwaysTrue
 			count: 1
 			path: LibreNMS/Modules/Ospf.php
 
 		-
-			message: "#^Variable \\$multi_get_array on left side of \\?\\? is never defined\\.$#"
+			message: '#^Variable \$multi_get_array on left side of \?\? is never defined\.$#'
+			identifier: nullCoalesce.variable
 			count: 2
 			path: LibreNMS/OS/Ceraos.php
 
 		-
-			message: "#^Parameter \\#16 \\$entPhysicalIndex of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects float\\|int\\|null, string given\\.$#"
+			message: '#^Parameter \#16 \$entPhysicalIndex of class LibreNMS\\Device\\WirelessSensor constructor expects float\|int\|null, string given\.$#'
+			identifier: argument.type
 			count: 1
 			path: LibreNMS/OS/Ios.php
 
 		-
-			message: "#^Variable \\$index might not be defined\\.$#"
+			message: '#^Variable \$index might not be defined\.$#'
+			identifier: variable.undefined
 			count: 2
 			path: LibreNMS/OS/SmOs.php
 
 		-
-			message: "#^If condition is always false\\.$#"
-			count: 2
-			path: LibreNMS/Util/CiHelper.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
-			message: "#^Variable \\$rrd_options in empty\\(\\) always exists and is always falsy\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
-			message: "#^Property App\\\\Console\\\\Commands\\\\InternalHttpRequest\\:\\:\\$app is never read, only written\\.$#"
+			message: '#^Property App\\Console\\Commands\\InternalHttpRequest\:\:\$app is never read, only written\.$#'
+			identifier: property.onlyWritten
 			count: 1
 			path: app/Console/Commands/InternalHttpRequest.php
-
-		-
-			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
-			count: 1
-			path: app/Http/Controllers/DeviceGroupController.php
-
-		-
-			message: "#^Ternary operator condition is always false\\.$#"
-			count: 1
-			path: app/Http/Controllers/LegacyController.php
-
-		-
-			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
-			count: 1
-			path: app/Http/Controllers/PortGroupController.php
-
-		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\ServiceTemplate\\:\\:hasAccess\\(\\)\\.$#"
-			count: 1
-			path: app/Http/Controllers/Select/ServiceTemplateController.php
-
-		-
-			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
-			count: 1
-			path: app/Http/Controllers/ServiceController.php
-
-		-
-			message: "#^Cannot call method only\\(\\) on array\\<string, string\\>\\.$#"
-			count: 1
-			path: app/Http/Controllers/ServiceController.php
-
-		-
-			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
-			count: 1
-			path: app/Http/Controllers/ServiceTemplateController.php
-
-		-
-			message: "#^Offset 'image_title' does not exist on null\\.$#"
-			count: 1
-			path: app/Http/Controllers/Widgets/ImageController.php
-
-		-
-			message: "#^Offset 'image_title' on null in empty\\(\\) does not exist\\.$#"
-			count: 1
-			path: app/Http/Controllers/Widgets/ImageController.php
-
-		-
-			message: "#^Access to an undefined property App\\\\Models\\\\DeviceRelatedModel\\:\\:\\$device_id\\.$#"
-			count: 1
-			path: app/Models/DeviceRelatedModel.php
-
-		-
-			message: "#^PHPDoc type array of property App\\\\Models\\\\UserPref\\:\\:\\$primaryKey is not covariant with PHPDoc type string of overridden property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$primaryKey\\.$#"
-			count: 1
-			path: app/Models/UserPref.php
-
-		-
-			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"
-			count: 2
-			path: tests/AuthSSOTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, null given\\.$#"
-			count: 2
-			path: tests/AuthSSOTest.php
-
-		-
-			message: "#^Parameter \\#2 \\$default of function set_null expects null, int given\\.$#"
-			count: 2
-			path: tests/CommonFunctionsTest.php

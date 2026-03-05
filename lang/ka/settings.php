@@ -621,8 +621,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC აღრიცხვა',
+            'mac-accounting' => [
+                'description' => 'MAC აღრიცხვა',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -1219,9 +1219,6 @@ return [
             'description' => 'ფაილის სახელის სუფიქსი',
             'help' => 'ეს ძალიან მნიშვნელოვანი ნაწილია, რადგან მოწყობილობის სახელები NfSen-ში შეზღუდულია 21 სიმბოლოზე. ეს ნიშნავს, რომ სრული დომენის სახელები მოწყობილობებისთვის შეიძლება, პრობლემატური იყოს, ჩაატიოთ. ასე რომ ეს ნაწილი ჩვეულებრივ იშლება.',
         ],
-        'nmap' => [
-            'description' => 'ბილიკი nmap-მდე',
-        ],
         'no_proxy' => [
             'description' => 'პროქსის გამონაკლისები',
             'help' => 'დააყენეთ, თუ გარემოს ცვლადი no_proxy ხელმისაწვდომი არაა. წარმოადგენს მძიმით გამოყოფილ სიას IP მისამართების, ჰოსტების და დომენების, რომლებიც გნებავთ, გამოტოვებული იყოს.',
@@ -1407,8 +1404,8 @@ return [
             'slas' => [
                 'description' => 'მომსახურების დონის შესახებ შეთანხმების თვალყურის დევნება',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC აღრიცხვა',
+            'mac-accounting' => [
+                'description' => 'MAC აღრიცხვა',
             ],
             'cipsec-tunnels' => [
                 'description' => 'Cipsec გვირაბები',
@@ -1977,9 +1974,6 @@ return [
         'device_location_map_show_device_dependencies' => [
             'description' => 'მოწყობილობის დამოკიდებულებების ჩვენება მდებარეობის რუკაზე',
             'help' => 'მოწყობილობებს შორის ბმულების ჩვენება მდებარეობის რუკაზე მშობელი დამოკიდებულებების მიხედვით',
-        ],
-        'whois' => [
-            'description' => 'ბილიკი პროგრამამდე whois',
         ],
         'smokeping.integration' => [
             'description' => 'ჩართვა',
