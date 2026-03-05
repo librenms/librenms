@@ -113,15 +113,14 @@ $rrd_def_id232 = RrdDefinition::make()
 $rrd_def_maxtemp = RrdDefinition::make()
     ->addDataset('maxtemp', 'GAUGE', 0);
 
-$rrd_def_overtemp = RrdDefinition::make()
-    ->addDataset('over_temp', 'GAUGE', 0);
-
 $new_disks_with_failed_tests = [];
 $new_disks_with_failed_health = [];
 $new_disks_with_over_temp = [];
+$new_disks_with_dev_error = [];
 $data['disks_with_failed_tests'] = [];
 $data['disks_with_failed_health'] = [];
 $data['disks_with_over_temp'] = [];
+$data['disks_with_dev_error'] = [];
 $data['has'] = [
     'id5' => 0,
     'id9' => 0,
