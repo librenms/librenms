@@ -110,6 +110,9 @@ $rrd_def_id232 = RrdDefinition::make()
 $rrd_def_maxtemp = RrdDefinition::make()
     ->addDataset('maxtemp', 'GAUGE', 0);
 
+$rrd_def_overtemp = RrdDefinition::make()
+    ->addDataset('over_temp', 'GAUGE', 0);
+
 $new_disks_with_failed_tests = [];
 $new_disks_with_failed_health = [];
 $new_disks_with_over_temp = [];
@@ -203,7 +206,6 @@ foreach ($data['disks'] as $disk_id => $disk) {
     $metrics['disk_' . $disk_id . '_short'] = $fields['short'];
     $metrics['disk_' . $disk_id . '_conveyance'] = $fields['conveyance'];
     $metrics['disk_' . $disk_id . '_selective'] = $fields['selective'];
-    $metrics['disk_' . $disk_id . '_over_temp'] = is_numeric($disk['over_temp']) ? $disk['over_temp'] : null;
 
     $rrd_name_id9 = ['app', $name . '_id9', $app->app_id, $disk_id];
     $fields_id9 = ['id9' => $disk['9']];
@@ -230,14 +232,23 @@ foreach ($data['disks'] as $disk_id => $disk) {
         $metrics['disk_' . $disk_id . '_max_temp'] = $disk['max_temp'];
     }
 
-    // check if we have over_temp set to 1(true)
-    if (is_numeric($disk['over_temp']) && $disk['over_temp'] > 0) {
-        $metrics['disk_with_over_temp']++;
-        $data['disks_with_over_temp'][$disk_id] = 1;
-        // add it to the list to alert on if it is a new over temp
-        if (! isset($old_data['disks_with_over_temp'][$disk_id])) {
-            $new_disks_with_failed_tests[] = $disk_id;
-            $metrics['new_disks_with_over_temp']++;
+    if (isset($disk['over_temp'])) {
+        $rrd_name_overtemp = ['app', $name . '_overtemp', $app->app_id, $disk_id];
+        $fields_overtemp = ['over_temp' => $disk['over_temp']];
+        $tags_maxtemp = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_overtemp, 'rrd_name' => $rrd_name_overtemp];
+        app('Datastore')->put($device, 'app', $tags_overtemp, $fields_overtemp);
+
+        $metrics['disk_' . $disk_id . '_over_temp'] = $disk['over_temp'];
+
+        // check if we have over_temp set to 1(true)
+        if (is_numeric($disk['over_temp']) && $disk['over_temp'] > 0) {
+            $metrics['disk_with_over_temp']++;
+            $data['disks_with_over_temp'][$disk_id] = 1;
+            // add it to the list to alert on if it is a new over temp
+            if (! isset($old_data['disks_with_over_temp'][$disk_id])) {
+                $new_disks_with_failed_tests[] = $disk_id;
+                $metrics['new_disks_with_over_temp']++;
+            }
         }
     }
 
