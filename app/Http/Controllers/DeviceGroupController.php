@@ -58,7 +58,7 @@ class DeviceGroupController extends Controller
             'rules' => 'json|required_if:type,dynamic',
         ]);
 
-        $deviceGroup = DeviceGroup::make($request->only(['name', 'desc', 'type']));
+        $deviceGroup = new DeviceGroup($request->only(['name', 'desc', 'type']));
         $deviceGroup->rules = json_decode($request->rules);
         $deviceGroup->save();
 
