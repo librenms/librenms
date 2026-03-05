@@ -711,6 +711,36 @@ TRAP,
         );
     }
 
+    public function testZebraPrinterDruckerpause(): void
+    {
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
+SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
+ESI-MIB::psOutput.7 MELDUNG: DRUCKERPAUSE
+TRAP,
+            'MELDUNG: DRUCKERPAUSE',
+            'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 DRUCKERPAUSE',
+            [Severity::Info, 'printer'],
+        );
+    }
+
+    public function testZebraPrinterDeckelOffen(): void
+    {
+        $this->assertTrapLogsMessage(<<<'TRAP'
+{{ hostname }}
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 19:3:47:23.13
+SNMPv2-MIB::snmpTrapOID.0 ZEBRA-QL-MIB::zebra.1.0.1
+ESI-MIB::psOutput.7 MELDUNG: Deckel Offen
+TRAP,
+            'MELDUNG: Deckel Offen',
+            'Failed to handle ZEBRA-QL-MIB::zebra.1.0.1 Deckel Offen',
+            [Severity::Warning, 'printer'],
+        );
+    }
+
     public function testZebraPrinterAlertCleared(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
