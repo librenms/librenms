@@ -11,7 +11,7 @@ icon: cisco
 poller_modules:
     bgp-peers: false
     cisco-cef: false
-    cisco-mac-accounting: false
+    mac-accounting: false
     cisco-remote-access-monitor: false
     slas: false
     cisco-ipsec-flow-monitor: false
@@ -22,7 +22,7 @@ poller_modules:
 discovery_modules:
     cisco-cef: false
     slas: false
-    cisco-mac-accounting: false
+    mac-accounting: false
     cisco-otv: false
     cisco-pw: false
     vrf: false
