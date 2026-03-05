@@ -53,7 +53,6 @@ if (! empty($peers)) {
     } elseif ($device['os'] === 'dell-os10') {
         $peer_data_check = snmpwalk_cache_oid($device, 'os10bgp4V2PeerRemoteAs', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell'); // practically identical MIB as arista
     } elseif ($device['os'] === 'timos') {
-        d_echo("inside main timos"); //PASS
         $peer_data_check = SnmpQuery::enumStrings()->numericIndex()->abortOnFailure()->walk([
             'TIMETRA-BGP-MIB::tBgpPeerNgTable',
             'TIMETRA-BGP-MIB::tBgpPeerNgOperTable',
@@ -247,9 +246,7 @@ if (! empty($peers)) {
                     $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
                     unset($peer_data['bgpPeerLastError']);
                 } elseif ($device['os'] == 'timos') {
-                    d_echo("inside if timos");
                     if (! isset($bgpPeers)) {
-                        d_echo("inside if of timos");
                         $bgpPeers = [];
                         foreach ($peer_data_check as $key => $value) {
                             $oid = explode('.', (string) $key);
@@ -731,7 +728,8 @@ if (! empty($peers)) {
                         $t_prefixes_parsed = [];
                         foreach ($timos_oid_map as $timos_afi => $safis_map) {
                             foreach ($safis_map as $timos_safi => $timos_oids) {
-                                $recv_oid = $timos_oids[0]; $sent_oid = $timos_oids[1];
+                                $recv_oid  = $timos_oids[0];
+                                $sent_oid  = $timos_oids[1];
                                 $recv_data = snmpwalk_cache_oid($device, $recv_oid, [], 'TIMETRA-BGP-MIB');
                                 $sent_data = snmpwalk_cache_oid($device, $sent_oid, [], 'TIMETRA-BGP-MIB');
                                 foreach ($recv_data as $index => $recv_val) {
@@ -751,13 +749,11 @@ if (! empty($peers)) {
                                 }
                             }
                         }
-                        d_echo("TIMOS parsed IPs: " . implode(', ', array_keys($t_prefixes_parsed)) . "\n");
                     }
 
                     $addr_str = (string) $peer_ip;
                     // Use $afi from DB row (ipv4/ipv6), not peer IP family
                     $current_peer_data = $t_prefixes_parsed[$addr_str][$afi][$safi] ?? null;
-                    d_echo("TIMOS lookup: addr=$addr_str afi=$afi safi=$safi data=" . json_encode($current_peer_data) . "\n");
 
                     $cbgpPeerAcceptedPrefixes   = $current_peer_data['recv'] ?? null;
                     $cbgpPeerAdvertisedPrefixes = $current_peer_data['sent'] ?? null;
