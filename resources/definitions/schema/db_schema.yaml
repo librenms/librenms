@@ -1392,16 +1392,16 @@ ospfv3_instances:
     - { Field: ospfv3AsScopeLsaCksumSum, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3ExitOverflowInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3ReferenceBandwidth, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartSupport, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartStrictLsaChecking, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartStatus, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartAge, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartExitReason, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3StubRouterSupport, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3StubRouterAdvertisement, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3DiscontinuityTime, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartTime, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartSupport, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3RestartInterval, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3RestartStrictLsaChecking, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3RestartStatus, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3RestartAge, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3RestartExitReason, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3StubRouterSupport, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3StubRouterAdvertisement, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3DiscontinuityTime, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3RestartTime, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
