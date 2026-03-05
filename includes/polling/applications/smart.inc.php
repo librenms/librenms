@@ -145,7 +145,6 @@ $data['has'] = [
 
 $metrics = [
     'disks_with_failed_tests' => 0,
-    'disks_with_failed_health' => 0,
     'disks_with_over_temp' => 0,
     'new_disks_with_failed_tests' => 0,
     'new_disks_with_failed_health' => 0,
@@ -298,7 +297,6 @@ foreach ($data['disks'] as $disk_id => $disk) {
     // checks if the health has failed
     if (isset($disk['health_pass']) && is_numeric($disk['health_pass']) && $disk['health_pass'] < 1) {
         $data['disks_with_failed_health'][$disk_id] = 1;
-        $metrics['disks_with_failed_health']++;
         // add it to the list to alert on if it is a new failure
         if (! isset($old_data['disks_with_failed_health'][$disk_id])) {
             $new_disks_with_failed_health[] = $disk_id;
