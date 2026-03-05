@@ -233,11 +233,6 @@ foreach ($data['disks'] as $disk_id => $disk) {
     }
 
     if (isset($disk['over_temp'])) {
-        $rrd_name_overtemp = ['app', $name . '_overtemp', $app->app_id, $disk_id];
-        $fields_overtemp = ['over_temp' => $disk['over_temp']];
-        $tags_maxtemp = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def_overtemp, 'rrd_name' => $rrd_name_overtemp];
-        app('Datastore')->put($device, 'app', $tags_overtemp, $fields_overtemp);
-
         $metrics['disk_' . $disk_id . '_over_temp'] = $disk['over_temp'];
 
         // check if we have over_temp set to 1(true)
