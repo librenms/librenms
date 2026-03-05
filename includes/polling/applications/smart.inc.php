@@ -147,13 +147,13 @@ $metrics = [
     'disks_with_failed_tests' => 0,
     'disks_with_failed_health' => 0,
     'disks_with_over_temp' => 0,
-    'disks_with_dev_error' => 0,
     'new_disks_with_failed_tests' => 0,
     'new_disks_with_failed_health' => 0,
     'new_disks_with_over_temp' => 0,
     'new_disks_with_dev_error' => 0,
     'exit_nonzero' => $data['exit_nonzero'] ?? null,
     'unhealthy' => $data['unhealthy'] ?? null,
+    'dev_error' => $data['dev_error'] ?? null,
 ];
 foreach ($data['disks'] as $disk_id => $disk) {
     $rrd_name = ['app', $name, $app->app_id, $disk_id];
@@ -257,7 +257,6 @@ foreach ($data['disks'] as $disk_id => $disk) {
 
         // check if we have over_temp set to 1(true)
         if (is_numeric($disk['dev_error']) && $disk['dev_error'] > 0) {
-            $metrics['disks_with_dev_error']++;
             $data['disks_with_dev_error'][$disk_id] = 1;
             // add it to the list to alert on if it is a new over temp
             if (! isset($old_data['disks_with_dev_error'][$disk_id])) {
