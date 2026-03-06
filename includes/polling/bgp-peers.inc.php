@@ -850,8 +850,6 @@ if (! empty($peers)) {
                     $cbgpPeerWithdrawnPrefixes = null;
                 }
 
-
-
                 // Validate data
                 $cbgpPeerAcceptedPrefixes = set_numeric($cbgpPeerAcceptedPrefixes ?? 0);
                 $cbgpPeerDeniedPrefixes = set_numeric($cbgpPeerDeniedPrefixes ?? 0);
