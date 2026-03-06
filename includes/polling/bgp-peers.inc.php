@@ -807,10 +807,10 @@ if (! empty($peers)) {
                             foreach ($safis_map as $timos_safi => $timos_oids) {
                                 $recv_oid  = $timos_oids[0];
                                 $sent_oid  = $timos_oids[1];
-                                $recv_data = snmpwalk_cache_oid($device, $recv_oid, [], 'TIMETRA-BGP-MIB');
-                                $sent_data = snmpwalk_cache_oid($device, $sent_oid, [], 'TIMETRA-BGP-MIB');
+                                $recv_data = SnmpQuery::numericIndex()->walk($recv_oid)->valuesByIndex();
+                                $sent_data = SnmpQuery::numericIndex()->walk($sent_oid)->valuesByIndex();
                                 foreach ($recv_data as $index => $recv_val) {
-                                    $parts = explode('.', $index);
+                                    $parts = explode('.', (string) $index);
                                     if (count($parts) < 3) {
                                         continue;
                                     }
@@ -818,7 +818,7 @@ if (! empty($peers)) {
                                         $hex_addr = str_replace(':', '', trim($parts[2], '"'));
                                         try {
                                             $addr = IP::fromHexString($hex_addr)->compressed();
-                                        } catch (\LibreNMS\Exceptions\InvalidIpException $e) {
+                                        } catch (\LibreNMS\Exceptions\InvalidIpException) {
                                             continue;
                                         }
                                     } else {

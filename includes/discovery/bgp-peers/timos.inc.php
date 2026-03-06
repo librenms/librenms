@@ -39,7 +39,7 @@ if ($device['os'] == 'timos') {
         if (strlen($address) > 15) {
             try {
                 $address = IP::fromSnmpString($address)->compressed();
-            } catch (\LibreNMS\Exceptions\InvalidIpException $e) {
+            } catch (\LibreNMS\Exceptions\InvalidIpException) {
                 d_echo("Nokia TIMOS: Skipping non-IP entry: $address\n");
                 continue;
             }
@@ -123,7 +123,7 @@ if ($device['os'] == 'timos') {
         128 => 'vpn',
     ];
 
-    // snmpwalk_cache_oid returns indexes like: "1.ipv4.62.40.116.67"
+    // SnmpQuery::numericIndex()->valuesByIndex() returns indexes like: "1.ipv4.62.40.116.67"
     // parts[0]=vrfOid, parts[1]="ipv4"/"ipv6" (string), parts[2..]=address octets
     $prefix_oids = [
         '1_1'   => [
@@ -161,14 +161,14 @@ if ($device['os'] == 'timos') {
     foreach ($prefix_oids as $oid_key => $oid_set) {
 
         // Fetch received and sent prefix counts for this AFI/SAFI
-        $recv_data = snmpwalk_cache_oid($device, $oid_set['recv'], [], 'TIMETRA-BGP-MIB');
-        $sent_data = snmpwalk_cache_oid($device, $oid_set['sent'], [], 'TIMETRA-BGP-MIB');
+        $recv_data = SnmpQuery::numericIndex()->walk($oid_set['recv'])->valuesByIndex();
+        $sent_data = SnmpQuery::numericIndex()->walk($oid_set['sent'])->valuesByIndex();
 
         d_echo("Nokia TIMOS: Processing OID key=$oid_key, entries=" . count($recv_data) . "\n");
 
         foreach ($recv_data as $index => $recv_entry) {
 
-            $parts = explode('.', $index);
+            $parts = explode('.', (string) $index);
 
             if (count($parts) < 4) {
                 d_echo("Nokia TIMOS: Skipping malformed index: $index\n");
@@ -187,7 +187,7 @@ if ($device['os'] == 'timos') {
             if (strlen($address) > 15) {
                 try {
                     $address = IP::fromSnmpString($address)->compressed();
-                } catch (\LibreNMS\Exceptions\InvalidIpException $e) {
+                } catch (\LibreNMS\Exceptions\InvalidIpException) {
                     d_echo("Nokia TIMOS: Skipping non-IP entry in prefix walk: $address\n");
                     continue;
                 }
@@ -208,7 +208,7 @@ if ($device['os'] == 'timos') {
 
             d_echo("Nokia TIMOS: Writing — index=$index addr=$address addr_type=$peer_addr_type ({$afi_name}/{$safi_name}) recv=$pfxRcv sent=$pfxSent\n");
 
-            add_cbgp_peer($device, $peer, $afi_name, $safi_name, $pfxRcv, $pfxSent);
+            add_cbgp_peer($device, $peer, $afi_name, $safi_name);
         }
     }
 }
