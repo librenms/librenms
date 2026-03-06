@@ -805,8 +805,8 @@ if (! empty($peers)) {
                         $t_prefixes_parsed = [];
                         foreach ($timos_oid_map as $timos_afi => $safis_map) {
                             foreach ($safis_map as $timos_safi => $timos_oids) {
-                                $recv_oid  = $timos_oids[0];
-                                $sent_oid  = $timos_oids[1];
+                                $recv_oid = $timos_oids[0];
+                                $sent_oid = $timos_oids[1];
                                 $recv_data = SnmpQuery::numericIndex()->walk($recv_oid)->valuesByIndex();
                                 $sent_data = SnmpQuery::numericIndex()->walk($sent_oid)->valuesByIndex();
                                 foreach ($recv_data as $index => $recv_val) {
@@ -837,17 +837,17 @@ if (! empty($peers)) {
                         }
                     }
 
-                    $addr_str          = (string) $peer_ip;
+                    $addr_str = (string) $peer_ip;
                     $current_peer_data = $t_prefixes_parsed[$addr_str][$afi][$safi] ?? null;
 
-                    $cbgpPeerAcceptedPrefixes    = $current_peer_data['recv'] ?? null;
-                    $cbgpPeerAdvertisedPrefixes  = $current_peer_data['sent'] ?? null;
-                    $cbgpPeerDeniedPrefixes      = null;
-                    $cbgpPeerPrefixAdminLimit    = null;
-                    $cbgpPeerPrefixThreshold     = null;
+                    $cbgpPeerAcceptedPrefixes = $current_peer_data['recv'] ?? null;
+                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['sent'] ?? null;
+                    $cbgpPeerDeniedPrefixes = null;
+                    $cbgpPeerPrefixAdminLimit = null;
+                    $cbgpPeerPrefixThreshold = null;
                     $cbgpPeerPrefixClearThreshold = null;
-                    $cbgpPeerSuppressedPrefixes  = null;
-                    $cbgpPeerWithdrawnPrefixes   = null;
+                    $cbgpPeerSuppressedPrefixes = null;
+                    $cbgpPeerWithdrawnPrefixes = null;
                 }
 
 

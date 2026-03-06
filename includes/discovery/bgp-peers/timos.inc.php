@@ -196,14 +196,14 @@ if ($device['os'] == 'timos') {
             // Build the peer array that add_cbgp_peer() needs
             $peer = ['ip' => $address];
 
-            $pfxRcv  = is_array($recv_entry) ? reset($recv_entry) : ($recv_entry ?? 0);
+            $pfxRcv = is_array($recv_entry) ? reset($recv_entry) : ($recv_entry ?? 0);
             $pfxSent = isset($sent_data[$index])
                 ? (is_array($sent_data[$index]) ? reset($sent_data[$index]) : $sent_data[$index])
                 : 0;
 
             // Decode oid_key (e.g. "1_1") back to human-readable names
             [$afi, $safi] = explode('_', $oid_key);
-            $afi_name  = $afi_map[(int) $afi]   ?? "afi$afi";
+            $afi_name = $afi_map[(int) $afi]   ?? "afi$afi";
             $safi_name = $safi_map[(int) $safi] ?? "safi$safi";
 
             d_echo("Nokia TIMOS: Writing — index=$index addr=$address addr_type=$peer_addr_type ({$afi_name}/{$safi_name}) recv=$pfxRcv sent=$pfxSent\n");
