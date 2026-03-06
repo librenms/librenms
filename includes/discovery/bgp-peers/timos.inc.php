@@ -28,7 +28,6 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\IP;
 
 if ($device['os'] == 'timos') {
-
     $mib_root = '.1.3.6.1.4.1.6527.3.1.2.14.4.8';
 
     $bgpPeersCache = SnmpQuery::numericIndex()->walk($mib_root)->valuesByIndex();
@@ -159,7 +158,6 @@ if ($device['os'] == 'timos') {
     ];
 
     foreach ($prefix_oids as $oid_key => $oid_set) {
-
         // Fetch received and sent prefix counts for this AFI/SAFI
         $recv_data = SnmpQuery::numericIndex()->walk($oid_set['recv'])->valuesByIndex();
         $sent_data = SnmpQuery::numericIndex()->walk($oid_set['sent'])->valuesByIndex();
@@ -167,7 +165,6 @@ if ($device['os'] == 'timos') {
         d_echo("Nokia TIMOS: Processing OID key=$oid_key, entries=" . count($recv_data) . "\n");
 
         foreach ($recv_data as $index => $recv_entry) {
-
             $parts = explode('.', (string) $index);
 
             if (count($parts) < 4) {
