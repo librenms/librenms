@@ -1,6 +1,4 @@
 <?php
 
-$class = 'runtime';
-$unit = 'Min';
-$unit_long = 'Minutes';
+$class = \LibreNMS\Enum\Sensor::Runtime;
 require 'includes/html/graphs/device/sensor.inc.php';

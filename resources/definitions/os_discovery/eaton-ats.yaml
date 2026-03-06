@@ -1,4 +1,3 @@
-mib: EATON-ATS2-MIB
 modules:
     os:
         hardware: EATON-ATS2-MIB::ats2IdentPartNumber.0
@@ -8,8 +7,8 @@ modules:
         voltage:
             data:
                 -
-                    oid: ats2OutputVoltage
-                    value: ats2OutputVoltage
+                    oid: EATON-ATS2-MIB::ats2OutputVoltage
+                    value: EATON-ATS2-MIB::ats2OutputVoltage
                     num_oid: '.1.3.6.1.4.1.534.10.2.2.3.1.{{ $index }}'
                     divisor: 10
                     descr: 'Output'
@@ -17,10 +16,10 @@ modules:
         state:
             data:
                 -
-                    oid: ats2OperationMode
-                    value: ats2OperationMode
+                    oid: EATON-ATS2-MIB::ats2OperationMode
+                    value: EATON-ATS2-MIB::ats2OperationMode
                     num_oid: '.1.3.6.1.4.1.534.10.2.2.4.{{ $index }}'
-                    descr: 'ats2OperationMode'
+                    descr: 'EATON-ATS2-MIB::ats2OperationMode'
                     index: 'ats2OperationMode.{{ $index }}'
                     state_name: ats2OperationMode
                     states:
@@ -32,10 +31,10 @@ modules:
                         - { descr: safe, graph: 0, value: 6, generic: 1 }
                         - { descr: fault, graph: 0, value: 7, generic: 2 }
                 -
-                    oid: ats2InputStatusDephasing
-                    value: ats2InputStatusDephasing
+                    oid: EATON-ATS2-MIB::ats2InputStatusDephasing
+                    value: EATON-ATS2-MIB::ats2InputStatusDephasing
                     num_oid: '.1.3.6.1.4.1.534.10.2.3.1.1.{{ $index }}'
-                    descr: 'ats2InputStatusDephasing'
+                    descr: 'EATON-ATS2-MIB::ats2InputStatusDephasing'
                     index: 'ats2InputStatusDephasing.{{ $index }}'
                     state_name: ats2InputStatusDephasing
                     states:

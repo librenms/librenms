@@ -1,4 +1,3 @@
-mib: TELTONIKA-RUTM-MIB
 modules:
     os:
         hardware: TELTONIKA-RUTM-MIB::deviceName.0
@@ -11,12 +10,12 @@ modules:
             data:
                 -
                     oid:
-                        - mOperator
-                        - ioSystemName
+                        - TELTONIKA-RUTM-MIB::mOperator
+                        - TELTONIKA-RUTM-MIB::ioSystemName
         temperature:
             data:
                 -
-                    oid: mTemperature
+                    oid: TELTONIKA-RUTM-MIB::mTemperature
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.17.{{ $index }}"
                     descr: Modem Module Temp
                     group: Modem
@@ -27,7 +26,7 @@ modules:
         state:
             data:
                 -
-                    oid: ioInput
+                    oid: TELTONIKA-RUTM-MIB::ioInput
                     num_oid: ".1.3.6.1.4.1.48690.6.2.1.7.{{ $index }}"
                     descr:  I/O {{ $index }} Type
                     group: Inputs/Outputs
@@ -36,16 +35,16 @@ modules:
                         - { descr: Digital Output, graph: 1, value: 0, generic: 0 }
                         - { descr: Digital Input, graph: 1, value: 1, generic: 0 }
                 -
-                    oid: ioState
+                    oid: TELTONIKA-RUTM-MIB::ioState
                     num_oid: ".1.3.6.1.4.1.48690.6.2.1.6.{{ $index }}"
-                    descr:  I/O {{ $index }} State ({{ $ioSystemName }})
+                    descr:  I/O {{ $index }} State ({{ TELTONIKA-RUTM-MIB::ioSystemName }})
                     group: Inputs/Outputs
                     state_name: TELTONIKA-RUTM-MIB::ioState
                     states:
                         - { descr: Low, graph: 1, value: 0, generic: 0 }
                         - { descr: High, graph: 1, value: 1, generic: 2 }
                 -
-                    oid: mSimState
+                    oid: TELTONIKA-RUTM-MIB::mSimState
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.9.{{ $index }}"
                     descr: SIM State
                     group: Mobile
@@ -55,7 +54,7 @@ modules:
                         - { descr: not inserted, graph: 1, value: 1, generic: 2 }
                         - { descr: unknown, graph: 1, value: 2, generic: 3 }
                 -
-                    oid: mPinState
+                    oid: TELTONIKA-RUTM-MIB::mPinState
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.10.{{ $index }}"
                     descr: SIM PIN State
                     group: Mobile
@@ -77,7 +76,7 @@ modules:
                         - { descr: SIM busy, graph: 1, value: 13, generic: 1 }
                         - { descr: PUK, graph: 1, value: 14, generic: 1 }
                 -
-                    oid: mNetState
+                    oid: TELTONIKA-RUTM-MIB::mNetState
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.11.{{ $index }}"
                     descr: Mobile Net State
                     group: Mobile
@@ -94,9 +93,9 @@ modules:
                         - { descr: Not supported, graph: 1, value: 8, generic: 2 }
                         - { descr: 'Registered, emergency services only', graph: 1, value: 9, generic: 2 }
                 -
-                    oid:  mConnectionState
+                    oid:  TELTONIKA-RUTM-MIB::mConnectionState
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.15.{{ $index }}"
-                    descr: "Connection State ({{ $mOperator }})"
+                    descr: "Connection State ({{ TELTONIKA-RUTM-MIB::mOperator }})"
                     group: Mobile
                     index: "mConnectionState.{{ $index }}"
                     state_name: TELTONIKA-RUTM-MIB::ConnectionState
@@ -105,7 +104,7 @@ modules:
                         - { descr: Not connected, graph: 1, value: 1, generic: 2 }
                         - { descr: Disconnected, graph: 1, value: 2, generic: 2 }
                 -
-                    oid: mConnectionType
+                    oid: TELTONIKA-RUTM-MIB::mConnectionType
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.16.{{ $index }}"
                     descr: "Connection Type"
                     group: Mobile
@@ -153,61 +152,61 @@ modules:
         count:
             data:
                 -
-                    oid: mReceivedToday
+                    oid: TELTONIKA-RUTM-MIB::mReceivedToday
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.26.{{ $index }}"
                     descr: "Mobile bytes received today"
                     group: Mobile
                     index: "mReceivedToday.{{ $index }}"
                 -
-                    oid: mSentToday
+                    oid: TELTONIKA-RUTM-MIB::mSentToday
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.25.{{ $index }}"
                     descr: "Mobile bytes sent today"
                     group: Mobile
                     index: "mSentToday.{{ $index }}"
                 -
-                    oid: mReceived
+                    oid: TELTONIKA-RUTM-MIB::mReceived
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.23.{{ $index }}"
                     descr: "Mobile total bytes received"
                     group: Mobile
                     index: "mReceived.{{ $index }}"
                 -
-                    oid: mSent
+                    oid: TELTONIKA-RUTM-MIB::mSent
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.22.{{ $index }}"
                     descr: "Mobile total bytes sent"
                     group: Mobile
                     index: "mSent.{{ $index }}"
                 -
-                    oid: numSatellites
+                    oid: TELTONIKA-RUTM-MIB::numSatellites
                     num_oid: ".1.3.6.1.4.1.48690.3.5.{{ $index }}"
                     descr: "Number of GPS Satellites"
                     group: GPS
                     index: "numSatellites.{{ $index }}"
                 -
-                    oid: latitude
+                    oid: TELTONIKA-RUTM-MIB::latitude
                     num_oid: ".1.3.6.1.4.1.48690.3.1.{{ $index }}"
                     descr: "GPS Latitude"
                     group: GPS
                     index: "latitude.{{ $index }}"
                 -
-                    oid: longtitude
+                    oid: TELTONIKA-RUTM-MIB::longtitude
                     num_oid: ".1.3.6.1.4.1.48690.3.2.{{ $index }}"
                     descr: "GPS Longitude"
                     group: GPS
                     index: "longtitude.{{ $index }}"
                 -
-                    oid: mCellID
+                    oid: TELTONIKA-RUTM-MIB::mCellID
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.18.{{ $index }}"
                     descr: "Cell ID"
                     group: Mobile
                     index: "mCellID.{{ $index }}"
                 -
-                    oid: mImei
+                    oid: TELTONIKA-RUTM-MIB::mImei
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.3.{{ $index }}"
                     descr: "IMEI"
                     group: Mobile
                     index: "mImei.{{ $index }}"
                 -
-                    oid: mIMSI
+                    oid: TELTONIKA-RUTM-MIB::mIMSI
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.8.{{ $index }}"
                     descr: "IMSI"
                     group: Mobile
@@ -215,7 +214,7 @@ modules:
         signal:
             data:
                 -
-                    oid: mSignal
+                    oid: TELTONIKA-RUTM-MIB::mSignal
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.12.{{ $index }}"
                     entPhysicalIndex: "{{ $index }}"
                     descr: "Signal Level - RSSI"
@@ -225,7 +224,7 @@ modules:
                     low_limit: -85
                     high_limit: 0
                 -
-                    oid: mRSRP
+                    oid: TELTONIKA-RUTM-MIB::mRSRP
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.20.{{ $index }}"
                     entPhysicalIndex: "{{ $index }}"
                     descr: "Signal Level - RSRP"
@@ -235,7 +234,7 @@ modules:
                     low_limit: -100
                     high_limit: 0
                 -
-                    oid: mRSRQ
+                    oid: TELTONIKA-RUTM-MIB::mRSRQ
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.21.{{ $index }}"
                     entPhysicalIndex: "{{ $index }}"
                     descr: "Signal Level - RSRQ"
@@ -247,7 +246,7 @@ modules:
         snr:
             data:
                 -
-                    oid: mSINR
+                    oid: TELTONIKA-RUTM-MIB::mSINR
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.19.{{ $index }}"
                     entPhysicalIndex: "{{ $index }}"
                     descr: "Signal Level - SINR"
@@ -259,7 +258,7 @@ modules:
         runtime:
             data:
                 -
-                    oid: connectionUptime
+                    oid: TELTONIKA-RUTM-MIB::connectionUptime
                     num_oid: ".1.3.6.1.4.1.48690.2.3.{{ $index }}"
                     descr: "Connection Uptime "
                     group: Mobile

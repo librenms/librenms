@@ -1,4 +1,3 @@
-mib: RPS-SC200-MIB
 modules:
     os:
         hardware:
@@ -15,52 +14,52 @@ modules:
         voltage:
             data:
                 -
-                    oid: ac-Voltage
+                    oid: RPS-SC200-MIB::ac-Voltage
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.40.10.{{ $index }}'
                     descr: 'Average Input Voltage'
                     index: 'acavg.{{ $index }}'
                 -
-                    oid: rectifier-Values-Table
-                    value: rectifier-Reported-AC-Voltage
+                    oid: RPS-SC200-MIB::rectifier-Values-Table
+                    value: RPS-SC200-MIB::rectifier-Reported-AC-Voltage
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.60.30.1.90.{{ $index }}'
                     descr: 'Rect {{ $index }} AC Voltage'
                     index: 'ac.{{ $index }}'
                     skip_values:
                     -
-                      oid: rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Serial-Number
                       op: '=='
                       value: "0"
                 -
-                    oid: bus-Voltage
+                    oid: RPS-SC200-MIB::bus-Voltage
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.70.10.20.{{ $index }}'
                     divisor: 100
                     descr: 'Bus Voltage'
                     index: 'bus.{{ $index }}'
-                    low_limit: minimum-System-Voltage
-                    low_warn_limit: minimum-System-Voltage
-                    warn_limit: maximum-System-Voltage
-                    high_limit: maximum-System-Voltage
+                    low_limit: RPS-SC200-MIB::minimum-System-Voltage
+                    low_warn_limit: RPS-SC200-MIB::minimum-System-Voltage
+                    warn_limit: RPS-SC200-MIB::maximum-System-Voltage
+                    high_limit: RPS-SC200-MIB::maximum-System-Voltage
                 -
-                    oid: rectifier-Values-Table
-                    value: rectifier-Reported-Voltage
+                    oid: RPS-SC200-MIB::rectifier-Values-Table
+                    value: RPS-SC200-MIB::rectifier-Reported-Voltage
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.60.30.1.95.{{ $index }}'
                     descr: 'Rect {{ $index }} DC Voltage'
                     index: 'dc.{{ $index }}'
                     divisor: 100
                     low_limit: 0
                     low_warn_limit: 0
-                    warn_limit: rectifier-Minimum-OVSD-Set-Point
-                    high_limit:  rectifier-Maximum-OVSD-Set-Point
+                    warn_limit: RPS-SC200-MIB::rectifier-Minimum-OVSD-Set-Point
+                    high_limit:  RPS-SC200-MIB::rectifier-Maximum-OVSD-Set-Point
                     skip_values:
                     -
-                      oid: rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Serial-Number
                       op: '=='
                       value: "0"
 
         power:
             data:
                 -
-                    oid: load-Power
+                    oid: RPS-SC200-MIB::load-Power
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.50.30.{{ $index }}'
                     descr: 'Total Power'
                     multiplier: 10
@@ -69,74 +68,75 @@ modules:
         current:
             data:
                 -
-                    oid: battery-Current
+                    oid: RPS-SC200-MIB::battery-Current
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.100.40.{{ $index }}'
                     descr: 'Battery Current'
                     index: 'battery-Current.{{ $index }}'
                 -
-                    oid: load-Current
+                    oid: RPS-SC200-MIB::load-Current
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.50.10.{{ $index }}'
                     descr: 'Total Load Current'
                 -
-                    oid: rectifier-Values-Table
-                    value: rectifier-Reported-Current
+                    oid: RPS-SC200-MIB::rectifier-Values-Table
+                    value: RPS-SC200-MIB::rectifier-Reported-Current
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.60.30.1.100.{{ $index }}'
                     descr: 'Rect {{ $index }} Current'
                     skip_values:
                     -
-                      oid: rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Serial-Number
                       op: '=='
                       value: "0"
         load:
             data:
                 -
-                    oid: system-Power
+                    oid: RPS-SC200-MIB::system-Power
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.50.20.{{ $index }}'
                     descr: 'Total Load'
                     index: 'totalLoad.{{ $index }}'
                 -
-                    oid: rectifier-Values-Table
-                    value: rectifier-Output-Power
+                    oid: RPS-SC200-MIB::rectifier-Values-Table
+                    value: RPS-SC200-MIB::rectifier-Output-Power
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.60.30.1.105.{{ $index }}'
                     descr: 'Rect {{ $index }} Load'
                     index: 'rectLoad.{{ $index }}'
                     divisor: 10
                     skip_values:
                     -
-                      oid: rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Serial-Number
                       op: '=='
                       value: "0"
 
         temperature:
             data:
                 -
-                    oid: battery-Temperature
+                    oid: RPS-SC200-MIB::battery-Temperature
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.100.30.{{ $index }}'
                     descr: 'Battery Temperature'
                     index: 'battery-Temperature.{{ $index }}'
                 -
-                    oid: highest-Rectifier-Heatsink-Temperature
+                    oid: RPS-SC200-MIB::highest-Rectifier-Heatsink-Temperature
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.60.29.{{ $index }}'
                     descr: 'Highest Rectifier Heatsink Temperature'
                     index: 'highestRectTemp.{{ $index }}'
                 -
-                    oid: rectifier-Values-Table
-                    value: rectifier-Heatsink-Temperature
+                    oid: RPS-SC200-MIB::rectifier-Values-Table
+                    value: RPS-SC200-MIB::rectifier-Heatsink-Temperature
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.60.30.1.110.{{ $index }}'
                     descr: 'Rect {{ $index }} Temperature'
                     index: 'rectTemp.{{ $index }}'
                     skip_values:
                     -
-                      oid: rectifier-Serial-Number
+                      oid: RPS-SC200-MIB::rectifier-Serial-Number
                       op: '=='
                       value: "0"
         state:
             data:
                 -
-                    oid: digital-Input-Table
-                    value: di-State
+                    oid: RPS-SC200-MIB::digital-Input-Table
+                    value: RPS-SC200-MIB::di-State
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.90.40.1.20.{{ $index }}'
-                    descr: '{{ $di-Name }}'
+                    state_name: digital-Input-Table
+                    descr: '{{ RPS-SC200-MIB::di-Name }}'
                     index: 'di.{{ $index }}'
                     states:
                       - { descr: 'OK',      graph: 0, value: 0, generic: 0 }
@@ -148,27 +148,33 @@ modules:
                       - { descr: 'Control', graph: 0, value: 6, generic: 3 }
                     skip_values:
                     -
-                      oid: di-Status
+                      oid: RPS-SC200-MIB::di-Status
                       op: '=='
                       value: "0"
                 -
-                    oid: summary-Alarm-Critical
+                    oid: RPS-SC200-MIB::summary-Alarm-Critical
+                    value: RPS-SC200-MIB::summary-Alarm-Critical
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.110.5.10.{{ $index }}'
                     descr: 'Alarm Summary Critical'
+                    state_name: summary-Alarm-Critical
                     states:
                       - { descr: 'OK',      graph: 0, value: 0, generic: 0 }
                       - { descr: 'Active',  graph: 1, value: 1, generic: 1 }
                 -
-                    oid: summary-Alarm-Major
+                    oid: RPS-SC200-MIB::summary-Alarm-Major
+                    value: RPS-SC200-MIB::summary-Alarm-Major
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.110.5.20.{{ $index }}'
                     descr: 'Alarm Summary Major'
+                    state_name: summary-Alarm-Major
                     states:
                       - { descr: 'OK',      graph: 0, value: 0, generic: 0 }
                       - { descr: 'Active',  graph: 1, value: 1, generic: 1 }
                 -
-                    oid: summary-Alarm-Minor
+                    oid: RPS-SC200-MIB::summary-Alarm-Minor
+                    value: RPS-SC200-MIB::summary-Alarm-Minor
                     num_oid: '.1.3.6.1.4.1.1918.2.13.10.110.5.30.{{ $index }}'
                     descr: 'Alarm Summary Minor'
+                    state_name: summary-Alarm-Minor
                     states:
                       - { descr: 'OK',      graph: 0, value: 0, generic: 0 }
                       - { descr: 'Active',  graph: 1, value: 1, generic: 1 }

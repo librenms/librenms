@@ -1,11 +1,10 @@
-mib: PEGASUS-MIB
 modules:
     sensors:
         state:
             data:
                 -
-                    oid: dslCardTable
-                    value: dslCardOperState
+                    oid: PEGASUS-MIB::dslCardTable
+                    value: PEGASUS-MIB::dslCardOperState
                     num_oid: '.1.3.6.1.4.1.6368.2.1.1.1.6.{{ $index }}'
                     descr: LTU {{ $index }} Operational State
                     state_name: dslCardOperState
@@ -13,8 +12,8 @@ modules:
                         - { descr: enabled, graph: 0, value: 1, generic: 0 }
                         - { descr: disabled, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: dslCardTable
-                    value: dslCardCommState
+                    oid: PEGASUS-MIB::dslCardTable
+                    value: PEGASUS-MIB::dslCardCommState
                     num_oid: '.1.3.6.1.4.1.6368.2.1.1.1.9.{{ $index }}'
                     descr: LTU {{ $index }} Mgmt Comm State
                     state_name: dslCardCommState
@@ -34,8 +33,8 @@ modules:
                         - { descr: inactive, graph: 0, value: 13, generic: 0 }
                         - { descr: active, graph: 0, value: 14, generic: 0 }
                 -
-                    oid: v5CardTable
-                    value: v5CardOperState
+                    oid: PEGASUS-MIB::v5CardTable
+                    value: PEGASUS-MIB::v5CardOperState
                     num_oid: '.1.3.6.1.4.1.6368.2.2.1.1.7.{{ $index }}'
                     descr: V5 {{ $index }} Operational State
                     state_name: v5CardOperState
@@ -43,8 +42,8 @@ modules:
                         - { descr: enabled, graph: 0, value: 1, generic: 0 }
                         - { descr: disabled, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: v5CardTable
-                    value: v5CardCommState
+                    oid: PEGASUS-MIB::v5CardTable
+                    value: PEGASUS-MIB::v5CardCommState
                     num_oid: '.1.3.6.1.4.1.6368.2.2.1.1.10.{{ $index }}'
                     descr: V5 {{ $index }} Mgmt Comm State
                     state_name: v5CardCommState
@@ -64,8 +63,8 @@ modules:
                         - { descr: inactive, graph: 0, value: 13, generic: 0 }
                         - { descr: active, graph: 0, value: 14, generic: 0 }
                 -
-                    oid: dataCardTable
-                    value: dataCardOperState
+                    oid: PEGASUS-MIB::dataCardTable
+                    value: PEGASUS-MIB::dataCardOperState
                     num_oid: '.1.3.6.1.4.1.6368.2.3.1.1.6.{{ $index }}'
                     descr: Data {{ $index }} Operational State
                     state_name: dataCardOperState
@@ -73,8 +72,8 @@ modules:
                         - { descr: enabled, graph: 0, value: 1, generic: 0 }
                         - { descr: disabled, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: dataCardTable
-                    value: dataCardCommState
+                    oid: PEGASUS-MIB::dataCardTable
+                    value: PEGASUS-MIB::dataCardCommState
                     num_oid: '.1.3.6.1.4.1.6368.2.3.1.1.9.{{ $index }}'
                     descr: Data {{ $index }} Mgmt Comm State
                     state_name: dataCardCommState

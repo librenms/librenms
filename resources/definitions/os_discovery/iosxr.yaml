@@ -1,13 +1,13 @@
-mib: CISCO-HSRP-MIB
 modules:
     sensors:
         state:
             data:
                 -
-                    oid: cHsrpGrpTable
-                    value: cHsrpGrpStandbyState
+                    oid: CISCO-HSRP-MIB::cHsrpGrpTable
+                    value: CISCO-HSRP-MIB::cHsrpGrpStandbyState
                     num_oid: '.1.3.6.1.4.1.9.9.106.1.2.1.1.15.{{ $index }}'
-                    descr: 'HSRP Status {{ $cHsrpGrpVirtualIpAddr }}'
+                    descr: 'HSRP Status {{ CISCO-HSRP-MIB::cHsrpGrpVirtualIpAddr }}'
+                    state_name: cHsrpGrpTable
                     index: 'cHsrpGrpStandbyState.{{ $index }}'
                     group: 'HSRP'
                     states:
@@ -19,6 +19,6 @@ modules:
                         - { value:  6, generic: 0, graph: 0, descr: 'active' }
                     skip_values:
                         -
-                          oid: cHsrpGrpVirtualIpAddr
+                          oid: CISCO-HSRP-MIB::cHsrpGrpVirtualIpAddr
                           op: '='
                           value: '0.0.0.0'

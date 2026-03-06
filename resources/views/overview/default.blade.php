@@ -194,16 +194,23 @@
     gridster = $(".gridster ul").gridster({
         widget_base_dimensions: ['auto', 100],
         autogenerate_stylesheet: true,
-        widget_margins: [5, 5],
         avoid_overlapped_widgets: true,
+        shift_widgets_up: false,
+        shift_larger_widgets_down: false,
+        move_widgets_down_only: true,
+        widget_margins: [10, 10],
         min_cols: 1,
         max_cols: 20,
+        autogrow_cols: true,
         max_rows: 200,
         draggable: {
             handle: 'header, span',
             stop: function(e, ui, $widget) {
                 updatePos(gridster);
             },
+        },
+        collision: {
+            wait_for_mouseup: true
         },
         resize: {
             enabled: true,

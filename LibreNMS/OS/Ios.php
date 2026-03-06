@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -79,7 +80,7 @@ class Ios extends Cisco implements
         $sensors = [];
         foreach ($data as $ifIndex => $entry) {
             $sensors[] = new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $device['device_id'],
                 ".1.3.6.1.4.1.9.9.273.1.1.2.1.1.$ifIndex",
                 'ios',

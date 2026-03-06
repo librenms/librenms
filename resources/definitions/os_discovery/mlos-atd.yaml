@@ -1,4 +1,3 @@
-mib: MCAFEE-ATD-MIB
 modules:
     mempools:
         data:
@@ -7,21 +6,21 @@ modules:
     processors:
         data:
             -
-                oid: atdCPUUtilizationAvg
+                oid: MCAFEE-ATD-MIB::atdCPUUtilizationAvg
                 num_oid: '.1.3.6.1.4.1.8962.4.1.1.1.{{ $index }}'
     sensors:
         count:
             data:
                 -
-                    oid: mcAfeeATDMIBObjects
-                    value: atdFileWaiting
+                    oid: MCAFEE-ATD-MIB::mcAfeeATDMIBObjects
+                    value: MCAFEE-ATD-MIB::atdFileWaiting
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.6.{{ $index }}'
                     descr: 'ATD Files Queued'
                     group: 'File Processing'
                     index: 'atdFileWaiting'
                 -
-                    oid: mcAfeeATDMIBObjects
-                    value: atdFileAnalyzing
+                    oid: MCAFEE-ATD-MIB::mcAfeeATDMIBObjects
+                    value: MCAFEE-ATD-MIB::atdFileAnalyzing
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.7.{{ $index }}'
                     descr: 'ATD Files Processing'
                     group: 'File Processing'
@@ -29,33 +28,33 @@ modules:
         temperature:
             data:
                 -
-                    oid: mcAfeeATDMIBObjects
-                    value: atdSystemTemperature
+                    oid: MCAFEE-ATD-MIB::mcAfeeATDMIBObjects
+                    value: MCAFEE-ATD-MIB::atdSystemTemperature
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.8.{{ $index }}'
                     descr: 'System Temperature'
         percent:
             data:
                 -
-                    oid: mcAfeeATDMIBObjects
-                    value: atdHDDDataSpaceUtilization
+                    oid: MCAFEE-ATD-MIB::mcAfeeATDMIBObjects
+                    value: MCAFEE-ATD-MIB::atdHDDDataSpaceUtilization
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.4.{{ $index }}'
                     descr: 'ATD Data Disk Space Utilization'
                     index: 'atdDataDiskSpaceUsed'
                 -
-                    oid: atdHDDSystemSpaceUtilization
+                    oid: MCAFEE-ATD-MIB::atdHDDSystemSpaceUtilization
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.3.{{ $index }}'
                     descr: 'ATD System Disk Space Utilization'
                     index: 'atdSystemDiskSpaceUsed'
 
                 -
-                    oid: atdHDDVarSpaceUtilization
+                    oid: MCAFEE-ATD-MIB::atdHDDVarSpaceUtilization
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.19.{{ $index }}'
                     descr: 'ATD Var Disk Space Utilization'
                     index: 'atdVarDiskSpaceUsed'
         state:
            data:
                 -
-                    oid: atdSystemHealth
+                    oid: MCAFEE-ATD-MIB::atdSystemHealth
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.9.{{ $index }}'
                     descr: 'System Health'
                     state_name: atdSystemHealth
@@ -63,7 +62,7 @@ modules:
                         - { value: 0, generic: 2, graph: 0, descr: 'Bad' }
                         - { value: 1, generic: 0, graph: 0, descr: 'Good' }
                 -
-                    oid: atdBackupSchedulerStatus
+                    oid: MCAFEE-ATD-MIB::atdBackupSchedulerStatus
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.10.{{ $index }}'
                     descr: 'Backup Scheduler Status'
                     state_name: atdBackupSchedulerStatus
@@ -71,7 +70,7 @@ modules:
                         - { value: 0, generic: 2, graph: 0, descr: 'Backup Scheduler Status Failed' }
                         - { value: 1, generic: 0, graph: 0, descr: 'Backup Scheduler Status Ok' }
                 -
-                    oid: atdLoadBalancerStatus
+                    oid: MCAFEE-ATD-MIB::atdLoadBalancerStatus
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.11.{{ $index }}'
                     descr: 'ATD Load Balancer Status'
                     state_name: atdLoadBalancerStatus
@@ -85,7 +84,7 @@ modules:
                         - { value: 6, generic: 1, graph: 0, descr: 'VM Creation Failed' }
                         - { value: 7, generic: 3, graph: 0, descr: 'Invalid Status' }
                 -
-                    oid: atdEmailConnectorStatus
+                    oid: MCAFEE-ATD-MIB::atdEmailConnectorStatus
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.12.{{ $index }}'
                     descr: 'ATD Email Connetor Status'
                     state_name: atdEmailConnectorStatus
@@ -95,7 +94,7 @@ modules:
                         - { value: 2, generic: 1, graph: 0, descr: 'Email Connector Degraded' }
                         - { value: 3, generic: 2, graph: 0, descr: 'Email Connector Overloaded' }
                 -
-                    oid: atdEmailGatewayWaitTime
+                    oid: MCAFEE-ATD-MIB::atdEmailGatewayWaitTime
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.13.{{ $index }}'
                     descr: 'Email Gateway Wait Time Threshold'
                     state_name: atdEmailGatewayWaitTime
@@ -103,7 +102,7 @@ modules:
                         - { value: 0, generic: 0, graph: 0, descr: 'Email Gateway Threshold Ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'Email Gateway Threshold Wait Time Reached' }
                 -
-                    oid: atdMalwareInterfaceStatus
+                    oid: MCAFEE-ATD-MIB::atdMalwareInterfaceStatus
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.14.{{ $index }}'
                     descr: 'ATD Malware Interface Status'
                     state_name: atdMalwareInterfaceStatus
@@ -111,7 +110,7 @@ modules:
                         - { value: 0, generic: 2, graph: 0, descr: Down }
                         - { value: 1, generic: 0, graph: 0, descr: Up }
                 -
-                    oid: atdLicenseStatus
+                    oid: MCAFEE-ATD-MIB::atdLicenseStatus
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.15.{{ $index }}'
                     descr: 'ATD License Status'
                     state_name: atdLicenseStatus
@@ -120,7 +119,7 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: Invalid }
                         - { value: 3, generic: 2, graph: 0, descr: Expired }
                 -
-                    oid: atdDXLChannelStatus
+                    oid: MCAFEE-ATD-MIB::atdDXLChannelStatus
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.16.{{ $index }}'
                     descr: 'ATD DXL Status'
                     state_name: atdDXLChannelStatus
@@ -128,7 +127,7 @@ modules:
                         - { value: 0, generic: 2, graph: 0, descr: Down }
                         - { value: 1, generic: 0, graph: 0, descr: Up }
                 -
-                    oid: atdSensorStatus
+                    oid: MCAFEE-ATD-MIB::atdSensorStatus
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.17.{{ $index }}'
                     descr: 'ATD Sensor Status'
                     state_name: atdSensorStatus
@@ -137,7 +136,7 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: Active }
                         - { value: 2, generic: 3, graph: 0, descr: 'Not Connected' }
                 -
-                    oid: atdTAXIIStatus
+                    oid: MCAFEE-ATD-MIB::atdTAXIIStatus
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.18.{{ $index }}'
                     descr: 'ATD TAXII Status'
                     state_name: atdTAXIIStatus
@@ -146,7 +145,7 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: Up }
                         - { value: 2, generic: 3, graph: 0, descr: Unknown }
                 -
-                    oid: atdMalwareDNSStatus
+                    oid: MCAFEE-ATD-MIB::atdMalwareDNSStatus
                     num_oid: '.1.3.6.1.4.1.8962.4.1.1.18.{{ $index }}'
                     descr: 'ATD Malware DNS Status'
                     state_name: atdMalwareDNSStatus

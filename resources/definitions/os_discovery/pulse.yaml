@@ -1,4 +1,3 @@
-mib: PULSESECURE-PSG-MIB
 modules:
     mempools:
         data:
@@ -14,6 +13,6 @@ modules:
     processors:
         data:
             -
-                oid: iveCpuUtil
+                oid: PULSESECURE-PSG-MIB::iveCpuUtil
                 num_oid: '.1.3.6.1.4.1.12532.10.{{ $index }}'
                 type: pulse-cpu

@@ -26,7 +26,6 @@
 
 namespace App\Http\Controllers\Table;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
@@ -151,8 +150,7 @@ class OutagesController extends TableController
         }
 
         // Convert epoch to local time
-        return Carbon::createFromTimestamp($timestamp, session('preferences.timezone'))
-            ->format(LibrenmsConfig::get('dateformat.compact'));
+        return Time::format($timestamp, 'compact');
     }
 
     private function statusLabel(DeviceOutage $outage): string
@@ -193,8 +191,8 @@ class OutagesController extends TableController
     {
         return [
             $outage->device ? $outage->device->displayName() : '',
-            Carbon::createFromTimestamp($outage->going_down)->toISOString(),
-            $outage->up_again ? Carbon::createFromTimestamp($outage->up_again)->toISOString() : '-',
+            Carbon::createFromTimestamp($outage->going_down)->toIso8601ZuluString(),
+            $outage->up_again ? Carbon::createFromTimestamp($outage->up_again)->toIso8601ZuluString() : '-',
             $this->asDuration($outage)->format('%H:%I:%S'),
         ];
     }

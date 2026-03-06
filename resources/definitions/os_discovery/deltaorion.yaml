@@ -1,4 +1,3 @@
-mib: GLOBAL-REG:ORION-BASE-MIB
 modules:
     os:
         version: ORION-BASE-MIB::dcSoftwareVersion.0
@@ -7,15 +6,16 @@ modules:
             data:
                 -
                     oid:
-                        - dcMeasurementTable
-                        - dcMeterPanelEventTable
+                        - ORION-BASE-MIB::dcMeasurementTable
+                        - ORION-BASE-MIB::dcMeterPanelEventTable
         state:
             data:
                 -
-                    oid: dcMeterPanelEventTable
-                    value: dcMeterPanelEventValue
+                    oid: ORION-BASE-MIB::dcMeterPanelEventTable
+                    value: ORION-BASE-MIB::dcMeterPanelEventValue
                     num_oid: '.1.3.6.1.4.1.20246.2.3.1.1.1.2.10.1.1.3.{{ $index }}'
-                    descr: '{{ $dcMeterPanelEventName }}'
+                    state_name: dcMeterPanelEventTable
+                    descr: '{{ ORION-BASE-MIB::dcMeterPanelEventName }}'
                     states:
                         - { value: 1, descr: off, graph: 1, generic: 0 }
                         - { value: 2, descr: indeterminate, graph: 1, generic: 3 }
@@ -24,19 +24,19 @@ modules:
             options:
                 skip_values:
                 -
-                  oid: dcMeasurementUnit
+                  oid: ORION-BASE-MIB::dcMeasurementUnit
                   op: '!='
                   value: 7
                 -
-                  oid: dcMeasurementValue
+                  oid: ORION-BASE-MIB::dcMeasurementValue
                   op: 'in_array'
                   value: [0, 2147483647]
             data:
                 -
-                  oid: dcMeasurementTable
-                  value: dcMeasurementValue
+                  oid: ORION-BASE-MIB::dcMeasurementTable
+                  value: ORION-BASE-MIB::dcMeasurementValue
                   num_oid: '.1.3.6.1.4.1.20246.2.3.1.1.1.2.9.1.1.3.{{ $index }}'
-                  descr: '{{ $dcMeasurementName }}'
+                  descr: '{{ ORION-BASE-MIB::dcMeasurementName }}'
                   divisor: 10
                   low_limit: 10
                   high_limit: 50
@@ -44,19 +44,19 @@ modules:
             options:
                 skip_values:
                 -
-                  oid: dcMeasurementUnit
+                  oid: ORION-BASE-MIB::dcMeasurementUnit
                   op: '!='
                   value: 3
                 -
-                  oid: dcMeasurementValue
+                  oid: ORION-BASE-MIB::dcMeasurementValue
                   op: 'in_array'
                   value: [0, 2147483647]
             data:
                 -
-                  oid: dcMeasurementTable
-                  value: dcMeasurementValue
+                  oid: ORION-BASE-MIB::dcMeasurementTable
+                  value: ORION-BASE-MIB::dcMeasurementValue
                   num_oid: '.1.3.6.1.4.1.20246.2.3.1.1.1.2.9.1.1.3.{{ $index }}'
-                  descr: '{{ $dcMeasurementName }}'
+                  descr: '{{ ORION-BASE-MIB::dcMeasurementName }}'
                   divisor: 100
                   low_limit: 46
                   high_limit: 56
@@ -64,16 +64,16 @@ modules:
             options:
                 skip_values:
                 -
-                  oid: dcMeasurementUnit
+                  oid: ORION-BASE-MIB::dcMeasurementUnit
                   op: '!='
                   value: 5
                 -
-                  oid: dcMeasurementValue
+                  oid: ORION-BASE-MIB::dcMeasurementValue
                   op: 'in_array'
                   value: [0, 2147483647]
             data:
                 -
-                  oid: dcMeasurementTable
-                  value: dcMeasurementValue
+                  oid: ORION-BASE-MIB::dcMeasurementTable
+                  value: ORION-BASE-MIB::dcMeasurementValue
                   num_oid: '.1.3.6.1.4.1.20246.2.3.1.1.1.2.9.1.1.3.{{ $index }}'
-                  descr: '{{ $dcMeasurementName }}'
+                  descr: '{{ ORION-BASE-MIB::dcMeasurementName }}'

@@ -1,5 +1,8 @@
---	POSEIDON-MIB 2.06
+--	POSEIDON-MIB 2.10
 --		History:
+--	2.10	27. 5.2020 Vit Olmr      - Unification of MIB devices and datalogger
+--	2.09	23.11.2019 Marek Hummel  - Fixed syntax errors, change Syntax "Gauge32" to "Gauge"(SMIv2 to SMIv1), change status "current" to "mandatory" (SMIv2 to SMIv1)
+--	2.08	29. 3.2016 Marek Hummel  - sensPortID added
 --	2.07	7. 10.2009 Marek Koci    - sensorUnitString added, traps renamed
 --	2.06	10. 9.2009 Marek Koci    - universal 1-wire sensor supported
 --	2.05	11. 9.2008 Marek Koci    - new sensor units added
@@ -15,31 +18,24 @@
 --
 --
 --
---  This is a MIB file for Poseidon product family - environment sensors & digital I/O over IP via XML, SNMP, Modbus/TCP 
---  Availabe sensors: Temperature, Humidity, Voltage, Current, Power comsuption (110/230V) Industrial standards 
+--  This is a MIB file for Poseidon product family - environment sensors & digital I/O over IP via XML, SNMP, Modbus/TCP
+--  Availabe sensors: Temperature, Humidity, Voltage, Current, Power comsuption (110/230V) Industrial standards
 --
 --  ---------------------  Poseidon Family ----------------------
 --
---  Poseidon model 3262:     6 sensors
---  Poseidon model 3265:     5 sensors,  GSM
---  Poseidon model 3266:     3 sensors,  4 Inputs
---  Poseidon model 3268:     4 sensors,  4 Inputs, 2 Outputs
---  Poseidon model 1250:    42 sensors,  3 Inputs, 2 Outputs, GSM
---  Poseidon model 2250:    42 sensors,  3 Inputs, 2 Outputs, GSM
---  Poseidon model 2261:    42 sensors,  3 Inputs, 2 Outputs
---  Poseidon model 3468:     4 sensors,  4 Inputs, 2 Outputs
---  Poseidon model Sitemon: 12 sensors, 16 Inputs, 4 Outputs
---  Poseidon model 4001:    16 sensors,  8 Inputs, 4 Outputs, GSM
---  Poseidon model 4002:    16 sensors,  6 Inputs, 2 Outputs, GSM
+--  Poseidon model 2250:    42 sensors,  8 Inputs, 2 Outputs, GSM
+
 
 POSEIDON-MIB DEFINITIONS ::= BEGIN
 IMPORTS
 	OBJECT-TYPE
 		FROM RFC-1212
-	Gauge, enterprises
+	Gauge, TimeTicks, enterprises
 		FROM RFC1155-SMI
 	DisplayString, sysName
-		FROM RFC1213-MIB;
+		FROM RFC1213-MIB
+	TRAP-TYPE
+		FROM RFC-1215;
 
 
 --
@@ -47,6 +43,8 @@ IMPORTS
 --
 
 PositiveInteger ::= INTEGER (1..2147483647)	-- 0x7FFF FFFF
+NonNegativeInteger ::= INTEGER (0..2147483647)	-- 0x7FFF FFFF
+
 
 OnOff ::= INTEGER {
 		off (0),
@@ -113,6 +111,12 @@ SensorFlags ::= INTEGER	-- will hold info that this sensor has alarm (trap) enab
 			-- and/or sets output pin (thermostat functionality)
 
 TimeStamp ::= TimeTicks
+LogTimeRemain ::= TimeTicks
+
+LogCmd ::= INTEGER {
+		writeOnly (0),
+		clearLog (1)
+	}
 
 
 --
@@ -123,6 +127,7 @@ hwgroup		OBJECT IDENTIFIER ::= { enterprises 21796 }
 
 charonII	OBJECT IDENTIFIER ::= { hwgroup 3 }
 poseidon	OBJECT IDENTIFIER ::= { charonII 3 }
+log		OBJECT IDENTIFIER ::= { poseidon 30 }
 
 
 
@@ -134,7 +139,7 @@ setup	OBJECT IDENTIFIER ::= { poseidon 99 }
 inpTable OBJECT-TYPE
 	SYNTAX	SEQUENCE OF InpEntry
 	ACCESS	not-accessible
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"A list of binary input entries."
 	::= { poseidon 1 }
@@ -142,7 +147,7 @@ inpTable OBJECT-TYPE
 inpEntry OBJECT-TYPE
 	SYNTAX	InpEntry
 	ACCESS	not-accessible
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"An entry containing information applicable
 		to a particular binary input."
@@ -154,13 +159,14 @@ InpEntry ::= SEQUENCE {
 	inpValue	OnOff,
 	inpName		IOName,
 	inpAlarmSetup	InputAlarmSetup,
-	inpAlarmState	InputAlarmState
+	inpAlarmState	InputAlarmState,
+	inpCounter	NonNegativeInteger
 }
 
 inpIndex OBJECT-TYPE
 	SYNTAX	PositiveInteger
-	ACCESS	not-accessible
-	STATUS	current
+	ACCESS	read-only
+	STATUS	mandatory
 	DESCRIPTION
 		"The binary input index."
 	::= { inpEntry 1 }
@@ -168,7 +174,7 @@ inpIndex OBJECT-TYPE
 inpValue OBJECT-TYPE
 	SYNTAX	OnOff
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The binary input value."
 	::= { inpEntry 2 }
@@ -176,7 +182,7 @@ inpValue OBJECT-TYPE
 inpName OBJECT-TYPE
 	SYNTAX	IOName
 	ACCESS	read-write
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The binary input name."
 	::= { inpEntry 3 }
@@ -184,7 +190,7 @@ inpName OBJECT-TYPE
 inpAlarmSetup OBJECT-TYPE
 	SYNTAX	InputAlarmSetup
 	ACCESS	read-write
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"You can enable alarm for this binary input.
 		Alarm can be inactive or active for On/Off state."
@@ -193,16 +199,28 @@ inpAlarmSetup OBJECT-TYPE
 inpAlarmState OBJECT-TYPE
 	SYNTAX	InputAlarmState
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The binary input alarm state."
 	::= { inpEntry 5 }
+
+
+inpCounter OBJECT-TYPE
+	SYNTAX	NonNegativeInteger
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Number of pulses on this input.
+		Entering edge is used to increment this counter.
+		Only pulses longer than sampling interval are counted."
+	::= { inpEntry 6 }
+
 
 --
 outTable OBJECT-TYPE
 	SYNTAX	SEQUENCE OF OutEntry
 	ACCESS	not-accessible
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"A list of binary output entries."
 	::= { poseidon 2 }
@@ -210,7 +228,7 @@ outTable OBJECT-TYPE
 outEntry OBJECT-TYPE
 	SYNTAX	OutEntry
 	ACCESS	not-accessible
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"An entry containing information applicable
 		to a particular binary output."
@@ -222,13 +240,14 @@ OutEntry ::= SEQUENCE {
 	outValue	OnOff,
 	outName		IOName,
 	outType		OutputType,
-	outMode		OutputMode
+	outMode		OutputMode,
+	outInit		OnOff
 }
 
 outIndex OBJECT-TYPE
 	SYNTAX	PositiveInteger
-	ACCESS	not-accessible
-	STATUS	current
+	ACCESS	read-only
+	STATUS	mandatory
 	DESCRIPTION
 		"The binary output index."
 	::= { outEntry 1 }
@@ -236,7 +255,7 @@ outIndex OBJECT-TYPE
 outValue OBJECT-TYPE
 	SYNTAX	OnOff
 	ACCESS	read-write
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The binary output value. 0 off(open), 1 on(close)"
 	::= { outEntry 2 }
@@ -244,7 +263,7 @@ outValue OBJECT-TYPE
 outName OBJECT-TYPE
 	SYNTAX	IOName
 	ACCESS	read-write
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The binary output name."
 	::= { outEntry 3 }
@@ -252,7 +271,7 @@ outName OBJECT-TYPE
 outType OBJECT-TYPE
 	SYNTAX	OutputType
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The binary output type. 0 relay (off, on), 1 rts (-10,+10V), 2 dtr (0,10V)"
 	::= { outEntry 4 }
@@ -260,18 +279,26 @@ outType OBJECT-TYPE
 outMode OBJECT-TYPE
 	SYNTAX	OutputMode
 	ACCESS	read-write
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The binary output mode. 0 manual, 1 autoAlarm,
 		2 autoTriggerEq, 3 autoTriggerHi, 4 autoTriggerLo"
 	::= { outEntry 5 }
+
+outInit OBJECT-TYPE
+	SYNTAX	OnOff
+	ACCESS	read-write
+	STATUS	obsolete
+	DESCRIPTION
+		"The binary output value after power-up. 0 off(open), 1 on(close)"
+	::= { outEntry 6 }
 
 
 -- Table has to be last in a branch to satisfy snmp walk engine implementation
 sensTable OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SensEntry
 	ACCESS	not-accessible
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"A list of sensor table entries. The number
 		of entries corresponds with number of detected sensors."
@@ -280,7 +307,7 @@ sensTable OBJECT-TYPE
 sensEntry OBJECT-TYPE
 	SYNTAX	SensEntry
 	ACCESS	not-accessible
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"An entry containing information applicable to a
 		particular sensor."
@@ -296,13 +323,14 @@ SensEntry ::= SEQUENCE {
 	sensValueRaw		SensorValue,
 	sensID			SensorID,
 	sensUnit		UnitType,
-	sensUnitString		SensorUnitString
+	sensUnitString		SensorUnitString,
+	sensPortID		INTEGER
 }
 
 sensIndex OBJECT-TYPE
 	SYNTAX	PositiveInteger
-	ACCESS	not-accessible
-	STATUS	current
+	ACCESS	read-only
+	STATUS	mandatory
 	DESCRIPTION
 		"The sensor index."
 	::= { sensEntry 1 }
@@ -310,7 +338,7 @@ sensIndex OBJECT-TYPE
 sensName OBJECT-TYPE
 	SYNTAX	SensorName
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The sensor name."
 	::= { sensEntry 2 }
@@ -318,7 +346,7 @@ sensName OBJECT-TYPE
 sensState OBJECT-TYPE
 	SYNTAX	SensorState
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The sensor state."
 	::= { sensEntry 4 }
@@ -326,7 +354,7 @@ sensState OBJECT-TYPE
 sensString OBJECT-TYPE
 	SYNTAX	SensorString
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The string representation of sensor value."
 	::= { sensEntry 5 }
@@ -334,7 +362,7 @@ sensString OBJECT-TYPE
 sensValue OBJECT-TYPE
 	SYNTAX	SensorValue
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The integer (decimal * 10) representation
 		of sensor value."
@@ -343,7 +371,7 @@ sensValue OBJECT-TYPE
 sensValueRaw OBJECT-TYPE
 	SYNTAX	SensorValue
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The original raw value of sensor
 		(it differs for each sensor type, especially
@@ -353,7 +381,7 @@ sensValueRaw OBJECT-TYPE
 sensID OBJECT-TYPE
 	SYNTAX	SensorID
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The sensor ID."
 	::= { sensEntry 8 }
@@ -361,7 +389,7 @@ sensID OBJECT-TYPE
 sensUnit OBJECT-TYPE
 	SYNTAX	UnitType
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The sensor unit."
 	::= { sensEntry 9 }
@@ -369,20 +397,27 @@ sensUnit OBJECT-TYPE
 sensUnitString OBJECT-TYPE
 	SYNTAX	SensorUnitString
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The string representation of sensor unit."
 	::= { sensEntry 10 }
 
+sensPortID OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sensor port ID."
+	::= { sensEntry 11 }
 
 -- The Alarm group.
 
 tsAlarm		OBJECT IDENTIFIER ::= { poseidon 50 }
 
 tsAlarmsPresent OBJECT-TYPE
-	SYNTAX	Gauge32
+	SYNTAX	Gauge
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The present number of active alarm conditions."
 	::= { tsAlarm 1 }
@@ -390,7 +425,7 @@ tsAlarmsPresent OBJECT-TYPE
 tsAlarmTable OBJECT-TYPE
 	SYNTAX	SEQUENCE OF TsAlarmEntry
 	ACCESS	not-accessible
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"A list of alarm table entries.  The table contains
 		zero, one, or many rows at any moment, depending upon
@@ -416,7 +451,7 @@ tsAlarmTable OBJECT-TYPE
 tsAlarmEntry OBJECT-TYPE
 	SYNTAX	TsAlarmEntry
 	ACCESS	not-accessible
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"An entry containing information applicable
 		to a particular alarm."
@@ -433,8 +468,8 @@ TsAlarmEntry ::= SEQUENCE {
 
 tsAlarmIdx OBJECT-TYPE
 	SYNTAX	PositiveInteger
-	ACCESS	not-accessible
-	STATUS	current
+	ACCESS	read-only
+	STATUS	mandatory
 	DESCRIPTION
 		"An index to alarm table."
 	::= { tsAlarmEntry 1 }
@@ -442,7 +477,7 @@ tsAlarmIdx OBJECT-TYPE
 tsAlarmId OBJECT-TYPE
 	SYNTAX	PositiveInteger
 	ACCESS	read-only	-- (used in trap variables)
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"A unique identifier for an alarm condition.
 		This value must remain constant."
@@ -454,7 +489,7 @@ tsAlarmDescr OBJECT-TYPE
 		temperatureOutOfRange(2)
 	}
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"Description of the alarm condition."
 	::= { tsAlarmEntry 3 }
@@ -470,7 +505,7 @@ tsAlarmDescr OBJECT-TYPE
 tsAlarmSensName OBJECT-TYPE
 	SYNTAX	SensorName
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"Name of sensor with alarm condition."
 	::= { tsAlarmEntry 4 }
@@ -478,7 +513,7 @@ tsAlarmSensName OBJECT-TYPE
 tsAlarmTime OBJECT-TYPE
 	SYNTAX	TimeStamp
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The value of sysUpTime when the alarm condition was
 		detected.  If the alarm condition was detected
@@ -492,7 +527,7 @@ tsAlarmTime OBJECT-TYPE
 infoAddressMAC OBJECT-TYPE
 	SYNTAX	DisplayString (SIZE (0..17))
 	ACCESS	read-only
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"MAC address in text form.
 		It is here to distinguish devices in trap messages."
@@ -505,7 +540,7 @@ sensSetup	OBJECT IDENTIFIER ::= { setup 1 }
 unitType OBJECT-TYPE
 	SYNTAX	UnitType
 	ACCESS	read-write
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"Units for displayed values.
 		All setup values are fixed in Celsius"
@@ -514,7 +549,7 @@ unitType OBJECT-TYPE
 sensSetupTable OBJECT-TYPE
 	SYNTAX	SEQUENCE OF SensSetupEntry
 	ACCESS	not-accessible
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"A list of sensor table setup entries. The number
 		of entries corresponds with number of detected sensors."
@@ -523,7 +558,7 @@ sensSetupTable OBJECT-TYPE
 sensSetupEntry OBJECT-TYPE
 	SYNTAX	SensSetupEntry
 	ACCESS	not-accessible
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"An entry containing setup information
 		for a particular sensor."
@@ -541,8 +576,8 @@ SensSetupEntry ::= SEQUENCE {
 
 sensSetupIndex OBJECT-TYPE
 	SYNTAX	PositiveInteger
-	ACCESS	not-accessible
-	STATUS	current
+	ACCESS	read-only
+	STATUS	mandatory
 	DESCRIPTION
 		"The sensor setup table index."
 	::= { sensSetupEntry 1 }
@@ -550,7 +585,7 @@ sensSetupIndex OBJECT-TYPE
 sensSetupName OBJECT-TYPE
 	SYNTAX	SensorName
 	ACCESS	read-write
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The sensor name."
 	::= { sensSetupEntry 2 }
@@ -558,7 +593,7 @@ sensSetupName OBJECT-TYPE
 sensFlags OBJECT-TYPE
 	SYNTAX	SensorFlags
 	ACCESS	read-write
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The behaviour of sensor
 		- 0x01: range or level detection
@@ -573,7 +608,7 @@ sensFlags OBJECT-TYPE
 sensLimitMin OBJECT-TYPE
 	SYNTAX	SensorValue
 	ACCESS	read-write
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The sensor low limit."
 	::= { sensSetupEntry 6 }
@@ -581,7 +616,7 @@ sensLimitMin OBJECT-TYPE
 sensLimitMax OBJECT-TYPE
 	SYNTAX	SensorValue
 	ACCESS	read-write
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The sensor high limit."
 	::= { sensSetupEntry 7 }
@@ -589,10 +624,63 @@ sensLimitMax OBJECT-TYPE
 sensHysteresis OBJECT-TYPE
 	SYNTAX	SensorValue
 	ACCESS	read-write
-	STATUS	current
+	STATUS	mandatory
 	DESCRIPTION
 		"The sensor hysteresis."
 	::= { sensSetupEntry 8 }
+
+
+-- The Log group.
+
+logRecordCount OBJECT-TYPE
+	SYNTAX	PositiveInteger
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"The number of already logged records.
+		There are 4 types of log records for
+		RS485 sensors, 1-Wire sensors, inputs and outputs.
+		Every log period is done a log sample,
+		that writes several log records."
+	::= { log 1 }
+
+logTimeRemain OBJECT-TYPE
+	SYNTAX	LogTimeRemain
+	ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"According to detected sensors and enabled I/O
+		space for log records is computed
+		and remaining logging time is estimated."
+	::= { log 2 }
+
+logPeriod OBJECT-TYPE
+	SYNTAX	PositiveInteger
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The time between two log samples [s]."
+	::= { log 3 }
+
+logIOEnabled OBJECT-TYPE
+	SYNTAX	OnOff
+	ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"Log also binary Inputs and Outputs.
+		If enabled, every log sample adds additional records for I/O.
+		If disabled, only 1-Wire and RSxxx sensors are logged."
+	::= { log 4 }
+
+logCmd OBJECT-TYPE
+	SYNTAX	LogCmd
+	ACCESS	write-only
+	STATUS	current
+	DESCRIPTION
+		"Log control commands.
+		You can erase log by writing to this variable."
+	::= { log 5 }
+
 
 -- Trap Definitions ------------------------------------------------------------
 
@@ -632,4 +720,3 @@ tsTrapAlarmEnd TRAP-TYPE
 
 
 END
-

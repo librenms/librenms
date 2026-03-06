@@ -17,7 +17,7 @@ class LegacyController extends Controller
         Checks::postAuth();
 
         // Set variables
-        $no_refresh = false;
+        $no_refresh = false; // may be overridden by included pages
         $init_modules = ['web', 'auth'];
         require base_path('/includes/init.php');
 
@@ -77,7 +77,7 @@ class LegacyController extends Controller
 
         return response()->view('layouts.legacy_page', [
             'content' => $html,
-            'refresh' => $no_refresh ? 0 : LibrenmsConfig::get('page_refresh'),
+            'refresh' => $no_refresh ? 0 : LibrenmsConfig::get('page_refresh'), // @phpstan-ignore ternary.alwaysFalse ($no_refresh may be set by included pages)
         ]);
     }
 

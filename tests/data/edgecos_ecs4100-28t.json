@@ -9396,5 +9396,289 @@
                 }
             ]
         }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 1301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 1301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 1301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 1301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 3005,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 4001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 5024,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1051,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1231,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1268,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 3005,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 4001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1051,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1231,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 3005,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 4001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1051,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1231,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1268,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 3005,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 4001,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "hu17-sw",
+                    "remote_port": "9 (b4fbe456a0b3)",
+                    "remote_platform": null,
+                    "remote_version": "EdgeSwitch 8-Port 150W, 1.8.2, Linux 3.6.5-1b505fb7, 1.0.0.4827685",
+                    "ifAlias": "hu17-sw",
+                    "ifDescr": "Ethernet Port on unit 1, port 28",
+                    "ifName": "Port28"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "ma104-1",
+                    "remote_port": "00 12 CF 48 D8 54 (0012cf48d854)",
+                    "remote_platform": null,
+                    "remote_version": "Edge-Core FE L2 Switch ES3528M",
+                    "ifAlias": "ma104-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 25",
+                    "ifName": "Port25"
+                }
+            ]
+        }
     }
 }

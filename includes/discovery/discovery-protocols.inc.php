@@ -271,7 +271,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     echo ' LLDP-MIB: ';
     $lldp_array = SnmpQuery::hideMib()->walk('LLDP-MIB::lldpRemTable')->table(3);
     if (! empty($lldp_array)) {
-        $lldp_remAddr_num = SnmpQuery::hideMib()->numeric()->walk('.1.0.8802.1.1.2.1.4.2.1.3');
+        $lldp_remAddr_num = SnmpQuery::hideMib()->numeric()->walk('.1.0.8802.1.1.2.1.4.2.1.3')->values();
         foreach ($lldp_remAddr_num as $key => $value) {
             $res = preg_match("/1\.0\.8802\.1\.1\.2\.1\.4\.2\.1\.3\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*).(([^\.]*)(\.([^\.]*))+)/", (string) $key, $matches);
             if ($res) {
@@ -388,13 +388,13 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 // normalize MAC address if present
                 $remote_port_mac = '';
                 $remote_port_name = $lldp['lldpRemPortId'] ?? null;
-                if ($lldp['lldpRemChassisIdSubtype'] == 4 && isset($lldp['lldpRemChassisId'])) { // 4 = macaddress
+                if (isset($lldp['lldpRemChassisIdSubtype']) && $lldp['lldpRemChassisIdSubtype'] == 4 && isset($lldp['lldpRemChassisId'])) { // 4 = macaddress
                     $remote_port_mac = str_replace([' ', ':', '-'], '', strtolower((string) $lldp['lldpRemChassisId']));
                 }
                 if (isset($lldp['lldpRemPortIdSubtype']) && $lldp['lldpRemPortIdSubtype'] == 3 && isset($lldp['lldpRemPortId'])) { // 3 = macaddress
                     $remote_port_mac = str_replace([' ', ':', '-'], '', strtolower((string) $lldp['lldpRemPortId']));
                 }
-                if (isset($lldp['lldpRemChassisId']) && ($lldp['lldpRemChassisIdSubtype'] == 6 || $lldp['lldpRemChassisIdSubtype'] == 2)) { // 6=ifName 2=ifAlias
+                if (isset($lldp['lldpRemChassisId']) && isset($lldp['lldpRemChassisIdSubtype']) && ($lldp['lldpRemChassisIdSubtype'] == 6 || $lldp['lldpRemChassisIdSubtype'] == 2)) { // 6=ifName 2=ifAlias
                     $remote_port_name = $lldp['lldpRemChassisId'];
                 }
                 // Linksys / Cisco SRW2016/24/48 all have lldpRemSysDesc Ethernet Interface, which makes all lldp mappings go to port g1.
@@ -459,7 +459,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 }
 
                 $remote_port_id = find_port_id(
-                    $lldp['lldpRemPortDesc'],
+                    $lldp['lldpRemPortDesc'] ?? null,
                     $remote_port_name,
                     $remote_device_id,
                     $remote_port_mac
@@ -473,7 +473,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 if (empty($lldp['lldpRemSysName']) && isset($lldp['lldpRemSysDesc'])) {
                     $lldp['lldpRemSysName'] = $lldp['lldpRemSysDesc'];
                 }
-                if (is_array($interface) && $interface['port_id'] && $lldp['lldpRemSysName'] && $remote_port_name) {
+                if (is_array($interface) && $interface['port_id'] && isset($lldp['lldpRemSysName']) && $lldp['lldpRemSysName'] && $remote_port_name) {
                     discover_link(
                         $interface['port_id'],
                         'lldp',

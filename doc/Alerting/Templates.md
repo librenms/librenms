@@ -141,6 +141,14 @@ In your alert template just use
 
 For more info on extending templates, see the [Laravel documentation](https://laravel.com/docs/blade#extending-a-layout).
 
+### Including other Alert templates
+
+Another way to extend a template, is to reuse the content of other Alert templates in LibreNMS. This can be done by leveraging the AlertTemplate database model. All inside the included template needed variables, need to be passed through to the second parameter (e.g.```["alert" => $alert]```) of the method Blade:render(). 
+With the following example the entire content of the template with the ID 5 will be included.  This could be useful to have all common text parts in seperate templates. E.g. headers or footers.
+```php
+{ \Illuminate\Support\Facades\Blade::render(\App\Models\AlertTemplate::find(5)->template , ["alert" => $alert]) }}
+```
+
 ## Examples
 
 ### Default Template
