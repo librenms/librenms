@@ -118,8 +118,8 @@ if ($device['os'] == 'timos') {
 
     // SAFI = Sub Address Family Identifier (what type of route)
     $safi_map = [
-        1   => 'unicast',
-        2   => 'multicast',
+        1 => 'unicast',
+        2 => 'multicast',
         128 => 'vpn',
     ];
 
@@ -203,7 +203,7 @@ if ($device['os'] == 'timos') {
 
             // Decode oid_key (e.g. "1_1") back to human-readable names
             [$afi, $safi] = explode('_', $oid_key);
-            $afi_name = $afi_map[(int) $afi]   ?? "afi$afi";
+            $afi_name = $afi_map[(int) $afi] ?? "afi$afi";
             $safi_name = $safi_map[(int) $safi] ?? "safi$safi";
 
             d_echo("Nokia TIMOS: Writing — index=$index addr=$address addr_type=$peer_addr_type ({$afi_name}/{$safi_name}) recv=$pfxRcv sent=$pfxSent\n");
