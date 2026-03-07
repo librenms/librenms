@@ -7,18 +7,6 @@ parameters:
 			path: LibreNMS/ComposerHelper.php
 
 		-
-			message: '#^Property LibreNMS\\Data\\Store\\Rrd\:\:\$async_process \(LibreNMS\\Proc\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: LibreNMS/Data/Store/Rrd.php
-
-		-
-			message: '#^Property LibreNMS\\Data\\Store\\Rrd\:\:\$sync_process \(LibreNMS\\Proc\) in isset\(\) is not nullable\.$#'
-			identifier: isset.property
-			count: 1
-			path: LibreNMS/Data/Store/Rrd.php
-
-		-
 			message: '#^Variable \$multi_get_array on left side of \?\? is never defined\.$#'
 			identifier: nullCoalesce.variable
 			count: 2
