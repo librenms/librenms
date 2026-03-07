@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Path in include\(\) "config\.php" is not a file or it does not exist\.$#'
-			identifier: include.fileNotFound
-			count: 1
-			path: LibreNMS/ComposerHelper.php
-
-		-
 			message: '#^Variable \$multi_get_array on left side of \?\? is never defined\.$#'
 			identifier: nullCoalesce.variable
 			count: 2
@@ -23,9 +17,3 @@ parameters:
 			identifier: variable.undefined
 			count: 2
 			path: LibreNMS/OS/SmOs.php
-
-		-
-			message: '#^Property App\\Console\\Commands\\InternalHttpRequest\:\:\$app is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/Console/Commands/InternalHttpRequest.php
