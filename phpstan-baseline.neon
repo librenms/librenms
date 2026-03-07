@@ -1,13 +1,13 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Path in include\(\) "config\.php" is not a file or it does not exist\.$#'
-			identifier: include.fileNotFound
+			message: '#^Parameter \#16 \$entPhysicalIndex of class LibreNMS\\Device\\WirelessSensor constructor expects float\|int\|null, string given\.$#'
+			identifier: argument.type
 			count: 1
-			path: LibreNMS/ComposerHelper.php
+			path: LibreNMS/OS/Ios.php
 
 		-
-			message: '#^Property App\\Console\\Commands\\InternalHttpRequest\:\:\$app is never read, only written\.$#'
-			identifier: property.onlyWritten
-			count: 1
-			path: app/Console/Commands/InternalHttpRequest.php
+			message: '#^Variable \$index might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: LibreNMS/OS/SmOs.php
