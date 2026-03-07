@@ -1,136 +1,85 @@
 <?php
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\JsonApp;
 
+/** @var \App\Models\Application $app */
+/** @var array $device */
 $name = 'proxmox';
+$vm_ports = [];
 
-if (! function_exists('proxmox_port_exists')) {
-    /**
-     * Check if a port on a Proxmox VM exists
-     *
-     * @param  string  $p  Port name
-     * @param  string  $c  Clustername
-     * @param  int  $i  VM ID
-     * @return int|bool The port-ID if the port exists, false if it doesn't exist
-     */
-    function proxmox_port_exists($i, $c, $p)
-    {
-        if ($row = dbFetchRow('SELECT pmp.id FROM proxmox_ports pmp, proxmox pm WHERE pm.id = pmp.vm_id AND pmp.port = ? AND pm.cluster = ? AND pm.vmid = ?', [$p, $c, $i])) {
-            return $row['id'];
+echo PHP_EOL;
+
+try {
+    $app_data = JsonApp::fetch($name, '2.0.0');
+    $status = $app_data->errorString ?: 'OK';
+    $pmxcluster = $app_data->data['cluster_name'];
+    foreach ($app_data->data['vms'] as $vm) {
+        foreach ($vm['ports'] as $port) {
+            $vm_ports[] = [
+                $vm['id'],
+                $port['dev'],
+                $port['in'],
+                $port['out'],
+                $vm['name'],
+            ];
         }
-
-        return false;
     }
-}
-
-if (! function_exists('proxmox_vm_exists')) {
-    /**
-     * Check if a Proxmox VM exists
-     *
-     * @param  int  $i  VM ID
-     * @param  string  $c  Clustername
-     * @param  array  $pmxcache  Reference to the Proxmox VM Cache
-     * @return bool true if the VM exists, false if it doesn't
-     */
-    function proxmox_vm_exists($i, $c, &$pmxcache)
-    {
-        if (isset($pmxcache[$c][$i]) && $pmxcache[$c][$i] > 0) {
-            return true;
-        }
-        if ($row = dbFetchRow('SELECT id FROM proxmox WHERE vmid = ? AND cluster = ?', [$i, $c])) {
-            $pmxcache[$c][$i] = (int) $row['id'];
-
-            return true;
-        }
-
-        return false;
-    }
-}
-
-if (\App\Facades\LibrenmsConfig::get('enable_proxmox') && ! empty($agent_data['app'][$name])) {
-    $proxmox = $agent_data['app'][$name];
-} elseif (\App\Facades\LibrenmsConfig::get('enable_proxmox')) {
-    $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.7.112.114.111.120.109.111.120';
-    $proxmox = SnmpQuery::get($oid)->value();
-    $proxmox = preg_replace('/^.+\n/', '', (string) $proxmox);
-    $proxmox = str_replace("<<<app-proxmox>>>\n", '', $proxmox);
-}
-
-if (! empty($proxmox)) {
-    $pmxlines = explode("\n", (string) $proxmox);
+} catch (JsonAppParsingFailedException $e) {
+    $status = 'OK';
+    $pmxlines = explode("\n", Str::chopStart($e->getOutput(), "<<<app-proxmox>>>"));
     $pmxcluster = array_shift($pmxlines);
-    dbUpdate(
-        ['device_id' => $device['device_id'], 'app_type' => $name, 'app_instance' => $pmxcluster],
-        'applications',
-        '`device_id` = ? AND `app_type` = ?',
-        [$device['device_id'], $name]
-    );
-
-    $metrics = [];
-    if (count($pmxlines) > 0) {
-        $pmxcache = [];
-
-        foreach ($pmxlines as $vm) {
-            $vm = trim(str_replace('"', '', $vm));
-            if (! preg_match('#^([^/]+)/([^/]+)/([^/]+)/([^/]+)/(.+)$#', $vm, $matches)) {
-                continue;
-            }
-            [, $vmid, $vmport, $vmpin, $vmpout, $vmdesc] = $matches;
-
-            $rrd_def = RrdDefinition::make()
-                ->addDataset('INOCTETS', 'DERIVE', 0, 12500000000)
-                ->addDataset('OUTOCTETS', 'DERIVE', 0, 12500000000);
-            $fields = [
-                'INOCTETS' => $vmpin,
-                'OUTOCTETS' => $vmpout,
-            ];
-
-            $proxmox_metric_prefix = "pmxcluster{$pmxcluster}_vmid{$vmid}_vmport$vmport";
-            $metrics[$proxmox_metric_prefix] = $fields;
-            $tags = [
-                'name' => $name,
-                'app_id' => $app->app_id,
-                'pmxcluster' => $pmxcluster,
-                'vmid' => $vmid,
-                'vmport' => $vmport,
-                'rrd_proxmox_name' => [
-                    'pmxcluster' => $pmxcluster,
-                    'vmid' => $vmid,
-                    'vmport' => $vmport,
-                ],
-                'rrd_def' => $rrd_def,
-            ];
-            app('Datastore')->put($device, 'app', $tags, $fields);
-
-            if (proxmox_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
-                dbUpdate([
-                    'device_id' => $device['device_id'],
-                    'last_seen' => ['NOW()'],
-                    'description' => $vmdesc,
-                ], $name, '`vmid` = ? AND `cluster` = ?', [$vmid, $pmxcluster]);
-            } else {
-                $pmxcache[$pmxcluster][$vmid] = dbInsert([
-                    'cluster' => $pmxcluster,
-                    'vmid' => $vmid,
-                    'description' => $vmdesc,
-                    'device_id' => $device['device_id'],
-                ], $name);
-            }
-
-            if ($portid = proxmox_port_exists($vmid, $pmxcluster, $vmport) !== false) {
-                dbUpdate(
-                    ['last_seen' => ['NOW()']],
-                    'proxmox_ports',
-                    '`vm_id` = ? AND `port` = ?',
-                    [$pmxcache[$pmxcluster][$vmid], $vmport]
-                );
-            } else {
-                dbInsert(['vm_id' => $pmxcache[$pmxcluster][$vmid], 'port' => $vmport], 'proxmox_ports');
-            }
-        }
+    foreach ($pmxlines as $pmxline) {
+        $vm_ports[] = explode('/', $pmxline, 5);
     }
+} catch (JsonAppException $e) {
+    Log::error($e->getMessage());
 
-    update_application($app, $proxmox, $metrics);
+    return;
 }
 
-unset($pmxlines, $pmxcluster, $pmxcdir, $proxmox, $pmxcache);
+$metrics = [];
+foreach ($vm_ports as $port) {
+    [$vmid, $vmport, $vmpin, $vmpout, $vmdesc] = $port;
+    echo "Proxmox ($pmxcluster): $vmdesc: $vmpin/$vmpout/$vmport\n";
+
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('INOCTETS', 'DERIVE', 0, 12500000000)
+        ->addDataset('OUTOCTETS', 'DERIVE', 0, 12500000000);
+    $fields = [
+        'INOCTETS' => $vmpin,
+        'OUTOCTETS' => $vmpout,
+    ];
+
+    $proxmox_metric_prefix = "pmxcluster{$pmxcluster}_vmid{$vmid}_vmport$vmport";
+    $metrics[$proxmox_metric_prefix] = $fields;
+    $tags = [
+        'name' => $name,
+        'app_id' => $app->app_id,
+        'pmxcluster' => $pmxcluster,
+        'vmid' => $vmid,
+        'vmport' => $vmport,
+        'rrd_proxmox_name' => [
+            'pmxcluster' => $pmxcluster,
+            'vmid' => $vmid,
+            'vmport' => $vmport,
+        ],
+        'rrd_def' => $rrd_def,
+    ];
+    app('Datastore')->put($device, 'app', $tags, $fields);
+
+    DB::table('proxmox_ports')->upsert([
+        'vm_id' => $vmid,
+        'port' => $vmport,
+        'last_seen' => Carbon::now(),
+    ], ['vm_id', 'port']);
+}
+
+update_application($app, 'Ports: ' . count($vm_ports), $metrics, $status);
+
+unset($pmxlines, $pmxcluster, $metrics, $app_data, $status);
