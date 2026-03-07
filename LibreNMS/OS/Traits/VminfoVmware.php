@@ -53,7 +53,7 @@ trait VminfoVmware
         return $vm_info->mapTable(function ($data, $vmwVmVMID) {
             $data['vm_type'] = 'vmware';
             $data['vmwVmVMID'] = $vmwVmVMID;
-            $data['vmwVmState'] = PowerState::STATES[$data['vmwVmState']] ?? PowerState::UNKNOWN;
+            $data['vmwVmState'] = PowerState::parse($data['vmwVmState']);
 
             /*
              * If VMware Tools is not running then don't overwrite the GuestOS with the error

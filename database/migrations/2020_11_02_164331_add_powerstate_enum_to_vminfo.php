@@ -21,7 +21,7 @@ return new class extends Migration
                     continue;
                 }
 
-                $vm->vmwVmState = PowerState::STATES[strtolower($vm->vmwVmState)] ?? PowerState::UNKNOWN;
+                $vm->vmwVmState = PowerState::parse($vm->vmwVmState);
                 $vm->update();
             }
         });

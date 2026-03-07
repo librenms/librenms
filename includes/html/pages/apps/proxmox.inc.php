@@ -46,9 +46,9 @@ if (isset($vars['vmid'])) {
     <div class="row">
         <div class="col-md-12">
             <div class="row">';
-    foreach (proxmox_cluster_vms($instance) as $pmxvm) {
+    foreach (\App\Models\Vminfo::query()->where('vm_type', 'proxmox')->get() as $pmxvm) {
         echo '
-                <div class="col-sm-4 col-md-3 col-lg-2">' . generate_link($pmxvm['vmid'] . ' (' . $pmxvm['description'] . ')', ['page' => 'apps', 'app' => 'proxmox', 'instance' => $instance, 'vmid' => $pmxvm['vmid']]) . '</div>';
+                <div class="col-sm-4 col-md-3 col-lg-2">' . generate_link($pmxvm->vmwVmVMID . ' (' . $pmxvm->vmwVmDisplayName . ')', ['page' => 'apps', 'app' => 'proxmox', 'instance' => $instance, 'vmid' => $pmxvm->vmwVmVMID]) . '</div>';
     }
     echo '
             </div>

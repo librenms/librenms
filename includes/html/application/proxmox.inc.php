@@ -16,27 +16,6 @@
  * See https://www.gnu.org/licenses/gpl.txt for the full license
  */
 
-/**
- * Fetch all VM's in a Proxmox Cluster
- *
- * @param  string  $c  Clustername
- * @return array An array with all the VM's on this cluster
- */
-function proxmox_cluster_vms($c)
-{
-    return dbFetchRows('SELECT * FROM proxmox WHERE cluster = ? ORDER BY vmid', [$c]);
-}
-
-/**
- * Fetch all VM's on a Proxmox node
- *
- * @param  int  $n  device_id
- * @return array An array with all the VM's on this node
- */
-function proxmox_node_vms($n)
-{
-    return dbFetchRows('SELECT * FROM proxmox WHERE device_id = ? ORDER BY vmid', [$n]);
-}
 
 /**
  * Fetch all info about a Proxmox VM
