@@ -77,7 +77,7 @@ class SmOs extends OS implements
                     $this->getDeviceId(),
                     $totalOids['rx'],
                     'total-rx',
-                    $index,
+                    $link,
                     $this->getLinkLabel($link) . ' Total Rx',
                     array_sum(array_column($radioEntry, 'linkRxETHCapacity')),
                     1000
@@ -90,7 +90,7 @@ class SmOs extends OS implements
                     $this->getDeviceId(),
                     $totalOids['tx'],
                     'total-tx',
-                    $index,
+                    $link,
                     $this->getLinkLabel($link) . ' Total Tx',
                     array_sum(array_column($radioEntry, 'linkTxETHCapacity')),
                     1000
