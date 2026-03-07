@@ -1,13 +1,2 @@
 parameters:
 	ignoreErrors:
-		-
-			message: '#^Parameter \#16 \$entPhysicalIndex of class LibreNMS\\Device\\WirelessSensor constructor expects float\|int\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: LibreNMS/OS/Ios.php
-
-		-
-			message: '#^Variable \$index might not be defined\.$#'
-			identifier: variable.undefined
-			count: 2
-			path: LibreNMS/OS/SmOs.php
