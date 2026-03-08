@@ -1362,13 +1362,13 @@ ospfv3_areas:
     - { Field: ospfv3AreaScopeLsaCount, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3AreaScopeLsaCksumSum, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3AreaSummary, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaStubMetric, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaStubMetricType, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaNssaTranslatorRole, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaNssaTranslatorState, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaNssaTranslatorStabInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaNssaTranslatorEvents, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaTEEnabled, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaStubMetric, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3AreaStubMetricType, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3AreaNssaTranslatorRole, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3AreaNssaTranslatorState, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3AreaNssaTranslatorStabInterval, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3AreaNssaTranslatorEvents, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3AreaTEEnabled, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
@@ -1392,16 +1392,16 @@ ospfv3_instances:
     - { Field: ospfv3AsScopeLsaCksumSum, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3ExitOverflowInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3ReferenceBandwidth, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartSupport, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartStrictLsaChecking, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartStatus, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartAge, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartExitReason, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3StubRouterSupport, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3StubRouterAdvertisement, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3DiscontinuityTime, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartTime, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartSupport, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3RestartInterval, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3RestartStrictLsaChecking, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3RestartStatus, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3RestartAge, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3RestartExitReason, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3StubRouterSupport, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3StubRouterAdvertisement, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3DiscontinuityTime, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3RestartTime, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
@@ -1425,9 +1425,9 @@ ospfv3_nbrs:
     - { Field: ospfv3NbrLsRetransQLen, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3NbrHelloSuppressed, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3NbrIfId, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrRestartHelperStatus, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrRestartHelperAge, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrRestartHelperExitReason, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrRestartHelperStatus, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3NbrRestartHelperAge, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3NbrRestartHelperExitReason, Type: varchar(32), 'Null': true, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
@@ -1443,14 +1443,14 @@ ospfv3_ports:
     - { Field: ospfv3IfIndex, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3IfInstId, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3IfAreaId, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3IfType, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3IfType, Type: varchar(32), 'Null': false, Extra: '', Default: '' }
     - { Field: ospfv3IfAdminStatus, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3IfRtrPriority, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3IfTransitDelay, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3IfRetransInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3IfHelloInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3IfRtrDeadInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3IfPollInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3IfPollInterval, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: ospfv3IfState, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3IfDesignatedRouter, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3IfBackupDesignatedRouter, Type: varchar(32), 'Null': false, Extra: '' }
