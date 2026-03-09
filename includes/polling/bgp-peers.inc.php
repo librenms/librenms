@@ -810,6 +810,7 @@ if (! empty($peers)) {
                                 $recv_data = SnmpQuery::enumStrings()->walk($recv_oid)->valuesByIndex();
                                 $sent_data = SnmpQuery::enumStrings()->walk($sent_oid)->valuesByIndex();
                                 foreach ($recv_data as $index => $recv_val) {
+                                        d_echo("TIMOS DEBUG index=$index\n");
                                     $parts = explode('.', (string) $index);
                                     if (count($parts) < 3) {
                                         continue;
