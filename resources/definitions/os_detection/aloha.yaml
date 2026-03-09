@@ -5,7 +5,6 @@ over:
 type: loadbalancer
 group: linux
 mib_dir: haproxy
-mib: EXCELIANCE-MIB
 icon: haproxy
 discovery:
     -

@@ -1,4 +1,3 @@
-mib: UPS-MIB
 modules:
     os:
         sysDescr_regex: '/_SWV(?<version>.*)$/'

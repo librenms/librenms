@@ -3,7 +3,6 @@ text: 'Infinera Groove'
 type: network
 icon: infinera
 mib_dir: infinera
-mib: CORIANT-GROOVE-MIB
 discovery_modules:
     ntp: false
     ospf: false

@@ -8,7 +8,6 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
     - { graph: device_storage, text: 'Storage Usage' }
 mib_dir: synology
-mibs: HOST-RESOURCES-MIB
 processor_stacked: true
 discovery:
     -

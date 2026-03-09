@@ -1,4 +1,3 @@
-mib: UBNT-MIB:UBNT-AFLTU-MIB
 modules:
     os:
         hardware: UBNT-AFLTU-MIB::afLTUDevModel.0
