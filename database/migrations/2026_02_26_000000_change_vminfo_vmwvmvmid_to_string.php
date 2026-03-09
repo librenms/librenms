@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('vminfo', function (Blueprint $table) {
-            $table->string('vmwVmVMID',36)->change();
+            $table->string('vmwVmVMID', 36)->change();
         });
     }
 
