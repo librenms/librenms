@@ -42,7 +42,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     private array $mibFilesLoaded = [];
     private array $mibDirs = [];
-    private array $mibs = ['SNMPv2-SMI', 'SNMPv2-TC', 'SNMPv2-CONF', 'SNMPv2-MIB', 'IANAifType-MIB', 'IF-MIB', 'INET-ADDRESS-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'SNMP-FRAMEWORK-MIB', 'SNMP-VIEW-BASED-ACM-MIB', 'NET-SNMP-VACM-MIB'];
+    private array $mibs = [];
     private Device $device;
     private \SNMP $snmp;
     private NetSnmpQuery $netsnmp;
@@ -387,9 +387,25 @@ class PhpSnmpQuery implements SnmpQueryInterface
         return [$oids]; // wrap in array for execMultiple so they are all done at once
     }
 
-    private function parseOid(array|string $oid): array
+    private function parseOid(array|string $oids): array
     {
-        return is_string($oid) ? explode(' ', $oid) : $oid;
+        if (is_string($oids)) {
+            $oids = explode(' ', $oids);
+        }
+
+        foreach ($oids as $oid) {
+            [$mib, $what] = explode('::', $oid, 2);
+
+            if (isset($what) && ! in_array($mib, $this->mibs)) {
+                if (Debug::isVerbose()) {
+                    Log::debug("Auto-loading $mib from $oid");
+                }
+
+                $this->mibs([$mib]);
+            }
+        }
+
+        return $oids;
     }
 
     private function setSecurity(?string $context): void
@@ -422,6 +438,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
     private function loadMibs(): void
     {
         $mibdirs = $this->mibDirectories();
+
         foreach ($this->mibs as $mib) {
             $mibfound = false;
 
@@ -435,6 +452,9 @@ class PhpSnmpQuery implements SnmpQueryInterface
                         Log::debug("Reading SNMP MIB $mibfile");
                     }
 
+                    // Load dependencies first
+                    $this->loadDependencies($mibfile, $mibdirs);
+
                     if (snmp_read_mib($mibfile)) {
                         $mibfound = true;
                         $this->mibFilesLoaded[$mibfile] = true;
@@ -447,6 +467,40 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
             if (! $mibfound) {
                 Log::debug("MIB $mib was not found");
+            }
+        }
+    }
+
+    private function loadDependencies(string $mibfile, array $mibdirs): void
+    {
+        Log::debug("Loading dependencies for $mibfile");
+        $mibdata = file_get_contents($mibfile);
+
+        if (preg_match('/IMPORTS([^;]+);/', $mibdata, $matches)) {
+            if (preg_match_all('/FROM\s+(\S+);?/', $matches[1], $imports)) {
+                foreach ($imports[1] as $import) {
+                    if (! in_array($import, $this->mibs)) {
+                        foreach ($mibdirs as $dir) {
+                            $depmibfile = $dir . '/' . $import;
+                            if (isset($this->mibFilesLoaded[$depmibfile])) {
+                                break;
+                            } elseif (file_exists($depmibfile)) {
+                                // Recurse until we find a file with no dependencies
+                                $this->loadDependencies($depmibfile, $mibdirs);
+
+                                // Then load this mib file once we have all dependencied loaded
+                                if (snmp_read_mib($depmibfile)) {
+                                    $this->mibFilesLoaded[$depmibfile] = true;
+                                    break;
+                                } else {
+                                    Log::debug("Failed to load SNMP MIB $depmibfile");
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                Log::debug('IMPORT section has no files');
             }
         }
     }
