@@ -6693,7 +6693,7 @@
             "units": "Workers"
         },
         "service_poller_frequency": {
-            "default": null,
+            "default": 300,
             "group": "poller",
             "section": "dispatcherservice",
             "order": 7,
