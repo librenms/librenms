@@ -1,11 +1,11 @@
 -- *****************************************************************
 -- CISCO-GNSS-MIB.my: Cisco GNSS MIB
---   
+--
 -- July 2021, Antony Wallace
---   
+--
 -- Copyright (c) 2021 by Cisco Systems, Inc.
 -- All rights reserved.
---   
+--
 -- *****************************************************************
 
 CISCO-GNSS-MIB DEFINITIONS ::= BEGIN
@@ -46,7 +46,7 @@ ciscoGnssMIB MODULE-IDENTITY
     DESCRIPTION
         "The MIB module for GNSS
 
-        Overview of GNSS 
+        Overview of GNSS
 
         GNSS (Global Navigation Satellite System) is used to describe
         the collection of Satellite Systems that are operating or
@@ -208,7 +208,7 @@ cGnssModuleLockStatus OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object specifies GNSS module lock status" 
+        "This object specifies GNSS module lock status"
     ::= { ciscoGnssMIBObjects 1 }
 
 cGnssModulePresenceStatus OBJECT-TYPE
@@ -216,7 +216,7 @@ cGnssModulePresenceStatus OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object specifies GNSS module presence status" 
+        "This object specifies GNSS module presence status"
     ::= { ciscoGnssMIBObjects 2 }
 
 cGnssModuleSlotInfo OBJECT-TYPE
@@ -225,7 +225,7 @@ cGnssModuleSlotInfo OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object specifies slot information where the GNSS module is
-        inserted" 
+        inserted"
     ::= { ciscoGnssMIBObjects 3 }
 
 cGnssModuleSlotState OBJECT-TYPE
@@ -234,7 +234,7 @@ cGnssModuleSlotState OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object specifies state of the RSP (active/standby) where
-        the GNSS module is inserted." 
+        the GNSS module is inserted."
     ::= { ciscoGnssMIBObjects 4 }
 
 cGnssSatelliteVisibilityStatus OBJECT-TYPE
@@ -246,7 +246,7 @@ cGnssSatelliteVisibilityStatus OBJECT-TYPE
         tracking minimum 3 satellites with more than 30dBM then good,
         if
         not bad."
-    DEFVAL          { 2 } 
+    DEFVAL          { 2 }
     ::= { ciscoGnssMIBObjects 5 }
 
 cGnssModuleSatelliteCount OBJECT-TYPE
@@ -256,7 +256,7 @@ cGnssModuleSatelliteCount OBJECT-TYPE
     DESCRIPTION
         "This object specifies the count of satellite tracked by GNSS
         module"
-    DEFVAL          { 0 } 
+    DEFVAL          { 0 }
     ::= { ciscoGnssMIBObjects 6 }
 
 cGnssModuleSvIdSNR OBJECT-TYPE
@@ -265,7 +265,7 @@ cGnssModuleSvIdSNR OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object specifies the SNR value and satellite id for each
-        visible satellite." 
+        visible satellite."
     ::= { ciscoGnssMIBObjects 7 }
 
 cGnssModuleSCAlarmStatus OBJECT-TYPE
@@ -274,7 +274,7 @@ cGnssModuleSCAlarmStatus OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object specifies GNSS module short-circuit alarm status"
-    DEFVAL          { 2 } 
+    DEFVAL          { 2 }
     ::= { ciscoGnssMIBObjects 8 }
 
 cGnssModuleOCAlarmStatus OBJECT-TYPE
@@ -283,7 +283,7 @@ cGnssModuleOCAlarmStatus OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object specifies GNSS module open-circuit alarm status"
-    DEFVAL          { 2 } 
+    DEFVAL          { 2 }
     ::= { ciscoGnssMIBObjects 9 }
 
 -- Default Notification Type
@@ -447,152 +447,152 @@ END
 
 -- %DNP%  MRS -with approver MRS
 
--- %DNP%  MOS -ciscoGnssMIB MOS 
+-- %DNP%  MOS -ciscoGnssMIB MOS
 
--- %DNP%  MOS -OpenCircuitAlarmStatus MOS 
+-- %DNP%  MOS -OpenCircuitAlarmStatus MOS
 
--- %DNP%  MOS -ShortCircuitAlarmStatus MOS 
+-- %DNP%  MOS -ShortCircuitAlarmStatus MOS
 
--- %DNP%  MOS -SVCnt MOS 
+-- %DNP%  MOS -SVCnt MOS
 
--- %DNP%  MOS -GnssSvVisibilityStatus MOS 
+-- %DNP%  MOS -GnssSvVisibilityStatus MOS
 
--- %DNP%  MOS -SlotState MOS 
+-- %DNP%  MOS -SlotState MOS
 
--- %DNP%  MOS -SlotInfo MOS 
+-- %DNP%  MOS -SlotInfo MOS
 
--- %DNP%  MOS -GnssModuleLockStatus MOS 
+-- %DNP%  MOS -GnssModuleLockStatus MOS
 
--- %DNP%  MOS -GnssModulePresenceStatus MOS 
+-- %DNP%  MOS -GnssModulePresenceStatus MOS
 
--- %DNP%  MOS -ciscoGnssMIBNotifs MOS 
+-- %DNP%  MOS -ciscoGnssMIBNotifs MOS
 
--- %DNP%  MOS -ciscoGnssMIBObjects MOS 
+-- %DNP%  MOS -ciscoGnssMIBObjects MOS
 
--- %DNP%  MOS -ciscoGnssMIBConform MOS 
+-- %DNP%  MOS -ciscoGnssMIBConform MOS
 
--- %DNP%  MOS -cGnssModuleLockStatus MOS 
+-- %DNP%  MOS -cGnssModuleLockStatus MOS
 
--- %DNP%  MOS -cGnssModulePresenceStatus MOS 
+-- %DNP%  MOS -cGnssModulePresenceStatus MOS
 
--- %DNP%  MOS -cGnssModuleSlotInfo MOS 
+-- %DNP%  MOS -cGnssModuleSlotInfo MOS
 
--- %DNP%  MOS -cGnssModuleSlotState MOS 
+-- %DNP%  MOS -cGnssModuleSlotState MOS
 
--- %DNP%  MOS -cGnssSatelliteVisibilityStatus MOS 
+-- %DNP%  MOS -cGnssSatelliteVisibilityStatus MOS
 
--- %DNP%  MOS -cGnssModuleSatelliteCount MOS 
+-- %DNP%  MOS -cGnssModuleSatelliteCount MOS
 
--- %DNP%  MOS -cGnssModuleSvIdSNR MOS 
+-- %DNP%  MOS -cGnssModuleSvIdSNR MOS
 
--- %DNP%  MOS -cGnssModuleSCAlarmStatus MOS 
+-- %DNP%  MOS -cGnssModuleSCAlarmStatus MOS
 
--- %DNP%  MOS -cGnssModuleOCAlarmStatus MOS 
+-- %DNP%  MOS -cGnssModuleOCAlarmStatus MOS
 
--- %DNP%  MOS -ciscoGnssModuleLockStatus MOS 
+-- %DNP%  MOS -ciscoGnssModuleLockStatus MOS
 
--- %DNP%  MOS -ciscoGnssModuleLockClear MOS 
+-- %DNP%  MOS -ciscoGnssModuleLockClear MOS
 
--- %DNP%  MOS -ciscoGnssModulePresenceStatus MOS 
+-- %DNP%  MOS -ciscoGnssModulePresenceStatus MOS
 
--- %DNP%  MOS -ciscoGnssModulePresenceClear MOS 
+-- %DNP%  MOS -ciscoGnssModulePresenceClear MOS
 
--- %DNP%  MOS -ciscoGnssAntennaSCAlarmStatus MOS 
+-- %DNP%  MOS -ciscoGnssAntennaSCAlarmStatus MOS
 
--- %DNP%  MOS -ciscoGnssAntennaSCAlarmClear MOS 
+-- %DNP%  MOS -ciscoGnssAntennaSCAlarmClear MOS
 
--- %DNP%  MOS -ciscoGnssAntennaOCAlarmStatus MOS 
+-- %DNP%  MOS -ciscoGnssAntennaOCAlarmStatus MOS
 
--- %DNP%  MOS -ciscoGnssAntennaOCAlarmClear MOS 
+-- %DNP%  MOS -ciscoGnssAntennaOCAlarmClear MOS
 
--- %DNP%  MOS -ciscoGnssSatelliteVisibilityStatus MOS 
+-- %DNP%  MOS -ciscoGnssSatelliteVisibilityStatus MOS
 
--- %DNP%  MOS -ciscoGnssSatelliteVisibilityClear MOS 
+-- %DNP%  MOS -ciscoGnssSatelliteVisibilityClear MOS
 
--- %DNP%  MOS -ciscoGnssMIBCompliances MOS 
+-- %DNP%  MOS -ciscoGnssMIBCompliances MOS
 
--- %DNP%  MOS -ciscoGnssMIBGroups MOS 
+-- %DNP%  MOS -ciscoGnssMIBGroups MOS
 
--- %DNP%  MOS -ciscoGnssMIBCompliance MOS 
+-- %DNP%  MOS -ciscoGnssMIBCompliance MOS
 
--- %DNP%  MOS -ciscoGnssMIBMainObjectGroup MOS 
+-- %DNP%  MOS -ciscoGnssMIBMainObjectGroup MOS
 
--- %DNP%  MOS -ciscoGnssMIBNotificationGroup MOS 
+-- %DNP%  MOS -ciscoGnssMIBNotificationGroup MOS
 
--- %DNP%  MOS -ciscoGnssMIB MOS 
+-- %DNP%  MOS -ciscoGnssMIB MOS
 
--- %DNP%  MOS -OpenCircuitAlarmStatus MOS 
+-- %DNP%  MOS -OpenCircuitAlarmStatus MOS
 
--- %DNP%  MOS -ShortCircuitAlarmStatus MOS 
+-- %DNP%  MOS -ShortCircuitAlarmStatus MOS
 
--- %DNP%  MOS -SVCnt MOS 
+-- %DNP%  MOS -SVCnt MOS
 
--- %DNP%  MOS -GnssSvVisibilityStatus MOS 
+-- %DNP%  MOS -GnssSvVisibilityStatus MOS
 
--- %DNP%  MOS -SlotState MOS 
+-- %DNP%  MOS -SlotState MOS
 
--- %DNP%  MOS -SlotInfo MOS 
+-- %DNP%  MOS -SlotInfo MOS
 
--- %DNP%  MOS -GnssModuleLockStatus MOS 
+-- %DNP%  MOS -GnssModuleLockStatus MOS
 
--- %DNP%  MOS -GnssModulePresenceStatus MOS 
+-- %DNP%  MOS -GnssModulePresenceStatus MOS
 
--- %DNP%  MOS -ciscoGnssMIBNotifs MOS 
+-- %DNP%  MOS -ciscoGnssMIBNotifs MOS
 
--- %DNP%  MOS -ciscoGnssModuleLockStatus MOS 
+-- %DNP%  MOS -ciscoGnssModuleLockStatus MOS
 
--- %DNP%  MOS -ciscoGnssModuleLockClear MOS 
+-- %DNP%  MOS -ciscoGnssModuleLockClear MOS
 
--- %DNP%  MOS -ciscoGnssModulePresenceStatus MOS 
+-- %DNP%  MOS -ciscoGnssModulePresenceStatus MOS
 
--- %DNP%  MOS -ciscoGnssModulePresenceClear MOS 
+-- %DNP%  MOS -ciscoGnssModulePresenceClear MOS
 
--- %DNP%  MOS -ciscoGnssAntennaSCAlarmStatus MOS 
+-- %DNP%  MOS -ciscoGnssAntennaSCAlarmStatus MOS
 
--- %DNP%  MOS -ciscoGnssAntennaSCAlarmClear MOS 
+-- %DNP%  MOS -ciscoGnssAntennaSCAlarmClear MOS
 
--- %DNP%  MOS -ciscoGnssAntennaOCAlarmStatus MOS 
+-- %DNP%  MOS -ciscoGnssAntennaOCAlarmStatus MOS
 
--- %DNP%  MOS -ciscoGnssAntennaOCAlarmClear MOS 
+-- %DNP%  MOS -ciscoGnssAntennaOCAlarmClear MOS
 
--- %DNP%  MOS -ciscoGnssSatelliteVisibilityStatus MOS 
+-- %DNP%  MOS -ciscoGnssSatelliteVisibilityStatus MOS
 
--- %DNP%  MOS -ciscoGnssSatelliteVisibilityClear MOS 
+-- %DNP%  MOS -ciscoGnssSatelliteVisibilityClear MOS
 
--- %DNP%  MOS -ciscoGnssMIBObjects MOS 
+-- %DNP%  MOS -ciscoGnssMIBObjects MOS
 
--- %DNP%  MOS -cGnssModuleLockStatus MOS 
+-- %DNP%  MOS -cGnssModuleLockStatus MOS
 
--- %DNP%  MOS -cGnssModulePresenceStatus MOS 
+-- %DNP%  MOS -cGnssModulePresenceStatus MOS
 
--- %DNP%  MOS -cGnssModuleSlotInfo MOS 
+-- %DNP%  MOS -cGnssModuleSlotInfo MOS
 
--- %DNP%  MOS -cGnssModuleSlotState MOS 
+-- %DNP%  MOS -cGnssModuleSlotState MOS
 
--- %DNP%  MOS -cGnssSatelliteVisibilityStatus MOS 
+-- %DNP%  MOS -cGnssSatelliteVisibilityStatus MOS
 
--- %DNP%  MOS -cGnssModuleSatelliteCount MOS 
+-- %DNP%  MOS -cGnssModuleSatelliteCount MOS
 
--- %DNP%  MOS -cGnssModuleSvIdSNR MOS 
+-- %DNP%  MOS -cGnssModuleSvIdSNR MOS
 
--- %DNP%  MOS -cGnssModuleSCAlarmStatus MOS 
+-- %DNP%  MOS -cGnssModuleSCAlarmStatus MOS
 
--- %DNP%  MOS -cGnssModuleOCAlarmStatus MOS 
+-- %DNP%  MOS -cGnssModuleOCAlarmStatus MOS
 
--- %DNP%  MOS -ciscoGnssMIBConform MOS 
+-- %DNP%  MOS -ciscoGnssMIBConform MOS
 
--- %DNP%  MOS -ciscoGnssMIBCompliances MOS 
+-- %DNP%  MOS -ciscoGnssMIBCompliances MOS
 
--- %DNP%  MOS -ciscoGnssMIBCompliance MOS 
+-- %DNP%  MOS -ciscoGnssMIBCompliance MOS
 
--- %DNP%  MOS -ciscoGnssMIBGroups MOS 
+-- %DNP%  MOS -ciscoGnssMIBGroups MOS
 
--- %DNP%  MOS -ciscoGnssMIBMainObjectGroup MOS 
+-- %DNP%  MOS -ciscoGnssMIBMainObjectGroup MOS
 
--- %DNP%  MOS -ciscoGnssMIBNotificationGroup MOS 
+-- %DNP%  MOS -ciscoGnssMIBNotificationGroup MOS
 
 -- %DNP%  MRC - SlotInfo~1~ - 2019060412:06 PST - sshabeen -2.0 -UNACK
 -- %DNP%  - Remove the keyword testbed.
 -- %DNP%
--- %DNP% -0 MRC 
+-- %DNP% -0 MRC
 
