@@ -9375,7 +9375,7 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 9
+			count: 11
 			path: includes/polling/bgp-peers.inc.php
 
 		-
