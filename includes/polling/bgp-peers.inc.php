@@ -807,25 +807,22 @@ if (! empty($peers)) {
                             foreach ($safis_map as $timos_safi => $timos_oids) {
                                 $recv_oid = $timos_oids[0];
                                 $sent_oid = $timos_oids[1];
-                                $recv_data = SnmpQuery::enumStrings()->walk($recv_oid)->valuesByIndex();
-                                $sent_data = SnmpQuery::enumStrings()->walk($sent_oid)->valuesByIndex();
+                                $recv_data = snmpwalk_cache_oid($device, $recv_oid, [], 'TIMETRA-BGP-MIB');
+                                $sent_data = snmpwalk_cache_oid($device, $sent_oid, [], 'TIMETRA-BGP-MIB');
                                 foreach ($recv_data as $index => $recv_val) {
-                                        d_echo("TIMOS DEBUG index=$index\n");
                                     $parts = explode('.', (string) $index);
                                     if (count($parts) < 3) {
                                         continue;
                                     }
                                     if ($parts[1] === 'ipv6') {
-                                        // IPv6: index = vrfOid.ipv6.16.o1.o2...o16
-                                        $hex_addr = implode('', array_map(fn($o) => sprintf('%02x', $o), array_slice($parts, 3)));
+                                        $hex_addr = str_replace(':', '', trim($parts[2], '"'));
                                         try {
                                             $addr = IP::fromHexString($hex_addr)->compressed();
                                         } catch (\LibreNMS\Exceptions\InvalidIpException) {
                                             continue;
                                         }
                                     } else {
-                                        // IPv4: index = vrfOid.ipv4.4.o1.o2.o3.o4
-                                        $addr = implode('.', array_slice($parts, 3));
+                                        $addr = implode('.', array_slice($parts, 2));
                                     }
                                     $recv_val = is_array($recv_val) ? reset($recv_val) : $recv_val;
                                     $sent_val = isset($sent_data[$index])
