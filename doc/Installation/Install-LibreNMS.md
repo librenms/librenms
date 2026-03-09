@@ -165,10 +165,24 @@ timedatectl set-timezone Etc/UTC
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
+    
+    Within the `[mysqld]` section add:
+
+    ```
+    innodb_file_per_table=1
+    lower_case_table_names=0
+    ```
 
 === "Ubuntu 22.04"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
+    ```
+
+    Within the `[mysqld]` section add:
+
+    ```
+    innodb_file_per_table=1
+    lower_case_table_names=0
     ```
 
 === "CentOS 8"
@@ -176,22 +190,37 @@ timedatectl set-timezone Etc/UTC
     vi /etc/my.cnf.d/mariadb-server.cnf
     ```
 
+    Within the `[mysqld]` section add:
+
+    ```
+    innodb_file_per_table=1
+    lower_case_table_names=0
+    ```
+
 === "Debian 12"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
+
+    Within the `[mysqld]` section add:
+
+    ```
+    innodb_file_per_table=1
+    lower_case_table_names=0
+    ```    
 
 === "Debian 13"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
 
-Within the `[mysqld]` section add:
+    Within the `[mariadbd]` section add:
 
-```
-innodb_file_per_table=1
-lower_case_table_names=0
-```
+    ```
+    innodb_file_per_table=1
+    lower_case_table_names=0
+    ```
+
 
 Then restart MariaDB
 

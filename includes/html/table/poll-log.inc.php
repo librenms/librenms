@@ -1,6 +1,7 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\Time;
 
 $param = [];
 $sql = ' FROM `devices` AS D ';
@@ -56,8 +57,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT D.device_id, L.location as `location`, D.hostname AS `hostname`, D.sysName, IFNULL(CONVERT_TZ(D.last_polled, @@global.time_zone, ?),D.last_polled) AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
-array_unshift($param, session('preferences.timezone'));
+$sql = "SELECT D.device_id, L.location as `location`, D.hostname AS `hostname`, D.sysName, D.last_polled AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
 
 foreach (dbFetchRows($sql, $param) as $device) {
     if (empty($device['group_name'])) {
@@ -65,7 +65,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
     }
     $response[] = [
         'hostname' => generate_device_link($device, null, ['tab' => 'graphs', 'group' => 'poller']),
-        'last_polled' => $device['last_polled'],
+        'last_polled' => Time::format($device['last_polled'], 'compact'),
         'poller_group' => $device['group_name'],
         'location' => $device['location'],
         'last_polled_timetaken' => round($device['last_polled_timetaken'], 2),

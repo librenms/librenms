@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSsrDiscovery;
@@ -50,7 +51,7 @@ class Ptp670 extends OS implements
 
         return [
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 $transmit,
                 'ptp670-tx',
@@ -61,7 +62,7 @@ class Ptp670 extends OS implements
                 10
             ),
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 $receive,
                 'ptp670-rx',
@@ -90,7 +91,7 @@ class Ptp670 extends OS implements
 
         return [
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 $receive,
                 'ptp670-rx-rate',
@@ -101,7 +102,7 @@ class Ptp670 extends OS implements
                 1
             ),
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 $transmit,
                 'ptp670-tx-rate',
@@ -112,7 +113,7 @@ class Ptp670 extends OS implements
                 1
             ),
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 $aggregate,
                 'ptp670-ag-rate',
@@ -123,7 +124,7 @@ class Ptp670 extends OS implements
                 1
             ),
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 $txModulation,
                 'ptp670-tx-mod',
@@ -132,7 +133,7 @@ class Ptp670 extends OS implements
                 null
             ),
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 $rxModulation,
                 'ptp670-rx-mod',
@@ -155,7 +156,7 @@ class Ptp670 extends OS implements
 
         return [
             new WirelessSensor(
-                'ssr',
+                WirelessSensorType::Ssr,
                 $this->getDeviceId(),
                 $ssr,
                 'ptp670',

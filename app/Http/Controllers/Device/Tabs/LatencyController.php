@@ -28,7 +28,6 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Smokeping;
@@ -57,9 +56,6 @@ class LatencyController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        $from = $request->input('dtpickerfrom', Carbon::now(session('preferences.timezone'))->subDays(2)->format(LibrenmsConfig::get('dateformat.byminute')));
-        $to = $request->input('dtpickerto', Carbon::now(session('preferences.timezone'))->format(LibrenmsConfig::get('dateformat.byminute')));
-
         $smokeping = new Smokeping($device);
         $smokeping_tabs = [];
         if ($smokeping->hasInGraph()) {
@@ -70,8 +66,6 @@ class LatencyController implements DeviceTab
         }
 
         return [
-            'from' => $from,
-            'to' => $to,
             'smokeping' => $smokeping,
             'smokeping_tabs' => $smokeping_tabs,
         ];

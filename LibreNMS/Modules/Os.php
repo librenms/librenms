@@ -103,12 +103,12 @@ class Os implements Module
             }
 
             // handle legacy variables, sometimes they are false
-            $deviceModel->version = ($version ?? $deviceModel->version) ?: null;
-            $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null;
-            $deviceModel->features = ($features ?? $deviceModel->features) ?: null;
-            $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
+            $deviceModel->version = ($version ?? $deviceModel->version) ?: null; // @phpstan-ignore nullCoalesce.variable (set by include)
+            $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null; // @phpstan-ignore nullCoalesce.variable (set by include)
+            $deviceModel->features = ($features ?? $deviceModel->features) ?: null; // @phpstan-ignore nullCoalesce.variable (set by include)
+            $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null; // @phpstan-ignore nullCoalesce.variable (set by include)
 
-            if (! empty($location)) { // legacy support, remove when no longer needed
+            if (! empty($location)) { // legacy support, remove when no longer needed // @phpstan-ignore empty.variable (set by include)
                 $deviceModel->setLocation($location);
                 $deviceModel->location?->save();
             }

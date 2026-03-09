@@ -133,8 +133,9 @@ class ComposerHelper
             'group' => '',
         ];
 
-        if (file_exists('config.php')) {
-            @include 'config.php';
+        $config_file = realpath('config.php');
+        if ($config_file !== false) {
+            @include $config_file;
         }
 
         try {

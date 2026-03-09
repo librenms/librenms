@@ -734,8 +734,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -1563,9 +1563,6 @@ return [
             'description' => 'File name suffix',
             'help' => 'This is a very important bit as device names in NfSen are limited to 21 characters. This means full domain names for devices can be very problematic to squeeze in, so therefor this chunk is usually removed.',
         ],
-        'nmap' => [
-            'description' => 'Path to nmap',
-        ],
         'no_proxy' => [
             'description' => 'Proxy Exceptions',
             'help' => 'Set this as a fallback if no_proxy environment variable is not available. Comma seperated list of IPs, hosts or domains to ignore.',
@@ -1687,9 +1684,6 @@ return [
             'description' => 'Bad Interface ifType',
             'help' => 'Network interface IF-MIB:!:ifType which should be ignored',
         ],
-        'ping' => [
-            'description' => 'Path to ping',
-        ],
         'ping_rrd_step' => [
             'description' => 'Ping Frequency',
             'help' => 'How often to check. Sets the default value for all nodes. Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
@@ -1770,7 +1764,7 @@ return [
             'slas' => [
                 'description' => 'Service Level Agreement Tracking',
             ],
-            'cisco-mac-accounting' => [
+            'mac-accounting' => [
                 'description' => 'Cisco MAC Accounting',
             ],
             'cipsec-tunnels' => [
@@ -2476,9 +2470,6 @@ return [
         'device_stats_avg_factor' => [
             'description' => 'Averaging factor',
             'help' => 'We calculate a moving average using an exponential weighted moving average function.  This is the factor used by the function to control how much the current value affects the average.  Values closer to 1 will make the average change quicker.',
-        ],
-        'whois' => [
-            'description' => 'Path to whois',
         ],
         'smokeping.integration' => [
             'description' => 'Enable',
