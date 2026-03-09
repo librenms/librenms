@@ -12,4 +12,4 @@
  */
 
 echo 'tlUpsSnmpCardSerialNum ';
-$pre_cache['poweralert_serial'] = trim(SnmpQuery::get('.1.3.6.1.4.1.850.100.1.1.4.0')->value(), '"');
+$pre_cache['poweralert_serial'] = trim((string) SnmpQuery::get('.1.3.6.1.4.1.850.100.1.1.4.0')->value(), '"');

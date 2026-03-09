@@ -8,7 +8,7 @@ switch ($device['sysObjectID']) {
     case '.1.3.6.1.4.1.674.10895.3017': /* Dell Powerconnect 3548 */
     case '.1.3.6.1.4.1.674.10895.3019': /* Dell Powerconnect 3548P */
     case '.1.3.6.1.4.1.674.10895.3028': /* Dell Powerconnect 2848 */
-        $temperature = trim(SnmpQuery::get('.1.3.6.1.4.1.89.53.15.1.9.1')->value());
+        $temperature = trim((string) SnmpQuery::get('.1.3.6.1.4.1.89.53.15.1.9.1')->value());
         discover_sensor(null, 'temperature', $device, '.1.3.6.1.4.1.89.53.15.1.9.1', 0, 'powerconnect', 'Internal Temperature', '1', '1', '0', null, null, '45', $temperature);
         break;
     default:

@@ -23,7 +23,7 @@ foreach (explode("\n", $oids) as $data) {
             $lowwarnlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.9.$temperature_id";
             $lowlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.10.$temperature_id";
 
-            $descr = trim(SnmpQuery::get($descr_oid)->value(), '"');
+            $descr = trim((string) SnmpQuery::get($descr_oid)->value(), '"');
             $temperature = SnmpQuery::get($temperature_oid)->value();
             $lowwarnlimit = SnmpQuery::get($lowwarnlimit_oid)->value();
             $warnlimit = SnmpQuery::get($warnlimit_oid)->value();

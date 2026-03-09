@@ -26,7 +26,7 @@
 
 // voltage
 
-$mainVoltage = trim(SnmpQuery::get('.1.3.6.1.4.1.7428.1.2.2.1.1.2.1')->value(), '" ');
+$mainVoltage = trim((string) SnmpQuery::get('.1.3.6.1.4.1.7428.1.2.2.1.1.2.1')->value(), '" ');
 
 if (! empty($mainVoltage)) {
     $divisor = 1;

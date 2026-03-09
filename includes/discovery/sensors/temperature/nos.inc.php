@@ -24,7 +24,7 @@ if ($oids = snmp_walk($device, '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2', '-Osqn')) {
             $descr_oid = '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5.' . $oididx;
             $value = SnmpQuery::get($value_oid)->value();
             $descr = SnmpQuery::get($descr_oid)->value();
-            if (! strstr($descr, 'No') and ! strstr($value, 'No')) {
+            if (! strstr((string) $descr, 'No') and ! strstr((string) $value, 'No')) {
                 $descr = str_replace('"', '', $descr);
                 $descr = trim($descr);
                 discover_sensor(null, 'temperature', $device, $value_oid, $oididx, 'nos', $descr, '1', '1', null, null, '80', '100', $value);

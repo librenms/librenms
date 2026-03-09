@@ -27,7 +27,7 @@
 // Output Current
 // SNMPv2-SMI::enterprises.39145.11.8.0 = STRING: "0.4" -- outputCurrent
 
-$outputCurrent = trim(SnmpQuery::get('ICT-PLATINUM-MIB::outputCurrent.0')->value(), '" ');
+$outputCurrent = trim((string) SnmpQuery::get('ICT-PLATINUM-MIB::outputCurrent.0')->value(), '" ');
 if (! empty($outputCurrent)) {
     $divisor = 1;
     $index = 0;
