@@ -12,15 +12,13 @@
 XCP-NG-VMINFO-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64,
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
     enterprises
         FROM SNMPv2-SMI
     DisplayString
-        FROM SNMPv2-TC
-    MODULE-COMPLIANCE, OBJECT-GROUP
-        FROM SNMPv2-CONF;
+        FROM SNMPv2-TC;
 
-xcpNgVmInfoMIB MODULE-IDENTITY
+xcpNgVmInfo MODULE-IDENTITY
     LAST-UPDATED "202602260000Z"
     ORGANIZATION "LibreNMS"
     CONTACT-INFO
@@ -178,7 +176,7 @@ xcpNgVmCpus OBJECT-TYPE
     ::= { xcpNgVmEntry 10 }
 
 xcpNgVmUUID OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (0..255))
+    SYNTAX      DisplayString (SIZE (0..36))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION

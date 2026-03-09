@@ -61,7 +61,7 @@ trait VminfoXcpNg
 
             $state = match ((int) $data['xcpNgVmState']) {
                 1 => PowerState::ON,
-                2 => PowerState::OFF,
+                2, 5 => PowerState::OFF,
                 3, 4 => PowerState::SUSPENDED,
                 default => PowerState::UNKNOWN,
             };
