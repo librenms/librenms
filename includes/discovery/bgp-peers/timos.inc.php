@@ -190,7 +190,7 @@ if ($device['os'] == 'timos') {
 
             // Parse the peer IP address from octets (skip vrfOid, addrType, addrLen)
             if ($peer_addr_type === 'ipv6') {
-                $hex_addr = implode('', array_map(fn($o) => sprintf('%02x', $o), array_slice($parts, 3)));
+                $hex_addr = implode('', array_map(fn ($o) => sprintf('%02x', $o), array_slice($parts, 3)));
                 try {
                     $address = IP::fromHexString($hex_addr)->compressed();
                 } catch (\LibreNMS\Exceptions\InvalidIpException) {
