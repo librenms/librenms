@@ -46,7 +46,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
     private array $mibs = [];
     private Device $device;
     private \SNMP $snmp;
-    private NetSnmpQuery $netsnmp;
+    private readonly NetSnmpQuery $netsnmp;
 
     public function __construct()
     {
@@ -406,7 +406,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         }
 
         foreach ($oids as $oid) {
-            [$mib, $what] = explode('::', $oid, 2);
+            [$mib, $what] = explode('::', (string) $oid, 2);
 
             if ($what && ! in_array($mib, $this->mibs)) {
                 if (Debug::isVerbose()) {
