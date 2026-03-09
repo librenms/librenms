@@ -171,7 +171,7 @@ if ($device['os'] == 'timos') {
         foreach ($recv_data as $index => $recv_entry) {
             $index_str = (string) $index;
             $index_part = str_starts_with($index_str, $oid_prefix . '.')
-                ? substr($index_str, strlen($oid_prefix) + 1)
+                ? substr($index_str, strlen((string) $oid_prefix) + 1)
                 : $index_str;
             $parts = explode('.', $index_part);
 
