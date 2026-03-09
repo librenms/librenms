@@ -132,6 +132,8 @@ return [
         'PowerNet-MIB::rPDUNearOverloadCleared' => LibreNMS\Snmptrap\Handlers\ApcPduNearOverloadCleared::class,
         'PowerNet-MIB::rPDUOverload' => LibreNMS\Snmptrap\Handlers\ApcPduOverload::class,
         'PowerNet-MIB::rPDUOverloadCleared' => LibreNMS\Snmptrap\Handlers\ApcPduOverloadCleared::class,
+        'PowerNet-MIB::upsDischarged' => LibreNMS\Snmptrap\Handlers\ApcUpsDischarged::class,
+        'PowerNet-MIB::dischargeCleared' => LibreNMS\Snmptrap\Handlers\ApcDischargeCleared::class,
         'PowerNet-MIB::upsOnBattery' => LibreNMS\Snmptrap\Handlers\ApcOnBattery::class,
         'PowerNet-MIB::powerRestored' => LibreNMS\Snmptrap\Handlers\ApcPowerRestored::class,
         'PowerNet-MIB::smartAvrReducing' => LibreNMS\Snmptrap\Handlers\ApcSmartAvrReducing::class,
