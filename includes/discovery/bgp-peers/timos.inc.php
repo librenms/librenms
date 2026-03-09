@@ -164,23 +164,42 @@ if ($device['os'] == 'timos') {
 
         d_echo("Nokia TIMOS: Processing OID key=$oid_key, entries=" . count($recv_data) . "\n");
 
+        // Strip OID prefix to get just the table index: vrfOid.addrType.addrLen.octets
+        // SnmpQuery::numericIndex()->valuesByIndex() returns keys like "6527.3.1.2.14.4.8.1.5.1.1.4.x.x.x.x"
+        // (strips the leading "1.3.6.1.4.1." prefix)
+        $oid_prefix = preg_replace('#^\.?1\.3\.6\.1\.4\.1\.#', '', $oid_set['recv']);
         foreach ($recv_data as $index => $recv_entry) {
-            $parts = explode('.', (string) $index);
+            $index_str = (string) $index;
+            $index_part = str_starts_with($index_str, $oid_prefix . '.')
+                ? substr($index_str, strlen($oid_prefix) + 1)
+                : $index_str;
+            $parts = explode('.', $index_part);
 
-            if (count($parts) < 4) {
+            if (count($parts) < 6) {
                 d_echo("Nokia TIMOS: Skipping malformed index: $index\n");
                 continue;
             }
 
-            $peer_addr_type = $parts[1];
+            // parts: [vrfOid, addrType(1=ipv4/2=ipv6), addrLen, octets...]
+            $peer_addr_type = $parts[1] === '1' ? 'ipv4' : ($parts[1] === '2' ? 'ipv6' : $parts[1]);
 
             if ($oid_set['filter'] !== null && $peer_addr_type !== $oid_set['filter']) {
                 d_echo("Nokia TIMOS: Skipping index=$index (peer addr_type=$peer_addr_type, expected={$oid_set['filter']}) — Nokia firmware bug row, ignoring\n");
                 continue;
             }
 
-            // Parse the peer IP address directly from the OID index
-            $address = implode('.', array_slice($parts, 2));
+            // Parse the peer IP address from octets (skip vrfOid, addrType, addrLen)
+            if ($peer_addr_type === 'ipv6') {
+                $hex_addr = implode('', array_map(fn($o) => sprintf('%02x', $o), array_slice($parts, 3)));
+                try {
+                    $address = IP::fromHexString($hex_addr)->compressed();
+                } catch (\LibreNMS\Exceptions\InvalidIpException) {
+                    d_echo("Nokia TIMOS: Skipping non-IP entry in prefix walk: $index\n");
+                    continue;
+                }
+            } else {
+                $address = implode('.', array_slice($parts, 3));
+            }
             if (strlen($address) > 15) {
                 try {
                     $address = IP::fromSnmpString($address)->compressed();
