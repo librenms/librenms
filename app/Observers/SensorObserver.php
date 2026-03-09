@@ -55,16 +55,16 @@ class SensorObserver
     public function updating(Sensor $sensor)
     {
         // prevent update of limits
-        if ($sensor->sensor_custom == 'Yes') {
+        if ($sensor->sensor_custom === 'Yes') {
             // if custom is set to yes (future someone's problem to allow ui to update this with eloquent)
             $sensor->sensor_limit = $sensor->getOriginal('sensor_limit');
             $sensor->sensor_limit_warn = $sensor->getOriginal('sensor_limit_warn');
             $sensor->sensor_limit_low_warn = $sensor->getOriginal('sensor_limit_low_warn');
             $sensor->sensor_limit_low = $sensor->getOriginal('sensor_limit_low');
-        } elseif ($sensor->sensor_custom == 'Reset') {
+        } elseif ($sensor->sensor_custom === 'Reset') {
             self::calculateLimits($sensor);
             $sensor->sensor_custom = 'No';
-        } elseif ($sensor->sensor_custom == 'Saving') {
+        } elseif ($sensor->sensor_custom === 'Saving') {
             $sensor->sensor_custom = 'Yes';
         } else {
             // change unset sensor limits to current values

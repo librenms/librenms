@@ -19,10 +19,6 @@
                     <th></th>
                 </tr>
                 @foreach ($sensors as $sensor)
-                    @php
-                        $alertChecked = $sensor->sensor_alert == 1;
-                        $customDisabledClass = $sensor->sensor_custom === 'Yes' ? '' : 'disabled';
-                    @endphp
                     <tr>
                         <td>{{ $sensor->sensor_class }}</td>
                         <td>{{ $sensor->sensor_type }}</td>
@@ -41,6 +37,7 @@
                                        data-device_id="{{ $sensor->device_id }}"
                                        data-value_type="sensor_limit"
                                        data-sensor_id="{{ $sensor->sensor_id }}"
+                                       data-update-url="{{ route('device.edit.health.sensor.update', [$device, $sensor]) }}"
                                        value="{{ $sensor->sensor_limit }}">
                             </div>
                         </td>
@@ -52,6 +49,7 @@
                                        data-device_id="{{ $sensor->device_id }}"
                                        data-value_type="sensor_limit_warn"
                                        data-sensor_id="{{ $sensor->sensor_id }}"
+                                       data-update-url="{{ route('device.edit.health.sensor.update', [$device, $sensor]) }}"
                                        value="{{ $sensor->sensor_limit_warn }}">
                             </div>
                         </td>
@@ -63,6 +61,7 @@
                                        data-device_id="{{ $sensor->device_id }}"
                                        data-value_type="sensor_limit_low_warn"
                                        data-sensor_id="{{ $sensor->sensor_id }}"
+                                       data-update-url="{{ route('device.edit.health.sensor.update', [$device, $sensor]) }}"
                                        value="{{ $sensor->sensor_limit_low_warn }}">
                             </div>
                         </td>
@@ -74,6 +73,7 @@
                                        data-device_id="{{ $sensor->device_id }}"
                                        data-value_type="sensor_limit_low"
                                        data-sensor_id="{{ $sensor->sensor_id }}"
+                                       data-update-url="{{ route('device.edit.health.sensor.update', [$device, $sensor]) }}"
                                        value="{{ $sensor->sensor_limit_low }}">
                             </div>
                         </td>
@@ -83,14 +83,16 @@
                                    data-device_id="{{ $sensor->device_id }}"
                                    data-sensor_id="{{ $sensor->sensor_id }}"
                                    data-sensor_desc="{{ $sensor->sensor_descr }}"
-                                   {{ $alertChecked ? 'checked' : '' }}>
+                                   data-alert-url="{{ route('device.edit.health.sensor.alert', [$device, $sensor]) }}"
+                                   {{ $sensor->sensor_alert == 1 ? 'checked' : '' }}>
                         </td>
                         <td>
                             <a type="button"
-                               class="btn btn-danger btn-sm {{ $customDisabledClass }} remove-custom"
+                               class="btn btn-danger btn-sm {{ $sensor->sensor_custom === 'Yes' ? '' : 'disabled' }} remove-custom"
                                id="remove-custom"
                                name="remove-custom"
-                               data-sensor_id="{{ $sensor->sensor_id }}">Reset</a>
+                               data-sensor_id="{{ $sensor->sensor_id }}"
+                               data-alert-url="{{ route('device.edit.health.sensor.alert', [$device, $sensor]) }}">Reset</a>
                         </td>
                     </tr>
                 @endforeach
@@ -101,11 +103,6 @@
             @csrf
             @foreach ($sensors as $sensor)
                 <input type="hidden" name="sensor_id[]" value="{{ $sensor->sensor_id }}">
-                <input type="hidden" name="sensor_limit[]" value="{{ $sensor->sensor_limit }}">
-                <input type="hidden" name="sensor_limit_warn[]" value="{{ $sensor->sensor_limit_warn }}">
-                <input type="hidden" name="sensor_limit_low_warn[]" value="{{ $sensor->sensor_limit_low_warn }}">
-                <input type="hidden" name="sensor_limit_low[]" value="{{ $sensor->sensor_limit_low }}">
-                <input type="hidden" name="sensor_alert[]" value="{{ $sensor->sensor_alert }}">
             @endforeach
             <button id="newThread" class="btn btn-primary btn-sm" type="submit">Reset values</button>
         </form>
@@ -156,11 +153,10 @@
             var $this = $(this);
             $.ajax({
                 type: 'POST',
-                url: '{{ route('device.edit.health.sensor.update', $device) }}',
+                url: $(this).data('update-url'),
                 data: {
                     device_id: device_id,
                     data: data,
-                    sensor_id: sensor_id,
                     value_type: value_type,
                     _token: '{{ csrf_token() }}'
                 },
@@ -188,10 +184,9 @@
             var sensor_desc = $(this).data('sensor_desc');
             $.ajax({
                 type: 'POST',
-                url: '{{ route('device.edit.health.sensor.alert', $device) }}',
+                url: $(this).data('alert-url'),
                 data: {
                     device_id: device_id,
-                    sensor_id: sensor_id,
                     sensor_desc: sensor_desc,
                     state: state,
                     _token: '{{ csrf_token() }}'
@@ -220,9 +215,8 @@
             var sensor_id = $(this).data('sensor_id');
             $.ajax({
                 type: 'POST',
-                url: '{{ route('device.edit.health.sensor.alert', $device) }}',
+                url: $(this).data('alert-url'),
                 data: {
-                    sensor_id: sensor_id,
                     sub_type: "remove-custom",
                     _token: '{{ csrf_token() }}'
                 },

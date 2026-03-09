@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Device;
 
 use App\Models\Device;
+use App\Models\Sensor;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -44,23 +45,17 @@ class EditHealthController
         return view('device.edit.health', [
             'device' => $device,
             'sensors' => $sensors,
-            'ajaxPrefix' => 'sensor',
         ]);
     }
 
     public function reset(Device $device, Request $request): JsonResponse
     {
-        $sensorIds = $request->input('sensor_id', []);
+        $validated = $request->validate([
+            'sensor_id' => 'required|array|min:1',
+            'sensor_id.*' => 'integer',
+        ]);
 
-        if (! is_array($sensorIds) || empty($sensorIds)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid sensor id',
-            ]);
-        }
-
-        $status = 'ok';
-        $message = 'No sensors to reset';
+        $sensorIds = $validated['sensor_id'];
 
         foreach ($sensorIds as $sensorId) {
             $sensor = $device->sensors()
@@ -72,67 +67,32 @@ class EditHealthController
                 // Clear custom flag and allow discovery to manage limits again
                 $sensor->sensor_custom = 'Reset';
 
-                if ($sensor->saveQuietly()) {
-                    $message = 'Sensor values reset';
-                    $status = 'ok';
-                } else {
-                    $message = 'Could not reset sensors values';
-                    $status = 'error';
+                if (!$sensor->saveQuietly()) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Could not reset sensors values',
+                    ]);
                 }
+                return response()->json([
+                    'status' => 'ok',
+                    'message' => 'Sensor values reset',
+                ]);
             }
         }
-
         return response()->json([
-            'status' => $status,
-            'message' => $message,
+            'status' => 'ok',
+            'message' => 'No sensors to reset',
         ]);
     }
 
-    public function update(Device $device, Request $request): JsonResponse
+    public function update(Device $device, Sensor $sensor, Request $request): JsonResponse
     {
-        $sensorId = $request->integer('sensor_id');
-        $valueType = $request->input('value_type');
-        $data = $request->input('data');
+        $validated = $request->validate([
+            'value_type' => 'required|in:sensor_limit,sensor_limit_warn,sensor_limit_low_warn,sensor_limit_low',
+            'data' => 'present',
+        ]);
 
-        $allowedColumns = [
-            'sensor_limit',
-            'sensor_limit_warn',
-            'sensor_limit_low_warn',
-            'sensor_limit_low',
-        ];
-
-        if (! in_array($valueType, $allowedColumns, true)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid value type',
-            ]);
-        }
-
-        if (! $sensorId) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Missing sensor id',
-            ]);
-        }
-
-        if ($data === null) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Missing data',
-            ]);
-        }
-
-        $sensor = $device->sensors()->where('sensor_id', $sensorId)
-            ->first();
-
-        if (! $sensor) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid sensor id',
-            ]);
-        }
-
-        $sensor->{$valueType} = self::nullIfEmpty($data);
+        $sensor->{$validated['value_type']} = self::nullIfEmpty($validated['data']);
         $sensor->sensor_custom = 'Saving';
         if ($sensor->save()) {
             return response()->json([
@@ -147,27 +107,15 @@ class EditHealthController
         ]);
     }
 
-    public function updateAlert(Device $device, Request $request): JsonResponse
+    public function updateAlert(Device $device, Sensor $sensor, Request $request): JsonResponse
     {
-        $subType = $request->input('sub_type');
-        $sensorId = $request->integer('sensor_id');
+        $validated = $request->validate([
+            'sub_type' => 'nullable|in:remove-custom',
+            'state' => 'nullable|boolean',
+            'sensor_desc' => 'nullable|string',
+        ]);
 
-        if (! $sensorId) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid sensor id',
-            ]);
-        }
-
-        $sensor = $device->sensors()->where('sensor_id', $sensorId)
-            ->first();
-
-        if (! $sensor) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Invalid sensor id',
-            ]);
-        }
+        $subType = $validated['sub_type'] ?? null;
 
         if ($subType) {
             $sensor->sensor_custom = 'Reset';
@@ -185,23 +133,10 @@ class EditHealthController
             ]);
         }
 
-        $stateString = 'disabled';
-        $rawState = $request->input('state');
-        $state = filter_var($rawState, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-
-        if ($state === null) {
-            $state = false;
-        }
-
-        if ($state) {
-            $stateValue = 1;
-            $stateString = 'enabled';
-        } else {
-            $stateValue = 0;
-        }
-
+        $state = (bool) ($validated['state'] ?? false);
+        $stateString = $state ? 'enabled' : 'disabled';
+        $sensorDesc = e($validated['sensor_desc'] ?? '');
         $sensor->sensor_alert = $state;
-        $sensorDesc = e($request->input('sensor_desc', ''));
 
         if ($sensor->save()) {
             return response()->json([
