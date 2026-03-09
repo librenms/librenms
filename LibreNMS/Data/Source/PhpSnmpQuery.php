@@ -50,7 +50,29 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
     public function __construct()
     {
-        $this->device = DeviceCache::getPrimary();
+        $this->device(DeviceCache::getPrimary(), false);
+
+        $this->loadMibs();
+
+        $this->netsnmp = new NetSnmpQuery();
+    }
+
+    /**
+     * Easy way to start a new instance
+     */
+    public static function make(): SnmpQueryInterface
+    {
+        return new static;
+    }
+
+    /**
+     * Specify a device to make the snmp query against.
+     * By default the query will use the primary device.
+     */
+    public function device(Device $device, bool $keepsettings = true): SnmpQueryInterface
+    {
+        $old_snmp = $keepsettings ? $this->snmp : null;
+        $this->device = $device;
 
         $snmpver = match ($this->device->snmpver) {
             'v1' => \SNMP::VERSION_1,
@@ -74,26 +96,14 @@ class PhpSnmpQuery implements SnmpQueryInterface
             $this->setSecurity(null);
         }
 
-        $this->loadMibs();
-
-        $this->netsnmp = new NetSnmpQuery();
-    }
-
-    /**
-     * Easy way to start a new instance
-     */
-    public static function make(): SnmpQueryInterface
-    {
-        return new static;
-    }
-
-    /**
-     * Specify a device to make the snmp query against.
-     * By default the query will use the primary device.
-     */
-    public function device(Device $device): SnmpQueryInterface
-    {
-        $this->device = $device;
+        // Copy settings from old SNMP object
+        if ($old_snmp) {
+            $this->snmp->oid_increasing_check = $old_snmp->oid_increasing_check;
+            $this->snmp->enum_print = $old_snmp->enum_print;
+            if ($old_snmp->oid_output_format) {
+                $this->snmp->oid_output_format = $old_snmp->oid_output_format;
+            }
+        }
 
         return $this;
     }
