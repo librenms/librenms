@@ -172,8 +172,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function abortOnFailure(): SnmpQueryInterface
     {
-        $this->abort = true;
-
+        // TODO: Maybe implement single walks if this is set?
         return $this;
     }
 
