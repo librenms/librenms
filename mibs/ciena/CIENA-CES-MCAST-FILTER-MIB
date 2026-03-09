@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-16-00-0047
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-06-00-5005
  --
  -- CIENA-CES-MCAST-FILTER-MIB.my
  --    
@@ -20,17 +20,20 @@
         FROM CIENA-SMI;
         
  cienaCesMcastFilterMIB MODULE-IDENTITY
-	LAST-UPDATED "201609300000Z"
-	ORGANIZATION "Ciena, Inc"
-	CONTACT-INFO
-                       "Mib Meister
-                        115 North Sullivan Road
-                        Spokane Valley, WA 99037
-                        USA            
-                        Phone:  +1 509 242 9000
-			Email:  support@ciena.com"
+       LAST-UPDATED "201706070000Z"
+       ORGANIZATION "Ciena Corp."
+       CONTACT-INFO
+       "   Mib Meister
+           7035 Ridge Road
+           Hanover, Maryland 21076
+           USA
+           Phone:  +1 800 921 1144
+           Email:  support@ciena.com"
        DESCRIPTION
 	                    "This module defines the IGMP Multicast SNMP objects."
+
+       REVISION    "201706070000Z"
+       DESCRIPTION "Updated contact info."
 
        REVISION    "201609300000Z"
        DESCRIPTION "Added objects cienaCesMcastIgmpQueryEngineOperState, 

@@ -110,7 +110,7 @@
         url: "{{ route('table.graylog', ) }}",
     });
 
-    init_select2("#stream", "graylog-streams", {}, @json($stream));
-    init_select2("select#device", "device", {limit: 100}, "{{ $device->device_id }}");
+    init_select2("#stream", "graylog-streams", {}, @json($stream), 'All Streams');
+    init_select2("select#device", "device", {limit: 100}, "{{ $device->device_id }}", 'All Devices');
 </script>
 @endsection

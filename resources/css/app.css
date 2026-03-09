@@ -59,3 +59,7 @@
 .device-link-disabled {
     @apply tw:font-bold tw:text-gray-400 tw:visited:text-gray-400 tw:dark:!text-gray-500 tw:dark:visited:!text-gray-500
 }
+
+#coordinates-text  {
+  @apply tw:underline;
+}

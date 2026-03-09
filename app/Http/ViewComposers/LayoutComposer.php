@@ -44,7 +44,7 @@ class LayoutComposer
         // build page title
         if ($view->getFactory()->hasSection('title')) {
             // short sections escape the html entities, reverse that
-            $title = html_entity_decode(trim($view->getFactory()->getSection('title')), ENT_QUOTES);
+            $title = html_entity_decode(trim((string) $view->getFactory()->getSection('title')), ENT_QUOTES);
             $title = str_replace('    ', ' : ', $title);
             $title .= ' | ' . LibrenmsConfig::get('page_title_suffix');
         } else {

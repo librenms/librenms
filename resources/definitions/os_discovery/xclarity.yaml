@@ -1,4 +1,3 @@
-mib: LENOVO-XCC-MIB:LENOVO-XCC-ALERT-MIB:LENOVO-SMI-MIB:LENOVO-PRODUCTS-MIB
 modules:
     os:
         hardware: LENOVO-XCC-MIB::machineLevelProductName.0
@@ -8,32 +7,34 @@ modules:
         temperature:
             data:
                 -
-                    oid: temperature
-                    value: tempReading
+                    oid: LENOVO-XCC-MIB::temperature
+                    value: LENOVO-XCC-MIB::tempReading
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.1.2.1.3.{{ $index }}'
                     index: 'tempReading.{{ $index }}'
-                    descr: tempDescr
-                    high_limit: tempCritLimitHigh
-                    low_limit: tempCritLimitLow
-                    low_warn_limit: tempNonCritLimitLow
-                    warn_limit: tempNonCritLimitHigh
+                    descr: LENOVO-XCC-MIB::tempDescr
+                    high_limit: LENOVO-XCC-MIB::tempCritLimitHigh
+                    low_limit: LENOVO-XCC-MIB::tempCritLimitLow
+                    low_warn_limit: LENOVO-XCC-MIB::tempNonCritLimitLow
+                    warn_limit: LENOVO-XCC-MIB::tempNonCritLimitHigh
         voltage:
             data:
                 -
-                    oid: voltage
-                    value: voltReading
+                    oid: LENOVO-XCC-MIB::voltage
+                    value: LENOVO-XCC-MIB::voltReading
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.2.2.1.3.{{ $index }}'
                     index: 'voltReading.{{ $index }}'
-                    descr: voltDescr
-                    high_limit: voltCritLimitHigh
-                    low_limit: voltCritLimitLow
-                    low_warn_limit: voltNonCritLimitLow
-                    warn_limit: voltNonCritLimitHigh
+                    descr: LENOVO-XCC-MIB::voltDescr
+                    high_limit: LENOVO-XCC-MIB::voltCritLimitHigh
+                    low_limit: LENOVO-XCC-MIB::voltCritLimitLow
+                    low_warn_limit: LENOVO-XCC-MIB::voltNonCritLimitLow
+                    warn_limit: LENOVO-XCC-MIB::voltNonCritLimitHigh
         state:
             data:
                 -
-                    oid: systemHealthStat
+                    oid: LENOVO-XCC-MIB::systemHealthStat
+                    value: LENOVO-XCC-MIB::systemHealthStat
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.4.1.{{ $index }}'
+                    state_name: systemHealthStat
                     index: 'systemHealthStat.{{ $index }}'
                     states:
                         - { descr: 'completely failed', graph: 1, value: 0, generic: 2 }
@@ -44,8 +45,10 @@ modules:
                     low_limit: 3
                     descr: 'Overall System Status'
                 -
-                    oid: currentSysPowerStatus
+                    oid: LENOVO-XCC-MIB::currentSysPowerStatus
+                    value: LENOVO-XCC-MIB::currentSysPowerStatus
                     num_oid: '.1.3.6.1.4.1.19046.11.1.5.1.1.{{ $index }}'
+                    state_name: currentSysPowerStatus
                     index: 'currentSysPowerStatus.{{ $index }}'
                     states:
                         - { descr: 'powered off', graph: 1, value: 0, generic: 2 }
@@ -55,39 +58,39 @@ modules:
         percent:
             data:
                 -
-                    oid: fans
-                    value: fanSpeed
+                    oid: LENOVO-XCC-MIB::fans
+                    value: LENOVO-XCC-MIB::fanSpeed
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.3.2.1.3.{{ $index }}'
                     index: 'fanSpeed.{{ $index }}'
-                    descr: fanDescr
-                    high_limit: fanCritLimitHigh
-                    low_limit: fanCritLimitLow
-                    low_warn_limit: fanNonCritLimitLow
-                    warn_limit: fanNonCritLimitHigh
+                    descr: LENOVO-XCC-MIB::fanDescr
+                    high_limit: LENOVO-XCC-MIB::fanCritLimitHigh
+                    low_limit: LENOVO-XCC-MIB::fanCritLimitLow
+                    low_warn_limit: LENOVO-XCC-MIB::fanNonCritLimitLow
+                    warn_limit: LENOVO-XCC-MIB::fanNonCritLimitHigh
         power:
             data:
                 -
-                    oid: fuelGaugeInformation
-                    value: fuelGaugeTotalPowerInUse
+                    oid: LENOVO-XCC-MIB::fuelGaugeInformation
+                    value: LENOVO-XCC-MIB::fuelGaugeTotalPowerInUse
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.10.1.10.{{ $index }}'
                     index: 'fuelGaugeTotalPowerInUse.{{ $index }}'
                     descr: 'Total in use'
-                    high_limit: fuelGaugeTotalPowerAvailable
+                    high_limit: LENOVO-XCC-MIB::fuelGaugeTotalPowerAvailable
                 -
-                    oid: fuelGaugeInformation
-                    value: fuelGaugePowerConsumptionCpu
+                    oid: LENOVO-XCC-MIB::fuelGaugeInformation
+                    value: LENOVO-XCC-MIB::fuelGaugePowerConsumptionCpu
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.10.1.11.{{ $index }}'
                     index: 'fuelGaugePowerConsumptionCpu.{{ $index }}'
                     descr: 'CPU'
                 -
-                    oid: fuelGaugeInformation
-                    value: fuelGaugePowerConsumptionMemory
+                    oid: LENOVO-XCC-MIB::fuelGaugeInformation
+                    value: LENOVO-XCC-MIB::fuelGaugePowerConsumptionMemory
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.10.1.12.{{ $index }}'
                     index: 'fuelGaugePowerConsumptionMemory.{{ $index }}'
                     descr: 'Memory'
                 -
-                    oid: fuelGaugeInformation
-                    value: fuelGaugePowerConsumptionOther
+                    oid: LENOVO-XCC-MIB::fuelGaugeInformation
+                    value: LENOVO-XCC-MIB::fuelGaugePowerConsumptionOther
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.10.1.13.{{ $index }}'
                     index: 'fuelGaugePowerConsumptionOther.{{ $index }}'
                     descr: 'Other'

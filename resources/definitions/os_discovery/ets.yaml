@@ -1,18 +1,19 @@
-mib: GUDEADS-ETS-MIB
 modules:
     sensors:
         state:
             data:
                 -
-                    oid: etsPrimPowAvail
+                    oid: GUDEADS-ETS-MIB::etsPrimPowAvail
                     num_oid: '.1.3.6.1.4.1.28507.4.1.2.{{ $index }}'
+                    state_name: etsPrimPowAvail
                     descr: 'Primary power'
                     index: 'etsPrimPowAvail.{{ $index }}'
                     states:
                         - { descr: unavailable, graph: 1, value: 0, generic: 2 }
                         - { descr: available, graph: 1, value: 1, generic: 0 }
                 -
-                    oid: etsSecPowAvail
+                    oid: GUDEADS-ETS-MIB::etsSecPowAvail
+                    state_name: etsSecPowAvail
                     num_oid: '.1.3.6.1.4.1.28507.4.1.3.{{ $index }}'
                     descr: 'Secondary power'
                     index: 'etsSecPowAvail.{{ $index }}'

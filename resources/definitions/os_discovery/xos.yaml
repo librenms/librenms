@@ -1,4 +1,3 @@
-mib: EXTREME-SOFTWARE-MONITOR-MIB
 modules:
     mempools:
         data:
@@ -13,7 +12,7 @@ modules:
     processors:
         data:
             -
-                oid: extremeCpuMonitorTotalUtilization
+                oid: EXTREME-SOFTWARE-MONITOR-MIB::extremeCpuMonitorTotalUtilization
                 num_oid: '.1.3.6.1.4.1.1916.1.32.1.2.{{ $index }}'
                 index: 0
                 type: extreme-cpu
@@ -22,7 +21,7 @@ modules:
             data:
                 -
                     oid: EXTREME-SYSTEM-MIB::extremeCurrentTemperature
-                    num_oid: '.1.3.6.1.4.1.1916.1.1.1.8.0'
+                    num_oid: '.1.3.6.1.4.1.1916.1.1.1.8.{{ $index }}'
                     descr: 'Chassis Temperature'
                     index: 1
                     high_limit: 65
@@ -33,7 +32,7 @@ modules:
             data:
                 -
                     oid: EXTREME-SYSTEM-MIB::extremeSystemPowerUsageValue
-                    num_oid: '.1.3.6.1.4.1.1916.1.1.1.40.1.0'
+                    num_oid: '.1.3.6.1.4.1.1916.1.1.1.40.1.{{ $index }}'
                     descr: 'Power Usage'
                     index: 1
                     divisor: 1000
@@ -43,6 +42,6 @@ modules:
                     oid: EXTREME-SYSTEM-MIB::extremeFanStatusTable
                     value: EXTREME-SYSTEM-MIB::extremeFanSpeed
                     num_oid: '.1.3.6.1.4.1.1916.1.1.1.9.1.4.{{ $index }}'
-                    descr: 'Fan Speed {{ $EXTREME-SYSTEM-MIB::extremeFanNumber }}'
+                    descr: 'Fan Speed {{ EXTREME-SYSTEM-MIB::extremeFanNumber }}'
                     index: '{{ $index }}'
                     divisor: 1

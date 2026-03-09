@@ -11,9 +11,8 @@ HP-SwitchStack-MIB DEFINITIONS ::= BEGIN
             FROM HP-ICF-OID;
 
     hpSwitchVirtualStackMib MODULE-IDENTITY
-        LAST-UPDATED "200011032344Z"  -- November 3, 2000
-        ORGANIZATION "Hewlett Packard Company,
-                      Network Infrastructure Solutions"
+        LAST-UPDATED "201010291946Z"  -- October 29, 2010
+        ORGANIZATION "HP Networking"
         CONTACT-INFO "Hewlett Packard Company
                       8000 Foothills Blvd.
                       Roseville, CA 95747"
@@ -21,6 +20,9 @@ HP-SwitchStack-MIB DEFINITIONS ::= BEGIN
                      the Stacking features of devices in the HP
                      Integrated Communication Facility product line."
 
+        REVISION     "201010291946Z"  -- October 29, 2010
+        DESCRIPTION  "Added hpSwitchStackMemberPasswordLong to
+                      hpSwitchStackConfigMemberEntry."
         REVISION     "200011032344Z"  -- November 3, 2000
         DESCRIPTION  "Initial version of this MIB module."
 
@@ -123,7 +125,8 @@ HP-SwitchStack-MIB DEFINITIONS ::= BEGIN
             hpSwitchStackMemberSwitchNum            Integer32,
             hpSwitchStackMemberMacAddr              MacAddress,
             hpSwitchStackMemberPassword             OCTET STRING,
-            hpSwitchStackMemberEntryStatus          RowStatus
+            hpSwitchStackMemberEntryStatus          RowStatus,
+            hpSwitchStackMemberPasswordLong         OCTET STRING
         }
 
     hpSwitchStackMemberSwitchNum OBJECT-TYPE
@@ -144,8 +147,13 @@ HP-SwitchStack-MIB DEFINITIONS ::= BEGIN
     hpSwitchStackMemberPassword OBJECT-TYPE
         SYNTAX      OCTET STRING (SIZE (0..17))
         MAX-ACCESS  read-create
-        STATUS      current
+        STATUS      deprecated
         DESCRIPTION "The manager password configured on the member switch.
+                    This object represents the first 17 octets of the
+                    object hpSwitchStackMemberPasswordLong; reading or
+                    writing a value to this object will also read or write 
+                    hpSwitchStackMemberPasswordLong, truncating the length
+                    to 17 octets.
                     This object always returns a 0 length octet string
                     when read."
         ::= { hpSwitchStackConfigMemberEntry 3 }
@@ -156,6 +164,17 @@ HP-SwitchStack-MIB DEFINITIONS ::= BEGIN
         STATUS      current
         DESCRIPTION "The status of a stack member entry."          
         ::= { hpSwitchStackConfigMemberEntry 4 }
+
+    hpSwitchStackMemberPasswordLong OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..1025))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The manager password configured on the member switch.
+                    This object always returns a 0 length octet string
+                    when read. The exact size of this object is implementation
+                    dependent; consult the product documentation to determine
+                    the supported size for a specific product."
+        ::= { hpSwitchStackConfigMemberEntry 5 }
 
     -- Status support for Stacking
 
@@ -172,7 +191,7 @@ HP-SwitchStack-MIB DEFINITIONS ::= BEGIN
         SYNTAX      Integer32 (0..32)           
         MAX-ACCESS  read-only
         STATUS      current
-        DESCRIPTION "Number of members switches that have joined this
+        DESCRIPTION "Number of member switches that have joined this
                     switch's stack.  This variable is only valid if this
                     switch has been set as a 'command-switch'."
         ::= { hpStackStats 2 }
@@ -237,7 +256,7 @@ HP-SwitchStack-MIB DEFINITIONS ::= BEGIN
         SYNTAX      HpStackStatsMemberEntry
         MAX-ACCESS  not-accessible
         STATUS      current
-        DESCRIPTION "The information assosiated with each row in the
+        DESCRIPTION "The information associated with each row in the
                     member table."
         INDEX       { hpStackStatsMemberSwitchIndx }
         ::= { hpStackStatsMembersTable 1 }
@@ -335,14 +354,14 @@ HP-SwitchStack-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "A table containing the switches that have been
-                    discovered as a candidates to form a stack."
+                    discovered as a candidate to form a stack."
         ::= { hpSwitchVirtualStackMib 6 }
 
     hpDiscoverStatsCandidateEntry OBJECT-TYPE
         SYNTAX      HpDiscoverStatsCandidateEntry
         MAX-ACCESS  not-accessible
         STATUS      current
-        DESCRIPTION "The information assosiated with each row in the
+        DESCRIPTION "The information associated with each row in the
                     candidate table."
         INDEX       { hpDiscoverStatsCandidateMacAddr }
         ::= { hpDiscoverStatsCandidatesTable 1 }
@@ -388,7 +407,7 @@ HP-SwitchStack-MIB DEFINITIONS ::= BEGIN
         SYNTAX      HpDiscoverStatsEntry
         MAX-ACCESS  not-accessible
         STATUS      current
-        DESCRIPTION "The information assosiated with each row in the
+        DESCRIPTION "The information associated with each row in the
                     discover table."
         INDEX       { hpDiscoverStatsSwitchIndex }
         ::= { hpDiscoverStatsTable 1 }
@@ -449,7 +468,7 @@ HP-SwitchStack-MIB DEFINITIONS ::= BEGIN
         OBJECT IDENTIFIER ::= {  hpSwitchVirtualStackMibConformance 2}
 
     hpSwitchVirtualStackMibCompliance MODULE-COMPLIANCE 
-        STATUS      current
+        STATUS      deprecated
         DESCRIPTION "The compliance statement for devices implementing the
                     HP Stack Mib."
         MODULE
@@ -459,6 +478,16 @@ HP-SwitchStack-MIB DEFINITIONS ::= BEGIN
                                hpDiscoverStatsGroup }
         ::= { hpSwitchVirtualStackMibCompliances 1 }
 
+  hpSwitchVirtualStackMibCompliance1 MODULE-COMPLIANCE 
+        STATUS      current
+        DESCRIPTION "The compliance statement for devices implementing the
+                    HP Stack Mib."
+        MODULE
+            MANDATORY-GROUPS { hpSwitchStackConfigGroup1,
+                               hpSwitchStackStatsGroup,
+                               hpSwitchDiscoverConfigGroup,
+                               hpDiscoverStatsGroup }
+        ::= { hpSwitchVirtualStackMibCompliances 2 }
 
 
     hpSwitchStackConfigGroup OBJECT-GROUP
@@ -473,7 +502,7 @@ HP-SwitchStack-MIB DEFINITIONS ::= BEGIN
                       hpSwitchStackMemberPassword,
                       hpSwitchStackMemberEntryStatus
                     }
-        STATUS      current
+        STATUS      deprecated
 	DESCRIPTION "A collection of objects for configuring a stack."
         ::= { hpSwitchVirtualStackMibGroups 1 }
 
@@ -519,5 +548,21 @@ HP-SwitchStack-MIB DEFINITIONS ::= BEGIN
                     discovered devices by the stack discovery 
                     protocol."
         ::= { hpSwitchVirtualStackMibGroups 4 }
+
+    hpSwitchStackConfigGroup1 OBJECT-GROUP
+        OBJECTS     { hpSwitchStackAdminStatus,
+		      hpSwitchStackCommandAddr,
+                      hpSwitchStackName,
+                      hpSwitchStackPropagate,
+                      hpSwitchStackAutoJoin,
+                      hpSwitchStackAutoGrab,
+                      hpSwitchStackMemberSwitchNum,
+                      hpSwitchStackMemberMacAddr,
+                      hpSwitchStackMemberPasswordLong,
+                      hpSwitchStackMemberEntryStatus
+                    }
+        STATUS      current
+	DESCRIPTION "A collection of objects for configuring a stack."
+        ::= { hpSwitchVirtualStackMibGroups 5 }
 
 END

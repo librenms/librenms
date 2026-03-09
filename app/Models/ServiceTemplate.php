@@ -192,6 +192,11 @@ class ServiceTemplate extends BaseModel
 
     // ---- Query Scopes ----
 
+    public function scopeHasAccess(Builder $query, User $user): Builder
+    {
+        return $query;
+    }
+
     /**
      * @param  Builder  $query
      * @return Builder

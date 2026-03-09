@@ -61,7 +61,7 @@ final class SVGTest extends TestCase
                 continue;
             }
 
-            if (str_starts_with($file, 'html/images/custommap/background/')) {
+            if (str_starts_with((string) $file, 'html/images/custommap/background/')) {
                 continue;
             }
 

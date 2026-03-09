@@ -1,5 +1,3 @@
-mib: AOS-CORE-FACILITY-MIB:AOS-CORE-CONDITION-MIB:AOS-DOMAIN-OTN-PM-MIB
-
 modules:
     os:
         hardware:
@@ -13,13 +11,13 @@ modules:
             data:
                 -
                     oid:
-                        - ifDescr
+                        - IF-MIB::ifDescr
         ber:
             data:
                 -
-                    oid: aosCoreFacCurrFecBitErrorRate
+                    oid: AOS-CORE-FACILITY-MIB::aosCoreFacCurrFecBitErrorRate
                     num_oid: '.1.3.6.1.4.1.2544.1.20.1.3.2.4.1.{{ $index }}'
-                    descr: '{{ $ifDescr }} FEC Bit Error Rate'
+                    descr: '{{ IF-MIB::ifDescr }} FEC Bit Error Rate'
                     index: 'FEC-BER-{{ $index }}'
                     group: FEC
                     skip_values: 0
@@ -28,9 +26,9 @@ modules:
         chromatic_dispersion:
             data:
                 -
-                    oid: aosDomainOtnPmQualityCdc
+                    oid: AOS-DOMAIN-OTN-PM-MIB::aosDomainOtnPmQualityCdc
                     num_oid: '.1.3.6.1.4.1.2544.1.20.1.5.2.5.1.1.{{ $index }}'
-                    descr: '{{ $ifDescr }}'
+                    descr: '{{ IF-MIB::ifDescr }}'
                     index: 'cdc-{{ $index }}'
                     group: Chromatic Dispersion
                     entPhysicalIndex: '{{ $index }}'
@@ -38,45 +36,45 @@ modules:
         dbm:
             data:
                 -
-                    oid: aosCoreFacCurrOpticalPowerRx
+                    oid: AOS-CORE-FACILITY-MIB::aosCoreFacCurrOpticalPowerRx
                     num_oid: '.1.3.6.1.4.1.2544.1.20.1.3.2.1.1.1.{{ $index }}'
-                    descr: '{{ $ifDescr }} Rx'
+                    descr: '{{ IF-MIB::ifDescr }} Rx'
                     index: 'tpnd-rx-{{ $index }}'
                     group: Laser Rx
                     divisor: 10
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                 -
-                    oid: aosCoreFacCurrOpticalPowerTx
+                    oid: AOS-CORE-FACILITY-MIB::aosCoreFacCurrOpticalPowerTx
                     num_oid: '.1.3.6.1.4.1.2544.1.20.1.3.2.1.1.2.{{ $index }}'
-                    descr: '{{ $ifDescr }} Tx'
+                    descr: '{{ IF-MIB::ifDescr }} Tx'
                     index: 'tpnd-tx-{{ $index }}'
                     group: Laser Tx
                     divisor: 10
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                 -
-                    oid: aosDomainOtnPmOscOptPowerRx
+                    oid: AOS-DOMAIN-OTN-PM-MIB::aosDomainOtnPmOscOptPowerRx
                     num_oid: '.1.3.6.1.4.1.2544.1.20.1.5.2.1.1.1.{{ $index }}'
-                    descr: '{{ $ifDescr }} Amp Rx'
+                    descr: '{{ IF-MIB::ifDescr }} Amp Rx'
                     index: 'otn-tx-{{ $index }}'
                     group: OTN Laser Rx
                     divisor: 10
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                 -
-                    oid: aosDomainOtnPmSpanLossRx
+                    oid: AOS-DOMAIN-OTN-PM-MIB::aosDomainOtnPmSpanLossRx
                     num_oid: '.1.3.6.1.4.1.2544.1.20.1.5.2.3.1.1.{{ $index }}'
-                    descr: '{{ $ifDescr }} Span Loss Rx'
+                    descr: '{{ IF-MIB::ifDescr }} Span Loss Rx'
                     index: 'otn-spanloss-rx-{{ $index }}'
                     group: OTN Span Loss
                     divisor: 10
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                 -
-                    oid: aosDomainOtnPmSpanLossTx
+                    oid: AOS-DOMAIN-OTN-PM-MIB::aosDomainOtnPmSpanLossTx
                     num_oid: '.1.3.6.1.4.1.2544.1.20.1.5.2.3.1.2.{{ $index }}'
-                    descr: '{{ $ifDescr }} Span Loss Tx'
+                    descr: '{{ IF-MIB::ifDescr }} Span Loss Tx'
                     index: 'otn-spanloss-tx-{{ $index }}'
                     group: OTN Span Loss
                     divisor: 10
@@ -85,9 +83,9 @@ modules:
         temperature:
             data:
                 -
-                    oid: aosDomainOtnPmOscLaserTemp
+                    oid: AOS-DOMAIN-OTN-PM-MIB::aosDomainOtnPmOscLaserTemp
                     num_oid: '.1.3.6.1.4.1.2544.1.20.1.5.2.2.1.2.{{ $index }}'
-                    descr: '{{ $ifDescr }} Laser Temperature'
+                    descr: '{{ IF-MIB::ifDescr }} Laser Temperature'
                     index: 'temp-laser-{{ $index }}'
                     group: OTN Laser Temperature
                     divisor: 10
@@ -96,9 +94,9 @@ modules:
         quality_factor:
             data:
                 -
-                    oid: aosDomainOtnPmAmpTotalGain
+                    oid: AOS-DOMAIN-OTN-PM-MIB::aosDomainOtnPmAmpTotalGain
                     num_oid: '.1.3.6.1.4.1.2544.1.20.1.5.2.4.1.2.{{ $index }}'
-                    descr: '{{ $ifDescr }} Gain (dB)'
+                    descr: '{{ IF-MIB::ifDescr }} Gain (dB)'
                     index: 'gainamp-{{ $index }}'
                     group: OTN Gain
                     divisor: 10
@@ -107,17 +105,17 @@ modules:
         snr:
             data:
                 -
-                    oid: aosCoreFacCurrSnrValue
+                    oid: AOS-CORE-FACILITY-MIB::aosCoreFacCurrSnrValue
                     num_oid: '.1.3.6.1.4.1.2544.1.20.1.3.2.7.{{ $index }}'
-                    descr: '{{ $ifDescr }} SNR'
+                    descr: '{{ IF-MIB::ifDescr }} SNR'
                     index: 'SNR-{{ $index }}'
                     group: SNR
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                 -
-                    oid: aosDomainOtnPmQualitySnr
+                    oid: AOS-DOMAIN-OTN-PM-MIB::aosDomainOtnPmQualitySnr
                     num_oid: '.1.3.6.1.4.1.2544.1.20.1.5.2.5.1.3.{{ $index }}'
-                    descr: '{{ $ifDescr }} SNR'
+                    descr: '{{ IF-MIB::ifDescr }} SNR'
                     index: 'SNR-{{ $index }}'
                     group: OTN SNR
                     entPhysicalIndex: '{{ $index }}'
@@ -125,11 +123,12 @@ modules:
         state:
             data:
                 -
-                    oid: aosCoreConditionTable
-                    value:  aosCoreConditionType
+                    oid: AOS-CORE-CONDITION-MIB::aosCoreConditionTable
+                    value:  AOS-CORE-CONDITION-MIB::aosCoreConditionType
                     num_oid: '.1.3.6.1.4.1.2544.1.20.1.2.1.1.1.2.{{ $index }}'
-                    descr: aosCoreConditionEntityTranslation
+                    descr: AOS-CORE-CONDITION-MIB::aosCoreConditionEntityTranslation
                     index: 'aosCoreConditionIndex.{{ $index }}'
+                    state_name: aosCoreConditionTable
                     group: Conditions
                     states:
                         - { value:     0, graph: 0, generic: 3, descr: unknown }

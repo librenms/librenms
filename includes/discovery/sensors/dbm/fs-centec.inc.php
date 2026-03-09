@@ -15,7 +15,7 @@ foreach ($powerTables as $ifIndex => $current) {
 
     // power-rx
     if (! empty($current['FS-SWITCH-V2-MIB::receivepowerCurrent']) && $current['FS-SWITCH-V2-MIB::receivepowerCurrent'] !== '0.00') {
-        foreach (explode(',', $current['FS-SWITCH-V2-MIB::receivepowerCurrent']) as $channel => $value) {
+        foreach (explode(',', (string) $current['FS-SWITCH-V2-MIB::receivepowerCurrent']) as $channel => $value) {
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
                 'sensor_class' => 'dbm',
@@ -40,7 +40,7 @@ foreach ($powerTables as $ifIndex => $current) {
 
     // power-tx
     if (! empty($current['FS-SWITCH-V2-MIB::transpowerCurrent']) && $current['FS-SWITCH-V2-MIB::transpowerCurrent'] !== '0.00') {
-        foreach (explode(',', $current['FS-SWITCH-V2-MIB::transpowerCurrent']) as $channel => $value) {
+        foreach (explode(',', (string) $current['FS-SWITCH-V2-MIB::transpowerCurrent']) as $channel => $value) {
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
                 'sensor_class' => 'dbm',

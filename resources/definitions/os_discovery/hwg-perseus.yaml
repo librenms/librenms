@@ -1,0 +1,86 @@
+modules:
+    os:
+        hardware: SNMPv2-MIB::sysDescr.0
+        hardware_regex: '/(?<hardware>\w*.*),.*/'
+        version: Perseus-MIB::fwVersion.0
+        serial: Perseus-MIB::serNumber.0
+    sensors:
+        state:
+            data:
+                -
+                    oid: Perseus-MIB::meterTable
+                    value: Perseus-MIB::meterEnable
+                    num_oid: '.1.3.6.1.4.1.21796.5.1.2.1.4.{{ $index }}'
+                    descr: 'Port ID {{ Perseus-MIB::meterPortID }} - {{ Perseus-MIB::meterName }} - State'
+                    index: 'meterEnable.{{ $index }}'
+                    states:
+                        - { descr: 'disabled',      graph: 1, value: 0, generic: 3 }
+                        - { descr: 'enabled',       graph: 1, value: 1, generic: 0 }
+                -
+                    oid: Perseus-MIB::meterTable
+                    value: Perseus-MIB::meterState
+                    num_oid: '.1.3.6.1.4.1.21796.5.1.2.1.3.{{ $index }}'
+                    descr: 'Port ID {{ Perseus-MIB::meterPortID }} - {{ Perseus-MIB::meterName }} - Status'
+                    state_name: meterState
+                    index: 'meterState.{{ $index }}'
+                    states:
+                        - { descr: 'unknown',      graph: 1, value: 0, generic: 0 }
+                        - { descr: 'ok',           graph: 1, value: 1, generic: 0 }
+                        - { descr: 'varInvalid',   graph: 1, value: 2, generic: 0 }
+                        - { descr: 'meterInvalid', graph: 1, value: 3, generic: 0 }
+                        - { descr: 'alarmLow',     graph: 1, value: 4, generic: 0 }
+                        - { descr: 'alarmHigh',    graph: 1, value: 5, generic: 0 }
+                        - { descr: 'inactive',     graph: 1, value: 6, generic: 0 }
+                -
+                    oid: Perseus-MIB::meterTable
+                    value: Perseus-MIB::meterType
+                    num_oid: '.1.3.6.1.4.1.21796.5.1.2.1.5.{{ $index }}'
+                    descr: 'Port ID {{ Perseus-MIB::meterPortID }} - {{ Perseus-MIB::meterName }} - Type'
+                    index: 'meterType.{{ $index }}'
+                    state_name: meterType
+                    states:
+                        - { descr: 'local',        graph: 1, value: 0, generic: 3 }
+                        - { descr: 'oneWire',      graph: 1, value: 1, generic: 0 }
+                        - { descr: 'varInvalid',   graph: 1, value: 2, generic: 0 }
+                        - { descr: 'unknown',      graph: 1, value: 3, generic: 0 }
+                        - { descr: 'mbus',         graph: 1, value: 4, generic: 0 }
+                        - { descr: 'modbusRTU',    graph: 1, value: 5, generic: 0 }
+                        - { descr: 'modbusTCP',    graph: 1, value: 6, generic: 0 }
+                        - { descr: 'httpXML',      graph: 1, value: 7, generic: 0 }
+                        - { descr: 'virtual',      graph: 1, value: 8, generic: 0 }
+                        - { descr: 'mQTT',         graph: 1, value: 9, generic: 0 }
+                        - { descr: 'snmp',         graph: 1, value: 10, generic: 0 }
+                        - { descr: 'localGPS',     graph: 1, value: 11, generic: 0 }
+                -
+                    oid: Perseus-MIB::varTable
+                    value: Perseus-MIB::varState
+                    num_oid: '.1.3.6.1.4.1.21796.5.1.3.1.3.{{ $index }}'
+                    descr: 'Sensor - {{ Perseus-MIB::varName }} - Status'
+                    index: 'varState.{{ $index }}'
+                    state_name: varState
+                    states:
+                        - { descr: 'unknown',      graph: 1, value: 0, generic: 3 }
+                        - { descr: 'ok',           graph: 1, value: 1, generic: 0 }
+                        - { descr: 'varInvalid',   graph: 1, value: 2, generic: 0 }
+                        - { descr: 'meterInvalid', graph: 1, value: 3, generic: 0 }
+                        - { descr: 'alarmLow',     graph: 1, value: 4, generic: 0 }
+                        - { descr: 'alarmHigh',    graph: 1, value: 5, generic: 0 }
+                        - { descr: 'inactive',     graph: 1, value: 6, generic: 0 }
+                -
+                    oid: Perseus-MIB::varTable
+                    value: Perseus-MIB::varEnable
+                    num_oid: '.1.3.6.1.4.1.21796.5.1.3.1.6.{{ $index }}'
+                    descr: 'Sensor - {{ Perseus-MIB::varName }} - State'
+                    index: 'varEnable.{{ $index }}'
+                    state_name: varEnable
+                    states:
+                        - { descr: 'disabled',      graph: 2, value: 0, generic: 1 }
+                        - { descr: 'enabled',       graph: 2, value: 1, generic: 0 }
+        count:
+            data:
+                -
+                    oid: Perseus-MIB::varTable
+                    value: Perseus-MIB::varValue
+                    num_oid: '.1.3.6.1.4.1.21796.5.1.3.1.4.{{ $index }}'
+                    descr: '{{ Perseus-MIB::varName }} Value in {{ Perseus-MIB::varUnit }}'
+                    index: 'varValue.{{ $index }}'

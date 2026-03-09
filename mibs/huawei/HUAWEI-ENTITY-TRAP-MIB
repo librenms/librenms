@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2023 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: 
 -- Reference: None
--- Version:V3.94
+-- Version:V3.99
 -- ============================================================================
 
 	HUAWEI-ENTITY-TRAP-MIB DEFINITIONS ::= BEGIN
@@ -37,7 +37,7 @@
 -- January 17, 2007 at 00:00 GMT
 		-- 1.3.6.1.4.1.2011.5.25.219
 		hwEntityTrapMIB MODULE-IDENTITY 
-			LAST-UPDATED "202211031624Z"
+			LAST-UPDATED "202301281600Z"
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."		
 			CONTACT-INFO 
@@ -50,6 +50,24 @@
 				 "
 DESCRIPTION 
  				"This is the base trap definition for DataCom."
+
+         REVISION     "202301281600Z"
+         DESCRIPTION  "v3.99 Add hwBoardInvalid 132721."
+
+         REVISION     "202212021600Z"
+         DESCRIPTION  "v3.98 Add hwBoardFail 132325."
+
+         REVISION     "202212021600Z"
+         DESCRIPTION  "v3.96 Modify the description of 157955."
+
+         REVISION     "202211291600Z"
+         DESCRIPTION  "v3.96 Add hwPortFail, 157952, 157953, 157954, 157955."
+
+         REVISION     "202211041608Z"
+         DESCRIPTION  "v3.95 Modify  hwBoardFail, 132348, 132349,
+         Add hwBoardFail, hwBoardInvalid, hwBoardWarning, 132202, 132214, 132293, 132298, 132323, 132332, 132333, 132334,132335, 132352, 132353, 132354, 132674, 132678, 132695, 132696, 132712, 132713, 132714, 147218,
+         Roll back reason code 132213, 132690 and 132691 to v3.92"
+
          REVISION     "202211031624Z"
          DESCRIPTION  "v3.94 add hwBoardFail, hwBoardWarning, 132212, 147221,
          Modify hwBoardFail, theFullinSignalOfTheBoardIsAbnormal, theFullinSignalOfTheBoardIsAbnormal"
@@ -553,6 +571,14 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 	        "This list contains the root reasons of the Huawei proprietary traps."
 	    SYNTAX         INTEGER
 	            {
+                        -- 157952:  Remote alarm indication on E1 port
+			remoteAlarmIndicationOnE1Port	(157952),
+			-- 157953:  An alarm indication of the upstream E1 signals
+			anAlarmIndicationOfTheUpstreamE1Signals	(157953),
+			-- 157954:  Loss of frame alignment alarm on E1 port
+			lossOfFrameAlignmentAlarmOnE1Port	(157954),
+			-- 157955:  Loss of multiframe alignment on E1 port
+			lossOfMultiframeAlignmentOnE1Port	(157955),
 			-- 131072:  Reseted Frame Register
 			resetedFrameRegister	(131072),
 			-- 131328:  The Air Filter Inside The Chassis Was Not Cleaned
@@ -761,6 +787,8 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			voltageADFault	(132183),
 			-- 132184:  SPI Bus Fault
 			sPIBusFault	(132184),
+			-- 132202:  The 38M clock fails
+			the38MClockFails	(132202),
 			-- 132205:  The HiGig Link On The Board Failed
 			theHiGigLinkOnTheBoardFailed	(132205),
 			-- 132207:  The board clock fails
@@ -770,9 +798,11 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			-- 132209:  The slot ID of the board fails to be checked
 			theSlotIdOfTheBoardFailsToBeChecked	(132209),
 			-- 132212:  Access to the flash memory of the board fails
-			accessToTheFlashMemoryOfTheBoardFails(132212),
-			-- 132213:  The micro switch of the board fails
-			theMicroSwitchOfTheBoardFails	(132213),
+			accessToTheFlashMemoryOfTheBoardFails	(132212),
+			-- 132213:  The external TCAM chip could not be accessed
+			theexternalTCAMchipcouldnotbeaccessed	(132213),
+			-- 132214:  The active and standby MPUs cannot communicate with each other
+			theActiveAndStandbyMpusCannotCommunicateWithEachOther	(132214),
 			-- 132279:  Failed to check the voltage of the board
 			failedToCheckTheVoltageOfTheBoard	(132279),
 			-- 132285:  The disk will soon become invalid
@@ -783,10 +813,14 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			theFrequencySynthesizerFailed	(132287),
 			-- 132290:  The slot ID signal from the CANBUS is abnormal
 			slotIdSignalFromCanbusIsAbnormal	(132290),
+			-- 132293:  CANBUS communications between the monitor chips failed
+			canbusCommunicationsBetweenTheMonitorChipsFailed	(132293),
 			-- 132296:  Overcurrent occurred on the board
 			overcurrentOccurredOnTheBoard	(132296),
 			-- 132297:  The FPGA is abnormal
 			theFPGAIsAbnormal	(132297),
+			-- 132298:  The sensor chip on the board was faulty
+			theSensorChipOnTheBoardWasFaulty	(132298),
 			-- 132313:  A voltage drop occurred on the board
 			aVoltageDropOccurredOnTheBoard	(132313),
 			-- 132314:  The serial management bus of the board malfunctions
@@ -797,8 +831,12 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			failedToCheckBackPlaneID	(132320),
 			-- 132321:  The IIC of MCU module is abnormal
 			theIICOfMcuModuleIsAbnormal	(132321),
+			-- 132323:  The 19M clock fails
+			the19MClockFails	(132323),
 			-- 132324:  The board clock(156M) failed
 			theBoard156MClockFailed	(132324),
+                        -- 132325 The device certificate verification failed
+                        deviceCertificateVerifyFail              (132325),
 			-- 132315:  The negotiated rate level of the SATA disk does not meet the requirement
 			theSataRateLevelIsAbnormal	(132315),
 			-- 132316:  The remaining life of SATA is not enough
@@ -811,16 +849,30 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			portReceivePreambleCodeErrorPackage	(132330),
 			-- 132331:  Port cannot go up due to lack of serdes mode
 			portCannotGoUpDueToLackOfSerdesMode	(132331),
+			-- 132332:  The system disk will soon become invalid
+			theSystemDiskWillSoonBecomeInvalid	(132332),
+			-- 132333:  The data disk will soon become invalid
+			theData-DiskWillSoonBecomeInvalid	(132333),
+			-- 132334:  The negotiation rate level of the disk does not meet the requirements
+			theNegotiationRateLevelOfTheDiskDoesNotMeetTheRequirements	(132334),
+			-- 132335:  SATA is abnormal
+			sataIsAbnormal	(132335),
 			-- 132347:  Failed to check the voltage of the card
 			failedToCheckTheVoltageOfTheCard	(132347),
-			-- 132348:  E1 framer of the board was faulty
-			e1FramerOfTheBoardWasFaulty	(132348),
-			-- 132349:  LTE module of the board was faulty
-			lteModuleOfTheBoardWasFaulty	(132349),
+			-- 132348:  E1 framer was faulty
+			e1FramerWasFaulty	(132348),
+			-- 132349:  LTE module was faulty
+			lteModuleWasFaulty	(132349),
 			-- 132350:  The FULLIN signal of the board is abnormal
 			theFullinSignalOfTheBoardIsAbnormal	(132350),
 			-- 132351:  A SerialCpldLocalbus fault occurs on the board
 			aSerialCpldLocalbusFaultOccursOnTheBoard	(132351),
+			-- 132352:  The micro switch of the board fails
+			theMicroSwitchOfTheBoardFails	(132352),
+			-- 132353:  USB overcurrent occurred
+			usbOvercurrentOccurred	(132353),
+			-- 132354:  The power supply self-check failed
+			thePowerSupplySelfCheckFailed	(132354),
 			-- 132425:  The FPGA1 logic of the board is abnormal
 			theFPGA1logicoftheboardisabnormal	(132425),
                         -- 132426:  The FPGA2 logic of the board is abnormal
@@ -949,26 +1001,42 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			trafficCongestionDueToTheTrafficBackpressure	(132665),
 			-- 132666:  Board Type Mismatches The Preconfiguration
 			boardTypeMismatchesThePreconfiguration	(132666),
+			-- 132674: The FPGA of the board failed
+			theFPGAOfTheBoardFailed	(132674),
                         -- 132675: The LSW port connected to the MPU fails
                         thsLswPortConnectedToTheMpuFails                  (132675),
 			-- 132677:  The FPGA localbus self-test failed
 			theFPGALocalbusSelf-testFailed	(132677),
+			-- 132678:  The board does not match the slot
+			theBoardDoesNotMatchTheSlot	(132678),
 			-- 132685:  The board is not installed properly
 			theBoardIsNotInstalledProperly	(132685),
 			-- 132686:  The smi serial of the board is abnormal
 			theSmiSerialOfTheBoardIsAbnormal	(132686),
-			-- 132690:  USB overcurrent occurred
-			usbOvercurrentOccurred	(132690),
-			-- 132691:  The power supply self-check failed
-			thePowerSupplySelfCheckFailed	(132691),
+			-- 132690:  The FPGA1 logic of the board failed
+			theFPGA1logicoftheboardfailed	(132690),
+			-- 132691:  The FPGA2 logic of the board failed
+			theFPGA2logicoftheboardfailed	(132691),
                         -- 132692:  The FPGA3 logic of the board failed
 			theFPGA3logicoftheboardfailed	(132692),
                         -- 132693:  The FPGA4 logic of the board failed
 			theFPGA4logicoftheboardfailed	(132693),
                         -- 132694:  The FPGA5 logic of the board failed
 			theFPGA5logicoftheboardfailed	(132694),
+			-- 132695:  The board voltage exceeds the fatal alarm threshold
+			theBoardVoltageExceedsTheFatalAlarmThreshold	(132695),
+			-- 132696:  The board voltage fell below the fatal alarm threshold
+			theBoardVoltageFellBelowTheFatalAlarmThreshold	(132696),
 			-- 132699:  Different SFUs were installed in the same chassis
 			differentSFUswereinstalledinthesamechassis	(132699),
+			-- 132712:  The board voltage exceeded the major alarm threshold
+			theBoardVoltageExceededTheMajorAlarmThreshold	(132712),
+			-- 132713:  The board voltage fell below the major alarm threshold
+			theBoardVoltageFellBelowTheMajorAlarmThreshold	(132713),
+			-- 132714:  The SD5K communication failed
+			theSd5kCommunicationFailed	(132714),
+			-- 132721:  The device hardware verification failed
+			deviceHardwareVerifyFail	(132721),
 			-- 133120:  The Master/slave Board Switchover Was Performed
 			theMasterSlaveBoardSwitchoverWasPerformed	(133120),
 			-- 133121:  PMU Board Leave Master
@@ -1425,8 +1493,10 @@ hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
 			theCPUfailedtosendpackets	(147208),
 			-- 147217:  Frequent erase and write operations are performed on the disk
 			frequentEraseAndWriteOperationsArePerformedOnTheDisk	(147217),
+			-- 147218:  The disk will soon become invalid
+			thediskWillSoonBecomeInvalid	(147218),
 			-- 147221:  The data disk will soon become invalid
-			theDataDiskWillSoonBecomeInvalid(147221),
+			theDataDiskWillSoonBecomeInvalid	(147221),
 			-- 155904:  The forwarding register was unstable
 			theForwardingRegisterWasUnstable	(155904),
 			-- 155648:  The coprocessor failed

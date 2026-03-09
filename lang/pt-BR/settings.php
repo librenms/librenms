@@ -615,8 +615,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -1317,9 +1317,6 @@ return [
             'description' => 'Sufixo do Nome do Arquivo',
             'help' => 'Isso é muito importante, pois os nomes dos dispositivos no NfSen são limitados a 21 caracteres. Isso significa que nomes de domínio completos para dispositivos podem ser muito problemáticos para encaixar, então, geralmente, esse pedaço é removido.',
         ],
-        'nmap' => [
-            'description' => 'Caminho para nmap',
-        ],
         'no_proxy' => [
             'description' => 'Exceções de Proxy',
             'help' => 'Defina isso como fallback se a variável de ambiente no_proxy não estiver disponível. Lista separada por vírgulas de IPs, hosts ou domínios a serem ignorados.',
@@ -1497,8 +1494,8 @@ return [
             'slas' => [
                 'description' => 'Rastreamento de Acordo de Nível de Serviço',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cipsec-tunnels' => [
                 'description' => 'Túneis Cipsec',
@@ -1711,7 +1708,7 @@ return [
                 'help' => 'Método de agendamento de tarefas de descoberta. O modo legado usará cron se a entrada do crontab existir e o serviço de dispatcher se a opção de configuração legada service_discovery_enabled estiver definida como verdadeiro.',
                 'options' => [
                     'legacy' => 'Legado (Irrestrito)',
-                    'cron' => 'Cron (discovery.php)',
+                    'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Serviço de Dispatcher',
                 ],
             ],
@@ -1807,9 +1804,6 @@ return [
         'service_watchdog_log' => [
             'description' => 'Arquivo de Log a ser Monitorado',
             'help' => 'O padrão é o arquivo de log do LibreNMS. Valor padrão para todos os nós.',
-        ],
-        'sfdp' => [
-            'description' => 'Caminho para sfdp',
         ],
         'shorthost_target_length' => [
             'description' => 'Comprimento máximo do nome de host encurtado',
@@ -2034,9 +2028,6 @@ return [
         'device_location_map_show_device_dependencies' => [
             'description' => 'Exibir dependências dos dispositivos no mapa de localização',
             'help' => 'Exibir links entre dispositivos no mapa de localização com base nas dependências dos pais',
-        ],
-        'whois' => [
-            'description' => 'Caminho para whois',
         ],
         'smokeping.integration' => [
             'description' => 'Habilitar',

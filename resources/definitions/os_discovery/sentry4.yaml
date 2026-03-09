@@ -1,4 +1,3 @@
-mib: Sentry4-MIB
 modules:
     os:
         hardware: Sentry4-MIB::st4UnitModel.1
@@ -9,66 +8,66 @@ modules:
             data:
                 -
                     oid:
-                        - st4InputCordName
-                        - st4LineLabel
-                        - st4PhaseLabel
-                        - st4OcpLabel
-                        - st4BranchLabel
+                        - Sentry4-MIB::st4InputCordName
+                        - Sentry4-MIB::st4LineLabel
+                        - Sentry4-MIB::st4PhaseLabel
+                        - Sentry4-MIB::st4OcpLabel
+                        - Sentry4-MIB::st4BranchLabel
         current:
             data:
                 -
-                    oid: st4LineCurrent
+                    oid: Sentry4-MIB::st4LineCurrent
                     num_oid: '.1.3.6.1.4.1.1718.4.1.4.3.1.3.{{ $index }}'
                     index: 'st4LineCurrent.{{ $index }}'
-                    descr: Line, {{ $st4LineLabel }}, Current
+                    descr: Line, {{ Sentry4-MIB::st4LineLabel }}, Current
                     divisor: 100
                 -
-                    oid: st4PhaseCurrent
+                    oid: Sentry4-MIB::st4PhaseCurrent
                     num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.6.{{ $index }}'
                     index: 'st4PhaseCurrent.{{ $index }}'
-                    descr: Phase, {{ $st4PhaseLabel }}, Current
+                    descr: Phase, {{ Sentry4-MIB::st4PhaseLabel }}, Current
                     divisor: 100
         frequency:
             data:
                 -
-                    oid: st4InputCordFrequency
+                    oid: Sentry4-MIB::st4InputCordFrequency
                     num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.11.{{ $index }}'
                     index: 'st4InputCord.{{ $index }}'
-                    descr: Line, {{ $st4InputCordName }}, Frequency
+                    descr: Line, {{ Sentry4-MIB::st4InputCordName }}, Frequency
                     divisor: 10
         power:
             data:
                 -
-                    oid: st4InputCordActivePower
+                    oid: Sentry4-MIB::st4InputCordActivePower
                     num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.3.{{ $index }}'
                     index: 'st4InputCord.{{ $index }}'
-                    descr: Cord, {{ $st4InputCordName }}, Active Power
+                    descr: Cord, {{ Sentry4-MIB::st4InputCordName }}, Active Power
                 -
-                    oid: st4PhaseActivePower
+                    oid: Sentry4-MIB::st4PhaseActivePower
                     num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.8.{{ $index }}'
                     index: 'st4PhaseActivePower.{{ $index }}'
-                    descr: Phase, {{ $st4PhaseLabel }}, Active Power
+                    descr: Phase, {{ Sentry4-MIB::st4PhaseLabel }}, Active Power
         voltage:
             data:
                 -
-                    oid: st4PhaseVoltage
+                    oid: Sentry4-MIB::st4PhaseVoltage
                     num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.3.{{ $index }}'
                     index: 'st4PhaseVoltage.{{ $index }}'
-                    descr: Phase, {{ $st4PhaseLabel }}, Voltage
+                    descr: Phase, {{ Sentry4-MIB::st4PhaseLabel }}, Voltage
                     divisor: 10
         percent:
             data:
                 -
-                    oid: st4InputCordOutOfBalance
+                    oid: Sentry4-MIB::st4InputCordOutOfBalance
                     num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.12.{{ $index }}'
                     index: 'st4InputCord.{{ $index }}'
-                    descr: Cord, {{ $st4InputCordName }}, Balance
+                    descr: Cord, {{ Sentry4-MIB::st4InputCordName }}, Balance
                     divisor: 10
         state:
             data:
                 -
-                    oid: st4UnitStatus
-                    value: st4UnitStatus
+                    oid: Sentry4-MIB::st4UnitStatus
+                    value: Sentry4-MIB::st4UnitStatus
                     num_oid: '.1.3.6.1.4.1.1718.4.1.2.3.1.1.{{ $index }}'
                     descr: Unit Status
                     index: 'st4UnitStatus.{{ $index }}'
@@ -97,8 +96,8 @@ modules:
                         - { descr: profileError, graph: 1, value: 22, generic: 2 }
                         - { descr: conflict, graph: 1, value: 23, generic: 2 }
                 -
-                    oid: st4InputCordState
-                    value: st4InputCordState
+                    oid: Sentry4-MIB::st4InputCordState
+                    value: Sentry4-MIB::st4InputCordState
                     num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.1.{{ $index }}'
                     descr: Input Cord State
                     index: 'st4InputCordState.{{ $index }}'
@@ -108,8 +107,8 @@ modules:
                         - { descr: on, graph: 0, value: 1, generic: 0 }
                         - { descr: off, graph: 0, value: 2, generic: 3 }
                 -
-                    oid: st4InputCordStatus
-                    value: st4InputCordStatus
+                    oid: Sentry4-MIB::st4InputCordStatus
+                    value: Sentry4-MIB::st4InputCordStatus
                     num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.2.{{ $index }}'
                     descr: Input Cord Status
                     index: 'st4InputCordStatus.{{ $index }}'
@@ -138,8 +137,8 @@ modules:
                         - { descr: profileError, graph: 1, value: 22, generic: 2 }
                         - { descr: conflict, graph: 1, value: 23, generic: 2 }
                 -
-                    oid: st4InputCordActivePowerStatus
-                    value: st4InputCordActivePowerStatus
+                    oid: Sentry4-MIB::st4InputCordActivePowerStatus
+                    value: Sentry4-MIB::st4InputCordActivePowerStatus
                     num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.4.{{ $index }}'
                     descr: Input Cord Active Power Status
                     index: 'st4InputCordActivePowerStatus.{{ $index }}'
@@ -168,8 +167,8 @@ modules:
                         - { descr: profileError, graph: 1, value: 22, generic: 2 }
                         - { descr: conflict, graph: 1, value: 23, generic: 2 }
                 -
-                    oid: st4InputCordApparentPowerStatus
-                    value: st4InputCordApparentPowerStatus
+                    oid: Sentry4-MIB::st4InputCordApparentPowerStatus
+                    value: Sentry4-MIB::st4InputCordApparentPowerStatus
                     num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.6.{{ $index }}'
                     descr: Input Cord Apparent Power Status
                     index: 'st4InputCordApparentPowerStatus.{{ $index }}'
@@ -198,8 +197,8 @@ modules:
                         - { descr: profileError, graph: 1, value: 22, generic: 2 }
                         - { descr: conflict, graph: 1, value: 23, generic: 2 }
                 -
-                    oid: st4InputCordPowerFactorStatus
-                    value: st4InputCordPowerFactorStatus
+                    oid: Sentry4-MIB::st4InputCordPowerFactorStatus
+                    value: Sentry4-MIB::st4InputCordPowerFactorStatus
                     num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.9.{{ $index }}'
                     descr: Input Cord Power Factor Status
                     index: 'st4InputCordPowerFactorStatus.{{ $index }}'
@@ -228,8 +227,8 @@ modules:
                         - { descr: profileError, graph: 1, value: 22, generic: 2 }
                         - { descr: conflict, graph: 1, value: 23, generic: 2 }
                 -
-                    oid: st4InputCordOutOfBalanceStatus
-                    value: st4InputCordOutOfBalanceStatus
+                    oid: Sentry4-MIB::st4InputCordOutOfBalanceStatus
+                    value: Sentry4-MIB::st4InputCordOutOfBalanceStatus
                     num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.13.{{ $index }}'
                     descr: Input Out Of Balance Status
                     index: 'st4InputCordOutOfBalanceStatus.{{ $index }}'
@@ -258,10 +257,10 @@ modules:
                         - { descr: profileError, graph: 1, value: 22, generic: 2 }
                         - { descr: conflict, graph: 1, value: 23, generic: 2 }
                 -
-                    oid: st4LineState
-                    value: st4LineState
+                    oid: Sentry4-MIB::st4LineState
+                    value: Sentry4-MIB::st4LineState
                     num_oid: '.1.3.6.1.4.1.1718.4.1.4.3.1.1.{{ $index }}'
-                    descr: Line {{ $st4LineLabel }} State
+                    descr: Line {{ Sentry4-MIB::st4LineLabel }} State
                     index: 'st4LineState.{{ $index }}'
                     state_name: st4LineState
                     states:
@@ -269,10 +268,10 @@ modules:
                         - { descr: on, graph: 0, value: 1, generic: 0 }
                         - { descr: off, graph: 0, value: 2, generic: 3 }
                 -
-                    oid: st4LineStatus
-                    value: st4LineStatus
+                    oid: Sentry4-MIB::st4LineStatus
+                    value: Sentry4-MIB::st4LineStatus
                     num_oid: '.1.3.6.1.4.1.1718.4.1.4.3.1.2.{{ $index }}'
-                    descr: Line {{ $st4LineLabel }} Status
+                    descr: Line {{ Sentry4-MIB::st4LineLabel }} Status
                     index: 'st4LineStatus.{{ $index }}'
                     state_name: st4LineStatus
                     states:
@@ -299,10 +298,10 @@ modules:
                         - { descr: profileError, graph: 1, value: 22, generic: 2 }
                         - { descr: conflict, graph: 1, value: 23, generic: 2 }
                 -
-                    oid: st4PhaseState
-                    value: st4PhaseState
+                    oid: Sentry4-MIB::st4PhaseState
+                    value: Sentry4-MIB::st4PhaseState
                     num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.1.{{ $index }}'
-                    descr: Phase {{ $st4PhaseLabel }} State
+                    descr: Phase {{ Sentry4-MIB::st4PhaseLabel }} State
                     index: 'st4PhaseState.{{ $index }}'
                     state_name: st4PhaseState
                     states:
@@ -310,10 +309,10 @@ modules:
                         - { descr: on, graph: 0, value: 1, generic: 0 }
                         - { descr: off, graph: 0, value: 2, generic: 3 }
                 -
-                    oid: st4PhaseStatus
-                    value: st4PhaseStatus
+                    oid: Sentry4-MIB::st4PhaseStatus
+                    value: Sentry4-MIB::st4PhaseStatus
                     num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.2.{{ $index }}'
-                    descr: Phase {{ $st4PhaseLabel }} Status
+                    descr: Phase {{ Sentry4-MIB::st4PhaseLabel }} Status
                     index: 'st4PhaseStatus.{{ $index }}'
                     state_name: st4PhaseStatus
                     states:
@@ -340,10 +339,10 @@ modules:
                         - { descr: profileError, graph: 1, value: 22, generic: 2 }
                         - { descr: conflict, graph: 1, value: 23, generic: 2 }
                 -
-                    oid: st4PhaseVoltageStatus
-                    value: st4PhaseVoltageStatus
+                    oid: Sentry4-MIB::st4PhaseVoltageStatus
+                    value: Sentry4-MIB::st4PhaseVoltageStatus
                     num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.4.{{ $index }}'
-                    descr: Phase {{ $st4PhaseLabel }} Voltage Status
+                    descr: Phase {{ Sentry4-MIB::st4PhaseLabel }} Voltage Status
                     index: 'st4PhaseVoltageStatus.{{ $index }}'
                     state_name: st4PhaseVoltageStatus
                     states:
@@ -370,10 +369,10 @@ modules:
                         - { descr: profileError, graph: 1, value: 22, generic: 2 }
                         - { descr: conflict, graph: 1, value: 23, generic: 2 }
                 -
-                    oid: st4PhasePowerFactorStatus
-                    value: st4PhasePowerFactorStatus
+                    oid: Sentry4-MIB::st4PhasePowerFactorStatus
+                    value: Sentry4-MIB::st4PhasePowerFactorStatus
                     num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.11.{{ $index }}'
-                    descr: Phase {{ $st4PhaseLabel }} Power Factor Status
+                    descr: Phase {{ Sentry4-MIB::st4PhaseLabel }} Power Factor Status
                     index: 'st4PhasePowerFactorStatus.{{ $index }}'
                     state_name: st4PhasePowerFactorStatus
                     states:
@@ -400,10 +399,10 @@ modules:
                         - { descr: profileError, graph: 1, value: 22, generic: 2 }
                         - { descr: conflict, graph: 1, value: 23, generic: 2 }
                 -
-                    oid: st4OcpStatus
-                    value: st4OcpStatus
+                    oid: Sentry4-MIB::st4OcpStatus
+                    value: Sentry4-MIB::st4OcpStatus
                     num_oid: '.1.3.6.1.4.1.1718.4.1.6.3.1.1.{{ $index }}'
-                    descr: Over-current Protector {{ $st4OcpLabel }} Status
+                    descr: Over-current Protector {{ Sentry4-MIB::st4OcpLabel }} Status
                     index: 'st4OcpStatus.{{ $index }}'
                     state_name: st4OcpStatus
                     states:
@@ -430,10 +429,10 @@ modules:
                         - { descr: profileError, graph: 1, value: 22, generic: 2 }
                         - { descr: conflict, graph: 1, value: 23, generic: 2 }
                 -
-                    oid: st4BranchState
-                    value: st4BranchState
+                    oid: Sentry4-MIB::st4BranchState
+                    value: Sentry4-MIB::st4BranchState
                     num_oid: '.1.3.6.1.4.1.1718.4.1.7.3.1.1.{{ $index }}'
-                    descr: Branch {{ $st4OcpLabel }} State
+                    descr: Branch {{ Sentry4-MIB::st4OcpLabel }} State
                     index: 'st4BranchState.{{ $index }}'
                     state_name: st4BranchState
                     states:
@@ -441,10 +440,10 @@ modules:
                         - { descr: on, graph: 0, value: 1, generic: 0 }
                         - { descr: off, graph: 0, value: 2, generic: 3 }
                 -
-                    oid: st4BranchStatus
-                    value: st4BranchStatus
+                    oid: Sentry4-MIB::st4BranchStatus
+                    value: Sentry4-MIB::st4BranchStatus
                     num_oid: '.1.3.6.1.4.1.1718.4.1.7.3.1.2.{{ $index }}'
-                    descr: Branch {{ $st4OcpLabel }} Status
+                    descr: Branch {{ Sentry4-MIB::st4OcpLabel }} Status
                     index: 'st4BranchStatus.{{ $index }}'
                     state_name: st4BranchStatus
                     states:
@@ -471,10 +470,10 @@ modules:
                         - { descr: profileError, graph: 1, value: 22, generic: 2 }
                         - { descr: conflict, graph: 1, value: 23, generic: 2 }
                 -
-                    oid: st4BranchCurrentStatus
-                    value: st4BranchCurrentStatus
+                    oid: Sentry4-MIB::st4BranchCurrentStatus
+                    value: Sentry4-MIB::st4BranchCurrentStatus
                     num_oid: '.1.3.6.1.4.1.1718.4.1.7.3.1.4.{{ $index }}'
-                    descr: Branch Current {{ $st4OcpLabel }} Status
+                    descr: Branch Current {{ Sentry4-MIB::st4OcpLabel }} Status
                     index: 'st4BranchCurrentStatus.{{ $index }}'
                     state_name: st4BranchCurrentStatus
                     states:

@@ -41,7 +41,7 @@ class EnlogicPdu extends OS
             'ENLOGIC-PDU2-MIB::pduNamePlateFirmwareVersion.1',
         ]);
 
-        if (preg_match('/\d\.\d\.\d/', $pdu2->value('ENLOGIC-PDU2-MIB::pduNamePlateFirmwareVersion.1'))) {
+        if (preg_match('/\d\.\d\.\d/', (string) $pdu2->value('ENLOGIC-PDU2-MIB::pduNamePlateFirmwareVersion.1'))) {
             $device->version = $pdu2->value('ENLOGIC-PDU2-MIB::pduNamePlateFirmwareVersion.1');
             $device->serial = $pdu2->value('ENLOGIC-PDU2-MIB::pduNamePlateSerialNumber.1');
             $device->hardware = $pdu2->value('ENLOGIC-PDU2-MIB::pduNamePlatePartNumber.1');

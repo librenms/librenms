@@ -32,7 +32,7 @@ use Log;
 
 class UpdateDeviceGroupsAction
 {
-    public function __construct(private Device $device)
+    public function __construct(private readonly Device $device)
     {
     }
 
@@ -60,8 +60,8 @@ class UpdateDeviceGroupsAction
                     try {
                         return $device_group->getParser()
                             ->toQuery()
-                            ->where('devices.device_id', $this->device->device_id)
-                            ->exists();
+                            ?->where('devices.device_id', $this->device->device_id)
+                            ?->exists();
                     } catch (\Illuminate\Database\QueryException $e) {
                         Log::error("Device Group '$device_group->name' generates invalid query: " . $e->getMessage());
 

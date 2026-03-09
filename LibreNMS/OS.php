@@ -203,7 +203,7 @@ class OS implements
 
         if (! isset($this->cache['cache_oid'][$oid])) {
             $data = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], $mib, null, $snmpflags);
-            $this->cache['cache_oid'][$oid] = array_map('current', $data);
+            $this->cache['cache_oid'][$oid] = array_map(current(...), $data);
         }
 
         return $this->cache['cache_oid'][$oid];
@@ -291,7 +291,7 @@ class OS implements
         $name = $rf->getShortName();
         preg_match_all('/[A-Z][a-z]*/', $name, $segments);
 
-        return implode('-', array_map('strtolower', $segments[0]));
+        return implode('-', array_map(strtolower(...), $segments[0]));
     }
 
     /**

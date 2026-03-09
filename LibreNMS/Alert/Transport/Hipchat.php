@@ -47,18 +47,18 @@ class Hipchat extends Transport
         }
 
         $url = $this->config['hipchat-url'];
-        $version = str_contains($url, 'v2') ? 2 : 1;
+        $version = str_contains((string) $url, 'v2') ? 2 : 1;
 
         // Generate our URL from the base URL + room_id and the auth token if the version is 2.
         if ($version == 2) {
-            $url .= '/' . urlencode($this->config['hipchat-room-id']) . '/notification';
+            $url .= '/' . urlencode((string) $this->config['hipchat-room-id']) . '/notification';
         }
 
         // Sane default of making the message color green if the message indicates
         // that the alert recovered.   If it rebooted, make it yellow.
         if ($alert_data['state'] == AlertState::RECOVERED) {
             $color = 'green';
-        } elseif (str_contains($alert_data['msg'], 'rebooted')) {
+        } elseif (str_contains((string) $alert_data['msg'], 'rebooted')) {
             $color = 'yellow';
         } elseif (empty($options['color']) || $options['color'] == 'u') {
             $color = 'red';

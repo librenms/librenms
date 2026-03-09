@@ -31,7 +31,7 @@ if (! empty($gpio_mon_data)) {
 
     foreach ($gpio_mon_data as $index => $entry) {
         if (Str::contains($entry['nsExtendOutLine'], ';')) {
-            $splitted_data_array = explode(';', $entry['nsExtendOutLine']);
+            $splitted_data_array = explode(';', (string) $entry['nsExtendOutLine']);
             $sensor_data = [];
             foreach ($splitted_data_array as $splitted_data_index => $splitted_data) {
                 $sensor_data_parts = explode(',', $splitted_data);

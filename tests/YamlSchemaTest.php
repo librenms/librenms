@@ -31,6 +31,7 @@ use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\JsonDecodingException;
 use JsonSchema\Exception\ValidationException;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -46,20 +47,24 @@ final class YamlSchemaTest extends TestCase
 
     public function testConfigSchema(): void
     {
-        $this->validateFileAgainstSchema(resource_path('definitions/config_definitions.json'), resource_path('definitions/schema/config_schema.json'));
+        $error = $this->validateFileAgainstSchema(resource_path('definitions/config_definitions.json'), resource_path('definitions/schema/config_schema.json'));
+
+        $this->assertNull($error, (string) $error);
     }
 
+    #[TestDox('OS definition schema')]
     public function testOSDefinitionSchema(): void
     {
         $this->validateYamlFilesAgainstSchema(resource_path('definitions/os_detection'), resource_path('definitions/schema/os_schema.json'));
     }
 
+    #[TestDox('OS match filename')]
     public function testOSMatchFilename(): void
     {
         foreach ($this->listFiles(resource_path('definitions/os_detection/*.yaml')) as $filename => $file) {
             $this->assertEquals(
                 Yaml::parseFile($file)['os'],
-                substr($filename, 0, -5),
+                substr((string) $filename, 0, -5),
                 "Parameter 'os' doesn't match the filename $filename"
             );
         }
@@ -72,9 +77,17 @@ final class YamlSchemaTest extends TestCase
 
     private function validateYamlFilesAgainstSchema(string $dir, string $schema_file): void
     {
+        $errors = [];
+
         foreach ($this->listFiles($dir . '/*.yaml') as $file) {
-            $this->validateFileAgainstSchema($file, $schema_file);
+            $error = $this->validateFileAgainstSchema($file, $schema_file);
+            if ($error) {
+                $errors[] = $error;
+            }
         }
+
+        $count = count($errors);
+        $this->assertEmpty($errors, implode("\n", $errors) . "\nFiles with errors: $count\n\n");
     }
 
     private function listFiles($pattern): array
@@ -96,13 +109,13 @@ final class YamlSchemaTest extends TestCase
      * @param  string  $filePath
      * @param  string  $schema_file  full path
      */
-    private function validateFileAgainstSchema(string $filePath, string $schema_file): void
+    private function validateFileAgainstSchema(string $filePath, string $schema_file): ?string
     {
         $schema = (object) ['$ref' => 'file://' . $schema_file];
         $filename = basename($filePath);
 
         try {
-            $data = Str::endsWith($filePath, '.json')
+            $data = str_ends_with($filePath, '.json')
             ? json_decode(file_get_contents($filePath))
             : Yaml::parse(file_get_contents($filePath));
         } catch (ParseException $e) {
@@ -123,12 +136,16 @@ final class YamlSchemaTest extends TestCase
                 $error = 'Discovery must contain an identifier sysObjectID or sysDescr';
             }
 
-            $this->fail("$filename failed to validate against $schema_file\n\n$error");
+            return "$filename failed to validate against $schema_file\n\n$error";
         }
 
-        $errors = collect($validator->getErrors())
-            ->reduce(fn ($out, $error) => sprintf("%s[%s] %s\n", $out, $error['property'], $error['message']), '');
+        if (! $validator->isValid()) {
+            $errors = collect($validator->getErrors())
+                ->reduce(fn ($out, $error) => sprintf("%s[%s] %s\n", $out, $error['property'], $error['message']), '');
 
-        $this->assertTrue($validator->isValid(), "$filename does not validate. Violations:\n$errors");
+            return "$filename failed to validate against $schema_file\n\n$errors";
+        }
+
+        return null;
     }
 }

@@ -1,21 +1,20 @@
-mib: PBI-4000P-5000P-MIB
 modules:
     sensors:
         dbm:
             data:
                 -
-                    oid: tunerBER
+                    oid: PBI-4000P-5000P-MIB::tunerBER
                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.1.1.7.{{ $index }}'
                     descr: 'BER'
                     index: 'tunerBER.{{ $index }}'
                 -
-                    oid: tunerCN
+                    oid: PBI-4000P-5000P-MIB::tunerCN
                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.1.1.8.{{ $index }}'
                     descr: 'C/N'
                     index: 'tunerCN.{{ $index }}'
                     divisor: 10
                 -
-                    oid: tunerEbNo
+                    oid: PBI-4000P-5000P-MIB::tunerEbNo
                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.1.1.9.{{ $index }}'
                     descr: 'Eb/N0'
                     index: 'tunerEbNo.{{ $index }}'
@@ -23,7 +22,7 @@ modules:
         signal:
             data:
                 -
-                    oid: tunerStrength
+                    oid: PBI-4000P-5000P-MIB::tunerStrength
                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.1.1.6.{{ $index }}'
                     descr: 'Signal Strength'
                     index: 'tunerStrength.{{ $index }}'
@@ -31,7 +30,7 @@ modules:
         state:
             data:
                 -
-                    oid: tunerLock
+                    oid: PBI-4000P-5000P-MIB::tunerLock
                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.1.1.1.{{ $index }}'
                     descr: Tuner Lock
                     state_name: tunerLock
@@ -39,7 +38,7 @@ modules:
                         - { descr: No, graph: 1, value: 0, generic: 3 }
                         - { descr: Yes, graph: 1, value: 1, generic: 0 }
                 -
-                    oid: lnbVoltage
+                    oid: PBI-4000P-5000P-MIB::lnbVoltage
                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.3.4.{{ $index }}'
                     descr: LNB Voltage
                     state_name: lnbVoltage
@@ -48,7 +47,7 @@ modules:
                         - { descr: 13V, graph: 1, value: 1, generic: 0 }
                         - { descr: 18V, graph: 1, value: 2, generic: 0 }
                 -
-                    oid: lnb22KHz
+                    oid: PBI-4000P-5000P-MIB::lnb22KHz
                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.3.5.{{ $index }}'
                     descr: LNB 22KHz
                     state_name: lnb22KHz
@@ -56,7 +55,7 @@ modules:
                         - { descr: Off, graph: 1, value: 0, generic: 3 }
                         - { descr: On, graph: 1, value: 1, generic: 0 }
                 -
-                    oid: diseqc
+                    oid: PBI-4000P-5000P-MIB::diseqc
                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.3.6.{{ $index }}'
                     descr: DiSEqC
                     state_name: diseq
@@ -67,7 +66,7 @@ modules:
                         - { descr: PortC, graph: 1, value: 3, generic: 0 }
                         - { descr: PortD, graph: 1, value: 4, generic: 0 }
                 -
-                    oid: linkStatus
+                    oid: PBI-4000P-5000P-MIB::linkStatus
                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.1.3.4.{{ $index }}'
                     descr: Eth Link Status
                     state_name: linkStatus
@@ -76,7 +75,7 @@ modules:
                         - { descr: 10 MB, graph: 1, value: 1, generic: 2 }
                         - { descr: 100 MB, graph: 1, value: 2, generic: 0 }
                 -
-                    oid: ciSource
+                    oid: PBI-4000P-5000P-MIB::ciSource
                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.11.1.{{ $index }}'
                     descr: CI Source
                     state_name: ciSource
@@ -84,7 +83,7 @@ modules:
                         - { descr: ASI, graph: 1, value: 0, generic: 0 }
                         - { descr: Tuner, graph: 1, value: 1, generic: 0 }
                 -
-                    oid: ciLock
+                    oid: PBI-4000P-5000P-MIB::ciLock
                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.11.6.{{ $index }}'
                     descr: CI Lock
                     state_name: ciLock

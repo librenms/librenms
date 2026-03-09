@@ -1,7 +1,7 @@
 ## aspSMS
 
 aspSMS is a SMS provider that can be configured by using the generic API Transport.
-You need a token you can find on your personnal space.
+You need a token you can find on your personal space.
 
 [aspSMS docs](https://www.aspsms.com/en/documentation/)
 

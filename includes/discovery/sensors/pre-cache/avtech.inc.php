@@ -37,7 +37,7 @@ $virtual_tables = [
     'ra32s-switch' => '/\.1\.3\.6\.1\.4\.1\.20916\.1\.11\.1\.3\.((\d+)\.0)/',
 ];
 
-$data = trim(snmp_walk($device, '.1.3.6.1.4.1.20916.1', '-OQn'));
+$data = trim((string) snmp_walk($device, '.1.3.6.1.4.1.20916.1', '-OQn'));
 foreach (explode(PHP_EOL, $data) as $line) {
     [$oid, $value] = explode(' =', $line);
     $value = trim($value);

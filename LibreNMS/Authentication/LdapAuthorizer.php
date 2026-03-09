@@ -113,7 +113,7 @@ class LdapAuthorizer extends AuthorizerBase
             $group_names = array_keys($groups);
             $ldap_group_filter = '';
             foreach ($group_names as $group_name) {
-                $ldap_group_filter .= '(cn=' . trim($group_name) . ')';
+                $ldap_group_filter .= '(cn=' . trim((string) $group_name) . ')';
             }
             if (count($group_names) > 1) {
                 $ldap_group_filter = "(|{$ldap_group_filter})";
@@ -277,7 +277,7 @@ class LdapAuthorizer extends AuthorizerBase
 
         foreach ($results as $entry) {
             if (isset($entry['uid'][0]) && $entry['uid'][0] == $username) {
-                preg_match('~,ou=([^,]+),~', $entry['dn'], $matches);
+                preg_match('~,ou=([^,]+),~', (string) $entry['dn'], $matches);
                 $user_ou = $matches[1] ?? '';
                 $new_auth_ldap_suffix = preg_replace('/,ou=[^,]+,/', ',ou=' . $user_ou . ',', LibrenmsConfig::get('auth_ldap_suffix'));
                 LibrenmsConfig::set('auth_ldap_suffix', $new_auth_ldap_suffix);

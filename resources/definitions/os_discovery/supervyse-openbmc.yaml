@@ -1,0 +1,19 @@
+modules:
+    os:
+        hardware: SNMPv2-MIB::sysDescr.0
+        version: INSYDE-IPMI-MIB::bmcFWversion.0
+        serial: INSYDE-IPMI-MIB::baseboardSN.0
+    sensors:
+        state:
+            data:
+                -
+                    oid: INSYDE-IPMI-MIB::hostPwrStatus
+                    value: INSYDE-IPMI-MIB::hostPwrStatus
+                    num_oid: '.1.3.6.1.4.1.45065.1.1.1.1.{{ $index }}'
+                    descr: 'Host {{ $index }} Status'
+                    index: 'hostPwrStatus.{{ $index }}'
+                    state_name: hostPwrStatus
+                    states:
+                        - { descr: "OFF", graph: 1, value: 0, generic: 2 }
+                        - { descr: "ON", graph: 1, value: 1, generic: 0 }
+                        - { descr: "RESET", graph: 1, value: 2, generic: 1 }

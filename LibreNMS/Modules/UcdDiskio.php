@@ -154,7 +154,7 @@ class UcdDiskio implements Module
     private function valid_disk($os, $disk): bool
     {
         foreach (LibrenmsConfig::getCombined($os->getDevice()->os, 'bad_disk_regexp') as $bir) {
-            if (preg_match($bir . 'i', $disk)) {
+            if (preg_match($bir . 'i', (string) $disk)) {
                 Log::debug('Ignored Disk: ' . $disk . ' (matched: ' . $bir . ')');
 
                 return false;

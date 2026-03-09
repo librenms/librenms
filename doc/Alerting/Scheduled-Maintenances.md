@@ -15,7 +15,7 @@ are not created, and existing alerts will not recover. This is the default behav
 transport like mail is suppressed. This is useful if you just want "silence" for a period of time for whatever
 reason but don't want to lose sight of what is happening to your devices.
 - Run alerts: This is basically just a cosmetic maintenance. You will see that a device is in maintenance, but this
-setting will not supress alerts.
+setting will not suppress alerts.
 
 ## Managing Maintenances
 

@@ -292,7 +292,7 @@ the default User Role for Authorized users.   Appropriate care should be taken.
 
 ###  Claims / Access Scopes
 
-Socialite can specifiy scopes that should be included with in the authentication request.
+Socialite can specify scopes that should be included with in the authentication request.
 (see [Larvel docs](https://laravel.com/docs/10.x/socialite#access-scopes) )
 
 For example, if Okta is configured to expose group information it is possible to use these group
@@ -348,7 +348,7 @@ It is up the IdP to provide the relevant details that you will need for configur
 
     ACS URL = https://*your-librenms-url*/auth/saml2/callback
     Entity ID = https://*your-librenms-url*/auth/saml2
-    Name ID format = PERSISTANT
+    Name ID format = PERSISTENT
     Name ID = Basic Information > Primary email
 
     ![socialite-saml-google-4](../img/socialite-saml-google-4.png)
@@ -399,7 +399,7 @@ It is up the IdP to provide the relevant details that you will need for configur
 #### Using an Identity Provider metadata URL
 
 !!! note
-    This is the prefered and easiest way, if your IdP supports it!
+    This is the preferred and easiest way, if your IdP supports it!
 
 !!! setting "settings/auth/socialite"
     ```bash

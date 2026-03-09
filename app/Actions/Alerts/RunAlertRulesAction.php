@@ -31,7 +31,7 @@ use LibreNMS\Alert\AlertRules;
 
 class RunAlertRulesAction
 {
-    public function __construct(private Device $device, private AlertRules $rules)
+    public function __construct(private readonly Device $device, private readonly AlertRules $rules)
     {
     }
 

@@ -199,7 +199,7 @@ GRAPHQL;
     private function parseLabels($labels)
     {
         return array_map(function ($label) {
-            $name = preg_replace('/ :[\S]+:/', '', strtolower($label['name']));
+            $name = preg_replace('/ :[\S]+:/', '', strtolower((string) $label['name']));
 
             return str_replace('-', ' ', $name);
         }, $labels);
@@ -229,7 +229,7 @@ GRAPHQL;
 
             // only add the changelog if it isn't set to ignore
             if (! in_array('ignore changelog', $pr['labels'])) {
-                $title = addcslashes(ucfirst(trim(preg_replace('/^[\S]+: /', '', $pr['title']))), '<>');
+                $title = addcslashes(ucfirst(trim((string) preg_replace('/^[\S]+: /', '', (string) $pr['title']))), '<>');
                 $this->changelog[$category][] = "$title ([#{$pr['number']}]({$pr['url']})) - [{$pr['author']['login']}]({$pr['author']['url']})" . PHP_EOL;
             }
 
@@ -290,7 +290,7 @@ GRAPHQL;
 
         foreach ($this->changelog as $section => $items) {
             if (! empty($items)) {
-                $tmp_markdown .= '#### ' . ucwords($section) . PHP_EOL;
+                $tmp_markdown .= '#### ' . ucwords((string) $section) . PHP_EOL;
                 $tmp_markdown .= '* ' . implode('* ', $items) . PHP_EOL;
             }
         }

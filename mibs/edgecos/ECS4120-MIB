@@ -31,7 +31,7 @@ IMPORTS
                 FROM POWER-ETHERNET-MIB;
 
 ecs4120MIB MODULE-IDENTITY
-        LAST-UPDATED "202309280000Z"
+        LAST-UPDATED "202408010000Z"
         ORGANIZATION "Edgecore Networks, Inc."
         CONTACT-INFO
                 "Edgecore Networks, Inc.
@@ -49,7 +49,7 @@ ecs4120MIB MODULE-IDENTITY
                  technical support:brandsupport@edge-core.com"
         DESCRIPTION
                 "The MIB module for ECS4120-Series."
-        REVISION "202309280000Z"
+        REVISION "202408010000Z"
         DESCRIPTION
                 "The current version of this MIB."
         ::= { edgeCoreNetworksMgt 45 }
@@ -2704,6 +2704,7 @@ TrunkEntry ::= SEQUENCE
     trunkCreation             INTEGER,
     trunkStatus               ValidStatus,
     trunkResetConfiguration   INTEGER,
+    trunkBandwidth            INTEGER,	
     trunkLinkDelayUp          Integer32,
     trunkLinkDelayDown        Integer32   
 }
@@ -2760,14 +2761,25 @@ trunkResetConfiguration OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Set this variable to reset(1) to reset the trunk configuration to its original state."
     ::= { trunkEntry 6 }
-    
+
+trunkBandwidth OBJECT-TYPE
+    SYNTAX      INTEGER	            
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The bandwidth of the trunk(Mb per second). If the entry represents a trunk,
+         the speed is that of its individual members unless
+         the member ports have been inconsistently configured
+         in which case the value is 0."
+    ::= { trunkEntry 7 }	
+ 
 trunkLinkDelayUp OBJECT-TYPE
         SYNTAX      Integer32(0..30)
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "Keep port state for a few time that it does 
                      not become up state."
-        ::= { trunkEntry 7 }
+        ::= { trunkEntry 8 }
         
 trunkLinkDelayDown OBJECT-TYPE
         SYNTAX      Integer32(0..30)
@@ -2775,8 +2787,8 @@ trunkLinkDelayDown OBJECT-TYPE
         STATUS      current
         DESCRIPTION "Keep port state for a few time that it does 
                      not become down state."
-        ::= { trunkEntry 8 } 
-        
+        ::= { trunkEntry 9 } 
+
 trunkBalanceMode OBJECT-TYPE
     SYNTAX  INTEGER
     {
@@ -5619,7 +5631,9 @@ DhcpcInterfaceEntry ::= SEQUENCE
 {
    dhcpcIfIndex         Integer32,
    dhcpcIfVendorClassIdMode  INTEGER,
-   dhcpcIfVendorClassId      OCTET STRING
+   dhcpcIfVendorClassId      OCTET STRING,
+   dhcpcIfHostnameMode  INTEGER,
+   dhcpcIfHostname     OCTET STRING
 }
 
 dhcpcIfIndex OBJECT-TYPE
@@ -5651,6 +5665,27 @@ dhcpcIfVendorClassId OBJECT-TYPE
                       This value may be used by DHCP servers to identify vendor
                       classof the client."
          ::= { dhcpcInterfaceEntry 5 }
+dhcpcIfHostnameMode OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                      notSpecify(1),
+                      text(2),
+                      hex(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Whether the Hostname is in text mode or in
+                     Hex mode."
+        ::= { dhcpcInterfaceEntry 6 }
+
+dhcpcIfHostname OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE(1..256))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION "The value that the DHCP client sets in the Hostname option of DHCPDISCOVER and DHCPREQUEST messages.
+                      This value may be used by DHCP servers to identify Hostname of the client."
+         ::= { dhcpcInterfaceEntry 7 }
+	 
 --
 -- dhcpRealyMgt
 --         
@@ -7973,7 +8008,22 @@ trapVarOwnerName OBJECT-TYPE
     STATUS      current
     DESCRIPTION "The name of the owner for sflow trap."
     ::= { trapVar 69 }
+	
+-- For SFP's alarm/warning threshold	
+trapSfpThresholdAlarmWarnThreshold OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..10))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "SFP's alarm/warning threshold ."
+    ::= { trapVar 85 }
 
+-- For SFP's alarm/warning actual value	
+trapSfpThresholdAlarmWarnValue OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..10))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "SFP's alarm/warning actual value ."
+    ::= { trapVar 86 }
 --
 -- AlarmMgt
 --
@@ -12382,7 +12432,8 @@ userAuthEnablePassword OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Set enable password or delete enable password. NULL is used to
                  delete the enable password. The password is starting with
-                 alphanumeric."
+                 alphanumeric.When any method have authentication failure except other error, 
+				 the fallback allow use the next authentication method."
     ::= { userAuthMgt 3 }
 
 userAuthMethod OBJECT-TYPE
@@ -12402,7 +12453,19 @@ userAuthMethod OBJECT-TYPE
                     tacacslocal(12),
                     tacacslocalradius(13),
                     tacacsradius(14),
-                    tacacsradiuslocal(15)
+                    tacacsradiuslocal(15),
+                    localradiusfallback(16),
+                    localradiustacacsfallback(17),
+                    localtacacsfallback(18),
+                    localtacacsradiusfallback(19),
+                    radiuslocalfallback(20),
+                    radiuslocaltacacsfallback(21),
+                    radiustacacsfallback(22),
+                    radiustacacslocalfallback(23),
+                    tacacslocalfallback(24),
+                    tacacslocalradiusfallback(25),
+                    tacacsradiusfallback(26),
+                    tacacsradiuslocalfallback(27)
                 }
     MAX-ACCESS  read-write
     STATUS      current
@@ -18207,7 +18270,11 @@ DhcpSnoopPortConfigEntry    ::= SEQUENCE
         dhcpSnoopPortInformationOptionCIDString         OCTET STRING,
         dhcpSnoopPortInformationOptionCIDTr101VlanField EnabledStatus,
         dhcpSnoopPortMaxNumber      Integer32,
-        dhcpSnoopPortVlanFlooding   EnabledStatus
+        dhcpSnoopPortVlanFlooding   EnabledStatus,   
+		dhcpSnoopPortInformationOptionRID               INTEGER,
+        dhcpSnoopPortInformationOptionRIDString         OCTET STRING,
+        dhcpSnoopPortInformationOptionRIDTr101VlanField EnabledStatus,
+		dhcpSnoopPortInformationPolicy                  INTEGER
 }
 
 dhcpSnoopPortIfIndex        OBJECT-TYPE
@@ -18274,7 +18341,60 @@ dhcpSnoopPortVlanFlooding    OBJECT-TYPE
         DESCRIPTION "This object indicates whether the port or trunk perform vlan flooding
                      when DHCP Snooping is disabled on that VLAN."
         ::= { dhcpSnoopPortConfigEntry 7 }
+		
+dhcpSnoopPortInformationOptionRID    OBJECT-TYPE
+        SYNTAX     INTEGER
+                    {
+                        none(0),
+                        macHex(1),
+                        macAscii(2),
+                        ipHex(3),
+						ipAscii(4),
+						string(5),
+						tr101IP(6),
+						tr101Sysname(7),	
+						plus-port-description(8),
+						port-description(9)
+					
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates the different option that is inserted to relay agent
+                     information remote ID sub-option."
+        ::= { dhcpSnoopPortConfigEntry 8 }
 
+dhcpSnoopPortInformationOptionRIDString OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Inserts string in remote ID sub-option."
+        ::= { dhcpSnoopPortConfigEntry 9 }
+
+dhcpSnoopPortInformationOptionRIDTr101VlanField  OBJECT-TYPE
+        SYNTAX     EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates whether the remote ID TR101 vlan field is enabled."
+        ::= { dhcpSnoopPortConfigEntry 10 }
+		
+dhcpSnoopPortInformationPolicy     OBJECT-TYPE
+        SYNTAX     INTEGER
+                    {
+					    none(0),
+                        drop(1),
+                        keep(2),
+                        replace(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates which reforwarding policy shall be used for DHCP
+                     snooping information option(option 82). A value of drop(1) means to drop
+                     the DHCP request packet which has the information option(option 82).
+                     A value of keep(2) means to keep the existing information option(option 82)
+                     of the DHCP request packet. A value of replace(3), which is the default value,
+                     means to replace the existing information option(option 82) of the DHCP
+                     request packet."
+        ::= { dhcpSnoopPortConfigEntry 11 }
 --
 dhcpSnoopBindingsTable      OBJECT-TYPE
         SYNTAX      SEQUENCE OF DhcpSnoopBindingsEntry
@@ -22832,7 +22952,9 @@ sfpThresholdAlarmWarnTrap NOTIFICATION-TYPE
         OBJECTS
         {
             trapSfpThresholdAlarmWarnIfIndex,
-            trapSfpThresholdAlarmWarnType
+            trapSfpThresholdAlarmWarnType,
+			trapSfpThresholdAlarmWarnThreshold,
+			trapSfpThresholdAlarmWarnValue
         }
         STATUS      current
         DESCRIPTION
@@ -22991,5 +23113,31 @@ erpsInstanceEastRingPortStateChangeTrap NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION "This trap is sent when the east ring port state of ERP instance changes."
     ::= { ecs4120TrapsPrefix 267 }
+--
+-- Smart-pair trap
+--
 
+smartpairPrimaryPortTrap NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION "This trap is sent when the smart pair forwarding change to primary port."
+    ::= { ecs4120TrapsPrefix 287 }
+    
+smartpairBackupPortTrap NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION "This trap is sent when the smart pair forwarding change to backup port."
+    ::= { ecs4120TrapsPrefix 288 }    
+
+--
+-- Rx los Interrupt trap
+--
+
+sfpRxlosInterruptDisableTrap NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION "This trap is sent when the SFP Rx LOS Flapping detected, interrupt disabled."
+    ::= { ecs4120TrapsPrefix 289 }
+    
+sfpRxlosInterruptEnableTrap NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION "This trap is sent when the SFP Rx LOS Flapping stopped, interrupt enabled."
+    ::= { ecs4120TrapsPrefix 290 }
 END

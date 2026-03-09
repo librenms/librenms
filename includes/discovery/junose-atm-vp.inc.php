@@ -6,13 +6,13 @@
 use App\Facades\LibrenmsConfig;
 
 if ($device['os'] == 'junose' && LibrenmsConfig::get('enable_ports_junoseatmvp')) {
-    $vp_array = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsInCells', $vp_array, 'Juniper-UNI-ATM-MIB', 'junose');
+    $vp_array = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsInCells', $vp_array, 'Juniper-UNI-ATM-MIB', 'juniper/junose');
     $valid_vp = [];
     d_echo($vp_array);
 
     if (is_array($vp_array)) {
         foreach ($vp_array as $index => $entry) {
-            [$ifIndex,$vp_id] = explode('.', $index);
+            [$ifIndex,$vp_id] = explode('.', (string) $index);
 
             $port_id = dbFetchCell('SELECT `port_id` FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $ifIndex]);
 

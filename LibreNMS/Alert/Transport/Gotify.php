@@ -51,7 +51,7 @@ class Gotify extends Transport
 
         $data = [
             'title' => $alert_data['title'],
-            'message' => preg_replace('/([a-z0-9]+)_([a-z0-9]+)/', "$1\_$2", $alert_data['msg']),
+            'message' => preg_replace('/([a-z0-9]+)_([a-z0-9]+)/', "$1\_$2", (string) $alert_data['msg']),
             'priority' => $priority,
             'extras' => [
                 'client::display' => [

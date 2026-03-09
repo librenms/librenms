@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "algcom-sm",
-                    "type": "power",
+                    "type": "environment",
                     "serial": null,
                     "icon": "algcom.png"
                 }

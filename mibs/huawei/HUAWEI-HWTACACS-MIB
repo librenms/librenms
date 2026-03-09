@@ -1,9 +1,9 @@
 -- =================================================================
-    -- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved
+    -- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved
     -- 
     -- Description:HUAWEI-HWTACACS-MIB
     -- Reference:
-    -- Version: V2.09
+    -- Version: V2.10
     -- History:
     --    <d30957>,<2003-03-20>,<create>
     -- =================================================================
@@ -26,7 +26,7 @@ IMPORTS
         FROM RFC1155-SMI; 
         
     hwTACACS MODULE-IDENTITY 
-            LAST-UPDATED "201611021620Z"        -- Nov  2, 2016 at 9:00 GMT
+            LAST-UPDATED "201907231457Z"        -- Jul  23, 2019 at 14:57 GMT
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -37,7 +37,10 @@ IMPORTS
                      Website: http://www.huawei.com
                      Email: support@huawei.com
                   " 
-            DESCRIPTION 
+           DESCRIPTION 
+                "Add hwTACACSServerSourceVlanifV4,hwTACACSServerSourceVlanifV6"
+           REVISION    "201907231457Z" 
+           DESCRIPTION 
                 "Update descriptions of hwtacacsClientAuthenServerType, hwtacacsClientAuthorServerType, hwtacacsClientAccountServerType, hwtacacsClientCommonServerType nodes,"
            REVISION    "201611021620Z" 
 		    DESCRIPTION 
@@ -49,6 +52,13 @@ IMPORTS
             DESCRIPTION 
                 "hwTACACSServerGroupKey range is changed from 0-255 to 0-392"
             REVISION    "201505061600Z" 
+           DESCRIPTION 
+                "Shared-key range is changed from 0-255 to 0-392"
+
+           REVISION    "201504011600Z"
+           DESCRIPTION 
+                "The MIB contains objects of module HWTACACS."
+           REVISION    "201402251600Z" 
             DESCRIPTION 
                 "Modify hwTACACSServerGroupTimer value range."
             REVISION    "201308241100Z"   
@@ -58,13 +68,7 @@ IMPORTS
             DESCRIPTION 
                 "Add hwTacacsSetting table."
             REVISION    "201303081600Z" 
-            DESCRIPTION 
-                "The MIB contains objects of module HWTACACS."
-           REVISION    "201402251600Z" 
-           DESCRIPTION 
-                "Shared-key range is changed from 0-255 to 0-392"
-
-           REVISION    "201504011600Z" 
+             
            DESCRIPTION 
                 "Added common server mib table"			
             ::= { hwDatacomm 20 }
@@ -220,7 +224,9 @@ IMPORTS
 	  hwTACACSServerSecAccoutKey    OCTET STRING,
 	  hwTACACSServerThiAuthenKey    OCTET STRING,
 	  hwTACACSServerThiAuthorKey    OCTET STRING,
-	  hwTACACSServerThiAccoutKey    OCTET STRING
+	  hwTACACSServerThiAccoutKey    OCTET STRING,
+                     hwTACACSServerSourceVlanifV4    Integer32,
+	  hwTACACSServerSourceVlanifV6    Integer32
     }
             
   hwTACACSServerGroupIndex OBJECT-TYPE
@@ -274,7 +280,7 @@ IMPORTS
     STATUS      current
     DESCRIPTION
         "Domain switch:1,open;2,close;3,original."
-    DEFVAL {1}
+    DEFVAL {open}
     ::={ hwTACACSServerGroupEntry 6 }
 
   hwTACACSServerGroupOctFmt OBJECT-TYPE
@@ -289,7 +295,7 @@ IMPORTS
     STATUS      current
     DESCRIPTION
         "Set octet format,The value must be byte(1), kbyte(2), mbyte(3), gbyte(4)."
-    DEFVAL {1}
+    DEFVAL {byte}
     ::={ hwTACACSServerGroupEntry 7 }
     
     
@@ -1289,7 +1295,25 @@ hwTACACSServerGroupRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Specify group encryption shared-key for thrid account server."
-    ::={ hwTACACSServerGroupEntry 129 }	
+    ::={ hwTACACSServerGroupEntry 129 }
+
+
+   hwTACACSServerSourceVlanifV4 OBJECT-TYPE
+    SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Source vlanifv4."
+    ::={ hwTACACSServerGroupEntry 130 }
+	
+   
+   hwTACACSServerSourceVlanifV6 OBJECT-TYPE
+	SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Source vlanifv6."
+    ::={ hwTACACSServerGroupEntry 131 }	
 		
     --  ============== conformance information ==============
         hwTacacsConformance OBJECT IDENTIFIER ::= { hwTACACS 2 }
@@ -1439,7 +1463,9 @@ hwTACACSServerGroupRowStatus OBJECT-TYPE
 	  hwTACACSServerSecAccoutKey    ,
 	  hwTACACSServerThiAuthenKey    ,
 	  hwTACACSServerThiAuthorKey    ,
-	  hwTACACSServerThiAccoutKey   
+	  hwTACACSServerThiAccoutKey   ,
+                     hwTACACSServerSourceVlanifV4,
+	  hwTACACSServerSourceVlanifV6
 	  }
             STATUS current
             DESCRIPTION 

@@ -1,5 +1,7 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
+
 require 'includes/html/graphs/common.inc.php';
 
 $scale_min = 0;
@@ -17,13 +19,13 @@ $i = 0;
 $x = 0;
 
 if (Rrd::checkRrdExists($rrd_filename)) {
-    $max_colours = count(Config::get("graph_colours.$colours"));
+    $max_colours = count(LibrenmsConfig::get("graph_colours.$colours"));
     foreach ($array as $ds => $var) {
         $x = (($x <= $max_colours) ? $x : 0);
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];
         $rrd_list[$i]['ds'] = $ds;
-        $rrd_list[$i]['colour'] = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$x");
+        $rrd_list[$i]['colour'] = LibrenmsConfig::get("graph_colours.$colours.$x");
         $i++;
         $x++;
     }

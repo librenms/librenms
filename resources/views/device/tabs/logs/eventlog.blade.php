@@ -73,6 +73,6 @@
                 term: params.term,
                 page: params.page || 1
             }
-        }, @json($eventtype));
+        }, @json($eventtype), 'All Types');
     </script>
 @endsection

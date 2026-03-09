@@ -54,6 +54,7 @@ been up for 30344 seconds`.
 - Features of the Device: `$alert->features`
 - Serial number of the Device: `$alert->serial`
 - Location of the Device: `$alert->location`
+- Device Groups of the Device (group_id->group_name Array): `$alert->device_groups`
 - uptime of the Device (in seconds): `$alert->uptime`
 - Short uptime of the Device (28d 22h 30m 7s): `$alert->uptime_short`
 - Long uptime of the Device (28 days, 22h 30m 7s): `$alert->uptime_long`
@@ -139,6 +140,14 @@ In your alert template just use
 ```
 
 For more info on extending templates, see the [Laravel documentation](https://laravel.com/docs/blade#extending-a-layout).
+
+### Including other Alert templates
+
+Another way to extend a template, is to reuse the content of other Alert templates in LibreNMS. This can be done by leveraging the AlertTemplate database model. All inside the included template needed variables, need to be passed through to the second parameter (e.g.```["alert" => $alert]```) of the method Blade:render(). 
+With the following example the entire content of the template with the ID 5 will be included.  This could be useful to have all common text parts in seperate templates. E.g. headers or footers.
+```php
+{ \Illuminate\Support\Facades\Blade::render(\App\Models\AlertTemplate::find(5)->template , ["alert" => $alert]) }}
+```
 
 ## Examples
 

@@ -28,6 +28,8 @@ class CheckAlerts
     public function handle(DevicePolled $event): void
     {
         if (LibrenmsConfig::get('alert.disable')) {
+            Log::info('#### Alerting disabled ####');
+
             return;
         }
 

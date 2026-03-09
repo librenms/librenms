@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Util;
 
-use App;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\HeaderBag;
 

@@ -3,7 +3,7 @@
 $oids = snmp_walk($device, '.1.3.6.1.4.1.3854.1.2.2.1.16.1.4', '-Osqn', '');
 d_echo($oids . "\n");
 
-$oids = trim($oids);
+$oids = trim((string) $oids);
 if ($oids) {
     echo 'AKCP ';
 }

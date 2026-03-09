@@ -6,40 +6,41 @@ IMPORTS
 	router
 		FROM FOUNDRY-SN-ROOT-MIB
 	ifIndex
-		FROM IF-MIB
+		FROM IF-MIB	
 	DisplayString,TEXTUAL-CONVENTION
 		FROM SNMPv2-TC;
-
+		
 snPOS MODULE-IDENTITY
-    LAST-UPDATED "201006020000Z"  -- 04 June 2010
-    ORGANIZATION "Brocade Communications Systems, Inc."
-    CONTACT-INFO
-             "Technical Support Center
-              130 Holger Way,
-              San Jose, CA  95134
-              Email:  ipsupport@brocade.com
-              Phone: 1-800-752-8061
-              URL:  www.brocade.com"
-    DESCRIPTION
-             "Copyright 1996-2010 Brocade Communications Systems, Inc.
-              All rights reserved.
-              This Brocade Communications Systems SNMP Management Information Base Specification
-              embodies Brocade Communications Systems' confidential and proprietary
-              intellectual property. Brocade Communications Systems retains all
-              title and ownership in the Specification, including any revisions.
-
-              This Specification is supplied AS IS, and Brocade Communications Systems makes
-              no warranty, either express or implied, as to the use,
-              operation, condition, or performance of the specification, and any unintended
-              consequence it may on the user environment."
-
-    REVISION        "201006020000Z"  -- 04 June 2010
-    DESCRIPTION
-        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
-
-    REVISION     "200909300000Z" -- September 30, 2009
-    DESCRIPTION
+	LAST-UPDATED "201708070000Z" -- Aug 7, 2017
+	ORGANIZATION "Ruckus Wireless, Inc."
+	CONTACT-INFO
+			"
+			Technical Support Center, Ruckus Wireless, Inc,
+			350 West Java Drive,
+			Sunnyvale, CA 94089, USA
+			Support URL: https://support.ruckuswireless.com
+			Phone: +1-855-782-5871
+			ROW TF Numbers: https://support.ruckuswireless.com/contact-us"
+	DESCRIPTION
+			"
+			Copyright 1996-2017 Ruckus Wireless, Inc..
+			All rights reserved.
+			This Ruckus Wireless, Inc SNMP Management Information Base Specification
+			embodies Ruckus Wireless, Inc' confidential and proprietary
+			intellectual property. Ruckus Wireless, Inc retains all
+			title and ownership in the Specification, including any
+			revisions.
+			
+			This Specification is supplied AS IS, and Ruckus Wireless, Inc makes
+			no warranty, either express or implied, as to the use,
+			operation, condition, or performance of the Specification.			
+			"            
+	REVISION     "200909300000Z" -- September 30, 2009
+	DESCRIPTION
 			""
+	REVISION     "201708070000Z" -- Aug 7, 2017
+	DESCRIPTION
+             "Modified contact Info, Organization and Decscription"
    ::= { router 14}
 
 	-- textual conventions
@@ -61,7 +62,7 @@ snPOSInfoTable OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS  current
 	DESCRIPTION
-		"A specific snPOSInfo group consists of a number of
+		"A specific snPOSInfo group consists of a number of 
 		 switch ports.  "
 	::= { snPOSInfo 1 }
 
@@ -70,13 +71,13 @@ snPOSInfoEntry OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS  current
 	DESCRIPTION
-		"An entry in the snPOSInfo table indicates the
-		 configuration on a specified port. A SNMP SET PDU
-		 for a row of the snPOSInfoTable requires the entired
-		 sequence of the MIB Objects in each
-		 snPOSInfoEntry stored in one PDU.  Otherwise,
+		"An entry in the snPOSInfo table indicates the 
+		 configuration on a specified port. A SNMP SET PDU 
+		 for a row of the snPOSInfoTable requires the entired 
+		 sequence of the MIB Objects in each 
+		 snPOSInfoEntry stored in one PDU.  Otherwise, 
 		 GENERR return-value will be returned."
-	INDEX   {
+	INDEX   { 
 		snPOSInfoPortNum
 	}
 	::= { snPOSInfoTable 1 }
@@ -122,7 +123,7 @@ SnPOSInfoEntry ::= SEQUENCE {
 		Counter32,
 	snPOSStatsFCSErrors
 		Counter32,
-	snPOSStatsFrameTooLongs
+	snPOSStatsFrameTooLongs              
 		Counter32,
 	snPOSStatsFrameTooShorts
 		Counter32,
@@ -173,7 +174,7 @@ snPOSInfoPortNum OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"The port index.
-		 The bit 0 to bit 7: port number.
+		 The bit 0 to bit 7: port number. 
 		 The bit 8 to bit 11: slot number (slot for chassis only)."
 	::= { snPOSInfoEntry 1 }
 
@@ -216,7 +217,7 @@ snPOSInfoSpeed OBJECT-TYPE
 		}
 	MAX-ACCESS  read-write
 	STATUS  current
-	DESCRIPTION
+	DESCRIPTION     
 		"The speed configuration for a port. The values are:
 		155000
 		622000
@@ -236,7 +237,7 @@ snPOSInfoAdminStatus OBJECT-TYPE
 	DESCRIPTION
 		"The desired state of all ports.  The
 		testing(3) state indicates that no operational
-		packets can be passed.
+		packets can be passed. 
 		(same as ifAdminStatus in MIB-II)"
 	::= { snPOSInfoEntry 6 }
 
@@ -252,14 +253,14 @@ snPOSInfoLinkStatus OBJECT-TYPE
 	DESCRIPTION
 		"The current operational state of the interface.
 		 The testing(3) state indicates that no operational
-		 packets can be passed.
+		 packets can be passed. 
 		 (same as ifOperStatus in MIB-II)"
 	::= { snPOSInfoEntry 7 }
 
 
 snPOSInfoClock  OBJECT-TYPE
 	SYNTAX  INTEGER {
-		internal(1),
+		internal(1),     
 		line(2)
 		}
 	MAX-ACCESS  read-write
@@ -270,7 +271,7 @@ snPOSInfoClock  OBJECT-TYPE
 
 snPOSInfoLoopBack   OBJECT-TYPE
 	SYNTAX  INTEGER {
-		line(1),
+		line(1),     
 		internal(2),
 		none(3)
 		}
@@ -290,7 +291,7 @@ snPOSInfoScrambleATM  OBJECT-TYPE
 
 snPOSInfoFraming  OBJECT-TYPE
 	SYNTAX  INTEGER {
-		sonet(1),
+		sonet(1),     
 		sdh(2)
 		}
 	MAX-ACCESS  read-write
@@ -301,7 +302,7 @@ snPOSInfoFraming  OBJECT-TYPE
 
 snPOSInfoCRC  OBJECT-TYPE
 	SYNTAX  INTEGER {
-		crc32bits(1),
+		crc32bits(1),     
 		crc16bits(2)
 		}
 	MAX-ACCESS  read-write
@@ -366,9 +367,9 @@ snPOSStatsAlignErrors   OBJECT-TYPE
 	 MAX-ACCESS     read-only
 	 STATUS     current
 	 DESCRIPTION
-		"dot3StatsAlignmentErrors : A count of frames
-		received on a particular interface that are
-		not an integral number of octets in length
+		"dot3StatsAlignmentErrors : A count of frames 
+		received on a particular interface that are 
+		not an integral number of octets in length 
 		and do not pass the FCS check.
 
 		The count represented by an instance of this
@@ -386,9 +387,9 @@ snPOSStatsFCSErrors   OBJECT-TYPE
 	 MAX-ACCESS      read-only
 	 STATUS      current
 	 DESCRIPTION
-		"dot3StatsFCSErrors : A count of frames received
-		on a particular interface that are an integral
-		number of octets in length but do not pass the
+		"dot3StatsFCSErrors : A count of frames received 
+		on a particular interface that are an integral 
+		number of octets in length but do not pass the 
 		FCS check.
 
 		The count represented by an instance of this
@@ -407,8 +408,8 @@ snPOSStatsFrameTooLongs   OBJECT-TYPE
 	 MAX-ACCESS    read-only
 	 STATUS    current
 	 DESCRIPTION
-		"dot3StatsFrameTooLongs : A count of frames
-		received on a particular interface that
+		"dot3StatsFrameTooLongs : A count of frames 
+		received on a particular interface that 
 		exceed the maximum permitted frame size.
 
 		The count represented by an instance of this
@@ -427,8 +428,8 @@ snPOSStatsFrameTooShorts   OBJECT-TYPE
 	 MAX-ACCESS    read-only
 	 STATUS    current
 	 DESCRIPTION
-		" A count of frames received on a particular
-		interface that below the minimum permitted
+		" A count of frames received on a particular 
+		interface that below the minimum permitted 
 		frame size."
 	::= { snPOSInfoEntry 22 }
 
@@ -543,14 +544,14 @@ snPOSStatsOutUtilization OBJECT-TYPE
 
 snPOSTagType OBJECT-TYPE
 	SYNTAX  INTEGER {
-		tagged(1),
-		untagged(2)
+		tagged(1),      
+		untagged(2)    
 		}
 	MAX-ACCESS  read-only
 	STATUS  current
 	DESCRIPTION
-		"For tagged port, we could have multiple VLANs
-		 per port."
+		"For tagged port, we could have multiple VLANs 
+		 per port."  
 	::= {snPOSInfoEntry  33}
 
 snPOSStatsB1 OBJECT-TYPE
@@ -624,7 +625,7 @@ snPOSInfo2Table OBJECT-TYPE
 	MAX-ACCESS		not-accessible
 	STATUS		current
 	DESCRIPTION
-		"An snPOSInfo2Table consists of a number of
+		"An snPOSInfo2Table consists of a number of 
 		 SnPOSInfo2Entry entries"
 	::= { snPOSInfo 2 }
 
@@ -633,10 +634,10 @@ snPOSInfo2Entry OBJECT-TYPE
 	MAX-ACCESS		not-accessible
 	STATUS		current
 	DESCRIPTION
-		"An entry in the snPOSInfo2Table indicates the
+		"An entry in the snPOSInfo2Table indicates the 
 		 POS configuration on a specified port"
 	INDEX {
-		ifIndex
+		ifIndex 
 	}
 	::= { snPOSInfo2Table 1 }
 
@@ -648,9 +649,9 @@ SnPOSInfo2Entry ::= SEQUENCE {
 	snPOSInfo2CRC
 		INTEGER,
 	snPOSInfo2KeepAlive
-		Unsigned32,
+		Unsigned32,	
 	snPOSInfo2FlagC2
-		Unsigned32,
+		Unsigned32,		
 	snPOSInfo2SSM
 		INTEGER,
 	snPOSInfo2Encapsulation
@@ -746,10 +747,10 @@ snPOSInfo2SSM OBJECT-TYPE
 	MAX-ACCESS		read-write
 	STATUS		current
 	DESCRIPTION
-		"The S(ynchronization) S(tatus) M(essage) is sent over
-		 the SONET/SDH line to tell the other end about the
+		"The S(ynchronization) S(tatus) M(essage) is sent over 
+		 the SONET/SDH line to tell the other end about the 
 		 quality of clock being sent over the line.
-
+		 
 		t1SonetPrimaryReferenceSource(1)		- SONET Primary Reference Source
 		t1SonetTraceabilityUnknown(2}			- SONET Traceability Unknown
 		t1SonetStratum2Traceable(3)				- SONET Stratum 2 Traceable
@@ -829,7 +830,7 @@ snPOSInfo2OverheadJ1MessageLength OBJECT-TYPE
 	DESCRIPTION
 		"Overhead J1 Length of Message
 		 s16(16)...........16 bytes
-		 s64(64)............64 bytes"
+		 s64(64)............64 bytes"  
 	DEFVAL		{ s64 }
 	::= { snPOSInfo2Entry 12 }
 
@@ -842,7 +843,7 @@ snPOSInfo2OverheadJ1TransmitMessage OBJECT-TYPE
 	::= { snPOSInfo2Entry 13 }
 
 -- POS PPP Group
--- If the L2 encapsulation is PPP, the following will provide
+-- If the L2 encapsulation is PPP, the following will provide 
 -- information on the states of various control protocols
 
 snPOSPPPTable OBJECT-TYPE
@@ -850,7 +851,7 @@ snPOSPPPTable OBJECT-TYPE
 	MAX-ACCESS		not-accessible
 	STATUS		current
 	DESCRIPTION
-		"An snPOSPPPTable consists of a number of
+		"An snPOSPPPTable consists of a number of 
 		 SnPOSPPPEntry entries"
 	::= { snPOSInfo 3 }
 
@@ -859,13 +860,13 @@ snPOSPPPEntry OBJECT-TYPE
 	MAX-ACCESS		not-accessible
 	STATUS		current
 	DESCRIPTION
-		"An entry in the snPOSPPPTable indicates the
+		"An entry in the snPOSPPPTable indicates the 
 		 PPP control protocol status on a specified port"
 	INDEX  {
 		ifIndex
 	}
 	::= { snPOSPPPTable 1 }
-
+	
 SnPOSPPPEntry ::= SEQUENCE {
 	snPosPppLcp
 		DisplayString,
@@ -920,7 +921,7 @@ snPosPppMpLscp  OBJECT-TYPE
 	::= { snPOSPPPEntry 5 }
 
 -- POS cHDLC Group
--- If the L2 encapsulation is cHDLC, the following will provide
+-- If the L2 encapsulation is cHDLC, the following will provide 
 -- information various cHDLC paraemters
 
 snPOScHDLCTable OBJECT-TYPE
@@ -928,7 +929,7 @@ snPOScHDLCTable OBJECT-TYPE
 	MAX-ACCESS		not-accessible
 	STATUS		current
 	DESCRIPTION
-		"An snPOScHDLCTable consists of a number of
+		"An snPOScHDLCTable consists of a number of 
 		 SnPOScHDLCEntry entries"
 	::= { snPOSInfo 4 }
 
@@ -937,13 +938,13 @@ snPOScHDLCEntry OBJECT-TYPE
 	MAX-ACCESS		not-accessible
 	STATUS		current
 	DESCRIPTION
-		"An entry in snPOScHDLCEntry shows the
+		"An entry in snPOScHDLCEntry shows the 
 		 cHDLC information on a specified port"
 	INDEX {
 		ifIndex
 	}
 	::= { snPOScHDLCTable 1 }
-
+	
 SnPOScHDLCEntry ::= SEQUENCE {
 	snPOScHDLCLineState
 		INTEGER,
@@ -1026,6 +1027,3 @@ snPOScHDLCUniqueReceived  OBJECT-TYPE
 	::= { snPOScHDLCEntry 7 }
 
 END
--- *****************************************************************
--- Commited Access Rate MIB file.
--- *****************************************************************

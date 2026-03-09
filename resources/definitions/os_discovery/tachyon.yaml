@@ -1,4 +1,3 @@
-mib: TACHYON-MIB
 
 modules:
 
@@ -14,34 +13,34 @@ modules:
     processors:
         data:
             -
-                oid: cpuUsagePercent
+                oid: TACHYON-MIB::cpuUsagePercent
                 num_oid: '.1.3.6.1.4.1.57344.1.3.6.{{ $index }}'
     sensors:
         additional_oids:
             data:
                 -
                     oid:
-                        - wirelessPeerMac
-                        - wirelessPeerName
+                        - TACHYON-MIB::wirelessPeerMac
+                        - TACHYON-MIB::wirelessPeerName
 
         temperature:
             data:
                 -
-                    oid: cpuTemperature
+                    oid: TACHYON-MIB::cpuTemperature
                     num_oid: ".1.3.6.1.4.1.57344.1.3.3.{{ $index }}"
                     descr: CPU temperature
                     index: "cpuTemperature.{{ $index }}"
                     low_limit: -40
                     high_limit: 75
                 -
-                    oid: wirelessRadioTemperature
+                    oid: TACHYON-MIB::wirelessRadioTemperature
                     num_oid: ".1.3.6.1.4.1.57344.1.2.2.1.11.{{ $index }}"
                     descr: Radio temperature
                     index: "wirelessRadioTemperature.{{ $index }}"
                     low_limit: -40
                     high_limit: 75
                 -
-                    oid: wirelessRadioModemTemperature
+                    oid: TACHYON-MIB::wirelessRadioModemTemperature
                     num_oid: ".1.3.6.1.4.1.57344.1.2.2.1.10.{{ $index }}"
                     descr: Radio Modem temperature
                     index: "wirelessRadioModemTemperature.{{ $index }}"
@@ -51,14 +50,14 @@ modules:
         frequency:
             data:
                 -
-                    oid: wirelessRadioFrequency
+                    oid: TACHYON-MIB::wirelessRadioFrequency
                     num_oid: ".1.3.6.1.4.1.57344.1.2.2.1.5.{{ $index }}"
                     descr: Frequency
                     index: "wirelessRadioFrequency.{{ $index }}"
                     multiplier: 1000000
 
                 -
-                    oid: wirelessRadioChannelWidth
+                    oid: TACHYON-MIB::wirelessRadioChannelWidth
                     num_oid: ".1.3.6.1.4.1.57344.1.2.2.1.6.{{ $index }}"
                     descr: Channel widht
                     index: "wirelessRadioChannelWidth.{{ $index }}"
@@ -68,7 +67,7 @@ modules:
         count:
             data:
                 -
-                    oid: wirelessPeersCount
+                    oid: TACHYON-MIB::wirelessPeersCount
                     num_oid: ".1.3.6.1.4.1.57344.1.2.5.{{ $index }}"
                     descr: Station
                     index: "wirelessPeersCount.{{ $index }}"
@@ -76,16 +75,16 @@ modules:
         runtime:
             data:
                 -
-                    oid: wirelessPeerLinkUptime
+                    oid: TACHYON-MIB::wirelessPeerLinkUptime
                     num_oid: ".1.3.6.1.4.1.57344.1.2.6.1.12.{{ $index }}"
-                    descr: 'Link up ({{ $wirelessPeerMac }})'
+                    descr: 'Link up ({{ TACHYON-MIB::wirelessPeerMac }})'
                     index: "wirelessPeerLinkUptime.{{ $index }}"
                     divisor: 60
 
         state:
             data:
                 -
-                    oid: wirelessVapOperationMode
+                    oid: TACHYON-MIB::wirelessVapOperationMode
                     num_oid: '.1.3.6.1.4.1.57344.1.2.4.1.5.{{ $index }}'
                     descr: Mode
                     index: 'wirelessVapOperationMode.{{ $index }}'
@@ -97,7 +96,7 @@ modules:
                         - { descr: stations, graph: 1, value: 2, generic: 0 }
 
                 -
-                    oid: wirelessVapSecurity
+                    oid: TACHYON-MIB::wirelessVapSecurity
                     num_oid: '.1.3.6.1.4.1.57344.1.2.4.1.8.{{ $index }}'
                     descr: Security mode
                     index: 'wirelessVapSecurity.{{ $index }}'
@@ -108,9 +107,9 @@ modules:
                         - { descr: WPA2-PSK (GCMP), graph: 1, value: 1, generic: 0 }
 
                 -
-                    oid: wirelessPeerAntennaKit
+                    oid: TACHYON-MIB::wirelessPeerAntennaKit
                     num_oid: '.1.3.6.1.4.1.57344.1.2.2.1.8.{{ $index }}'
-                    descr: '{{ $wirelessPeerMac }}'
+                    descr: '{{ TACHYON-MIB::wirelessPeerMac }}'
                     group: 'Antenna kit'
                     index: 'wirelessPeerAntennaKit.{{ $index }}'
                     state_name: wirelessPeerAntennaKit
@@ -123,11 +122,12 @@ modules:
                         - { descr: ak-s-90, graph: 1, value: 4, generic: 0 }
 
                 -
-                    oid: wirelessPeerTxMcs
+                    oid: TACHYON-MIB::wirelessPeerTxMcs
                     num_oid: '.1.3.6.1.4.1.57344.1.2.6.1.10.{{ $index }}'
-                    descr: 'MCS TX ({{ $wirelessPeerMac }})'
-                    group: 'MCS {{ $wirelessPeerMac }}'
+                    descr: 'MCS TX ({{ TACHYON-MIB::wirelessPeerMac }})'
+                    group: 'MCS {{ TACHYON-MIB::wirelessPeerMac }}'
                     index: wirelessPeerTxMcs.{{ $index }}
+                    state_name: wirelessPeerTxMcs
                     states:
                         - { value: 0, descr: mcs0, graph: 1, generic: 1 }
                         - { value: 1, descr: mcs1, graph: 1, generic: 1 }
@@ -145,11 +145,12 @@ modules:
                         - { value: 13, descr: mcs13, graph: 1, generic: 0 }
 
                 -
-                    oid: wirelessPeerRxMcs
+                    oid: TACHYON-MIB::wirelessPeerRxMcs
                     num_oid: '.1.3.6.1.4.1.57344.1.2.6.1.11.{{ $index }}'
-                    descr: 'MCS RX ({{ $wirelessPeerMac }})'
-                    group: 'MCS {{ $wirelessPeerMac }}'
+                    descr: 'MCS RX ({{ TACHYON-MIB::wirelessPeerMac }})'
+                    group: 'MCS {{ TACHYON-MIB::wirelessPeerMac }}'
                     index: wirelessPeerRxMcs.{{ $index }}
+                    state_name: wirelessPeerRxMcs
                     states:
                         - { value: 0, descr: mcs0, graph: 1, generic: 1 }
                         - { value: 1, descr: mcs1, graph: 1, generic: 1 }

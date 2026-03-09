@@ -35,7 +35,7 @@ class GraphController extends Controller
                 'Content-type' => $graph->contentType(),
             ];
 
-            if ($request->get('output') == 'base64') {
+            if ($request->input('output') == 'base64') {
                 return response($graph->base64(), 200, $headers);
             }
 

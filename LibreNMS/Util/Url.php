@@ -50,9 +50,9 @@ class Url
         }
 
         $class = match ($device->getDeviceStatus()) {
-            DeviceStatus::UP, DeviceStatus::IGNORED_UP => 'device-link-up',
-            DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED, DeviceStatus::IGNORED_DOWN => 'device-link-down',
-            DeviceStatus::DISABLED => 'device-link-disabled',
+            DeviceStatus::Up, DeviceStatus::IgnoredUp => 'device-link-up',
+            DeviceStatus::Down, DeviceStatus::NeverPolled, DeviceStatus::IgnoredDown => 'device-link-down',
+            DeviceStatus::Disabled => 'device-link-disabled',
         };
 
         return sprintf('<a href="%s" class="%s" x-data="deviceLink()">%s</a>%s',
@@ -76,7 +76,7 @@ class Url
     public static function deviceLink($device, $text = '', $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
         if (! $device instanceof Device || ! $device->hostname) {
-            return $escape_text ? htmlentities($text) : (string) $text;
+            return $escape_text ? htmlentities((string) $text) : (string) $text;
         }
 
         if (! $device->canAccess(Auth::user())) {
@@ -225,7 +225,7 @@ class Url
             $text = $label;
         }
 
-        $content = '<div class=list-large>' . addslashes(htmlentities($sensor->device->displayName() . ' - ' . $label)) . '</div>';
+        $content = '<div class=list-large>' . addslashes(htmlentities($sensor->device?->displayName() . ' - ' . $label)) . '</div>';
 
         $content .= "<div style=\'width: 850px\'>";
         $graph_array = [
@@ -351,7 +351,7 @@ class Url
         $url = empty($vars) ? '' : $prefix;
         foreach ($vars as $var => $value) {
             if ($value == '0' || $value != '' && ! Str::contains($var, 'opt') && ! is_numeric($var)) {
-                $url .= urlencode($var) . '=' . urlencode($value) . '/';
+                $url .= urlencode((string) $var) . '=' . urlencode((string) $value) . '/';
             }
         }
 
@@ -370,6 +370,11 @@ class Url
         }
 
         return LaravelUrl::signedRoute('graph', $args);
+    }
+
+    public static function graphPageUrl(string $type, array $args = []): string
+    {
+        return url('graphs', ['type' => $type, ...$args]);
     }
 
     /**
@@ -500,11 +505,11 @@ class Url
     private static function deviceLinkDisplayClass($device)
     {
         return match ($device->getDeviceStatus()) {
-            DeviceStatus::DISABLED => 'list-device-disabled',
-            DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED => 'list-device-down',
-            DeviceStatus::UP => 'list-device',
-            DeviceStatus::IGNORED_DOWN => 'list-device-ignored',
-            DeviceStatus::IGNORED_UP => 'list-device-ignored-up',
+            DeviceStatus::Disabled => 'list-device-disabled',
+            DeviceStatus::Down, DeviceStatus::NeverPolled => 'list-device-down',
+            DeviceStatus::Up => 'list-device',
+            DeviceStatus::IgnoredDown => 'list-device-ignored',
+            DeviceStatus::IgnoredUp => 'list-device-ignored-up',
         };
     }
 
@@ -649,7 +654,7 @@ class Url
         if (strlen($base_url) > 1) {
             $segments = explode('/', trim(str_replace($base_url, '', $path), '/'));
         } else {
-            $segments = explode('/', trim($path, '/'));
+            $segments = explode('/', trim((string) $path, '/'));
         }
 
         // parse the path

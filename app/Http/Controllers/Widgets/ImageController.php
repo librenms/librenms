@@ -47,7 +47,7 @@ class ImageController extends WidgetController
             return $this->getSettingsView($request);
         }
 
-        $dimensions = $request->get('dimensions');
+        $dimensions = $request->input('dimensions');
         $data['dimensions'] = $dimensions;
 
         // send size so generated images can generate the proper size
@@ -66,7 +66,7 @@ class ImageController extends WidgetController
     public function getSettings($settingsView = false): array
     {
         if (is_null($this->settings)) {
-            parent::getSettings();
+            $this->settings = parent::getSettings();
             if (! empty($this->settings['image_title'])) {
                 $this->settings['title'] = $this->settings['image_title'];
             }

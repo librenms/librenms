@@ -1,8 +1,7 @@
 <?php
 
-$class = 'count';
-$unit = '';
-$unit_long = '';
+$class = \LibreNMS\Enum\Sensor::Count;
 
-$rrd_options .= ' -o';
+$graph_params->logarithmic = true;
+
 require 'includes/html/graphs/device/sensor.inc.php';

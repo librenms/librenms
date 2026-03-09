@@ -18,7 +18,7 @@ IMPORTS
 -- Waystream products 
 --
 wsProductsMIB MODULE-IDENTITY
-    LAST-UPDATED "201702101100Z"	-- February 10, 2017
+    LAST-UPDATED "201802231700Z"	-- February 23, 2018
     ORGANIZATION "Waystream AB"
     CONTACT-INFO
         "Waystream AB
@@ -36,6 +36,9 @@ wsProductsMIB MODULE-IDENTITY
         "The Waystream management information base describing product
          families and the products within those families"
 
+    REVISION "201802231700Z"	-- February 23, 2018
+    DESCRIPTION
+        "Added ASR6226, ASR6326, MS4226 and MS4326"
     REVISION "201702101100Z"	-- February 10, 2017
     DESCRIPTION
         "Company name change:
@@ -124,6 +127,12 @@ mpc	OBJECT-IDENTITY
 		"The MPC edge router platform (MPC) product group"
 	::= { wsProduct 7 }
 
+ls	OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"The LightStar (LS) product group"
+	::= { wsProduct 8 }
+
 
 -- ASR4000 products
 
@@ -198,6 +207,10 @@ asr6026ac	OBJECT IDENTIFIER ::= { asr 60 }	-- 2 1/10GE SFP+, 20 100/1000 SFP Slo
 asr6026dc	OBJECT IDENTIFIER ::= { asr 61 }	-- 2 1/10GE SFP+, 20 100/1000 SFP Slots, 4 BaseTX/SFP combo, Central Office DC
 asr6126ac	OBJECT IDENTIFIER ::= { asr 62 }	-- 2 1/10GE SFP+, 20 10/100/1000BaseTX ports, 4 BaseTX/SFP combo, Central Office AC
 asr6126dc	OBJECT IDENTIFIER ::= { asr 63 }	-- 2 1/10GE SFP+, 20 10/100/1000BaseTX ports, 4 BaseTX/SFP combo, Central Office DC
+asr6226ac	OBJECT IDENTIFIER ::= { asr 78 }
+asr6226dc	OBJECT IDENTIFIER ::= { asr 79 }
+asr6326ac	OBJECT IDENTIFIER ::= { asr 80 }
+asr6326dc	OBJECT IDENTIFIER ::= { asr 81 }
 
 -- IPD products
 ipd1116C	OBJECT IDENTIFIER ::= { ipd 1 }
@@ -212,6 +225,10 @@ ms4026ac	OBJECT IDENTIFIER ::= { ms  64 }
 ms4026dc	OBJECT IDENTIFIER ::= { ms  65 }
 ms4126ac	OBJECT IDENTIFIER ::= { ms  66 }
 ms4126dc	OBJECT IDENTIFIER ::= { ms  67 }
+ms4226ac	OBJECT IDENTIFIER ::= { ms  82 }
+ms4226dc	OBJECT IDENTIFIER ::= { ms  83 }
+ms4326ac	OBJECT IDENTIFIER ::= { ms  84 }
+ms4326dc	OBJECT IDENTIFIER ::= { ms  85 }
 
 -- MPC products
 mpc480se4818	OBJECT IDENTIFIER ::= { mpc  68 }
@@ -224,6 +241,10 @@ reserved1	OBJECT IDENTIFIER ::= { mpc  74 }
 reserved2	OBJECT IDENTIFIER ::= { mpc  75 }
 reserved3	OBJECT IDENTIFIER ::= { mpc  76 }
 reserved4	OBJECT IDENTIFIER ::= { mpc  77 }
+
+-- LightStar products 
+
+ls2324		OBJECT IDENTIFIER ::= { ls 1 }
 
 
 END

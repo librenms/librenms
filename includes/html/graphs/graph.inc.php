@@ -34,7 +34,7 @@ try {
     $nototal = ! $graph_params->visible('total');
     $nodetails = ! $graph_params->visible('details');
     $noagg = ! $graph_params->visible('aggregate');
-    $rrd_options = '';
+    $rrd_options = [];
     $env = [];
 
     if (session('preferences.timezone')) {
@@ -54,6 +54,8 @@ try {
         graph_error("$type*$subtype Graph Template Missing", "$type*$subtype");
     }
 
+    array_push($rrd_options, ...$graph_params->toRrdOptions());
+
     if ($auth === null) {
         // We are unauthenticated :(
         graph_error('No Authorization', 'No Auth');
@@ -66,15 +68,13 @@ try {
         throw new \LibreNMS\Exceptions\RrdGraphException('Device not found');
     }
 
-    $rrd_options = $graph_params . ' ' . $rrd_options;
-
     // command output requested
     if (! empty($command_only)) {
+        $command = implode(' ', array_map(escapeshellarg(...), ['rrdtool', ...Rrd::buildCommand('graph', LibrenmsConfig::get('temp_dir') . '/' . Str::random(), $rrd_options)]));
+
         echo "<div class='infobox'>";
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
-        echo "<pre class='rrd-pre'>";
-        echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', LibrenmsConfig::get('temp_dir') . '/' . Str::random(), $rrd_options));
-        echo '</pre>';
+        echo "<pre class='rrd-pre'>$command</pre>";
         try {
             Rrd::graph($rrd_options, $env);
         } catch (\LibreNMS\Exceptions\RrdGraphException $e) {

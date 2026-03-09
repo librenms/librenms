@@ -42,10 +42,14 @@ STORMSHIELD-AUTHUSERS-MIB DEFINITIONS ::= BEGIN
       ::= {  snsAuthUsersTable 1 }
 
    SnsAuthUsersEntry ::= SEQUENCE {
-      snsAuthUsersIPAddr    DisplayString,
-      snsAuthUsersTimeOut   Counter64,
-      snsAuthUsersName      SnmpAdminString,
-      snsAuthUsersDomain    SnmpAdminString
+      snsAuthUsersIPAddr       DisplayString,
+      snsAuthUsersTimeOut      Counter64,
+      snsAuthUsersName         SnmpAdminString,
+      snsAuthUsersDomain       SnmpAdminString,
+      snsAuthUsersAuthMethod   DisplayString,
+      snsAuthUsersPorts        DisplayString,
+      snsAuthUsersHostChecking DisplayString,
+      snsAuthUsersOsType       DisplayString
    }
 
    snsAuthUsersIPAddr OBJECT-TYPE
@@ -79,5 +83,37 @@ STORMSHIELD-AUTHUSERS-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "Domain name"
       ::= { snsAuthUsersEntry 4 }
+
+   snsAuthUsersAuthMethod OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Authentication method"
+      ::= { snsAuthUsersEntry 5 }
+
+   snsAuthUsersPorts OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Ports ranges"
+      ::= { snsAuthUsersEntry 6 }
+
+   snsAuthUsersHostChecking OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Host checking state"
+      ::= { snsAuthUsersEntry 7 }
+
+   snsAuthUsersOsType OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Operating system"
+      ::= { snsAuthUsersEntry 8 }
 
  END

@@ -1,7 +1,7 @@
 <?php
 
 echo 'MGE ';
-$oids = trim(snmp_walk($device, '.1.3.6.1.4.1.705.1.7.2.1.5', '-OsqnU')); // OID: mgoutputCurrent
+$oids = trim((string) snmp_walk($device, '.1.3.6.1.4.1.705.1.7.2.1.5', '-OsqnU')); // OID: mgoutputCurrent
 d_echo($oids . "\n");
 
 $numPhase = count(explode("\n", $oids));
@@ -31,7 +31,7 @@ for ($i = 1; $i <= $numPhase; $i++) {
     discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $current);
 }//end for
 
-$oids = trim(snmp_walk($device, '.1.3.6.1.4.1.705.1.6.2.1.6', '-OsqnU')); // OID: mginputCurrent
+$oids = trim((string) snmp_walk($device, '.1.3.6.1.4.1.705.1.6.2.1.6', '-OsqnU')); // OID: mginputCurrent
 d_echo($oids . "\n");
 
 $numPhase = count(explode("\n", $oids));

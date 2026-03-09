@@ -37,7 +37,7 @@ class SettingsController extends Controller
      */
     public function update(DynamicConfig $config, Request $request, $id)
     {
-        $value = $request->get('value');
+        $value = $request->input('value');
 
         if (! $config->isValidSetting($id)) {
             return $this->jsonResponse($id, ':id is not a valid setting', null, 400);

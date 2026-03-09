@@ -115,12 +115,12 @@ class Sensor
             return true;
         }
         foreach (LibrenmsConfig::getCombined($this->device->os, 'disabled_sensors_regex') as $skipRegex) {
-            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, $sensor->sensor_descr)) {
+            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, (string) $sensor->sensor_descr)) {
                 return true;
             }
         }
         foreach (LibrenmsConfig::getCombined($this->device->os, "disabled_sensors_regex.$sensor->sensor_class") as $skipRegex) {
-            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, $sensor->sensor_descr)) {
+            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, (string) $sensor->sensor_descr)) {
                 return true;
             }
         }

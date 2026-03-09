@@ -47,6 +47,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Plugins\Hooks\MenuEntryHook;
 use LibreNMS\Plugins;
 use LibreNMS\Util\ObjectCache;
@@ -103,7 +104,15 @@ class MenuComposer
         $vars['links'] = Link::exists();
         $vars['device_dependencies'] = \DB::table('device_relationships')->exists();
         $vars['device_group_dependencies'] = $vars['device_groups']->isNotEmpty() && \DB::table('device_group_device')->exists();
-        $vars['custommaps'] = CustomMap::select(['custom_map_id', 'name', 'menu_group'])->hasAccess($user)->orderBy('name')->get()->groupBy('menu_group')->sortKeys();
+
+        $vars['custommaps_groups'] = CustomMap::select(['custom_map_id', 'name', 'menu_group'])
+            ->hasAccess($user)->orderBy('name')->get()
+            ->groupBy('menu_group')->sortKeys();
+        $vars['custommaps'] = $vars['custommaps_groups']->pull('', new Collection);
+        if ($vars['custommaps']->count() >= 20) {
+            $vars['custommaps_groups']->prepend($vars['custommaps'], __('Custom Maps'));
+            $vars['custommaps'] = new Collection;
+        }
 
         // Service menu
         if (LibrenmsConfig::get('show_services')) {
@@ -142,12 +151,12 @@ class MenuComposer
         $vars['sensor_menu'] = ObjectCache::sensors();
 
         // Wireless menu
-        $wireless_menu_order = array_keys(\LibreNMS\Device\WirelessSensor::getTypes());
+        $wireless_menu_order = WirelessSensorType::values();
         $vars['wireless_menu'] = WirelessSensor::hasAccess($user)
             ->groupBy('sensor_class')
             ->get(['sensor_class'])
             ->sortBy(function ($wireless_sensor) use ($wireless_menu_order) {
-                $pos = array_search($wireless_sensor->sensor_class, $wireless_menu_order);
+                $pos = array_search($wireless_sensor->sensor_class->value, $wireless_menu_order);
 
                 return $pos === false ? 100 : $pos; // unknown at bottom
             });

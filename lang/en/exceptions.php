@@ -21,6 +21,7 @@ return [
         'ip_exists' => 'Cannot add :hostname, already have device :existing with this IP :ip',
         'sysname_exists' => 'Already have device :hostname due to duplicate sysName: :sysname',
     ],
+    'host_name_empty' => 'Hostname is empty',
     'host_unreachable' => [
         'unpingable' => 'Could not ping :hostname (:ip)',
         'unsnmpable' => 'Could not connect to :hostname, please check the snmp details and snmp reachability',

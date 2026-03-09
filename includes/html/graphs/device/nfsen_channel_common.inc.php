@@ -3,7 +3,7 @@
 $simple_rrd = true;
 
 foreach ((array) \App\Facades\LibrenmsConfig::get('nfsen_rrds', []) as $nfsenrrds) {
-    if ($nfsenrrds[strlen($nfsenrrds) - 1] != '/') {
+    if ($nfsenrrds[strlen((string) $nfsenrrds) - 1] != '/') {
         $nfsenrrds .= '/';
     }
 

@@ -1,18 +1,18 @@
-mib: RADLAN-rndMng:RADLAN-HWENVIROMENT
 modules:
     os:
         sysDescr_regex: '/(?<hardware>OmniStack \S+ \S+|OS\S+)? ?(?<version>\d+\.\d+\.\S+)?/'
-        hardware: .1.3.6.1.4.1.89.53.4.1.6.1 # RADLAN-Physicaldescription-MIB::rlPhdStackProductID
-        version: .1.3.6.1.4.1.89.53.14.1.2.1 # RADLAN-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion
+        hardware: RADLAN-Physicaldescription-MIB::rlPhdStackProductID.1
+        version: RADLAN-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion.1
     sensors:
         state:
             data:
                 -
-                    oid: rlEnvMonFanStatusTable
-                    value: rlEnvMonFanState
+                    oid: RADLAN-HWENVIROMENT::rlEnvMonFanStatusTable
+                    value: RADLAN-HWENVIROMENT::rlEnvMonFanState
                     num_oid: '.1.3.6.1.4.1.89.83.1.1.1.3.{{ $index }}'
                     descr: 'Fan State Sensor'
                     index: 'FanStatus.{{ $index }}'
+                    state_name: rlEnvMonFanStatusTable
                     states:
                         - { value: 1, descr: normal, graph: 1, generic: 0 }
                         - { value: 2, descr: warning, graph: 1, generic: 1 }
@@ -22,15 +22,16 @@ modules:
                         - { value: 6, descr: notFunctioning, graph: 1, generic: 2 }
                     skip_values:
                         -
-                            oid: rlEnvMonFanState
+                            oid: RADLAN-HWENVIROMENT::rlEnvMonFanState
                             op: '='
                             value: 5
                 -
-                    oid: rlEnvMonSupplyStatusTable
-                    value: rlEnvMonSupplyState
+                    oid: RADLAN-HWENVIROMENT::rlEnvMonSupplyStatusTable
+                    value: RADLAN-HWENVIROMENT::rlEnvMonSupplyState
                     num_oid: '.1.3.6.1.4.1.89.83.1.2.1.3.{{ $index }}'
                     descr: 'PowerSupply State Sensor'
                     index: 'PowerSupply.{{ $index }}'
+                    state_name: rlEnvMonSupplyStatusTable
                     states:
                         - { value: 1, descr: normal, graph: 1, generic: 0 }
                         - { value: 2, descr: warning, graph: 1, generic: 1 }
@@ -40,12 +41,12 @@ modules:
                         - { value: 6, descr: notFunctioning, graph: 1, generic: 2 }
                     skip_values:
                         -
-                            oid: rlEnvMonSupplyState
+                            oid: RADLAN-HWENVIROMENT::rlEnvMonSupplyState
                             op: '='
                             value: 5
     processors:
         data:
             -
-                oid: rlCpuUtilDuringLastMinute
+                oid: RADLAN-rndMng::rlCpuUtilDuringLastMinute
                 num_oid: '.1.3.6.1.4.1.89.1.8.{{ $index }}'
                 index: 0

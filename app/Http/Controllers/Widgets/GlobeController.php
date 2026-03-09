@@ -84,7 +84,7 @@ class GlobeController extends WidgetController
             }
 
             // indicate the number of up items before the itemized down
-            $down_items->prepend($up . '&nbsp;' . ucfirst($data['markers']) . '&nbsp;OK');
+            $down_items->prepend($up . '&nbsp;' . ucfirst((string) $data['markers']) . '&nbsp;OK');
 
             if ($count > 0) {
                 $locations->push([

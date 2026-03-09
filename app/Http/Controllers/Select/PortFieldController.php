@@ -64,7 +64,7 @@ class PortFieldController extends SelectController
      */
     protected function searchFields($request)
     {
-        return [$request->get('field')];
+        return [$request->input('field')];
     }
 
     /**
@@ -76,6 +76,6 @@ class PortFieldController extends SelectController
     protected function baseQuery($request)
     {
         return Port::hasAccess($request->user())
-            ->select($request->get('field'))->distinct();
+            ->select($request->input('field'))->distinct();
     }
 }

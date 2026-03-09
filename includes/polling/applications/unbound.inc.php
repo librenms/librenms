@@ -12,7 +12,7 @@ if (! empty($agent_data['app'][$name])) {
     $rawdata = snmp_get($device, $oid, $options);
 }
 //Format Data
-$lines = explode("\n", $rawdata);
+$lines = explode("\n", (string) $rawdata);
 $unbound = [];
 $metrics = [];
 foreach ($lines as $line) {

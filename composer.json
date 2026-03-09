@@ -23,6 +23,7 @@
         "ext-pdo": "*",
         "ext-session": "*",
         "ext-simplexml": "*",
+        "ext-sockets": "*",
         "ext-xml": "*",
         "ext-zlib": "*",
         "amenadiel/jpgraph": "^4",
@@ -54,7 +55,6 @@
         "spatie/laravel-ignition": "^2.9",
         "spatie/laravel-permission": "^6.16",
         "symfony/yaml": "^7.2",
-        "tecnickcom/tcpdf": "^6.4",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
@@ -65,11 +65,10 @@
         "fakerphp/faker": "^1.23",
         "friendsofphp/php-cs-fixer": "^3.66",
         "larastan/larastan": "^3.1",
+        "laravel/boost": "^1.8",
         "laravel/dusk": "^8.2.2",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "pestphp/pest": "^3.8 || ^4.0",
-        "pestphp/pest-plugin-laravel": "^3.0 || ^4.0",
         "php-parallel-lint/php-parallel-lint": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-mockery": "^2.0",
@@ -133,8 +132,7 @@
             "@php artisan vue-i18n:generate --multi-locales --format=umd",
             "@php artisan view:cache",
             "@php artisan optimize",
-            "@php artisan config:clear",
-            "@python-requirements"
+            "@php artisan config:clear"
         ],
         "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
         "post-update-cmd": [
@@ -147,9 +145,6 @@
         "post-root-package-install": "LibreNMS\\ComposerHelper::postRootPackageInstall",
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
-        ],
-        "python-requirements": [
-            "scripts/dynamic_check_requirements.py || pip3 install --user -r requirements.txt || :"
         ]
     },
     "support": {

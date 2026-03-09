@@ -6,7 +6,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href>
+            <a class="navbar-brand" href="{{ route('home') }}">
                 <x-logo responsive="lg" class="tw:h-full tw:max-w-[170px]" />
             </a>
         </div>
@@ -162,7 +162,7 @@
                         </li>
                     @endif
                         <li role="presentation" class="divider"></li>
-                        <li><a href="{{ url('outages') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
+                        <li><a href="{{ url('outages') }}"><i class="fa fa-exclamation-triangle fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Outages') }}</a></li>
 
                         @admin
@@ -232,44 +232,38 @@
                                 </ul></li>
                         @endif
 
-                        @if($custommaps->isNotEmpty())
+                        @if($custommaps_groups->isNotEmpty() || $custommaps->isNotEmpty())
                             <li role="presentation" class="divider"></li>
-                            @if($custommaps->count() == 1)
-                            <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{__('Custom Maps') }}</a>
-                                <ul class="dropdown-menu scrollable-menu">
-                                    @foreach($custommaps as $map_group => $group_maps)
-                                        @foreach($group_maps as $map)
-                                        <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
-                                            {{ ucfirst($map->name) }}
-                                        </a></li>
-                                        @endforeach
-                                    @endforeach
-                                </ul>
-                            </li>
-                            @elseif($custommaps->count() < 20)
-                                @foreach($custommaps as $map_group => $group_maps)
-                                <li class="dropdown-submenu">
-                                    <a><i class="fa fa-map-marked fa-fw fa-lg"aria-hidden="true"></i> {{ $map_group  }}</a>
-                                    <ul class="dropdown-menu scrollable-menu">
-                                    @foreach($group_maps as $map)
-                                    <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
-                                        {{ ucfirst($map->name) }}
+                            @foreach($custommaps as $map)
+                                <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}">
+                                        <i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                        {{ $map->name }}
                                     </a></li>
-                                    @endforeach
-                                    </ul>
-                                </li>
-                                @endforeach
-                            @else
-                            <li class="dropdown-submenu"><a href="{{ route('maps.custom.list') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{__('Custom Maps') }}</a>
+                            @endforeach
+                        @if($custommaps_groups->count() < 20)
+                            @foreach($custommaps_groups as $map_group => $group_maps)
+                            <li class="dropdown-submenu">
+                                <a href="{{ route('maps.custom.list', ['group' => $map_group]) }}"><i class="fa fa-map fa-fw fa-lg" aria-hidden="true"></i> {{ $map_group  }}</a>
                                 <ul class="dropdown-menu scrollable-menu">
-                                    @foreach($custommaps as $map_group => $group_maps)
+                                @foreach($group_maps as $map)
+                                <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                    {{ $map->name }}
+                                </a></li>
+                                @endforeach
+                                </ul>
+                            </li>
+                            @endforeach
+                        @else
+                            <li class="dropdown-submenu"><a href="{{ route('maps.custom.list') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{__('Custom Map Groups') }}</a>
+                                <ul class="dropdown-menu scrollable-menu">
+                                    @foreach($custommaps_groups as $map_group => $group_maps)
                                         <li><a href="{{ route('maps.custom.list', ['group' => $map_group]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
-                                            {{ ucfirst($map_group) }}
-                                        </a></li>
+                                                {{ $map_group }}
+                                            </a></li>
                                     @endforeach
                                 </ul>
                             </li>
-                            @endif
+                        @endif
                         @endif
                         @admin
                         <li role="presentation" class="divider"></li>
@@ -443,7 +437,7 @@
                                 class="tw:md:hidden tw:2xl:inline-block">{{ __('wireless.title') }}</span></a>
                         <ul class="dropdown-menu">
                         @foreach($wireless_menu as $wireless_menu_entry)
-                                <li><a href="{{ url('wireless/metric=' . $wireless_menu_entry->sensor_class) }}"><i class="fa fa-{{ $wireless_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $wireless_menu_entry->classDescr() }}</a></li>
+                                <li><a href="{{ url('wireless/metric=' . $wireless_menu_entry->sensor_class->value) }}"><i class="fa fa-{{ $wireless_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $wireless_menu_entry->classDescr() }}</a></li>
                         @endforeach
                         </ul>
                     </li>

@@ -44,7 +44,6 @@ class LegacyModule implements Module
     private $module_deps = [
         'arp-table' => ['ports'],
         'bgp-peers' => ['ports', 'vrf', 'ipv4-addresses', 'ipv6-addresses'],
-        'cisco-mac-accounting' => ['ports'],
         'fdb-table' => ['ports', 'vlans'],
         'vlans' => ['ports'],
         'vrf' => ['ports'],
@@ -58,7 +57,7 @@ class LegacyModule implements Module
         return $this->module_deps[$this->name] ?? [];
     }
 
-    public function __construct(private string $name)
+    public function __construct(private readonly string $name)
     {
     }
 
@@ -76,6 +75,7 @@ class LegacyModule implements Module
         }
 
         $device = &$os->getDeviceArray();
+        $module = $this->name;
         Debug::disableErrorReporting(); // ignore errors in legacy code
 
         include_once base_path('includes/dbFacile.php');
@@ -156,8 +156,8 @@ class LegacyModule implements Module
 
                     $default_select = [];
                 } else {
-                    [$left, $lkey] = explode('.', $join_info['left']);
-                    [$right, $rkey] = explode('.', $join_info['right']);
+                    [$left, $lkey] = explode('.', (string) $join_info['left']);
+                    [$right, $rkey] = explode('.', (string) $join_info['right']);
                     $join .= " LEFT JOIN `$right` ON (`$left`.`$lkey` = `$right`.`$rkey`)";
 
                     $default_select = ["`$right`.*"];

@@ -364,7 +364,7 @@ log host source <eth0>
 configure
 logging severity warning
 logging facility local6
-logging librenms.ip control-descr “LibreNMS”
+logging librenms.ip control-descr "LibreNMS"
 logging notify running-config-change
 write memory
 ```

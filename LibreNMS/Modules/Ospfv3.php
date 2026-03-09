@@ -169,7 +169,7 @@ class Ospfv3 implements Module
                 $this->createArea($ospfv3AreaId, $instance, $ospf_area)))->flatten();
 
         // fill data in new areas
-        Ospfv3Area::creating([$this, 'fetchAndFillArea']);
+        Ospfv3Area::creating($this->fetchAndFillArea(...));
         $ospf_areas = $this->syncModels($device, 'ospfv3Areas', $ospf_areas);
         ModuleModelObserver::done();
 
@@ -185,7 +185,7 @@ class Ospfv3 implements Module
                 'OSPFV3-MIB::ospfv3IfAreaId',
             ])->mapTable(fn ($ospf_port, $ospfv3IfIndex, $ospfv3IfInstId) => $this->createPort($ospfv3IfIndex, $ospfv3IfInstId, $instance, $ospf_areas, $ospf_port)))->flatten();
 
-        Ospfv3Port::creating([$this, 'fetchAndFillPort']);
+        Ospfv3Port::creating($this->fetchAndFillPort(...));
         $this->syncModels($device, 'ospfv3Ports', $ospf_ports);
         ModuleModelObserver::done();
 
@@ -198,7 +198,7 @@ class Ospfv3 implements Module
                 'OSPFV3-MIB::ospfv3NbrAddress',
             ])->mapTable(fn ($ospf_nbr, $ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId) => $this->createNeighbor($ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId, $instance, $ospf_nbr)))->flatten();
 
-        Ospfv3Nbr::creating([$this, 'fetchAndFillNeighbor']);
+        Ospfv3Nbr::creating($this->fetchAndFillNeighbor(...));
         $this->syncModels($device, 'ospfv3Nbrs', $ospf_neighbors);
         ModuleModelObserver::done();
 

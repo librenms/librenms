@@ -2865,7 +2865,7 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "rate",
-                    "sensor_index": "1.2",
+                    "sensor_index": "1",
                     "sensor_type": "total-rx",
                     "sensor_descr": "Link 1 Total Rx",
                     "sensor_divisor": 1,
@@ -2887,7 +2887,7 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "rate",
-                    "sensor_index": "1.2",
+                    "sensor_index": "1",
                     "sensor_type": "total-tx",
                     "sensor_descr": "Link 1 Total Tx",
                     "sensor_divisor": 1,
@@ -3111,7 +3111,7 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "rate",
-                    "sensor_index": "1.2",
+                    "sensor_index": "1",
                     "sensor_type": "total-rx",
                     "sensor_descr": "Link 1 Total Rx",
                     "sensor_divisor": 1,
@@ -3133,7 +3133,7 @@
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "rate",
-                    "sensor_index": "1.2",
+                    "sensor_index": "1",
                     "sensor_type": "total-tx",
                     "sensor_descr": "Link 1 Total Tx",
                     "sensor_divisor": 1,

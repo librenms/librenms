@@ -1,0 +1,362 @@
+PACKETFLUX-SENSORS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    packetfluxFeatureSpecific
+        FROM PACKETFLUX-SMI
+    Fixed2DecimalDigits, Fixed6DecimalDigits
+        FROM PACKETFLUX-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ;
+
+packetfluxSensors MODULE-IDENTITY
+    LAST-UPDATED  "202004120559Z" -- April 12, 2020
+    ORGANIZATION
+        "PacketFlux Technologies"
+    CONTACT-INFO
+        "custsvc@packetflux.com http://www.packetflux.com"
+    DESCRIPTION
+        "MIB for generic sensor types found throughout a system"
+    REVISION      "202004120559Z" -- April 12, 2020
+    DESCRIPTION
+        "Added additional functions implemented initially in the
+         SiteMonitor Base 3, including a separate Sensor Function column
+         on each Sensor Type, and addition of the resistanceSensor
+         sensor type"
+    REVISION      "201807081126Z" -- July 08, 2018
+    DESCRIPTION
+        "Initial version of the mib"
+    ::= { packetfluxFeatureSpecific 2 }
+
+voltageSensorTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF VoltageSensorEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Sensors which read voltage with units of 'volts'."
+    ::= { packetfluxSensors 1 }
+
+voltageSensorEntry OBJECT-TYPE
+    SYNTAX        VoltageSensorEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A single entry of the voltageSensor table."
+    INDEX
+        { voltageSensorSlot, voltageSensorIndex }
+    ::= { voltageSensorTable 1 }
+
+VoltageSensorEntry ::= SEQUENCE
+{
+    voltageSensorSlot        Unsigned32,
+    voltageSensorIndex       Unsigned32,
+    voltageSensorDescription DisplayString,
+    voltageSensorValue       Fixed6DecimalDigits,
+    voltageSensorFunction    DisplayString
+}
+
+
+voltageSensorSlot OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The slot which contains the sensor."
+    ::= { voltageSensorEntry 1 }
+
+voltageSensorIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The number of the sensor within the slot. This field
+         distinguishes between multiple sensors of the same type in the
+         same slot, and is used as an index for this table."
+    ::= { voltageSensorEntry 2 }
+
+voltageSensorDescription OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Contains a brief description for this sensor.  This
+         description may be able to be changed by the user."
+    ::= { voltageSensorEntry 3 }
+
+voltageSensorValue OBJECT-TYPE
+    SYNTAX        Fixed6DecimalDigits
+    UNITS         "V"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The value of the sensor in volts. Note that this is reported
+         from the controller with 6 fixed decimal digits which is enough
+         to correctly represent mV and uV ranges. Some SNMP tools will
+         automatically put the decimal in the right spot. If not, you
+         will need to divide this value by 1,000,000 to get the value in
+         Volts."
+    ::= { voltageSensorEntry 4 }
+
+voltageSensorFunction OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A human readable description of the function of this sensor."
+    ::= { voltageSensorEntry 5 }
+
+currentSensorTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CurrentSensorEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Sensors which read current with units of 'amps'."
+    ::= { packetfluxSensors 2 }
+
+currentSensorEntry OBJECT-TYPE
+    SYNTAX        CurrentSensorEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A single entry of the currentSensor table."
+    INDEX
+        { currentSensorSlot, currentSensorIndex }
+    ::= { currentSensorTable 1 }
+
+CurrentSensorEntry ::= SEQUENCE
+{
+    currentSensorSlot        Unsigned32,
+    currentSensorIndex       Unsigned32,
+    currentSensorDescription DisplayString,
+    currentSensorValue       Fixed6DecimalDigits,
+    currentSensorFunction    DisplayString
+}
+
+
+currentSensorSlot OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The slot which contains the sensor."
+    ::= { currentSensorEntry 1 }
+
+currentSensorIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The number of the sensor within the slot. This field
+         distinguishes between multiple sensors of the same type in the
+         same slot, and is used as an index for this table."
+    ::= { currentSensorEntry 2 }
+
+currentSensorDescription OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Contains a brief description for this sensor. This may be able
+         to be set by the user."
+    ::= { currentSensorEntry 3 }
+
+currentSensorValue OBJECT-TYPE
+    SYNTAX        Fixed6DecimalDigits
+    UNITS         "A"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The value of the sensor in anps. Note that this is reported
+         from the controller with 6 fixed decimal digits which is enough
+         to correctly represent mA and uA ranges. Some SNMP tools will
+         automatically put the decimal in the right spot. If not, you
+         will need to divide this value by 1,000,000 to get the value in
+         Amps."
+    ::= { currentSensorEntry 4 }
+
+currentSensorFunction OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A human readable description of the function of this sensor."
+    ::= { currentSensorEntry 5 }
+
+temperatureSensorTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TemperatureSensorEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Sensors which read temperature with units of degrees
+         Celsius."
+    ::= { packetfluxSensors 3 }
+
+temperatureSensorEntry OBJECT-TYPE
+    SYNTAX        TemperatureSensorEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A single entry of the temperatureSensor table."
+    INDEX
+        { temperatureSensorSlot, temperatureSensorIndex }
+    ::= { temperatureSensorTable 1 }
+
+TemperatureSensorEntry ::= SEQUENCE
+{
+    temperatureSensorSlot        Unsigned32,
+    temperatureSensorIndex       Unsigned32,
+    temperatureSensorDescription DisplayString,
+    temperatureSensorValue       Fixed2DecimalDigits,
+    temperatureSensorFunction    DisplayString
+}
+
+
+temperatureSensorSlot OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The slot which contains the sensor."
+    ::= { temperatureSensorEntry 1 }
+
+temperatureSensorIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The number of the sensor within the slot. This field
+         distinguishes between multiple sensors of the same type in the
+         same slot, and is used as an index for this table."
+    ::= { temperatureSensorEntry 2 }
+
+temperatureSensorDescription OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Contains a brief description for this sensor. This may be able
+         to be set by the user."
+    ::= { temperatureSensorEntry 3 }
+
+temperatureSensorValue OBJECT-TYPE
+    SYNTAX        Fixed2DecimalDigits
+    UNITS         "C"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The value of the sensor in degrees Celsius. Note that this is
+         reported from the controller with 2 decimal digits. Some SNMP
+         tools will automatically put the decimal in the right spot. If
+         not, you will need to divide this value by 100 to get the value
+         in Degrees.   If you're needing Fahrenheit, multiply this value
+         by 1.8 then add 32 - or alternatively multiply by 9, divide by
+         5, then add 32 to the result."
+    ::= { temperatureSensorEntry 4 }
+
+temperatureSensorFunction OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A human readable description of the function of this sensor."
+    ::= { temperatureSensorEntry 5 }
+
+resistanceSensorTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF ResistanceSensorEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Sensors which read resistance with units of ohms"
+    ::= { packetfluxSensors 4 }
+
+resistanceSensorEntry OBJECT-TYPE
+    SYNTAX        ResistanceSensorEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A single entry of the resistanceSensor table."
+    INDEX
+        { resistanceSensorSlot, resistanceSensorIndex }
+    ::= { resistanceSensorTable 1 }
+
+ResistanceSensorEntry ::= SEQUENCE
+{
+    resistanceSensorSlot        Unsigned32,
+    resistanceSensorIndex       Unsigned32,
+    resistanceSensorDescription DisplayString,
+    resistanceSensorValue       Fixed2DecimalDigits,
+    resistanceSensorFunction    DisplayString
+}
+
+
+resistanceSensorSlot OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The slot which contains the sensor."
+    ::= { resistanceSensorEntry 1 }
+
+resistanceSensorIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The number of the sensor within the slot. This field
+         distinguishes between multiple sensors of the same type in the
+         same slot, and is used as an index for this table."
+    ::= { resistanceSensorEntry 2 }
+
+resistanceSensorDescription OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Contains a brief description for this sensor. This may be able
+         to be set by the user."
+    ::= { resistanceSensorEntry 3 }
+
+resistanceSensorValue OBJECT-TYPE
+    SYNTAX        Fixed2DecimalDigits
+    UNITS         "C"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The value of the sensor in ohms. Note that this is reported
+         from the controller with 2 decimal digits. Some SNMP tools will
+         automatically put the decimal in the right spot. If not, you
+         will need to divide this value by 100 to get the correct
+         value."
+    ::= { resistanceSensorEntry 4 }
+
+resistanceSensorFunction OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A human readable description of the function of this sensor."
+    ::= { resistanceSensorEntry 5 }
+
+packetfluxSensorsConformance OBJECT IDENTIFIER ::= { packetfluxSensors 128 }
+
+packetfluxSensorsGroups OBJECT IDENTIFIER ::= { packetfluxSensorsConformance 1 }
+
+packetfluxSensorsMibAllObjects OBJECT-GROUP
+    OBJECTS
+        { currentSensorDescription, currentSensorFunction,
+        currentSensorValue, temperatureSensorDescription,
+        temperatureSensorFunction, temperatureSensorValue,
+        resistanceSensorDescription, resistanceSensorFunction,
+        resistanceSensorValue, voltageSensorDescription,
+        voltageSensorFunction, voltageSensorValue }
+    STATUS        current
+    DESCRIPTION
+        "This automatically created object group contains all those
+         objects that do not belong to any other OBJECT-GROUP"
+    ::= { packetfluxSensorsGroups 1 }
+
+END

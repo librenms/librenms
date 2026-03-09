@@ -138,7 +138,7 @@ class CustomMapNodeImageController extends Controller
             Cache::driver('file')->forget($this->getCacheKey($image)); // clear old image cache if present
 
             $image->image = $image_content;
-            $image->version = md5($image_content);
+            $image->version = md5((string) $image_content);
             $image->mime = $mimeType;
         }
         $image->name = $request->name;

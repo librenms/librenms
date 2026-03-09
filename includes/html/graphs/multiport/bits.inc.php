@@ -2,7 +2,7 @@
 
 $i = 1;
 
-foreach (explode(',', $vars['id']) as $ifid) {
+foreach (explode(',', (string) $vars['id']) as $ifid) {
     if (strstr($ifid, '!')) {
         $rrd_inverted[$i] = true;
         $ifid = str_replace('!', '', $ifid);

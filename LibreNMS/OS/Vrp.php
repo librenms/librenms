@@ -47,6 +47,7 @@ use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -537,7 +538,7 @@ class Vrp extends OS implements
         $ap_number = snmpwalk_cache_oid($this->getDeviceArray(), 'hwWlanCurJointApNum.0', [], 'HUAWEI-WLAN-GLOBAL-MIB');
 
         $sensors[] = new WirelessSensor(
-            'ap-count',
+            WirelessSensorType::ApCount,
             $this->getDeviceId(),
             '.1.3.6.1.4.1.2011.6.139.12.1.2.1.0',
             'vrp-ap-count',
@@ -574,7 +575,7 @@ class Vrp extends OS implements
                 $ssid_oid_array[] = $oid;
                 $ssid_total_oid_array[] = $oid;
                 $sensors[] = new WirelessSensor(
-                    'clients',
+                    WirelessSensorType::Clients,
                     $this->getDeviceId(),
                     $oid,
                     'vrpi-clients',
@@ -589,7 +590,7 @@ class Vrp extends OS implements
 
             // And we add a sensor with all frequencies for each SSID
             $sensors[] = new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 $ssid_oid_array,
                 'vrp-clients',
@@ -604,7 +605,7 @@ class Vrp extends OS implements
         if (count($ssid_total_oid_array) > 0) {
             // We have at least 1 SSID, so we can count the total of STA
             $sensors[] = new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 $ssid_total_oid_array,
                 'vrp-clients',
@@ -635,7 +636,7 @@ class Vrp extends OS implements
         }
 
         foreach ($sla_table as $sla_key => $sla_config) {
-            [$owner, $test] = explode('.', $sla_key, 2);
+            [$owner, $test] = explode('.', (string) $sla_key, 2);
 
             $slas->push(new Sla([
                 'sla_nr' => hexdec(hash('crc32', $owner . $test)), // indexed by owner+test, convert to int
@@ -755,12 +756,14 @@ class Vrp extends OS implements
                         $vlansOnPort = StringHelpers::bitsToIndices($vlanArray[$oid]);
                         foreach ($vlansOnPort as $vlanIdOnPort) {
                             $vlanIdOnPort = ($hilo == 'High') ? ($vlanIdOnPort + 2047) : ($vlanIdOnPort - 1);
-                            $ports->push(new PortVlan([
-                                'vlan' => $vlanIdOnPort,
-                                'baseport' => $baseport,
-                                'untagged' => 0,
-                                'port_id' => PortCache::getIdFromIfIndex($portsIndexes[$baseport] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
-                            ]));
+                            if ($vlans->contains('vlan_vlan', $vlanIdOnPort)) {
+                                $ports->push(new PortVlan([
+                                    'vlan' => $vlanIdOnPort,
+                                    'baseport' => $baseport,
+                                    'untagged' => 0,
+                                    'port_id' => PortCache::getIdFromIfIndex($portsIndexes[$baseport] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
+                                ]));
+                            }
                         }
                     }
                 }

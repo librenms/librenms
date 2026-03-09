@@ -36,7 +36,7 @@ print_optionbar_start();
 // if (!$vars['protocol']) { $vars['protocol'] = "overview"; }
 echo "<span style='font-weight: bold;'>Routing</span> &#187; ";
 
-$vars['protocol'] = basename($vars['protocol']);
+$vars['protocol'] = basename((string) $vars['protocol']);
 $sep = '';
 foreach ($routing_count as $type => $value) {
     if (! $vars['protocol']) {

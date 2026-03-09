@@ -19,9 +19,9 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
          E-mail: support@stormshield.eu
          http://www.stormshield.eu"
       DESCRIPTION   "stormshield alarm MIBs"
-      REVISION      "201702200000Z"
+      REVISION      "202206280000Z"
       DESCRIPTION   "Initial"
-      ::= { stormshieldMIB 5 }
+      ::= { stormshieldMIB 19 }
 
    snsATable OBJECT-TYPE
       SYNTAX      SEQUENCE OF SnsAEntry
@@ -29,7 +29,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "Alarm Table"
-      ::= { snsAlarm 0 }
+      ::= { snsAlarm 1 }
 
    snsAEntry OBJECT-TYPE
       SYNTAX  SnsAEntry
@@ -61,7 +61,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "Index of each line in table"
-      ::= { snsAEntry 0 }
+      ::= { snsAEntry 1 }
 
    snsATime OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -69,7 +69,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "alarm date"
-      ::= { snsAEntry 1 }
+      ::= { snsAEntry 2 }
 
    snsASif OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -77,7 +77,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "source interface"
-      ::= { snsAEntry 2 }
+      ::= { snsAEntry 3 }
 
    snsADif OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -85,7 +85,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "destination interface"
-      ::= { snsAEntry 3 }
+      ::= { snsAEntry 4 }
 
    snsAProto OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -93,7 +93,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "IP protocol"
-      ::= { snsAEntry 4 }
+      ::= { snsAEntry 5 }
 
    snsASaddr OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -101,7 +101,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "source IP address"
-      ::= { snsAEntry 5 }
+      ::= { snsAEntry 6 }
 
    snsADaddr OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -109,7 +109,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "destination IP address"
-      ::= { snsAEntry 6 }
+      ::= { snsAEntry 7 }
 
    snsASport OBJECT-TYPE
       SYNTAX     Integer32
@@ -117,7 +117,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "Source port"
-      ::= { snsAEntry 7 }
+      ::= { snsAEntry 8 }
 
    snsADport OBJECT-TYPE
       SYNTAX     Integer32
@@ -125,7 +125,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "Destination port"
-      ::= { snsAEntry 8 }
+      ::= { snsAEntry 9 }
 
    snsASname OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -133,7 +133,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "IP source name"
-      ::= { snsAEntry 9 }
+      ::= { snsAEntry 10 }
 
    snsADname OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -141,7 +141,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "IP destination name"
-      ::= { snsAEntry 10 }
+      ::= { snsAEntry 11 }
 
    snsAMessage OBJECT-TYPE
       SYNTAX     SnmpAdminString
@@ -149,7 +149,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "Alarm Message"
-      ::= { snsAEntry 11 }
+      ::= { snsAEntry 12 }
 
    snsAicmpTable OBJECT-TYPE
       SYNTAX SEQUENCE OF SnsAicmpEntry
@@ -157,7 +157,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "ICMP alarm table"
-      ::= { snsAlarm 1 }
+      ::= { snsAlarm 2 }
 
    snsAicmpEntry OBJECT-TYPE
       SYNTAX  SnsAicmpEntry
@@ -190,7 +190,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
          "A unique value for phase one table.  Its value
          ranges between 1 and 65535 and may not be contigous.
          the index has no other meaning but a pure index"
-      ::= { snsAicmpEntry 0 }
+      ::= { snsAicmpEntry 1 }
 
    snsAicmpTime OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -198,7 +198,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "Alarm date"
-      ::= { snsAicmpEntry 1 }
+      ::= { snsAicmpEntry 2 }
 
    snsAicmpSif OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -206,7 +206,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "source interface"
-      ::= { snsAicmpEntry 2 }
+      ::= { snsAicmpEntry 3 }
 
    snsAicmpDif OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -214,7 +214,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "destination interface"
-      ::= { snsAicmpEntry 3 }
+      ::= { snsAicmpEntry 4 }
 
    snsAicmpSaddr OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -222,7 +222,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "IP source address"
-      ::= { snsAicmpEntry 4 }
+      ::= { snsAicmpEntry 5 }
 
    snsAicmpDaddr OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -230,7 +230,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "IP destination address"
-      ::= { snsAicmpEntry 5 }
+      ::= { snsAicmpEntry 6 }
 
    snsAicmpType OBJECT-TYPE
       SYNTAX     Integer32
@@ -238,7 +238,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "ICMP type"
-      ::= { snsAicmpEntry 6 }
+      ::= { snsAicmpEntry 7 }
 
    snsAicmpCode OBJECT-TYPE
       SYNTAX     Integer32
@@ -246,7 +246,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "ICMP code"
-      ::= { snsAicmpEntry 7 }
+      ::= { snsAicmpEntry 8 }
 
    snsAicmpSname OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -254,7 +254,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "IP source name"
-      ::= { snsAicmpEntry 8 }
+      ::= { snsAicmpEntry 9 }
 
    snsAicmpDname OBJECT-TYPE
       SYNTAX     OCTET STRING
@@ -262,7 +262,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "IP destination name"
-      ::= { snsAicmpEntry 9 }
+      ::= { snsAicmpEntry 10 }
 
    snsAicmpMessage OBJECT-TYPE
       SYNTAX     SnmpAdminString
@@ -270,7 +270,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       STATUS     current
       DESCRIPTION
          "Alarm message"
-      ::= { snsAicmpEntry 10 }
+      ::= { snsAicmpEntry 11 }
 
    snsNotification NOTIFICATION-TYPE
    OBJECTS { snsATime, snsASif, snsASaddr, snsADaddr, snsAMessage }

@@ -22,32 +22,26 @@ IMPORTS
 
 
 alcatelIND1ChassisMIB MODULE-IDENTITY
-    LAST-UPDATED "201103230000Z"
-    ORGANIZATION "Alcatel-Lucent, Enterprise Solutions Division"
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
     CONTACT-INFO
      "Please consult with Customer Service to ensure the most appropriate
       version of this document is used with the products in question:
 
-                 Alcatel-Lucent, Enterprise Solutions Division
-                (Formerly Alcatel Internetworking, Incorporated)
+                      ALE USA Inc. Enterprise
                         26801 West Agoura Road
                      Agoura Hills, CA  91301-5122
                        United States Of America
 
-     Telephone:               North America  +1 800 995 2696
-                              Latin America  +1 877 919 9526
-                              Europe         +31 23 556 0100
-                              Asia           +65 394 7933
-                              All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-     Electronic Mail:         support@ind.alcatel.com
-     World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-     File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
         etwork Management Protocol (SNMP) Management Information Base (MIB):
 
-        For the Birds Of Prey Product Line, this is the Chassis Supervision
+        For the OmniSwitch Product Line, this is the Chassis Supervision
         Chassis MIB
         for managing physical chassis objects not covered in the IETF
         Entity MIB (rfc 2737).
@@ -63,8 +57,17 @@ alcatelIND1ChassisMIB MODULE-IDENTITY
         non-exclusive license to use this specification in connection with
         management of the products for which it is intended to be used.
 
-                   Copyright (C) 1995-2007 Alcatel-Lucent
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
                        ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201911270000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
+
+        REVISION      "201901290000Z"
+        DESCRIPTION
+            "Added CMM/NI/CFM down chassis traps alerts."
 
         REVISION      "201409020000Z"
         DESCRIPTION
@@ -86,13 +89,11 @@ alcatelIND1ChassisMIB MODULE-IDENTITY
         DESCRIPTION
             "Added image file MD5 checksum changed alert, airflow, and temperature alerts"
 
-
         REVISION      "201005130000Z"
         DESCRIPTION
             "Fixed the Notifications to use MIB Module OID.0 as Notifications root."
 
         REVISION      "200706180000Z"
-
         DESCRIPTION
             "Addressing discrepancies with Alcatel Standard."
      ::= { hardentIND1Chassis 1 }
@@ -302,7 +303,8 @@ chasControlVersionMngt OBJECT-TYPE
         activate(6),
         issu(7),
         shutdown(8),
-        vcConvert(9)
+        vcConvert(9),
+        configSynchro(10)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -1007,7 +1009,12 @@ ChasEntPhysicalEntry ::= SEQUENCE
         chasEntPhysCpuModel                   SnmpAdminString,
         chasEntPhysAirflow                    INTEGER,
         chasEntPhysPowerUsed                  Integer32,
-        chasEntPhysPowerType                  INTEGER
+        chasEntPhysPowerType                  INTEGER,
+        chasEntPowerSupplyName                SnmpAdminString,
+        chasEntPowerSupplyType                INTEGER,
+        chasEntPowerSupplyInputType           INTEGER,
+        chasEntPowerSupplyWattage             Unsigned32,
+        chasEntPowerSupplyVoltage             Unsigned32
     }
 
 
@@ -1411,6 +1418,60 @@ SYNTAX     INTEGER{
         "This object is the type of the power supply, It corresponds to AC,
 	     DC or BPS. This value is only intended for Alcatel internal use."
         ::= { chasEntPhysicalEntry 35 }
+
+chasEntPowerSupplyName OBJECT-TYPE
+    SYNTAX    SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS    current
+    DESCRIPTION "The name of the power supply of this entry."
+    ::= { chasEntPhysicalEntry 36 }
+
+chasEntPowerSupplyType OBJECT-TYPE
+    SYNTAX INTEGER   {
+            ale(1),
+            phoenixContact(2),
+            thirdParty(3),
+            none(4)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Type of power supply."
+    ::= { chasEntPhysicalEntry  37 }
+
+chasEntPowerSupplyInputType OBJECT-TYPE
+    SYNTAX INTEGER   {
+            none(1),
+            loAc (2),
+            hiAc(3),
+            dc24v(4),
+            dc48v(5),
+            xlAc(6)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Type of power supply input."
+    DEFVAL  { none }
+    ::= { chasEntPhysicalEntry  38 }
+
+chasEntPowerSupplyWattage OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The wattage of power supply."
+    DEFVAL  { 0 }
+    ::= { chasEntPhysicalEntry  39 }
+
+chasEntPowerSupplyVoltage OBJECT-TYPE
+    SYNTAX       Unsigned32(0|24|48|54)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Voltage of power supply."
+    DEFVAL  { 0 }
+    ::= { chasEntPhysicalEntry  40 }
 
 -- Extension of the Entity physical table
 
@@ -2077,7 +2138,9 @@ chasGlobalControlUpdateFirmware OBJECT-TYPE
                 fpgaNiDaughterBoard2(9),
                 fpgaCmmAll(10),
                 fpgaCmmPower(11),
-                fpgaNiPower(12)
+                fpgaNiPower(12),
+                fpgaCmmCpu(13),
+                fpgaCmmLed(14)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -2164,13 +2227,59 @@ chasGlobalControlConfirmMessage OBJECT-TYPE
          chasGlobalControlConfirmOperation to true."
 ::= { chasGlobalControl 9 }
 
+chasGlobalControlCertifyOnReboot OBJECT-TYPE
+        SYNTAX INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable/disable certify on reboot."
+        DEFVAL { disable }
+::= { chasGlobalControl 10 }
+
+chasGlobalControlResetToFactory OBJECT-TYPE
+        SYNTAX INTEGER {
+            cancel(1),
+            all(2),
+            config(3),
+            configRetainVC(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reset type to factory status to start, schedule or cancel."
+::= { chasGlobalControl 11 }
+
+chasGlobalControlResetToFactoryInTime OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reset to factory time delay in second."
+::= { chasGlobalControl 12 }
+
+chasGlobalControlMakePersistent OBJECT-TYPE
+        SYNTAX INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable/disable make persistent."
+        DEFVAL { disable }
+::= { chasGlobalControl 13 }
+
+
 alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
 
 
   alaChasBpsFwTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF AlaChasBpsFwEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      deprecated 
     DESCRIPTION
     "This table contains one row per shelf bps firrmware "
     ::= { alaChasBpsObjects 1 }
@@ -2178,7 +2287,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsFwEntry OBJECT-TYPE
     SYNTAX     AlaChasBpsFwEntry 
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      deprecated 
     DESCRIPTION
     "Information about a bps firrmare" 
     INDEX { alaChasBpsShelfId } 
@@ -2196,7 +2305,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsShelfId OBJECT-TYPE
     SYNTAX       AlaChasBpsShelfId 
     MAX-ACCESS    not-accessible
-    STATUS        current
+    STATUS        deprecated 
     DESCRIPTION
     "Bps shelf ID "
     ::= { alaChasBpsFwEntry 1 }
@@ -2208,7 +2317,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
             enabled(2)
         }
         MAX-ACCESS  read-write
-        STATUS      current
+        STATUS      deprecated 
         DESCRIPTION
         "This object is used to start BPS firmware update."
         DEFVAL { disabled }
@@ -2217,7 +2326,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
     alaChasBpsCpldRev               OBJECT-TYPE
         SYNTAX          Integer32(0..100)
         MAX-ACCESS      read-only
-        STATUS          current
+        STATUS          deprecated 
         DESCRIPTION
         "This object contains the CPLD revision Number of the  BPS"
         ::= { alaChasBpsFwEntry 3 }
@@ -2225,7 +2334,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
     alaChasBpsMmcuRev OBJECT-TYPE
         SYNTAX          Integer32(0..100)
         MAX-ACCESS      read-only
-        STATUS          current
+        STATUS          deprecated 
         DESCRIPTION
         "This object contains the MMCU revision Number of the  BPS"
         ::= { alaChasBpsFwEntry 4 }
@@ -2233,7 +2342,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
     alaChasBpsCmcuRev OBJECT-TYPE
         SYNTAX          Integer32(0..100)
         MAX-ACCESS      read-only
-        STATUS          current
+        STATUS          deprecated 
         DESCRIPTION
         "This object contains the CMCU revision Number of the  BPS"
         ::= { alaChasBpsFwEntry 5 }
@@ -2245,7 +2354,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsConnectorPriorityTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF AlaChasBpsConnectorPriorityEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "This table contains BPS connector priority for each slot"
     ::= { alaChasBpsObjects 2 }
@@ -2253,7 +2362,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsConnectorPriorityEntry OBJECT-TYPE
     SYNTAX          AlaChasBpsConnectorPriorityEntry 
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "Information about bps connector priority for each slot"
     INDEX { alaChasBpsChassisId }
@@ -2270,7 +2379,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsChassisId OBJECT-TYPE
     SYNTAX          Integer32(1..8)
     MAX-ACCESS      not-accessible 
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION "Numbers allocated for the stack NIs as follows:
     - 1..8:       valid and assigned slot numbers corresponding to values from the entPhysicalTable"
     ::= { alaChasBpsConnectorPriorityEntry 1 }
@@ -2279,7 +2388,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsConnectorShelfId OBJECT-TYPE
     SYNTAX          AlaChasBpsShelfId 
     MAX-ACCESS      read-only 
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "Bps shelf ID "
     ::= { alaChasBpsConnectorPriorityEntry 2  }
@@ -2288,7 +2397,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsConnectorPriority OBJECT-TYPE
     SYNTAX          Integer32(0..8)
     MAX-ACCESS      read-write
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION "This object specifies the bps connector priority."
     DEFVAL { 0 }
     ::= { alaChasBpsConnectorPriorityEntry 3 }
@@ -2296,14 +2405,14 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsConnectorNum OBJECT-TYPE
     SYNTAX          Integer32(0..7)
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION "This object specifies the bps connector num."
     ::= { alaChasBpsConnectorPriorityEntry 4 }
 
   alaChasBpsSerialNum OBJECT-TYPE
     SYNTAX          SnmpAdminString (SIZE(0..14)) 
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION "This object specifies the bps serial num."
     ::= { alaChasBpsConnectorPriorityEntry 5 }
 
@@ -2355,7 +2464,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPowerSupplyTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF AlaChasBpsPowerSupplyEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "This table contains   BPS power supplies details"
      ::= {alaChasBpsObjects 4}
@@ -2363,7 +2472,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPowerSupplyEntry OBJECT-TYPE
     SYNTAX          AlaChasBpsPowerSupplyEntry
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "Information about a particular  BPS power supply"
     INDEX { alaChasBpsPowerSupplyShelfId, alaChasBpsPowerSupplyIndex }
@@ -2387,7 +2496,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPowerSupplyShelfId    OBJECT-TYPE
     SYNTAX          AlaChasBpsShelfId 
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "BPS shelf ID"
     ::= { alaChasBpsPowerSupplyEntry 1 }
@@ -2396,7 +2505,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPowerSupplyIndex OBJECT-TYPE
     SYNTAX          Integer32(1..6)
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "This value hold BPS power power supply Index"
     ::= { alaChasBpsPowerSupplyEntry 2 }
@@ -2404,7 +2513,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPowerSupplyName  OBJECT-TYPE
     SYNTAX          SnmpAdminString(SIZE(0..63))
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "This object hold name of BPS power supply"
     ::= { alaChasBpsPowerSupplyEntry 3 }
@@ -2412,7 +2521,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPowerSupplyDescr OBJECT-TYPE
     SYNTAX          SnmpAdminString(SIZE(0..63))
     MAX-ACCESS      read-only
-    STATUS           current
+    STATUS           deprecated
     DESCRIPTION
     "This object hold description of BPS power supply"
     ::= { alaChasBpsPowerSupplyEntry 4 }
@@ -2420,7 +2529,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPowerSupplyModuleType OBJECT-TYPE
     SYNTAX          SnmpAdminString(SIZE(0..31))
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "This object is unique module Type or ID from BPS entities eeprom"
     ::= { alaChasBpsPowerSupplyEntry 5 }
@@ -2428,7 +2537,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPowerSupplyPartNumber OBJECT-TYPE
     SYNTAX          SnmpAdminString(SIZE(0..16))
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "This object contains the BPS power supply  Part Number "
     ::= {   alaChasBpsPowerSupplyEntry 6 }
@@ -2436,7 +2545,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPowerSupplyHardwareRev OBJECT-TYPE
     SYNTAX      SnmpAdminString(SIZE(0..8))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
     "The vendor-specific hardware revision string for the
     BPS  power supplies
@@ -2454,7 +2563,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPowerSupplySerialNum OBJECT-TYPE
     SYNTAX      SnmpAdminString (SIZE (0..32))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
     "The vendor-specific serial number string for the
     BPS power supplies"
@@ -2463,7 +2572,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPowerSupplyMfgDate OBJECT-TYPE
     SYNTAX      SnmpAdminString (SIZE(0..11))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
     "This object contains the manufacturing date of the BPS power supplies .
     Its format is mmm dd yyyy : NOV 27 2012."
@@ -2477,7 +2586,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
         unknown(3)
     }
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
     "Oper status of  BPS power supply"
     ::= { alaChasBpsPowerSupplyEntry 10 }
@@ -2485,7 +2594,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPowerSupplyPowerProv OBJECT-TYPE
     SYNTAX      Integer32(0..2000)
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
     " It corresponds to  max power  of  BPS power supply.
     This value is in Watts."
@@ -2498,7 +2607,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsTotalPowerAllocTable OBJECT-TYPE
     SYNTAX SEQUENCE OF AlaChasBpsTotalPowerAllocEntry
     MAX-ACCESS not-accessible
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
     "This table contains one row for parameters which reflect total allocation by BPS ."
     ::= { alaChasBpsObjects 5 }
@@ -2506,7 +2615,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsTotalPowerAllocEntry  OBJECT-TYPE
     SYNTAX  AlaChasBpsTotalPowerAllocEntry 
     MAX-ACCESS  not-accessible
-    STATUS  current
+    STATUS  deprecated
     DESCRIPTION
     " Information about various bps config parameters"
     INDEX  { alaChasBpsShelfId }
@@ -2523,7 +2632,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsSysTotalAvailablePower OBJECT-TYPE
     SYNTAX          Integer32(0..900)
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "This value is only applicable to the BPS Module.  It
     corresponds to system total power available on BPS
@@ -2533,7 +2642,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsSysTotalAllocation OBJECT-TYPE
     SYNTAX          Integer32(0..900)
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "This value is only applicable to the BPS Modules.  It
     corresponds to  total system  power allocated by  BPS
@@ -2543,7 +2652,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPoeTotalAvailablePower OBJECT-TYPE
     SYNTAX          Integer32(0..6000)
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "This value is only applicable to the  BPS Modules.  It
     corresponds to system total power available on BPS
@@ -2553,7 +2662,7 @@ alaChasBpsObjects OBJECT IDENTIFIER ::= { alcatelIND1ChassisMIBObjects 14 }
   alaChasBpsPoeTotalAllocation OBJECT-TYPE
     SYNTAX          Integer32(0..6000)
     MAX-ACCESS      read-only
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
     "This value is only applicable to the Bps Modules.  It
     corresponds to  total POE  power allocated by  BPS
@@ -2643,7 +2752,8 @@ ChassisTrapsObjectType ::= TEXTUAL-CONVENTION
         fan               (4),
         cmm               (5),
         fabric            (6),
-        gbic              (7)
+        gbic              (7),
+        temperature       (8)
     }
 
 
@@ -2739,7 +2849,10 @@ ChassisTrapsAlertNumber ::= TEXTUAL-CONVENTION
         tempSWHigh                      (59),   -- the cmm/ni temperature is over SW high level
         tempHWHigh                      (60),   -- the cmm/ni temperature is over HW high level
         tempDanger                      (61),   -- the cmm/ni temperature is over HW danger set level
-        imageFileChecksumChanged        (62)    -- the image file MD5 checksum has changed
+        imageFileChecksumChanged        (62),   -- the image file MD5 checksum has changed
+	cmmDown                         (63),   -- A CMM went down
+	niDown                          (64),   -- an NI wend down
+	cfmDown                         (65)    -- a fabric board went down
     }
 
 --
@@ -2847,6 +2960,27 @@ chassisTrapsStateChange NOTIFICATION-TYPE
     ::= { alcatelIND1ChassisMIBNotifications 7 }
 
 -- BPS related traps  end
+
+chassisTrapsImageSigCheckFailed NOTIFICATION-TYPE
+    OBJECTS {
+        physicalIndex,
+        chassisTrapsWorkingVersion
+    }
+    STATUS        current
+    DESCRIPTION
+       "Image signature verification failed"
+::= { alcatelIND1ChassisMIBNotifications 8 }
+
+chassisTrapsResetToFactory NOTIFICATION-TYPE
+    OBJECTS {
+        chassisTrapResetToFactory,
+        chassisTrapResetToFactoryInTime,
+        chassisTrapResetToFactoryDescription
+    }
+    STATUS        current
+    DESCRIPTION
+       "Trap to notify the reset to factory"
+::= { alcatelIND1ChassisMIBNotifications 9 }
 
 -- objects used in the traps.
 --
@@ -3052,6 +3186,44 @@ physicalIndex             OBJECT-TYPE
 
 --BPS Traps objects End
 
+chassisTrapsWorkingVersion OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "The path to the currently specified working image directory.
+         Value may be /flash/certified or /flash/<working directory name>."
+    ::= { chassisTrapsObj 23 }
+
+chassisTrapResetToFactory OBJECT-TYPE
+        SYNTAX INTEGER {
+            cancel(1),
+            all(2),
+            config(3),
+            configRetainVC(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reset type to factory status to start, schedule or cancel."
+    ::= { chassisTrapsObj 24 }
+
+chassisTrapResetToFactoryInTime OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reset to factory time delay in second."
+    ::= { chassisTrapsObj 25 }
+
+chassisTrapResetToFactoryDescription OBJECT-TYPE
+        SYNTAX SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "To provide detail when reset to factory "
+    ::= { chassisTrapsObj 26 }
+
 -- END Trap Objects
 
 
@@ -3196,7 +3368,11 @@ physicalIndex             OBJECT-TYPE
             chasGlobalControlUpdateFilename,
             chasGlobalControlUpdateStatus,
             chasGlobalControlConfirmOperation,
-            chasGlobalControlConfirmMessage
+            chasGlobalControlConfirmMessage,
+            chasGlobalControlCertifyOnReboot,
+            chasGlobalControlResetToFactory,
+            chasGlobalControlResetToFactoryInTime,
+            chasGlobalControlMakePersistent
         }
         STATUS  current
         DESCRIPTION
@@ -3211,7 +3387,9 @@ physicalIndex             OBJECT-TYPE
             chasTrapsBPSLessAllocSysPwr,
             chasTrapsBPSStateChange, 
             chasTrapsNiBPSFETStateChange,
-            chasTrapsBPSFwUpgradeAlert 
+            chasTrapsBPSFwUpgradeAlert, 
+            chassisTrapsImageSigCheckFailed,
+            chassisTrapsResetToFactory
         }
         STATUS  current
         DESCRIPTION
@@ -3254,7 +3432,11 @@ physicalIndex             OBJECT-TYPE
             chasTrapsBPSSystemFETChange,
             chasTrapsBPSPoeFETChange,
             chasTrapsBPSFwVersion,
-            chasTrapsBPSFwType
+            chasTrapsBPSFwType,
+            chassisTrapsWorkingVersion,
+            chassisTrapResetToFactory,
+            chassisTrapResetToFactoryInTime,
+            chassisTrapResetToFactoryDescription
         }
         STATUS  current
         DESCRIPTION
@@ -3436,7 +3618,12 @@ physicalIndex             OBJECT-TYPE
             chasEntPhysCpuModel                   ,
             chasEntPhysAirflow                    ,
             chasEntPhysPowerUsed                  ,
-            chasEntPhysPowerType
+            chasEntPhysPowerType                  ,
+            chasEntPowerSupplyName                ,
+            chasEntPowerSupplyType                ,
+            chasEntPowerSupplyInputType           ,
+            chasEntPowerSupplyWattage             ,
+            chasEntPowerSupplyVoltage
 
         }
         STATUS  current

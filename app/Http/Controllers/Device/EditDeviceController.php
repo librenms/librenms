@@ -35,10 +35,12 @@ use App\Models\PollerGroup;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Exceptions\HostRenameException;
-use LibreNMS\Util\File;
 use LibreNMS\Util\Number;
+use SplFileInfo;
+use Throwable;
 
 class EditDeviceController
 {
@@ -53,7 +55,7 @@ class EditDeviceController
             ]);
         }
 
-        [$rrd_size, $rrd_num] = File::getFolderSize(Rrd::dirFromHost($device->hostname));
+        [$rrd_size, $rrd_num] = $this->getFolderSize(Rrd::dirFromHost($device->hostname));
 
         $alertSchedules = $device->alertSchedules()->isActive()->get();
         $isUnderMaintenance = $alertSchedules->isNotEmpty();
@@ -93,15 +95,15 @@ class EditDeviceController
     {
         $device->fill($request->validated());
 
-        $device->parents()->sync($request->get('parent_id', [])); // TODO avoid loops!
+        $device->parents()->sync($request->input('parent_id', [])); // TODO avoid loops!
 
         // sync groups without removing dynamic groups
         $dynamic_groups = $device->groups()->where('type', 'dynamic')->pluck('id')->toArray();
-        $device->groups()->sync(array_merge($dynamic_groups, $request->get('static_groups', [])));
+        $device->groups()->sync(array_merge($dynamic_groups, $request->input('static_groups', [])));
 
         // handle sysLocation update
         if ($device->override_sysLocation) {
-            $device->setLocation($request->get('sysLocation'), true, true);
+            $device->setLocation($request->input('sysLocation'), true, true);
             $device->location?->save();
         } elseif ($device->isDirty('override_sysLocation')) {
             // no longer overridden, clear location
@@ -109,9 +111,9 @@ class EditDeviceController
         }
 
         // check if sysContact is overridden
-        if ($request->get('override_sysContact')) {
+        if ($request->input('override_sysContact')) {
             $device->setAttrib('override_sysContact_bool', true);
-            $device->setAttrib('override_sysContact_string', (string) $request->get('override_sysContact_string'));
+            $device->setAttrib('override_sysContact_string', (string) $request->input('override_sysContact_string'));
         } else {
             $device->forgetAttrib('override_sysContact_bool');
         }
@@ -136,5 +138,32 @@ class EditDeviceController
         }
 
         return response()->redirectToRoute('device', ['device' => $device->device_id, 'edit']);
+    }
+
+    /**
+     * @param  string  $directory
+     * @return array{int, int} [size, count]
+     */
+    private function getFolderSize(string $directory): array
+    {
+        if (! File::isDirectory($directory) || ! File::isReadable($directory)) {
+            return [0, 0];
+        }
+
+        try {
+            $files = collect(File::allFiles($directory));
+
+            $size = $files->sum(function (SplFileInfo $file): int {
+                try {
+                    return $file->getSize();
+                } catch (Throwable) {
+                    return 0;
+                }
+            });
+
+            return [$size, $files->count()];
+        } catch (Throwable) {
+            return [0, 0];
+        }
     }
 }

@@ -47,12 +47,12 @@ function process_syslog($entry, $update)
     global $dev_cache;
 
     foreach (LibrenmsConfig::get('syslog_filter') as $bi) {
-        if (str_contains($entry['msg'], $bi)) {
+        if (str_contains((string) $entry['msg'], $bi)) {
             return $entry;
         }
     }
 
-    $entry['host'] = preg_replace('/^::ffff:/', '', $entry['host']);
+    $entry['host'] = preg_replace('/^::ffff:/', '', (string) $entry['host']);
     $syslog_xlate = LibrenmsConfig::get('syslog_xlate');
     if (! empty($syslog_xlate[$entry['host']])) {
         $entry['host'] = $syslog_xlate[$entry['host']];
@@ -66,26 +66,26 @@ function process_syslog($entry, $update)
             foreach (LibrenmsConfig::getOsSetting($os, 'syslog_hook') as $v) {
                 $syslogprogmsg = $entry['program'] . ': ' . $entry['msg'];
                 if ((isset($v['script'])) && (isset($v['regex'])) && preg_match($v['regex'], $syslogprogmsg)) {
-                    shell_exec(escapeshellcmd($v['script']) . ' ' . escapeshellarg($hostname) . ' ' . escapeshellarg($os) . ' ' . escapeshellarg($syslogprogmsg) . ' >/dev/null 2>&1 &');
+                    shell_exec(escapeshellcmd($v['script']) . ' ' . escapeshellarg((string) $hostname) . ' ' . escapeshellarg((string) $os) . ' ' . escapeshellarg($syslogprogmsg) . ' >/dev/null 2>&1 &');
                 }
             }
         }
 
         if (in_array($os, ['ios', 'iosxe', 'catos'])) {
             // multipart message
-            if (str_contains($entry['msg'], ':')) {
+            if (str_contains((string) $entry['msg'], ':')) {
                 $matches = [];
                 $timestamp_prefix = '([\*\.]?[A-Z][a-z]{2} \d\d? \d\d:\d\d:\d\d(.\d\d\d)?( [A-Z]{3})?: )?';
                 $program_match = '(?<program>%?[A-Za-z\d\-_]+(:[A-Z]* %[A-Z\d\-_]+)?)';
                 $message_match = '(?<msg>.*)';
-                if (preg_match('/^' . $timestamp_prefix . $program_match . ': ?' . $message_match . '/', $entry['msg'], $matches)) {
+                if (preg_match('/^' . $timestamp_prefix . $program_match . ': ?' . $message_match . '/', (string) $entry['msg'], $matches)) {
                     $entry['program'] = $matches['program'];
                     $entry['msg'] = $matches['msg'];
                 }
                 unset($matches);
             } else {
                 // if this looks like a program (no groups of 2 or more lowercase letters), move it to program
-                if (! preg_match('/[(a-z)]{2,}/', $entry['msg'])) {
+                if (! preg_match('/[(a-z)]{2,}/', (string) $entry['msg'])) {
                     $entry['program'] = $entry['msg'];
                     unset($entry['msg']);
                 }
@@ -93,7 +93,7 @@ function process_syslog($entry, $update)
         } elseif ($os == 'linux' and get_cache($entry['host'], 'version') == 'Point') {
             // Cisco WAP200 and similar
             $matches = [];
-            if (preg_match('#Log: \[(?P<program>.*)\] - (?P<msg>.*)#', $entry['msg'], $matches)) {
+            if (preg_match('#Log: \[(?P<program>.*)\] - (?P<msg>.*)#', (string) $entry['msg'], $matches)) {
                 $entry['msg'] = $matches['msg'];
                 $entry['program'] = $matches['program'];
             }
@@ -103,7 +103,7 @@ function process_syslog($entry, $update)
             $matches = [];
             // pam_krb5(sshd:auth): authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
             // pam_krb5[sshd:auth]: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
-            if (empty($entry['program']) and preg_match('#^(?P<program>([^(:]+\([^)]+\)|[^\[:]+\[[^\]]+\])) ?: ?(?P<msg>.*)$#', $entry['msg'], $matches)) {
+            if (empty($entry['program']) and preg_match('#^(?P<program>([^(:]+\([^)]+\)|[^\[:]+\[[^\]]+\])) ?: ?(?P<msg>.*)$#', (string) $entry['msg'], $matches)) {
                 $entry['msg'] = $matches['msg'];
                 $entry['program'] = $matches['program'];
             } elseif (empty($entry['program']) and ! empty($entry['facility'])) {
@@ -122,7 +122,7 @@ function process_syslog($entry, $update)
             unset($matches);
         } elseif ($os == 'procurve') {
             $matches = [];
-            if (preg_match('/^(?P<program>[A-Za-z]+): {2}(?P<msg>.*)/', $entry['msg'], $matches)) {
+            if (preg_match('/^(?P<program>[A-Za-z]+): {2}(?P<msg>.*)/', (string) $entry['msg'], $matches)) {
                 $entry['msg'] = $matches['msg'] . ' [' . $entry['program'] . ']';
                 $entry['program'] = $matches['program'];
             }
@@ -130,10 +130,10 @@ function process_syslog($entry, $update)
         } elseif ($os == 'zywall') {
             // Zwwall sends messages without all the fields, so the offset is wrong
             $msg = preg_replace('/" /', '";', stripslashes($entry['program'] . ':' . $entry['msg']));
-            $msg = str_getcsv($msg, ';', escape: '\\');
+            $msg = str_getcsv((string) $msg, ';', escape: '\\');
             $entry['program'] = null;
             foreach ($msg as $param) {
-                [$var, $val] = explode('=', $param);
+                [$var, $val] = explode('=', (string) $param);
                 if ($var == 'cat') {
                     $entry['program'] = str_replace('"', '', $val);
                 }
@@ -146,8 +146,8 @@ function process_syslog($entry, $update)
             unset($entry['msg']);
         }
 
-        $entry['program'] = strtoupper($entry['program']);
-        $entry = array_map('trim', $entry);
+        $entry['program'] = strtoupper((string) $entry['program']);
+        $entry = array_map(trim(...), $entry);
 
         if ($update) {
             dbInsert(

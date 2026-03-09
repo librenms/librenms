@@ -25,7 +25,6 @@ class ConfigListCommand extends LnmsCommand
      */
     public function handle(): int
     {
-        $this->configureOutputOptions();
         $search = $this->argument('search') ?? '';
 
         $settings = (new DynamicConfig)->all()
