@@ -432,7 +432,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
             $options[] = '';
             $options[] = $context ?: '';
         }
-        $this->snmp->setSecurity($options);
+        $this->snmp->setSecurity(...$options);
     }
 
     private function loadMibs(): void
