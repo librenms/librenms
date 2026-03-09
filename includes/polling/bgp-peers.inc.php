@@ -815,14 +815,16 @@ if (! empty($peers)) {
                                         continue;
                                     }
                                     if ($parts[1] === 'ipv6') {
-                                        $hex_addr = str_replace(':', '', trim($parts[2], '"'));
+                                        // IPv6: index = vrfOid.ipv6.16.o1.o2...o16
+                                        $hex_addr = implode('', array_map(fn($o) => sprintf('%02x', $o), array_slice($parts, 3)));
                                         try {
                                             $addr = IP::fromHexString($hex_addr)->compressed();
                                         } catch (\LibreNMS\Exceptions\InvalidIpException) {
                                             continue;
                                         }
                                     } else {
-                                        $addr = implode('.', array_slice($parts, 2));
+                                        // IPv4: index = vrfOid.ipv4.4.o1.o2.o3.o4
+                                        $addr = implode('.', array_slice($parts, 3));
                                     }
                                     $recv_val = is_array($recv_val) ? reset($recv_val) : $recv_val;
                                     $sent_val = isset($sent_data[$index])
