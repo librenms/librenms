@@ -60,6 +60,12 @@ modules:
                     high_limit: POWERSUPPLY-MIB::hpicfPsWattageMax
                     descr: 'Power Supply #{{ $index }}'
                 -
+                    oid: hpicfPseFeaturesTable
+                    value: hpicfPseAvailablePower
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.1.9.1.6.1.4.{{ $index }}'
+                    index: 'hpicfPseTotalPower.{{ $index }}'
+                    descr: 'PoE Power Total'
+                -
                     oid: HP-ICF-POE-MIB::hpicfPseFeaturesTable
                     value: HP-ICF-POE-MIB::hpicfPseUsedPower
                     num_oid: '.1.3.6.1.4.1.11.2.14.11.1.9.1.6.1.5.{{ $index }}'
