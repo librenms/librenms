@@ -2,8 +2,8 @@
 
 echo 'Papouch TME ';
 
-$descr = snmp_get($device, 'SNMPv2-SMI::enterprises.18248.1.1.3.0', '-Oqv');
-$temperature = (snmp_get($device, 'SNMPv2-SMI::enterprises.18248.1.1.1.0', '-Oqv') / 10);
+$descr = SnmpQuery::get('SNMPv2-SMI::enterprises.18248.1.1.3.0')->value();
+$temperature = (SnmpQuery::get('SNMPv2-SMI::enterprises.18248.1.1.1.0')->value() / 10);
 
 if ($descr != '' && is_numeric($temperature) && $temperature > '0') {
     $temperature_oid = '.1.3.6.1.4.1.18248.1.1.1.0';

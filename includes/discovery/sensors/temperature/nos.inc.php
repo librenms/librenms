@@ -22,8 +22,8 @@ if ($oids = snmp_walk($device, '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.2', '-Osqn')) {
         if ($data and $dataval == '1') {
             $value_oid = '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.' . $oididx;
             $descr_oid = '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.5.' . $oididx;
-            $value = snmp_get($device, $value_oid, '-Oqv');
-            $descr = snmp_get($device, $descr_oid, '-Oqv');
+            $value = SnmpQuery::get($value_oid)->value();
+            $descr = SnmpQuery::get($descr_oid)->value();
             if (! strstr($descr, 'No') and ! strstr($value, 'No')) {
                 $descr = str_replace('"', '', $descr);
                 $descr = trim($descr);

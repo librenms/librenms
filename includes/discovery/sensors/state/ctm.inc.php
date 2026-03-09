@@ -65,7 +65,7 @@ $octetSetup = [
 ];
 
 foreach ($octetSetup as $entry) {
-    $octetString = snmp_get($device, $entry['oid'], '-Ovqe', 'CTMMIBCUSTOM');
+    $octetString = SnmpQuery::get('CTMMIBCUSTOM::' . $entry['oid'])->value();
     if ($octetString) {
         $onStates = explode(',', $octetString);
 
