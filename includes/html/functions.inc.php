@@ -710,7 +710,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
         if ($tmp_alerts['app_status']) {
             $fault_detail .= ' => ' . $tmp_alerts['app_status'];
         }
-        if ($tmp_alerts['metric']) {
+        if (isset($tmp_alerts['metric']) && $tmp_alerts['metric'] && isset($tmp_alerts['value']) && $tmp_alerts['value']) {
             $fault_detail .= ' : ' . $tmp_alerts['metric'] . ' => ' . $tmp_alerts['value'];
         }
         $fallback = false;
