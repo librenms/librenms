@@ -285,14 +285,14 @@ if (! empty($peers)) {
                     }
 
                     $peer_data = [];
-                    $peer_data['bgpPeerState'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgConnState'];
-                    if ($peerData['TIMETRA-BGP-MIB::tBgpPeerNgShutdown'] == '1') {
+                    $peer_data['bgpPeerState'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgConnState'] ?? 'unknown';
+                    if (($peerData['TIMETRA-BGP-MIB::tBgpPeerNgShutdown'] ?? '0') == '1') {
                         $peer_data['bgpPeerAdminStatus'] = 'adminShutdown';
                     } else {
-                        $peer_data['bgpPeerAdminStatus'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent'];
+                        $peer_data['bgpPeerAdminStatus'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent'] ?? 'unknown';
                     }
-                    $peer_data['bgpPeerInTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] % (2 ** 32);  // That are actually only octets available,
-                    $peer_data['bgpPeerOutTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] % (2 ** 32); // not messages
+                    $peer_data['bgpPeerInTotalMessages'] = ($peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] ?? 0) % (2 ** 32);  // That are actually only octets available,
+                    $peer_data['bgpPeerOutTotalMessages'] = ($peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] ?? 0) % (2 ** 32); // not messages
                     $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
                 } elseif ($device['os'] == 'firebrick') {
                     // ToDo, It seems that bgpPeer(In|Out)Updates and bgpPeerInUpdateElapsedTime are actually not available over SNMP
@@ -807,8 +807,8 @@ if (! empty($peers)) {
                             foreach ($safis_map as $timos_safi => $timos_oids) {
                                 $recv_oid = $timos_oids[0];
                                 $sent_oid = $timos_oids[1];
-                                $recv_data = SnmpQuery::numericIndex()->walk($recv_oid)->valuesByIndex();
-                                $sent_data = SnmpQuery::numericIndex()->walk($sent_oid)->valuesByIndex();
+                                $recv_data = SnmpQuery::enumStrings()->walk($recv_oid)->valuesByIndex();
+                                $sent_data = SnmpQuery::enumStrings()->walk($sent_oid)->valuesByIndex();
                                 foreach ($recv_data as $index => $recv_val) {
                                     $parts = explode('.', (string) $index);
                                     if (count($parts) < 3) {
