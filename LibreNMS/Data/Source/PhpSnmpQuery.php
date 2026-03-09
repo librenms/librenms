@@ -33,6 +33,7 @@ use DeviceCache;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\Rewrite;
 use Log;
 
 class PhpSnmpQuery implements SnmpQueryInterface
@@ -57,9 +58,11 @@ class PhpSnmpQuery implements SnmpQueryInterface
             'v3' => \SNMP::VERSION_3,
             default => null,
         };
+        $hostname = Rewrite::addIpv6Brackets((string) ($this->device->overwrite_ip ?: $this->device->hostname));
+
         $this->snmp = new \SNMP(
             $snmpver,
-            $this->device->hostname,
+            $hostname . ':' . $this->device->port,
             $this->device->snmpver === 'v3' ? ($this->device->authname ?: 'root') : $this->device->community,
             ($this->device->timeout ?? LibrenmsConfig::get('snmp.timeout')) * 1000000,
             $this->device->retries ?? LibrenmsConfig::get('snmp.retries'),
