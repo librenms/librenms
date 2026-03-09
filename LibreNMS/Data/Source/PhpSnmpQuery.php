@@ -395,7 +395,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         foreach ($oids as $oid) {
             [$mib, $what] = explode('::', $oid, 2);
 
-            if (isset($what) && ! in_array($mib, $this->mibs)) {
+            if ($what && ! in_array($mib, $this->mibs)) {
                 if (Debug::isVerbose()) {
                     Log::debug("Auto-loading $mib from $oid");
                 }
