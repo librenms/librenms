@@ -67,18 +67,20 @@ class EditHealthController
                 // Clear custom flag and allow discovery to manage limits again
                 $sensor->sensor_custom = 'Reset';
 
-                if (!$sensor->saveQuietly()) {
+                if (! $sensor->saveQuietly()) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Could not reset sensors values',
                     ]);
                 }
+
                 return response()->json([
                     'status' => 'ok',
                     'message' => 'Sensor values reset',
                 ]);
             }
         }
+
         return response()->json([
             'status' => 'ok',
             'message' => 'No sensors to reset',
