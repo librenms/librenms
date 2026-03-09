@@ -14,8 +14,6 @@ The transport uses the system `snmptrap` binary (configurable under
 - A MIB file accessible on the LibreNMS host describing the trap structure.
   The LibreNMS-contributed MIB (`LIBRENMS-NOTIFICATIONS-MIB`) is shipped under
   `mibs/librenms/` and covers the default alert template.
-  The original Tigo Technology Center MIB (`TTC-NOTIFICATIONS-MIB`) is available
-  under `mibs/ttc/` for backward compatibility with existing integrations.
 
 ### Configuration
 
@@ -92,53 +90,6 @@ defaultAlertFaultDetail.{{ $key }} s "{{ $value['string'] }}"
 @endif
 ```
 
-#### Catch-All Template (TTC-NOTIFICATIONS-MIB — backward compatible)
-
-For installations already using the TTC MIB, point the **MIB Directory** to
-`/opt/librenms/mibs/ttc` and the **Trap OID** to
-`TTC-NOTIFICATIONS-MIB::daEvent`.  Use the following template body:
-
-```
-daTitle s "{{ $alert->title }}"
-daAlertID i {{ $alert->id }}
-daEventID i {{ $alert->uid }}
-daState i {{ $alert->state }}
-daSeverity s "{{ $alert->severity }}"
-daRuleID i {{ $alert->rule_id }}
-daRuleName s "{{ $alert->name }}"
-daProcedure s "{{ $alert->proc }}"
-daTimestamp s "{{ $alert->timestamp }}"
-@if ($alert->state == 0)
-daTimeElapsed s "{{ $alert->elapsed }}"
-@endif
-daDeviceID i {{ $alert->device_id }}
-daDevHostname s "{{ $alert->hostname }}"
-daDevSysName s "{{ $alert->sysName }}"
-daDevMgmtIP s "{{ $alert->ip }}"
-daDevSysDescr s "{{ $alert->sysDescr }}"
-daDevOS s "{{ $alert->os }}"
-daDevType s "{{ $alert->type }}"
-daDevHardware s "{{ $alert->hardware }}"
-daDevVersion s "{{ $alert->version }}"
-daDevSerial s "{{ $alert->serial }}"
-daDevLocation s "{{ $alert->location }}"
-daDevUptime t {{ $alert->uptime }}
-daDevShortUptime s "{{ $alert->uptime_short }}"
-daDevLongUptime s "{{ $alert->uptime_long }}"
-daDevPurpose s "{{ $alert->description }}"
-daDevNotes s "{{ $alert->notes }}"
-daACKNotes s "{{ $alert->alert_notes }}"
-daDevPingLoss s "{{ $alert->ping_loss }}"
-daDevPingMin s "{{ $alert->ping_min }}"
-daDevPingMax s "{{ $alert->ping_max }}"
-daDevPingAvg s "{{ $alert->ping_avg }}"
-@if ($alert->faults)
-@foreach ($alert->faults as $key => $value)
-daFaultTableEntryDetail.{{ $key }} s "{{ $value['string'] }}"
-@endforeach
-@endif
-```
-
 ### MIB Installation
 
 Copy the desired MIB directory to the LibreNMS host and configure the path:
@@ -146,9 +97,6 @@ Copy the desired MIB directory to the LibreNMS host and configure the path:
 ```bash
 # LibreNMS MIB (default)
 cp -r /opt/librenms/mibs/librenms /opt/librenms/mibs/librenms
-
-# TTC MIB (backward compatibility)
-cp -r /opt/librenms/mibs/ttc /opt/librenms/mibs/ttc
 ```
 
 To make the MIB globally available to Net-SNMP tools:
