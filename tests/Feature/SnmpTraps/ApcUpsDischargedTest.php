@@ -36,7 +36,7 @@ final class ApcUpsDischargedTest extends SnmpTrapTestCase
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
-UDP: [{{ ip }}]:57602->[10.0.0.1]:162
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 SNMPv2-MIB::sysUpTime.0 0:0:10:23.40
 SNMPv2-MIB::snmpTrapOID.0 PowerNet-MIB::upsDischarged
 PowerNet-MIB::mtrapargsString "UPS: The battery power is too low to support the load; if power fails, the UPS will be shut down immediately."

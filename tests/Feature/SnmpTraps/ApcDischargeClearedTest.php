@@ -36,7 +36,7 @@ final class ApcDischargeClearedTest extends SnmpTrapTestCase
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
-UDP: [{{ ip }}]:57602->[10.0.0.1]:162
+UDP: [{{ ip }}]:44298->[192.168.5.5]:162
 SNMPv2-MIB::sysUpTime.0 0:0:44:22.50
 SNMPv2-MIB::snmpTrapOID.0 PowerNet-MIB::dischargeCleared
 PowerNet-MIB::mtrapargsString "UPS: A discharged battery condition no longer exists."
