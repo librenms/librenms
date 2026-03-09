@@ -142,7 +142,7 @@ foreach ($controllers as $ctrl) {
         <tr>
           <th>BBU / CacheVault</th>
           <td>{$bbu['type']} &nbsp; {$bbu_badge} &nbsp; State: <strong>"
-            . htmlspecialchars($bbu['state']) . '</strong>'
+            . htmlspecialchars((string) $bbu['state']) . '</strong>'
             . ($bbu['temperature'] !== 'N/A' ? ' &nbsp; Temp: ' . htmlspecialchars((string) $bbu['temperature']) : '')
             . ($bbu['charge_pct'] !== 'N/A' ? ' &nbsp; Charge: ' . htmlspecialchars((string) $bbu['charge_pct']) : '')
             . '</td>
@@ -253,7 +253,7 @@ foreach ($physical_disks as $pd) {
 
     $model_link = Url::overlibLink(
         '#',
-        htmlspecialchars($pd['model']),
+        htmlspecialchars((string) $pd['model']),
         Url::graphTag($graph_pop)
     );
 
