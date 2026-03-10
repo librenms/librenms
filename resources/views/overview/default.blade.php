@@ -95,7 +95,8 @@
                             </div>
                         </form>
                     </div>
-                    @if (count($user_list) and auth()->user()->isAdmin())
+                    @can('copy', \App\Models\Dashboard::class)
+                    @if (count($user_list))
                     <div class="btn-group btn-lg" style="margin-top:5px;position:absolute;right:0px;">
                         <div class="btn-group">
                         <select class="form-control" id="dashboard_copy_target" name="dashboard_copy_target" onchange="dashboard_copy_user_select()">
@@ -108,6 +109,7 @@
                         <button disabled id="do_copy_dashboard" class="btn btn-primary" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.copy') }}"><i class="fa fa-copy fa-fw"></i></button>
                     </div>
                     @endif
+                    @endcan
                 </div>
             </div>
             <!-- End Dashboard-Settings -->
@@ -470,7 +472,6 @@
         });
     }
 
-@if (auth()->user()->isAdmin())
     function dashboard_copy_user_select() {
         var button_disabled = true;
         if (document.getElementById("dashboard_copy_target").value > 0) {
@@ -511,7 +512,6 @@
             dashboard_copy_user_select();
         }
     }
-@endif
 
     function widget_dom(data) {
         dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'" data-settings="0">'+

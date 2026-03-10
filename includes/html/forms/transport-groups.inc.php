@@ -23,9 +23,13 @@
  * @copyright  2018 Vivia Nguyen-Tran
  * @author     Vivia Nguyen-Tran <vivia@ualberta.ca>
  */
+
+use App\Models\AlertTransport;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', AlertTransport::class)) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'You need to be admin',

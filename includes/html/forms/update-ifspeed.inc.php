@@ -15,6 +15,8 @@
 use App\Models\Port;
 use LibreNMS\Enum\Severity;
 
+Gate::authorize('update', Port::class);
+
 header('Content-type: application/json');
 
 $status = 'error';

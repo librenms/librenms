@@ -13,12 +13,14 @@
  * the source code distribution for details.
  */
 
+use App\Models\WirelessSensor;
+
 header('Content-type: text/plain');
 
 // FUA
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    exit('ERROR: You need to be admin');
+if (Gate::denies('update', WirelessSensor::class)) {
+    exit('ERROR: You need permission');
 }
 
 for ($x = 0; $x < count($_POST['sensor_id']); $x++) {

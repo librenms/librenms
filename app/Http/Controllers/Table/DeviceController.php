@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -291,7 +292,7 @@ class DeviceController extends TableController
             ],
         ];
 
-        if (\Auth::user()->hasGlobalAdmin()) {
+        if (Gate::allows('update', Device::class)) {
             $actions[0][] = [
                 'title' => 'Edit device',
                 'href' => Url::deviceUrl($device, ['tab' => 'edit']),

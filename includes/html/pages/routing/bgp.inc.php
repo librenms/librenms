@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\BgpPeer;
 use App\Models\Device;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IPv6;
@@ -7,7 +8,7 @@ use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
-if (! Auth::user()->hasGlobalRead()) {
+if (\Illuminate\Support\Facades\Gate::denies('viewAny', BgpPeer::class)) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     $where = '';

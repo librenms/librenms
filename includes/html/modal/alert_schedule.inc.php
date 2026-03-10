@@ -15,8 +15,7 @@
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\MaintenanceBehavior;
 
-if (Auth::user()->hasGlobalAdmin()) {
-    $default_behavior = MaintenanceBehavior::tryFrom((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'));
+$default_behavior = MaintenanceBehavior::tryFrom((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'));
     ?>
 
 <div class="modal fade bs-example-modal-sm" id="schedule-maintenance" tabindex="-1" role="dialog" aria-labelledby="Create" aria-hidden="true">
@@ -423,5 +422,3 @@ $(function () {
 
 $("[name='recurring']").bootstrapSwitch();
 </script>
-    <?php
-}
