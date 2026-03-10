@@ -57,7 +57,7 @@ foreach ($tables as $tablevalue) {
         create_state_index($state_name, $states);
 
         foreach ($temp as $index => $entry) {
-            $drive_bay = snmp_get($device, "cpqDaPhyDrvBay.$index", '-Ovqn', 'CPQIDA-MIB', 'hp');
+            $drive_bay = SnmpQuery::mibDir('hp')->get("CPQIDA-MIB::cpqDaPhyDrvBay.$index")->value();
 
             //Discover Sensors
             discover_sensor(

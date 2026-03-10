@@ -20,13 +20,13 @@ foreach (explode("\n", $oids) as $data) {
             $limit_oid = ".1.3.6.1.4.1.10876.2.1.1.1.1.6.$index";
             $divisor_oid = ".1.3.6.1.4.1.10876.2.1.1.1.1.9.$index";
             $monitor_oid = ".1.3.6.1.4.1.10876.2.1.1.1.1.10.$index";
-            $descr = snmp_get($device, $descr_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB', 'supermicro');
-            $current = snmp_get($device, $fan_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB', 'supermicro');
-            $low_limit = snmp_get($device, $limit_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB', 'supermicro');
+            $descr = SnmpQuery::mibDir('supermicro')->get($descr_oid)->value();
+            $current = SnmpQuery::mibDir('supermicro')->get($fan_oid)->value();
+            $low_limit = SnmpQuery::mibDir('supermicro')->get($limit_oid)->value();
             // $divisor       = snmp_get($device, $divisor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB", 'supermicro');
             // ^ This returns an incorrect precision. At least using the raw value... I think. -TL
             $divisor = '1';
-            $monitor = snmp_get($device, $monitor_oid, '-Oqv', 'SUPERMICRO-HEALTH-MIB', 'supermicro');
+            $monitor = SnmpQuery::mibDir('supermicro')->get($monitor_oid)->value();
             $descr = str_replace(' Fan Speed', '', $descr);
             $descr = str_replace(' Speed', '', $descr);
             if ($monitor == 'true') {

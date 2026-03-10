@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-$temp = snmp_get($device, 'upsAdvBatteryReplaceIndicator.0', '-Ovqe', 'PowerNet-MIB');
+$temp = SnmpQuery::get('PowerNet-MIB::upsAdvBatteryReplaceIndicator.0')->value();
 $cur_oid = '.1.3.6.1.4.1.318.1.1.1.2.2.4.0';
 $index = '0';
 

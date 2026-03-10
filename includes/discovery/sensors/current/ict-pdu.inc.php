@@ -44,7 +44,7 @@ foreach ($oids as $index => $entry) {
 }
 
 // System Current
-$systemCurrent = trim(snmp_get($device, 'systemCurrent.0', '-Oqv', 'ICT-PDU-MIB'), '" ');
+$systemCurrent = trim((string) SnmpQuery::get('ICT-PDU-MIB::systemCurrent.0')->value(), '" ');
 if (! empty($systemCurrent)) {
     $divisor = 1;
     $index = '7.0';

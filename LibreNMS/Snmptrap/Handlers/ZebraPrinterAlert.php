@@ -61,7 +61,7 @@ class ZebraPrinterAlert implements SnmptrapHandler
             return Severity::Info;
         }
 
-        if (preg_match('/PQ JOB COMPLETED|LABEL READY|POWER ON|COLD START|RIBBON IN|Druckauftr Fertg/', $message)) {
+        if (preg_match('/PQ JOB COMPLETED|LABEL READY|POWER ON|COLD START|RIBBON IN|Druckauftr Fertg|Eingeschaltet|KALTSTART/', $message)) {
             return Severity::Ok;
         }
 
