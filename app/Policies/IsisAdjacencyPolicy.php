@@ -10,7 +10,7 @@ class IsisAdjacencyPolicy
 
     public function __construct()
     {
-        $this->prefix = 'routing';
+        $this->globalPrefix = 'routing';
     }
 
     /**

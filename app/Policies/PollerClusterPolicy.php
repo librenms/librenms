@@ -10,7 +10,7 @@ class PollerClusterPolicy
 
     public function __construct()
     {
-        $this->prefix = 'poller';
+        $this->globalPrefix = 'poller';
     }
 
     /**

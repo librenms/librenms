@@ -9,15 +9,15 @@ use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
 trait ChecksGlobalPermissions
 {
-    protected ?string $prefix = null;
+    protected ?string $globalPrefix = null;
 
     protected function hasGlobalPermission(User $user, string $action): bool
     {
         // Guess prefix
-        $this->prefix ??= Str::kebab(Str::before(class_basename($this), 'Policy'));
+        $this->globalPrefix ??= Str::kebab(Str::before(class_basename($this), 'Policy'));
 
         try {
-            return $user->hasPermissionTo("$this->prefix.$action");
+            return $user->hasPermissionTo("$this->globalPrefix.$action");
         } catch (PermissionDoesNotExist $e) {
             Log::error($e->getMessage());
 
