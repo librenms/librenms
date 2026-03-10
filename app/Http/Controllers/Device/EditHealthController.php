@@ -30,11 +30,13 @@ use App\Models\Sensor;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class EditHealthController
 {
     public function index(Device $device): View
     {
+        Gate::authorize('view', Sensor::class);
         $sensors = $device->sensors()
             ->where('sensor_deleted', 0)
             ->orderBy('sensor_class')
@@ -50,6 +52,7 @@ class EditHealthController
 
     public function reset(Device $device, Request $request): JsonResponse
     {
+        Gate::authorize('update', Sensor::class);
         $validated = $request->validate([
             'sensor_id' => 'required|array|min:1',
             'sensor_id.*' => 'integer',
@@ -89,6 +92,7 @@ class EditHealthController
 
     public function update(Device $device, Sensor $sensor, Request $request): JsonResponse
     {
+        Gate::authorize('update', Sensor::class);
         $validated = $request->validate([
             'value_type' => 'required|in:sensor_limit,sensor_limit_warn,sensor_limit_low_warn,sensor_limit_low',
             'data' => 'present',
@@ -111,6 +115,7 @@ class EditHealthController
 
     public function updateAlert(Device $device, Sensor $sensor, Request $request): JsonResponse
     {
+        Gate::authorize('update', Sensor::class);
         $validated = $request->validate([
             'sub_type' => 'nullable|in:remove-custom',
             'state' => 'nullable|boolean',
