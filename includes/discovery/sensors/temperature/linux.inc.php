@@ -8,8 +8,8 @@
 use Illuminate\Support\Str;
 
 $sensor_oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.1';
-$value = snmp_get($device, $sensor_oid, '-Oqve');
-$value = trim($value, '"');
+$value = SnmpQuery::get($sensor_oid)->value();
+$value = trim((string) $value, '"');
 if (is_numeric($value)) {
     $sensor_type = 'raspberry_temp';
     $descr = 'CPU Temp';
@@ -28,13 +28,13 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.232.')) {
             $temperature_id = $split_oid[count($split_oid) - 2] . '.' . $split_oid[count($split_oid) - 1];
 
             $descr_oid = ".1.3.6.1.4.1.232.6.2.6.8.1.3.$temperature_id";
-            $descr = snmp_get($device, $descr_oid, '-Oqnv', 'CPQHLTH-MIB', 'hp');
+            $descr = SnmpQuery::mibDir('hp')->get($descr_oid)->value();
 
             $temperature_oid = ".1.3.6.1.4.1.232.6.2.6.8.1.4.$temperature_id";
-            $temperature = snmp_get($device, $temperature_oid, '-Oqv', '');
+            $temperature = SnmpQuery::get($temperature_oid)->value();
 
             $threshold_oid = ".1.3.6.1.4.1.232.6.2.6.8.1.5.$temperature_id";
-            $threshold = snmp_get($device, $threshold_oid, '-Oqv', '');
+            $threshold = SnmpQuery::get($threshold_oid)->value();
 
             if (! empty($temperature)) {
                 discover_sensor(null, 'temperature', $device, $temperature_oid, $oid, 'hpilo', $descr, '1', '1', null, null, null, $threshold, $temperature);
@@ -52,7 +52,7 @@ if (preg_match('/(Linux).+(ntc)/', (string) $device['sysDescr'])) {
     $limit = 130;
     $descr = 'AXP209 Temperature';
     $index = '116.1';
-    $value = snmp_get($device, $oid . $index, '-Oqv');
+    $value = SnmpQuery::get($oid . $index)->value();
     if (is_numeric($value)) {
         discover_sensor(null, 'temperature', $device, $oid . $index, $index, $sensor_type, $descr, '1', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $value);
     }
