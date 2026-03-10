@@ -245,7 +245,6 @@ class AppServiceProvider extends ServiceProvider
             return new ApiTokenGuard($userProvider, $request);
         });
 
-        Gate::define('global-admin', fn (User $user) => $user->hasAnyRole('admin', 'demo'));
         Gate::define('admin', fn (User $user) => $user->hasRole('admin'));
         Gate::define('global-read', fn (User $user) => $user->hasAnyRole('admin', 'global-read'));
         Gate::define('demo', fn (User $user) => $user->hasRole('demo'));
