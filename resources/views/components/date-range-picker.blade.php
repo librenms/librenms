@@ -34,7 +34,7 @@
          x-transition:leave-end="tw:opacity-0 tw:transform tw:-translate-y-2"
          style="    display: none;">
         @if($presets)
-            <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3 tw:dark:text-white tw:justify-start">
+            <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(40px,max-content))] tw:gap-2 tw:justify-center tw:mb-3 tw:dark:text-white">
                 <template x-for="(preset, idx) in presets">
                     <button type="button"
                             class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-[40px] tw:dark:text-gray-400"
