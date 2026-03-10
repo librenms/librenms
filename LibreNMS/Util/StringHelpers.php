@@ -69,6 +69,7 @@ class StringHelpers
             'sdfsinfo' => 'SDFS info',
             'smart' => 'SMART',
             'ss' => 'Socket Statistics',
+            'systemd-timesyncd' => 'Systemd-Timesyncd',
             'ups-apcups' => 'UPS apcups',
             'ups-nut' => 'UPS nut',
             'zfs' => 'ZFS',

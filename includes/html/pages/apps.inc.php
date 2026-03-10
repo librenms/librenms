@@ -108,6 +108,10 @@ $graphs['ntp-client'] = [
     'stats',
     'freq',
 ];
+$graphs['systemd-timesyncd'] = [
+    'stats',
+    'freq',
+];
 $graphs['ntp-server'] = [
     'stats',
     'freq',

@@ -143,6 +143,7 @@ Currently supported applications as are below.
 - redis
 - seafile
 - supervisord
+- systemd-timesyncd
 - ups-apcups
 - zfs
 
