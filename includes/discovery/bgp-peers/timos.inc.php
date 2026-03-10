@@ -101,7 +101,6 @@ if ($device['os'] == 'timos') {
     }
 
     unset($bgpPeers);
-    // AFI/SAFI prefix count discovery
     $afi_map = [1 => 'ipv4', 2 => 'ipv6'];
     $safi_map = [1 => 'unicast', 2 => 'multicast', 128 => 'vpn'];
 

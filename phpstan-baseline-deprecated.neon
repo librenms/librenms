@@ -10322,3 +10322,12 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/syslog.php
+
+-
+  message: '''
+    #^Call to deprecated function snmpwalk_cache_oid\(\)\:
+    Please use SnmpQuery instead$#
+  '''
+  identifier: function.deprecated
+  count: 2
+  path: includes/discovery/bgp-peers/timos.inc.php
