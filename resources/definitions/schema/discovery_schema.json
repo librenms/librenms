@@ -25,7 +25,7 @@
                                             "string"
                                         ]
                                     },
-                                    "oid": {"$ref": "#/$defs/oid"},
+                                    "oid": {"$ref": "oid_types.json#/$defs/oid"},
                                     "percent_used": {
                                         "type": "string"
                                     },
@@ -83,9 +83,9 @@
                         "features": {"$ref": "#/$defs/oids"},
                         "serial": {"$ref": "#/$defs/oids"},
                         "sysName": {"$ref": "#/$defs/oids"},
-                        "lat": {"$ref": "#/$defs/oid"},
+                        "lat": {"$ref": "oid_types.json#/$defs/oid"},
                         "location": {"$ref": "#/$defs/oids"},
-                        "long": {"$ref": "#/$defs/oid"},
+                        "long": {"$ref": "oid_types.json#/$defs/oid"},
                         "sysDescr_regex": {
                             "type": ["string", "array"]
                         },
@@ -137,7 +137,7 @@
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "oid": {"$ref": "#/$defs/oid"},
+                                    "oid": {"$ref": "oid_types.json#/$defs/oid"},
                                     "num_oid": {"$ref": "#/$defs/num_oid"},
                                     "index": {
                                         "type": [
@@ -201,7 +201,7 @@
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "oid": {"$ref": "#/$defs/oid"},
+                                            "oid": {"$ref": "oid_types.json#/$defs/oid"},
                                             "value": {
                                                 "type": "string"
                                             },
@@ -361,7 +361,7 @@
                                             "string"
                                         ]
                                     },
-                                    "oid": {"$ref": "#/$defs/oid"},
+                                    "oid": {"$ref": "oid_types.json#/$defs/oid"},
                                     "percent_used": {
                                         "type": "string"
                                     },
@@ -412,8 +412,6 @@
         "modules"
     ],
     "$defs": {
-        "mib_oid": {"$ref": "oid_types.json#/$defs/mib_oid"},
-        "oid": {"$ref": "oid_types.json#/$defs/oid"},
         "num_oid": {
             "type": "string",
             "pattern": "^(\\.\\d+)+(\\.\\{\\{ \\$(index|subindex\\d) }}|\\{\\{ \\$noindex }})$"
@@ -481,7 +479,7 @@
                     "items": {
                         "type": "object",
                         "properties": {
-                            "oid": {"$ref": "#/$defs/oid"},
+                            "oid": {"$ref": "oid_types.json#/$defs/oid"},
                             "num_oid": {"$ref": "#/$defs/num_oid"},
                             "index": {
                                 "type": ["integer", "string"]
