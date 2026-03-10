@@ -128,7 +128,7 @@ if ($device['os'] == 'timos') {
             // Keys from numericIndex()->valuesByIndex() look like "6527.3.1.2.14.4.8.1.X.vrfOid.addrType.addrLen.octets"
             // Strip table OID + entry(1) + column(X) to get: vrfOid.addrType.addrLen.octets
             $index_part = preg_replace('#^' . preg_quote($table_stripped, '#') . '\.\d+\.\d+\.#', '', $index_str);
-            $parts = explode('.', $index_part);
+            $parts = explode('.', (string) $index_part);
             if (count($parts) < 6) {
                 continue;
             }
