@@ -109,8 +109,12 @@ trait BridgeMib
         $basePortIdMap = array_map(fn ($ifIndex) => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()), $baseIfIndex);
 
         foreach ($stpInstances as $instance) {
-            $vlan_ports = SnmpQuery::context("$instance->vlan", 'vlan-')
-                ->enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
+            $vlanContext = $instance->vlan == 1 ? '' : (string) $instance->vlan;
+
+            $vlan_ports = SnmpQuery::context($vlanContext, 'vlan-')
+                ->enumStrings()
+                ->cache()
+                ->walk('BRIDGE-MIB::dot1dStpPortTable')
                 ->mapTable(fn ($data, $port) => new PortStp([
                     'vlan' => $instance->vlan,
                     'port_id' => $basePortIdMap[$port] ?? 0,
