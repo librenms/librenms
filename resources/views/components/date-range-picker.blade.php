@@ -34,7 +34,7 @@
          x-transition:leave-end="tw:opacity-0 tw:transform tw:-translate-y-2"
          style="    display: none;">
         @if($presets)
-            <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3 tw:dark:text-white tw:justify-center">
+            <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3 tw:dark:text-white tw:justify-start">
                 <template x-for="(preset, idx) in presets">
                     <button type="button"
                             class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-[40px] tw:dark:text-gray-400"
@@ -46,14 +46,14 @@
             </div>
         @endif
         <div class="tw:flex-1 tw:mb-3">
-            <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">From</label>
+            <label class="tw:block tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">{{ __('From') }} <span x-show="preset || ! start" x-text="'(' + (preset || '{{ __('All') }}') + ')'"></span></label>
             <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
                 <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
                 <input type="time" x-model="startTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
             </div>
         </div>
         <div class="tw:flex-1 tw:mb-4">
-            <label class="tw:block tw:text-sm tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">To</label>
+            <label class="tw:block tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">{{ __('To')  }} <span x-show="! end">({{ __('Now') }})</span></label>
             <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
                 <input type="date" x-model="endDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
                 <input type="time" x-model="endTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
@@ -145,6 +145,10 @@
                 return !!(this.start || this.end);
             },
 
+            get preset() {
+                return this.presets.find(preset => this.isPresetSelected(preset));
+            },
+
             get displayText() {
                 if (this.relativeStartSeconds !== null) {
                     const rel = this.formatRelative(this.relativeStartSeconds);
@@ -225,7 +229,6 @@
                 this.endTime = '';
                 this.relativeStartSeconds = null;
                 this.relativeEndSeconds = null;
-                this.closeDropdown();
                 this.emitChange();
             },
 
