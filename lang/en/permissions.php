@@ -1,41 +1,84 @@
 <?php
 
 return [
-    'devices' => [
-        'view'   => ['label' => 'View Devices',   'description' => 'View device list, details, and graphs'],
-        'create' => ['label' => 'Add Devices',    'description' => 'Add new devices to LibreNMS'],
-        'edit'   => ['label' => 'Edit Devices',   'description' => 'Modify device settings and SNMP credentials'],
-        'delete' => ['label' => 'Delete Devices', 'description' => 'Remove devices from LibreNMS'],
-        'purge'  => ['label' => 'Purge Devices',  'description' => 'Permanently purge a device and all associated data'],
+    'device' => [
+        'title'       => 'Devices',
+        'viewAny'     => ['label' => 'View Devices',           'description' => 'View the list of all devices'],
+        'view'        => ['label' => 'View Device Details',    'description' => 'View device details, and graphs'],
+        'create'      => ['label' => 'Add Devices',            'description' => 'Add new devices to LibreNMS'],
+        'update'      => ['label' => 'Edit Devices',           'description' => 'Modify device settings and SNMP credentials'],
+        'delete'      => ['label' => 'Delete Devices',         'description' => 'Remove devices from LibreNMS'],
+        'debug'       => ['label' => 'Debug Devices',          'description' => 'Run snmpwalk and other debug commands on devices'],
+        'showConfig'  => ['label' => 'Show Device Config',     'description' => 'Show device configuration'],
+        'updateNotes' => ['label' => 'Update Device Notes',    'description' => 'Update device notes'],
     ],
 
-    'alerts' => [
-        'view'        => ['label' => 'View Alerts',        'description' => 'View active and historical alerts'],
-        'create'      => ['label' => 'Create Alert Rules', 'description' => 'Create new alert rules and templates'],
-        'edit'        => ['label' => 'Edit Alert Rules',   'description' => 'Modify existing alert rules and templates'],
-        'delete'      => ['label' => 'Delete Alert Rules', 'description' => 'Delete alert rules and templates'],
-        'acknowledge' => ['label' => 'Acknowledge Alerts', 'description' => 'Acknowledge active alerts'],
-        'unmute'      => ['label' => 'Unmute Alerts',      'description' => 'Unmute alerts that have been silenced'],
+    'alert' => [
+        'title'       => 'Alerts',
+        'viewAny'     => ['label' => 'View Alerts',        'description' => 'View active and historical alerts'],
+        'view'        => ['label' => 'View Alert Details', 'description' => 'View detailed alert information'],
+        'detail'      => ['label' => 'View Alert Details', 'description' => 'View detailed alert information'],
+        'update'      => ['label' => 'Edit Alerts',        'description' => 'Acknowledge or modify alerts'],
+        'delete'      => ['label' => 'Delete Alerts',      'description' => 'Delete alert history'],
     ],
 
-    'services' => [
+    'alert-rule' => [
+        'title'   => 'Alert Rules',
+        'viewAny' => ['label' => 'View Alert Rules',   'description' => 'View alert rules'],
+        'view'    => ['label' => 'View Alert Rule',    'description' => 'View alert rule details'],
+        'create'  => ['label' => 'Create Alert Rules', 'description' => 'Create new alert rules'],
+        'update'  => ['label' => 'Edit Alert Rules',   'description' => 'Modify existing alert rules'],
+        'delete'  => ['label' => 'Delete Alert Rules', 'description' => 'Delete alert rules'],
+    ],
+
+    'alert-schedule' => [
+        'title'   => 'Alert Schedules',
+        'viewAny' => ['label' => 'View Alert Schedules',   'description' => 'View alert schedules'],
+        'view'    => ['label' => 'View Alert Schedule',    'description' => 'View alert schedule details'],
+        'create'  => ['label' => 'Create Alert Schedules', 'description' => 'Create new alert schedules'],
+        'update'  => ['label' => 'Edit Alert Schedules',   'description' => 'Modify existing alert schedules'],
+        'delete'  => ['label' => 'Delete Alert Schedules', 'description' => 'Delete alert schedules'],
+    ],
+
+    'alert-template' => [
+        'title'   => 'Alert Templates',
+        'view'    => ['label' => 'View Alert Templates',   'description' => 'View alert templates'],
+        'create'  => ['label' => 'Create Alert Templates', 'description' => 'Create new alert templates'],
+        'update'  => ['label' => 'Edit Alert Templates',   'description' => 'Modify existing alert templates'],
+        'delete'  => ['label' => 'Delete Alert Templates', 'description' => 'Delete alert templates'],
+    ],
+
+    'alert-transport' => [
+        'title'   => 'Alert Transports',
+        'view'    => ['label' => 'View Alert Transports',   'description' => 'View alert transports'],
+        'create'  => ['label' => 'Create Alert Transports', 'description' => 'Create new alert transports'],
+        'update'  => ['label' => 'Edit Alert Transports',   'description' => 'Modify existing alert transports'],
+        'delete'  => ['label' => 'Delete Alert Transports', 'description' => 'Delete alert transports'],
+    ],
+
+    'service' => [
+        'title'  => 'Services',
         'view'   => ['label' => 'View Services',   'description' => 'View services monitored on devices'],
         'create' => ['label' => 'Add Services',    'description' => 'Add new services to devices'],
-        'edit'   => ['label' => 'Edit Services',   'description' => 'Modify service check settings'],
+        'update' => ['label' => 'Edit Services',   'description' => 'Modify service check settings'],
         'delete' => ['label' => 'Delete Services', 'description' => 'Remove services from devices'],
     ],
 
-    'ports' => [
-        'view'  => ['label' => 'View Ports',  'description' => 'View port details, graphs, and statistics'],
-        'edit'  => ['label' => 'Edit Ports',  'description' => 'Modify port descriptions and settings'],
-        'purge' => ['label' => 'Purge Ports', 'description' => 'Permanently purge deleted ports and their data'],
+    'port' => [
+        'title'   => 'Ports',
+        'viewAny' => ['label' => 'View Ports',        'description' => 'View the list of all ports'],
+        'view'    => ['label' => 'View Port Details', 'description' => 'View port details, graphs, and statistics'],
+        'update'  => ['label' => 'Edit Ports',        'description' => 'Modify port descriptions and settings'],
+        'delete'  => ['label' => 'Delete Ports',      'description' => 'Permanently delete ports and their data'],
     ],
 
-    'maps' => [
-        'view'   => ['label' => 'View Maps',   'description' => 'View network maps'],
-        'create' => ['label' => 'Create Maps', 'description' => 'Create new network maps'],
-        'edit'   => ['label' => 'Edit Maps',   'description' => 'Modify existing network maps'],
-        'delete' => ['label' => 'Delete Maps', 'description' => 'Delete network maps'],
+    'custom-map' => [
+        'title'   => 'Maps',
+        'viewAny' => ['label' => 'View Maps',   'description' => 'View network maps'],
+        'view'    => ['label' => 'View Map',    'description' => 'View network map details'],
+        'create'  => ['label' => 'Create Maps', 'description' => 'Create new network maps'],
+        'update'  => ['label' => 'Edit Maps',   'description' => 'Modify existing network maps'],
+        'delete'  => ['label' => 'Delete Maps', 'description' => 'Delete network maps'],
     ],
 
     'reports' => [
@@ -50,11 +93,13 @@ return [
         'diff'   => ['label' => 'View Config Diffs',      'description' => 'View configuration change diffs between backups'],
     ],
 
-    'users' => [
-        'view'   => ['label' => 'View Users',   'description' => 'View user accounts and their roles'],
-        'create' => ['label' => 'Create Users', 'description' => 'Create new user accounts'],
-        'edit'   => ['label' => 'Edit Users',   'description' => 'Modify user accounts, roles, and permissions'],
-        'delete' => ['label' => 'Delete Users', 'description' => 'Delete user accounts'],
+    'user' => [
+        'title'   => 'Users',
+        'viewAny' => ['label' => 'View Users',   'description' => 'View user accounts and their roles'],
+        'view'    => ['label' => 'View User',    'description' => 'View user account details'],
+        'create'  => ['label' => 'Create Users', 'description' => 'Create new user accounts'],
+        'update'  => ['label' => 'Edit Users',   'description' => 'Modify user accounts, roles, and permissions'],
+        'delete'  => ['label' => 'Delete Users', 'description' => 'Delete user accounts'],
     ],
 
     'settings' => [

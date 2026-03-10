@@ -51,10 +51,11 @@
         @foreach($groups as $group => $perms)
             @php
                 $groupPerms = array_map(function($perm) use ($labels, $group) {
+                    $permName = explode('.', $perm)[1] ?? $perm;
                     return [
                         'name' => $perm,
-                        'label' => $labels[$group][explode('.', $perm)[1]]['label'] ?? $perm,
-                        'description' => $labels[$group][explode('.', $perm)[1]]['description'] ?? ''
+                        'label' => $labels[$group][$permName]['label'] ?? ($labels[$group]['label'] ?? $perm),
+                        'description' => $labels[$group][$permName]['description'] ?? ($labels[$group]['description'] ?? '')
                     ];
                 }, $perms);
             @endphp
@@ -64,7 +65,7 @@
                 {{-- Group header --}}
                 <div class="tw:px-5 tw:py-3 tw:border-b tw:border-slate-200 tw:dark:border-dark-gray-200 tw:bg-white tw:dark:bg-dark-gray-300">
                 <span class="tw:text-lg tw:font-bold tw:uppercase tw:tracking-widest tw:text-slate-500 tw:dark:text-dark-white-400">
-                    {{ $group }}
+                    {{ $labels[$group]['title'] ?? $group }}
                 </span>
                 </div>
 
