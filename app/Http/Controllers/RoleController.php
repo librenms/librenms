@@ -17,7 +17,7 @@ class RoleController extends Controller
         $this->authorize('viewAny', Role::class);
 
         return view('roles.index', [
-            'roles' => Role::with('permissions')->get(),
+            'roles' => Role::with('permissions')->orderBy('name')->get(),
             'protected' => ['admin', 'global-read'],
         ]);
     }
