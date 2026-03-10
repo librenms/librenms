@@ -20,6 +20,7 @@ class UpdateUserRequest extends FormRequest
     {
         /** @var User|null $target_user */
         $target_user = $this->route('user');
+
         return $target_user && $this->user()->can('update', $target_user);
     }
 
