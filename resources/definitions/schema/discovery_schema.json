@@ -151,7 +151,9 @@
                                     "precision": {
                                         "type": "integer"
                                     },
-                                    "value": {"$ref": "#/$defs/oid"},
+                                    "value": {
+                                        "type": "string"
+                                    },
                                     "type": {
                                         "type": "string",
                                         "maxLength": 16
@@ -410,9 +412,8 @@
         "modules"
     ],
     "$defs": {
-        "oid": {
-            "type": "string"
-        },
+        "mib_oid": {"$ref": "oid_types.json#/$defs/mib_oid"},
+        "oid": {"$ref": "oid_types.json#/$defs/oid"},
         "num_oid": {
             "type": "string",
             "pattern": "^(\\.\\d+)+(\\.\\{\\{ \\$(index|subindex\\d) }}|\\{\\{ \\$noindex }})$"
@@ -480,9 +481,7 @@
                     "items": {
                         "type": "object",
                         "properties": {
-                            "oid": {
-                                "type": "string"
-                            },
+                            "oid": {"$ref": "#/$defs/oid"},
                             "num_oid": {"$ref": "#/$defs/num_oid"},
                             "index": {
                                 "type": ["integer", "string"]

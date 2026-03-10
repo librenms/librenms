@@ -567,11 +567,13 @@
                 }
             ]
         },
+        "mib_oid": {"$ref": "oid_types.json#/$defs/mib_oid"},
+        "oid": {"$ref": "oid_types.json#/$defs/oid"},
         "snmpget": {
             "type": "object",
             "properties": {
                 "oid": {
-                    "type": "string"
+                    "$ref": "#/$defs/oid"
                 },
                 "op": {
                     "$ref": "#/$defs/comparison"
@@ -591,9 +593,6 @@
                             }
                         }
                     ]
-                },
-                "mib": {
-                    "type": "string"
                 },
                 "mib_dir": {
                     "type": "string"
