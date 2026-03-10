@@ -12,6 +12,7 @@ class UpdateRoleRequest extends FormRequest
     public function authorize(): bool
     {
         $role = $this->route('role');
+
         return $this->user()->can('update', $role);
     }
 
@@ -28,7 +29,7 @@ class UpdateRoleRequest extends FormRequest
         ];
 
         // Do not allow renaming protected roles
-        if (in_array(strtolower($role->name), ['admin', 'global-read'])) {
+        if (in_array(strtolower((string) $role->name), ['admin', 'global-read'])) {
             $rules['name'] = 'required|in:' . $role->name;
         } else {
             $rules['name'] = 'required|unique:roles,name,' . $role->id . '|regex:/^[a-z-]+$/';
