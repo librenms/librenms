@@ -105,14 +105,16 @@ if ($device['os'] == 'timos') {
     $safi_map = [1 => 'unicast', 2 => 'multicast', 128 => 'vpn'];
 
     $prefix_oids = [
-        '1_1' => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.5', 'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.6', 'filter' => 'ipv4'],
-        '1_2' => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.37', 'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.38', 'filter' => null],
-        '1_128' => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.13', 'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.14', 'filter' => null],
-        '2_1' => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.27', 'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.28', 'filter' => 'ipv6'],
-        '2_2' => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.95', 'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.96', 'filter' => null],
-        '2_128' => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.40', 'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.41', 'filter' => null],
+        '1_1' => ['recv' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperReceivedPrefixes', 'sent' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperSentPrefixes', 'filter' => 'ipv4'],
+        '1_2' => ['recv' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4RecvPfxs', 'sent' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4SentPfxs', 'filter' => null],
+        '1_128' => ['recv' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperVpnRecvPrefixes', 'sent' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperVpnSentPrefixes', 'filter' => null],
+        '2_1' => ['recv' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperV6ReceivedPrefixes', 'sent' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperV6SentPrefixes', 'filter' => 'ipv6'],
+        '2_2' => ['recv' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6RecvPfxs', 'sent' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6SentPfxs', 'filter' => null],
+        '2_128' => ['recv' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6RecvPfxs', 'sent' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6SentPfxs', 'filter' => null],
     ];
 
+    // tBgpPeerNgEntry table OID stripped of 1.3.6.1.4.1. prefix
+    $table_stripped = '6527.3.1.2.14.4.8';
     foreach ($prefix_oids as $oid_key => $oid_set) {
         $recv_data = SnmpQuery::numericIndex()->walk($oid_set['recv'])->valuesByIndex();
         $sent_data = SnmpQuery::numericIndex()->walk($oid_set['sent'])->valuesByIndex();
@@ -121,12 +123,11 @@ if ($device['os'] == 'timos') {
         $afi_name = $afi_map[(int) $afi] ?? "afi$afi";
         $safi_name = $safi_map[(int) $safi] ?? "safi$safi";
 
-        $oid_stripped = ltrim((string) preg_replace('#^\.?1\.3\.6\.1\.4\.1\.#', '', $oid_set['recv']), '.');
         foreach ($recv_data as $index => $recv_val) {
             $index_str = (string) $index;
-            $index_part = str_starts_with($index_str, $oid_stripped . '.')
-                ? substr($index_str, strlen((string) $oid_stripped) + 1)
-                : $index_str;
+            // Keys from numericIndex()->valuesByIndex() look like "6527.3.1.2.14.4.8.1.X.vrfOid.addrType.addrLen.octets"
+            // Strip table OID + entry(1) + column(X) to get: vrfOid.addrType.addrLen.octets
+            $index_part = preg_replace('#^' . preg_quote($table_stripped, '#') . '\.\d+\.\d+\.#', '', $index_str);
             $parts = explode('.', $index_part);
             if (count($parts) < 6) {
                 continue;
