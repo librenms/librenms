@@ -114,31 +114,38 @@ if ($device['os'] == 'timos') {
     ];
 
     foreach ($prefix_oids as $oid_key => $oid_set) {
-        $recv_data = snmpwalk_cache_oid($device, $oid_set['recv'], [], 'TIMETRA-BGP-MIB');
-        $sent_data = snmpwalk_cache_oid($device, $oid_set['sent'], [], 'TIMETRA-BGP-MIB');
+        $recv_data = SnmpQuery::numericIndex()->walk($oid_set['recv'])->valuesByIndex();
+        $sent_data = SnmpQuery::numericIndex()->walk($oid_set['sent'])->valuesByIndex();
 
         [$afi, $safi] = explode('_', $oid_key);
         $afi_name = $afi_map[(int) $afi] ?? "afi$afi";
         $safi_name = $safi_map[(int) $safi] ?? "safi$safi";
 
+        $oid_stripped = ltrim(preg_replace('#^\.?1\.3\.6\.1\.4\.1\.#', '', $oid_set['recv']), '.');
         foreach ($recv_data as $index => $recv_val) {
-            $parts = explode('.', (string) $index);
-            if (count($parts) < 3) {
+            $index_str = (string) $index;
+            $index_part = str_starts_with($index_str, $oid_stripped . '.')
+                ? substr($index_str, strlen((string) $oid_stripped) + 1)
+                : $index_str;
+            $parts = explode('.', $index_part);
+            if (count($parts) < 6) {
                 continue;
             }
-            $peer_addr_type = $parts[1];
-            if ($oid_set['filter'] !== null && $peer_addr_type !== $oid_set['filter']) {
+            $addr_type = $parts[1];
+            $filter = $oid_set['filter'];
+            $addr_type_name = $addr_type === '1' ? 'ipv4' : ($addr_type === '2' ? 'ipv6' : $addr_type);
+            if ($filter !== null && $addr_type_name !== $filter) {
                 continue;
             }
-            if ($peer_addr_type === 'ipv6') {
-                $hex_addr = str_replace(':', '', trim($parts[2], '"'));
+            if ($addr_type === '2') {
+                $hex_addr = implode('', array_map(fn ($o) => sprintf('%02x', $o), array_slice($parts, 3)));
                 try {
                     $address = IP::fromHexString($hex_addr)->compressed();
                 } catch (\LibreNMS\Exceptions\InvalidIpException) {
                     continue;
                 }
             } else {
-                $address = implode('.', array_slice($parts, 2));
+                $address = implode('.', array_slice($parts, 3));
             }
             $peer = ['ip' => $address];
             add_cbgp_peer($device, $peer, $afi_name, $safi_name);
