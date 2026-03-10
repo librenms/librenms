@@ -72,7 +72,7 @@
                 "cisco-cef": {
                     "type": "boolean"
                 },
-                "cisco-mac-accounting": {
+                "mac-accounting": {
                     "type": "boolean"
                 },
                 "cisco-remote-access-monitor": {
@@ -240,7 +240,7 @@
                 "slas": {
                     "type": "boolean"
                 },
-                "cisco-mac-accounting": {
+                "mac-accounting": {
                     "type": "boolean"
                 },
                 "cisco-otv": {

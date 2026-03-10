@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Gate;
 use Permissions;
 
 class CustomMap extends BaseModel
@@ -103,7 +104,7 @@ class CustomMap extends BaseModel
 
     public function scopeHasAccess(Builder $query, User $user): Builder
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAny', CustomMap::class)) {
             return $query;
         }
 

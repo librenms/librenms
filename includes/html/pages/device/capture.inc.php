@@ -22,10 +22,12 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+use App\Models\Device;use Illuminate\Support\Facades\Gate;
+
 $no_refresh = true;
 $pagetitle[] = 'Capture';
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('debug', Device::class)) {
     print_error('Insufficient Privileges');
 } else {
     ?>

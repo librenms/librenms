@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Dns;
 
 /**
@@ -161,7 +162,7 @@ class Location extends Model
      */
     public function scopeHasAccess($query, $user)
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAny', Location::class)) {
             return $query;
         }
 

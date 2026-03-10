@@ -4,7 +4,9 @@ type: network
 icon: packetpower
 mib_dir: packetpower
 over:
-    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_temperature, text: 'Temperature' }
+    - { graph: device_voltage, text: 'Voltage' }
+    - { graph: device_humidity, text: 'Humidity' }
 discovery:
     -
         sysObjectID:

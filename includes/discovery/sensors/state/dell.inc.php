@@ -111,9 +111,9 @@ foreach ($tables as [$table, $num_oid, $value_oid, $descr_oid, $mib, $mib_dir]) 
                 if ($state_name == 'dell.intrusionStatus') {
                     $descr = $descr_oid;
                 } elseif ($state_name == 'dell.batteryState') {
-                    $descr = str_replace('"', '', snmp_get($device, 'batteryConnectionControllerName.' . $index, '-Ovqn', $mib)) . ' - ' . $entry[$descr_oid];
+                    $descr = str_replace('"', '', SnmpQuery::get($mib . '::batteryConnectionControllerName.' . $index)->value()) . ' - ' . $entry[$descr_oid];
                 } elseif ($state_name == 'dell.arrayDiskState') {
-                    $descr = str_replace('"', '', snmp_get($device, 'arrayDiskEnclosureConnectionEnclosureName.' . $index, '-Ovqn', $mib)) . ' - ' . $entry[$descr_oid];
+                    $descr = str_replace('"', '', SnmpQuery::get($mib . '::arrayDiskEnclosureConnectionEnclosureName.' . $index)->value()) . ' - ' . $entry[$descr_oid];
                 } else {
                     $descr = strip_tags((string) $entry[$descr_oid]); // Use clean as virtualDiskDeviceName is user defined
                 }

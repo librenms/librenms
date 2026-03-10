@@ -26,8 +26,8 @@
 
 // temperature
 
-$temperature_unit = trim(snmp_get($device, '.1.3.6.1.4.1.7428.1.2.2.1.1.12.1', '-Oqv'), '" ');
-$temperature = trim(snmp_get($device, '.1.3.6.1.4.1.7428.1.2.2.1.1.11.1', '-Oqv'), '" ');
+$temperature_unit = trim((string) SnmpQuery::get('.1.3.6.1.4.1.7428.1.2.2.1.1.12.1')->value(), '" ');
+$temperature = trim((string) SnmpQuery::get('.1.3.6.1.4.1.7428.1.2.2.1.1.11.1')->value(), '" ');
 
 if (! empty($temperature_unit) && ! empty($temperature)) {
     // If fahrenheit convert to celsius

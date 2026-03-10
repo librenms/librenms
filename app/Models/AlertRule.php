@@ -29,6 +29,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\AlertState;
 
 class AlertRule extends BaseModel
@@ -101,7 +102,7 @@ class AlertRule extends BaseModel
      */
     public function scopeHasAccess($query, User $user)
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAny', AlertRule::class)) {
             return $query;
         }
 
