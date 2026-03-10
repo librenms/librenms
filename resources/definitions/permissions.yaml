@@ -1,0 +1,180 @@
+groups:
+    alert:
+        - alert.viewAny
+        - alert.view
+        - alert.detail
+        - alert.update
+        - alert.delete
+
+    alert-rule:
+        - alert-rule.viewAny
+        - alert-rule.view
+        - alert-rule.create
+        - alert-rule.update
+        - alert-rule.delete
+
+    alert-schedule:
+        - alert-schedule.viewAny
+        - alert-schedule.view
+        - alert-schedule.create
+        - alert-schedule.update
+        - alert-schedule.delete
+
+    alert-template:
+        - alert-template.view
+        - alert-template.create
+        - alert-template.update
+        - alert-template.delete
+
+    alert-transport:
+        - alert-transport.view
+        - alert-transport.create
+        - alert-transport.update
+        - alert-transport.delete
+
+    api:
+        - api.access
+
+    application:
+        - application.update
+
+    auth-log:
+        - auth-log.view
+
+    bill:
+        - bill.viewAny
+        - bill.view
+        - bill.create
+        - bill.update
+        - bill.delete
+
+    component:
+        - component.update
+
+    custom-map:
+        - custom-map.viewAny
+        - custom-map.view
+        - custom-map.create
+        - custom-map.update
+        - custom-map.delete
+
+    dashboard:
+        - dashboard.copy
+
+    device:
+        - device.viewAny
+        - device.view
+        - device.create
+        - device.update
+        - device.delete
+        - device.debug
+        - device.showConfig
+        - device.updateNotes
+
+    device-group:
+        - device-group.viewAny
+        - device-group.view
+        - device-group.create
+        - device-group.update
+        - device-group.delete
+
+    link:
+        - link.viewAny
+
+    location:
+        - location.viewAny
+        - location.view
+        - location.create
+        - location.update
+        - location.delete
+
+    mempool:
+        - mempool.update
+
+    notification:
+        - notification.update
+        - notification.create
+
+    oxidized:
+        - oxidized.refresh
+        - oxidized.search
+
+    plugin:
+        - plugin.admin
+
+    poller:
+        - poller.viewAny
+        - poller.view
+        - poller.update
+        - poller.delete
+
+    poller-group:
+        - poller-group.viewAny
+        - poller-group.create
+        - poller-group.update
+        - poller-group.delete
+
+    port:
+        - port.viewAny
+        - port.view
+        - port.update
+        - port.delete
+
+    port-group:
+        - port-group.viewAny
+        - port-group.create
+        - port-group.update
+        - port-group.delete
+
+    processor:
+        - processor.update
+
+    role:
+        - role.viewAny
+        - role.update
+
+    routing:
+        - routing.viewAny
+        - routing.view
+        - routing.update
+
+    service:
+        - service.view
+        - service.create
+        - service.update
+        - service.delete
+
+    service-template:
+        - service-template.viewAny
+        - service-template.view
+        - service-template.create
+        - service-template.update
+        - service-template.delete
+
+    settings:
+        - settings.viewAny
+        - settings.update
+
+    syslog:
+        - syslog.delete
+
+    user:
+        - user.viewAny
+        - user.view
+        - user.create
+        - user.update
+        - user.delete
+
+    vlan:
+        - vlan.viewAny
+
+    wireless-sensor:
+        - wireless-sensor.update
+        - wireless-sensor.delete
+
+hidden:
+    - customoid.update
+    - customoid.create
+    - customoid.delete
+    - customoid.view
+    - user.updatePassword

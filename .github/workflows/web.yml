@@ -8,6 +8,10 @@ on:
     branches:
       - 'master'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
 
   dusk-php:
@@ -30,6 +34,7 @@ jobs:
           APP_KEY=
           APP_URL=http://127.0.0.1:8000
           APP_ENV=testing
+          APP_DEBUG=true
           DB_HOST=127.0.0.1
           DB_DATABASE=librenms_phpunit_78hunjuybybh
           DB_USERNAME=root
@@ -94,3 +99,10 @@ jobs:
         with:
           name: console
           path: tests/Browser/console
+
+      - name: Upload LibreNMS Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: librenms-logs
+          path: logs/librenms.log

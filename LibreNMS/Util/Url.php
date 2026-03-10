@@ -31,7 +31,7 @@ use App\Models\Device;
 use App\Models\Port;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\DeviceStatus;
@@ -79,7 +79,7 @@ class Url
             return $escape_text ? htmlentities((string) $text) : (string) $text;
         }
 
-        if (! $device->canAccess(Auth::user())) {
+        if (Gate::denies('view', $device)) {
             return $escape_text ? htmlentities($device->displayName()) : $device->displayName();
         }
 
@@ -203,7 +203,7 @@ class Url
 
         if (! $overlib) {
             return $content;
-        } elseif ($port->canAccess(Auth::user())) {
+        } elseif (Gate::allows('view', $port)) {
             return self::overlibLink(self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
         }
 

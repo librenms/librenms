@@ -28,6 +28,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Permissions;
 
@@ -94,7 +95,7 @@ class DeviceGroup extends BaseModel
 
     public function scopeHasAccess($query, User $user)
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAny', DeviceGroup::class)) {
             return $query;
         }
 

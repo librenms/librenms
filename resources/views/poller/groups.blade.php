@@ -6,7 +6,9 @@
 
 @parent
 
+@can('create', \App\Models\PollerGroup::class)
 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#poller-groups">{{ __('Create new poller group') }}</button>
+@endcan
 <br /><br />
 <div class="table-responsive">
     <table class="table table-striped table-bordered table-hover table-condensed">
@@ -31,15 +33,18 @@
             <td><a href="{{ url('devices/poller_group=' . $group->id) }}">{{ $group->devices_count }}</a></td>
             <td>{{ $group->descr }}</td>
             <td>
+                @can('update', $group)
                 <button type="button" class="btn btn-success btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#poller-groups">{{ __('Edit') }}</button>
+                @endcan
+                @can('delete', $group)
                 <button type="button" class="btn btn-danger btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#confirm-delete">{{ __('Delete') }}</button>
+                @endcan
             </td>
         @endforeach
         </tr>
     </table>
 </div>
 
-@if(auth()->user()->isAdmin())
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -104,12 +109,9 @@
         </div>
     </div>
 </div>
-</form>
-@endif
 @endsection
 
 @section('scripts')
-@if(auth()->user()->isAdmin())
 <script>
 $('#confirm-delete').on('show.bs.modal', function(e) {
     group_id = $(e.relatedTarget).data('group_id');
@@ -179,6 +181,5 @@ $('#create-group').on("click", function(e) {
         }
     });
 });
-@endif
 </script>
 @endsection

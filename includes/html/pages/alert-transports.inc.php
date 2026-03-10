@@ -1,6 +1,9 @@
 <?php
 
-if (Auth::user()->hasGlobalAdmin()) {
+use App\Models\AlertTransport;
+use Illuminate\Support\Facades\Gate;
+
+if (Gate::allows('create', AlertTransport::class)) {
     // handle OAuth requests
     $request = request();  // grab the Request object
 

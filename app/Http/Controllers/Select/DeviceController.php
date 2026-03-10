@@ -53,7 +53,7 @@ class DeviceController extends SelectController
         $user_id = $request->input('user');
 
         // list devices the user does not have access to
-        if ($request->input('access') == 'inverted' && $user_id && $request->user()->isAdmin()) {
+        if ($request->input('access') == 'inverted' && $user_id && $request->user()->can('viewAny', Device::class)) {
             return Device::query()
                 ->select(['device_id', 'hostname', 'sysName', 'display', 'icon'])
                 ->whereNotIn('device_id', function ($query) use ($user_id): void {

@@ -18,6 +18,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
 use App\Models\Availability;
+use App\Models\BgpPeer;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
@@ -27,6 +28,7 @@ use App\Models\Ipv4Mac;
 use App\Models\Ipv4Network;
 use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
+use App\Models\Link;
 use App\Models\Location;
 use App\Models\MplsSap;
 use App\Models\MplsService;
@@ -44,11 +46,14 @@ use App\Models\PortsNac;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
+use App\Models\Vlan;
+use App\Models\Vrf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Alert\AlertData;
@@ -392,7 +397,7 @@ function list_devices(Illuminate\Http\Request $request)
         $sql = '1';
     }
 
-    if (! Auth::user()->hasGlobalRead()) {
+    if (Gate::denies('viewAny', Device::class)) {
         $sql .= ' AND `d`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $param[] = Auth::id();
     }
@@ -774,7 +779,7 @@ function edit_bgp_descr(Illuminate\Http\Request $request)
         return api_error(400, 'Invalid id has been provided');
     }
 
-    $peer = \App\Models\BgpPeer::firstWhere('bgpPeer_id', $bgpPeerId);
+    $peer = BgpPeer::firstWhere('bgpPeer_id', $bgpPeerId);
 
     // update existing bgp
     if ($peer === null) {
@@ -804,7 +809,7 @@ function list_cbgp(Illuminate\Http\Request $request)
         $sql = ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
     }
-    if (! Auth::user()->hasGlobalRead()) {
+    if (Gate::denies('viewAny', BgpPeer::class)) {
         $sql .= ' AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $sql_params[] = Auth::id();
     }
@@ -1922,7 +1927,7 @@ function list_bills(Illuminate\Http\Request $request)
     } else {
         $sql = '1';
     }
-    if (! Auth::user()->hasGlobalRead()) {
+    if (Gate::denies('viewAny', \App\Models\Bill::class)) {
         $sql .= ' AND `bill_id` IN (SELECT `bill_id` FROM `bill_perms` WHERE `user_id` = ?)';
         $param[] = Auth::id();
     }
@@ -2772,7 +2777,7 @@ function list_vrf(Illuminate\Http\Request $request)
         $sql = '  AND `vrfs`.`vrf_name`=?';
         $sql_params = [$vrfname];
     }
-    if (! Auth::user()->hasGlobalRead()) {
+    if (Gate::denies('viewAny', Vrf::class)) {
         $sql .= ' AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $sql_params[] = Auth::id();
     }
@@ -2858,7 +2863,7 @@ function list_vlans(Illuminate\Http\Request $request)
         $sql = ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
     }
-    if (! Auth::user()->hasGlobalRead()) {
+    if (Gate::denies('viewAny', Vlan::class)) {
         $sql .= ' AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $sql_params[] = Auth::id();
     }
@@ -2887,7 +2892,7 @@ function list_links(Illuminate\Http\Request $request)
         $sql = ' AND `links`.`local_device_id`=?';
         $sql_params = [$device_id];
     }
-    if (! Auth::user()->hasGlobalRead()) {
+    if (Gate::denies('viewAny', Link::class)) {
         $sql .= ' AND `links`.`local_device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $sql_params[] = Auth::id();
     }

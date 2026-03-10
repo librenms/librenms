@@ -243,7 +243,7 @@ class ConfigRepository
                 echo $e;
             }
 
-            if ($e instanceof QueryException && $e->getCode() !== '42S02') {
+            if ($e instanceof QueryException && $e->getCode() !== '42S02' && ! str_contains($e->getMessage(), 'no such table')) {
                 // re-throw, else Config service provider get stuck in a loop
                 // if there is an error (database not connected)
                 // unless it is table not found (migrations have not been run yet)

@@ -130,7 +130,7 @@ class DashboardController extends Controller
 
         $widgets = self::listWidgets();
 
-        $user_list = $user->can('manage', User::class)
+        $user_list = $user->can('viewAny', User::class)
             ? User::where('user_id', '!=', $user->user_id)
                 ->orderBy('username')
                 ->pluck('username', 'user_id')
