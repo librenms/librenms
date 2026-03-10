@@ -253,14 +253,14 @@ class AppServiceProvider extends ServiceProvider
         // define super admin and global read
         Gate::before(function (User $user, string $ability) {
             if ($ability === 'demo') {
-                return null;
+                return null; // defer to middleware
             }
 
             if ($user->hasRole('admin')) {
                 return true;  // super admin
             }
 
-            if (in_array($ability, ['view', 'viewAny']) && $user->hasRole('global-read')) {
+            if ((str_ends_with($ability, 'view') || str_ends_with($ability, 'viewAny')) && $user->hasRole('global-read')) {
                 return true; // global read access
             }
 

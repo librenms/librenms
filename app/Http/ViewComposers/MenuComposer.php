@@ -168,7 +168,7 @@ class MenuComposer
         // Routing menu
         // FIXME queries use relationships to user
         $routing_menu = [];
-        if (Gate::any(['routing.view', 'routing.viewAny', 'viewAny'])) {
+        if (Gate::any(['routing.view', 'routing.viewAny'])) {
             $routing_count = ObjectCache::routing();
 
             if ($routing_count['vrf']) {
