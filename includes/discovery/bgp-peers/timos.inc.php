@@ -121,7 +121,7 @@ if ($device['os'] == 'timos') {
         $afi_name = $afi_map[(int) $afi] ?? "afi$afi";
         $safi_name = $safi_map[(int) $safi] ?? "safi$safi";
 
-        $oid_stripped = ltrim(preg_replace('#^\.?1\.3\.6\.1\.4\.1\.#', '', $oid_set['recv']), '.');
+        $oid_stripped = ltrim((string) preg_replace('#^\.?1\.3\.6\.1\.4\.1\.#', '', $oid_set['recv']), '.');
         foreach ($recv_data as $index => $recv_val) {
             $index_str = (string) $index;
             $index_part = str_starts_with($index_str, $oid_stripped . '.')
