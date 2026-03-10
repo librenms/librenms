@@ -46,11 +46,12 @@ class PhpSnmpQuery implements SnmpQueryInterface
     private array $mibs = [];
     private Device $device;
     private \SNMP $snmp;
+    private bool $snmpinit = false;
     private readonly NetSnmpQuery $netsnmp;
 
     public function __construct()
     {
-        $this->device(DeviceCache::getPrimary(), false);
+        $this->device(DeviceCache::getPrimary());
 
         $this->loadMibs();
 
@@ -69,9 +70,9 @@ class PhpSnmpQuery implements SnmpQueryInterface
      * Specify a device to make the snmp query against.
      * By default the query will use the primary device.
      */
-    public function device(Device $device, bool $keepsettings = true): SnmpQueryInterface
+    public function device(Device $device): SnmpQueryInterface
     {
-        $old_snmp = $keepsettings ? $this->snmp : null;
+        $old_snmp = $this->snmpinit ? $this->snmp : null;
         $this->device = $device;
 
         $snmpver = match ($this->device->snmpver) {
@@ -104,6 +105,9 @@ class PhpSnmpQuery implements SnmpQueryInterface
                 $this->snmp->oid_output_format = $old_snmp->oid_output_format;
             }
         }
+
+        // Make sure we copy settings if the device changes in future
+        $this->snmpinit = true;
 
         return $this;
     }
