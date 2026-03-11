@@ -130,6 +130,7 @@ final class CommonFunctionsTest extends TestCase
 
         // numeric prefix
         $this->assertSame('ZeroClass', StringHelpers::toClass('0_class'));
+        $this->assertSame('ZeroName', StringHelpers::toClass('0name'));
         $this->assertSame('OneClass', StringHelpers::toClass('1_class'));
         $this->assertSame('NineClass', StringHelpers::toClass('9_class'));
         $this->assertSame('Foo2Bar', StringHelpers::toClass('foo_2_bar'));

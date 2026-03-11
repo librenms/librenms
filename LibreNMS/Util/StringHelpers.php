@@ -135,7 +135,7 @@ class StringHelpers
         $numbers = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
 
         $class = Str::of($name)
-            ->replaceMatches('/^(\d)(.)/', fn (array $m) => $numbers[$m[1]] . $m[2])
+            ->replaceMatches('/^(\d)(.)/', fn (array $m) => $numbers[$m[1]] . strtoupper($m[2]))
             ->headline()
             ->replace(' ', '')
             ->toString();
