@@ -26,6 +26,8 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Support\Str;
+
 class StringHelpers
 {
     public static function niceCase($string)
@@ -130,13 +132,13 @@ class StringHelpers
      */
     public static function toClass(string $name, ?string $namespace = null): string
     {
-        $pre_format = str_replace(['-', '_'], ' ', $name);
-        $class = str_replace(' ', '', ucwords(strtolower($pre_format)));
-        $class = preg_replace_callback('/^(\d)(.)/', function ($matches) {
-            $numbers = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+        $numbers = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
 
-            return $numbers[$matches[1]] . strtoupper($matches[2]);
-        }, $class);
+        $class = Str::of($name)
+            ->replaceMatches('/^(\d)(.)/', fn (array $m) => $numbers[$m[1]] . $m[2])
+            ->headline()
+            ->replace(' ', '')
+            ->toString();
 
         return $namespace . $class;
     }

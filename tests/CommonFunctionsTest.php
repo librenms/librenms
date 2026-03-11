@@ -112,11 +112,31 @@ final class CommonFunctionsTest extends TestCase
 
     public function testStringToClass(): void
     {
-        $this->assertSame('LibreNMS\OS\Os', StringHelpers::toClass('OS', 'LibreNMS\\OS\\'));
-        $this->assertSame('SpacesName', StringHelpers::toClass('spaces name', null));
-        $this->assertSame('DashName', StringHelpers::toClass('dash-name', null));
-        $this->assertSame('UnderscoreName', StringHelpers::toClass('underscore_name', null));
+        // namespace
+        $this->assertSame('LibreNMS\OS\Os', StringHelpers::toClass('os', 'LibreNMS\\OS\\'));
         $this->assertSame('LibreNMS\\AllOfThemName', StringHelpers::toClass('all OF-thEm_NaMe', 'LibreNMS\\'));
+        $this->assertSame('App\\Models\\FooBar', StringHelpers::toClass('foo_bar', 'App\\Models\\'));
+
+        // delimiters
+        $this->assertSame('SpacesName', StringHelpers::toClass('spaces name'));
+        $this->assertSame('DashName', StringHelpers::toClass('dash-name'));
+        $this->assertSame('UnderscoreName', StringHelpers::toClass('underscore_name'));
+        $this->assertSame('FooBarBaz', StringHelpers::toClass('foo-bar_baz'));
+
+        // camel/pascal input
+        $this->assertSame('FooBar', StringHelpers::toClass('fooBar'));
+        $this->assertSame('FooBar', StringHelpers::toClass('FooBar'));
+        $this->assertSame('MyHTTPRequest', StringHelpers::toClass('myHTTPRequest'));
+
+        // numeric prefix
+        $this->assertSame('ZeroClass', StringHelpers::toClass('0_class'));
+        $this->assertSame('OneClass', StringHelpers::toClass('1_class'));
+        $this->assertSame('NineClass', StringHelpers::toClass('9_class'));
+        $this->assertSame('Foo2Bar', StringHelpers::toClass('foo_2_bar'));
+
+        // single word / edge cases
+        $this->assertSame('Foo', StringHelpers::toClass('foo'));
+        $this->assertSame('FOOBAR', StringHelpers::toClass('FOOBAR'));
     }
 
     public function testIsValidHostname(): void
