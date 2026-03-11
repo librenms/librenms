@@ -18,14 +18,14 @@
                 <div class="tw:flex tw:items-center tw:gap-3">
                     @can('viewAny', \App\Models\User::class)
                         <a href="{{ route('users.index') }}"
-                           class="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2.5 tw:rounded-lg tw:border tw:border-slate-200 tw:dark:border-dark-gray-100 tw:bg-white tw:dark:bg-dark-gray-400 tw:text-slate-700 tw:dark:text-dark-white-200 tw:font-semibold tw:shadow-sm tw:hover:bg-slate-50 tw:dark:hover:bg-dark-gray-300 tw:hover:border-slate-300 tw:dark:hover:border-dark-gray-100 tw:transition-all tw:duration-150">
+                           class="tw:inline-flex tw:items-center tw:gap-2 tw:px-4 tw:py-2.5 tw:rounded-lg tw:border tw:border-slate-200 tw:dark:border-dark-gray-100 tw:bg-white tw:dark:bg-dark-gray-400 tw:text-slate-700 tw:dark:text-dark-white-200 tw:font-semibold tw:shadow-sm tw:hover:bg-slate-50 tw:dark:hover:bg-dark-gray-300 tw:hover:border-slate-300 tw:dark:hover:border-dark-gray-100 tw:transition-all tw:duration-150 tw:no-underline">
                             <i class="fas fa-users tw:text-slate-400 tw:dark:text-dark-white-400"></i>
                             {{ __('permissions.rbac.manage_users') }}
                         </a>
                     @endcan
                     <a href="{{ route('roles.create') }}"
-                       class="tw:inline-flex tw:items-center tw:gap-2 tw:px-5 tw:py-2.5 tw:rounded-lg tw:bg-indigo-600 tw:hover:bg-indigo-700 tw:text-white tw:font-semibold tw:shadow-sm tw:transition-all tw:duration-150">
-                        <i class="fas fa-plus tw:text-indigo-200"></i>
+                       class="tw:inline-flex tw:items-center tw:gap-2 tw:px-5 tw:py-2.5 tw:rounded-lg tw:bg-sky-700 tw:hover:bg-sky-800 tw:text-white tw:font-semibold tw:shadow-sm tw:transition-all tw:duration-150 tw:no-underline">
+                        <i class="fas fa-plus tw:text-white"></i>
                         {{ __('permissions.rbac.add_role') }}
                     </a>
                 </div>
@@ -50,7 +50,7 @@
                                     <div class="tw:text-xl tw:font-bold tw:text-slate-800 tw:dark:text-dark-white-100">
                                         {{ $role->name }}
                                     </div>
-                                    <div class="tw:text-xs tw:text-slate-400 tw:dark:text-dark-white-400 tw:mt-1">
+                                    <div class="tw:text-base tw:text-slate-400 tw:dark:text-dark-white-400 tw:mt-1">
                                         {{ $role->permissions->count() }} {{ Str::plural('permission', $role->permissions->count()) }}
                                     </div>
                                 </div>
@@ -101,7 +101,7 @@
                                         @method('DELETE')
                                         <button type="submit"
                                                 title="{{ __('permissions.rbac.delete_role') }}"
-                                                class="tw:inline-flex tw:items-center tw:justify-center tw:w-9 tw:h-9 tw:rounded-lg tw:text-slate-400 tw:dark:text-dark-white-400 tw:hover:text-red-600 tw:dark:hover:text-red-400 tw:hover:bg-red-50 tw:dark:hover:bg-red-900/20 tw:transition-all tw:duration-150">
+                                                class="tw:inline-flex tw:items-center tw:justify-center tw:w-9 tw:h-9 tw:rounded-lg tw:text-slate-400 tw:dark:text-dark-red-400 tw:hover:text-red-600 tw:dark:hover:text-red-600 tw:transition-all tw:duration-150">
                                             <i class="fas fa-lg fa-trash"></i>
                                         </button>
                                     </form>
