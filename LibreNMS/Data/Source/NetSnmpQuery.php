@@ -75,6 +75,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * @var string[]
      */
+    private array $mibsLoaded = [];
     private array $mibDirs = [];
     private string $context = '';
     private array|string $options = [self::DEFAULT_FLAGS, '-Pu'];
@@ -270,7 +271,126 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function get($oid): SnmpResponse
     {
+        // Use the PHP SNMP module if:
+        //   - the PHP SNMP module is installed
+        //   - UDP trsnaport is requested
+        //   - SNMP version is v1/2c OR v3 with AES OR v3 with DES
+        if (class_exists('\SNMP') && ($device->transport ?? 'udp') === 'udp' && ($this->device->snmpver !== 'v3' || $this->device->cryptoalgo === 'AES' || $this->device->cryptoalgo === 'DES')) {
+            return $this->getPhpSnmp($oid);
+        }
         return $this->execMultiple('snmpget', $this->limitOids($this->parseOid($oid)));
+    }
+
+    /**
+     * snmpget using PHP-SNMP library
+     */
+    private function getPhpSnmp(string|array $oids): SnmpResponse
+    {
+        $response = new SnmpResponse('');
+
+        $snmpver = match ($this->device->snmpver) {
+            'v1' => \SNMP::VERSION_1,
+            'v2c' => \SNMP::VERSION_2c,
+            'v3' => \SNMP::VERSION_3,
+            default => null,
+        };
+        $hostname = Rewrite::addIpv6Brackets((string) ($this->device->overwrite_ip ?: $this->device->hostname));
+
+        $snmp = new \SNMP(
+            $snmpver,
+            ($hostname ?: 'localhost') . ':' . $this->device->port,
+            $this->device->snmpver === 'v3' ? ($this->device->authname ?: 'root') : $this->device->community,
+            ($this->device->timeout ?? LibrenmsConfig::get('snmp.timeout')) * 1000000,
+            $this->device->retries ?? LibrenmsConfig::get('snmp.retries'),
+        );
+        $snmp->oid_output_format = (in_array('-On', $this->options) ? SNMP_OID_OUTPUT_NUMERIC : (in_array('-Os', $this->options) ? SNMP_OID_OUTPUT_SUFFIX : SNMP_OID_OUTPUT_MODULE));
+        $snmp->quick_print = true;
+        $snmp->valueretrieval = SNMP_VALUE_PLAIN;
+
+        foreach ($this->limitOids($this->parseOid($oids)) as $oidgroup) {
+            $measure = Measurement::start('Phpget');
+
+            foreach ($oidgroup as $oid) {
+                $oidparts = explode('::', (string) $oid, 2);
+
+                if (count($oidparts) > 1) {
+                    $this->loadMib($oidparts[0]);
+                }
+            }
+
+            $this->logCommand('SNMP::get('. implode(',', $oidgroup) . ')');
+            $res = @$snmp->get($oidgroup);
+            $measure->manager()->recordSnmp($measure->end());
+
+            if ($res) {
+                $res_str = '';
+                foreach ($res as $k => $v) {
+                    $res_str .= "$k = $v\n";
+                }
+
+                $this->logOutput($res_str, '');
+                $response = $response->append(new SnmpResponse($res_str, '', 0));
+            } elseif (preg_match('/\'([^\']+)\': No Such Object available on this agent at this OID/', $snmp->getError(), $matches)) {
+                $this->logOutput("$matches[1] = No Such Object available on this agent at this OID\n", '');
+                $response = $response->append(new SnmpResponse("$matches[1] = No Such Object available on this agent at this OID\n", '', 0));
+            } elseif ($this->abort) {
+                $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oidgroup));
+                Log::debug("SNMP failed walking $oid of $oid_list aborting.");
+
+                return $response;
+            }
+        }
+        return $response;
+    }
+
+    /**
+     * load a SNMP mib into the global memory MIB tree
+     */
+    private function loadMib(string $mib): void
+    {
+        // Do nothing if the MIB has already been loaded
+        if (isset($this->mibsLoaded[$mib])) {
+            return;
+        }
+
+        $mibfound = false;
+        foreach (explode(':', $this->mibDirectories()) as $dir) {
+            $mibfile = $dir . '/' . $mib;
+            if (file_exists($mibfile)) {
+                // Load dependencies first
+                $this->loadMibDependencies($mibfile);
+
+                if (snmp_read_mib($mibfile)) {
+                    $mibfound = true;
+                    $this->mibsLoaded[$mib] = true;
+                    break;
+                } else {
+                    Log::debug("Failed to load SNMP MIB $mibfile");
+                }
+            }
+        }
+
+        if (! $mibfound) {
+            Log::debug("MIB $mib was not found");
+        }
+    }
+
+    /**
+     * load dependencies recursively for a SNMP mib into the global memory MIB tree
+     */
+    private function loadMibDependencies(string $mibfile): void
+    {
+        $mibdata = file_get_contents($mibfile);
+
+        if (preg_match('/IMPORTS([^;]+);/', $mibdata, $matches)) {
+            if (preg_match_all('/FROM\s+(\S+);?/', $matches[1], $imports)) {
+                foreach ($imports[1] as $import) {
+                    $this->loadMib($import);
+                }
+            } else {
+                Log::debug('IMPORT section has no files');
+            }
+        }
     }
 
     /**
