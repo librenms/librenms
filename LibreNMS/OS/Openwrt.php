@@ -77,7 +77,7 @@ class Openwrt extends OS implements
             // Safely split interface data
             $parts = explode(',', $interface, 2);
             if (count($parts) === 2) {
-                [$k, $v] = array_map('trim', $parts);
+                [$k, $v] = array_map(trim(...), $parts);
                 $arrIfaces[$k] = $v;
             }
         }
@@ -99,7 +99,7 @@ class Openwrt extends OS implements
             // Return SSID if not empty, otherwise return interface name
             return $ssid !== '' ? $ssid : preg_replace('/\s*\(.*?\)\s*/', '', $interface);
         }
-        
+
         return $interface;
     }
 
@@ -129,14 +129,14 @@ class Openwrt extends OS implements
         // Loop over interfaces, adding sensors
         foreach ($interfaces as $index => $interface) {
             $ssid = $this->extractSSID($interface);
-            
+
             // Loop over stats, appending to sensors as needed (only a single, blank, addition if no stats)
             foreach ($statstr as $stat) {
                 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.1.' . Oid::encodeString("{$type->value}$query-$index$stat");
-                
+
                 // Format description: use SSID if available, otherwise interface name
                 $description = $ssid . $query . $stat;
-                
+
                 $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, "openwrt$query", $count, $description);
                 $count += 1;
             }
