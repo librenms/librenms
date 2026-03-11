@@ -100,6 +100,7 @@ class FdbTablesController extends TableController
                     if (count($vendor_ouis) == 0) {
                         $vendor_ouis[] = 'not found';
                     }
+
                     return $this->findPortsByOui($vendor_ouis, $query);
                 default:
                     return $query->where(function ($query) use ($search, $mac_search): void {
