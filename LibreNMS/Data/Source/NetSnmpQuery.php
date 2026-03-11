@@ -278,6 +278,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         if (class_exists('\SNMP') && ($device->transport ?? 'udp') === 'udp' && ($this->device->snmpver !== 'v3' || $this->device->cryptoalgo === 'AES' || $this->device->cryptoalgo === 'DES')) {
             return $this->getPhpSnmp($oid);
         }
+
         return $this->execMultiple('snmpget', $this->limitOids($this->parseOid($oid)));
     }
 
@@ -318,7 +319,7 @@ class NetSnmpQuery implements SnmpQueryInterface
                 }
             }
 
-            $this->logCommand('SNMP::get('. implode(',', $oidgroup) . ')');
+            $this->logCommand('SNMP::get(' . implode(',', $oidgroup) . ')');
             $res = @$snmp->get($oidgroup);
             $measure->manager()->recordSnmp($measure->end());
 
@@ -340,6 +341,7 @@ class NetSnmpQuery implements SnmpQueryInterface
                 return $response;
             }
         }
+
         return $response;
     }
 
