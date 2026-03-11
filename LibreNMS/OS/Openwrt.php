@@ -96,6 +96,7 @@ class Openwrt extends OS implements
         // Match "interface (SSID)" pattern and extract SSID
         if (preg_match('/\(([^)]+)\)/', $interface, $matches)) {
             $ssid = trim($matches[1]);
+
             // Return SSID if not empty, otherwise return interface name
             return $ssid !== '' ? $ssid : preg_replace('/\s*\(.*?\)\s*/', '', $interface);
         }
