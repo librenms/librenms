@@ -52,7 +52,12 @@ class EditHealthController
 
     public function reset(Device $device, Request $request): JsonResponse
     {
-        Gate::authorize('update', Sensor::class);
+        if (Gate::denies('update', Sensor::class)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized',
+            ], 403);
+        }
         $validated = $request->validate([
             'sensor_id' => 'required|array|min:1',
             'sensor_id.*' => 'integer',
@@ -92,7 +97,12 @@ class EditHealthController
 
     public function update(Device $device, Sensor $sensor, Request $request): JsonResponse
     {
-        Gate::authorize('update', Sensor::class);
+        if (Gate::denies('update', Sensor::class)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized',
+            ], 403);
+        }
         $validated = $request->validate([
             'value_type' => 'required|in:sensor_limit,sensor_limit_warn,sensor_limit_low_warn,sensor_limit_low',
             'data' => 'present',
@@ -115,7 +125,12 @@ class EditHealthController
 
     public function updateAlert(Device $device, Sensor $sensor, Request $request): JsonResponse
     {
-        Gate::authorize('update', Sensor::class);
+        if (Gate::denies('update', Sensor::class)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized',
+            ], 403);
+        }
         $validated = $request->validate([
             'sub_type' => 'nullable|in:remove-custom',
             'state' => 'nullable|boolean',
