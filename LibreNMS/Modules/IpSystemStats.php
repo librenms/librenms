@@ -71,9 +71,7 @@ class IpSystemStats implements Module
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        $device = $os->getDeviceArray();
-        $data = SnmpQuery::device($os->getDevice())
-            ->walk('IP-MIB::ipSystemStatsTable')
+        $data = SnmpQuery::walk('IP-MIB::ipSystemStatsTable')
             ->table(1);
 
         if (empty($data)) {
@@ -127,7 +125,7 @@ class IpSystemStats implements Module
             }
 
             $tags = ['af' => $af, 'rrd_name' => ['ipSystemStats', $af], 'rrd_def' => $rrd_def];
-            $datastore->put($device, 'ipSystemStats', $tags, $fields);
+            $datastore->put($os->getDeviceArray(), 'ipSystemStats', $tags, $fields);
 
             $os->enableGraph("ipsystemstats_$af");
             $os->enableGraph("ipsystemstats_{$af}_frag");
