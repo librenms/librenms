@@ -97,11 +97,9 @@ class FdbTablesController extends TableController
                     return $query->whereIntegerInRaw('ports_fdb.port_id', $this->findPorts($search));
                 case 'vendor':
                     $vendor_ouis = $this->ouisFromVendor($search);
-
                     if (count($vendor_ouis) == 0) {
-                        $vendor_ouis[]= 'not found';
+                        $vendor_ouis[] = 'not found';
                     }
-					
                     return $this->findPortsByOui($vendor_ouis, $query);
                 default:
                     return $query->where(function ($query) use ($search, $mac_search): void {
@@ -307,7 +305,7 @@ class FdbTablesController extends TableController
 
         return $query; // Return the query builder instance
     }
-	
+
     /**
      * Get headers for CSV export
      *
