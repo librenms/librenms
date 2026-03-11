@@ -41,7 +41,7 @@ $refresh = request()->input('refresh', 30);
                                 x-on:date-range-changed="refreshOutagesGrid"
                             ></x-date-range-picker>
                         </div>
-                        <button type="button" id="apply-filters" class="btn btn-default">{{ __('Filter') }}</button>
+                        <button type="button" id="apply-filters" class="btn btn-default">{{ __('Update URL') }}</button>
                     </form>
                 </template>
 
