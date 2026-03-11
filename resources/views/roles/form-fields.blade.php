@@ -1,10 +1,10 @@
 {{-- Role Name --}}
 <div class="tw:mb-8">
-    <label for="name" class="tw:block tw:font-semibold tw:tracking-wider tw:text-slate-500 tw:dark:text-dark-white-400 tw:mb-2">
+    <label for="name" class="tw:block tw:text-2xl tw:font-semibold tw:tracking-wider tw:text-slate-500 tw:dark:text-dark-white-400 tw:mb-2">
         {{ __('permissions.rbac.role_name') }}
     </label>
     <input type="text" name="name" id="name" required
-           class="tw:w-full tw:px-4 tw:py-2.5 tw:rounded-lg tw:border tw:border-slate-200 tw:dark:border-dark-gray-100 tw:bg-white tw:dark:bg-dark-gray-500 tw:text-slate-800 tw:dark:text-dark-white-100 tw:placeholder-slate-400 tw:dark:placeholder-dark-white-400 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-indigo-500 tw:dark:focus:ring-dark-gray-100 tw:focus:border-transparent tw:transition tw:duration-150 tw:text-base"
+           class="tw:w-full tw:px-4 tw:py-2.5 tw:rounded-lg tw:border tw:border-slate-200 tw:dark:border-dark-gray-100 tw:bg-white tw:dark:bg-dark-gray-500 tw:text-slate-800 tw:dark:text-dark-white-100 tw:placeholder-slate-400 tw:dark:placeholder-dark-white-400 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-indigo-500 tw:dark:focus:ring-dark-gray-100 tw:focus:border-transparent tw:transition tw:duration-150 tw:text-lg"
            placeholder="{{ __('permissions.rbac.role_name_placeholder') }}"
            value="{{ old('name', $role->name ?? '') }}"
            @if(isset($role) && in_array(strtolower($role->name), ['admin', 'global-read'])) readonly @endif>
@@ -18,7 +18,7 @@
     {{-- Section header --}}
     <div class="tw:flex tw:items-center tw:justify-between tw:mb-5 tw:pb-3 tw:border-b tw:border-slate-100 tw:dark:border-dark-gray-200">
         <div class="tw:flex tw:items-center tw:gap-4">
-            <span class="tw:text-lg tw:font-bold tw:text-slate-800 tw:dark:text-dark-white-100">
+            <span class="tw:text-xl tw:font-bold tw:text-slate-800 tw:dark:text-dark-white-100">
                 {{ __('permissions.rbac.permissions') }}
             </span>
             {{-- Search --}}
@@ -28,19 +28,19 @@
                 </span>
                 <input type="text" x-model="search"
                        placeholder="{{ __('permissions.rbac.search_permissions') }}"
-                       class="tw:pl-8 tw:pr-4 tw:py-1.5 tw:border tw:border-slate-200 tw:dark:border-dark-gray-100 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:text-slate-800 tw:dark:text-dark-white-200 tw:placeholder-slate-400 tw:dark:placeholder-dark-white-400 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-indigo-500 tw:dark:focus:ring-dark-gray-100 tw:focus:border-transparent tw:text-sm tw:transition tw:duration-150">
+                       class="tw:pl-8 tw:pr-4 tw:py-1.5 tw:border tw:border-slate-200 tw:dark:border-dark-gray-100 tw:rounded-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:text-slate-800 tw:dark:text-dark-white-200 tw:placeholder-slate-400 tw:dark:placeholder-dark-white-400 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-indigo-500 tw:dark:focus:ring-dark-gray-100 tw:focus:border-transparent tw:text-lg tw:transition tw:duration-150">
             </div>
         </div>
         <div class="tw:flex tw:items-center tw:gap-3 tw:text-sm">
             <button type="button"
                     @click="permissions = Array.from(document.querySelectorAll('input[name=\'permissions[]\']')).map(el => el.value)"
-                    class="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-indigo-600 tw:dark:text-dark-white-300 tw:hover:text-indigo-800 tw:dark:hover:text-dark-white-100 tw:font-semibold tw:transition-colors tw:duration-150">
+                    class="tw:inline-flex tw:items-center tw:text-lg tw:gap-1.5 tw:text-indigo-600 tw:dark:text-dark-white-300 tw:hover:text-indigo-800 tw:dark:hover:text-dark-white-100 tw:font-semibold tw:transition-colors tw:duration-150">
                 <i class="fas fa-check-square"></i>{{ __('permissions.rbac.select_all') }}
             </button>
             <span class="tw:text-slate-300 tw:dark:text-dark-gray-100">|</span>
             <button type="button"
                     @click="permissions = []"
-                    class="tw:inline-flex tw:items-center tw:gap-1.5 tw:text-slate-500 tw:dark:text-dark-white-400 tw:hover:text-slate-700 tw:dark:hover:text-dark-white-200 tw:font-semibold tw:transition-colors tw:duration-150">
+                    class="tw:inline-flex tw:items-center tw:text-lg tw:gap-1.5 tw:text-slate-500 tw:dark:text-dark-white-400 tw:hover:text-slate-700 tw:dark:hover:text-dark-white-200 tw:font-semibold tw:transition-colors tw:duration-150">
                 <i class="fas fa-square"></i>{{ __('permissions.rbac.clear_all') }}
             </button>
         </div>
@@ -74,17 +74,17 @@
                     @foreach($groupPerms as $p)
                         <div class="tw:flex tw:items-start tw:gap-3"
                              x-show="isPermMatch('{{ $p['label'] }}', '{{ $p['description'] }}', '{{ $group }}')">
-                            <div class="tw:flex-shrink-0">
+                            <div class="tw:flex tw:items-center tw:h-5">
                                 <input type="checkbox" name="permissions[]" value="{{ $p['name'] }}" id="perm-{{ $p['name'] }}"
                                        x-model="permissions"
-                                       class="tw:h-4 tw:w-4 tw:text-indigo-600 tw:focus:ring-indigo-500 tw:border-slate-300 tw:dark:border-dark-gray-100 tw:rounded tw:cursor-pointer tw:bg-white tw:dark:bg-dark-gray-300 tw:transition tw:duration-150">
+                                       class="tw:h-6 tw:w-6 tw:text-indigo-600 tw:focus:ring-indigo-500 tw:border-slate-300 tw:dark:border-dark-gray-100 tw:rounded tw:cursor-pointer tw:bg-white tw:dark:bg-dark-gray-300 tw:transition tw:duration-150">
                             </div>
-                            <div>
-                                <label for="perm-{{ $p['name'] }}" class="tw:block tw:text-lg tw:font-semibold tw:text-slate-800 tw:dark:text-white tw:cursor-pointer tw:leading-7">
+                            <div class="tw:ms-2 tw:text-sm tw:select-none">
+                                <label for="perm-{{ $p['name'] }}" class="tw:block tw:text-xl tw:font-semibold tw:text-slate-800 tw:dark:text-white tw:cursor-pointer tw:leading-7">
                                     {{ $p['label'] }}
                                 </label>
                                 @if($p['description'])
-                                    <p class="tw:text-sm tw:text-slate-500 tw:dark:text-dark-white-400 tw:mt-0.5 tw:leading-1">
+                                    <p class="tw:text-lg tw:text-slate-500 tw:dark:text-dark-white-400 tw:mt-0.5 tw:leading-1">
                                         {{ $p['description'] }}
                                     </p>
                                 @endif
