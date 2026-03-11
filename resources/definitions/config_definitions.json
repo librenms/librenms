@@ -5990,7 +5990,7 @@
             "default": true,
             "type": "boolean"
         },
-        "poller_modules.ipSystemStats": {
+        "poller_modules.ip-system-stats": {
             "order": 214,
             "group": "poller",
             "section": "poller_modules",
