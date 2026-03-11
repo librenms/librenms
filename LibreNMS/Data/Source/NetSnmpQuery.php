@@ -275,7 +275,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         //   - the PHP SNMP module is installed
         //   - UDP trsnaport is requested
         //   - SNMP version is v1/2c OR v3 with AES OR v3 with DES
-        if (class_exists('\SNMP') && ($device->transport ?? 'udp') === 'udp' && ($this->device->snmpver !== 'v3' || $this->device->cryptoalgo === 'AES' || $this->device->cryptoalgo === 'DES')) {
+        if (class_exists('\SNMP') && ($this->device->transport ?? 'udp') === 'udp' && ($this->device->snmpver !== 'v3' || $this->device->cryptoalgo === 'AES' || $this->device->cryptoalgo === 'DES')) {
             return $this->getPhpSnmp($oid);
         }
 
@@ -336,7 +336,7 @@ class NetSnmpQuery implements SnmpQueryInterface
                 $response = $response->append(new SnmpResponse("$matches[1] = No Such Object available on this agent at this OID\n", '', 0));
             } elseif ($this->abort) {
                 $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oidgroup));
-                Log::debug("SNMP failed walking $oid of $oid_list aborting.");
+                Log::debug("SNMP failed getting $oid_list aborting.");
 
                 return $response;
             }
