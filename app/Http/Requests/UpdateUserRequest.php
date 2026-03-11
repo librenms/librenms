@@ -43,7 +43,7 @@ class UpdateUserRequest extends FormRequest
                 'dashboard' => 'int',
                 'roles' => [
                     'array',
-                    Rule::when($this->user()->cannot('manage', Role::class), 'size:0'),
+                    Rule::when($this->user()->cannot('update', Role::class), 'size:0'),
                 ],
                 'roles.*' => Rule::in(Role::query()->pluck('name')),
                 'enabled' => 'boolean',
