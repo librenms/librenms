@@ -189,7 +189,7 @@ class UserController extends Controller
 
         $user->fill($request->validated());
 
-        if ($request->has('roles')) {
+        if ($request->has('roles') && $request->user()->can('update', Role::class)) {
             $user->syncRoles($request->input('roles', []));
         }
 

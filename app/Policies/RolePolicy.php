@@ -7,12 +7,14 @@ use Spatie\Permission\Models\Role;
 
 class RolePolicy
 {
+    use ChecksGlobalPermissions;
+
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $this->hasGlobalPermission($user, 'viewAny');
     }
 
     /**
@@ -20,7 +22,7 @@ class RolePolicy
      */
     public function view(User $user, Role $role): bool
     {
-        return $user->hasRole('admin');
+        return $this->hasGlobalPermission($user, 'view');
     }
 
     /**
@@ -28,15 +30,15 @@ class RolePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $this->hasGlobalPermission($user, 'create');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Role $role): bool
+    public function update(User $user, ?Role $role = null): bool
     {
-        return $user->hasRole('admin');
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -44,14 +46,10 @@ class RolePolicy
      */
     public function delete(User $user, Role $role): bool
     {
-        return $user->hasRole('admin') && ! in_array(strtolower($role->name), ['admin', 'global-read', 'user']);
-    }
+        if (in_array(strtolower($role->name), ['admin', 'global-read', 'user'])) {
+            return false;
+        }
 
-    /**
-     * Determine whether the user can manage roles.
-     */
-    public function manage(User $user): bool
-    {
-        return $user->hasRole('admin');
+        return $this->hasGlobalPermission($user, 'delete');
     }
 }
