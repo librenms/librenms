@@ -99,8 +99,9 @@ class FdbTablesController extends TableController
                     $vendor_ouis = $this->ouisFromVendor($search);
 
                     if (count($vendor_ouis) == 0) {
-                        $vendor_ouis[]="not found";
+                        $vendor_ouis[]= 'not found';
                     }
+					
                     return $this->findPortsByOui($vendor_ouis, $query);
                 default:
                     return $query->where(function ($query) use ($search, $mac_search): void {
@@ -306,6 +307,7 @@ class FdbTablesController extends TableController
 
         return $query; // Return the query builder instance
     }
+	
     /**
      * Get headers for CSV export
      *
@@ -350,7 +352,7 @@ class FdbTablesController extends TableController
             'first_seen' => 'unknown',
             'last_seen' => 'unknown',
         ];
-        
+
         // diffForHumans and doDateTimeString are not safe
         if ($fdb_entry->updated_at) {
             $item['last_seen'] = $fdb_entry->updated_at->diffForHumans();
