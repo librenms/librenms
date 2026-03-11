@@ -18,7 +18,7 @@
                     </div>
                 </div>
                 <button type="submit" form="role-form"
-                        class="tw:inline-flex tw:items-center tw:gap-2 tw:px-5 tw:py-2.5 tw:rounded-lg tw:bg-indigo-600 tw:hover:bg-indigo-700 tw:text-white tw:font-semibold tw:shadow-sm tw:transition-all tw:duration-150">
+                        class="tw:inline-flex tw:items-center tw:gap-2 tw:px-5 tw:py-2.5 tw:rounded-lg tw:bg-sky-700 tw:hover:bg-sky-800 tw:text-white tw:font-semibold tw:shadow-sm tw:transition-all tw:duration-150">
                     <i class="fas fa-save tw:text-indigo-200"></i>
                     {{ __('permissions.rbac.save_role') }}
                 </button>
