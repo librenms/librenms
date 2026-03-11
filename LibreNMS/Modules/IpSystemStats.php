@@ -73,7 +73,6 @@ class IpSystemStats implements Module
     {
         $device = $os->getDeviceArray();
         $data = SnmpQuery::device($os->getDevice())
-            ->enumStrings()
             ->walk('IP-MIB::ipSystemStatsTable')
             ->table(1);
 
@@ -109,7 +108,7 @@ class IpSystemStats implements Module
         ];
 
         foreach ($data as $af => $stats) {
-            Log::info("$af ");
+            Log::info("$af");
 
             // Prefer HC (64-bit) counters over their 32-bit equivalents when available.
             foreach ($hcSubstitutions as $hc => $standard) {
@@ -123,15 +122,8 @@ class IpSystemStats implements Module
 
             foreach ($oids as $oid) {
                 $oid_ds = str_replace('IP-MIB::ipSystemStats', '', $oid);
-                $value = $stats[$oid] ?? '0';
-
-                // Treat invalid/missing enum strings as zero.
-                if (str_contains($value, 'No') || str_contains($value, 'd') || str_contains($value, 's')) {
-                    $value = '0';
-                }
-
                 $rrd_def->addDataset($oid_ds, 'COUNTER');
-                $fields[$oid_ds] = $value;
+                $fields[$oid_ds] = $stats[$oid] ?? 0;
             }
 
             $tags = ['af' => $af, 'rrd_name' => ['ipSystemStats', $af], 'rrd_def' => $rrd_def];
