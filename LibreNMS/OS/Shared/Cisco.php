@@ -1225,6 +1225,8 @@ class Cisco extends OS implements
                 }
             }
         }
+
         return $macs;
     }
+    
 }
