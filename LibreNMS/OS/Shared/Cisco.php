@@ -1085,7 +1085,7 @@ class Cisco extends OS implements
                     // Otherwise use $voice_vlan
                     $ports->push(new PortVlan([
                         'vlan' => $vlan_id,
-                        'voice' => 0,
+                        'voice' => 2,
                         'baseport' => $baseport,
                         'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
                         'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
@@ -1131,7 +1131,7 @@ class Cisco extends OS implements
                     // Otherwise use $voice_vlan
                     $ports->push(new PortVlan([
                         'vlan' => $vlan_id,
-                        'voice' => 0,
+                        'voice' => 2,
                         'baseport' => $this->bridgePortFromIfIndex($ifindex),
                         'untagged' => $value,
                         'state' => 'unknown',
