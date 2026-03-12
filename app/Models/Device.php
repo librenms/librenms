@@ -27,7 +27,6 @@ use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
-use Permissions;
 
 /**
  * @property-read int|null $ports_count
@@ -340,25 +339,6 @@ class Device extends BaseModel
         }
 
         return $this->last_polled ?? Carbon::now();
-    }
-
-    /**
-     * Check if user can access this device.
-     *
-     * @param  User  $user
-     * @return bool
-     */
-    public function canAccess($user)
-    {
-        if (! $user) {
-            return false;
-        }
-
-        if ($user->hasGlobalRead()) {
-            return true;
-        }
-
-        return Permissions::canAccessDevice($this->device_id, $user->user_id);
     }
 
     public function formatDownUptime($short = false): string

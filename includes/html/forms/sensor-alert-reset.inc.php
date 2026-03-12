@@ -13,12 +13,15 @@
  * the source code distribution for details.
  */
 
+use App\Models\Sensor;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', Sensor::class)) {
     $response = [
         'status' => 'error',
-        'message' => 'Need to be admin',
+        'message' => 'Need permission',
     ];
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;

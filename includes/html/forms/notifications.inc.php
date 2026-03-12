@@ -30,10 +30,10 @@ if (! isset($_REQUEST['action'])) {
     ]));
 }
 
-if (in_array($_REQUEST['action'], ['stick', 'unstick', 'create']) && ! Auth::user()->hasGlobalAdmin()) {
+if (($_REQUEST['action'] === 'create' && Gate::denies('notification.create')) || (in_array($_REQUEST['action'], ['stick', 'unstick']) && Gate::denies('notification.update'))) {
     exit(json_encode([
         'status' => 'error',
-        'message' => 'ERROR: Need to be GlobalAdmin or DemoUser',
+        'message' => 'ERROR: Need permission',
     ]));
 }
 

@@ -14,6 +14,8 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
 use LibreNMS\Tests\DBTestCase;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RestifyApiTest extends DBTestCase
 {
@@ -23,6 +25,11 @@ class RestifyApiTest extends DBTestCase
     {
         parent::setUp();
         $this->seed(RolesSeeder::class);
+
+        // Ensure api.access permission exists and is assigned to admin and global-read roles
+        $apiAccess = Permission::findOrCreate('api.access');
+        Role::findOrCreate('admin')->givePermissionTo($apiAccess);
+        Role::findOrCreate('global-read')->givePermissionTo($apiAccess);
     }
 
     /**
@@ -676,5 +683,76 @@ class RestifyApiTest extends DBTestCase
             ->assertJsonStructure([
                 'data' => ['id', 'type', 'attributes'],
             ]);
+    }
+
+    // ── Custom role with partial permissions ─────────────────
+
+    private function createAlertTemplateReaderUser(): User
+    {
+        Permission::findOrCreate('api.access');
+        Permission::findOrCreate('alert-template.view');
+        Permission::findOrCreate('alert-template.viewAny');
+
+        $role = Role::findOrCreate('alert-template-reader');
+        $role->givePermissionTo(['api.access', 'alert-template.view', 'alert-template.viewAny']);
+
+        $user = User::factory()->create();
+        $user->assignRole('alert-template-reader');
+
+        return $user;
+    }
+
+    public function testCustomRoleCanReadAlertTemplates(): void
+    {
+        $user = $this->createAlertTemplateReaderUser();
+        $existing = AlertTemplate::count();
+        AlertTemplate::factory()->count(2)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/alert-templates')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', $existing + 2);
+    }
+
+    public function testCustomRoleCanShowSingleAlertTemplate(): void
+    {
+        $user = $this->createAlertTemplateReaderUser();
+        $template = AlertTemplate::factory()->create(['name' => 'Visible Template']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/alert-templates/{$template->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.name', 'Visible Template');
+    }
+
+    public function testCustomRoleCannotCreateAlertTemplates(): void
+    {
+        $user = $this->createAlertTemplateReaderUser();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-templates', [
+            'name' => 'Should Fail',
+            'template' => 'body',
+        ])->assertStatus(403);
+    }
+
+    public function testCustomRoleCannotAccessDevices(): void
+    {
+        $user = $this->createAlertTemplateReaderUser();
+        Device::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/devices')
+            ->assertStatus(403);
+    }
+
+    public function testCustomRoleCannotAccessAlertRules(): void
+    {
+        $user = $this->createAlertTemplateReaderUser();
+        AlertRule::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/alert-rules')
+            ->assertStatus(403);
     }
 }

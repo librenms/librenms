@@ -2,41 +2,49 @@
 
 namespace App\Policies;
 
-use App\Models\AlertTemplate;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class AlertTemplatePolicy
 {
-    use HandlesAuthorization;
+    use ChecksGlobalPermissions;
 
-    public function allowRestify(User $user = null): bool
-    {
-        return $user !== null && $user->hasGlobalRead();
-    }
-
+    /**
+     * Determine whether the user can view any models.
+     */
     public function viewAny(User $user): bool
     {
-        return $user->hasGlobalRead();
+        return $this->hasGlobalPermission($user, 'viewAny');
     }
 
-    public function view(User $user, AlertTemplate $alertTemplate): bool
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(User $user): bool
     {
-        return $user->hasGlobalRead();
+        return $this->hasGlobalPermission($user, 'view');
     }
 
+    /**
+     * Determine whether the user can create models.
+     */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'create');
     }
 
-    public function update(User $user, AlertTemplate $alertTemplate): bool
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(User $user): bool
     {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'update');
     }
 
-    public function delete(User $user, AlertTemplate $alertTemplate): bool
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user): bool
     {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'delete');
     }
 }

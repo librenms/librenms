@@ -12,10 +12,10 @@ if ($oids) {
         $temperature_id = $split_oid[count($split_oid) - 1];
         $x = 1;
         preg_match_all('/([0-9]+C)+/', $descr, $temps);
-        preg_match_all('/([0-9]+C)+/', snmp_get($device, $main_oid . '.26.' . $temperature_id, '-Ovq'), $over_fail);
-        preg_match_all('/([0-9]+C)+/', snmp_get($device, $main_oid . '.27.' . $temperature_id, '-Ovq'), $over_warn);
-        preg_match_all('/([0-9]+C)+/', snmp_get($device, $main_oid . '.28.' . $temperature_id, '-Ovq'), $under_fail);
-        preg_match_all('/([0-9]+C)+/', snmp_get($device, $main_oid . '.29.' . $temperature_id, '-Ovq'), $under_warn);
+        preg_match_all('/([0-9]+C)+/', (string) SnmpQuery::get($main_oid . '.26.' . $temperature_id)->value(), $over_fail);
+        preg_match_all('/([0-9]+C)+/', (string) SnmpQuery::get($main_oid . '.27.' . $temperature_id)->value(), $over_warn);
+        preg_match_all('/([0-9]+C)+/', (string) SnmpQuery::get($main_oid . '.28.' . $temperature_id)->value(), $under_fail);
+        preg_match_all('/([0-9]+C)+/', (string) SnmpQuery::get($main_oid . '.29.' . $temperature_id)->value(), $under_warn);
         $x = 0;
         foreach ($temps[0] as $temperature) {
             $low_limit = str_replace('C', '', $under_fail[0][$x]);

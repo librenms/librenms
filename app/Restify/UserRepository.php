@@ -27,7 +27,6 @@ class UserRepository extends Repository
             field("username")->readonly(),
             field("realname")->readonly(),
             field("email")->readonly(),
-            field("level")->readonly(),
             field("enabled")->readonly(),
         ];
     }
@@ -35,7 +34,7 @@ class UserRepository extends Repository
     public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
     {
         if ($user = $request->user()) {
-            if (! $user->isAdmin()) {
+            if (! $user->hasRole('admin')) {
                 return $query->where("user_id", $user->user_id);
             }
 

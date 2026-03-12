@@ -149,7 +149,7 @@ foreach ($unique_desc_counter as $sensor_desc => $sensor_id_r) {
 
 //At first device discovery the serial number is not set. But we need this in the next step for our state indexes.
 if (! $device['serial']) {
-    $serial_number = snmp_get($device, 'cmcIIIUnitSerial.0', '-Oqv', 'RITTAL-CMC-III-MIB');
+    $serial_number = SnmpQuery::get('RITTAL-CMC-III-MIB::cmcIIIUnitSerial.0')->value();
 } else {
     $serial_number = $device['serial'];
 }

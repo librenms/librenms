@@ -56,6 +56,21 @@ modules:
                     descr: 'Power Supply {{ ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUName }}'
                     value: ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUInstantaneousPower
                     high_limit: ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUMaximumPower
+                -
+                    oid: POWER-ETHERNET-MIB::pethMainPseTable
+                    value: POWER-ETHERNET-MIB::pethMainPsePower
+                    num_oid: '.1.3.6.1.2.1.105.1.3.1.1.2.{{ $index }}'
+                    index: 'pethMainPsePower.{{ $index }}'
+                    group: "PoE"
+                    descr: "PoE Budget Total - ID {{ $index }}"
+                -
+                    oid: POWER-ETHERNET-MIB::pethMainPseTable
+                    value: POWER-ETHERNET-MIB::pethMainPseConsumptionPower
+                    num_oid: '.1.3.6.1.2.1.105.1.3.1.1.4.{{ $index }}'
+                    index: 'pethMainPseConsumptionPower.{{ $index }}'
+                    high_limit: POWER-ETHERNET-MIB::pethMainPsePower
+                    group: "PoE"
+                    descr: "PoE Budget Consumed - ID {{ $index }}"
         voltage:
             data:
                 -
@@ -131,7 +146,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.11.2.1.1.11.{{ $index }}'
                     descr: 'Power Supply {{ ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUName }}'
                     value: ARUBAWIRED-POWERSUPPLY-MIB::arubaWiredPSUStateEnum
-                    state_name: arubaWiredPowerSupplyTable 
+                    state_name: arubaWiredPowerSupplyTable
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
                         - { value: 2, descr: Absent, graph: 1, generic: 2 }
