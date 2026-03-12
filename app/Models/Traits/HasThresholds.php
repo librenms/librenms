@@ -76,7 +76,7 @@ trait HasThresholds
     public function guessLimits(bool $high, bool $low): void
     {
         if (! $this->sensor_class instanceof SensorEnum) {
-            Log::error('guessLimits called with non-SensorEnum sensor_class: ' . get_class($this));
+            Log::error('guessLimits called with non-SensorEnum sensor_class: ' . $this::class);
 
             return;
         }
