@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::denies('update', AlertTransport::class)) {
+if (Gate::denies('delete', AlertTransport::class)) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'ERROR: You need permission.',
