@@ -7,9 +7,6 @@ return [
     "auth" => [
         "table" => "users",
         "provider" => "sanctum",
-        "frontend_app_url" => env("FRONTEND_APP_URL", env("APP_URL")),
-        "password_reset_url" => env("FRONTEND_APP_URL") . "/password/reset?token={token}&email={email}",
-        "user_verify_url" => env("FRONTEND_APP_URL") . "/verify/{id}/{emailHash}",
         "user_model" => "\\App\\Models\\User",
         "token_ttl" => env("RESTIFY_TOKEN_TTL", null),
     ],
