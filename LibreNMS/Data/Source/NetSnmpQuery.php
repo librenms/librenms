@@ -322,7 +322,7 @@ class NetSnmpQuery implements SnmpQueryInterface
             $missing = [];
             $errors = '';
 
-            set_error_handler(function ($err_severity, $err_msg) use (&$missing, &$errors) {
+            set_error_handler(function (int $err_severity, string $err_msg, string $err_filename, int $err_line) use (&$missing, &$errors): bool {
                 if (preg_match('/\'([^\']+)\': No Such Object available on this agent at this OID/', $err_msg, $matches)) {
                     $missing[$matches[1]] = 'No Such Object available on this agent at this OID';
                 } elseif (preg_match('/Invalid object identifier: (\S+)/', $err_msg, $matches)) {
@@ -330,6 +330,8 @@ class NetSnmpQuery implements SnmpQueryInterface
                 } else {
                     $errors .= "$err_msg\n";
                 }
+
+                return true;
             }, E_WARNING);
 
             $this->logCommand('SNMP::get(' . implode(',', $oidgroup) . ')');
