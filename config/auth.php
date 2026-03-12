@@ -18,7 +18,7 @@ return [
 
         'api' => [
             'driver' => 'token',
-            'provider' => 'users',
+            'provider' => 'legacy',
             'hash' => false,
         ],
 
@@ -32,11 +32,6 @@ return [
     'providers' => [
         'legacy' => [
             'driver' => 'legacy',
-            'model' => App\Models\User::class,
-        ],
-
-        'users' => [
-            'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
     ],
