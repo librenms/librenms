@@ -1074,18 +1074,18 @@ class Cisco extends OS implements
                     if (isset($voice_vlans[$ifindex]['CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'])) {
                         $voice_vlan = $voice_vlans[$ifindex]['CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'];
                         if ($voice_vlan > 0 && $voice_vlan < 4095) {
-                            $is_voice_vlan = 1;
+                            $is_voice_vlan = true;
                         }
                         else {
-                            $is_voice_vlan = 0;
+                            $is_voice_vlan = false;
                         }
                     }
                     $alreadyProcessed[$vlan_id][$ifindex] = 1; // We don't want to override it later
                     // If $is_voice_vlan == 0 (false), use the $vlan_id (access vlan)
                     // Otherwise use $voice_vlan
                     $ports->push(new PortVlan([
-                        'vlan' => ($is_voice_vlan == 0) ? $vlan_id : $voice_vlan,
-                        'voice' => $is_voice_vlan,
+                        'vlan' => $vlan_id,
+                        'voice' => 0,
                         'baseport' => $baseport,
                         'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
                         'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
@@ -1093,6 +1093,19 @@ class Cisco extends OS implements
                         'untagged' => isset($isNative[$vlan_id][$ifindex]) && $isNative[$vlan_id][$ifindex] > 0,
                         'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device
                     ]));
+                    // Add another record if there is a voice vlan on this port
+                    if ($is_voice_vlan) {
+                        $ports->push(new PortVlan([
+                            'vlan' => $voice_vlan,
+                            'voice' => 1,
+                            'baseport' => $baseport,
+                            'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
+                            'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
+                            'cost' => $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
+                            'untagged' => isset($isNative[$vlan_id][$ifindex]) && $isNative[$vlan_id][$ifindex] > 0,
+                            'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device
+                        ]));
+                    }
                 }
             }
 
@@ -1108,22 +1121,33 @@ class Cisco extends OS implements
                     if (isset($voice_vlans[$ifindex]['CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'])) {
                         $voice_vlan = $voice_vlans[$ifindex]['CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'];
                         if ($voice_vlan > 0 && $voice_vlan < 4095) {
-                            $is_voice_vlan = 1;
+                            $is_voice_vlan = true;
                         }
                         else {
-                            $is_voice_vlan = 0;
+                            $is_voice_vlan = false;
                         }
                     }
                     // If $is_voice_vlan == 0 (false), use the $vlan_id (access vlan)
                     // Otherwise use $voice_vlan
                     $ports->push(new PortVlan([
-                        'vlan' => ($is_voice_vlan == 0) ? $vlan_id : $voice_vlan,
-                        'voice' => $is_voice_vlan,
+                        'vlan' => $vlan_id,
+                        'voice' => 0
                         'baseport' => $this->bridgePortFromIfIndex($ifindex),
                         'untagged' => $value,
                         'state' => 'unknown',
                         'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device,
                     ]));
+                    // Add another record if there is a voice vlan on this port
+                    if ($is_voice_vlan) {
+                        $ports->push(new PortVlan([
+                            'vlan' => $voice_vlan,
+                            'voice' => 1,
+                            'baseport' => $baseport,
+                            'untagged' => isset($isNative[$vlan_id][$ifindex]) && $isNative[$vlan_id][$ifindex] > 0,
+                            'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
+                            'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device
+                        ]));
+                    }
                 }
             }
         }
