@@ -5,6 +5,7 @@
 !/.git-blame-ignore-revs
 !/.editorconfig
 !/.php_cs
+!/.snmp
 !/.github/
 !/.mention-bot
 !/.env.example

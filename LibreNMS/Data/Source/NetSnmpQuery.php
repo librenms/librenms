@@ -306,7 +306,13 @@ class NetSnmpQuery implements SnmpQueryInterface
         );
         $snmp->oid_output_format = (in_array('-On', $this->options) ? SNMP_OID_OUTPUT_NUMERIC : (in_array('-Os', $this->options) ? SNMP_OID_OUTPUT_SUFFIX : SNMP_OID_OUTPUT_MODULE));
         $snmp->quick_print = true;
-        $snmp->valueretrieval = SNMP_VALUE_PLAIN;
+        $snmp->valueretrieval = SNMP_VALUE_LIBRARY;
+        $snmp->enum_print = isset($this->options[0]) && ! Str::contains($this->options[0], 'e');
+
+        // Load base mibs first
+        foreach ($this->mibs as $mib) {
+            $this->loadMib($mib);
+        }
 
         foreach ($this->limitOids($this->parseOid($oids)) as $oidgroup) {
             $measure = Measurement::start('Phpget');
