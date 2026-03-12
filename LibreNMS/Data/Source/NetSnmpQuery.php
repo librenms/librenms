@@ -300,14 +300,16 @@ class NetSnmpQuery implements SnmpQueryInterface
         $snmp = new \SNMP(
             $snmpver,
             ($hostname ?: 'localhost') . ':' . $this->device->port,
-            $this->device->snmpver === 'v3' ? ($this->device->authname ?: 'root') : $this->device->community,
+            $this->device->snmpver === 'v3' ? ($this->device->authname ?: 'root') : ($this->context ? "{$this->device->community}@$this->context" : $this->device->community),
             ($this->device->timeout ?? LibrenmsConfig::get('snmp.timeout')) * 1000000,
             $this->device->retries ?? LibrenmsConfig::get('snmp.retries'),
         );
         $snmp->oid_output_format = (in_array('-On', $this->options) ? SNMP_OID_OUTPUT_NUMERIC : (in_array('-Os', $this->options) ? SNMP_OID_OUTPUT_SUFFIX : SNMP_OID_OUTPUT_MODULE));
         $snmp->quick_print = true;
         $snmp->valueretrieval = SNMP_VALUE_LIBRARY;
-        $snmp->enum_print = isset($this->options[0]) && ! Str::contains($this->options[0], 'e');
+        $snmp->enum_print = isset($this->options[0]) && Str::contains($this->options[0], 'e');
+
+        // TODO: V3 security
 
         // Load base mibs first
         foreach ($this->mibs as $mib) {
@@ -361,7 +363,7 @@ class NetSnmpQuery implements SnmpQueryInterface
 
             if ($this->abort && ! $response->isValid()) {
                 $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oidgroup));
-                Log::debug("SNMP failed getting $oid_list aborting.");
+                Log::info("SNMP failed getting $oid_list aborting.");
 
                 return $response;
             }
@@ -387,6 +389,7 @@ class NetSnmpQuery implements SnmpQueryInterface
                 // Load dependencies first
                 $this->loadMibDependencies($mibfile);
 
+                Log::debug("Loading mib $mibfile");
                 if (snmp_read_mib($mibfile)) {
                     $mibfound = true;
                     $this->mibsLoaded[$mib] = true;
