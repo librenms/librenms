@@ -488,14 +488,14 @@ function cache_peeringdb()
 
             // cleanup
             if (empty($peer_keep)) {
-                dbDelete('pdb_ix_peers');
+                \App\Models\PeeringdbIxPeer::query()->delete();
             } else {
-                dbDelete('pdb_ix_peers', '`pdb_ix_peers_id` NOT IN ' . dbGenPlaceholders(count($peer_keep)), $peer_keep);
+                \App\Models\PeeringdbIxPeer::whereNotIn('pdb_ix_peers_id', $peer_keep)->delete();
             }
             if (empty($ix_keep)) {
-                dbDelete('pdb_ix');
+                \App\Models\PeeringdbIx::query()->delete();
             } else {
-                dbDelete('pdb_ix', '`pdb_ix_id` NOT IN ' . dbGenPlaceholders(count($ix_keep)), $ix_keep);
+                \App\Models\PeeringdbIx::whereNotIn('pdb_ix_id', $ix_keep)->delete();
             }
         } else {
             echo 'Cached PeeringDB data found.....' . PHP_EOL;
@@ -545,7 +545,7 @@ function lock_and_purge($table, $sql)
 
         $name = str_replace('_', ' ', ucfirst($table));
         if (is_numeric($purge_days)) {
-            if (dbDelete($table, $sql, [$purge_days])) {
+            if (\Illuminate\Support\Facades\DB::table($table)->whereRaw($sql, [$purge_days])->delete()) {
                 echo "$name cleared for entries over $purge_days days\n";
             }
         }

@@ -562,7 +562,7 @@ foreach (dbFetchRows($sql, [$device['device_id']]) as $test) {
 
     if (! isset($link_exists[$local_port_id][$remote_hostname][$remote_port])) {
         echo '-';
-        $rows = dbDelete('links', '`id` = ?', [$test['id']]);
+        $rows = Link::where('id', $test['id'])->delete();
         d_echo("$rows deleted ");
     }
 }
