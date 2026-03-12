@@ -29,6 +29,7 @@
 
 namespace LibreNMS\OS\Shared;
 
+use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Models\Component;
 use App\Models\Device;
@@ -977,9 +978,16 @@ class Cisco extends OS implements
 
         $vtpdomains = SnmpQuery::walk('CISCO-VTP-MIB::managementDomainName')->pluck();
         $current_domain = 0;
+        $os = $this->getName();
+        $ignore_vlans = (array) LibrenmsConfig::getOsSetting($os, 'ignore_vlans');
 
         return SnmpQuery::enumStrings()->walk('CISCO-VTP-MIB::vtpVlanTable')
-            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain) {
+            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain, $ignore_vlans) {
+                // Skip VLANs configured to be ignored
+                if (in_array($vlan_id, $ignore_vlans)) {
+                    return null;
+                }
+
                 if ($current_domain != $vtpdomain_id) {
                     $current_domain = $vtpdomain_id;
                     Log::info('VTP Domain ' . $vtpdomain_id . ' ' . ($vtpdomains[$vtpdomain_id] ?? 'none'));
@@ -992,7 +1000,8 @@ class Cisco extends OS implements
                     'vlan_type' => $vlan['CISCO-VTP-MIB::vtpVlanType'] ?? '',
                     'vlan_state' => isset($vlan['CISCO-VTP-MIB::vtpVlanState']) && $vlan['CISCO-VTP-MIB::vtpVlanState'] == 'operational',
                 ]);
-            });
+            })
+            ->filter(); // Remove null values from ignored VLANs
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection
@@ -1050,8 +1059,7 @@ class Cisco extends OS implements
         foreach ($vlans as $vlan) {
             $vlan_id = (int) $vlan->vlan_vlan;
 
-            // Ignore reserved VLAN IDs
-            if ($vlan->vlan_state && $vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
+            if ($vlan->vlan_state && $vlan_id) {
                 // collect BRIDGE-MIB in vlan context
                 $tmp_vlan_data = SnmpQuery::context($vlan_id === 1 ? '' : (string) $vlan_id, 'vlan-')
                     ->enumStrings()
