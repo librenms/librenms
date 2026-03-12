@@ -319,22 +319,39 @@ class NetSnmpQuery implements SnmpQueryInterface
                 }
             }
 
+            $missing = [];
+            $errors = '';
+
+            set_error_handler(function ($err_severity, $err_msg) use (&$missing, &$errors) {
+                if (preg_match('/\'([^\']+)\': No Such Object available on this agent at this OID/', $err_msg, $matches)) {
+                    $missing[$matches[1]] = 'No Such Object available on this agent at this OID';
+                } elseif (preg_match('/Invalid object identifier: (\S+)/', $err_msg, $matches)) {
+                    $errors .= "$matches[1]: Unknown Object Identifier\n";
+                } else {
+                    $errors .= "$err_msg\n";
+                }
+            }, E_WARNING);
+
             $this->logCommand('SNMP::get(' . implode(',', $oidgroup) . ')');
-            $res = @$snmp->get($oidgroup);
+            $res = $snmp->get($oidgroup);
             $measure->manager()->recordSnmp($measure->end());
 
+            restore_error_handler();
+
+            $res_str = '';
             if ($res) {
-                $res_str = '';
                 foreach ($res as $k => $v) {
                     $res_str .= "$k = $v\n";
                 }
+            }
+            foreach ($missing as $k => $v) {
+                $res_str .= "$k = $v\n";
+            }
 
-                $this->logOutput($res_str, '');
-                $response = $response->append(new SnmpResponse($res_str, '', 0));
-            } elseif (preg_match('/\'([^\']+)\': No Such Object available on this agent at this OID/', $snmp->getError(), $matches)) {
-                $this->logOutput("$matches[1] = No Such Object available on this agent at this OID\n", '');
-                $response = $response->append(new SnmpResponse("$matches[1] = No Such Object available on this agent at this OID\n", '', 0));
-            } elseif ($this->abort) {
+            $this->logOutput($res_str, '');
+            $response = $response->append(new SnmpResponse($res_str, $errors, $errors ? 1 : 0));
+
+            if ($this->abort && ! $response->isValid()) {
                 $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oidgroup));
                 Log::debug("SNMP failed getting $oid_list aborting.");
 
