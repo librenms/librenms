@@ -1053,6 +1053,8 @@ class Cisco extends OS implements
         // process all the discovered vlans
         foreach ($vlans as $vlan) {
             $vlan_id = (int) $vlan->vlan_vlan;
+            $voice_vlan = 0;
+            $is_voice_vlan = false;
             // Ignore reserved VLAN IDs
             if ($vlan->vlan_state && $vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
                 // collect BRIDGE-MIB in vlan context
@@ -1070,10 +1072,8 @@ class Cisco extends OS implements
                     $ifindex = $this->ifIndexFromBridgePort($baseport);
                     // Determining if port has a voice VLAN configured.
                     // If returned value is 0 or 4096, no voice VLAN is configured.
-                    $voice_vlan = 0;
                     if (isset($voice_vlans[$ifindex]['CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'])) {
                         $voice_vlan = $voice_vlans[$ifindex]['CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'];
-                        $is_voice_vlan = false;
                         if ($voice_vlan > 0 && $voice_vlan < 4095) {
                             $is_voice_vlan = true;
                         }
