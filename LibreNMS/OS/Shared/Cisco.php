@@ -1131,7 +1131,7 @@ class Cisco extends OS implements
                     // Otherwise use $voice_vlan
                     $ports->push(new PortVlan([
                         'vlan' => $vlan_id,
-                        'voice' => 0
+                        'voice' => 0,
                         'baseport' => $this->bridgePortFromIfIndex($ifindex),
                         'untagged' => $value,
                         'state' => 'unknown',
