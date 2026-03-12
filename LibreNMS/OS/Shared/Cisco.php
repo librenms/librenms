@@ -1008,7 +1008,7 @@ class Cisco extends OS implements
         ])->table(1);
 
         $voice_vlans = SnmpQuery::abortOnFailure()->walk([
-            'CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'
+            'CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId',
         ])->table(1);
 
         // Hash Table indexed by vlans and ifIndexes
@@ -1075,8 +1075,7 @@ class Cisco extends OS implements
                         $voice_vlan = $voice_vlans[$ifindex]['CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'];
                         if ($voice_vlan > 0 && $voice_vlan < 4095) {
                             $is_voice_vlan = true;
-                        }
-                        else {
+                        } else {
                             $is_voice_vlan = false;
                         }
                     }
@@ -1122,8 +1121,7 @@ class Cisco extends OS implements
                         $voice_vlan = $voice_vlans[$ifindex]['CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'];
                         if ($voice_vlan > 0 && $voice_vlan < 4095) {
                             $is_voice_vlan = true;
-                        }
-                        else {
+                        } else {
                             $is_voice_vlan = false;
                         }
                     }
@@ -1227,7 +1225,6 @@ class Cisco extends OS implements
                 }
             }
         }
-
         return $macs;
     }
 }
