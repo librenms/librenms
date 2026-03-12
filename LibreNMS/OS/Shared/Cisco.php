@@ -1056,6 +1056,7 @@ class Cisco extends OS implements
                 $vlanContext = $vlan_id == 1 ? '' : (string) $vlan_id;
                 $tmp_vlan_data = SnmpQuery::context($vlanContext, 'vlan-')
                     ->enumStrings()
+                    ->abortOnFailure()
                     ->cache()
                     ->walk('BRIDGE-MIB::dot1dStpPortTable')
                     ->table(1);
