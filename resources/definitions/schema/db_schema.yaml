@@ -1013,20 +1013,31 @@ locations:
 mac_accounting:
   Columns:
     - { Field: ma_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'bigint unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: mac, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ifIndex, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: vlan, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: in_oid, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: out_oid, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: bps_out, Type: int, 'Null': false, Extra: '' }
     - { Field: bps_in, Type: int, 'Null': false, Extra: '' }
-    - { Field: bytes_in, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: bytes_in_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: bytes_out, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: bytes_out_rate, Type: int, 'Null': true, Extra: '' }
-    - { Field: packets_in, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: packets_out, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: last_polled, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedBytes_input, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedBytes_input_prev, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedBytes_input_delta, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedBytes_input_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedBytes_output, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedBytes_output_prev, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedBytes_output_delta, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedBytes_output_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedPkts_input, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedPkts_input_prev, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedPkts_input_delta, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedPkts_input_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedPkts_output, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedPkts_output_prev, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedPkts_output_delta, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: cipMacHCSwitchedPkts_output_rate, Type: int, 'Null': true, Extra: '' }
+    - { Field: poll_time, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: poll_prev, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: poll_period, Type: 'int unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ma_id], Unique: true, Type: BTREE }
     mac_accounting_port_id_index: { Name: mac_accounting_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
@@ -1362,13 +1373,13 @@ ospfv3_areas:
     - { Field: ospfv3AreaScopeLsaCount, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3AreaScopeLsaCksumSum, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3AreaSummary, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: ospfv3AreaStubMetric, Type: 'int unsigned', 'Null': true, Extra: '' }
-    - { Field: ospfv3AreaStubMetricType, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3AreaNssaTranslatorRole, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3AreaNssaTranslatorState, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3AreaNssaTranslatorStabInterval, Type: 'int unsigned', 'Null': true, Extra: '' }
-    - { Field: ospfv3AreaNssaTranslatorEvents, Type: 'int unsigned', 'Null': true, Extra: '' }
-    - { Field: ospfv3AreaTEEnabled, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3AreaStubMetric, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaStubMetricType, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaNssaTranslatorRole, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaNssaTranslatorState, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaNssaTranslatorStabInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaNssaTranslatorEvents, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3AreaTEEnabled, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
@@ -1392,16 +1403,16 @@ ospfv3_instances:
     - { Field: ospfv3AsScopeLsaCksumSum, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3ExitOverflowInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3ReferenceBandwidth, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3RestartSupport, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3RestartInterval, Type: 'int unsigned', 'Null': true, Extra: '' }
-    - { Field: ospfv3RestartStrictLsaChecking, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3RestartStatus, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3RestartAge, Type: 'int unsigned', 'Null': true, Extra: '' }
-    - { Field: ospfv3RestartExitReason, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3StubRouterSupport, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3StubRouterAdvertisement, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3DiscontinuityTime, Type: 'int unsigned', 'Null': true, Extra: '' }
-    - { Field: ospfv3RestartTime, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3RestartSupport, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartStrictLsaChecking, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartStatus, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartAge, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartExitReason, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3StubRouterSupport, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3StubRouterAdvertisement, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3DiscontinuityTime, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3RestartTime, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
@@ -1425,9 +1436,9 @@ ospfv3_nbrs:
     - { Field: ospfv3NbrLsRetransQLen, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3NbrHelloSuppressed, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3NbrIfId, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3NbrRestartHelperStatus, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: ospfv3NbrRestartHelperAge, Type: 'int unsigned', 'Null': true, Extra: '' }
-    - { Field: ospfv3NbrRestartHelperExitReason, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: ospfv3NbrRestartHelperStatus, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrRestartHelperAge, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ospfv3NbrRestartHelperExitReason, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
@@ -1443,14 +1454,14 @@ ospfv3_ports:
     - { Field: ospfv3IfIndex, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3IfInstId, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3IfAreaId, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3IfType, Type: varchar(32), 'Null': false, Extra: '', Default: '' }
+    - { Field: ospfv3IfType, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3IfAdminStatus, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3IfRtrPriority, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3IfTransitDelay, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3IfRetransInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3IfHelloInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3IfRtrDeadInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ospfv3IfPollInterval, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: ospfv3IfPollInterval, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ospfv3IfState, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3IfDesignatedRouter, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: ospfv3IfBackupDesignatedRouter, Type: varchar(32), 'Null': false, Extra: '' }
@@ -1921,6 +1932,7 @@ ports_vlans:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: vlan, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: voice, Type: 'tinyint', 'Null': false, Extra: '', Default: '0' }
     - { Field: baseport, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: priority, Type: 'bigint unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: state, Type: varchar(16), 'Null': false, Extra: '', Default: unknown }
@@ -1930,6 +1942,16 @@ ports_vlans:
     PRIMARY: { Name: PRIMARY, Columns: [port_vlan_id], Unique: true, Type: BTREE }
     ports_vlans_device_id_port_id_vlan_unique: { Name: ports_vlans_device_id_port_id_vlan_unique, Columns: [device_id, port_id, vlan], Unique: true, Type: BTREE }
     ports_vlans_port_id_index: { Name: ports_vlans_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+ports_voice_vlan:
+  Columns:
+    - { Field: ports_voice_vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: voice_vlan, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [ports_voice_vlan_id], Unique: true, Type: BTREE }
+    ports_voice_vlans_device_id_port_id_voice_vlan_unique: { Name: ports_voice_vlans_device_id_port_id_voice_vlan_unique, Columns: [device_id, port_id, voice_vlan], Unique: true, Type: BTREE }
+    ports_voice_vlans_port_id_index: { Name: ports_voice_vlans_port_id_index, Columns: [port_id], Unique: true, Type: BTREE }
 port_groups:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2344,7 +2366,7 @@ stp:
     - { Field: protocolSpecification, Type: varchar(16), 'Null': false, Extra: '' }
     - { Field: priority, Type: mediumint, 'Null': false, Extra: '' }
     - { Field: timeSinceTopologyChange, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: topChanges, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: topChanges, Type: mediumint, 'Null': false, Extra: '' }
     - { Field: designatedRoot, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: rootCost, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: rootPort, Type: int, 'Null': true, Extra: '' }
