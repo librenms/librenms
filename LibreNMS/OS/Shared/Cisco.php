@@ -1008,7 +1008,7 @@ class Cisco extends OS implements
         ])->table(1);
 
         $voice_vlans = SnmpQuery::abortOnFailure()->walk([
-            'CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'
+            'CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId',
         ])->table(1);
 
         // Hash Table indexed by vlans and ifIndexes
@@ -1053,7 +1053,8 @@ class Cisco extends OS implements
         // process all the discovered vlans
         foreach ($vlans as $vlan) {
             $vlan_id = (int) $vlan->vlan_vlan;
-
+            $voice_vlan = 0;
+            $is_voice_vlan = false;
             // Ignore reserved VLAN IDs
             if ($vlan->vlan_state && $vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
                 // collect BRIDGE-MIB in vlan context
@@ -1076,13 +1077,9 @@ class Cisco extends OS implements
                         if ($voice_vlan > 0 && $voice_vlan < 4095) {
                             $is_voice_vlan = true;
                         }
-                        else {
-                            $is_voice_vlan = false;
-                        }
                     }
                     $alreadyProcessed[$vlan_id][$ifindex] = 1; // We don't want to override it later
-                    // If $is_voice_vlan == 0 (false), use the $vlan_id (access vlan)
-                    // Otherwise use $voice_vlan
+                    // Access VLAN
                     $ports->push(new PortVlan([
                         'vlan' => $vlan_id,
                         'voice' => 0,
@@ -1093,7 +1090,7 @@ class Cisco extends OS implements
                         'untagged' => isset($isNative[$vlan_id][$ifindex]) && $isNative[$vlan_id][$ifindex] > 0,
                         'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device
                     ]));
-                    // Add another record if there is a voice vlan on this port
+                    // Add another record if there is a voice VLAN on this port
                     if ($is_voice_vlan) {
                         $ports->push(new PortVlan([
                             'vlan' => $voice_vlan,
@@ -1122,13 +1119,11 @@ class Cisco extends OS implements
                         $voice_vlan = $voice_vlans[$ifindex]['CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'];
                         if ($voice_vlan > 0 && $voice_vlan < 4095) {
                             $is_voice_vlan = true;
-                        }
-                        else {
+                        } else {
                             $is_voice_vlan = false;
                         }
                     }
-                    // If $is_voice_vlan == 0 (false), use the $vlan_id (access vlan)
-                    // Otherwise use $voice_vlan
+                    // Access VLAN
                     $ports->push(new PortVlan([
                         'vlan' => $vlan_id,
                         'voice' => 0,
@@ -1137,14 +1132,14 @@ class Cisco extends OS implements
                         'state' => 'unknown',
                         'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device,
                     ]));
-                    // Add another record if there is a voice vlan on this port
+                    // Add another record if there is a voice VLAN on this port
                     if ($is_voice_vlan) {
                         $ports->push(new PortVlan([
                             'vlan' => $voice_vlan,
                             'voice' => 1,
-                            'baseport' => $baseport,
-                            'untagged' => isset($isNative[$vlan_id][$ifindex]) && $isNative[$vlan_id][$ifindex] > 0,
-                            'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
+                            'baseport' => $this->bridgePortFromIfIndex($ifindex),
+                            'untagged' => $value,
+                            'state' => 'unknown',
                             'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device
                         ]));
                     }
