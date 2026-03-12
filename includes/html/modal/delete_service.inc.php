@@ -11,7 +11,6 @@
  * the source code distribution for details.
  */
 
-if (Auth::user()->hasGlobalAdmin()) {
     ?>
 
     <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
@@ -73,6 +72,3 @@ if (Auth::user()->hasGlobalAdmin()) {
             });
         });
     </script>
-    <?php
-}
-?>

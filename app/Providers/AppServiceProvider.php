@@ -85,7 +85,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Blade::if('config', fn ($key, $value = true) => LibrenmsConfig::get($key) == $value);
         Blade::if('notconfig', fn ($key) => ! LibrenmsConfig::get($key));
-        Blade::if('admin', fn () => auth()->check() && auth()->user()->isAdmin());
+        Blade::if('admin', fn () => auth()->check() && auth()->user()->hasRole('admin')); // TODO remove
 
         Blade::directive('deviceUrl', fn ($arguments) => "<?php echo \LibreNMS\Util\Url::deviceUrl($arguments); ?>");
 
@@ -245,18 +245,21 @@ class AppServiceProvider extends ServiceProvider
             return new ApiTokenGuard($userProvider, $request);
         });
 
-        Gate::define('global-admin', fn (User $user) => $user->hasAnyRole('admin', 'demo'));
         Gate::define('admin', fn (User $user) => $user->hasRole('admin'));
         Gate::define('global-read', fn (User $user) => $user->hasAnyRole('admin', 'global-read'));
-        Gate::define('device', fn (User $user, $device) => $user->canAccessDevice($device));
+        Gate::define('demo', fn (User $user) => $user->hasRole('demo'));
 
         // define super admin and global read
         Gate::before(function (User $user, string $ability) {
+            if ($ability === 'demo') {
+                return null; // defer to middleware
+            }
+
             if ($user->hasRole('admin')) {
                 return true;  // super admin
             }
 
-            if (in_array($ability, ['view', 'viewAny']) && $user->hasRole('global-read')) {
+            if ((str_ends_with($ability, 'view') || str_ends_with($ability, 'viewAny')) && $user->hasRole('global-read')) {
                 return true; // global read access
             }
 

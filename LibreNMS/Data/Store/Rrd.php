@@ -48,10 +48,8 @@ class Rrd extends BaseDatastore
 {
     private $disabled = false;
 
-    /** @var Proc */
-    private $sync_process;
-    /** @var Proc */
-    private $async_process;
+    private ?Proc $sync_process = null;
+    private ?Proc $async_process = null;
     /** @var string */
     private $rrd_dir;
     /** @var string */

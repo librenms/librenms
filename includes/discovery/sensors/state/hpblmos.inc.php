@@ -16,7 +16,7 @@ foreach (explode("\n", $fans) as $fan) {
             $current_id = $split_oid[count($split_oid) - 1];
             $current_oid = $fan_state_oid . $current_id;
             $descr = $fan_state_descr . $current_id;
-            $state = snmp_get($device, $current_oid, '-Oqv');
+            $state = SnmpQuery::get($current_oid)->value();
             if (! empty($state)) {
                 $states = [
                     ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
@@ -47,7 +47,7 @@ foreach (explode("\n", $psus) as $psu) {
             $current_id = $split_oid[count($split_oid) - 1];
             $current_oid = $psu_state_oid . $current_id;
             $descr = $psu_state_descr . $current_id;
-            $state = snmp_get($device, $current_oid, '-Oqv');
+            $state = SnmpQuery::get($current_oid)->value();
             if (! empty($state)) {
                 $states = [
                     ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],

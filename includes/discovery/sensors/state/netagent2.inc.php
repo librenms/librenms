@@ -27,7 +27,7 @@
  * @author     Mikael Sipilainen <mikael.sipilainen@gmail.com>
  */
 $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.4.1.1.0';
-$ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
+$ups_state = SnmpQuery::get($ups_state_oid)->value();
 
 if (! empty($ups_state) || $ups_state == 0) {
     // UPS state OID (Value : 0-1 Unknown, 2 On Line, 3 On Battery, 4 On Boost, 5 Sleeping, 6 On Bypass, 7 Rebooting, 8 Standby, 9 On Buck )
@@ -61,13 +61,13 @@ if (! empty($ups_state) || $ups_state == 0) {
 // Detect type of UPS (Signle-Phase/3 Phase)
 // Number of input lines
 $upsInputNumLines_oid = '.1.3.6.1.2.1.33.1.3.2.0';
-$in_phaseNum = snmp_get($device, $upsInputNumLines_oid, '-Oqv');
+$in_phaseNum = SnmpQuery::get($upsInputNumLines_oid)->value();
 
 // 3 Phase system states
 if ($in_phaseNum == '3') {
     // In And Out
     $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.8.5.4.0';
-    $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
+    $ups_state = SnmpQuery::get($ups_state_oid)->value();
 
     if (! empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseDCandRectifierStatusInAndOut';
@@ -91,7 +91,7 @@ if ($in_phaseNum == '3') {
 
     // Back Status
     $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.8.5.5.0';
-    $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
+    $ups_state = SnmpQuery::get($ups_state_oid)->value();
 
     if (! empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseDCandRectifierStatusBatteryStatus';
@@ -115,7 +115,7 @@ if ($in_phaseNum == '3') {
 
     // Charge Status
     $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.8.5.6.0';
-    $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
+    $ups_state = SnmpQuery::get($ups_state_oid)->value();
 
     if (! empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseDCandRectifierStatusChargeStatus';
@@ -140,7 +140,7 @@ if ($in_phaseNum == '3') {
 
     // Bypass braker status
     $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.8.6.2.0';
-    $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
+    $ups_state = SnmpQuery::get($ups_state_oid)->value();
 
     if (! empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseUPSStatusManualBypassBreaker';
@@ -164,7 +164,7 @@ if ($in_phaseNum == '3') {
 
     // AC Status
     $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.8.6.3.0';
-    $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
+    $ups_state = SnmpQuery::get($ups_state_oid)->value();
 
     if (! empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseUPSStatusACStatus';
@@ -194,7 +194,7 @@ if ($in_phaseNum == '3') {
 
     // Inverter active
     $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.8.6.5.0';
-    $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
+    $ups_state = SnmpQuery::get($ups_state_oid)->value();
 
     if (! empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseUPSStatusInverterOperating';
@@ -214,7 +214,7 @@ if ($in_phaseNum == '3') {
 
     // Rectifier Operating
     $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.8.5.7.0';
-    $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
+    $ups_state = SnmpQuery::get($ups_state_oid)->value();
 
     if (! empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseDCandRectifierStatusRecOperating';
@@ -234,7 +234,7 @@ if ($in_phaseNum == '3') {
 
     // Switch Mode
     $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.8.6.4.0';
-    $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
+    $ups_state = SnmpQuery::get($ups_state_oid)->value();
 
     if (! empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseUPSStaticSwitchMode';
@@ -264,7 +264,7 @@ if ($in_phaseNum == '3') {
 
     // Rectifier Rotation Error
     $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.8.5.1.0';
-    $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
+    $ups_state = SnmpQuery::get($ups_state_oid)->value();
 
     if (! empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseDCandRectifierStatusRecRotError';
@@ -284,7 +284,7 @@ if ($in_phaseNum == '3') {
 
     // Bypass Status
     $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.8.6.1.0';
-    $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
+    $ups_state = SnmpQuery::get($ups_state_oid)->value();
 
     if (! empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseUPSStatusBypassFreqFail';
@@ -304,7 +304,7 @@ if ($in_phaseNum == '3') {
 
     // Short Circuit
     $ups_state_oid = '.1.3.6.1.4.1.935.1.1.1.8.7.7.0';
-    $ups_state = snmp_get($device, $ups_state_oid, '-Oqv');
+    $ups_state = SnmpQuery::get($ups_state_oid)->value();
 
     if (! empty($ups_state) || $ups_state == 0) {
         $state_name = 'upsThreePhaseFaultStatusShortCircuit';

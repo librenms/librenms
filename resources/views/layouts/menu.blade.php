@@ -36,7 +36,7 @@
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
-                        @if(auth()->user()->isAdmin() || $has_v1_plugins || $has_v2_plugins)
+                        @if(Gate::allows('plugin.admin') || $has_v1_plugins || $has_v2_plugins)
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> {{ __('Plugins') }}</a>
                             <ul class="dropdown-menu">
@@ -167,7 +167,7 @@
 
                         @admin
                         <li role="presentation" class="divider"></li>
-                        @can('manage', \App\Models\DeviceGroup::class)
+                        @can('viewAny', \App\Models\DeviceGroup::class)
                             <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('Manage Groups') }}
                                 </a></li>
@@ -326,7 +326,7 @@
                             <li><a href="{{ url('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
                                                               aria-hidden="true"></i> NAC</a></li>
                         @endif
-                        @if(auth()->user()->hasGlobalRead())
+                        @can('viewAny', \App\Models\Port::class)
                             @if($port_groups_exist)
                                 <li role="presentation" class="divider"></li>
                                 @config('int_customers')
@@ -365,7 +365,9 @@
                             @endif
 
                             <li role="presentation" class="divider"></li>
+                            @if(Gate::any(['create', 'update', 'delete'], \App\Models\PortGroup::class))
                             <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Manage Groups') }} </a></li>
+                            @endif
                             @if($port_groups->isNotEmpty())
                                 <li class="dropdown-submenu">
                                 <a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Port Groups') }}</a>
@@ -393,12 +395,14 @@
                                         aria-hidden="true"></i> {{ __('Disabled :port_count', ['port_count' => $port_counts['shutdown']]) }}
                                 </a></li>
 
+                            @can('delete', \App\Models\Port::class)
                             @if($port_counts['deleted'])
                                 <li><a href="{{ url('ports/deleted=1') }}"><i class="fa fa-minus-circle fa-fw fa-lg"
                                                                                 aria-hidden="true"></i> {{ __('Deleted :port_count', ['port_count' => $port_counts['deleted']]) }}
                                     </a></li>
                             @endif
-                        @endif
+                            @endcan
+                        @endcan
                     </ul>
                 </li>
 {{-- Sensors --}}
@@ -452,11 +456,13 @@
                 <ul class="dropdown-menu">
                     <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Services') }}</a>
                     </li>
+                    @can('viewAny', \App\Models\ServiceTemplate::class)
                     <li><a href="{{ route('services.templates.index') }}"><span class="fa-stack" aria-hidden="true" style="font-size: 12px">
                                   <i class="fa fa-square fa-stack-2x"></i>
                                   <i class="fa fa-cogs fa-stack-1x fa-inverse"></i>
                                 </span> {{ __('Services Templates') }}</a>
                     </li>
+                    @endcan
                     @if($service_counts['warning'] || $service_counts['critical'])
                         <li role="presentation" class="divider"></li>
                         @if($service_counts['warning'])

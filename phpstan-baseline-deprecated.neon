@@ -2652,15 +2652,6 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/airflow/geist-watchdog.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
 			count: 2
 			path: includes/discovery/sensors/charge/apc.inc.php
 
@@ -2672,15 +2663,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/charge/compas.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/discovery/sensors/charge/dsm.inc.php
 
 		-
 			message: '''
@@ -2702,33 +2684,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/charge/linux.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/charge/netagent2.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/charge/rfc1628.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -2744,24 +2699,6 @@ parameters:
 			identifier: function.deprecated
 			count: 4
 			path: includes/discovery/sensors/cisco-entity-sensor.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/count/christie-projector.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/count/cisco.inc.php
 
 		-
 			message: '''
@@ -2783,15 +2720,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/count/epson-projector.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -2801,30 +2729,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/count/sonicwall.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/count/webmon.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 26
-			path: includes/discovery/sensors/current/apc.inc.php
 
 		-
 			message: '''
@@ -2843,15 +2753,6 @@ parameters:
 			identifier: function.deprecated
 			count: 3
 			path: includes/discovery/sensors/current/apc.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/current/commander-plus.inc.php
 
 		-
 			message: '''
@@ -2882,48 +2783,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/current/fs-net-pdu.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/current/gamatronicups.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/current/ict-pdu.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/current/ict-pdu.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/current/ict-psu.inc.php
 
 		-
 			message: '''
@@ -2954,24 +2819,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/discovery/sensors/current/linux.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 4
-			path: includes/discovery/sensors/current/mgeups.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -2986,25 +2833,7 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
-			path: includes/discovery/sensors/current/netagent2.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
 			path: includes/discovery/sensors/current/netonix.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 15
-			path: includes/discovery/sensors/current/raritan-pdu.inc.php
 
 		-
 			message: '''
@@ -3017,30 +2846,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/current/rfc1628.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_group\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 3
 			path: includes/discovery/sensors/current/rfc1628.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/current/sitemonitor.inc.php
 
 		-
 			message: '''
@@ -3059,15 +2870,6 @@ parameters:
 			identifier: function.deprecated
 			count: 2
 			path: includes/discovery/sensors/dbm/fabos.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 16
-			path: includes/discovery/sensors/dbm/fs-nmu.inc.php
 
 		-
 			message: '''
@@ -3095,15 +2897,6 @@ parameters:
 			identifier: function.deprecated
 			count: 4
 			path: includes/discovery/sensors/entity-sensor.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/fanspeed/areca.inc.php
 
 		-
 			message: '''
@@ -3179,15 +2972,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/fanspeed/nos.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -3215,24 +2999,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/discovery/sensors/fanspeed/sgos.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 4
-			path: includes/discovery/sensors/fanspeed/supermicro.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -3275,15 +3041,6 @@ parameters:
 			identifier: function.deprecated
 			count: 2
 			path: includes/discovery/sensors/frequency/apc.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/frequency/eaton-ats.inc.php
 
 		-
 			message: '''
@@ -3314,30 +3071,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 4
-			path: includes/discovery/sensors/frequency/mgeups.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 2
 			path: includes/discovery/sensors/frequency/mgeups.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 6
-			path: includes/discovery/sensors/frequency/netagent2.inc.php
 
 		-
 			message: '''
@@ -3356,15 +3095,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/frequency/raritan-pdu.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/frequency/rfc1628.inc.php
 
 		-
 			message: '''
@@ -3386,15 +3116,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 32
-			path: includes/discovery/sensors/gw-eydfa.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -3410,24 +3131,6 @@ parameters:
 			identifier: function.deprecated
 			count: 4
 			path: includes/discovery/sensors/humidity/apc.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 5
-			path: includes/discovery/sensors/humidity/ipoman.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/humidity/liebert.inc.php
 
 		-
 			message: '''
@@ -3449,30 +3152,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 6
-			path: includes/discovery/sensors/humidity/minkelsrms.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/humidity/minkelsrms.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/humidity/pcoweb.inc.php
 
 		-
 			message: '''
@@ -3539,24 +3224,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/discovery/sensors/load/dsm.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 5
-			path: includes/discovery/sensors/load/netagent2.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_group\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -3593,15 +3260,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/power/dell-ups.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -3615,26 +3273,8 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 3
-			path: includes/discovery/sensors/power/dsm.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/power/eatonups.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/power/hpblmos.inc.php
 
 		-
 			message: '''
@@ -3656,15 +3296,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 7
-			path: includes/discovery/sensors/power/raritan-pdu.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -3680,15 +3311,6 @@ parameters:
 			identifier: function.deprecated
 			count: 3
 			path: includes/discovery/sensors/power/rfc1628.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/power/smartax.inc.php
 
 		-
 			message: '''
@@ -3761,15 +3383,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/pre-cache/aos-emu2.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/pre-cache/apc.inc.php
 
 		-
 			message: '''
@@ -3881,15 +3494,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/pre-cache/ifotec.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -3959,15 +3563,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/pre-cache/pbn.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/pre-cache/poweralert.inc.php
 
 		-
 			message: '''
@@ -4079,15 +3674,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/rittal-cmc-iii-sensors.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -4137,15 +3723,6 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/runtime/rfc1628.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
 			count: 3
 			path: includes/discovery/sensors/signal/cambium.inc.php
 
@@ -4155,7 +3732,7 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 4
+			count: 1
 			path: includes/discovery/sensors/signal/canopy.inc.php
 
 		-
@@ -4202,15 +3779,6 @@ parameters:
 			identifier: function.deprecated
 			count: 2
 			path: includes/discovery/sensors/state/aos6.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/state/apc.inc.php
 
 		-
 			message: '''
@@ -4268,24 +3836,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/state/ctm.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/state/dell.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -4340,48 +3890,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/state/extendair.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/discovery/sensors/state/fs-nmu.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/state/hp.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/state/hp.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/state/hpblmos.inc.php
 
 		-
 			message: '''
@@ -4430,15 +3944,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 13
-			path: includes/discovery/sensors/state/netagent2.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -4453,25 +3958,7 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
-			path: includes/discovery/sensors/state/pcoweb.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
 			path: includes/discovery/sensors/state/powervault.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/state/printer.inc.php
 
 		-
 			message: '''
@@ -4490,33 +3977,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/state/quanta.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/state/rfc1628.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/state/serveriron.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/state/sitemonitor.inc.php
 
 		-
 			message: '''
@@ -4547,30 +4007,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/temperature/aen.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/temperature/akcp.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/aos.inc.php
 
 		-
 			message: '''
@@ -4598,15 +4040,6 @@ parameters:
 			identifier: function.deprecated
 			count: 5
 			path: includes/discovery/sensors/temperature/apc.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/temperature/areca.inc.php
 
 		-
 			message: '''
@@ -4664,24 +4097,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/binos.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/binox.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -4691,30 +4106,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 8
-			path: includes/discovery/sensors/temperature/calix.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 4
 			path: includes/discovery/sensors/temperature/calix.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/cisco.inc.php
 
 		-
 			message: '''
@@ -4733,15 +4130,6 @@ parameters:
 			identifier: function.deprecated
 			count: 3
 			path: includes/discovery/sensors/temperature/ciscowlc.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/commander-plus.inc.php
 
 		-
 			message: '''
@@ -4769,15 +4157,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/temperature/dell.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/dhcpatriot.inc.php
 
 		-
 			message: '''
@@ -4826,24 +4205,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/ericsson-ml.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/temperature/extendair.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -4862,15 +4223,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/temperature/geist-watchdog.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -4880,30 +4232,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/hpblmos.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/temperature/hpblmos.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/hytera.inc.php
 
 		-
 			message: '''
@@ -4925,15 +4259,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/ies.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -4943,48 +4268,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 5
-			path: includes/discovery/sensors/temperature/ipoman.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/temperature/junose.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_multi_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/temperature/junose.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/lantronix-slc.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/temperature/liebert.inc.php
 
 		-
 			message: '''
@@ -4994,15 +4283,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/temperature/liebert.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 5
-			path: includes/discovery/sensors/temperature/linux.inc.php
 
 		-
 			message: '''
@@ -5024,57 +4304,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/temperature/microsemipdsine.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/mimosa.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 6
-			path: includes/discovery/sensors/temperature/minkelsrms.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/temperature/minkelsrms.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/netagent2.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 4
-			path: includes/discovery/sensors/temperature/netapp.inc.php
 
 		-
 			message: '''
@@ -5105,15 +4340,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/temperature/nos.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -5129,33 +4355,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/temperature/onefs.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/temperature/papouch-tme.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/pcoweb.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/temperature/powerconnect.inc.php
 
 		-
 			message: '''
@@ -5218,15 +4417,6 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
-			path: includes/discovery/sensors/temperature/rfc1628.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
 			path: includes/discovery/sensors/temperature/saf.inc.php
 
 		-
@@ -5237,24 +4427,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/temperature/sentry3.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/sentry4.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/temperature/seos.inc.php
 
 		-
 			message: '''
@@ -5271,35 +4443,8 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 3
-			path: includes/discovery/sensors/temperature/serveriron.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/discovery/sensors/temperature/sgos.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/temperature/siklu.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/discovery/sensors/temperature/sitemonitor.inc.php
 
 		-
 			message: '''
@@ -5330,39 +4475,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 5
-			path: includes/discovery/sensors/temperature/supermicro.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/temperature/supermicro.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/terra.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 5
-			path: includes/discovery/sensors/temperature/voss.inc.php
 
 		-
 			message: '''
@@ -5415,15 +4533,6 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/zxdsl.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
 			count: 7
 			path: includes/discovery/sensors/voltage/apc.inc.php
 
@@ -5444,15 +4553,6 @@ parameters:
 			identifier: function.deprecated
 			count: 2
 			path: includes/discovery/sensors/voltage/apc.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/voltage/areca.inc.php
 
 		-
 			message: '''
@@ -5488,15 +4588,6 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
-			path: includes/discovery/sensors/voltage/commander-plus.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
 			path: includes/discovery/sensors/voltage/compas.inc.php
 
 		-
@@ -5519,24 +4610,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 6
-			path: includes/discovery/sensors/voltage/dsm.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/voltage/eaton-ats.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -5555,66 +4628,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/voltage/fs-net-pdu.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/voltage/gamatronicups.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/voltage/geist-watchdog.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/voltage/hytera.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/voltage/hytera.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/voltage/ict-pdu.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/voltage/ict-psu.inc.php
 
 		-
 			message: '''
@@ -5627,30 +4646,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 8
-			path: includes/discovery/sensors/voltage/linux.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/voltage/linux.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 4
-			path: includes/discovery/sensors/voltage/mgeups.inc.php
 
 		-
 			message: '''
@@ -5660,24 +4661,6 @@ parameters:
 			identifier: function.deprecated
 			count: 2
 			path: includes/discovery/sensors/voltage/mgeups.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/voltage/microsemipdsine.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 15
-			path: includes/discovery/sensors/voltage/netagent2.inc.php
 
 		-
 			message: '''
@@ -5708,24 +4691,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/discovery/sensors/voltage/raritan-pdu.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/voltage/rfc1628.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_group\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -5750,24 +4715,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/discovery/sensors/voltage/siklu.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/discovery/sensors/voltage/sitemonitor.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/voltage/terra.inc.php
 
 		-
 			message: '''
@@ -6731,15 +5678,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/html/forms/parse-customoid.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/parse-poller-groups.inc.php
 
 		-
 			message: '''

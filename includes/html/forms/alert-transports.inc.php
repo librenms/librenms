@@ -23,12 +23,16 @@
  * @copyright  2018 Vivia Nguyen-Tran
  * @author     Vivia Nguyen-Tran <vivia@ualberta.ca>
  */
+
+use App\Models\AlertTransport;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::none(['create', 'update'], AlertTransport::class)) {
     exit(json_encode([
         'status' => 'error',
-        'message' => 'You need to be admin',
+        'message' => 'You need permisisson',
     ]));
 }
 
@@ -53,9 +57,11 @@ if (empty($name)) {
     ];
 
     if (is_numeric($transport_id) && $transport_id > 0) {
+        Gate::authorize('update', AlertTransport::class);
         // Update the fields -- json config field will be updated later
         dbUpdate($details, 'alert_transports', 'transport_id=?', [$transport_id]);
     } else {
+        Gate::authorize('create', AlertTransport::class);
         // Insert the new alert transport
         $newEntry = true;
         $transport_id = dbInsert($details, 'alert_transports');

@@ -24,10 +24,12 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
+use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('debug', Device::class)) {
     echo 'Insufficient Privileges';
     exit;
 }

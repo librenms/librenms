@@ -1,4 +1,3 @@
-var LibreNMS = {Date: {}};
 window.maps = {};
 
 function override_config(event, state, tmp_this) {
@@ -768,34 +767,3 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
-
-/**
- * Format a date or string into a localized string in the user's configured timezone.
- *
- * @param {string|Date} value Date object or time string (ISO8601 preferred)
- * @param {Object} options passed to Intl.DateTimeFormat()
- * @return {string}
- */
-LibreNMS.Date.format = function (value, options = {}) {
-    let defaults = {
-        dateStyle: "medium",
-        timeStyle: "medium",
-        timeZone: window.tz
-    };
-
-    let compositeOptions = {...defaults, ...options};
-
-    return new Intl.DateTimeFormat(navigator.language, compositeOptions).format(new Date(value));
-};
-
-/**
- * Convert a wall clock date to the user's configured timezone. (ignoring source timezone)
- * Use toISOString() if sending this time to the backend
- *
- * @param {Date} date
- * @return {Date}
- */
-LibreNMS.Date.inUserTz = function (date) {
-    // uses en-US for reliable parsing. Notably, toLocaleString omits tz information to allow conversion.
-    return new Date(date.toLocaleString('en-US', { timeZone: window.tz }));
-};

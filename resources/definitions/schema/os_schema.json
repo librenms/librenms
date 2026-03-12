@@ -495,6 +495,12 @@
                 "type": "string"
             }
         },
+        "ignore_vlans": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            }
+        },
         "bad_hrSystemUptime": {
             "type": "boolean"
         },

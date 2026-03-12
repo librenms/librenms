@@ -15,12 +15,13 @@
 
 use App\Facades\LibrenmsConfig;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
 
 $no_refresh = true;
 $param = [];
 $device_id = isset($vars['device']) ? (int) $vars['device'] : null;
 
-if (isset($vars['action']) && $vars['action'] == 'expunge' && \Auth::user()->hasGlobalAdmin()) {
+if (isset($vars['action']) && $vars['action'] == 'expunge' && Gate::allows('syslog.delete')) {
     \App\Models\Syslog::truncate();
     print_message('syslog truncated');
 }

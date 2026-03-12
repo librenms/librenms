@@ -2,9 +2,11 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Models\Vrf;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Rewrite;
 
-if (! Auth::user()->hasGlobalRead()) {
+if (Gate::denies('viewAny', Vrf::class)) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     $link_array = [
