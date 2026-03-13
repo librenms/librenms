@@ -439,6 +439,7 @@ class ConfigRepository
         $this->deprecatedVariable('poller_modules.cisco-sla', 'poller_modules.slas');
         $this->deprecatedVariable('discovery_modules.cisco-mac-accounting', 'discovery_modules.mac-accounting');
         $this->deprecatedVariable('poller_modules.cisco-mac-accounting', 'poller_modules.mac-accounting');
+        $this->deprecatedVariable('poller_modules.ipSystemStats', 'poller_modules.ip-system-stats');
         $this->deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         // migrate device display
