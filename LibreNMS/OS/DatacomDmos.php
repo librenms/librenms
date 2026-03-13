@@ -2,6 +2,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use App\Facades\PortCache;
 use App\Models\Mempool;
 use App\Models\Transceiver;
@@ -19,6 +20,24 @@ class DatacomDmos extends OS implements MempoolsDiscovery, ProcessorDiscovery, T
     private const MEM_TOTAL_OID = '.1.3.6.1.4.1.3709.3.6.4.2.2.1.26';
     private const MEM_USED_OID = '.1.3.6.1.4.1.3709.3.6.4.2.2.1.27';
     private const MEM_FREE_OID = '.1.3.6.1.4.1.3709.3.6.4.2.2.1.28';
+
+    public function discoverOS(Device $device): void
+    {
+        parent::discoverOS($device);
+
+        $module = $this->findPrimaryModule();
+        if ($module === null) {
+            return;
+        }
+
+        if (empty($device->features) && ! empty($module['name'])) {
+            $device->features = $module['name'];
+        }
+
+        if (empty($device->serial) && ! empty($module['serial'])) {
+            $device->serial = $module['serial'];
+        }
+    }
 
     public function discoverProcessors()
     {
@@ -124,6 +143,46 @@ class DatacomDmos extends OS implements MempoolsDiscovery, ProcessorDiscovery, T
     private function isTransceiverSupportedHardware(): bool
     {
         return stripos((string) ($this->getDevice()['hardware'] ?? ''), 'DM4370') !== false;
+    }
+
+    /**
+     * @return array{name: string, serial: string}|null
+     */
+    private function findPrimaryModule(): ?array
+    {
+        $entities = SnmpQuery::cache()
+            ->mibs(['ENTITY-MIB'])
+            ->hideMib()
+            ->walk([
+                'ENTITY-MIB::entPhysicalClass',
+                'ENTITY-MIB::entPhysicalName',
+                'ENTITY-MIB::entPhysicalSerialNum',
+            ])->table(1);
+
+        foreach ($entities as $entity) {
+            $class = (string) ($entity['entPhysicalClass'] ?? '');
+            $name = trim((string) ($entity['entPhysicalName'] ?? ''));
+            $serial = trim((string) ($entity['entPhysicalSerialNum'] ?? ''));
+
+            if ($class !== 'module' && $class !== '9') {
+                continue;
+            }
+
+            if ($name === '' || preg_match('/^(slot|psu)/i', $name)) {
+                continue;
+            }
+
+            if (preg_match('/port/i', $name)) {
+                continue;
+            }
+
+            return [
+                'name' => $name,
+                'serial' => $serial,
+            ];
+        }
+
+        return null;
     }
 
     private function extractValidatedIndex(string $oid, string $baseOid): ?string
