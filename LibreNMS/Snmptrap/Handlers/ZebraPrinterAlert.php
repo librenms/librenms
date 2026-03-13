@@ -44,7 +44,7 @@ class ZebraPrinterAlert implements SnmptrapHandler
         $message = $trap->getOidData('ESI-MIB::psOutput.7');
         $severity = $this->getSeverity($message);
 
-        $trap->log($message, $severity, 'printer');
+        $trap->log($message, $severity);
     }
 
     private function getSeverity(string $message): Severity
@@ -61,7 +61,7 @@ class ZebraPrinterAlert implements SnmptrapHandler
             return Severity::Info;
         }
 
-        if (preg_match('/PQ JOB COMPLETED|LABEL READY|POWER ON|COLD START|RIBBON IN|Druckauftr Fertg/', $message)) {
+        if (preg_match('/PQ JOB COMPLETED|LABEL READY|POWER ON|COLD START|RIBBON IN|Druckauftr Fertg|Eingeschaltet|KALTSTART/', $message)) {
             return Severity::Ok;
         }
 

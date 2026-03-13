@@ -215,24 +215,22 @@ class Ospf implements Module
 
             Log::info('Total TOS metrics: ' . $ospf_tos_metrics->count());
 
-            if ($instance_count) {
-                // Create device-wide statistics RRD
-                $rrd_def = RrdDefinition::make()
-                    ->addDataset('instances', 'GAUGE', 0, 1000000)
-                    ->addDataset('areas', 'GAUGE', 0, 1000000)
-                    ->addDataset('ports', 'GAUGE', 0, 1000000)
-                    ->addDataset('neighbours', 'GAUGE', 0, 1000000);
+            // Create device-wide statistics RRD
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('instances', 'GAUGE', 0, 1000000)
+                ->addDataset('areas', 'GAUGE', 0, 1000000)
+                ->addDataset('ports', 'GAUGE', 0, 1000000)
+                ->addDataset('neighbours', 'GAUGE', 0, 1000000);
 
-                $fields = [
-                    'instances' => $instance_count,
-                    'areas' => $ospf_areas->count(),
-                    'ports' => $ospf_ports->count(),
-                    'neighbours' => $ospf_neighbours->count(),
-                ];
+            $fields = [
+                'instances' => $instance_count,
+                'areas' => $ospf_areas->count(),
+                'ports' => $ospf_ports->count(),
+                'neighbours' => $ospf_neighbours->count(),
+            ];
 
-                $tags = ['rrd_def' => $rrd_def];
-                $datastore->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
-            }
+            $tags = ['rrd_def' => $rrd_def];
+            $datastore->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
         }
     }
 

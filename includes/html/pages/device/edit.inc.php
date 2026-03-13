@@ -1,12 +1,14 @@
 <?php
 
+use App\Models\Device;
+
 $no_refresh = true;
 
 $link_array = ['page' => 'device',
     'device' => $device['device_id'],
     'tab' => 'edit', ];
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', Device::class)) {
     print_error('Insufficient Privileges');
 } else {
     $panes['device'] = 'Device Settings';

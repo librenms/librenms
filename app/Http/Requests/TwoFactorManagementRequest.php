@@ -41,6 +41,6 @@ class TwoFactorManagementRequest extends FormRequest
         $auth_user = auth()->user();
 
         // don't allow admins to bypass security for themselves
-        return $auth_user->isAdmin() && ! $auth_user->is($user);
+        return $auth_user->can('update', $user) && $auth_user->isNot($user);
     }
 }

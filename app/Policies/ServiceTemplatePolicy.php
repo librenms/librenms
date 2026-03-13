@@ -4,11 +4,10 @@ namespace App\Policies;
 
 use App\Models\ServiceTemplate;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ServiceTemplatePolicy
 {
-    use HandlesAuthorization;
+    use ChecksGlobalPermissions;
 
     /**
      * Determine whether the user can view any service templates.
@@ -17,7 +16,7 @@ class ServiceTemplatePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasGlobalRead();
+        return $this->hasGlobalPermission($user, 'viewAny');
     }
 
     /**
@@ -28,7 +27,7 @@ class ServiceTemplatePolicy
      */
     public function view(User $user, ServiceTemplate $template): bool
     {
-        return $this->viewAny($user);
+        return $this->hasGlobalPermission($user, 'view');
     }
 
     /**
@@ -38,7 +37,7 @@ class ServiceTemplatePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasGlobalAdmin();
+        return $this->hasGlobalPermission($user, 'create');
     }
 
     /**
@@ -49,7 +48,7 @@ class ServiceTemplatePolicy
      */
     public function update(User $user, ServiceTemplate $template): bool
     {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -60,51 +59,6 @@ class ServiceTemplatePolicy
      */
     public function delete(User $user, ServiceTemplate $template): bool
     {
-        return $user->isAdmin();
-    }
-
-    /**
-     * Determine whether the user can restore the service template.
-     *
-     * @param  User  $user
-     * @param  ServiceTemplate  $template
-     */
-    public function restore(User $user, ServiceTemplate $template): bool
-    {
-        return $user->hasGlobalAdmin();
-    }
-
-    /**
-     * Determine whether the user can permanently delete the service template.
-     *
-     * @param  User  $user
-     * @param  ServiceTemplate  $template
-     */
-    public function forceDelete(User $user, ServiceTemplate $template): bool
-    {
-        return $user->isAdmin();
-    }
-
-    /**
-     * Determine whether the user can view the stored configuration of the service template
-     * from Oxidized or Rancid
-     *
-     * @param  User  $user
-     * @param  ServiceTemplate  $template
-     */
-    public function showConfig(User $user, ServiceTemplate $template): bool
-    {
-        return $user->isAdmin();
-    }
-
-    /**
-     * Determine whether the user can update service template notes.
-     *
-     * @param  User  $user
-     * @param  ServiceTemplate  $template
-     */
-    public function updateNotes(User $user, ServiceTemplate $template): bool
-    {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'delete');
     }
 }

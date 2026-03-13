@@ -120,7 +120,7 @@ class Mpls implements Module
                 $lsps = $this->syncModels($device, 'mplsLsps', $os->pollMplsLsps());
             }
 
-            if ($device->mplsLspPaths()->exists()) {
+            if (isset($lsps) && $device->mplsLspPaths()->exists()) {
                 ModuleModelObserver::observe(\App\Models\MplsLspPath::class, 'MPLS LSP Paths');
                 $paths = $this->syncModels($device, 'mplsLspPaths', $os->pollMplsPaths($lsps));
                 ModuleModelObserver::done();
@@ -138,25 +138,25 @@ class Mpls implements Module
                 ModuleModelObserver::done();
             }
 
-            if ($device->mplsSaps()->exists() && isset($svcs)) {
+            if (isset($svcs) && $device->mplsSaps()->exists()) {
                 ModuleModelObserver::observe(\App\Models\MplsSap::class, 'MPLS SAPs');
                 $this->syncModels($device, 'mplsSaps', $os->pollMplsSaps($svcs));
                 ModuleModelObserver::done();
             }
 
-            if ($device->mplsSdpBinds()->exists() && isset($sdps, $svcs)) {
+            if (isset($sdps, $svcs) && $device->mplsSdpBinds()->exists()) {
                 ModuleModelObserver::observe(\App\Models\MplsSdpBind::class, 'MPLS SDP Bindings');
                 $this->syncModels($device, 'mplsSdpBinds', $os->pollMplsSdpBinds($sdps, $svcs));
                 ModuleModelObserver::done();
             }
 
-            if ($device->mplsTunnelArHops()->exists()) {
+            if (isset($paths) && $device->mplsTunnelArHops()->exists()) {
                 ModuleModelObserver::observe(\App\Models\MplsTunnelArHop::class, 'MPLS Tunnel Active Routing Hops');
                 $this->syncModels($device, 'mplsTunnelArHops', $os->pollMplsTunnelArHops($paths));
                 ModuleModelObserver::done();
             }
 
-            if ($device->mplsTunnelCHops()->exists()) {
+            if (isset($paths) && $device->mplsTunnelCHops()->exists()) {
                 ModuleModelObserver::observe(\App\Models\MplsTunnelCHop::class, 'MPLS Tunnel Constrained Shortest Path First Hops');
                 $this->syncModels($device, 'mplsTunnelCHops', $os->pollMplsTunnelCHops($paths));
                 ModuleModelObserver::done();

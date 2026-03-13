@@ -24,8 +24,11 @@
  * @author     Aaron Daniels <aaron@daniels.id.au>
  */
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    exit('ERROR: You need to be admin');
+use App\Models\Service;
+use Illuminate\Support\Facades\Gate;
+
+if (Gate::none(['create', 'update'], Service::class)) {
+    exit('ERROR: You need to have permission');
 }
 
 foreach (['desc', 'name'] as $varname) {
@@ -48,6 +51,7 @@ foreach (['stype', 'device_id', 'service_id'] as $varname) {
 }
 
 if (is_numeric($service_id) && $service_id > 0) {
+    Gate::authorize('update', Service::class);
     // Need to edit.
     if (is_numeric(edit_service($update, $service_id))) {
         $status = ['status' => 0, 'message' => 'Modified Service: <i>' . $service_id . ': ' . $stype . '</i>'];
@@ -55,6 +59,7 @@ if (is_numeric($service_id) && $service_id > 0) {
         $status = ['status' => 1, 'message' => 'ERROR: Failed to modify service: <i>' . $service_id . '</i>'];
     }
 } else {
+    Gate::authorize('create', Service::class);
     // Need to add.
     $service_id = add_service($device_id, $stype, $desc, $ip, $param, $ignore, $disabled, 0, $name);
     if ($service_id == false) {

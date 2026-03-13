@@ -24,7 +24,7 @@
  * @author     Cedric MARMONIER
  */
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
-    $pre_cache['ifoSysProductIndex'] = snmp_get($device, 'ifoSysProductIndex.0', '-Oqv', 'IFOTEC-SMI');
+    $pre_cache['ifoSysProductIndex'] = SnmpQuery::get('IFOTEC-SMI::ifoSysProductIndex.0')->value();
 
     if ($pre_cache['ifoSysProductIndex'] != null) {
         $virtual_tables = [

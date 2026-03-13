@@ -16,7 +16,7 @@ class DenyDemoUser
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user()->isDemo()) {
+        if ($request->user()->can('demo')) {
             return response()->view('auth.deny-demo');
         }
 

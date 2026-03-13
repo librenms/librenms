@@ -52,8 +52,8 @@ class WirelessSensor
      * @param  int|float  $low_limit  Alerting: Minimum value
      * @param  int|float  $high_warn  Alerting: High warning value
      * @param  int|float  $low_warn  Alerting: Low warning value
-     * @param  int|float  $entPhysicalIndex  The entPhysicalIndex this sensor is associated, often a port
-     * @param  int|float  $entPhysicalMeasured  the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
+     * @param  string|int|null  $entPhysicalIndex  The entPhysicalIndex this sensor is associated, often a port
+     * @param  string|null  $entPhysicalMeasured  the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
      */
     public function __construct(
         protected WirelessSensorType $type,

@@ -12,10 +12,13 @@
  * the source code distribution for details.
  */
 
+use App\Models\AlertTemplate;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: text/plain');
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    exit('ERROR: You need to be admin');
+if (Gate::denies('delete', AlertTemplate::class)) {
+    exit('ERROR: You need permission');
 }
 
 if (! is_numeric($_POST['template_id'])) {
