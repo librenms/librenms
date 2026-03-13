@@ -88,23 +88,15 @@ class Services implements Module
             143 => 'imap',
         ];
 
-        $oids = SnmpQuery::enumStrings()->walk('TCP-MIB::tcpConnState')->values();
-        if (empty($oids)) {
-            return;
-        }
-
-        foreach ($oids as $data => $tcpstatus) {
-            preg_match('/\[(\d+)\]/', (string) $data, $matches);
-            if ($tcpstatus != 'listen') {
-                continue;
+        SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpConnState')->mapTable(function ($tcpConnState, $tcpConnLocalAddress, $tcpConnLocalPort, $tcpConnRemAddress, $tcpConnRemPort) use ($device, $known_services) {
+            if (empty($tcpConnState['tcpConnState']) || $tcpConnState['tcpConnState'] != 'listen') {
+                return null;
             }
 
-            $tcp_port = $matches[1] ?? null;
-
-            if ($tcp_port !== null && isset($known_services[$tcp_port])) {
-                ServicesHelper::discover($device, $known_services[$tcp_port]);
+            if ($tcpConnLocalPort !== null && isset($known_services[$tcpConnLocalPort])) {
+                ServicesHelper::discover($device, $known_services[$tcpConnLocalPort]);
             }
-        }
+        });
     }
 
     /**
