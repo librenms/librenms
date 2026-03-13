@@ -94,7 +94,7 @@ class Services implements Module
         }
 
         foreach ($oids as $data => $tcpstatus) {
-            preg_match('/\[(\d+)\]/', $data, $matches);
+            preg_match('/\[(\d+)\]/', (string) $data, $matches);
             if ($tcpstatus != 'listen') {
                 continue;
             }
