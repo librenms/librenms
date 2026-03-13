@@ -11,17 +11,17 @@
 
 1: Fetch the script in question and make it executable.
 
-    ```bash
+```bash
     wget https://github.com/librenms/librenms-agent/raw/master/snmp/xcp-ng-vminfo -O /etc/snmp/xcp-ng-vminfo
     chmod +x /etc/snmp/xcp-ng-vminfo
-    ```
+```
 
 3: Add the following to `/etc/snmp/snmpd.conf` and restart snmpd.
 
-    ```bash
+```
     pass_persist .1.3.6.1.4.1.60652.100 /bin/bash /etc/snmp/xcp-ng-vminfo
-    ```
+```
 
-    ```
+```bash
     systemctl restart snmpd
-    ```
+```
