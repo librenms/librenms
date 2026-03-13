@@ -278,7 +278,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         //   - SNMP version is v1/2c OR v3 with AES OR v3 with DES
         if (class_exists('\SNMP') && ($this->device->transport ?? 'udp') === 'udp' && ($this->device->snmpver !== 'v3' || $this->device->cryptoalgo === 'AES' || $this->device->cryptoalgo === 'DES')) {
             $measure = Measurement::start('Phpget');
-            $ret = new SnmpResponse(...Concurrency::driver('fork')->run( fn() => $this->getPhpSnmp($oid)));
+            $ret = new SnmpResponse(...Concurrency::driver('fork')->run(fn () => $this->getPhpSnmp($oid)));
             $measure->manager()->recordSnmp($measure->end());
 
             return $ret;
@@ -364,7 +364,7 @@ class NetSnmpQuery implements SnmpQueryInterface
             $response = $response->append(new SnmpResponse($res_str, $errors, $errors ? 1 : 0));
 
             if ($this->abort && ! $response->isValid()) {
-                $oid_list = implode(',', array_map( fn($group) => is_array($group) ? implode(',', $group) : $group, $oidgroup));
+                $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oidgroup));
                 Log::info("SNMP failed getting $oid_list aborting.");
 
                 return $response;
