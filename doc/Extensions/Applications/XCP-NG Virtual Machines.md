@@ -3,6 +3,7 @@
 
 !!! note
     This requires the vminfo discovery and polling module to be enabled, it is NOT detected under applications.
+    You also need to have the distro script setup in snmpd.conf as detailed in the example [Linux snmpd config](../../Support/SNMP-Configuration-Examples.md#linux-snmpd-v2)
 
 !!! note
     Only snmp is supported.
