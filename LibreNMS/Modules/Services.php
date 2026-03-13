@@ -149,4 +149,3 @@ class Services implements Module
         return null; // no database dump support for services module
     }
 }
-
