@@ -45,7 +45,7 @@ if ($_REQUEST['action'] == 'read' && isset($_REQUEST['notification_id'])) {
         ]));
     }
 } elseif ($_REQUEST['action'] == 'read-all-notif') {
-    $unread = dbFetchColumn("SELECT `notifications_id` FROM `notifications` AS N WHERE NOT EXISTS ( SELECT 1 FROM `notifications_attribs` WHERE `notifications_id` = N.`notifications_id` AND `user_id`=? AND `key`='read' AND `value`=1)", [Auth::id()]);
+    $unread = \App\Models\Notification::isUnread(Auth::user())->pluck('notifications_id');
     foreach ($unread as $notification_id) {
         dbInsert(
             [

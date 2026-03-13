@@ -12,6 +12,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\StateTranslation;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
@@ -574,7 +575,7 @@ function lock_and_purge_query($table, $sql, $msg)
     }
     $lock = Cache::lock($purge_name, 86000);
     if ($lock->get()) {
-        if (dbQuery($sql, [$purge_duration])) {
+        if (DB::statement($sql, [$purge_duration])) {
             printf($msg, $purge_duration);
         }
         $lock->release();

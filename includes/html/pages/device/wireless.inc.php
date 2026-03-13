@@ -6,10 +6,10 @@ use LibreNMS\Util\Number;
 // this determines the order of the tabs
 $types = WirelessSensor::getTypes();
 
-$sensors = dbFetchColumn(
-    'SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? GROUP BY `sensor_class`',
-    [$device['device_id']]
-);
+$sensors = \App\Models\WirelessSensor::where('device_id', $device['device_id'])
+    ->distinct()
+    ->pluck('sensor_class')
+    ->all();
 $datas = array_intersect(array_keys($types), $sensors);
 
 $wireless_link_array = [
