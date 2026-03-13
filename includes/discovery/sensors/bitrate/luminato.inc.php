@@ -72,7 +72,7 @@ if (! empty($oids)) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'bitrate',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Bitrate,
                 'sensor_oid' => $oid,
                 'sensor_index' => $index,
                 'sensor_type' => 'Transfer_' . $mname,

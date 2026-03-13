@@ -24,4 +24,4 @@
  * @author     Frederik Kriewitz <frederik@kriewitz.eu>
  */
 $os->discoverSwitchTemperatureSensors();
-$os->discoverTransceiverSensors(['temperature']);
+$os->discoverTransceiverSensors([\LibreNMS\Enum\Sensor::Temperature]);

@@ -14,7 +14,7 @@ foreach ($biasTable as $ifIndex => $current) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'current',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Current,
                 'sensor_oid' => ".1.3.6.1.4.1.52642.1.37.1.10.4.1.5.$ifIndex",
                 'sensor_index' => "$ifIndex.$channel",
                 'sensor_type' => 'fs-centec',

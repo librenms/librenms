@@ -23,7 +23,7 @@ if ($oidsEnv[0]['ipmEnvEmdStatusEmdType'] == 'eMD-HT') {
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
             'poller_type' => 'snmp',
-            'sensor_class' => 'humidity',
+            'sensor_class' => \LibreNMS\Enum\Sensor::Humidity,
             'sensor_oid' => $oid,
             'sensor_index' => 1,
             'sensor_type' => 'ipoman',

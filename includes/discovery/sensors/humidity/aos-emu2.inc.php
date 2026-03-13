@@ -43,7 +43,7 @@ foreach ($oids as $temp) {
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
             'poller_type' => 'snmp',
-            'sensor_class' => 'humidity',
+            'sensor_class' => \LibreNMS\Enum\Sensor::Humidity,
             'sensor_oid' => $oid,
             'sensor_index' => $index,
             'sensor_type' => 'aos-emu2',

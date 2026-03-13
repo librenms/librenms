@@ -6,7 +6,7 @@ $battery_temp = SnmpQuery::get('UPS-MIB::upsBatteryTemperature.0')->value();
 if (is_numeric($battery_temp)) {
     discover_sensor(
         null,
-        'temperature',
+        $sensor_class,
         $device,
         '.1.3.6.1.2.1.33.1.2.7.0',
         0,

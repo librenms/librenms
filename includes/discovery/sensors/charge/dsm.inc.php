@@ -25,5 +25,5 @@ $ups_device_model = str_replace('"', '', SnmpQuery::get($ups_device_model_oid)->
 $ups_charge_oid = '.1.3.6.1.4.1.6574.4.3.1.1.0';
 $ups_charge = SnmpQuery::get($ups_charge_oid)->value();
 if (is_numeric($ups_charge)) {
-    discover_sensor(null, 'charge', $device, $ups_charge_oid, 'UPSChargeValue', $ups_device_manufacturer . ' ' . $ups_device_model, 'UPS Charge Value', 1, 1, 0, 10, null, null, $ups_charge);
+    discover_sensor(null, \LibreNMS\Enum\Sensor::Charge, $device, $ups_charge_oid, 'UPSChargeValue', $ups_device_manufacturer . ' ' . $ups_device_model, 'UPS Charge Value', 1, 1, 0, 10, null, null, $ups_charge);
 }

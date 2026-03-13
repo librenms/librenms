@@ -51,7 +51,7 @@ if (! empty($eltexPhyTransceiverDiagnosticTable['temperature'])) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'temperature',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Temperature,
                 'sensor_oid' => $oid,
                 'sensor_index' => 'SfpTemp' . $ifIndex,
                 'sensor_type' => 'ELTEX-PHY-MIB',

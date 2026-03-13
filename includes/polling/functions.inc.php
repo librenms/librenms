@@ -51,6 +51,7 @@ function poll_sensor($device, $class)
     }
 
     $snmp_data = bulk_sensor_snmpget($device, $sensors);
+    $isState = Sensor::tryFrom($class) === Sensor::State;
 
     foreach ($sensors as $sensor) {
         Log::info('Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... ');
@@ -65,7 +66,7 @@ function poll_sensor($device, $class)
                 require LibrenmsConfig::get('install_dir') . '/includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
             }
 
-            if ($class == 'state') {
+            if ($isState) {
                 if (! is_numeric($sensor_value)) {
                     $state_value = dbFetchCell(
                         'SELECT `state_value`
@@ -121,8 +122,13 @@ function poll_sensor($device, $class)
 function record_sensor_data($device, $all_sensors)
 {
     foreach ($all_sensors as $sensor) {
-        $class = trans('sensors.' . $sensor['sensor_class'] . '.short');
-        $unit = Sensor::from($sensor['sensor_class'])->unit();
+        $sensorEnum = Sensor::tryFrom($sensor['sensor_class']);
+        if ($sensorEnum === null) {
+            Log::error("Unknown sensor_class '{$sensor['sensor_class']}' for sensor_id {$sensor['sensor_id']}, skipping");
+            continue;
+        }
+        $class = $sensorEnum->shortLabel();
+        $unit = $sensorEnum->unit();
         $sensor_value = Number::extract($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
 
@@ -175,7 +181,7 @@ function record_sensor_data($device, $all_sensors)
             echo 'Alerting for ' . $device['hostname'] . ' ' . $sensor['sensor_descr'] . "\n";
             Eventlog::log("$class above threshold: $sensor_value $unit (> {$sensor['sensor_limit']} $unit)", $device['device_id'], $sensor['sensor_class'], Severity::Warning, $sensor['sensor_id']);
         }
-        if ($sensor['sensor_class'] == 'state' && $prev_sensor_value != $sensor_value) {
+        if ($sensorEnum === Sensor::State && $prev_sensor_value != $sensor_value) {
             $trans = array_column(
                 dbFetchRows(
                     'SELECT `state_translations`.`state_value`, `state_translations`.`state_descr` FROM `sensors_to_state_indexes` LEFT JOIN `state_translations` USING (`state_index_id`) WHERE `sensors_to_state_indexes`.`sensor_id`=? AND `state_translations`.`state_value` IN (?,?)',

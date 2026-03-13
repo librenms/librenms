@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 echo 'ServerIron States';
 
 // All those states are : (Value: 1 Other, 2 Normal, 3 failure) (Power Supply and Fans)
@@ -9,7 +11,7 @@ for ($i = 1; $i != 3; $i++) {
     $power_oid = '.1.3.6.1.4.1.1991.1.1.1.2.1.1.3.' . $i;
     $power_status = SnmpQuery::get($power_oid)->value();
     if (! empty($power_status)) {
-        discover_sensor(null, 'state', $device, $power_oid, 'powerstatus' . $i, 'snmp', 'Power Supply ' . $i . ' Status', 1, 1, '1', null, null, '3', $power_status);
+        discover_sensor(null, SensorEnum::State, $device, $power_oid, 'powerstatus' . $i, 'snmp', 'Power Supply ' . $i . ' Status', 1, 1, '1', null, null, '3', $power_status);
     }
 }
 
@@ -18,6 +20,6 @@ for ($i = 1; $i != 7; $i++) {
     $fan_oid = '.1.3.6.1.4.1.1991.1.1.1.3.1.1.3.' . $i;
     $fan_status = SnmpQuery::get($fan_oid)->value();
     if (! empty($fan_status)) {
-        discover_sensor(null, 'state', $device, $fan_oid, 'fanstatus' . $i, 'snmp', 'Fan ' . $i . ' Status', 1, 1, '1', null, null, '3', $fan_status);
+        discover_sensor(null, SensorEnum::State, $device, $fan_oid, 'fanstatus' . $i, 'snmp', 'Fan ' . $i . ' Status', 1, 1, '1', null, null, '3', $fan_status);
     }
 }

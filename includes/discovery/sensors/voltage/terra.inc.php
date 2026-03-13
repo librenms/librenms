@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 if ($device['os'] === 'terra') {
     $query = [
         ['sti410C', '.1.3.6.1.4.1.30631.1.9.1.1.5.0'],
@@ -11,7 +13,7 @@ if ($device['os'] === 'terra') {
             $value = SnmpQuery::get($row[1])->value();
             if (is_numeric($value)) {
                 $c = $value / 10;
-                discover_sensor(null, 'voltage', $device, $row[1], 0, $row[0], 'Supply voltage', 10, 1, null, null, null, null, $c);
+                discover_sensor(null, SensorEnum::Voltage, $device, $row[1], 0, $row[0], 'Supply voltage', 10, 1, null, null, null, null, $c);
             }
         }
     }

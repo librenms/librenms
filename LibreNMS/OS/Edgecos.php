@@ -35,6 +35,7 @@ use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
@@ -191,7 +192,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
      *
      * @return void
      */
-    public function discoverTransceiverSensors($types = ['dbm', 'current', 'temperature', 'voltage']): void
+    public function discoverTransceiverSensors(array $types = [SensorEnum::Dbm, SensorEnum::Current, SensorEnum::Temperature, SensorEnum::Voltage]): void
     {
         $mib = $this->findMib();
 
@@ -216,11 +217,11 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
 
         foreach ($table as $ifIndex => $data) {
             $ifName = PortCache::getNameFromIfIndex($ifIndex, $this->getDevice());
-            if (in_array('dbm', $types)) {
+            if (in_array(SensorEnum::Dbm, $types)) {
                 if (isset($data['portOpticalMonitoringInfoRxPower'])) {
                     app('sensor-discovery')->discover(new \App\Models\Sensor([
                         'poller_type' => 'snmp',
-                        'sensor_class' => 'dbm',
+                        'sensor_class' => SensorEnum::Dbm,
                         'sensor_oid' => "$portOpticalMonitoringInfoTableOidPrefix.1.6.$ifIndex",
                         'sensor_index' => "portOpticalMonitoringInfoRxPower.$ifIndex",
                         'sensor_type' => 'edgecos',
@@ -241,7 +242,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                 if (isset($data['portOpticalMonitoringInfoTxPower'])) {
                     app('sensor-discovery')->discover(new \App\Models\Sensor([
                         'poller_type' => 'snmp',
-                        'sensor_class' => 'dbm',
+                        'sensor_class' => SensorEnum::Dbm,
                         'sensor_oid' => "$portOpticalMonitoringInfoTableOidPrefix.1.5.$ifIndex",
                         'sensor_index' => "portOpticalMonitoringInfoTxPower.$ifIndex",
                         'sensor_type' => 'edgecos',
@@ -260,11 +261,11 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                 }
             }
 
-            if (in_array('current', $types)) {
+            if (in_array(SensorEnum::Current, $types)) {
                 if (isset($data['portOpticalMonitoringInfoTxBiasCurrent'])) {
                     app('sensor-discovery')->discover(new \App\Models\Sensor([
                         'poller_type' => 'snmp',
-                        'sensor_class' => 'current',
+                        'sensor_class' => SensorEnum::Current,
                         'sensor_oid' => "$portOpticalMonitoringInfoTableOidPrefix.1.4.$ifIndex",
                         'sensor_index' => "portOpticalMonitoringInfoTxBiasCurrent.$ifIndex",
                         'sensor_type' => 'edgecos',
@@ -283,11 +284,11 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                 }
             }
 
-            if (in_array('temperature', $types)) {
+            if (in_array(SensorEnum::Temperature, $types)) {
                 if (isset($data['portOpticalMonitoringInfoTemperature'])) {
                     app('sensor-discovery')->discover(new \App\Models\Sensor([
                         'poller_type' => 'snmp',
-                        'sensor_class' => 'temperature',
+                        'sensor_class' => SensorEnum::Temperature,
                         'sensor_oid' => "$portOpticalMonitoringInfoTableOidPrefix.1.2.$ifIndex",
                         'sensor_index' => "portOpticalMonitoringInfoTemperature.$ifIndex",
                         'sensor_type' => 'edgecos',
@@ -306,11 +307,11 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                 }
             }
 
-            if (in_array('voltage', $types)) {
+            if (in_array(SensorEnum::Voltage, $types)) {
                 if (isset($data['portOpticalMonitoringInfoVcc'])) {
                     app('sensor-discovery')->discover(new \App\Models\Sensor([
                         'poller_type' => 'snmp',
-                        'sensor_class' => 'voltage',
+                        'sensor_class' => SensorEnum::Voltage,
                         'sensor_oid' => "$portOpticalMonitoringInfoTableOidPrefix.1.3.$ifIndex",
                         'sensor_index' => "portOpticalMonitoringInfoVcc.$ifIndex",
                         'sensor_type' => 'edgecos',
@@ -374,7 +375,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
             // create power state sensor
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'state',
+                'sensor_class' => SensorEnum::State,
                 'sensor_oid' => $powerStatusOidPrefix . '.' . $unit,
                 'sensor_index' => "$state_name.$unit",
                 'sensor_type' => $state_name,
@@ -389,7 +390,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
      *
      * @return void
      */
-    public function discoverFanSensors($types = ['fanspeed', 'state']): void
+    public function discoverFanSensors(array $types = [SensorEnum::Fanspeed, SensorEnum::State]): void
     {
         $mib = $this->findMib();
 
@@ -405,10 +406,10 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
 
         foreach ($table as $unit => $unitData) {
             foreach ($unitData as $index => $data) {
-                if (in_array('fanspeed', $types)) {
+                if (in_array(SensorEnum::Fanspeed, $types)) {
                     app('sensor-discovery')->discover(new \App\Models\Sensor([
                         'poller_type' => 'snmp',
-                        'sensor_class' => 'fanspeed',
+                        'sensor_class' => SensorEnum::Fanspeed,
                         'sensor_oid' => "$switchFanTableOidPrefix.1.6.$unit.$index",
                         'sensor_index' => "edgecos-switchFanOperSpeed.$unit.$index",
                         'sensor_type' => 'edgecos',
@@ -417,7 +418,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                     ]));
                 }
 
-                if (in_array('state', $types)) {
+                if (in_array(SensorEnum::State, $types)) {
                     //Create fan state Index
                     $state_name = 'edgecos-switchFanStatus';
                     $states = [
@@ -429,7 +430,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
                     // create fan state sensor
                     app('sensor-discovery')->discover(new \App\Models\Sensor([
                         'poller_type' => 'snmp',
-                        'sensor_class' => 'state',
+                        'sensor_class' => SensorEnum::State,
                         'sensor_oid' => "$switchFanTableOidPrefix.1.3.$unit.$index",
                         'sensor_index' => "$state_name.$unit.$index",
                         'sensor_type' => $state_name,
@@ -466,7 +467,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
             foreach ($unitData as $index => $data) {
                 app('sensor-discovery')->discover(new \App\Models\Sensor([
                     'poller_type' => 'snmp',
-                    'sensor_class' => 'temperature',
+                    'sensor_class' => SensorEnum::Temperature,
                     'sensor_oid' => "$switchThermalTempTableOidPrefix.1.3.$unit.$unit",
                     'sensor_index' => "edgecos-switchThermalTempValue.$unit.$index",
                     'sensor_type' => 'edgecos',

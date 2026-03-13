@@ -23,6 +23,7 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
+
 $divisor = 1000000;
 $multiplier = 1;
 
@@ -39,7 +40,7 @@ foreach ($oids as $ifIndex => $data) {
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
             'poller_type' => 'snmp',
-            'sensor_class' => 'voltage',
+            'sensor_class' => \LibreNMS\Enum\Sensor::Voltage,
             'sensor_oid' => $oid,
             'sensor_index' => 'SfpVolt' . $ifIndex,
             'sensor_type' => 'rlPhyTestTableTransceiverSupply',

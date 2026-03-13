@@ -30,7 +30,7 @@ foreach (explode("\n", $oids) as $data) {
             $lowlimit = SnmpQuery::get($lowlimit_oid)->value();
             $warnlowlimit = SnmpQuery::get($warnlowlimit_oid)->value();
 
-            discover_sensor(null, 'humidity', $device, $oid, $index, 'akcp', $descr, '1', '1', $lowlimit, $warnlowlimit, $limit, $warnlimit, $humidity);
+            discover_sensor(null, \LibreNMS\Enum\Sensor::Humidity, $device, $oid, $index, 'akcp', $descr, '1', '1', $lowlimit, $warnlowlimit, $limit, $warnlimit, $humidity);
         }
     }
 }

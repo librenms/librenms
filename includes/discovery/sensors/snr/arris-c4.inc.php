@@ -41,7 +41,7 @@ foreach ($oids as $index => $data) {
         if (preg_match('/.0$/', (string) $port?->ifName)) {
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'snr',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Snr,
                 'sensor_oid' => $oid,
                 'sensor_index' => 'docsIfSigQSignalNoise.' . $index,
                 'sensor_type' => 'cmts',

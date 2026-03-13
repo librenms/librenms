@@ -29,7 +29,7 @@ foreach ($oids as $index => $ciscosb_data) {
         if (is_numeric($current)) {
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'current',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Current,
                 'sensor_oid' => $oid,
                 'sensor_index' => $index,
                 'sensor_type' => 'rlPhyTestTableTxBias',

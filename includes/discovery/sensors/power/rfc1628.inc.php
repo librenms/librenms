@@ -25,7 +25,7 @@ foreach ($output_power as $index => $data) {
 
     discover_sensor(
         null,
-        'power',
+        $sensor_class,
         $device,
         $pwr_oid,
         300 + $index,
@@ -62,7 +62,7 @@ foreach ($input_power as $index => $data) {
 
     discover_sensor(
         null,
-        'power',
+        $sensor_class,
         $device,
         $pwr_oid,
         100 + $index,
@@ -99,7 +99,7 @@ foreach ($bypass_power as $index => $data) {
 
     discover_sensor(
         null,
-        'power',
+        $sensor_class,
         $device,
         $pwr_oid,
         200 + $index,

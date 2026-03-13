@@ -23,6 +23,9 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
+
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $divisor = 1;
 $multiplier = 100 * 1000;
 $limit = 60 * 1000 * 1000;  // 50 mbps
@@ -46,7 +49,7 @@ if (is_array($oids)) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'bitrate',
+                'sensor_class' => SensorEnum::Bitrate,
                 'sensor_oid' => $oid,
                 'sensor_index' => $inputid,
                 'sensor_type' => $type,
@@ -77,7 +80,7 @@ if (is_array($oids)) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'bitrate',
+                'sensor_class' => SensorEnum::Bitrate,
                 'sensor_oid' => $oid,
                 'sensor_index' => $outputid,
                 'sensor_type' => $type,

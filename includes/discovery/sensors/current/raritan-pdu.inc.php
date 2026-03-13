@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 /**
  * raritan.inc.php
  *
@@ -48,7 +50,7 @@ if ($outlet_oids) {
             $outlet_high_limit = SnmpQuery::get("PDU-MIB::outletCurrentUpperCritical.$outletsuffix")->value() / $divisor;
             $outlet_current = SnmpQuery::get("PDU-MIB::outletCurrent.$outletsuffix")->value() / $divisor;
             if ($outlet_current >= 0) {
-                discover_sensor(null, 'current', $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $divisor, $multiplier, $outlet_low_limit, $outlet_low_warn_limit, $outlet_high_warn_limit, $outlet_high_limit, $outlet_current);
+                discover_sensor(null, SensorEnum::Current, $device, $outlet_oid, $outlet_insert_index, 'raritan', $outlet_descr, $divisor, $multiplier, $outlet_low_limit, $outlet_low_warn_limit, $outlet_high_warn_limit, $outlet_high_limit, $outlet_current);
             }
         }
     }
@@ -66,6 +68,6 @@ foreach ($pre_cache['raritan_inletTable'] as $index => $raritan_data) {
         $warn_limit = isset($raritan_data['inletCurrentUpperWarning']) ? $raritan_data['inletCurrentUpperWarning'] / $divisor : null;
         $high_limit = isset($raritan_data['inletCurrentUpperCritical']) ? $raritan_data['inletCurrentUpperCritical'] / $divisor : null;
         $current = $pre_cache['raritan_inletPoleTable'][$index][$x]['inletPoleCurrent'] / $divisor;
-        discover_sensor(null, 'current', $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current);
+        discover_sensor(null, SensorEnum::Current, $device, $oid, $tmp_index, 'raritan', $descr, $divisor, 1, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current);
     }
 }

@@ -52,7 +52,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descrRx = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetNetPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetNetPortIfIndex']) . ' Rx Power';
             discover_sensor(
                 null,
-                'dbm',
+                $sensor_class,
                 $device,
                 $oidRx,
                 'cmEthernetNetPortStatsOPR.' . $index,
@@ -74,7 +74,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descrTx = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetNetPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetNetPortIfIndex']) . ' Tx Power';
             discover_sensor(
                 null,
-                'dbm',
+                $sensor_class,
                 $device,
                 $oidTx,
                 'cmEthernetNetPortStatsOPT.' . $index,
@@ -109,7 +109,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
 
             discover_sensor(
                 null,
-                'dbm',
+                $sensor_class,
                 $device,
                 $oidRx,
                 'cmEthernetAccPortStatsOPR.' . $index,
@@ -131,7 +131,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
 
             discover_sensor(
                 null,
-                'dbm',
+                $sensor_class,
                 $device,
                 $oidTx,
                 'cmEthernetAccPortStatsOPT.' . $index,
@@ -165,7 +165,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descrRx = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetTrafficPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetTrafficPortIfIndex']) . ' Rx Power';
             discover_sensor(
                 null,
-                'dbm',
+                $sensor_class,
                 $device,
                 $oidRx,
                 'cmEthernetTrafficPortStatsOPR.' . $index,
@@ -186,7 +186,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
             $descrTx = ($pre_cache['adva_fsp150_ifName'][$entry['cmEthernetTrafficPortIfIndex']]['ifName'] ?? 'ifIndex ' . $entry['cmEthernetTrafficPortIfIndex']) . ' Tx Power';
             discover_sensor(
                 null,
-                'dbm',
+                $sensor_class,
                 $device,
                 $oidTx,
                 'cmEthernetTrafficPortStatsOPT.' . $index,

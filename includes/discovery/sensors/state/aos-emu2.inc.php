@@ -25,6 +25,8 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 // Input Contact discovery
 $oids = SnmpQuery::walk([
     'PowerNet-MIB::emsInputContactStatusEntry',
@@ -54,7 +56,7 @@ foreach ($oids as $contact) {
 
     app('sensor-discovery')->discover(new \App\Models\Sensor([
         'poller_type' => 'snmp',
-        'sensor_class' => 'state',
+        'sensor_class' => SensorEnum::State,
         'sensor_oid' => $oid,
         'sensor_index' => $index,
         'sensor_type' => $state_name,
@@ -102,7 +104,7 @@ foreach ($oids as $relay) {
 
     app('sensor-discovery')->discover(new \App\Models\Sensor([
         'poller_type' => 'snmp',
-        'sensor_class' => 'state',
+        'sensor_class' => SensorEnum::State,
         'sensor_oid' => $oid,
         'sensor_index' => $index,
         'sensor_type' => $state_name,
@@ -150,7 +152,7 @@ foreach ($oids as $outlet) {
 
     app('sensor-discovery')->discover(new \App\Models\Sensor([
         'poller_type' => 'snmp',
-        'sensor_class' => 'state',
+        'sensor_class' => SensorEnum::State,
         'sensor_oid' => $oid,
         'sensor_index' => $index,
         'sensor_type' => $state_name,

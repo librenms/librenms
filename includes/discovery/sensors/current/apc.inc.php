@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 // PDU - Phase
 $oids = snmp_walk($device, 'rPDUStatusPhaseIndex', '-OsqnU', 'PowerNet-MIB');
 if (isset($oids) && $oids) {
@@ -39,7 +41,7 @@ if (isset($oids) && $oids) {
             } else {
                 $descr = 'Output';
             }
-            discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+            discover_sensor(null, SensorEnum::Current, $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
         }
     }
 }
@@ -86,7 +88,7 @@ if (isset($oids) && $oids) {
             } else {
                 $descr = 'Output';
             }
-            discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+            discover_sensor(null, SensorEnum::Current, $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
         }
     }
 }
@@ -130,7 +132,7 @@ if (isset($oids) && $oids) {
             $lowlimit = SnmpQuery::get($lowlimit_oid)->value();
             $warnlimit = SnmpQuery::get($warnlimit_oid)->value();
             if ($limit != -1 && $lowlimit != -1 && $warnlimit != -1) {
-                discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+                discover_sensor(null, SensorEnum::Current, $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
             }
         }
     }
@@ -177,7 +179,7 @@ if (isset($oids) && $oids) {
             }
 
             $descr = 'Outlet ' . $index . ' - ' . SnmpQuery::get($name_oid)->value();
-            discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+            discover_sensor(null, SensorEnum::Current, $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
         }
     }
 }
@@ -209,7 +211,7 @@ if (isset($oids) && $oids) {
     $warnlimit = SnmpQuery::get($warnlimit_oid)->value();
     // No / $precision here! Nice, APC!
     $descr = 'Output Feed';
-    discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+    discover_sensor(null, SensorEnum::Current, $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
 }
 unset($oids);
 
@@ -231,10 +233,10 @@ if (isset($in_oids)) {
         $in_index = '3.1.4.' . $index;
         if (substr((string) $index, 0, 1) == 2 && $data['upsPhaseInputCurrent'] != -1) {
             $descr = 'Phase ' . substr((string) $index, -1) . ' Bypass Input';
-            discover_sensor(null, 'current', $device, $current_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $current);
+            discover_sensor(null, SensorEnum::Current, $device, $current_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $current);
         } elseif (substr((string) $index, 0, 1) == 1) {
             $descr = 'Phase ' . substr((string) $index, -1) . ' Input';
-            discover_sensor(null, 'current', $device, $current_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $current);
+            discover_sensor(null, SensorEnum::Current, $device, $current_oid, $in_index, $type, $descr, $divisor, 0, null, null, null, null, $current);
         }
     }
 }
@@ -253,7 +255,7 @@ foreach ($oids as $index => $data) {
         $current = $data['upsPhaseOutputCurrent'] / $divisor;
     }
     if ($current >= -1) {
-        discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::Current, $device, $current_oid, $index, $type, $descr, $divisor, 1, null, null, null, null, $current);
     }
 }
 unset($index);

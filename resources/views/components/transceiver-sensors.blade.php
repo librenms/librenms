@@ -14,11 +14,11 @@
         <div style="height: 26px;">
             <x-popup>
                 <div class="tw:border-2">
-                    <x-graph :type="'sensor_' . $class" :vars="['id' => $sensor->sensor_id]" legend="yes" width="100" height="20"></x-graph>
+                    <x-graph :type="'sensor_' . $class->value" :vars="['id' => $sensor->sensor_id]" legend="yes" width="100" height="20"></x-graph>
                 </div>
                 <x-slot name="title">{{ $transceiver->port?->getLabel() }}</x-slot>
                 <x-slot name="body">
-                    <x-graph-row loading="lazy" :type="'sensor_' . $class" :vars="['id' => $sensor->sensor_id]" legend="yes"></x-graph-row>
+                    <x-graph-row loading="lazy" :type="'sensor_' . $class->value" :vars="['id' => $sensor->sensor_id]" legend="yes"></x-graph-row>
                 </x-slot>
             </x-popup>
         </div>

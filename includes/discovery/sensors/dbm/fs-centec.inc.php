@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Util\Number;
 
 $powerTables = SnmpQuery::walk('FS-SWITCH-V2-MIB::transReceivePowerTable')->table(1);
@@ -18,7 +19,7 @@ foreach ($powerTables as $ifIndex => $current) {
         foreach (explode(',', (string) $current['FS-SWITCH-V2-MIB::receivepowerCurrent']) as $channel => $value) {
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'dbm',
+                'sensor_class' => SensorEnum::Dbm,
                 'sensor_oid' => ".1.3.6.1.4.1.52642.1.37.1.10.6.1.5.$ifIndex",
                 'sensor_index' => "rx-$ifIndex.$channel",
                 'sensor_type' => 'fs-centec',
@@ -43,7 +44,7 @@ foreach ($powerTables as $ifIndex => $current) {
         foreach (explode(',', (string) $current['FS-SWITCH-V2-MIB::transpowerCurrent']) as $channel => $value) {
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'dbm',
+                'sensor_class' => SensorEnum::Dbm,
                 'sensor_oid' => ".1.3.6.1.4.1.52642.1.37.1.10.5.1.5.$ifIndex",
                 'sensor_index' => "tx-$ifIndex.$channel",
                 'sensor_type' => 'fs-centec',

@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Unit\Http\Parsers;
 
 use App\Http\Parsers\AlertLogDetailParser;
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Tests\TestCase;
 
 class AlertLogDetailParserTest extends TestCase
@@ -108,7 +109,7 @@ class AlertLogDetailParserTest extends TestCase
                 [
                     'device_id' => 1,
                     'sensor_id' => 456,
-                    'sensor_class' => 'temperature',
+                    'sensor_class' => SensorEnum::Temperature->value,
                     'sensor_current' => 35,
                     'sensor_limit' => 40,
                     'sensor_limit_warn' => 38,
@@ -137,7 +138,7 @@ class AlertLogDetailParserTest extends TestCase
                 [
                     'device_id' => 1,
                     'sensor_id' => 789,
-                    'sensor_class' => 'state',
+                    'sensor_class' => SensorEnum::State->value,
                     'sensor_current' => 2,
                     'state_descr' => 'Critical',
                     'state_value' => 2, // Used by StateTranslation if constructor receives it

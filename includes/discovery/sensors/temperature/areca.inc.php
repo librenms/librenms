@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
+
 $oids = snmp_walk($device, '.1.3.6.1.4.1.18928.1.1.2.14.1.2', '-Osqn', '');
 d_echo($oids . "\n");
 
@@ -18,7 +20,7 @@ foreach (explode("\n", $oids) as $data) {
         $temperature = SnmpQuery::get($temperature_oid)->value();
         $descr = "Hard disk $temperature_id";
         if ($temperature != -128) { // -128 = not measured/present
-            discover_sensor(null, 'temperature', $device, $temperature_oid, Str::padLeft($temperature_id, 2, '0'), 'areca', $descr, '1', '1', null, null, null, null, $temperature);
+            discover_sensor(null, SensorEnum::Temperature, $device, $temperature_oid, Str::padLeft($temperature_id, 2, '0'), 'areca', $descr, '1', '1', null, null, null, null, $temperature);
         }
     }
 }
@@ -41,6 +43,6 @@ foreach (explode("\n", (string) $oids) as $data) {
         $oid = '.1.3.6.1.4.1.18928.1.2.2.1.10.1.3.' . $index;
         $current = SnmpQuery::get($oid)->value();
 
-        discover_sensor(null, 'temperature', $device, $oid, $index, 'areca', trim($descr, '"'), '1', '1', null, null, null, null, $current);
+        discover_sensor(null, SensorEnum::Temperature, $device, $oid, $index, 'areca', trim($descr, '"'), '1', '1', null, null, null, null, $current);
     }
 }

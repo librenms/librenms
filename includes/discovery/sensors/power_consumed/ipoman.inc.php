@@ -22,7 +22,7 @@ foreach ($oidsPowOut as $index => $entry) {
 
     app('sensor-discovery')->discover(new \App\Models\Sensor([
         'poller_type' => 'snmp',
-        'sensor_class' => 'power_consumed',
+        'sensor_class' => \LibreNMS\Enum\Sensor::PowerConsumed,
         'sensor_oid' => $oid,
         'sensor_index' => $oid,
         'sensor_type' => 'ipoman',

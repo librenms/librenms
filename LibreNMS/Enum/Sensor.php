@@ -2,7 +2,6 @@
 
 namespace LibreNMS\Enum;
 
-use App\Models\UserPref;
 use LibreNMS\Traits\EnumToArray;
 
 enum Sensor: string
@@ -41,6 +40,11 @@ enum Sensor: string
     case Waterflow = 'waterflow';
     case SignalLoss = 'signal_loss';
 
+    public function shortLabel(): string
+    {
+        return __("sensors.$this->value.short");
+    }
+
     public function label(): string
     {
         return __("sensors.$this->value.long");
@@ -48,28 +52,12 @@ enum Sensor: string
 
     public function unit(): string
     {
-        if ($this === self::Temperature && $this->userPrefsFahrenheit()) {
-            return __('sensors.temperature.unit_f');
-        }
-
         return __("sensors.$this->value.unit");
     }
 
     public function unitLong(): string
     {
-        if ($this === self::Temperature && $this->userPrefsFahrenheit()) {
-            return __('sensors.temperature.unit_long_f');
-        }
-
         return __("sensors.$this->value.unit_long");
-    }
-
-    private function userPrefsFahrenheit(): bool
-    {
-        /** @var ?\App\Models\User $user */
-        $user = auth()->user();
-
-        return $user && UserPref::getPref($user, 'temp_units') == 'f';
     }
 
     public function icon(): string

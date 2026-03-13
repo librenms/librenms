@@ -12,7 +12,7 @@ foreach ($ponTable as $e7OltPonPortShelf => $ponShelf) {
 
                 app('sensor-discovery')->discover(new \App\Models\Sensor([
                     'poller_type' => 'snmp',
-                    'sensor_class' => 'voltage',
+                    'sensor_class' => \LibreNMS\Enum\Sensor::Voltage,
                     'sensor_oid' => ".1.3.6.1.4.1.6321.1.2.2.2.1.6.2.1.9.$index",
                     'sensor_index' => $index,
                     'sensor_type' => 'exa',

@@ -28,7 +28,7 @@ if (! empty($fgDhcpTables['fgDhcpLeaseUsage'])) {
 
             discover_sensor(
                 null,
-                'percent',
+                $sensor_class,
                 $device,
                 '.1.3.6.1.4.1.12356.101.23.2.1.1.2.' . $vdomID . '.' . $fgDhcpServerID,
                 'fgDhcpLeaseUsage.' . $vdomID . '.' . $fgDhcpServerID,

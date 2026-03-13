@@ -92,10 +92,10 @@ class ObjectCache
             foreach ($sensor_classes as $sensor_model) {
                 /** @var Sensor $sensor_model */
                 $class = $sensor_model->sensor_class;
-                if (in_array($class, ['fanspeed', 'humidity', 'temperature', 'signal'])) {
+                if (in_array($class, [SensorEnum::Fanspeed, SensorEnum::Humidity, SensorEnum::Temperature, SensorEnum::Signal])) {
                     // First group
                     $group = 0;
-                } elseif (in_array($class, ['current', 'frequency', 'power', 'voltage', 'power_factor', 'power_consumed'])) {
+                } elseif (in_array($class, [SensorEnum::Current, SensorEnum::Frequency, SensorEnum::Power, SensorEnum::Voltage, SensorEnum::PowerFactor, SensorEnum::PowerConsumed])) {
                     // Second group
                     $group = 1;
                 } else {
@@ -104,8 +104,8 @@ class ObjectCache
                 }
 
                 $sensor_menu[$group][] = [
-                    'class' => $class,
-                    'icon' => SensorEnum::from($class)->icon(),
+                    'class' => $class->value,
+                    'icon' => $class->icon(),
                     'descr' => $sensor_model->classDescr(),
                 ];
             }

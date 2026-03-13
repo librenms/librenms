@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\OS;
 
 if (empty($os)) {
@@ -21,7 +22,7 @@ if ($os instanceof \LibreNMS\OS\Ocnos) {
                 if (isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransTxPowerSupported']) && $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransTxPowerSupported'] == 'supported') {
                     app('sensor-discovery')->discover(new \App\Models\Sensor([
                         'poller_type' => 'snmp',
-                        'sensor_class' => 'dbm',
+                        'sensor_class' => SensorEnum::Dbm,
                         'sensor_oid' => ".1.3.6.1.4.1.36673.100.1.2.3.1.17.$cmmStackUnitIndex.$cmmTransIndex.$cmmTransChannelIndex",
                         'sensor_index' => "tx-$cmmStackUnitIndex.$cmmTransIndex.$cmmTransChannelIndex",
                         'sensor_type' => 'ocnos',
@@ -44,7 +45,7 @@ if ($os instanceof \LibreNMS\OS\Ocnos) {
                 if (isset($channel_data['IPI-CMM-CHASSIS-MIB::cmmTransRxPowerSupported']) && $channel_data['IPI-CMM-CHASSIS-MIB::cmmTransRxPowerSupported'] == 'supported') {
                     app('sensor-discovery')->discover(new \App\Models\Sensor([
                         'poller_type' => 'snmp',
-                        'sensor_class' => 'dbm',
+                        'sensor_class' => SensorEnum::Dbm,
                         'sensor_oid' => ".1.3.6.1.4.1.36673.100.1.2.3.1.22.$cmmStackUnitIndex.$cmmTransIndex.$cmmTransChannelIndex",
                         'sensor_index' => "rx-$cmmStackUnitIndex.$cmmTransIndex.$cmmTransChannelIndex",
                         'sensor_type' => 'ocnos',

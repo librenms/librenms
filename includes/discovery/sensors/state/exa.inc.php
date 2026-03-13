@@ -17,7 +17,7 @@ foreach ($ponTable as $e7OltPonPortShelf => $ponShelf) {
 
                 app('sensor-discovery')->discover(new Sensor([
                     'poller_type' => 'snmp',
-                    'sensor_class' => 'state',
+                    'sensor_class' => \LibreNMS\Enum\Sensor::State,
                     'sensor_oid' => ".1.3.6.1.4.1.6321.1.2.2.2.1.6.2.1.4.$index",
                     'sensor_index' => 'ponStatus.' . $index,
                     'sensor_type' => 'E7-Calix-MIB::e7OltPonPortStatus',

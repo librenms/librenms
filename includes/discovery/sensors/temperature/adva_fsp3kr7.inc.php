@@ -34,7 +34,7 @@ if (is_array($pre_cache['adva_fsp3kr7_Card'])) {
 
             discover_sensor(
                 null,
-                'temperature',
+                $sensor_class,
                 $device,
                 $oid,
                 'eqptPhysInstValueTemp' . $index,

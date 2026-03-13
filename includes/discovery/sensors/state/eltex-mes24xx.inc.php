@@ -59,7 +59,7 @@ if (isset($eltexPhyTransceiverDiagnosticTable['lossOfSignal'])) {
 
         app('sensor-discovery')->discover(new \App\Models\Sensor([
             'poller_type' => 'snmp',
-            'sensor_class' => 'state',
+            'sensor_class' => \LibreNMS\Enum\Sensor::State,
             'sensor_oid' => $oid,
             'sensor_index' => 'SfpLoss' . $ifIndex,
             'sensor_type' => 'ELTEX-PHY-MIB',

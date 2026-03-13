@@ -13,7 +13,7 @@ if (is_array($oids)) {
             $value = str_replace('V', '', $temp_value[1]);
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
-                'sensor_class' => 'voltage',
+                'sensor_class' => \LibreNMS\Enum\Sensor::Voltage,
                 'sensor_oid' => '.1.3.6.1.3.94.1.8.1.6.' . $index,
                 'sensor_index' => $entry['connUnitSensorIndex'],
                 'sensor_type' => 'exos',
