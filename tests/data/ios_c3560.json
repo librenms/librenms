@@ -12200,7 +12200,7 @@
                     "baseport": 4,
                     "priority": 0,
                     "state": "forwarding",
-                    "cost": 0,
+                    "cost": 19,
                     "untagged": 1
                 },
                 {
