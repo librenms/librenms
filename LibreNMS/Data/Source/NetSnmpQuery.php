@@ -290,7 +290,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * snmpget using PHP-SNMP library
      */
-    private function getPhpSnmp(string|array $oids): array
+    private function getPhpSnmp(string|array $oids): SnmpResponse
     {
         $response = new SnmpResponse('');
 
@@ -364,7 +364,7 @@ class NetSnmpQuery implements SnmpQueryInterface
             $response = $response->append(new SnmpResponse($res_str, $errors, $errors ? 1 : 0));
 
             if ($this->abort && ! $response->isValid()) {
-                $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oidgroup));
+                $oid_list = implode(',', array_map( fn($group) => is_array($group) ? implode(',', $group) : $group, $oidgroup));
                 Log::info("SNMP failed getting $oid_list aborting.");
 
                 return $response;
