@@ -1301,3 +1301,25 @@
 .dark div[role=listbox] {
     background-color: #464c53;
 }
+
+/* Fix legacy tables for dark mode — overrides inline styles and bgcolor attrs */
+.dark table[border="0"][cellpadding="5"] tr {
+    background-color: #2e3338 !important;
+    color: #c8c8c8 !important;
+}
+
+.dark table[border="0"][cellpadding="5"] tr:nth-child(even) {
+    background-color: #353a41 !important;
+}
+
+.dark table[border="0"][cellpadding="5"] tr:hover {
+    background-color: #49515a !important;
+}
+
+.dark table[border="0"][cellpadding="5"] a {
+    color: #5bc0de !important;
+}
+
+.dark table[border="0"][cellpadding="5"] .interface-desc {
+    color: #7a8288 !important;
+}
