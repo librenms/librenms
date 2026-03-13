@@ -48,12 +48,14 @@ class DatacomDmos extends OS implements MempoolsDiscovery, ProcessorDiscovery, T
                 continue;
             }
 
+            $processorIndex = $this->normalizeProcessorIndex($index);
+
             $processors[] = Processor::discover(
                 $this->getName(),
                 $this->getDeviceId(),
                 $oid,
-                $index,
-                "Processor $index",
+                $processorIndex,
+                'Processor',
                 1,
                 is_numeric($value) ? (int) round((float) $value) : null
             );
@@ -185,5 +187,12 @@ class DatacomDmos extends OS implements MempoolsDiscovery, ProcessorDiscovery, T
 
         // DMOS samples use dotted numeric indexes like 1.1.49.
         return preg_match('/^\d+(?:\.\d+)+$/', $index) ? $index : null;
+    }
+
+    private function normalizeProcessorIndex(string $index): string
+    {
+        $parts = explode('.', $index);
+
+        return count($parts) > 2 ? implode('.', array_slice($parts, 0, -1)) : $index;
     }
 }
