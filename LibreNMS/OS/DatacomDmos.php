@@ -103,10 +103,6 @@ class DatacomDmos extends OS implements MempoolsDiscovery, ProcessorDiscovery, T
 
     public function discoverTransceivers(): Collection
     {
-        if (! $this->isTransceiverSupportedHardware()) {
-            return collect();
-        }
-
         return SnmpQuery::cache()
             ->mibDir('datacom')
             ->mibs(['DMOS-TRANSCEIVER-MIB'])
@@ -138,11 +134,6 @@ class DatacomDmos extends OS implements MempoolsDiscovery, ProcessorDiscovery, T
     private function walkNumeric(string $oid): array
     {
         return SnmpQuery::numeric()->walk($oid)->values();
-    }
-
-    private function isTransceiverSupportedHardware(): bool
-    {
-        return stripos((string) ($this->getDevice()['hardware'] ?? ''), 'DM4370') !== false;
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-if (($device['os'] ?? '') !== 'datacom-dmos' || stripos((string) ($device['hardware'] ?? ''), 'DM4370') === false) {
+if (($device['os'] ?? '') !== 'datacom-dmos') {
     return;
 }
 
