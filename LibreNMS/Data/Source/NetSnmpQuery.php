@@ -394,13 +394,15 @@ class NetSnmpQuery implements SnmpQueryInterface
                 Log::debug("Loading mib $mibfile");
                 if (snmp_read_mib($mibfile)) {
                     $mibfound = true;
-                    $this->mibsLoaded[$mib] = true;
                     break;
                 } else {
                     Log::debug("Failed to load SNMP MIB $mibfile");
                 }
             }
         }
+
+        // No point in trying to load it again
+        $this->mibsLoaded[$mib] = true;
 
         if (! $mibfound) {
             Log::debug("MIB $mib was not found");
