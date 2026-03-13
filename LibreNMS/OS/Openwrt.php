@@ -74,15 +74,54 @@ class Openwrt extends OS implements
                 continue;
             }
 
-            // Safely split interface data
-            $parts = explode(',', $interface, 2);
-            if (count($parts) === 2) {
-                [$k, $v] = array_map(trim(...), $parts);
+            $parsed = $this->parseInterfaceLine($interface);
+            if ($parsed !== null) {
+                [$k, $v] = $parsed;
                 $arrIfaces[$k] = $v;
             }
         }
 
         return $arrIfaces;
+    }
+
+    /**
+     * Parse a single interface mapping line.
+     *
+     * Supported formats:
+     * - current: "wlan0,radio0 (SSID)"
+     * - legacy:  "wlan0 wl-2.4G"
+     * - fallback: "wlan0" (name maps to itself)
+     *
+     * @return array<string>|null [interface, description]
+     */
+    private function parseInterfaceLine(string $interface): ?array
+    {
+        // Preferred format used by current OpenWrt helper scripts.
+        $parts = explode(',', $interface, 2);
+        if (count($parts) === 2) {
+            [$key, $value] = array_map(trim(...), $parts);
+
+            if ($key !== '' && $value !== '') {
+                return [$key, $value];
+            }
+        }
+
+        // Legacy wlInterfaces.txt style with whitespace separator.
+        $legacyParts = preg_split('/\s+/', $interface, 2) ?: [];
+        if (count($legacyParts) === 2) {
+            [$key, $value] = array_map('trim', $legacyParts);
+
+            if ($key !== '' && $value !== '') {
+                return [$key, $value];
+            }
+        }
+
+        // Final fallback for single-token lines.
+        if ($interface !== '') {
+            return [$interface, $interface];
+        }
+
+        return null;
     }
 
     /**
