@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\EntityState;
+
 /**
  * entity-state.inc.php
  *
@@ -85,7 +87,9 @@ if (! empty($entPhysical)) {
     }
 
     if (! empty($state_data)) {
-        dbBulkInsert($state_data, 'entityState');
+        foreach (array_chunk($state_data, 1000) as $chunk) {
+            EntityState::insert($chunk);
+        }
     }
 
     if (! empty($db_states)) {
