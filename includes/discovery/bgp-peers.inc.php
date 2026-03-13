@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\BgpPeer;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
@@ -175,10 +176,10 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
 }
 
 // delete unknown contexts
-$contexts = dbFetchColumn(
-    'SELECT DISTINCT context_name FROM bgpPeers WHERE device_id=?',
-    [$device['device_id']]
-);
+$contexts = BgpPeer::where('device_id', $device['device_id'])
+    ->distinct()
+    ->pluck('context_name')
+    ->all();
 
 $existing_contexts = DeviceCache::getPrimary()->getVrfContexts();
 foreach ($contexts as $context) {
