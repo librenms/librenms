@@ -108,7 +108,7 @@ trait BridgeMib
             $vlanContext = $instance->vlan == 1 ? '' : (string) $instance->vlan;
 
             // prep base port to port_id map for this specific VLAN context
-            $baseIfIndex = SnmpQuery::context($vlanContext, 'vlan-')->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+            $baseIfIndex = SnmpQuery::context($vlanContext, 'vlan-')->cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
             $basePortIdMap = array_map(fn ($ifIndex) => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()), $baseIfIndex);
 
             $vlan_ports = SnmpQuery::context($vlanContext, 'vlan-')

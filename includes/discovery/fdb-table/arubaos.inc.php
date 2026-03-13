@@ -52,6 +52,7 @@ if (! empty($fdbPort_table)) {
     foreach ($fdbPort_table as $vlan => $data) {
         Log::debug("VLAN: $vlan\n");
         $dot1dBasePortIfIndex = SnmpQuery::context($vlan, 'vlan-')
+            ->cache()
             ->walk('BRIDGE-MIB::dot1dBasePortIfIndex')
             ->table(1, $dot1dBasePortIfIndex);
     }
