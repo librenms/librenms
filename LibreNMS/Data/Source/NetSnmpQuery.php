@@ -33,6 +33,7 @@ use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Concurrency;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Debug;
@@ -276,7 +277,11 @@ class NetSnmpQuery implements SnmpQueryInterface
         //   - UDP trsnaport is requested
         //   - SNMP version is v1/2c OR v3 with AES OR v3 with DES
         if (class_exists('\SNMP') && ($this->device->transport ?? 'udp') === 'udp' && ($this->device->snmpver !== 'v3' || $this->device->cryptoalgo === 'AES' || $this->device->cryptoalgo === 'DES')) {
-            return $this->getPhpSnmp($oid);
+            $measure = Measurement::start('Phpget');
+            $ret = new SnmpResponse(...Concurrency::driver('fork')->run( fn() => $this->getPhpSnmp($oid)));
+            $measure->manager()->recordSnmp($measure->end());
+
+            return $ret;
         }
 
         return $this->execMultiple('snmpget', $this->limitOids($this->parseOid($oid)));
@@ -285,7 +290,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * snmpget using PHP-SNMP library
      */
-    private function getPhpSnmp(string|array $oids): SnmpResponse
+    private function getPhpSnmp(string|array $oids): array
     {
         $response = new SnmpResponse('');
 
@@ -317,8 +322,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         }
 
         foreach ($this->limitOids($this->parseOid($oids)) as $oidgroup) {
-            $measure = Measurement::start('Phpget');
-
             foreach ($oidgroup as $oid) {
                 $oidparts = explode('::', (string) $oid, 2);
 
@@ -344,7 +347,6 @@ class NetSnmpQuery implements SnmpQueryInterface
 
             $this->logCommand('SNMP::get(' . implode(',', $oidgroup) . ')');
             $res = $snmp->get($oidgroup);
-            $measure->manager()->recordSnmp($measure->end());
 
             restore_error_handler();
 
