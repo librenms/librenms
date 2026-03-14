@@ -797,6 +797,9 @@ Route: `/api/v0/devices/:hostname/fdb`
 
 - hostname can be either the device hostname or id
 
+Input:
+- vlans: Filter results by VLAN ID(s). Can be a single VLAN (vlans=100) or multiple VLANs as comma-separated values (vlans=100,200,300)
+
 Example:
 
 ```curl
@@ -818,6 +821,12 @@ Output:
         "updated_at": "2019-01-1 01:01:01"
     }
 }
+```
+
+Example with VLAN filtering:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/fdb?vlans=100,200
 ```
 
 ### `get_device_nac`

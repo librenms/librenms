@@ -3287,11 +3287,23 @@ function get_fdb(Illuminate\Http\Request $request)
     if (! $device) {
         return api_error(404, "Device $hostname not found");
     }
+    $vlan_list = [];
+    $vlans = $request->get('vlans');
+    if (!empty($vlans)) {
+        if (is_string($vlans)) {
+            $vlan_list = explode(',', $vlans);
+        } else {
+            $vlan_list = [$vlans];
+        }
+        // Convert to integers and filter out invalid values
+        $vlan_list = array_filter(array_map('intval', $vlan_list));
 
-    return check_device_permission($device_id, function () use ($device) {
+
+    return check_device_permission($device_id, function () use ($device, $vlan_list) {
         if ($device) {
-            $fdb = $device->portsFdb;
-
+            $fdb = $device->portsFdb()
+                ->when(!empty($vlan_list), fn ($q) => $q->whereIn('vlan', $vlan_list));
+            
             return api_success($fdb, 'ports_fdb');
         }
 
