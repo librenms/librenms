@@ -1,0 +1,370 @@
+ROOMALERT-MAX-BASE-STATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+roomAlertMaxBaseStation MODULE-IDENTITY
+    LAST-UPDATED "202508040000Z"
+    ORGANIZATION "AVTECH Software, Inc."
+    CONTACT-INFO
+        "Support: support@avtech.com
+         Web: https://avtech.com/support/"
+    DESCRIPTION
+        "This MIB module defines management objects for the Room Alert MAX
+         Base Station environmental monitoring device.
+
+         OID Structure:
+         iso.org.dod.internet.private.enterprises.avtech.products.roomAlertMaxBaseStation
+         1.3.6.1.4.1.20916.1.14"
+    REVISION "202508040000Z"
+    DESCRIPTION
+        "Initial version of the Room Alert MAX Base Station MIB."
+    ::= { enterprises 20916 1 14 }
+
+avtech OBJECT IDENTIFIER ::= { enterprises 20916 }
+
+products OBJECT IDENTIFIER ::= { avtech 1 }
+
+sensors OBJECT IDENTIFIER ::= { roomAlertMaxBaseStation 1 }
+
+sensorsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SensorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of sensor entries. Each entry represents a sensor
+         in the system and contains metadata such as a MAC address,
+         name, and description."
+    ::= { sensors 1 }
+
+sensorsEntry OBJECT-TYPE
+    SYNTAX      SensorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in the Sensors table containing metadata about a
+         particular sensor, uniquely identified by its MAC address."
+    INDEX       { sensorsMacAddress }
+    ::= { sensorsTable 1 }
+
+SensorsEntry ::= SEQUENCE {
+    sensorsMacAddress  MacAddress,
+    sensorsName        DisplayString,
+    sensorsDescription DisplayString
+}
+
+sensorsMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC address associated with this sensor, which acts as a
+         primary key to uniquely identify the sensor in the table."
+    ::= { sensorsEntry 1 }
+
+sensorsName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the sensor, such as 'Temperature Sensor 01'."
+    ::= { sensorsEntry 2 }
+
+sensorsDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A textual description of the sensor, which may include details
+         about its purpose or usage."
+    ::= { sensorsEntry 3 }
+
+channelGroup OBJECT IDENTIFIER ::= { roomAlertMaxBaseStation 2 }
+
+channelGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ChannelGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of channel group entries. Each entry maps a channel
+         to a specific sensor and contains metadata such as channel group
+         label, type, and description."
+    ::= { channelGroup 1 }
+
+channelGroupEntry OBJECT-TYPE
+    SYNTAX      ChannelGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in the Channel Group table containing metadata about
+         a particular channel group, uniquely identified by its channelGroupKey."
+    INDEX       { channelGroupKey }
+    ::= { channelGroupTable 1 }
+
+ChannelGroupEntry ::= SEQUENCE {
+    channelGroupKey         OCTET STRING,
+    channelGroupSensorId    MacAddress,
+    channelGroupLabel       DisplayString,
+    channelGroupType        DisplayString,
+    channelGroupDescription DisplayString
+}
+
+channelGroupKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..35))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique string key identifying the channel group in the table.
+         Format: <baseMac>_<sensorMac>_<groupType>_<groupIndex>"
+    ::= { channelGroupEntry 1 }
+
+channelGroupSensorId OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the sensor to which this channel group belongs.
+         This mapping allows association of channel groups to specific sensors
+         in the system."
+    ::= { channelGroupEntry 2 }
+
+channelGroupLabel OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A user-defined label for the channel group, such as 'Channel Group A1'."
+    ::= { channelGroupEntry 3 }
+
+channelGroupType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of channel group, such as 'Temperature &
+         Humidity'."
+    ::= { channelGroupEntry 4 }
+
+channelGroupDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A free-text description of the channel group, which may include its
+         purpose or additional details about its configuration."
+    ::= { channelGroupEntry 5 }
+
+channels OBJECT IDENTIFIER ::= { roomAlertMaxBaseStation 3 }
+
+channelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ChannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of individual channels. Each entry corresponds to a
+         specific channel and is uniquely identified by a channelKey.
+         Channels are mapped to a channel group using the channelGroupKey."
+    ::= { channels 1 }
+
+channelEntry OBJECT-TYPE
+    SYNTAX      ChannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in the Channel Table containing metadata about a particular
+         channel. Each channel entry is uniquely identified by a channelKey
+         and references a channel group using the channelGroupKey field."
+    INDEX       { channelKey }
+    ::= { channelTable 1 }
+
+ChannelEntry ::= SEQUENCE {
+    channelKey          OCTET STRING,
+    channelGroupReference     OCTET STRING,
+    channelType         DisplayString,
+    channelValue        Integer32,
+    channelDescription  DisplayString
+}
+
+channelKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..55))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique string key identifying the channel in the Channel Table.
+         Format: <baseMac>_<sensorMac>_<groupType>_<groupIndex>_<channelType>_<channelIndex>"
+    ::= { channelEntry 1 }
+
+channelGroupReference OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..35))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A reference to the associated channel group. The value of this
+         field corresponds to the unique channelGroupKey in the
+         Channel Group table."
+    ::= { channelEntry 2 }
+
+channelType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of channel, such as 'Temperature' or 'Switch'."
+    ::= { channelEntry 3 }
+
+channelValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the channel. This may represent a raw reading or
+         a binary/boolean state."
+    ::= { channelEntry 4 }
+
+channelDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A free-text description of the channel, including metadata such as its
+         purpose, function, or configuration details."
+    ::= { channelEntry 5 }
+
+traps OBJECT IDENTIFIER ::= { roomAlertMaxBaseStation 4 }
+
+trapSensorId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sensor's name that triggered the most recent trap or alarm condition.
+         This value is updated each time a trap is sent."
+    ::= { traps 1 }
+
+trapValue OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A formatted sensor reading that triggered the most recent alarm condition,
+         for example '91.2 deg F' or '41.45 %RH'. This value is updated each time
+         a trap is sent."
+    ::= { traps 2 }
+
+trapThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The threshold value that was exceeded to trigger the most recent alarm,
+         formatted in the same manner as the sensor reading. This value is
+         updated each time a trap is sent."
+    ::= { traps 3 }
+
+trapStatus OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "String indicating the current alarm status of the most recent trap.
+         Valid values include 'In Alarm' and 'Alarm Cleared'. This value is
+         updated each time a trap is sent."
+    ::= { traps 4 }
+
+roomAlertNotifications OBJECT IDENTIFIER ::= { roomAlertMaxBaseStation 0 }
+
+sensorAlarmTrap NOTIFICATION-TYPE
+    OBJECTS {
+        trapSensorId,
+        trapValue,
+        trapThreshold,
+        trapStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a sensor alarm condition occurs or clears."
+    ::= { roomAlertNotifications 1 }
+
+-- Conformance Information
+roomAlertMaxConformance OBJECT IDENTIFIER ::= { roomAlertMaxBaseStation 100 }
+roomAlertMaxCompliances OBJECT IDENTIFIER ::= { roomAlertMaxConformance 1 }
+roomAlertMaxGroups OBJECT IDENTIFIER ::= { roomAlertMaxConformance 2 }
+
+-- Compliance Statement
+roomAlertMaxCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for SNMP entities that implement
+         the Room Alert MAX Base Station MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            sensorsGroup,
+            channelGroupsGroup,
+            channelsGroup,
+            trapsGroup,
+            notificationsGroup
+        }
+    ::= { roomAlertMaxCompliances 1 }
+
+-- Object Groups
+sensorsGroup OBJECT-GROUP
+    OBJECTS {
+        sensorsName,
+        sensorsDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing sensor information."
+    ::= { roomAlertMaxGroups 1 }
+
+channelGroupsGroup OBJECT-GROUP
+    OBJECTS {
+        channelGroupSensorId,
+        channelGroupLabel,
+        channelGroupType,
+        channelGroupDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing channel group information."
+    ::= { roomAlertMaxGroups 2 }
+
+channelsGroup OBJECT-GROUP
+    OBJECTS {
+        channelGroupReference,
+        channelType,
+        channelValue,
+        channelDescription
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing individual channel information."
+    ::= { roomAlertMaxGroups 3 }
+
+trapsGroup OBJECT-GROUP
+    OBJECTS {
+        trapSensorId,
+        trapValue,
+        trapThreshold,
+        trapStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing the most recent trap and alarm information."
+    ::= { roomAlertMaxGroups 4 }
+
+notificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        sensorAlarmTrap
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of notifications for sensor alarm conditions."
+    ::= { roomAlertMaxGroups 5 }
+
+END
