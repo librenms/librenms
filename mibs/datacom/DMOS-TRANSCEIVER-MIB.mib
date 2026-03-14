@@ -1,0 +1,160 @@
+DMOS-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, DisplayString
+        FROM SNMPv2-TC
+    datacomDevicesMIBs
+        FROM DATACOM-SMI
+    ifIndex, ifDescr
+        FROM IF-MIB;
+
+dmosTransceiverMIB MODULE-IDENTITY
+    LAST-UPDATED "201905070000Z"
+    ORGANIZATION "DATACOM"
+    CONTACT-INFO
+                "DATACOM
+
+                 Postal: DATACOM
+                     Rua America, 1000
+                     Eldorado do Sul, RS
+                     CEP 92990-000
+                             BRAZIL
+
+                 Tel:+55(51)3933 3000
+                 Fax:+55(51)3933 3003
+
+                 E-mail: datacom@datacom.ind.br"
+    DESCRIPTION "This module contains DmOS transceivers status monitoring objects."
+    REVISION "201905070000Z"
+    DESCRIPTION "First revision"
+    ::= { datacomDevicesMIBs 8 }
+
+TransceiverTemperature ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX Integer32
+
+TransceiverOpticalPower ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX Integer32
+
+TransceiverCurrent ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX Integer32
+
+TransceiverVoltage ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX Integer32
+
+transceiver OBJECT IDENTIFIER ::= { dmosTransceiverMIB 1 }
+
+transceiverTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TransceiverEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of transceivers for which status information is available"
+    ::= { transceiver 1 }
+
+transceiverEntry OBJECT-TYPE
+    SYNTAX      TransceiverEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Transceiver status information structure"
+    INDEX { ifIndex }
+        ::= { transceiverTable 1 }
+
+TransceiverEntry ::=
+    SEQUENCE {
+        temperature TransceiverTemperature,
+        voltage TransceiverVoltage,
+        laneCount Integer32
+    }
+
+temperature OBJECT-TYPE
+    SYNTAX      TransceiverTemperature
+    UNITS       "C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current transceiver temperature"
+    ::= { transceiverEntry 1 }
+
+voltage OBJECT-TYPE
+    SYNTAX      TransceiverVoltage
+    UNITS       "V"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current transceiver voltage"
+    ::= { transceiverEntry 2 }
+
+laneCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of lanes (lasers) in the transceiver"
+    ::= { transceiverEntry 3 }
+
+transceiverLane OBJECT IDENTIFIER ::= { dmosTransceiverMIB 2 }
+
+transceiverLaneTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TransceiverLaneEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of transceiver lanes for which status information is available"
+    ::= { transceiverLane 1 }
+
+transceiverLaneEntry OBJECT-TYPE
+    SYNTAX      TransceiverLaneEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Transceiver lane status information structure"
+    INDEX { ifIndex, laneIndex }
+        ::= { transceiverLaneTable 1 }
+
+TransceiverLaneEntry ::=
+    SEQUENCE {
+        laneIndex Unsigned32,
+        laneRxPower TransceiverOpticalPower,
+        laneTxPower TransceiverOpticalPower,
+        laneTxBias TransceiverCurrent
+    }
+
+laneIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "A lane on this transceiver"
+    ::= { transceiverLaneEntry 1 }
+
+laneRxPower OBJECT-TYPE
+    SYNTAX      TransceiverOpticalPower
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current transceiver lane RX power"
+    ::= { transceiverLaneEntry 2 }
+
+laneTxPower OBJECT-TYPE
+    SYNTAX      TransceiverOpticalPower
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current transceiver lane TX power"
+    ::= { transceiverLaneEntry 3 }
+
+laneTxBias OBJECT-TYPE
+    SYNTAX      TransceiverCurrent
+    UNITS       "mA"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current transceiver lane TX bias current"
+    ::= { transceiverLaneEntry 4 }
+
+END
