@@ -1685,15 +1685,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchColumn\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/bgp-peers.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchRows\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -2194,15 +2185,6 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 7
-			path: includes/discovery/functions.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchColumn\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
 			path: includes/discovery/functions.inc.php
 
 		-
@@ -5150,15 +5132,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbQuery\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#building\-queries$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/functions.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbUpdate\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
@@ -5326,15 +5299,6 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
-			path: includes/html/forms/alert-rules.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchColumn\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 2
 			path: includes/html/forms/alert-rules.inc.php
 
 		-
@@ -5627,15 +5591,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchColumn\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/notifications.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbInsert\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
@@ -5705,15 +5660,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/html/forms/processor-update.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchColumn\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/rediscover-device.inc.php
 
 		-
 			message: '''
@@ -5881,15 +5827,6 @@ parameters:
 			message: '''
 				#^Call to deprecated function dbDelete\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#deleting\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/transport-groups.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchColumn\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
 			count: 1
@@ -6698,15 +6635,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchColumn\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/device/edit/device.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchRows\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -7166,15 +7094,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchColumn\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/device/wireless.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchRows\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -7514,15 +7433,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/html/pages/services.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchColumn\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/wireless.inc.php
 
 		-
 			message: '''
@@ -8684,15 +8594,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/polling/hr-mib.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/polling/ipSystemStats.inc.php
 
 		-
 			message: '''
