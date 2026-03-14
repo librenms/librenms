@@ -384,6 +384,9 @@ class NetSnmpQuery implements SnmpQueryInterface
             return;
         }
 
+        // Mark the MIB as loaded here to avoid any circular dependencies
+        $this->mibsLoaded[$mib] = true;
+
         $mibfound = false;
         foreach (explode(':', $this->mibDirectories()) as $dir) {
             $mibfile = $dir . '/' . $mib;
@@ -400,9 +403,6 @@ class NetSnmpQuery implements SnmpQueryInterface
                 }
             }
         }
-
-        // No point in trying to load it again
-        $this->mibsLoaded[$mib] = true;
 
         if (! $mibfound) {
             Log::debug("MIB $mib was not found");
