@@ -89,6 +89,9 @@ class Services implements Module
         ];
 
         SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpConnState')->mapTable(function ($tcpConnState, $tcpConnLocalAddress, $tcpConnLocalPort, $tcpConnRemAddress, $tcpConnRemPort) use ($device, $known_services) {
+            if ($tcpConnLocalAddress == '127.0.0.1') {
+                return null;
+            }
             if (empty($tcpConnState['tcpConnState']) || $tcpConnState['tcpConnState'] != 'listen') {
                 return null;
             }
