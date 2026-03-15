@@ -837,10 +837,19 @@ Route: `/api/v0/devices/:hostname/nac`
 
 - hostname can be either the device hostname or id
 
+Input:
+- hide_historical: Set to true to hide historical entries
+
 Example:
 
 ```curl
 curl -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/nac
+```
+
+Example with hide_historical parameter:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/nac?hide_historical=true
 ```
 
 Output:
