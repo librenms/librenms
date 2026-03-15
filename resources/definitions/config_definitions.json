@@ -7417,6 +7417,24 @@
             "default": false,
             "type": "boolean"
         },
+        "ssl_certificates.auto_discover": {
+            "default": true,
+            "group": "apps",
+            "section": "ssl-certificates",
+            "order": 0,
+            "type": "boolean"
+        },
+        "ssl_certificates.skip_hosts": {
+            "default": [],
+            "group": "apps",
+            "section": "ssl-certificates",
+            "order": 1,
+            "type": "array",
+            "validate": {
+                "value": "array",
+                "value.*": "string"
+            }
+        },
         "smokeping.integration": {
             "default": false,
             "group": "external",

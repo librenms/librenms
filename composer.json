@@ -34,6 +34,7 @@
         "fico7489/laravel-pivot": "^3.0",
         "influxdata/influxdb-client-php": "^3.8",
         "influxdb/influxdb-php": "^1.15",
+        "jalle19/certificate-parser": "^4.0",
         "justinrainbow/json-schema": "^6.4",
         "laravel-notification-channels/webpush": "^10.0",
         "laravel/framework": "^12.10",
