@@ -210,7 +210,7 @@ Schedule::command(MaintenanceDiscoverSslCertificates::class)
     ->dailyAt(Time::pseudoRandomBetween('04:00', '04:59'))
     ->onOneServer()
     ->appendOutputTo($maintenance_log_file)
-    ->when(fn () => LibrenmsConfig::get('ssl_certificates.auto_discover', true))
+    ->when(fn () => LibrenmsConfig::get('ssl_certificates.auto_discover', false))
     ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:discover-ssl-certificates failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
 
 Schedule::command(MaintenanceRefreshSslCertificates::class)

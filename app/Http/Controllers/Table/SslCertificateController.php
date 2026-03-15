@@ -34,6 +34,10 @@ class SslCertificateController extends TableController
         return SslCertificate::hasAccess($request->user())->with('device:device_id,hostname');
     }
 
+    /**
+     * @param  SslCertificate  $model
+     * @return array<string, mixed>
+     */
     public function formatItem($model)
     {
         $sslCertificate = $model;
@@ -42,7 +46,7 @@ class SslCertificateController extends TableController
             $deviceLink = '<a href="' . url('device/' . $sslCertificate->device_id) . '">' . e($sslCertificate->device->hostname) . '</a>';
         }
 
-        $validTo = $sslCertificate->valid_to?->format('Y-m-d H:i');
+        $validTo = $sslCertificate->valid_to !== null ? $sslCertificate->valid_to->format('Y-m-d H:i') : null;
         $status = '';
         if ($sslCertificate->disabled) {
             $status = '<span class="label label-default">' . __('Disabled') . '</span>';
@@ -72,7 +76,7 @@ class SslCertificateController extends TableController
             'issuer' => $sslCertificate->issuer,
             'valid_to' => $validTo,
             'days_until_expiry' => $daysDisplay,
-            'last_checked_at' => $sslCertificate->last_checked_at?->format('Y-m-d H:i'),
+            'last_checked_at' => $sslCertificate->last_checked_at !== null ? $sslCertificate->last_checked_at->format('Y-m-d H:i') : null,
             'device_id' => $sslCertificate->device_id,
             'device' => $deviceLink,
             'status' => $status,

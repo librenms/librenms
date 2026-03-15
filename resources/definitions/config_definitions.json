@@ -7418,7 +7418,7 @@
             "type": "boolean"
         },
         "ssl_certificates.auto_discover": {
-            "default": true,
+            "default": false,
             "group": "apps",
             "section": "ssl-certificates",
             "order": 0,

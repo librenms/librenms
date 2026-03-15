@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
+use AcmePhp\Ssl\Exception\CertificateParsingException;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use App\Models\SslCertificate;
-use AcmePhp\Ssl\Exception\CertificateParsingException;
 use Jalle19\CertificateParser\Parser;
 use Jalle19\CertificateParser\Provider\Exception\ProviderException;
 use Jalle19\CertificateParser\Provider\StreamContext;
