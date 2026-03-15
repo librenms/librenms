@@ -486,8 +486,6 @@
                 </ul>
             </li>
             @endconfig
-{{-- App --}}
-                @if($app_menu->isNotEmpty())
                     <li class="dropdown">
                         <a href="{{ url('apps') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"
@@ -510,9 +508,13 @@
                                     <li><a href="{{ url('apps/app=' . $app_type) }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a></li>
                                 @endif
                             @endforeach
+                            <li role="presentation" class="divider"></li>
+                            <li>
+                                <a href="{{ url('ssl-certificates') }}"><i class="fa fa-lock fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span
+                                        class="tw:md:hidden tw:2xl:inline-block">{{ __('SSL Certificates') }}</span></a>
+                            </li>
                         </ul>
                     </li>
-                @endif
 {{-- Routing --}}
                 @if($routing_menu)
                     <li class="dropdown">
@@ -796,7 +798,7 @@
             }
         });
 
-    var hideDashboardEditor = {{ (int)$hide_dashboard_editor }};
+    var hideDashboardEditor = {{ (int) $hide_dashboard_editor }};
     function toggleDashboardEditor() {
         $.ajax({
             url: '{{ route('preferences.store') }}',
