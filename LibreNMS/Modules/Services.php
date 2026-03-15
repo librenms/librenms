@@ -88,10 +88,8 @@ class Services implements Module
             143 => 'imap',
         ];
 
-        SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpConnState')->mapTable(function ($tcpConnState, $tcpConnLocalAddress, $tcpConnLocalPort, $tcpConnRemAddress, $tcpConnRemPort) use ($device, $known_services) {
-            if ($tcpConnLocalAddress !== '0.0.0.0') {
-                return null;
-            }
+        // Only lookup services listening on 0.0.0.0
+        SnmpQuery::enumStrings()->hideMib()->walk('TCP-MIB::tcpConnState.0.0.0.0')->mapTable(function ($tcpConnState, $tcpConnLocalAddress, $tcpConnLocalPort, $tcpConnRemAddress, $tcpConnRemPort) use ($device, $known_services) {
             if (empty($tcpConnState['tcpConnState']) || $tcpConnState['tcpConnState'] != 'listen') {
                 return null;
             }
