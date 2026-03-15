@@ -73,6 +73,7 @@ if (Gate::denies('update', Device::class)) {
         echo match ($type) {
             'device' => '<a href="' . route('device.edit', [$device['device_id']]) . "\">$text</a>",
             'misc' => '<a href="' . route('device.edit.misc', [$device['device_id']]) . "\">$text</a>",
+            'health' => '<a href="' . route('device.edit.health', [$device['device_id']]) . "\">$text</a>",
             default => generate_link($text, $link_array, ['section' => $type]),
         };
 
