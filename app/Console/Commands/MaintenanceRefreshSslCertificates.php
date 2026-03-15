@@ -37,7 +37,7 @@ class MaintenanceRefreshSslCertificates extends LnmsCommand
         }
         $certificates = $query->get();
 
-        $skipHosts = array_map('strtolower', (array) LibrenmsConfig::get('ssl_certificates.skip_hosts', []));
+        $skipHosts = array_map(fn ($host) => strtolower($host), (array) LibrenmsConfig::get('ssl_certificates.skip_hosts', []));
         if ($skipHosts !== []) {
             $certificates = $certificates->filter(fn (SslCertificate $cert) => ! in_array(strtolower($cert->host), $skipHosts, true));
         }

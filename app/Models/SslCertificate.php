@@ -108,7 +108,7 @@ class SslCertificate extends Model
      */
     public function scopeHasAccess($query, $user)
     {
-        return $query->where(function ($q) use ($user) {
+        return $query->where(function ($q) use ($user): void {
             $q->whereNull('device_id')
                 ->orWhereIn('device_id', Device::hasAccess($user)->select('device_id'));
         });
