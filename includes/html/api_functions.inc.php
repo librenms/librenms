@@ -3297,7 +3297,7 @@ function get_fdb(Illuminate\Http\Request $request)
         }
         // Convert to integers and filter out invalid values
         $vlan_list = array_filter(array_map('intval', $vlan_list));
-
+    }
 
     return check_device_permission($device_id, function () use ($device, $vlan_list) {
         if ($device) {
@@ -3323,9 +3323,12 @@ function get_nac(Illuminate\Http\Request $request)
     if (! $device->exists) {
         return api_error(404, "Device $hostname not found");
     }
+    $hideHistorical = $request->get('hide_historical', false);
 
-    return check_device_permission($device, function () use ($device) {
-        $nac = $device->portsNac;
+    return check_device_permission($device, function () use ($device, $hideHistorical) {
+        
+        $nac = $device->portsNac()
+            ->when(!empty($hideHistorical), fn ($q) => $q->where('historical', 0));
 
         return api_success($nac, 'ports_nac');
     });
