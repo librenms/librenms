@@ -53,7 +53,7 @@ class MaintenanceDiscoverSslCertificates extends LnmsCommand
         $created = 0;
         $updated = 0;
         $failed = 0;
-        $skipHosts = array_map(fn ($host) => strtolower($host), (array) LibrenmsConfig::get('ssl_certificates.skip_hosts', []));
+        $skipHosts = array_map(strtolower(...), (array) LibrenmsConfig::get('ssl_certificates.skip_hosts', []));
 
         /** @var \App\Models\Device $device */
         foreach ($devices as $device) {
