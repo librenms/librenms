@@ -9,7 +9,7 @@
            value="{{ old('name', $role->name ?? '') }}"
            @if(isset($role) && in_array(strtolower($role->name), ['admin', 'global-read'])) readonly @endif>
     @error('name')
-    <p class="tw:text-red-500 tw:dark:text-red-400 tw:text-sm tw:mt-1.5">{{ $message }}</p>
+        <p class="tw:text-red-500 tw:dark:text-red-400 tw:text-lg tw:mt-1.5">{{ $message }}</p>
     @enderror
 </div>
 
@@ -50,14 +50,14 @@
     <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
         @foreach($groups as $group => $perms)
             @php
-                $groupPerms = array_map(function($perm) use ($labels, $group) {
-                    $permName = explode('.', $perm)[1] ?? $perm;
-                    return [
-                        'name' => $perm,
-                        'label' => $labels[$group][$permName]['label'] ?? ($labels[$group]['label'] ?? $perm),
-                        'description' => $labels[$group][$permName]['description'] ?? ($labels[$group]['description'] ?? '')
-                    ];
-                }, $perms);
+    $groupPerms = array_map(function ($perm) use ($labels, $group) {
+        $permName = explode('.', $perm)[1] ?? $perm;
+        return [
+            'name' => $perm,
+            'label' => $labels[$group][$permName]['label'] ?? ($labels[$group]['label'] ?? $perm),
+            'description' => $labels[$group][$permName]['description'] ?? ($labels[$group]['description'] ?? '')
+        ];
+    }, $perms);
             @endphp
             <div class="tw:rounded-xl tw:border tw:border-slate-200 tw:dark:border-dark-gray-200 tw:bg-slate-50 tw:dark:bg-dark-gray-500 tw:overflow-hidden"
                  x-show="groupHasMatch('{{ $group }}', {{ json_encode($groupPerms) }})">
