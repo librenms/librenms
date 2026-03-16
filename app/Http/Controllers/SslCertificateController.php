@@ -58,7 +58,7 @@ class SslCertificateController extends Controller
                     ]);
             }
         }
-        
+
         try {
             $cert = SslCertificate::fetchAndParse($host, $port);
         } catch (\Throwable $e) {
