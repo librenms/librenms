@@ -106,7 +106,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('templates/remove/{template}', [ServiceTemplateController::class, 'remove'])->name('templates.remove');
     });
     Route::get('locations', [LocationController::class, 'index']);
-    Route::resource('ssl-certificates', SslCertificateController::class);
+    Route::resource('ssl-certificates', SslCertificateController::class)->except(['edit']);
     Route::resource('preferences', UserPreferencesController::class)->only('index', 'store');
     Route::resource('users', UserController::class);
     Route::get('about', [AboutController::class, 'index'])->name('about');

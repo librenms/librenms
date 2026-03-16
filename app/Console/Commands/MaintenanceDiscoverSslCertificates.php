@@ -92,9 +92,8 @@ class MaintenanceDiscoverSslCertificates extends LnmsCommand
             if ($existing) {
                 $changes = SslCertificate::formatAttributeChanges($existing->only(['subject', 'issuer', 'valid_to', 'valid_from', 'fingerprint', 'days_until_expiry']), $data);
                 // Always persist bookkeeping fields like last_checked_at, even if there are no meaningful changes.
-                $existing->update(['last_checked_at' => now()]);
+                $existing->update($data);
                 if ($changes !== '') {
-                    $existing->update($data);
                     $updated++;
                     Eventlog::log("SSL certificate updated: {$host}:{$port} – {$changes}", $device->device_id, 'ssl-certificate', Severity::Info, $existing->id);
                 }
