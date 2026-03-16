@@ -164,7 +164,6 @@ jobs:
         name: lnms dev:check ci
         env:
           SNMPCONFPATH: "${{ github.workspace }}/.snmp"
-          MIBDIRS: "${{ github.workspace }}/mibs"
         run: |
           php lnms dev:check ci ${{ matrix.arguments }}
 
