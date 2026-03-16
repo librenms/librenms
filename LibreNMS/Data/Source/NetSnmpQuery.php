@@ -264,6 +264,62 @@ class NetSnmpQuery implements SnmpQueryInterface
     }
 
     /**
+     * Get security options to pass into setSecurity()
+     */
+    private function getSecurityOpts(): array
+    {
+        $options = [];
+
+        if ($this->device->authlevel === 'authpriv') {
+            $options[] = 'authPriv';
+            $options[] = $this->device->authalgo;
+            $options[] = $this->device->authpass;
+            $options[] = $this->device->cryptoalgo;
+            $options[] = $this->device->cryptopass;
+            $options[] = $this->context;
+        } elseif ($this->device->authlevel === 'authnopriv') {
+            $options[] = 'authNoPriv';
+            $options[] = $this->device->authalgo;
+            $options[] = $this->device->authpass;
+            $options[] = '';
+            $options[] = '';
+            $options[] = $this->context;
+        } else {
+            $options[] = 'noAuthNoPriv';
+            $options[] = '';
+            $options[] = '';
+            $options[] = '';
+            $options[] = '';
+            $options[] = $this->context;
+        }
+
+        return $options;
+    }
+
+    private function usePhpSnmp(): bool
+    {
+        // Fail if class does not exist, or if device is not UDP
+        if (! class_exists('\SNMP') || ($this->device->transport ?? 'udp') !== 'udp') {
+            return false;
+        }
+
+        if ($this->device->snmpver !== 'v3') {
+            return true;
+        }
+
+        // Create a dummy SNMP session so we can check crypto algorithm
+        $snmp = new \SNMP(\SNMP::VERSION_3, 'localhost', 'user', 1000000, 1);
+        try {
+            $snmp->setSecurity(...$this->getSecurityOpts());
+        } catch (\Exception $e) {
+            // SNMP library does not support all security options
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * snmpget an OID
      * Commonly used to fetch a single or multiple explicit values.
      *
@@ -272,25 +328,59 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function get($oid): SnmpResponse
     {
+        $oids = $this->parseOid($oid);
+
         // Use the PHP SNMP module if:
         //   - the PHP SNMP module is installed
-        //   - UDP trsnaport is requested
+        //   - UDP transport is requested
         //   - SNMP version is v1/2c OR v3 with AES OR v3 with DES
-        if (class_exists('\SNMP') && ($this->device->transport ?? 'udp') === 'udp' && ($this->device->snmpver !== 'v3' || $this->device->cryptoalgo === 'AES' || $this->device->cryptoalgo === 'DES')) {
+        if ($this->usePhpSnmp()) {
+            if (function_exists('snmp_init_mib')) {
+                $this->resetMibs($oids);
+                return $this->getPhpSnmp($oids, true);
+            }
+
+            // Measure response time here because the fork driver prevents the stats from being recorded within getPhpSnmp
             $measure = Measurement::start('Phpget');
-            $ret = new SnmpResponse(...Concurrency::driver('fork')->run(fn () => $this->getPhpSnmp($oid)));
+            $ret = new SnmpResponse(...Concurrency::driver('fork')->run(fn () => $this->getPhpSnmp($oids, false)));
             $measure->manager()->recordSnmp($measure->end());
 
             return $ret;
         }
 
-        return $this->execMultiple('snmpget', $this->limitOids($this->parseOid($oid)));
+        return $this->execMultiple('snmpget', $this->limitOids($oids));
+    }
+
+    /**
+     * Reset the MIB tree
+     */
+    private function resetMibs(array $oids): void
+    {
+        $mibs = $this->mibs;
+
+        foreach ($oids as $oid) {
+            $oidparts = explode('::', (string) $oid, 2);
+
+            if (count($oidparts) > 1 && ! in_array($oidparts[0], $mibs)) {
+                array_push($mibs, $oidparts[0]);
+            }
+        }
+
+        // Set SNMP environment prior to init
+        putenv('MIBDIRS=' . $this->mibDirectories());
+        putenv('MIBS=' . implode(':', $mibs));
+
+        snmp_init_mib();
+
+        // Clear environment so external SNMP commands are not affected
+        putenv('MIBDIRS');
+        putenv('MIBS');
     }
 
     /**
      * snmpget using PHP-SNMP library
      */
-    private function getPhpSnmp(string|array $oids): SnmpResponse
+    private function getPhpSnmp(array $oids, bool $isSubProcess): SnmpResponse
     {
         $response = new SnmpResponse('');
 
@@ -314,19 +404,26 @@ class NetSnmpQuery implements SnmpQueryInterface
         $snmp->valueretrieval = SNMP_VALUE_LIBRARY;
         $snmp->enum_print = isset($this->options[0]) && Str::contains($this->options[0], 'e');
 
-        // TODO: V3 security
+        // Set up V3 security if needed
+        if ($snmpver == \SNMP::VERSION_3) {
+            $snmp->setSecurity(...$this->getSecurityOpts());
+        }
 
         // Load base mibs first
-        foreach ($this->mibs as $mib) {
-            $this->loadMib($mib);
+        if ($isSubProcess) {
+            foreach ($this->mibs as $mib) {
+                $this->loadMib($mib);
+            }
         }
 
         foreach ($this->limitOids($this->parseOid($oids)) as $oidgroup) {
-            foreach ($oidgroup as $oid) {
-                $oidparts = explode('::', (string) $oid, 2);
+            if ($isSubProcess) {
+                foreach ($oidgroup as $oid) {
+                    $oidparts = explode('::', (string) $oid, 2);
 
-                if (count($oidparts) > 1) {
-                    $this->loadMib($oidparts[0]);
+                    if (count($oidparts) > 1) {
+                        $this->loadMib($oidparts[0]);
+                    }
                 }
             }
 
@@ -334,8 +431,8 @@ class NetSnmpQuery implements SnmpQueryInterface
             $errors = '';
 
             set_error_handler(function (int $err_severity, string $err_msg, string $err_filename, int $err_line) use (&$missing, &$errors): bool {
-                if (preg_match('/\'([^\']+)\': No Such Object available on this agent at this OID/', $err_msg, $matches)) {
-                    $missing[$matches[1]] = 'No Such Object available on this agent at this OID';
+                if (preg_match('/\'([^\']+)\': (No Such Object available on this agent at this OID|No Such Instance currently exists at this OID)/', $err_msg, $matches)) {
+                    $missing[$matches[1]] = $matches[2];
                 } elseif (preg_match('/Invalid object identifier: (\S+)/', $err_msg, $matches)) {
                     $errors .= "$matches[1]: Unknown Object Identifier\n";
                 } else {
@@ -345,6 +442,9 @@ class NetSnmpQuery implements SnmpQueryInterface
                 return true;
             }, E_WARNING);
 
+            if (!$isSubProcess) {
+                $measure = Measurement::start('Phpget');
+            }
             $this->logCommand('SNMP::get(' . implode(',', $oidgroup) . ')');
             $res = $snmp->get($oidgroup);
 
@@ -362,6 +462,9 @@ class NetSnmpQuery implements SnmpQueryInterface
 
             $this->logOutput($res_str, '');
             $response = $response->append(new SnmpResponse($res_str, $errors, $errors ? 1 : 0));
+            if (!$isSubProcess) {
+                $measure->manager()->recordSnmp($measure->end());
+            }
 
             if ($this->abort && ! $response->isValid()) {
                 $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oidgroup));
