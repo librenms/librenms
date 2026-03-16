@@ -463,7 +463,7 @@ class NetSnmpQuery implements SnmpQueryInterface
 
             $this->logOutput($res_str, '');
             $response = $response->append(new SnmpResponse($res_str, $errors, $errors ? 1 : 0));
-            if ($measure) {
+            if (isset($measure)) {
                 $measure->manager()->recordSnmp($measure->end());
             }
 
