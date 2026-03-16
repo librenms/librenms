@@ -1,67 +1,138 @@
 
 # SMART
 
+Monitor disk SMART health and attributes via a LibreNMS JSON SNMP extend.
+
+The script uses `smartctl --json -a` to collect data and writes cached output files for `snmpd` to read.
+
 ## Install prerequisites
+
+`smartctl` must support `--json` (smartmontools >= 7).
 
 === "Debian/Ubuntu"
 
     ```bash
-    apt-get install smartmontools libjson-perl libmime-base64-perl
+    apt-get install smartmontools libjson-perl libmime-base64-perl libio-compress-perl
     ```
 
 === "FreeBSD"
 
     ```bash
-    pkg install p5-JSON p5-MIME-Base64 smartmontools
+    pkg install smartmontools p5-JSON p5-MIME-Base64 p5-IO-Compress
     ```
 
 === "RedHat/CentOS"
 
     ```bash
-    dnf install smartmontools perl-JSON perl-MIME-Base64
+    dnf install smartmontools perl-JSON perl-MIME-Base64 perl-IO-Compress
     ```
 
 ## SNMP Extend
 
-1. Copy the Perl script, smart, to the desired host.
+1. Download the script onto the host.
+
+    ```bash
+    wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart-v1 -O /etc/snmp/smart
+    ```
+
+2. Make it executable.
+
+    ```bash
+    chmod +x /etc/snmp/smart
+    ```
+
+3. Create the config file. By default it is the script path with `.config` appended.
+   If the script is located at `/etc/snmp/smart`, the config file will be `/etc/snmp/smart.config`.
+   Alternatively you can specify a config via `-c`.
+
+   To generate a starter config:
+
+    ```bash
+    /etc/snmp/smart -g > /etc/snmp/smart.config
+    ```
+
+4. (Recommended) Run it periodically (writes cache files, then SNMP only reads them).
+   This avoids SNMP timeouts on slow disks.
+
+    === "cron"
+
+        Add to root's crontab (or `/etc/cron.d/snmp-extentions`):
+
+        ```bash
+        # SNMP SMART extend, runs every 5 minutes
+        */5 * * * * /etc/snmp/smart -u >/dev/null 2>&1
+ 
+        ```
+
+    === "systemd"
+
+        `/etc/systemd/system/snmp-smart-extend.service`
+
+        ```ini
+        [Unit]
+        Description=LibreNMS SMART SNMP extend cache
+
+        [Service]
+        Type=oneshot
+        ExecStart=/etc/snmp/smart -u
+        ```
+
+        `/etc/systemd/system/snmp-smart-extend.timer`
+
+        ```ini
+        [Unit]
+        Description=Run LibreNMS SMART extend every 5 minutes
+
+        [Timer]
+        OnBootSec=2min
+        OnUnitActiveSec=5min
+        Persistent=true
+
+        [Install]
+        WantedBy=timers.target
+        ```
+
+        Enable the timer:
+
+        ```bash
+        systemctl daemon-reload
+        systemctl enable --now smart-extend.timer
+        ```
+
+        Note: `smartctl` often requires elevated privileges to access disks. If you change the service to run as a non-root user, ensure it can run `smartctl` against your devices and can write the cache path.
+
+5. Edit your `snmpd.conf` file (usually `/etc/snmp/snmpd.conf`) and add:
+
+    ```bash
+    extend smart /bin/cat /var/cache/smart.snmp
+    ```
+
+6. Restart `snmpd`.
+
+    ```bash
+    sudo systemctl restart snmpd
+    ```
+
+The application should be auto-discovered as described at the top of the page.
+If it is not, follow the steps under the `SNMP Extend` heading on that page.
+
+## Config file format
+
+- Lines starting with `#` are comments.
+- Variables use `key=value`.
+- Empty lines are ignored.
+- Spaces and tabs at either the start or end of a line are ignored.
+- Any other line is treated as a disk entry.
+
+Example:
 
 ```bash
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/smart-v1 -O /etc/snmp/smart
-```
-
-3. Make the script executable
-
-```bash
-chmod +x /etc/snmp/smart
-```
-
-4. Setup a cronjob to run it. This ensures slow to poll disks won't
-   result in errors.
-
-```bash
- */5 * * * * /etc/snmp/smart -u -Z
-```
-
-5. Edit your snmpd.conf file and add:
-
-```bash
-extend smart /bin/cat /var/cache/smart
-```
-
-6. You will also need to create the config file, which defaults to the same path as the script,
-but with .config appended. So if the script is located at /etc/snmp/smart, the config file will be `/etc/snmp/smart.config`. Alternatively you can also specific a config via `-c`.
-
-- Anything starting with a # is comment. 
-- variables is $variable=$value.  
-- Empty lines are ignored. 
-- Spaces and tabes at either the start or end of a line are ignored. 
-- Any line with out a matched variable or # are treated as a disk.
-
-```bash
-#This is a comment
+# This is a comment
 cache=/var/cache/smart
 smartctl=/usr/bin/env smartctl
 useSN=1
+
+# Disk entries:
 ada0
 ada1
 da5 /dev/da5 -d sat
@@ -70,33 +141,29 @@ twl0,1 /dev/twl0 -d 3ware,1
 twl0,2 /dev/twl0 -d 3ware,2
 ```
 
-The variables are as below.
+Variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| cache    | /var/cache/smart | The path to the cache file to use. |
-| smartctl | /usr/bin/env smartctl | The path to use for smartctl. |
-| useSN    | 1       | If set to 1, it will use the disks SN for reporting instead of the device name. |
+| cache    | /var/cache/smart | Cache base path. The script writes JSON to `cache` and base64+gzip to `cache.snmp`. |
+| smartctl | /usr/bin/env smartctl | Command/path used to run `smartctl`. |
+| useSN    | 1 | If set to 1, it will use the disk serial number for reporting instead of the device name. |
 
-A disk line is can be as simple as just a disk name under /dev/. Such as in the config above
-The line `ada0` would resolve to `/dev/ada0` and would be called with no special argument. If a line has a space in it, everything before the space is treated as the disk name and is what used for reporting and everything after that is used as the argument to be passed to `smartctl`.
+Disk entry rules:
 
-If you want to guess at the configuration, call it with `-g` and it will print out what it thinks it should be.
+- A disk line can be just a device name under `/dev` (for example, `ada0` resolves to `/dev/ada0`).
+- If the line contains a space, everything before the first space is used for reporting; everything after is passed to `smartctl`.
 
-6. Restart snmpd on your host
+To have the script guess disk entries for your system:
 
-    ```bash
-    sudo systemctl restart snmpd
-    ```
+```bash
+/etc/snmp/smart -g
+```
 
-The application should be auto-discovered as described at the top of
-the page. If it is not, please follow the steps set out under `SNMP
-Extend` heading top of page.
+## Optional: schedule SMART self-tests
 
-7. Optionally setup nightly self tests for the disks. The exend will
-   run the specified test on all configured disks if called with the
-   `-t` flag and the name of the SMART test to run.
+The script will run a SMART self-test on all configured disks when called with `-t <test>`:
 
-    ```
-    0 0 * * * /etc/snmp/smart -t long
-    ```
+```bash
+0 0 * * * /etc/snmp/smart -t long >/dev/null 2>&1
+```
