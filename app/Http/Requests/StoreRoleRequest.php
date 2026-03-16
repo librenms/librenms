@@ -23,7 +23,7 @@ class StoreRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|unique:roles,name|regex:/^[a-z-]+$/',
+            'name' => 'required|unique:roles,name|regex:/^[a-zA-Z-]+$/',
             'permissions' => 'array',
         ];
     }
