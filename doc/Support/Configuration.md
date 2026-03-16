@@ -749,7 +749,7 @@ LibreNMS can discover and monitor SSL/TLS certificates presented by your devices
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `ssl_certificates.auto_discover` | boolean | `true` | When enabled, the scheduled SSL discovery job runs daily. Set to `false` to disable automatic discovery (for example, if you only add certificates manually). |
+| `ssl_certificates.auto_discover` | boolean | `false` | When enabled, the scheduled SSL discovery job runs daily. Set to `false` to disable automatic discovery (for example, if you only add certificates manually). |
 | `ssl_certificates.skip_hosts` | array (strings) | `[]` | List of hostnames or IPs to skip during both discovery and refresh. Matching is case-insensitive. Use this to exclude devices or hosts that should not be probed for SSL (for example, load balancers that present different certs, or hosts that block or rate-limit connections). |
 
 !!! setting "system/ssl-certificates"
