@@ -337,6 +337,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         if ($this->usePhpSnmp()) {
             if (function_exists('snmp_init_mib')) {
                 $this->resetMibs($oids);
+
                 return $this->getPhpSnmp($oids, true);
             }
 
@@ -442,7 +443,7 @@ class NetSnmpQuery implements SnmpQueryInterface
                 return true;
             }, E_WARNING);
 
-            if (!$isSubProcess) {
+            if (! $isSubProcess) {
                 $measure = Measurement::start('Phpget');
             }
             $this->logCommand('SNMP::get(' . implode(',', $oidgroup) . ')');
@@ -462,7 +463,7 @@ class NetSnmpQuery implements SnmpQueryInterface
 
             $this->logOutput($res_str, '');
             $response = $response->append(new SnmpResponse($res_str, $errors, $errors ? 1 : 0));
-            if (!$isSubProcess) {
+            if (! $isSubProcess) {
                 $measure->manager()->recordSnmp($measure->end());
             }
 
