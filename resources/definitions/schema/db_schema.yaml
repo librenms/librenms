@@ -2303,7 +2303,7 @@ ssl_certificates:
     - { Field: issuer_country, Type: varchar(8), 'Null': true, Extra: '' }
     - { Field: issuer_organization, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: subject, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: subject_alternative_names, Type: json, 'Null': true, Extra: '' }
+    - { Field: subject_alternative_names, Type: longtext, 'Null': true, Extra: '' }
     - { Field: serial_number, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: serial_number_hex, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: self_signed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }

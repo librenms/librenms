@@ -345,10 +345,6 @@ class Schema
                     $def['Extra'] = preg_replace('/DEFAULT_GENERATED[ ]*/', '', $def['Extra']);
                 }
 
-                // MariaDB fix for json columns being aliased tolongtext columns
-                if ($table == 'ssl_certificates' && $def['Type'] == 'longtext') {
-                    $def['Type'] = 'json';
-                }
                 $output[$table]['Columns'][] = $def;
             }
 

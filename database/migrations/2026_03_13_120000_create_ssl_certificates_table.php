@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('issuer_country', 8)->nullable();
             $table->string('issuer_organization')->nullable();
             $table->string('subject')->nullable();
-            $table->json('subject_alternative_names')->nullable();
+            $table->longtext('subject_alternative_names')->nullable();
             $table->string('serial_number', 64)->nullable();
             $table->string('serial_number_hex', 64)->nullable();
             $table->boolean('self_signed')->default(false);
