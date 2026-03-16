@@ -338,12 +338,12 @@ class NetSnmpQuery implements SnmpQueryInterface
             if (function_exists('snmp_init_mib')) {
                 $this->resetMibs($oids);
 
-                return $this->getPhpSnmp($oids, true);
+                return $this->getPhpSnmp($oids, false);
             }
 
             // Measure response time here because the fork driver prevents the stats from being recorded within getPhpSnmp
             $measure = Measurement::start('Phpget');
-            $ret = new SnmpResponse(...Concurrency::driver('fork')->run(fn () => $this->getPhpSnmp($oids, false)));
+            $ret = new SnmpResponse(...Concurrency::driver('fork')->run(fn () => $this->getPhpSnmp($oids, true)));
             $measure->manager()->recordSnmp($measure->end());
 
             return $ret;
