@@ -371,7 +371,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         putenv('MIBDIRS=' . $this->mibDirectories());
         putenv('MIBS=' . implode(':', $mibs));
 
-        snmp_init_mib();
+        snmp_init_mib(); /** @phpstan-ignore function.notFound */
 
         // Clear environment so external SNMP commands are not affected
         putenv('MIBDIRS');

@@ -152,11 +152,6 @@ parameters:
 			identifier: function.deprecated
 			count: 2
 			path: LibreNMS/Component.php
-		-
-			message: '#^Function snmp_init_mib not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: LibreNMS/Data/Source/NetSnmpQuery.php
 
 		-
 			message: '''
