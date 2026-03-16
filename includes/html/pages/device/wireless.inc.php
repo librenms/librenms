@@ -1,16 +1,12 @@
 <?php
 
-use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Util\Number;
 
-// this determines the order of the tabs
-$types = WirelessSensor::getTypes();
-
-$sensors = \App\Models\WirelessSensor::where('device_id', $device['device_id'])
+$datas = \App\Models\WirelessSensor::where('device_id', $device['device_id'])
     ->distinct()
     ->pluck('sensor_class')
     ->all();
-$datas = array_intersect(array_keys($types), $sensors);
 
 $wireless_link_array = [
     'page' => 'device',
@@ -33,12 +29,12 @@ echo '</span>';
 
 foreach ($datas as $type) {
     echo ' | <span';
-    if ($vars['metric'] == $type) {
+    if ($vars['metric'] == $type->value) {
         echo ' class="pagemenu-selected"';
     }
     echo '>';
 
-    echo generate_link(__("wireless.$type.short"), $wireless_link_array, ['metric' => $type]);
+    echo generate_link(__("wireless.{$type->value}.short"), $wireless_link_array, ['metric' => $type->value]);
 
     echo '</span>';
 }
@@ -47,18 +43,18 @@ print_optionbar_end();
 
 if ($vars['metric'] == 'overview') {
     foreach ($datas as $type) {
-        $text = __("wireless.$type.long");
-        $unit = __("wireless.$type.unit");
+        $text = __("wireless.{$type->value}.long");
+        $unit = __("wireless.{$type->value}.unit");
         if (! empty($unit)) {
             $text .= " ($unit)";
         }
 
-        $graph_title = generate_link($text, $wireless_link_array, ['metric' => $type]);
-        $graph_array['type'] = 'device_wireless_' . $type;
+        $graph_title = generate_link($text, $wireless_link_array, ['metric' => $type->value]);
+        $graph_array['type'] = 'device_wireless_' . $type->value;
 
         include \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/html/print-device-graph.php';
     }
-} elseif (isset($types[$vars['metric']])) {
+} elseif (WirelessSensorType::tryFrom($vars['metric']) !== null) {
     $unit = __('wireless.' . $vars['metric'] . '.unit');
     $factor = 1;
     if ($unit == 'MHz') {
