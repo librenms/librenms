@@ -1012,6 +1012,7 @@
   },
   {
     "name": "Expiring SSL Certificates",
+    "severity": "warning",
     "builder": {"condition":"AND","rules":[{"id":"ssl_certificates.days_until_expiry","field":"ssl_certificates.days_until_expiry","type":"integer","input":"text","operator":"less","value":"14"},{"id":"ssl_certificates.disabled","field":"ssl_certificates.disabled","type":"integer","input":"text","operator":"equal","value":"0"}],"valid":true}
   }
 ]

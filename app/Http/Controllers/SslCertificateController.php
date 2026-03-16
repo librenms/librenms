@@ -46,6 +46,19 @@ class SslCertificateController extends Controller
         $port = (int) ($validated['port'] ?? 443);
         $deviceId = $validated['device_id'] ?? null;
 
+        if ($deviceId !== null) {
+            $hasAccess = Device::hasAccess($request->user())
+                ->where('device_id', $deviceId)
+                ->exists();
+            if (! $hasAccess) {
+                return redirect()->route('ssl-certificates.create')
+                    ->withInput()
+                    ->withErrors([
+                        'device_id' => __('You are not allowed to use the selected device.'),
+                    ]);
+            }
+        }
+        
         try {
             $cert = SslCertificate::fetchAndParse($host, $port);
         } catch (\Throwable $e) {

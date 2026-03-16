@@ -69,13 +69,14 @@ class MaintenanceRefreshSslCertificates extends LnmsCommand
                 continue;
             }
 
-            $newData = array_merge(SslCertificate::attributesFromParserResults($results), [
+            $attrData = SslCertificate::attributesFromParserResults($results);
+            $newData = array_merge($attrData, [
                 'last_checked_at' => now(),
             ]);
             $oldAttrs = $cert->only(['subject', 'issuer', 'valid_to', 'valid_from', 'fingerprint', 'days_until_expiry']);
-            $changes = SslCertificate::formatAttributeChanges($oldAttrs, $newData);
+            $changes = SslCertificate::formatAttributeChanges($oldAttrs, $attrData);
+            $cert->update($newData);
             if ($changes !== '') {
-                $cert->update($newData);
                 $refreshed++;
                 Eventlog::log("SSL certificate refreshed: {$cert->host}:{$cert->port} – {$changes}", $cert->device_id, 'ssl-certificate', Severity::Info, $cert->id);
             }
