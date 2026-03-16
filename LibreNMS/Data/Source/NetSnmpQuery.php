@@ -311,7 +311,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         $snmp = new \SNMP(\SNMP::VERSION_3, 'localhost', 'user', 1000000, 1);
         try {
             $snmp->setSecurity(...$this->getSecurityOpts());
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // SNMP library does not support all security options
             return false;
         }
