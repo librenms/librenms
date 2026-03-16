@@ -33,7 +33,7 @@ if ($vars['string']) {
     $param[] = '%' . $vars['string'] . '%';
 }
 
-if (Auth::user()->hasGlobalRead()) {
+if (Gate::allows('viewAny', \App\Models\Device::class)) {
     $sql = " FROM `eventlog` AS E LEFT JOIN `devices` AS `D` ON `E`.`device_id`=`D`.`device_id` WHERE $where";
 } else {
     $sql = " FROM `eventlog` AS E, devices_perms AS P WHERE $where AND E.device_id = P.device_id AND P.user_id = ?";

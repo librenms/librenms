@@ -12,7 +12,9 @@
  * the source code distribution for details.
  */
 
-if (! Auth::user()->hasGlobalAdmin()) {
+use App\Models\Device;
+
+if (Gate::denies('update', Device::class)) {
     $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
     $parent_ids = (array) $_POST['parent_ids'];
@@ -38,7 +40,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
             break;
         }
 
-        \App\Models\Device::find($device_id)->parents()->sync($parent_ids);
+        Device::find($device_id)->parents()->sync($parent_ids);
 
         $status = ['status' => 0, 'message' => 'Device dependencies have been saved'];
     }

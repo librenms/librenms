@@ -28,6 +28,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 
 abstract class BaseModel extends Model
 {
@@ -63,7 +64,7 @@ abstract class BaseModel extends Model
      */
     protected function hasDeviceAccess($query, User $user, $table = null)
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAny', Device::class)) {
             return $query;
         }
 
@@ -84,7 +85,7 @@ abstract class BaseModel extends Model
      */
     protected function hasPortAccess($query, User $user, $table = null)
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAny', Port::class)) {
             return $query;
         }
 
@@ -101,7 +102,7 @@ abstract class BaseModel extends Model
      */
     protected function hasBillAccess(Builder $query, User $user, ?string $table = null): Builder
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAny', Bill::class)) {
             return $query;
         }
 

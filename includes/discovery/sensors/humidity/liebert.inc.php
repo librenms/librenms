@@ -59,7 +59,7 @@ unset(
     $new_index
 );
 
-$return_humidity = snmp_get($device, 'lgpEnvReturnAirHumidity.0', '-Oqv');
+$return_humidity = SnmpQuery::get('lgpEnvReturnAirHumidity.0')->value();
 if (is_numeric($return_humidity)) {
     $oid = '.1.3.6.1.4.1.476.1.42.3.4.2.1.2.0';
     $index = 'lgpEnvReturnAirHumidity.0';
@@ -67,7 +67,7 @@ if (is_numeric($return_humidity)) {
     discover_sensor(null, 'humidity', $device, $oid, $index, 'liebert', $descr, $divisor, '1', null, null, null, null, $return_humidity);
 }
 
-$supply_humidity = snmp_get($device, 'lgpEnvSupplyAirHumidity.0', '-Oqv');
+$supply_humidity = SnmpQuery::get('lgpEnvSupplyAirHumidity.0')->value();
 if (is_numeric($supply_humidity)) {
     $oid = '.1.3.6.1.4.1.476.1.42.3.4.2.1.3.0';
     $index = 'lgpEnvSupplyAirHumidity.0';

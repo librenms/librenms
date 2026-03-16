@@ -23,12 +23,12 @@ foreach (explode("\n", $oids) as $data) {
             $warnlowlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.9.$index";
             $lowlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.10.$index";
 
-            $descr = trim(snmp_get($device, $descr_oid, '-Oqv', ''), '"');
-            $humidity = snmp_get($device, $oid, '-Oqv', '');
-            $warnlimit = snmp_get($device, $warnlimit_oid, '-Oqv', '');
-            $limit = snmp_get($device, $limit_oid, '-Oqv', '');
-            $lowlimit = snmp_get($device, $lowlimit_oid, '-Oqv', '');
-            $warnlowlimit = snmp_get($device, $warnlowlimit_oid, '-Oqv', '');
+            $descr = trim((string) SnmpQuery::get($descr_oid)->value(), '"');
+            $humidity = SnmpQuery::get($oid)->value();
+            $warnlimit = SnmpQuery::get($warnlimit_oid)->value();
+            $limit = SnmpQuery::get($limit_oid)->value();
+            $lowlimit = SnmpQuery::get($lowlimit_oid)->value();
+            $warnlowlimit = SnmpQuery::get($warnlowlimit_oid)->value();
 
             discover_sensor(null, 'humidity', $device, $oid, $index, 'akcp', $descr, '1', '1', $lowlimit, $warnlowlimit, $limit, $warnlimit, $humidity);
         }

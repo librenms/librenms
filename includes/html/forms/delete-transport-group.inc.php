@@ -12,12 +12,15 @@
  * the source code distribution for details.
  */
 
+use App\Models\AlertTransport;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', AlertTransport::class)) {
     exit(json_encode([
         'status' => 'error',
-        'message' => 'ERROR: You need to be admin.',
+        'message' => 'ERROR: You need permission.',
     ]));
 }
 

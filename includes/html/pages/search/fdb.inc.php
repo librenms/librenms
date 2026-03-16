@@ -44,7 +44,7 @@ $sql = 'SELECT D.device_id AS device_id, `hostname`, `sysName`, `display` FROM `
 $param = [];
 $where = '';
 
-if (! Auth::user()->hasGlobalRead()) {
+if (Gate::denies('viewAny', \App\Models\Device::class)) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
     $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);

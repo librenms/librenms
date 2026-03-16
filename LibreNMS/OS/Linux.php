@@ -31,6 +31,7 @@ use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\OS\Traits\VminfoLibvirt;
 use LibreNMS\OS\Traits\VminfoVmware;
+use LibreNMS\OS\Traits\VminfoXcpNg;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
@@ -38,13 +39,18 @@ class Linux extends Shared\Unix implements VminfoDiscovery
 {
     // NOTE: Only Linux specific stuff should go here, most things should be in Unix
 
-    use VminfoLibvirt, VminfoVmware {
+    use VminfoLibvirt, VminfoVmware, VminfoXcpNg {
         VminfoLibvirt::discoverVminfo as discoverLibvirtVminfo;
         VminfoVmware::discoverVmInfo as discoverVmwareVminfo;
+        VminfoXcpNg::discoverVmInfo as discoverXcpNgVminfo;
     }
 
     public function discoverVmInfo(): Collection
     {
+        if (preg_match('/^XCP-ng/', (string) $this->getDevice()->features)) {
+            return $this->discoverXcpNgVminfo();
+        }
+
         $vms = $this->discoverLibvirtVminfo();
 
         if ($vms->isNotEmpty()) {

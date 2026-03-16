@@ -406,7 +406,17 @@
             "type": "integer",
             "minimum": 1
         },
-        "syslog_hook": {
+    "snmp":{
+        "type": "object",
+        "properties": {
+            "max_repeaters": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "additionalProperties": false
+    },
+    "syslog_hook": {
             "type": "array",
             "items": {
                 "type": "object",
@@ -490,6 +500,12 @@
             "type": "array",
             "items": {
                 "type": "string"
+            }
+        },
+        "ignore_vlans": {
+            "type": "array",
+            "items": {
+                "type": "integer"
             }
         },
         "bad_hrSystemUptime": {

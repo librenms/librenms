@@ -17,6 +17,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Port;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Device\YamlDiscovery;
@@ -841,7 +842,7 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
         }
 
         $sql = 'SELECT `device_id` FROM `devices` WHERE ' . implode(' OR ', $where) . ' LIMIT 2';
-        $ids = dbFetchColumn($sql, $params);
+        $ids = array_column(DB::select($sql, $params), 'device_id');
         if (count($ids) == 1) {
             return (int) $ids[0];
         } elseif (count($ids) > 1) {

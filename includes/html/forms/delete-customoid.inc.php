@@ -2,7 +2,7 @@
 
 header('Content-type: text/plain');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('customoid.delete')) {
     $response = [
         'status' => 'error',
         'message' => 'Need to be admin',

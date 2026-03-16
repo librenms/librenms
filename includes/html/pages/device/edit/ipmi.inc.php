@@ -1,7 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Gate;
+
 if ($_POST['editing']) {
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (Gate::allows('update', DeviceCache::getPrimary())) {
         $ipmi_hostname = $_POST['ipmi_hostname'];
         $ipmi_port = (int) $_POST['ipmi_port'];
         $ipmi_username = $_POST['ipmi_username'];

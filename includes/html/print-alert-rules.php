@@ -23,13 +23,15 @@
  * @author     Original Author <unknown>
  * @author     Joseph Tingiris <joseph.tingiris@gmail.com>
  */
-if (! Auth::user()->hasGlobalAdmin()) {
-    exit('ERROR: You need to be admin');
-}
 
 use App\Facades\DeviceCache;
+use App\Models\AlertRule;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
+
+if (Gate::denies('viewAny', AlertRule::class)) {
+    exit('ERROR: You need to be admin');
+}
 
 $no_refresh = true;
 
@@ -92,9 +94,11 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
 echo '<div class="table-responsive">';
 echo '<div class="col pull-left">';
 $device_id = $device['device_id'] ?? 0;
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' .$device_id. '">Create new alert rule</button>';
-echo '<i> - OR - </i>';
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' .$device_id. '">Create rule from collection</button>';
+if (Gate::allows('create', AlertRule::class)) {
+    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' . $device_id . '">Create new alert rule</button>';
+    echo '<i> - OR - </i>';
+    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' . $device_id . '">Create rule from collection</button>';
+}
 echo '</div>';
 
 echo '<div class="col pull-right">';
@@ -413,8 +417,12 @@ foreach ($rule_list as $rule) {
 
     echo '<td>';
     echo "<div class='btn-group btn-group-sm' role='group'>";
-    echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-placement='left' data-target='#create-alert' data-rule_id='" . $rule['id'] . "' name='edit-alert-rule' title='Edit alert rule' data-content='" . htmlentities((string) $rule['name']) . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-    echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='left' data-toggle='modal' data-target='#confirm-delete' data-alert_id='" . $rule['id'] . "' data-alert_name='" . htmlentities((string) $rule['name']) . "' name='delete-alert-rule' title='Delete alert rule' data-content='" . htmlentities((string) $rule['name']) . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+    if (Gate::allows('update', AlertRule::class)) {
+        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-placement='left' data-target='#create-alert' data-rule_id='" . $rule['id'] . "' name='edit-alert-rule' title='Edit alert rule' data-content='" . htmlentities((string) $rule['name']) . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+    }
+    if (Gate::allows('delete', AlertRule::class)) {
+        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='left' data-toggle='modal' data-target='#confirm-delete' data-alert_id='" . $rule['id'] . "' data-alert_name='" . htmlentities((string) $rule['name']) . "' name='delete-alert-rule' title='Delete alert rule' data-content='" . htmlentities((string) $rule['name']) . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+    }
     echo '</td>';
 
     echo "</tr>\r\n";
