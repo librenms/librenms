@@ -15,6 +15,7 @@
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Models\AlertSchedule;
 use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
 use App\Models\Availability;
@@ -1533,6 +1534,136 @@ function add_edit_alert_template(Illuminate\Http\Request $request)
     }
 
     return response()->json($response, 200, [], JSON_PRETTY_PRINT);
+}
+
+function list_scheduled_maintenance(): JsonResponse
+{
+    $maintenceSchedules = AlertSchedule::all();
+    $alertSchedules = [];
+    foreach ($maintenceSchedules as $maintenceSchedule) {
+        $alertSchedule = $maintenceSchedule->attributesToArray();
+        $alertSchedule['devices'] = $maintenceSchedule->devices->pluck('device_id')->toArray();
+        $alertSchedule['device_groups'] = $maintenceSchedule->deviceGroups->pluck('id')->toArray();
+        $alertSchedule['locations'] = $maintenceSchedule->locations->pluck('id')->toArray();
+        array_push($alertSchedules, $alertSchedule);
+    }
+
+    return api_success($alertSchedules, 'schedule');
+}
+
+function get_scheduled_maintenance(Illuminate\Http\Request $request): JsonResponse
+{
+    $id = $request->route('id');
+
+    $maintenceSchedule = AlertSchedule::find($id);
+
+    if (! $maintenceSchedule) {
+        return api_error(404, 'Scheduled maintenance not found');
+    }
+
+    if (! $maintenceSchedule->recurring) {
+        $maintenceSchedule
+            ->makeHidden('start_recurring_dt')
+            ->makeHidden('start_recurring_hr')
+            ->makeHidden('end_recurring_dt')
+            ->makeHidden('end_recurring_hr')
+            ->makeHidden('recurring_day');
+    }
+
+    $alertSchedule = $maintenceSchedule->attributesToArray();
+    $alertSchedule['devices'] = $maintenceSchedule->devices->pluck('device_id')->toArray();
+    $alertSchedule['device_groups'] = $maintenceSchedule->deviceGroups->pluck('id')->toArray();
+    $alertSchedule['locations'] = $maintenceSchedule->locations->pluck('id')->toArray();
+
+    return api_success($alertSchedule, 'schedule');
+}
+
+function add_scheduled_maintenance(Illuminate\Http\Request $request): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    $rules = [
+        'title' => 'required|string',
+        'notes' => 'nullable|string',
+        'behavior' => 'nullable|integer|in:1,2,3',
+        'recurring' => 'boolean',
+        'start' => 'required_if:recurring,0|nullable|date_format:Y-m-d H:i:s',
+        'end' => 'required_if:recurring,0|nullable|date_format:Y-m-d H:i:s|after:start',
+        'start_recurring_dt' => 'required_if:recurring,1|nullable|date_format:Y-m-d',
+        'start_recurring_hr' => 'required_if:recurring,1|nullable|date_format:H:i',
+        'end_recurring_hr' => 'required_if:recurring,1|nullable|date_format:H:i',
+        'end_recurring_dt' => 'required_if:recurring,1|nullable|date_format:Y-m-d|after_or_equal:start_recurring_dt',
+        'recurring_day' => 'required_if:recurring,1|nullable|array',
+        'recurring_day.*' => 'in:Mo,Tu,We,Th,Fr,Sa,Su',
+        'devices' => 'nullable|array',
+        'devices.*' => 'integer',
+        'device_groups' => 'nullable|array',
+        'device_groups.*' => 'integer',
+        'locations' => 'nullable|array',
+        'locations.*' => 'integer',
+    ];
+
+    $v = Validator::make($data, $rules);
+    if ($v->fails()) {
+        return api_error(422, $v->messages());
+    }
+
+    $recurring = (bool) ($data['recurring'] ?? false);
+
+    if (empty($data['devices']) && empty($data['device_groups']) && empty($data['locations'])) {
+        return api_error(422, 'At least one device, device_group, or location is required');
+    }
+
+    $alertSchedule = new AlertSchedule($v->safe()->only(['title', 'notes', 'recurring', 'behavior']));
+
+    if ($recurring) {
+        $alertSchedule->start_recurring_dt = $data['start_recurring_dt'];
+        $alertSchedule->start_recurring_hr = $data['start_recurring_hr'];
+        $alertSchedule->end_recurring_dt = $data['end_recurring_dt'];
+        $alertSchedule->end_recurring_hr = $data['end_recurring_hr'];
+        if (! empty($data['recurring_day'])) {
+            $day_map = ['Mo' => 1, 'Tu' => 2, 'We' => 3, 'Th' => 4, 'Fr' => 5, 'Sa' => 6, 'Su' => 7];
+            $alertSchedule->recurring_day = array_map(fn ($d) => $day_map[$d], $data['recurring_day']);
+        }
+    } else {
+        $alertSchedule->start = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $data['start']);
+        $alertSchedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $data['end']);
+    }
+
+    $alertSchedule->save();
+
+    $alertSchedule->devices()->sync($data['devices'] ?? []);
+    $alertSchedule->deviceGroups()->sync($data['device_groups'] ?? []);
+    $alertSchedule->locations()->sync($data['locations'] ?? []);
+
+    return api_success(
+        $alertSchedule->schedule_id,
+        'schedule_id',
+        'Scheduled maintenance created',
+        201,
+    );
+}
+
+function delete_scheduled_maintenance(Illuminate\Http\Request $request): JsonResponse
+{
+    $scheduleId = $request->route('id');
+
+    $alertSchedule = AlertSchedule::find($scheduleId);
+
+    if (! $alertSchedule) {
+        return api_error(404, 'Scheduled maintenance not found');
+    }
+
+    $deleted = $alertSchedule->delete();
+
+    if (! $deleted) {
+        return api_error(500, 'Scheduled maintenance could not be removed');
+    }
+
+    return api_success_noresult(200, 'Scheduled maintenance removed');
 }
 
 /**

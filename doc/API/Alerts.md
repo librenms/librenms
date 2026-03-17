@@ -341,6 +341,168 @@ Output:
 }
 ```
 
+## Scheduled maintenance
+
+### `list_scheduled_maintenance`
+
+List all scheduled maintenances.
+
+Route: `/api/v0/alerts/scheduled_maintenance`
+
+Input: None
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alerts/scheduled_maintenance
+```
+
+Output:
+
+```json
+{
+  "status": "ok",
+  "schedule": [
+    {
+      "schedule_id": 1,
+      "title": "Planned maintenance",
+      "notes": "Monthly maintenance window",
+      "recurring": 0,
+      "start": "2026-03-17 00:00:00",
+      "end": "2026-03-17 06:00:00",
+      "start_recurring_dt": "2026-03-17",
+      "start_recurring_hr": "00:00",
+      "end_recurring_dt": "2026-03-17",
+      "end_recurring_hr": "06:00",
+      "recurring_day": ["Mo"],
+      "status": 1,
+      "devices": [1, 2],
+      "device_groups": [1],
+      "locations": []
+    }
+  ],
+  "count": 1
+}
+```
+
+### `get_scheduled_maintenance`
+
+Get details of a specific alert maintenance schedule.
+
+Route: `/api/v0/alerts/scheduled_maintenance/:id`
+
+- id is the scheduled maintenance id, obtainable from [`list_scheduled_maintenance`](#list_scheduled_maintenance).
+
+Input:
+
+  -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alerts/scheduled_maintenance/1
+```
+
+Output:
+
+```json
+{
+  "status": "ok",
+  "schedule": {
+    "schedule_id": 1,
+    "title": "Planned maintenance",
+    "notes": "Monthly maintenance window",
+    "recurring": 0,
+    "start": "2026-03-17 00:00:00",
+    "end": "2026-03-17 06:00:00",
+    "start_recurring_dt": "2026-03-17",
+    "start_recurring_hr": "00:00",
+    "end_recurring_dt": "2026-03-17",
+    "end_recurring_hr": "06:00",
+    "recurring_day": ["Mo"],
+    "status": 1,
+    "devices": [1, 2],
+    "device_groups": [1],
+    "locations": []
+  }
+}
+```
+
+### `add_scheduled_maintenance`
+
+Create a new scheduled maintenance.
+
+Route: `/api/v0/alerts/scheduled_maintenance`
+
+Input (JSON):
+
+- title: (Required) Title of the maintenance schedule.
+- notes: Optional notes for this maintenance schedule.
+- behavior: Optional integer controlling maintenance behavior (`1`, `2`, or `3`).
+- recurring: Whether this is a recurring schedule (boolean, default `false`).
+- **When `recurring` is `false`** (non-recurring):
+  - start: (Required) Start datetime in `Y-m-d H:i:s` format.
+  - end: (Required) End datetime in `Y-m-d H:i:s` format. Must be after `start`.
+- **When `recurring` is `true`**:
+  - start_recurring_dt: (Required) Start date in `Y-m-d` format.
+  - start_recurring_hr: (Required) Start time in `H:i` format.
+  - end_recurring_hr: (Required) End time in `H:i` format. May be before `start_recurring_hr` to span midnight.
+  - end_recurring_dt: Optional end date in `Y-m-d` format (no end date if omitted).
+  - recurring_day: Optional array of day abbreviations. Valid values: `Mo`, `Tu`, `We`, `Th`, `Fr`, `Sa`, `Su`.
+- **Targets** (at least one is required):
+  - devices: Array of device IDs.
+  - device_groups: Array of device group IDs.
+  - locations: Array of location IDs.
+
+Example (non-recurring):
+
+```curl
+curl -X POST -d '{"title":"Planned maintenance","notes":"Monthly maintenance window","devices":[1,2],"start":"2026-03-17 00:00:00","end":"2026-03-17 06:00:00"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alerts/scheduled_maintenance
+```
+
+Example (recurring):
+
+```curl
+curl -X POST -d '{"title":"Weekly maintenance","recurring":true,"start_recurring_dt":"2026-03-17","start_recurring_hr":"22:00","end_recurring_hr":"06:00","recurring_day":["Mo","Tu","We","Th","Fr"],"device_groups":[1]}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alerts/scheduled_maintenance
+```
+
+Output:
+
+```json
+{
+  "status": "ok",
+  "message": "Scheduled maintenance created",
+  "schedule_id": 1
+}
+```
+
+### `delete_scheduled_maintenance`
+
+Delete an alert maintenance schedule.
+
+Route: `/api/v0/alerts/scheduled_maintenance/:id`
+
+- id is the scheduled maintenance id, obtainable from [`list_scheduled_maintenance`](#list_scheduled_maintenance).
+
+Input:
+
+  -
+
+Example:
+
+```curl
+curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alerts/scheduled_maintenance/1
+```
+
+Output:
+
+```json
+{
+  "status": "ok",
+  "message": "Scheduled maintenance deleted"
+}
+```
+
 ## Alert templates
 
 ### `get_alert_template`

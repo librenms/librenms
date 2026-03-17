@@ -35,6 +35,8 @@ Route::prefix('v0')->group(function (): void {
         Route::get('port_groups/{name}', [App\Api\Controllers\LegacyApiController::class, 'get_ports_by_group'])->name('get_ports_by_group');
         Route::get('portgroups/multiport/bits/{id}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_by_portgroup'])->name('get_graph_by_portgroup_multiport_bits');
         Route::get('portgroups/{group}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_by_portgroup'])->name('get_graph_by_portgroup');
+        Route::get('alerts/scheduled_maintenance', [\App\Api\Controllers\LegacyApiController::class, 'list_scheduled_maintenance'])->name('list_scheduled_maintenance');
+        Route::get('alerts/scheduled_maintenance/{id}', [\App\Api\Controllers\LegacyApiController::class, 'get_scheduled_maintenance'])->name('get_scheduled_maintenance');
         Route::get('alerts/{id}', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('get_alert');
         Route::get('alerts', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('list_alerts');
         Route::get('rules/{id}', [App\Api\Controllers\LegacyApiController::class, 'list_alert_rules'])->name('get_alert_rule');
@@ -86,6 +88,8 @@ Route::prefix('v0')->group(function (): void {
         Route::delete('bills/{bill_id}', [App\Api\Controllers\LegacyApiController::class, 'delete_bill'])->name('delete_bill');
         Route::put('alerts/{id}', [App\Api\Controllers\LegacyApiController::class, 'ack_alert'])->name('ack_alert');
         Route::put('alerts/unmute/{id}', [App\Api\Controllers\LegacyApiController::class, 'unmute_alert'])->name('unmute_alert');
+        Route::post('alerts/scheduled_maintenance', [\App\Api\Controllers\LegacyApiController::class, 'add_scheduled_maintenance'])->name('add_scheduled_maintenance');
+        Route::delete('alerts/scheduled_maintenance/{id}', [\App\Api\Controllers\LegacyApiController::class, 'delete_scheduled_maintenance'])->name('delete_scheduled_maintenance');
         Route::post('alert_templates', [App\Api\Controllers\LegacyApiController::class, 'add_edit_alert_template'])->name('add_alert_template');
         Route::put('alert_templates', [App\Api\Controllers\LegacyApiController::class, 'add_edit_alert_template'])->name('edit_alert_template');
         // Route::delete('alert_templates/{id}', [App\Api\Controllers\LegacyApiController::class, 'delete_alert_template'])->name('delete_alert_template');
