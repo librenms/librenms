@@ -113,6 +113,7 @@ class WirelessSensor
      * @param  bool  $valid  filter this list by valid types in the database
      * @param  int  $device_id  when filtering, only return types valid for this device_id
      * @return array
+     * @deprecated use WirelessSensorType enum
      */
     public static function getTypes($valid = false, $device_id = null): array
     {

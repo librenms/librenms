@@ -1,16 +1,16 @@
 <?php
 
-use LibreNMS\Device\WirelessSensor;
+use App\Models\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Util\Number;
 
 // this determines the order of the tabs
-$types = WirelessSensor::getTypes();
-
-$sensors = \App\Models\WirelessSensor::where('device_id', $device['device_id'])
+$db_classes = WirelessSensor::where('device_id', $device['device_id'])
     ->distinct()
     ->pluck('sensor_class')
+    ->map(fn (WirelessSensorType $class) => $class->value)
     ->all();
-$datas = array_intersect(array_keys($types), $sensors);
+$sensor_classes = array_intersect(WirelessSensorType::values(), $db_classes);
 
 $wireless_link_array = [
     'page' => 'device',
@@ -31,7 +31,7 @@ echo '<span' . ($vars['metric'] == 'overview' ? ' class="pagemenu-selected"' : '
 echo generate_link('Overview', $wireless_link_array, ['metric' => 'overview']);
 echo '</span>';
 
-foreach ($datas as $type) {
+foreach ($sensor_classes as $type) {
     echo ' | <span';
     if ($vars['metric'] == $type) {
         echo ' class="pagemenu-selected"';
@@ -46,7 +46,7 @@ foreach ($datas as $type) {
 print_optionbar_end();
 
 if ($vars['metric'] == 'overview') {
-    foreach ($datas as $type) {
+    foreach ($sensor_classes as $type) {
         $text = __("wireless.$type.long");
         $unit = __("wireless.$type.unit");
         if (! empty($unit)) {
@@ -58,7 +58,7 @@ if ($vars['metric'] == 'overview') {
 
         include \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/html/print-device-graph.php';
     }
-} elseif (isset($types[$vars['metric']])) {
+} elseif (WirelessSensorType::tryFrom($vars['metric'])) {
     $unit = __('wireless.' . $vars['metric'] . '.unit');
     $factor = 1;
     if ($unit == 'MHz') {
