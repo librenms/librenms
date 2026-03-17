@@ -3288,7 +3288,7 @@ function get_fdb(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname not found");
     }
     $vlan_list = [];
-    $vlans = $request->get('vlans');
+    $vlans = $request->get('vlan_id');
     if (!empty($vlans)) {
         if (is_string($vlans)) {
             $vlan_list = explode(',', $vlans);
@@ -3301,8 +3301,8 @@ function get_fdb(Illuminate\Http\Request $request)
 
     return check_device_permission($device_id, function () use ($device, $vlan_list) {
         if ($device) {
-            $fdb = $device->portsFdb()
-                ->when(!empty($vlan_list), fn ($q) => $q->whereIn('vlan', $vlan_list));
+            $fdb = $device->portsFdb
+                ->when(!empty($vlan_list), fn ($q) => $q->whereIn('vlan_id', $vlan_list));
             
             return api_success($fdb, 'ports_fdb');
         }
