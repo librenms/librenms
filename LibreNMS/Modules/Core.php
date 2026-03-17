@@ -205,7 +205,7 @@ class Core implements Module
      * sysObjectID if sysObjectID starts with any of the values under this item
      * sysDescr if sysDescr contains any of the values under this item
      * sysDescr_regex if sysDescr matches any of the regexes under this item
-     * snmpget perform an snmpget on `oid` and check if the result contains `value`. Other subkeys: options, mib, mibdir
+     * snmpget perform an snmpget on `oid` and check if the result contains `value`. Other subkeys: options, mib_dir
      *
      * Appending _except to any condition will invert the match.
      *
@@ -242,7 +242,7 @@ class Core implements Module
                 $get_value = SnmpQuery::device($device)
                     ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
-                    ->get(isset($value['mib']) ? "{$value['mib']}::{$value['oid']}" : $value['oid'])
+                    ->get($value['oid'])
                     ->value();
                 if (Compare::values($get_value, $value['value'], $value['op'] ?? 'contains') == $check) {
                     return false;
@@ -251,7 +251,7 @@ class Core implements Module
                 $walk_value = SnmpQuery::device($device)
                     ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
-                    ->walk(isset($value['mib']) ? "{$value['mib']}::{$value['oid']}" : $value['oid'])
+                    ->walk($value['oid'])
                     ->raw;
                 if (Compare::values($walk_value, $value['value'], $value['op'] ?? 'contains') == $check) {
                     return false;
