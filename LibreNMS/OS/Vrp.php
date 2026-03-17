@@ -124,30 +124,30 @@ class Vrp extends OS implements
         // Walk both OIDs and merge results - use pluck() to get simple entIndex => value mapping
         $mfgDatesInfo = \SnmpQuery::walk('.1.3.6.1.4.1.2011.5.25.31.1.1.2.1.4')->pluck();
         $mfgDatesExt = \SnmpQuery::walk('.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.49')->pluck();
-        
+
         // Merge and convert Huawei hex date format to YYYY-MM-DD
         // Format: "07 DF 05 0D 00 00 00 00" = year 2015 (0x07DF), month 05, day 13 (0x0D)
         // OCTET STRING (SIZE (8 | 11)) - first 4 bytes contain date
         $mfgDates = [];
-        
+
         // Use + operator to preserve numeric keys (array_merge reindexes!)
         foreach ($mfgDatesInfo + $mfgDatesExt as $entIndex => $hexDate) {
             if (empty($hexDate)) {
                 continue;
             }
-            
+
             // Parse hex string format: "07 DF 05 0D 00 00 00 00"
             $bytes = array_map('hexdec', explode(' ', trim($hexDate)));
-            
+
             // Skip all-zero dates or invalid data
             if (count($bytes) < 4 || ($bytes[0] === 0 && $bytes[1] === 0)) {
                 continue;
             }
-            
+
             $year = ($bytes[0] << 8) | $bytes[1];  // Combine first two bytes for year
             $month = $bytes[2];
             $day = $bytes[3];
-            
+
             // Validate date components
             if ($year > 1990 && $year < 2100 && $month >= 1 && $month <= 12 && $day >= 1 && $day <= 31) {
                 $mfgDates[$entIndex] = sprintf('%04d-%02d-%02d', $year, $month, $day);
