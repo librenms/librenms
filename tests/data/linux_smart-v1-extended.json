@@ -192,7 +192,13 @@
                 },
                 {
                     "metric": "disk_da0_max_temp",
-                    "value": 34,
+                    "value": 33,
+                    "value_prev": null,
+                    "app_type": "smart"
+                },
+                {
+                    "metric": "disk_da0_over_temp",
+                    "value": 1,
                     "value_prev": null,
                     "app_type": "smart"
                 },
