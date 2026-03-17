@@ -133,7 +133,7 @@ class EditHealthController
         }
         $validated = $request->validate([
             'sub_type' => 'nullable|in:remove-custom',
-            'state' => 'nullable|boolean',
+            'state' => 'nullable',
             'sensor_desc' => 'nullable|string',
         ]);
 
@@ -155,7 +155,7 @@ class EditHealthController
             ]);
         }
 
-        $state = (bool) ($validated['state'] ?? false);
+        $state = filter_var($validated['state'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $stateString = $state ? 'enabled' : 'disabled';
         $sensorDesc = e($validated['sensor_desc'] ?? '');
         $sensor->sensor_alert = $state;
