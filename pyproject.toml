@@ -1,0 +1,21 @@
+[project]
+name = "docs"
+version = "0.1.0"
+description = "Project documentation"
+requires-python = ">=3.10"
+dependencies = [
+    "markdown-exec",
+    "markdown-include",
+    "mkdocs",
+    "mkdocs-awesome-pages-plugin",
+    "mkdocs-exclude",
+    "mkdocs-git-revision-date-localized-plugin",
+    "mkdocs-include-dir-to-nav",
+    "mkdocs-macros-plugin",
+    "mkdocs-material",
+    "mkdocs-minify-plugin",
+    "mkdocs-redirects"
+]
+
+[tool.uv]
+package = false
