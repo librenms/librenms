@@ -3323,12 +3323,12 @@ function get_nac(Illuminate\Http\Request $request)
     if (! $device->exists) {
         return api_error(404, "Device $hostname not found");
     }
-    $hideHistorical = $request->get('hide_historical', false);
+    $hideHistorical = $request->get('hide_historical', false) == "true";
 
     return check_device_permission($device, function () use ($device, $hideHistorical) {
         
-        $nac = $device->portsNac()
-            ->when(!empty($hideHistorical), fn ($q) => $q->where('historical', 0));
+        $nac = $device->portsNac
+            ->when($hideHistorical, fn ($q) => $q->where('historical', 0));
 
         return api_success($nac, 'ports_nac');
     });
