@@ -1,3 +1,26 @@
+## 26.3.1
+*(2026-03-17)*
+
+A big thank you to the following 3 contributors this last month:
+
+  - [laf](https://github.com/laf) (1)
+  - [murrant](https://github.com/murrant) (1)
+  - [Jellyfrog](https://github.com/Jellyfrog) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [laf](https://github.com/laf) (2)
+  - [murrant](https://github.com/murrant) (1)
+  - [copilot-pull-request-reviewer](https://github.com/apps/copilot-pull-request-reviewer) (1)
+
+#### Bug
+* Fixed health alert toggle button in settings ([#19234](https://github.com/librenms/librenms/pull/19234)) - [laf](https://github.com/laf)
+* Fix device wireless sensors ([#19231](https://github.com/librenms/librenms/pull/19231)) - [murrant](https://github.com/murrant)
+
+#### Cleanup
+* Add shared OID type definitions and enforce on both schemas ([#19190](https://github.com/librenms/librenms/pull/19190)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+
 ## 26.3.0
 *(2026-03-16)*
 
