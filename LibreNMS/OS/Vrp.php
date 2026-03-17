@@ -137,7 +137,7 @@ class Vrp extends OS implements
             }
 
             // Parse hex string format: "07 DF 05 0D 00 00 00 00"
-            $bytes = array_map('hexdec', explode(' ', trim($hexDate)));
+            $bytes = array_map(hexdec(...), explode(' ', trim((string) $hexDate)));
 
             // Skip all-zero dates or invalid data
             if (count($bytes) < 4 || ($bytes[0] === 0 && $bytes[1] === 0)) {
