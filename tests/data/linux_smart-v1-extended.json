@@ -222,7 +222,7 @@
                 },
                 {
                     "metric": "disk_da0_unknownfail",
-                    "value": 0,
+                    "value": 1,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -252,7 +252,7 @@
                 },
                 {
                     "metric": "new_disks_with_failed_health",
-                    "value": 1,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -270,7 +270,7 @@
                 },
                 {
                     "metric": "unhealthy",
-                    "value": 1,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 }
