@@ -119,7 +119,7 @@ class Aos6 extends OS implements TransceiverDiscovery, VlanDiscovery, VlanPortDi
         // Update sensor group to 'transceiver' for DDM sensors matching these ports
         if ($transceivers->isNotEmpty()) {
             $ifIndexes = $transceivers->pluck('entity_physical_index')->toArray();
-            
+
             \DB::table('sensors')
                 ->where('device_id', $this->getDevice()->device_id)
                 ->whereIn('entPhysicalIndex', $ifIndexes)
