@@ -47,7 +47,8 @@ foreach (explode(PHP_EOL, (string) $data) as $line) {
         continue;
     }
     [$oid, $value] = $parts;
-    $value = trim(trim($value), '"');    $processed = false;
+    $value = trim(trim($value), '"');
+    $processed = false;
     foreach ($virtual_tables as $vt_name => $vt_regex) {
         if (preg_match($vt_regex, $oid, $matches)) {
             $index = $matches[1];
