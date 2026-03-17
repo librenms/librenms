@@ -285,14 +285,14 @@ if (! empty($peers)) {
                     }
 
                     $peer_data = [];
-                    $peer_data['bgpPeerState'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgConnState'];
-                    if ($peerData['TIMETRA-BGP-MIB::tBgpPeerNgShutdown'] == '1') {
+                    $peer_data['bgpPeerState'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgConnState'] ?? 'unknown';
+                    if (($peerData['TIMETRA-BGP-MIB::tBgpPeerNgShutdown'] ?? '0') == '1') {
                         $peer_data['bgpPeerAdminStatus'] = 'adminShutdown';
                     } else {
-                        $peer_data['bgpPeerAdminStatus'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent'];
+                        $peer_data['bgpPeerAdminStatus'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent'] ?? 'unknown';
                     }
-                    $peer_data['bgpPeerInTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] % (2 ** 32);  // That are actually only octets available,
-                    $peer_data['bgpPeerOutTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] % (2 ** 32); // not messages
+                    $peer_data['bgpPeerInTotalMessages'] = ($peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] ?? 0) % (2 ** 32);  // That are actually only octets available,
+                    $peer_data['bgpPeerOutTotalMessages'] = ($peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] ?? 0) % (2 ** 32); // not messages
                     $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
                 } elseif ($device['os'] == 'firebrick') {
                     // ToDo, It seems that bgpPeer(In|Out)Updates and bgpPeerInUpdateElapsedTime are actually not available over SNMP
@@ -604,7 +604,7 @@ if (! empty($peers)) {
         }
 
         // --- Populate cbgp data ---
-        if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista' || $device['os'] == 'dell-os10' || $device['os'] == 'firebrick') {
+        if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista' || $device['os'] == 'dell-os10' || $device['os'] == 'firebrick' || $device['os'] == 'timos') {
             // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
             $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
             foreach ($peer_afis as $peer_afi) {
@@ -782,6 +782,72 @@ if (! empty($peers)) {
                             break;
                         }
                     }
+                }
+
+                if ($device['os'] == 'timos') {
+                    $timos_oid_map = [
+                        'ipv4' => [
+                            'unicast' => ['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.5',  '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.6'],
+                            'multicast' => ['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.37', '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.38'],
+                            'vpn' => ['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.13', '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.14'],
+                        ],
+                        'ipv6' => [
+                            'unicast' => ['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.27', '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.28'],
+                            'multicast' => ['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.95', '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.96'],
+                            'vpn' => ['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.40', '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.41'],
+                        ],
+                    ];
+
+                    // Walk all OIDs once per poll cycle, cache results by peer IP.
+                    // snmpwalk_cache_oid returns indexes as "vrfOid.addrType.address"
+                    // where addrType is "ipv4" (dotted-decimal) or "ipv6" (MIB-quoted hex).
+                    if (! isset($t_prefixes_parsed)) {
+                        $t_prefixes_parsed = [];
+                        foreach ($timos_oid_map as $timos_afi => $safis_map) {
+                            foreach ($safis_map as $timos_safi => $timos_oids) {
+                                $recv_oid = $timos_oids[0];
+                                $sent_oid = $timos_oids[1];
+                                $recv_data = snmpwalk_cache_oid($device, $recv_oid, [], 'TIMETRA-BGP-MIB');
+                                $sent_data = snmpwalk_cache_oid($device, $sent_oid, [], 'TIMETRA-BGP-MIB');
+                                foreach ($recv_data as $index => $recv_val) {
+                                    $parts = explode('.', (string) $index);
+                                    if (count($parts) < 3) {
+                                        continue;
+                                    }
+                                    if ($parts[1] === 'ipv6') {
+                                        $hex_addr = str_replace(':', '', trim($parts[2], '"'));
+                                        try {
+                                            $addr = IP::fromHexString($hex_addr)->compressed();
+                                        } catch (\LibreNMS\Exceptions\InvalidIpException) {
+                                            continue;
+                                        }
+                                    } else {
+                                        $addr = implode('.', array_slice($parts, 2));
+                                    }
+                                    $recv_val = is_array($recv_val) ? reset($recv_val) : $recv_val;
+                                    $sent_val = isset($sent_data[$index])
+                                        ? (is_array($sent_data[$index]) ? reset($sent_data[$index]) : $sent_data[$index])
+                                        : 0;
+                                    $t_prefixes_parsed[$addr][$timos_afi][$timos_safi] = [
+                                        'recv' => $recv_val,
+                                        'sent' => $sent_val,
+                                    ];
+                                }
+                            }
+                        }
+                    }
+
+                    $addr_str = (string) $peer_ip;
+                    $current_peer_data = $t_prefixes_parsed[$addr_str][$afi][$safi] ?? null;
+
+                    $cbgpPeerAcceptedPrefixes = $current_peer_data['recv'] ?? null;
+                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['sent'] ?? null;
+                    $cbgpPeerDeniedPrefixes = null;
+                    $cbgpPeerPrefixAdminLimit = null;
+                    $cbgpPeerPrefixThreshold = null;
+                    $cbgpPeerPrefixClearThreshold = null;
+                    $cbgpPeerSuppressedPrefixes = null;
+                    $cbgpPeerWithdrawnPrefixes = null;
                 }
 
                 // Validate data

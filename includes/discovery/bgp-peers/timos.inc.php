@@ -52,7 +52,7 @@ if ($device['os'] == 'timos') {
         d_echo($vrfId);
 
         foreach ($vrf as $address => $value) {
-            $astext = \LibreNMS\Util\AutonomousSystem::get($value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'])->name();
+            $astext = \LibreNMS\Util\AutonomousSystem::get($value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'] ?? null)->name();
             if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
                 $peers = [
                     'device_id' => $device['device_id'],
@@ -101,5 +101,57 @@ if ($device['os'] == 'timos') {
     }
 
     unset($bgpPeers);
+    $afi_map = [1 => 'ipv4', 2 => 'ipv6'];
+    $safi_map = [1 => 'unicast', 2 => 'multicast', 128 => 'vpn'];
+
+    $prefix_oids = [
+        '1_1' => ['recv' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperReceivedPrefixes', 'sent' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperSentPrefixes', 'filter' => 'ipv4'],
+        '1_2' => ['recv' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4RecvPfxs', 'sent' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperMCastV4SentPfxs', 'filter' => null],
+        '1_128' => ['recv' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperVpnRecvPrefixes', 'sent' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperVpnSentPrefixes', 'filter' => null],
+        '2_1' => ['recv' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperV6ReceivedPrefixes', 'sent' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperV6SentPrefixes', 'filter' => 'ipv6'],
+        '2_2' => ['recv' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6RecvPfxs', 'sent' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperMcastV6SentPfxs', 'filter' => null],
+        '2_128' => ['recv' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6RecvPfxs', 'sent' => 'TIMETRA-BGP-MIB::tBgpPeerNgOperVpnIpv6SentPfxs', 'filter' => null],
+    ];
+
+    // tBgpPeerNgEntry table OID stripped of 1.3.6.1.4.1. prefix
+    $table_stripped = '6527.3.1.2.14.4.8';
+    foreach ($prefix_oids as $oid_key => $oid_set) {
+        $recv_data = SnmpQuery::numericIndex()->walk($oid_set['recv'])->valuesByIndex();
+        $sent_data = SnmpQuery::numericIndex()->walk($oid_set['sent'])->valuesByIndex();
+
+        [$afi, $safi] = explode('_', $oid_key);
+        $afi_name = $afi_map[(int) $afi] ?? "afi$afi";
+        $safi_name = $safi_map[(int) $safi] ?? "safi$safi";
+
+        foreach ($recv_data as $index => $recv_val) {
+            $index_str = (string) $index;
+            // Keys from numericIndex()->valuesByIndex() look like "6527.3.1.2.14.4.8.1.X.vrfOid.addrType.addrLen.octets"
+            // Strip table OID + entry(1) + column(X) to get: vrfOid.addrType.addrLen.octets
+            $index_part = preg_replace('#^' . preg_quote($table_stripped, '#') . '\.\d+\.\d+\.#', '', $index_str);
+            $parts = explode('.', (string) $index_part);
+            if (count($parts) < 6) {
+                continue;
+            }
+            $addr_type = $parts[1];
+            $filter = $oid_set['filter'];
+            $addr_type_name = $addr_type === '1' ? 'ipv4' : ($addr_type === '2' ? 'ipv6' : $addr_type);
+            if ($filter !== null && $addr_type_name !== $filter) {
+                continue;
+            }
+            if ($addr_type === '2') {
+                $hex_addr = implode('', array_map(fn ($o) => sprintf('%02x', $o), array_slice($parts, 3)));
+                try {
+                    $address = IP::fromHexString($hex_addr)->compressed();
+                } catch (\LibreNMS\Exceptions\InvalidIpException) {
+                    continue;
+                }
+            } else {
+                $address = implode('.', array_slice($parts, 3));
+            }
+            $peer = ['ip' => $address];
+            add_cbgp_peer($device, $peer, $afi_name, $safi_name);
+        }
+    }
+
     // No return statement here, so standard BGP mib will still be polled after this file is executed.
 }
