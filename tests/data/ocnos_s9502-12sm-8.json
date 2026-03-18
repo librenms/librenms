@@ -3450,6 +3450,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3469,6 +3470,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "FS",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3488,6 +3490,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "FS",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3507,6 +3510,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "FS",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -3554,7 +3558,7 @@
                     "model": "QSFP-SR4-100G",
                     "revision": "1A",
                     "serial": "C2410891766",
-                    "date": "2024-10-31",
+                    "date": "241031",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -3573,7 +3577,7 @@
                     "model": "QSFP-SR4-100G",
                     "revision": "1A",
                     "serial": "C2410891313",
-                    "date": "2024-10-31",
+                    "date": "241031",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -3592,7 +3596,7 @@
                     "model": "QSFP-SR4-100G",
                     "revision": "1A",
                     "serial": "C2410891292",
-                    "date": "2024-10-31",
+                    "date": "241031",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
