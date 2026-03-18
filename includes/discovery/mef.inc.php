@@ -61,7 +61,7 @@ foreach (dbFetchRows($sql) as $db_mef) {
      * Delete the MEF Link that are removed from the host.
      */
     if (! in_array($db_mef['mefID'], $mef_list)) {
-        dbDelete('mefinfo', '`id` = ?', [$db_mef['id']]);
+        \App\Models\MefInfo::where('id', $db_mef['id'])->delete();
         Eventlog::log('MEF link: ' . $db_mef['mefIdent'] . ' Removed', $device['device_id'], 'system', Severity::Notice);
         echo '-';
     }

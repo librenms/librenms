@@ -93,11 +93,7 @@ if (! empty($entPhysical)) {
     }
 
     if (! empty($db_states)) {
-        dbDelete(
-            'entityState',
-            'entity_state_id IN ' . dbGenPlaceholders(count($db_states)),
-            array_column($db_states, 'entity_state_id')
-        );
+        \App\Models\EntityState::whereIn('entity_state_id', array_column($db_states, 'entity_state_id'))->delete();
     }
 }
 
