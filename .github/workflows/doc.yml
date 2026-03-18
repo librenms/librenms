@@ -39,6 +39,7 @@ jobs:
             /resources/definitions/os_detection
             /doc
             /mkdocs.yml
+            /pyproject.toml
       -
         name: Build mkdocs Docker image
         run: |
