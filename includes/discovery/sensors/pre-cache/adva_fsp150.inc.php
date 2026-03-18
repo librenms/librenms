@@ -23,7 +23,7 @@ $pre_cache['adva_erp'] = snmpwalk_cache_multi_oid($device, 'f3ErpConfigObjects',
 $pre_cache['adva_fsp150_perfs'] = [];
 $pre_cache['adva_fsp150_ports'] = [];
 
-$neType = $pre_cache['adva_fsp150'][1]['neType'];
+$neType = $pre_cache['adva_fsp150'][1]['neType'] ?? null;
 $pre_cache['adva_fsp150_ifName'] = snmpwalk_cache_multi_oid($device, 'ifName', [], 'IF-MIB', null, '-OQUbs');
 
 if ($neType == 'ccxg116pro' || $neType == 'ccxg116proH' || $neType == 'ccxg120pro' || $neType == 'aggregation') {
