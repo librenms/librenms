@@ -40,6 +40,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Mediant VE SBC",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -59,6 +60,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -78,6 +80,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -97,6 +100,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -116,6 +120,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -135,6 +140,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -154,6 +160,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -173,6 +180,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -192,6 +200,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -211,6 +220,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -230,6 +240,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -249,6 +260,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

@@ -2773,6 +2773,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "ZTE",
+                    "entPhysicalMfgDate": "17990-70-70,70:70:70.70,F70:7070707070707070707070707070707070707070707070707070707070707070",
                     "ifIndex": null
                 },
                 {
@@ -2792,6 +2793,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "ZTE",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:000000",
                     "ifIndex": null
                 },
                 {
@@ -2811,6 +2813,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "ZTE",
+                    "entPhysicalMfgDate": "17990-70-70,70:70:70.70,F70:7070707070707070707070707070707070707070707070707070484869694950",
                     "ifIndex": null
                 },
                 {
@@ -2830,6 +2833,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ZTE",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:4848484848484848484848484848484848484848484848484848484848484848",
                     "ifIndex": null
                 },
                 {
@@ -2849,6 +2853,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ZTE",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:4848484848484848484848484848484848484848484848484848484848484848",
                     "ifIndex": null
                 }
             ]

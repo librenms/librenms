@@ -56,49 +56,6 @@ function dbInsert($data, $table): ?int
 }//end dbInsert()
 
 /**
- * Passed an array and a table name, it attempts to insert the data into the table.
- * $data is an array (rows) of key value pairs.  keys are fields.  Rows need to have same fields.
- * Check for boolean false to determine whether insert failed
- *
- * @param  array  $data
- * @param  string  $table
- * @return bool
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
- * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
- */
-function dbBulkInsert($data, $table)
-{
-    // check that data isn't an empty array
-    if (empty($data)) {
-        return false;
-    }
-
-    // make sure we have fields to insert
-    $fields = array_keys(reset($data));
-    if (empty($fields)) {
-        return false;
-    }
-
-    // Break into managable chunks to prevent situations where insert
-    // fails due to prepared statement having too many placeholders.
-    $data_chunks = array_chunk($data, 10000, true);
-
-    foreach ($data_chunks as $data_chunk) {
-        try {
-            $result = Eloquent::DB()->table($table)->insert((array) $data_chunk);
-
-            return $result;
-        } catch (PDOException $pdoe) {
-            // FIXME query?
-            dbHandleException(new QueryException('dbFacile', "Bulk insert $table", $data_chunk, $pdoe));
-        }
-    }
-
-    return false;
-}//end dbBulkInsert()
-
-/**
  * Passed an array, table name, WHERE clause, and placeholder parameters, it attempts to update a record.
  * Returns the number of affected rows
  *
