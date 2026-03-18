@@ -202,10 +202,11 @@ enable it, add `--livereload`.
 
 === "docker"
 
-    Run the Docker container:
-
+    The `squidfunk/mkdocs-material` image defaults to listening on all interfaces.
+    To listen on localhost only, you can use the following directive:
+ 
     ```bash
-    docker run --rm -p 8000:8000 -v "$(pwd):/docs" librenms-docs
+    docker run --rm -p 127.0.0.1:8000:8000 -v "$(pwd):/docs" librenms-docs
     ```
 
 Now you will find the complete set of LibreNMS documentation by opening your
@@ -235,8 +236,10 @@ to listen on all interfaces:
 
 === "docker"
 
+    The `squidfunk/mkdocs-material` default to 0.0.0.0, so you can just run:
+
     ```bash
-    docker run --rm -p 8000:8000 -v "$(pwd):/docs" librenms-docs --dev-addr=0.0.0.0:8000
+    docker run --rm -p 8000:8000 -v "$(pwd):/docs" librenms-docs 
     ```
 
 WARNING: this is not a secure web server, do this at your own risk, with
