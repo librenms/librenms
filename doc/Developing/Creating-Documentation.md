@@ -161,13 +161,13 @@ LibreNMS uses `pyproject.toml` to manage the Python dependencies for building th
     Build the docs inside the container:
 
     ```bash
-    docker run --rm -v "$(pwd):/app" librenms-docs mkdocs build
+    docker run --rm -v "$(pwd):/docs" librenms-docs build 
     ```
 
     To fail on warnings (useful before submitting changes):
 
     ```bash
-    docker run --rm -v "$(pwd):/app" librenms-docs mkdocs build --strict
+    docker run --rm -v "$(pwd):/docs" librenms-docs  build --strict
     ```
 
 
