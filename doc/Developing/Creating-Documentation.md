@@ -205,7 +205,7 @@ enable it, add `--livereload`.
     Run the Docker container:
 
     ```bash
-    docker run --rm -p 8000:8000 -v "$(pwd):/app" librenms-docs
+    docker run --rm -p 8000:8000 -v "$(pwd):/docs" librenms-docs
     ```
 
 Now you will find the complete set of LibreNMS documentation by opening your
@@ -236,7 +236,7 @@ to listen on all interfaces:
 === "docker"
 
     ```bash
-    docker run --rm -p 8000:8000 -v "$(pwd):/app" librenms-docs --dev-addr=0.0.0.0:8000
+    docker run --rm -p 8000:8000 -v "$(pwd):/docs" librenms-docs --dev-addr=0.0.0.0:8000
     ```
 
 WARNING: this is not a secure web server, do this at your own risk, with
