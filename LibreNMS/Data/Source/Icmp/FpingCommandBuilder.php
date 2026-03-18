@@ -85,6 +85,7 @@ class FpingCommandBuilder
     public function build(string ...$hosts): array
     {
         $base = LibrenmsConfig::fpingCommand($this->addressFamily ?? AddressFamily::IPv4);
+
         return array_merge($base, $this->args, $hosts);
     }
 }
