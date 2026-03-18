@@ -13,11 +13,14 @@
  */
 
 use App\Models\AlertTransport;
+use App\Models\AlertTransportGroup;
+use App\Models\AlertTransportMap;
+use App\Models\TransportGroupTransport;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-if (Gate::denies('update', AlertTransport::class)) {
+if (Gate::denies('delete', AlertTransport::class)) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'ERROR: You need permission.',
@@ -31,9 +34,9 @@ if (! is_numeric($vars['group_id'])) {
     $status = 'error';
     $message = 'ERROR: No transport group selected';
 } else {
-    if (dbDelete('alert_transport_groups', '`transport_group_id` = ?', [$vars['group_id']])) {
-        dbDelete('transport_group_transport', '`transport_group_id`=?', [$vars['group_id']]);
-        dbDelete('alert_transport_map', '`target_type`="group" AND `transport_or_group_id`=?', [$vars['group_id']]);
+    if (AlertTransportGroup::where('transport_group_id', $vars['group_id'])->delete()) {
+        TransportGroupTransport::where('transport_group_id', $vars['group_id'])->delete();
+        AlertTransportMap::where('target_type', 'group')->where('transport_or_group_id', $vars['group_id'])->delete();
         $message = 'Alert transport group has been deleted';
     } else {
         $message = 'ERROR: Alert transport group has not been deleted';

@@ -98,7 +98,7 @@ if ($device['os_group'] == 'cisco') {
         print_r($cefs_db);
 
         foreach ((array) $cefs_db as $cef_switching_id) {
-            dbDelete('cef_switching', '`cef_switching_id` =  ?', [$cef_switching_id]);
+            \App\Models\CefSwitching::where('cef_switching_id', $cef_switching_id)->delete();
             echo '-';
         }
     }
