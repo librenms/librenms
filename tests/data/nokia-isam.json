@@ -1511,6 +1511,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "ALCL",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -1530,6 +1531,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "TI",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -1549,6 +1551,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "TI",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 }
             ]

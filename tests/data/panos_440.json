@@ -3476,6 +3476,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Palo Alto Networks",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -3495,6 +3496,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 }
             ]
