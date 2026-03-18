@@ -39,7 +39,10 @@ $virtual_tables = [
 
 $data = trim((string) snmp_walk($device, '.1.3.6.1.4.1.20916.1', '-OQn'));
 foreach (explode(PHP_EOL, $data) as $line) {
-    [$oid, $value] = explode(' =', $line);
+    if (! str_contains($line, ' =')) {
+        continue;
+    }
+    [$oid, $value] = explode(' =', $line, 2);
     $value = trim($value);
 
     $processed = false;
