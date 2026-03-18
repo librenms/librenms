@@ -90,10 +90,9 @@ This is achieved with `mkdocs`.
 
 Build from the LibreNMS base directory (for example: `cd /opt/librenms`).
 
-=== "uv (recommended)"
+LibreNMS uses `pyproject.toml` to manage the Python dependencies for building the docs. You can use either `uv`, `venv + pip` or `docker` to set up the environment and build the documentation.
 
-    LibreNMS includes a `pyproject.toml` with the documentation dependencies.
-    If `uv.lock` is present, it pins exact versions for reproducible builds.
+=== "uv"
 
     [`uv`](https://docs.astral.sh/uv/) is a fast Python package manager and
     runner. Install it (for example: `pipx install uv`) and then:
@@ -124,8 +123,7 @@ Build from the LibreNMS base directory (for example: `cd /opt/librenms`).
 
 === "venv + pip"
 
-    If you don't have `uv`, you can install the required packages with `pip`.
-
+    To build the docs with `venv` and `pip`, you will need to have Python installed on your machine.
     Make a new virtual environment and activate it:
 
     ```bash
@@ -134,18 +132,7 @@ Build from the LibreNMS base directory (for example: `cd /opt/librenms`).
     ```
 
     ```bash
-    pip install \
-     markdown-exec \
-     markdown-include \
-     mkdocs \
-     mkdocs-awesome-pages-plugin \
-     mkdocs-exclude \
-     mkdocs-git-revision-date-localized-plugin \
-     mkdocs-include-dir-to-nav \
-     mkdocs-macros-plugin \
-     mkdocs-material \
-     mkdocs-minify-plugin \
-     mkdocs-redirects
+    pip install -e .
     ```
 
     If you encounter permissions issues, these might be resolved by using the user
@@ -162,6 +149,27 @@ Build from the LibreNMS base directory (for example: `cd /opt/librenms`).
     ```bash
     mkdocs build --strict
     ```
+
+=== "docker"
+
+    Build the Docker image from the repository root:
+
+    ```bash
+    docker build -t librenms-docs -f doc/Dockerfile .
+    ```
+
+    Build the docs inside the container:
+
+    ```bash
+    docker run --rm -v "$(pwd):/app" librenms-docs mkdocs build
+    ```
+
+    To fail on warnings (useful before submitting changes):
+
+    ```bash
+    docker run --rm -v "$(pwd):/app" librenms-docs mkdocs build --strict
+    ```
+
 
 This will output all the documentation in HTML format to `/opt/librenms/out`
 (this folder will be ignored from any commits).
@@ -192,6 +200,14 @@ enable it, add `--livereload`.
     mkdocs serve
     ```
 
+=== "docker"
+
+    Run the Docker container:
+
+    ```bash
+    docker run --rm -p 8000:8000 -v "$(pwd):/app" librenms-docs
+    ```
+
 Now you will find the complete set of LibreNMS documentation by opening your
 browser to `localhost:8000`.
 
@@ -215,6 +231,12 @@ to listen on all interfaces:
 
     ```bash
     mkdocs serve --dev-addr=0.0.0.0:8000
+    ```
+
+=== "docker"
+
+    ```bash
+    docker run --rm -p 8000:8000 -v "$(pwd):/app" librenms-docs --dev-addr=0.0.0.0:8000
     ```
 
 WARNING: this is not a secure web server, do this at your own risk, with

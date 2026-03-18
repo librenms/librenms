@@ -1,7 +1,7 @@
 [project]
-name = "docs"
+name = "librenms-docs"
 version = "0.1.0"
-description = "Project documentation"
+description = "LibreNMS project documentation"
 requires-python = ">=3.10"
 dependencies = [
     "markdown-exec",
@@ -17,5 +17,5 @@ dependencies = [
     "mkdocs-redirects"
 ]
 
-[tool.uv]
-package = false
+[project.optional-dependencies]
+dev = []
