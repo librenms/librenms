@@ -24,17 +24,18 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Data\Source;
+namespace LibreNMS\Data\Source\Icmp;
 
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\DeviceStats;
 use Carbon\Carbon;
+use LibreNMS\Enum\FpingExitCode;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\RRD\RrdDefinition;
 
-class FpingResponse extends FpingResponseBase implements \Stringable
+class FpingResponse implements PingResultInterface, \Stringable
 {
     /**
      * @param  int  $transmitted  ICMP packets transmitted
@@ -44,7 +45,7 @@ class FpingResponse extends FpingResponseBase implements \Stringable
      * @param  float  $max_latency  Maximum latency (ms)
      * @param  float  $avg_latency  Average latency (ms)
      * @param  int  $duplicates  Number of duplicate responses (Indicates network issue)
-     * @param  int  $exit_code  Return code from fping
+     * @param  FpingExitCode  $exit_code  Return code from fping
      * @param  string|null  $host  Hostname/IP pinged
      */
     public function __construct(
@@ -55,21 +56,20 @@ class FpingResponse extends FpingResponseBase implements \Stringable
         public readonly float $max_latency,
         public readonly float $avg_latency,
         public readonly int $duplicates,
-        int $exit_code,
-        ?string $host = null,
-        private readonly bool $skipped = false)
-    {
-        parent::__construct($exit_code, $host);
+        public FpingExitCode $exit_code,
+        public readonly ?string $host = null,
+        private readonly bool $skipped = false
+    ) {
     }
 
     public static function artificialUp(?string $host = null): static
     {
-        return new static(1, 1, 0, 0, 0, 0, 0, self::SUCCESS, $host, true);
+        return new static(1, 1, 0, 0, 0, 0, 0, FpingExitCode::Success, $host, true);
     }
 
     public static function artificialDown(?string $host = null): static
     {
-        return new static(1, 0, 100, 0, 0, 0, 0, self::SUCCESS, $host, false);
+        return new static(1, 0, 100, 0, 0, 0, 0, FpingExitCode::Success, $host, false);
     }
 
     public function wasSkipped(): bool
@@ -89,9 +89,9 @@ class FpingResponse extends FpingResponseBase implements \Stringable
         $loss = $loss100 ?: $loss;
 
         if ($error == 'Name or service not known') {
-            return new FpingResponse(0, 0, 0, 0, 0, 0, 0, self::INVALID_HOST, $host);
+            return new FpingResponse(0, 0, 0, 0, 0, 0, 0, FpingExitCode::InvalidHost, $host);
         } elseif ($error == 'Temporary failure in name resolution') {
-            return new FpingResponse(0, 0, 0, 0, 0, 0, 0, self::SYS_CALL_FAIL, $host);
+            return new FpingResponse(0, 0, 0, 0, 0, 0, 0, FpingExitCode::SysCallFail, $host);
         }
 
         return new static(
@@ -102,7 +102,7 @@ class FpingResponse extends FpingResponseBase implements \Stringable
             (float) $max,
             (float) $avg,
             substr_count($output, 'duplicate'),
-            $code ?? ($loss100 ? self::UNREACHABLE : self::SUCCESS),
+            $code !== null ? FpingExitCode::from($code) : ($loss100 ? FpingExitCode::Unreachable : FpingExitCode::Success),
             $host,
         );
     }
@@ -113,7 +113,25 @@ class FpingResponse extends FpingResponseBase implements \Stringable
      */
     public function isAlive(): bool
     {
-        return $this->exit_code == self::SUCCESS && $this->loss < 100;
+        return $this->exit_code === FpingExitCode::Success && $this->loss < 100;
+    }
+
+    /**
+     * Change the exit code to 0, this may be appropriate when a non-fatal error was encountered
+     */
+    public function ignoreFailure(): void
+    {
+        $this->exit_code = FpingExitCode::Success;
+    }
+
+    public function getHost(): ?string
+    {
+        return $this->host;
+    }
+
+    public function getExitCode(): FpingExitCode
+    {
+        return $this->exit_code;
     }
 
     public function __toString(): string

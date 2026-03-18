@@ -30,8 +30,8 @@ use App\Facades\LibrenmsConfig;
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
-use LibreNMS\Data\Source\Fping;
-use LibreNMS\Data\Source\FpingResponse;
+use LibreNMS\Data\Source\Icmp\FpingMetricService;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\ModuleList;
@@ -175,8 +175,8 @@ final class OSModulesTest extends DBTestCase
             return $mock;
         });
 
-        $this->app->bind(Fping::class, function ($app) {
-            $mock = \Mockery::mock(Fping::class);
+        $this->app->bind(FpingMetricService::class, function ($app) {
+            $mock = \Mockery::mock(FpingMetricService::class);
             $mock->shouldReceive('ping')->andReturn(FpingResponse::artificialUp());
 
             return $mock;

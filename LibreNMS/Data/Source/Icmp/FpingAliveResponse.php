@@ -24,12 +24,23 @@
  * @author     Steven Wilton <swilton@fluentit.au>
  */
 
-namespace LibreNMS\Data\Source;
+namespace LibreNMS\Data\Source\Icmp;
 
+use LibreNMS\Enum\FpingExitCode;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 
-class FpingAliveResponse extends FpingResponseBase
+class FpingAliveResponse implements PingResultInterface
 {
+    /**
+     * @param  FpingExitCode  $exit_code  Return code from fping
+     * @param  string|null  $host  Hostname/IP pinged
+     */
+    public function __construct(
+        public FpingExitCode $exit_code,
+        public readonly ?string $host = null
+    ) {
+    }
+
     public static function parseLine(string $output): FpingAliveResponse
     {
         $matched = preg_match('/^(\S+) is (alive|unreachable)$/', $output, $parsed);
@@ -37,7 +48,7 @@ class FpingAliveResponse extends FpingResponseBase
             [, $host, $result] = array_pad($parsed, 3, 0);
 
             return new static(
-                $result == 'alive' ? self::SUCCESS : self::UNREACHABLE,
+                $result == 'alive' ? FpingExitCode::Success : FpingExitCode::Unreachable,
                 $host,
             );
         }
@@ -48,8 +59,8 @@ class FpingAliveResponse extends FpingResponseBase
 
             try {
                 $ret_code = match ($result) {
-                    'Name or service not known' => self::INVALID_HOST,
-                    'Temporary failure in name resolution' => self::SYS_CALL_FAIL,
+                    'Name or service not known' => FpingExitCode::InvalidHost,
+                    'Temporary failure in name resolution' => FpingExitCode::SysCallFail,
                 };
             } catch (\UnhandledMatchError) {
                 throw new FpingUnparsableLine($output);
@@ -70,6 +81,24 @@ class FpingAliveResponse extends FpingResponseBase
      */
     public function isAlive(): bool
     {
-        return $this->exit_code == self::SUCCESS;
+        return $this->exit_code === FpingExitCode::Success;
+    }
+
+    /**
+     * Change the exit code to 0, this may be appropriate when a non-fatal error was encountered
+     */
+    public function ignoreFailure(): void
+    {
+        $this->exit_code = FpingExitCode::Success;
+    }
+
+    public function getHost(): ?string
+    {
+        return $this->host;
+    }
+
+    public function getExitCode(): FpingExitCode
+    {
+        return $this->exit_code;
     }
 }
