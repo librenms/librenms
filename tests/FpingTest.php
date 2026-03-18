@@ -40,7 +40,7 @@ final class FpingTest extends TestCase
 
         $actual = app()->make(Fping::class)->ping('192.168.1.3');
 
-        $this->assertTrue($actual->success());
+        $this->assertTrue($actual->isAlive());
         $this->assertEquals('192.168.1.3', $actual->host);
         $this->assertEquals(3, $actual->transmitted);
         $this->assertEquals(3, $actual->received);
@@ -59,7 +59,7 @@ final class FpingTest extends TestCase
 
         $actual = app()->make(Fping::class)->ping('192.168.1.7');
 
-        $this->assertTrue($actual->success());
+        $this->assertTrue($actual->isAlive());
         $this->assertEquals('192.168.1.7', $actual->host);
         $this->assertEquals(5, $actual->transmitted);
         $this->assertEquals(3, $actual->received);
@@ -78,7 +78,7 @@ final class FpingTest extends TestCase
 
         $actual = app()->make(Fping::class)->ping('192.168.53.1');
 
-        $this->assertFalse($actual->success());
+        $this->assertFalse($actual->isAlive());
         $this->assertEquals('192.168.53.1', $actual->host);
         $this->assertEquals(3, $actual->transmitted);
         $this->assertEquals(0, $actual->received);
@@ -102,7 +102,7 @@ OUT;
 
         $actual = app()->make(Fping::class)->ping('192.168.1.2');
 
-        $this->assertFalse($actual->success());
+        $this->assertFalse($actual->isAlive());
         $this->assertEquals('192.168.1.2', $actual->host);
         $this->assertEquals(3, $actual->transmitted);
         $this->assertEquals(3, $actual->received);

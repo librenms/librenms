@@ -179,7 +179,7 @@ class PingCheck implements ShouldQueue
         }
 
         // mark up only if snmp is not down too
-        $changed = app(SetDeviceAvailability::class)->execute($device, $response->success(), AvailabilitySource::Icmp, true);
+        $changed = app(SetDeviceAvailability::class)->execute($device, $response->isAlive(), AvailabilitySource::Icmp, true);
 
         // mark as processed
         $this->processed->put($device->device_id, true);

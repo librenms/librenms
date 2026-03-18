@@ -34,14 +34,8 @@ use Carbon\Carbon;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\RRD\RrdDefinition;
 
-class FpingResponse implements \Stringable
+class FpingResponse extends FpingResponseBase implements \Stringable
 {
-    const SUCESS = 0;
-    const UNREACHABLE = 1;
-    const INVALID_HOST = 2;
-    const INVALID_ARGS = 3;
-    const SYS_CALL_FAIL = 4;
-
     /**
      * @param  int  $transmitted  ICMP packets transmitted
      * @param  int  $received  ICMP packets received
@@ -53,7 +47,7 @@ class FpingResponse implements \Stringable
      * @param  int  $exit_code  Return code from fping
      * @param  string|null  $host  Hostname/IP pinged
      */
-    private function __construct(
+    public function __construct(
         public readonly int $transmitted,
         public readonly int $received,
         public readonly int $loss,
@@ -61,28 +55,21 @@ class FpingResponse implements \Stringable
         public readonly float $max_latency,
         public readonly float $avg_latency,
         public readonly int $duplicates,
-        public int $exit_code,
-        public readonly ?string $host = null,
+        int $exit_code,
+        ?string $host = null,
         private readonly bool $skipped = false)
     {
+        parent::__construct($exit_code, $host);
     }
 
     public static function artificialUp(?string $host = null): static
     {
-        return new static(1, 1, 0, 0, 0, 0, 0, 0, $host, true);
+        return new static(1, 1, 0, 0, 0, 0, 0, self::SUCCESS, $host, true);
     }
 
     public static function artificialDown(?string $host = null): static
     {
-        return new static(1, 0, 100, 0, 0, 0, 0, 0, $host, false);
-    }
-
-    /**
-     * Change the exit code to 0, this may be approriate when a non-fatal error was encourtered
-     */
-    public function ignoreFailure(): void
-    {
-        $this->exit_code = 0;
+        return new static(1, 0, 100, 0, 0, 0, 0, self::SUCCESS, $host, false);
     }
 
     public function wasSkipped(): bool
@@ -115,7 +102,7 @@ class FpingResponse implements \Stringable
             (float) $max,
             (float) $avg,
             substr_count($output, 'duplicate'),
-            $code ?? ($loss100 ? self::UNREACHABLE : self::SUCESS),
+            $code ?? ($loss100 ? self::UNREACHABLE : self::SUCCESS),
             $host,
         );
     }
@@ -124,9 +111,9 @@ class FpingResponse implements \Stringable
      * Ping result was successful.
      * fping didn't have an error and we got at least one ICMP packet back.
      */
-    public function success(): bool
+    public function isAlive(): bool
     {
-        return $this->exit_code == 0 && $this->loss < 100;
+        return $this->exit_code == self::SUCCESS && $this->loss < 100;
     }
 
     public function __toString(): string
@@ -148,14 +135,14 @@ class FpingResponse implements \Stringable
         if ($this->avg_latency) {
             $stats->ping_rtt_prev = $stats->ping_rtt_last ?: $this->avg_latency;
             $stats->ping_rtt_last = $this->avg_latency;
-            // Average is calcualted as the exponential weighted moving average
+            // Average is calculated as the exponential weighted moving average
             $stats->ping_rtt_avg = $stats->ping_rtt_avg ? $stats->ping_rtt_avg + (($stats->ping_rtt_last - $stats->ping_rtt_avg) * LibrenmsConfig::get('device_stats_avg_factor')) : $stats->ping_rtt_last;
         }
         // Only update loss if we transmitted a packet
         if ($this->transmitted) {
             $stats->ping_loss_prev = $stats->ping_loss_last ?: 100 * ($this->transmitted - $this->received) / $this->transmitted;
             $stats->ping_loss_last = 100 * ($this->transmitted - $this->received) / $this->transmitted;
-            // Average is calcualted as the exponential weighted moving average
+            // Average is calculated as the exponential weighted moving average
             $stats->ping_loss_avg = $stats->ping_loss_avg ? $stats->ping_loss_avg + (($stats->ping_loss_last - $stats->ping_loss_avg) * LibrenmsConfig::get('device_stats_avg_factor')) : $stats->ping_loss_last;
         }
         $stats->save();

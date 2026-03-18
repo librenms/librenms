@@ -28,24 +28,8 @@ namespace LibreNMS\Data\Source;
 
 use LibreNMS\Exceptions\FpingUnparsableLine;
 
-class FpingAliveResponse
+class FpingAliveResponse extends FpingResponseBase
 {
-    const SUCCESS = 0;
-    const UNREACHABLE = 1;
-    const INVALID_HOST = 2;
-    const INVALID_ARGS = 3;
-    const SYS_CALL_FAIL = 4;
-
-    /**
-     * @param  int  $exit_code  Return code from fping
-     * @param  string|null  $host  Hostname/IP pinged
-     */
-    private function __construct(
-        public int $exit_code,
-        public readonly ?string $host = null)
-    {
-    }
-
     public static function parseLine(string $output): FpingAliveResponse
     {
         $matched = preg_match('/^(\S+) is (alive|unreachable)$/', $output, $parsed);
@@ -84,7 +68,7 @@ class FpingAliveResponse
      * Ping result was successful.
      * fping didn't have an error and we got at least one ICMP packet back.
      */
-    public function success(): bool
+    public function isAlive(): bool
     {
         return $this->exit_code == self::SUCCESS;
     }
