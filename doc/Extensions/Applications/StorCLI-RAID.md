@@ -35,20 +35,21 @@ interval.
 
 ## SNMP Extend
 
-### 1. Install StorCLI on the monitored host
-
-Download `storcli64` from the [Broadcom support site](https://www.broadcom.com/support/download-search) and install it:
+### 1. Verify StorCLI is available on the monitored host
 
 ```bash
-cp storcli64 /usr/local/sbin/storcli64
-chmod +x /usr/local/sbin/storcli64
-storcli64 /call show   # verify it works
+storcli /call show
+or
+storcli64 /call show
+
 ```
 
 ### 2. Install the agent script
 
+1. Copy the shell script, unbound, to the desired host
+
 ```bash
-cp storraid.py /etc/snmp/storraid.py
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/storraid.py -O /etc/snmp/storraid.py
 chmod +x /etc/snmp/storraid.py
 
 # Test as root — should print a JSON envelope
@@ -100,12 +101,6 @@ Restart snmpd:
 
 ```bash
 systemctl restart snmpd
-```
-
-Verify the extend is reachable and responds instantly(could be run from librenms):
-
-```bash
-time snmpwalk -v2c -c COMMUNITY HOST  .1.3.6.1.4.1.8072.1.3.2
 ```
 
 ### 5. Enable in LibreNMS and poll
