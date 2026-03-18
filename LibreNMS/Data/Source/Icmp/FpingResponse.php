@@ -85,13 +85,13 @@ class FpingResponse implements PingResultInterface, \Stringable
             throw new FpingUnparsableLine($output);
         }
 
-        [, $host, $error, $xmt, $rcv, $loss100, $loss, $min, $avg, $max] = array_pad($parsed, 10, 0);
+        [, $host, $error, $xmt, $rcv, $loss100, $loss, $min, $avg, $max] = array_pad($parsed, 10, null);
         $loss = $loss100 ?: $loss;
 
         if ($error == 'Name or service not known') {
-            return new FpingResponse(0, 0, 0, 0, 0, 0, 0, FpingExitCode::InvalidHost, $host);
+            return new FpingResponse(0, 0, 0, 0, 0, 0, 0, FpingExitCode::InvalidHost, (string) $host);
         } elseif ($error == 'Temporary failure in name resolution') {
-            return new FpingResponse(0, 0, 0, 0, 0, 0, 0, FpingExitCode::SysCallFail, $host);
+            return new FpingResponse(0, 0, 0, 0, 0, 0, 0, FpingExitCode::SysCallFail, (string) $host);
         }
 
         return new static(
@@ -103,7 +103,7 @@ class FpingResponse implements PingResultInterface, \Stringable
             (float) $avg,
             substr_count($output, 'duplicate'),
             $code !== null ? FpingExitCode::from($code) : ($loss100 ? FpingExitCode::Unreachable : FpingExitCode::Success),
-            $host,
+            (string) $host,
         );
     }
 
