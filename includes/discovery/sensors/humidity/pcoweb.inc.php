@@ -36,7 +36,7 @@ $humidities = [
 ];
 
 foreach ($humidities as $humidity) {
-    $current = (snmp_get($device, $humidity['mib'], '-OqvU') / $humidity['precision']);
+    $current = (SnmpQuery::get($humidity['mib'])->value() / $humidity['precision']);
 
     $high_limit = null;
     $low_limit = null;

@@ -1,9 +1,5 @@
 <?php
 
-if (! (Auth::user()->hasGlobalAdmin())) {
-    exit('ERROR: You need to be admin');
-}
-
 ?>
 
 <div class="modal fade" id="delete-oid-form" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">

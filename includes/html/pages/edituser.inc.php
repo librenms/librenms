@@ -8,7 +8,7 @@ echo "<div style='margin: 10px;'>";
 
 $pagetitle[] = 'Edit user';
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', User::class)) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     if ($vars['user_id'] && empty($vars['edit'])) {

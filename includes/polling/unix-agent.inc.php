@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Process;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -119,7 +120,9 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
                 }
             }
             if (count($data) > 0) {
-                dbBulkInsert($data, 'processes');
+                foreach (array_chunk($data, 1000) as $chunk) {
+                    Process::insert($chunk);
+                }
             }
             echo "\n";
         }
@@ -143,7 +146,9 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
                 }
             }
             if (count($data) > 0) {
-                dbBulkInsert($data, 'processes');
+                foreach (array_chunk($data, 1000) as $chunk) {
+                    Process::insert($chunk);
+                }
             }
             echo "\n";
         }

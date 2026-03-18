@@ -26,7 +26,7 @@
 
 use App\Facades\LibrenmsConfig;
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (\Illuminate\Support\Facades\Gate::denies('debug', \App\Models\Device::class)) {
     echo 'Insufficient Privileges';
     exit;
 }

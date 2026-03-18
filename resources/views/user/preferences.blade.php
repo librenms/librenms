@@ -208,9 +208,9 @@
     </x-panel>
 
     <x-panel title="{{ __('Device Permissions') }}">
-        @if($user->can('global-admin'))
+        @can('update', \App\Models\Device::class)
             <strong class="blue">{{ __('Global Administrative Access') }}</strong>
-        @elseif($user->can('global-read'))
+        @elseCan('viewAny', \App\Models\Device::class)
             <strong class="green">{{ __('Global Viewing Access') }}</strong>
         @else
             @forelse($devices as $device)
@@ -218,7 +218,7 @@
             @empty
                 <strong class="red">{{ __('No access!') }}</strong>
             @endforelse
-        @endif
+        @endcan
     </x-panel>
 </div>
 @endsection

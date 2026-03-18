@@ -5990,7 +5990,7 @@
             "default": true,
             "type": "boolean"
         },
-        "poller_modules.ipSystemStats": {
+        "poller_modules.ip-system-stats": {
             "order": 214,
             "group": "poller",
             "section": "poller_modules",
@@ -6444,6 +6444,9 @@
             "type": "text",
             "group": "external",
             "section": "rancid",
+            "validate": {
+                "value": "url"
+            },
             "order": 3
         },
         "reporting.error": {
@@ -6548,7 +6551,7 @@
             "type": "text"
         },
         "rrdgraph_def_text_dark": {
-            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#292929 -c MGRID#2f343e -c FRAME#5e5e5e -c ARROW#5e5e5e",
+            "default": "-c BACK#2e3338 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#292929 -c MGRID#2f343e -c FRAME#5e5e5e -c ARROW#5e5e5e",
             "type": "text"
         },
         "rrdgraph_def_text_color": {

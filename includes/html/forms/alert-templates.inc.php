@@ -22,14 +22,16 @@
  * @license GPL
  */
 
+use App\Models\AlertTemplate;
 use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Alert\AlertData;
 
 $status = 'error';
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::none(['create', 'update'], AlertTemplate::class)) {
     header('Content-Type: application/json');
-    $response = ['status' => $status, 'message' => 'You need to be admin'];
+    $response = ['status' => $status, 'message' => 'You need permission'];
     exit(json_encode($response));
 }
 
@@ -66,6 +68,7 @@ try {
     if (! empty($name)) {
         if ($vars['template'] && is_numeric($vars['template_id'])) {
             // Update template
+            Gate::authorize('update', AlertTemplate::class);
             $create = false;
             $template_id = $vars['template_id'];
             if (! dbUpdate(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], 'alert_templates', 'id = ?', [$template_id]) >= 0) {
@@ -75,6 +78,7 @@ try {
             }
         } elseif ($vars['template']) {
             // Create template
+            Gate::authorize('create', AlertTemplate::class);
             if ($name != 'Default Alert Template') {
                 $template_newid = dbInsert(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], 'alert_templates');
                 if ($template_newid != false) {

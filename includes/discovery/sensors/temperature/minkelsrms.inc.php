@@ -23,12 +23,12 @@ foreach (explode("\n", $oids) as $data) {
             $lowwarnlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.9.$temperature_id";
             $lowlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.10.$temperature_id";
 
-            $descr = trim(snmp_get($device, $descr_oid, '-Oqv', ''), '"');
-            $temperature = snmp_get($device, $temperature_oid, '-Oqv', '');
-            $lowwarnlimit = snmp_get($device, $lowwarnlimit_oid, '-Oqv', '');
-            $warnlimit = snmp_get($device, $warnlimit_oid, '-Oqv', '');
-            $limit = snmp_get($device, $limit_oid, '-Oqv', '');
-            $lowlimit = snmp_get($device, $lowlimit_oid, '-Oqv', '');
+            $descr = trim((string) SnmpQuery::get($descr_oid)->value(), '"');
+            $temperature = SnmpQuery::get($temperature_oid)->value();
+            $lowwarnlimit = SnmpQuery::get($lowwarnlimit_oid)->value();
+            $warnlimit = SnmpQuery::get($warnlimit_oid)->value();
+            $limit = SnmpQuery::get($limit_oid)->value();
+            $lowlimit = SnmpQuery::get($lowlimit_oid)->value();
 
             discover_sensor(null, 'temperature', $device, $temperature_oid, $temperature_id, 'akcp', $descr, '1', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $temperature);
         }

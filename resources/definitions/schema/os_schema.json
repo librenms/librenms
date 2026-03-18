@@ -406,7 +406,17 @@
             "type": "integer",
             "minimum": 1
         },
-        "syslog_hook": {
+    "snmp":{
+        "type": "object",
+        "properties": {
+            "max_repeaters": {
+                "type": "integer",
+                "minimum": 1
+            }
+        },
+        "additionalProperties": false
+    },
+    "syslog_hook": {
             "type": "array",
             "items": {
                 "type": "object",
@@ -492,6 +502,12 @@
                 "type": "string"
             }
         },
+        "ignore_vlans": {
+            "type": "array",
+            "items": {
+                "type": "integer"
+            }
+        },
         "bad_hrSystemUptime": {
             "type": "boolean"
         },
@@ -555,7 +571,7 @@
             "type": "object",
             "properties": {
                 "oid": {
-                    "type": "string"
+                    "$ref": "oid_types.json#/$defs/oid"
                 },
                 "op": {
                     "$ref": "#/$defs/comparison"
@@ -575,9 +591,6 @@
                             }
                         }
                     ]
-                },
-                "mib": {
-                    "type": "string"
                 },
                 "mib_dir": {
                     "type": "string"

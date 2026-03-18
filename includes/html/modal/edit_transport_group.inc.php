@@ -11,7 +11,6 @@
  * the source code distribution for details.
  */
 
-if (Auth::user()->hasGlobalAdmin()) {
     ?>
 <!--Modal for adding or updating a transport group -->
     <div class="modal fade" id="edit-transport-group" tabindex="-1" role="dialog"
@@ -176,6 +175,3 @@ if (Auth::user()->hasGlobalAdmin()) {
     });
 
     </script>
-
-    <?php
-}

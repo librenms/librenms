@@ -18,6 +18,7 @@ class EntPhysical extends DeviceRelatedModel implements Keyable
         'entPhysicalSerialNum',
         'entPhysicalModelName',
         'entPhysicalMfgName',
+        'entPhysicalMfgDate',
         'entPhysicalVendorType',
         'entPhysicalParentRelPos',
         'entPhysicalHardwareRev',
