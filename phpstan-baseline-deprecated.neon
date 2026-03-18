@@ -2036,15 +2036,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbBulkInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/entity-state.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbDelete\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#deleting\-models$#
 			'''
@@ -5276,15 +5267,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbBulkInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/alert-rules.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbDelete\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#deleting\-models$#
 			'''
@@ -5813,15 +5795,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/html/forms/token-item-remove.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbBulkInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/transport-groups.inc.php
 
 		-
 			message: '''
@@ -9071,15 +9044,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/polling/ucd-mib.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbBulkInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 2
-			path: includes/polling/unix-agent.inc.php
 
 		-
 			message: '''
