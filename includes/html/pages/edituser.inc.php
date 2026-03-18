@@ -20,9 +20,7 @@ if (Gate::denies('update', User::class)) {
         echo '<p><h2>' . $user_data['realname'] . '</h2></p>';
         // Perform actions if requested
         if ($action == 'deldevperm') {
-            if (dbFetchCell('SELECT COUNT(*) FROM devices_perms WHERE `device_id` = ? AND `user_id` = ?', [$vars['device_id'], $user_data['user_id']])) {
-                dbDelete('devices_perms', '`device_id` =  ? AND `user_id` = ?', [$vars['device_id'], $user_data['user_id']]);
-            }
+            \App\Models\DevicePerm::where('device_id', $vars['device_id'])->where('user_id', $user_data['user_id'])->delete();
         }
 
         if ($action == 'adddevperm') {
@@ -40,9 +38,7 @@ if (Gate::denies('update', User::class)) {
         }
 
         if ($action == 'delifperm') {
-            if (dbFetchCell('SELECT COUNT(*) FROM ports_perms WHERE `port_id` = ? AND `user_id` = ?', [$vars['port_id'], $user_data['user_id']])) {
-                dbDelete('ports_perms', '`port_id` =  ? AND `user_id` = ?', [$vars['port_id'], $user_data['user_id']]);
-            }
+            \App\Models\PortPerm::where('port_id', $vars['port_id'])->where('user_id', $user_data['user_id'])->delete();
         }
 
         if ($action == 'addifperm') {
@@ -52,9 +48,7 @@ if (Gate::denies('update', User::class)) {
         }
 
         if ($action == 'delbillperm') {
-            if (dbFetchCell('SELECT COUNT(*) FROM bill_perms WHERE `bill_id` = ? AND `user_id` = ?', [$vars['bill_id'], $user_data['user_id']])) {
-                dbDelete('bill_perms', '`bill_id` =  ? AND `user_id` = ?', [$vars['bill_id'], $user_data['user_id']]);
-            }
+            \App\Models\BillPerm::where('bill_id', $vars['bill_id'])->where('user_id', $user_data['user_id'])->delete();
         }
 
         if ($action == 'addbillperm') {

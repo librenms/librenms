@@ -125,5 +125,5 @@ if (count($components) > 0) {
         dbInsert(['device_id' => $device['device_id'], 'app_type' => $module, 'app_status' => '', 'app_instance' => ''], 'applications');
     }
 } else {
-    dbDelete('applications', '`device_id` = ? AND `app_type` = ?', [$device['device_id'], $module]);
+    \App\Models\Application::where('device_id', $device['device_id'])->where('app_type', $module)->delete();
 }

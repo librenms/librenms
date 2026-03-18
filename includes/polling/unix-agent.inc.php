@@ -111,7 +111,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         // Unix Processes
         if (! empty($agent_data['ps'])) {
             echo 'Processes: ';
-            dbDelete('processes', 'device_id = ?', [$device['device_id']]);
+            \App\Models\Process::where('device_id', $device['device_id'])->delete();
             $data = [];
             foreach (explode("\n", $agent_data['ps']) as $process) {
                 if (preg_match('/\((.*),([0-9]*),([0-9]*),([-0-9:.]*),([0-9]*)\) (.+)/', $process, $process_matches)) {
@@ -130,7 +130,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         // Windows Processes
         if (! empty($agent_data['ps:sep(9)'])) {
             echo 'Processes: ';
-            dbDelete('processes', 'device_id = ?', [$device['device_id']]);
+            \App\Models\Process::where('device_id', $device['device_id'])->delete();
             $data = [];
             foreach (explode("\n", $agent_data['ps:sep(9)']) as $process) {
                 $process = preg_replace('/\(([^,;]+),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*)?,?([0-9]*)\)(.*)/', '\\1|\\2|\\3|\\4|\\5|\\6|\\7|\\8|\\9|\\10|\\11|\\12', $process);
