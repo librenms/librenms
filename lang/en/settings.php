@@ -32,7 +32,6 @@ return [
             'powerdns-recursor' => ['name' => 'PowerDNS Recursor'],
             'oslv_monitor' => ['name' => 'OSLV Monitor'],
             'sneck' => ['name' => 'Sneck'],
-            'ssl-certificates' => ['name' => 'SSL Certificates'],
         ],
         'auth' => [
             'general' => ['name' => 'General Authentication Settings'],
