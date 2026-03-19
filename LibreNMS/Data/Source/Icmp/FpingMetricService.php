@@ -10,10 +10,10 @@ use Symfony\Component\Process\Process;
 
 class FpingMetricService
 {
-    private int $count;
-    private int $timeout;
-    private int $interval;
-    private int $tos;
+    private readonly int $count;
+    private readonly int $timeout;
+    private readonly int $interval;
+    private readonly int $tos;
 
     public function __construct()
     {
