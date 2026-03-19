@@ -8,7 +8,7 @@ use LibreNMS\Enum\AddressFamily;
 use Log;
 use Symfony\Component\Process\Process;
 
-readonly class FpingMetricService
+class FpingMetricService
 {
     private int $count;
     private int $timeout;
