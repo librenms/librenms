@@ -107,12 +107,23 @@ class Stp implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'stp' => $device->stpInstances()->orderBy('bridgeAddress')
+            'stp' => $device->stpInstances()
+                ->orderByColumns($this->getSortColumns('stp'))
                 ->get()->map->makeHidden(['stp_id', 'device_id']),
-            'ports_stp' => $device->portsStp()->orderBy('port_index')
+            'ports_stp' => $device->portsStp()
+                ->orderByColumns($this->getSortColumns('ports_stp'))
                 ->leftJoin('ports', 'ports_stp.port_id', 'ports.port_id')
                 ->select(['ports_stp.*', 'ifIndex'])
                 ->get()->map->makeHidden(['port_stp_id', 'device_id', 'port_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return match($table) {
+            'stp' => ['bridgeAddress'],
+            'ports_stp' => ['port_index'],
+            default => [],
+        };
     }
 }

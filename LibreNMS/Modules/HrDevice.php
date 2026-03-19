@@ -95,8 +95,13 @@ class HrDevice implements Module
 
         return [
             'hrDevice' => $device->hostResources()
-                ->orderBy('hrDeviceIndex')
+                ->orderByColumns($this->getSortColumns('hrDevice'))
                 ->get()->map->makeHidden(['hrDevice_id', 'device_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['hrDeviceIndex'];
     }
 }
