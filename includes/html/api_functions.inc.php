@@ -1703,7 +1703,8 @@ function delete_rule(Illuminate\Http\Request $request)
 {
     $rule_id = $request->route('id');
     if (is_numeric($rule_id)) {
-        if (dbDelete('alert_rules', '`id` =  ? LIMIT 1', [$rule_id])) {
+        $rule = \App\Models\AlertRule::find($rule_id);
+        if ($rule && $rule->delete()) {
             return api_success_noresult(200, 'Alert rule has been removed');
         } else {
             return api_success_noresult(200, 'No alert rule by that ID');
@@ -2107,13 +2108,12 @@ function delete_bill(Illuminate\Http\Request $request)
         return api_error(400, 'Could not remove bill with id ' . $bill_id . '. Invalid id');
     }
 
-    $res = dbDelete('bills', '`bill_id` =  ? LIMIT 1', [$bill_id]);
+    $res = \App\Models\Bill::where('bill_id', $bill_id)->delete();
     if ($res == 1) {
-        dbDelete('bill_ports', '`bill_id` =  ? ', [$bill_id]);
-        dbDelete('bill_data', '`bill_id` =  ? ', [$bill_id]);
-        dbDelete('bill_history', '`bill_id` =  ? ', [$bill_id]);
-        dbDelete('bill_history', '`bill_id` =  ? ', [$bill_id]);
-        dbDelete('bill_perms', '`bill_id` =  ? ', [$bill_id]);
+        \App\Models\BillPort::where('bill_id', $bill_id)->delete();
+        \App\Models\BillData::where('bill_id', $bill_id)->delete();
+        \App\Models\BillHistory::where('bill_id', $bill_id)->delete();
+        \App\Models\BillPerm::where('bill_id', $bill_id)->delete();
 
         return api_success_noresult(200, 'Bill has been removed');
     }
@@ -2271,7 +2271,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
 
     // set previously checked ports
     if (is_array($ports_add)) {
-        dbDelete('bill_ports', "`bill_id` =  $bill_id");
+        \App\Models\BillPort::where('bill_id', $bill_id)->delete();
         if (count($ports_add) > 0) {
             foreach ($ports_add as $port_id) {
                 dbInsert(['bill_id' => $bill_id, 'port_id' => $port_id, 'bill_port_autoadded' => 0], 'bill_ports');
@@ -3557,7 +3557,7 @@ function del_location(Illuminate\Http\Request $request)
         'location_id' => 0,
     ];
     dbUpdate($data, 'devices', '`location_id` = ?', [$location_id]);
-    $result = dbDelete('locations', '`id` = ? ', [$location_id]);
+    $result = \App\Models\Location::where('id', $location_id)->delete();
     if ($result == 1) {
         return api_success_noresult(201, "Location $location has been deleted successfully");
     }

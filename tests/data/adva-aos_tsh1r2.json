@@ -11250,6 +11250,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11269,6 +11270,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11288,6 +11290,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11307,6 +11310,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11326,6 +11330,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11345,6 +11350,7 @@
                     "entPhysicalContainedIn": 5,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11364,6 +11370,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11383,6 +11390,7 @@
                     "entPhysicalContainedIn": 7,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11402,6 +11410,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11421,6 +11430,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11440,6 +11450,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11459,6 +11470,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11478,6 +11490,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11497,6 +11510,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11516,6 +11530,7 @@
                     "entPhysicalContainedIn": 24,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11535,6 +11550,7 @@
                     "entPhysicalContainedIn": 11,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11554,6 +11570,7 @@
                     "entPhysicalContainedIn": 12,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11573,6 +11590,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11592,6 +11610,7 @@
                     "entPhysicalContainedIn": 23,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11611,6 +11630,7 @@
                     "entPhysicalContainedIn": 23,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11630,6 +11650,7 @@
                     "entPhysicalContainedIn": 23,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11649,6 +11670,7 @@
                     "entPhysicalContainedIn": 23,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11668,6 +11690,7 @@
                     "entPhysicalContainedIn": 23,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11687,6 +11710,7 @@
                     "entPhysicalContainedIn": 23,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11706,6 +11730,7 @@
                     "entPhysicalContainedIn": 23,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11725,6 +11750,7 @@
                     "entPhysicalContainedIn": 23,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11744,6 +11770,7 @@
                     "entPhysicalContainedIn": 14,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "UN344269584",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11763,6 +11790,7 @@
                     "entPhysicalContainedIn": 25,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11782,6 +11810,7 @@
                     "entPhysicalContainedIn": 26,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11801,6 +11830,7 @@
                     "entPhysicalContainedIn": 27,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11820,6 +11850,7 @@
                     "entPhysicalContainedIn": 28,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11839,6 +11870,7 @@
                     "entPhysicalContainedIn": 29,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11858,6 +11890,7 @@
                     "entPhysicalContainedIn": 30,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -11877,6 +11910,7 @@
                     "entPhysicalContainedIn": 31,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

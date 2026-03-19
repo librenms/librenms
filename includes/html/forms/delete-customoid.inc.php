@@ -15,7 +15,7 @@ if (! is_numeric($_POST['customoid_id'])) {
     echo 'ERROR: No alert selected';
     exit;
 } else {
-    if (dbDelete('customoids', '`customoid_id` =  ?', [$_POST['customoid_id']])) {
+    if (\App\Models\Customoid::where('customoid_id', $_POST['customoid_id'])->delete()) {
         echo 'Custom OID has been deleted.';
         exit;
     } else {

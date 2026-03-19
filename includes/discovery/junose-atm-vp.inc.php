@@ -4,6 +4,7 @@
 // snmpwalk -v2c -c <community> <hostname> -M mibs/junose/ -m Juniper-UNI-ATM-MIB juniAtmVpStatsEntry
 // JunOSe ATM vps
 use App\Facades\LibrenmsConfig;
+use App\Models\JuniAtmVp;
 
 if ($device['os'] == 'junose' && LibrenmsConfig::get('enable_ports_junoseatmvp')) {
     $vp_array = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsInCells', $vp_array, 'Juniper-UNI-ATM-MIB', 'juniper/junose');
@@ -36,7 +37,7 @@ if ($device['os'] == 'junose' && LibrenmsConfig::get('enable_ports_junoseatmvp')
 
         if (! $valid_vp[$port_id][$vp_id]) {
             echo '-';
-            dbDelete('juniAtmvp', '`juniAtmVp` = ?', [$test['juniAtmvp']]);
+            JuniAtmVp::where('juniAtmVp', $test['juniAtmvp'])->delete();
         }
 
         unset($port_id);

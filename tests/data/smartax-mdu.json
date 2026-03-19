@@ -6076,6 +6076,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:00",
                     "ifIndex": null
                 },
                 {
@@ -6095,6 +6096,7 @@
                     "entPhysicalContainedIn": 875160,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:00",
                     "ifIndex": null
                 },
                 {
@@ -6114,6 +6116,7 @@
                     "entPhysicalContainedIn": 888624,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:00",
                     "ifIndex": null
                 },
                 {
@@ -6133,6 +6136,7 @@
                     "entPhysicalContainedIn": 889032,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": "2011-3-2,0:0:0.0,.0:00",
                     "ifIndex": null
                 },
                 {
@@ -6152,6 +6156,7 @@
                     "entPhysicalContainedIn": 889236,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:00",
                     "ifIndex": null
                 },
                 {
@@ -6171,6 +6176,7 @@
                     "entPhysicalContainedIn": 889270,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:00",
                     "ifIndex": null
                 },
                 {
@@ -6190,6 +6196,7 @@
                     "entPhysicalContainedIn": 888624,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:00",
                     "ifIndex": null
                 },
                 {
@@ -6209,6 +6216,7 @@
                     "entPhysicalContainedIn": 889440,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:00",
                     "ifIndex": null
                 },
                 {
@@ -6228,6 +6236,7 @@
                     "entPhysicalContainedIn": 888624,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:00",
                     "ifIndex": null
                 },
                 {
@@ -6247,6 +6256,7 @@
                     "entPhysicalContainedIn": 889848,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:00",
                     "ifIndex": null
                 },
                 {
@@ -6266,6 +6276,7 @@
                     "entPhysicalContainedIn": 888624,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:00",
                     "ifIndex": null
                 },
                 {
@@ -6285,6 +6296,7 @@
                     "entPhysicalContainedIn": 890256,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:00",
                     "ifIndex": null
                 }
             ]
