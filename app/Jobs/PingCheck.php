@@ -83,7 +83,7 @@ class PingCheck implements ShouldQueue
         Log::info('Processing hosts in this order : ' . implode(', ', $ordered_hostname_list));
 
         // bulk ping and send FpingAliveResponse to recordData as they come in
-        app()->make(FpingAvailabilityService::class)->bulkPing($ordered_hostname_list, function (FpingAliveResponse $response) {
+        app()->make(FpingAvailabilityService::class)->bulkPing($ordered_hostname_list, function (FpingAliveResponse $response): void {
             $this->handleResponse($response);
         });
 
