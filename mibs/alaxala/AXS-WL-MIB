@@ -1,0 +1,101 @@
+--
+-- Copyright(C) 2016 ALAXALA Networks Corporation. All Rights Reserved.
+-- LAST-UPDATED "201604061700Z"
+--
+-- AXS-WL-MIB.my: axsWhitelist MIB file
+--
+AXS-WL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, Integer32, Unsigned32, Counter32, Counter64, Gauge32 FROM SNMPv2-SMI
+	RowStatus, StorageType FROM SNMPv2-TC
+	InetAddressType, InetAddress FROM INET-ADDRESS-MIB
+	axsMib FROM AX2530S
+;
+
+axsWhitelist                  OBJECT IDENTIFIER ::= { axsMib 500 }
+axsWhitelistControl           OBJECT IDENTIFIER ::= { axsWhitelist 1 }
+axsWhitelistDataGroup         OBJECT IDENTIFIER ::= { axsWhitelist 2 }
+axsWhitelistAlarmGroup        OBJECT IDENTIFIER ::= { axsWhitelist 3 }
+axsWhitelistSourceBlockGroup  OBJECT IDENTIFIER ::= { axsWhitelist 4 }
+
+
+
+axsWhitelistSourceBlockTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF AxsWhitelistSourceBlockEntry
+	MAX-ACCESS  not-accessible
+	STATUS      mandatory
+	DESCRIPTION
+		"A table containing blocked source addresses.
+		Any IPv4 or ARP packet list entry that carries a source or sender IP address
+		that appears in this table shall be inhibited.
+		Each row of this table corresponds to one, many, or no entries in the packet list.
+		In other words, the occupation in this table is independent from the packet list table.
+		This table may contain up to some specified number of entries."
+	::= { axsWhitelistSourceBlockGroup 1 }
+
+axsWhitelistSourceBlockEntry OBJECT-TYPE
+	SYNTAX      AxsWhitelistSourceBlockEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry containing a blocked source address."
+	INDEX { axsWhitelistSourceBlockAddressType, axsWhitelistSourceBlockAddress }
+	::= { axsWhitelistSourceBlockTable 1 }
+
+	AxsWhitelistSourceBlockEntry ::=
+		SEQUENCE {
+			axsWhitelistSourceBlockAddressType
+				InetAddressType,
+			axsWhitelistSourceBlockAddress
+			  	InetAddress,
+			axsWhitelistSourceBlockRowStatus
+				RowStatus,
+			axsWhitelistSourceBlockStorageType
+				StorageType,
+			axsWhitelistSourceBlockTime
+				Integer32
+		}
+
+axsWhitelistSourceBlockAddressType OBJECT-TYPE
+	SYNTAX      InetAddressType
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"Must be ipv4."
+	::= { axsWhitelistSourceBlockEntry 1 }
+
+axsWhitelistSourceBlockAddress OBJECT-TYPE
+	SYNTAX      InetAddress
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A blocked source address."
+	::= { axsWhitelistSourceBlockEntry 2 }
+
+axsWhitelistSourceBlockRowStatus OBJECT-TYPE
+	SYNTAX      RowStatus
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+		"Must be createAndGo to create a row."
+	::= { axsWhitelistSourceBlockEntry 3 }
+
+axsWhitelistSourceBlockStorageType OBJECT-TYPE
+	SYNTAX      StorageType
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+		"Must be volatile."
+	::= { axsWhitelistSourceBlockEntry 4 }
+
+axsWhitelistSourceBlockTime OBJECT-TYPE
+	SYNTAX      Integer32 (1..2147483647)
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION
+		"The remaining time in centiseconds for this row to stay in effect.
+		The row will be automatically destroyed upon the expiration of this timer."
+	::= { axsWhitelistSourceBlockEntry 5 }
+
+END
