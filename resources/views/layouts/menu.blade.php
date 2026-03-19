@@ -447,13 +447,13 @@
                     </li>
                 @endif
 {{-- Services --}}
-            @config('show_services')
             <li class="dropdown">
                 <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
                    data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons"
                                              aria-hidden="true"></i> <span
                         class="tw:md:hidden tw:2xl:inline-block">{{ __('Services') }}</span></a>
                 <ul class="dropdown-menu">
+                    @config('show_services')
                     <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Services') }}</a>
                     </li>
                     @can('viewAny', \App\Models\ServiceTemplate::class)
@@ -483,9 +483,13 @@
                     <li><a href="{{ url('addsrv') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                          aria-hidden="true"></i> {{ __('Add Service') }}</a></li>
                     @endadmin
+                    @endconfig
+                    <li>
+                        <a href="{{ url('ssl-certificates') }}"><i class="fa fa-lock fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span
+                                class="tw:md:hidden tw:2xl:inline-block">{{ __('SSL Certificates') }}</span></a>
+                    </li>
                 </ul>
             </li>
-            @endconfig
                     <li class="dropdown">
                         <a href="{{ url('apps') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"
@@ -508,11 +512,6 @@
                                     <li><a href="{{ url('apps/app=' . $app_type) }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a></li>
                                 @endif
                             @endforeach
-                            <li role="presentation" class="divider"></li>
-                            <li>
-                                <a href="{{ url('ssl-certificates') }}"><i class="fa fa-lock fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span
-                                        class="tw:md:hidden tw:2xl:inline-block">{{ __('SSL Certificates') }}</span></a>
-                            </li>
                         </ul>
                     </li>
 {{-- Routing --}}
