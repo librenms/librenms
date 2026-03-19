@@ -26,10 +26,10 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         }
 
         $oid = '.1.3.6.1.4.1.25506.2.70.1.1.1.17.' . $index;
-        $limit_low = $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasLoAlarm'] / $divisor_alarm;
-        $warn_limit_low = $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasLoWarn'] / $divisor_alarm;
-        $limit = $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasHiAlarm'] / $divisor_alarm;
-        $warn_limit = $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasHiWarn'] / $divisor_alarm;
+        $limit_low = isset($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasLoAlarm']) ? $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasLoAlarm'] / $divisor_alarm : null;
+        $warn_limit_low = isset($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasLoWarn']) ? $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasLoWarn'] / $divisor_alarm : null;
+        $limit = isset($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasHiAlarm']) ? $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasHiAlarm'] / $divisor_alarm : null;
+        $warn_limit = isset($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasHiWarn']) ? $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasHiWarn'] / $divisor_alarm : null;
         $current = $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverBiasCurrent'] / $divisor;
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
