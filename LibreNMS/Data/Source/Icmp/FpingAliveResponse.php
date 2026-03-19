@@ -24,26 +24,21 @@
  * @author     Steven Wilton <swilton@fluentit.au>
  */
 
-namespace LibreNMS\Data\Source;
+namespace LibreNMS\Data\Source\Icmp;
 
+use LibreNMS\Enum\FpingExitCode;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 
-class FpingAliveResponse
+class FpingAliveResponse implements PingResultInterface
 {
-    const SUCCESS = 0;
-    const UNREACHABLE = 1;
-    const INVALID_HOST = 2;
-    const INVALID_ARGS = 3;
-    const SYS_CALL_FAIL = 4;
-
     /**
-     * @param  int  $exit_code  Return code from fping
+     * @param  FpingExitCode  $exit_code  Return code from fping
      * @param  string|null  $host  Hostname/IP pinged
      */
-    private function __construct(
-        public int $exit_code,
-        public readonly ?string $host = null)
-    {
+    public function __construct(
+        public FpingExitCode $exit_code,
+        public readonly ?string $host = null
+    ) {
     }
 
     public static function parseLine(string $output): FpingAliveResponse
@@ -53,7 +48,7 @@ class FpingAliveResponse
             [, $host, $result] = array_pad($parsed, 3, 0);
 
             return new static(
-                $result == 'alive' ? self::SUCCESS : self::UNREACHABLE,
+                $result == 'alive' ? FpingExitCode::Success : FpingExitCode::Unreachable,
                 $host,
             );
         }
@@ -64,8 +59,8 @@ class FpingAliveResponse
 
             try {
                 $ret_code = match ($result) {
-                    'Name or service not known' => self::INVALID_HOST,
-                    'Temporary failure in name resolution' => self::SYS_CALL_FAIL,
+                    'Name or service not known' => FpingExitCode::InvalidHost,
+                    'Temporary failure in name resolution' => FpingExitCode::SysCallFail,
                 };
             } catch (\UnhandledMatchError) {
                 throw new FpingUnparsableLine($output);
@@ -84,8 +79,26 @@ class FpingAliveResponse
      * Ping result was successful.
      * fping didn't have an error and we got at least one ICMP packet back.
      */
-    public function success(): bool
+    public function isAlive(): bool
     {
-        return $this->exit_code == self::SUCCESS;
+        return $this->exit_code === FpingExitCode::Success;
+    }
+
+    /**
+     * Change the exit code to 0, this may be appropriate when a non-fatal error was encountered
+     */
+    public function ignoreFailure(): void
+    {
+        $this->exit_code = FpingExitCode::Success;
+    }
+
+    public function getHost(): ?string
+    {
+        return $this->host;
+    }
+
+    public function getExitCode(): FpingExitCode
+    {
+        return $this->exit_code;
     }
 }
