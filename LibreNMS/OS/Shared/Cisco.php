@@ -29,7 +29,6 @@
 
 namespace LibreNMS\OS\Shared;
 
-use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Models\Component;
 use App\Models\Device;
@@ -979,16 +978,9 @@ class Cisco extends OS implements
 
         $vtpdomains = SnmpQuery::walk('CISCO-VTP-MIB::managementDomainName')->pluck();
         $current_domain = 0;
-        $os = $this->getName();
-        $ignore_vlans = (array) LibrenmsConfig::getOsSetting($os, 'ignore_vlans');
 
         return SnmpQuery::enumStrings()->walk('CISCO-VTP-MIB::vtpVlanTable')
-            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain, $ignore_vlans) {
-                // Skip VLANs configured to be ignored
-                if (in_array($vlan_id, $ignore_vlans)) {
-                    return null;
-                }
-
+            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain) {
                 if ($current_domain != $vtpdomain_id) {
                     $current_domain = $vtpdomain_id;
                     Log::info('VTP Domain ' . $vtpdomain_id . ' ' . ($vtpdomains[$vtpdomain_id] ?? 'none'));
@@ -1001,8 +993,7 @@ class Cisco extends OS implements
                     'vlan_type' => $vlan['CISCO-VTP-MIB::vtpVlanType'] ?? '',
                     'vlan_state' => isset($vlan['CISCO-VTP-MIB::vtpVlanState']) && $vlan['CISCO-VTP-MIB::vtpVlanState'] == 'operational',
                 ]);
-            })
-            ->filter(); // Remove null values from ignored VLANs
+            });
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection
@@ -1015,6 +1006,10 @@ class Cisco extends OS implements
         $native_vlans_raw = SnmpQuery::abortOnFailure()->walk([
             'CISCO-VTP-MIB::vlanTrunkPortTable',
             'CISCO-VLAN-MEMBERSHIP-MIB::vmVlan',
+        ])->table(1);
+
+        $voice_vlans = SnmpQuery::abortOnFailure()->walk([
+            'CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId',
         ])->table(1);
 
         // Hash Table indexed by vlans and ifIndexes
@@ -1059,23 +1054,36 @@ class Cisco extends OS implements
         // process all the discovered vlans
         foreach ($vlans as $vlan) {
             $vlan_id = (int) $vlan->vlan_vlan;
-
-            if ($vlan->vlan_state && $vlan_id) {
+            $voice_vlan = 0;
+            $is_voice_vlan = false;
+            // Ignore reserved VLAN IDs
+            if ($vlan->vlan_state && $vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
                 // collect BRIDGE-MIB in vlan context
-                $vlanContext = $vlan_id == 1 ? '' : (string) $vlan_id;
-                $tmp_vlan_data = SnmpQuery::context($vlanContext, 'vlan-')
+                $tmp_vlan_data = SnmpQuery::context($vlan_id === 1 ? '' : (string) $vlan_id, 'vlan-')
                     ->enumStrings()
                     ->abortOnFailure()
-                    ->cache()
-                    ->walk('BRIDGE-MIB::dot1dStpPortTable')
-                    ->table(1);
+                    ->walk([
+                        'BRIDGE-MIB::dot1dStpPortState',
+                        'BRIDGE-MIB::dot1dStpPortPriority',
+                        'BRIDGE-MIB::dot1dStpPortPathCost',
+                    ])->table(1);
 
                 foreach ($tmp_vlan_data as $baseport => $data) {
                     // use the collected untagged vlan info
                     $ifindex = $this->ifIndexFromBridgePort($baseport);
+                    // Determining if port has a voice VLAN configured.
+                    // If returned value is 0 or 4096, no voice VLAN is configured.
+                    if (isset($voice_vlans[$ifindex]['CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'])) {
+                        $voice_vlan = $voice_vlans[$ifindex]['CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'];
+                        if ($voice_vlan > 0 && $voice_vlan < 4095) {
+                            $is_voice_vlan = true;
+                        }
+                    }
                     $alreadyProcessed[$vlan_id][$ifindex] = 1; // We don't want to override it later
+                    // Access VLAN
                     $ports->push(new PortVlan([
                         'vlan' => $vlan_id,
+                        'voice' => 0,
                         'baseport' => $baseport,
                         'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
                         'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
@@ -1083,6 +1091,19 @@ class Cisco extends OS implements
                         'untagged' => isset($isNative[$vlan_id][$ifindex]) && $isNative[$vlan_id][$ifindex] > 0,
                         'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device
                     ]));
+                    // Add another record if there is a voice VLAN on this port
+                    if ($is_voice_vlan) {
+                        $ports->push(new PortVlan([
+                            'vlan' => $voice_vlan,
+                            'voice' => 1,
+                            'baseport' => $baseport,
+                            'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
+                            'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
+                            'cost' => $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
+                            'untagged' => isset($isNative[$vlan_id][$ifindex]) && $isNative[$vlan_id][$ifindex] > 0,
+                            'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device
+                        ]));
+                    }
                 }
             }
 
@@ -1093,13 +1114,36 @@ class Cisco extends OS implements
                     if (isset($alreadyProcessed[$vlan_id][$ifindex])) {
                         continue;
                     }
+                    // Determining if port has a voice VLAN configured.
+                    // If returned value is 0 or 4096, no voice VLAN is configured.
+                    if (isset($voice_vlans[$ifindex]['CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'])) {
+                        $voice_vlan = $voice_vlans[$ifindex]['CISCO-VLAN-MEMBERSHIP-MIB::vmVoiceVlanId'];
+                        if ($voice_vlan > 0 && $voice_vlan < 4095) {
+                            $is_voice_vlan = true;
+                        } else {
+                            $is_voice_vlan = false;
+                        }
+                    }
+                    // Access VLAN
                     $ports->push(new PortVlan([
                         'vlan' => $vlan_id,
+                        'voice' => 0,
                         'baseport' => $this->bridgePortFromIfIndex($ifindex),
                         'untagged' => $value,
                         'state' => 'unknown',
                         'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device,
                     ]));
+                    // Add another record if there is a voice VLAN on this port
+                    if ($is_voice_vlan) {
+                        $ports->push(new PortVlan([
+                            'vlan' => $voice_vlan,
+                            'voice' => 1,
+                            'baseport' => $this->bridgePortFromIfIndex($ifindex),
+                            'untagged' => $value,
+                            'state' => 'unknown',
+                            'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device
+                        ]));
+                    }
                 }
             }
         }
