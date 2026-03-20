@@ -23,13 +23,13 @@ Composer requires PHP and PHP extensions to be installed, you can install it wit
 
     ```bash
     sudo apt update
-    sudo apt install php8.4-curl php8.4-gd php8.4-xml php8.4-zip
+    sudo apt install curl php php8.4-curl php8.4-gd php8.4-xml php8.4-zip
     ```
 
 === "RHEL/CentOS"
 
     ```bash
-    sudo dnf install php-curl php-gd php-xml php-zip
+    sudo dnf install curl php php-curl php-gd php-xml php-zip
     ```
 
 ### installing composer
