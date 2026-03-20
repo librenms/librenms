@@ -7,24 +7,12 @@ for the meaning of individual keys.
 
 ## Source Files and Navigation
 
-- `docs_dir: doc` means documentation source files live under `doc/`.
+- `docs_dir: doc` — LibreNMS places documentation source files under `doc/`.
   See [MkDocs - docs_dir](https://www.mkdocs.org/user-guide/configuration/#docs_dir).
 - `nav:` is the table of contents. Paths in `nav:` are relative to `doc/`.
+  When adding a new page, include it in `nav:` under the relevant section,
+  unless the relevant section is directory-driven via `include_dir_to_nav`.
   See [MkDocs - nav](https://www.mkdocs.org/user-guide/configuration/#nav).
-- LibreNMS also uses the `include_dir_to_nav` plugin to pull directories into
-  the nav in some places (for example the `Applications` section).
-
-LibreNMS convention:
-
-- When you add a new page, include it in `nav:` unless the relevant section is
-  directory-driven via `include_dir_to_nav`.
-
-## Output Location and Canonical URL
-
-- `site_dir: out` is where `mkdocs build` writes the generated site.
-  See [MkDocs - site_dir](https://www.mkdocs.org/user-guide/configuration/#site_dir).
-- `site_url` is the canonical published URL.
-  See [MkDocs - site_url](https://www.mkdocs.org/user-guide/configuration/#site_url).
 
 ## Theme (Material) and Enabled Features
 
@@ -60,37 +48,6 @@ Extensions you will commonly use while writing LibreNMS docs:
 - `pymdownx.highlight` for syntax highlighting.
   LibreNMS config extends highlighting for PHP inline mode.
 
-Examples:
-
-Content tabs:
-
-````markdown
-=== "uv"
-
-    ```bash
-    uv run mkdocs serve
-    ```
-
-=== "venv + pip"
-
-    ```bash
-    mkdocs serve
-    ```
-````
-
-Admonitions:
-
-```markdown
-!!! note
-    Notes render as callouts.
-
-??? tip
-    This tip is collapsible.
-
-!!! warning "Custom title"
-    You can also specify a custom title.
-```
-
 ## Plugins Used by LibreNMS Docs
 
 Plugins are configured under `plugins:`.
@@ -107,24 +64,15 @@ LibreNMS plugin notes:
 - `exclude`: excludes files from the build (LibreNMS excludes the docs Dockerfile).
 - `minify`: minifies HTML/JS/CSS and injects configured asset files.
 
-## Repository Links and "Edit" Button
+## Repository Links
 
-- `repo_url` and `repo_name` control the repository link shown in the UI.
-  See [MkDocs - repo_url](https://www.mkdocs.org/user-guide/configuration/#repo_url).
-- `edit_uri` controls where the Edit button points.
-  See [MkDocs - edit_uri](https://www.mkdocs.org/user-guide/configuration/#edit_uri).
+LibreNMS sets `repo_url`, `repo_name`, and `edit_uri` to point to the GitHub
+repository. These control the repository link and Edit button in the UI.
+If the repository location changes (for example, moving to a different org
+or renaming), update these values in `mkdocs.yml`.
 
-LibreNMS note:
+## Extra Assets
 
-- LibreNMS sets `edit_uri` to point to `doc/` on the `master` branch. If you
-  change documentation paths or restructure folders, verify the Edit button
-  still links to the correct file.
-
-## Extra Assets and Site Extras
-
-- `extra_css` and `extra_javascript` include additional assets used by the docs.
-  See [MkDocs - extra_css](https://www.mkdocs.org/user-guide/configuration/#extra_css)
-  and [MkDocs - extra_javascript](https://www.mkdocs.org/user-guide/configuration/#extra_javascript).
-- `extra:` provides theme/plugin variables (LibreNMS uses it for analytics and
-  site-specific settings).
-  See [MkDocs - extra](https://www.mkdocs.org/user-guide/configuration/#extra).
+`extra_css`, `extra_javascript`, and `extra:` include additional assets and
+variables used by the docs (LibreNMS uses these for analytics and
+site-specific settings).
