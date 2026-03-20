@@ -19,15 +19,12 @@ class AlertPolicy
         /** @var Alert $model */
         $model = $this->castToModel($alert, Alert::class);
 
-        return $model;
-    }
+        // Authorization only needs device_id; ensure it's present even if mass assignment blocks it.
+        if (is_array($alert) && array_key_exists('device_id', $alert)) {
+            $model->device_id = $alert['device_id'];
+        }
 
-    /**
-     * @param  Alert|array  $alert
-     */
-    private function getAlertDeviceId(Alert|array $alert): ?int
-    {
-        return $this->getNumericId($alert, ['device_id']);
+        return $model;
     }
 
     /**
@@ -48,7 +45,7 @@ class AlertPolicy
         }
 
         $alert = $this->castAlertModel($alert);
-        $deviceId = $this->getAlertDeviceId($alert);
+        $deviceId = is_numeric($alert->device_id) ? (int) $alert->device_id : null;
 
         return $this->hasGlobalPermission($user, 'view')
             && $deviceId !== null
@@ -58,7 +55,7 @@ class AlertPolicy
     public function detail(User $user, Alert|array $alert): bool
     {
         $alert = $this->castAlertModel($alert);
-        $deviceId = $this->getAlertDeviceId($alert);
+        $deviceId = is_numeric($alert->device_id) ? (int) $alert->device_id : null;
 
         return $this->hasGlobalPermission($user, 'detail') &&
             $deviceId !== null &&
@@ -71,7 +68,7 @@ class AlertPolicy
     public function update(User $user, Alert|array $alert): bool
     {
         $alert = $this->castAlertModel($alert);
-        $deviceId = $this->getAlertDeviceId($alert);
+        $deviceId = is_numeric($alert->device_id) ? (int) $alert->device_id : null;
 
         return $this->hasGlobalPermission($user, 'update') &&
             $deviceId !== null &&
@@ -84,7 +81,7 @@ class AlertPolicy
     public function delete(User $user, Alert|array $alert): bool
     {
         $alert = $this->castAlertModel($alert);
-        $deviceId = $this->getAlertDeviceId($alert);
+        $deviceId = is_numeric($alert->device_id) ? (int) $alert->device_id : null;
 
         return $this->hasGlobalPermission($user, 'delete') &&
             $deviceId !== null &&
