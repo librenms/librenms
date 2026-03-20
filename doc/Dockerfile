@@ -1,12 +1,6 @@
 FROM squidfunk/mkdocs-material:9.7
 
+COPY ./pyproject.toml  pyproject.toml
 RUN \
-  pip install --no-cache-dir \
-    'markdown-exec' \
-    'markdown-include' \
-    'mkdocs-awesome-pages-plugin' \
-    'mkdocs-exclude' \
-    'mkdocs-git-revision-date-localized-plugin' \
-    'mkdocs-macros-plugin' \
-    'mkdocs-include-dir-to-nav' \
-  && rm -rf /tmp/*
+  pip install --no-cache-dir -e .\
+     && rm -rf /tmp/*

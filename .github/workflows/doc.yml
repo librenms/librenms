@@ -39,10 +39,11 @@ jobs:
             /resources/definitions/os_detection
             /doc
             /mkdocs.yml
+            /pyproject.toml
       -
         name: Build mkdocs Docker image
         run: |
-          docker build -t mkdocs - < doc/Dockerfile
+          docker build -t mkdocs -f doc/Dockerfile .
       -
         name: Build docs
         run: |

@@ -48,3 +48,5 @@ pyvenv.cfg
 
 /.phpunit.cache/storage/pail
 /.nova
+
+/uv*
