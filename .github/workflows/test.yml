@@ -167,6 +167,8 @@ jobs:
 
       -
         name: lnms dev:check ci
+        env:
+          SNMPCONFPATH: "/etc/snmp:/usr/share/snmp:${{ github.workspace }}/.snmp:/var/lib/snmp"
         run: |
           php lnms dev:check ci ${{ matrix.arguments }}
 
