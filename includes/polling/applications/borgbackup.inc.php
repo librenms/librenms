@@ -41,7 +41,7 @@ Log::info('Fetched data, mode=' . ($data['mode'] ?? 'undef'));
 // This check ensures the data is valid before processing. If mode is missing or invalid,
 // the function returns early with an error state.
 if (! isset($data['mode']) || (strcmp((string) $data['mode'], 'single') !== 0 && strcmp((string) $data['mode'], 'multi') !== 0)) {
-    print('    ERROR: .data.mode is undef or not set to single or multi' . PHP_EOL);
+    echo '    ERROR: .data.mode is undef or not set to single or multi' . PHP_EOL;
     update_application($app, 'Error', $metrics);
 
     return;
@@ -73,7 +73,7 @@ if (strcmp((string) $data['mode'], 'single') == 0
     if (isset($data['repos']['single']['error'])
         && strcmp($data['repos']['single']['error'], '') !== 0) {
         $app_data['errored']['single'] = $data['repos']['single']['error'];
-        print('        -> Error: ' . $data['repos']['single']['error'] . PHP_EOL);
+        echo '        -> Error: ' . $data['repos']['single']['error'] . PHP_EOL;
     } else {
         $app_data['errored']['single'] = 'Unknown error. .totals.errored > 0, but .repos.single.error is empty.';
         Log::info('        -> Unknown error (totals.errored > 0)');
@@ -219,7 +219,7 @@ if (strcmp((string) $data['mode'], 'multi') == 0) {
 // application state with success status ('OK') and all collected metrics.
 // This makes the data available for the web UI and graphing.
 $app->data = $app_data;
-print("RRD updating");
+echo 'RRD updating';
 update_application($app, 'OK', $metrics);
 Log::info('Done. Collected ' . count($metrics) . ' metrics');
 // Log::info('All metrics: ' . json_encode($metrics));
