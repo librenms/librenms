@@ -28,7 +28,6 @@ class AlertPolicy
         }
 
         return $this->hasGlobalPermission($user, 'view')
-            && $alertId !== null
             && Permissions::canAccessDevice($alertId, $user);
     }
 
@@ -47,7 +46,6 @@ class AlertPolicy
         }
 
         return $this->hasGlobalPermission($user, 'update') &&
-            $alertId !== null &&
             Permissions::canAccessDevice($alertId, $user);
     }
 
@@ -61,7 +59,6 @@ class AlertPolicy
         }
 
         return $this->hasGlobalPermission($user, 'delete') &&
-            $alertId !== null &&
             Permissions::canAccessDevice($alertId, $user);
     }
 }
