@@ -9,6 +9,9 @@ or create markdown you only need a text editor, but it is recommended to build
 your docs before submitting, in order to check them visually. The section on
 this page has instructions for this step.
 
+For details on the LibreNMS docs build configuration (enabled Markdown
+extensions, Material features, plugins like redirects, and how `nav` and other details are configured), see [MkDocs Configuration](MkDocs-Configuration.md).
+
 ## Writing docs
 
 When you are adding a new feature or extension, we need to have full
