@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\Sensor;
+use App\Models\StateTranslation;
+use LibreNMS\Enum\Severity;
+
 $cur_oid = '.1.3.6.1.3.94.1.8.1.6.';
 
 // These sensors are not provided as tables. They are strings of the form:
@@ -13,18 +17,24 @@ $oids = SnmpQuery::cache()->hideMib()->numericIndex()->walk('FCMGMT-MIB::connUni
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
         if (str_contains((string) $entry['connUnitSensorMessage'], 'Status')) {
-            $states = [
-                ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
-                ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Not OK'],
-            ];
-
             $connUnitSensorMessage = explode(':', (string) $entry['connUnitSensorMessage']);
             $value = array_pop($connUnitSensorMessage) === ' OK' ? 1 : 2;
             $descr = implode(':', $connUnitSensorMessage);
 
-            create_state_index($descr, $states);
-
-            discover_sensor(null, 'state', $device, $cur_oid . $index, $index, 'dellme', $descr, '1', '1', null, null, null, null, $value);
+            app('sensor-discovery')->discover(new Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'state',
+                'sensor_oid' => $cur_oid . $index,
+                'sensor_index' => $index,
+                'sensor_type' => 'dellme',
+                'sensor_descr' => $descr,
+                'sensor_divisor' => 1,
+                'sensor_multiplier' => 1,
+                'sensor_current' => $value,
+            ]))->withStateTranslations('dellme', [
+                StateTranslation::define('OK', 1, Severity::Ok),
+                StateTranslation::define('Not OK', 2, Severity::Error),
+            ]);
         }
     }
 }
@@ -32,6 +42,5 @@ unset($cur_oid,
     $connUnitSensorMessage,
     $value,
     $descr,
-    $states,
     $oids
 );
