@@ -17,7 +17,7 @@ $mef_list = [];
  * Fetch information about MEF Links.
  */
 
-$oids = snmpwalk_cache_multi_oid($device, 'MefServiceEvcCfgEntry', $oids, 'MEF-UNI-EVC-MIB');
+$oids = snmpwalk_cache_multi_oid($device, 'MefServiceEvcCfgEntry', [], 'MEF-UNI-EVC-MIB');
 
 echo 'MEF : ';
 foreach ($oids as $index => $entry) {
