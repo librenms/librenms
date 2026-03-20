@@ -32,8 +32,8 @@ if (is_numeric($temp)) {
 $cooling_status = snmpwalk_cache_oid($device, 'coolingUnitStatusDiscreteEntry', [], 'PowerNet-MIB');
 foreach ($cooling_status as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.4.2.2.1.4.' . $index;
-    $state_name = 'coolingUnitStatusDiscreteDescription';
-    $descr = $data[$state_name];
+    $state_name = $data['coolingUnitStatusDiscreteDescription'];
+    $descr = $state_name;
 
     $tmp_states = explode(',', (string) $data['coolingUnitStatusDiscreteIntegerReferenceKey']);
     $states = [];
@@ -52,8 +52,8 @@ unset($cooling_status);
 $cooling_unit = snmpwalk_cache_oid($device, 'coolingUnitExtendedDiscreteEntry', [], 'PowerNet-MIB');
 foreach ($cooling_unit as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.6.2.2.1.4.' . $index;
-    $state_name = 'coolingUnitExtendedDiscreteDescription';
-    $descr = $data[$state_name];
+    $state_name = $data['coolingUnitExtendedDiscreteDescription'];
+    $descr = $state_name;
 
     $tmp_states = explode(',', (string) $data['coolingUnitExtendedDiscreteIntegerReferenceKey']);
     $states = [];
