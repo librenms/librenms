@@ -76,15 +76,36 @@ class Aos6 extends OS implements TransceiverDiscovery, VlanDiscovery, VlanPortDi
         $entVendor = \SnmpQuery::walk('ENTITY-MIB::entPhysicalMfgName')->pluck();
         $entModel = \SnmpQuery::walk('ENTITY-MIB::entPhysicalModelName')->pluck();
         $entSerial = \SnmpQuery::walk('ENTITY-MIB::entPhysicalSerialNum')->pluck();
+        $entParentRelPos = \SnmpQuery::walk('ENTITY-MIB::entPhysicalParentRelPos')->pluck();
 
-        // Get all ports ordered by ifIndex for positional mapping
-        $ports = \DB::table('ports')
-            ->where('device_id', $this->getDevice()->device_id)
-            ->orderBy('ifIndex')
-            ->get();
+        // Get port information for matching via ifDescr format (e.g., "1/25")
+        $ifDescrs = \SnmpQuery::walk('IF-MIB::ifDescr')->pluck();
+
+        // Build entity index to ifIndex mapping by matching entPhysicalParentRelPos with ifDescr port number
+        $entIndexToIfIndex = [];
+
+        foreach ($entParentRelPos as $entIndex => $relPos) {
+            $class = $entClass[$entIndex] ?? null;
+
+            // Only process transceivers (class 10 = port)
+            if ($class != 10 || $relPos < 0) {
+                continue;
+            }
+
+            // Try to find matching ifIndex by port description
+            // For AOS6, ifDescr format is "Alcatel-Lucent Enterprise 1/25"
+            foreach ($ifDescrs as $ifIndex => $ifDescr) {
+                // Match patterns like "1/25" in ifDescr where 25 is the relPos
+                if (preg_match('/1\/(\d+)$/', trim($ifDescr), $matches)) {
+                    if ((int) $matches[1] == $relPos) {
+                        $entIndexToIfIndex[$entIndex] = (int) $ifIndex;
+                        break;
+                    }
+                }
+            }
+        }
 
         $transceivers = collect();
-        $portIndex = 0;
 
         foreach ($mfgDates as $entIndex => $mfgDate) {
             $class = $entClass[$entIndex] ?? null;
@@ -94,20 +115,22 @@ class Aos6 extends OS implements TransceiverDiscovery, VlanDiscovery, VlanPortDi
                 continue;
             }
 
-            // Map transceivers to ports by position (in sorted order)
-            if (! isset($ports[$portIndex])) {
+            // Get ifIndex for this entity using the mapping
+            $ifIndex = $entIndexToIfIndex[$entIndex] ?? null;
+            if (! $ifIndex) {
                 continue;
             }
 
-            $port = $ports[$portIndex];
-            $portId = (int) $port->port_id;
-            $portIfIndex = (int) $port->ifIndex;
-            $portIndex++;
+            // Get port_id from ifIndex
+            $portId = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId());
+            if (! $portId) {
+                continue;
+            }
 
             $transceivers->push(new Transceiver([
                 'port_id' => $portId,
                 'index' => $entIndex,
-                'entity_physical_index' => $portIfIndex,  // Use ifIndex for DDM sensor matching
+                'entity_physical_index' => $ifIndex,  // Use ifIndex for DDM sensor matching
                 'type' => $entDescr[$entIndex] ?? null,
                 'vendor' => $entVendor[$entIndex] ?? null,
                 'model' => $entModel[$entIndex] ?? null,
