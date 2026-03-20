@@ -42,6 +42,10 @@ class AlertPolicy
      */
     public function update(User $user, int $alertId): bool
     {
+        if ($this->hasGlobalPermission($user, 'update') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'update') &&
             $alertId !== null &&
             Permissions::canAccessDevice($alertId, $user);
@@ -52,6 +56,10 @@ class AlertPolicy
      */
     public function delete(User $user, int $alertId): bool
     {
+        if ($this->hasGlobalPermission($user, 'delete') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'delete') &&
             $alertId !== null &&
             Permissions::canAccessDevice($alertId, $user);
