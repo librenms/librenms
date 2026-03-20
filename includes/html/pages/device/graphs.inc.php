@@ -26,7 +26,7 @@ foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY g
 $sep = '';
 foreach ($graph_enable as $section => $nothing) {
     if (isset($graph_enable) && is_array($graph_enable[$section])) {
-        $type = strtolower($section);
+        $type = strtolower((string) $section);
         if (empty($vars['group'])) {
             $vars['group'] = $type;
         }

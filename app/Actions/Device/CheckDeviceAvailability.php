@@ -9,9 +9,10 @@ use LibreNMS\Polling\ConnectivityHelper;
 class CheckDeviceAvailability
 {
     public function __construct(
-        private SetDeviceAvailability $setDeviceAvailability,
-        private DeviceIsPingable $deviceIsPingable,
-        private DeviceIsSnmpable $deviceIsSnmpable,
+        private readonly SetDeviceAvailability $setDeviceAvailability,
+        private readonly DeviceIsPingable $deviceIsPingable,
+        private readonly DeviceIsSnmpable $deviceIsSnmpable,
+        private readonly DeviceMtuTest $deviceMtuTest,
     ) {
     }
 
@@ -21,9 +22,11 @@ class CheckDeviceAvailability
 
         if ($ping_response->success()) {
             $is_up_snmp = ! ConnectivityHelper::snmpIsAllowed($device) || $this->deviceIsSnmpable->execute($device);
-            $this->setDeviceAvailability->execute($device, $is_up_snmp, AvailabilitySource::SNMP, $commit);
+            $this->setDeviceAvailability->execute($device, $is_up_snmp, AvailabilitySource::Snmp, $commit);
+
+            $device->mtu_status = $this->deviceMtuTest->execute($device);
         } else { // icmp down
-            $this->setDeviceAvailability->execute($device, false, AvailabilitySource::ICMP, $commit);
+            $this->setDeviceAvailability->execute($device, false, AvailabilitySource::Icmp, $commit);
         }
 
         if ($commit) {

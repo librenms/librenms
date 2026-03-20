@@ -11,23 +11,27 @@
 ACD-DISCOVERY-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE,IpAddress, Unsigned32 FROM SNMPv2-SMI
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress, Unsigned32 FROM SNMPv2-SMI
     DisplayString, DateAndTime, MacAddress FROM SNMPv2-TC
-    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF
     acdMibs FROM ACCEDIAN-SMI;
 
 acdDiscovery MODULE-IDENTITY
 
-    LAST-UPDATED "201111010100Z"
+    LAST-UPDATED "201210110100Z"
     ORGANIZATION "Accedian Networks, Inc."
     CONTACT-INFO
             "Accedian Technical Assistance Center
              Accedian Networks, Inc.
-             4878 Levy, suite 202
-             Saint-Laurent, Quebec Canada H4R 2P1
+             2351 Alfred-Nobel blvd., Suite N-410
+             Saint-Laurent, Quebec Canada H4S 2A9
              E-mail: support@accedian.com"
     DESCRIPTION
             "The discovery inventory information for this Accedian Networks device."
+
+    REVISION "201210110100Z"        -- 11 October 2012
+    DESCRIPTION
+            "Addition of MAC Address List table."
 
     REVISION "201111010100Z"        -- 1 November 2011
     DESCRIPTION
@@ -42,6 +46,10 @@ acdDiscovery MODULE-IDENTITY
 acdDiscoveryNotifications   OBJECT IDENTIFIER ::= { acdDiscovery 0 }
 acdDiscoveryMIBObjects      OBJECT IDENTIFIER ::= { acdDiscovery 1 }
 acdDiscoveryConformance     OBJECT IDENTIFIER ::= { acdDiscovery 2 }
+
+--
+-- ACD Discovery MIB Objects
+--
 
 acdDiscoveryInventory       OBJECT IDENTIFIER ::= { acdDiscoveryMIBObjects 1 }
 
@@ -368,9 +376,57 @@ acdDiscoveryMacAddressListPortMacAddress OBJECT-TYPE
         "This is the MAC address of one of the ports found on the remote device."
     ::= { acdDiscoveryMacAddressListEntry 5 }
 
----------------------------------------------------------------------------
- -- ACD-DISCOVERY-MIB Module - Conformance Information
----------------------------------------------------------------------------
+
+acdDiscoveryInventoryInserts OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    UNITS       "table entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of times the complete set of information
+            advertised by a particular device has been inserted into the
+            inventory database.
+
+            This counter should be incremented only once after the
+            complete set of information is successfully recorded
+            in the inventory database."
+    ::= { acdDiscoveryInventory 4 }
+
+acdDiscoveryInventoryAgeouts   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    UNITS       "table entries"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of times the complete set of information
+            advertised by a particular device has been deleted from the
+            inventory database because the information timeliness interval 
+            has expired.
+
+            This counter should be incremented only once when the complete
+            set of information is completely invalidated (aged out)."
+    ::= { acdDiscoveryInventory 5 }
+
+
+acdDiscoveryInventoryChange NOTIFICATION-TYPE
+    OBJECTS  {  acdDiscoveryInventoryInserts,
+                acdDiscoveryInventoryAgeouts                
+                }
+    STATUS      current
+    DESCRIPTION
+        "The SNMP notification generated when a change is detected in the 
+        inventory database."
+
+    ::= { acdDiscoveryNotifications 1 }
+
+--
+-- ***********************************************************
+-- 
+--       D I S C O V E R Y   M I B   C O N F O R M A N C E 
+-- 
+-- *********************************************************** 
+--
+-- ACD-DISCOVERY-MIB Module - Conformance Information
 
 acdDiscoveryCompliances  OBJECT IDENTIFIER ::= { acdDiscoveryConformance 1 }
 acdDiscoveryGroups       OBJECT IDENTIFIER ::= { acdDiscoveryConformance 2 }
@@ -398,7 +454,9 @@ acdDiscoveryInventoryGroup OBJECT-GROUP
         acdDiscoverySnmpAgentPort,
         acdDiscoverySshPort,
         acdDiscoveryVlan1,
-        acdDiscoveryVlan2
+        acdDiscoveryVlan2,
+        acdDiscoveryInventoryInserts,
+        acdDiscoveryInventoryAgeouts
     }
     STATUS      current
     DESCRIPTION
@@ -426,6 +484,15 @@ acdDiscoveryMacAddressListGroup OBJECT-GROUP
        "."
     ::= { acdDiscoveryGroups 3 }
 
+acdDiscoveryNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        acdDiscoveryInventoryChange
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Inventory Notifications group."
+    ::= { acdDiscoveryGroups 4 }
+
 acdDiscoveryCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION
@@ -434,7 +501,8 @@ acdDiscoveryCompliance MODULE-COMPLIANCE
         MANDATORY-GROUPS {
             acdDiscoveryInventoryGroup,
             acdDiscoveryIpListGroup,
-            acdDiscoveryMacAddressListGroup
+            acdDiscoveryMacAddressListGroup,
+            acdDiscoveryNotificationsGroup
          }
 
     ::= { acdDiscoveryCompliances 1 }

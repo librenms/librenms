@@ -58,7 +58,7 @@ class Color
         if ($percentage > 75) {
             return [
                 'left' => 'bf5d5b',
-                'right' => 'd39392',
+                'right' => 'eaeaea',
                 'middle' => 'c97e7d',
             ];
         }
@@ -66,7 +66,7 @@ class Color
         if ($percentage > 50) {
             return [
                 'left' => 'bf875b',
-                'right' => 'd3ae92',
+                'right' => 'eaeaea',
                 'middle' => 'cca07e',
             ];
         }
@@ -74,14 +74,14 @@ class Color
         if ($percentage > 25) {
             return [
                 'left' => '5b93bf',
-                'right' => '92b7d3',
+                'right' => 'eaeaea',
                 'middle' => '7da8c9',
             ];
         }
 
         return [
             'left' => '9abf5b',
-            'right' => 'bbd392',
+            'right' => 'eaeaea',
             'middle' => 'afcc7c',
         ];
     }

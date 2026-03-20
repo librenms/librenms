@@ -76,7 +76,7 @@ function cleanPort($interface, $device = null)
 
     if (is_array(LibrenmsConfig::get('rewrite_if'))) {
         foreach (LibrenmsConfig::get('rewrite_if') as $src => $val) {
-            if (stristr($interface['label'], (string) $src)) {
+            if (stristr((string) $interface['label'], (string) $src)) {
                 $interface['label'] = $val;
             }
         }
@@ -84,8 +84,8 @@ function cleanPort($interface, $device = null)
 
     if (is_array(LibrenmsConfig::get('rewrite_if_regexp'))) {
         foreach (LibrenmsConfig::get('rewrite_if_regexp') as $reg => $val) {
-            if (preg_match($reg . 'i', $interface['label'])) {
-                $interface['label'] = preg_replace($reg . 'i', $val, $interface['label']);
+            if (preg_match($reg . 'i', (string) $interface['label'])) {
+                $interface['label'] = preg_replace($reg . 'i', $val, (string) $interface['label']);
             }
         }
     }
@@ -124,7 +124,7 @@ function short_hrDeviceDescr($dev)
 
 function short_port_descr($desc)
 {
-    [$desc] = explode('(', $desc);
+    [$desc] = explode('(', (string) $desc);
     [$desc] = explode('[', $desc);
     [$desc] = explode('{', $desc);
     [$desc] = explode('|', $desc);
@@ -253,7 +253,7 @@ function parse_entity_state_alarm($bits)
         6 => ['text' => 'indeterminate', 'color' => 'default'],
     ];
 
-    $alarms = str_split(base_convert($bits, 16, 2));
+    $alarms = str_split(base_convert((string) $bits, 16, 2));
     $active_alarms = array_filter($alarms);
 
     return array_intersect_key($data, $active_alarms);

@@ -2,7 +2,7 @@
 -- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: 
 -- Reference: None
--- Version:   V3.82
+-- Version:   V3.84
 -- ============================================================================
 --
 -- HUAWEI-ENTITY-EXTENT-MIB.mib
@@ -33,7 +33,7 @@
 
         -- 1.3.6.1.4.1.2011.5.25.31
         hwEntityExtentMIB MODULE-IDENTITY 
-            LAST-UPDATED "202209130000Z"
+            LAST-UPDATED "202211240000Z"
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -46,6 +46,12 @@
  "          
              DESCRIPTION 
                 "The private mib file includes the general extent information of the device."
+
+            REVISION     "202211240000Z"                                                                                   
+            DESCRIPTION  "V3.84 modify hwEntityOpticalType."
+
+            REVISION     "202211180000Z"                                                                                   
+            DESCRIPTION  "V3.83 add hwEntityExtHardDiskOnlineFail and  hwEntityExtHardDiskOfflineFail."
             
             REVISION     "202209130000Z"                                                                                   
             DESCRIPTION  "V3.82 modify the description of hwEntityOpticalVoltage, hwEntityOpticalRxPower, hwEntityOpticalTxPower, hwEntityOpticalTemperature."
@@ -2117,7 +2123,8 @@ hwEntityOpticalWaveLength, hwEntityOpticalBiasCurrent, hwEntityOpticalRxLowThres
                 cfp2dco(27),
                 sfp56(28),
                 qsfp56(29),
-                oa(30)
+                oa(30),
+                micro(31)
                 }
             MAX-ACCESS read-only
             STATUS current
@@ -5186,6 +5193,24 @@ hwEntityOpticalWaveLength, hwEntityOpticalBiasCurrent, hwEntityOpticalRxLowThres
             DESCRIPTION 
                 " The hwEntityExtCpuUsageNotficationClear indicates the entity CPU usage fell below the threshold. "
             ::= { hwEntityExtTrapsPrefix 49 }
+
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.50
+		hwEntityExtHardDiskOnlineFail NOTIFICATION-TYPE
+		OBJECTS { hwDiskType, hwDiskSN, hwDiskSlot }
+	    STATUS current
+	    DESCRIPTION 
+	        " The object indicates
+			that the hard disk went online fail."
+	    ::= { hwEntityExtTrapsPrefix 50 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.31.2.0.51
+		hwEntityExtHardDiskOfflineFail NOTIFICATION-TYPE
+		OBJECTS { hwDiskType, hwDiskSN, hwDiskSlot }
+	    STATUS current
+	    DESCRIPTION 
+	        " The object indicates
+			that the hard disk went offline fail. "
+	    ::= { hwEntityExtTrapsPrefix 51 }
 		
 		-- 1.3.6.1.4.1.2011.5.25.31.2.1
         hwEntityExtTrapObject OBJECT IDENTIFIER ::= { hwEntityExtTraps 1 }

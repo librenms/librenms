@@ -1,18 +1,23 @@
 <?php
 
 use App\Models\Bill;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Billing;
+use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 
-$bill_id = $vars['bill_id'];
+$bill_id = (int) ($vars['bill_id'] ?? 0);
+$bill = Bill::find($bill_id);
 
-if (Auth::user()->hasGlobalAdmin()) {
+if ($bill === null) {
+    abort(404);
+}
+
+if (Gate::any(['update', 'delete', 'create'], $bill)) {
     include 'includes/html/pages/bill/actions.inc.php';
 }
 
-if (!Bill::where('bill_id', $bill_id)->exists()) {
-    abort(404);
-} elseif (bill_permitted($bill_id)) {
+if (Gate::allows('view', $bill)) {
     $bill_data = dbFetchRow('SELECT * FROM bills WHERE bill_id = ?', [$bill_id]);
 
     $bill_name = $bill_data['bill_name'];
@@ -67,9 +72,7 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
         [$bill_id]
     );
 
-    if (! $vars['view']) {
-        $vars['view'] = 'quick';
-    }
+    $vars['view'] ??= 'quick';
 
     function print_port_list($ports)
     {
@@ -92,7 +95,7 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
         echo '</div></div>';
     }//end print_port_list?>
 
-    <h2>Bill: <?php echo htmlentities($bill_data['bill_name']); ?></h2>
+    <h2>Bill: <?php echo htmlentities((string) $bill_data['bill_name']); ?></h2>
 
     <?php
     print_optionbar_start();
@@ -103,9 +106,13 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
         'transfer' => 'Transfer Graphs',
         'history' => 'Historical Graphs',
     ];
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (Gate::allows('update', $bill)) {
         $menu_options['edit'] = 'Edit';
+    }
+    if (Gate::allows('delete', $bill)) {
         $menu_options['delete'] = 'Delete';
+    }
+    if (Gate::allows('update', $bill)) {
         $menu_options['reset'] = 'Reset';
     }
     $sep = '';
@@ -127,11 +134,11 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
 
     print_optionbar_end();
 
-    if ($vars['view'] == 'edit' && Auth::user()->hasGlobalAdmin()) {
+    if ($vars['view'] == 'edit' && Gate::allows('update', $bill)) {
         include 'includes/html/pages/bill/edit.inc.php';
-    } elseif ($vars['view'] == 'delete' && Auth::user()->hasGlobalAdmin()) {
+    } elseif ($vars['view'] == 'delete' && Gate::allows('delete', $bill)) {
         include 'includes/html/pages/bill/delete.inc.php';
-    } elseif ($vars['view'] == 'reset' && Auth::user()->hasGlobalAdmin()) {
+    } elseif ($vars['view'] == 'reset' && Gate::allows('update', $bill)) {
         include 'includes/html/pages/bill/reset.inc.php';
     } elseif ($vars['view'] == 'history') {
         include 'includes/html/pages/bill/history.inc.php';
@@ -168,13 +175,12 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
             $percent = Number::calculatePercent($total_data, $bill_data['bill_quota']);
             $unit = 'MB';
             $total_data = round($total_data, 2);
-            $background = \LibreNMS\Util\Color::percentage($percent, null);
             $type = '&amp;ave=yes'; ?>
         <td>
             <?php echo Billing::formatBytes($total_data) ?> of <?php echo Billing::formatBytes($bill_data['bill_quota']) . ' (' . $percent . '%)' ?>
             - Average rate <?php echo Number::formatSi($rate_average, 2, 0, 'bps') ?>
         </td>
-        <td style="width: 210px;"><?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']) ?></td>
+        <td style="width: 210px;"><?php echo Html::percentageBar(200, 10, $percent, right_text: $percent . '%'); ?></td>
         </tr>
         <tr>
             <td colspan="2">
@@ -188,13 +194,12 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
             $cdr = $bill_data['bill_cdr'];
             $rate_95th = round($rate_95th, 2);
             $percent = Number::calculatePercent($rate_95th, $cdr);
-            $background = \LibreNMS\Util\Color::percentage($percent, null);
             $type = '&amp;95th=yes'; ?>
         <td>
             <?php echo Number::formatSi($rate_95th, 2, 0, '') . 'bps' ?> of <?php echo Number::formatSi($cdr, 2, 0, '') . 'bps (' . $percent . '%)' ?> (95th%ile)
         </td>
         <td style="width: 210px;">
-            <?php echo print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']) ?>
+            <?php echo Html::percentageBar(200, 10, $percent, right_text: $percent . '%'); ?>
         </td>
         </tr>
         <tr>
@@ -218,22 +223,23 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
         $rightnow = date('U');
 
         if ($vars['view'] == 'accurate') {
-            $bi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($_GET['bill_code']);
+            $bill_code = (string) ($_GET['bill_code'] ?? '');
+            $bi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($bill_code);
             $bi .= '&amp;from=' . $unixfrom . '&amp;to=' . $unixto;
             $bi .= '&amp;x=1190&amp;y=250';
             $bi .= "$type'>";
 
-            $li = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . $_GET['bill_code'];
+            $li = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($bill_code);
             $li .= '&amp;from=' . $unix_prev_from . '&amp;to=' . $unix_prev_to;
             $li .= '&amp;x=1190&amp;y=250';
             $li .= "$type'>";
 
-            $di = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($_GET['bill_code']);
+            $di = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($bill_code);
             $di .= '&amp;from=' . \App\Facades\LibrenmsConfig::get('time.day') . '&amp;to=' . \App\Facades\LibrenmsConfig::get('time.now');
             $di .= '&amp;x=1190&amp;y=250';
             $di .= "$type'>";
 
-            $mi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($_GET['bill_code']);
+            $mi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($bill_code);
             $mi .= '&amp;from=' . $lastmonth . '&amp;to=' . $rightnow;
             $mi .= '&amp;x=1190&amp;y=250';
             $mi .= "$type'>";

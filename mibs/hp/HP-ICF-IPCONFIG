@@ -1,32 +1,30 @@
 HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
 
     IMPORTS
-        OBJECT-TYPE, MODULE-IDENTITY
+        OBJECT-TYPE, MODULE-IDENTITY, Unsigned32, Integer32
             FROM SNMPv2-SMI
-        RowStatus
+        RowStatus, TruthValue
             FROM SNMPv2-TC
         MODULE-COMPLIANCE, OBJECT-GROUP
             FROM SNMPv2-CONF
         InetAddress, InetAddressType, InetAddressPrefixLength, InetAddressIPv4, 
         InetPortNumber
             FROM INET-ADDRESS-MIB
-        ipNetToPhysicalEntry
-            FROM IP-MIB
         ifIndex
             FROM IF-MIB
         hpicfCommon
             FROM HP-ICF-OID
         ipv4InterfaceEntry, ipv6InterfaceEntry, IpAddressOriginTC, 
-	    IpAddressStatusTC
+	    IpAddressStatusTC, ipNetToPhysicalEntry
             FROM IP-MIB
         tunnelInetConfigEntry
             FROM TUNNEL-MIB;
         
     hpicfIpConfig MODULE-IDENTITY
-        LAST-UPDATED "200702020000Z"  -- JUNE 06,2007
-        ORGANIZATION "Hewlett Packard Company,
-                      ProCurve Networking Business"
-        CONTACT-INFO "Hewlett Packard Company
+
+        LAST-UPDATED "201711140000Z"  -- November 14, 2017
+        ORGANIZATION "HP Networking"
+        CONTACT-INFO "Hewlett-Packard Company
                       8000 Foothills Blvd.
                       Roseville, CA 95747"
         DESCRIPTION  "This MIB module describes objects for basic
@@ -34,7 +32,54 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
                       for devices in the HP Integrated Communication Facility
                       product line."
 
-        REVISION     "200702020000Z"  -- JUNE 06, 2007
+        REVISION     "201711140000Z"  -- November 14, 2017
+        DESCRIPTION  "Added hpicfIpClientTrackerProbeDelay object
+                      in hpicfIpClientTrackerObjects group.
+                      Added hpicfIpConfigCompliance11 and 
+                      hpicfIpClientTrackerGroup3 and deprecated 
+                      hpicfIpClientTrackerGroup."
+
+        REVISION     "201706072140Z"  -- June 07, 2017
+        DESCRIPTION  "Added hpicfIpClientTrackerUntrusted object
+                      and hpicfIpClientTrackerTrusted object in
+                      hpicfIpClientTrackerGroup2 and
+                      deprecated hpicfIpClientTrackerGroup."
+
+        REVISION     "201608042140Z"  -- August 04, 2016
+        DESCRIPTION  "Added hpicfIpClientTrackerObjects group in 
+                      hpicfIpConfigObjects for Static IP Visibility
+                      feature and added hpicfIpClientTrackerEnable object,
+                      hpicfIpConfigCompliance10 and hpicfIpClientTrackerGroup."
+
+        REVISION     "201006102140Z"  -- June 10, 2010
+        DESCRIPTION  "Added hpicfIpv4InterfaceDirectedBcastFwd object
+                      to hpicfIpv4InterfaceTable."
+       
+        REVISION     "200910020000Z"  -- October 02, 2009
+        DESCRIPTION  "Added hpicfIpv6InterfaceReachableTime and
+	              hpicfIpv6InterfaceRetransmitTime objects
+                      to hpicfIpv6InterfaceTable."
+
+	     REVISION     "200909100000Z"  -- September 10, 2009
+        DESCRIPTION  "Added hpicfUdpTunnelMirrorTruncate object 
+                      to HpicfUdpTunnelEntry."
+
+        REVISION     "200909040000Z"  -- September 04, 2009
+        DESCRIPTION  "Added hpicfIpNetToPhysicalTableClear."
+
+        REVISION     "200907210000Z"  -- July 21, 2009
+        DESCRIPTION  "Added hpicfIpv6InterfaceDadAttempts and
+                      hpicfIpv6InterfaceDadAttemptsMode object to the 
+                      hpicfIpv6InterfaceTable."
+
+        REVISION     "200812090000Z"  -- Dec 09, 2008
+        DESCRIPTION  "Updated Description of
+	              hpicfIpv4InterfaceBootpGateway"
+
+        REVISION     "200810010000Z"  -- Oct 01, 2008
+        DESCRIPTION  "Move ipNetToPhysicalEntry to correct IMPORT."
+
+        REVISION     "200706060000Z"  -- JUNE 06, 2007
         DESCRIPTION  "Added hpicfIpv6NDDadAttempts to augment the 
                       hpicfIpv6GlobalConfigObjects."
 
@@ -71,6 +116,10 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
     -- The HP ICF IPV4 interface group
 
     hpicfIpv4InterfaceObjects    OBJECT IDENTIFIER ::= {hpicfIpConfigObjects 2}
+
+    -- The HP ICF IP device tracker group
+
+    hpicfIpClientTrackerObjects       OBJECT IDENTIFIER ::= {hpicfIpConfigObjects 3}
 
     -- The HP ICF IPV6 config group
 
@@ -201,7 +250,7 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
                      for each interface.
 
                      These IP Addresses are either manually configured or 
-                     obtained by a dynamic meathod (such as DHCP).
+                     obtained by a dynamic method (such as DHCP).
 
                      This table will hold all manually configured IP Addresses
                      that exist in hpicfIpAddressTable except for those entries
@@ -326,17 +375,17 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
     ::= { hpicfSwitchIpAddressEntry 8 }   
 
     hpicfSwitchIpAddressExtendedType OBJECT-TYPE
-    SYNTAX      INTEGER {
+     SYNTAX      INTEGER {
                      none(0),
                      eui64(1),
                      linkLocal(2)
                  }
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION "IP address type. For V4 addresses the value will be 
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "IP address type. For V4 addresses the value will be 
                   none. For V6 address it can be eui64 and linkLocal also."
-    DEFVAL { none }
-    ::= { hpicfSwitchIpAddressEntry 9 }
+     DEFVAL { none }
+     ::= { hpicfSwitchIpAddressEntry 9 }
 
     hpicfIpNetToPhysicalTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF HpicfIpNetToPhysicalEntry
@@ -372,6 +421,18 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
 	     physical address was learnt"
     ::= { hpicfIpNetToPhysicalEntry 1}
 
+    hpicfIpNetToPhysicalTableClear  OBJECT-TYPE
+        SYNTAX       INTEGER {
+			unknown(1),
+                        ipv4(2),
+                        ipv6(3)
+                     }
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION   "This provides the clear options for hpicfIpNetToPhysicalTable.
+                      A value of 2 is to clear arp table. A value of 3 
+                      is to clear the ipv6 neighbor table. A get returns 'unknown' always."
+       ::= { hpicfIpAddressObjects 4 }
 
 
     -- V4 Interface Table
@@ -402,7 +463,8 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
             hpicfIpv4InterfaceForwarding         INTEGER,
             hpicfIpv4InterfaceProxyArp           INTEGER,
             hpicfIpv4InterfaceLocalProxyArp      INTEGER,
-            hpicfIpv4InterfaceBootpGateway       InetAddressIPv4 
+            hpicfIpv4InterfaceBootpGateway       InetAddressIPv4,
+            hpicfIpv4InterfaceDirectedBcastFwd   INTEGER
         }
 
     hpicfIpv4InterfaceDhcpEnable OBJECT-TYPE
@@ -487,9 +549,65 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
         SYNTAX      InetAddressIPv4
         MAX-ACCESS  read-write
         STATUS      current
-        DESCRIPTION "This entry will contain the IP address of the 
-                     BOOTP gateway for the interface."
+        DESCRIPTION "This entry will specify the IP address to be used 
+	             as the BOOTP gateway for this interface. Note that 
+		     this IP address will be used as the BOOTP gateway 
+		     only when it is configured as an IP address on this
+		     interface. Otherwise, the lowest IP address 
+		     configured on the interface will be used as the
+		     gateway address."
         ::= { hpicfIpv4InterfaceEntry 5 }
+
+    hpicfIpv4InterfaceDirectedBcastFwd OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enabled(1),
+                        default(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Enable/disable directed-broadcast forwarding 
+                     on this interface. When set to default, the
+                     global hpicfDBroadcastFwdEnable setting is 
+                     used. When set to enable, directed-broadcasts 
+                     are enabled irrespective of the global 
+                     setting."
+        ::= { hpicfIpv4InterfaceEntry 6 }
+
+    hpicfIpClientTrackerEnable OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "Enable ip client tracking for trusted and
+                    untrusted devices."
+       DEFVAL      { false }
+       ::= { hpicfIpClientTrackerObjects 1}
+
+    hpicfIpClientTrackerTrusted OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "Enable ip client tracking for trusted devices."
+       DEFVAL      { false }
+       ::= { hpicfIpClientTrackerObjects 2}
+
+    hpicfIpClientTrackerUntrusted OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "Enable ip client tracking for untrusted devices."
+       DEFVAL      { false }
+       ::= { hpicfIpClientTrackerObjects 3}
+
+    hpicfIpClientTrackerProbeDelay OBJECT-TYPE
+       SYNTAX      Unsigned32 (0 | 15..300)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "This object specifies ARP probe delay time in seconds 
+                    for IP client-tracker. When the object value is set to
+                    '0', IP client-tracker probe-delay is disabled. 
+                    By default probe-dealy is disabled."
+       DEFVAL      { 0 }
+       ::= { hpicfIpClientTrackerObjects 4}
 
     -- V6 Global Objects 
     hpicfIpv6NDDadAttempts OBJECT-TYPE
@@ -497,7 +615,7 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-write
         STATUS      current
         DESCRIPTION "The value in this object indicates the maximum number of
-                     neighbour solicitation requests that will be sent while
+                     neighbor solicitation requests that will be sent while
                      performing duplicate address detection." 
 
         ::= { hpicfIpv6NDObjects 1 }
@@ -553,7 +671,11 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
             hpicfIpv6InterfaceAutoConfig        INTEGER,
             hpicfIpv6InterfaceDhcpRapidCommit   INTEGER,
             hpicfIpv6InterfaceDhcpRelay         INTEGER,
-            hpicfIpv6InterfaceCfgEnableStatus   INTEGER
+            hpicfIpv6InterfaceCfgEnableStatus   INTEGER,
+            hpicfIpv6InterfaceDadAttempts       Integer32,
+            hpicfIpv6InterfaceDadAttemptsMode   INTEGER,
+	    hpicfIpv6InterfaceReachableTime     Unsigned32, 
+	    hpicfIpv6InterfaceRetransmitTime    Unsigned32
         }
 
 
@@ -656,6 +778,65 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
                  ipv6InterfaceEnableStatus."
     ::= { hpicfIpv6InterfaceEntry 6 }        
 
+   hpicfIpv6InterfaceDadAttempts OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "This object indicates the maximum number
+                     of neighbor solicitation requests that will be sent
+                     while performing duplicate address detection for 
+                     this interface.
+                     Note: hpicfIpv6NDDadAttempts object's value will 
+                     be in use for dad attempts for this interface when 
+                     hpicfIpv6InterfaceDadAttemptsMode is 'global'. " 
+        ::= { hpicfIpv6InterfaceEntry 7 }
+
+   hpicfIpv6InterfaceDadAttemptsMode OBJECT-TYPE
+       SYNTAX      INTEGER {
+                    global (1),
+                    perInterface (2)
+       }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION " This object indicates whether the
+                     value in hpicfIpv6NDDadAttempts is in use or
+                     the value in hpicfIpv6InterfaceDadAttempts 
+                     is in use for an entry in this table while
+                     performing duplicate address detection.
+                     A set to 'global' means: 
+                     - hpicfIpv6NDDadAttempts value will be used for dad 
+                        attempts.
+                     A set to 'perInterface' means:
+                     - hpicfIpv6InterfaceDadAttempts value will be used for
+                       dad attempts."
+        DEFVAL { global }             
+        ::= { hpicfIpv6InterfaceEntry 8 }
+        
+   hpicfIpv6InterfaceReachableTime OBJECT-TYPE
+       SYNTAX      Unsigned32
+       UNITS       "milliseconds"
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+                    "The time a neighbor is considered reachable after
+                     receiving a reachability confirmation."
+       REFERENCE    "RFC2461, Section 6.3.2"
+        ::= { hpicfIpv6InterfaceEntry 9 }
+
+
+   hpicfIpv6InterfaceRetransmitTime OBJECT-TYPE
+       SYNTAX     Unsigned32
+       UNITS      "milliseconds"
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+           "The time between retransmissions of Neighbor Solicitation
+            messages to a neighbor when resolving the address or when
+            probing the reachability of a neighbor."
+       REFERENCE "RFC2461, Section 6.3.2"
+        ::= { hpicfIpv6InterfaceEntry 10 }
+
+
 -- **********************************************************************
 -- Remote mirroring tunnel Objects
 -- **********************************************************************
@@ -684,7 +865,8 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
     HpicfUdpTunnelEntry ::=
         SEQUENCE {
             hpicfUdpTunnelSrcPort                InetPortNumber,
-            hpicfUdpTunnelMirrorSessionID        Integer32
+            hpicfUdpTunnelMirrorSessionID        Integer32,
+            hpicfUdpTunnelMirrorTruncate         INTEGER
         }
 
     hpicfUdpTunnelSrcPort OBJECT-TYPE
@@ -719,6 +901,18 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
                         is irrelevant for the tunnel type. "
         DEFVAL { 0 }
         ::= { hpicfUdpTunnelEntry 2 }
+
+    hpicfUdpTunnelMirrorTruncate OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Enables/disables truncation for remote mirroring."
+        DEFVAL { disabled }
+        ::= { hpicfUdpTunnelEntry 3 }
+
 
 
 -- **********************************************************************
@@ -794,6 +988,97 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
         DESCRIPTION "An agent is not required to implement inform (3) 
                      state."
         ::= { hpicfIpConfigCompliances 4 }
+        
+    hpicfIpConfigCompliance5 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "
+                A compliance statement for HP Routing switches with IP 
+                Configuration"
+       MODULE
+       GROUP  hpicfIpv6DadAttemptsGroup
+       DESCRIPTION "This group is for Dad Attempts to be configured on 
+                    a device."
+       GROUP  hpicfIpv6NDGroup
+       DESCRIPTION "This group is for configuring ipv6 ND parameters 
+                    on  a device."
+       ::= { hpicfIpConfigCompliances 5 }                
+
+    hpicfIpConfigCompliance6 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "
+                A compliance statement for HP Routing switches with IP 
+                Configuration"
+       MODULE
+       GROUP  hpicfIpv6IcmpGroup
+       DESCRIPTION "This group is for ipv6 icmp configuration."
+
+       ::= { hpicfIpConfigCompliances 6 }                
+
+    hpicfIpConfigCompliance7 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "
+                A compliance statement for HP Routing switches with IP 
+                Configuration"
+       MODULE
+       GROUP  hpicfIpNetToPhysicalTableGroup
+       DESCRIPTION "This group is for clear options provided in the switch."
+
+       ::= { hpicfIpConfigCompliances 7 }  
+              
+
+    hpicfIpConfigCompliance8 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "
+                A compliance statement for HP Routing switches with IP 
+                Configuration"
+       MODULE
+       GROUP  hpicfUdpTunnelMirrorGroup
+       DESCRIPTION "This group is for the Truncation option provided for
+                    remote mirroring."
+
+        ::= { hpicfIpConfigCompliances 8 }
+
+    hpicfIpConfigCompliance9 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "
+                A compliance statement for HP Routing switches with IP 
+                Configuration"
+        MODULE
+        MANDATORY-GROUPS {  hpicfIpAddressTableGroup,
+                            hpicfIpv4InterfaceTableGroup3,
+                            hpicfSwitchIpAddressTableGroup,
+                            hpicfIpv6InterfaceTableGroup }
+        
+        GROUP       hpicfUdpTunnelTableGroup
+        DESCRIPTION "This group is valid only for the remote
+                        mirroring source or destination switch.  
+                        The value will be ignored otherwise."
+        OBJECT      hpicfIpv4InterfaceDhcpEnable
+        MIN-ACCESS  read-write        
+        DESCRIPTION "An agent is not required to implement inform (3) 
+                     state."
+        ::= { hpicfIpConfigCompliances 9 }
+  
+    hpicfIpConfigCompliance10 MODULE-COMPLIANCE
+         STATUS      deprecated
+         DESCRIPTION "A compliance statement for IP Client tracking"
+         MODULE
+         MANDATORY-GROUPS { hpicfIpClientTrackerGroup }
+         ::= { hpicfIpConfigCompliances 10 }  
+
+    hpicfIpConfigCompliance11 MODULE-COMPLIANCE
+         STATUS      deprecated
+         DESCRIPTION "A compliance statement for IP Client tracking"
+         MODULE
+         MANDATORY-GROUPS { hpicfIpClientTrackerGroup2 }
+         ::= { hpicfIpConfigCompliances 11 } 
+
+    hpicfIpConfigCompliance13 MODULE-COMPLIANCE
+         STATUS      current
+         DESCRIPTION "A compliance statement for IP Client tracking"
+         MODULE
+         MANDATORY-GROUPS { hpicfIpClientTrackerGroup3 }
+         ::= { hpicfIpConfigCompliances 13 }
 
     hpicfIpAddressTableGroup OBJECT-GROUP
         OBJECTS { 
@@ -808,8 +1093,14 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
 
     hpicfSwitchIpAddressTableGroup OBJECT-GROUP
         OBJECTS { 
-                    hpicfSwitchIpAddressAddrType,
-                    hpicfSwitchIpAddressAddr}
+              hpicfSwitchIpAddressPrefixLength,
+              hpicfSwitchIpAddressType,
+              hpicfSwitchIpAddressOrigin,
+              hpicfSwitchIpAddressStatus,
+              hpicfSwitchIpAddressPreferredLifetime,
+              hpicfSwitchIpAddressValidLifetime,
+              hpicfSwitchIpAddressExtendedType
+             }
         STATUS      current
         DESCRIPTION "A Collection of objects providing interfaces addressing
                      information."
@@ -842,7 +1133,8 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
                     hpicfIpv6InterfaceManual,
                     hpicfIpv6InterfaceAutoConfig,
                     hpicfIpv6InterfaceDhcpRapidCommit,
-                    hpicfIpv6InterfaceDhcpRelay }
+                    hpicfIpv6InterfaceDhcpRelay,
+		    hpicfIpv6InterfaceCfgEnableStatus}
         STATUS      current
         DESCRIPTION "A Collection of objects that allows IPV6 interface 
                      configuration"
@@ -853,12 +1145,105 @@ HP-ICF-IPCONFIG DEFINITIONS ::= BEGIN
                     hpicfIpv4InterfaceDhcpEnable,
                     hpicfIpv4InterfaceForwarding,
                     hpicfIpv4InterfaceProxyArp,
-                    hpicfIpv4InterfaceLocalProxyArp }
+                    hpicfIpv4InterfaceLocalProxyArp,
+		    hpicfIpv4InterfaceBootpGateway}
         STATUS      current
         DESCRIPTION "A Collection of objects that allows IPV4 interface 
                      configuration"
         ::= { hpicfIpConfigGroups 6 }
 
- 
- 
+   hpicfIpv6DadAttemptsGroup  OBJECT-GROUP
+        OBJECTS {
+                  hpicfIpv6NDDadAttempts,
+                  hpicfIpv6InterfaceDadAttempts,
+                  hpicfIpv6InterfaceDadAttemptsMode
+                 } 
+    STATUS      current
+    DESCRIPTION "A collection of objects that allows the number of DAD 
+                 Attempts to be configured globally and also on a per
+                 interface basis."
+        ::= { hpicfIpConfigGroups 7 }
+
+    hpicfIpv6IcmpGroup  OBJECT-GROUP
+        OBJECTS {
+	           hpicfIpv6IcmpErrorInterval,
+                   hpicfIpv6IcmpBucketsize
+                } 
+    STATUS      current
+    DESCRIPTION "Objects provided for the ipv6 icmp configuration."
+        ::= { hpicfIpConfigGroups 8 }
+
+    hpicfIpNetToPhysicalTableGroup  OBJECT-GROUP
+        OBJECTS {
+	           hpicfIpNetToPhysicalPort,
+                   hpicfIpNetToPhysicalTableClear
+                } 
+    STATUS      current
+    DESCRIPTION "Objects provided for the clear options in the device."
+        ::= { hpicfIpConfigGroups 9 }
+
+  
+
+   hpicfUdpTunnelMirrorGroup  OBJECT-GROUP
+        OBJECTS {
+                  hpicfUdpTunnelMirrorTruncate
+                 } 
+    STATUS      current
+    DESCRIPTION "An object that enables or disables truncation
+                 for remote mirroring."
+        ::= { hpicfIpConfigGroups 10 }
+
+   hpicfIpv6NDGroup  OBJECT-GROUP
+        OBJECTS {
+                  hpicfIpv6InterfaceReachableTime,
+                  hpicfIpv6InterfaceRetransmitTime
+                 } 
+    STATUS      current
+    DESCRIPTION "Objects provided for configuration of ipv6 ND 
+                 parameters"
+        ::= { hpicfIpConfigGroups 11 }
+
+   hpicfIpv4InterfaceTableGroup3  OBJECT-GROUP
+        OBJECTS {
+                    hpicfIpv4InterfaceDhcpEnable,
+                    hpicfIpv4InterfaceForwarding,
+                    hpicfIpv4InterfaceProxyArp,
+                    hpicfIpv4InterfaceLocalProxyArp,
+                    hpicfIpv4InterfaceBootpGateway,
+                    hpicfIpv4InterfaceDirectedBcastFwd }
+        STATUS      current
+        DESCRIPTION "A Collection of objects that allows IPV4 interface 
+                     configuration"
+        ::= { hpicfIpConfigGroups 12 }
+
+   hpicfIpClientTrackerGroup  OBJECT-GROUP
+        OBJECTS {
+                   hpicfIpClientTrackerEnable
+                }
+       STATUS   deprecated
+       DESCRIPTION " Deprecated - see  hpicfIpClientTrackerGroup2"
+       ::= { hpicfIpConfigGroups 13 }
+
+   hpicfIpClientTrackerGroup2  OBJECT-GROUP
+        OBJECTS {
+                   hpicfIpClientTrackerEnable,
+                   hpicfIpClientTrackerTrusted,
+                   hpicfIpClientTrackerUntrusted
+                }
+       STATUS   deprecated
+       DESCRIPTION " A Collection of objects that allows IpClient Tracking
+                     Depricated - see hpicfIpClientTrackerGroup3."
+       ::= { hpicfIpConfigGroups 14 }
+
+   hpicfIpClientTrackerGroup3  OBJECT-GROUP
+        OBJECTS {
+                   hpicfIpClientTrackerEnable,
+                   hpicfIpClientTrackerTrusted,
+                   hpicfIpClientTrackerUntrusted,
+                   hpicfIpClientTrackerProbeDelay
+                }
+       STATUS   current
+       DESCRIPTION " A Collection of objects that allows IpClient Tracking"
+       ::= { hpicfIpConfigGroups 16 }
+
 END

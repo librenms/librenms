@@ -24,8 +24,8 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Application;
+use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\Enum\Severity;
@@ -38,7 +38,7 @@ $results = snmpwalk_cache_oid($device, 'nsExtendStatus', [], 'NET-SNMP-EXTEND-MI
 // Load our list of available applications
 $applications = [];
 if ($results) {
-    foreach (glob(LibrenmsConfig::get('install_dir') . '/includes/polling/applications/*.inc.php') as $file) {
+    foreach (glob(base_path('includes/polling/applications/*.inc.php')) as $file) {
         $name = basename($file, '.inc.php');
         $applications[$name] = $name;
     }
@@ -102,7 +102,7 @@ DeviceCache::getPrimary()->applications()->whereIn('app_type', $apps_to_remove)-
 });
 
 // clean application_metrics
-dbDeleteOrphans('application_metrics', ['applications.app_id']);
+ApplicationMetric::doesntHave('app')->delete();
 
 echo PHP_EOL;
 

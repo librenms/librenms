@@ -3,6 +3,8 @@ ALCATEL-IND1-RIP-MIB DEFINITIONS ::= BEGIN
     IMPORTS
         MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress, TimeTicks, Integer32
             FROM SNMPv2-SMI
+        InterfaceIndexOrZero
+            FROM IF-MIB
         rip2IfConfEntry
             FROM RIPv2-MIB
         RowStatus, TEXTUAL-CONVENTION
@@ -16,33 +18,27 @@ ALCATEL-IND1-RIP-MIB DEFINITIONS ::= BEGIN
 
 
     alcatelIND1RIPMIB MODULE-IDENTITY
-        LAST-UPDATED "201010260000Z"
-        ORGANIZATION "Alcatel-Lucent"
+        LAST-UPDATED "201911270000Z"
+        ORGANIZATION "ALE USA Inc."
         CONTACT-INFO
-                " Please consult with Customer Service to ensure the most appropriate
-                  version of this document is used with the products in question:
+         "Please consult with Customer Service to ensure the most appropriate
+          version of this document is used with the products in question:
 
-                            Alcatel-Lucent, Enterprise Solutions Division
-                           (Formerly Alcatel Internetworking, Incorporated)
-                                   26801 West Agoura Road
-                                Agoura Hills, CA  91301-5122
-                                  United States Of America
+                          ALE USA Inc. Enterprise
+                            26801 West Agoura Road
+                         Agoura Hills, CA  91301-5122
+                           United States Of America
 
-                Telephone:               North America  +1 800 995 2696
-                                         Latin America  +1 877 919 9526
-                                         Europe         +31 23 556 0100
-                                         Asia           +65 394 7933
-                                         All Other      +1 818 878 4507
+         Telephone:          +1 800 995 2696
 
-                Electronic Mail:         support@ind.alcatel.com
-                World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+         Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+         World Wide Web:     https://www.al-enterprise.com"
 
         DESCRIPTION
                 "This module describes an authoritative enterprise-specific Simple
                  Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                     For the Birds Of Prey Product Line
+                     For the OmniSwitch Product Line
                      Configuration Of Global RIP Configuration Parameters.
 
                  The right to make changes in specification and other information
@@ -56,13 +52,17 @@ ALCATEL-IND1-RIP-MIB DEFINITIONS ::= BEGIN
                  non-exclusive license to use this specification in connection with
                  management of the products for which it is intended to be used.
 
-                             Copyright (C) 1995-2007 Alcatel-Lucent
-                                 ALL RIGHTS RESERVED WORLDWIDE"
+                           Copyright (C) ALE USA Inc. 2014-2019
+                           Copyright (C) 1995-2013 Alcatel-Lucent
+                               ALL RIGHTS RESERVED WORLDWIDE"
 
-        REVISION         "200704030000Z"
+        REVISION      "201911270000Z"
         DESCRIPTION
-            "The latest version of this MIB Module."
+            "Updated the latest contact and Copyright information for ALE USA Inc."
 
+        REVISION     "201905140000Z"
+        DESCRIPTION
+            "Added alaRip2IfIfIndex."
         ::= { routingIND1Rip 1 }
 
     alcatelIND1RIPMIBObjects OBJECT-IDENTITY
@@ -219,17 +219,17 @@ ALCATEL-IND1-RIP-MIB DEFINITIONS ::= BEGIN
 
 
 -- ************************************************************************
--- Expansion of rip2IfCOnf
+-- Expansion of rip2IfConf
 -- ************************************************************************
-        alaRip2IfConfAugTable OBJECT-TYPE
-                SYNTAX SEQUENCE OF AlaRip2IfConfAugEntry
-                MAX-ACCESS not-accessible
-                STATUS current
-                DESCRIPTION
-                        "Expansion for rip2ifconftable"
+    alaRip2IfConfAugTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AlaRip2IfConfAugEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Expansion for rip2ifconftable"
         ::= { alaProtocolRip 11 }
 
-        alaRip2IfConfAugEntry OBJECT-TYPE
+    alaRip2IfConfAugEntry OBJECT-TYPE
         SYNTAX   AlaRip2IfConfAugEntry
         MAX-ACCESS   not-accessible
         STATUS   current
@@ -240,14 +240,16 @@ ALCATEL-IND1-RIP-MIB DEFINITIONS ::= BEGIN
 
     AlaRip2IfConfAugEntry ::=
         SEQUENCE {
-                alaRip2IfConfEncryptKey AlaAuthenticationEncryptKey,
-                alaRip2IfIpConfStatus   INTEGER,
-                alaRip2IfRecvPkts       Integer32,
-                alaRip2IfConfName       SnmpAdminString,
-                alaRip2IfConfType       INTEGER,
-            alaRip2IfConfPtoPPeer            IpAddress,
+            alaRip2IfConfEncryptKey AlaAuthenticationEncryptKey,
+            alaRip2IfIpConfStatus   INTEGER,
+            alaRip2IfRecvPkts       Integer32,
+            alaRip2IfConfName       SnmpAdminString,
+            alaRip2IfConfType       INTEGER,
+            alaRip2IfConfPtoPPeer   IpAddress,
             alaRip2IfConfIngressFilterRouteMapName SnmpAdminString,
-            alaRip2IfConfEgressFilterRouteMapName  SnmpAdminString
+            alaRip2IfConfEgressFilterRouteMapName  SnmpAdminString,
+            alaRip2IfIfIndex         InterfaceIndexOrZero,
+            alaRip2IfKeyChainId     Integer32
         }
 
     alaRip2IfConfEncryptKey OBJECT-TYPE
@@ -339,6 +341,24 @@ ALCATEL-IND1-RIP-MIB DEFINITIONS ::= BEGIN
              (cf. alaRouteMapNameTable.AlaRouteMapNameEntry.alaRouteMapName)"
         DEFVAL { ''H }    -- the empty string
        ::= { alaRip2IfConfAugEntry 8 }
+
+    alaRip2IfIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "The ifIndex value which identifies the local interface 
+              on which RIP is configured."
+         DEFVAL { 0 }
+       ::= { alaRip2IfConfAugEntry 9 }
+
+    alaRip2IfKeyChainId OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+             "Key Chain ID for RIP interface."
+       ::= { alaRip2IfConfAugEntry 10 }
 
 -- ************************************************************************
 -- ************************************************************************
@@ -451,7 +471,7 @@ ALCATEL-IND1-RIP-MIB DEFINITIONS ::= BEGIN
 
      alaRipEcmpRouteStatus OBJECT-TYPE
          SYNTAX   RowStatus
-         MAX-ACCESS read-only
+         MAX-ACCESS read-create
          STATUS    current
          DESCRIPTION
             "The row status variable, used according to
@@ -522,7 +542,9 @@ ALCATEL-IND1-RIP-MIB DEFINITIONS ::= BEGIN
             alaRip2IfConfType       ,
             alaRip2IfConfPtoPPeer            ,
             alaRip2IfConfIngressFilterRouteMapName ,
-            alaRip2IfConfEgressFilterRouteMapName
+            alaRip2IfConfEgressFilterRouteMapName ,
+            alaRip2IfIfIndex,
+            alaRip2IfKeyChainId
         }
         STATUS current
         DESCRIPTION

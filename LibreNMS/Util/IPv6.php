@@ -125,7 +125,7 @@ class IPv6 extends IP
         }
         array_unshift($net_bytes, 'n*'); // add pack format
 
-        return self::ntop(call_user_func_array('pack', $net_bytes));
+        return self::ntop(call_user_func_array(pack(...), $net_bytes));
     }
 
     /**
@@ -173,15 +173,15 @@ class IPv6 extends IP
     {
         $ip = $this->ip;
 
-        if (strlen($ip) === 39) {
+        if (strlen((string) $ip) === 39) {
             return $ip; // already uncompressed
         }
 
         // mapped ipv4 to hex
-        if (str_contains($ip, '.') && str_contains($ip, ':')) {
-            $split = strrpos($ip, ':');
-            $parts = array_map(fn ($part) => dechex((int) $part), explode('.', substr($ip, $split + 1)));
-            $ip = substr($ip, 0, $split); // extract prefix
+        if (str_contains((string) $ip, '.') && str_contains((string) $ip, ':')) {
+            $split = strrpos((string) $ip, ':');
+            $parts = array_map(fn ($part) => dechex((int) $part), explode('.', substr((string) $ip, $split + 1)));
+            $ip = substr((string) $ip, 0, $split); // extract prefix
 
             foreach ($parts as $pos => $part) {
                 if ($pos % 2 == 0) {
@@ -192,7 +192,7 @@ class IPv6 extends IP
         }
 
         // remove ::
-        $replacement = ':' . str_repeat('0000:', 8 - substr_count($ip, ':'));
+        $replacement = ':' . str_repeat('0000:', 8 - substr_count((string) $ip, ':'));
         $ip = str_replace('::', $replacement, $ip);
 
         // zero pad
@@ -202,7 +202,7 @@ class IPv6 extends IP
     }
 
     /**
-     * Convert this IP to an snmp index hex encoded
+     * Convert this IP to an snmp index decimal encoded
      *
      * @return string
      */
@@ -210,6 +210,16 @@ class IPv6 extends IP
     {
         $ipv6_split = str_split(str_replace(':', '', $this->uncompressed()), 2);
 
-        return implode('.', array_map('hexdec', $ipv6_split));
+        return implode('.', array_map(hexdec(...), $ipv6_split));
+    }
+
+    /**
+     * Convert this IP to an snmp string hex encoded
+     *
+     * @return string
+     */
+    public function toSnmpString()
+    {
+        return implode(':', str_split(str_replace(':', '', $this->uncompressed()), 2));
     }
 }

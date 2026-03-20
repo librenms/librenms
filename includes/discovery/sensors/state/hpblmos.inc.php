@@ -5,7 +5,7 @@ $fan_state_descr = 'Fan ';
 $fans_oid = '.1.3.6.1.4.1.232.22.2.3.1.3.1.8';
 $fan_state_oid = '.1.3.6.1.4.1.232.22.2.3.1.3.1.11.';
 
-$fans = trim(snmp_walk($device, $fans_oid, '-Osqn'));
+$fans = trim((string) snmp_walk($device, $fans_oid, '-Osqn'));
 
 foreach (explode("\n", $fans) as $fan) {
     $fan = trim($fan);
@@ -16,7 +16,7 @@ foreach (explode("\n", $fans) as $fan) {
             $current_id = $split_oid[count($split_oid) - 1];
             $current_oid = $fan_state_oid . $current_id;
             $descr = $fan_state_descr . $current_id;
-            $state = snmp_get($device, $current_oid, '-Oqv');
+            $state = SnmpQuery::get($current_oid)->value();
             if (! empty($state)) {
                 $states = [
                     ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],
@@ -36,7 +36,7 @@ $psu_state_name = 'hpblmos_psustate';
 $psu_state_descr = 'PSU ';
 $psu_state_oid = '.1.3.6.1.4.1.232.22.2.5.1.1.1.17.';
 
-$psus = trim(snmp_walk($device, $psu_oid, '-Osqn'));
+$psus = trim((string) snmp_walk($device, $psu_oid, '-Osqn'));
 
 foreach (explode("\n", $psus) as $psu) {
     $psu = trim($psu);
@@ -47,7 +47,7 @@ foreach (explode("\n", $psus) as $psu) {
             $current_id = $split_oid[count($split_oid) - 1];
             $current_oid = $psu_state_oid . $current_id;
             $descr = $psu_state_descr . $current_id;
-            $state = snmp_get($device, $current_oid, '-Oqv');
+            $state = SnmpQuery::get($current_oid)->value();
             if (! empty($state)) {
                 $states = [
                     ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'other'],

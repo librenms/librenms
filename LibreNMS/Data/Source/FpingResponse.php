@@ -29,6 +29,7 @@ namespace LibreNMS\Data\Source;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Device;
+use App\Models\DeviceStats;
 use Carbon\Carbon;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\RRD\RrdDefinition;
@@ -62,7 +63,7 @@ class FpingResponse implements \Stringable
         public readonly int $duplicates,
         public int $exit_code,
         public readonly ?string $host = null,
-        private bool $skipped = false)
+        private readonly bool $skipped = false)
     {
     }
 
@@ -141,6 +142,25 @@ class FpingResponse implements \Stringable
 
     public function saveStats(Device $device): void
     {
+        $stats = $device->stats ?? new DeviceStats(['device_id' => $device->device_id]);
+        $stats->ping_last_timestamp = Carbon::now();
+        // Only update the latency if we have data
+        if ($this->avg_latency) {
+            $stats->ping_rtt_prev = $stats->ping_rtt_last ?: $this->avg_latency;
+            $stats->ping_rtt_last = $this->avg_latency;
+            // Average is calcualted as the exponential weighted moving average
+            $stats->ping_rtt_avg = $stats->ping_rtt_avg ? $stats->ping_rtt_avg + (($stats->ping_rtt_last - $stats->ping_rtt_avg) * LibrenmsConfig::get('device_stats_avg_factor')) : $stats->ping_rtt_last;
+        }
+        // Only update loss if we transmitted a packet
+        if ($this->transmitted) {
+            $stats->ping_loss_prev = $stats->ping_loss_last ?: 100 * ($this->transmitted - $this->received) / $this->transmitted;
+            $stats->ping_loss_last = 100 * ($this->transmitted - $this->received) / $this->transmitted;
+            // Average is calcualted as the exponential weighted moving average
+            $stats->ping_loss_avg = $stats->ping_loss_avg ? $stats->ping_loss_avg + (($stats->ping_loss_last - $stats->ping_loss_avg) * LibrenmsConfig::get('device_stats_avg_factor')) : $stats->ping_loss_last;
+        }
+        $stats->save();
+
+        // Update the stats stored in the device table until the field is removed
         $device->last_ping = Carbon::now();
         $device->last_ping_timetaken = $this->avg_latency ?: $device->last_ping_timetaken;
         $device->save();

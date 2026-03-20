@@ -183,7 +183,7 @@ class CiHelper
      */
     public function checkUnit(): int
     {
-        $phpunit_cmd = [$this->checkPhpExec('phpunit'), '--colors=always', '--fail-on-all-issues'];
+        $phpunit_cmd = [$this->checkPhpExec('phpunit'), '--colors=always', '--fail-on-all-issues', '--testdox'];
 
         if ($this->flags['fail-fast']) {
             $phpunit_cmd[] = '--stop-on-defect';
@@ -224,6 +224,9 @@ class CiHelper
         } elseif ($this->flags['unit_svg']) {
             array_push($phpunit_cmd, '--group', 'svg');
         } elseif ($this->flags['unit_modules'] || $this->flags['os-modules-only']) {
+            if ($this->flags['os-modules-only']) {
+                array_push($phpunit_cmd, '--filter', '/::testOS /');
+            }
             $phpunit_cmd[] = 'tests/OSModulesTest.php';
         }
 
@@ -268,7 +271,7 @@ class CiHelper
             $server->setTimeout(3600)
                 ->setIdleTimeout(3600)
                 ->start();
-            $server->waitUntil(fn ($type, $output) => str_contains($output, 'Development Server (http://127.0.0.1:8000) started'));
+            $server->waitUntil(fn ($type, $output) => str_contains((string) $output, 'Development Server (http://127.0.0.1:8000) started'));
             if ($server->isRunning()) {
                 echo "Started server http://127.0.0.1:8000\n";
             }
@@ -506,7 +509,7 @@ class CiHelper
         echo "Running composer install to install developer dependencies.\n";
         passthru('scripts/composer_wrapper.php install');
 
-        if (is_executable($path)) {
+        if (is_executable($path)) { // @phpstan-ignore if.alwaysFalse (passthru may install the executable)
             return $path;
         }
 
@@ -541,7 +544,7 @@ class CiHelper
         echo "Running pip3 install to install developer dependencies.\n";
         passthru("pip3 install --user $exec"); // probably wrong in other cases...
 
-        if (is_executable($path)) {
+        if (is_executable($path)) { // @phpstan-ignore if.alwaysFalse (passthru may install the executable)
             return $path;
         }
 

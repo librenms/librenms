@@ -252,13 +252,13 @@ class ReportDevices extends LnmsCommand
                 ->merge(Schema::getColumnListing('devices'))
                 ->merge(array_keys($this->getSyntheticFields()))
                 ->merge(Device::definedRelations())
-                ->when($current, fn ($c) => $c->filter(fn ($i) => str_starts_with($i, $current)));
+                ->when($current, fn ($c) => $c->filter(fn ($i) => str_starts_with((string) $i, $current)));
         }
 
         if ($option->getName() == 'relationships') {
             return collect()
                 ->merge($this->getRelationships())
-                ->when($current, fn ($c) => $c->filter(fn ($i) => str_starts_with($i, $current)));
+                ->when($current, fn ($c) => $c->filter(fn ($i) => str_starts_with((string) $i, $current)));
         }
 
         return null;

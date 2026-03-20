@@ -7,9 +7,10 @@ if ($device['os'] === 'terra') {
     ];
 
     foreach ($query as $row) {
-        if (str_contains($device['sysDescr'], $row[0])) {
-            $c = snmp_get($device, $row[1], '-Oqv') / 10;
-            if (is_numeric($c)) {
+        if (str_contains((string) $device['sysDescr'], $row[0])) {
+            $value = SnmpQuery::get($row[1])->value();
+            if (is_numeric($value)) {
+                $c = $value / 10;
                 discover_sensor(null, 'voltage', $device, $row[1], 0, $row[0], 'Supply voltage', 10, 1, null, null, null, null, $c);
             }
         }

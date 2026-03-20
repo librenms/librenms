@@ -1,4 +1,3 @@
-mib: ARRIS-C3-FPD-MIB
 modules:
     sensors:
         additional_oids:
@@ -9,25 +8,29 @@ modules:
         temperature:
             data:
                 -
-                    oid: dcxFPDTemp1Status
+                    oid: ARRIS-C3-FPD-MIB::dcxFPDTemp1Status
+                    value: ARRIS-C3-FPD-MIB::dcxFPDTemp1Status
                     divisor: 100
                     num_oid: '.1.3.6.1.4.1.4115.1.4.3.3.1.2.4.{{ $index }}'
                     descr: 'CPU card closest to the CPU'
                     index: 'dcxFPDTemp1Status.{{ $index }}'
                 -
-                    oid: dcxFPDTemp2Status
+                    oid: ARRIS-C3-FPD-MIB::dcxFPDTemp2Status
+                    value: ARRIS-C3-FPD-MIB::dcxFPDTemp2Status
                     divisor: 100
                     num_oid: '.1.3.6.1.4.1.4115.1.4.3.3.1.2.5.{{ $index }}'
                     descr: 'CPU card, on the right hand side.'
                     index: 'dcxFPDTemp2Status.{{ $index }}'
                 -
-                    oid: dcxFPDTemp3Status
+                    oid: ARRIS-C3-FPD-MIB::dcxFPDTemp3Status
+                    value: ARRIS-C3-FPD-MIB::dcxFPDTemp3Status
                     divisor: 100
                     num_oid: '.1.3.6.1.4.1.4115.1.4.3.3.1.2.6.{{ $index }}'
                     descr: 'Kanga, under Roo cards between RX4 and RX5.'
                     index: 'dcxFPDTemp3Status.{{ $index }}'
                 -
-                    oid: dcxFPDTemp4Status
+                    oid: ARRIS-C3-FPD-MIB::dcxFPDTemp4Status
+                    value: ARRIS-C3-FPD-MIB::dcxFPDTemp4Status
                     divisor: 100
                     num_oid: '.1.3.6.1.4.1.4115.1.4.3.3.1.2.7.{{ $index }}'
                     descr: 'Kanga, under Roo cards between RX2 and RX3.'
@@ -35,7 +38,8 @@ modules:
         state:
             data:
                 -
-                    oid: dcxFPDFan1Status
+                    oid: ARRIS-C3-FPD-MIB::dcxFPDFan1Status
+                    value: ARRIS-C3-FPD-MIB::dcxFPDFan1Status
                     num_oid: '.1.3.6.1.4.1.4115.1.4.3.3.1.2.8.{{ $index }}'
                     descr: 'Fan 1'
                     index: 'dcxFPDFan1Status.{{ $index }}'
@@ -44,7 +48,8 @@ modules:
                         - { descr: rotating, graph: 0, value: 1, generic: 0 }
                         - { descr: bad Rotating, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: dcxFPDFan2Status
+                    oid: ARRIS-C3-FPD-MIB::dcxFPDFan2Status
+                    value: ARRIS-C3-FPD-MIB::dcxFPDFan2Status
                     num_oid: '.1.3.6.1.4.1.4115.1.4.3.3.1.2.9.{{ $index }}'
                     descr: 'Fan 2'
                     index: 'dcxFPDFan2Status.{{ $index }}'
@@ -53,7 +58,8 @@ modules:
                         - { descr: rotating, graph: 0, value: 1, generic: 0 }
                         - { descr: bad Rotating, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: dcxFPDFan3Status
+                    oid: ARRIS-C3-FPD-MIB::dcxFPDFan3Status
+                    value: ARRIS-C3-FPD-MIB::dcxFPDFan3Status
                     num_oid: '.1.3.6.1.4.1.4115.1.4.3.3.1.2.10.{{ $index }}'
                     descr: 'Fan 3'
                     index: 'dcxFPDFan3Status.{{ $index }}'
@@ -62,7 +68,8 @@ modules:
                         - { descr: rotating, graph: 0, value: 1, generic: 0 }
                         - { descr: bad Rotating, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: dcxFPDFan4Status
+                    oid: ARRIS-C3-FPD-MIB::dcxFPDFan4Status
+                    value: ARRIS-C3-FPD-MIB::dcxFPDFan4Status
                     num_oid: '.1.3.6.1.4.1.4115.1.4.3.3.1.2.11.{{ $index }}'
                     descr: 'Fan 4'
                     index: 'dcxFPDFan4Status.{{ $index }}'
@@ -71,7 +78,8 @@ modules:
                         - { descr: rotating, graph: 0, value: 1, generic: 0 }
                         - { descr: bad Rotating, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: dcxFPDFan5Status
+                    oid: ARRIS-C3-FPD-MIB::dcxFPDFan5Status
+                    value: ARRIS-C3-FPD-MIB::dcxFPDFan5Status
                     num_oid: '.1.3.6.1.4.1.4115.1.4.3.3.1.2.12.{{ $index }}'
                     descr: 'Fan 5'
                     index: 'dcxFPDFan5Status.{{ $index }}'
@@ -80,7 +88,8 @@ modules:
                         - { descr: rotating, graph: 0, value: 1, generic: 0 }
                         - { descr: bad Rotating, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: dcxFPDFan6Status
+                    oid: ARRIS-C3-FPD-MIB::dcxFPDFan6Status
+                    value: ARRIS-C3-FPD-MIB::dcxFPDFan6Status
                     num_oid: '.1.3.6.1.4.1.4115.1.4.3.3.1.2.13.{{ $index }}'
                     descr: 'Fan 6'
                     index: 'dcxFPDFan6Status.{{ $index }}'
@@ -89,7 +98,8 @@ modules:
                         - { descr: rotating, graph: 0, value: 1, generic: 0 }
                         - { descr: bad Rotating, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: dcxFPDPowerStatus2
+                    oid: ARRIS-C3-FPD-MIB::dcxFPDPowerStatus2
+                    value: ARRIS-C3-FPD-MIB::dcxFPDPowerStatus2
                     num_oid: '.1.3.6.1.4.1.4115.1.4.3.3.1.2.3.{{ $index }}'
                     descr: 'Power status'
                     index: 'dcxFPDPowerStatus2.{{ $index }}'
@@ -98,7 +108,8 @@ modules:
                         - { descr: on, graph: 0, value: 1, generic: 0 }
                         - { descr: off, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: dcxFPDAttachedStatus
+                    oid: ARRIS-C3-FPD-MIB::dcxFPDAttachedStatus
+                    value: ARRIS-C3-FPD-MIB::dcxFPDAttachedStatus
                     num_oid: '.1.3.6.1.4.1.4115.1.4.3.3.1.2.1.{{ $index }}'
                     descr: 'Front panel'
                     index: 'dcxFPDAttachedStatus.{{ $index }}'
@@ -112,7 +123,7 @@ modules:
                     oid: DOCS-IF-MIB::docsIfSignalQualityTable
                     value: DOCS-IF-MIB::docsIfSigQSignalNoise
                     num_oid: '.1.3.6.1.2.1.10.127.1.1.4.1.5.{{ $index }}'
-                    descr: 'Channel  - {{ $IF-MIB::ifName }}'
+                    descr: 'Channel  - {{ IF-MIB::ifName }}'
                     index: 'docsIfSigQSignalNoise.{{ $index }}'
                     divisor: 10
                     skip_values:

@@ -2,9 +2,11 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Models\Vrf;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Rewrite;
 
-if (! Auth::user()->hasGlobalRead()) {
+if (Gate::denies('viewAny', Vrf::class)) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     $link_array = [
@@ -160,7 +162,7 @@ if (! Auth::user()->hasGlobalRead()) {
                             text-align: center; float: left; background-color: " . LibrenmsConfig::get('list_colour.odd_alt2') . ";'>
                                 <div style='font-weight: bold;'>" . Rewrite::shortenIfName($port['ifDescr']) . '</div>';
                             print_port_thumbnail($port);
-                            echo "<div style='font-size: 9px;'>" . substr(short_port_descr($port['ifAlias']), 0, 22) . '</div>
+                            echo "<div style='font-size: 9px;'>" . substr((string) short_port_descr($port['ifAlias']), 0, 22) . '</div>
                                 </div>';
                             break;
 

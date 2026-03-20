@@ -9,17 +9,16 @@ IMPORTS
             FROM SNMPv2-TC;                              -- [RFC2579]
 
 ianaPrinterMIB MODULE-IDENTITY
-    LAST-UPDATED  "200406020000Z" -- June 2, 2004
+    LAST-UPDATED  "201609140000Z" -- September 14, 2016
 
     ORGANIZATION  "IANA"
     CONTACT-INFO  "Internet Assigned Numbers Authority
                   Postal: ICANN
-                          4676 Admiralty Way, Suite 330
-                          Marina del Rey, CA 90292
+                  12025 Waterfront Drive, Suite 300
+                  Los Angeles, CA 90094-2536
 
-                  Tel:    +1 310 823 9358
-                  E-Mail: iana@iana.org"
-
+                  Tel:    +1 310-301-5800
+                  E-Mail: iana&iana.org"
     DESCRIPTION   "This MIB module defines a set of printing-related
                   TEXTUAL-CONVENTIONs for use in Printer MIB (RFC 3805),
                   Finisher MIB (RFC 3806), and other MIBs which need to
@@ -38,6 +37,51 @@ ianaPrinterMIB MODULE-IDENTITY
                   itself or see:
                   http://www.ietf.org/copyrights/ianamib.html"
 
+    REVISION      "201609140000Z" -- September 14, 2016
+    DESCRIPTION   "Replaced references to RFC 2911 with
+                  references to RFC8011."
+
+    REVISION      "201608170000Z" -- August 17, 2016
+    DESCRIPTION   "Replaced references to RFC 2910 with
+                  references to RFC 8010."
+
+    REVISION      "201405220000Z" -- May 22, 2014
+    DESCRIPTION   "Updated contact info."
+
+    REVISION      "201309230000Z" -- September 23, 2013
+    DESCRIPTION   "Added 8 in PrtInputTypeTC."
+
+    REVISION      "201207190000Z" -- July 19, 2012
+    DESCRIPTION   "Added 84-85 in PrtInterpreterLangFamilyTC."
+
+    REVISION      "201111040000Z" -- November 4, 2011
+    DESCRIPTION   "Added 35-36 in PrtMarkerSuppliesTypeTC."
+
+    REVISION      "201005170000Z" -- May 17, 2010
+    DESCRIPTION   "Added 72-83 in PrtInterpreterLangFamilyTC,
+                  600+ lines from 30203-31838 in PrtAlertCodeTC."
+
+    REVISION      "201004070000Z" -- April 7, 2010
+    DESCRIPTION   "Added langJDF(68), langJMF(69), langPPML(70),
+                  and langXHTMLPrint(71)."
+
+    REVISION      "200911230000Z" -- November 23, 2009
+    DESCRIPTION   "Added langXPS(66) and langOpenXPS(67)."
+
+    REVISION      "200910140000Z" -- October 14, 2009
+    DESCRIPTION   "Added references for langPCLXL(47),
+                  langART(48), and langTIPSI(49)."
+
+    REVISION      "200902060000Z" -- February 6, 2009
+    DESCRIPTION   "Added chWSPrint(46) 'Channel Type' for Web
+                  Services based printing."
+
+    REVISION      "200509140000Z"  -- September 14, 2005
+    DESCRIPTION   "Updates to include missing 'unknown' values
+                       for PrtCoverStatusTC, PrtChannelTypeTC,
+                  PrtAlertGroupTC and removal of comment for
+                  for PrtAlertGroupTC."
+
     REVISION      "200406020000Z"  -- June 2, 2004
     DESCRIPTION   "Original version, published in coordination
                   with Printer MIB (RFC 3805)."
@@ -55,6 +99,7 @@ PrtCoverStatusTC ::= TEXTUAL-CONVENTION
         access panel on the printer case or enclosure."
     SYNTAX    INTEGER {
                   other(1),
+                  unknown(2),
                   coverOpen(3),
                   coverClosed(4),
                   interlockOpen(5),
@@ -78,7 +123,6 @@ PrtGeneralResetTC ::= TEXTUAL-CONVENTION
         defined state that is preferably under control of the system
         administrator by some means outside the scope of the Printer
         MIB specification."
-
     SYNTAX    INTEGER {
                   notResetting(3),
                   powerCycleReset(4), -- Cold Start
@@ -99,6 +143,7 @@ PrtChannelTypeTC ::= TEXTUAL-CONVENTION
         receiving jobs."
     SYNTAX    INTEGER {
                   other(1),
+                  unknown(2),
                   chSerialPort(3),
                   chParallelPort(4),
                   chIEEE1284Port(5),
@@ -347,7 +392,7 @@ PrtChannelTypeTC ::= TEXTUAL-CONVENTION
                       -- application protocol available on
                       -- multiple transport protocols.
                       -- Underscore, Inc.
-                      -- Contact: info@underscore.com
+                      -- Contact: info&underscore.com
                   chAppleTalkADSP(40),  -- Not in RFC 1759
                       -- AppleTalk Data Stream Protocol.
                       -- ADSP is part of the AppleTalk
@@ -415,7 +460,8 @@ PrtChannelTypeTC ::= TEXTUAL-CONVENTION
                       --                 Agent Name
                   chIPP(44),  -- Not in RFC 1759
                       -- Internet Printing Protocol (IPP),
-                      -- (IPP/1.1 - see [RFC2910] and [RFC2911])
+                      -- (IPP/1.1 - see [RFC 8010] and
+                      -- [RFC8011])
                       -- also applies to all future versions of IPP.
                       --
                       -- IPP Printer URI
@@ -434,8 +480,9 @@ PrtChannelTypeTC ::= TEXTUAL-CONVENTION
                       --     IPP URI it supports (one per IPP Channel
                       --     entry).  If a URI contains the 'http:'
                       --     scheme it must have an explicit port.
-                      --   See: [RFC3629], [RFC2396], [RFC2910],
-                     --     [RFC2911].
+                      --   See: [RFC3629], [RFC2396],
+                      --     [RFC 8010],
+                      --     [RFC8011].
                       --
                       -- IPP Printer Client Authentication
                       --   Keyword:      Auth
@@ -464,7 +511,8 @@ PrtChannelTypeTC ::= TEXTUAL-CONVENTION
                       --   Conformance: An IPP Printer should list
                       --     all IPP client authentication mechanisms
                       --     it supports (one per IPP Channel entry).
-                      --     See: [RFC2911] and [RFC2910].
+                      --     See: [RFC 8011] and
+                      --     [RFC 8010].
                       --
                       -- IPP Printer Security
                       --   Keyword:      Security
@@ -485,7 +533,7 @@ PrtChannelTypeTC ::= TEXTUAL-CONVENTION
                       --   Conformance: An IPP Printer should list
                       --     all IPP security mechanisms it supports
                       --     (one per IPP Channel entry).
-                      --   See: [RFC2246], [RFC2911].
+                      --   See: [RFC2246], [RFC8011].
                       --
                       -- IPP Printer Protocol Version
                       --   Keyword:      Version
@@ -508,8 +556,8 @@ PrtChannelTypeTC ::= TEXTUAL-CONVENTION
                       --     numbered version the IPP Client supports
                       --     for use in all IPP Requests (for optimum
                       --     interworking).
-                      --   See: [RFC2911].
-                  chSMTP(45)
+                      --   See: [RFC8011].
+                  chSMTP(45),
                       -- Print Job submission via Simple Mail
                       -- Transfer Protocol (SMTP) - see [RFC2821]
                       --
@@ -521,6 +569,39 @@ PrtChannelTypeTC ::= TEXTUAL-CONVENTION
                       --   Multiplicity: Single
                       --   Default:      not applicable
                       --   Description:  The SMTP URL of the printer.
+                  chWSPrint(46) -- Not in RFC 3805
+                      -- Web Services on Devices Printer (WS-Print),
+                      -- (WS-Print 1.0 - see [WS-Print])
+                      --
+                      -- WS-Print Service URL
+                      -- Keyword: ServiceURL
+                      -- Syntax: URI (Unicode UTF-8 per
+                      -- [RFC3986])
+                      -- Status: Mandatory
+                      -- Multiplicity: Multiple
+                      -- Default: not applicable
+                      -- Description: URL of this WS-Print Printer
+                      -- within Internet naming scope. Unicode
+                      -- UTF-8 [RFC3629] string with
+                      -- hexadecimal escapes for any non-ASCII
+                      -- characters (per [RFC3986]).
+                      -- Conformance: A WS-Print Printer shall list
+                      -- all URLs it
+                      --
+                      -- WS-Print Web Services Target Namespace
+                      -- Keyword: Namespace
+                      -- Syntax: 'URI (Unicode UTF-8 per RFC 3986)
+                      -- Status: Optional
+                      -- Multiplicity: Multiple
+                      -- Default: http://schemas.microsoft.com/windows/2006/08/wdp/print
+                      -- Description: XML Namespace for the Service
+                      -- and associated print service model. Unicode
+                      -- UTF-8 [RFC3629] string with
+                      -- hexadecimal escapes for any non-ASCII
+                      -- characters (per [RFC3986]).
+                      -- Conformance: A WS-Print Printer shall list
+                      -- all interoperable WS-Print namespaces it
+                      -- supports.
 }
 
 --
@@ -715,19 +796,26 @@ PrtInterpreterLangFamilyTC ::= TEXTUAL-CONVENTION
                              -- Printer Control Language. Extended
                              -- language features for printing, and
                              -- printer control.
+                             -- Tammy Ferguson (HP)
+                             -- and Binnur Al-Kazily (HP)
+                             -- Technical reference manual: None
                              -- Hewlett-Packard Co.
         langART(48),         -- Not in RFC 1759
                              -- Advanced Rendering Tools (ART).
                              -- Page Description language
                              -- originally developed for the Laser
                              -- Press printers.
+                             -- Norio Iwamoto (Fuji Xerox)
+                             -- and Tom Hastings (Xerox)
                              -- Technical reference manual: "ART IV
                              -- Reference Manual", No F33M.
                              -- Fuji Xerox Co., Ltd.
         langTIPSI(49),       -- Not in RFC 1759
                              -- Transport Independent Printer
-                             -- System Interface (ref. IEEE Std.
-                             -- 1284.1)
+                             -- System Interface
+                             -- Don Wright (Lexmark)
+                             -- Technical reference manual: "IEEE
+                             -- 1284.1"
         langPrescribe(50),   -- Not in RFC 1759
                              -- Page description and printer
                              -- control language. It can be
@@ -802,9 +890,101 @@ PrtInterpreterLangFamilyTC ::= TEXTUAL-CONVENTION
         langNIRS(64),        -- Not in RFC 1759
                              -- US DOD NIRS (see MIL-STD-1840)
                              -- MIME type 'application/cals-1840'
-        langC4(65)           -- Not in RFC 1759
+        langC4(65),          -- Not in RFC 1759
                              -- US DOD C4 (see MIL-STD-1840)
                              -- MIME type 'application/cals-1840'
+        langXPS(66),         -- Not in RFC 3805
+                             -- Microsoft XML Paper Specification
+                             -- http://www.microsoft.com/whdc/xps/xpsspec
+        langOpenXPS(67),     -- Not in RFC 3805
+                             -- ECMA OpenXPS
+                             -- http://www.ecma-international.org/
+                             --   publications/standards/Ecma-388.htm
+        langJDF(68),         -- Not in RFC 3805
+                             -- CIP4 Job Definition Format
+                             -- http://www.cip4.org/documents/
+                             --   jdf_specifications/JDF1.4a.pdf
+        langJMF(69),         -- Not in RFC 3805
+                             -- CIP4 Job Messaging Format
+                             -- also defined in CIP4 JDF specification
+                             -- http://www.cip4.org/documents/
+                             --   jdf_specifications/JDF1.4a.pdf
+        langPPML(70),        -- Not in RFC 3805
+                             -- PODI Personalized Print Markup Language
+                             -- http://ppml.podi.org/ppml-docs/
+                             --   ppml-specifications.php
+        langXHTMLPrint(71),  -- Not in RFC 3805
+                             -- W3C XHTML-Print
+                             -- http://www.w3.org/TR/xhtml-print/
+        langPDFis(72),       -- Not in RFC 3805
+                             -- PWG PDF Image-Streamable (PWG 5102.3)
+                             -- ftp://pwg.org/pub/pwg/candidates/
+                             --   cs-ifxpdfis10-20040315-5102.3.pdf
+                             -- See also 'langPDF'
+        langPDF13(73),       -- Not in RFC 3805
+                             -- Adobe Portable Document Format v1.3
+                             -- http://www.adobe.com/devnet/
+                             --   pdf/pdfs/PDFReference13.pdf
+                             -- See also 'langPDF'
+        langPDF14(74),       -- Not in RFC 3805
+                             -- Adobe Portable Document Format v1.4
+                             -- http://www.adobe.com/devnet/
+                             --   pdf/pdfs/PDFReference.pdf
+                             -- See also 'langPDF'
+        langPDF15(75),       -- Not in RFC 3805
+                             -- Adobe Portable Document Format v1.5
+                             -- http://www.adobe.com/devnet/
+                             --   pdf/pdfs/PDFReference15_v5.pdf
+                             -- See also 'langPDF'
+        langPDF16(76),       -- Not in RFC 3805
+                             -- Adobe Portable Document Format v1.6
+                             -- http://www.adobe.com/devnet/
+                             --   pdf/pdfs/PDFReference16.pdf
+                             -- See also 'langPDF'
+        langPDF17(77),       -- Not in RFC 3805
+                             -- Adobe Portable Document Format v1.7
+                             -- http://www.adobe.com/devnet/
+                             --   acrobat/pdfs/pdf_reference_1-7.pdf
+                             -- Equivalent to ISO 32000-1:2008
+                             -- See also 'langPDF'
+        langPS2(78),         -- Not in RFC 3805
+                             -- Adobe PostScript Second Edition
+                             -- http://partners.adobe.com/public/
+                             --   developer/en/ps/psrefman.pdf
+                             -- See also 'langPS'
+        langPS3(79),         -- Not in RFC 3805
+                             -- Adobe PostScript Third Edition
+                             -- http://www.adobe.com/products/
+                             --   postscript/pdfs/PLRM.pdf
+                             -- See also 'langPS'
+        langPCL3(80),        -- Not in RFC 3805
+                             -- HP Printer Command Language 3
+                             -- No technical reference manual online
+                             -- See also 'langPCL'
+        langPCL3GUI(81),     -- Not in RFC 3805
+                             -- HP Printer Command Language 3 GUI
+                             -- No technical reference manual online
+                             -- See also 'langPCL'
+        langPCL5e(82),       -- Not in RFC 3805
+                             -- HP Printer Command Language 5 Enhanced
+                             -- http://h20000.www2.hp.com/bc/docs/
+                             --   support/SupportManual/bpl13210/
+                             --   bpl13210.pdf
+                             -- See also 'langPCL'
+        langPCL5c(83),       -- Not in RFC 3805
+                             -- HP Printer Command Language 5 Color
+                             -- http://h20000.www2.hp.com/bc/docs/
+                             --   support/SupportManual/bpl13212/
+                             --   bpl13212.pdf
+                             -- See also 'langPCL'
+        langPWGRaster(84),   -- Not in RFC 1759
+                             -- PWG 5102.4: PWG Raster Format
+                             -- ftp://ftp.pwg.org/pub/pwg/candidates/
+                             --   cs-ippraster10-20120420-5102.4.pdf
+                             -- MIME type "image/pwg-raster"
+        langAppleRaster(85)  -- Not in RFC 1759
+                             -- Apple raster format for printing
+                             -- No public specifications available at this time.
 }
 
 --
@@ -825,7 +1005,8 @@ PrtInputTypeTC ::= TEXTUAL-CONVENTION
                   sheetFeedAutoNonRemovableTray(4),
                   sheetFeedManual(5),
                   continuousRoll(6),
-                  continuousFanFold(7)
+                  continuousFanFold(7),
+                  sheetFeedPull(8)
                   }
 
 PrtOutputTypeTC ::= TEXTUAL-CONVENTION
@@ -891,7 +1072,6 @@ PrtMarkerSuppliesTypeTC ::= TEXTUAL-CONVENTION
     SYNTAX    INTEGER {
                   other(1),
                   unknown(2),
-
                 -- Values for Printer MIB
                   toner(3),
                   wasteToner(4),
@@ -926,7 +1106,9 @@ PrtMarkerSuppliesTypeTC ::= TEXTUAL-CONVENTION
                   paperWrap(31),        -- Not in RFC 1759
                   staples(32),          -- Not in RFC 1759
                   inserts(33),          -- Not in RFC 1759
-                  covers(34)            -- Not in RFC 1759
+                  covers(34),           -- Not in RFC 1759
+                  matteToner(35),       -- Not in RFC 3805
+                  matteInk(36)          -- Not in RFC 3805
                 -- End of values for Finisher MIB
                   }
 
@@ -989,7 +1171,6 @@ PrtConsoleDisableTC ::= TEXTUAL-CONVENTION
 
 PrtAlertTrainingLevelTC ::= TEXTUAL-CONVENTION
     -- This TC was extracted from prtAlertTrainingLevel in RFC 1759.
-
     STATUS    current
     DESCRIPTION
         "The level of training required to handle this alert, if
@@ -1038,7 +1219,6 @@ PrtAlertGroupTC ::= TEXTUAL-CONVENTION
     -- Values of 30 and greater are for use in MIBs that augment
     -- the Printer MIB, such as the Finisher MIB.
     -- This TC extracted from prtAlertGroup in RFC 1759.
-
     STATUS    current
     DESCRIPTION
         "The type of subunit within the printer model that this alert
@@ -1054,7 +1234,7 @@ PrtAlertGroupTC ::= TEXTUAL-CONVENTION
         alerts)."
     SYNTAX    INTEGER {
                   other(1),
-                -- (2) is reserved for conformance information
+                  unknown(2),
                 -- Values for Host Resources MIB
                   hostResourcesMIBStorageTable(3),
                   hostResourcesMIBDeviceTable(4),
@@ -1185,7 +1365,6 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   subunitRecoverableFailure(29),
                                                -- Not in RFC 1759
                   subunitUnrecoverableFailure(30),
-
                                                -- Not in RFC 1759
                   subunitRecoverableStorageError(31),
                                                -- Not in RFC 1759
@@ -1283,7 +1462,6 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   mediaPathMediaTrayAlmostFull(1302),
                   mediaPathMediaTrayFull(1303),
                   mediaPathCannotDuplexMediaSelected(1304),
-
                                         -- Not in RFC 1759
                 -- Interpreter Group
                   interpreterMemoryIncrease(1501),
@@ -1299,13 +1477,642 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                       -- that is too complex for the resources that
                       -- are available.
                 -- Alert Group
-                  alertRemovalOfBinaryChangeEntry(1801)
+                  alertRemovalOfBinaryChangeEntry(1801),
                                         -- Not in RFC 1759
                       -- A binary change event entry has been
                       -- removed from the alert table.  This unary
                       -- change alert table entry is added to the
                       -- end of the alert table.
+                      -- FinDeviceTypeTC = stitcher(3) -> stapler
+                      -- FinStitchingTypeTC = staple... (4,5,6,7, or 10)
+                  staplerCoverOpen(30203),
+                  staplerCoverClosed(30204),
+                  staplerInterlockOpen(30205),
+                  staplerInterlockClosed(30206),
+                  staplerConfigurationChange(30207),
+                  staplerJam(30208),
+                  staplerMissing(30209),
+                  staplerLifeAlmostOver(30210),
+                  staplerLifeOver(30211),
+                  staplerAlmostEmpty(30212),
+                  staplerEmpty(30213),
+                  staplerAlmostFull(30214),
+                  staplerFull(30215),
+                  staplerNearLimit(30216),
+                  staplerAtLimit(30217),
+                  staplerOpened(30218),
+                  staplerClosed(30219),
+                  staplerTurnedOn(30220),
+                  staplerTurnedOff(30221),
+                  staplerOffline(30222),
+                  staplerPowerSaver(30223),
+                  staplerWarmingUp(30224),
+                  staplerAdded(30225),
+                  staplerRemoved(30226),
+                  staplerResourceAdded(30227),
+                  staplerResourceRemoved(30228),
+                  staplerRecoverableFailure(30229),
+                  staplerUnrecoverableFailure(30230),
+                  staplerRecoverableStorageError(30231),
+                  staplerUnrecoverableStorageError(30232),
+                  staplerMotorFailure(30233),
+                  staplerMemoryExhausted(30234),
+                  staplerUnderTemperature(30235),
+                  staplerOverTemperature(30236),
+                  staplerTimingFailure(30237),
+                  staplerThermistorFailure(30238),
+                  -- FinDeviceTypeTC = stitcher(3) -> stitcher
+                  -- FinStitchingTypeTC = saddleStitch(8) or edgeStitch(9)
+                  stitcherCoverOpen(30303),
+                  stitcherCoverClosed(30304),
+                  stitcherInterlockOpen(30305),
+                  stitcherInterlockClosed(30306),
+                  stitcherConfigurationChange(30307),
+                  stitcherJam(30308),
+                  stitcherMissing(30309),
+                  stitcherLifeAlmostOver(30310),
+                  stitcherLifeOver(30311),
+                  stitcherAlmostEmpty(30312),
+                  stitcherEmpty(30313),
+                  stitcherAlmostFull(30314),
+                  stitcherFull(30315),
+                  stitcherNearLimit(30316),
+                  stitcherAtLimit(30317),
+                  stitcherOpened(30318),
+                  stitcherClosed(30319),
+                  stitcherTurnedOn(30320),
+                  stitcherTurnedOff(30321),
+                  stitcherOffline(30322),
+                  stitcherPowerSaver(30323),
+                  stitcherWarmingUp(30324),
+                  stitcherAdded(30325),
+                  stitcherRemoved(30326),
+                  stitcherResourceAdded(30327),
+                  stitcherResourceRemoved(30328),
+                  stitcherRecoverableFailure(30329),
+                  stitcherUnrecoverableFailure(30330),
+                  stitcherRecoverableStorageError(30331),
+                  stitcherUnrecoverableStorageError(30332),
+                  stitcherMotorFailure(30333),
+                  stitcherMemoryExhausted(30334),
+                  stitcherUnderTemperature(30335),
+                  stitcherOverTemperature(30336),
+                  stitcherTimingFailure(30337),
+                  stitcherThermistorFailure(30338),
+                  -- FinDeviceTypeTC = folder(4)
+                  folderCoverOpen(30403),
+                  folderCoverClosed(30404),
+                  folderInterlockOpen(30405),
+                  folderInterlockClosed(30406),
+                  folderConfigurationChange(30407),
+                  folderJam(30408),
+                  folderMissing(30409),
+                  folderLifeAlmostOver(30410),
+                  folderLifeOver(30411),
+                  folderAlmostEmpty(30412),
+                  folderEmpty(30413),
+                  folderAlmostFull(30414),
+                  folderFull(30415),
+                  folderNearLimit(30416),
+                  folderAtLimit(30417),
+                  folderOpened(30418),
+                  folderClosed(30419),
+                  folderTurnedOn(30420),
+                  folderTurnedOff(30421),
+                  folderOffline(30422),
+                  folderPowerSaver(30423),
+                  folderWarmingUp(30424),
+                  folderAdded(30425),
+                  folderRemoved(30426),
+                  folderResourceAdded(30427),
+                  folderResourceRemoved(30428),
+                  folderRecoverableFailure(30429),
+                  folderUnrecoverableFailure(30430),
+                  folderRecoverableStorageError(30431),
+                  folderUnrecoverableStorageError(30432),
+                  folderMotorFailure(30433),
+                  folderMemoryExhausted(30434),
+                  folderUnderTemperature(30435),
+                  folderOverTemperature(30436),
+                  folderTimingFailure(30437),
+                  folderThermistorFailure(30438),
+                  -- FinDeviceTypeTC = binder(5)
+                  binderCoverOpen(30503),
+                  binderCoverClosed(30504),
+                  binderInterlockOpen(30505),
+                  binderInterlockClosed(30506),
+                  binderConfigurationChange(30507),
+                  binderJam(30508),
+                  binderMissing(30509),
+                  binderLifeAlmostOver(30510),
+                  binderLifeOver(30511),
+                  binderAlmostEmpty(30512),
+                  binderEmpty(30513),
+                  binderAlmostFull(30514),
+                  binderFull(30515),
+                  binderNearLimit(30516),
+                  binderAtLimit(30517),
+                  binderOpened(30518),
+                  binderClosed(30519),
+                  binderTurnedOn(30520),
+                  binderTurnedOff(30521),
+                  binderOffline(30522),
+                  binderPowerSaver(30523),
+                  binderWarmingUp(30524),
+                  binderAdded(30525),
+                  binderRemoved(30526),
+                  binderResourceAdded(30527),
+                  binderResourceRemoved(30528),
+                  binderRecoverableFailure(30529),
+                  binderUnrecoverableFailure(30530),
+                  binderRecoverableStorageError(30531),
+                  binderUnrecoverableStorageError(30532),
+                  binderMotorFailure(30533),
+                  binderMemoryExhausted(30534),
+                  binderUnderTemperature(30535),
+                  binderOverTemperature(30536),
+                  binderTimingFailure(30537),
+                  binderThermistorFailure(30538),
+                  -- FinDeviceTypeTC = trimmer(6)
+                  trimmerCoverOpen(30603),
+                  trimmerCoverClosed(30604),
+                  trimmerInterlockOpen(30605),
+                  trimmerInterlockClosed(30606),
+                  trimmerConfigurationChange(30607),
+                  trimmerJam(30608),
+                  trimmerMissing(30609),
+                  trimmerLifeAlmostOver(30610),
+                  trimmerLifeOver(30611),
+                  trimmerAlmostEmpty(30612),
+                  trimmerEmpty(30613),
+                  trimmerAlmostFull(30614),
+                  trimmerFull(30615),
+                  trimmerNearLimit(30616),
+                  trimmerAtLimit(30617),
+                  trimmerOpened(30618),
+                  trimmerClosed(30619),
+                  trimmerTurnedOn(30620),
+                  trimmerTurnedOff(30621),
+                  trimmerOffline(30622),
+                  trimmerPowerSaver(30623),
+                  trimmerWarmingUp(30624),
+                  trimmerAdded(30625),
+                  trimmerRemoved(30626),
+                  trimmerResourceAdded(30627),
+                  trimmerResourceRemoved(30628),
+                  trimmerRecoverableFailure(30629),
+                  trimmerUnrecoverableFailure(30630),
+                  trimmerRecoverableStorageError(30631),
+                  trimmerUnrecoverableStorageError(30632),
+                  trimmerMotorFailure(30633),
+                  trimmerMemoryExhausted(30634),
+                  trimmerUnderTemperature(30635),
+                  trimmerOverTemperature(30636),
+                  trimmerTimingFailure(30637),
+                  trimmerThermistorFailure(30638),
+                  -- FinDeviceTypeTC = dieCutter(7)
+                  dieCutterCoverOpen(30703),
+                  dieCutterCoverClosed(30704),
+                  dieCutterInterlockOpen(30705),
+                  dieCutterInterlockClosed(30706),
+                  dieCutterConfigurationChange(30707),
+                  dieCutterJam(30708),
+                  dieCutterMissing(30709),
+                  dieCutterLifeAlmostOver(30710),
+                  dieCutterLifeOver(30711),
+                  dieCutterAlmostEmpty(30712),
+                  dieCutterEmpty(30713),
+                  dieCutterAlmostFull(30714),
+                  dieCutterFull(30715),
+                  dieCutterNearLimit(30716),
+                  dieCutterAtLimit(30717),
+                  dieCutterOpened(30718),
+                  dieCutterClosed(30719),
+                  dieCutterTurnedOn(30720),
+                  dieCutterTurnedOff(30721),
+                  dieCutterOffline(30722),
+                  dieCutterPowerSaver(30723),
+                  dieCutterWarmingUp(30724),
+                  dieCutterAdded(30725),
+                  dieCutterRemoved(30726),
+                  dieCutterResourceAdded(30727),
+                  dieCutterResourceRemoved(30728),
+                  dieCutterRecoverableFailure(30729),
+                  dieCutterUnrecoverableFailure(30730),
+                  dieCutterRecoverableStorageError(30731),
+                  dieCutterUnrecoverableStorageError(30732),
+                  dieCutterMotorFailure(30733),
+                  dieCutterMemoryExhausted(30734),
+                  dieCutterUnderTemperature(30735),
+                  dieCutterOverTemperature(30736),
+                  dieCutterTimingFailure(30737),
+                  dieCutterThermistorFailure(30738),
+                  -- FinDeviceTypeTC = puncher(8)
+                  puncherCoverOpen(30803),
+                  puncherCoverClosed(30804),
+                  puncherInterlockOpen(30805),
+                  puncherInterlockClosed(30806),
+                  puncherConfigurationChange(30807),
+                  puncherJam(30808),
+                  puncherMissing(30809),
+                  puncherLifeAlmostOver(30810),
+                  puncherLifeOver(30811),
+                  puncherAlmostEmpty(30812),
+                  puncherEmpty(30813),
+                  puncherAlmostFull(30814),
+                  puncherFull(30815),
+                  puncherNearLimit(30816),
+                  puncherAtLimit(30817),
+                  puncherOpened(30818),
+                  puncherClosed(30819),
+                  puncherTurnedOn(30820),
+                  puncherTurnedOff(30821),
+                  puncherOffline(30822),
+                  puncherPowerSaver(30823),
+                  puncherWarmingUp(30824),
+                  puncherAdded(30825),
+                  puncherRemoved(30826),
+                  puncherResourceAdded(30827),
+                  puncherResourceRemoved(30828),
+                  puncherRecoverableFailure(30829),
+                  puncherUnrecoverableFailure(30830),
+                  puncherRecoverableStorageError(30831),
+                  puncherUnrecoverableStorageError(30832),
+                  puncherMotorFailure(30833),
+                  puncherMemoryExhausted(30834),
+                  puncherUnderTemperature(30835),
+                  puncherOverTemperature(30836),
+                  puncherTimingFailure(30837),
+                  puncherThermistorFailure(30838),
+                  -- FinDeviceTypeTC = perforater(9)
+                  perforaterCoverOpen(30903),
+                  perforaterCoverClosed(30904),
+                  perforaterInterlockOpen(30905),
+                  perforaterInterlockClosed(30906),
+                  perforaterConfigurationChange(30907),
+                  perforaterJam(30908),
+                  perforaterMissing(30909),
+                  perforaterLifeAlmostOver(30910),
+                  perforaterLifeOver(30911),
+                  perforaterAlmostEmpty(30912),
+                  perforaterEmpty(30913),
+                  perforaterAlmostFull(30914),
+                  perforaterFull(30915),
+                  perforaterNearLimit(30916),
+                  perforaterAtLimit(30917),
+                  perforaterOpened(30918),
+                  perforaterClosed(30919),
+                  perforaterTurnedOn(30920),
+                  perforaterTurnedOff(30921),
+                  perforaterOffline(30922),
+                  perforaterPowerSaver(30923),
+                  perforaterWarmingUp(30924),
+                  perforaterAdded(30925),
+                  perforaterRemoved(30926),
+                  perforaterResourceAdded(30927),
+                  perforaterResourceRemoved(30928),
+                  perforaterRecoverableFailure(30929),
+                  perforaterUnrecoverableFailure(30930),
+                  perforaterRecoverableStorageError(30931),
+                  perforaterUnrecoverableStorageError(30932),
+                  perforaterMotorFailure(30933),
+                  perforaterMemoryExhausted(30934),
+                  perforaterUnderTemperature(30935),
+                  perforaterOverTemperature(30936),
+                  perforaterTimingFailure(30937),
+                  perforaterThermistorFailure(30938),
+                  -- FinDeviceTypeTC = slitter(10)
+                  slitterCoverOpen(31003),
+                  slitterCoverClosed(31004),
+                  slitterInterlockOpen(31005),
+                  slitterInterlockClosed(31006),
+                  slitterConfigurationChange(31007),
+                  slitterJam(31008),
+                  slitterMissing(31009),
+                  slitterLifeAlmostOver(31010),
+                  slitterLifeOver(31011),
+                  slitterAlmostEmpty(31012),
+                  slitterEmpty(31013),
+                  slitterAlmostFull(31014),
+                  slitterFull(31015),
+                  slitterNearLimit(31016),
+                  slitterAtLimit(31017),
+                  slitterOpened(31018),
+                  slitterClosed(31019),
+                  slitterTurnedOn(31020),
+                  slitterTurnedOff(31021),
+                  slitterOffline(31022),
+                  slitterPowerSaver(31023),
+                  slitterWarmingUp(31024),
+                  slitterAdded(31025),
+                  slitterRemoved(31026),
+                  slitterResourceAdded(31027),
+                  slitterResourceRemoved(31028),
+                  slitterRecoverableFailure(31029),
+                  slitterUnrecoverableFailure(31030),
+                  slitterRecoverableStorageError(31031),
+                  slitterUnrecoverableStorageError(31032),
+                  slitterMotorFailure(31033),
+                  slitterMemoryExhausted(31034),
+                  slitterUnderTemperature(31035),
+                  slitterOverTemperature(31036),
+                  slitterTimingFailure(31037),
+                  slitterThermistorFailure(31038),
+                  -- FinDeviceTypeTC = separationCutter(11)
+                  separationCutterCoverOpen(31103),
+                  separationCutterCoverClosed(31104),
+                  separationCutterInterlockOpen(31105),
+                  separationCutterInterlockClosed(31106),
+                  separationCutterConfigurationChange(31107),
+                  separationCutterJam(31108),
+                  separationCutterMissing(31109),
+                  separationCutterLifeAlmostOver(31110),
+                  separationCutterLifeOver(31111),
+                  separationCutterAlmostEmpty(31112),
+                  separationCutterEmpty(31113),
+                  separationCutterAlmostFull(31114),
+                  separationCutterFull(31115),
+                  separationCutterNearLimit(31116),
+                  separationCutterAtLimit(31117),
+                  separationCutterOpened(31118),
+                  separationCutterClosed(31119),
+                  separationCutterTurnedOn(31120),
+                  separationCutterTurnedOff(31121),
+                  separationCutterOffline(31122),
+                  separationCutterPowerSaver(31123),
+                  separationCutterWarmingUp(31124),
+                  separationCutterAdded(31125),
+                  separationCutterRemoved(31126),
+                  separationCutterResourceAdded(31127),
+                  separationCutterResourceRemoved(31128),
+                  separationCutterRecoverableFailure(31129),
+                  separationCutterUnrecoverableFailure(31130),
+                  separationCutterRecoverableStorageError(31131),
+                  separationCutterUnrecoverableStorageError(31132),
+                  separationCutterMotorFailure(31133),
+                  separationCutterMemoryExhausted(31134),
+                  separationCutterUnderTemperature(31135),
+                  separationCutterOverTemperature(31136),
+                  separationCutterTimingFailure(31137),
+                  separationCutterThermistorFailure(31138),
+                  -- FinDeviceTypeTC = imprinter(12)
+                  imprinterCoverOpen(31203),
+                  imprinterCoverClosed(31204),
+                  imprinterInterlockOpen(31205),
+                  imprinterInterlockClosed(31206),
+                  imprinterConfigurationChange(31207),
+                  imprinterJam(31208),
+                  imprinterMissing(31209),
+                  imprinterLifeAlmostOver(31210),
+                  imprinterLifeOver(31211),
+                  imprinterAlmostEmpty(31212),
+                  imprinterEmpty(31213),
+                  imprinterAlmostFull(31214),
+                  imprinterFull(31215),
+                  imprinterNearLimit(31216),
+                  imprinterAtLimit(31217),
+                  imprinterOpened(31218),
+                  imprinterClosed(31219),
+                  imprinterTurnedOn(31220),
+                  imprinterTurnedOff(31221),
+                  imprinterOffline(31222),
+                  imprinterPowerSaver(31223),
+                  imprinterWarmingUp(31224),
+                  imprinterAdded(31225),
+                  imprinterRemoved(31226),
+                  imprinterResourceAdded(31227),
+                  imprinterResourceRemoved(31228),
+                  imprinterRecoverableFailure(31229),
+                  imprinterUnrecoverableFailure(31230),
+                  imprinterRecoverableStorageError(31231),
+                  imprinterUnrecoverableStorageError(31232),
+                  imprinterMotorFailure(31233),
+                  imprinterMemoryExhausted(31234),
+                  imprinterUnderTemperature(31235),
+                  imprinterOverTemperature(31236),
+                  imprinterTimingFailure(31237),
+                  imprinterThermistorFailure(31238),
+                  -- FinDeviceTypeTC = wrapper(13)
+                  wrapperCoverOpen(31303),
+                  wrapperCoverClosed(31304),
+                  wrapperInterlockOpen(31305),
+                  wrapperInterlockClosed(31306),
+                  wrapperConfigurationChange(31307),
+                  wrapperJam(31308),
+                  wrapperMissing(31309),
+                  wrapperLifeAlmostOver(31310),
+                  wrapperLifeOver(31311),
+                  wrapperAlmostEmpty(31312),
+                  wrapperEmpty(31313),
+                  wrapperAlmostFull(31314),
+                  wrapperFull(31315),
+                  wrapperNearLimit(31316),
+                  wrapperAtLimit(31317),
+                  wrapperOpened(31318),
+                  wrapperClosed(31319),
+                  wrapperTurnedOn(31320),
+                  wrapperTurnedOff(31321),
+                  wrapperOffline(31322),
+                  wrapperPowerSaver(31323),
+                  wrapperWarmingUp(31324),
+                  wrapperAdded(31325),
+                  wrapperRemoved(31326),
+                  wrapperResourceAdded(31327),
+                  wrapperResourceRemoved(31328),
+                  wrapperRecoverableFailure(31329),
+                  wrapperUnrecoverableFailure(31330),
+                  wrapperRecoverableStorageError(31331),
+                  wrapperUnrecoverableStorageError(31332),
+                  wrapperMotorFailure(31333),
+                  wrapperMemoryExhausted(31334),
+                  wrapperUnderTemperature(31335),
+                  wrapperOverTemperature(31336),
+                  wrapperTimingFailure(31337),
+                  wrapperThermistorFailure(31338),
+                  -- FinDeviceTypeTC = bander(14)
+                  banderCoverOpen(31403),
+                  banderCoverClosed(31404),
+                  banderInterlockOpen(31405),
+                  banderInterlockClosed(31406),
+                  banderConfigurationChange(31407),
+                  banderJam(31408),
+                  banderMissing(31409),
+                  banderLifeAlmostOver(31410),
+                  banderLifeOver(31411),
+                  banderAlmostEmpty(31412),
+                  banderEmpty(31413),
+                  banderAlmostFull(31414),
+                  banderFull(31415),
+                  banderNearLimit(31416),
+                  banderAtLimit(31417),
+                  banderOpened(31418),
+                  banderClosed(31419),
+                  banderTurnedOn(31420),
+                  banderTurnedOff(31421),
+                  banderOffline(31422),
+                  banderPowerSaver(31423),
+                  banderWarmingUp(31424),
+                  banderAdded(31425),
+                  banderRemoved(31426),
+                  banderResourceAdded(31427),
+                  banderResourceRemoved(31428),
+                  banderRecoverableFailure(31429),
+                  banderUnrecoverableFailure(31430),
+                  banderRecoverableStorageError(31431),
+                  banderUnrecoverableStorageError(31432),
+                  banderMotorFailure(31433),
+                  banderMemoryExhausted(31434),
+                  banderUnderTemperature(31435),
+                  banderOverTemperature(31436),
+                  banderTimingFailure(31437),
+                  banderThermistorFailure(31438),
+                  -- FinDeviceTypeTC = makeEnvelope(15)
+                  makeEnvelopeCoverOpen(31503),
+                  makeEnvelopeCoverClosed(31504),
+                  makeEnvelopeInterlockOpen(31505),
+                  makeEnvelopeInterlockClosed(31506),
+                  makeEnvelopeConfigurationChange(31507),
+                  makeEnvelopeJam(31508),
+                  makeEnvelopeMissing(31509),
+                  makeEnvelopeLifeAlmostOver(31510),
+                  makeEnvelopeLifeOver(31511),
+                  makeEnvelopeAlmostEmpty(31512),
+                  makeEnvelopeEmpty(31513),
+                  makeEnvelopeAlmostFull(31514),
+                  makeEnvelopeFull(31515),
+                  makeEnvelopeNearLimit(31516),
+                  makeEnvelopeAtLimit(31517),
+                  makeEnvelopeOpened(31518),
+                  makeEnvelopeClosed(31519),
+                  makeEnvelopeTurnedOn(31520),
+                  makeEnvelopeTurnedOff(31521),
+                  makeEnvelopeOffline(31522),
+                  makeEnvelopePowerSaver(31523),
+                  makeEnvelopeWarmingUp(31524),
+                  makeEnvelopeAdded(31525),
+                  makeEnvelopeRemoved(31526),
+                  makeEnvelopeResourceAdded(31527),
+                  makeEnvelopeResourceRemoved(31528),
+                  makeEnvelopeRecoverableFailure(31529),
+                  makeEnvelopeUnrecoverableFailure(31530),
+                  makeEnvelopeRecoverableStorageError(31531),
+                  makeEnvelopeUnrecoverableStorageError(31532),
+                  makeEnvelopeMotorFailure(31533),
+                  makeEnvelopeMemoryExhausted(31534),
+                  makeEnvelopeUnderTemperature(31535),
+                  makeEnvelopeOverTemperature(31536),
+                  makeEnvelopeTimingFailure(31537),
+                  makeEnvelopeThermistorFailure(31538),
+                  -- FinDeviceTypeTC = stacker(16)
+                  stackerCoverOpen(31603),
+                  stackerCoverClosed(31604),
+                  stackerInterlockOpen(31605),
+                  stackerInterlockClosed(31606),
+                  stackerConfigurationChange(31607),
+                  stackerJam(31608),
+                  stackerMissing(31609),
+                  stackerLifeAlmostOver(31610),
+                  stackerLifeOver(31611),
+                  stackerAlmostEmpty(31612),
+                  stackerEmpty(31613),
+                  stackerAlmostFull(31614),
+                  stackerFull(31615),
+                  stackerNearLimit(31616),
+                  stackerAtLimit(31617),
+                  stackerOpened(31618),
+                  stackerClosed(31619),
+                  stackerTurnedOn(31620),
+                  stackerTurnedOff(31621),
+                  stackerOffline(31622),
+                  stackerPowerSaver(31623),
+                  stackerWarmingUp(31624),
+                  stackerAdded(31625),
+                  stackerRemoved(31626),
+                  stackerResourceAdded(31627),
+                  stackerResourceRemoved(31628),
+                  stackerRecoverableFailure(31629),
+                  stackerUnrecoverableFailure(31630),
+                  stackerRecoverableStorageError(31631),
+                  stackerUnrecoverableStorageError(31632),
+                  stackerMotorFailure(31633),
+                  stackerMemoryExhausted(31634),
+                  stackerUnderTemperature(31635),
+                  stackerOverTemperature(31636),
+                  stackerTimingFailure(31637),
+                  stackerThermistorFailure(31638),
+                  -- FinDeviceTypeTC = sheetRotator(17)
+                  sheetRotatorCoverOpen(31703),
+                  sheetRotatorCoverClosed(31704),
+                  sheetRotatorInterlockOpen(31705),
+                  sheetRotatorInterlockClosed(31706),
+                  sheetRotatorConfigurationChange(31707),
+                  sheetRotatorJam(31708),
+                  sheetRotatorMissing(31709),
+                  sheetRotatorLifeAlmostOver(31710),
+                  sheetRotatorLifeOver(31711),
+                  sheetRotatorAlmostEmpty(31712),
+                  sheetRotatorEmpty(31713),
+                  sheetRotatorAlmostFull(31714),
+                  sheetRotatorFull(31715),
+                  sheetRotatorNearLimit(31716),
+                  sheetRotatorAtLimit(31717),
+                  sheetRotatorOpened(31718),
+                  sheetRotatorClosed(31719),
+                  sheetRotatorTurnedOn(31720),
+                  sheetRotatorTurnedOff(31721),
+                  sheetRotatorOffline(31722),
+                  sheetRotatorPowerSaver(31723),
+                  sheetRotatorWarmingUp(31724),
+                  sheetRotatorAdded(31725),
+                  sheetRotatorRemoved(31726),
+                  sheetRotatorResourceAdded(31727),
+                  sheetRotatorResourceRemoved(31728),
+                  sheetRotatorRecoverableFailure(31729),
+                  sheetRotatorUnrecoverableFailure(31730),
+                  sheetRotatorRecoverableStorageError(31731),
+                  sheetRotatorUnrecoverableStorageError(31732),
+                  sheetRotatorMotorFailure(31733),
+                  sheetRotatorMemoryExhausted(31734),
+                  sheetRotatorUnderTemperature(31735),
+                  sheetRotatorOverTemperature(31736),
+                  sheetRotatorTimingFailure(31737),
+                  sheetRotatorThermistorFailure(31738),
+                  -- FinDeviceTypeTC = inserter(18)
+                  inserterCoverOpen(31803),
+                  inserterCoverClosed(31804),
+                  inserterInterlockOpen(31805),
+                  inserterInterlockClosed(31806),
+                  inserterConfigurationChange(31807),
+                  inserterJam(31808),
+                  inserterMissing(31809),
+                  inserterLifeAlmostOver(31810),
+                  inserterLifeOver(31811),
+                  inserterAlmostEmpty(31812),
+                  inserterEmpty(31813),
+                  inserterAlmostFull(31814),
+                  inserterFull(31815),
+                  inserterNearLimit(31816),
+                  inserterAtLimit(31817),
+                  inserterOpened(31818),
+                  inserterClosed(31819),
+                  inserterTurnedOn(31820),
+                  inserterTurnedOff(31821),
+                  inserterOffline(31822),
+                  inserterPowerSaver(31823),
+                  inserterWarmingUp(31824),
+                  inserterAdded(31825),
+                  inserterRemoved(31826),
+                  inserterResourceAdded(31827),
+                  inserterResourceRemoved(31828),
+                  inserterRecoverableFailure(31829),
+                  inserterUnrecoverableFailure(31830),
+                  inserterRecoverableStorageError(31831),
+                  inserterUnrecoverableStorageError(31832),
+                  inserterMotorFailure(31833),
+                  inserterMemoryExhausted(31834),
+                  inserterUnderTemperature(31835),
+                  inserterOverTemperature(31836),
+                  inserterTimingFailure(31837),
+                  inserterThermistorFailure(31838)
                   }
 END
-
-

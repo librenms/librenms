@@ -12,7 +12,10 @@
  * the source code distribution for details.
  */
 
-if (! Auth::user()->hasGlobalAdmin()) {
+use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
+
+if (Gate::denies('update', Device::class)) {
     $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
     if (isset($_POST['viewtype'])) {
@@ -31,8 +34,8 @@ if (! Auth::user()->hasGlobalAdmin()) {
                 $order_by = '';
                 if (isset($_POST['sort']) && is_array($_REQUEST['sort'])) {
                     foreach ($_REQUEST['sort'] as $key => $value) {
-                        $key = preg_replace('/[^A-Za-z0-9_]/', '', $key); // only allow plain columns
-                        $value = strtolower($value) == 'desc' ? 'DESC' : 'ASC';
+                        $key = preg_replace('/[^A-Za-z0-9_]/', '', (string) $key); // only allow plain columns
+                        $value = strtolower((string) $value) == 'desc' ? 'DESC' : 'ASC';
 
                         $order_by .= " $key $value";
                     }

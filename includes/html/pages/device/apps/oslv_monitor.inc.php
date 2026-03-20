@@ -44,7 +44,7 @@ if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
     }
     $index_int = 0;
     foreach ($app_data['oslvms'] as $oslvm) {
-        $oslvm = htmlspecialchars($oslvm);
+        $oslvm = htmlspecialchars((string) $oslvm);
         $label = (! isset($vars['oslvm']) || $vars['oslvm'] != $oslvm)
             ? $oslvm
             : '<span class="pagemenu-selected">' . $oslvm . '</span>';
@@ -59,7 +59,7 @@ if (isset($app_data['backend']) && $app_data['backend'] != 'cgroups') {
         sort($app_data['inactive']);
         $index_int = 0;
         foreach ($app_data['inactive'] as $oslvm) {
-            $oslvm = htmlspecialchars($oslvm);
+            $oslvm = htmlspecialchars((string) $oslvm);
             $label = (! isset($vars['inactive']) || $vars['oslvm'] != $oslvm)
                 ? $oslvm
                 : '<span class="pagemenu-selected">' . $oslvm . '</span>';
@@ -79,7 +79,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     $other_containers = [];
     $user_containers = [];
     foreach ($app_data['oslvms'] as $oslvm) {
-        $oslvm = htmlspecialchars($oslvm);
+        $oslvm = htmlspecialchars((string) $oslvm);
         if (preg_match('/^d_.*/', $oslvm)) {
             $docker_containers[] = $oslvm;
         } elseif (preg_match('/^s_.*/', $oslvm)) {
@@ -98,7 +98,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     $seen_other_containers = [];
     $seen_user_containers = [];
     foreach ($app_data['inactive'] as $oslvm) {
-        $oslvm = htmlspecialchars($oslvm);
+        $oslvm = htmlspecialchars((string) $oslvm);
         if (preg_match('/^d_.*/', $oslvm)) {
             $seen_docker_containers[] = $oslvm;
         } elseif (preg_match('/^s_.*/', $oslvm)) {
@@ -319,7 +319,7 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
             'rows' => [],
         ];
         foreach ($app_data['oslvm_data'][$vars['oslvm']]['path'] as $path) {
-            $path = htmlspecialchars($path);
+            $path = htmlspecialchars((string) $path);
             $path = preg_replace('/\/$/', '', $path);
             $mount_path = $path;
             $mount_path_raw = false;
@@ -331,8 +331,8 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 ['storage_descr' => $mount_path],
                 ['device_id' => $device['device_id']]
             );
-            if (! isset($storage_info) && ! preg_match('/^\/+$/', $mount_path)) {
-                $mount_path = preg_replace('/\/[^\/]+$/', '', $mount_path);
+            if (! isset($storage_info) && ! preg_match('/^\/+$/', (string) $mount_path)) {
+                $mount_path = preg_replace('/\/[^\/]+$/', '', (string) $mount_path);
                 while ($mount_path != '' && ! isset($storage_info)) {
                     $storage_info = Storage::firstWhere(
                         ['storage_descr' => $mount_path],
@@ -430,7 +430,7 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                 if (is_array($ip_data)) {
                     if (isset($ip_data['ip']) && ! is_null($ip_data['ip'])) {
                         $ip = $ip_data['ip'];
-                        $ip = htmlspecialchars($ip);
+                        $ip = htmlspecialchars((string) $ip);
                     }
                     if (isset($ip_data['gw']) && ! is_null($ip_data['gw'])) {
                         $gw_ip = $ip_data['gw'];

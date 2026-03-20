@@ -34,21 +34,6 @@ function bulk_sensor_snmpget($device, $sensors)
     return $cache;
 }
 
-/**
- * @param  $device
- * @param  string  $type  type/class of sensor
- * @return array
- */
-function sensor_precache($device, $type)
-{
-    $sensor_cache = [];
-    if (file_exists(LibrenmsConfig::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php')) {
-        include LibrenmsConfig::get('install_dir') . '/includes/polling/sensors/pre-cache/' . $device['os'] . '.inc.php';
-    }
-
-    return $sensor_cache;
-}
-
 function poll_sensor($device, $class)
 {
     $sensors = [];
@@ -66,8 +51,6 @@ function poll_sensor($device, $class)
     }
 
     $snmp_data = bulk_sensor_snmpget($device, $sensors);
-
-    $sensor_cache = sensor_precache($device, $class);
 
     foreach ($sensors as $sensor) {
         Log::info('Checking (' . $sensor['poller_type'] . ") $class " . $sensor['sensor_descr'] . '... ');
@@ -341,11 +324,9 @@ function update_application($app, $response, $metrics = [], $status = '')
 
         // remove no longer existing metrics (generally should not happen
         foreach ($db_metrics as $db_metric) {
-            dbDelete(
-                'application_metrics',
-                'app_id=? && metric=?',
-                [$app['app_id'], $db_metric['metric']]
-            );
+            \App\Models\ApplicationMetric::where('app_id', $app['app_id'])
+                ->where('metric', $db_metric['metric'])
+                ->delete();
             echo '-';
         }
 

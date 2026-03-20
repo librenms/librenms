@@ -37,7 +37,7 @@ class PushNotificationController extends Controller
                 $request->input('subscription.keys.auth')
             );
 
-        $subscription->description = $request->get('description');
+        $subscription->description = $request->input('description');
         $success = $subscription->save();
 
         return response()->json(['success' => $success], 200);

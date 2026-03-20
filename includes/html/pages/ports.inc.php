@@ -16,6 +16,7 @@
 
 use App\Models\Port;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Gate;
 
 $pagetitle[] = 'Ports';
 
@@ -92,7 +93,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= "<div class='form-group'>";
     $output .= "<select name='device_id' id='device_id' class='form-control input-sm'></select>&nbsp;";
 
-    $hasvalue = ! empty($vars['hostname']) ? "value='" . htmlspecialchars($vars['hostname']) . "'" : '';
+    $hasvalue = ! empty($vars['hostname']) ? "value='" . htmlspecialchars((string) $vars['hostname']) . "'" : '';
 
     $output .= "<input type='text' name='hostname' id='hostname' title='Hostname' class='form-control input-sm' " . $hasvalue . " placeholder='Hostname'>";
 
@@ -167,7 +168,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= "<select name='port_descr_type' id='port_descr_type' class='form-control input-sm'>";
     $output .= "<option value=''>All Port Types</option>";
 
-    if (Auth::user()->hasGlobalRead()) {
+    if (Gate::allows('viewAny', Port::class)) {
         $sql = 'SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr_type` ORDER BY `port_descr_type`';
     } else {
         $sql = 'SELECT `port_descr_type` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `port_descr_type` ORDER BY `port_descr_type`';
@@ -186,7 +187,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
             } else {
                 $portdescrib = '';
             }
-            $output .= "<option value='" . clean_bootgrid($data['port_descr_type']) . "' " . $portdescrib . '>' . ucfirst(clean_bootgrid($data['port_descr_type'])) . '</option>';
+            $output .= "<option value='" . clean_bootgrid($data['port_descr_type']) . "' " . $portdescrib . '>' . ucfirst((string) clean_bootgrid($data['port_descr_type'])) . '</option>';
         }
     }
 
@@ -246,12 +247,12 @@ if (isset($vars['purge'])) {
         try {
             Port::hasAccess(Auth::user())->where('port_id', $vars['purge'])->firstOrFail()->delete();
         } catch (ModelNotFoundException) {
-            echo "<div class='alert alert-danger'>Port ID " . htmlspecialchars($vars['purge']) . ' not found! Could not purge port.</div>';
+            echo "<div class='alert alert-danger'>Port ID " . htmlspecialchars((string) $vars['purge']) . ' not found! Could not purge port.</div>';
         }
     }
 }
 
-[$format, $subformat] = explode('_', basename($vars['format']));
+[$format, $subformat] = explode('_', basename((string) $vars['format']));
 
 if (file_exists('includes/html/pages/ports/' . $format . '.inc.php')) {
     require 'includes/html/pages/ports/' . $format . '.inc.php';

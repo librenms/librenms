@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Gate;
 
 class PortGroup extends BaseModel
 {
@@ -35,12 +36,12 @@ class PortGroup extends BaseModel
 
     public function scopeHasAccess($query, User $user)
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAny', PortGroup::class)) {
             return $query;
         }
 
         // maybe filtered in future
-        return $query;
+        return $query->limit(0);
     }
 
     /**

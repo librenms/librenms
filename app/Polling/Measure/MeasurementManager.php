@@ -123,7 +123,7 @@ class MeasurementManager
         if (! empty($snmpquery_cache_performance)) {
             Log::info('SnmpQuery Cache Performance');
             foreach ($snmpquery_cache_performance as $key => $hits) {
-                $vars = explode('|', $key);
+                $vars = explode('|', (string) $key);
                 Log::info(" $vars[4] cache hits: $hits" . ($hits ? '' : ' %RWaste of memory!%n'), ['color' => true]);
             }
         }

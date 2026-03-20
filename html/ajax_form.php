@@ -24,7 +24,6 @@ if (! Auth::check()) {
 Debug::set(isset($_REQUEST['debug']));
 
 $ajax_form = match ($_POST['type'] ?? '') {
-    'alert-details' => 'includes/html/forms/alert-details.inc.php',
     'alert-notes' => 'includes/html/forms/alert-notes.inc.php',
     'alert-templates' => 'includes/html/forms/alert-templates.inc.php',
     'alert-transports' => 'includes/html/forms/alert-transports.inc.php',
@@ -59,9 +58,6 @@ $ajax_form = match ($_POST['type'] ?? '') {
     'save-host-dependency' => 'includes/html/forms/save-host-dependency.inc.php',
     'schedule-maintenance' => 'includes/html/forms/schedule-maintenance.inc.php',
     'search-oxidized-config' => 'includes/html/forms/search-oxidized-config.inc.php',
-    'sensor-alert-reset' => 'includes/html/forms/sensor-alert-reset.inc.php',
-    'sensor-alert-update' => 'includes/html/forms/sensor-alert-update.inc.php',
-    'sensor-update' => 'includes/html/forms/sensor-update.inc.php',
     'show-alert-transport' => 'includes/html/forms/show-alert-transport.inc.php',
     'show-transport-group' => 'includes/html/forms/show-transport-group.inc.php',
     'storage-update' => 'includes/html/forms/storage-update.inc.php',

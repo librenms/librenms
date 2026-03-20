@@ -48,6 +48,7 @@ class AvailabilityMapController extends WidgetController
             'tile_size' => 12,
             'color_only_select' => 0,
             'show_disabled_and_ignored' => 0,
+            'show_totals' => 1,
             'mode_select' => 0,
             'order_by' => LibrenmsConfig::get('webui.availability_map_sort_status') ? 'status' : 'display-name',
             'device_group' => null,
@@ -173,10 +174,10 @@ class AvailabilityMapController extends WidgetController
     private function sort(array &$data): void
     {
         match ($this->getSettings()['order_by']) {
-            'status' => usort($data, fn ($l, $r) => ($l['status'] <=> $r['status']) ?: strcasecmp($l['label'], $r['label'])),
-            'label' => usort($data, fn ($l, $r) => strcasecmp($l['label'], $r['label'])),
+            'status' => usort($data, fn ($l, $r) => ($l['status'] <=> $r['status']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
+            'label' => usort($data, fn ($l, $r) => strcasecmp((string) $l['label'], (string) $r['label'])),
             // device display name (tooltip starts with the display name)
-            default => usort($data, fn ($l, $r) => strcasecmp($l['tooltip'], $r['tooltip']) ?: strcasecmp($l['label'], $r['label'])),
+            default => usort($data, fn ($l, $r) => strcasecmp((string) $l['tooltip'], (string) $r['tooltip']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
         };
     }
 

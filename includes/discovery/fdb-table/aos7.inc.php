@@ -45,4 +45,4 @@ if (! empty($dot1d)) {
         }
     }
 }
-include 'includes/discovery/fdb-table/aos6.inc.php';
+include base_path('includes/discovery/fdb-table/aos6.inc.php');

@@ -23,13 +23,15 @@
  * @author     Original Author <unknown>
  * @author     Joseph Tingiris <joseph.tingiris@gmail.com>
  */
-if (! Auth::user()->hasGlobalAdmin()) {
-    exit('ERROR: You need to be admin');
-}
 
 use App\Facades\DeviceCache;
+use App\Models\AlertRule;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
+
+if (Gate::denies('viewAny', AlertRule::class)) {
+    exit('ERROR: You need to be admin');
+}
 
 $no_refresh = true;
 
@@ -92,9 +94,11 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
 echo '<div class="table-responsive">';
 echo '<div class="col pull-left">';
 $device_id = $device['device_id'] ?? 0;
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' .$device_id. '">Create new alert rule</button>';
-echo '<i> - OR - </i>';
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' .$device_id. '">Create rule from collection</button>';
+if (Gate::allows('create', AlertRule::class)) {
+    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' . $device_id . '">Create new alert rule</button>';
+    echo '<i> - OR - </i>';
+    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' . $device_id . '">Create rule from collection</button>';
+}
 echo '</div>';
 
 echo '<div class="col pull-right">';
@@ -201,14 +205,14 @@ foreach ($rule_list as $rule) {
         if ((int) $sub['state'] === AlertState::CLEAR) {
             $ico = 'check';
             $col = 'success';
-            $status_msg = 'All devices matching ' . htmlentities($rule['name']) . '  are OK';
+            $status_msg = 'All devices matching ' . htmlentities((string) $rule['name']) . '  are OK';
         }
         if ((int) $sub['state'] === AlertState::ACTIVE || (int) $sub['state'] === AlertState::ACKNOWLEDGED) {
             $alert_style = alert_layout($severity);
             $ico = $alert_style['icon'];
             $col = $alert_style['icon_color'];
             $extra = $alert_style['background_color'];
-            $status_msg = 'Some devices matching ' . htmlentities($rule['name']) . ' are currently alerting';
+            $status_msg = 'Some devices matching ' . htmlentities((string) $rule['name']) . ' are currently alerting';
         }
     }
 
@@ -220,12 +224,12 @@ foreach ($rule_list as $rule) {
         $ico = 'pause';
         $col = '';
         $extra = 'active';
-        $status_msg = htmlentities($rule['name']) . ' is OFF';
+        $status_msg = htmlentities((string) $rule['name']) . ' is OFF';
     } else {
         $alert_checked = 'checked';
     }
 
-    $rule_extra = json_decode($rule['extra'], true);
+    $rule_extra = json_decode((string) $rule['extra'], true);
 
     $device_count = dbFetchCell('SELECT COUNT(*) FROM alert_device_map WHERE rule_id=?', [$rule['id']]);
     $group_count = dbFetchCell('SELECT COUNT(*) FROM alert_group_map WHERE rule_id=?', [$rule['id']]);
@@ -263,7 +267,7 @@ foreach ($rule_list as $rule) {
 
     // Name
 
-    echo '<td><a href="' . url('alerts/rule_id='.$rule['id']) .'" data-container="body" data-toggle="popover" data-placement="right" data-content="View active alerts for this rule" target="_blank">' . htmlentities($rule['name']) . '</a></td>';
+    echo '<td><a href="' . url('alerts/rule_id='.$rule['id']) .'" data-container="body" data-toggle="popover" data-placement="right" data-content="View active alerts for this rule" target="_blank">' . e(strip_tags((string) $rule['name']), true) . '</a></td>';
 
     // Devices (and Groups)
 
@@ -284,7 +288,7 @@ foreach ($rule_list as $rule) {
         $location_query = 'SELECT locations.location, locations.id FROM alert_location_map, locations WHERE alert_location_map.rule_id=? and alert_location_map.location_id = locations.id ORDER BY location';
         $location_maps = dbFetchRows($location_query, [$rule['id']]);
         foreach ($location_maps as $location_map) {
-            $locations .= $except_device_or_group . '<a href="' . url('devices/location=' . $location_map['id']) . '" data-container="body" data-toggle="popover" data-placement="right" data-content="View Devices for Location" target="_blank">' . htmlentities($location_map['location']) . '</a><br>';
+            $locations .= $except_device_or_group . '<a href="' . url('devices/location=' . $location_map['id']) . '" data-container="body" data-toggle="popover" data-placement="right" data-content="View Devices for Location" target="_blank">' . htmlentities((string) $location_map['location']) . '</a><br>';
         }
     }
 
@@ -293,7 +297,7 @@ foreach ($rule_list as $rule) {
         $group_query = 'SELECT device_groups.name, device_groups.id FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name';
         $group_maps = dbFetchRows($group_query, [$rule['id']]);
         foreach ($group_maps as $group_map) {
-            $groups .= $except_device_or_group . '<a href="' . url('device-groups/' . $group_map['id'] . '/edit') . '" data-container="body" data-toggle="popover" data-placement="right" data-content="' . htmlentities($group_map['name']) . '" title="' . $groups_msg . '" target="_blank">' . htmlentities($group_map['name']) . '</a><br>';
+            $groups .= $except_device_or_group . '<a href="' . url('device-groups/' . $group_map['id'] . '/edit') . '" data-container="body" data-toggle="popover" data-placement="right" data-content="' . htmlentities((string) $group_map['name']) . '" title="' . $groups_msg . '" target="_blank">' . htmlentities((string) $group_map['name']) . '</a><br>';
         }
     }
 
@@ -302,7 +306,7 @@ foreach ($rule_list as $rule) {
         $device_query = 'SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname';
         $device_maps = dbFetchRows($device_query, [$rule['id']]);
         foreach ($device_maps as $device_map) {
-            $devices .= $except_device_or_group . '<a href="' . url('device/device=' . $device_map['device_id'] . '/tab=edit/') . '" data-container="body" data-toggle="popover" data-placement="right" data-content="' . htmlentities($device_map['hostname']) . '" title="' . $devices_msg . '" target="_blank">' . htmlentities(DeviceCache::get($device_map['device_id'])->displayName()) . '</a><br>';
+            $devices .= $except_device_or_group . '<a href="' . url('device/device=' . $device_map['device_id'] . '/tab=edit/') . '" data-container="body" data-toggle="popover" data-placement="right" data-content="' . htmlentities((string) $device_map['hostname']) . '" title="' . $devices_msg . '" target="_blank">' . htmlentities((string) DeviceCache::get($device_map['device_id'])->displayName()) . '</a><br>';
         }
     }
 
@@ -375,10 +379,10 @@ foreach ($rule_list as $rule) {
     } else {
         $rule_display = QueryBuilderParser::fromJson($rule['builder'])->toSql(false);
     }
-    echo '<i>' . htmlentities($rule_display) . '</i></td>';
+    echo '<i>' . htmlentities((string) $rule_display) . '</i></td>';
 
     // Severity
-    echo '<td>' . htmlentities($rule['severity'] == 'ok' ? strtoupper($rule['severity']) : ucwords($rule['severity'])) . '</td>';
+    echo '<td>' . htmlentities($rule['severity'] == 'ok' ? strtoupper((string) $rule['severity']) : ucwords((string) $rule['severity'])) . '</td>';
 
     // Status
 
@@ -398,14 +402,14 @@ foreach ($rule_list as $rule) {
 
     echo '<td>';
     if ($rule['disabled']) {
-        $enabled_msg = htmlentities($rule['name']) . ' is OFF';
+        $enabled_msg = htmlentities((string) $rule['name']) . ' is OFF';
     }
     if (! $rule['disabled']) {
-        $enabled_msg = htmlentities($rule['name']) . ' is ON';
+        $enabled_msg = htmlentities((string) $rule['name']) . ' is ON';
     }
 
     echo "<div id='on-off-checkbox-" . $rule['id'] . "' data-toggle='popover' data-placement='$enabled_popover' data-content='" . $enabled_msg . "' class='btn-group btn-group-sm' role='group'>";
-    echo "<input id='" . $rule['id'] . "' type='checkbox' name='alert-rule' data-orig_class='" . $orig_class . "' data-orig_colour='" . $orig_col . "' data-orig_state='" . $orig_ico . "' data-alert_id='" . $rule['id'] . "' data-alert_name='" . htmlentities($rule['name']) . "' data-alert_status='" . $status_msg . "' " . $alert_checked . " data-size='small' data-toggle='modal'>";
+    echo "<input id='" . $rule['id'] . "' type='checkbox' name='alert-rule' data-orig_class='" . $orig_class . "' data-orig_colour='" . $orig_col . "' data-orig_state='" . $orig_ico . "' data-alert_id='" . $rule['id'] . "' data-alert_name='" . htmlentities((string) $rule['name']) . "' data-alert_status='" . $status_msg . "' " . $alert_checked . " data-size='small' data-toggle='modal'>";
     echo '</div>';
     echo '</td>';
 
@@ -413,8 +417,12 @@ foreach ($rule_list as $rule) {
 
     echo '<td>';
     echo "<div class='btn-group btn-group-sm' role='group'>";
-    echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-placement='left' data-target='#create-alert' data-rule_id='" . $rule['id'] . "' name='edit-alert-rule' title='Edit alert rule' data-content='" . htmlentities($rule['name']) . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-    echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='left' data-toggle='modal' data-target='#confirm-delete' data-alert_id='" . $rule['id'] . "' data-alert_name='" . htmlentities($rule['name']) . "' name='delete-alert-rule' title='Delete alert rule' data-content='" . htmlentities($rule['name']) . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+    if (Gate::allows('update', AlertRule::class)) {
+        echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-placement='left' data-target='#create-alert' data-rule_id='" . $rule['id'] . "' name='edit-alert-rule' title='Edit alert rule' data-content='" . htmlentities((string) $rule['name']) . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+    }
+    if (Gate::allows('delete', AlertRule::class)) {
+        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='left' data-toggle='modal' data-target='#confirm-delete' data-alert_id='" . $rule['id'] . "' data-alert_name='" . htmlentities((string) $rule['name']) . "' name='delete-alert-rule' title='Delete alert rule' data-content='" . htmlentities((string) $rule['name']) . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+    }
     echo '</td>';
 
     echo "</tr>\r\n";
@@ -443,8 +451,8 @@ if ($count > $results) {
     echo '</div>';
 }
 
-echo '<input type="hidden" name="page_number" id="page_number" value="' . htmlspecialchars($page_number) . '">
-    <input type="hidden" name="results_amount" id="results_amount" value="' . htmlspecialchars($results) . '">
+echo '<input type="hidden" name="page_number" id="page_number" value="' . htmlspecialchars((string) $page_number) . '">
+    <input type="hidden" name="results_amount" id="results_amount" value="' . htmlspecialchars((string) $results) . '">
     </form>';
 
 if ($count < 1) {

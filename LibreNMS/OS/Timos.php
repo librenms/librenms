@@ -28,6 +28,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\MplsLsp;
@@ -38,8 +39,10 @@ use App\Models\MplsSdpBind;
 use App\Models\MplsService;
 use App\Models\MplsTunnelArHop;
 use App\Models\MplsTunnelCHop;
+use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
@@ -48,13 +51,14 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Polling\MplsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use SnmpQuery;
 
-class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDiscovery, WirelessSnrDiscovery, WirelessRsrqDiscovery, WirelessRssiDiscovery, WirelessRsrpDiscovery, WirelessChannelDiscovery
+class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscovery, WirelessPowerDiscovery, WirelessSnrDiscovery, WirelessRsrqDiscovery, WirelessRssiDiscovery, WirelessRsrpDiscovery, WirelessChannelDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -96,7 +100,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         foreach ($snmp as $index => $data) {
             if (isset($data['ALU-MICROWAVE-MIB::aluMwRadioLocalRxMainPower'])) {
                 $sensors[] = new WirelessSensor(
-                    'power',
+                    WirelessSensorType::Power,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.6527.6.1.2.2.7.1.3.1.2.' . $index,
                     'Nokia-Packet-MW-Rx',
@@ -112,7 +116,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         foreach ($snmp as $index => $data) {
             if (isset($data['ALU-MICROWAVE-MIB::aluMwRadioLocalTxPower'])) {
                 $sensors[] = new WirelessSensor(
-                    'power',
+                    WirelessSensorType::Power,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.6527.6.1.2.2.7.1.3.1.1.' . $index,
                     'Nokia-Packet-MW-Tx',
@@ -182,7 +186,12 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             'TIMETRA-MPLS-MIB::vRtrMplsLspPathTable',
             'TIMETRA-MPLS-MIB::vRtrMplsLspPathLastChange',
         ])->mapTable(function ($value, $vrf_oid, $lsp_oid, $path_oid) use ($lsps) {
-            $lsp_id = $lsps->where('lsp_oid', $lsp_oid)->firstWhere('vrf_oid', $vrf_oid)->lsp_id;
+            $lsp = $lsps->where('lsp_oid', $lsp_oid)->firstWhere('vrf_oid', $vrf_oid);
+            $lsp_id = $lsp?->lsp_id;
+
+            if (! $lsp_id) {
+                return null;
+            }
 
             return new MplsLspPath([
                 'lsp_id' => $lsp_id,
@@ -203,7 +212,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'mplsLspPathTunnelARHopListIndex' => $value['vRtrMplsLspPathTunnelARHopListIndex'] ?? null,
                 'mplsLspPathTunnelCHopListIndex' => $value['vRtrMplsLspPathTunnelCRHopListIndex'] ?? null,
             ]);
-        });
+        })->filter();
     }
 
     /**
@@ -239,7 +248,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             'TIMETRA-SERV-MIB::svcTlsInfoTable',
         ])->mapTable(function ($value) {
             // Workaround, remove some default entries we do not want to see
-            if (preg_match('/^\w* Service for internal purposes only/', $value['svcDescription'])) {
+            if (preg_match('/^\w* Service for internal purposes only/', (string) $value['svcDescription'])) {
                 return null;
             }
 
@@ -283,12 +292,17 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
 
             // remove some default entries we do not want to see
-            if (str_starts_with($value['sapDescription'], 'Internal SAP')) {
+            if (str_starts_with((string) $value['sapDescription'], 'Internal SAP')) {
+                return null;
+            }
+
+            $svc = $svcs->firstWhere('svc_oid', $svcId);
+            if (! $svc) {
                 return null;
             }
 
             return new MplsSap([
-                'svc_id' => $svcs->firstWhere('svc_oid', $svcId)->svc_id,
+                'svc_id' => $svc->svc_id,
                 'svc_oid' => $svcId,
                 'sapPortId' => $sapPortId,
                 'device_id' => $this->getDeviceId(),
@@ -319,9 +333,11 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         ])->mapTable(function ($value, $svcId) use ($sdps, $svcs) {
             $bind_id = str_replace(' ', '', $value['sdpBindId'] ?? '');
             $sdp_oid = hexdec(substr($bind_id, 0, 8));
-            $svc_oid = hexdec(substr($bind_id, 9, 16));
-            $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
-            $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
+            $svc_oid = hexdec(substr($bind_id, 8, 8));
+            $sdp = $sdps->firstWhere('sdp_oid', $sdp_oid);
+            $svc = $svcs->firstWhere('svc_oid', $svc_oid);
+            $sdp_id = $sdp?->sdp_id;
+            $svc_id = $svc?->svc_id;
 
             if ($sdp_id && $svc_id && $sdp_oid && $svc_oid) {
                 return new MplsSdpBind([
@@ -469,7 +485,12 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             'TIMETRA-MPLS-MIB::vRtrMplsLspPathLastChange',
             'TIMETRA-MPLS-MIB::vRtrMplsLspPathStatTable',
         ])->mapTable(function ($value, $vrf_oid, $lsp_oid, $path_oid) use ($lsps) {
-            $lsp_id = $lsps->where('lsp_oid', $lsp_oid)->firstWhere('vrf_oid', $vrf_oid)->lsp_id;
+            $lsp = $lsps->where('lsp_oid', $lsp_oid)->firstWhere('vrf_oid', $vrf_oid);
+            $lsp_id = $lsp?->lsp_id;
+
+            if (! $lsp_id) {
+                return null;
+            }
 
             return new MplsLspPath([
                 'lsp_id' => $lsp_id,
@@ -493,7 +514,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'mplsLspPathTunnelARHopListIndex' => $value['vRtrMplsLspPathTunnelARHopListIndex'] ?? null,
                 'mplsLspPathTunnelCHopListIndex' => $value['vRtrMplsLspPathTunnelCRHopListIndex'] ?? null,
             ]);
-        });
+        })->filter();
     }
 
     /**
@@ -529,7 +550,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             'TIMETRA-SERV-MIB::svcTlsInfoTable',
         ])->mapTable(function ($value) {
             // Workaround, remove some default entries we do not want to see
-            if (preg_match('/^\w* Service for internal purposes only/', $value['svcDescription'])) {
+            if (preg_match('/^\w* Service for internal purposes only/', (string) $value['svcDescription'])) {
                 return null;
             }
 
@@ -576,11 +597,15 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
 
             // remove some default entries we do not want to see
-            if (str_starts_with($value['sapDescription'], 'Internal SAP')) {
+            if (str_starts_with((string) $value['sapDescription'], 'Internal SAP')) {
                 return null;
             }
 
-            $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
+            $svc = $svcs->firstWhere('svc_oid', $svcId);
+            if (! $svc) {
+                return null;
+            }
+            $svc_id = $svc->svc_id;
 
             // Any unused vlan on a port returns * in sapEncapValue but had OID .4095
             $specialQinQIdentifier = $this->nokiaEncap($sapEncapValue);
@@ -642,9 +667,11 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         ])->mapTable(function ($value, $svcId) use ($sdps, $svcs) {
             $bind_id = str_replace(' ', '', $value['sdpBindId'] ?? '');
             $sdp_oid = hexdec(substr($bind_id, 0, 8));
-            $svc_oid = hexdec(substr($bind_id, 9, 16));
-            $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
-            $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
+            $svc_oid = hexdec(substr($bind_id, 8, 8));
+            $sdp = $sdps->firstWhere('sdp_oid', $sdp_oid);
+            $svc = $svcs->firstWhere('svc_oid', $svc_oid);
+            $sdp_id = $sdp?->sdp_id;
+            $svc_id = $svc?->svc_id;
 
             if ($sdp_id && $svc_id && $sdp_oid && $svc_oid) {
                 return new MplsSdpBind([
@@ -759,7 +786,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         foreach ($data as $index => $entry) {
             if (isset($entry['TIMETRA-CELLULAR-MIB::tmnxCellPortSinr'])) {
                 $sensors[] = new WirelessSensor(
-                    'snr',
+                    WirelessSensorType::Snr,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.' . $index,
                     'timos',
@@ -785,7 +812,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         foreach ($data as $index => $entry) {
             if (isset($entry['TIMETRA-CELLULAR-MIB::tmnxCellPortRsrq'])) {
                 $sensors[] = new WirelessSensor(
-                    'rsrq',
+                    WirelessSensorType::Rsrq,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.' . $index,
                     'timos',
@@ -809,7 +836,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         foreach ($data as $index => $entry) {
             if (isset($entry['TIMETRA-CELLULAR-MIB::tmnxCellPortRssi'])) {
                 $sensors[] = new WirelessSensor(
-                    'rssi',
+                    WirelessSensorType::Rssi,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.' . $index,
                     'timos',
@@ -833,7 +860,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         foreach ($data as $index => $entry) {
             if (isset($entry['TIMETRA-CELLULAR-MIB::tmnxCellPortRsrp'])) {
                 $sensors[] = new WirelessSensor(
-                    'rsrp',
+                    WirelessSensorType::Rsrp,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.' . $index,
                     'timos',
@@ -857,7 +884,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         foreach ($data as $index => $entry) {
             if (isset($entry['TIMETRA-CELLULAR-MIB::tmnxCellPortChannelNumber'])) {
                 $sensors[] = new WirelessSensor(
-                    'channel',
+                    WirelessSensorType::Channel,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.' . $index,
                     'timos',
@@ -895,20 +922,20 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             foreach ($chassisContents as $tmnxHwIndex => $entry) {
                 $inventory->push(new EntPhysical([
                     'entPhysicalIndex' => $tmnxHwIndex,
-                    'entPhysicalClass' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwClass'],
+                    'entPhysicalClass' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwClass'] ?? null,
                     //                    'entPhysicalDescr' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwID'],
-                    'entPhysicalName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwName'],
-                    'entPhysicalModelName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwMfgBoardNumber'],
-                    'entPhysicalSerialNum' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwSerialNumber'],
-                    'entPhysicalContainedIn' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwContainedIn'],
-                    'entPhysicalMfgName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwMfgBoardNumber'],
-                    'entPhysicalParentRelPos' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwParentRelPos'],
+                    'entPhysicalName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwName'] ?? null,
+                    'entPhysicalModelName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwMfgBoardNumber'] ?? null,
+                    'entPhysicalSerialNum' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwSerialNumber'] ?? null,
+                    'entPhysicalContainedIn' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwContainedIn'] ?? 0,
+                    'entPhysicalMfgName' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwMfgBoardNumber'] ?? null,
+                    'entPhysicalParentRelPos' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwParentRelPos'] ?? -1,
                     'entPhysicalHardwareRev' => '1.0',
-                    'entPhysicalFirmwareRev' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwBootCodeVersion'],
-                    'entPhysicalSoftwareRev' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwBootCodeVersion'],
-                    'entPhysicalIsFRU' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwIsFRU'],
-                    'entPhysicalAlias' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwAlias'],
-                    'entPhysicalAssetID' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwAssetID'],
+                    'entPhysicalFirmwareRev' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwBootCodeVersion'] ?? null,
+                    'entPhysicalSoftwareRev' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwBootCodeVersion'] ?? null,
+                    'entPhysicalIsFRU' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwIsFRU'] ?? null,
+                    'entPhysicalAlias' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwAlias'] ?? null,
+                    'entPhysicalAssetID' => $entry['TIMETRA-CHASSIS-MIB::tmnxHwAssetID'] ?? null,
                 ]));
             }
         }
@@ -933,5 +960,117 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $nonNg = str_replace('Ng', '', $ngField);
 
         return $data[$nonNg] ?? null;
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        return SnmpQuery::enumStrings()->walk([
+            'TIMETRA-PORT-MIB::tmnxPortAdminStatus',
+            'TIMETRA-PORT-MIB::tmnxPortSFPEquipped',
+            'TIMETRA-PORT-MIB::tmnxPortSFPConnectorCode',
+            'TIMETRA-PORT-MIB::tmnxPortSFPVendorOUI',
+            'TIMETRA-PORT-MIB::tmnxPortSFPVendorSerialNum',
+            'TIMETRA-PORT-MIB::tmnxPortSFPVendorPartNum',
+            'TIMETRA-PORT-MIB::tmnxPortSFPVendorManufactureDate',
+            'TIMETRA-PORT-MIB::tmnxPortSFPStatus',
+            'TIMETRA-PORT-MIB::tmnxPortSFPNumLanes',
+            'TIMETRA-PORT-MIB::tmnxPortTransceiverType',
+            'TIMETRA-PORT-MIB::tmnxPortTransceiverLaserWaveLen',
+            'TIMETRA-PORT-MIB::tmnxPortTransceiverDiagCapable',
+            'TIMETRA-PORT-MIB::tmnxPortTransceiverModelNumber',
+        ])->mapTable(function ($data, $chassisIndex, $portId) {
+            // Skip ports that are not inService (inService)
+            if (($data['TIMETRA-PORT-MIB::tmnxPortAdminStatus'] ?? '') !== 'inService') {
+                return null;
+            }
+
+            // Skip ports without SFP equipped
+            if (($data['TIMETRA-PORT-MIB::tmnxPortSFPEquipped'] ?? 'false') !== 'true') {
+                return null;
+            }
+
+            // portId is the same as ifIndex in Nokia TiMOS
+            $ifIndex = $portId;
+
+            // Map connector codes to standardized names
+            $connector = match ($data['TIMETRA-PORT-MIB::tmnxPortSFPConnectorCode'] ?? 'unknown') {
+                'sc' => 'SC',
+                'lc' => 'LC',
+                'mt-rj' => 'MTRJ',
+                'mu' => 'MU',
+                'sg' => 'SG',
+                'opticalPigtail' => 'AOC',
+                'copperPigtail' => 'DAC',
+                'mpo1x12' => 'MPO-12',
+                'mpo2x16' => 'MPO-16',
+                'mpo2x12' => 'MPO-12',
+                'mpo1x16' => 'MPO-16',
+                'rj45' => 'RJ45',
+                'hssdcII' => 'HSSDC',
+                'fiberJack' => 'FJ',
+                'bncortnc' => 'BNC/TNC',
+                'fiberChannel-Style1-CopperConnector', 'fiberChannel-Style2-CopperConnector', 'fiberChannelCoaxialHeaders' => 'FC',
+                'noSepConn' => 'None',
+                'mxc2x16' => 'MXC',
+                'cs' => 'CS',
+                'snOptConn' => 'SN',
+                default => null,
+            };
+
+            // Map transceiver types
+            $type = match ($data['TIMETRA-PORT-MIB::tmnxPortTransceiverType'] ?? 'unknown') {
+                'sfpTransceiver' => 'SFP',
+                'xfpTransceiver' => 'XFP',
+                'qsfpTransceiver' => 'QSFP',
+                'qsfpPlusTransceiver' => 'QSFP+',
+                'cfp2OrQsfp28Transceiver' => 'CFP2/QSFP28',
+                'cfpTransceiver' => 'CFP',
+                'cfp2AcoTransceiver' => 'CFP2-ACO',
+                'cfp2DcoTransceiver' => 'CFP2-DCO',
+                'cfp4Transceiver' => 'CFP4',
+                'cfp8Transceiver' => 'CFP8',
+                'cxpTransceiver' => 'CXP',
+                'xenpakTransceiver' => 'XENPAK',
+                'xpakTransceiver' => 'XPAK',
+                'x2Transceiver' => 'X2',
+                'dwdmSfpTransceiver' => 'DWDM-SFP',
+                'gbic' => 'GBIC',
+                'qsfpDdTransceiver' => 'QSFP-DD',
+                'sfpDdTransceiver' => 'SFP-DD',
+                'microQsfpTransceiver' => 'Micro-QSFP',
+                'cdfpTransceiver', 'cdfp3Transceiver' => 'CDFP',
+                default => $data['TIMETRA-PORT-MIB::tmnxPortTransceiverType'] ?? null,
+            };
+
+            // Handle wavelength - can be in nm (1-2000) or pm (850000-2000000)
+            $wavelength = $data['TIMETRA-PORT-MIB::tmnxPortTransceiverLaserWaveLen'] ?? null;
+            if ($wavelength !== null && $wavelength > 2000) {
+                // Convert from picometers to nanometers
+                $wavelength = (int) round($wavelength / 1000);
+            }
+
+            // DDM capability
+            $ddm = match ($data['TIMETRA-PORT-MIB::tmnxPortTransceiverDiagCapable'] ?? 'notApplicable') {
+                'true' => true,
+                'false' => false,
+                default => null,
+            };
+
+            return new Transceiver([
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'index' => "$chassisIndex.$portId",
+                'entity_physical_index' => $ifIndex,
+                'type' => $type,
+                'vendor' => null, // Nokia MIB doesn't expose vendor name, only OUI
+                'oui' => $data['TIMETRA-PORT-MIB::tmnxPortSFPVendorOUI'] ?? null,
+                'model' => $data['TIMETRA-PORT-MIB::tmnxPortTransceiverModelNumber'] ?? $data['TIMETRA-PORT-MIB::tmnxPortSFPVendorPartNum'] ?? null,
+                'serial' => $data['TIMETRA-PORT-MIB::tmnxPortSFPVendorSerialNum'] ?? null,
+                'date' => $data['TIMETRA-PORT-MIB::tmnxPortSFPVendorManufactureDate'] ?? null,
+                'ddm' => $ddm,
+                'connector' => $connector,
+                'wavelength' => $wavelength > 0 ? $wavelength : null,
+                'channels' => $data['TIMETRA-PORT-MIB::tmnxPortSFPNumLanes'] ?? null,
+            ]);
+        })->filter();
     }
 }

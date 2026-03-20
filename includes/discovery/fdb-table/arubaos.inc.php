@@ -73,10 +73,7 @@ if (! empty($fdbPort_table)) {
                 continue;
             }
 
-            $port_id = $portid_dict[$dot1dBasePort];
-            if ($port_id === null) {
-                $port_id = 0;
-            }
+            $port_id = $portid_dict[$dot1dBasePort] ?? 0;
             $vlan_id = $vlans_dict[$vlan] ?? 0;
 
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;

@@ -34,7 +34,6 @@ class DevicePing extends LnmsCommand
      */
     public function handle(DeviceIsPingable $deviceIsPingable): int
     {
-        $this->configureOutputOptions();
         $spec = $this->argument('device spec');
 
         if ($spec == 'fast') {

@@ -8,7 +8,7 @@ the WLED web interface.
 
 Leaving warning, critical, or recovery blank, will mean that severity/state is ignored.
 
-Using warning, critical, and recovery together can lead to unpredicatble
+Using warning, critical, and recovery together can lead to unpredictable
 results. Similarly best to only use this for very specific alerts/hosts given this
 transport can only communicate limited info.
 

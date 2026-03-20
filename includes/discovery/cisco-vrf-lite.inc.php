@@ -19,6 +19,7 @@ use App\Facades\LibrenmsConfig;
 
 if (LibrenmsConfig::get('enable_vrf_lite_cisco')) {
     $ids = [];
+    $tableVrf = [];
 
     // For the moment only will be cisco and the version 3
     if ($device['os_group'] == 'cisco' && $device['snmpver'] == 'v3') {
@@ -59,7 +60,7 @@ if (LibrenmsConfig::get('enable_vrf_lite_cisco')) {
         }
         unset($listIntance);
 
-        foreach ((array) $tableVrf as $context => $vrf) {
+        foreach ($tableVrf as $context => $vrf) {
             if (\LibreNMS\Util\Debug::isEnabled()) {
                 echo "\n[DEBUG]\nRelation:t" . $context . 't' . (array_key_exists('intance_name', $vrf) ? $vrf['intance_name'] : '') . 't' . (array_key_exists('vrf_name', $vrf) ? $vrf['vrf_name'] : '') . "\n[/DEBUG]\n";
             }
@@ -102,7 +103,7 @@ if (LibrenmsConfig::get('enable_vrf_lite_cisco')) {
     //Delete all vrf that changed
     foreach ($tmpVrfC as $vrfC) {
         if (! in_array($vrfC['vrf_lite_cisco_id'], $ids)) {
-            dbDelete('vrf_lite_cisco', 'vrf_lite_cisco_id = ? ', [$vrfC['vrf_lite_cisco_id']]);
+            \App\Models\VrfLite::where('vrf_lite_cisco_id', $vrfC['vrf_lite_cisco_id'])->delete();
         }
     }
     unset($ids);

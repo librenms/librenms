@@ -7,21 +7,14 @@ use App\Models\User;
 
 class CustomMapPolicy
 {
-    public function before(User $user): ?bool
-    {
-        if ($user->isAdmin()) {
-            return true;
-        }
-
-        return null;
-    }
+    use ChecksGlobalPermissions;
 
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasGlobalRead();
+        return $this->hasGlobalPermission($user, 'viewAny');
     }
 
     /**
@@ -29,7 +22,8 @@ class CustomMapPolicy
      */
     public function view(User $user, CustomMap $customMap): bool
     {
-        return $user->hasGlobalRead() || $customMap->hasReadAccess($user);
+        return $this->hasGlobalPermission($user, 'view')
+            || $customMap->hasReadAccess($user);
     }
 
     /**
@@ -37,7 +31,7 @@ class CustomMapPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $this->hasGlobalPermission($user, 'create');
     }
 
     /**
@@ -45,7 +39,7 @@ class CustomMapPolicy
      */
     public function update(User $user, CustomMap $customMap): bool
     {
-        return false;
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -53,22 +47,6 @@ class CustomMapPolicy
      */
     public function delete(User $user, CustomMap $customMap): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, CustomMap $customMap): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, CustomMap $customMap): bool
-    {
-        return false;
+        return $this->hasGlobalPermission($user, 'delete');
     }
 }

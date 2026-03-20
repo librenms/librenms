@@ -1,7 +1,7 @@
 --
 -- Accedian Enterprise Specific MIB
 --
--- Copyright (c) 2005-2011, Accedian Networks, Inc.
+-- Copyright (c) 2005-2016, Accedian Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -24,16 +24,32 @@ IMPORTS
 
 acdSa MODULE-IDENTITY
 
-    LAST-UPDATED "201112210100Z"
+    LAST-UPDATED "201609230100Z"
     ORGANIZATION "Accedian Networks, Inc."
     CONTACT-INFO
             "Accedian Technical Assistance Center
              Accedian Networks, Inc.
-             4878 Levy, suite 202
-             Saint-Laurent, Quebec Canada H4R 2P1
+             2351 Alfred-Nobel blvd., Suite N-410
+             Saint-Laurent, Quebec Canada H4S 2A9
              E-mail: support@accedian.com"
     DESCRIPTION
             "The Service Availability database for this Accedian Networks device."
+
+    REVISION "201609230100Z"        -- 23 September 2016
+    DESCRIPTION
+            "Add acdSaServiceHistCounterPeriodIndex
+             to acdSaServiceHistCounterGroup.
+             Add acdSaMetricHistCounterID and acdSaMetricHistCounterPeriodIndex
+             to acdSaMetricHistCounterGroup."
+
+    REVISION "201606160100Z"        -- 16 June 2016
+    DESCRIPTION
+            "Add invalid(4) value for AcdSaValidFlag syntax."
+
+    REVISION "201605260100Z"        -- 26 May 2016
+    DESCRIPTION
+            "Set access level to read-only for acdSaServiceHistCounterPeriodIndex,
+             acdSaMetricHistCounterID, acdSaMetricHistCounterPeriodIndex."
 
     REVISION "201112210100Z"        -- 21 Dec 2011
     DESCRIPTION
@@ -91,7 +107,8 @@ AcdSaValidFlag ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER {
                     valid(1),
                     adjusted(2),
-                    pending(3)
+                    pending(3),
+                    invalid(4)
     }
     
 AcdSaAdminStateFlag ::= TEXTUAL-CONVENTION
@@ -486,7 +503,7 @@ AcdSaServiceHistCounterEntry ::= SEQUENCE {
 
 acdSaServiceHistCounterPeriodIndex  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "An index that uniquely identifies the particular sample this entry
@@ -543,12 +560,11 @@ acdSaServiceHistCounterMaintTime  OBJECT-TYPE
     ::= { acdSaServiceHistCounterEntry 6 }
 
 acdSaServiceHistCounterAvailRatio  OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..100000000)
+    SYNTAX      Unsigned32 (0..100)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Indicates the availability ratio in millionth of a percent
-        (1,000,000 is 1%)."
+        "Indicates the availability ratio as a percentage."
     ::= { acdSaServiceHistCounterEntry 7 }
 
 
@@ -800,7 +816,7 @@ AcdSaMetricHistCounterEntry ::= SEQUENCE {
 
 acdSaMetricHistCounterID  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Unique value for each Metric instance. This value follows the
@@ -809,7 +825,7 @@ acdSaMetricHistCounterID  OBJECT-TYPE
 
 acdSaMetricHistCounterPeriodIndex  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "An index that uniquely identifies the particular sample this entry
@@ -1051,7 +1067,7 @@ acdSaServiceCounterGroup OBJECT-GROUP
 
 acdSaServiceHistCounterGroup OBJECT-GROUP
     OBJECTS {
-    
+        acdSaServiceHistCounterPeriodIndex,
         acdSaServiceHistCounterIntervalEnd,
         acdSaServiceHistCounterValidFlag,
         acdSaServiceHistCounterUpTime,
@@ -1098,7 +1114,8 @@ acdSaMetricCounterGroup OBJECT-GROUP
 
 acdSaMetricHistCounterGroup OBJECT-GROUP
     OBJECTS {
-    
+        acdSaMetricHistCounterID,
+        acdSaMetricHistCounterPeriodIndex,
         acdSaMetricHistCounterIntervalEnd,
         acdSaMetricHistCounterValidFlag,
         acdSaMetricHistCounterUaTime,

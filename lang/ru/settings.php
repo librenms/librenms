@@ -612,8 +612,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Учет',
+            'mac-accounting' => [
+                'description' => 'MAC Учет',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -1170,9 +1170,6 @@ return [
             'description' => 'Суффикс имени файла',
             'help' => 'Это очень важный момент, так как имена устройств в NfSen ограничены 21 символом. Это означает, что полные доменные имена для устройств могут быть проблематичными для втиснуть, поэтому этот фрагмент обычно удаляется.',
         ],
-        'nmap' => [
-            'description' => 'Путь к nmap',
-        ],
         'no_proxy' => [
             'description' => 'Исключения прокси',
             'help' => 'Установите это в качестве резервного варианта, если переменная окружения no_proxy недоступна. Список IP, хостов или доменов, которые следует игнорировать, разделенный запятыми.',
@@ -1270,9 +1267,6 @@ return [
             'description' => 'Плохие типы интерфейсов',
             'help' => 'Сетевой интерфейс IF-MIB:!:ifType, который следует игнорировать',
         ],
-        'ping' => [
-            'description' => 'Путь к ping',
-        ],
         'ping_rrd_step' => [
             'description' => 'Частота пинга',
             'help' => 'Как часто проверять. Устанавливает значение по умолчанию для всех узлов. Внимание! Если вы измените это, вам нужно будет внести дополнительные изменения. Ознакомьтесь с документацией по Fast Ping.',
@@ -1347,8 +1341,8 @@ return [
             'slas' => [
                 'description' => 'Отслеживание соглашений об уровне обслуживания',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Учет MAC Cisco',
+            'mac-accounting' => [
+                'description' => 'Учет MAC',
             ],
             'cipsec-tunnels' => [
                 'description' => 'Туннели Cipsec',
@@ -1564,7 +1558,7 @@ return [
                 'help' => 'Метод планирования задач обнаружения. Устаревший метод будет использовать cron, если запись crontab существует, и службу диспетчера, если устаревшая конфигурация service_discovery_enabled установлена в true.',
                 'options' => [
                     'legacy' => 'Устаревший (Без ограничений)',
-                    'cron' => 'Cron (discovery.php)',
+                    'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Служба диспетчера',
                 ],
             ],
@@ -1660,9 +1654,6 @@ return [
         'service_watchdog_log' => [
             'description' => 'Файл журнала для мониторинга',
             'help' => 'По умолчанию это файл журнала LibreNMS. Устанавливает значение по умолчанию для всех узлов.',
-        ],
-        'sfdp' => [
-            'description' => 'Путь к sfdp',
         ],
         'shorthost_target_length' => [
             'description' => 'Максимальная длина сокращенного имени хоста',
@@ -1887,9 +1878,6 @@ return [
         'device_location_map_show_device_dependencies' => [
             'description' => 'Показать зависимости устройств на карте местоположения',
             'help' => 'Показать связи между устройствами на карте местоположения на основе родительских зависимостей',
-        ],
-        'whois' => [
-            'description' => 'Путь к whois',
         ],
         'smokeping.integration' => [
             'description' => 'Включить',

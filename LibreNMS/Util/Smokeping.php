@@ -34,7 +34,7 @@ class Smokeping
 {
     private $files;
 
-    public function __construct(private Device $device)
+    public function __construct(private readonly Device $device)
     {
     }
 
@@ -51,7 +51,7 @@ class Smokeping
                 foreach (array_diff(scandir($dir), ['.', '..']) as $file) {
                     if (stripos($file, '.rrd') !== false) {
                         if (str_contains($file, '~')) {
-                            [$target, $slave] = explode('~', $this->filenameToHostname($file));
+                            [$target, $slave] = explode('~', (string) $this->filenameToHostname($file));
                             $this->files['in'][$target][$slave] = $file;
                             $this->files['out'][$slave][$target] = $file;
                         } else {

@@ -33,6 +33,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
@@ -110,11 +111,11 @@ class ArubaInstant extends OS implements
                 $description = sprintf('SSID %s Clients', $entry['AI-AP-MIB::aiSSID']);
                 $oids[] = $oid;
                 $total_clients += $entry['AI-AP-MIB::aiSSIDClientNum'];
-                $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', $index, $description, $entry['AI-AP-MIB::aiSSIDClientNum']);
+                $sensors[] = new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), $oid, 'aruba-instant', $index, $description, $entry['AI-AP-MIB::aiSSIDClientNum']);
             }
 
             // Total Clients across all SSIDs
-            $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oids, 'aruba-instant', 'total-clients', 'Total Clients', $total_clients);
+            $sensors[] = new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), $oids, 'aruba-instant', 'total-clients', 'Total Clients', $total_clients);
 
             // Clients Per Radio
             foreach ($client_num as $index => $entry) {
@@ -123,7 +124,7 @@ class ArubaInstant extends OS implements
                     $oid = '.1.3.6.1.4.1.14823.2.3.3.1.2.2.1.21.' . $mac->oid() . '.' . $radio;
                     $description = sprintf('%s Radio %s', $ap_data[$index]['AI-AP-MIB::aiAPSerialNum'], $radio);
                     $sensor_index = sprintf('%s.%s', $mac->hex(), $radio);
-                    $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', $sensor_index, $description, $value['AI-AP-MIB::aiRadioClientNum']);
+                    $sensors[] = new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), $oid, 'aruba-instant', $sensor_index, $description, $value['AI-AP-MIB::aiRadioClientNum']);
                 }
             }
         } else {
@@ -134,7 +135,7 @@ class ArubaInstant extends OS implements
             $total_clients = count($client_data);
             $oid = '.1.3.6.1.4.1.14823.2.3.3.1.2.4.1.1';
 
-            $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', 'total-clients', 'Total Clients', $total_clients);
+            $sensors[] = new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), $oid, 'aruba-instant', 'total-clients', 'Total Clients', $total_clients);
         }
 
         return $sensors;
@@ -155,7 +156,7 @@ class ArubaInstant extends OS implements
 
         $oid = '.1.3.6.1.4.1.14823.2.3.3.1.2.1.1.4';
 
-        $sensors[] = new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'aruba-instant', 'total-aps', 'Total APs', $total_aps);
+        $sensors[] = new WirelessSensor(WirelessSensorType::ApCount, $this->getDeviceId(), $oid, 'aruba-instant', 'total-aps', 'Total APs', $total_aps);
 
         return $sensors;
     }
@@ -175,7 +176,7 @@ class ArubaInstant extends OS implements
                 $mac = Mac::parse($aiRadioAPMACAddress);
 
                 return new WirelessSensor(
-                    'frequency',
+                    WirelessSensorType::Frequency,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.14823.2.3.3.1.2.2.1.4.' . $mac->oid() . '.' . $aiRadioIndex,
                     'aruba-instant',
@@ -201,7 +202,7 @@ class ArubaInstant extends OS implements
                 $mac = Mac::parse($aiRadioAPMACAddress);
 
                 return new WirelessSensor(
-                    'noise-floor',
+                    WirelessSensorType::NoiseFloor,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.14823.2.3.3.1.2.2.1.6.' . $mac->oid() . '.' . $aiRadioIndex,
                     'aruba-instant',
@@ -228,7 +229,7 @@ class ArubaInstant extends OS implements
                 $mac = Mac::parse($aiRadioAPMACAddress);
 
                 return new WirelessSensor(
-                    'power',
+                    WirelessSensorType::Power,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.14823.2.3.3.1.2.2.1.5.' . $mac->oid() . '.' . $aiRadioIndex,
                     'aruba-instant',
@@ -254,7 +255,7 @@ class ArubaInstant extends OS implements
                 $mac = Mac::parse($aiRadioAPMACAddress);
 
                 return new WirelessSensor(
-                    'utilization',
+                    WirelessSensorType::Utilization,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.14823.2.3.3.1.2.2.1.8.' . $mac->oid() . '.' . $aiRadioIndex,
                     'aruba-instant',
@@ -268,7 +269,7 @@ class ArubaInstant extends OS implements
     protected function decodeChannel($channel): int
     {
         // Trim off everything not a digit, like channel "116e"
-        $channel = Number::cast(preg_replace("/\D/", '', $channel));
+        $channel = Number::cast(preg_replace("/\D/", '', (string) $channel));
 
         return $channel & 255; // mask off the channel width information
     }
@@ -282,7 +283,7 @@ class ArubaInstant extends OS implements
      */
     public function pollWirelessFrequency(array $sensors)
     {
-        return $this->pollWirelessChannelAsFrequency($sensors, [$this, 'decodeChannel']);
+        return $this->pollWirelessChannelAsFrequency($sensors, $this->decodeChannel(...));
     }
 
     /**
@@ -365,7 +366,7 @@ class ArubaInstant extends OS implements
                 'entPhysicalClass' => 'other',
                 'entPhysicalContainedIn' => 1,
                 'entPhysicalSerialNum' => $entry['AI-AP-MIB::aiAPSerialNum'],
-                'entPhysicalModelName' => explode('::', $model, 2)[1] ?? $model,
+                'entPhysicalModelName' => explode('::', (string) $model, 2)[1] ?? $model,
                 'entPhysicalMfgName' => 'Aruba',
                 'entPhysicalVendorType' => 'accessPoint',
                 'entPhysicalSoftwareRev' => $this->getDevice()->version,

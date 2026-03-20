@@ -48,7 +48,7 @@ $sensors = [
 ];
 
 foreach ($sensors as $sensor) {
-    $temp = snmp_get($device, $sensor['state_name'] . '.0', '-Ovqe', 'ExaltComProducts');
+    $temp = SnmpQuery::get('ExaltComProducts::' . $sensor['state_name'] . '.0')->value();
     $cur_oid = $sensor['num_oid'];
 
     if (is_numeric($temp)) {

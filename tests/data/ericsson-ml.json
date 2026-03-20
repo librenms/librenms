@@ -2320,6 +2320,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2339,6 +2340,7 @@
                     "entPhysicalContainedIn": 40100,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2358,6 +2360,7 @@
                     "entPhysicalContainedIn": 40100,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Optech",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2377,6 +2380,7 @@
                     "entPhysicalContainedIn": 40100,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

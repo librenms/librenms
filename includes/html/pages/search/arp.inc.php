@@ -41,7 +41,7 @@ $device_id = (int) ($_POST['device_id'] ?? 0);
 $searchby = $_POST['searchby'] ?? 'ip';
 $searchPhrase = $_POST['searchPhrase'] ?? '';
 
-if (! Auth::user()->hasGlobalRead()) {
+if (Gate::denies('viewAny', \App\Models\Device::class)) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
     $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
@@ -82,7 +82,7 @@ if ($searchby == 'ip') {
                 "<div class=\"form-group\">"+
                 "<input type=\"text\" name=\"searchPhrase\" id=\"address\" value=\""+
 <?php
-echo '"' . htmlspecialchars($searchPhrase) . '"+';
+echo '"' . htmlspecialchars((string) $searchPhrase) . '"+';
 ?>
 
                 "\" class=\"form-control input-sm\" placeholder=\"Address\" />"+
@@ -96,8 +96,8 @@ echo '"' . htmlspecialchars($searchPhrase) . '"+';
         return {
             id: "arp-search",
             device_id: '<?php echo $device_id ?: 'null'; ?>',
-            searchby: '<?php echo htmlspecialchars($searchby); ?>',
-            searchPhrase: '<?php echo htmlspecialchars($searchPhrase); ?>'
+            searchby: '<?php echo htmlspecialchars((string) $searchby); ?>',
+            searchPhrase: '<?php echo htmlspecialchars((string) $searchPhrase); ?>'
         };
     },
     url: "ajax_table.php",

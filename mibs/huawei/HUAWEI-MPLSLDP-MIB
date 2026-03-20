@@ -1,9 +1,9 @@
 -- ===================================================================
--- Copyright (C) 2014 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: This MIB contains private managed object and notification 
 --              trap definitions for MPLS LDP.
 -- Reference:
--- Version: V2.46
+-- Version: V3.08
 -- ===================================================================
 
 
@@ -32,7 +32,7 @@
     
     
         hwMplsLdp MODULE-IDENTITY 
-            LAST-UPDATED "201411061640Z"        -- Nov 6, 2014 at 16:40:00 GMT            
+            LAST-UPDATED "202206062000Z"        -- June 6, 2022 at 20:00:00 GMT           
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -46,9 +46,60 @@
             DESCRIPTION 
                 "This MIB contains private managed object and notification trap 
                 definitions for MPLS LDP."
+
 --
 -- Revision history
--- 
+--
+        REVISION    "202206062000Z"   
+        DESCRIPTION "V3.08, modify hwLdpLastLocalAdjDownEntry index"
+
+        REVISION    "202205262000Z"   
+        DESCRIPTION "V3.07, modify hwMplsLdpLastLocalAdjDownClear"
+
+        REVISION    "202205262000Z"   
+        DESCRIPTION "V3.06, add hwMplsLdpLastLocalAdjDown and hwMplsLdpLastLocalAdjDownClear"
+
+        REVISION    "202202192000Z"   
+        DESCRIPTION "V3.05, add hwMplsLdpSessionDownReason object type."
+
+        REVISION    "202201202000Z"   
+        DESCRIPTION "V3.04, add hwMplsLdpSessionDownReason object type configICCP(32)."
+
+        REVISION    "202112162000Z"   
+        DESCRIPTION "V3.03, delete hwMplsLdpSessionDownReason object type configICCP(32)."
+
+        REVISION    "202112151638Z"   
+        DESCRIPTION "V3.02, modify description of hwLdpPeerMd5Type, hwLdpVpnPeerMd5Type."
+
+        REVISION    "202111112000Z"   
+        DESCRIPTION "V3.01, add hwMplsLdpSessionDownReason object type configICCP(32)."
+
+        REVISION    "202102182000Z"   
+        DESCRIPTION "V3.00, add and modify hwMplsLdpMappingCountExceed and hwMplsLdpMappingCountExceedClear."
+        
+        REVISION    "202102042000Z"   
+        DESCRIPTION "V2.52, add hwMplsLdpPeerAddressCountExceed and hwMplsLdpPeerAddressCountExceedClear."
+        
+        REVISION    "201908141800Z"   
+        DESCRIPTION "V2.51, add hwMplsLdpSessionDownReason object type rlfaIidDel(31)."
+
+        REVISION    "201810101810Z"   
+        DESCRIPTION "V2.50, modify description of hwLdpVpnTable,hwLdpRemoteEntityTable,hwLdpPeerTable,hwLdpInterfaceTable,hwMplsLdpSessionStateTable."
+
+        REVISION    "201809211810Z"   
+        DESCRIPTION "V2.49, modify description of hwMplsFrrLspTrigger,hwMplsVpnFrrLspTrigger,hwLdpPeerOutBoundPolicyRange,hwLdpPeerOutBoundPolicyBgpRange,
+             hwLdpPeerInBoundPolicyRange,hwLdpVpnPeerMd5Type,hwLdpPeerGroupOutBoundRange,hwLdpPeerGroupOutBoundBgpRange,hwLdpPeerGroupInBoundRange,
+             hwLdpOutBoundPolicyPeerAllRange,hwLdpOutBoundPolicyPeerAllBgpRange,hwLdpInBoundPolicyPeerAllRange,hwLdpLspDownReason."
+
+
+        REVISION    "201711231800Z"   
+        DESCRIPTION "V2.48, modify description of hwMplsLdpSessionTable."
+
+
+         REVISION    "201709211800Z"   
+        DESCRIPTION "V2.47, add  hwMplsLdpMultiLinkCfgInconsistent and hwMplsLdpMultiLinkCfgInconsistentClear, and add table hwLdpMultiLinkCfgTable include objects belong to it."
+
+	
         REVISION    "201411061640Z"   
         DESCRIPTION "V2.46, delete LDP GR timer  range's validity check, include hwLdpGrNeighborLivenessTimer,hwLdpGrReconnectTimer,hwLdpGrRecoveryTimer."
 
@@ -199,9 +250,7 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This object is used to display the session parameters and session age.
-                 The index of this table is hwMplsLdpSessionPeerLsrId.
-                "
+                "This table describes LDP session parameters, including the index of an interface of a session, the cause for a session Down event, and time elapsed since a session was established."
             ::= { hwMplsLdpInfo 7 }
         
         hwMplsLdpSessionEntry OBJECT-TYPE
@@ -276,7 +325,13 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
                 modifyLocalLsrID(27),
                 modifyP2MP(28),
                 modifyMP2MP(29),
-                sessionProtectTimerExp(30)
+                sessionProtectTimerExp(30),
+                rlfaIidDel(31),
+                excessiveMessagesReceived(32),
+                configICCP(33),
+                packetSendReceiveError(34),
+                socketSetOptError(35),
+                receiveSocketClose(36)
                 }
             MAX-ACCESS accessible-for-notify
             STATUS current
@@ -314,6 +369,12 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
                  29. modifyP2MP(28)               -indicates that the mLDP P2MP was modified.
                  30. modifyMP2MP(29)            -indicates that the mLDP MP2MP was modified.
                  31. sessionProtectTimerExp(30)        -indicates that the session protection timer expired.
+                 32. rlfaIidDel(31)        -indicates that IGP deleted the RLFA IID.
+                 33. excessiveMessagesReceived(32)       -indicates Excessive messages were received.
+                 34. configICCP(33)       -indicates that the ICCP was configured.
+                 35. packetSendReceiveError(34)       -indicates that LDP cannot send or receive packets successfully.
+                 36. socketSetOptError(35)       -indicates that LDP cannot set the socket option successfully.
+                 37. receiveSocketClose(36)       -indicates that LDP received a socket close message.
                 "
             ::= { hwMplsLdpSessionEntry 3 }        
         
@@ -333,9 +394,7 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This object is used to display the detailed state parameters of the session.
-                 The index of this table is hwMplsLdpSessionPeerId.
-                "
+                "This object is used to display the detailed state parameters of the session."
             ::= { hwMplsLdpInfo 8 }
         
         hwMplsLdpSessionStateEntry OBJECT-TYPE
@@ -724,13 +783,13 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "This object indicates the way to configure the LDP policy of global instance for LDP Auto FRR.
+                 If the object is set as ipprefix, the value of hwMplsFrrLspTriggerIpPrefix must be set together.
+                 Default: host
                  Options:
                  1. all(1)      -indicates that all FECs are triggered for the IGP.
                  2. none(2)     -indicates that no FEC is triggered for the IGP.
                  3. host(3)     -indicates that the host FEC is triggered for the IGP.
-                 4. ipprefix(4) -indicates that the ip-prefix list is triggered for the IGP. 
-                                 If the object is set as ipprefix, the value of hwMplsFrrLspTriggerIpPrefix must be set together.
-                 Default: host
+                 4. ipprefix(4) -indicates that the ip-prefix list is triggered for the IGP.                 
                 "
             ::= { hwMplsLdpInfo 26 }  
             
@@ -800,7 +859,6 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "This object is used to configure or delete the LDP multi-instance.
-                 The index of this table is hwLdpVpnInstanceId.
                  Make sure the relevant VPN instance is already created.
                 "
             ::= { hwMplsLdpInfo 50 }
@@ -899,12 +957,12 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "This object indicates the way to configure the LDP policy of vpn instance for LDP Auto FRR.
+                 If the object is set as ipprefix, the value of hwMplsVpnFrrLspTriggerIpPrefix must be set together.
                  Options:
                  1. all(1)      -indicates that all FECs are triggered for the IGP.
                  2. none(2)     -indicates that no FEC is triggered for the IGP.
                  3. host(3)     -indicates that the host FEC is triggered for the IGP.
-                 4. ipprefix(4) -indicates that the ip-prefix list is triggered for the IGP. 
-                                 If the object is set as ipprefix, the value of hwMplsVpnFrrLspTriggerIpPrefix must be set together.
+                 4. ipprefix(4) -indicates that the ip-prefix list is triggered for the IGP.                  
                 "
             ::= { hwLdpVpnEntry 14 }
              
@@ -956,9 +1014,7 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This object is used to configure or delete the LDP remote peer.
-                 The index of this table is hwLdpRemoteName.
-                "
+                "This object is used to configure or delete the LDP remote peer."
             ::= { hwMplsLdpInfo 51 }
         
         hwLdpRemoteEntityEntry OBJECT-TYPE
@@ -1161,9 +1217,7 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This object is used to configure the LDP peer.
-                 The index of this table is hwLdpPeerLsrId.
-                "
+                "This object is used to configure the LDP peer."
             ::= { hwMplsLdpInfo 52 }
         
         hwLdpPeerEntry OBJECT-TYPE
@@ -1230,7 +1284,7 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "This object indicates the Md5 type.
+                "This object indicates the Md5 type. MD5 is an insecure algorithm and is not recommended.
                  Options:
                  1. cipher(1) -indicates that the MD5 password is in cipher text mode.
                  2. plain(2)  -indicates that the MD5 password is in plain text mode.
@@ -1306,7 +1360,13 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "This object indicates the range of IGP routes for an outbound policy. The default value is clear. 
-                 If the object is set as ipprefix, the value of hwLdpPeerOutBoundPolicyFecIpPrefix must be set together."
+                 If the object is set as ipprefix, the value of hwLdpPeerOutBoundPolicyFecIpPrefix must be set together.
+                 Options:
+                 1. clear(1)      -This policy is disabled by default. 
+                 2. none(2)     -The policy filters out all FECs.
+                 3. ipprefix(3)     -The policy allows FECs only in a specified IP prefix to pass through.
+                 4. host(4)     -The policy allows FECs only of host routes to pass through.   
+                 "
             ::= { hwLdpPeerEntry 19 }
             
         hwLdpPeerOutBoundPolicyFecIpPrefix OBJECT-TYPE
@@ -1329,7 +1389,12 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "This object indicates the range of BGP routes for an outbound policy. The default value is clear. 
-                 If the object is set as ipprefix, the value of hwLdpPeerOutBoundPolicyBgpIpPrefix must be set together."
+                 If the object is set as ipprefix, the value of hwLdpPeerOutBoundPolicyBgpIpPrefix must be set together.
+                 Options:
+                 1. clear(1)      -This policy is disabled by default. 
+                 2. none(2)     -The policy filters out all FECs.
+                 3. ipprefix(3)    -The policy allows FECs only in a specified IP prefix to pass through.                       
+                 "
             ::= { hwLdpPeerEntry 21 }   
         
         hwLdpPeerOutBoundPolicyBgpIpPrefix OBJECT-TYPE
@@ -1353,7 +1418,13 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "This object indicates the route range for the inbound policy. The default value is clear. 
-                 If the object is set as ipprefix, the value of hwLdpPeerInBoundPolicyFecIpPrefix must be set together."
+                 If the object is set as ipprefix, the value of hwLdpPeerInBoundPolicyFecIpPrefix must be set together.
+                 Options:
+                 1. clear(1)      -This policy is disabled by default. 
+                 2. none(2)     -The policy filters out all FECs.
+                 3. ipprefix(3)     -The policy allows FECs only in a specified IP prefix to pass through.
+                 4. host(4)     -The policy allows FECs only of host routes to pass through.
+                 "
             ::= { hwLdpPeerEntry 23 }
         
         hwLdpPeerInBoundPolicyFecIpPrefix OBJECT-TYPE
@@ -1384,7 +1455,6 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "This table is used to create and delete peer configurations in the LDP multi-instance.
-                 The indexs of this table are hwLdpVpnInstanceId, hwLdpVpnPeerLsrId.
                  Make sure the corresponding LDP VPN-instance is already created in hwLdpVpnTable.
                 "
             ::= { hwMplsLdpInfo 53 }
@@ -1440,7 +1510,8 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "This object indicates the Md5 type.
+                "This object indicates the Md5 type. MD5 is an insecure algorithm and is not recommended.
+                 Options:
                  1. cipher(1) -indicates that the MD5 password is in cipher text mode.
                  2. plain(2)  -indicates that the MD5 password is in plain text mode.
                  3. null(3)   -indicates that the MD5 type is null, which means that the MD5 authentication is not configured for the LDP peer. 
@@ -1511,9 +1582,7 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "This table is used to configure or delete the LDP capability on the interface.
-                 The index of this table is hwLdpInterfaceIndex.
-                "
+                "This table is used to configure or delete the LDP capability on the interface."
             ::= { hwMplsLdpInfo 54 }
         
         hwLdpInterfaceEntry OBJECT-TYPE
@@ -1748,7 +1817,13 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "This object indicates the range of IGP routes for an outbound policy. 
-                 The default value is clear. If the object is set as ipprefix, the value of hwLdpPeerGroupOutBoundFecIpPrefix must be set together."
+                 The default value is clear. If the object is set as ipprefix, the value of hwLdpPeerGroupOutBoundFecIpPrefix must be set together.
+                 Options:
+                 1. clear(1)      -This policy is disabled by default. 
+                 2. none(2)     -The policy filters out all FECs.
+                 3. ipprefix(3)     -The policy allows FECs only in a specified IP prefix to pass through.
+                 4. host(4)     -The policy allows FECs only of host routes to pass through.
+                 "
             ::= { hwLdpPeerGroupEntry 11 }
              
         hwLdpPeerGroupOutBoundFecIpPrefix OBJECT-TYPE
@@ -1771,7 +1846,12 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "This object indicates the range of BGP routes for an outbound policy. The default value is clear. 
-                 If the object is set as ipprefix, the value of hwLdpPeerGroupOutBoundBgpIpPrefix must be set together."
+                 If the object is set as ipprefix, the value of hwLdpPeerGroupOutBoundBgpIpPrefix must be set together.
+                 Options:
+                 1. clear(1)      -This policy is disabled by default. 
+                 2. none(2)     -The policy filters out all FECs.
+                 3. ipprefix(3)     -The policy allows FECs only in a specified IP prefix to pass through.
+                 "
             ::= { hwLdpPeerGroupEntry 13 }
              
         hwLdpPeerGroupOutBoundBgpIpPrefix OBJECT-TYPE
@@ -1795,7 +1875,13 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "This object indicates the route range for an inbound policy. The default value is clear. 
-                 If the object is set as ipprefix, the value of hwLdpPeerGroupInBoundIpPrefix must be set together."
+                 If the object is set as ipprefix, the value of hwLdpPeerGroupInBoundIpPrefix must be set together.
+                 Options:
+                 1. clear(1)      -This policy is disabled by default. 
+                 2. none(2)     -The policy filters out all FECs.
+                 3. ipprefix(3)     -The policy allows FECs only in a specified IP prefix to pass through.
+                 4. host(4)     -The policy allows FECs only of host routes to pass through. 
+                 "
             ::= { hwLdpPeerGroupEntry 15 }
              
         hwLdpPeerGroupInBoundIpPrefix OBJECT-TYPE
@@ -1827,7 +1913,13 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "This object indicates the range of IGP routes for a global outbound LDP policy. The default value is all.
-                 If the object is set as ipprefix, the value of hwLdpOutBoundPolicyPeerAllFecIpPrefix  must be set together."
+                 If the object is set as ipprefix, the value of hwLdpOutBoundPolicyPeerAllFecIpPrefix  must be set together.
+                 Options:
+                 1. all(1)      -The default policy allows all LDP peers.
+                 2. none(2)     -The policy filters out all FECs.
+                 3. ipprefix(3)     -The policy allows FECs only in a specified IP prefix to pass through.
+                 4. host(4)     -The policy allows FECs only of host routes to pass through. 
+                 "
             ::= { hwMplsLdpInfo 59 }
         -- 1.3.6.1.4.1.2011.5.25.143.1.60    
         hwLdpOutBoundPolicyPeerAllFecIpPrefix  OBJECT-TYPE
@@ -1850,7 +1942,12 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "This object indicates the range of BGP routes for a global outbound LDP policy. The default value is all.
-                 If the object is set as ipprefix, the value of hwLdpOutBoundPolicyPeerAllBgpIpPrefix must be set together."
+                 If the object is set as ipprefix, the value of hwLdpOutBoundPolicyPeerAllBgpIpPrefix must be set together.
+                 Options:
+                 1. all(1)      -The default policy allows all LDP peers.
+                 2. none(2)     -The policy filters out all FECs.
+                 3. ipprefix(3)     -The policy allows FECs only in a specified IP prefix to pass through.
+                 "
 
             ::= { hwMplsLdpInfo 61 }
         -- 1.3.6.1.4.1.2011.5.25.143.1.62    
@@ -1875,7 +1972,13 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "This object indicates the range of routes for a global inbound LDP policy. The default value is all.
-                 If the object is set as ipprefix, the value of hwLdpInBoundPolicyPeerAllIpPrefix must be set together."
+                 If the object is set as ipprefix, the value of hwLdpInBoundPolicyPeerAllIpPrefix must be set together.
+                 Options:
+                 1. all(1)      -The default policy allows all LDP peers.
+                 2. none(2)     -The policy filters out all FECs.
+                 3. ipprefix(3)     -The policy allows FECs only in a specified IP prefix to pass through.
+                 4. host(4)     -The policy allows FECs only of host routes to pass through.
+                 "
             ::= { hwMplsLdpInfo 63 }
         -- 1.3.6.1.4.1.2011.5.25.143.1.64    
         hwLdpInBoundPolicyPeerAllIpPrefix   OBJECT-TYPE
@@ -1924,8 +2027,8 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
                 "The LDP LSP down reason. 
                  Options:
                  1. other(1)                     -indicates other reasons.
-                 2. session down(2)   		 -indicates the ldp session went down.
-                 3. route change(3)   		 -indicates the route changed.
+                 2. session down(2)              -indicates the ldp session went down.
+                 3. route change(3)              -indicates the route changed.
                  4. cannot recovery from GR(4)   -indicates LSP cannot recovery from graceful-restart.
                  5. policy change(5)             -indicates the policy changed.
                 "
@@ -2013,6 +2116,301 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
                 "This object indicates the total number of LDP operational sessions."
             ::= { hwLdpSessionStatistics 4 } 
  
+           hwLdpMultiLinkCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLdpMultiLinkCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates that MPLS LDP multi-link (include local and remote coexist) configurations are inconsistent.
+                 The index of this entry is hwMplsLdpVrfIndex,hwMplsLdpPeerLdpId,hwMplsLdpLocalLdpId,hwMplsLdpConfigIfIndex, hwMplsLdpConfigRemotePeerIP and hwMplsLdpConfigType.
+                "
+            ::= { hwMplsLdpInfo 74 }
+        
+        hwLdpMultiLinkCfgEntry OBJECT-TYPE
+            SYNTAX HwLdpMultiLinkCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates that MPLS LDP multi-link (include local and remote coexist) configurations are inconsistent.
+                 The index of this entry is hwMplsLdpVrfIndex,hwMplsLdpPeerLdpId,hwMplsLdpLocalLdpId,hwMplsLdpConfigIfIndex, hwMplsLdpConfigRemotePeerIP and hwMplsLdpConfigType.
+                "
+            INDEX { hwMplsLdpVrfIndex, hwMplsLdpPeerLdpId, hwMplsLdpLocalLdpId, hwMplsLdpConfigIfIndex, hwMplsLdpConfigRemotePeerIP, hwMplsLdpConfigType }
+            ::= { hwLdpMultiLinkCfgTable 1 }
+        
+        HwLdpMultiLinkCfgEntry ::=
+            SEQUENCE { 
+                hwMplsLdpVrfIndex
+                    Integer32,
+                hwMplsLdpPeerLdpId
+                    MplsLdpIdentifier,
+                hwMplsLdpLocalLdpId
+                    MplsLdpIdentifier,
+                hwMplsLdpConfigIfIndex
+                    Integer32,
+                hwMplsLdpConfigRemotePeerIP
+                    InetAddress,
+                hwMplsLdpConfigType
+                   OCTET STRING,
+                hwMplsLdpConsistentState
+                    INTEGER,
+                hwMplsLdpEffectKeepAlive
+                    Integer32,
+                hwMplsLdpEffectTransportAddr
+                    InetAddress,
+                hwMplsLdpEffectLabelAdvertisementMode
+                    OCTET STRING
+             }
+ 
+        hwMplsLdpVrfIndex OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS  not-accessible
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the vrfIndex."
+            ::= { hwLdpMultiLinkCfgEntry 1 }
+            
+        hwMplsLdpPeerLdpId OBJECT-TYPE
+            SYNTAX        MplsLdpIdentifier
+            MAX-ACCESS    not-accessible
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the peer LDP ID."
+            ::= { hwLdpMultiLinkCfgEntry 2 }
+            
+        hwMplsLdpLocalLdpId OBJECT-TYPE
+            SYNTAX        MplsLdpIdentifier
+            MAX-ACCESS    not-accessible
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the local LDP ID."
+            ::= { hwLdpMultiLinkCfgEntry 3 } 
+            
+        hwMplsLdpConfigIfIndex OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS    not-accessible
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the inconsistent interface."
+            ::= { hwLdpMultiLinkCfgEntry 4}
+ 
+         hwMplsLdpConfigRemotePeerIP  OBJECT-TYPE
+            SYNTAX        InetAddress
+            MAX-ACCESS    not-accessible
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the rempte ip.
+                 Range: 1-32 characters"
+            ::= { hwLdpMultiLinkCfgEntry 5}
+
+        hwMplsLdpConfigType OBJECT-TYPE
+            SYNTAX      OCTET STRING
+            MAX-ACCESS    not-accessible
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the inconsistent configuration type."
+            ::= { hwLdpMultiLinkCfgEntry 6 }
+            
+       hwMplsLdpConsistentState OBJECT-TYPE
+            SYNTAX      INTEGER {
+                       consistent(1),
+                       inconsistent(2)
+                    }
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the the state is inconsistent or consistent."
+            ::= { hwLdpMultiLinkCfgEntry 7 }
+            
+        hwMplsLdpEffectKeepAlive OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the value of effect keepalive time."
+            ::= { hwLdpMultiLinkCfgEntry 8 } 
+            
+        hwMplsLdpEffectTransportAddr OBJECT-TYPE
+            SYNTAX        InetAddress
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the value of effect transport address."
+            ::= { hwLdpMultiLinkCfgEntry 9 }
+            
+        hwMplsLdpEffectLabelAdvertisementMode OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the value of effect label advertisement mode."
+            ::= { hwLdpMultiLinkCfgEntry 10}
+
+       hwLdpPeerAddressTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwLdpPeerAddressEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates that peer address count has exceeded the total count.
+             The index of this entry is hwLdpPeerAddressLsrId and hwLdpPeerVrfIndex.
+            "
+        ::= { hwMplsLdpInfo 75 }
+
+        hwLdpPeerAddressEntry OBJECT-TYPE
+            SYNTAX HwLdpPeerAddressEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates that peer address count has exceeded the total count.
+                 The index of this entry is hwLdpPeerAddressLsrId and hwLdpPeerVrfIndex.
+                "
+            INDEX { hwLdpPeerAddressLsrId, hwLdpPeerVrfIndex }
+            ::= { hwLdpPeerAddressTable 1 }
+
+        HwLdpPeerAddressEntry ::=
+            SEQUENCE { 
+                hwLdpPeerAddressLsrId
+                    MplsLdpIdentifier,
+                hwLdpPeerVrfIndex
+                    Integer32,
+                hwLdpAddressTotalCount
+                    Integer32
+             }
+
+        hwLdpPeerAddressLsrId OBJECT-TYPE
+            SYNTAX        MplsLdpIdentifier
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates peer LSR ID."
+            ::= { hwLdpPeerAddressEntry 1 }
+
+        hwLdpPeerVrfIndex OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS  accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the vrfIndex."
+            ::= { hwLdpPeerAddressEntry 2 }
+
+        hwLdpAddressTotalCount OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS  accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The value of this object identifies the maximum number of peer address."
+            ::= { hwLdpPeerAddressEntry 3 }
+
+       hwLdpMappingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwLdpMappingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates that mapping count has exceeded the total count.
+             The index of this entry is hwLdpMappingType and hwLdpVrfIndex.
+            "
+        ::= { hwMplsLdpInfo 76 }
+
+        hwLdpMappingEntry OBJECT-TYPE
+            SYNTAX HwLdpMappingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates that mapping count has exceeded the total count.
+                 The index of this entry is hwLdpMappingType and hwLdpVrfIndex.
+                "
+            INDEX { hwLdpMappingType, hwLdpVrfIndex }
+            ::= { hwLdpMappingTable 1 }
+
+        HwLdpMappingEntry ::=
+            SEQUENCE { 
+                hwLdpMappingType
+                    OCTET STRING,
+                hwLdpVrfIndex
+                    Integer32,
+                hwLdpMappingTotalCount
+                    Integer32
+             }
+
+        hwLdpMappingType OBJECT-TYPE
+            SYNTAX        OCTET STRING
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "sent         -Indicates that the sent mapping.
+                received         -Indicates that the received mapping. "
+            ::= { hwLdpMappingEntry 1 }
+
+        hwLdpVrfIndex OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS  accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the vrfIndex."
+            ::= { hwLdpMappingEntry 2 }
+
+        hwLdpMappingTotalCount OBJECT-TYPE
+            SYNTAX        Integer32
+            MAX-ACCESS  accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "The value of this object identifies the maximum number of mapping count."
+            ::= { hwLdpMappingEntry 3 }
+
+    hwLdpLastLocalAdjDownTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwLdpLastLocalAdjDownEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates that the last local adjacency in the local-and-remote LDP session went Down due to hello timeout.
+             The index of this entry is hwLdpVrfName, hwLdpAdjPeerLsrId.
+            "
+        ::= { hwMplsLdpInfo 77 }
+
+        hwLdpLastLocalAdjDownEntry OBJECT-TYPE
+            SYNTAX HwLdpLastLocalAdjDownEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the last local adjacency in the local-and-remote LDP session went Down due to hello timeout.
+                 The index of this entry is hwLdpVrfName, hwLdpAdjPeerLsrId.
+                "
+            INDEX { hwLdpVrfName, hwLdpAdjPeerLsrId }
+            ::= { hwLdpLastLocalAdjDownTable 1 }
+
+        HwLdpLastLocalAdjDownEntry ::=
+            SEQUENCE { 
+                hwLdpVrfName
+                    OCTET STRING,
+                hwLdpAdjPeerLsrId
+                    MplsLdpIdentifier,
+                hwLdpInterfaceName
+                    OCTET STRING
+             }
+
+        hwLdpVrfName OBJECT-TYPE
+            SYNTAX        OCTET STRING
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the VRF name."
+            ::= { hwLdpLastLocalAdjDownEntry 1 }
+
+        hwLdpAdjPeerLsrId OBJECT-TYPE
+            SYNTAX        MplsLdpIdentifier
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the LSR ID of the LDP peer."
+            ::= { hwLdpLastLocalAdjDownEntry 2 }
+
+        hwLdpInterfaceName OBJECT-TYPE
+            SYNTAX        OCTET STRING
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "This object indicates the interface name."
+            ::= { hwLdpLastLocalAdjDownEntry 3 }
+
         hwMplsLdpTrap OBJECT IDENTIFIER ::= { hwMplsLdp 2 }
         
         hwMplsLdpSessionDown NOTIFICATION-TYPE
@@ -2044,6 +2442,62 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             DESCRIPTION 
                 "A trap is sent when all the ingress lsp of a specified FEC went down."
             ::= { hwMplsLdpTrap 4 }
+
+        hwMplsLdpMultiLinkCfgInconsistent NOTIFICATION-TYPE
+            OBJECTS { hwMplsLdpConsistentState, hwMplsLdpEffectKeepAlive, hwMplsLdpEffectTransportAddr, hwMplsLdpEffectLabelAdvertisementMode }
+            STATUS current
+            DESCRIPTION 
+                "Indicates that MPLS LDP multi-link configurations are Inconsistent."
+            ::= { hwMplsLdpTrap 5 }
+
+        hwMplsLdpMultiLinkCfgInconsistentClear NOTIFICATION-TYPE
+            OBJECTS { hwMplsLdpConsistentState, hwMplsLdpEffectKeepAlive, hwMplsLdpEffectTransportAddr, hwMplsLdpEffectLabelAdvertisementMode }
+            STATUS current
+            DESCRIPTION 
+                "Indicates that MPLS LDP multi-link configurations are consistent."
+            ::= { hwMplsLdpTrap 6 }
+
+        hwMplsLdpPeerAddressCountExceed NOTIFICATION-TYPE
+            OBJECTS { hwLdpPeerAddressLsrId, hwLdpPeerVrfIndex, hwLdpAddressTotalCount }
+            STATUS current
+            DESCRIPTION 
+                "Indicates that peer address count reaches the upper limit."
+            ::= { hwMplsLdpTrap 7 }
+
+        hwMplsLdpPeerAddressCountExceedClear NOTIFICATION-TYPE
+            OBJECTS { hwLdpPeerAddressLsrId, hwLdpPeerVrfIndex }
+            STATUS current
+            DESCRIPTION 
+                "Indicates that peer address count falls from the upper limit."
+            ::= { hwMplsLdpTrap 8 }
+
+        hwMplsLdpMappingCountExceed NOTIFICATION-TYPE
+            OBJECTS { hwLdpMappingType, hwLdpVrfIndex, hwLdpMappingTotalCount }
+            STATUS current
+            DESCRIPTION 
+                "Indicates that the number of LDP label mapping sent or received on the device exceeded the upper limit."
+            ::= { hwMplsLdpTrap 9 }
+
+        hwMplsLdpMappingCountExceedClear NOTIFICATION-TYPE
+            OBJECTS { hwLdpMappingType, hwLdpVrfIndex }
+            STATUS current
+            DESCRIPTION 
+                "Indicates that the number of LDP label mapping sent or received on the device falls from the upper limit."
+            ::= { hwMplsLdpTrap 10 }
+
+        hwMplsLdpLastLocalAdjDown NOTIFICATION-TYPE
+            OBJECTS { hwLdpVrfName, hwLdpAdjPeerLsrId, hwLdpInterfaceName }
+            STATUS current
+            DESCRIPTION 
+                "The last local adjacency in the local-and-remote LDP session went Down due to hello timeout."
+            ::= { hwMplsLdpTrap 11 }
+
+        hwMplsLdpLastLocalAdjDownClear NOTIFICATION-TYPE
+            OBJECTS { hwLdpVrfName, hwLdpAdjPeerLsrId }
+            STATUS current
+            DESCRIPTION 
+                "A local adjacency is established, and the alarm is cleared."
+            ::= { hwMplsLdpTrap 12 }
 
         hwMplsLdpConformance OBJECT IDENTIFIER ::= { hwMplsLdp 3 }
         
@@ -2174,7 +2628,64 @@ hwLdpPeerGroupOutBoundBgpIpPrefix, hwLdpPeerGroupInBoundRange, hwLdpPeerGroupInB
             STATUS current
             DESCRIPTION
                 "Information about Ldp Session Statistics."
-            ::= { hwMplsLdpGroup 17}  
+            ::= { hwMplsLdpGroup 17} 
+
+        hwMplsLdpMultiLinkCfgGroup OBJECT-GROUP
+            OBJECTS {  hwMplsLdpConsistentState, hwMplsLdpEffectKeepAlive, hwMplsLdpEffectTransportAddr, hwMplsLdpEffectLabelAdvertisementMode }
+            STATUS current
+            DESCRIPTION
+                "Information about MPLS LDP multi-link configurations."
+            ::= { hwMplsLdpGroup 18} 
+
+         hwMplsLdpMultiLinkCfgNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMplsLdpMultiLinkCfgInconsistent,  hwMplsLdpMultiLinkCfgInconsistentClear}
+            STATUS current
+            DESCRIPTION 
+                "Information about MPLS LDP multi-link configurations."
+            ::= { hwMplsLdpGroup 19 }
+
+         hwMplsLdpPeerAddressGroup OBJECT-GROUP
+            OBJECTS { hwLdpPeerAddressLsrId, hwLdpPeerVrfIndex, hwLdpAddressTotalCount}
+            STATUS current
+            DESCRIPTION 
+                "Information about MPLS LDP peer address."
+            ::= { hwMplsLdpGroup 20 }
+            
+         hwMplsLdpPeerAddressTotalCountNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMplsLdpPeerAddressCountExceed, hwMplsLdpPeerAddressCountExceedClear}
+            STATUS current
+            DESCRIPTION 
+                "Information about MPLS LDP peer address notification."
+            ::= { hwMplsLdpGroup 21 }
+            
+         hwMplsLdpMappingCountGroup OBJECT-GROUP
+            OBJECTS { hwLdpMappingType, hwLdpVrfIndex, hwLdpMappingTotalCount}
+            STATUS current
+            DESCRIPTION 
+                "Information about MPLS LDP mapping count."
+            ::= { hwMplsLdpGroup 22 }
+            
+         hwMplsLdpMappingCountNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMplsLdpMappingCountExceed, hwMplsLdpMappingCountExceedClear}
+            STATUS current
+            DESCRIPTION 
+                "Information about MPLS LDP mapping count notification."
+            ::= { hwMplsLdpGroup 23 }
+        
+        hwMplsLdpLastLocalAdjDownGroup OBJECT-GROUP
+            OBJECTS { hwLdpVrfName, hwLdpAdjPeerLsrId, hwLdpInterfaceName}
+            STATUS current
+            DESCRIPTION 
+                "Information about MPLS LDP last local adjacency."
+            ::= { hwMplsLdpGroup 24 }
+
+        hwMplsLdpLastLocalAdjDownNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMplsLdpLastLocalAdjDown, hwMplsLdpLastLocalAdjDownClear}
+            STATUS current
+            DESCRIPTION 
+                "Information about MPLS LDP last local adjacency notification."
+            ::= { hwMplsLdpGroup 25 }
+
     END
 
 --

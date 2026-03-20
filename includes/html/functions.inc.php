@@ -13,7 +13,10 @@
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
+use App\Models\Bill;
+use App\Models\Device;
 use App\Models\Port;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -23,26 +26,26 @@ function toner2colour($descr, $percent)
 {
     $colour = \LibreNMS\Util\Color::percentage(100 - $percent, null);
 
-    if (str_ends_with($descr, 'C') || stripos($descr, 'cyan') !== false) {
+    if (str_ends_with((string) $descr, 'C') || stripos((string) $descr, 'cyan') !== false) {
         $colour['left'] = '55D6D3';
         $colour['right'] = '33B4B1';
     }
 
-    if (str_ends_with($descr, 'M') || stripos($descr, 'magenta') !== false) {
+    if (str_ends_with((string) $descr, 'M') || stripos((string) $descr, 'magenta') !== false) {
         $colour['left'] = 'F24AC8';
         $colour['right'] = 'D028A6';
     }
 
-    if (str_ends_with($descr, 'Y') || stripos($descr, 'yellow') !== false
-        || stripos($descr, 'giallo') !== false
-        || stripos($descr, 'gul') !== false
+    if (str_ends_with((string) $descr, 'Y') || stripos((string) $descr, 'yellow') !== false
+        || stripos((string) $descr, 'giallo') !== false
+        || stripos((string) $descr, 'gul') !== false
     ) {
         $colour['left'] = 'FFF200';
         $colour['right'] = 'DDD000';
     }
 
-    if (str_ends_with($descr, 'K') || stripos($descr, 'black') !== false
-        || stripos($descr, 'nero') !== false
+    if (str_ends_with((string) $descr, 'K') || stripos((string) $descr, 'black') !== false
+        || stripos((string) $descr, 'nero') !== false
     ) {
         $colour['left'] = '000000';
         $colour['right'] = '222222';
@@ -63,7 +66,7 @@ function escape_quotes($text)
 
 function generate_overlib_content($graph_array, $text)
 {
-    $overlib_content = '<div class=overlib><span class=overlib-text>' . htmlspecialchars($text) . '</span><br />';
+    $overlib_content = '<div class=overlib><span class=overlib-text>' . htmlspecialchars((string) $text) . '</span><br />';
     foreach (['day', 'week', 'month', 'year'] as $period) {
         $graph_array['from'] = LibrenmsConfig::get("time.$period");
         $overlib_content .= escape_quotes(Url::graphTag($graph_array));
@@ -83,7 +86,7 @@ function generate_device_link($device, $text = null, $vars = [], $start = 0, $en
 
 function bill_permitted($bill_id)
 {
-    if (Auth::user()->hasGlobalRead()) {
+    if (Gate::allows('viewAny', Bill::class)) {
         return true;
     }
 
@@ -92,6 +95,10 @@ function bill_permitted($bill_id)
 
 function port_permitted($port_id, $device_id = null)
 {
+    if (Gate::allows('viewAny', Port::class)) {
+        return true;
+    }
+
     if (! is_numeric($device_id)) {
         $device_id = PortCache::get((int) $port_id)?->device_id;
     }
@@ -105,7 +112,7 @@ function port_permitted($port_id, $device_id = null)
 
 function device_permitted($device_id)
 {
-    if (Auth::user() && Auth::user()->hasGlobalRead()) {
+    if (Gate::allows('viewAny', Device::class)) {
         return true;
     }
 
@@ -146,7 +153,7 @@ function generate_dynamic_graph_tag($args)
     $urlargs = [];
     $width = 0;
     foreach ($args as $key => $arg) {
-        switch (strtolower($key)) {
+        switch (strtolower((string) $key)) {
             case 'width':
                 $width = $arg;
                 $value = '{{width}}';
@@ -218,16 +225,6 @@ STATE;
     return $state;
 }//end generate_graph_js_state()
 
-function print_percentage_bar($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
-{
-    return \LibreNMS\Util\Html::percentageBar($width, $height, $percent, $left_text, $right_text, null, null, [
-        'left' => $left_background,
-        'left_text' => $left_colour,
-        'right' => $right_background,
-        'right_text' => $right_colour,
-    ]);
-}
-
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
     if (is_null($port)) {
@@ -257,7 +254,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = cleanPort($port);
     }
 
-    $content = '<div class=list-large>' . $port['hostname'] . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
+    $content = '<div class=list-large>' . ($port['hostname'] ?? '') . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
     $content .= addslashes(\LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
 
     $content .= "<div style=\'width: 850px\'>";
@@ -507,11 +504,6 @@ function generate_pagination($count, $limit, $page, $links = 2)
     return $return;
 }//end generate_pagination()
 
-function demo_account()
-{
-    print_error("You are logged in as a demo account, this page isn't accessible to you");
-}//end demo_account()
-
 function get_client_ip()
 {
     if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -563,7 +555,7 @@ function alert_details($details)
         if (isset($details['diff']['added'])) {
             foreach (array_values($details['diff']['added'] ?? []) as $oa => $tmp_alerts_added) {
                 $fault_detail = format_alert_details($oa, $tmp_alerts_added, 'Added');
-                $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+                $max_row_length = strlen(strip_tags((string) $fault_detail)) > $max_row_length ? strlen(strip_tags((string) $fault_detail)) : $max_row_length;
                 $all_fault_detail .= $fault_detail;
             }//end foreach
         }
@@ -572,7 +564,7 @@ function alert_details($details)
         if (isset($details['diff']['resolved'])) {
             foreach (array_values($details['diff']['resolved'] ?? []) as $or => $tmp_alerts_resolved) {
                 $fault_detail = format_alert_details($or, $tmp_alerts_resolved, 'Resolved');
-                $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+                $max_row_length = strlen(strip_tags((string) $fault_detail)) > $max_row_length ? strlen(strip_tags((string) $fault_detail)) : $max_row_length;
                 $all_fault_detail .= $fault_detail;
             }//end foreach
         }
@@ -583,7 +575,7 @@ function alert_details($details)
 
     foreach ($details['rule'] ?? [] as $o => $tmp_alerts_rule) {
         $fault_detail = format_alert_details($o, $tmp_alerts_rule);
-        $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+        $max_row_length = strlen(strip_tags((string) $fault_detail)) > $max_row_length ? strlen(strip_tags((string) $fault_detail)) : $max_row_length;
         $all_fault_detail .= $fault_detail;
     }//end foreach
 
@@ -720,7 +712,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
         if ($tmp_alerts['app_status']) {
             $fault_detail .= ' => ' . $tmp_alerts['app_status'];
         }
-        if ($tmp_alerts['metric']) {
+        if (isset($tmp_alerts['metric']) && $tmp_alerts['metric'] && isset($tmp_alerts['value']) && $tmp_alerts['value']) {
             $fault_detail .= ' : ' . $tmp_alerts['metric'] . ' => ' . $tmp_alerts['value'];
         }
         $fallback = false;
@@ -745,21 +737,6 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
 
     return $fault_detail;
 }
-
-function dynamic_override_config($type, $name, $device)
-{
-    $attrib_val = get_dev_attrib($device, $name);
-    if ($attrib_val == 'true') {
-        $checked = 'checked';
-    } else {
-        $checked = '';
-    }
-    if ($type == 'checkbox') {
-        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="' . htmlentities($name) . '" data-device_id="' . $device['device_id'] . '" data-size="small" ' . $checked . '>';
-    } elseif ($type == 'text') {
-        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . htmlentities($name) . '" data-device_id="' . $device['device_id'] . '" value="' . htmlentities($attrib_val) . '">';
-    }
-}//end dynamic_override_config()
 
 /**
  * Return the rows from 'ports' for all ports of a certain type as parsed by port_descr_parser.
@@ -823,7 +800,7 @@ function get_ports_from_type($given_types)
  */
 function file_download($filename, $content)
 {
-    $length = strlen($content);
+    $length = strlen((string) $content);
     header('Content-Description: File Transfer');
     header('Content-Type: text/plain');
     header("Content-Disposition: attachment; filename=$filename");
@@ -842,7 +819,7 @@ function get_rules_from_json()
 
 function search_oxidized_config($search_in_conf_textbox)
 {
-    if (! Auth::user()->hasGlobalRead()) {
+    if (Gate::denies('oxidized.search')) {
         return false;
     }
 

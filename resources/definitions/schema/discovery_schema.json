@@ -2,9 +2,6 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "properties": {
-        "mib": {
-            "type": "string"
-        },
         "modules": {
             "type": "object",
             "properties": {
@@ -28,7 +25,7 @@
                                             "string"
                                         ]
                                     },
-                                    "oid": {"$ref": "#/$defs/oid"},
+                                    "oid": {"$ref": "oid_types.json#/$defs/oid"},
                                     "percent_used": {
                                         "type": "string"
                                     },
@@ -86,9 +83,9 @@
                         "features": {"$ref": "#/$defs/oids"},
                         "serial": {"$ref": "#/$defs/oids"},
                         "sysName": {"$ref": "#/$defs/oids"},
-                        "lat": {"$ref": "#/$defs/oid"},
+                        "lat": {"$ref": "oid_types.json#/$defs/oid"},
                         "location": {"$ref": "#/$defs/oids"},
-                        "long": {"$ref": "#/$defs/oid"},
+                        "long": {"$ref": "oid_types.json#/$defs/oid"},
                         "sysDescr_regex": {
                             "type": ["string", "array"]
                         },
@@ -140,10 +137,8 @@
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "oid": {"$ref": "#/$defs/oid"},
-                                    "num_oid": {
-                                        "type": "string"
-                                    },
+                                    "oid": {"$ref": "oid_types.json#/$defs/oid"},
+                                    "num_oid": {"$ref": "#/$defs/num_oid"},
                                     "index": {
                                         "type": [
                                             "integer",
@@ -156,7 +151,9 @@
                                     "precision": {
                                         "type": "integer"
                                     },
-                                    "value": {"$ref": "#/$defs/oid"},
+                                    "value": {
+                                        "type": "string"
+                                    },
                                     "type": {
                                         "type": "string",
                                         "maxLength": 16
@@ -204,7 +201,7 @@
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "oid": {"$ref": "#/$defs/oid"},
+                                            "oid": {"$ref": "oid_types.json#/$defs/oid"},
                                             "value": {
                                                 "type": "string"
                                             },
@@ -229,10 +226,7 @@
                                             "skip_value_gt": {
                                                 "type": "number"
                                             },
-                                            "num_oid": {
-                                                "type": "string",
-                                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index|subindex\\d) \\}\\})?(\\.\\d+)*$"
-                                            },
+                                            "num_oid": {"$ref": "#/$defs/num_oid"},
                                             "descr": {
                                                 "type": "string"
                                             },
@@ -313,28 +307,39 @@
                                 "data"
                             ]
                         },
-                        "voltage": {"$ref": "#/$defs/sensor"},
-                        "fanspeed": {"$ref": "#/$defs/sensor"},
-                        "temperature": {"$ref": "#/$defs/sensor"},
                         "additional_oids": {"$ref":  "#/$defs/sensor_additional_oids"},
-                        "humidity": {"$ref": "#/$defs/sensor"},
                         "airflow": {"$ref": "#/$defs/sensor"},
-                        "current": {"$ref": "#/$defs/sensor"},
-                        "frequency": {"$ref": "#/$defs/sensor"},
-                        "power": {"$ref": "#/$defs/sensor"},
-                        "pressure": {"$ref": "#/$defs/sensor"},
-                        "cooling": {"$ref": "#/$defs/sensor"},
+                        "ber": {"$ref": "#/$defs/sensor"},
+                        "bitrate": {"$ref": "#/$defs/sensor"},
                         "charge": {"$ref": "#/$defs/sensor"},
-                        "runtime": {"$ref": "#/$defs/sensor"},
-                        "dbm": {"$ref": "#/$defs/sensor"},
-                        "load": {"$ref": "#/$defs/sensor"},
                         "chromatic_dispersion": {"$ref": "#/$defs/sensor"},
+                        "cooling": {"$ref": "#/$defs/sensor"},
+                        "count": {"$ref":  "#/$defs/sensor"},
+                        "current": {"$ref": "#/$defs/sensor"},
+                        "dbm": {"$ref": "#/$defs/sensor"},
                         "delay": {"$ref": "#/$defs/sensor"},
+                        "eer": {"$ref": "#/$defs/sensor"},
+                        "fanspeed": {"$ref": "#/$defs/sensor"},
+                        "frequency": {"$ref": "#/$defs/sensor"},
+                        "humidity": {"$ref": "#/$defs/sensor"},
+                        "load": {"$ref": "#/$defs/sensor"},
+                        "loss": {"$ref": "#/$defs/sensor"},
+                        "percent": {"$ref": "#/$defs/sensor"},
+                        "power": {"$ref": "#/$defs/sensor"},
+                        "power_factor": {"$ref": "#/$defs/sensor"},
+                        "power_consumed": {"$ref": "#/$defs/sensor"},
+                        "pressure": {"$ref": "#/$defs/sensor"},
                         "quality_factor": {"$ref": "#/$defs/sensor"},
+                        "runtime": {"$ref": "#/$defs/sensor"},
+                        "signal": {"$ref": "#/$defs/sensor"},
+                        "signal_loss": {"$ref": "#/$defs/sensor"},
                         "snr": {"$ref": "#/$defs/sensor"},
-                        "waterflow": {"$ref": "#/$defs/sensor"},
-                        "eer": {"$ref": "#/$defs/sensor"}
-                    }
+                        "temperature": {"$ref": "#/$defs/sensor"},
+                        "tv_signal": {"$ref": "#/$defs/sensor"},
+                        "voltage": {"$ref": "#/$defs/sensor"},
+                        "waterflow": {"$ref": "#/$defs/sensor"}
+                    },
+                    "additionalProperties": false
                 },
                 "storage": {
                     "type": "object",
@@ -356,7 +361,7 @@
                                             "string"
                                         ]
                                     },
-                                    "oid": {"$ref": "#/$defs/oid"},
+                                    "oid": {"$ref": "oid_types.json#/$defs/oid"},
                                     "percent_used": {
                                         "type": "string"
                                     },
@@ -407,12 +412,9 @@
         "modules"
     ],
     "$defs": {
-        "oid": {
-            "type": "string"
-        },
         "num_oid": {
             "type": "string",
-            "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index) \\}\\})?(\\.\\d+)*$"
+            "pattern": "^(\\.\\d+)+(\\.\\{\\{ \\$(index|subindex\\d) }}|\\{\\{ \\$noindex }})$"
         },
         "oids": {
             "type": ["string", "array"],
@@ -477,9 +479,7 @@
                     "items": {
                         "type": "object",
                         "properties": {
-                            "oid": {
-                                "type": "string"
-                            },
+                            "oid": {"$ref": "oid_types.json#/$defs/oid"},
                             "num_oid": {"$ref": "#/$defs/num_oid"},
                             "index": {
                                 "type": ["integer", "string"]

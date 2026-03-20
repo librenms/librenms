@@ -1,11 +1,13 @@
 <?php
 
+use App\Models\Port;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', Port::class)) {
     $response = [
         'status' => 'error',
-        'message' => 'Need to be admin',
+        'message' => 'You need permission',
     ];
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
@@ -19,9 +21,9 @@ $device_id = intval($_POST['device']);
 $rows_updated = 0;
 
 foreach ($_POST as $key => $val) {
-    if (str_starts_with($key, 'oldign_')) {
+    if (str_starts_with((string) $key, 'oldign_')) {
         // Interface identifier passed as part of the field name
-        $port_id = intval(substr($key, 7));
+        $port_id = intval(substr((string) $key, 7));
 
         $oldign = intval($val) ? 1 : 0;
         $newign = $_POST['ignore_' . $port_id] ? 1 : 0;
@@ -40,9 +42,9 @@ foreach ($_POST as $key => $val) {
         }
 
         $rows_updated += $n;
-    } elseif (str_starts_with($key, 'olddis_')) {
+    } elseif (str_starts_with((string) $key, 'olddis_')) {
         // Interface identifier passed as part of the field name
-        $port_id = intval(substr($key, 7));
+        $port_id = intval(substr((string) $key, 7));
 
         $olddis = intval($val) ? 1 : 0;
         $newdis = $_POST['disabled_' . $port_id] ? 1 : 0;

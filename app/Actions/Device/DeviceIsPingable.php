@@ -12,7 +12,7 @@ use LibreNMS\Polling\ConnectivityHelper;
 class DeviceIsPingable
 {
     public function __construct(
-        private Fping $fping,
+        private readonly Fping $fping,
     ) {
     }
 

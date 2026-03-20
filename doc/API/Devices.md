@@ -419,7 +419,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/device_wireless_ccq/1
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless/device_wireless_ccq/1
 ```
 
 Output:
@@ -588,7 +588,7 @@ Input:
   Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services/localhost/35/graphs/loss
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/services/35/graphs/loss
 ```
 
 Output:
@@ -607,6 +607,7 @@ Route: `/api/v0/devices/:hostname/ports`
 Input:
 
 - columns: Comma separated list of columns you want returned.
+- `with=vlans`. Returns VLAN associations (tagged and untagged) for each port.
 
 Example:
 
@@ -634,6 +635,54 @@ Output:
     ]
 }
 ```
+
+Example with VLANs:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports?with=vlans
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ports": [
+        {
+            "port_id": 12345,
+            "ifName": "Gi1/0/1",
+            "vlans": [
+                {
+                    "port_vlan_id": 2,
+                    "device_id": 3,
+                    "port_id": 12345,
+                    "vlan": 1,
+                    "baseport": 2,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "port_vlan_id": 54,
+                    "device_id": 3,
+                    "port_id": 12345,
+                    "vlan": 250,
+                    "baseport": 2,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                }
+            ]
+        }
+    ]
+}
+```
+
+> **Note:** Using `with=vlans` on devices with many ports may increase response
+> size and memory usage. Consider using the `columns` parameter to limit
+> returned fields when fetching VLAN data for large devices.
 
 ### `get_device_fdb`
 
@@ -1055,11 +1104,11 @@ Route: `/api/v0/devices/:hostname/ports/:ifname/:type`
 - hostname can be either the device hostname or id
 - ifname can be any of the interface names for the device which can be
   obtained using
-  [`get_port_graphs`](#get_port_graphs). Please ensure that
+  [`get_device_ports`](#get_device_ports). Please ensure that
   the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need
   to be urlencoded.
 - type is the port type you want the graph for, you can request a list
-  of ports for a device with [`get_port_graphs`](#get_port_graphs).
+  of ports for a device with [`get_device_ports`](#get_device_ports).
 
 Input:
 

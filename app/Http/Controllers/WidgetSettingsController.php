@@ -39,7 +39,7 @@ class WidgetSettingsController extends Controller
             'settings.refresh' => 'int|min:1',
         ]);
 
-        $widget_settings = (array) $request->get('settings', []);
+        $widget_settings = (array) $request->input('settings', []);
         unset($widget_settings['_token']);
 
         if (! $request->user()->can('update', $widget->dashboard)) {

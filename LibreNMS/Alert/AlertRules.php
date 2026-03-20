@@ -48,7 +48,7 @@ class AlertRules
     public function runRules($device_id)
     {
         //Check to see if under maintenance
-        if (AlertUtil::getMaintenanceStatus($device_id) === MaintenanceStatus::SKIP_ALERTS) {
+        if (AlertUtil::getMaintenanceStatus($device_id) === MaintenanceStatus::SkipAlerts) {
             echo "Under Maintenance, skipping alert rules check.\r\n";
 
             return false;
@@ -66,7 +66,7 @@ class AlertRules
         //Checks each rule.
         foreach (AlertUtil::getRules($device_id) as $rule) {
             Log::info('Rule %p#' . $rule['id'] . ' (' . $rule['name'] . '):%n ', ['color' => true]);
-            $extra = json_decode($rule['extra'], true);
+            $extra = json_decode((string) $rule['extra'], true);
             if (isset($extra['invert'])) {
                 $inv = (bool) $extra['invert'];
             } else {

@@ -13,19 +13,21 @@
  */
 
 use App\Facades\LibrenmsConfig;
+use App\Models\AlertSchedulable;
 use App\Models\AlertSchedule;
 use App\Models\UserPref;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\MaintenanceBehavior;
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::none(['create', 'update', 'view', 'delete'], AlertSchedule::class)) {
     header('Content-type: text/plain');
-    exit('ERROR: You need to be admin');
+    exit('ERROR: You need permission');
 }
 
 $sub_type = $_POST['sub_type'];
 
 if ($sub_type == 'new-maintenance') {
+    Gate::authorize('create', AlertSchedule::class);
     // Defaults
     $status = 'error';
     $update = 0;
@@ -44,13 +46,13 @@ if ($sub_type == 'new-maintenance') {
     $start_recurring_hr = $_POST['start_recurring_hr'] ?? null;
     $end_recurring_hr = $_POST['end_recurring_hr'] ?? null;
     $start = $_POST['start'] ?? null;
-    [$duration_hour, $duration_min] = isset($_POST['duration']) ? explode(':', $_POST['duration']) : [null, null];
+    [$duration_hour, $duration_min] = isset($_POST['duration']) ? explode(':', (string) $_POST['duration']) : [null, null];
     $end = $_POST['end'] ?? null;
     $behavior = $_POST['behavior'] ?? LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
     $maps = $_POST['maps'] ?? null;
 
     if (isset($duration_hour) && isset($duration_min)) {
-        $end = date('Y-m-d H:i:00', strtotime('+' . intval($duration_hour) . ' hour ' . intval($duration_min) . ' minute', strtotime($start)));
+        $end = date('Y-m-d H:i:00', strtotime('+' . intval($duration_hour) . ' hour ' . intval($duration_min) . ' minute', strtotime((string) $start)));
     }
 
     if (empty($title)) {
@@ -68,14 +70,14 @@ if ($sub_type == 'new-maintenance') {
             $message .= 'Missing start recurring date<br />';
         } else {
             // check if date is correct
-            [$ysrd, $msrd, $dsrd] = explode('-', $start_recurring_dt);
+            [$ysrd, $msrd, $dsrd] = explode('-', (string) $start_recurring_dt);
             if (! checkdate($msrd, $dsrd, $ysrd)) {
                 $message .= 'Please check start recurring date<br />';
             }
         }
         // end recurring dt not mandatory.. but if set, check if correct
         if (! empty($end_recurring_dt) && $end_recurring_dt != '0000-00-00' && $end_recurring_dt != '') {
-            [$yerd, $merd, $derd] = explode('-', $end_recurring_dt);
+            [$yerd, $merd, $derd] = explode('-', (string) $end_recurring_dt);
             if (! checkdate($merd, $derd, $yerd)) {
                 $message .= 'Please check end recurring date<br />';
             }
@@ -147,17 +149,17 @@ if ($sub_type == 'new-maintenance') {
             $fail = 0;
 
             if ($update == 1) {
-                dbDelete('alert_schedulables', '`schedule_id`=?', [$alert_schedule->schedule_id]);
+                AlertSchedulable::where('schedule_id', $alert_schedule->schedule_id)->delete();
             }
 
             foreach ($maps as $target) {
                 $type = 'device';
                 if (Str::startsWith($target, 'l')) {
                     $type = 'location';
-                    $target = substr($target, 1);
+                    $target = substr((string) $target, 1);
                 } elseif (Str::startsWith($target, 'g')) {
                     $type = 'device_group';
-                    $target = substr($target, 1);
+                    $target = substr((string) $target, 1);
                 }
 
                 $item = dbInsert(['schedule_id' => $alert_schedule->schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $target], 'alert_schedulables');
@@ -175,10 +177,10 @@ if ($sub_type == 'new-maintenance') {
 
             if ($fail == 1 && $update == 0) {
                 foreach ($items as $item) {
-                    dbDelete('alert_schedulables', '`item_id`=?', [$item]);
+                    AlertSchedulable::where('item_id', $item)->delete();
                 }
 
-                dbDelete('alert_schedule', '`schedule_id`=?', [$alert_schedule->schedule_id]);
+                AlertSchedule::where('schedule_id', $alert_schedule->schedule_id)->delete();
                 $message = 'Issue scheduling maintenance';
             } else {
                 $status = 'ok';
@@ -195,6 +197,7 @@ if ($sub_type == 'new-maintenance') {
         'schedule_id' => $alert_schedule->schedule_id ?? null,
     ];
 } elseif ($sub_type == 'parse-maintenance') {
+    Gate::authorize('view', AlertSchedule::class);
     $alert_schedule = AlertSchedule::findOrFail($_POST['schedule_id']);
     $items = [];
 
@@ -219,6 +222,7 @@ if ($sub_type == 'new-maintenance') {
     $response['recurring_day'] = $alert_schedule->getOriginal('recurring_day');
     $response['targets'] = $items;
 } elseif ($sub_type == 'end-maintenance') {
+    Gate::authorize('update', AlertSchedule::class);
     $alert_schedule = AlertSchedule::findOrFail($_POST['schedule_id'] ?? 0);
     $alert_schedule->end = date('Y-m-d H:i:s');
     $alert_schedule->save();
@@ -227,9 +231,10 @@ if ($sub_type == 'new-maintenance') {
         'message' => 'Maintenance has been ended',
     ];
 } elseif ($sub_type == 'del-maintenance') {
+    Gate::authorize('delete', AlertSchedule::class);
     $schedule_id = $_POST['del_schedule_id'];
-    dbDelete('alert_schedule', '`schedule_id`=?', [$schedule_id]);
-    dbDelete('alert_schedulables', '`schedule_id`=?', [$schedule_id]);
+    AlertSchedule::where('schedule_id', $schedule_id)->delete();
+    AlertSchedulable::where('schedule_id', $schedule_id)->delete();
     $status = 'ok';
     $message = 'Maintenance schedule has been removed';
     $response = [

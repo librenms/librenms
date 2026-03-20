@@ -37,7 +37,6 @@ use App\Models\UserPref;
 use Auth;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
-use Spatie\Permission\Models\Role;
 use URL;
 
 class UserController extends Controller
@@ -56,7 +55,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $this->authorize('manage', User::class);
+        $this->authorize('viewAny', User::class);
 
         return view('user.index', [
             'users' => User::with(['preferences', 'roles'])->orderBy('username')->get(),
@@ -94,17 +93,19 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request, ToastInterface $toast)
     {
+        $this->authorize('create', User::class);
+
         $user = $request->only(['username', 'realname', 'email', 'descr', 'can_modify_passwd']);
         $user['auth_type'] = LegacyAuth::getType();
-        $user['can_modify_passwd'] = $request->get('can_modify_passwd'); // checkboxes are missing when unchecked
+        $user['can_modify_passwd'] = $request->input('can_modify_passwd'); // checkboxes are missing when unchecked
 
         $user = User::create($user);
 
         $user->setPassword($request->new_password);
-        $user->syncRoles($request->get('roles', []));
+        $user->syncRoles($request->input('roles', []));
         $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
-        $this->updateDashboard($user, $request->get('dashboard'));
-        $this->updateTimezone($user, $request->get('timezone'));
+        $this->updateDashboard($user, $request->input('dashboard'));
+        $this->updateTimezone($user, $request->input('timezone'));
 
         if ($user->save()) {
             $toast->success(__('User :username created', ['username' => $user->username]));
@@ -173,7 +174,7 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user, ToastInterface $toast)
     {
-        if ($request->get('new_password') && $user->canSetPassword($request->user())) {
+        if ($request->input('new_password')) {
             $user->setPassword($request->new_password);
             /** @var User $current_user */
             $current_user = Auth::user();
@@ -188,16 +189,16 @@ class UserController extends Controller
 
         $user->fill($request->validated());
 
-        if ($request->user()->can('manage', Role::class) && $request->has('roles')) {
-            $user->syncRoles($request->get('roles', []));
+        if ($request->has('roles')) {
+            $user->syncRoles($request->input('roles', []));
         }
 
-        if ($request->has('dashboard') && $this->updateDashboard($user, $request->get('dashboard'))) {
+        if ($request->has('dashboard') && $this->updateDashboard($user, $request->input('dashboard'))) {
             $toast->success(__('Updated dashboard for :username', ['username' => $user->username]));
         }
 
-        if ($request->has('timezone') && $this->updateTimezone($user, $request->get('timezone'))) {
-            if ($request->get('timezone') != 'default') {
+        if ($request->has('timezone') && $this->updateTimezone($user, $request->input('timezone'))) {
+            if ($request->input('timezone') != 'default') {
                 $toast->success(__('Updated timezone for :username', ['username' => $user->username]));
             } else {
                 $toast->success(__('Cleared timezone for :username', ['username' => $user->username]));
@@ -282,7 +283,7 @@ class UserController extends Controller
 
     public function authlog()
     {
-        $this->authorize('manage', User::class);
+        $this->authorize('view', AuthLog::class);
 
         return view('user.authlog', [
             'authlog' => AuthLog::orderBy('datetime', 'DESC')->get(),

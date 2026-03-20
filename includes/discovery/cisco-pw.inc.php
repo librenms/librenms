@@ -24,10 +24,10 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
         // To correct Interface names that use escaped '/' e.g. GigabitEthernet0_4_0_12
         // and translate the underscore back to a slash - e.g. GigabitEthernet0/4/0/12
         // Thank you @murrant
-        $pw['cpwVcName'] = preg_replace('/(?<=\d)_(?=\d)/', '/', $pw['cpwVcName']);
+        $pw['cpwVcName'] = preg_replace('/(?<=\d)_(?=\d)/', '/', (string) $pw['cpwVcName']);
         // END
 
-        [$cpw_remote_id] = explode(':', $pw['cpwVcMplsPeerLdpID']);
+        [$cpw_remote_id] = explode(':', (string) $pw['cpwVcMplsPeerLdpID']);
 
         if (\LibreNMS\Util\IPv4::isValid($cpw_remote_id)) {
             //If cpwVcMplsPeerLdpID is in the IP form, then convert it to number to store it in DB to avoid failing
@@ -63,7 +63,7 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
     // Cycle the list of pseudowires we cached earlier and make sure we saw them again.
     foreach ($pws_db as $pw_id => $pseudowire_id) {
         if (empty($device['pws'][$pw_id])) {
-            dbDelete('pseudowires', '`pseudowire_id` = ?', [$pseudowire_id]);
+            \App\Models\Pseudowire::where('pseudowire_id', $pseudowire_id)->delete();
         }
     }
 

@@ -1,0 +1,586 @@
+G6-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32, enterprises,NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+	DisplayString, MacAddress
+		FROM SNMPv2-TC
+	g6	FROM MICROSENS-G6-MIB
+	;
+
+device MODULE-IDENTITY --Category
+	LAST-UPDATED "202302141127Z"
+	ORGANIZATION "MICROSENS GmbH & Co. KG"
+	CONTACT-INFO
+		"Kueferstrasse 16
+		D-59067 Hamm
+		Germany
+		support@microsens.de
+		http://www.microsens.de"
+	DESCRIPTION
+		"Microsens private MIB for Generation 6 Ethernet Switches"
+
+	REVISION "202302141127Z"
+	DESCRIPTION
+		"File creation"
+	::= { g6 1 }
+
+system  OBJECT IDENTIFIER ::= { device 30 }
+
+
+
+-- *************************** CONFIGURATION SECTION ********************************
+
+
+systemShowTimeDate OBJECT-TYPE   -- show_time_date
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Show system time and date."
+	::= { system 1 }
+
+
+systemSetTime OBJECT-TYPE   -- set_time
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Sets the system clock (time only). Syntax: 12:30:00"
+	::= { system 2 }
+
+
+systemSetDate OBJECT-TYPE   -- set_date
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Sets the system clock (date only). Syntax: 2012-12-24"
+	::= { system 3 }
+
+
+systemShowUtilization OBJECT-TYPE   -- show_utilization
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Show CPU status information"
+	::= { system 4 }
+
+
+systemRebootDevice OBJECT-TYPE   -- reboot_device
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"This command will restart the device. All communication will be disrupted! Syntax: reboot_device = CONFIRM."
+	::= { system 5 }
+
+
+systemCreateSnapshot OBJECT-TYPE   -- create_snapshot
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Creates a snapshot of all relevant configuration and status information packaged as a single tar archive. This file can be found in service/snapshot."
+	::= { system 6 }
+
+
+systemSendWakeOnLanPacket OBJECT-TYPE   -- send_wake_on_lan_packet
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"This command will send a magic packet to wake up a selected sleeping device. The device is identified by its MAC address. Syntax: send_wake_on_lan_packet  = 00:11:22:44:55:66."
+	::= { system 7 }
+
+
+systemAlternativeMacAddress OBJECT-TYPE   -- alternative_mac_address
+	SYNTAX MacAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"This field is usually empty. This field may be used to override the MAC address fixed in the factory setting. NOTE: This value is only activated after a reset!"
+	::= { system 8 }
+
+
+systemBootPreference OBJECT-TYPE   -- boot_preference
+	SYNTAX INTEGER 
+		{
+		sdCardFirst (0),
+		internalFirst (1),
+		sdCardOnly (2),
+		internalOnly (3)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"This feature only applies to devices that feature internal memory plus plugged-in SD cards. It defines which software is used after reboot."
+	::= { system 9 }
+
+
+systemInventory OBJECT-TYPE   -- inventory
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Inventory string free for customer use. Up to 512 character are accepted. Note this config is linked to the SD card and may change when config or SD card is exchanged. For an inventory information that is fixed to the hardware use Device.Factory.custom_info command."
+	::= { system 10 }
+
+
+systemAutorunCliScript OBJECT-TYPE   -- autorun_cli_script
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Optional cli scripts executed after power sequence is completed. Several scripts may be assigned, with comma or blank separation."
+	::= { system 11 }
+
+
+systemSerialPort OBJECT-TYPE   -- serial_port
+	SYNTAX INTEGER 
+		{
+		disabled (0),
+		console (1),
+		appControlled (2),
+		terminalServer (3),
+		smartSensor (4)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When set to DISABLED the local serial console port is disabled. Local access via serial cable is blocked. While this enhances local protection it also closes the emergency access should the device become inaccessible over the network due to misconfiguration. Other setting permit use of the serial port as TERMINAL_SERVER to attach a foreign device for management or to SMART_SENSOR to attach a local hardware extension for use with smart office solutions. "
+	::= { system 12 }
+
+
+systemPermitDebugAccess OBJECT-TYPE   -- permit_debug_access
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When enabled it is possible to log into the system for debug purposes. This includes telnet/ssh, as well as web and file transfer protocols. To protect the system from unauthorized access it is advised to disable this feature unless instructed by authorized service personnel. NOTE: To ensure that any possibly pending debug access is terminated reboot the device after setting this parameter to disabled."
+	::= { system 13 }
+
+
+systemPermitIncomingAlerts OBJECT-TYPE   -- permit_incoming_alerts
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When enabled it is possible receive alerts via from external devices via SNMP or HTTP(S). This feature may be used in combination with custom scripting to react to external events. To protect the system from unauthorized spam it is advised to disable this feature unless there is an application for it."
+	::= { system 14 }
+
+
+systemCharacterSet OBJECT-TYPE   -- character_set
+	SYNTAX INTEGER 
+		{
+		iso88591 (1),
+		iso88595 (5)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"This parameter can be set to support languages with characters not found the normal Western European character set. Be sure to set your CLI terminal to the matching setting."
+	::= { system 15 }
+
+
+systemConfigurationSaveMode OBJECT-TYPE   -- configuration_save_mode
+	SYNTAX INTEGER 
+		{
+		permanently (0),
+		temporarily (1)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"In most cases the configuration of the device should be permanently saved and automatically be applied after a power up. In some cases, however, where public access to the device is granted it can be desirable to only save changes temporarily. In this mode all configuration changes that occurred after setting this mode will be saved in RAM only and will be forgotten on the next system reboot. Important: When this parameter changed to PERMANENTLY all outstanding changes are committed to SD card immediately. When this parameter is changed to temporarily, this already is not saved permanently. Use Management.Files.configuration.commit_config to save this setting before proceeding."
+	::= { system 16 }
+
+
+-- ******************* Begin of compatibilityTable *************************
+
+compatibilityTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF CompatibilityEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This section contains parameter that may be required to select certain compatibility functions that cannot be auto-detected by the system."
+	::= { system 17 }
+
+compatibilityEntry	OBJECT-TYPE
+	SYNTAX CompatibilityEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { compatibilityIndex }
+	::= { compatibilityTable 1 }
+
+
+	CompatibilityEntry ::= SEQUENCE {
+	compatibilityIndex INTEGER,
+	compatibilityLinkDetection INTEGER 
+	}
+
+compatibilityIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { compatibilityEntry 1 }
+
+compatibilityLinkDetection OBJECT-TYPE   -- link_detection
+	SYNTAX INTEGER 
+		{
+		pollAndInterrupt (0),
+		interruptOnly (1)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Usually the default setting POLL_AND_INTERRUPT should  be selected. To attain fastest possible link change detection, as required by the RING protocols, select INT_ONLY. However, some older devices do not offer the faster interrupt only mode and cannot be used in this mode.  "
+	::= { compatibilityEntry 2 }
+
+
+-- ********************* End of compatibilityTable ***********************
+
+
+-- ******************* Begin of scriptScheduleTable *************************
+
+scriptScheduleTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF ScriptScheduleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This dynamic table permits the setup of automated script execution based on precise time scheduling definition. Any number of scripts may be executed at any desired interval or at selected dates. Please ensure the time and date are properly set (via NTP) when using this feature."
+	::= { system 18 }
+
+scriptScheduleEntry	OBJECT-TYPE
+	SYNTAX ScriptScheduleEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { scriptScheduleIndex }
+	::= { scriptScheduleTable 1 }
+
+
+	ScriptScheduleEntry ::= SEQUENCE {
+	scriptScheduleIndex INTEGER,
+	scriptScheduleName DisplayString,
+	scriptScheduleMode INTEGER ,
+	scriptScheduleCliScript DisplayString,
+	scriptScheduleMinutes DisplayString,
+	scriptScheduleHours DisplayString,
+	scriptScheduleDays DisplayString,
+	scriptScheduleMonths DisplayString,
+	scriptScheduleWeekdays DisplayString
+	}
+
+scriptScheduleIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0..31)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { scriptScheduleEntry 1 }
+
+scriptScheduleName OBJECT-TYPE   -- name
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Unique name to reference this entry and to remember whose MAC address is entered."
+	::= { scriptScheduleEntry 2 }
+
+scriptScheduleMode OBJECT-TYPE   -- mode
+	SYNTAX INTEGER {  disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"When set to disabled this entry is ignored. It is recommended to first set the mode to disabled before the associated time values are modified. When all values are properly set re-enable the entry."
+	::= { scriptScheduleEntry 3 }
+
+scriptScheduleCliScript OBJECT-TYPE   -- cli_script
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Enter the name of the cli script that should be executed when the defined time occurs. Ensure that the script name selects a valid file. Several scripts may be assigned, with comma or blank separation."
+	::= { scriptScheduleEntry 4 }
+
+scriptScheduleMinutes OBJECT-TYPE   -- minutes
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Format: 3,14 select exact minutes hour:03 and hour:14. * is every minute. */5 defines every five minutes."
+	::= { scriptScheduleEntry 5 }
+
+scriptScheduleHours OBJECT-TYPE   -- hours
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Format: 0-23. Range and comma separation is permitted. * is every hour."
+	::= { scriptScheduleEntry 6 }
+
+scriptScheduleDays OBJECT-TYPE   -- days
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Format: 1-31. Range and comma separation is permitted. * is every day."
+	::= { scriptScheduleEntry 7 }
+
+scriptScheduleMonths OBJECT-TYPE   -- months
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Format: 1-12 or Jan-Dec. Range and comma separation is permitted. * is every month."
+	::= { scriptScheduleEntry 8 }
+
+scriptScheduleWeekdays OBJECT-TYPE   -- weekdays
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Format: 0-6 or Sun-Sat. Range and comma separation is permitted. * is every day."
+	::= { scriptScheduleEntry 9 }
+
+
+-- ********************* End of scriptScheduleTable ***********************
+
+
+
+-- ****************************** STATUS SECTION ********************************
+
+
+systemLastBootTime OBJECT-TYPE   -- last_boot_time
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The time and date when this device has booted."
+	::= { system 100 }
+
+
+systemUptime OBJECT-TYPE   -- uptime
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Uptime since last reboot in seconds."
+	::= { system 101 }
+
+
+systemUsedMacAddress OBJECT-TYPE   -- used_mac_address
+	SYNTAX MacAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Contains the mac address used by this unit. Usually follows to MAC defined in the factory setting, but may be overwritten by the alternative_mac_address."
+	::= { system 102 }
+
+
+systemUsedBootMedia OBJECT-TYPE   -- used_boot_media
+	SYNTAX INTEGER 
+		{
+		sdCard (0),
+		internalMemory (1),
+		nfs (2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	""
+	::= { system 103 }
+
+
+systemTemperature OBJECT-TYPE   -- temperature
+	SYNTAX Integer32 (0..255)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Temperature value in centigrade."
+	::= { system 104 }
+
+
+systemClimateLevel OBJECT-TYPE   -- climate_level
+	SYNTAX INTEGER 
+		{
+		unknown (0),
+		criticalLow (1),
+		low (2),
+		normal (3),
+		increased (4),
+		high (5),
+		criticalHigh (6),
+		shutdown (7)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Annotated temperature level."
+	::= { system 105 }
+
+
+-- ******************* Begin of firmwareTable *************************
+
+firmwareTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF FirmwareEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This section provides details about the running firmware."
+	::= { system 106 }
+
+firmwareEntry	OBJECT-TYPE
+	SYNTAX FirmwareEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { firmwareIndex }
+	::= { firmwareTable 1 }
+
+
+	FirmwareEntry ::= SEQUENCE {
+	firmwareIndex INTEGER,
+	firmwareRunningVersion DisplayString,
+	firmwareBuildDate DisplayString,
+	firmwareBuildNumber DisplayString,
+	firmwarePatchVersion DisplayString
+	}
+
+firmwareIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { firmwareEntry 1 }
+
+firmwareRunningVersion OBJECT-TYPE   -- running_version
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Running firmware version."
+	::= { firmwareEntry 2 }
+
+firmwareBuildDate OBJECT-TYPE   -- build_date
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Build date of the running firmware. Format: 2012-01-18 12:00:22."
+	::= { firmwareEntry 3 }
+
+firmwareBuildNumber OBJECT-TYPE   -- build_number
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Build number of the running firmware retrieved from the repository."
+	::= { firmwareEntry 4 }
+
+firmwarePatchVersion OBJECT-TYPE   -- patch_version
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"If extra patches are installed, their version(s) are indicated here."
+	::= { firmwareEntry 5 }
+
+
+-- ********************* End of firmwareTable ***********************
+
+
+-- ******************* Begin of saveInfoTable *************************
+
+saveInfoTable	OBJECT-TYPE
+	SYNTAX SEQUENCE OF SaveInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This section provided status information about the internal parameter saving process."
+	::= { system 107 }
+
+saveInfoEntry	OBJECT-TYPE
+	SYNTAX SaveInfoEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { saveInfoIndex }
+	::= { saveInfoTable 1 }
+
+
+	SaveInfoEntry ::= SEQUENCE {
+	saveInfoIndex INTEGER,
+	saveInfoLastSavedParameter DisplayString,
+	saveInfoSaveMode INTEGER ,
+	saveInfoWriteStatus INTEGER ,
+	saveInfoTimeStamp Counter32
+	}
+
+saveInfoIndex	OBJECT-TYPE
+	SYNTAX INTEGER (0)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Automatically generated"
+	::= { saveInfoEntry 1 }
+
+saveInfoLastSavedParameter OBJECT-TYPE   -- last_saved_parameter
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Records the last written parameter."
+	::= { saveInfoEntry 2 }
+
+saveInfoSaveMode OBJECT-TYPE   -- save_mode
+	SYNTAX INTEGER 
+		{
+		permanently (0),
+		temporarily (1)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Reflects Device.system.configuration_save_mode setting."
+	::= { saveInfoEntry 3 }
+
+saveInfoWriteStatus OBJECT-TYPE   -- write_status
+	SYNTAX INTEGER 
+		{
+		nothingToSave (0),
+		processing (1),
+		savedToRam (2),
+		savedToSdcard (3)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates if last parameter was written to SD card or temporary RAM."
+	::= { saveInfoEntry 4 }
+
+saveInfoTimeStamp OBJECT-TYPE   -- time_stamp
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Records the time the write status was last changed."
+	::= { saveInfoEntry 5 }
+
+
+-- ********************* End of saveInfoTable ***********************
+
+
+
+END
+

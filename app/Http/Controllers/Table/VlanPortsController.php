@@ -35,7 +35,7 @@ class VlanPortsController extends TableController
     protected function baseQuery(Request $request): Builder
     {
         $this->validate($request, ['vlan' => 'integer']);
-        $this->vlanId = $request->get('vlan', 1);
+        $this->vlanId = $request->input('vlan', 1);
 
         return Port::with(['device', 'device.location'])
             ->hasAccess($request->user())
@@ -59,6 +59,16 @@ class VlanPortsController extends TableController
                 'ports_vlans.cost',
                 DB::raw("CASE WHEN ports.ifVlan = $this->vlanId or ports_vlans.untagged <> 0 THEN \"yes\" ELSE \"no\" END as untagged"),
             ]);
+    }
+
+    protected function search($search, $query, $fields)
+    {
+        if ($search) {
+            $query->leftJoin('devices', 'ports.device_id', 'devices.device_id');
+            $fields = array_merge($fields, ['devices.hostname', 'devices.display', 'devices.sysName']);
+        }
+
+        return parent::search($search, $query, $fields);
     }
 
     /**

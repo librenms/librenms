@@ -1,61 +1,60 @@
-mib: STE-MIB
 modules:
     sensors:
         temperature:
             data:
                 -
-                    oid: sensTable
-                    value: sensValue
+                    oid: STE-MIB::sensTable
+                    value: STE-MIB::sensValue
                     num_oid: '.1.3.6.1.4.1.21796.4.1.3.1.5.{{ $index }}'
                     divisor: 10
-                    descr: sensName
+                    descr: STE-MIB::sensName
                     index: 'sensTable.{{ $index }}'
                     skip_values:
                         -
-                            oid: sensUnit
+                            oid: STE-MIB::sensUnit
                             op: '!='
                             value: 1
         humidity:
             data:
                 -
-                    oid: sensTable
-                    value: sensValue
+                    oid: STE-MIB::sensTable
+                    value: STE-MIB::sensValue
                     num_oid: '.1.3.6.1.4.1.21796.4.1.3.1.5.{{ $index }}'
                     divisor: 10
-                    descr: sensName
+                    descr: STE-MIB::sensName
                     index: 'sensTable.{{ $index }}'
                     skip_values:
                         -
-                            oid: sensUnit
+                            oid: STE-MIB::sensUnit
                             op: '!='
                             value: 4
         state:
             data:
                 -
-                    oid: inpTable
-                    value: inpValue
+                    oid: STE-MIB::inpTable
+                    value: STE-MIB::inpValue
                     num_oid: '.1.3.6.1.4.1.21796.4.1.1.1.2.{{ $index }}'
-                    descr: inpName
+                    descr: STE-MIB::inpName
                     index: 'inpValue.{{ $index }}'
                     state_name: inpValue
                     states:
                         - { descr: open, graph: 0, value: 0, generic: 0 }
                         - { descr: closed, graph: 0, value: 1, generic: 2 }
                 -
-                    oid: inpTable
-                    value: inpAlarmState
+                    oid: STE-MIB::inpTable
+                    value: STE-MIB::inpAlarmState
                     num_oid: '.1.3.6.1.4.1.21796.4.1.1.1.4.{{ $index }}'
-                    descr: 'alarm : {{ $inpName }}'
+                    descr: 'alarm : {{ STE-MIB::inpName }}'
                     index: 'inpAlarmState.{{ $index }}'
                     state_name: inpAlarmState
                     states:
                         - { descr: normal, graph: 0, value: 0, generic: 0 }
                         - { descr: alarm, graph: 0, value: 1, generic: 2 }
                 -
-                    oid: sensTable
-                    value: sensState
+                    oid: STE-MIB::sensTable
+                    value: STE-MIB::sensState
                     num_oid: '.1.3.6.1.4.1.21796.4.1.3.1.3.{{ $index }}'
-                    descr: sensName
+                    descr: STE-MIB::sensName
                     index: 'sensState.{{ $index }}'
                     state_name: sensName
                     states:

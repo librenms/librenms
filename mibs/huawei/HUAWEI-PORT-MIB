@@ -2,7 +2,7 @@
 -- Copyright (C) 2022 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:
 -- Reference:
--- Version: V3.32
+-- Version: V3.33
 -- ===================================================================
 HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
     IMPORTS
@@ -28,7 +28,7 @@ HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
             FROM HUAWEI-GTL-MIB;
 
     hwPortMIB MODULE-IDENTITY
-        LAST-UPDATED "202211020000Z"
+        LAST-UPDATED "202211080000Z"
         ORGANIZATION "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
             "Huawei Industrial Base
@@ -40,6 +40,11 @@ HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION 
             "The private mib file includes the general extent
             information of the device.hwDatacomm(157).hwPortMIB"
+
+-- Add revision info here!
+  REVISION "202211080000Z"
+        DESCRIPTION
+        "Add hwEthernetSpeedSet enum speed12500(17)."
 
 -- Add revision info here!
    REVISION "202211020000Z"
@@ -759,7 +764,7 @@ HUAWEI-PORT-MIB DEFINITIONS ::= BEGIN
 
 
     hwEthernetSpeedSet OBJECT-TYPE
-        SYNTAX INTEGER {other(1),speed10(2),speed100(3),speed1000(4),speed10000(5),speed40000(6),speed20000(7),speed2500(8),speed5000(9),speed100000(10),speed12000(11),speed48000(12),speed25000(13),speed50000(14),speed200000(15),speed400000(16)}
+        SYNTAX INTEGER {other(1),speed10(2),speed100(3),speed1000(4),speed10000(5),speed40000(6),speed20000(7),speed2500(8),speed5000(9),speed100000(10),speed12000(11),speed48000(12),speed25000(13),speed50000(14),speed200000(15),speed400000(16),speed12500(17)}
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION

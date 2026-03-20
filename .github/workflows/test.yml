@@ -11,6 +11,10 @@ on:
 permissions:
   contents: read # to fetch code (actions/checkout)
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: ${{ matrix.name }} ${{ matrix.arguments }}
@@ -19,7 +23,6 @@ jobs:
       fail-fast: false
       matrix:
         php-version:
-          - 8.2
           - 8.4
         arguments:
           - --os a
@@ -32,10 +35,6 @@ jobs:
           - --os u,v,w,x,y,z,0,1,2,3,4,5,6,7,8,9
         include:
           -
-            name: PHP 8.2
-            php-version: 8.2
-            database: mysql:8.0
-          -
             name: PHP 8.4
             php-version: 8.4
             database: mariadb:11.7
@@ -43,6 +42,11 @@ jobs:
             name: Other
             php-version: 8.4
             database: mariadb:11.7
+            arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
+          -
+            name: Other
+            php-version: 8.2
+            database: mysql:8.0
             arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
 
     services:
@@ -103,6 +107,7 @@ jobs:
           APP_KEY=base64:vHI+YHgkyCDad31iPEErGSNEOWO21wNzV+zyENKQv04=
           APP_URL=http://127.0.0.1:8000
           APP_ENV=testing
+          APP_DEBUG=true
           DB_DRIVER=mysql
           DB_HOST=127.0.0.1
           DB_PORT=${{ job.services.database.ports[3306] }}
@@ -180,3 +185,10 @@ jobs:
         name: Dump context
         if: always()
         uses: crazy-max/ghaction-dump-context@v1
+      -
+        name: Upload LibreNMS Logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: librenms-logs-${{ matrix.name }}-${{ strategy.job-index }}
+          path: logs/librenms.log

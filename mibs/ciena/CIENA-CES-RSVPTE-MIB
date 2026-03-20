@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-16-00-0047
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-06-00-5005
  --
  -- CIENA-CES-RSVPTE-MIB.my
  --
@@ -17,19 +17,24 @@
 	
 
  cienaCesRsvpteMIB MODULE-IDENTITY
-	    LAST-UPDATED "201607150000Z"
-	    ORGANIZATION "Ciena, Inc"
+	    LAST-UPDATED "201706070000Z"
+	    ORGANIZATION "Ciena Corp."
 	    CONTACT-INFO
-		    "   Mib Meister
-		  	115 North Sullivan Road
-			Spokane Valley, WA 99037
-		        USA		 		
-		        Phone:  +1 509 242 9000
-			Email:  support@ciena.com"
+	    "   Mib Meister
+	        7035 Ridge Road
+	        Hanover, Maryland 21076
+	        USA
+	        Phone:  +1 800 921 1144
+	        Email:  support@ciena.com"
 
 	    DESCRIPTION
-		"This MIB module is for the RSVP-TE configuration for MPLS tunnels"
-            
+		    "This MIB module is for the RSVP-TE configuration for MPLS tunnels"
+
+	    REVISION
+	    	"201706070000Z"
+	    DESCRIPTION
+		"Updated contact info."
+
 	    REVISION
 	    	"201607150000Z"
 	    DESCRIPTION
@@ -41,7 +46,7 @@
 	    DESCRIPTION
 		"Modified the attribute cienaCesRsvpteGRStatus to cienaCesRsvpteGRAdminStatus.
 		Added the attribute cienaCesRsvpteGROperStatus under cienaCesRsvpteObjects."
- 
+       
 	    REVISION
 	    	"201607040000Z"
 	    DESCRIPTION
@@ -280,7 +285,7 @@
          the Restart_Cap object in Hello messages.
 
          Only used if cienaCesRsvpteRestartCapable is set to true.
-
+           
          For devices which only act as the Helper node, this timer
          is unused and will return value 0."
       DEFVAL { 60000 }
@@ -303,7 +308,7 @@
          A value of 0xFFFFFFFF indicates an infinite recovery time.
 
          Only used if cienaCesRsvpteRestartCapable is set to true.
-
+         
          For devices which only act as the Helper node, this timer
          is unused and will return value 0."
       DEFVAL { 120000 }
@@ -358,12 +363,12 @@
       ::= { cienaCesRsvpteObjects 20 }
 
  cienaCesRsvpteGRMode OBJECT-TYPE
-     SYNTAX      RsvpGRMode
-     MAX-ACCESS  read-only
-     STATUS      current
-     DESCRIPTION
+      SYNTAX      RsvpGRMode
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
        "RSVP-TE Graceful restart Operational status."
-    ::= { cienaCesRsvpteObjects 21 }
+      ::= { cienaCesRsvpteObjects 21 }
 
 
  cienaCesRsvpteIfTable OBJECT-TYPE

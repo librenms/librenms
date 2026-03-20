@@ -1,4 +1,3 @@
-mib: ATS-MIB
 modules:
     os:
         sysDescr_regex: '/v(?<version>[\d.]+) \(SN (?<serial>[^)]+)\)/'
@@ -8,30 +7,30 @@ modules:
             data:
                 -
                     oid:
-                        - atsMiscellaneousGroupSystemMaxCurrent
-                        - atsInputGroupSourceAvoltageUpperLimit
-                        - atsInputGroupSourceAvoltageLowerLimit
-                        - atsInputGroupSourceBvoltageUpperLimit
-                        - atsInputGroupSourceBvoltageLowerLimit
-                        - atsInputGroupSourceAfrequencyUpperLimit
-                        - atsInputGroupSourceAfrequencyLowerLimit
-                        - atsInputGroupSourceBfrequencyUpperLimit
-                        - atsInputGroupSourceBfrequencyLowerLimit
+                        - ATS-MIB::atsMiscellaneousGroupSystemMaxCurrent
+                        - ATS-MIB::atsInputGroupSourceAvoltageUpperLimit
+                        - ATS-MIB::atsInputGroupSourceAvoltageLowerLimit
+                        - ATS-MIB::atsInputGroupSourceBvoltageUpperLimit
+                        - ATS-MIB::atsInputGroupSourceBvoltageLowerLimit
+                        - ATS-MIB::atsInputGroupSourceAfrequencyUpperLimit
+                        - ATS-MIB::atsInputGroupSourceAfrequencyLowerLimit
+                        - ATS-MIB::atsInputGroupSourceBfrequencyUpperLimit
+                        - ATS-MIB::atsInputGroupSourceBfrequencyLowerLimit
         current:
             data:
                 -
-                    oid: atsOutputGroupOutputCurrent
-                    value: atsOutputGroupOutputCurrent
+                    oid: ATS-MIB::atsOutputGroupOutputCurrent
+                    value: ATS-MIB::atsOutputGroupOutputCurrent
                     num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.3.4.{{ $index }}'
                     divisor: 10
                     descr: 'Output'
                     index: 'atsOutputGroupOutputCurrent.{{ $index }}'
-                    high_limit: 'atsMiscellaneousGroupSystemMaxCurrent'
+                    high_limit: ATS-MIB::atsMiscellaneousGroupSystemMaxCurrent
         load:
             data:
                 -
-                    oid: atsOutputGroupLoad
-                    value: atsOutputGroupLoad
+                    oid: ATS-MIB::atsOutputGroupLoad
+                    value: ATS-MIB::atsOutputGroupLoad
                     num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.3.5.{{ $index }}'
                     descr: 'Output'
                     index: 'atsOutputGroupLoad.{{ $index }}'
@@ -39,46 +38,46 @@ modules:
         voltage:
             data:
                 -
-                    oid: atsInputGroupSourceAinputVoltage
-                    value: atsInputGroupSourceAinputVoltage
+                    oid: ATS-MIB::atsInputGroupSourceAinputVoltage
+                    value: ATS-MIB::atsInputGroupSourceAinputVoltage
                     num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.2.3.{{ $index }}'
                     descr: 'Input A'
                     index: 'atsInputGroupSourceAinputVoltage.{{ $index }}'
-                    high_limit: 'atsInputGroupSourceAvoltageUpperLimit'
-                    low_limit: 'atsInputGroupSourceAvoltageLowerLimit'
+                    high_limit: ATS-MIB::atsInputGroupSourceAvoltageUpperLimit
+                    low_limit: ATS-MIB::atsInputGroupSourceAvoltageLowerLimit
                 -
-                    oid: atsInputGroupSourceBinputVoltage
-                    value: atsInputGroupSourceBinputVoltage
+                    oid: ATS-MIB::atsInputGroupSourceBinputVoltage
+                    value: ATS-MIB::atsInputGroupSourceBinputVoltage
                     num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.2.6.{{ $index }}'
                     descr: 'Input B'
                     index: 'atsInputGroupSourceBinputVoltage.{{ $index }}'
-                    high_limit: 'atsInputGroupSourceBvoltageUpperLimit'
-                    low_limit: 'atsInputGroupSourceBvoltageLowerLimit'
+                    high_limit: ATS-MIB::atsInputGroupSourceBvoltageUpperLimit
+                    low_limit: ATS-MIB::atsInputGroupSourceBvoltageLowerLimit
         frequency:
             data:
                 -
-                    oid: atsInputGroupSourceAinputFrequency
-                    value: atsInputGroupSourceAinputFrequency
+                    oid: ATS-MIB::atsInputGroupSourceAinputFrequency
+                    value: ATS-MIB::atsInputGroupSourceAinputFrequency
                     num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.2.4.{{ $index }}'
                     divisor: 10
                     descr: 'Input A'
                     index: 'atsInputGroupSourceAinputFrequency.{{ $index }}'
-                    high_limit: 'atsInputGroupSourceAfrequencyUpperLimit'
-                    low_limit: 'atsInputGroupSourceAfrequencyLowerLimit'
+                    high_limit: ATS-MIB::atsInputGroupSourceAfrequencyUpperLimit
+                    low_limit: ATS-MIB::atsInputGroupSourceAfrequencyLowerLimit
                 -
-                    oid: atsInputGroupSourceBinputFrequency
-                    value: atsInputGroupSourceBinputFrequency
+                    oid: ATS-MIB::atsInputGroupSourceBinputFrequency
+                    value: ATS-MIB::atsInputGroupSourceBinputFrequency
                     num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.2.4.{{ $index }}'
                     divisor: 10
                     descr: 'Input B'
                     index: 'atsInputGroupSourceBinputFrequency.{{ $index }}'
-                    high_limit: 'atsInputGroupSourceBfrequencyUpperLimit'
-                    low_limit: 'atsInputGroupSourceBfrequencyLowerLimit'
+                    high_limit: ATS-MIB::atsInputGroupSourceBfrequencyUpperLimit
+                    low_limit: ATS-MIB::atsInputGroupSourceBfrequencyLowerLimit
         state:
             data:
                 -
-                    oid: atsInputGroupSourceAstatus
-                    value: atsInputGroupSourceAstatus
+                    oid: ATS-MIB::atsInputGroupSourceAstatus
+                    value: ATS-MIB::atsInputGroupSourceAstatus
                     num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.2.2.{{ $index }}'
                     descr: 'Input A'
                     index: 'atsInputGroupSourceAstatus.{{ $index }}'
@@ -87,8 +86,8 @@ modules:
                         - { descr: Ok, graph: 0, value: 2, generic: 0 }
                         - { descr: Fail, graph: 0, value: 1, generic: 2 }
                 -
-                    oid: atsInputGroupSourceBstatus
-                    value: atsInputGroupSourceBstatus
+                    oid: ATS-MIB::atsInputGroupSourceBstatus
+                    value: ATS-MIB::atsInputGroupSourceBstatus
                     num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.2.5.{{ $index }}'
                     descr: 'Input B'
                     index: 'atsInputGroupSourceBstatus.{{ $index }}'
@@ -97,8 +96,8 @@ modules:
                         - { descr: Ok, graph: 0, value: 2, generic: 0 }
                         - { descr: Fail, graph: 0, value: 1, generic: 2 }
                 -
-                    oid: atsHmiSwitchGroupBuzzer
-                    value: atsHmiSwitchGroupBuzzer
+                    oid: ATS-MIB::atsHmiSwitchGroupBuzzer
+                    value: ATS-MIB::atsHmiSwitchGroupBuzzer
                     num_oid: '.1.3.6.1.4.1.37662.1.2.2.1.1.4.1.{{ $index }}'
                     descr: 'Buzzer'
                     index: 'atsHmiSwitchGroupBuzzer.{{ $index }}'

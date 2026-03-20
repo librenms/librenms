@@ -121,7 +121,7 @@ class InfluxDBv2 extends BaseDatastore
             $device_groups = $device->groups;
             foreach ($device_groups as $group) {
                 // The group name will always be parsed as lowercase, even when uppercase in the GUI.
-                if (in_array(strtoupper($group->name), array_map('strtoupper', $excluded_groups))) {
+                if (in_array(strtoupper((string) $group->name), array_map(strtoupper(...), $excluded_groups))) {
                     Log::warning('Skipped parsing to InfluxDBv2, device is in group: ' . $group->name);
 
                     return;

@@ -31,6 +31,7 @@ use App\Models\Device;
 use Illuminate\Support\Arr;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostIpExistsException;
+use LibreNMS\Exceptions\HostNameEmptyException;
 use LibreNMS\Exceptions\HostnameExistsException;
 use LibreNMS\Exceptions\HostSysnameExistsException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
@@ -41,7 +42,7 @@ use SnmpQuery;
 
 class ValidateDeviceAndCreate
 {
-    public function __construct(private Device $device, private bool $force = false, private bool $ping_fallback = false)
+    public function __construct(private readonly Device $device, private readonly bool $force = false, private readonly bool $ping_fallback = false)
     {
     }
 
@@ -55,6 +56,10 @@ class ValidateDeviceAndCreate
      */
     public function execute(): bool
     {
+        if (empty($this->device->hostname)) {
+            throw new HostNameEmptyException();
+        }
+
         if ($this->device->exists) {
             return false;
         }

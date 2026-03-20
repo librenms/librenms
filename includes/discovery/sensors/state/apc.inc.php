@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-$temp = snmp_get($device, 'upsAdvBatteryReplaceIndicator.0', '-Ovqe', 'PowerNet-MIB');
+$temp = SnmpQuery::get('PowerNet-MIB::upsAdvBatteryReplaceIndicator.0')->value();
 $cur_oid = '.1.3.6.1.4.1.318.1.1.1.2.2.4.0';
 $index = '0';
 
@@ -35,7 +35,7 @@ foreach ($cooling_status as $index => $data) {
     $state_name = 'coolingUnitStatusDiscreteDescription';
     $descr = $data[$state_name];
 
-    $tmp_states = explode(',', $data['coolingUnitStatusDiscreteIntegerReferenceKey']);
+    $tmp_states = explode(',', (string) $data['coolingUnitStatusDiscreteIntegerReferenceKey']);
     $states = [];
     foreach ($tmp_states as $ref) {
         preg_match('/([\w ]+)?\\(([\d]+)\\)/', $ref, $matches);
@@ -54,7 +54,8 @@ foreach ($cooling_unit as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.6.2.2.1.4.' . $index;
     $state_name = 'coolingUnitExtendedDiscreteDescription';
     $descr = $data[$state_name];
-    $tmp_states = explode(',', $data['coolingUnitExtendedDiscreteIntegerReferenceKey']);
+
+    $tmp_states = explode(',', (string) $data['coolingUnitExtendedDiscreteIntegerReferenceKey']);
     $states = [];
     foreach ($tmp_states as $ref) {
         preg_match('/([\w ]+)\\(([\d]+)\\)/', $ref, $matches);
@@ -181,7 +182,7 @@ if (isset($apcContactData['uioInputContactStatusTableSize']) && $apcContactData[
             // future appearing sub-index will remain untouched, so 1.2 will stay 1.2, 2.2 will stay 2.2, etc.
             // The reason that we remove the sub-index from the first entry is to preserve compatibility with sensors
             // created by prior versions using the legacy iemConfig and iemStatus tables.
-            $split_index = explode('.', $index);
+            $split_index = explode('.', (string) $index);
             if (count($split_index) == 2 && $split_index[1] == 1) {
                 $index = $split_index[0];
             }

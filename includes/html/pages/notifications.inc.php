@@ -22,6 +22,7 @@
  */
 
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\ObjectCache;
 
 $total = Auth::user()->notifications()->count();
@@ -35,7 +36,7 @@ $total = Auth::user()->notifications()->count();
 <?php
 echo '<strong class="count-notif">' . $total . '</strong> Unread Notifications ';
 
-if (Auth::user()->hasGlobalAdmin()) {
+if (Gate::allows('notification.update')) {
     echo '<button class="btn btn-success pull-right fa fa-plus new-notif" data-toggle="tooltip" data-placement="bottom" title="Create new notification" style="margin-top:-10px;"></button>';
 }
 
@@ -88,12 +89,12 @@ if ($total > 0 && ! isset($vars['archive'])) {
 
         $class = $notif->severity == 2 ? 'text-danger' : 'text-warning';
         echo "<h4 class='$class' id='{$notif->notifications_id}'>";
-        echo "<strong><i class='fa fa-bell-o'></i>&nbsp;" . htmlentities($notif->title) . '</strong>';
+        echo "<strong><i class='fa fa-bell-o'></i>&nbsp;" . htmlentities((string) $notif->title) . '</strong>';
         echo "<span class='pull-right'>";
 
         if ($notif->user_id != Auth::id()) {
             $sticky_user = User::find($notif->user_id);
-            echo "<code>Sticky by " . htmlentities($sticky_user->username) . "</code>";
+            echo "<code>Sticky by " . htmlentities((string) $sticky_user->username) . "</code>";
         } else {
             echo '<button class="btn btn-primary fa fa-bell-slash-o unstick-notif" data-toggle="tooltip" data-placement="bottom" title="Remove Sticky" style="margin-top:-10px;"></button>';
         }
@@ -105,7 +106,7 @@ if ($total > 0 && ! isset($vars['archive'])) {
       <div class="col-md-12">
         <blockquote<?php echo $notif->severity == 2 ? ' style="border-color: darkred;"' : '' ?>>
           <p><?php echo \LibreNMS\Util\Clean::html($notif->body, ['HTML.Allowed' => 'br']); ?></p>
-          <footer><?php echo $notif->datetime; ?> | Source: <code><?php echo htmlentities($notif->source); ?></code></footer>
+          <footer><?php echo $notif->datetime; ?> | Source: <code><?php echo htmlentities((string) $notif->source); ?></code></footer>
         </blockquote>
       </div>
     </div>
@@ -132,9 +133,9 @@ if ($total > 0 && ! isset($vars['archive'])) {
         } elseif ($notif->severity == 2) {
             $class = 'text-danger';
         }
-        echo "<h4 class='$class' id='{$notif->notifications_id}'>" . htmlentities($notif->title) . "<span class='pull-right'>";
+        echo "<h4 class='$class' id='{$notif->notifications_id}'>" . htmlentities((string) $notif->title) . "<span class='pull-right'>";
 
-        if (Auth::user()->hasGlobalAdmin()) {
+        if (Gate::allows('notification.update')) {
             echo '<button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button>';
         } ?>
 
@@ -147,7 +148,7 @@ if ($total > 0 && ! isset($vars['archive'])) {
       <div class="col-md-12">
           <blockquote<?php echo $notif->severity == 2 ? ' style="border-color: darkred;"' : '' ?>>
           <p><?php echo \LibreNMS\Util\Clean::html($notif->body, ['HTML.Allowed' => 'br']); ?></p>
-          <footer><?php echo $notif->datetime; ?> | Source: <code><?php echo htmlentities($notif->source); ?></code></footer>
+          <footer><?php echo $notif->datetime; ?> | Source: <code><?php echo htmlentities((string) $notif->source); ?></code></footer>
         </blockquote>
       </div>
     </div>
@@ -176,9 +177,9 @@ if ($total > 0 && ! isset($vars['archive'])) {
         } elseif ($notif->severity == 2) {
             echo ' class="text-danger"';
         }
-        echo  " id='{$notif->notifications_id}'>" . htmlentities($notif->title);
+        echo  " id='{$notif->notifications_id}'>" . htmlentities((string) $notif->title);
 
-        if (Auth::user()->isAdmin()) {
+        if (Gate::allows('notification.update')) {
             echo '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>';
         } ?>
         </h4>
@@ -188,7 +189,7 @@ if ($total > 0 && ! isset($vars['archive'])) {
       <div class="col-md-12">
           <blockquote<?php echo $notif->severity == 2 ? ' style="border-color: darkred;"' : '' ?>>
           <p><?php echo \LibreNMS\Util\Clean::html($notif->body, ['HTML.Allowed' => 'br']); ?></p>
-          <footer><?php echo $notif->datetime; ?> | Source: <code><?php echo htmlentities($notif->source); ?></code></footer>
+          <footer><?php echo $notif->datetime; ?> | Source: <code><?php echo htmlentities((string) $notif->source); ?></code></footer>
         </blockquote>
       </div>
     </div>

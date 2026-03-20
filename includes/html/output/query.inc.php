@@ -24,10 +24,12 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
+use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alerting\QueryBuilderParser;
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('debug', Device::class)) {
     echo 'Insufficient Privileges';
     exit;
 }
@@ -56,7 +58,7 @@ switch ($type) {
                 $response = 'no match';
             }
 
-            $extra = json_decode($rule['extra'], true);
+            $extra = json_decode((string) $rule['extra'], true);
             if ($extra['options']['override_query'] === 'on' || $extra['options']['override_query'] === true) {
                 $qb = $extra['options']['override_query'];
             } else {

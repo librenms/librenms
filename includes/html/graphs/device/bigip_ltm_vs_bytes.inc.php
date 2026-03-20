@@ -26,23 +26,24 @@ if (isset($components[$vars['id']])) {
     $hash = $components[$vars['id']]['hash'];
 
     include 'includes/html/graphs/common.inc.php';
-    $rrd_options .= ' -l 0 -E ';
-    $rrd_options .= " COMMENT:'Bits           Now      Ave      Max\\n'";
+    $graph_params->scale_min = 0;
+
+    $rrd_options[] = 'COMMENT:Bits           Now      Ave      Max\\n';
 
     $rrd_filename = Rrd::name($device['hostname'], ['f5-ltm-vs', $label, $hash]);
     if (Rrd::checkRrdExists($rrd_filename)) {
-        $rrd_options .= ' DEF:INBYTES=' . $rrd_filename . ':bytesin:AVERAGE ';
-        $rrd_options .= ' CDEF:INBITS=INBYTES,8,* ';
-        $rrd_options .= " LINE1.25:INBITS#330033:'Bits In '";
-        $rrd_options .= ' GPRINT:INBITS:LAST:%6.2lf%s ';
-        $rrd_options .= ' GPRINT:INBITS:AVERAGE:%6.2lf%s ';
-        $rrd_options .= " GPRINT:INBITS:MAX:%6.2lf%s\l ";
+        $rrd_options[] = 'DEF:INBYTES=' . $rrd_filename . ':bytesin:AVERAGE';
+        $rrd_options[] = 'CDEF:INBITS=INBYTES,8,*';
+        $rrd_options[] = 'LINE1.25:INBITS#330033:Bits In ';
+        $rrd_options[] = 'GPRINT:INBITS:LAST:%6.2lf%s';
+        $rrd_options[] = 'GPRINT:INBITS:AVERAGE:%6.2lf%s';
+        $rrd_options[] = "GPRINT:INBITS:MAX:%6.2lf%s\l";
 
-        $rrd_options .= ' DEF:OUTBYTES=' . $rrd_filename . ':bytesout:AVERAGE ';
-        $rrd_options .= ' CDEF:OUTBITS=OUTBYTES,8,* ';
-        $rrd_options .= " LINE1.25:OUTBITS#FF6600:'Bits Out'";
-        $rrd_options .= ' GPRINT:OUTBITS:LAST:%6.2lf%s ';
-        $rrd_options .= ' GPRINT:OUTBITS:AVERAGE:%6.2lf%s ';
-        $rrd_options .= " GPRINT:OUTBITS:MAX:%6.2lf%s\l ";
+        $rrd_options[] = 'DEF:OUTBYTES=' . $rrd_filename . ':bytesout:AVERAGE';
+        $rrd_options[] = 'CDEF:OUTBITS=OUTBYTES,8,*';
+        $rrd_options[] = 'LINE1.25:OUTBITS#FF6600:Bits Out';
+        $rrd_options[] = 'GPRINT:OUTBITS:LAST:%6.2lf%s';
+        $rrd_options[] = 'GPRINT:OUTBITS:AVERAGE:%6.2lf%s';
+        $rrd_options[] = "GPRINT:OUTBITS:MAX:%6.2lf%s\l";
     }
 }

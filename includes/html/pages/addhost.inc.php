@@ -2,13 +2,15 @@
 
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Util\IP;
 
 $no_refresh = true;
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('create', Device::class)) {
     include 'includes/html/error-no-perm.inc.php';
 
     exit;
@@ -23,28 +25,28 @@ echo '<div class="row">
 $snmp_enabled = ! isset($_POST['hostname']) || isset($_POST['snmp']);
 
 if (! empty($_POST['hostname'])) {
-    $hostname = strip_tags($_POST['hostname']);
+    $hostname = strip_tags((string) $_POST['hostname']);
     if (! \LibreNMS\Util\Validate::hostname($hostname) && ! IP::isValid($hostname)) {
         print_error("Invalid hostname or IP: $hostname");
     } else {
         $new_device = new \App\Models\Device(['hostname' => $hostname]);
 
-        if (Auth::user()->hasGlobalRead()) {
+        if (Gate::allows('create', Device::class)) {
             // Settings common to SNMPv2 & v3
             if ($_POST['port']) {
-                $new_device->port = strip_tags($_POST['port']);
+                $new_device->port = strip_tags((string) $_POST['port']);
             }
 
             if ($_POST['transport']) {
-                $new_device->transport = strip_tags($_POST['transport']);
+                $new_device->transport = strip_tags((string) $_POST['transport']);
             }
 
             $additional = [];
             if (! $snmp_enabled) {
                 $new_device->snmp_disable = 1;
-                $new_device->os = $_POST['os'] ? strip_tags($_POST['os']) : 'ping';
-                $new_device->hardware = strip_tags($_POST['hardware']);
-                $new_device->sysName = strip_tags($_POST['sysName']);
+                $new_device->os = $_POST['os'] ? strip_tags((string) $_POST['os']) : 'ping';
+                $new_device->hardware = strip_tags((string) $_POST['hardware']);
+                $new_device->sysName = strip_tags((string) $_POST['sysName']);
             } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
                 $new_device->snmpver = strip_tags($_POST['snmpver']);
                 $communities = LibrenmsConfig::get('snmp.community');
@@ -52,13 +54,13 @@ if (! empty($_POST['hostname'])) {
                     $new_device->community = $_POST['community'];
                     $communities = [$_POST['community']];
                 }
-                print_message('Adding host ' . htmlentities($hostname) . (count($communities) == 1 ? ' community' : ' communities') . ' ' . implode(', ', array_map('htmlspecialchars', $communities)) . ' port ' . htmlentities($new_device->port) . ' using ' . htmlentities($new_device->transport));
+                print_message('Adding host ' . htmlentities($hostname) . (count($communities) == 1 ? ' community' : ' communities') . ' ' . implode(', ', array_map(htmlspecialchars(...), $communities)) . ' port ' . htmlentities($new_device->port) . ' using ' . htmlentities($new_device->transport));
             } elseif ($_POST['snmpver'] === 'v3') {
                 $new_device->snmpver = 'v3';
-                $new_device->authlevel = strip_tags($_POST['authlevel']);
+                $new_device->authlevel = strip_tags((string) $_POST['authlevel']);
                 $new_device->authname = $_POST['authname'];
                 $new_device->authpass = $_POST['authpass'];
-                $new_device->authalgo = strip_tags($_POST['authalgo']);
+                $new_device->authalgo = strip_tags((string) $_POST['authalgo']);
                 $new_device->cryptopass = $_POST['cryptopass'];
                 $new_device->cryptoalgo = $_POST['cryptoalgo'];
 
@@ -81,7 +83,7 @@ if (! empty($_POST['hostname'])) {
             } catch (HostUnreachableException $e) {
                 print_error($e->getMessage());
                 foreach ($e->getReasons() as $reason) {
-                    print_error(htmlentities($reason));
+                    print_error(htmlentities((string) $reason));
                 }
             } catch (Exception $e) {
                 print_error($e->getMessage());
@@ -280,7 +282,7 @@ if (LibrenmsConfig::get('distributed_poller') === true) {
     ';
 
                       foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
-                          echo '<option value="' . $group['id'] . '">' . htmlentities($group['group_name']) . '</option>';
+                          echo '<option value="' . $group['id'] . '">' . htmlentities((string) $group['group_name']) . '</option>';
                       }
 
                       echo '

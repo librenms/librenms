@@ -103,7 +103,7 @@ class Mac implements \Stringable
             return $plainMac;
         }
 
-        return new static(substr(preg_replace('/[^0-9a-f]/', '', strtolower($bridge)), -12));
+        return new static(substr((string) preg_replace('/[^0-9a-f]/', '', strtolower($bridge)), -12));
     }
 
     /**
@@ -149,7 +149,7 @@ class Mac implements \Stringable
         // Then we may have a shorter prefix, so let's try them one after the other
         $mac = $this->hex();
         foreach ($results as $oui => $vendor) {
-            if (str_starts_with($mac, $oui)) {
+            if (str_starts_with($mac, (string) $oui)) {
                 return $vendor;
             }
         }
@@ -167,7 +167,7 @@ class Mac implements \Stringable
      */
     public function oid(): string
     {
-        return implode('.', array_map('hexdec', $this->mac));
+        return implode('.', array_map(hexdec(...), $this->mac));
     }
 
     /**

@@ -1,4 +1,3 @@
-mib: ALCATEL-IND1-CHASSIS-MIB:ALCATEL-IND1-HEALTH-MIB:ALCATEL-IND1-PORT-MIB:ALCATEL-IND1-LAG-MIB
 modules:
     mempools:
         data:
@@ -12,7 +11,7 @@ modules:
     processors:
         data:
             -
-                oid: healthDeviceCpu1MinAvg
+                oid: ALCATEL-IND1-HEALTH-MIB::healthDeviceCpu1MinAvg
                 num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.16.1.1.1.14.{{ $index }}'
                 index: 0
     sensors:
@@ -20,92 +19,92 @@ modules:
             data:
                 -
                     oid:
-                        - ifName
-                        - entPhysicalName
-                        - alclnkaggAggNumber
-                        - alaStackMgrSlotNINumber
+                        - IF-MIB::ifName
+                        - ENTITY-MIB::entPhysicalName
+                        - ALCATEL-IND1-LAG-MIB::alclnkaggAggNumber
+                        - ALCATEL-IND1-STACK-MANAGER-MIB::alaStackMgrSlotNINumber
         temperature:
             data:
                 -
-                    oid: ddmInfoEntry
-                    value: ddmTemperature
+                    oid: ALCATEL-IND1-PORT-MIB::ddmInfoEntry
+                    value: ALCATEL-IND1-PORT-MIB::ddmTemperature
                     num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.1.{{ $index }}'
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    descr: '{{ $ifName }} SFP Temperature'
+                    descr: '{{ IF-MIB::ifName }} SFP Temperature'
                     index: 'ddmTemperature.{{ $index }}'
-                    low_limit: ddmTempLowAlarm
-                    low_warn_limit: ddmTempLowWarning
-                    high_limit: ddmTempHiAlarm
-                    warn_limit: ddmTempHiWarning
+                    low_limit: ALCATEL-IND1-PORT-MIB::ddmTempLowAlarm
+                    low_warn_limit: ALCATEL-IND1-PORT-MIB::ddmTempLowWarning
+                    high_limit: ALCATEL-IND1-PORT-MIB::ddmTempHiAlarm
+                    warn_limit: ALCATEL-IND1-PORT-MIB::ddmTempHiWarning
 
         voltage:
             data:
                 -
-                    oid: ddmInfoEntry
-                    value: ddmSupplyVoltage
+                    oid: ALCATEL-IND1-PORT-MIB::ddmInfoEntry
+                    value: ALCATEL-IND1-PORT-MIB::ddmSupplyVoltage
                     num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.6.{{ $index }}'
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    descr: '{{ $ifName }} SFP Voltage'
+                    descr: '{{ IF-MIB::ifName }} SFP Voltage'
                     index: 'ddmSupplyVoltage.{{ $index }}'
-                    low_limit: ddmSupplyVoltageLowAlarm
-                    low_warn_limit: ddmSupplyVoltageLowWarning
-                    high_limit: ddmSupplyVoltageHiAlarm
-                    warn_limit: ddmSupplyVoltageHiWarning
+                    low_limit: ALCATEL-IND1-PORT-MIB::ddmSupplyVoltageLowAlarm
+                    low_warn_limit: ALCATEL-IND1-PORT-MIB::ddmSupplyVoltageLowWarning
+                    high_limit: ALCATEL-IND1-PORT-MIB::ddmSupplyVoltageHiAlarm
+                    warn_limit: ALCATEL-IND1-PORT-MIB::ddmSupplyVoltageHiWarning
 
 
         current:
             data:
                 -
-                    oid: ddmInfoEntry
-                    value: ddmTxBiasCurrent
+                    oid: ALCATEL-IND1-PORT-MIB::ddmInfoEntry
+                    value: ALCATEL-IND1-PORT-MIB::ddmTxBiasCurrent
                     num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.11.{{ $index }}'
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    descr: '{{ $ifName }} Tx Bias'
+                    descr: '{{ IF-MIB::ifName }} Tx Bias'
                     index: 'ddmTxBiasCurrent.{{ $index }}'
-                    low_limit: ddmTxBiasCurrentLowAlarm
-                    low_warn_limit: ddmTxBiasCurrentLowWarning
-                    high_limit: ddmTxBiasCurrentHiAlarm
-                    warn_limit: ddmTxBiasCurrentHiWarning
+                    low_limit: ALCATEL-IND1-PORT-MIB::ddmTxBiasCurrentLowAlarm
+                    low_warn_limit: ALCATEL-IND1-PORT-MIB::ddmTxBiasCurrentLowWarning
+                    high_limit: ALCATEL-IND1-PORT-MIB::ddmTxBiasCurrentHiAlarm
+                    warn_limit: ALCATEL-IND1-PORT-MIB::ddmTxBiasCurrentHiWarning
 
         dbm:
             data:
                 -
-                    oid: ddmInfoEntry
-                    value: ddmRxOpticalPower
+                    oid: ALCATEL-IND1-PORT-MIB::ddmInfoEntry
+                    value: ALCATEL-IND1-PORT-MIB::ddmRxOpticalPower
                     num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.21.{{ $index }}'
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    descr: '{{ $ifName }} Rx Power'
+                    descr: '{{ IF-MIB::ifName }} Rx Power'
                     index: 'ddmRxOpticalPower.{{ $index }}'
-                    low_limit: ddmRxOpticalPowerLowAlarm
-                    low_warn_limit: ddmRxOpticalPowerLowWarning
-                    high_limit: ddmRxOpticalPowerHiAlarm
-                    warn_limit: ddmRxOpticalPowerHiWarning
+                    low_limit: ALCATEL-IND1-PORT-MIB::ddmRxOpticalPowerLowAlarm
+                    low_warn_limit: ALCATEL-IND1-PORT-MIB::ddmRxOpticalPowerLowWarning
+                    high_limit: ALCATEL-IND1-PORT-MIB::ddmRxOpticalPowerHiAlarm
+                    warn_limit: ALCATEL-IND1-PORT-MIB::ddmRxOpticalPowerHiWarning
                 -
-                    oid: ddmInfoEntry
-                    value: ddmTxOutputPower
+                    oid: ALCATEL-IND1-PORT-MIB::ddmInfoEntry
+                    value: ALCATEL-IND1-PORT-MIB::ddmTxOutputPower
                     num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.16.{{ $index }}'
                     divisor: 1000
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: 'ports'
-                    descr: '{{ $ifName }} Tx Power'
+                    descr: '{{ IF-MIB::ifName }} Tx Power'
                     index: 'ddmTxOutputPower.{{ $index }}'
-                    low_limit: ddmTxOutputPowerLowAlarm
-                    low_warn_limit: ddmTxOutputPowerLowWarning
-                    high_limit: ddmTxOutputPowerHiAlarm
-                    warn_limit: ddmTxOutputPowerHiWarning
+                    low_limit: ALCATEL-IND1-PORT-MIB::ddmTxOutputPowerLowAlarm
+                    low_warn_limit: ALCATEL-IND1-PORT-MIB::ddmTxOutputPowerLowWarning
+                    high_limit: ALCATEL-IND1-PORT-MIB::ddmTxOutputPowerHiAlarm
+                    warn_limit: ALCATEL-IND1-PORT-MIB::ddmTxOutputPowerHiWarning
         state:
             data:
                 -
-                    oid: chasControlModuleTable
-                    value: chasControlCertifyStatus
+                    oid: ALCATEL-IND1-CHASSIS-MIB::chasControlModuleTable
+                    value: ALCATEL-IND1-CHASSIS-MIB::chasControlCertifyStatus
                     num_oid: '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.1.1.5.{{ $index }}'
                     descr: 'Certify/Restore Status'
                     group: Chassis
@@ -116,8 +115,8 @@ modules:
                         - { value: 2, generic: 1, graph: 1, descr: Need Certify }
                         - { value: 3, generic: 0, graph: 1, descr: Certified }
                 -
-                    oid: chasControlModuleTable
-                    value: chasControlSynchronizationStatus
+                    oid: ALCATEL-IND1-CHASSIS-MIB::chasControlModuleTable
+                    value: ALCATEL-IND1-CHASSIS-MIB::chasControlSynchronizationStatus
                     num_oid: '.1.3.6.1.4.1.6486.800.1.1.1.3.1.1.1.1.6.{{ $index }}'
                     descr: 'Flash Between CMMs'
                     group: Chassis
@@ -129,10 +128,10 @@ modules:
                         - { value: 3, generic: 1, graph: 1, descr: Not Synchronized }
                         - { value: 4, generic: 0, graph: 1, descr: Synchronized }
                 -
-                    oid: alclnkaggAggEntry
-                    value: alclnkaggAggNbrAttachedPorts
+                    oid: ALCATEL-IND1-LAG-MIB::alclnkaggAggEntry
+                    value: ALCATEL-IND1-LAG-MIB::alclnkaggAggNbrAttachedPorts
                     num_oid: '.1.3.6.1.4.1.6486.800.1.2.1.13.1.1.1.1.1.19.{{ $index }}'
-                    descr: 'LACP Number {{ $alclnkaggAggNumber }}'
+                    descr: 'LACP Number {{ ALCATEL-IND1-LAG-MIB::alclnkaggAggNumber }}'
                     index: 'alclnkaggAggNbrAttachedPorts.{{ $index }}'
                     group: LACP
                     state_name: alclnkaggAggNbrAttachedPorts
@@ -147,15 +146,16 @@ modules:
                         - { value: 8, generic: 0, graph: 1, descr: Redundant (8) }
                     skip_values:
                         -
-                            oid: alclnkaggAggNbrAttachedPorts
+                            oid: ALCATEL-IND1-LAG-MIB::alclnkaggAggNbrAttachedPorts
                             op: '='
                             value: 0
                 -
-                    oid: chasEntPhysOperStatus
+                    oid: ALCATEL-IND1-CHASSIS-MIB::chasEntPhysOperStatus
                     num_oid: '.1.3.6.1.4.1.6486.800.1.1.1.1.1.1.1.2.{{ $index }}'
-                    descr: '{{ $entPhysicalName }}'
+                    descr: '{{ ENTITY-MIB::entPhysicalName }}'
                     group: Components
                     index: 'chasEntPhysOperStatus.{{ $index }}'
+                    state_name: chasEntPhysOperStatus
                     states:
                         - { value: 1, generic: 0, graph: 1, descr: Up }
                         - { value: 2, generic: 2, graph: 1, descr: Down }
@@ -169,7 +169,6 @@ modules:
                         - { value: 10, generic: 0, graph: 1, descr: PwrSave }
                     skip_values:
                         -
-                            oid: entPhysicalName
+                            oid: ENTITY-MIB::entPhysicalName
                             op: 'regex'
                             value: '/port|Chassis|PS-1|PS-2/'
-

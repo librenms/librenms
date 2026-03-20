@@ -31,11 +31,15 @@ return [
             'engine' => null,
             'sslmode' => env('DB_SSLMODE', 'disabled'),
             'options' => extension_loaded('pdo_mysql') ? [
-                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', false),
+                // @phpstan-ignore class.notFound, greaterOrEqual.alwaysFalse
+                (PHP_VERSION_ID >= 80500 ? Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT) => env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', false),
             ] + array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-                PDO::MYSQL_ATTR_SSL_CERT => env('MYSQL_ATTR_SSL_CERT'),
-                PDO::MYSQL_ATTR_SSL_KEY => env('MYSQL_ATTR_SSL_KEY'),
+                // @phpstan-ignore class.notFound, greaterOrEqual.alwaysFalse
+                (PHP_VERSION_ID >= 80500 ? Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
+                // @phpstan-ignore class.notFound, greaterOrEqual.alwaysFalse
+                (PHP_VERSION_ID >= 80500 ? Pdo\Mysql::ATTR_SSL_CERT : PDO::MYSQL_ATTR_SSL_CERT) => env('MYSQL_ATTR_SSL_CERT'),
+                // @phpstan-ignore class.notFound, greaterOrEqual.alwaysFalse
+                (PHP_VERSION_ID >= 80500 ? Pdo\Mysql::ATTR_SSL_KEY : PDO::MYSQL_ATTR_SSL_KEY) => env('MYSQL_ATTR_SSL_KEY'),
             ]) : [],
         ],
 
@@ -81,7 +85,8 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                // @phpstan-ignore class.notFound, greaterOrEqual.alwaysFalse
+                (PHP_VERSION_ID >= 80500 ? Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 
@@ -140,6 +145,7 @@ return [
         ],
 
         'cache' => [
+            'scheme' => env('REDIS_SCHEME', 'tcp'),
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'username' => env('REDIS_USERNAME'),
@@ -149,7 +155,7 @@ return [
         ],
 
         'sentinel_session' => [
-            ...explode(',', env('REDIS_SENTINEL_HOSTS', '')),
+            ...explode(',', (string) env('REDIS_SENTINEL_HOSTS', '')),
             'options' => [
                 'replication' => 'sentinel',
                 'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
@@ -161,7 +167,7 @@ return [
         ],
 
         'sentinel_cache' => [
-            ...explode(',', env('REDIS_SENTINEL_HOSTS', '')),
+            ...explode(',', (string) env('REDIS_SENTINEL_HOSTS', '')),
             'options' => [
                 'replication' => 'sentinel',
                 'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),

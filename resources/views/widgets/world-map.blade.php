@@ -5,6 +5,7 @@
         const map_id = 'worldmap_widget-{{ $id }}';
         const status = {{ Js::from($status) }};
         const device_group = {{ (int) $device_group }};
+        const disabled_alerts = {{ Js::from($disabled_alerts) }};
         const map_config = {{ Js::from($map_config) }};
         const group_radius = {{ (int) $group_radius }};
 
@@ -13,7 +14,7 @@
                 type: "POST",
                 url: '{{ route('maps.getdevices') }}',
                 dataType: "json",
-                data: { location_valid: 1, disabled: 0, disabled_alerts: 0, statuses: status, group: device_group },
+                data: { location_valid: 1, disabled: 0, disabled_alerts: disabled_alerts, statuses: status, group: device_group },
                 success: function (data) {
                     var markers = Object.values(data).map((device) => {
                         var deviceMarker = L.AwesomeMarkers.icon({

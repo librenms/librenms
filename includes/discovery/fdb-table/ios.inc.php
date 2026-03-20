@@ -4,10 +4,15 @@ use LibreNMS\Util\Mac;
 
 $vtpdomains = snmpwalk_group($device, 'managementDomainName', 'CISCO-VTP-MIB');
 $vlans = snmpwalk_group($device, 'vtpVlanEntry', 'CISCO-VTP-MIB', 2);
+$ignore_vlans = (array) LibrenmsConfig::getOsSetting($device['os'], 'ignore_vlans');
 
 foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
     echo "VTP Domain $vtpdomain_id {$vtpdomain['managementDomainName']}> ";
     foreach ($vlans[$vtpdomain_id] as $vlan_raw => $vlan) {
+        if (in_array($vlan_raw, $ignore_vlans)) {
+            continue;
+        }
+
         echo "$vlan_raw ";
         if (! array_key_exists($vlan_raw, $vlans_dict)) {
             $newvlan_id = dbInsert([
@@ -35,10 +40,12 @@ foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
                     d_echo("MAC address padding failed for $mac\n");
                     continue;
                 }
-                $port_id = $portid_dict[$dot1dBasePort];
-                $vlan_id = $vlans_dict[$vlan_raw] ?? 0;
-                $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
-                d_echo("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
+                if (isset($portid_dict[$dot1dBasePort])) {
+                    $port_id = $portid_dict[$dot1dBasePort];
+                    $vlan_id = $vlans_dict[$vlan_raw] ?? 0;
+                    $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
+                    d_echo("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
+                }
             }
         } //end if operational
     } // end for each vlan

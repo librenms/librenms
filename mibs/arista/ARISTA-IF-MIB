@@ -7,12 +7,13 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,
     TimeTicks, Gauge32, Counter32      FROM SNMPv2-SMI
     MODULE-COMPLIANCE, OBJECT-GROUP    FROM SNMPv2-CONF
+    DisplayString                      FROM SNMPv2-TC
     ifIndex                            FROM IF-MIB
     CounterBasedGauge64                FROM HCNUM-TC
     aristaMibs                         FROM ARISTA-SMI-MIB;
 
 aristaIfMIB MODULE-IDENTITY
-    LAST-UPDATED "201410090000Z"
+    LAST-UPDATED "202103100000Z"
     ORGANIZATION "Arista Networks, Inc."
     CONTACT-INFO
         "Arista Networks, Inc.
@@ -26,8 +27,15 @@ aristaIfMIB MODULE-IDENTITY
     DESCRIPTION
             "The MIB module for reporting additional interface statistics
             on Arista devices."
+    REVISION      "202103100000Z"
+    DESCRIPTION
+            "Added Dot1X dropped packet statistics to aristaIfTable."
+    REVISION      "202101210000Z"
+    DESCRIPTION
+            "Updated aristaIfTable to include interface error disabled state."
     REVISION      "201410090000Z"
-    DESCRIPTION "Initial version."
+    DESCRIPTION
+            "Initial version."
     ::= { aristaMibs 15 }
 
 
@@ -60,7 +68,11 @@ AristaIfEntry ::= SEQUENCE {
     aristaIfOutOctetRate              CounterBasedGauge64,
     aristaIfRatesLastUpdated          TimeTicks,
     aristaIfOperStatusChanges         Counter32,
-    aristaIfInAclDrops                Counter32
+    aristaIfInAclDrops                Counter32,
+    aristaIfErrDisabledReason         DisplayString,
+    aristaIfDot1xEapolPortDrops       Counter32,
+    aristaIfDot1xEapolHostDrops       Counter32,
+    aristaIfDot1xMbaHostDrops         Counter32
 }
 
 aristaIfCounterLastUpdated OBJECT-TYPE
@@ -149,6 +161,63 @@ aristaIfInAclDrops OBJECT-TYPE
         ifCounterDiscontinuityTime."
     ::= { aristaIfEntry 9 }
 
+aristaIfErrDisabledReason OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the interface has been disabled due to an error, this object
+        contains a textual string that represents the reason for being
+        disabled. Otherwise, this object contains an empty string.
+
+        As an example: When a port-channel interface is administratively
+        shut down, all member interfaces will be error-disabled. In this
+        case, the reason string will be 'port-channel-shutdown'."
+    ::= { aristaIfEntry 10 }
+
+aristaIfDot1xEapolPortDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inbound packets dropped because a 802.1X
+        port configured for EAPoL is not authorized.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the management system, and at other
+        times as indicated by the value of
+        ifCounterDiscontinuityTime."
+    ::= { aristaIfEntry 11 }
+
+aristaIfDot1xEapolHostDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inbound packets dropped on a 802.1X port
+        configured for EAPoL because the host is not
+        authenticated.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the management system, and at other
+        times as indicated by the value of
+        ifCounterDiscontinuityTime."
+    ::= { aristaIfEntry 12 }
+    
+aristaIfDot1xMbaHostDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inbound packets dropped on a 802.1X port
+        configured for MBA because the host is not authenticated.
+
+        Discontinuities in the value of this counter can occur at
+        re-initialization of the management system, and at other
+        times as indicated by the value of
+        ifCounterDiscontinuityTime."
+    ::= { aristaIfEntry 13 }
+
 -- Conformance information
 aristaIfConformance OBJECT IDENTIFIER ::= { aristaIfMIB 2 }
 
@@ -172,7 +241,9 @@ aristaIfAdditionalInformationGroup OBJECT-GROUP
               aristaIfInPktRate, aristaIfOutPktRate,
               aristaIfInOctetRate, aristaIfOutOctetRate,
               aristaIfRatesLastUpdated, aristaIfOperStatusChanges,
-              aristaIfInAclDrops }
+              aristaIfInAclDrops, aristaIfErrDisabledReason,
+              aristaIfDot1xEapolPortDrops, aristaIfDot1xEapolHostDrops,
+              aristaIfDot1xMbaHostDrops }
     STATUS      current
     DESCRIPTION
         "A collection of objects providing additional information

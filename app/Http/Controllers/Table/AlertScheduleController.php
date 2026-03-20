@@ -68,15 +68,15 @@ class AlertScheduleController extends TableController
     public function formatItem($schedule)
     {
         $behavior = match ($schedule->behavior) {
-            MaintenanceBehavior::SKIP_ALERTS->value => __('alerting.maintenance.behavior.options.skip_alerts'),
-            MaintenanceBehavior::MUTE_ALERTS->value => __('alerting.maintenance.behavior.options.mute_alerts'),
-            MaintenanceBehavior::RUN_ALERTS->value => __('alerting.maintenance.behavior.options.run_alerts'),
+            MaintenanceBehavior::SkipAlerts->value => __('alerting.maintenance.behavior.options.skip_alerts'),
+            MaintenanceBehavior::MuteAlerts->value => __('alerting.maintenance.behavior.options.mute_alerts'),
+            MaintenanceBehavior::RunAlerts->value => __('alerting.maintenance.behavior.options.run_alerts'),
             default => 'Error: Unknown behavior',
         };
 
         return [
-            'title' => htmlentities($schedule->title),
-            'notes' => htmlentities($schedule->notes),
+            'title' => htmlentities((string) $schedule->title),
+            'notes' => htmlentities((string) $schedule->notes),
             'behavior' => $behavior,
             'id' => $schedule->schedule_id,
             'start' => $schedule->recurring ? '' : $schedule->start->toDateTimeString('minutes'),

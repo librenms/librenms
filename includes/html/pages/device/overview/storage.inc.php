@@ -23,17 +23,17 @@ if (count($drives)) {
 
         if ($device['os'] == 'junos') {
             foreach (\App\Facades\LibrenmsConfig::get('ignore_junos_os_drives', []) as $jdrive) {
-                if (preg_match($jdrive, $drive['storage_descr'])) {
+                if (preg_match($jdrive, (string) $drive['storage_descr'])) {
                     $skipdrive = 1;
                 }
             }
 
-            $drive['storage_descr'] = preg_replace('/.*mounted on: (.*)/', '\\1', $drive['storage_descr']);
+            $drive['storage_descr'] = preg_replace('/.*mounted on: (.*)/', '\\1', (string) $drive['storage_descr']);
         }
 
         if ($device['os'] == 'freebsd') {
             foreach (\App\Facades\LibrenmsConfig::get('ignore_bsd_os_drives', []) as $jdrive) {
-                if (preg_match($jdrive, $drive['storage_descr'])) {
+                if (preg_match($jdrive, (string) $drive['storage_descr'])) {
                     $skipdrive = 1;
                 }
             }
@@ -76,7 +76,12 @@ if (count($drives)) {
         echo '<tr>
            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $drive['storage_descr'], $overlib_content) . '</td>
            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
-           <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(400, 20, $percent, "$used / $total ($percent%)", 'ffffff', $background['left'], $free, 'ffffff', $background['right']), $overlib_content) . '
+           <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(400, 10, $percent, "$used / $total ($percent%)", $free, null, null, [
+            'left' => $background['left'],
+            'left_text' => null,
+            'right' => $background['right'],
+            'right_text' => null,
+        ]), $overlib_content) . '
            </a></td>
          </tr>';
     }//end foreach

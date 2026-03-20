@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Gate;
 use Permissions;
 
 class CustomMap extends BaseModel
@@ -101,23 +102,15 @@ class CustomMap extends BaseModel
         return true;
     }
 
-    public function scopeHasAccess($query, User $user)
+    public function scopeHasAccess(Builder $query, User $user): Builder
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAny', CustomMap::class)) {
             return $query;
         }
 
-        // Allow only if the user has access to all devices on the map
-        return $query->withCount([
-            'nodes as device_nodes_count' => function (Builder $q): void {
-                $q->whereNotNull('device_id');
-            },
-            'nodes as device_nodes_allowed_count' => function (Builder $q) use ($user): void {
-                $this->hasDeviceAccess($q, $user, 'custom_map_nodes');
-            },
-        ])
-            ->havingRaw('device_nodes_count = device_nodes_allowed_count')
-            ->having('device_nodes_count', '>', 0);
+        // Only show maps where ALL device nodes are accessible by the user
+        return $query->whereHas('nodes', fn ($q) => $q->whereNotNull('device_id'))
+            ->whereDoesntHave('nodes', fn ($q) => $q->whereNotNull('device_id')->whereNotIn('device_id', \Permissions::devicesForUser($user)));
     }
 
     /**

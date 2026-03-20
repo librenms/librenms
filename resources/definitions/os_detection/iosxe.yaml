@@ -9,11 +9,15 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 icon: cisco
 mib_dir: cisco
+ignore_vlans:
+    - 1002
+    - 1003
+    - 1004
+    - 1005
 poller_modules:
     cisco-ace-serverfarms: true
     cisco-ace-loadbalancer: true
     cisco-cef: true
-    cisco-mac-accounting: true
     cisco-remote-access-monitor: true
     slas: true
     cisco-ipsec-flow-monitor: true
@@ -27,7 +31,6 @@ poller_modules:
 discovery_modules:
     cisco-cef: true
     slas: true
-    cisco-mac-accounting: true
     cisco-otv: true
     cisco-pw: true
     vrf: true
@@ -41,6 +44,13 @@ discovery:
             - IOSXE
             - LINUX_IOSD
             - CAT3K_CAA
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.9.1.2683 # ciscoIE32008T2S
+            - .1.3.6.1.4.1.9.1.2684 # ciscoIE32008P2S
+            - .1.3.6.1.4.1.9.1.2685 # ciscoIE33008T2S
+            - .1.3.6.1.4.1.9.1.2686 # ciscoIE33008P2S
+            - .1.3.6.1.4.1.9.1.2687 # ciscoIE34008P2S
 bad_iftype:
     - macSecControlledIF
     - macSecUncontrolledIF

@@ -5,6 +5,7 @@ use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
 
 $install_dir = realpath(__DIR__ . '/..');
@@ -115,7 +116,7 @@ if ($variant) {
 echo PHP_EOL;
 
 try {
-    $capture = new ModuleTestHelper($modules, $target_os, $variant);
+    $capture = new ModuleTestHelper(ModuleList::fromUserOverrides($modules), $target_os, $variant);
 
     if (isset($options['f'])) {
         $capture->setSnmprecSavePath($options['f']);

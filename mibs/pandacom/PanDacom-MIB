@@ -1,0 +1,77 @@
+PanDacom-MIB DEFINITIONS	::= BEGIN
+
+IMPORTS
+	DisplayString	, TEXTUAL-CONVENTION FROM SNMPv2-TC
+	enterprises, Integer32, OBJECT-TYPE, MODULE-IDENTITY	FROM SNMPv2-SMI;
+
+--      panDacom       OBJECT IDENTIFIER ::= { enterprises 3652 }
+
+    panDacom MODULE-IDENTITY
+            LAST-UPDATED "201906060000Z"
+            ORGANIZATION "Pan Dacom Direkt GmbH"
+            CONTACT-INFO
+                "Pan Dacom Direkt GmbH
+                Bereich Entwicklung und Produktion
+                Dreieich Plaza 1B
+                63303 Dreieich / Germany
+                Tel. : +49 6103/83483-333
+                Fax. : +49 6103/83483-444
+                email: kontakt@pandacomdirekt.de
+                web  : www.pandacomdirekt.de"
+            DESCRIPTION	 "Rev. 3.0"
+
+            REVISION "201906060000Z"
+            DESCRIPTION "Rev. 7.3
+            - new fixed float type"
+
+            REVISION "201703261700Z"
+            DESCRIPTION "Rev. 3.2
+            - syntax correction"
+
+            ::= { enterprises 3652 }
+        
+--*****  types  ****************************
+FixedDiv100 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION  "Fixed point, two decimal"
+    SYNTAX       Integer32
+--****************
+
+--****************
+--***  trap's  ***
+--****************
+        traps           OBJECT IDENTIFIER ::= { panDacom 0 }
+
+	descr OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..255))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Trap Description"
+              ::= { traps 100 }
+
+	slot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Slot No"
+               ::= { traps 101 }
+
+	port OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port No"
+               ::= { traps 102 }
+
+	iFCard OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+		         "IFCard No from variable Interface-Cards like FO155"
+               ::= { traps 103 }
+END

@@ -23,22 +23,26 @@
  * @copyright  2018 Vivia Nguyen-Tran
  * @author     Vivia Nguyen-Tran <vivia@ualberta.ca>
  */
+
+use App\Models\AlertTransport;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::none(['create', 'update'], AlertTransport::class)) {
     exit(json_encode([
         'status' => 'error',
-        'message' => 'You need to be admin',
+        'message' => 'You need permisisson',
     ]));
 }
 
 $status = 'ok';
 $message = '';
 
-$transport_id = strip_tags($vars['transport_id']);
-$name = strip_tags($vars['name']);
+$transport_id = strip_tags((string) $vars['transport_id']);
+$name = strip_tags((string) $vars['name']);
 $is_default = (int) (isset($vars['is_default']) && $vars['is_default'] == 'on');
-$transport_type = strip_tags($vars['transport-type']);
+$transport_type = strip_tags((string) $vars['transport-type']);
 
 if (empty($name)) {
     $status = 'error';
@@ -53,9 +57,11 @@ if (empty($name)) {
     ];
 
     if (is_numeric($transport_id) && $transport_id > 0) {
+        Gate::authorize('update', AlertTransport::class);
         // Update the fields -- json config field will be updated later
         dbUpdate($details, 'alert_transports', 'transport_id=?', [$transport_id]);
     } else {
+        Gate::authorize('create', AlertTransport::class);
         // Insert the new alert transport
         $newEntry = true;
         $transport_id = dbInsert($details, 'alert_transports');
@@ -81,7 +87,7 @@ if (empty($name)) {
             }
             $status = 'error';
         } else {
-            $transport_config = (array) json_decode(dbFetchCell('SELECT transport_config FROM alert_transports WHERE transport_id=?', [$transport_id]), true);
+            $transport_config = (array) json_decode((string) dbFetchCell('SELECT transport_config FROM alert_transports WHERE transport_id=?', [$transport_id]), true);
             foreach ($result['config'] as $tmp_config) {
                 if (isset($tmp_config['name']) && $tmp_config['type'] !== 'hidden') {
                     $transport_config[$tmp_config['name']] = $vars[$tmp_config['name']] ?? null;
@@ -102,7 +108,7 @@ if (empty($name)) {
         if ($status == 'error' && $newEntry) {
             //If error, we will have to delete the new entry in alert_transports tbl
             $where = '`transport_id`=?';
-            dbDelete('alert_transports', $where, [$transport_id]);
+            \App\Models\AlertTransport::where('transport_id', $transport_id)->delete();
         }
     } else {
         $status = 'error';

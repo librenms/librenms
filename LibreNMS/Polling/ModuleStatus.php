@@ -35,6 +35,7 @@ class ModuleStatus implements \Stringable
         public ?bool $os = null,
         public ?bool $device = null,
         public ?bool $manual = null,
+        public ?array $submodules = null,
     ) {
     }
 
@@ -83,6 +84,11 @@ class ModuleStatus implements \Stringable
         }
 
         return $this->isEnabled() && $device->status;
+    }
+
+    public function hasSubModules(): bool
+    {
+        return ! empty($this->submodules);
     }
 
     public function __toString(): string

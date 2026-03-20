@@ -26,8 +26,10 @@
 
 use App\Models\Device;
 use App\Models\Eventlog;
+use App\Models\Port;
+use Illuminate\Support\Facades\Gate;
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', Port::class)) {
     $response = [
         'status' => 'error',
         'message' => 'Need to be admin',
@@ -39,7 +41,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 if (isset($_POST['device_id'])) {
     if (! is_numeric($_POST['device_id'])) {
         $status = 'error';
-        $message = 'Invalid device id ' . htmlspecialchars($_POST['device_id']);
+        $message = 'Invalid device id ' . htmlspecialchars((string) $_POST['device_id']);
     } else {
         $device = Device::find($_POST['device_id']);
 

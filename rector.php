@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Rector\CodingStyle\Rector\Enum_\EnumCaseToPascalCaseRector;
 use Rector\Config\RectorConfig;
 
 return RectorConfig::configure()
@@ -17,9 +18,8 @@ return RectorConfig::configure()
         __DIR__ . '/scripts',
         __DIR__ . '/tests',
     ])
-    // uncomment to reach your current PHP version
-    // ->withPhpSets()
-    ->withPhpSets(php80: true)
+    ->withPhpSets()
     ->withTypeCoverageLevel(0)
     ->withDeadCodeLevel(0)
-    ->withCodeQualityLevel(0);
+    ->withCodeQualityLevel(0)
+    ->withRules([EnumCaseToPascalCaseRector::class]);

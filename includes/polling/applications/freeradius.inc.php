@@ -13,7 +13,7 @@ if (! empty($agent_data['app'][$name])) {
 }
 
 // Format Data
-$lines = explode("\n", $rawdata);
+$lines = explode("\n", (string) $rawdata);
 $freeradius = [];
 $metrics = [];
 foreach ($lines as $line) {

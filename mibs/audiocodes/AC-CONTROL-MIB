@@ -5,27 +5,28 @@ AC-CONTROL-MIB DEFINITIONS ::= BEGIN
     IMPORTS
        
 
-        OBJECT-TYPE, 
-        MODULE-IDENTITY                             FROM SNMPv2-SMI
-        TAddress, 
-        DisplayString, 
-        DateAndTime, TEXTUAL-CONVENTION, 
-		RowPointer									FROM SNMPv2-TC
-        IpAddress                                   FROM RFC1155-SMI
-        Unsigned32,
-		Integer32,
-        enterprises                                 FROM SNMPv2-SMI
-	RowStatus      				    FROM SNMPv2-TC
+	OBJECT-TYPE, 
+	MODULE-IDENTITY                             FROM SNMPv2-SMI
+	TAddress, 
+	DisplayString, 
+	DateAndTime, TEXTUAL-CONVENTION, 
+	RowPointer                                  FROM SNMPv2-TC
+	IpAddress                                   FROM RFC1155-SMI
+	Unsigned32,
+	Integer32,
+	Gauge32,		
+	enterprises                                 FROM SNMPv2-SMI
+	RowStatus                                   FROM SNMPv2-TC
 
-		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
-		audioCodes,       
-        acRegistrations,
-        acGeneric, 
-        acProducts,acBoardMibs						FROM AUDIOCODES-TYPES-MIB;
+	SnmpAdminString                             FROM SNMP-FRAMEWORK-MIB
+	audioCodes,       
+	acRegistrations,
+	acGeneric, 
+	acProducts,acBoardMibs                      FROM AUDIOCODES-TYPES-MIB;
 
        
 acControl  MODULE-IDENTITY       
-    LAST-UPDATED "201301141127Z"          --Monday, January 14 2013
+    LAST-UPDATED "202012200623Z"          --Sunday, December 20 2020
     ORGANIZATION "AudioCodes Ltd"
     CONTACT-INFO
     "Postal: Support
@@ -67,7 +68,7 @@ acControl  MODULE-IDENTITY
      acCPKeepAliveEnabled OBJECT-TYPE
        SYNTAX Integer32 (-2147483647..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Enables a proprietary keep-alive mechanism, in which a serviceChange
 is send with UNDEFINED as the termination ID and restart
@@ -83,7 +84,7 @@ AC INI-Param: KEEPALIVEENABLED"
      acCPKeepAliveInterval OBJECT-TYPE
        SYNTAX Unsigned32 (1..300)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to define the interval in seconds of
 a KeepAlive message.
@@ -101,18 +102,15 @@ AC INI-Param: KEEPALIVEINTERVAL"
                   acCPTransport-UDP-IP(0)
 ,
                   acCPTransport-TCP-IP(1)
-,
-                  acCPTransport-SCTP-IP(2)
 
                   }
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Defines the transport type for the control protocol: 
 
 0 = UDP
-1 = TCP
-2 = SCTP.
+1 = TCP.
 Access: Offline.
 AC INI-Param: CPTRANSPORTTYPE "
        ::= {acCPTransport 1}
@@ -122,7 +120,7 @@ AC INI-Param: CPTRANSPORTTYPE "
      acCPTransportRetransmitionTimeOut OBJECT-TYPE
        SYNTAX Integer32 (-2147483647..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Controls protocols retransmission timeout. Sets the initial
 time (in msec) for the first retransmission. The retransmission
@@ -136,7 +134,7 @@ AC INI-Param: MGCPRETRANSMISSIONTIMEOUT"
      acCPTransportControlDiffServ OBJECT-TYPE
        SYNTAX Unsigned32 (0..63)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the value of the field 'DiffServ' in the IP header for
 control traffic.
@@ -154,7 +152,7 @@ AC INI-Param: CONTROLDIFFSERV"
      acCPTransactionIDRange OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the range for the transaction ID. 
 
@@ -168,7 +166,7 @@ AC INI-Param: TRANSACTIONIDRANGE"
      acCPTransactionIDBase OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the minimum number for the transaction ID. 
 
@@ -187,7 +185,7 @@ AC INI-Param: TRANSACTIONIDBASE"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines if the transactions produced by the board start with
 a fixed or random number. 
@@ -204,7 +202,7 @@ AC INI-Param: RANDOMIZETRANSACTIONID"
      acCPTransactionCommunicationLayerTimeout OBJECT-TYPE
        SYNTAX Unsigned32 (0..999)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Assumed delay of the communication layer. It is used in retransmission.
 This parameter defines the maximal time to wait
@@ -265,7 +263,7 @@ AC INI-Param: DTMFINTERDIGITINTERVAL"
      acCPDigitCollectMapTimeOutTimer OBJECT-TYPE
        SYNTAX Integer32 (-1..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the timeout value (T symbol) in a digit map, in increments
 of 10. For MEGACO, it's the start timer. For the others,
@@ -281,7 +279,7 @@ AC INI-Param: DIGITMAPTIMEOUTTIMER"
      acCPDigitCollectMapShortTimer OBJECT-TYPE
        SYNTAX Integer32 (-1..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the short timer (S Symbol) value in millisecond, in
 a digit map.This timer is typically activated when the repetition
@@ -297,7 +295,7 @@ AC INI-Param: cpDIGITMAPSHORTTIMER"
      acCPDigitCollectMapLongTimer OBJECT-TYPE
        SYNTAX Integer32 (-1..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the inter-digit long timer (L Symbol) value in millisecond,
 in a digit map.This timer is typically activated between
@@ -317,7 +315,7 @@ AC INI-Param: cpDIGITMAPLONGTIMER"
      acCPDigitMapDefaultName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..30))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Name of the provisioned digit map.
 
@@ -346,7 +344,7 @@ AC INI-Param: DIGITMAPPING"
      acCPDigitMapDialedStringPrefix OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..8))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines a prefix to add to the dialed string.
 
@@ -363,7 +361,7 @@ AC INI-Param: DialedStringPrefix"
      acCPNamingGateWay OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..63))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the media gateway's identification name.
 
@@ -380,7 +378,7 @@ AC INI-Param: GATEWAYNAME"
      acCPNamingEndPoint OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..19))
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "MGCP: Gateway's endpoint name. This is a prefix used to identify
 the endpoint, i.e., 'ACgw' in the following example: 
@@ -402,7 +400,7 @@ AC INI-Param: ENDPOINTNAME"
      acCPNamingTrunk OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..19))
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "(MGCP) This parameter generates (together with the parameter
 defining the Endpoint Prefix) a local endpoint name on trunk-enabled
@@ -424,7 +422,7 @@ AC INI-Param: TRUNKNAME"
      acCPNamingEndpointPrefix OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..19))
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "(MGCP) This parameter generates (together with parameter Trunk
 Name) a local endpoint name on trunk-enabled media gateways.
@@ -439,7 +437,7 @@ AC INI-Param: ENDPOINTPREFIX"
      acCPNamingCallAgentDomain OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..63))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines a domain name to be used to connect with the Call Agent.
 The parameter takes precedence over the Call Agent IP and
@@ -456,7 +454,7 @@ AC INI-Param: CALLAGENTDOMAINNAME"
      acCPNamingCoderTblFileName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..47))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter defines the name of an external coders table.
 In this table, the user can decide which coders will be used
@@ -471,7 +469,7 @@ AC INI-Param: CODERTBLFILENAME"
      acCPNamingSessionOwner OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..31))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the owner/creator of the session
 Range = String[31].
@@ -487,7 +485,7 @@ AC INI-Param: CPSDPSESSIONOWNER"
      acCPConferenceMaxUsers OBJECT-TYPE
        SYNTAX Unsigned32 (3..64)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the maximal number of users to reserve for a new conference.
 The actual conference size can be more than this, but
@@ -503,7 +501,7 @@ AC INI-Param: CONFERENCEMAXUSERS"
      acCPConferenceMaxSimultaneousSpeakers OBJECT-TYPE
        SYNTAX Unsigned32 (1..3)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the maximum number of users that can speak simultaneously
 in a conference.
@@ -523,7 +521,7 @@ AC INI-Param: CONFERENCEMAXSIMULTANEOUSSPEAKERS"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Generates a beep when a participant enters or exits the conference.
 
@@ -697,7 +695,7 @@ AC INI-Param: RTCPINTERVAL"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter can be used to set a default coder for channel
 opening. For the legal coder names, refer to the product's
@@ -713,7 +711,7 @@ AC INI-Param: MGCPDEFAULTCODER"
      acCPMediaPacketizationPeriod OBJECT-TYPE
        SYNTAX Unsigned32 (5..120)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the default packetization period (Frame Size).
 
@@ -734,7 +732,7 @@ AC INI-Param: DEFAULTPACKETIZATIONPERIOD"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Determines the coder used for recording to a file.
 Access: Instant.
@@ -751,7 +749,7 @@ AC INI-Param: cpRecordCoder"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Determines the coder type to be used when playing a file of
 type .raw.
@@ -764,7 +762,7 @@ AC INI-Param: cpPlayCoder"
      acCPMediaDefaultRealmName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..39))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "By default, the default CP media realm is the first realm appearing
 in the CP media realm table.
@@ -786,7 +784,7 @@ AC INI-Param: cpDefaultMediaRealmName"
 
                   }
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "determines dsp allocation method in IP to IP call.
 If this parameter is set to DISABLE_SINGLE_DSP_ALLOCATION (0)
@@ -851,13 +849,15 @@ AC INI-Param: CPMEDIARESOURCEOPTIMIZATION"
        acCPMediaRealmMediaSessionLeg                   Integer32,
        acCPMediaRealmPortRangeEnd                      Integer32,
        acCPMediaRealmTransRateRatio                    Unsigned32,
-       acCPMediaRealmIsDefault                         INTEGER
+       acCPMediaRealmIsDefault                         INTEGER,
+       acCPMediaRealmQOEProfileName                    RowPointer,
+       acCPMediaRealmBWProfileName                     RowPointer
      }
 
 
 
      acCPMediaRealmIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..15)
+       SYNTAX Unsigned32 (0..200)
        MAX-ACCESS not-accessible
        STATUS current
        DESCRIPTION
@@ -912,7 +912,7 @@ AC INI-Param: N/A"
        STATUS current
        DESCRIPTION
            "A string representing the name of the media realm.
-Access: Offline.
+Access: Instant.
 AC INI-Param: CpMediaRealm_MediaRealmName"
        ::= {acCPMediaRealmEntry 5}
 
@@ -928,7 +928,7 @@ one appearing in the interface table.
 The OID should be 1.3.6.1.4.1.5003.9.10.10.1.3.1.30.22.1.11.
 acSysInterfaceIndex
 Note: when ignore a default value will be SET: 0.0.
-Access: Offline.
+Access: Instant.
 AC INI-Param: CpMediaRealm_IPv4IF"
        ::= {acCPMediaRealmEntry 6}
 
@@ -944,7 +944,7 @@ one appearing in the interface table.
 The OID should be 1.3.6.1.4.1.5003.9.10.10.1.3.1.30.22.1.11.
 acSysInterfaceIndex
 Note: when ignore a default value will be SET: 0.0.
-Access: Offline.
+Access: Instant.
 AC INI-Param: CpMediaRealm_IPv6IF"
        ::= {acCPMediaRealmEntry 7}
 
@@ -956,7 +956,7 @@ AC INI-Param: CpMediaRealm_IPv6IF"
        STATUS current
        DESCRIPTION
            "The starting port for the range of media ports.
-Access: Offline.
+Access: Instant.
 AC INI-Param: CpMediaRealm_PortRangeStart"
        ::= {acCPMediaRealmEntry 8}
 
@@ -968,7 +968,7 @@ AC INI-Param: CpMediaRealm_PortRangeStart"
        STATUS current
        DESCRIPTION
            " The number of media sessions associated with the range of ports.
-Access: Offline.
+Access: Instant.
 AC INI-Param: CpMediaRealm_MediaSessionLeg"
        ::= {acCPMediaRealmEntry 9}
 
@@ -991,7 +991,7 @@ AC INI-Param: CpMediaRealm_PortRangeEnd"
        STATUS obsolete
        DESCRIPTION
            "In case of trans-rating the ptime will be multiplied.
-Access: Offline.
+Access: Instant.
 AC INI-Param: CpMediaRealm_TransRateRatio"
        ::= {acCPMediaRealmEntry 11}
 
@@ -1008,9 +1008,390 @@ AC INI-Param: CpMediaRealm_TransRateRatio"
        STATUS current
        DESCRIPTION
            "Determines whether this is the default media realm or not.
-Access: Offline.
+Access: Instant.
 AC INI-Param: CpMediaRealm_IsDefault"
        ::= {acCPMediaRealmEntry 12}
+
+
+
+     acCPMediaRealmQOEProfileName OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "A string representing the name of the media realm.
+Access: Instant.
+AC INI-Param: CpMediaRealm_QoeProfile"
+       ::= {acCPMediaRealmEntry 13}
+
+
+
+     acCPMediaRealmBWProfileName OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "BW profile.
+Access: Instant.
+AC INI-Param: CpMediaRealm_BWProfile"
+       ::= {acCPMediaRealmEntry 14}
+
+
+
+     -- ****************************************
+     -- acCPMediaSubRealm table declaration
+     -- ****************************************
+     acCPMediaSubRealmTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcCPMediaSubRealmEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acCPMedia 22}
+
+
+
+     -- ****************************************
+     -- acCPMediaSubRealm table entry
+     -- ****************************************
+     acCPMediaSubRealmEntry OBJECT-TYPE
+       SYNTAX AcCPMediaSubRealmEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acCPMediaSubRealmMediaRealmIndex,acCPMediaSubRealmSubRealmIndex}
+       ::= {acCPMediaSubRealmTable 1}
+
+
+
+     -- ****************************************
+     -- acCPMediaSubRealm TABLE
+     -- ****************************************
+     AcCPMediaSubRealmEntry ::= SEQUENCE {
+       acCPMediaSubRealmMediaRealmIndex                Unsigned32,
+       acCPMediaSubRealmSubRealmIndex                  Unsigned32,
+       acCPMediaSubRealmRowStatus                      RowStatus,
+       acCPMediaSubRealmAction                         INTEGER,
+       acCPMediaSubRealmActionRes                      INTEGER,
+       acCPMediaSubRealmPrefixLength                   Unsigned32,
+       acCPMediaSubRealmAddressFamily                  INTEGER,
+       acCPMediaSubRealmDstIPAddress                   SnmpAdminString,
+       acCPMediaSubRealmQOEProfileName                 RowPointer,
+       acCPMediaSubRealmBWProfileName                  RowPointer,
+       acCPMediaSubRealmName                           SnmpAdminString
+     }
+
+
+
+     acCPMediaSubRealmMediaRealmIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Realm Index.
+AC INI-Param: RemoteMediaSubnet_Realm"
+       ::= {acCPMediaSubRealmEntry 1}
+
+
+
+     acCPMediaSubRealmSubRealmIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Sub Realm Index.
+AC INI-Param: RemoteMediaSubnet_RemoteMediaSubnetIndex"
+       ::= {acCPMediaSubRealmEntry 2}
+
+
+
+     acCPMediaSubRealmRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS Field for line.
+AC INI-Param: RemoteMediaSubnet_RowStatus"
+       ::= {acCPMediaSubRealmEntry 3}
+
+
+
+     acCPMediaSubRealmAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS.
+AC INI-Param: RemoteMediaSubnet_Action"
+       ::= {acCPMediaSubRealmEntry 4}
+
+
+
+     acCPMediaSubRealmActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT.
+AC INI-Param: RemoteMediaSubnet_ActionRes"
+       ::= {acCPMediaSubRealmEntry 5}
+
+
+
+     acCPMediaSubRealmPrefixLength OBJECT-TYPE
+       SYNTAX Unsigned32 (0..128)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "prefix length.
+Access: Online.
+AC INI-Param: RemoteMediaSubnet_PrefixLength"
+       ::= {acCPMediaSubRealmEntry 6}
+
+
+
+     acCPMediaSubRealmAddressFamily OBJECT-TYPE
+       SYNTAX INTEGER {
+                  ipv4(0)
+,
+                  ipv6(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "address family.
+Access: Online.
+AC INI-Param: RemoteMediaSubnet_AddressFamily"
+       ::= {acCPMediaSubRealmEntry 7}
+
+
+
+     acCPMediaSubRealmDstIPAddress OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..45))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "destination IP address.
+Access: Online.
+AC INI-Param: RemoteMediaSubnet_DstIPAddress"
+       ::= {acCPMediaSubRealmEntry 8}
+
+
+
+     acCPMediaSubRealmQOEProfileName OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "QOE threshold rules profile.
+Access: Online.
+AC INI-Param: RemoteMediaSubnet_QOEProfileName"
+       ::= {acCPMediaSubRealmEntry 9}
+
+
+
+     acCPMediaSubRealmBWProfileName OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "QOE BW rules profile.
+Access: Online.
+AC INI-Param: RemoteMediaSubnet_BWProfileName"
+       ::= {acCPMediaSubRealmEntry 10}
+
+
+
+     acCPMediaSubRealmName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..39))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "A string representing the name of the media subrealm.
+Access: Online.
+AC INI-Param: RemoteMediaSubnet_RemoteMediaSubnetName"
+       ::= {acCPMediaSubRealmEntry 11}
+
+
+
+     -- ****************************************
+     -- acCPMediaRealmExtension table declaration
+     -- ****************************************
+     acCPMediaRealmExtensionTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcCPMediaRealmExtensionEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Extension of Control Protocol media realm configuration table."
+       ::= {acCPMedia 23}
+
+
+
+     -- ****************************************
+     -- acCPMediaRealmExtension table entry
+     -- ****************************************
+     acCPMediaRealmExtensionEntry OBJECT-TYPE
+       SYNTAX AcCPMediaRealmExtensionEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acCPMediaRealmExtensionMediaRealmIndex,acCPMediaRealmExtensionIndex}
+       ::= {acCPMediaRealmExtensionTable 1}
+
+
+
+     -- ****************************************
+     -- acCPMediaRealmExtension TABLE
+     -- ****************************************
+     AcCPMediaRealmExtensionEntry ::= SEQUENCE {
+       acCPMediaRealmExtensionMediaRealmIndex          Unsigned32,
+       acCPMediaRealmExtensionIndex                    Unsigned32,
+       acCPMediaRealmExtensionRowStatus                RowStatus,
+       acCPMediaRealmExtensionAction                   INTEGER,
+       acCPMediaRealmExtensionActionRes                INTEGER,
+       acCPMediaRealmExtensionIPv4If                   RowPointer,
+       acCPMediaRealmExtensionIPv6If                   RowPointer,
+       acCPMediaRealmExtensionPortRangeStart           Integer32,
+       acCPMediaRealmExtensionPortRangeEnd             Integer32,
+       acCPMediaRealmExtensionMediaSessionLeg          Integer32
+     }
+
+
+
+     acCPMediaRealmExtensionMediaRealmIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Realm Index.
+AC INI-Param: MediaRealmExtension_MediaRealmIndex"
+       ::= {acCPMediaRealmExtensionEntry 1}
+
+
+
+     acCPMediaRealmExtensionIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Row index (per realm).
+AC INI-Param: MediaRealmExtension_ExtensionIndex"
+       ::= {acCPMediaRealmExtensionEntry 2}
+
+
+
+     acCPMediaRealmExtensionRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS field for line. Internal parameter.
+AC INI-Param: MediaRealmExtension_RowStatus"
+       ::= {acCPMediaRealmExtensionEntry 3}
+
+
+
+     acCPMediaRealmExtensionAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS. Internal parameter.
+AC INI-Param: MediaRealmExtension_Action"
+       ::= {acCPMediaRealmExtensionEntry 4}
+
+
+
+     acCPMediaRealmExtensionActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT. Internal parameter.
+AC INI-Param: MediaRealmExtension_ActionRes"
+       ::= {acCPMediaRealmExtensionEntry 5}
+
+
+
+     acCPMediaRealmExtensionIPv4If OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Select the OID of the IPv4 interface name corresponding to the
+one appearing in the interface table.
+The OID should be 1.3.6.1.4.1.5003.9.10.10.1.3.1.30.22.1.11.
+acSysInterfaceIndex
+Note: when ignore a default value will be SET: 0.0.
+Access: Instant.
+AC INI-Param: MediaRealmExtension_IPv4IF"
+       ::= {acCPMediaRealmExtensionEntry 6}
+
+
+
+     acCPMediaRealmExtensionIPv6If OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Select the OID of the IPv6interface name corresponding to the
+one appearing in the interface table.
+The OID should be 1.3.6.1.4.1.5003.9.10.10.1.3.1.30.22.1.11.
+acSysInterfaceIndex
+Note: when ignore a default value will be SET: 0.0.
+Access: Instant.
+AC INI-Param: MediaRealmExtension_IPv6IF"
+       ::= {acCPMediaRealmExtensionEntry 7}
+
+
+
+     acCPMediaRealmExtensionPortRangeStart OBJECT-TYPE
+       SYNTAX Integer32 (-1..60000)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The starting port for the range of media ports.
+Access: Instant.
+AC INI-Param: MediaRealmExtension_PortRangeStart"
+       ::= {acCPMediaRealmExtensionEntry 8}
+
+
+
+     acCPMediaRealmExtensionPortRangeEnd OBJECT-TYPE
+       SYNTAX Integer32 (-1..60000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The ending port for the range of media ports.
+AC INI-Param: MediaRealmExtension_PortRangeEnd"
+       ::= {acCPMediaRealmExtensionEntry 9}
+
+
+
+     acCPMediaRealmExtensionMediaSessionLeg OBJECT-TYPE
+       SYNTAX Integer32 (-1..6000)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           " The number of media sessions associated with the range of ports.
+Access: Instant.
+AC INI-Param: MediaRealmExtension_MediaSessionLeg"
+       ::= {acCPMediaRealmExtensionEntry 10}
 
 
 
@@ -1020,7 +1401,7 @@ AC INI-Param: CpMediaRealm_IsDefault"
      acCPMiscDialToneDuration OBJECT-TYPE
        SYNTAX Integer32 (-2147483647..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the timeout (in seconds) for the dial tone signal.
 
@@ -1034,7 +1415,7 @@ AC INI-Param: DIALTONEDURATION"
      acCPMiscTrunkIDOffset OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Sets the offset to the trunk numbering. 
 e.g., Offset = 2 causes the first trunk number to be 2. 
@@ -1051,7 +1432,7 @@ AC INI-Param: MEGACOTRUNKIDOFFSET"
      acCPMiscCompatibilityProfile OBJECT-TYPE
        SYNTAX Unsigned32 (0..131071)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ControlS MGCP/MEGACO functioning for vendor-specific compatibility.
 Refer to the product's User's Manual.
@@ -1069,7 +1450,7 @@ AC INI-Param: MGCPCOMPATIBILITYPROFILE"
      acCPMiscSDPProfile OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Controls MGCP/MEGACO functioning for SDP negotiation. The parameter
 is bitwise.
@@ -1093,7 +1474,7 @@ AC INI-Param: CPSDPPROFILE"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Enables/disables the VXML stack. 
 
@@ -1118,7 +1499,7 @@ AC INI-Param: EnableVXML"
 
                   }
        MAX-ACCESS read-write
-       STATUS obsolete
+       STATUS current
        DESCRIPTION
            "Defines whether the module will connect to the VQMS (client)
 or receive connection from the server (server).
@@ -1138,7 +1519,7 @@ AC INI-Param: QOEConnectionMode"
 
                   }
        MAX-ACCESS read-write
-       STATUS obsolete
+       STATUS current
        DESCRIPTION
            "Defines the quantity of VQ information sent the the serverl.
 Access: Instant.
@@ -1155,7 +1536,7 @@ AC INI-Param: QOEInformationLevel"
 
                   }
        MAX-ACCESS read-write
-       STATUS obsolete
+       STATUS current
        DESCRIPTION
            "If it is enabled the moss_lq will be used by the board to calculate
 the moss status instead of the moss_cq'.
@@ -1197,11 +1578,11 @@ AC INI-Param: QOEEnableTLS"
      acCPQualityOfExperienceServerIp OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS deprecated
        DESCRIPTION
            "in case VQM is at client configuration, this parameter defines
 the server ip.
-Access: Offline.
+Access: Online.
 AC INI-Param: QOEServerIp"
        ::= {acCPQualityOfExperience 6}
 
@@ -1213,7 +1594,7 @@ AC INI-Param: QOEServerIp"
        STATUS current
        DESCRIPTION
            "Quality Of Experience Port.
-Access: Instant.
+Access: Online.
 AC INI-Param: QOEPort"
        ::= {acCPQualityOfExperience 7}
 
@@ -1226,7 +1607,7 @@ AC INI-Param: QOEPort"
        DESCRIPTION
            "the interface to wait on in case of server (default is the default
 control interface).
-Access: Offline.
+Access: Online.
 AC INI-Param: QOEInterfaceName"
        ::= {acCPQualityOfExperience 8}
 
@@ -1250,13 +1631,26 @@ AC INI-Param: QOEUseMosLQ"
 
 
 
+     acCPQualityOfExperienceSecondaryServerIp OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "in case VQM is at client configuration, this parameter defines
+the secondary server ip.
+Access: Online.
+AC INI-Param: QOERedundantServerIp"
+       ::= {acCPQualityOfExperience 10}
+
+
+
      -- ****************************************
      -- acCPQOERules table declaration
      -- ****************************************
      acCPQOERulesTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcCPQOERulesEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acCPQualityOfExperience 21}
@@ -1269,10 +1663,10 @@ AC INI-Param: QOEUseMosLQ"
      acCPQOERulesEntry OBJECT-TYPE
        SYNTAX AcCPQOERulesEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
-       INDEX {acCPQOERulesMediaRealmIndex,acCPQOERulesRuleIndex}
+       INDEX {acCPQOERulesQOEProfileIndex,acCPQOERulesRuleIndex}
        ::= {acCPQOERulesTable 1}
 
 
@@ -1281,7 +1675,7 @@ AC INI-Param: QOEUseMosLQ"
      -- acCPQOERules TABLE
      -- ****************************************
      AcCPQOERulesEntry ::= SEQUENCE {
-       acCPQOERulesMediaRealmIndex                     Unsigned32,
+       acCPQOERulesQOEProfileIndex                     Unsigned32,
        acCPQOERulesRuleIndex                           Unsigned32,
        acCPQOERulesRowStatus                           RowStatus,
        acCPQOERulesAction                              INTEGER,
@@ -1301,13 +1695,13 @@ AC INI-Param: QOEUseMosLQ"
 
 
 
-     acCPQOERulesMediaRealmIndex OBJECT-TYPE
+     acCPQOERulesQOEProfileIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..63)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
-           "The Media Realm Name index at acCPMediaRealmTable.
-AC INI-Param: QOERules_MediaRealmIndex"
+           "The QOE Profile index at acCPQOEProfileTable.
+AC INI-Param: QOERules_QOEProfileIndex"
        ::= {acCPQOERulesEntry 1}
 
 
@@ -1315,7 +1709,7 @@ AC INI-Param: QOERules_MediaRealmIndex"
      acCPQOERulesRuleIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..9)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Rule Index.
 AC INI-Param: QOERules_RuleIndex"
@@ -1326,7 +1720,7 @@ AC INI-Param: QOERules_RuleIndex"
      acCPQOERulesRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS Field for line.
 AC INI-Param: QOERules_RowStatus"
@@ -1340,7 +1734,7 @@ AC INI-Param: QOERules_RowStatus"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mangement Field for ACTIONS.
 AC INI-Param: QOERules_Action"
@@ -1354,7 +1748,7 @@ AC INI-Param: QOERules_Action"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mangement Field for ACTIONS RESULT.
 AC INI-Param: QOERules_ActionRes"
@@ -1376,7 +1770,7 @@ AC INI-Param: QOERules_ActionRes"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "MonitoredParam.
 Access: Online.
@@ -1388,7 +1782,7 @@ AC INI-Param: QOERules_MonitoredParam"
      acCPQOERulesGreenYellowThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..4294967295)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "GreenYellowThreshold.
 Access: Online.
@@ -1400,7 +1794,7 @@ AC INI-Param: QOERules_GreenYellowThreshold"
      acCPQOERulesGreenYellowHystersis OBJECT-TYPE
        SYNTAX Unsigned32 (0..4294967295)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "GreenYellowHystersis.
 Access: Online.
@@ -1412,7 +1806,7 @@ AC INI-Param: QOERules_GreenYellowHysteresis"
      acCPQOERulesYellowRedThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..4294967295)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "YellowRedThreshold.
 Access: Online.
@@ -1424,7 +1818,7 @@ AC INI-Param: QOERules_YellowRedThreshold"
      acCPQOERulesYellowRedHystersis OBJECT-TYPE
        SYNTAX Unsigned32 (0..4294967295)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "YellowRedHystersis.
 Access: Online.
@@ -1445,7 +1839,7 @@ AC INI-Param: QOERules_YellowRedHysteresis"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Profile.
 Access: Online.
@@ -1462,7 +1856,7 @@ AC INI-Param: QOERules_Profile"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The operation upon crossing green to yellow threshold.
 Access: Online.
@@ -1474,7 +1868,7 @@ AC INI-Param: QOERules_GreenYellowOperation"
      acCPQOERulesGreenYellowOperationDetails OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The specific details for the operation (relevant to Activate2198
 only).
@@ -1492,7 +1886,7 @@ AC INI-Param: QOERules_GreenYellowOperationDetails"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The operation upon crossing yellow to red threshold.
 Access: Online.
@@ -1504,7 +1898,7 @@ AC INI-Param: QOERules_YellowRedOperation"
      acCPQOERulesYellowRedOperationDetails OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The specific details for the operation (relevant to Activate2198
 only).
@@ -1522,12 +1916,870 @@ AC INI-Param: QOERules_YellowRedOperationDetails"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Whether the paramter is monitored on the remote or local side.
 Access: Online.
 AC INI-Param: QOERules_Direction"
        ::= {acCPQOERulesEntry 16}
+
+
+
+     -- ****************************************
+     -- acCPQOEBWProfile table declaration
+     -- ****************************************
+     acCPQOEBWProfileTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcCPQOEBWProfileEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acCPQualityOfExperience 22}
+
+
+
+     -- ****************************************
+     -- acCPQOEBWProfile table entry
+     -- ****************************************
+     acCPQOEBWProfileEntry OBJECT-TYPE
+       SYNTAX AcCPQOEBWProfileEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acCPQOEBWProfileIndex}
+       ::= {acCPQOEBWProfileTable 1}
+
+
+
+     -- ****************************************
+     -- acCPQOEBWProfile TABLE
+     -- ****************************************
+     AcCPQOEBWProfileEntry ::= SEQUENCE {
+       acCPQOEBWProfileIndex                           Unsigned32,
+       acCPQOEBWProfileRowStatus                       RowStatus,
+       acCPQOEBWProfileAction                          INTEGER,
+       acCPQOEBWProfileActionResult                    INTEGER,
+       acCPQOEBWProfileName                            SnmpAdminString,
+       acCPQOEBWProfileEgressAudioBandwidth            Integer32,
+       acCPQOEBWProfileIngressAudioBandwidth           Integer32,
+       acCPQOEBWProfileEgressVideoBandwidth            Integer32,
+       acCPQOEBWProfileIngressVideoBandwidth           Integer32,
+       acCPQOEBWProfileTotalEgressBandwidth            Integer32,
+       acCPQOEBWProfileTotalIngressBandwidth           Integer32,
+       acCPQOEBWProfileWarningThreshold                Unsigned32,
+       acCPQOEBWProfileHysteresis                      Unsigned32,
+       acCPQOEBWProfileGenerateAlarms                  INTEGER
+     }
+
+
+
+     acCPQOEBWProfileIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..199)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index Field for line.
+AC INI-Param: BWProfile_Index"
+       ::= {acCPQOEBWProfileEntry 1}
+
+
+
+     acCPQOEBWProfileRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS field for line. Internal parameter.
+AC INI-Param: BWProfile_RowStatus"
+       ::= {acCPQOEBWProfileEntry 2}
+
+
+
+     acCPQOEBWProfileAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: BWProfile_Action"
+       ::= {acCPQOEBWProfileEntry 3}
+
+
+
+     acCPQOEBWProfileActionResult OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: BWProfile_ActionRes"
+       ::= {acCPQOEBWProfileEntry 4}
+
+
+
+     acCPQOEBWProfileName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..39))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "BW Profile name.
+Access: Online.
+AC INI-Param: BWProfile_Name"
+       ::= {acCPQOEBWProfileEntry 5}
+
+
+
+     acCPQOEBWProfileEgressAudioBandwidth OBJECT-TYPE
+       SYNTAX Integer32 (-2147483648..2147483647)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Audio tx throughput in bits per second to cross this threshold.
+Access: Online.
+AC INI-Param: BWProfile_EgressAudioBandwidth"
+       ::= {acCPQOEBWProfileEntry 6}
+
+
+
+     acCPQOEBWProfileIngressAudioBandwidth OBJECT-TYPE
+       SYNTAX Integer32 (-2147483648..2147483647)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Audio tx throughput in bits per second to cross this threshold.
+Access: Online.
+AC INI-Param: BWProfile_IngressAudioBandwidth"
+       ::= {acCPQOEBWProfileEntry 7}
+
+
+
+     acCPQOEBWProfileEgressVideoBandwidth OBJECT-TYPE
+       SYNTAX Integer32 (-2147483648..2147483647)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Video  tx throughput in bits per second to cross this threshold.
+Access: Online.
+AC INI-Param: BWProfile_EgressVideoBandwidth"
+       ::= {acCPQOEBWProfileEntry 8}
+
+
+
+     acCPQOEBWProfileIngressVideoBandwidth OBJECT-TYPE
+       SYNTAX Integer32 (-2147483648..2147483647)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Video rx throughput in bits per second to cross this threshold.
+Access: Online.
+AC INI-Param: BWProfile_IngressVideoBandwidth"
+       ::= {acCPQOEBWProfileEntry 9}
+
+
+
+     acCPQOEBWProfileTotalEgressBandwidth OBJECT-TYPE
+       SYNTAX Integer32 (-2147483648..2147483647)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Total tx throughput in bits per second to cross this threshold.
+Access: Online.
+AC INI-Param: BWProfile_TotalEgressBandwidth"
+       ::= {acCPQOEBWProfileEntry 10}
+
+
+
+     acCPQOEBWProfileTotalIngressBandwidth OBJECT-TYPE
+       SYNTAX Integer32 (-2147483648..2147483647)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Total rx throughput in bits per second to cross this threshold.
+Access: Online.
+AC INI-Param: BWProfile_TotalIngressBandwidth"
+       ::= {acCPQOEBWProfileEntry 11}
+
+
+
+     acCPQOEBWProfileWarningThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..100)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "warning threshold in percent from the total bandwidth.
+Access: Online.
+AC INI-Param: BWProfile_WarningThreshold"
+       ::= {acCPQOEBWProfileEntry 12}
+
+
+
+     acCPQOEBWProfileHysteresis OBJECT-TYPE
+       SYNTAX Unsigned32 (0..100)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Hysteresis in percentage from total bandwidth.
+Access: Online.
+AC INI-Param: BWProfile_hysteresis"
+       ::= {acCPQOEBWProfileEntry 13}
+
+
+
+     acCPQOEBWProfileGenerateAlarms OBJECT-TYPE
+       SYNTAX INTEGER {
+                  no(0)
+,
+                  yes(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "if threshold is crossed SNMP alarm should be generated.
+Access: Online.
+AC INI-Param: BWProfile_GenerateAlarms"
+       ::= {acCPQOEBWProfileEntry 14}
+
+
+
+     -- ****************************************
+     -- acCPQOEProfile table declaration
+     -- ****************************************
+     acCPQOEProfileTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcCPQOEProfileEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acCPQualityOfExperience 23}
+
+
+
+     -- ****************************************
+     -- acCPQOEProfile table entry
+     -- ****************************************
+     acCPQOEProfileEntry OBJECT-TYPE
+       SYNTAX AcCPQOEProfileEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acCPQOEProfileIndex}
+       ::= {acCPQOEProfileTable 1}
+
+
+
+     -- ****************************************
+     -- acCPQOEProfile TABLE
+     -- ****************************************
+     AcCPQOEProfileEntry ::= SEQUENCE {
+       acCPQOEProfileIndex                             Unsigned32,
+       acCPQOEProfileRowStatus                         RowStatus,
+       acCPQOEProfileAction                            INTEGER,
+       acCPQOEProfileActionResult                      INTEGER,
+       acCPQOEProfileName                              SnmpAdminString,
+       acCPQOEProfileSensitivityLevel                  INTEGER
+     }
+
+
+
+     acCPQOEProfileIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index Field for line.
+AC INI-Param: QOEProfile_Index"
+       ::= {acCPQOEProfileEntry 1}
+
+
+
+     acCPQOEProfileRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS field for line. Internal parameter.
+AC INI-Param: QOEProfile_RowStatus"
+       ::= {acCPQOEProfileEntry 2}
+
+
+
+     acCPQOEProfileAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: QOEProfile_Action"
+       ::= {acCPQOEProfileEntry 3}
+
+
+
+     acCPQOEProfileActionResult OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: QOEProfile_ActionRes"
+       ::= {acCPQOEProfileEntry 4}
+
+
+
+     acCPQOEProfileName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..39))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "QOE Profile Name.
+Access: Online.
+AC INI-Param: QOEProfile_Name"
+       ::= {acCPQOEProfileEntry 5}
+
+
+
+     acCPQOEProfileSensitivityLevel OBJECT-TYPE
+       SYNTAX INTEGER {
+                  userDefined(0)
+,
+                  lowSensitivity(1)
+,
+                  averageSensitivity(2)
+,
+                  highSensitivity(3)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Audio tx throughput in bits per second to cross this threshold.
+Access: Online.
+AC INI-Param: QOEProfile_SensitivityLevel"
+       ::= {acCPQOEProfileEntry 6}
+
+
+
+     -- ****************************************
+     -- acCPQOEColorRules table declaration
+     -- ****************************************
+     acCPQOEColorRulesTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcCPQOEColorRulesEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acCPQualityOfExperience 24}
+
+
+
+     -- ****************************************
+     -- acCPQOEColorRules table entry
+     -- ****************************************
+     acCPQOEColorRulesEntry OBJECT-TYPE
+       SYNTAX AcCPQOEColorRulesEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acCPQOEColorRulesQoeProfileIndex,acCPQOEColorRulesColorRuleIndex}
+       ::= {acCPQOEColorRulesTable 1}
+
+
+
+     -- ****************************************
+     -- acCPQOEColorRules TABLE
+     -- ****************************************
+     AcCPQOEColorRulesEntry ::= SEQUENCE {
+       acCPQOEColorRulesQoeProfileIndex                Unsigned32,
+       acCPQOEColorRulesColorRuleIndex                 Unsigned32,
+       acCPQOEColorRulesRowStatus                      RowStatus,
+       acCPQOEColorRulesAction                         INTEGER,
+       acCPQOEColorRulesActionRes                      INTEGER,
+       acCPQOEColorRulesMonitoredParam                 INTEGER,
+       acCPQOEColorRulesDirection                      INTEGER,
+       acCPQOEColorRulesProfile                        INTEGER,
+       acCPQOEColorRulesGreenYellowThreshold           Unsigned32,
+       acCPQOEColorRulesGreenYellowHystersis           Unsigned32,
+       acCPQOEColorRulesYellowRedThreshold             Unsigned32,
+       acCPQOEColorRulesYellowRedHystersis             Unsigned32
+     }
+
+
+
+     acCPQOEColorRulesQoeProfileIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "QOE Profile index at QOEProfile table.
+AC INI-Param: QOEColorRules_QoeProfile"
+       ::= {acCPQOEColorRulesEntry 1}
+
+
+
+     acCPQOEColorRulesColorRuleIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..9)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Color Rule Index.
+AC INI-Param: QOEColorRules_ColorRuleIndex"
+       ::= {acCPQOEColorRulesEntry 2}
+
+
+
+     acCPQOEColorRulesRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS Field for line.
+AC INI-Param: QOEColorRules_RowStatus"
+       ::= {acCPQOEColorRulesEntry 3}
+
+
+
+     acCPQOEColorRulesAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS.
+AC INI-Param: QOEColorRules_Action"
+       ::= {acCPQOEColorRulesEntry 4}
+
+
+
+     acCPQOEColorRulesActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT.
+AC INI-Param: QOEColorRules_ActionRes"
+       ::= {acCPQOEColorRulesEntry 5}
+
+
+
+     acCPQOEColorRulesMonitoredParam OBJECT-TYPE
+       SYNTAX INTEGER {
+                  mos(0)
+,
+                  delay(1)
+,
+                  packetLoss(2)
+,
+                  jitter(3)
+,
+                  rerl(4)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The quality parameter to monitor.
+Access: Online.
+AC INI-Param: QOEColorRules_monitoredParam"
+       ::= {acCPQOEColorRulesEntry 6}
+
+
+
+     acCPQOEColorRulesDirection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  deviceSide(0)
+,
+                  remoteSide(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Whether the parameter is monitored on the remote or local side.
+Access: Online.
+AC INI-Param: QOEColorRules_direction"
+       ::= {acCPQOEColorRulesEntry 7}
+
+
+
+     acCPQOEColorRulesProfile OBJECT-TYPE
+       SYNTAX INTEGER {
+                  userDefined(0)
+,
+                  lowSensitivity(1)
+,
+                  averageSensitivity(2)
+,
+                  highSensitivity(3)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Predefined thresholds selected according to the chosen sensitivity
+level.
+Access: Online.
+AC INI-Param: QOEColorRules_profile"
+       ::= {acCPQOEColorRulesEntry 8}
+
+
+
+     acCPQOEColorRulesGreenYellowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4294967295)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The threshold for status change from green (good quality)  to
+yellow (medium quality).
+Access: Online.
+AC INI-Param: QOEColorRules_GreenYellowThreshold"
+       ::= {acCPQOEColorRulesEntry 9}
+
+
+
+     acCPQOEColorRulesGreenYellowHystersis OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4294967295)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The hysteresis of the green to yellow threshold.
+Access: Online.
+AC INI-Param: QOEColorRules_GreenYellowHysteresis"
+       ::= {acCPQOEColorRulesEntry 10}
+
+
+
+     acCPQOEColorRulesYellowRedThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4294967295)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The threshold for status change from yellow (medium quality)
+ to red (poor quality).
+Access: Online.
+AC INI-Param: QOEColorRules_YellowRedThreshold"
+       ::= {acCPQOEColorRulesEntry 11}
+
+
+
+     acCPQOEColorRulesYellowRedHystersis OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4294967295)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The hysteresis of  yellow to red threshold.
+Access: Online.
+AC INI-Param: QOEColorRules_YellowRedHysteresis"
+       ::= {acCPQOEColorRulesEntry 12}
+
+
+
+     -- ****************************************
+     -- acCPQOEMediaEnhancementProfile table declaration
+     -- ****************************************
+     acCPQOEMediaEnhancementProfileTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcCPQOEMediaEnhancementProfileEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acCPQualityOfExperience 25}
+
+
+
+     -- ****************************************
+     -- acCPQOEMediaEnhancementProfile table entry
+     -- ****************************************
+     acCPQOEMediaEnhancementProfileEntry OBJECT-TYPE
+       SYNTAX AcCPQOEMediaEnhancementProfileEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acCPQOEMediaEnhancementProfileIndex}
+       ::= {acCPQOEMediaEnhancementProfileTable 1}
+
+
+
+     -- ****************************************
+     -- acCPQOEMediaEnhancementProfile TABLE
+     -- ****************************************
+     AcCPQOEMediaEnhancementProfileEntry ::= SEQUENCE {
+       acCPQOEMediaEnhancementProfileIndex             Unsigned32,
+       acCPQOEMediaEnhancementProfileRowStatus         RowStatus,
+       acCPQOEMediaEnhancementProfileAction            INTEGER,
+       acCPQOEMediaEnhancementProfileActionResult      INTEGER,
+       acCPQOEMediaEnhancementProfileProfileName       SnmpAdminString
+     }
+
+
+
+     acCPQOEMediaEnhancementProfileIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..200)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index Field for line.
+AC INI-Param: MediaEnhancementProfile_Index"
+       ::= {acCPQOEMediaEnhancementProfileEntry 1}
+
+
+
+     acCPQOEMediaEnhancementProfileRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS field for line. Internal parameter.
+AC INI-Param: MediaEnhancementProfile_RowStatus"
+       ::= {acCPQOEMediaEnhancementProfileEntry 2}
+
+
+
+     acCPQOEMediaEnhancementProfileAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: MediaEnhancementProfile_Action"
+       ::= {acCPQOEMediaEnhancementProfileEntry 3}
+
+
+
+     acCPQOEMediaEnhancementProfileActionResult OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Development Impending.
+AC INI-Param: MediaEnhancementProfile_ActionRes"
+       ::= {acCPQOEMediaEnhancementProfileEntry 4}
+
+
+
+     acCPQOEMediaEnhancementProfileProfileName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..39))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Media enhancement profile - defines the BW and QoE profile for
+IP Groups.
+Access: Online.
+AC INI-Param: MediaEnhancementProfile_ProfileName"
+       ::= {acCPQOEMediaEnhancementProfileEntry 5}
+
+
+
+     -- ****************************************
+     -- acCPQOEMediaEnhancementRules table declaration
+     -- ****************************************
+     acCPQOEMediaEnhancementRulesTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcCPQOEMediaEnhancementRulesEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acCPQualityOfExperience 26}
+
+
+
+     -- ****************************************
+     -- acCPQOEMediaEnhancementRules table entry
+     -- ****************************************
+     acCPQOEMediaEnhancementRulesEntry OBJECT-TYPE
+       SYNTAX AcCPQOEMediaEnhancementRulesEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acCPQOEMediaEnhancementRulesMediaEnhancementProfile,acCPQOEMediaEnhancementRulesRuleIndex}
+       ::= {acCPQOEMediaEnhancementRulesTable 1}
+
+
+
+     -- ****************************************
+     -- acCPQOEMediaEnhancementRules TABLE
+     -- ****************************************
+     AcCPQOEMediaEnhancementRulesEntry ::= SEQUENCE {
+       acCPQOEMediaEnhancementRulesMediaEnhancementProfile 
+                                                       Unsigned32,
+       acCPQOEMediaEnhancementRulesRuleIndex           Unsigned32,
+       acCPQOEMediaEnhancementRulesRowStatus           RowStatus,
+       acCPQOEMediaEnhancementRulesAction              INTEGER,
+       acCPQOEMediaEnhancementRulesActionRes           INTEGER,
+       acCPQOEMediaEnhancementRulesTrigger             INTEGER,
+       acCPQOEMediaEnhancementRulesColor               INTEGER,
+       acCPQOEMediaEnhancementRulesActionRule          INTEGER,
+       acCPQOEMediaEnhancementRulesActionValue         Integer32
+     }
+
+
+
+     acCPQOEMediaEnhancementRulesMediaEnhancementProfile OBJECT-TYPE
+       SYNTAX Unsigned32 (0..200)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Media Enhancement Profile index at MediaEnhancementProfile table.
+AC INI-Param: MediaEnhancementRules_MediaEnhancementProfile"
+       ::= {acCPQOEMediaEnhancementRulesEntry 1}
+
+
+
+     acCPQOEMediaEnhancementRulesRuleIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..200)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "The index of the rule within the profile.
+AC INI-Param: MediaEnhancementRules_RuleIndex"
+       ::= {acCPQOEMediaEnhancementRulesEntry 2}
+
+
+
+     acCPQOEMediaEnhancementRulesRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS Field for line.
+AC INI-Param: MediaEnhancementRules_RowStatus"
+       ::= {acCPQOEMediaEnhancementRulesEntry 3}
+
+
+
+     acCPQOEMediaEnhancementRulesAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS.
+AC INI-Param: MediaEnhancementRules_Action"
+       ::= {acCPQOEMediaEnhancementRulesEntry 4}
+
+
+
+     acCPQOEMediaEnhancementRulesActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT.
+AC INI-Param: MediaEnhancementRules_ActionRes"
+       ::= {acCPQOEMediaEnhancementRulesEntry 5}
+
+
+
+     acCPQOEMediaEnhancementRulesTrigger OBJECT-TYPE
+       SYNTAX INTEGER {
+                  mos(0)
+,
+                  delay(1)
+,
+                  packetLoss(2)
+,
+                  jitter(3)
+,
+                  bw(4)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Trigger values:
+0 - MOS
+1 - Delay
+2 - PacketLoss
+3 - Jitter
+4 - BW.
+Access: Online.
+AC INI-Param: MediaEnhancementRules_Trigger"
+       ::= {acCPQOEMediaEnhancementRulesEntry 6}
+
+
+
+     acCPQOEMediaEnhancementRulesColor OBJECT-TYPE
+       SYNTAX INTEGER {
+                  red(0)
+,
+                  yellow(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Color values:
+0 - red
+1 - yellow.
+Access: Online.
+AC INI-Param: MediaEnhancementRules_Color"
+       ::= {acCPQOEMediaEnhancementRulesEntry 7}
+
+
+
+     acCPQOEMediaEnhancementRulesActionRule OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acceptCalls(0)
+,
+                  rejectCalls(1)
+,
+                  alternativeIPProfile(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Action values:
+0 - Accept calls (override)
+1 - Rejet calls
+2 - alternative IP profile.
+Access: Online.
+AC INI-Param: MediaEnhancementRules_ActionRule"
+       ::= {acCPQOEMediaEnhancementRulesEntry 8}
+
+
+
+     acCPQOEMediaEnhancementRulesActionValue OBJECT-TYPE
+       SYNTAX Integer32 (-2147483647..2147483647)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The value required because of the action's selection.
+Access: Online.
+AC INI-Param: MediaEnhancementRules_ActionValue"
+       ::= {acCPQOEMediaEnhancementRulesEntry 9}
 
 
 
@@ -1540,7 +2792,7 @@ AC INI-Param: QOERules_Direction"
      acBandwidthManagementTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcBandwidthManagementEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acBandwidth 21}
@@ -1553,9 +2805,9 @@ AC INI-Param: QOERules_Direction"
      acBandwidthManagementEntry OBJECT-TYPE
        SYNTAX AcBandwidthManagementEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
-           ""
+           "2"
        INDEX {acBandwidthManagementMediaRealmIndex,acBandwidthManagementThresholdIndex}
        ::= {acBandwidthManagementTable 1}
 
@@ -1580,7 +2832,7 @@ AC INI-Param: QOERules_Direction"
      acBandwidthManagementMediaRealmIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..63)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The Media Realm Name index at acCPMediaRealmTable.
 AC INI-Param: BWManagement_MediaRealmIndex"
@@ -1591,7 +2843,7 @@ AC INI-Param: BWManagement_MediaRealmIndex"
      acBandwidthManagementThresholdIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..1)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Rule Index.
 AC INI-Param: BWManagement_ThresholdIndex"
@@ -1602,7 +2854,7 @@ AC INI-Param: BWManagement_ThresholdIndex"
      acBandwidthManagementRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS Field for line.
 Access: Offline.
@@ -1617,7 +2869,7 @@ AC INI-Param: BWManagement_RowStatus"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mangement Field for ACTIONS.
 Access: Offline.
@@ -1632,7 +2884,7 @@ AC INI-Param: BWManagement_Action"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mangement Field for ACTIONS RESULT.
 AC INI-Param: BWManagement_ActionRes"
@@ -1656,7 +2908,7 @@ AC INI-Param: BWManagement_ActionRes"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Rule Action.
 Access: Offline.
@@ -1668,7 +2920,7 @@ AC INI-Param: BWManagement_RuleAction"
      acBandwidthManagementThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..4294967295)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Threshold.
 Access: Offline.
@@ -1680,7 +2932,7 @@ AC INI-Param: BWManagement_Threshold"
      acBandwidthManagementHysteresis OBJECT-TYPE
        SYNTAX Unsigned32 (0..4294967295)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Hysteresis.
 Access: Offline.
@@ -1698,7 +2950,7 @@ AC INI-Param: BWManagement_Hysteresis"
      acProvisionedCallAgentTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcProvisionedCallAgentEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Magaco Call agents Table.;The table defines the IP and port of each call agent.;The Row Status in this table is currently degenerated. It is permanently set to 'active(1)'. Also, changing other values in the table can be done freely (no need to set the Row Status to other values)."
        ::= {acProvisionedCallAgent 1}
@@ -1711,7 +2963,7 @@ AC INI-Param: BWManagement_Hysteresis"
      acProvisionedCallAgentEntry OBJECT-TYPE
        SYNTAX AcProvisionedCallAgentEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acProvisionedCallAgentIndex}
@@ -1736,7 +2988,7 @@ AC INI-Param: BWManagement_Hysteresis"
      acProvisionedCallAgentRowStatus OBJECT-TYPE
        SYNTAX Unsigned32 (1..1)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Provisioned call agent table row-status.
 AC INI-Param: N/A"
@@ -1747,7 +2999,7 @@ AC INI-Param: N/A"
      acProvisionedCallAgentAction OBJECT-TYPE
        SYNTAX Unsigned32 (0..0)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Provisioned call agent table action.
 AC INI-Param: N/A"
@@ -1758,7 +3010,7 @@ AC INI-Param: N/A"
      acProvisionedCallAgentActionResult OBJECT-TYPE
        SYNTAX Unsigned32 (0..0)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Provisioned call agent table result.
 AC INI-Param: N/A"
@@ -1769,7 +3021,7 @@ AC INI-Param: N/A"
      acProvisionedCallAgentIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..9)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Megaco Call Agent Id.
 AC INI-Param: N/A"
@@ -1780,7 +3032,7 @@ AC INI-Param: N/A"
      acProvisionedCallAgentIp OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..20))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Use this parameter to define a list of up to 10 legal IP addresses
 separated by ',' or ';'  for the ServiceChange command.
@@ -1796,7 +3048,7 @@ AC INI-Param: PROVISIONEDCALLAGENTS"
      acProvisionedCallAgentPort OBJECT-TYPE
        SYNTAX Unsigned32 (0..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Use this parameter to define a list of up to 10 Call Agent UDP
 ports separated by , or ; for each Call Agent defined
@@ -1814,7 +3066,7 @@ AC INI-Param: PROVISIONEDCALLAGENTSPORTS"
      acCallManagerGroupsTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcCallManagerGroupsEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "List the trunks in the group. Comma and range can be used"
        ::= {acProvisionedCallAgent 2}
@@ -1827,7 +3079,7 @@ AC INI-Param: PROVISIONEDCALLAGENTSPORTS"
      acCallManagerGroupsEntry OBJECT-TYPE
        SYNTAX AcCallManagerGroupsEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acCallManagerGroupsIndex}
@@ -1854,7 +3106,7 @@ AC INI-Param: PROVISIONEDCALLAGENTSPORTS"
      acCallManagerGroupsIndex OBJECT-TYPE
        SYNTAX Unsigned32 (1..10)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Call Manager Groups index.
 AC INI-Param: CPCallManagerGroups_Index"
@@ -1865,7 +3117,7 @@ AC INI-Param: CPCallManagerGroups_Index"
      acCallManagerGroupsRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Call Manager Groups table row-status.
 AC INI-Param: CPCallManagerGroups_RowStatus"
@@ -1876,7 +3128,7 @@ AC INI-Param: CPCallManagerGroups_RowStatus"
      acCallManagerGroupsAction OBJECT-TYPE
        SYNTAX Unsigned32 (0..0)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Call Manager Groups table action.
 AC INI-Param: CPCallManagerGroups_Action"
@@ -1887,7 +3139,7 @@ AC INI-Param: CPCallManagerGroups_Action"
      acCallManagerGroupsActionResult OBJECT-TYPE
        SYNTAX Unsigned32 (0..0)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Call Manager Groups table result.
 AC INI-Param: CPCallManagerGroups_ActionRes"
@@ -1898,7 +3150,7 @@ AC INI-Param: CPCallManagerGroups_ActionRes"
      acCallManagerGroupsList OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..63))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "List the trunks in the group. Comma and range can be used.
 Access: Offline.
@@ -1915,7 +3167,7 @@ AC INI-Param: CPCallManagerGroups_GroupMembersList"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "0- IP4 CA, 1- DNS (MGCPCallAgentDomainName).
 Access: Offline.
@@ -1927,7 +3179,7 @@ AC INI-Param: CPCallManagerGroups_MGCType"
      acCallManagerGroupsPrimaryMGCIndx OBJECT-TYPE
        SYNTAX Unsigned32 (0..10)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index of primary MGC in the call agents list. The value 0 means
 there is no IP.
@@ -1940,7 +3192,7 @@ AC INI-Param: CPCallManagerGroups_PrimaryMGCIndx"
      acCallManagerGroupsSecondaryMGCIndx OBJECT-TYPE
        SYNTAX Unsigned32 (0..10)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index of secondary MGC in the call agents list. If none - set
 to 10.
@@ -1959,7 +3211,7 @@ AC INI-Param: CPCallManagerGroups_SecondaryMGCIndx"
      acMGCallAgentIP OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The Call Agent IP address, in dotted notation, to be used for
 the initial Restart in Progress (RSIP) message. Set to 0.0.0.0
@@ -1975,7 +3227,7 @@ AC INI-Param: CALLAGENTIP"
      acMGCallAgentPort OBJECT-TYPE
        SYNTAX Unsigned32 (0..65534)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the Call Agent port number. Defaults to the MGCP default
 port number of 2427.
@@ -1990,7 +3242,7 @@ AC INI-Param: CALLAGENTPORT"
      acMGCallAgentRedundantIP OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the redundant Call Agent IP address to be used for the
 initial Restart in Progress message (RSIP). Set to 0.0.0.0
@@ -2005,7 +3257,7 @@ AC INI-Param: REDUNDANTAGENTIP"
      acMGCallAgentRedundantPort OBJECT-TYPE
        SYNTAX Unsigned32 (0..65534)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the redundant Call Agent port number. Defaults to the
 MGCP default port number of 2427.
@@ -2018,7 +3270,7 @@ AC INI-Param: REDUNDANTAGENTPORT"
      acMGCallAgentRedundantDomainName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..64))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the redundant MGCP Call Agent domain name. 
 
@@ -2036,7 +3288,7 @@ AC INI-Param: REDUNDANTCALLAGENTDOMAINNAME"
      acMGCallAgentRedundantIPTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcMGCallAgentRedundantIPEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the redundant Call Agent IP address to be used for the initial Restart in Progress message (RSIP).{@} Set to 0.0.0.0 to avoid sending RSIP.{@}Range = IP address in dotted format notation"
        ::= {acMGCallAgent 21}
@@ -2049,7 +3301,7 @@ AC INI-Param: REDUNDANTCALLAGENTDOMAINNAME"
      acMGCallAgentRedundantIPEntry OBJECT-TYPE
        SYNTAX AcMGCallAgentRedundantIPEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acMGCallAgentRedundantIPIndex}
@@ -2070,7 +3322,7 @@ AC INI-Param: REDUNDANTCALLAGENTDOMAINNAME"
      acMGCallAgentRedundantIPIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..2)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Call Agent number starting at 0.
 AC INI-Param: N/A"
@@ -2081,7 +3333,7 @@ AC INI-Param: N/A"
      acMGCallAgentRedundantIPAddress OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Offline.
@@ -2096,7 +3348,7 @@ AC INI-Param: RedundantAgentIP"
      acMGCallAgentRedundantPortTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcMGCallAgentRedundantPortEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the redundant Call Agent port number.{@}Defaults to the MGCP default port number of 2427."
        ::= {acMGCallAgent 22}
@@ -2109,7 +3361,7 @@ AC INI-Param: RedundantAgentIP"
      acMGCallAgentRedundantPortEntry OBJECT-TYPE
        SYNTAX AcMGCallAgentRedundantPortEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acMGCallAgentRedundantPortIndex}
@@ -2130,7 +3382,7 @@ AC INI-Param: RedundantAgentIP"
      acMGCallAgentRedundantPortIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..2)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Call Agent number starting at 0.
 AC INI-Param: N/A"
@@ -2141,7 +3393,7 @@ AC INI-Param: N/A"
      acMGCallAgentRedundantPortNumber OBJECT-TYPE
        SYNTAX Unsigned32 (0..65534)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 Access: Offline.
@@ -2156,7 +3408,7 @@ AC INI-Param: RedundantAgentPort"
      acMGCommunicationConnectionIDBase OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the lowest number for the Connection ID values assigned
 by the media gateway.
@@ -2169,7 +3421,7 @@ AC INI-Param: CONNECTIONIDBASE"
      acMGCommunicationConnectionIDRange OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the range for the Connection ID values assigned by the
 gateway.
@@ -2183,7 +3435,7 @@ AC INI-Param: CONNECTIONIDRANGE"
      acMGCommunicationGateWayPort OBJECT-TYPE
        SYNTAX Integer32 (-2147483647..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Users can use this parameter to force the media gateway to listen
 to another UDP port instead of to the original 2427, as
@@ -2207,7 +3459,7 @@ AC INI-Param: GATEWAYMGCPPORT"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The MGCP standard defines that if a number does not match the
 digitmap definition, a notification is not sent.
@@ -2237,7 +3489,7 @@ AC INI-Param: MGCPSendDigitmapMismatchNotification"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter configures the option to send piggy backed commands
 while RSIPS are sent. For example, if the event is triggered
@@ -2264,7 +3516,7 @@ AC INI-Param: EnablePiggyBacking"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "When wildcard is used RSIPs turn in a single message on EndPoint
 Naming configuration and Single message for each trunk
@@ -2281,7 +3533,7 @@ AC INI-Param: UseWildCardWithRSIP"
      acMGMiscSDPProfile OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Controls MGCP functioning for SDP negotiation. The parameter
 is bitwise.
@@ -2304,7 +3556,7 @@ AC INI-Param: CPSDPPROFILE"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Determines when signals and events are cleared.
 0 = only an empty R: clears the event list and only an empty
@@ -2328,13 +3580,13 @@ AC INI-Param: ClearRequestBuffer"
      acMGNamePatternEndpoint OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..63))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
-           "Defines the endpoint naming pattern for a gateway. The ‘*’ signs
+           "Defines the endpoint naming pattern for a gateway. The ’*’ signs
 will be replaced with an actual endpoint number or with
 a wild-card sign. The string will contain up to 63 characters.
 
-Default value will be “ACgw*”.
+Default value will be ”ACgw*”.
 .
 Access: Offline.
 AC INI-Param: MGCPEndpointNamingPattern"
@@ -2345,14 +3597,14 @@ AC INI-Param: MGCPEndpointNamingPattern"
      acMGNamePatternTrunk OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..63))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the trunk and B-channel naming pattern used by the gateway.
-The ‘*’ signs will be replaced with a trunk or B-channel
+The ’*’ signs will be replaced with a trunk or B-channel
 number or with a wild-card sign. The string will contain
 up to 63 characters. 
 
-Default value will be “ds*/tr*”.
+Default value will be ”ds*/tr*”.
 .
 Access: Offline.
 AC INI-Param: MGCPTrunkNamingPattern"
@@ -2361,81 +3613,6 @@ AC INI-Param: MGCPTrunkNamingPattern"
 
 
      acMegacoConfig OBJECT IDENTIFIER ::= {acControlConfiguration 4}
-
-
-     acLocalSwitching OBJECT IDENTIFIER ::= {acControlConfiguration 5}
-
-
-     -- ****************************************
-     -- acLocalSwitching table declaration
-     -- ****************************************
-     acLocalSwitchingTable OBJECT-TYPE
-       SYNTAX SEQUENCE OF AcLocalSwitchingEntry
-       MAX-ACCESS not-accessible
-       STATUS current
-       DESCRIPTION
-           "Local Switching definitions for analog ports"
-       ::= {acLocalSwitching 1}
-
-
-
-     -- ****************************************
-     -- acLocalSwitching table entry
-     -- ****************************************
-     acLocalSwitchingEntry OBJECT-TYPE
-       SYNTAX AcLocalSwitchingEntry
-       MAX-ACCESS not-accessible
-       STATUS current
-       DESCRIPTION
-           ""
-       INDEX {acLocalSwitchingIndex}
-       ::= {acLocalSwitchingTable 1}
-
-
-
-     -- ****************************************
-     -- acLocalSwitching TABLE
-     -- ****************************************
-     AcLocalSwitchingEntry ::= SEQUENCE {
-       acLocalSwitchingIndex                           Unsigned32,
-       acLocalSwitchingRowStatus                       RowStatus,
-       acLocalSwitchingPhoneNumber                     Unsigned32
-     }
-
-
-
-     acLocalSwitchingIndex OBJECT-TYPE
-       SYNTAX Unsigned32 (0..23)
-       MAX-ACCESS not-accessible
-       STATUS current
-       DESCRIPTION
-           "
-AC INI-Param: LocalSwitchingPorts_Index"
-       ::= {acLocalSwitchingEntry 1}
-
-
-
-     acLocalSwitchingRowStatus OBJECT-TYPE
-       SYNTAX RowStatus
-       MAX-ACCESS read-create
-       STATUS current
-       DESCRIPTION
-           "
-AC INI-Param: LocalSwitchingPorts_RowStatus"
-       ::= {acLocalSwitchingEntry 2}
-
-
-
-     acLocalSwitchingPhoneNumber OBJECT-TYPE
-       SYNTAX Unsigned32
-       MAX-ACCESS read-create
-       STATUS current
-       DESCRIPTION
-           "Local Switching definitions for analog ports.
-Access: Offline.
-AC INI-Param: LocalSwitchingPorts_PhoneNumber"
-       ::= {acLocalSwitchingEntry 3}
-
 
 
      acMCLink OBJECT IDENTIFIER ::= {acMegacoConfig 1}
@@ -2452,7 +3629,7 @@ AC INI-Param: LocalSwitchingPorts_PhoneNumber"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter specifies if MEGACO rejects commands from an
 MGC not in the provisioned list.
@@ -2468,7 +3645,7 @@ AC INI-Param: MEGACOCHECKLEGALITYOFMGC "
      acMCCommunicationGateWayMID OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..64))
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Defines the media gateway's MID towards the MEGACO Call Agent.
 If empty or illegal, the MID holds the IP address of the
@@ -2483,7 +3660,7 @@ AC INI-Param: MEGACO_MID"
      acMCCommunicationServiceChangeProfile OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..63))
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Specifies the Profile that will be displayed in the MEGACO serviceChange
 command.
@@ -2503,7 +3680,7 @@ AC INI-Param: CPSERVICECHANGEPROFILE"
      acMCCommunicationTimerMGProvisionalResponse OBJECT-TYPE
        SYNTAX Unsigned32 (0..20000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the provisional response timer for the media gateway
 (in msec).
@@ -2518,7 +3695,7 @@ AC INI-Param: MGPROVISIONALRESPONSETIME"
      acMCCommunicationTimerMGCProvisionalResponse OBJECT-TYPE
        SYNTAX Unsigned32 (0..20000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the provisional response timer for the MGC (in msec).
 
@@ -2532,7 +3709,7 @@ AC INI-Param: MGCPROVISIONALRESPONSETIME"
      acMCCommunicationTimerMGExecutionTime OBJECT-TYPE
        SYNTAX Unsigned32 (0..2000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the estimated execution time of the media gateway (in
 msec).
@@ -2547,7 +3724,7 @@ AC INI-Param: MGEXECUTIONTIME"
      acMCCommunicationTimerMGCExecutionTime OBJECT-TYPE
        SYNTAX Unsigned32 (0..2000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the estimated execution time of the MGC (in msec).
 
@@ -2561,7 +3738,7 @@ AC INI-Param: MGCEXECUTIONTIME"
      acMCCommunicationTimerHangTermTimeout OBJECT-TYPE
        SYNTAX Unsigned32 (0..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Default timeout (in seconds) for sending Hanging Termination
 event, when a request for Hanging Termination is sent without
@@ -2577,7 +3754,7 @@ AC INI-Param: MEGACOHangTermTimeout"
      acMCCommunicationTimerRestartMaxWaitingDelay OBJECT-TYPE
        SYNTAX Unsigned32 (0..600000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the Maximum Waiting Delay (in milliseconds) before restart
 service change when the Media Gateway is powered on.
@@ -2590,7 +3767,7 @@ AC INI-Param: RestartMaximumWaitingDelay"
      acMCCommunicationTimerTargetMgResponseTime OBJECT-TYPE
        SYNTAX Unsigned32 (100..1000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The response time is defined as the time from the arrival of
 a call set-up request until the response (in msec).
@@ -2612,7 +3789,7 @@ AC INI-Param: TargetMG_ResponseTime"
      acMCNamePatternPhys OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..30))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the name pattern of a physical termination. 
 For Example: 'tgw/t*/c*'. The '*' sign stands for the actual
@@ -2628,7 +3805,7 @@ AC INI-Param: PHYSTERMNAMEPATTERN"
      acMCNamePatternLogicalRTP OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..30))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the name pattern of an RTP termination.
 
@@ -2645,7 +3822,7 @@ AC INI-Param: LOGICALRTPTERMPATTERN"
      acMCNamePatternLogicalATM OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..30))
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Defines the name pattern of an ATM termination.
 
@@ -2659,7 +3836,7 @@ AC INI-Param: LOGICALATMTERMPATTERN"
      acMCNamePatternConf OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..32))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the name pattern of a conference termination.
 
@@ -2675,7 +3852,7 @@ AC INI-Param: CONFERENCETERMPATTERN"
      acMCNamePatternBCTN OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..32))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the name pattern of a BCT termination.
 
@@ -2691,7 +3868,7 @@ AC INI-Param: BCTTERMPATTERN"
      acMCNamePatternAudio OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..32))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the name pattern of an audio termination.
 
@@ -2707,7 +3884,7 @@ AC INI-Param: AUDIOTERMPATTERN"
      acMCNamePatternTrunkTest OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..32))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the name pattern of a trunk test termination.
 
@@ -2726,7 +3903,7 @@ AC INI-Param: TRUNKTESTTERMPATTERN"
      acMCNameNumberEphemeralIDOffset OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Offset for the ephemeral termination IDs in the gateway.
  e.g., offset = 100 causes the first ephemeral termination
@@ -2746,7 +3923,7 @@ AC INI-Param: MEGACOTERMINATIONIDOFFSET"
      acMCNameNumberPhysicalEndpointTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcMCNameNumberPhysicalEndpointEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Magaco physical endpoint's numbering Table.;The table defines per level (e.g. trunk and channel) the numbering starting point and range.;The Row Status in this table is currently degenerated. It is permanently set to 'active(1)'. Also, changing other values in the table can be done freely (no need to set the Row Status to other values)."
        ::= {acMCNameNumber 21}
@@ -2759,7 +3936,7 @@ AC INI-Param: MEGACOTERMINATIONIDOFFSET"
      acMCNameNumberPhysicalEndpointEntry OBJECT-TYPE
        SYNTAX AcMCNameNumberPhysicalEndpointEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acMCNameNumberPhysicalEndpointIndex}
@@ -2785,7 +3962,7 @@ AC INI-Param: MEGACOTERMINATIONIDOFFSET"
      acMCNameNumberPhysicalEndpointRowStatus OBJECT-TYPE
        SYNTAX Unsigned32 (1..1)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Physical endpoint table row-status.
 AC INI-Param: N/A"
@@ -2796,7 +3973,7 @@ AC INI-Param: N/A"
      acMCNameNumberPhysicalEndpointAction OBJECT-TYPE
        SYNTAX Unsigned32 (0..0)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Physical endpoint table action.
 AC INI-Param: N/A"
@@ -2807,7 +3984,7 @@ AC INI-Param: N/A"
      acMCNameNumberPhysicalEndpointActionResult OBJECT-TYPE
        SYNTAX Unsigned32 (0..0)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Physical endpoint table result.
 AC INI-Param: N/A"
@@ -2818,7 +3995,7 @@ AC INI-Param: N/A"
      acMCNameNumberPhysicalEndpointIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..4)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index for table use.
 AC INI-Param: N/A"
@@ -2829,7 +4006,7 @@ AC INI-Param: N/A"
      acMCNameNumberPhysicalEndpointStart OBJECT-TYPE
        SYNTAX Integer32 (-1..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the starting number for each name level (level 0 is
 the left one when looking at the parameter defining Phys Term
@@ -2846,7 +4023,7 @@ AC INI-Param: EP_NUM"
      acMCNameNumberPhysicalEndpointMin OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Defines the minimum number for each name level (level 0 is the
 left one, i.e., the trunk number).
@@ -2859,7 +4036,7 @@ AC INI-Param: EP_MIN"
      acMCNameNumberPhysicalEndpointMax OBJECT-TYPE
        SYNTAX Unsigned32 (0..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the maximum number for each name level (level 0 is the
 left one, i.e., the trunk number).
@@ -2875,7 +4052,7 @@ AC INI-Param: EP_MAX"
      acMCNameNumberStreamEndpointTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcMCNameNumberStreamEndpointEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Magaco stream endpoint's numbering Table.;The table defines per level the numbering starting point and range.;The Row Status in this table is currently degenerated. It is permanently set to 'active(1)'. Also, changing other values in the table can be done freely (no need to set the Row Status to other values)."
        ::= {acMCNameNumber 22}
@@ -2888,7 +4065,7 @@ AC INI-Param: EP_MAX"
      acMCNameNumberStreamEndpointEntry OBJECT-TYPE
        SYNTAX AcMCNameNumberStreamEndpointEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acMCNameNumberStreamEndpointIndex}
@@ -2913,7 +4090,7 @@ AC INI-Param: EP_MAX"
      acMCNameNumberStreamEndpointRowStatus OBJECT-TYPE
        SYNTAX Unsigned32 (1..1)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Stream endpoint table row-status.
 AC INI-Param: N/A"
@@ -2924,7 +4101,7 @@ AC INI-Param: N/A"
      acMCNameNumberStreamEndpointAction OBJECT-TYPE
        SYNTAX Unsigned32 (0..0)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Stream endpoint table action.
 AC INI-Param: N/A"
@@ -2935,7 +4112,7 @@ AC INI-Param: N/A"
      acMCNameNumberStreamEndpointActionResult OBJECT-TYPE
        SYNTAX Unsigned32 (0..0)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Stream endpoint table result.
 AC INI-Param: N/A"
@@ -2946,7 +4123,7 @@ AC INI-Param: N/A"
      acMCNameNumberStreamEndpointIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..1)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index for table use.
 AC INI-Param: N/A"
@@ -2957,7 +4134,7 @@ AC INI-Param: N/A"
      acMCNameNumberStreamEndpointRTPStart OBJECT-TYPE
        SYNTAX Integer32 (-1..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the starting number for each name's RTP termination
 level.
@@ -2970,7 +4147,7 @@ AC INI-Param: RTP_NUM"
      acMCNameNumberStreamEndpointATMStart OBJECT-TYPE
        SYNTAX Integer32 (-1..65535)
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Defines the starting number for each ATM termination level name.
 
@@ -2987,7 +4164,7 @@ AC INI-Param: ATM_NUM"
      acMCPoolSizeProvisionedConf OBJECT-TYPE
        SYNTAX Unsigned32 (0..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Provisioned conference size indicated by parameter X-PtEngr.
 
@@ -3006,7 +4183,7 @@ AC INI-Param: MEGACOPROVISIONEDCONFSIZE"
      acMCPoolSizeProvisionedBCT OBJECT-TYPE
        SYNTAX Unsigned32 (0..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Provisioned BCT size indicated by parameter X-PtEngr. 
 
@@ -3022,7 +4199,7 @@ AC INI-Param: MEGACOPROVISIONEDBCTSIZE"
      acMCPoolSizeProvisionedAudio OBJECT-TYPE
        SYNTAX Unsigned32 (0..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the provisioned audio size indicated by parameter X-PtEngr.
 
@@ -3038,7 +4215,7 @@ AC INI-Param: MEGACOPROVISIONEDAUDIOSIZE"
      acMCPoolSizeNumOfTestTrunkPorts OBJECT-TYPE
        SYNTAX Unsigned32 (0..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the provisioned TT (trunk testing) size indicated by
 the parameter X-PtEngr.
@@ -3058,7 +4235,7 @@ AC INI-Param: MEGACOPROVISIONEDTRUNKTESTINGSIZE"
      acMCProfileBinary OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Used to profile the binary ASN.1 encoding. 
 
@@ -3082,7 +4259,7 @@ AC INI-Param: MEGACOASN1PROFILE"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Selects the profile for the Advanced Audio Syntax specification.
 
@@ -3105,14 +4282,14 @@ AC INI-Param: AASPACKAGESPROFILE"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "determinewhich Hair-pinning mode is to be used:
 
 mode 0 - will create TDM to TDM connection through IP software
 Loopback 
 
-mode 1 - will create “pure” hair-pinning i.e. TDM to TDM connection
+mode 1 - will create ”pure” hair-pinning i.e. TDM to TDM connection
 through PSTN .
 Access: Offline.
 AC INI-Param: MegacoTdmHairPinningMode"
@@ -3129,7 +4306,7 @@ AC INI-Param: MegacoTdmHairPinningMode"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Sets the MEGACO coding method. 
 
@@ -3143,7 +4320,7 @@ AC INI-Param: MEGACOENCODING"
      acMCMiscContextIDOffset OBJECT-TYPE
        SYNTAX Unsigned32 (0..20000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Offset for the context ID generated by the gateway.
 e.g., offset = 100 causes the first context to be 101.
@@ -3165,7 +4342,7 @@ AC INI-Param: MEGACOCONTEXTIDOFFSET"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Determines PBX behavior upon losing connectivity with H.248
 Call agent or TPNCP.
@@ -3181,7 +4358,7 @@ AC INI-Param: DisconnectBehavior"
      acMCMiscMegacoVersion OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..10))
        MAX-ACCESS read-write
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Determines the maximum Megaco Version number that is supported
 by the device.
@@ -3194,7 +4371,7 @@ AC INI-Param: MegacoVersion"
      acMCMiscSDPProfile OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Controls MEGACO functioning for SDP negotiation. The parameter
 is bitwise.
@@ -3213,9 +4390,9 @@ AC INI-Param: CPSDPPROFILE"
      acMCAMSNumOfConferencePorts OBJECT-TYPE
        SYNTAX Unsigned32 (0..5000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
-           "Number Of Conference ports.  How many ports on the TPM are allocated
+           "Number Of Conference ports. How many ports on the TPM are allocated
 to the conferencing service.
 Access: Instant.
 AC INI-Param: MEGACOPROVISIONEDCONFSIZE"
@@ -3226,9 +4403,9 @@ AC INI-Param: MEGACOPROVISIONEDCONFSIZE"
      acMCAMSNumOfTestTrunkPorts OBJECT-TYPE
        SYNTAX Unsigned32 (0..5000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
-           "Number Of Test Trunk ports.  How many ports on the TPM are allocated
+           "Number Of Test Trunk ports. How many ports on the TPM are allocated
 to the Test Trunk service.
 Access: Instant.
 AC INI-Param: MEGACOPROVISIONEDTRUNKTESTINGSIZE"
@@ -3239,9 +4416,9 @@ AC INI-Param: MEGACOPROVISIONEDTRUNKTESTINGSIZE"
      acMCAMSNumOfLawfulInterceptPorts OBJECT-TYPE
        SYNTAX Unsigned32 (0..5000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
-           "Number Of Test Trunk ports.  How many ports on the TPM are allocated
+           "Number Of Test Trunk ports. How many ports on the TPM are allocated
 to the Lawful Intercept service.
 Access: Instant.
 AC INI-Param: MEGACOPROVISIONEDBCTSIZE"
@@ -3252,9 +4429,9 @@ AC INI-Param: MEGACOPROVISIONEDBCTSIZE"
      acMCAMSNumOfAnnouncementPorts OBJECT-TYPE
        SYNTAX Unsigned32 (0..5000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
-           "Number Of Test Trunk ports.  How many ports on the TPM are allocated
+           "Number Of Test Trunk ports. How many ports on the TPM are allocated
 to the Announcement service.
 Access: Instant.
 AC INI-Param: MEGACOPROVISIONEDAUDIOSIZE"
@@ -3271,7 +4448,7 @@ AC INI-Param: MEGACOPROVISIONEDAUDIOSIZE"
      acVGWConfigurationTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcVGWConfigurationEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Table provides the list of the gateway in the device and their configuration.{@}Virtual GW is represented as separate row in this table. "
        ::= {acMCVGW 21}
@@ -3284,7 +4461,7 @@ AC INI-Param: MEGACOPROVISIONEDAUDIOSIZE"
      acVGWConfigurationEntry OBJECT-TYPE
        SYNTAX AcVGWConfigurationEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acVGWConfigurationIndex}
@@ -3317,7 +4494,7 @@ AC INI-Param: MEGACOPROVISIONEDAUDIOSIZE"
      acVGWConfigurationIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..2)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index Field for line.
 AC INI-Param: MegacoGtwConfigurationTable_Index"
@@ -3328,7 +4505,7 @@ AC INI-Param: MegacoGtwConfigurationTable_Index"
      acVGWConfigurationRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS Field for line.
 AC INI-Param: MegacoGtwConfigutationTable_RowStatus"
@@ -3342,7 +4519,7 @@ AC INI-Param: MegacoGtwConfigutationTable_RowStatus"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mangement Field for ACTIONS.
 AC INI-Param: MegacoGtwConfigutationTable_Action"
@@ -3356,7 +4533,7 @@ AC INI-Param: MegacoGtwConfigutationTable_Action"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mangement Field for ACTIONS RESULT.
 AC INI-Param: MegacoGtwConfigutationTable_ActionRes"
@@ -3367,7 +4544,7 @@ AC INI-Param: MegacoGtwConfigutationTable_ActionRes"
      acVGWConfigurationVirtualGWName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..17))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The descriptive name of the Virtual GW.
 Access: Offline.
@@ -3379,7 +4556,7 @@ AC INI-Param: MegacoGtwConfigurationTable_VirtualGWName"
      acVGWConfigurationIPv4InterfaceName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Define the pointer (Interface Name) to network Interface Table
 for IP version 4 address interface name.
@@ -3392,7 +4569,7 @@ AC INI-Param: MegacoGtwConfigurationTable_IPv4InterfaceName"
      acVGWConfigurationIPv6InterfaceName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Define the pointer (Interface name) to network Interface Table
 for IP version 6 address interface name.
@@ -3405,7 +4582,7 @@ AC INI-Param: MegacoGtwConfigurationTable_IPv6InterfaceName"
      acVGWConfigurationLocalPort OBJECT-TYPE
        SYNTAX Unsigned32 (0..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Define the port to be used by the Media Gateway Controller to
 communicate with this Virtual GW. The value 0 mean select
@@ -3419,7 +4596,7 @@ AC INI-Param: MegacoGtwConfigurationTable_LocalPort"
      acVGWConfigurationAssociatedMembersList OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..64))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the list of the Trunks/Interfaces. coma and range can
 be used.
@@ -3432,7 +4609,7 @@ AC INI-Param: MegacoGtwConfigurationTable_AssociatedMembersList"
      acVGWConfigurationServiceChangeProfile OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..64))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Define the service change profile.
 Access: Offline.
@@ -3451,7 +4628,7 @@ AC INI-Param: MegacoGtwConfigurationTable_ServiceChangeProfile"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Megaco Version.
 Access: Offline.
@@ -3463,7 +4640,7 @@ AC INI-Param: MegacoGtwConfigurationTable_MegacoVersion"
      acVGWConfigurationMID OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..68))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Define the Virtual GW Message Identifier.
 Access: Offline.
@@ -3475,7 +4652,7 @@ AC INI-Param: MegacoGtwConfigurationTable_MID"
      acVGWConfigurationMediaRealmName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..38))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Define the default media realm name (pointer to media realm
 table).
@@ -3488,7 +4665,7 @@ AC INI-Param: MegacoGtwConfigurationTable_MediaRealmName"
      acVGWConfigurationLoadWeight OBJECT-TYPE
        SYNTAX Unsigned32 (1..5)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Define the weight of the VGW out of the total load.
 VGW with higher values process more messages.
@@ -3504,7 +4681,7 @@ AC INI-Param: MegacoGtwConfigurationTable_LoadWeight"
      acVGWControllerLinkTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcVGWControllerLinkEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Table provides the list of the gateway controllers in the network and their configuration.{@}Each row represents link between Virtual Media GW and Media GW Controller."
        ::= {acMCVGW 22}
@@ -3517,7 +4694,7 @@ AC INI-Param: MegacoGtwConfigurationTable_LoadWeight"
      acVGWControllerLinkEntry OBJECT-TYPE
        SYNTAX AcVGWControllerLinkEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acVGWControllerLinkVGWIndex,acVGWControllerLinkActivityOrder}
@@ -3545,7 +4722,7 @@ AC INI-Param: MegacoGtwConfigurationTable_LoadWeight"
      acVGWControllerLinkVGWIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..2)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The virtual GW index at MegacoGtwConfigutationTable.
 AC INI-Param: MegacoGtwControllerLinkTable_VirtualGWIndex"
@@ -3556,7 +4733,7 @@ AC INI-Param: MegacoGtwControllerLinkTable_VirtualGWIndex"
      acVGWControllerLinkActivityOrder OBJECT-TYPE
        SYNTAX Unsigned32 (1..10)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter define the order of redundancy call agents (1
 is the active CA).
@@ -3568,7 +4745,7 @@ AC INI-Param: MegacoGtwControllerLinkTable_ActivityOrder"
      acVGWControllerLinkRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS Field for line.
 AC INI-Param: MegacoGtwControllerLinkTable_RowStatus"
@@ -3582,7 +4759,7 @@ AC INI-Param: MegacoGtwControllerLinkTable_RowStatus"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mangement Field for ACTIONS.
 AC INI-Param: MegacoGtwControllerLinkTable_Action"
@@ -3596,7 +4773,7 @@ AC INI-Param: MegacoGtwControllerLinkTable_Action"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mangement Field for ACTIONS RESULT.
 AC INI-Param: MegacoGtwControllerLinkTable_ActionRes"
@@ -3614,7 +4791,7 @@ AC INI-Param: MegacoGtwControllerLinkTable_ActionRes"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Define the Define the format of the MGC address (IPv4, IPv6,
 DNS).
@@ -3627,7 +4804,7 @@ AC INI-Param: MegacoGtwControllerLinkTable_MGCAddressFormat"
      acVGWControllerLinkMGControllerAddress OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..64))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The domain name or IP address of the MG Controller.
 If a domain name is provided, then a DNS server must be configured.
@@ -3640,7 +4817,7 @@ AC INI-Param: MegacoGtwControllerLinkTable_MGControllerAddress"
      acVGWControllerLinkMGControllerPort OBJECT-TYPE
        SYNTAX Unsigned32 (0..65535)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The port number MG Controller is listening for.
 0 mean select default port according to encoding method.
@@ -3655,18 +4832,91 @@ AC INI-Param: MegacoGtwControllerLinkTable_MGControllerPort"
                   udpIP(0)
 ,
                   tcpIP(1)
-,
-                  sctpIP(2)
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Define the signaling transport type to be used for communication
 with this MGC.
 Access: Offline.
 AC INI-Param: MegacoGtwControllerLinkTable_TransportType"
        ::= {acVGWControllerLinkEntry 9}
+
+
+
+     acLocalSwitching OBJECT IDENTIFIER ::= {acControlConfiguration 5}
+
+
+     -- ****************************************
+     -- acLocalSwitching table declaration
+     -- ****************************************
+     acLocalSwitchingTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcLocalSwitchingEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "Local Switching definitions for analog ports"
+       ::= {acLocalSwitching 1}
+
+
+
+     -- ****************************************
+     -- acLocalSwitching table entry
+     -- ****************************************
+     acLocalSwitchingEntry OBJECT-TYPE
+       SYNTAX AcLocalSwitchingEntry
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           ""
+       INDEX {acLocalSwitchingIndex}
+       ::= {acLocalSwitchingTable 1}
+
+
+
+     -- ****************************************
+     -- acLocalSwitching TABLE
+     -- ****************************************
+     AcLocalSwitchingEntry ::= SEQUENCE {
+       acLocalSwitchingIndex                           Unsigned32,
+       acLocalSwitchingRowStatus                       RowStatus,
+       acLocalSwitchingPhoneNumber                     Unsigned32
+     }
+
+
+
+     acLocalSwitchingIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..23)
+       MAX-ACCESS not-accessible
+       STATUS obsolete
+       DESCRIPTION
+           "
+AC INI-Param: LocalSwitchingPorts_Index"
+       ::= {acLocalSwitchingEntry 1}
+
+
+
+     acLocalSwitchingRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS obsolete
+       DESCRIPTION
+           "
+AC INI-Param: LocalSwitchingPorts_RowStatus"
+       ::= {acLocalSwitchingEntry 2}
+
+
+
+     acLocalSwitchingPhoneNumber OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-create
+       STATUS obsolete
+       DESCRIPTION
+           "Local Switching definitions for analog ports.
+Access: Offline.
+AC INI-Param: LocalSwitchingPorts_PhoneNumber"
+       ::= {acLocalSwitchingEntry 3}
 
 
 
@@ -3679,7 +4929,7 @@ AC INI-Param: MegacoGtwControllerLinkTable_TransportType"
      acActiveCallAgentIp OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..20))
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Megaco Active Call Agent.
 AC INI-Param: N/A"
@@ -3690,7 +4940,7 @@ AC INI-Param: N/A"
      acActiveCallAgentPort OBJECT-TYPE
        SYNTAX Unsigned32 (0..32767)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Megaco Active Port.
 AC INI-Param: N/A"
@@ -3710,7 +4960,7 @@ AC INI-Param: N/A"
      acCallInfoTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcCallInfoEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acCallInfo 1}
@@ -3723,7 +4973,7 @@ AC INI-Param: N/A"
      acCallInfoEntry OBJECT-TYPE
        SYNTAX AcCallInfoEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acCallInfoCallIndex}
@@ -3747,7 +4997,7 @@ AC INI-Param: N/A"
      acCallInfoCallIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..5000)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The Index of a call.
 AC INI-Param: N/A"
@@ -3758,7 +5008,7 @@ AC INI-Param: N/A"
      acCallInfoCallId OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..64))
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Describes the Call ID in the control protocol.For mgcp, string,
 For megaco asci.
@@ -3783,7 +5033,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The type of the media transforming.
 AC INI-Param: N/A"
@@ -3803,7 +5053,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The name of the control protocol active now.
 AC INI-Param: N/A"
@@ -3814,7 +5064,7 @@ AC INI-Param: N/A"
      acCallInfoDuration OBJECT-TYPE
        SYNTAX Integer32 (-1..31536000)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "the duration of a call from the momet it started.
 AC INI-Param: N/A"
@@ -3831,7 +5081,7 @@ AC INI-Param: N/A"
      acCallHierarchyTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcCallHierarchyEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acCallHierarchy 1}
@@ -3844,7 +5094,7 @@ AC INI-Param: N/A"
      acCallHierarchyEntry OBJECT-TYPE
        SYNTAX AcCallHierarchyEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acCallHierarchyCallIndex,acCallHierarchyLegType,acCallHierarchyLegID}
@@ -3867,7 +5117,7 @@ AC INI-Param: N/A"
      acCallHierarchyCallIndex OBJECT-TYPE
        SYNTAX Integer32
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The Index of a call.
 AC INI-Param: N/A"
@@ -3891,7 +5141,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Describes the Type of an end poit.
 AC INI-Param: N/A"
@@ -3902,7 +5152,7 @@ AC INI-Param: N/A"
      acCallHierarchyLegID OBJECT-TYPE
        SYNTAX Integer32 (0..20)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Describes the end point of a call by index.
 AC INI-Param: N/A"
@@ -3913,7 +5163,7 @@ AC INI-Param: N/A"
      acCallHierarchyRowPointer OBJECT-TYPE
        SYNTAX RowPointer
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "A pointer to the right instance in the current Leg table.
 AC INI-Param: N/A"
@@ -3927,7 +5177,7 @@ AC INI-Param: N/A"
      acMegacoStatusCurrentVersion OBJECT-TYPE
        SYNTAX Unsigned32 (1..3)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The Megaco version currently being used.
 AC INI-Param: N/A"

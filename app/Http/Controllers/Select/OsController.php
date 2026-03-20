@@ -36,8 +36,8 @@ class OsController
         $term = strtolower($term);
 
         $scored = array_map(function ($item) use ($term) {
-            $id = strtolower($item['id']);
-            $text = strtolower($item['text']);
+            $id = strtolower((string) $item['id']);
+            $text = strtolower((string) $item['text']);
 
             return [
                 'item' => $item,

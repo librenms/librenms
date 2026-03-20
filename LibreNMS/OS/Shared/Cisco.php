@@ -29,10 +29,12 @@
 
 namespace LibreNMS\OS\Shared;
 
+use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Models\Component;
 use App\Models\Device;
 use App\Models\EntPhysical;
+use App\Models\MacAccounting;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
@@ -45,6 +47,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\MacAccountingDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -55,6 +58,7 @@ use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
+use LibreNMS\Interfaces\Polling\MacAccountingPolling;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
@@ -72,6 +76,8 @@ class Cisco extends OS implements
     StpInstanceDiscovery,
     ProcessorDiscovery,
     QosDiscovery,
+    MacAccountingDiscovery,
+    MacAccountingPolling,
     MempoolsDiscovery,
     NacPolling,
     QosPolling,
@@ -147,11 +153,11 @@ class Cisco extends OS implements
             }
         }
 
-        if ((empty($hardware) || preg_match('/Switch System/', $hardware) || preg_match('/MIDPLANE/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
+        if ((empty($hardware) || preg_match('/Switch System/', (string) $hardware) || preg_match('/MIDPLANE/', (string) $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
-        } elseif ((empty($hardware) || preg_match('/Virtual Stack/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
+        } elseif ((empty($hardware) || preg_match('/Virtual Stack/', (string) $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
-        } elseif ((empty($hardware) || preg_match('/Virtual Stack/', $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
+        } elseif ((empty($hardware) || preg_match('/Virtual Stack/', (string) $hardware)) && ! empty($data[1000]['entPhysicalModelName'])) {
             $hardware = $data[1000]['entPhysicalModelName'];
         } elseif (empty($hardware) && ! empty($data[1000]['entPhysicalContainedIn'])) {
             $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
@@ -179,7 +185,7 @@ class Cisco extends OS implements
 
         foreach (Arr::wrap($cemp) as $index => $entry) {
             if (is_numeric($entry['cempMemPoolUsed']) && $entry['cempMemPoolValid'] == 'true') {
-                [$entPhysicalIndex] = explode('.', $index);
+                [$entPhysicalIndex] = explode('.', (string) $index);
                 $entPhysicalName = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
                 $descr = ucwords((isset($entPhysicalName[$entPhysicalIndex]) ? "{$entPhysicalName[$entPhysicalIndex]} - " : '') . $entry['cempMemPoolName']);
                 $descr = trim(str_replace(['Cisco ', 'Network Processing Engine'], '', $descr), ' -');
@@ -707,7 +713,7 @@ class Cisco extends OS implements
     public function discoverTransceivers(): Collection
     {
         // use data collected by entPhysical module if available
-        $arrayOfContainers = ['cevContainerSFP', 'cevContainerGbic', 'cevContainer10GigBasePort', 'cevContainerTransceiver', 'cevContainerXFP', 'cevContainer40GigBasePort', 'cevContainerCFP', 'cevContainerCXP', 'cevContainerCPAK', 'cevContainerNCS4KSFP', 'cevContainerQSFP28SR', 'cevContainerQSFP28LR', 'cevContainerQSFP28CR', 'cevContainerQSFP28AOC', 'cevContainerQSFP28CWDM', 'cevContainerNonCiscoQSFP28SR', 'cevContainerNonCiscoQSFP28LR', 'cevContainerNonCiscoQSFP28CR', 'cevContainerNonCiscoQSFP28AOC', 'cevContainerNonCiscoQSFP28CWDM', 'cevContainerQSFPDD', 'cevPortGigEthernet'];
+        $arrayOfContainers = ['cevContainerSFP', 'cevContainerGbic', 'cevContainer10GigBasePort', 'cevContainerTransceiver', 'cevContainerXFP', 'cevContainer40GigBasePort', 'cevContainerCFP', 'cevContainerCXP', 'cevContainerCPAK', 'cevContainerNCS4KSFP', 'cevContainerQSFP', 'cevContainerQSFP28SR', 'cevContainerQSFP28LR', 'cevContainerQSFP28CR', 'cevContainerQSFP28AOC', 'cevContainerQSFP28CWDM', 'cevContainerNonCiscoQSFP28SR', 'cevContainerNonCiscoQSFP28LR', 'cevContainerNonCiscoQSFP28CR', 'cevContainerNonCiscoQSFP28AOC', 'cevContainerNonCiscoQSFP28CWDM', 'cevContainerQSFPDD', 'cevPortGigEthernet', 'cevPortSseBreakout100GePort'];
 
         $dbSfpCages = $this->getDevice()->entityPhysical()->whereIn('entPhysicalVendorType', $arrayOfContainers)->pluck('ifIndex', 'entPhysicalIndex');
         if ($dbSfpCages->isNotEmpty()) {
@@ -735,7 +741,7 @@ class Cisco extends OS implements
             $data = $dataFilter->map(function ($e, $e_index) use ($snmpData) {
                 $e['entPhysicalIndex'] = $e_index;
                 if (isset($e['entAliasMappingIdentifier'][0])) {
-                    $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', $e['entAliasMappingIdentifier'][0]);
+                    $e['ifIndex'] = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', (string) $e['entAliasMappingIdentifier'][0]);
                 } else {
                     // Lets try to find the 1st subentity with an ifIndex below this one and use it. Some (most?) ISR and ASR on IOSXE at least are behaving like this.
                     $sibling = $snmpData->filter(fn ($ent, $ent_index) => ($ent['entPhysicalContainedIn'] == $e_index) && isset($ent['entAliasMappingIdentifier'][0]))->first();
@@ -762,6 +768,7 @@ class Cisco extends OS implements
                 'vendor' => $ent['entPhysicalMfgName'] ?? null,
                 'revision' => $ent['entPhysicalHardwareRev'] ?? null,
                 'model' => $ent['entPhysicalModelName'] ?? null,
+                'date' => $ent['entPhysicalMfgDate'] ?? null,
                 'serial' => $ent['entPhysicalSerialNum'] ?? null,
                 'entity_physical_index' => $ent['entPhysicalIndex'],
             ]);
@@ -892,19 +899,22 @@ class Cisco extends OS implements
     public function pollQos($qos)
     {
         $poll_time = time();
-        $preBytes = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyByte64')->table(2);
-        $postBytes = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPostPolicyByte64')->table(2);
-        $dropBytes = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropByte64')->table(2);
-        $bufferDrops = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMNoBufDropPkt64')->table(2);
-        $prePackets = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyPkt64')->table(2);
-        $dropPackets = SnmpQuery::hideMib()->walk('CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropPkt64')->table(2);
+        $snmp_data = SnmpQuery::hideMib()->walk([
+            'CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyByte64',
+            'CISCO-CLASS-BASED-QOS-MIB::cbQosCMPostPolicyByte64',
+            'CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropByte64',
+            'CISCO-CLASS-BASED-QOS-MIB::cbQosCMNoBufDropPkt64',
+            'CISCO-CLASS-BASED-QOS-MIB::cbQosCMPrePolicyPkt64',
+            'CISCO-CLASS-BASED-QOS-MIB::cbQosCMDropPkt64',
+        ])->table(2);
 
         foreach ($qos as $thisQos) {
-            if ($thisQos->type == 'cisco_cbqos_classmap') {
-                $snmp_parts = explode('.', $thisQos->snmp_idx);
+            $snmp_parts = explode('.', (string) $thisQos->snmp_idx);
+            $data = $snmp_data[$snmp_parts[0]][$snmp_parts[1]] ?? [];
 
+            if ($thisQos->type == 'cisco_cbqos_classmap') {
                 // Ignore changes to QoS maps between discovery runs
-                if (! array_key_exists($snmp_parts[0], $preBytes) || ! array_key_exists($snmp_parts[1], $preBytes[$snmp_parts[0]])) {
+                if (! $data) {
                     d_echo('Cisco CBQoS ' . $thisQos->title . ' not processed because SNMP did not return any data');
 
                     // Null out all values so we get a break in the graph
@@ -924,36 +934,33 @@ class Cisco extends OS implements
                 }
 
                 // Values ony saved to RRD
-                $thisQos->poll_data['postbytes'] = $postBytes ? $postBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPostPolicyByte64'] : null;
-                $thisQos->poll_data['bufferdrops'] = $bufferDrops ? $bufferDrops[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMNoBufDropPkt64'] : null;
+                $thisQos->poll_data['postbytes'] = $data['cbQosCMPostPolicyByte64'] ?? null;
+                $thisQos->poll_data['bufferdrops'] = $data['cbQosCMNoBufDropPkt64'] ?? null;
 
                 // Cisco CBQoS is one directional
+                $thisQos->last_polled = $poll_time;
                 if ($thisQos->ingress) {
-                    $thisQos->last_polled = $poll_time;
-                    $thisQos->last_bytes_in = $preBytes ? (int) $preBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyByte64'] : null;
+                    $thisQos->last_bytes_in = isset($data['cbQosCMPrePolicyByte64']) ? (int) $data['cbQosCMPrePolicyByte64'] : null;
                     $thisQos->last_bytes_out = null;
-                    $thisQos->last_bytes_drop_in = $dropBytes ? (int) $dropBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropByte64'] : null;
+                    $thisQos->last_bytes_drop_in = isset($data['cbQosCMDropByte64']) ? (int) $data['cbQosCMDropByte64'] : null;
                     $thisQos->last_bytes_drop_out = null;
-                    $thisQos->last_packets_in = $prePackets ? (int) $prePackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyPkt64'] : null;
+                    $thisQos->last_packets_in = isset($data['cbQosCMPrePolicyPkt64']) ? (int) $data['cbQosCMPrePolicyPkt64'] : null;
                     $thisQos->last_packets_out = null;
-                    $thisQos->last_packets_drop_in = $dropPackets ? (int) $dropPackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropPkt64'] : null;
+                    $thisQos->last_packets_drop_in = isset($data['cbQosCMDropPkt64']) ? (int) $data['cbQosCMDropPkt64'] : null;
                     $thisQos->last_packets_drop_out = null;
                 } elseif ($thisQos->egress) {
-                    $thisQos->last_polled = $poll_time;
                     $thisQos->last_bytes_in = null;
-                    $thisQos->last_bytes_out = $preBytes ? (int) $preBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyByte64'] : null;
+                    $thisQos->last_bytes_out = isset($data['cbQosCMPrePolicyByte64']) ? (int) $data['cbQosCMPrePolicyByte64'] : null;
                     $thisQos->last_bytes_drop_in = null;
-                    $thisQos->last_bytes_drop_out = $dropBytes ? (int) $dropBytes[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropByte64'] : null;
+                    $thisQos->last_bytes_drop_out = isset($data['cbQosCMDropByte64']) ? (int) $data['cbQosCMDropByte64'] : null;
                     $thisQos->last_packets_in = null;
-                    $thisQos->last_packets_out = $prePackets ? (int) $prePackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMPrePolicyPkt64'] : null;
+                    $thisQos->last_packets_out = isset($data['cbQosCMPrePolicyPkt64']) ? (int) $data['cbQosCMPrePolicyPkt64'] : null;
                     $thisQos->last_packets_drop_in = null;
-                    $thisQos->last_packets_drop_out = $dropPackets ? (int) $dropPackets[$snmp_parts[0]][$snmp_parts[1]]['cbQosCMDropPkt64'] : null;
+                    $thisQos->last_packets_drop_out = isset($data['cbQosCMDropPkt64']) ? (int) $data['cbQosCMDropPkt64'] : null;
                 } else {
                     d_echo('Cisco CBQoS ' . $thisQos->title . ' not processed because it it not marked as ingress or egress');
                 }
-            } elseif ($thisQos->type == 'cisco_cbqos_policymap') {
-                // No polling for policymap
-            } else {
+            } elseif ($thisQos->type !== 'cisco_cbqos_policymap') { // No polling for policymap
                 d_echo('Cisco CBQoS ' . $thisQos->type . ' not implemented in LibreNMS/OS/Shared/Cisco.php');
             }
         }
@@ -972,9 +979,16 @@ class Cisco extends OS implements
 
         $vtpdomains = SnmpQuery::walk('CISCO-VTP-MIB::managementDomainName')->pluck();
         $current_domain = 0;
+        $os = $this->getName();
+        $ignore_vlans = (array) LibrenmsConfig::getOsSetting($os, 'ignore_vlans');
 
         return SnmpQuery::enumStrings()->walk('CISCO-VTP-MIB::vtpVlanTable')
-            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain) {
+            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain, $ignore_vlans) {
+                // Skip VLANs configured to be ignored
+                if (in_array($vlan_id, $ignore_vlans)) {
+                    return null;
+                }
+
                 if ($current_domain != $vtpdomain_id) {
                     $current_domain = $vtpdomain_id;
                     Log::info('VTP Domain ' . $vtpdomain_id . ' ' . ($vtpdomains[$vtpdomain_id] ?? 'none'));
@@ -987,7 +1001,8 @@ class Cisco extends OS implements
                     'vlan_type' => $vlan['CISCO-VTP-MIB::vtpVlanType'] ?? '',
                     'vlan_state' => isset($vlan['CISCO-VTP-MIB::vtpVlanState']) && $vlan['CISCO-VTP-MIB::vtpVlanState'] == 'operational',
                 ]);
-            });
+            })
+            ->filter(); // Remove null values from ignored VLANs
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection
@@ -1045,17 +1060,15 @@ class Cisco extends OS implements
         foreach ($vlans as $vlan) {
             $vlan_id = (int) $vlan->vlan_vlan;
 
-            // Ignore reserved VLAN IDs
-            if ($vlan->vlan_state && $vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
+            if ($vlan->vlan_state && $vlan_id) {
                 // collect BRIDGE-MIB in vlan context
-                $tmp_vlan_data = SnmpQuery::context($vlan_id === 1 ? '' : (string) $vlan_id, 'vlan-')
+                $vlanContext = $vlan_id == 1 ? '' : (string) $vlan_id;
+                $tmp_vlan_data = SnmpQuery::context($vlanContext, 'vlan-')
                     ->enumStrings()
                     ->abortOnFailure()
-                    ->walk([
-                        'BRIDGE-MIB::dot1dStpPortState',
-                        'BRIDGE-MIB::dot1dStpPortPriority',
-                        'BRIDGE-MIB::dot1dStpPortPathCost',
-                    ])->table(1);
+                    ->cache()
+                    ->walk('BRIDGE-MIB::dot1dStpPortTable')
+                    ->table(1);
 
                 foreach ($tmp_vlan_data as $baseport => $data) {
                     // use the collected untagged vlan info
@@ -1092,5 +1105,81 @@ class Cisco extends OS implements
         }
 
         return $ports;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discoverMacAccounting(): Collection
+    {
+        return SnmpQuery::walk('CISCO-IP-STAT-MIB::cipMacSwitchedBytes')
+            ->mapTable(function (array $data, int $ifIndex, string $direction, string $mac) {
+                $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDevice());
+
+                if ($port_id === null) {
+                    return null;
+                }
+
+                return new MacAccounting([
+                    'port_id' => $port_id,
+                    'mac' => Mac::parse($mac)->hex(),
+                    'ifIndex' => $ifIndex,
+                    'bps_in' => 0,
+                    'bps_out' => 0,
+                ]);
+            })->filter()->unique(fn (MacAccounting $m) => $m->getCompositeKey());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function pollMacAccounting(Collection $macs): Collection
+    {
+        $cip_response = SnmpQuery::walk([
+            'CISCO-IP-STAT-MIB::cipMacHCSwitchedBytes',
+            'CISCO-IP-STAT-MIB::cipMacHCSwitchedPkts',
+        ]);
+        if (! $cip_response->isValid()) {
+            $cip_response = SnmpQuery::walk([
+                'CISCO-IP-STAT-MIB::cipMacSwitchedBytes',
+                'CISCO-IP-STAT-MIB::cipMacSwitchedPkts',
+            ]);
+
+            if (! $cip_response->isValid()) {
+                return new Collection;
+            }
+        }
+
+        foreach ($cip_response->table(3) as $ifIndex => $port_data) {
+            foreach ($port_data as $direction => $dir_data) {
+                foreach ($dir_data as $mac => $mac_data) {
+                    $mac = Mac::parse($mac)->hex();
+                    $current = new MacAccounting([
+                        'mac' => Mac::parse($mac)->hex(),
+                        'ifIndex' => $ifIndex,
+                        'bps_in' => 0,
+                        'bps_out' => 0,
+                    ]);
+
+                    // get existing or add new
+                    $key = $current->getCompositeKey();
+                    if ($macs->has($key)) {
+                        $current = $macs->get($key);
+                    } else {
+                        $macs->put($key, $current);
+                    }
+
+                    if ($direction == 'input') {
+                        $current->bytes_in = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedBytes'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedBytes'] ?? null;
+                        $current->packets_in = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedPkts'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedPkts'] ?? null;
+                    } else {
+                        $current->bytes_out = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedBytes'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedBytes'] ?? null;
+                        $current->packets_out = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedPkts'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedPkts'] ?? null;
+                    }
+                }
+            }
+        }
+
+        return $macs;
     }
 }
