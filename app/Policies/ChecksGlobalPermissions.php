@@ -24,4 +24,20 @@ trait ChecksGlobalPermissions
             return false;
         }
     }
+
+    /**
+     * Restify calls 'show' (defined in vendor/binaryk/laravel-restify/src/Bootstrap/RoutesDefinition.php) instead of 'view' for single-resource requests.
+     */
+    public function show(User $user, ...$args): bool
+    {
+        return $this->view($user, ...$args);
+    }
+
+    /**
+     * Restify calls 'store' (defined in vendor/binaryk/laravel-restify/src/Bootstrap/RoutesDefinition.php) instead of 'create' for resource creation.
+     */
+    public function store(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'create');
+    }
 }

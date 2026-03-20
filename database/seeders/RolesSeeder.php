@@ -27,6 +27,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RolesSeeder extends Seeder
@@ -34,8 +35,10 @@ class RolesSeeder extends Seeder
     public function run(): void
     {
         if (Role::query()->count() === 0) {
-            Role::findOrCreate('admin');
-            Role::findOrCreate('global-read');
+            $apiAccess = Permission::findOrCreate('api.access');
+
+            Role::findOrCreate('admin')->givePermissionTo($apiAccess);
+            Role::findOrCreate('global-read')->givePermissionTo($apiAccess);
             Role::findOrCreate('user');
         }
     }

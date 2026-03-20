@@ -8,4 +8,6 @@ return [
     App\Providers\DatastoreServiceProvider::class,
     App\Providers\SnmptrapProvider::class,
     App\Providers\PluginProvider::class,
+    Binaryk\LaravelRestify\LaravelRestifyServiceProvider::class,
+    App\Providers\RestifyServiceProvider::class,
 ];
