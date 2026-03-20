@@ -79,7 +79,10 @@ trait HasThresholds
         if ($high) {
             $this->sensor_limit = match ($class) {
                 'temperature' => $this->sensor_current + 20,
-                'voltage' => $this->sensor_current * 1.15,
+                'voltage' => ($this->sensor_type == 'cisco-entity-sensor' && $this->sensor_current > 0 && $this->sensor_current < 0.5)
+                    // special handling for Cisco voltage sensors with very small values where 115% threshold is insufficient
+                    ? max($this->sensor_current * 1.15, $this->sensor_current + 2.5 / $this->sensor_divisor)
+                    : $this->sensor_current * 1.15,
                 'humidity' => 70,
                 'fanspeed' => $this->sensor_current * 1.80,
                 'power_factor' => 1,
@@ -93,7 +96,10 @@ trait HasThresholds
         if ($low) {
             $this->sensor_limit_low = match ($class) {
                 'temperature' => $this->sensor_current - 10,
-                'voltage' => $this->sensor_current * 0.85,
+                'voltage' => ($this->sensor_type == 'cisco-entity-sensor' && $this->sensor_current > 0 && $this->sensor_current < 0.5)
+                    // special handling for Cisco voltage sensors with very small values where 85% threshold is insufficient
+                    ? min($this->sensor_current * 0.85, $this->sensor_current - 2.5 / $this->sensor_divisor)
+                    : $this->sensor_current * 0.85,
                 'humidity' => 30,
                 'fanspeed' => $this->sensor_current * 0.80,
                 'power_factor' => -1,
