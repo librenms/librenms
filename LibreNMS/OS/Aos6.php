@@ -29,6 +29,7 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\EntPhysical;
 use App\Models\PortVlan;
 use App\Models\Transceiver;
 use App\Models\Vlan;
@@ -70,25 +71,22 @@ class Aos6 extends OS implements TransceiverDiscovery, VlanDiscovery, VlanPortDi
             $mfgDates[$entIndex] = $parsed->format('Y-m-d');
         }
 
-        // Get entity information from Entity-MIB
-        $entClass = \SnmpQuery::walk('ENTITY-MIB::entPhysicalClass')->pluck();
-        $entDescr = \SnmpQuery::walk('ENTITY-MIB::entPhysicalDescr')->pluck();
-        $entVendor = \SnmpQuery::walk('ENTITY-MIB::entPhysicalMfgName')->pluck();
-        $entModel = \SnmpQuery::walk('ENTITY-MIB::entPhysicalModelName')->pluck();
-        $entSerial = \SnmpQuery::walk('ENTITY-MIB::entPhysicalSerialNum')->pluck();
-        $entParentRelPos = \SnmpQuery::walk('ENTITY-MIB::entPhysicalParentRelPos')->pluck();
+        // Get entity information from database (already discovered by entity-physical module)
+        $entities = EntPhysical::where('device_id', $this->getDeviceId())
+            ->where('entPhysicalClass', 'port') // class 10 = port
+            ->get()
+            ->keyBy('entPhysicalIndex');
 
-        // Get port information for matching via ifDescr format (e.g., "1/25")
+        // Get port information for matching via ifDescr format
         $ifDescrs = \SnmpQuery::walk('IF-MIB::ifDescr')->pluck();
 
         // Build entity index to ifIndex mapping by matching entPhysicalParentRelPos with ifDescr port number
         $entIndexToIfIndex = [];
 
-        foreach ($entParentRelPos as $entIndex => $relPos) {
-            $class = $entClass[$entIndex] ?? null;
+        foreach ($entities as $entIndex => $entity) {
+            $relPos = $entity->entPhysicalParentRelPos;
 
-            // Only process transceivers (class 10 = port)
-            if ($class != 10 || $relPos < 0) {
+            if ($relPos < 0) {
                 continue;
             }
 
@@ -96,7 +94,7 @@ class Aos6 extends OS implements TransceiverDiscovery, VlanDiscovery, VlanPortDi
             // For AOS6, ifDescr format is "Alcatel-Lucent Enterprise 1/25"
             foreach ($ifDescrs as $ifIndex => $ifDescr) {
                 // Match patterns like "1/25" in ifDescr where 25 is the relPos
-                if (preg_match('/1\/(\d+)$/', trim($ifDescr), $matches)) {
+                if (preg_match('/1\/(\d+)$/', trim((string) $ifDescr), $matches)) {
                     if ((int) $matches[1] == $relPos) {
                         $entIndexToIfIndex[$entIndex] = (int) $ifIndex;
                         break;
@@ -108,10 +106,9 @@ class Aos6 extends OS implements TransceiverDiscovery, VlanDiscovery, VlanPortDi
         $transceivers = collect();
 
         foreach ($mfgDates as $entIndex => $mfgDate) {
-            $class = $entClass[$entIndex] ?? null;
+            $entity = $entities[$entIndex] ?? null;
 
-            // Only process transceivers (class 10)
-            if ($class != 10) {
+            if (! $entity) {
                 continue;
             }
 
@@ -130,16 +127,18 @@ class Aos6 extends OS implements TransceiverDiscovery, VlanDiscovery, VlanPortDi
             $transceivers->push(new Transceiver([
                 'port_id' => $portId,
                 'index' => $entIndex,
-                'entity_physical_index' => $ifIndex,  // Use ifIndex for DDM sensor matching
-                'type' => $entDescr[$entIndex] ?? null,
-                'vendor' => $entVendor[$entIndex] ?? null,
-                'model' => $entModel[$entIndex] ?? null,
-                'serial' => $entSerial[$entIndex] ?? null,
+                'entity_physical_index' => $ifIndex,  // ifIndex matches entPhysicalIndex in sensors from entity-sensor.inc.php
+                'type' => $entity->entPhysicalDescr ?? null,
+                'vendor' => $entity->entPhysicalMfgName ?? null,
+                'model' => $entity->entPhysicalModelName ?? null,
+                'serial' => $entity->entPhysicalSerialNum ?? null,
                 'date' => $mfgDate,
             ]));
         }
 
-        // Update sensor group to 'transceiver' for DDM sensors matching these ports
+        // Update sensor group='transceiver' for DDM sensors to enable Health > Transceivers tab grouping
+        // Required because entity-sensor.inc.php doesn't set group for AOS6 (unlike comware/cisco which
+        // use OS-specific sensor discovery files or custom entity-sensor logic to set group at creation)
         if ($transceivers->isNotEmpty()) {
             $ifIndexes = $transceivers->pluck('entity_physical_index')->toArray();
 
