@@ -1,22 +1,49 @@
 <?php
 
 $name = 'borgbackup';
-$unit_text = 'Repos';
-$descr = 'Locked';
 $ds = 'data';
-$no_hourly = true;
-$no_daily = true;
-$no_weekly = true;
-$no_percentile = true;
-
-$name_part = 'locked';
+$colours = 'mega';
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 15;
+$unitlen = 0;
+$bigdescrlen = 18;
+$smalldescrlen = 15;
 
 if (isset($vars['borgrepo'])) {
-    $name_part = 'repos___' . $vars['borgrepo'] . '___' . $name_part;
+    $repo = $vars['borgrepo'];
+    $repo_key = preg_replace('/[^A-Za-z0-9_\-]/', '_', (string) $repo);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'repos___' . $repo_key . '___locked']);
+
+    if (Rrd::checkRrdExists($rrd_filename)) {
+        $rrd_list = [
+            [
+                'filename' => $rrd_filename,
+                'descr' => $repo,
+                'ds' => $ds,
+            ],
+        ];
+    }
+
+    require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';
 } else {
-    $name_part = 'totals___' . $name_part;
+    $repos = array_keys($app->data['repos'] ?? []);
+    sort($repos);
+
+    $rrd_list = [];
+    foreach ($repos as $repo) {
+        $repo_key = preg_replace('/[^A-Za-z0-9_\-]/', '_', (string) $repo);
+        $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'repos___' . $repo_key . '___locked']);
+
+        if (Rrd::checkRrdExists($rrd_filename)) {
+            $rrd_list[] = [
+                'filename' => $rrd_filename,
+                'descr' => $repo,
+                'ds' => $ds,
+            ];
+        }
+    }
+
+    require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';
 }
-
-$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $name_part]);
-
-require 'includes/html/graphs/generic_stats.inc.php';
