@@ -160,6 +160,13 @@ class SocialiteController extends Controller
         $scopes = LibrenmsConfig::get('auth.socialite.scopes');
         $claims = LibrenmsConfig::get('auth.socialite.claims');
 
+        // This function assumes that the scope and claim have the same name.
+        // Microsoft emits app roles (or users groups, if configured) via the `roles` claim
+        // but doesn't have a `roles` scope. So we just pretend that this scope was set.
+        if ($provider === 'microsoft') {
+            $scopes[] = 'roles';
+        }
+
         if (is_array($scopes) &&
             $this->socialite_user instanceof \Laravel\Socialite\AbstractUser &&
             ! empty($claims)
