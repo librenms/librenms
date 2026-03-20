@@ -4,15 +4,15 @@ namespace App\Actions\Device;
 
 use App\Models\Device;
 use App\Models\Eventlog;
-use LibreNMS\Data\Source\Fping;
-use LibreNMS\Data\Source\FpingResponse;
+use LibreNMS\Data\Source\Icmp\FpingMetricService;
+use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Polling\ConnectivityHelper;
 
 class DeviceIsPingable
 {
     public function __construct(
-        private readonly Fping $fping,
+        private readonly FpingMetricService $fping,
     ) {
     }
 

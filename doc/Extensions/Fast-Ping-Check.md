@@ -18,72 +18,27 @@ devices by switching to 1 minute polling.
 
 ## Setting the ping check to 1 minute
 
-1: If you are using [RRDCached](../Extensions/RRDCached.md), stop the service.
-
-!!! note
-
-    This will flush all pending writes so that the lnms maintenance:rrd-step script can change the steps.
-
-2: Change the `ping_rrd_step` setting in WebUI or CLI
+To use the dispatcher service to run the fast pings:
 
 !!! setting "poller/rrdtool"
 
     ```bash
-    lnms config:set ping_rrd_step 60
+    lnms config:set schedule_type.ping dispatcher
+    lnms config:set service_ping_frequency 60
+    systemctl restart librenms.service
     ```
 
-3: Update the rrd files to change the step (step is hardcoded at file
-creation in rrd files)
-
-```bash
-lnms maintenance:rrd-step all
-```
-
-4: Add the following line to `/etc/cron.d/librenms` to allow 1 minute
-ping checks
+If you are still using CRON:
 
 ```title="/etc/cron.d/librenms"
 *    *    * * *   librenms    /opt/librenms/ping.php >> /dev/null 2>&1
 ```
-
-5: If applicable: Start the [RRDCached](../Extensions/RRDCached.md) service
 
 !!! note
 
     If you are using distributed pollers you can restrict a
     poller to a group by appending `-g` to the cron entry. Alternatively,
     you should only run `ping.php` on a single node.
-
-## Sub minute ping check
-
-Cron only has a resolution of one minute, so for sub-minute ping checks we need to adapt both `ping`
-and `alerts` entries. We add two entries per function, but add a delay before one of these entries.
-
-Remember, you need to remove the original `ping.php` and `alerts.php` entries in crontab before
-proceeding!
-
-1: Set `ping_rrd_step` setting in WebUI or CLI
-
-!!! setting "poller/rrdtool"
-
-    ```bash
-    lnms config:set ping_rrd_step 30
-    ```
-
-2: Update the rrd files
-
-```bash
-lnms maintenance:rrd-step all
-```
-
-3: Update cron (removing any other `ping.php` or `alerts.php` entries)
-
-```title="/etc/cron.d/librenms"
-*    *    * * *   librenms    /opt/librenms/ping.php >> /dev/null 2>&1
-*    *    * * *   librenms    sleep 30 && /opt/librenms/ping.php >> /dev/null 2>&1
-*    *    * * *   librenms    sleep 15 && /opt/librenms/alerts.php >> /dev/null 2>&1
-*    *    * * *   librenms    sleep 45 && /opt/librenms/alerts.php >> /dev/null 2>&1
-```
 
 ## Device dependencies
 

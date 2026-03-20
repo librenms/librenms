@@ -20,7 +20,7 @@ class CheckDeviceAvailability
     {
         $ping_response = $this->deviceIsPingable->execute($device);
 
-        if ($ping_response->success()) {
+        if ($ping_response->isAlive()) {
             $is_up_snmp = ! ConnectivityHelper::snmpIsAllowed($device) || $this->deviceIsSnmpable->execute($device);
             $this->setDeviceAvailability->execute($device, $is_up_snmp, AvailabilitySource::Snmp, $commit);
 

@@ -38,8 +38,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Data\Source\Fping;
-use LibreNMS\Data\Source\FpingResponse;
+use LibreNMS\Data\Source\Icmp\FpingAliveResponse;
+use LibreNMS\Data\Source\Icmp\FpingAvailabilityService;
 use LibreNMS\Enum\AvailabilitySource;
 
 class PingCheck implements ShouldQueue
@@ -82,8 +82,10 @@ class PingCheck implements ShouldQueue
 
         Log::info('Processing hosts in this order : ' . implode(', ', $ordered_hostname_list));
 
-        // bulk ping and send FpingResponse's to recordData as they come in
-        app()->make(Fping::class)->bulkPing($ordered_hostname_list, $this->handleResponse(...));
+        // bulk ping and send FpingAliveResponse to recordData as they come in
+        app()->make(FpingAvailabilityService::class)->bulkPing($ordered_hostname_list, function (FpingAliveResponse $response): void {
+            $this->handleResponse($response);
+        });
 
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {
@@ -159,9 +161,9 @@ class PingCheck implements ShouldQueue
     /**
      * Record the data and run alerts if all parents have been processed
      */
-    public function handleResponse(FpingResponse $response): void
+    public function handleResponse(FpingAliveResponse $response): void
     {
-        Log::debug("Attempting to record data for $response->host");
+        Log::debug("Received response for $response->host");
 
         $device = $this->devices->get($response->host);
 
@@ -179,10 +181,7 @@ class PingCheck implements ShouldQueue
         }
 
         // mark up only if snmp is not down too
-        $changed = app(SetDeviceAvailability::class)->execute($device, $response->success(), AvailabilitySource::Icmp, true);
-
-        // save last_ping_timetaken and rrd data
-        $response->saveStats($device);
+        $changed = app(SetDeviceAvailability::class)->execute($device, $response->isAlive(), AvailabilitySource::Icmp, true);
 
         // mark as processed
         $this->processed->put($device->device_id, true);
