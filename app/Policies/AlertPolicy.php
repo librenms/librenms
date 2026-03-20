@@ -27,7 +27,7 @@ class AlertPolicy
             return true;
         }
 
-        $alertId = isset($alert['device_id']) ? $alert['device_id'] : $alert->device_id;
+        $alertId = $alert['device_id'] ?? $alert->device_id;
 
         return $this->hasGlobalPermission($user, 'view')
             && Permissions::canAccessDevice($alertId, $user);
@@ -47,7 +47,7 @@ class AlertPolicy
             return true;
         }
 
-        $alertId = isset($alert['device_id']) ? $alert['device_id'] : $alert->device_id;
+        $alertId = $alert['device_id'] ?? $alert->device_id;
 
         return $this->hasGlobalPermission($user, 'update') &&
             Permissions::canAccessDevice($alertId, $user);
@@ -62,7 +62,7 @@ class AlertPolicy
             return true;
         }
 
-        $alertId = isset($alert['device_id']) ? $alert['device_id'] : $alert->device_id;
+        $alertId = $alert['device_id'] ?? $alert->device_id;
 
         return $this->hasGlobalPermission($user, 'delete') &&
             Permissions::canAccessDevice($alertId, $user);
