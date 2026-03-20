@@ -205,6 +205,12 @@ if ($device['os_group'] == 'cisco') {
                             break;
                         }
 
+                        if (! isset($entity_array[$phys_index])) {
+                            // NX-OS: entPhysicalContainedIn may reference a parent index (e.g. 1)
+                            // that is not returned by the SNMP walk — stop traversal safely.
+                            break;
+                        }
+
                         $entPhysicalClass = $entity_array[$phys_index]['entPhysicalClass'];
                         $entPhysicalName = $entity_array[$phys_index]['entPhysicalName'];
                         $transceivers = \App\Models\Transceiver::where('device_id', $device['device_id'])->where('index', '=', $phys_index)->first();
