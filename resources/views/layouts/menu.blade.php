@@ -447,13 +447,13 @@
                     </li>
                 @endif
 {{-- Services --}}
-            @config('show_services')
             <li class="dropdown">
                 <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
                    data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons"
                                              aria-hidden="true"></i> <span
                         class="tw:md:hidden tw:2xl:inline-block">{{ __('Services') }}</span></a>
                 <ul class="dropdown-menu">
+                    @config('show_services')
                     <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Services') }}</a>
                     </li>
                     @can('viewAny', \App\Models\ServiceTemplate::class)
@@ -483,11 +483,13 @@
                     <li><a href="{{ url('addsrv') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                          aria-hidden="true"></i> {{ __('Add Service') }}</a></li>
                     @endadmin
+                    @endconfig
+                    <li>
+                        <a href="{{ url('ssl-certificates') }}"><i class="fa fa-lock fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span
+                                class="tw:md:hidden tw:2xl:inline-block">{{ __('SSL Certificates') }}</span></a>
+                    </li>
                 </ul>
             </li>
-            @endconfig
-{{-- App --}}
-                @if($app_menu->isNotEmpty())
                     <li class="dropdown">
                         <a href="{{ url('apps') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"
@@ -512,7 +514,6 @@
                             @endforeach
                         </ul>
                     </li>
-                @endif
 {{-- Routing --}}
                 @if($routing_menu)
                     <li class="dropdown">
@@ -796,7 +797,7 @@
             }
         });
 
-    var hideDashboardEditor = {{ (int)$hide_dashboard_editor }};
+    var hideDashboardEditor = {{ (int) $hide_dashboard_editor }};
     function toggleDashboardEditor() {
         $.ajax({
             url: '{{ route('preferences.store') }}',

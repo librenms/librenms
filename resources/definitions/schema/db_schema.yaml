@@ -2294,6 +2294,42 @@ slas:
     PRIMARY: { Name: PRIMARY, Columns: [sla_id], Unique: true, Type: BTREE }
     slas_device_id_index: { Name: slas_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     slas_device_id_sla_nr_unique: { Name: slas_device_id_sla_nr_unique, Columns: [device_id, sla_nr], Unique: true, Type: BTREE }
+ssl_certificates:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: host, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: port, Type: 'smallint unsigned', 'Null': false, Extra: '', Default: '443' }
+    - { Field: issuer, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: issuer_country, Type: varchar(8), 'Null': true, Extra: '' }
+    - { Field: issuer_organization, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: subject, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: subject_alternative_names, Type: longtext, 'Null': true, Extra: '' }
+    - { Field: serial_number, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: serial_number_hex, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: self_signed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: signature_algorithm, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: certificate_version, Type: 'tinyint unsigned', 'Null': true, Extra: '' }
+    - { Field: key_usage, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: extended_key_usage, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: basic_constraints, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: subject_key_identifier, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: authority_key_identifier, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: valid_from, Type: datetime, 'Null': true, Extra: '' }
+    - { Field: valid_to, Type: datetime, 'Null': true, Extra: '' }
+    - { Field: days_until_expiry, Type: int, 'Null': true, Extra: '' }
+    - { Field: fingerprint, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: pem, Type: text, 'Null': true, Extra: '' }
+    - { Field: last_checked_at, Type: datetime, 'Null': true, Extra: '' }
+    - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: deleted_at, Type: timestamp, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    ssl_certificates_device_id_index: { Name: ssl_certificates_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints:
+    ssl_certificates_device_id_foreign: { name: ssl_certificates_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE SET NULL' }
 state_indexes:
   Columns:
     - { Field: state_index_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

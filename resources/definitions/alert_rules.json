@@ -1009,5 +1009,10 @@
     "name": "I2PD: tunnels not establishing",
     "severity": "warning",
     "builder": {"condition":"AND","rules":[{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"tunnels_successrate"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"less_or_equal","value":"10"}],"valid":true}
+  },
+  {
+    "name": "Expiring SSL Certificates",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"ssl_certificates.days_until_expiry","field":"ssl_certificates.days_until_expiry","type":"integer","input":"text","operator":"less","value":"14"},{"id":"ssl_certificates.disabled","field":"ssl_certificates.disabled","type":"integer","input":"text","operator":"equal","value":"0"}],"valid":true}
   }
 ]

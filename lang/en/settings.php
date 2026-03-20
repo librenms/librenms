@@ -2270,6 +2270,16 @@ return [
         'snmpwalk' => [
             'description' => 'Path to snmpwalk',
         ],
+        'ssl_certificates' => [
+            'auto_discover' => [
+                'description' => 'Auto Discover SSL Certificates',
+                'help' => 'Auto discover SSL certificates',
+            ],
+            'skip_hosts' => [
+                'description' => 'Skip Hosts',
+                'help' => 'Skip hosts from SSL certificate discovery',
+            ],
+        ],
         'sso' => [
             'create_users' => [
                 'description' => 'Create Users',
