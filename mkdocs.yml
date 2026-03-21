@@ -281,6 +281,8 @@ nav:
       - Code Structure: Developing/Code-Structure.md
       - Fetching SNMP Data: Developing/Using-SnmpQuery.md
       - Creating Documentation: Developing/Creating-Documentation.md
+      - Developing SNMP Extensions: Developing/Extension-developing.md
+      - Developing Applications (LibreNMS): Developing/Application-Developing.md
       - Component: Extensions/Component.md
     - Support for a new OS:
       - Intro: Developing/Support-New-OS.md
