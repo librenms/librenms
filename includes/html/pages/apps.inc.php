@@ -104,11 +104,7 @@ $graphs['sneck'] = [
     'time',
     'runtime',
 ];
-$graphs['ntp-client'] = [
-    'stats',
-    'freq',
-];
-$graphs['ntp-server'] = [
+$graphs['ntp'] = [
     'stats',
     'freq',
     'stratum',
