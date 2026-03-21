@@ -1,19 +1,15 @@
 <?php
 
-$name = 'borgbackup';
 $unit_text = 'Bytes';
 $descr = 'Dedup Size';
-$ds = 'data';
-$no_hourly = true;
+$metric = 'unique_csize';
 
-$name_part = 'unique_csize';
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 15;
+$unitlen = 4;
+$bigdescrlen = 105;
+$smalldescrlen = 205;
 
-if (isset($vars['borgrepo'])) {
-    $name_part = 'repos___' . $vars['borgrepo'] . '___' . $name_part;
-} else {
-    $name_part = 'totals___' . $name_part;
-}
-
-$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $name_part]);
-
-require 'includes/html/graphs/generic_stats.inc.php';
+require 'includes/html/graphs/application/borgbackup-common.inc.php';
