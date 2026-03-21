@@ -7,6 +7,7 @@ use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\Yaml\Yaml;
 
@@ -36,6 +37,7 @@ class RoleController extends Controller
         $validated = $request->validated();
 
         $role = Role::create(['name' => $validated['name']]);
+        $this->ensurePermissionsExist($validated['permissions'] ?? []);
         $role->syncPermissions($validated['permissions'] ?? []);
 
         $toast->success(__('permissions.rbac.created', ['name' => $role->name]));
@@ -58,9 +60,11 @@ class RoleController extends Controller
         $this->authorize('update', Role::class);
 
         $validated = $request->validated();
+        $permissions = $validated['permissions'] ?? [];
 
         $role->update(['name' => $validated['name']]);
-        $role->syncPermissions($validated['permissions'] ?? []);
+        $this->ensurePermissionsExist($permissions);
+        $role->syncPermissions($permissions);
 
         $toast->success(__('permissions.rbac.updated', ['name' => $role->name]));
 
@@ -76,6 +80,13 @@ class RoleController extends Controller
         $toast->success(__('permissions.rbac.deleted', ['name' => $role->name]));
 
         return redirect()->route('roles.index');
+    }
+
+    private function ensurePermissionsExist(array $permissions): void
+    {
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission);
+        }
     }
 
     private function getPermissionData(): array
