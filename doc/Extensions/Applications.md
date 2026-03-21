@@ -133,8 +133,8 @@ Currently supported applications as are below.
 - gpsd
 - mailcow-postfix
 - mdadm
-- ntp-client
-- ntp-server
+- ntpd
+- systemd-timesyncd
 - portactivity
 - powerdns
 - powermon
