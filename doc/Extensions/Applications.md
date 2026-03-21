@@ -150,6 +150,7 @@ The following apps have extends that have native support for this,
 if congiured to do so.
 
 - suricata
+- storraid
 
 ## Enable the application discovery module
 

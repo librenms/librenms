@@ -1,0 +1,415 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux some.host.name 5.4.34-1-pve #1 SMP PVE 5.4.34-2 (Thu, 07 May 2020 10:02:02 +0200) x86_64",
+                    "sysContact": null,
+                    "version": "5.4.34-1-pve",
+                    "hardware": "Generic x86 64-bit",
+                    "features": null,
+                    "location": null,
+                    "os": "proxmox",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "proxmox.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "storraid",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "storraid",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"version\":\"1\",\"application\":\"storraid\",\"timestamp\":\"2026-03-08T22:34:01.608560Z\",\"error\":null,\"controllers\":[{\"id\":0,\"model\":\"AVAGO MegaRAID SAS 9361-8i\",\"serial\":\"SV52000000\",\"firmware\":\"4.290.00-4536\",\"memory_mb\":\"1024MB\",\"state\":\"Optimal\",\"severity\":0,\"temperature\":57,\"vd_count\":2,\"pd_count\":8,\"bbu\":null,\"is_hba\":false},{\"id\":1,\"model\":\"SAS9300-8e\",\"serial\":\"SV52000001\",\"firmware\":\"09.00.00.00\",\"memory_mb\":\"0MB\",\"state\":\"N\\/A (HBA)\",\"severity\":0,\"temperature\":68,\"vd_count\":0,\"pd_count\":0,\"bbu\":null,\"is_hba\":true}],\"virtual_disks\":[{\"controller\":0,\"id\":\"0\\/0\",\"name\":\"VD0\\/0\",\"raid_level\":\"RAID1\",\"state\":\"Optl\",\"severity\":0,\"size\":\"465.250 GB\",\"access\":\"RW\",\"cache\":\"RWTD\",\"consist\":\"Yes\",\"progress_pct\":null},{\"controller\":0,\"id\":\"1\\/1\",\"name\":\"VD1\\/1\",\"raid_level\":\"RAID5\",\"state\":\"Optl\",\"severity\":0,\"size\":\"27.287 TB\",\"access\":\"RW\",\"cache\":\"RWTD\",\"consist\":\"Yes\",\"progress_pct\":null}],\"physical_disks\":[{\"controller\":0,\"eid_slot\":\"252:0\",\"vd\":\"0\",\"state\":\"Onln\",\"severity\":0,\"size\":\"465.250 GB\",\"media_type\":\"HDD\",\"interface\":\"SATA\",\"model\":\"WDC WD5003ABYZ-011FA0\",\"serial\":\"WD-WM00000000B\",\"firmware\":\"01.01S03\",\"temperature\":30,\"media_errors\":0,\"other_errors\":0,\"pred_failure\":\"0\",\"smart_alert\":false},{\"controller\":0,\"eid_slot\":\"252:1\",\"vd\":\"0\",\"state\":\"Onln\",\"severity\":0,\"size\":\"465.250 GB\",\"media_type\":\"HDD\",\"interface\":\"SATA\",\"model\":\"WDC WD5003ABYZ-011FA0\",\"serial\":\"WD-WM00000000S\",\"firmware\":\"01.01S03\",\"temperature\":31,\"media_errors\":0,\"other_errors\":0,\"pred_failure\":\"0\",\"smart_alert\":false},{\"controller\":0,\"eid_slot\":\"252:2\",\"vd\":\"1\",\"state\":\"Onln\",\"severity\":0,\"size\":\"5.457 TB\",\"media_type\":\"HDD\",\"interface\":\"SATA\",\"model\":\"ST6000NM0024-1HT17Z\",\"serial\":\"Z4000000\",\"firmware\":\"SN02    \",\"temperature\":42,\"media_errors\":0,\"other_errors\":0,\"pred_failure\":\"0\",\"smart_alert\":false},{\"controller\":0,\"eid_slot\":\"252:3\",\"vd\":\"1\",\"state\":\"Onln\",\"severity\":0,\"size\":\"5.457 TB\",\"media_type\":\"HDD\",\"interface\":\"SATA\",\"model\":\"ST6000NM0024-1HT17Z\",\"serial\":\"Z4000001\",\"firmware\":\"SN02    \",\"temperature\":42,\"media_errors\":0,\"other_errors\":0,\"pred_failure\":\"0\",\"smart_alert\":false},{\"controller\":0,\"eid_slot\":\"252:4\",\"vd\":\"1\",\"state\":\"Onln\",\"severity\":0,\"size\":\"5.457 TB\",\"media_type\":\"HDD\",\"interface\":\"SATA\",\"model\":\"ST6000NM0024-1HT17Z\",\"serial\":\"Z4000002\",\"firmware\":\"SN02    \",\"temperature\":35,\"media_errors\":0,\"other_errors\":0,\"pred_failure\":\"0\",\"smart_alert\":false},{\"controller\":0,\"eid_slot\":\"252:5\",\"vd\":\"1\",\"state\":\"Onln\",\"severity\":0,\"size\":\"5.457 TB\",\"media_type\":\"HDD\",\"interface\":\"SATA\",\"model\":\"ST6000NM0024-1HT17Z\",\"serial\":\"Z4000003\",\"firmware\":\"SN02    \",\"temperature\":36,\"media_errors\":0,\"other_errors\":0,\"pred_failure\":\"0\",\"smart_alert\":false},{\"controller\":0,\"eid_slot\":\"252:6\",\"vd\":\"1\",\"state\":\"Onln\",\"severity\":0,\"size\":\"5.457 TB\",\"media_type\":\"HDD\",\"interface\":\"SATA\",\"model\":\"ST6000NM0024-1HT17Z\",\"serial\":\"Z4000004\",\"firmware\":\"SN02    \",\"temperature\":39,\"media_errors\":0,\"other_errors\":3,\"pred_failure\":\"0\",\"smart_alert\":false},{\"controller\":0,\"eid_slot\":\"252:7\",\"vd\":\"1\",\"state\":\"Onln\",\"severity\":0,\"size\":\"5.457 TB\",\"media_type\":\"HDD\",\"interface\":\"SATA\",\"model\":\"ST6000NM0024-1HT17Z\",\"serial\":\"Z4000005\",\"firmware\":\"SN02    \",\"temperature\":39,\"media_errors\":0,\"other_errors\":3,\"pred_failure\":\"0\",\"smart_alert\":false}],\"summary\":{\"overall_severity\":0,\"ctrl_count\":2,\"vd_count\":2,\"pd_count\":8,\"ctrl_ok\":2,\"ctrl_warn\":0,\"ctrl_crit\":0,\"vd_ok\":2,\"vd_warn\":0,\"vd_crit\":0,\"pd_ok\":8,\"pd_warn\":0,\"pd_crit\":0}}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "ctrl_c0_temperature",
+                    "value": 57,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "ctrl_c1_temperature",
+                    "value": 68,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_0_media_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_0_other_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_0_pred_failure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_0_severity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_1_media_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_1_other_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_1_pred_failure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_1_severity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_2_media_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_2_other_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_2_pred_failure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_2_severity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_3_media_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_3_other_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_3_pred_failure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_3_severity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_4_media_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_4_other_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_4_pred_failure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_4_severity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_5_media_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_5_other_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_5_pred_failure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_5_severity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_6_media_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_6_other_errors",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_6_pred_failure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_6_severity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_7_media_errors",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_7_other_errors",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_7_pred_failure",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pd_c0_252_7_severity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pdtemp_c0_252_0_temperature",
+                    "value": 30,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pdtemp_c0_252_1_temperature",
+                    "value": 31,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pdtemp_c0_252_2_temperature",
+                    "value": 42,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pdtemp_c0_252_3_temperature",
+                    "value": 42,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pdtemp_c0_252_4_temperature",
+                    "value": 35,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pdtemp_c0_252_5_temperature",
+                    "value": 36,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pdtemp_c0_252_6_temperature",
+                    "value": 39,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "pdtemp_c0_252_7_temperature",
+                    "value": 39,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_ctrl_count",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_ctrl_crit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_ctrl_ok",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_ctrl_warn",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_overall_severity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_pd_count",
+                    "value": 8,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_pd_crit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_pd_ok",
+                    "value": 8,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_pd_total_errors",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_pd_warn",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_vd_count",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_vd_crit",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_vd_ok",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "summary_vd_warn",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "vd_c0_0_0_progress",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "vd_c0_0_0_severity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "vd_c0_1_1_progress",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                },
+                {
+                    "metric": "vd_c0_1_1_severity",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "storraid"
+                }
+            ]
+        }
+    }
+}

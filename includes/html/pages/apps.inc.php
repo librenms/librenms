@@ -646,6 +646,10 @@ $graphs['i2pd'] = [
     'peers',
     'total_bytes',
 ];
+$graphs['storraid'] = [
+    'summary',
+    'temp',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
