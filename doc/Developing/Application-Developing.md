@@ -1166,9 +1166,7 @@ State is stored in `$vars['graph']`. Combine with Pattern 3 (instance selection)
 Add a stable metadata block near the top of your user-facing doc page:
 
 | Field | Value |
-| --- | --- |
-| Polling file | `includes/polling/applications/{name}.inc.php` |
-| Graph files | `includes/html/graphs/application/{name}_*.inc.php` |
+| --- | --- | 
 | JSON contract version | 1 |
 | App type | `{name}` |
 | SNMP extend name | `{name}` |
