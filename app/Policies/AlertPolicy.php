@@ -21,10 +21,16 @@ class AlertPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Alert $alert): bool
+    public function view(User $user, Alert|array $alert): bool
     {
+        if ($this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
+        $alertId = $alert['device_id'] ?? $alert->device_id;
+
         return $this->hasGlobalPermission($user, 'view')
-            || Permissions::canAccessDevice($alert->device_id, $user);
+            && Permissions::canAccessDevice($alertId, $user);
     }
 
     public function detail(User $user): bool
@@ -35,16 +41,30 @@ class AlertPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user): bool
+    public function update(User $user, Alert|array $alert): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        if ($this->hasGlobalPermission($user, 'update') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
+        $alertId = $alert['device_id'] ?? $alert->device_id;
+
+        return $this->hasGlobalPermission($user, 'update') &&
+            Permissions::canAccessDevice($alertId, $user);
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, Alert|array $alert): bool
     {
-        return $this->hasGlobalPermission($user, 'delete');
+        if ($this->hasGlobalPermission($user, 'delete') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
+        $alertId = $alert['device_id'] ?? $alert->device_id;
+
+        return $this->hasGlobalPermission($user, 'delete') &&
+            Permissions::canAccessDevice($alertId, $user);
     }
 }

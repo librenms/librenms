@@ -14,6 +14,7 @@
  * @author     LibreNMS Contributors
 */
 
+use App\Models\Alert;
 use LibreNMS\Util\Time;
 
 $where = ' `devices`.`disabled` = 0';
@@ -123,9 +124,11 @@ if ($rowCount != -1) {
 }
 
 $sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`name`, `alert_rules`.`severity`, `alert_rules`.`builder` $sql";
-
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alert) {
+    if (Gate::denies('view', [Alert::class, $alert])) {
+        continue;
+    }
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
     $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
     [$fault_detail, $max_row_length] = alert_details($log);
