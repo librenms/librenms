@@ -281,6 +281,7 @@ nav:
       - Code Structure: Developing/Code-Structure.md
       - Fetching SNMP Data: Developing/Using-SnmpQuery.md
       - Creating Documentation: Developing/Creating-Documentation.md
+      - MkDocs Configuration: Developing/MkDocs-Configuration.md
       - Component: Extensions/Component.md
     - Support for a new OS:
       - Intro: Developing/Support-New-OS.md
