@@ -118,13 +118,15 @@ class ArpTable implements Module
                 );
 
                 foreach ($port_arp as $ip => $raw_mac) {
-                    // Some SNMP agents encode IpAddress indexes with an extra prefix byte,
-                    // causing table() to produce nested arrays instead of flat ip => mac entries.
-                    // Flatten by appending the spilled octet to $ip and taking the mac value.
+                    // Some SNMP agents add an extra prefix byte to IpAddress indexes, so instead of:
+                    //   '1.2.3.4' => 'aa:bb:cc:dd:ee:ff'
+                    // table() returns:
+                    //   '0.1.2.3' => [ '4' => 'aa:bb:cc:dd:ee:ff' ]
+                    // Reconstruct the correct IP by dropping the prefix octet and appending the spilled one.
                     if (is_array($raw_mac)) {
-                        $parts = explode('.', ltrim((string) $ip, '.'));
-                        array_shift($parts);
-                        $ip = implode('.', $parts) . '.' . ltrim((string) array_key_first($raw_mac), '.');
+                        $octets = explode('.', ltrim((string) $ip, '.'));
+                        $spilled_octet = ltrim((string) array_key_first($raw_mac), '.');
+                        $ip = implode('.', array_slice($octets, 1)) . '.' . $spilled_octet;
                         $raw_mac = array_values($raw_mac)[0];
                     }
 
