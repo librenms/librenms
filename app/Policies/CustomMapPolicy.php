@@ -19,13 +19,14 @@ class CustomMapPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, int $customMapId): bool
+    public function view(User $user, CustomMap $customMap): bool
     {
         if ($this->hasGlobalPermission($user, 'viewAny')) {
             return true;
         }
 
-        return $this->hasGlobalPermission($user, 'view');
+        return $this->hasGlobalPermission($user, 'view')
+            || $customMap->hasReadAccess($user);
     }
 
     /**
@@ -39,7 +40,7 @@ class CustomMapPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, int $customMapId): bool
+    public function update(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'update');
     }
@@ -47,7 +48,7 @@ class CustomMapPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, int $customMapId): bool
+    public function delete(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'delete');
     }

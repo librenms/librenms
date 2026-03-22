@@ -28,8 +28,10 @@ class PortPolicy
         }
 
         $port_id = $port->port_id ?? $port['port_id'];
+        $device_id = $port->device_id ?? $port['device_id'];
 
         return $this->hasGlobalPermission($user, 'view')
+            || Permissions::canAccessDevice($device_id, $user)
             || Permissions::canAccessPort($port_id, $user);
     }
 
@@ -43,8 +45,10 @@ class PortPolicy
         }
 
         $port_id = $port->port_id ?? $port['port_id'];
+        $device_id = $port->device_id ?? $port['device_id'];
 
         return $this->hasGlobalPermission($user, 'update') &&
+            Permissions::canAccessDevice($device_id, $user) &&
             Permissions::canAccessPort($port_id, $user);
     }
 
@@ -58,8 +62,10 @@ class PortPolicy
         }
 
         $port_id = $port->port_id ?? $port['port_id'];
+        $device_id = $port->device_id ?? $port['device_id'];
 
         return $this->hasGlobalPermission($user, 'delete') &&
+            Permissions::canAccessDevice($device_id, $user) &&
             Permissions::canAccessPort($port_id, $user);
     }
 
@@ -73,8 +79,10 @@ class PortPolicy
         }
 
         $port_id = $port->port_id ?? $port['port_id'];
+        $device_id = $port->device_id ?? $port['device_id'];
 
         return $this->hasGlobalPermission($user, 'restore') &&
+            Permissions::canAccessDevice($device_id, $user) &&
             Permissions::canAccessPort($port_id, $user);
     }
 
@@ -88,8 +96,10 @@ class PortPolicy
         }
 
         $port_id = $port->port_id ?? $port['port_id'];
+        $device_id = $port->device_id ?? $port['device_id'];
 
         return $this->hasGlobalPermission($user, 'forceDelete') &&
+            Permissions::canAccessDevice($device_id, $user) &&
             Permissions::canAccessPort($port_id, $user);
     }
 }
