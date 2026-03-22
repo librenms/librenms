@@ -71,7 +71,7 @@ if (empty($name)) {
     if (is_numeric($group_id) && $group_id > 0) {
         $db_members = AlertTransportGroup::find($group_id)
             ->transports()
-            ->pluck('transport_id')
+            ->pluck('alert_transports.transport_id')
             ->all();
 
         // Compare arrays to get added and removed transports
