@@ -191,13 +191,13 @@ Route::middleware(['auth'])->group(function (): void {
     });
 
     Route::get('alertlog/{alertLog}/details', Ajax\AlertDetailsController::class)->name('alertlog.details');
+    Route::get('settings/{tab?}/{section?}', [SettingsController::class, 'index'])->name('settings');
+    Route::put('settings/{name}', [SettingsController::class, 'update'])->name('settings.update');
+    Route::delete('settings/{name}', [SettingsController::class, 'destroy'])->name('settings.destroy');
+
     // admin pages
     Route::middleware('can:admin')->group(function (): void {
-        Route::get('settings/{tab?}/{section?}', [SettingsController::class, 'index'])->name('settings');
-        Route::put('settings/{name}', [SettingsController::class, 'update'])->name('settings.update');
-        Route::delete('settings/{name}', [SettingsController::class, 'destroy'])->name('settings.destroy');
-
-        Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
+            Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
         Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
         Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
         Route::get('alert-rule-from-template/{template_id}', [AlertRuleTemplateController::class, 'template'])->name('alert-rule-template');

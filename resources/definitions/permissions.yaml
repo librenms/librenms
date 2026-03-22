@@ -108,6 +108,9 @@ groups:
         - poller.update
         - poller.delete
 
+    poller-cluster:
+        - poller-cluster.update
+
     poller-group:
         - poller-group.viewAny
         - poller-group.create

@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\CustomMap;
 use App\Models\User;
 
 class CustomMapPolicy

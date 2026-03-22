@@ -44,7 +44,7 @@
                                 @foreach($menu_hooks as [$view, $data])
                                     <li>@include($view, $data)</li>
                                 @endforeach
-                                @admin
+                                @can('plugin.admin')
                                 @if($has_v1_plugins || $has_v2_plugins)
                                     <li role="presentation" class="divider"></li>
                                 @endif
@@ -53,7 +53,7 @@
                                         <i class="fa fa-lock fa-fw fa-lg" aria-hidden="true"></i>{{ __('Plugin Admin') }}
                                     </a>
                                 </li>
-                                @endadmin
+                                @endcan
                             </ul>
                         </li>
                         @endif
@@ -165,7 +165,6 @@
                         <li><a href="{{ url('outages') }}"><i class="fa fa-exclamation-triangle fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Outages') }}</a></li>
 
-                        @admin
                         <li role="presentation" class="divider"></li>
                         @can('viewAny', \App\Models\DeviceGroup::class)
                             <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
@@ -177,12 +176,13 @@
                             <li><a href="{{ url('vminfo') }}"><i
                                         class="fa fa-cog fa-fw fa-lg"></i> {{ __('Virtual Machines') }}</a></li>
                         @endif
+                        @can('create', \App\Models\Device::class)
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('addhost') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Add Device') }}</a></li>
+                        @endcan
                         <li><a href="{{ url('delhost') }}"><i class="fa fa-trash fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Delete Device') }}</a></li>
-                    @endadmin
 
                     </ul>
                 </li>
@@ -265,7 +265,7 @@
                             </li>
                         @endif
                         @endif
-                        @admin
+                        @can('create', \App\Models\CustomMap::class)
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ route('maps.custom.index') }}">
                             <i class="fa fa-pen fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Map Editor') }}
@@ -278,7 +278,7 @@
                         <li><a href="{{ route('maps.nodeimage.index') }}">
                             <i class="fa fa-image fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Node Image Manager') }}
                         </a></li>
-                        @endadmin
+                        @endcan
 
                     </ul>
                 </li>
@@ -478,11 +478,11 @@
                                 </a></li>
                         @endif
                     @endif
-                    @admin
+                    @can('create', \App\Models\Service::class)
                     <li role="presentation" class="divider"></li>
                     <li><a href="{{ url('addsrv') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                          aria-hidden="true"></i> {{ __('Add Service') }}</a></li>
-                    @endadmin
+                    @endcan
                 </ul>
             </li>
             @endconfig
@@ -618,17 +618,21 @@
                        style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
                         <span class="visible-xs-inline-block">{{ __('settings.title') }}</span></a>
                     <ul class="dropdown-menu">
-                        @admin
+                        @can('settings.viewAny')
                         <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Global Settings') }}</a></li>
                         <li><a href="{{ url('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Validate Config') }}</a></li>
+                        @endcan
+                        @canany(['viewAny', 'view'], \App\Models\User::class)
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ route('users.index') }}"><i class="fa fa-user-circle-o fa-fw fa-lg"
                                                                     aria-hidden="true"></i> {{ __('Manage Users') }}</a>
                         </li>
                         <li><a href="{{ url('authlog') }}"><i class="fa fa-shield fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Auth History') }}</a></li>
+                        @endcanany
+                        @canany(['viewAny', 'view'], \App\Models\Poller::class)
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a>
@@ -644,6 +648,8 @@
                                 <li><a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> {{ __('Log') }}</a></li>
                             </ul>
                         </li>
+                        @endcanany
+                        @can('api.access')
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> {{ __('API') }}</a>
@@ -656,8 +662,8 @@
                                 </li>
                             </ul>
                         </li>
+                        @endcan
                         <li role="presentation" class="divider"></li>
-                        @endadmin
                         <li class="dropdown-submenu" id="countdown_timer_menu" style="display: none">
                             <a href="#"><i class="fa fa-clock-o fa-fw fa-lg"></i> <span id="countdown_timer"></span></a>
                             <ul class="dropdown-menu">
@@ -796,7 +802,7 @@
             }
         });
 
-    var hideDashboardEditor = {{ (int)$hide_dashboard_editor }};
+    var hideDashboardEditor = {{ (int) $hide_dashboard_editor }};
     function toggleDashboardEditor() {
         $.ajax({
             url: '{{ route('preferences.store') }}',

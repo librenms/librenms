@@ -48,7 +48,7 @@ class DevicePolicy
     /**
      * Determine whether the user can update the device.
      */
-    public function update(User $user, Device|int $device): bool
+    public function update(User $user, Device|array $device): bool
     {
         if ($this->hasGlobalPermission($user, 'update') && $this->hasGlobalPermission($user, 'viewAny')) {
             return true;
@@ -60,10 +60,15 @@ class DevicePolicy
             Permissions::canAccessDevice($device_id, $user);
     }
 
+    public function canDelete(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'delete');
+    }
+    
     /**
      * Determine whether the user can delete the device.
      */
-    public function delete(User $user, Device|int $device): bool
+    public function delete(User $user, Device|array $device): bool
     {
         if ($this->hasGlobalPermission($user, 'delete') && $this->hasGlobalPermission($user, 'viewAny')) {
             return true;
@@ -79,7 +84,7 @@ class DevicePolicy
      * Determine whether the user can view the stored configuration of the device
      * from Oxidized or Rancid
      */
-    public function showConfig(User $user, Device|int $device): bool
+    public function showConfig(User $user, Device|array $device): bool
     {
         if ($this->hasGlobalPermission($user, 'showConfig') && $this->hasGlobalPermission($user, 'viewAny')) {
             return true;
@@ -94,7 +99,7 @@ class DevicePolicy
     /**
      * Determine whether the user can update device notes.
      */
-    public function updateNotes(User $user, Device|int $device): bool
+    public function updateNotes(User $user, Device|array $device): bool
     {
         if ($this->hasGlobalPermission($user, 'updateNotes') && $this->hasGlobalPermission($user, 'viewAny')) {
             return true;

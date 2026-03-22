@@ -292,7 +292,7 @@ class DeviceController extends TableController
             ],
         ];
 
-        if (Gate::allows('update', Device::class)) {
+        if (Gate::allows('update', [Device::class, $device])) {
             $actions[0][] = [
                 'title' => 'Edit device',
                 'href' => Url::deviceUrl($device, ['tab' => 'edit']),

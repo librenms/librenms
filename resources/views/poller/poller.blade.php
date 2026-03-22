@@ -86,6 +86,7 @@
 </x-panel>
 @endif
 
+@can('delete', \App\Models\Poller::class)
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="{{ __('Delete') }}" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -111,6 +112,7 @@
         </div>
     </div>
 </div>
+@endcan
 @endsection
 
 @section('scripts')

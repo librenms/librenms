@@ -9,14 +9,14 @@ $param = [];
 $sql = ' FROM `devices` AS D ';
 
 if (Gate::denies('viewAny', Device::class)) {
-    $sql .= ', devices_perms AS P ';
+    $sql .= 'LEFT JOIN devices_perms AS P ON D.device_id = P.device_id ';
 }
 
 $sql .= ' LEFT JOIN `locations` as L ON `D`.`location_id`=`L`.`id`';
 $sql .= ' LEFT JOIN `poller_groups` ON `D`.`poller_group`=`poller_groups`.`id`';
 
 if (Gate::denies('viewAny', Device::class)) {
-    $sql .= " WHERE D.device_id = P.device_id AND P.user_id = '" . Auth::id() . "' AND D.ignore = '0'";
+    $sql .= " WHERE P.user_id = '" . Auth::id() . "' AND D.ignore = '0'";
 } else {
     $sql .= ' WHERE 1';
 }

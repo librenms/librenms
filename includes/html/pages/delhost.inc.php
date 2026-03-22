@@ -2,7 +2,7 @@
 
 use App\Models\Device;
 
-if (Gate::denies('delete', Device::class)) {
+if (Gate::denies('canDelete', Device::class)) {
     require 'includes/html/error-no-perm.inc.php';
     exit;
 }
@@ -13,6 +13,11 @@ if (Gate::allows('demo')) {
     print_error("You are logged in as a demo account, this page isn't accessible to you");
 } else {
     if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
+
+        if (Gate::denies('delete', [Device::class, ['device_id' => $_REQUEST['id']]])) {
+            require 'includes/html/error-no-perm.inc.php';
+            exit;
+        }
         echo '
             <div class="row">
             <div class="col-sm-offset-2 col-sm-7">
@@ -62,7 +67,9 @@ if (Gate::allows('demo')) {
                         <option disabled="disabled" selected="selected">Please select</option>
                     <?php
                     foreach (dbFetchRows('SELECT `device_id`, `hostname` FROM `devices` ORDER BY `hostname`') as $data) {
-                        echo "<option value='" . $data['device_id'] . "'>" . $data['hostname'] . '</option>';
+                        if (Gate::allows('delete', [Device::class, $data])) {
+                            echo "<option value='" . $data['device_id'] . "'>" . $data['hostname'] . '</option>';
+                        }
                     } ?>
                     </select>
                   </div>

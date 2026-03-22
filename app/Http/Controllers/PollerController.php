@@ -22,7 +22,7 @@ class PollerController extends Controller
 
     public function logTab(Request $request)
     {
-        $this->authorize('viewAny', PollerCluster::class);
+        $this->authorize('view', PollerCluster::class);
 
         return view('poller.log', [
             'current_tab' => 'log',
@@ -44,7 +44,7 @@ class PollerController extends Controller
 
     public function pollerTab()
     {
-        $this->authorize('viewAny', PollerCluster::class);
+        $this->authorize('view', PollerCluster::class);
 
         return view('poller.poller', [
             'current_tab' => 'poller',
@@ -67,7 +67,7 @@ class PollerController extends Controller
 
     public function performanceTab()
     {
-        $this->authorize('viewAny', PollerCluster::class);
+        $this->authorize('view', PollerCluster::class);
 
         return view('poller.performance', ['current_tab' => 'performance']);
     }
