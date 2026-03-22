@@ -29,7 +29,7 @@ use App\Models\AlertRule;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
 
-if (Gate::denies('viewAny', AlertRule::class)) {
+if (Gate::denies('view', AlertRule::class)) {
     exit('ERROR: You need to be admin');
 }
 

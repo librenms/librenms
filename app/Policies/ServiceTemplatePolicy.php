@@ -22,7 +22,6 @@ class ServiceTemplatePolicy
      * Determine whether the user can view the service template.
      *
      * @param  User  $user
-     * @param  ServiceTemplate  $template
      */
     public function view(User $user): bool
     {
@@ -47,7 +46,6 @@ class ServiceTemplatePolicy
      * Determine whether the user can update the service template.
      *
      * @param  User  $user
-     * @param  ServiceTemplate  $template
      */
     public function update(User $user): bool
     {
@@ -58,9 +56,8 @@ class ServiceTemplatePolicy
      * Determine whether the user can delete the service template.
      *
      * @param  User  $user
-     * @param  ServiceTemplate  $template
      */
-    public function delete(User $user, int $serviceTemplateId): bool
+    public function delete(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'delete');
     }

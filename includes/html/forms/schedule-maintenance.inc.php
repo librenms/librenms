@@ -26,7 +26,7 @@ if (Gate::none(['create', 'update', 'view', 'delete'], AlertSchedule::class)) {
 $sub_type = $_POST['sub_type'];
 
 if ($sub_type == 'new-maintenance') {
-    Gate::authorize('create', AlertSchedule::class);
+    Gate::any(['create', 'update'], AlertSchedule::class);
     // Defaults
     $status = 'error';
     $update = 0;

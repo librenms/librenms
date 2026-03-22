@@ -560,20 +560,26 @@
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>
                         <li><a href="{{ url('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
-                        @admin
                         <li role="presentation" class="divider"></li>
+                        @can('view', \App\Models\AlertRule::class)
                         <li><a href="{{ url('alert-rules') }}"><i class="fa fa-list fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Alert Rules') }}</a></li>
+                        @endcan
+                        @can('view', \App\Models\AlertSchedule::class)
                         <li><a href="{{ url('alert-schedule') }}"><i class="fa fa-calendar fa-fw fa-lg"
                                                                      aria-hidden="true"></i> {{ __('Scheduled Maintenance') }}
                             </a></li>
+                        @endcan
+                        @can('view', \App\Models\AlertTemplate::class)
                         <li><a href="{{ url('templates') }}"><i class="fa fa-file fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert Templates') }}</a>
                         </li>
+                        @endcan
+                        @can('view', \App\Models\AlertTransport::class)
                         <li><a href="{{ url('alert-transports') }}"><i class="fa fa-bus fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Alert Transports') }}
                             </a></li>
-                        @endadmin
+                        @endcan
                     </ul>
                 </li>
                 @includeIf('menu.custom')

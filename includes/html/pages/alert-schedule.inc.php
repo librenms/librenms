@@ -54,8 +54,15 @@ var grid = $("#alert-schedule").bootgrid({
     ajax: true,
     formatters: {
         "commands": function(column, row) {
-            var response = "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#schedule-maintenance' data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-pencil\"></span></button> " +
-                "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-trash-o\"></span></button>";
+            var response = "";
+            <?php if (Gate::allows('update', AlertSchedule::class)) { ?>
+                response += "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#schedule-maintenance' data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-pencil\"></span></button> ";
+            <?php
+            }
+            if (Gate::allows('delete', AlertSchedule::class)) {
+            ?>
+                response += "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-schedule_id=\"" + row.id + "\"><span class=\"fa fa-trash-o\"></span></button>";
+            <?php } ?>
             return response;
         },
         "schedstatus": function(column, row) {

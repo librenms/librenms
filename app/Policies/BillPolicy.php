@@ -21,13 +21,13 @@ class BillPolicy
     /**
      * Determine whether the user can view the bill.
      */
-    public function view(User $user, Bill|int $bill): bool
+    public function view(User $user, Bill|array $bill): bool
     {
         if ($this->hasGlobalPermission($user, 'viewAny')) {
             return true;
         }
 
-        $bill_id = $bill['id'] ?? $bill->id;
+        $bill_id = $bill->id ?? $bill['id'];
 
         return $this->hasGlobalPermission($user, 'view')
             || Permissions::canAccessBill($bill_id, $user);

@@ -5,6 +5,7 @@ use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
 use Illuminate\Support\Facades\Gate as Gate;
 
+Gate::authorize('view', AlertTemplate::class);
 $no_refresh = true;
 
 include 'includes/html/modal/alert_template.inc.php';
@@ -88,9 +89,16 @@ $(document).ready(function() {
                     response = "<button type='button' class='btn btn-xs btn-warning' data-content=' class='btn btn-xs btn-warning' data-content='><i class='fa fa-exclamation-triangle' title='This is a legacy template and needs converting, please edit this template and click convert then save'><i class='fa fa-exclamation-triangle'></i></button> ";
                 }
                 if(row.id == 0) {
-                    response = response + "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" disabled=\"disabled\"><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button>";
+                    <?php if (Gate::allows('update', AlertTemplate::class)) { ?>
+                    response = response + "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> "
+                    <?php } ?>
                 } else {
-                    response = response + "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> " + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-toggle=\"modal\" data-target='#confirm-delete-alert-template' data-template_id=\"" + row.id + "\" name='delete-alert-template'><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button>";
+                    <?php if (Gate::allows('update', AlertTemplate::class)) { ?>
+                    response = response + "<button type=\"button\" class=\"btn btn-xs btn-primary command-edit\" data-toggle='modal' data-target='#alert-template' data-template_id=\"" + row.id + "\" data-template_action='edit' name='edit-alert-template'><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i></button> "
+                    <?php } ?>
+                    <?php if (Gate::allows('delete', AlertTemplate::class)) { ?>
+                    response = response + "<button type=\"button\" class=\"btn btn-xs btn-danger command-delete\" data-toggle=\"modal\" data-target='#confirm-delete-alert-template' data-template_id=\"" + row.id + "\" name='delete-alert-template'><i class=\"fa fa-trash-o\" aria-hidden=\"true\"></i></button>";
+                    <?php } ?>
                 }
                 return response;
             },

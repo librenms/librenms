@@ -50,14 +50,18 @@
                                         onclick="discover_dg(this, '{{ $device_group->id }}')">
                                     <i
                                         class="fa fa-retweet" aria-hidden="true"></i></button>
+                                @can('update', \App\Models\DeviceGroup::class)
                                 <a type="button" title="{{ __('edit Device Group') }}" class="btn btn-primary btn-sm" aria-label="{{ __('Edit') }}"
                                    href="{{ route('device-groups.edit', $device_group->id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                    @endcan
+                                    @can('delete', \App\Models\DeviceGroup::class)
                                 <button type="button" class="btn btn-danger btn-sm" title="{{ __('delete Device Group') }}" aria-label="{{ __('Delete') }}"
                                         data-group-name="{{ $device_group->name }}"
                                         onclick="delete_dg(this, '{{ route('device-groups.destroy', $device_group->id) }}')">
                                     <i
                                         class="fa fa-trash" aria-hidden="true"></i></button>
+                                    @endcan
                             </td>
                         </tr>
                     @endforeach
