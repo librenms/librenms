@@ -2,8 +2,6 @@
 
 namespace App\Policies;
 
-use App\Facades\Permissions;
-use App\Models\AlertRule;
 use App\Models\User;
 
 class AlertRulePolicy

@@ -64,7 +64,7 @@ class DevicePolicy
     {
         return $this->hasGlobalPermission($user, 'delete');
     }
-    
+
     /**
      * Determine whether the user can delete the device.
      */

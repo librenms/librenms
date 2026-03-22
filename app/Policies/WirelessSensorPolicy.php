@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
 use App\Models\User;
 use App\Models\WirelessSensor;
-use App\Facades\Permissions;
 
 class WirelessSensorPolicy
 {

@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
 use App\Models\Storage;
 use App\Models\User;
-use App\Facades\Permissions;
 
 class StoragePolicy
 {

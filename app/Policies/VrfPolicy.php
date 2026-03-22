@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
 use App\Models\User;
 use App\Models\Vrf;
-use App\Facades\Permissions;
 
 class VrfPolicy
 {
