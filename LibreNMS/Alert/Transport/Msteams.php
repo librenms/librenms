@@ -23,7 +23,7 @@ class Msteams extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $url    = $this->config['msteam-url'];
+        $url = $this->config['msteam-url'];
         $useJson = $this->config['use-json'] === 'on';
 
         $client = Http::client();
@@ -43,15 +43,15 @@ class Msteams extends Transport
             // Markdown/MessageCard mode.
             // Build the MessageCard payload from alert data.
             $messageCard = [
-                '@type'      => 'MessageCard',
-                '@context'   => 'http://schema.org/extensions',
-                'title'      => $alert_data['title'],
+                '@type' => 'MessageCard',
+                '@context' => 'http://schema.org/extensions',
+                'title' => $alert_data['title'],
                 'themeColor' => self::getColorForState($alert_data['state']),
-                'text'       => strip_tags(
+                'text' => strip_tags(
                     (string) $alert_data['msg'],
                     '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'
                 ),
-                'summary'    => $alert_data['title'],
+                'summary' => $alert_data['title'],
             ];
 
             if (! $this->isLegacyConnectorWebhook($url)) {
@@ -59,11 +59,11 @@ class Msteams extends Transport
                 // MessageCard must be wrapped in the "message"/"attachments" envelope.
                 // Supported as of February 2026 per Microsoft dev blog update.
                 $payload = [
-                    'type'        => 'message',
+                    'type' => 'message',
                     'attachments' => [
                         [
                             'contentType' => 'application/vnd.microsoft.teams.card.o365connector',
-                            'content'     => $messageCard,
+                            'content' => $messageCard,
                         ],
                     ],
                 ];
