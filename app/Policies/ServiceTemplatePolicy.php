@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Models\ServiceTemplate;
 use App\Models\User;
 
 class ServiceTemplatePolicy
@@ -25,8 +24,12 @@ class ServiceTemplatePolicy
      * @param  User  $user
      * @param  ServiceTemplate  $template
      */
-    public function view(User $user, ServiceTemplate $template): bool
+    public function view(User $user): bool
     {
+        if ($this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'view');
     }
 
@@ -46,7 +49,7 @@ class ServiceTemplatePolicy
      * @param  User  $user
      * @param  ServiceTemplate  $template
      */
-    public function update(User $user, ServiceTemplate $template): bool
+    public function update(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'update');
     }
@@ -57,7 +60,7 @@ class ServiceTemplatePolicy
      * @param  User  $user
      * @param  ServiceTemplate  $template
      */
-    public function delete(User $user, ServiceTemplate $template): bool
+    public function delete(User $user, int $serviceTemplateId): bool
     {
         return $this->hasGlobalPermission($user, 'delete');
     }

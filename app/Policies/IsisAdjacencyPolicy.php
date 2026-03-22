@@ -2,6 +2,8 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
+use App\Models\IsisAdjacency;
 use App\Models\User;
 
 class IsisAdjacencyPolicy
@@ -24,16 +26,30 @@ class IsisAdjacencyPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user): bool
+    public function view(User $user, IsisAdjacency|array $isisAdjacency): bool
     {
-        return $this->hasGlobalPermission($user, 'view');
+        if ($this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
+        $device_id = $isisAdjacency->device_id ?? $isisAdjacency['device_id'];
+
+        return $this->hasGlobalPermission($user, 'view') &&
+            Permissions::canAccessDevice($device_id, $user);
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user): bool
+    public function update(User $user, IsisAdjacency|array $isisAdjacency): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        if ($this->hasGlobalPermission($user, 'update') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
+        $device_id = $isisAdjacency->device_id ?? $isisAdjacency['device_id'];
+
+        return $this->hasGlobalPermission($user, 'update') &&
+            Permissions::canAccessDevice($device_id, $user);
     }
 }

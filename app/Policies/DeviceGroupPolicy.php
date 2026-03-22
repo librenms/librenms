@@ -21,6 +21,10 @@ class DeviceGroupPolicy
      */
     public function view(User $user): bool
     {
+        if ($this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'view');
     }
 

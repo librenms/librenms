@@ -21,6 +21,10 @@ class AlertTransportPolicy
      */
     public function view(User $user): bool
     {
+        if ($this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'view');
     }
 
@@ -37,6 +41,10 @@ class AlertTransportPolicy
      */
     public function update(User $user): bool
     {
+        if ($this->hasGlobalPermission($user, 'update') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'update');
     }
 
@@ -45,6 +53,10 @@ class AlertTransportPolicy
      */
     public function delete(User $user): bool
     {
+        if ($this->hasGlobalPermission($user, 'delete') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'delete');
     }
 }

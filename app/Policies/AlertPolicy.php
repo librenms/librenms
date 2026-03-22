@@ -27,10 +27,10 @@ class AlertPolicy
             return true;
         }
 
-        $alertId = $alert['device_id'] ?? $alert->device_id;
+        $device_id = $alert->device_id ?? $alert['device_id'];
 
         return $this->hasGlobalPermission($user, 'view')
-            && Permissions::canAccessDevice($alertId, $user);
+            && Permissions::canAccessDevice($device_id, $user);
     }
 
     public function detail(User $user): bool
@@ -47,10 +47,10 @@ class AlertPolicy
             return true;
         }
 
-        $alertId = $alert['device_id'] ?? $alert->device_id;
+        $device_id = $alert->device_id ?? $alert['device_id'];
 
         return $this->hasGlobalPermission($user, 'update') &&
-            Permissions::canAccessDevice($alertId, $user);
+            Permissions::canAccessDevice($device_id, $user);
     }
 
     /**
@@ -62,9 +62,9 @@ class AlertPolicy
             return true;
         }
 
-        $alertId = $alert['device_id'] ?? $alert->device_id;
+        $device_id = $alert->device_id ?? $alert['device_id'];
 
         return $this->hasGlobalPermission($user, 'delete') &&
-            Permissions::canAccessDevice($alertId, $user);
+            Permissions::canAccessDevice($device_id, $user);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
+use App\Models\AlertRule;
 use App\Models\User;
 
 class AlertRulePolicy
@@ -21,6 +23,10 @@ class AlertRulePolicy
      */
     public function view(User $user): bool
     {
+        if ($this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'view');
     }
 

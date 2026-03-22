@@ -2,6 +2,8 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
+use App\Models\Component;
 use App\Models\User;
 
 class ComponentPolicy
@@ -19,9 +21,15 @@ class ComponentPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user): bool
+    public function view(User $user, Component|array $component): bool
     {
-        return $this->hasGlobalPermission($user, 'view');
+        if ($this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+        $device_id = $component->device_id ?? $component['device_id'];
+
+        return $this->hasGlobalPermission($user, 'view') &&
+            Permissions::canAccessDevice($device_id, $user);
     }
 
     /**
@@ -35,16 +43,30 @@ class ComponentPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user): bool
+    public function update(User $user, Component|array $component): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        if ($this->hasGlobalPermission($user, 'update') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
+        $device_id = $component->device_id ?? $component['device_id'];
+
+        return $this->hasGlobalPermission($user, 'update') &&
+            Permissions::canAccessDevice($device_id, $user);
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, Component|array $component): bool
     {
-        return $this->hasGlobalPermission($user, 'delete');
+        if ($this->hasGlobalPermission($user, 'delete') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
+        $device_id = $component->device_id ?? $component['device_id'];
+
+        return $this->hasGlobalPermission($user, 'delete') &&
+            Permissions::canAccessDevice($device_id, $user);
     }
 }

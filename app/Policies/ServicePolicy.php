@@ -19,8 +19,12 @@ class ServicePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user): bool
+    public function view(User $user, int $serviceId): bool
     {
+        if ($this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'view');
     }
 
@@ -35,16 +39,24 @@ class ServicePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user): bool
+    public function update(User $user, int $serviceId): bool
     {
+        if ($this->hasGlobalPermission($user, 'update') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, int $serviceId): bool
     {
+        if ($this->hasGlobalPermission($user, 'delete') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'delete');
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
+use App\Models\Mempool;
 use App\Models\User;
 
 class MempoolPolicy
@@ -19,16 +21,30 @@ class MempoolPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user): bool
+    public function view(User $user, Mempool|array $mempool): bool
     {
-        return $this->hasGlobalPermission($user, 'view');
+        if ($this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
+        $device_id = $mempool->device_id ?? $mempool['device_id'];
+
+        return $this->hasGlobalPermission($user, 'view') &&
+            Permissions::canAccessDevice($device_id, $user);
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user): bool
+    public function update(User $user, Mempool|array $mempool): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        if ($this->hasGlobalPermission($user, 'update') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
+        $device_id = $mempool->device_id ?? $mempool['device_id'];
+
+        return $this->hasGlobalPermission($user, 'update') &&
+            Permissions::canAccessDevice($device_id, $user);
     }
 }

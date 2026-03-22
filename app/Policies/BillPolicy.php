@@ -21,10 +21,16 @@ class BillPolicy
     /**
      * Determine whether the user can view the bill.
      */
-    public function view(User $user, Bill $bill): bool
+    public function view(User $user, Bill|int $bill): bool
     {
+        if ($this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
+        $bill_id = $bill['id'] ?? $bill->id;
+
         return $this->hasGlobalPermission($user, 'view')
-            || Permissions::canAccessBill($bill, $user);
+            || Permissions::canAccessBill($bill_id, $user);
     }
 
     /**
@@ -38,16 +44,30 @@ class BillPolicy
     /**
      * Determine whether the user can update the bill.
      */
-    public function update(User $user): bool
+    public function update(User $user, Bill|array $bill): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        if ($this->hasGlobalPermission($user, 'update') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
+        $bill_id = $bill->id ?? $bill['id'];
+
+        return $this->hasGlobalPermission($user, 'update') &&
+            Permissions::canAccessBill($bill_id, $user);
     }
 
     /**
      * Determine whether the user can delete the bill.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, Bill|array $bill): bool
     {
-        return $this->hasGlobalPermission($user, 'delete');
+        if ($this->hasGlobalPermission($user, 'delete') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
+        $bill_id = $bill->id ?? $bill['id'];
+
+        return $this->hasGlobalPermission($user, 'delete') &&
+            Permissions::canAccessBill($bill_id, $user);
     }
 }

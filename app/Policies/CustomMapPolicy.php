@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Models\CustomMap;
 use App\Models\User;
 
 class CustomMapPolicy
@@ -20,10 +19,13 @@ class CustomMapPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, CustomMap $customMap): bool
+    public function view(User $user, int $customMapId): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
-            || $customMap->hasReadAccess($user);
+        if ($this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
+        return $this->hasGlobalPermission($user, 'view');
     }
 
     /**
@@ -37,7 +39,7 @@ class CustomMapPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, CustomMap $customMap): bool
+    public function update(User $user, int $customMapId): bool
     {
         return $this->hasGlobalPermission($user, 'update');
     }
@@ -45,7 +47,7 @@ class CustomMapPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, CustomMap $customMap): bool
+    public function delete(User $user, int $customMapId): bool
     {
         return $this->hasGlobalPermission($user, 'delete');
     }

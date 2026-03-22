@@ -21,6 +21,10 @@ class AlertTemplatePolicy
      */
     public function view(User $user): bool
     {
+        if ($this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'view');
     }
 
@@ -45,6 +49,10 @@ class AlertTemplatePolicy
      */
     public function delete(User $user): bool
     {
+        if ($this->hasGlobalPermission($user, 'delete') && $this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'delete');
     }
 }

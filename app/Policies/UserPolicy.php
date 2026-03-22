@@ -18,6 +18,10 @@ class UserPolicy
      */
     public function view(User $user, ?User $target = null): bool
     {
+        if ($this->hasGlobalPermission($user, 'viewAny')) {
+            return true;
+        }
+
         return ($target && $user->is($target)) // allow users to view themselves
             || $this->hasGlobalPermission($user, 'view');
     }
