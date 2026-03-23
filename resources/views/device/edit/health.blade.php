@@ -188,7 +188,7 @@
                 data: {
                     device_id: device_id,
                     sensor_desc: sensor_desc,
-                    state: state,
+                    state: state ? 1 : 0,
                     _token: '{{ csrf_token() }}'
                 },
                 dataType: "json",

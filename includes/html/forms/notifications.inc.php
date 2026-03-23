@@ -69,7 +69,7 @@ if ($_REQUEST['action'] == 'read' && isset($_REQUEST['notification_id'])) {
         ]));
     }
 } elseif ($_REQUEST['action'] == 'unstick' && isset($_REQUEST['notification_id'])) {
-    if (dbDelete('notifications_attribs', "notifications_id = ? && user_id = ? AND `key`='sticky'", [$_REQUEST['notification_id'], Auth::id()])) {
+    if (\App\Models\NotificationAttrib::where('notifications_id', $_REQUEST['notification_id'])->where('user_id', Auth::id())->where('key', 'sticky')->delete()) {
         exit(json_encode([
             'status' => 'ok',
             'message' => 'Removed Sticky',

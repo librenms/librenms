@@ -11,6 +11,8 @@
  */
 
 use App\Models\AlertTransport;
+use App\Models\AlertTransportMap;
+use App\Models\TransportGroupTransport;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
@@ -29,9 +31,9 @@ if (! is_numeric($vars['transport_id'])) {
     $status = 'error';
     $message = 'No transport selected';
 } else {
-    if (dbDelete('alert_transports', '`transport_id` = ?', [$vars['transport_id']])) {
-        dbDelete('alert_transport_map', '`target_type` = "single" AND `transport_or_group_id` = ?', [$vars['transport_id']]);
-        dbDelete('transport_group_transport', '`transport_id`=?', [$vars['transport_id']]);
+    if (AlertTransport::where('transport_id', $vars['transport_id'])->delete()) {
+        AlertTransportMap::where('target_type', 'single')->where('transport_or_group_id', $vars['transport_id'])->delete();
+        TransportGroupTransport::where('transport_id', $vars['transport_id'])->delete();
 
         $message = 'Alert transport has been deleted';
     } else {
