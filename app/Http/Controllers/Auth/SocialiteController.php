@@ -177,11 +177,26 @@ class SocialiteController extends Controller
                 $attributes = $parsed_attributes;
             }
 
-            foreach ($scopes as $scope) {
-                foreach ($attributes as $attribute_name => $attribute_values) {
-                    if (str_contains((string) $attribute_name, (string) $scope)) {
-                        foreach (Arr::wrap($attributes[$attribute_name] ?? []) as $scope_data) {
-                            $roles = array_merge($roles, $claims[$scope_data]['roles'] ?? []);
+            // claim_field decouples token attribute lookup from OAuth scopes.
+            // Some providers (e.g. Microsoft) deliver role information under a
+            // claim field such as 'roles' that is not a valid OAuth scope name.
+            // Adding it to scopes causes the IdP to reject the authorization
+            // request. Set claim_field per provider to specify which token field
+            // to read without changing the scopes sent to the IdP.
+            // Falls back to scopes-based lookup when not set (existing behaviour).
+            $claimField = LibrenmsConfig::get("auth.socialite.configs.$provider.claim_field");
+
+            if ($claimField !== null) {
+                foreach (Arr::wrap($attributes[$claimField] ?? []) as $scope_data) {
+                    $roles = array_merge($roles, $claims[$scope_data]['roles'] ?? []);
+                }
+            } else {
+                foreach ($scopes as $scope) {
+                    foreach ($attributes as $attribute_name => $attribute_values) {
+                        if (str_contains((string) $attribute_name, (string) $scope)) {
+                            foreach (Arr::wrap($attributes[$attribute_name] ?? []) as $scope_data) {
+                                $roles = array_merge($roles, $claims[$scope_data]['roles'] ?? []);
+                            }
                         }
                     }
                 }
