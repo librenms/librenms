@@ -26,13 +26,24 @@
 
 namespace App\Facades;
 
+use DeviceCache;
 use Illuminate\Support\Facades\Facade;
 use LibreNMS\Data\Source\NetSnmpQuery;
+use LibreNMS\Data\Source\PhpSnmpQuery;
 
 class FacadeAccessorSnmp extends Facade
 {
     protected static function getFacadeAccessor()
     {
+        $device = DeviceCache::getPrimary();
+
+        if (PhpSnmpQuery::worksFor($device)) {
+            // always resolve a new instance
+            self::clearResolvedInstance(PhpSnmpQuery::class);
+
+            return PhpSnmpQuery::class;
+        }
+
         // always resolve a new instance
         self::clearResolvedInstance(NetSnmpQuery::class);
 
