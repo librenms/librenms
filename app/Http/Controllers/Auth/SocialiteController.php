@@ -170,7 +170,7 @@ class SocialiteController extends Controller
         $scopeValues = $claimField !== null
             ? Arr::wrap($attributes[$claimField] ?? [])
             : collect($attributes)
-                ->filter(fn($values, $name) => collect($scopes)->contains(fn($scope) => str_contains((string) $name, (string) $scope)))
+                ->filter(fn ($values, $name) => collect($scopes)->contains(fn ($scope) => str_contains((string) $name, (string) $scope)))
                 ->flatten()
                 ->all();
 
