@@ -150,6 +150,7 @@
                             </ul>
                         </li>
                     @endif
+                    @can('viewAny', \App\Models\Location::class)
                     @if($locations->isNotEmpty())
                         <li class="dropdown-submenu">
                             <a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> {{ __('Geo Locations') }}</a>
@@ -161,22 +162,29 @@
                             </ul>
                         </li>
                     @endif
+                    @endcan
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('outages') }}"><i class="fa fa-exclamation-triangle fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Outages') }}</a></li>
 
+                        @if($show_device_extra_divider)
                         <li role="presentation" class="divider"></li>
+                        @endif
                         @can('viewAny', \App\Models\DeviceGroup::class)
                             <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('Manage Groups') }}
                                 </a></li>
                         @endcan
+                        @can('update', \App\Models\Device::class)
                         <li><a href="{{ url('device-dependencies') }}"><i class="fa fa-group fa-fw fa-lg"></i> {{ __('Device Dependencies') }}</a></li>
-                        @if(Gate::allows('viewAny', \App\Models\Vminfo::class) && $show_vmwinfo)
+                        @endcan
+                        @if($show_vmwinfo)
                             <li><a href="{{ url('vminfo') }}"><i
                                         class="fa fa-cog fa-fw fa-lg"></i> {{ __('Virtual Machines') }}</a></li>
                         @endif
+                        @canany(['create', 'delete'], \App\Models\Device::class)
                         <li role="presentation" class="divider"></li>
+                        @endcanany
                         @can('create', \App\Models\Device::class)
                         <li><a href="{{ url('addhost') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Add Device') }}</a></li>
@@ -565,7 +573,9 @@
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>
                         <li><a href="{{ url('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
+                        @if($show_alert_divider)
                         <li role="presentation" class="divider"></li>
+                        @endif
                         @can('viewAny', \App\Models\AlertRule::class)
                         <li><a href="{{ url('alert-rules') }}"><i class="fa fa-list fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Alert Rules') }}</a></li>
