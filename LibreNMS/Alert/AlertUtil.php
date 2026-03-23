@@ -121,7 +121,7 @@ class AlertUtil
             return;
         }
 
-        $rule = AlertRule::find($ruleId)->first(['default_operation_step_duration_seconds']);
+        $rule = AlertRule::find($ruleId, ['default_operation_step_duration_seconds']);
         $defaultStep = max(0, (int) ($rule->default_operation_step_duration_seconds ?? 0));
 
         $notificationCount = (int) ($details['count'] ?? 0);

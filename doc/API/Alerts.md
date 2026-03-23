@@ -179,7 +179,23 @@ Output:
    "device_id": "1",
    "rule": "%devices.os != \"Juniper\"",
    "severity": "warning",
-   "extra": "{\"mute\":true,\"count\":\"15\",\"delay\":null,\"invert\":false}",
+   "extra": "{\"invert\":false}",
+   "default_operation_step_duration_seconds": 300,
+   "operations": [
+    {
+      "id": 12,
+      "position": 0,
+      "operation_phase": "problem",
+      "escalation_step_from": 1,
+      "escalation_step_to": 2,
+      "start_in_seconds": 60,
+      "step_duration_seconds": 0,
+      "transports": [
+       {"id": "3", "text": "Mail: NOC"},
+       {"id": "g2", "text": "Group: On-call"}
+      ]
+    }
+   ],
    "disabled": "0",
    "name": "A test rule"
   }
@@ -246,7 +262,22 @@ Output:
    "device_id": "-1",
    "rule": "%devices.os != \"Juniper\"",
    "severity": "critical",
-   "extra": "{\"mute\":false,\"count\":\"15\",\"delay\":\"300\",\"invert\":false}",
+   "extra": "{\"invert\":false}",
+   "default_operation_step_duration_seconds": 300,
+   "operations": [
+    {
+      "id": 12,
+      "position": 0,
+      "operation_phase": "problem",
+      "escalation_step_from": 1,
+      "escalation_step_to": null,
+      "start_in_seconds": 300,
+      "step_duration_seconds": 0,
+      "transports": [
+       {"id": "3", "text": "Mail: NOC"}
+      ]
+    }
+   ],
    "disabled": "0",
    "name": "A test rule"
   }]
@@ -264,20 +295,23 @@ Route: `/api/v0/rules`
 Input (JSON):
 
 - devices: This is either an array of device ids or -1 for a global rule
+- groups: Array of device group ids
+- locations: Array of location ids
 - builder: The rule which should be in the format entity.condition
   value (i.e devices.status != 0 for devices marked as down). It must
   be json encoded in the format rules are currently stored.
 - severity: The severity level the alert will be raised against, Ok, Warning, Critical.
 - disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled
-- count: This is how many polling runs before an alert will trigger and the frequency.
-- delay: Delay is when to start alerting and how frequently. The value
-  is stored in seconds but you can specify minutes, hours or days by
-  doing 5 m, 5 h, 5 d for each one.
-- interval: How often to re-issue notifications while this alert is active,0 means notify once.The value
-  is stored in seconds but you can specify minutes, hours or days by
-  doing 5 m, 5 h, 5 d for each one.
-- mute: If mute is enabled then an alert will never be sent but will
-  show up in the Web UI (true or false).
+- default_operation_step_duration: Default operation step duration (for example `5 m`)
+- operations: Array of operation objects
+  - operation_phase: `problem`, `recovery`, or `update`
+  - escalation_step_from: 1-based escalation step start
+  - escalation_step_to: escalation step end (`null` for no limit)
+  - start_in_seconds: delay before first notification in this operation
+  - step_duration_seconds: repeat interval in seconds (`0` means use default_operation_step_duration)
+  - transports: required array of targets
+    - single transport id: `3`
+    - transport group id: `\"g2\"`
 - invert: This would invert the rules check.
 - name: This is the name of the rule and is mandatory.
 - notes: Some informal notes for this rule
@@ -285,7 +319,7 @@ Input (JSON):
 Example:
 
 ```curl
-curl -X POST -d '{"devices":[1,2,3], "name": "testrule", "builder":{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true},"severity": "critical","count":15,"delay":"5 m","interval":"5 m","mute":false,"notes":"This a note from the API"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/rules
+curl -X POST -d '{"devices":[1,2,3], "name":"testrule", "builder":{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true}, "severity":"critical", "default_operation_step_duration":"5 m", "operations":[{"operation_phase":"problem","escalation_step_from":1,"escalation_step_to":2,"start_in_seconds":60,"step_duration_seconds":0,"transports":[3,"g2"]}], "notes":"This a note from the API"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/rules
 ```
 
 Output:
@@ -309,20 +343,23 @@ Input (JSON):
 - rule_id: You must specify the rule_id to edit an existing rule, if
   this is absent then a new rule will be created.
 - devices: This is either an array of device ids or -1 for a global rule
+- groups: Array of device group ids
+- locations: Array of location ids
 - builder: The rule which should be in the format entity.condition
   value (i.e devices.status != 0 for devices marked as down). It must
   be json encoded in the format rules are currently stored.
 - severity: The severity level the alert will be raised against, Ok, Warning, Critical.
 - disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled
-- count: This is how many polling runs before an alert will trigger and the frequency.
-- delay: Delay is when to start alerting and how frequently. The value
-  is stored in seconds but you can specify minutes, hours or days by
-  doing 5 m, 5 h, 5 d for each one.
-- interval: How often to re-issue notifications while this alert is active,0 means notify once.The value
-  is stored in seconds but you can specify minutes, hours or days by
-  doing 5 m, 5 h, 5 d for each one.
-- mute: If mute is enabled then an alert will never be sent but will
-  show up in the Web UI (true or false).
+- default_operation_step_duration: Default operation step duration (for example `5 m`)
+- operations: Array of operation objects
+  - operation_phase: `problem`, `recovery`, or `update`
+  - escalation_step_from: 1-based escalation step start
+  - escalation_step_to: escalation step end (`null` for no limit)
+  - start_in_seconds: delay before first notification in this operation
+  - step_duration_seconds: repeat interval in seconds (`0` means use default_operation_step_duration)
+  - transports: required array of targets
+    - single transport id: `3`
+    - transport group id: `\"g2\"`
 - invert: This would invert the rules check.
 - name: This is the name of the rule and is mandatory.
 - notes: Some informal notes for this rule
@@ -330,7 +367,7 @@ Input (JSON):
 Example:
 
 ```curl
-curl -X PUT -d '{"rule_id":1,"device_id":"-1", "name": "testrule", "builder":{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true},"severity": "critical","count":15,"delay":"5 m","interval":"5 m","mute":false,"notes":"This a note from the API"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/rules
+curl -X PUT -d '{"rule_id":1,"devices":["-1"], "name":"testrule", "builder":{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true}, "severity":"critical", "default_operation_step_duration":"5 m", "operations":[{"operation_phase":"problem","escalation_step_from":1,"escalation_step_to":3,"start_in_seconds":120,"step_duration_seconds":0,"transports":[3]}], "notes":"This a note from the API"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/rules
 ```
 
 Output:

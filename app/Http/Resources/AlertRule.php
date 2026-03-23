@@ -22,6 +22,7 @@ class AlertRule extends JsonResource
         $rule['devices'] = $this->devices->pluck('device_id')->all();
         $rule['groups'] = $this->groups->pluck('id')->all();
         $rule['locations'] = $this->locations->pluck('id')->all();
+        $rule['operations'] = $this->toOperationsApiArray();
 
         return $rule;
     }
