@@ -63,6 +63,11 @@ class AlertUtil
      */
     public static function mapAlertStateToOperationPhase(int $state): string
     {
+        // For now we route all states through "problem" operations so recovery/acknowledgment
+        // notifications still send even when dedicated recovery/update operation rows are absent.
+        // TODO: Re-enable state-based routing (problem/recovery/update) once UI/workflows enforce
+        // explicit operation coverage for each phase.
+        return AlertRuleOperationPhase::PROBLEM;// Remove this when we intrduce other operation types
         if ($state === AlertState::ACKNOWLEDGED) {
             return AlertRuleOperationPhase::UPDATE;
         }
@@ -116,7 +121,7 @@ class AlertUtil
             return;
         }
 
-        $rule = AlertRule::find('id', $ruleId)->first(['default_operation_step_duration_seconds']);
+        $rule = AlertRule::find($ruleId)->first(['default_operation_step_duration_seconds']);
         $defaultStep = max(0, (int) ($rule->default_operation_step_duration_seconds ?? 0));
 
         $notificationCount = (int) ($details['count'] ?? 0);
@@ -132,7 +137,8 @@ class AlertUtil
         $rextra['delay'] = $notificationCount === 0 ? (int) $op->start_in_seconds : 0;
         $stepDur = (int) $op->step_duration_seconds;
         $rextra['interval'] = $stepDur > 0 ? $stepDur : $defaultStep;
-        $rextra['count'] = -1;
+        // Keep legacy runAlerts() counter incrementing for escalation tracking.
+        $rextra['count'] = PHP_INT_MAX;
     }
 
     /**
