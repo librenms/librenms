@@ -86,7 +86,7 @@ function generate_device_link($device, $text = null, $vars = [], $start = 0, $en
 
 function bill_permitted($bill_id)
 {
-    if (Gate::allows('viewAny', Bill::class)) {
+    if (Gate::allows('viewAll', Bill::class)) {
         return true;
     }
 
@@ -95,7 +95,7 @@ function bill_permitted($bill_id)
 
 function port_permitted($port_id, $device_id = null)
 {
-    if (Gate::allows('viewAny', Port::class)) {
+    if (Gate::allows('viewAll', Port::class)) {
         return true;
     }
 
@@ -112,7 +112,7 @@ function port_permitted($port_id, $device_id = null)
 
 function device_permitted($device_id)
 {
-    if (Gate::allows('viewAny', Device::class)) {
+    if (Gate::allows('viewAll', Device::class)) {
         return true;
     }
 

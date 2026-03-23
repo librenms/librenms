@@ -182,7 +182,7 @@ class User extends Authenticatable
     public function devices()
     {
         // pseudo relation
-        return Device::query()->when(Gate::denies('viewAny', Device::class), fn ($query) => $query->whereIntegerInRaw('device_id', Permissions::devicesForUser($this)));
+        return Device::query()->when(Gate::denies('viewAll', Device::class), fn ($query) => $query->whereIntegerInRaw('device_id', Permissions::devicesForUser($this)));
     }
 
     /**
@@ -203,7 +203,7 @@ class User extends Authenticatable
 
     public function ports()
     {
-        if (Gate::allows('viewAny', Port::class)) {
+        if (Gate::allows('viewAll', Port::class)) {
             return Port::query();
         } else {
             //FIXME we should return all ports for a device if the user has been given access to the whole device.

@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
 use App\Models\CustomMap;
 use App\Models\User;
 
@@ -14,7 +15,11 @@ class CustomMapPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAny');
+        return $this->hasGlobalPermission($user, 'view')
+            || $this->hasGlobalPermission($user, 'viewAll')
+            || $this->hasGlobalPermission($user, 'create')
+            || $this->hasGlobalPermission($user, 'update')
+            || $this->hasGlobalPermission($user, 'delete');
     }
 
     /**
@@ -22,8 +27,29 @@ class CustomMapPolicy
      */
     public function view(User $user, CustomMap $customMap): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
-            || $customMap->hasReadAccess($user);
+        if ($this->hasGlobalPermission($user, 'viewAll')) {
+            return true;
+        }
+
+        if ($this->hasGlobalPermission($user, 'view')) {
+            $device_ids = $customMap->nodes()->whereNotNull('device_id')->pluck('device_id');
+
+            // Restricted users can only view maps that have at least one device
+            if (count($device_ids) === 0) {
+                return false;
+            }
+
+            // Deny access if we don't have permission on any device
+            foreach ($device_ids as $device_id) {
+                if (! Permissions::canAccessDevice($device_id, $user)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
