@@ -332,51 +332,36 @@ foreach ($rule_list as $rule) {
     $transports = '';
     $legacy_transport_mode = false;
 
-    if (Schema::hasTable('alert_rule_operations')) {
-        // Transports (per alert rule operation)
-        $transport_count = (int) dbFetchCell('SELECT COUNT(*) FROM alert_rule_operation_transport_map m INNER JOIN alert_rule_operations o ON o.id = m.operation_id WHERE o.rule_id=?', [$rule['id']]);
+    // Transports (per alert rule operation)
+    $transport_maps = \App\Models\AlertRuleOperation::query()
+        ->join('alert_rule_operation_transport_map as m', 'm.operation_id', '=', 'alert_rule_operations.id')
+        ->where('alert_rule_operations.rule_id', (int) $rule['id'])
+        ->orderBy('alert_rule_operations.position')
+        ->orderBy('alert_rule_operations.id')
+        ->orderBy('m.target_type')
+        ->get([
+            'm.transport_or_group_id',
+            'm.target_type',
+            'alert_rule_operations.operation_phase',
+        ]);
+    $transport_count = $transport_maps->count();
 
-        if ($transport_count) {
-            $transport_maps = dbFetchRows('SELECT m.transport_or_group_id,m.target_type,o.operation_phase,o.position FROM alert_rule_operation_transport_map m INNER JOIN alert_rule_operations o ON o.id = m.operation_id WHERE o.rule_id=? ORDER BY o.position, o.id, m.target_type', [$rule['id']]);
-            foreach ($transport_maps as $transport_map) {
-                $transport_name = null;
-                $phase = e((string) $transport_map['operation_phase']);
-                if ($transport_map['target_type'] == 'group') {
-                    $transport_name = dbFetchCell('SELECT transport_group_name FROM alert_transport_groups WHERE transport_group_id=?', [$transport_map['transport_or_group_id']]);
-                    $transport_edit = "<span class=\"label label-default\">$phase</span> <a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group " . e($transport_name) . "'>" . e($transport_name) . '</a>';
-                } elseif ($transport_map['target_type'] == 'single') {
-                    $transport_name = dbFetchCell('SELECT transport_name FROM alert_transports WHERE transport_id=?', [$transport_map['transport_or_group_id']]);
-                    $transport_edit = "<span class=\"label label-default\">$phase</span> <a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport " . e($transport_name) . "'>" . e($transport_name) . '</a>';
-                } else {
-                    $transport_edit = '';
-                }
-                $transports .= $transport_edit . '<br>';
-            }
-        }
-    } elseif (Schema::hasTable('alert_transport_map')) {
-        $legacy_transport_mode = true;
-        $transport_count = (int) dbFetchCell('SELECT COUNT(*) FROM alert_transport_map WHERE rule_id=?', [$rule['id']]);
-        if ($transport_count) {
-            $transport_maps = dbFetchRows('SELECT transport_or_group_id,target_type FROM alert_transport_map WHERE alert_transport_map.rule_id=? ORDER BY target_type', [$rule['id']]);
-            foreach ($transport_maps as $transport_map) {
-                if ($transport_map['target_type'] == 'group') {
-                    $transport_name = dbFetchCell('SELECT transport_group_name FROM alert_transport_groups WHERE transport_group_id=?', [$transport_map['transport_or_group_id']]);
-                    $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group " . e($transport_name) . "'>" . e($transport_name) . '</a>';
-                } elseif ($transport_map['target_type'] == 'single') {
-                    $transport_name = dbFetchCell('SELECT transport_name FROM alert_transports WHERE transport_id=?', [$transport_map['transport_or_group_id']]);
-                    $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport " . e($transport_name) . "'>" . e($transport_name) . '</a>';
-                } else {
-                    $transport_edit = '';
-                }
-                $transports .= $transport_edit . '<br>';
-            }
-        }
-    }
+    if ($transport_count) {
+        $singleIds = $transport_maps->where('target_type', 'single')->pluck('transport_or_group_id')->unique()->all();
+        $groupIds = $transport_maps->where('target_type', 'group')->pluck('transport_or_group_id')->unique()->all();
+        $singleNames = \App\Models\AlertTransport::query()->whereIn('transport_id', $singleIds)->pluck('transport_name', 'transport_id');
+        $groupNames = \App\Models\AlertTransportGroup::query()->whereIn('transport_group_id', $groupIds)->pluck('transport_group_name', 'transport_group_id');
 
-    if ($legacy_transport_mode && ! $transports) {
-        $default_transports = dbFetchRows('SELECT transport_id, transport_name FROM alert_transports WHERE is_default=1 ORDER BY transport_name', []);
-        foreach ($default_transports as $default_transport) {
-            $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $default_transport['transport_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit default transport " . e($default_transport['transport_name']) . "'>" . e($default_transport['transport_name']) . '</a>';
+        foreach ($transport_maps as $transport_map) {
+            if ($transport_map->target_type == 'group') {
+                $groupName = (string) ($groupNames[$transport_map->transport_or_group_id] ?? '');
+                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map->transport_or_group_id . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group " . e($groupName) . "'>" . e($groupName) . '</a>';
+            } elseif ($transport_map->target_type == 'single') {
+                $transportName = (string) ($singleNames[$transport_map->transport_or_group_id] ?? '');
+                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport_map->transport_or_group_id . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport " . e($transportName) . "'>" . e($transportName) . '</a>';
+            } else {
+                $transport_edit = '';
+            }
             $transports .= $transport_edit . '<br>';
         }
     }
@@ -387,25 +372,23 @@ foreach ($rule_list as $rule) {
 
     echo "<td colspan='2'>$transports</td>";
 
-    // Operations / timing summary (or legacy extra timing fields)
-
-    if (Schema::hasTable('alert_rule_operations')) {
-        $op_summary = '';
-        $op_rows = dbFetchRows('SELECT operation_phase, escalation_step_from, escalation_step_to, start_in_seconds, step_duration_seconds FROM alert_rule_operations WHERE rule_id=? ORDER BY position, id', [$rule['id']]);
-        foreach ($op_rows as $op_row) {
-            $to = $op_row['escalation_step_to'] === null ? '∞' : (string) $op_row['escalation_step_to'];
-            $op_summary .= '<small><strong>' . e((string) $op_row['operation_phase']) . '</strong> steps ' . (int) $op_row['escalation_step_from'] . '–' . e($to)
-                . ', start ' . (int) $op_row['start_in_seconds'] . 's, step ' . (int) $op_row['step_duration_seconds'] . 's'
-                . '</small><br />';
-        }
-        if ($op_summary === '') {
-            $op_summary = '<small class="text-muted">No operations (notifications suppressed)</small>';
-        }
-        $def_step = isset($rule['default_operation_step_duration_seconds']) ? (int) $rule['default_operation_step_duration_seconds'] : '';
-        echo '<td><small>Default step dur.: ' . e((string) $def_step) . 's</small><br />' . $op_summary . '</td>';
-    } else {
-        echo '<td><small>Max: ' . e((string) ($rule_extra['count'] ?? '')) . '<br />Delay: ' . e((string) ($rule_extra['delay'] ?? '')) . '<br />Interval: ' . e((string) ($rule_extra['interval'] ?? '')) . '</small></td>';
+    $op_summary = '';
+    $op_rows = \App\Models\AlertRuleOperation::query()
+        ->where('rule_id', (int) $rule['id'])
+        ->orderBy('position')
+        ->orderBy('id')
+        ->get(['escalation_step_from', 'escalation_step_to', 'start_in_seconds', 'step_duration_seconds']);
+    foreach ($op_rows as $op_row) {
+        $to = $op_row->escalation_step_to === null ? '∞' : (string) $op_row->escalation_step_to;
+        $op_summary .= '<small>steps ' . (int) $op_row->escalation_step_from . '–' . e($to)
+            . ', start ' . (int) $op_row->start_in_seconds . 's, step ' . (int) $op_row->step_duration_seconds . 's'
+            . '</small><br />';
     }
+    if ($op_summary === '') {
+        $op_summary = '<small class="text-muted">No operations (notifications suppressed)</small>';
+    }
+    $def_step = isset($rule['default_operation_step_duration_seconds']) ? (int) $rule['default_operation_step_duration_seconds'] : '';
+    echo '<td><small>Default step dur.: ' . e((string) $def_step) . 's</small><br />' . $op_summary . '</td>';
 
     // Rule
 

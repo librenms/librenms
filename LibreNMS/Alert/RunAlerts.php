@@ -35,6 +35,7 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Alert;
+use App\Models\AlertLog;
 use App\Models\AlertTransport;
 use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
@@ -537,7 +538,7 @@ class RunAlerts
 
             if ($status_check === null) {
                 Log::warning("Alert #{$alert['id']} references non-existent device {$alert['device_id']}, cleaning up");
-                Alert::query()->where('id', $alert['id'])->delete();
+                AlertLog::query()->where('id', $alert['id'])->delete();
 
                 continue;
             }

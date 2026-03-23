@@ -36,7 +36,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
 
     <div class="modal fade" id="create-alert" tabindex="-1" role="dialog"
          aria-labelledby="Create" aria-hidden="true">
-        <div class="modal-dialog modal-lg" style="width:1200px !important;">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -144,16 +144,20 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                                 <div class="form-group">
                                     <label class="col-sm-3 col-md-2 control-label">Operations</label>
                                     <div class="col-sm-9 col-md-10">
-                                        <p class="help-block">Configure notifications per phase (problem / recovery / update). Per-operation: <em>Start in</em> (seconds), <em>Step duration</em> (seconds, 0 = use default above), <em>Steps from</em> / <em>Steps to</em> (escalation range; leave &ldquo;Steps to&rdquo; empty for no limit). <strong>Each operation must have at least one transport or group.</strong> Leave <strong>no operations</strong> to suppress all notifications for this rule (alerts can still appear in the UI). See <a href="https://www.zabbix.com/documentation/current/en/manual/config/notifications/action/operation" target="_blank" rel="noopener">Zabbix operations</a>.</p>
+                                        <p class="help-block">Per-operation: Leave Steps to empty for no limit.<br />
+                                        <em>Start in:</em> how long to wait for the first step.<br />
+                                        <em>Step duration:</em> (seconds, 0 = use default above)<br />
+                                        <strong>Each operation must have at least one transport or group.</strong><br />
+                                        Leave <strong>no operations</strong> to suppress all notifications for this rule (alerts can still appear in the UI).</p>
                                         <input type="hidden" name="operations_json" id="operations_json" value="">
                                         <div class="table-responsive">
-                                            <table class="table table-bordered table-condensed" id="operations-table">
+                                            <table class="table table-condensed" id="operations-table">
                                                 <thead>
                                                     <tr>
                                                         <th>Steps from</th>
                                                         <th>Steps to</th>
                                                         <th>Start in (s)</th>
-                                                        <th>Step dur. (s)</th>
+                                                        <th>Step duration (s)</th>
                                                         <th class="text-center" style="width: 3em;"></th>
                                                     </tr>
                                                 </thead>
