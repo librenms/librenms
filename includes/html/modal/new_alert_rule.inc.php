@@ -16,10 +16,16 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Alerting\QueryBuilderFilter;
 
 $default_severity = LibrenmsConfig::get('alert_rule.severity');
-$default_max_alerts = LibrenmsConfig::get('alert_rule.max_alerts');
-$default_delay = LibrenmsConfig::get('alert_rule.delay') . 'm';
-$default_interval = LibrenmsConfig::get('alert_rule.interval') . 'm';
-$default_mute_alerts = LibrenmsConfig::get('alert_rule.mute_alerts');
+$default_default_op_step_duration = LibrenmsConfig::get('alert_rule.interval') . 'm';
+$max_alerts_cfg = (int) LibrenmsConfig::get('alert_rule.max_alerts');
+$default_operation_row_json = json_encode([
+    'operation_phase' => 'problem',
+    'escalation_step_from' => 1,
+    'escalation_step_to' => $max_alerts_cfg === -1 ? null : max(1, $max_alerts_cfg),
+    'start_in_seconds' => max(0, 60 * (int) LibrenmsConfig::get('alert_rule.delay')),
+    'step_duration_seconds' => max(0, 60 * (int) LibrenmsConfig::get('alert_rule.interval')),
+    'transports' => [],
+]);
 $default_invert_rule_match = LibrenmsConfig::get('alert_rule.invert_rule_match');
 $default_recovery_alerts = LibrenmsConfig::get('alert_rule.recovery_alerts');
 $default_acknowledgement_alerts = LibrenmsConfig::get('alert_rule.acknowledgement_alerts');
@@ -48,6 +54,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                         <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities((string) DeviceCache::get($device_id)->displayName()); ?>">
                         <input type="hidden" name="rule_id" id="rule_id" value="">
                         <input type="hidden" name="builder_json" id="builder_json" value="">
+                        <div id="operations-form-error" class="alert alert-danger" style="display: none; margin-top: 10px;"></div>
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active" id="main">
                                 <div class='form-group' title="The description of this alert rule.">
@@ -88,25 +95,34 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                                     </div>
                                 </div>
                                 <div class="form-group form-inline">
-                                    <label for='count' class='col-sm-3 col-md-2 control-label' title="How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.">Max alerts </label>
-                                    <div class="col-sm-2" title="How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.">
-                                        <input type='text' id='count' name='count' class='form-control' size="4" value="123">
+                                    <label for="default_operation_step_duration" class="col-sm-3 col-md-2 control-label" title="Default step duration when an operation step duration is 0 (repeat interval).">Default step duration </label>
+                                    <div class="col-sm-3" title="Duration suffix: s,m,h,d — used when an operation step duration is 0.">
+                                        <input type="text" id="default_operation_step_duration" name="default_operation_step_duration" class="form-control" size="8" value="<?php echo htmlspecialchars($default_default_op_step_duration); ?>">
                                     </div>
-                                    <div class="col-sm-3" title="How long to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)">
-                                        <label for='delay' class='control-label' style="vertical-align: top;">Delay </label>
-                                        <input type='text' id='delay' name='delay' class='form-control' size="4">
-                                    </div>
-                                    <div class="col-sm-4 col-md-3" title="How often to re-issue notifications while this alert is active. 0 means notify once. This is affected by the poller interval. (s,m,h,d)">
-                                        <label for='interval' class='control-label' style="vertical-align: top;">Interval </label>
-                                        <input type='text' id='interval' name='interval' class='form-control' size="4">
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 col-md-2 control-label">Operations</label>
+                                    <div class="col-sm-9 col-md-10">
+                                        <p class="help-block">Configure notifications per phase (problem / recovery / update). Per-operation: <em>Start in</em> (seconds), <em>Step duration</em> (seconds, 0 = use default above), <em>Steps from</em> / <em>Steps to</em> (escalation range; leave &ldquo;Steps to&rdquo; empty for no limit). <strong>Each operation must have at least one transport or group.</strong> Leave <strong>no operations</strong> to suppress all notifications for this rule (alerts can still appear in the UI). See <a href="https://www.zabbix.com/documentation/current/en/manual/config/notifications/action/operation" target="_blank" rel="noopener">Zabbix operations</a>.</p>
+                                        <input type="hidden" name="operations_json" id="operations_json" value="">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-condensed" id="operations-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Steps from</th>
+                                                        <th>Steps to</th>
+                                                        <th>Start in (s)</th>
+                                                        <th>Step dur. (s)</th>
+                                                        <th class="text-center" style="width: 3em;"></th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                        <button type="button" class="btn btn-default btn-sm" id="btn-add-operation">Add operation</button>
                                     </div>
                                 </div>
                                 <div class='form-group form-inline'>
-                                    <label for='mute' class='col-sm-3 col-md-2 control-label' title="Show alert status in the webui, but do not issue notifications.">Mute alerts </label>
-                                    <div class='col-sm-2' title="Show alert status in the webui, but do not issue notifications.">
-                                        <input type="checkbox" name="mute" id="mute">
-                                    </div>
-                                    <label for='invert' class='col-sm-3 col-md-3 control-label' title="Alert when this rule doesn't match." style="vertical-align: top;">Invert rule match </label>
+                                    <label for='invert' class='col-sm-3 col-md-2 control-label' title="Alert when this rule doesn't match.">Invert rule match </label>
                                     <div class='col-sm-2' title="Alert when this rule doesn't match.">
                                         <input type='checkbox' name='invert' id='invert'>
                                     </div>
@@ -129,12 +145,6 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                                     <div>
                                         <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">All devices except in list </label>
                                         <input type='checkbox' name='invert_map' id='invert_map'>
-                                    </div>
-                                </div>
-                                <div class="form-group" title="Restricts this alert rule to specified transports.">
-                                    <label for="transports" class="col-sm-3 col-md-2 control-label">Transports </label>
-                                    <div class="col-sm-9 col-md-10">
-                                        <select id="transports" name="transports[]" class="form-control" multiple="multiple"></select>
                                     </div>
                                 </div>
                                 <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">
@@ -231,6 +241,112 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
             }
         });
 
+        var DEFAULT_OPERATION_ROW = <?php echo $default_operation_row_json . "\n"; ?>;
+
+        function secondsToDurationInput(sec) {
+            sec = parseInt(sec, 10) || 0;
+            if (sec >= 86400) {
+                return (sec / 86400) + 'd';
+            }
+            if (sec >= 3600) {
+                return (sec / 3600) + 'h';
+            }
+            if (sec >= 60) {
+                return (sec / 60) + 'm';
+            }
+            return String(sec);
+        }
+
+        function initOperationTransportSelect($sel) {
+            $sel.select2({
+                width: '100%',
+                placeholder: 'Transport / group',
+                allowClear: true,
+                ajax: {
+                    url: '<?php echo route('ajax.select.alert-transports-groups') ?>',
+                    delay: 150
+                },
+                dropdownParent: $('#create-alert')
+            });
+        }
+
+        function addOperationRow(op) {
+            op = $.extend({}, DEFAULT_OPERATION_ROW, op || {});
+            var toVal = op.escalation_step_to === null || typeof op.escalation_step_to === 'undefined' ? '' : String(op.escalation_step_to);
+            var $tbody = $('<tbody class="operation-group"></tbody>');
+            var $trMain = $('<tr class="operation-row-main"></tr>');
+            $trMain.append('<td><input type="number" class="form-control input-sm op-from" min="1" value="' + (op.escalation_step_from || 1) + '"></td>');
+            $trMain.append('<td><input type="number" class="form-control input-sm op-to" min="1" placeholder="∞" value="' + toVal + '"></td>');
+            $trMain.append('<td><input type="number" class="form-control input-sm op-start" min="0" value="' + (op.start_in_seconds || 0) + '"></td>');
+            $trMain.append('<td><input type="number" class="form-control input-sm op-step-dur" min="0" value="' + (op.step_duration_seconds || 0) + '"></td>');
+            $trMain.append('<td class="text-center"><button type="button" class="btn btn-danger btn-xs btn-remove-operation" title="Remove operation">&times;</button></td>');
+            var $trTrans = $('<tr class="operation-row-transports"></tr>');
+            $trTrans.append(
+                '<td colspan="6" class="operation-transports-cell" style="border-top: none; padding-top: 4px; padding-bottom: 10px;">' +
+                '<label class="control-label" style="display: block; margin-bottom: 4px; font-weight: 600; font-size: 12px;">Transports / groups</label>' +
+                '<select class="form-control input-sm op-transports" multiple="multiple"></select>' +
+                '</td>'
+            );
+            $tbody.append($trMain, $trTrans);
+            $('#operations-table').append($tbody);
+            $tbody.find('.op-phase').val(op.operation_phase || 'problem');
+            initOperationTransportSelect($tbody.find('.op-transports'));
+            if (op.transports && op.transports.length) {
+                $.each(op.transports, function (i, t) {
+                    var opt = new Option(t.text, t.id, true, true);
+                    $tbody.find('.op-transports').append(opt);
+                });
+                $tbody.find('.op-transports').trigger('change');
+            }
+        }
+
+        /**
+         * @returns {string|null} Error message or null if OK. Empty table (no operations) is allowed (notifications suppressed).
+         */
+        function validateOperationsTransports() {
+            var groups = $('#operations-table tbody.operation-group');
+            if (groups.length === 0) {
+                return null;
+            }
+            var missing = false;
+            groups.each(function () {
+                var v = $(this).find('.op-transports').val();
+                if (!v || !v.length) {
+                    missing = true;
+                    return false;
+                }
+            });
+            return missing
+                ? 'Each operation must have at least one transport or transport group selected.'
+                : null;
+        }
+
+        function buildOperationsJson() {
+            var ops = [];
+            $('#operations-table tbody.operation-group').each(function () {
+                var $grp = $(this);
+                var $tr = $grp.find('tr.operation-row-main');
+                var toRaw = $tr.find('.op-to').val();
+                ops.push({
+                    operation_phase: $tr.find('.op-phase').val(),
+                    escalation_step_from: parseInt($tr.find('.op-from').val(), 10) || 1,
+                    escalation_step_to: (toRaw === '' || toRaw === null) ? null : parseInt(toRaw, 10),
+                    start_in_seconds: parseInt($tr.find('.op-start').val(), 10) || 0,
+                    step_duration_seconds: parseInt($tr.find('.op-step-dur').val(), 10) || 0,
+                    transports: $grp.find('.op-transports').val() || []
+                });
+            });
+            $('#operations_json').val(JSON.stringify(ops));
+        }
+
+        $('#btn-add-operation').on('click', function () {
+            addOperationRow(null);
+        });
+
+        $('#operations-table').on('click', '.btn-remove-operation', function () {
+            $(this).closest('tbody.operation-group').remove();
+        });
+
         $('#btn-save').on('click', function (e) {
             e.preventDefault();
 
@@ -243,8 +359,17 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
             }
             var result_json = $('#builder').queryBuilder('getRules');
 
+            // Clear any previous inline form error
+            $('#operations-form-error').hide().text('');
+
             if (result_json !== null && result_json.valid) {
+                var opErr = validateOperationsTransports();
+                if (opErr) {
+                    $('#operations-form-error').text(opErr).show();
+                    return;
+                }
                 $('#builder_json').val(JSON.stringify(result_json));
+                buildOperationsJson();
                 $.ajax({
                     type: method,
                     url: url,
@@ -259,8 +384,17 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                             toastr.error(data.message);
                         }
                     },
-                    error: function (data) {
-                        toastr.error(data.responseJSON.message);
+                    error: function (xhr) {
+                        var msg = 'Request failed';
+                        if (xhr.responseJSON) {
+                            if (xhr.responseJSON.errors && xhr.responseJSON.errors.operations_json && xhr.responseJSON.errors.operations_json[0]) {
+                                msg = xhr.responseJSON.errors.operations_json[0];
+                            } else if (xhr.responseJSON.message) {
+                                msg = xhr.responseJSON.message;
+                            }
+                        }
+
+                        $('#operations-form-error').text(msg).show();
                     }
                 });
             }
@@ -323,16 +457,13 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 $("#builder").queryBuilder("reset");
                 var $severity = $('#severity');
                 $severity.val($severity.find("option[selected]").val());
-                $("#mute").bootstrapSwitch('state', <?=$default_mute_alerts?>);
                 $("#invert").bootstrapSwitch('state', <?=$default_invert_rule_match?>);
                 $("#recovery").bootstrapSwitch('state', <?=$default_recovery_alerts?>);
                 $("#acknowledgement").bootstrapSwitch('state', <?=$default_acknowledgement_alerts?>);
                 $("#override_query").bootstrapSwitch('state', false);
                 $("#invert_map").bootstrapSwitch('state', <?=$default_invert_map?>);
                 $(this).find("input[type=text]").val("");
-                $('#count').val('<?=$default_max_alerts?>');
-                $('#delay').val('<?=$default_delay?>');
-                $('#interval').val('<?=$default_interval?>');
+                $('#default_operation_step_duration').val('<?php echo htmlspecialchars($default_default_op_step_duration); ?>');
                 $('#adv_query').val('');
                 $('#notes').val('');
                 $('#severity').val('<?=$default_severity?>');
@@ -342,10 +473,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 $maps.val(null).trigger('change');
                 setRuleDevice();// pre-populate device in the maps if this is a per-device rule
 
-                var $transports = $("#transports");
-                $transports.empty();
-                $transports.val(null).trigger('change');
-                $("#transport-choice").val("email");
+                $('#operations-table tbody.operation-group').remove();
             }
         });
 
@@ -356,6 +484,17 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
             $('#severity').val(rule.severity).trigger('change');
             $('#adv_query').val(rule.adv_query);
             $('#notes').val(rule.notes);
+
+            if (rule.default_operation_step_duration_seconds != null) {
+                $('#default_operation_step_duration').val(secondsToDurationInput(rule.default_operation_step_duration_seconds));
+            }
+
+            $('#operations-table tbody.operation-group').remove();
+            if (rule.operations && rule.operations.length) {
+                $.each(rule.operations, function (i, op) {
+                    addOperationRow(op);
+                });
+            }
 
             var $maps = $('#maps');
             $maps.empty();
@@ -369,43 +508,12 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                     $maps.append(option).trigger('change')
                 });
             }
-            var $transports = $("#transports");
-            $transports.empty();
-            $transports.val(null).trigger('change');
-            if(rule.transports != null) {
-                $.each(rule.transports, function(index, value) {
-                    var option = new Option(value.text, value.id, true, true);
-                    $transports.append(option).trigger("change");
-                });
-            }
 
             if (rule.extra != null) {
                 var extra = rule.extra;
-                $('#count').val(extra.count);
-                if ((extra.delay / 86400) >= 1) {
-                    $('#delay').val(extra.delay / 86400 + 'd');
-                } else if ((extra.delay / 3600) >= 1) {
-                    $('#delay').val( extra.delay / 3600 + 'h');
-                } else if ((extra.delay / 60) >= 1) {
-                    $('#delay').val( extra.delay / 60 + 'm');
-                } else {
-                    $('#delay').val(extra.delay);
-                }
-
-                if ((extra.interval / 86400) >= 1) {
-                    $('#interval').val(extra.interval / 86400 + 'd');
-                } else if ((extra.interval / 3600) >= 1) {
-                    $('#interval').val(extra.interval / 3600 + 'h');
-                } else if ((extra.interval / 60) >= 1) {
-                    $('#interval').val(extra.interval / 60 + 'm');
-                } else {
-                    $('#interval').val(extra.interval);
-                }
-
                 if (extra.adv_query) {
                     $('#adv_query').val(extra.adv_query);
                 }
-                $("[name='mute']").bootstrapSwitch('state', extra.mute);
                 $("[name='invert']").bootstrapSwitch('state', extra.invert);
                 if (typeof extra.recovery == 'undefined') {
                     extra.recovery = '<?=$default_recovery_alerts?>';
@@ -430,8 +538,6 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 }
 
                 $("[name='override_query']").bootstrapSwitch('state', extra.options.override_query);
-            } else {
-                $('#count').val('<?=$default_max_alerts?>');
             }
         }
 
@@ -450,15 +556,6 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
             placeholder: "Devices, Groups or Locations",
             ajax: {
                 url: '<?php echo route('ajax.select.devices-groups-locations') ?>',
-                delay: 150
-            }
-        });
-
-        $("#transports").select2({
-            width: "100%",
-            placeholder: "Transport/Group Name",
-            ajax: {
-                url: '<?php echo route('ajax.select.alert-transports-groups') ?>',
                 delay: 150
             }
         });

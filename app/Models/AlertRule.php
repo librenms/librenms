@@ -46,8 +46,6 @@ class AlertRule extends BaseModel
             $rule->devices()->detach();
             $rule->groups()->detach();
             $rule->locations()->detach();
-            $rule->transportSingles()->detach();
-            $rule->transportGroups()->detach();
         });
     }
 
@@ -61,11 +59,13 @@ class AlertRule extends BaseModel
         'query',
         'builder',
         'invert_map',
+        'default_operation_step_duration_seconds',
     ];
 
     protected $casts = [
         'builder' => 'array',
         'extra' => 'array',
+        'default_operation_step_duration_seconds' => 'integer',
     ];
 
     // ---- Query scopes ----
@@ -164,22 +164,51 @@ class AlertRule extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\AlertTransport, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertRuleOperation, $this>
      */
-    public function transportSingles(): BelongsToMany
+    public function operations(): HasMany
     {
-        return $this->belongsToMany(AlertTransport::class, 'alert_transport_map', 'rule_id', 'transport_or_group_id')
-            ->withPivot('target_type')
-            ->wherePivot('target_type', 'single');
+        return $this->hasMany(AlertRuleOperation::class, 'rule_id')->orderBy('position')->orderBy('id');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\AlertTransportGroup, $this>
+     * @return array<int, array<string, mixed>>
      */
-    public function transportGroups(): BelongsToMany
+    public function toOperationsApiArray(): array
     {
-        return $this->belongsToMany(AlertTransportGroup::class, 'alert_transport_map', 'rule_id', 'transport_or_group_id')
-            ->withPivot('target_type')
-            ->wherePivot('target_type', 'group');
+        $this->loadMissing([
+            'operations.transportSingles:alert_transports.transport_id,transport_type,transport_name',
+            'operations.transportGroups:alert_transport_groups.transport_group_id,transport_group_name',
+        ]);
+
+        $out = [];
+        foreach ($this->operations as $op) {
+            $transports = [];
+            foreach ($op->transportSingles as $transport) {
+                $transports[] = [
+                    'id' => (string) $transport->transport_id,
+                    'text' => ucfirst((string) $transport->transport_type) . ': ' . $transport->transport_name,
+                ];
+            }
+            foreach ($op->transportGroups as $group) {
+                $transports[] = [
+                    'id' => 'g' . $group->transport_group_id,
+                    'text' => 'Group: ' . $group->transport_group_name,
+                ];
+            }
+
+            $out[] = [
+                'id' => $op->id,
+                'position' => $op->position,
+                'operation_phase' => $op->operation_phase,
+                'escalation_step_from' => $op->escalation_step_from,
+                'escalation_step_to' => $op->escalation_step_to,
+                'start_in_seconds' => $op->start_in_seconds,
+                'step_duration_seconds' => $op->step_duration_seconds,
+                'transports' => $transports,
+            ];
+        }
+
+        return $out;
     }
 }

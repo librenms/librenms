@@ -14,8 +14,9 @@
 
 use App\Models\AlertTransport;
 use App\Models\AlertTransportGroup;
-use App\Models\AlertTransportMap;
 use App\Models\TransportGroupTransport;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
@@ -36,7 +37,12 @@ if (! is_numeric($vars['group_id'])) {
 } else {
     if (AlertTransportGroup::where('transport_group_id', $vars['group_id'])->delete()) {
         TransportGroupTransport::where('transport_group_id', $vars['group_id'])->delete();
-        AlertTransportMap::where('target_type', 'group')->where('transport_or_group_id', $vars['group_id'])->delete();
+        if (Schema::hasTable('alert_rule_operation_transport_map')) {
+            DB::table('alert_rule_operation_transport_map')->where('target_type', 'group')->where('transport_or_group_id', $vars['group_id'])->delete();
+        }
+        if (Schema::hasTable('alert_transport_map')) {
+            DB::table('alert_transport_map')->where('target_type', 'group')->where('transport_or_group_id', $vars['group_id'])->delete();
+        }
         $message = 'Alert transport group has been deleted';
     } else {
         $message = 'ERROR: Alert transport group has not been deleted';
