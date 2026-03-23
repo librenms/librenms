@@ -38,10 +38,12 @@ use Log;
 
 class PhpSnmpQuery implements SnmpQueryInterface
 {
+    private string $output_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
+    private string $output_replacement = '*';
+
     /**
      * @var string[]
      */
-    private array $mibFilesLoaded = [];
     private array $mibDirs = [];
     private array $mibs = [];
     private Device $device;
@@ -94,7 +96,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         $this->snmp->valueretrieval = SNMP_VALUE_PLAIN;
 
         if ($this->device->snmpver === 'v3') {
-            $this->setSecurity(null);
+            $this->snmp->setSecurity(...self::getSecurityOptions($this->device, null));
         }
 
         // Copy settings from old SNMP object
@@ -146,14 +148,14 @@ class PhpSnmpQuery implements SnmpQueryInterface
     {
         if ($context) {
             if ($this->device->snmpver === 'v3') {
-                $this->snmp->setSecurity(...$this->getSecurityOptions($this->device, $v3_prefix . $context));
+                $this->snmp->setSecurity(...self::getSecurityOptions($this->device, $v3_prefix . $context));
             } else {
                 // Cannot change context for community based
                 throw new \Exception('Cannot change context for v1/v2c');
             }
         } else {
             if ($this->device->snmpver === 'v3') {
-                $this->snmp->setSecurity(...$this->getSecurityOptions($this->device, null));
+                $this->snmp->setSecurity(...self::getSecurityOptions($this->device, null));
             }
         }
 
@@ -182,7 +184,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
         // Read it in immediately if we are initialised
         if ($this->mibinit) {
-            foreach($mibs as $mib) {
+            foreach ($mibs as $mib) {
                 snmp_read_mib($mib);
             }
         }
@@ -260,8 +262,8 @@ class PhpSnmpQuery implements SnmpQueryInterface
             return;
         }
 
-        snmp_init_mib(implode(':', $this->mibDirectories()));
-        foreach($this->mibs as $mib) {
+        snmp_init_mib(implode(':', $this->mibDirectories())); /** @phpstan-ignore function.notFound */
+        foreach ($this->mibs as $mib) {
             snmp_read_mib($mib);
         }
 
@@ -336,7 +338,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
             $response = $response->append(new SnmpResponse($res_str, $errors, $errors ? 1 : 0));
 
             if ($this->abort && ! $response->isValid()) {
-                $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oidgroup));
+                $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oids));
                 Log::info("SNMP failed getting $oid_list aborting.");
 
                 restore_error_handler();
@@ -366,7 +368,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         $this->logSnmpCmd('WALK', $oids);
         foreach ($oids as $oid) {
             $measure = Measurement::start('phpwalk');
-            $walkoutput = @$this->snmp->walk($oid, false, ($max_repeaters > 0 ? $max_repeaters : null), null);
+            $walkoutput = @$this->snmp->walk($oid, false, $max_repeaters > 0 ? $max_repeaters : null, null);
             $measure->manager()->recordSnmp($measure->end());
 
             if ($walkoutput) {
@@ -512,7 +514,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
     private function logSnmpCmd(string $cmd, array $oids): void
     {
         if (Debug::isVerbose()) {
-            Log::debug("SNMP $cmd - MIBS: " . implode(':', array_keys($this->mibFilesLoaded)) . ' OIDS: ' . implode(' ', $oids));
+            Log::debug("SNMP $cmd - MIBS: " . implode(':', array_keys($this->mibs)) . ' OIDS: ' . implode(' ', $oids));
         } else {
             Log::debug("SNMP $cmd - OIDS: " . implode(' ', $oids));
         }
