@@ -183,7 +183,6 @@ class SocialiteController extends Controller
             // Adding it to scopes causes the IdP to reject the authorization
             // request. Set claim_field per provider to specify which token field
             // to read without changing the scopes sent to the IdP.
-            // Falls back to scopes-based lookup when not set (existing behaviour).
             $claimField = LibrenmsConfig::get("auth.socialite.configs.$provider.claim_field");
 
             if ($claimField !== null) {
