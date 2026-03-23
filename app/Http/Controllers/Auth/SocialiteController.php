@@ -160,55 +160,32 @@ class SocialiteController extends Controller
         $scopes = LibrenmsConfig::get('auth.socialite.scopes');
         $claims = LibrenmsConfig::get('auth.socialite.claims');
 
-        if (is_array($scopes) &&
-            $this->socialite_user instanceof \Laravel\Socialite\AbstractUser &&
-            ! empty($claims)
-        ) {
-            $roles = [];
-            $attributes = $this->socialite_user->getRaw();
-
-            if (is_object(current($attributes)) && method_exists(current($attributes), 'getName') && method_exists(current($attributes), 'getAllAttributeValues')) {
-                $parsed_attributes = [];
-                foreach ($attributes as $attribute_object) {
-                    $attribute_name = $attribute_object->getName();
-                    $attribute_values = $attribute_object->getAllAttributeValues();
-                    $parsed_attributes[$attribute_name] = $attribute_values;
-                }
-                $attributes = $parsed_attributes;
-            }
-
-            // claim_field decouples token attribute lookup from OAuth scopes.
-            // Some providers (e.g. Microsoft) deliver role information under a
-            // claim field such as 'roles' that is not a valid OAuth scope name.
-            // Adding it to scopes causes the IdP to reject the authorization
-            // request. Set claim_field per provider to specify which token field
-            // to read without changing the scopes sent to the IdP.
-            $claimField = LibrenmsConfig::get("auth.socialite.configs.$provider.claim_field");
-
-            if ($claimField !== null) {
-                foreach (Arr::wrap($attributes[$claimField] ?? []) as $scope_data) {
-                    $roles = array_merge($roles, $claims[$scope_data]['roles'] ?? []);
-                }
-            } else {
-                foreach ($scopes as $scope) {
-                    foreach ($attributes as $attribute_name => $attribute_values) {
-                        if (str_contains((string) $attribute_name, (string) $scope)) {
-                            foreach (Arr::wrap($attributes[$attribute_name] ?? []) as $scope_data) {
-                                $roles = array_merge($roles, $claims[$scope_data]['roles'] ?? []);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (count($roles) > 0) {
-                $user->syncRoles(array_unique($roles));
-
-                return true;
-            }
+        if (! is_array($scopes) || ! $this->socialite_user instanceof \Laravel\Socialite\AbstractUser || empty($claims)) {
+            return false;
         }
 
-        return false;
+        $attributes = $this->normalizeAttributes($this->socialite_user->getRaw());
+
+        $claimField = LibrenmsConfig::get("auth.socialite.configs.$provider.claim_field");
+        $scopeValues = $claimField !== null
+            ? Arr::wrap($attributes[$claimField] ?? [])
+            : collect($attributes)
+                ->filter(fn($values, $name) => collect($scopes)->contains(fn($scope) => str_contains((string) $name, (string) $scope)))
+                ->flatten()
+                ->all();
+
+        $roles = [];
+        foreach ($scopeValues as $value) {
+            $roles = array_merge($roles, $claims[$value]['roles'] ?? []);
+        }
+
+        if (empty($roles)) {
+            return false;
+        }
+
+        $user->syncRoles(array_unique($roles));
+
+        return true;
     }
 
     private function pairUser(string $provider): RedirectResponse
