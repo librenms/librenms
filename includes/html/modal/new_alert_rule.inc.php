@@ -16,14 +16,14 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Alerting\QueryBuilderFilter;
 
 $default_severity = LibrenmsConfig::get('alert_rule.severity');
-$default_default_op_step_duration = LibrenmsConfig::get('alert_rule.interval') . 'm';
-$max_alerts_cfg = (int) LibrenmsConfig::get('alert_rule.max_alerts');
+$default_default_op_step_duration = LibrenmsConfig::get('alert_rule.default_operation_step_duration', LibrenmsConfig::get('alert_rule.interval')) . 'm';
+$max_alerts_cfg = (int) LibrenmsConfig::get('alert_rule.default_operation_steps_to', LibrenmsConfig::get('alert_rule.max_alerts'));
 $default_operation_row_json = json_encode([
     'operation_phase' => 'problem',
     'escalation_step_from' => 1,
     'escalation_step_to' => $max_alerts_cfg === -1 ? null : max(1, $max_alerts_cfg),
-    'start_in_seconds' => max(0, 60 * (int) LibrenmsConfig::get('alert_rule.delay')),
-    'step_duration_seconds' => max(0, 60 * (int) LibrenmsConfig::get('alert_rule.interval')),
+    'start_in_seconds' => max(0, 60 * (int) LibrenmsConfig::get('alert_rule.default_operation_start_in', LibrenmsConfig::get('alert_rule.delay'))),
+    'step_duration_seconds' => max(0, 60 * (int) LibrenmsConfig::get('alert_rule.default_operation_step_duration', LibrenmsConfig::get('alert_rule.interval'))),
     'transports' => [],
 ]);
 $default_invert_rule_match = LibrenmsConfig::get('alert_rule.invert_rule_match');
