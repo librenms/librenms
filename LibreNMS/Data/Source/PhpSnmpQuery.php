@@ -103,9 +103,18 @@ class PhpSnmpQuery implements SnmpQueryInterface
         if ($old_snmp) {
             $this->snmp->oid_increasing_check = $old_snmp->oid_increasing_check;
             $this->snmp->enum_print = $old_snmp->enum_print;
+            $this->snmp->numeric_timeticks = $old_snmp->numeric_timeticks;
+            $this->snmp->extended_index = $old_snmp->extended_index;
+            $this->snmp->dontprint_units = $old_snmp->dontprint_units;
             if ($old_snmp->oid_output_format) {
                 $this->snmp->oid_output_format = $old_snmp->oid_output_format;
             }
+        } else {
+            $this->snmp->oid_increasing_check = true;
+            $this->snmp->enum_print = true;
+            $this->snmp->numeric_timeticks = true;
+            $this->snmp->extended_index = true;
+            $this->snmp->dontprint_units = true;
         }
 
         // Make sure we copy settings if the device changes in future
@@ -262,6 +271,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
             return;
         }
 
+        snmp_mib_allow_underscores(true); /** @phpstan-ignore function.notFound */
         snmp_init_mib(implode(':', $this->mibDirectories())); /** @phpstan-ignore function.notFound */
         foreach ($this->mibs as $mib) {
             snmp_read_mib($mib);
