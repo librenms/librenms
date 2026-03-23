@@ -8,8 +8,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Enum\AlertRuleOperationPhase;
-use LibreNMS\Util\Time;
 
 class AlertRuleController extends Controller
 {
@@ -24,7 +22,6 @@ class AlertRuleController extends Controller
             $alertRule->save();
 
             $this->syncMaps($request->input('maps', []), $alertRule);
-            $this->syncOperations($request->input('operations_json'), $alertRule);
 
             return response()->json([
                 'status' => 'ok',
@@ -47,13 +44,16 @@ class AlertRuleController extends Controller
             'devices:device_id,hostname,sysName',
             'groups:id,name',
             'locations:id,location',
+            'alertOperation:id,name,default_operation_step_duration_seconds',
         ]);
 
         return response()->json([
             'extra' => $alertRule->extra,
             'maps' => $this->formatDeviceMaps($alertRule),
+            'alert_operation_id' => $alertRule->alert_operation_id,
+            'alert_operation_name' => $alertRule->alertOperation?->name,
             'operations' => $alertRule->toOperationsApiArray(),
-            'default_operation_step_duration_seconds' => $alertRule->default_operation_step_duration_seconds,
+            'default_operation_step_duration_seconds' => $alertRule->alertOperation?->default_operation_step_duration_seconds,
             'name' => $alertRule->name,
             'proc' => $alertRule->proc,
             'notes' => $alertRule->notes,
@@ -80,7 +80,6 @@ class AlertRuleController extends Controller
             }
 
             $this->syncMaps($request->input('maps', []), $alertRule);
-            $this->syncOperations($request->input('operations_json'), $alertRule);
 
             return response()->json([
                 'status' => 'ok',
@@ -177,7 +176,8 @@ class AlertRuleController extends Controller
         $extra['options'] = ['override_query' => $overrideQuery];
         $alertRule->extra = array_merge($alertRule->extra ?? [], $extra);
 
-        $alertRule->default_operation_step_duration_seconds = Time::durationToSeconds($request->validated('default_operation_step_duration') ?? '');
+        $opId = $request->input('alert_operation_id');
+        $alertRule->alert_operation_id = ($opId === null || $opId === '') ? null : (int) $opId;
     }
 
     private function syncMaps(array $maps, AlertRule $alertRule): void
@@ -199,64 +199,4 @@ class AlertRuleController extends Controller
         $alertRule->locations()->sync($locationIds);
     }
 
-    /**
-     * @param  string|null  $operationsJson
-     */
-    private function syncOperations($operationsJson, AlertRule $alertRule): void
-    {
-        $alertRule->operations()->delete();
-
-        $rows = [];
-        if (is_string($operationsJson) && $operationsJson !== '') {
-            $decoded = json_decode($operationsJson, true);
-            if (is_array($decoded)) {
-                $rows = $decoded;
-            }
-        }
-
-        foreach ($rows as $idx => $row) {
-            $transportsRaw = $row['transports'] ?? [];
-            if (! is_array($transportsRaw)) {
-                $transportsRaw = [];
-            }
-            $transportsRaw = array_values(array_filter($transportsRaw, fn ($t) => $t !== null && $t !== ''));
-            if ($transportsRaw === []) {
-                throw new \InvalidArgumentException('Each operation must have at least one transport or transport group mapped.');
-            }
-
-            $phase = $row['operation_phase'] ?? AlertRuleOperationPhase::PROBLEM;
-            if (! in_array($phase, [AlertRuleOperationPhase::PROBLEM, AlertRuleOperationPhase::RECOVERY, AlertRuleOperationPhase::UPDATE], true)) {
-                $phase = AlertRuleOperationPhase::PROBLEM;
-            }
-
-            $from = isset($row['escalation_step_from']) ? (int) $row['escalation_step_from'] : 1;
-            $from = max(1, $from);
-            $to = array_key_exists('escalation_step_to', $row) && $row['escalation_step_to'] !== null && $row['escalation_step_to'] !== ''
-                ? (int) $row['escalation_step_to']
-                : null;
-
-            $op = $alertRule->operations()->create([
-                'position' => (int) ($row['position'] ?? $idx),
-                'operation_phase' => $phase,
-                'escalation_step_from' => $from,
-                'escalation_step_to' => $to,
-                'start_in_seconds' => max(0, (int) ($row['start_in_seconds'] ?? 0)),
-                'step_duration_seconds' => max(0, (int) ($row['step_duration_seconds'] ?? 0)),
-                'notifications_suppressed' => false,
-            ]);
-
-            $transportIds = [];
-            $transportGroupIds = [];
-            foreach ($transportsRaw as $transport) {
-                if (Str::startsWith((string) $transport, 'g')) {
-                    $transportGroupIds[] = (int) substr((string) $transport, 1);
-                } else {
-                    $transportIds[] = (int) $transport;
-                }
-            }
-
-            $op->transportSingles()->syncWithPivotValues($transportIds, ['target_type' => 'single']);
-            $op->transportGroups()->syncWithPivotValues($transportGroupIds, ['target_type' => 'group']);
-        }
-    }
 }

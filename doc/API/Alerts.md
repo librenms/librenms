@@ -181,9 +181,11 @@ Output:
    "severity": "warning",
    "extra": "{\"invert\":false}",
    "default_operation_step_duration_seconds": 300,
+   "alert_operation_id": 12,
    "operations": [
     {
       "id": 12,
+      "name": "Default operation",
       "position": 0,
       "operation_phase": "problem",
       "escalation_step_from": 1,
@@ -264,9 +266,11 @@ Output:
    "severity": "critical",
    "extra": "{\"invert\":false}",
    "default_operation_step_duration_seconds": 300,
+   "alert_operation_id": 12,
    "operations": [
     {
       "id": 12,
+      "name": "Default operation",
       "position": 0,
       "operation_phase": "problem",
       "escalation_step_from": 1,
@@ -302,13 +306,14 @@ Input (JSON):
   be json encoded in the format rules are currently stored.
 - severity: The severity level the alert will be raised against, Ok, Warning, Critical.
 - disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled
-- default_operation_step_duration: Default operation step duration (for example `5 m`)
-- operations: Array of operation objects
+- default_operation_step_duration: Optional. When `alert_operation_id` is set, updates that **operation’s** default step duration (for example `5 m`). The value is stored on the global operation, not on the rule. When a segment’s `step_duration_seconds` is `0`, this default (or the global config default if unset) is used as the repeat interval.
+- alert_operation_id: ID of a global alert operation (see **Alerts → Operations** in the UI), or `null` to suppress notifications for this rule
+- operations: (optional) If `alert_operation_id` is not sent, a legacy array of operation objects is converted into a new global operation (with one **segment** per array element) and linked to the rule. Each segment has its own escalation range, timing, and transports.
   - operation_phase: `problem`, `recovery`, or `update`
   - escalation_step_from: 1-based escalation step start
   - escalation_step_to: escalation step end (`null` for no limit)
   - start_in_seconds: delay before first notification in this operation
-  - step_duration_seconds: repeat interval in seconds (`0` means use default_operation_step_duration)
+  - step_duration_seconds: repeat interval in seconds (`0` means use the operation’s default step duration, or the global config default)
   - transports: required array of targets
     - single transport id: `3`
     - transport group id: `\"g2\"`
@@ -319,7 +324,7 @@ Input (JSON):
 Example:
 
 ```curl
-curl -X POST -d '{"devices":[1,2,3], "name":"testrule", "builder":{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true}, "severity":"critical", "default_operation_step_duration":"5 m", "operations":[{"operation_phase":"problem","escalation_step_from":1,"escalation_step_to":2,"start_in_seconds":60,"step_duration_seconds":0,"transports":[3,"g2"]}], "notes":"This a note from the API"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/rules
+curl -X POST -d '{"devices":[1,2,3], "name":"testrule", "builder":{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true}, "severity":"critical", "default_operation_step_duration":"5 m", "alert_operation_id": 12, "notes":"This a note from the API"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/rules
 ```
 
 Output:
@@ -350,13 +355,14 @@ Input (JSON):
   be json encoded in the format rules are currently stored.
 - severity: The severity level the alert will be raised against, Ok, Warning, Critical.
 - disabled: Whether the rule will be disabled or not, 0 = enabled, 1 = disabled
-- default_operation_step_duration: Default operation step duration (for example `5 m`)
-- operations: Array of operation objects
+- default_operation_step_duration: Optional. When `alert_operation_id` is set, updates that **operation’s** default step duration (for example `5 m`). Stored on the operation, not the rule.
+- alert_operation_id: ID of a global alert operation, or `null` to suppress notifications for this rule
+- operations: (optional) Legacy array of operation objects; used only when `alert_operation_id` is not present in the request
   - operation_phase: `problem`, `recovery`, or `update`
   - escalation_step_from: 1-based escalation step start
   - escalation_step_to: escalation step end (`null` for no limit)
   - start_in_seconds: delay before first notification in this operation
-  - step_duration_seconds: repeat interval in seconds (`0` means use default_operation_step_duration)
+  - step_duration_seconds: repeat interval in seconds (`0` means use the operation’s default step duration, or the global config default)
   - transports: required array of targets
     - single transport id: `3`
     - transport group id: `\"g2\"`
@@ -367,7 +373,7 @@ Input (JSON):
 Example:
 
 ```curl
-curl -X PUT -d '{"rule_id":1,"devices":["-1"], "name":"testrule", "builder":{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true}, "severity":"critical", "default_operation_step_duration":"5 m", "operations":[{"operation_phase":"problem","escalation_step_from":1,"escalation_step_to":3,"start_in_seconds":120,"step_duration_seconds":0,"transports":[3]}], "notes":"This a note from the API"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/rules
+curl -X PUT -d '{"rule_id":1,"devices":["-1"], "name":"testrule", "builder":{"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"equal","value":"localhost"}],"valid":true}, "severity":"critical", "default_operation_step_duration":"5 m", "alert_operation_id": 12, "notes":"This a note from the API"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/rules
 ```
 
 Output:

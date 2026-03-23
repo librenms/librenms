@@ -27,6 +27,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Gate;
@@ -59,13 +60,13 @@ class AlertRule extends BaseModel
         'query',
         'builder',
         'invert_map',
-        'default_operation_step_duration_seconds',
+        'alert_operation_id',
     ];
 
     protected $casts = [
         'builder' => 'array',
         'extra' => 'array',
-        'default_operation_step_duration_seconds' => 'integer',
+        'alert_operation_id' => 'integer',
     ];
 
     // ---- Query scopes ----
@@ -164,49 +165,35 @@ class AlertRule extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertRuleOperation, $this>
+     * @return BelongsTo<AlertOperation, $this>
      */
-    public function operations(): HasMany
+    public function alertOperation(): BelongsTo
     {
-        return $this->hasMany(AlertRuleOperation::class, 'rule_id')->orderBy('position')->orderBy('id');
+        return $this->belongsTo(AlertOperation::class, 'alert_operation_id');
     }
 
     /**
+     * Backwards-compatible shape: one array entry per segment (same as legacy multi-row operations).
+     *
      * @return array<int, array<string, mixed>>
      */
     public function toOperationsApiArray(): array
     {
         $this->loadMissing([
-            'operations.transportSingles:alert_transports.transport_id,transport_type,transport_name',
-            'operations.transportGroups:alert_transport_groups.transport_group_id,transport_group_name',
+            'alertOperation.segments.transportSingles:alert_transports.transport_id,transport_type,transport_name',
+            'alertOperation.segments.transportGroups:alert_transport_groups.transport_group_id,transport_group_name',
         ]);
 
-        $out = [];
-        foreach ($this->operations as $op) {
-            $transports = [];
-            foreach ($op->transportSingles as $transport) {
-                $transports[] = [
-                    'id' => (string) $transport->transport_id,
-                    'text' => ucfirst((string) $transport->transport_type) . ': ' . $transport->transport_name,
-                ];
-            }
-            foreach ($op->transportGroups as $group) {
-                $transports[] = [
-                    'id' => 'g' . $group->transport_group_id,
-                    'text' => 'Group: ' . $group->transport_group_name,
-                ];
-            }
+        if ($this->alertOperation === null) {
+            return [];
+        }
 
-            $out[] = [
-                'id' => $op->id,
-                'position' => $op->position,
-                'operation_phase' => $op->operation_phase,
-                'escalation_step_from' => $op->escalation_step_from,
-                'escalation_step_to' => $op->escalation_step_to,
-                'start_in_seconds' => $op->start_in_seconds,
-                'step_duration_seconds' => $op->step_duration_seconds,
-                'transports' => $transports,
-            ];
+        $out = [];
+        foreach ($this->alertOperation->segments as $segment) {
+            $out[] = array_merge($segment->toApiArray(), [
+                'alert_operation_id' => $this->alertOperation->id,
+                'name' => $this->alertOperation->name,
+            ]);
         }
 
         return $out;

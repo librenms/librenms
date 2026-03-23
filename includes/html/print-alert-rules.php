@@ -154,6 +154,8 @@ if (isset($device_id) && $device_id > 0) {
 $full_query .= ' ORDER BY name ASC';
 
 $rule_list = dbFetchRows($full_query, $param);
+$opIdsAll = array_unique(array_filter(array_map('intval', array_column($rule_list, 'alert_operation_id'))));
+$opDefaults = $opIdsAll === [] ? [] : \App\Models\AlertOperation::query()->whereIn('id', $opIdsAll)->pluck('default_operation_step_duration_seconds', 'id')->all();
 $count = count($rule_list);
 
 if (isset($_POST['page_number']) && $_POST['page_number'] > 0 && $_POST['page_number'] <= $count) {
@@ -330,20 +332,23 @@ foreach ($rule_list as $rule) {
 
     $transports_popover = 'right';
     $transports = '';
-    $legacy_transport_mode = false;
 
-    // Transports (per alert rule operation)
-    $transport_maps = \App\Models\AlertRuleOperation::query()
-        ->join('alert_rule_operation_transport_map as m', 'm.operation_id', '=', 'alert_rule_operations.id')
-        ->where('alert_rule_operations.rule_id', (int) $rule['id'])
-        ->orderBy('alert_rule_operations.position')
-        ->orderBy('alert_rule_operations.id')
-        ->orderBy('m.target_type')
-        ->get([
-            'm.transport_or_group_id',
-            'm.target_type',
-            'alert_rule_operations.operation_phase',
-        ]);
+    // Transports (via global operation assigned to this rule)
+    $opId = (int) ($rule['alert_operation_id'] ?? 0);
+    $transport_maps = collect();
+    if ($opId > 0) {
+        $transport_maps = \App\Models\AlertOperationSegment::query()
+            ->join('alert_operation_transport_map as m', 'm.segment_id', '=', 'alert_operation_segments.id')
+            ->where('alert_operation_segments.alert_operation_id', $opId)
+            ->orderBy('alert_operation_segments.position')
+            ->orderBy('alert_operation_segments.id')
+            ->orderBy('m.target_type')
+            ->get([
+                'm.transport_or_group_id',
+                'm.target_type',
+                'alert_operation_segments.operation_phase',
+            ]);
+    }
     $transport_count = $transport_maps->count();
 
     if ($transport_count) {
@@ -373,21 +378,30 @@ foreach ($rule_list as $rule) {
     echo "<td colspan='2'>$transports</td>";
 
     $op_summary = '';
-    $op_rows = \App\Models\AlertRuleOperation::query()
-        ->where('rule_id', (int) $rule['id'])
-        ->orderBy('position')
-        ->orderBy('id')
-        ->get(['escalation_step_from', 'escalation_step_to', 'start_in_seconds', 'step_duration_seconds']);
-    foreach ($op_rows as $op_row) {
-        $to = $op_row->escalation_step_to === null ? '∞' : (string) $op_row->escalation_step_to;
-        $op_summary .= '<small>steps ' . (int) $op_row->escalation_step_from . '–' . e($to)
-            . ', start ' . (int) $op_row->start_in_seconds . 's, step ' . (int) $op_row->step_duration_seconds . 's'
-            . '</small><br />';
+    if ($opId > 0) {
+        $opName = \App\Models\AlertOperation::query()->whereKey($opId)->value('name');
+        $segRows = \App\Models\AlertOperationSegment::query()
+            ->where('alert_operation_id', $opId)
+            ->orderBy('position')
+            ->orderBy('id')
+            ->get(['escalation_step_from', 'escalation_step_to', 'start_in_seconds', 'step_duration_seconds']);
+        if ($opName !== null && $segRows->isNotEmpty()) {
+            $op_summary = '<small><strong>' . e((string) $opName) . '</strong></small><br />';
+            foreach ($segRows as $op_row) {
+                $to = $op_row->escalation_step_to === null ? '∞' : (string) $op_row->escalation_step_to;
+                $op_summary .= '<small>steps ' . (int) $op_row->escalation_step_from . '–' . e($to)
+                    . ', start ' . (int) $op_row->start_in_seconds . 's, step ' . (int) $op_row->step_duration_seconds . 's'
+                    . '</small><br />';
+            }
+        }
     }
     if ($op_summary === '') {
-        $op_summary = '<small class="text-muted">No operations (notifications suppressed)</small>';
+        $op_summary = '<small class="text-muted">No operation (notifications suppressed)</small>';
     }
-    $def_step = isset($rule['default_operation_step_duration_seconds']) ? (int) $rule['default_operation_step_duration_seconds'] : '';
+    $def_step = '';
+    if (! empty($rule['alert_operation_id']) && isset($opDefaults[$rule['alert_operation_id']]) && $opDefaults[$rule['alert_operation_id']] !== null) {
+        $def_step = (int) $opDefaults[$rule['alert_operation_id']];
+    }
     echo '<td><small>Default step dur.: ' . e((string) $def_step) . 's</small><br />' . $op_summary . '</td>';
 
     // Rule

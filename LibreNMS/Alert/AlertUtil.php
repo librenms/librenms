@@ -31,14 +31,13 @@ use App\Models\Alert;
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
-use App\Models\AlertRuleOperation;
+use App\Models\AlertOperationSegment;
 use App\Models\User;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use LibreNMS\Enum\AlertRuleOperationPhase;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
@@ -54,9 +53,7 @@ class AlertUtil
      */
     private static function getRuleId($alert_id)
     {
-        $query = 'SELECT `rule_id` FROM `alerts` WHERE `id`=?';
-
-        return dbFetchCell($query, [$alert_id]);
+        return Alert::find($alert_id)?->rule_id;
     }
 
     /**
@@ -84,11 +81,7 @@ class AlertUtil
      */
     public static function ruleHasAlertOperations(int $ruleId): bool
     {
-        if (! Schema::hasTable('alert_rule_operations')) {
-            return false;
-        }
-
-        return AlertRuleOperation::query()->where('rule_id', $ruleId)->exists();
+        return AlertRule::find($ruleId)?->alert_operation_id !== null;
     }
 
     /**
@@ -103,15 +96,14 @@ class AlertUtil
     {
         unset($rextra['_stop_notifications']);
 
-        $totalOps = AlertRuleOperation::query()->where('rule_id', $ruleId)->count();
-        if ($totalOps === 0) {
+        $ruleRow = AlertRule::find($ruleId)->with('alertOperation:id,default_operation_step_duration_seconds')->first(['id', 'alert_operation_id']);
+        if ($ruleRow === null || $ruleRow->alert_operation_id === null) {
             $rextra['mute'] = true;
 
             return;
         }
 
-        $ops = AlertRuleOperation::query()
-            ->where('rule_id', $ruleId)
+        $ops = AlertOperationSegment::where('alert_operation_id', $ruleRow->alert_operation_id)
             ->where('operation_phase', AlertRuleOperationPhase::PROBLEM)
             ->orderBy('position')
             ->orderBy('id')
@@ -121,8 +113,11 @@ class AlertUtil
             return;
         }
 
-        $rule = AlertRule::find($ruleId, ['default_operation_step_duration_seconds']);
-        $defaultStep = max(0, (int) ($rule->default_operation_step_duration_seconds ?? 0));
+        $opDefault = $ruleRow->alertOperation?->default_operation_step_duration_seconds;
+        if ($opDefault === null) {
+            $opDefault = max(0, 60 * (int) LibrenmsConfig::get('alert_rule.default_operation_step_duration', LibrenmsConfig::get('alert_rule.interval')));
+        }
+        $defaultStep = max(0, (int) $opDefault);
 
         $notificationCount = (int) ($details['count'] ?? 0);
         $nextStep = $notificationCount + 1;
@@ -188,39 +183,59 @@ class AlertUtil
             return [];
         }
 
-        // “Single” transports mapped directly to operation.transports.
-        $single = AlertRuleOperation::query()
-            ->join('alert_rule_operation_transport_map as m', 'm.operation_id', '=', 'alert_rule_operations.id')
-            ->join('alert_transports as b', 'b.transport_id', '=', 'm.transport_or_group_id')
-            ->where('m.target_type', '=', 'single')
-            ->where('alert_rule_operations.rule_id', '=', $rule_id)
-            ->where('alert_rule_operations.operation_phase', '=', $operation_phase)
-            ->where('alert_rule_operations.escalation_step_from', '<=', $escalation_step)
-            ->where(function ($q) use ($escalation_step): void {
-                $q->whereNull('alert_rule_operations.escalation_step_to')
-                    ->orWhereRaw('? <= alert_rule_operations.escalation_step_to', [$escalation_step]);
-            })
-            ->select(['b.transport_id', 'b.transport_type', 'b.transport_name'])
-            ->distinct()
-            ->get();
+        $rule = AlertRule::query()->whereKey($rule_id)->first(['alert_operation_id']);
+        if ($rule === null || $rule->alert_operation_id === null) {
+            return [];
+        }
 
-        // Transport groups mapped to operation.transports: expand group membership via transport_group_transport.
-        $group = AlertRuleOperation::query()
-            ->join('alert_rule_operation_transport_map as m', 'm.operation_id', '=', 'alert_rule_operations.id')
-            ->join('alert_transport_groups as g', 'g.transport_group_id', '=', 'm.transport_or_group_id')
-            ->join('transport_group_transport as c', 'c.transport_group_id', '=', 'g.transport_group_id')
-            ->join('alert_transports as d', 'd.transport_id', '=', 'c.transport_id')
-            ->where('m.target_type', '=', 'group')
-            ->where('alert_rule_operations.rule_id', '=', $rule_id)
-            ->where('alert_rule_operations.operation_phase', '=', $operation_phase)
-            ->where('alert_rule_operations.escalation_step_from', '<=', $escalation_step)
-            ->where(function ($q) use ($escalation_step): void {
-                $q->whereNull('alert_rule_operations.escalation_step_to')
-                    ->orWhereRaw('? <= alert_rule_operations.escalation_step_to', [$escalation_step]);
-            })
-            ->select(['d.transport_id', 'd.transport_type', 'd.transport_name'])
-            ->distinct()
-            ->get();
+        $operationId = $rule->alert_operation_id;
+        // Prefer the alert's phase; if no segments exist for recovery/update, fall back to problem
+        // (UI-defined operations store segments as problem-only).
+        $phasesToTry = $operation_phase === AlertRuleOperationPhase::PROBLEM
+            ? [AlertRuleOperationPhase::PROBLEM]
+            : [$operation_phase, AlertRuleOperationPhase::PROBLEM];
+
+        $single = collect();
+        $group = collect();
+        foreach ($phasesToTry as $phase) {
+            // “Single” transports mapped per segment.
+            $single = AlertOperationSegment::query()
+                ->join('alert_operation_transport_map as m', 'm.segment_id', '=', 'alert_operation_segments.id')
+                ->join('alert_transports as b', 'b.transport_id', '=', 'm.transport_or_group_id')
+                ->where('m.target_type', '=', 'single')
+                ->where('alert_operation_segments.alert_operation_id', '=', $operationId)
+                ->where('alert_operation_segments.operation_phase', '=', $phase)
+                ->where('alert_operation_segments.escalation_step_from', '<=', $escalation_step)
+                ->where(function ($q) use ($escalation_step): void {
+                    $q->whereNull('alert_operation_segments.escalation_step_to')
+                        ->orWhereRaw('? <= alert_operation_segments.escalation_step_to', [$escalation_step]);
+                })
+                ->select(['b.transport_id', 'b.transport_type', 'b.transport_name'])
+                ->distinct()
+                ->get();
+
+            // Transport groups: expand group membership via transport_group_transport.
+            $group = AlertOperationSegment::query()
+                ->join('alert_operation_transport_map as m', 'm.segment_id', '=', 'alert_operation_segments.id')
+                ->join('alert_transport_groups as g', 'g.transport_group_id', '=', 'm.transport_or_group_id')
+                ->join('transport_group_transport as c', 'c.transport_group_id', '=', 'g.transport_group_id')
+                ->join('alert_transports as d', 'd.transport_id', '=', 'c.transport_id')
+                ->where('m.target_type', '=', 'group')
+                ->where('alert_operation_segments.alert_operation_id', '=', $operationId)
+                ->where('alert_operation_segments.operation_phase', '=', $phase)
+                ->where('alert_operation_segments.escalation_step_from', '<=', $escalation_step)
+                ->where(function ($q) use ($escalation_step): void {
+                    $q->whereNull('alert_operation_segments.escalation_step_to')
+                        ->orWhereRaw('? <= alert_operation_segments.escalation_step_to', [$escalation_step]);
+                })
+                ->select(['d.transport_id', 'd.transport_type', 'd.transport_name'])
+                ->distinct()
+                ->get();
+
+            if ($single->isNotEmpty() || $group->isNotEmpty()) {
+                break;
+            }
+        }
 
         return $single
             ->concat($group)

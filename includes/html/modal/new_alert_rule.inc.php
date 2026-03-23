@@ -16,16 +16,6 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Alerting\QueryBuilderFilter;
 
 $default_severity = LibrenmsConfig::get('alert_rule.severity');
-$default_default_op_step_duration = LibrenmsConfig::get('alert_rule.default_operation_step_duration', LibrenmsConfig::get('alert_rule.interval')) . 'm';
-$max_alerts_cfg = (int) LibrenmsConfig::get('alert_rule.default_operation_steps_to', LibrenmsConfig::get('alert_rule.max_alerts'));
-$default_operation_row_json = json_encode([
-    'operation_phase' => 'problem',
-    'escalation_step_from' => 1,
-    'escalation_step_to' => $max_alerts_cfg === -1 ? null : max(1, $max_alerts_cfg),
-    'start_in_seconds' => max(0, 60 * (int) LibrenmsConfig::get('alert_rule.default_operation_start_in', LibrenmsConfig::get('alert_rule.delay'))),
-    'step_duration_seconds' => max(0, 60 * (int) LibrenmsConfig::get('alert_rule.default_operation_step_duration', LibrenmsConfig::get('alert_rule.interval'))),
-    'transports' => [],
-]);
 $default_invert_rule_match = LibrenmsConfig::get('alert_rule.invert_rule_match');
 $default_recovery_alerts = LibrenmsConfig::get('alert_rule.recovery_alerts');
 $default_acknowledgement_alerts = LibrenmsConfig::get('alert_rule.acknowledgement_alerts');
@@ -45,7 +35,6 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 <div class="modal-body">
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a href="#main" aria-controls="main" role="tab" data-toggle="tab">Main </a></li>
-                        <li role="presentation"><a href="#operations" aria-controls="operations" role="tab" data-toggle="tab">Operations</a></li>
                         <li role="presentation"><a href="#advanced" aria-controls="advanced" role="tab" data-toggle="tab">Advanced</a></li>
                     </ul>
                     <br />
@@ -55,7 +44,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                         <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities((string) DeviceCache::get($device_id)->displayName()); ?>">
                         <input type="hidden" name="rule_id" id="rule_id" value="">
                         <input type="hidden" name="builder_json" id="builder_json" value="">
-                        <div id="operations-form-error" class="alert alert-danger" style="display: none; margin-top: 10px;"></div>
+                        <div id="alert-rule-form-error" class="alert alert-danger" style="display: none; margin-top: 10px;"></div>
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active" id="main">
                                 <div class='form-group' title="The description of this alert rule.">
@@ -111,6 +100,15 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                                         <input type='checkbox' name='acknowledgement' id='acknowledgement'>
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label for="alert_operation_id" class="col-sm-3 col-md-2 control-label" title="Notification behaviour (escalation, transports). Configure under Alerts → Operations.">Operation </label>
+                                    <div class="col-sm-9 col-md-10">
+                                        <input type="hidden" name="alert_operation_id" id="alert_operation_id_input" value="">
+                                        <select id="alert_operation_id" class="form-control" style="width: 100%;" data-placeholder="<?php echo __('None (suppress notifications)'); ?>">
+                                        </select>
+                                        <p class="help-block"><?php echo __('Leave empty to suppress all notifications for this rule.'); ?></p>
+                                    </div>
+                                </div>
                                 <div class="form-group form-inline">
                                     <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices, groups and locations.">Match devices, groups and locations list </label>
                                     <div class="col-sm-7" style="width: 56%;">
@@ -131,39 +129,6 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                                     <label for='notes' class='col-sm-3 col-md-2 control-label'>Notes</label>
                                     <div class='col-sm-9 col-md-10'>
                                         <textarea class="form-control" rows="6" name="notes" id='notes'></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                            <div role="tabpanel" class="tab-pane" id="operations">
-                                <div class="form-group form-inline">
-                                    <label for="default_operation_step_duration" class="col-sm-3 col-md-2 control-label" title="Default step duration when an operation step duration is 0 (repeat interval).">Default step duration </label>
-                                    <div class="col-sm-3" title="Duration suffix: s,m,h,d — used when an operation step duration is 0.">
-                                        <input type="text" id="default_operation_step_duration" name="default_operation_step_duration" class="form-control" size="8" value="<?php echo htmlspecialchars($default_default_op_step_duration); ?>">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 col-md-2 control-label">Operations</label>
-                                    <div class="col-sm-9 col-md-10">
-                                        <p class="help-block">Per-operation: Leave Steps to empty for no limit.<br />
-                                        <em>Start in:</em> how long to wait for the first step.<br />
-                                        <em>Step duration:</em> (seconds, 0 = use default above)<br />
-                                        <strong>Each operation must have at least one transport or group.</strong><br />
-                                        Leave <strong>no operations</strong> to suppress all notifications for this rule (alerts can still appear in the UI).</p>
-                                        <input type="hidden" name="operations_json" id="operations_json" value="">
-                                        <div class="table-responsive">
-                                            <table class="table table-condensed" id="operations-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Steps from</th>
-                                                        <th>Steps to</th>
-                                                        <th>Start in (s)</th>
-                                                        <th>Step duration (s)</th>
-                                                        <th class="text-center" style="width: 3em;"></th>
-                                                    </tr>
-                                                </thead>
-                                            </table>
-                                        </div>
-                                        <button type="button" class="btn btn-default btn-sm" id="btn-add-operation">Add operation</button>
                                     </div>
                                 </div>
                             </div>
@@ -248,111 +213,10 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
             }
         });
 
-        var DEFAULT_OPERATION_ROW = <?php echo $default_operation_row_json . "\n"; ?>;
-
-        function secondsToDurationInput(sec) {
-            sec = parseInt(sec, 10) || 0;
-            if (sec >= 86400) {
-                return (sec / 86400) + 'd';
-            }
-            if (sec >= 3600) {
-                return (sec / 3600) + 'h';
-            }
-            if (sec >= 60) {
-                return (sec / 60) + 'm';
-            }
-            return String(sec);
+        function syncAlertOperationHidden() {
+            var v = $('#alert_operation_id').val();
+            $('#alert_operation_id_input').val(v === null || v === undefined ? '' : v);
         }
-
-        function initOperationTransportSelect($sel) {
-            $sel.select2({
-                width: '100%',
-                placeholder: 'Transport / group',
-                allowClear: true,
-                ajax: {
-                    url: '<?php echo route('ajax.select.alert-transports-groups') ?>',
-                    delay: 150
-                },
-                dropdownParent: $('#create-alert')
-            });
-        }
-
-        function addOperationRow(op) {
-            op = $.extend({}, DEFAULT_OPERATION_ROW, op || {});
-            var toVal = op.escalation_step_to === null || typeof op.escalation_step_to === 'undefined' ? '' : String(op.escalation_step_to);
-            var $tbody = $('<tbody class="operation-group"></tbody>');
-            var $trMain = $('<tr class="operation-row-main"></tr>');
-            $trMain.append('<td><input type="number" class="form-control input-sm op-from" min="1" value="' + (op.escalation_step_from || 1) + '"></td>');
-            $trMain.append('<td><input type="number" class="form-control input-sm op-to" min="1" placeholder="∞" value="' + toVal + '"></td>');
-            $trMain.append('<td><input type="number" class="form-control input-sm op-start" min="0" value="' + (op.start_in_seconds || 0) + '"></td>');
-            $trMain.append('<td><input type="number" class="form-control input-sm op-step-dur" min="0" value="' + (op.step_duration_seconds || 0) + '"></td>');
-            $trMain.append('<td class="text-center"><button type="button" class="btn btn-danger btn-xs btn-remove-operation" title="Remove operation">&times;</button></td>');
-            var $trTrans = $('<tr class="operation-row-transports"></tr>');
-            $trTrans.append(
-                '<td colspan="6" class="operation-transports-cell" style="border-top: none; padding-top: 4px; padding-bottom: 10px;">' +
-                '<label class="control-label" style="display: block; margin-bottom: 4px; font-weight: 600; font-size: 12px;">Transports / groups</label>' +
-                '<select class="form-control input-sm op-transports" multiple="multiple"></select>' +
-                '</td>'
-            );
-            $tbody.append($trMain, $trTrans);
-            $('#operations-table').append($tbody);
-            $tbody.find('.op-phase').val(op.operation_phase || 'problem');
-            initOperationTransportSelect($tbody.find('.op-transports'));
-            if (op.transports && op.transports.length) {
-                $.each(op.transports, function (i, t) {
-                    var opt = new Option(t.text, t.id, true, true);
-                    $tbody.find('.op-transports').append(opt);
-                });
-                $tbody.find('.op-transports').trigger('change');
-            }
-        }
-
-        /**
-         * @returns {string|null} Error message or null if OK. Empty table (no operations) is allowed (notifications suppressed).
-         */
-        function validateOperationsTransports() {
-            var groups = $('#operations-table tbody.operation-group');
-            if (groups.length === 0) {
-                return null;
-            }
-            var missing = false;
-            groups.each(function () {
-                var v = $(this).find('.op-transports').val();
-                if (!v || !v.length) {
-                    missing = true;
-                    return false;
-                }
-            });
-            return missing
-                ? 'Each operation must have at least one transport or transport group selected.'
-                : null;
-        }
-
-        function buildOperationsJson() {
-            var ops = [];
-            $('#operations-table tbody.operation-group').each(function () {
-                var $grp = $(this);
-                var $tr = $grp.find('tr.operation-row-main');
-                var toRaw = $tr.find('.op-to').val();
-                ops.push({
-                    operation_phase: $tr.find('.op-phase').val(),
-                    escalation_step_from: parseInt($tr.find('.op-from').val(), 10) || 1,
-                    escalation_step_to: (toRaw === '' || toRaw === null) ? null : parseInt(toRaw, 10),
-                    start_in_seconds: parseInt($tr.find('.op-start').val(), 10) || 0,
-                    step_duration_seconds: parseInt($tr.find('.op-step-dur').val(), 10) || 0,
-                    transports: $grp.find('.op-transports').val() || []
-                });
-            });
-            $('#operations_json').val(JSON.stringify(ops));
-        }
-
-        $('#btn-add-operation').on('click', function () {
-            addOperationRow(null);
-        });
-
-        $('#operations-table').on('click', '.btn-remove-operation', function () {
-            $(this).closest('tbody.operation-group').remove();
-        });
 
         $('#btn-save').on('click', function (e) {
             e.preventDefault();
@@ -367,16 +231,11 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
             var result_json = $('#builder').queryBuilder('getRules');
 
             // Clear any previous inline form error
-            $('#operations-form-error').hide().text('');
+            $('#alert-rule-form-error').hide().text('');
 
             if (result_json !== null && result_json.valid) {
-                var opErr = validateOperationsTransports();
-                if (opErr) {
-                    $('#operations-form-error').text(opErr).show();
-                    return;
-                }
+                syncAlertOperationHidden();
                 $('#builder_json').val(JSON.stringify(result_json));
-                buildOperationsJson();
                 $.ajax({
                     type: method,
                     url: url,
@@ -394,14 +253,14 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                     error: function (xhr) {
                         var msg = 'Request failed';
                         if (xhr.responseJSON) {
-                            if (xhr.responseJSON.errors && xhr.responseJSON.errors.operations_json && xhr.responseJSON.errors.operations_json[0]) {
-                                msg = xhr.responseJSON.errors.operations_json[0];
+                            if (xhr.responseJSON.errors && xhr.responseJSON.errors.alert_operation_id && xhr.responseJSON.errors.alert_operation_id[0]) {
+                                msg = xhr.responseJSON.errors.alert_operation_id[0];
                             } else if (xhr.responseJSON.message) {
                                 msg = xhr.responseJSON.message;
                             }
                         }
 
-                        $('#operations-form-error').text(msg).show();
+                        $('#alert-rule-form-error').text(msg).show();
                     }
                 });
             }
@@ -447,7 +306,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
         });
 
         $('#create-alert').on('show.bs.modal', function(e) {
-            $('#operations-form-error').hide().text('');
+            $('#alert-rule-form-error').hide().text('');
             //get data-id attribute of the clicked element
             var rule_id = $(e.relatedTarget).data('rule_id');
             $('#rule_id').val(rule_id);
@@ -471,7 +330,6 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 $("#override_query").bootstrapSwitch('state', false);
                 $("#invert_map").bootstrapSwitch('state', <?=$default_invert_map?>);
                 $(this).find("input[type=text]").val("");
-                $('#default_operation_step_duration').val('<?php echo htmlspecialchars($default_default_op_step_duration); ?>');
                 $('#adv_query').val('');
                 $('#notes').val('');
                 $('#severity').val('<?=$default_severity?>');
@@ -493,16 +351,13 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
             $('#adv_query').val(rule.adv_query);
             $('#notes').val(rule.notes);
 
-            if (rule.default_operation_step_duration_seconds != null) {
-                $('#default_operation_step_duration').val(secondsToDurationInput(rule.default_operation_step_duration_seconds));
+            var $op = $('#alert_operation_id');
+            $op.empty().val(null).trigger('change');
+            if (rule.alert_operation_id) {
+                var opText = rule.alert_operation_name || ('#' + rule.alert_operation_id);
+                $op.append(new Option(opText, rule.alert_operation_id, true, true)).trigger('change');
             }
-
-            $('#operations-table tbody.operation-group').remove();
-            if (rule.operations && rule.operations.length) {
-                $.each(rule.operations, function (i, op) {
-                    addOperationRow(op);
-                });
-            }
+            syncAlertOperationHidden();
 
             var $maps = $('#maps');
             $maps.empty();
@@ -566,5 +421,18 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 url: '<?php echo route('ajax.select.devices-groups-locations') ?>',
                 delay: 150
             }
+        });
+
+        $('#alert_operation_id').on('change', syncAlertOperationHidden);
+
+        $('#alert_operation_id').select2({
+            width: '100%',
+            placeholder: '<?php echo __('None (suppress notifications)'); ?>',
+            allowClear: true,
+            ajax: {
+                url: '<?php echo route('ajax.select.alert-operation') ?>',
+                delay: 150
+            },
+            dropdownParent: $('#create-alert')
         });
     </script>

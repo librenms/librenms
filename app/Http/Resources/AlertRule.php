@@ -18,10 +18,14 @@ class AlertRule extends JsonResource
      */
     public function toArray($request): array
     {
+        $this->loadMissing('alertOperation:id,default_operation_step_duration_seconds');
+
         $rule = parent::toArray($request);
         $rule['devices'] = $this->devices->pluck('device_id')->all();
         $rule['groups'] = $this->groups->pluck('id')->all();
         $rule['locations'] = $this->locations->pluck('id')->all();
+        $rule['alert_operation_id'] = $this->alert_operation_id;
+        $rule['default_operation_step_duration_seconds'] = $this->alertOperation?->default_operation_step_duration_seconds;
         $rule['operations'] = $this->toOperationsApiArray();
 
         return $rule;

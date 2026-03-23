@@ -26,6 +26,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\AlertOperation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -55,8 +56,6 @@ class AlertRuleRequest extends FormRequest
             'builder_json' => ['required_unless:override_query,on', 'json'],
             'adv_query' => ['required_if:override_query,on', 'nullable', 'string'],
 
-            'default_operation_step_duration' => ['nullable', 'string', 'regex:/^\d+[mhd]?$/'],
-
             'invert' => ['sometimes', 'boolean'],
             'recovery' => ['sometimes', 'boolean'],
             'acknowledgement' => ['sometimes', 'boolean'],
@@ -65,7 +64,7 @@ class AlertRuleRequest extends FormRequest
             'maps' => ['sometimes', 'array'],
             'maps.*' => ['string'],
 
-            'operations_json' => ['nullable', 'string'],
+            'alert_operation_id' => ['nullable', 'integer', Rule::exists(AlertOperation::class, 'id')],
 
             'proc' => ['nullable', 'string'],
             'notes' => ['nullable', 'string'],
@@ -109,30 +108,6 @@ class AlertRuleRequest extends FormRequest
                 $maps = $this->input('maps');
                 if (empty($maps) || ! is_array($maps)) {
                     $v->errors()->add('maps', 'Invert map is on but no selection in devices, groups and locations match list');
-                }
-            }
-
-            $raw = $this->input('operations_json');
-            if ($raw === null || $raw === '') {
-                return;
-            }
-            $decoded = json_decode((string) $raw, true);
-            if (! is_array($decoded)) {
-                return;
-            }
-            foreach ($decoded as $index => $op) {
-                $transports = $op['transports'] ?? [];
-                if (! is_array($transports)) {
-                    $transports = [];
-                }
-                $transports = array_values(array_filter($transports, fn ($t) => $t !== null && $t !== ''));
-                if (count($transports) === 0) {
-                    $v->errors()->add(
-                        'operations_json',
-                        'Each operation must have at least one transport or transport group mapped (see operation #' . ($index + 1) . ').'
-                    );
-
-                    return;
                 }
             }
         });

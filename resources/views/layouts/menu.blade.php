@@ -564,6 +564,8 @@
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('alert-rules') }}"><i class="fa fa-list fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Alert Rules') }}</a></li>
+                        <li><a href="{{ route('alert-operations.index') }}"><i class="fa fa-sliders fa-fw fa-lg"
+                                                                       aria-hidden="true"></i> {{ __('Operations') }}</a></li>
                         <li><a href="{{ url('alert-schedule') }}"><i class="fa fa-calendar fa-fw fa-lg"
                                                                      aria-hidden="true"></i> {{ __('Scheduled Maintenance') }}
                             </a></li>

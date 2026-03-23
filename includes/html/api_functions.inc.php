@@ -1410,8 +1410,8 @@ function list_alert_rules(Illuminate\Http\Request $request)
             'devices:device_id',
             'groups:id',
             'locations:id',
-            'operations.transportSingles:alert_transports.transport_id,transport_type,transport_name',
-            'operations.transportGroups:alert_transport_groups.transport_group_id,transport_group_name',
+            'alertOperation.segments.transportSingles:alert_transports.transport_id,transport_type,transport_name',
+            'alertOperation.segments.transportGroups:alert_transport_groups.transport_group_id,transport_group_name',
         ])->get()
     );
 
@@ -1637,20 +1637,33 @@ function api_default_transport_targets(): array
     return [$single, []];
 }
 
-function api_sync_rule_operations(int $ruleId, array $operations): void
+/**
+ * Legacy API: build one global {@see \App\Models\AlertOperation} from the operations array and assign to the rule.
+ *
+ * @param  array<int, array<string, mixed>>  $operations
+ */
+function api_assign_rule_alert_operation_from_legacy_api(int $ruleId, array $operations, string $ruleName, ?int $defaultStepSeconds = null): void
 {
-    $opIds = \App\Models\AlertRuleOperation::where('rule_id', $ruleId)
-        ->pluck('id')
-        ->all();
-
-    if (! empty($opIds)) {
-        \App\Models\AlertRuleOperationTransportMap::whereIn('operation_id', $opIds)
-            ->delete();
+    $rule = \App\Models\AlertRule::find($ruleId);
+    if (! $rule) {
+        return;
     }
 
-    \App\Models\AlertRuleOperation::where('rule_id', $ruleId)
-        ->delete();
+    if ($operations === []) {
+        $rule->alert_operation_id = null;
+        $rule->save();
 
+        return;
+    }
+
+    $name = mb_substr(trim($ruleName) !== '' ? $ruleName : 'Rule #' . $ruleId, 0, 200) . ' — API';
+
+    $op = \App\Models\AlertOperation::create([
+        'name' => $name,
+        'default_operation_step_duration_seconds' => $defaultStepSeconds !== null ? max(0, $defaultStepSeconds) : null,
+    ]);
+
+    $anyTransports = false;
     foreach (array_values($operations) as $idx => $operation) {
         $phase = $operation['operation_phase'] ?? 'problem';
         if (! in_array($phase, ['problem', 'recovery', 'update'], true)) {
@@ -1663,37 +1676,46 @@ function api_sync_rule_operations(int $ruleId, array $operations): void
         $startIn = max(0, (int) ($operation['start_in_seconds'] ?? 0));
         $stepDuration = max(0, (int) ($operation['step_duration_seconds'] ?? 0));
 
-        [$single, $group] = api_parse_transport_targets((array) ($operation['transports'] ?? []));
-        if (empty($single) && empty($group)) {
-            throw new \InvalidArgumentException('Each operation must include at least one transport or transport group.');
-        }
-
-        $op = \App\Models\AlertRuleOperation::create([
-            'rule_id' => $ruleId,
+        $seg = $op->segments()->create([
             'position' => (int) ($operation['position'] ?? $idx),
             'operation_phase' => $phase,
             'escalation_step_from' => $from,
             'escalation_step_to' => $to,
             'start_in_seconds' => $startIn,
             'step_duration_seconds' => $stepDuration,
+            'notifications_suppressed' => false,
         ]);
 
+        [$single, $group] = api_parse_transport_targets((array) ($operation['transports'] ?? []));
+        if (empty($single) && empty($group)) {
+            $op->delete();
+            throw new \InvalidArgumentException('Each operation must include at least one transport or transport group.');
+        }
+        $anyTransports = true;
+
         foreach ($single as $transportId) {
-            \App\Models\AlertRuleOperationTransportMap::create([
-                'operation_id' => $op->id,
+            \App\Models\AlertOperationTransportMap::create([
+                'segment_id' => $seg->id,
                 'transport_or_group_id' => $transportId,
                 'target_type' => 'single',
             ]);
         }
-
         foreach ($group as $groupId) {
-            \App\Models\AlertRuleOperationTransportMap::create([
-                'operation_id' => $op->id,
+            \App\Models\AlertOperationTransportMap::create([
+                'segment_id' => $seg->id,
                 'transport_or_group_id' => $groupId,
                 'target_type' => 'group',
             ]);
         }
     }
+
+    if (! $anyTransports) {
+        $op->delete();
+        throw new \InvalidArgumentException('Each operation must include at least one transport or transport group.');
+    }
+
+    $rule->alert_operation_id = $op->id;
+    $rule->save();
 }
 
 function add_edit_rule(Illuminate\Http\Request $request)
@@ -1795,7 +1817,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
         || array_key_exists('delay', $data)
         || array_key_exists('interval', $data)
         || array_key_exists('mute', $data);
-    if (! is_array($operations) && $legacyProvided) {
+    if (! is_array($operations) && $legacyProvided && ! array_key_exists('alert_operation_id', $data)) {
         $legacyCount = isset($data['count']) ? (int) $data['count'] : -1;
         $legacyDelaySec = convert_delay((string) ($data['delay'] ?? 0));
         $legacyIntervalSec = convert_delay((string) ($data['interval'] ?? 0));
@@ -1840,8 +1862,10 @@ function add_edit_rule(Illuminate\Http\Request $request)
         'extra' => $extra_json,
         'notes' => $notes,
     ];
-    if ($defaultOperationStepDuration !== null) {
-        $saveData['default_operation_step_duration_seconds'] = max(0, (int) $defaultOperationStepDuration);
+
+    if (array_key_exists('alert_operation_id', $data)) {
+        $v = $data['alert_operation_id'];
+        $saveData['alert_operation_id'] = ($v === null || $v === '') ? null : (int) $v;
     }
 
     if (is_numeric($rule_id)) {
@@ -1866,9 +1890,16 @@ function add_edit_rule(Illuminate\Http\Request $request)
     $alertRule->groups()->sync($groups);
     $alertRule->locations()->sync($locations);
 
-    if (is_array($operations)) {
+    if (array_key_exists('default_operation_step_duration', $data) && $alertRule->alert_operation_id) {
+        $opSec = $defaultOperationStepDuration !== null ? max(0, (int) $defaultOperationStepDuration) : null;
+        \App\Models\AlertOperation::query()->whereKey($alertRule->alert_operation_id)->update([
+            'default_operation_step_duration_seconds' => $opSec,
+        ]);
+    }
+
+    if (! array_key_exists('alert_operation_id', $data) && is_array($operations)) {
         try {
-            api_sync_rule_operations((int) $rule_id, $operations);
+            api_assign_rule_alert_operation_from_legacy_api((int) $rule_id, $operations, $name, $defaultOperationStepDuration);
         } catch (\InvalidArgumentException $e) {
             return api_error(400, $e->getMessage());
         } catch (\Throwable $e) {
