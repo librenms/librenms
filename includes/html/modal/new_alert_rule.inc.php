@@ -36,7 +36,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
 
     <div class="modal fade" id="create-alert" tabindex="-1" role="dialog"
          aria-labelledby="Create" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg" style="width:1200px !important;">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -45,6 +45,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 <div class="modal-body">
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active"><a href="#main" aria-controls="main" role="tab" data-toggle="tab">Main </a></li>
+                        <li role="presentation"><a href="#operations" aria-controls="operations" role="tab" data-toggle="tab">Operations</a></li>
                         <li role="presentation"><a href="#advanced" aria-controls="advanced" role="tab" data-toggle="tab">Advanced</a></li>
                     </ul>
                     <br />
@@ -94,33 +95,6 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group form-inline">
-                                    <label for="default_operation_step_duration" class="col-sm-3 col-md-2 control-label" title="Default step duration when an operation step duration is 0 (repeat interval).">Default step duration </label>
-                                    <div class="col-sm-3" title="Duration suffix: s,m,h,d — used when an operation step duration is 0.">
-                                        <input type="text" id="default_operation_step_duration" name="default_operation_step_duration" class="form-control" size="8" value="<?php echo htmlspecialchars($default_default_op_step_duration); ?>">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-3 col-md-2 control-label">Operations</label>
-                                    <div class="col-sm-9 col-md-10">
-                                        <p class="help-block">Configure notifications per phase (problem / recovery / update). Per-operation: <em>Start in</em> (seconds), <em>Step duration</em> (seconds, 0 = use default above), <em>Steps from</em> / <em>Steps to</em> (escalation range; leave &ldquo;Steps to&rdquo; empty for no limit). <strong>Each operation must have at least one transport or group.</strong> Leave <strong>no operations</strong> to suppress all notifications for this rule (alerts can still appear in the UI). See <a href="https://www.zabbix.com/documentation/current/en/manual/config/notifications/action/operation" target="_blank" rel="noopener">Zabbix operations</a>.</p>
-                                        <input type="hidden" name="operations_json" id="operations_json" value="">
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered table-condensed" id="operations-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Steps from</th>
-                                                        <th>Steps to</th>
-                                                        <th>Start in (s)</th>
-                                                        <th>Step dur. (s)</th>
-                                                        <th class="text-center" style="width: 3em;"></th>
-                                                    </tr>
-                                                </thead>
-                                            </table>
-                                        </div>
-                                        <button type="button" class="btn btn-default btn-sm" id="btn-add-operation">Add operation</button>
-                                    </div>
-                                </div>
                                 <div class='form-group form-inline'>
                                     <label for='invert' class='col-sm-3 col-md-2 control-label' title="Alert when this rule doesn't match.">Invert rule match </label>
                                     <div class='col-sm-2' title="Alert when this rule doesn't match.">
@@ -157,6 +131,35 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                                     <label for='notes' class='col-sm-3 col-md-2 control-label'>Notes</label>
                                     <div class='col-sm-9 col-md-10'>
                                         <textarea class="form-control" rows="6" name="notes" id='notes'></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="operations">
+                                <div class="form-group form-inline">
+                                    <label for="default_operation_step_duration" class="col-sm-3 col-md-2 control-label" title="Default step duration when an operation step duration is 0 (repeat interval).">Default step duration </label>
+                                    <div class="col-sm-3" title="Duration suffix: s,m,h,d — used when an operation step duration is 0.">
+                                        <input type="text" id="default_operation_step_duration" name="default_operation_step_duration" class="form-control" size="8" value="<?php echo htmlspecialchars($default_default_op_step_duration); ?>">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-3 col-md-2 control-label">Operations</label>
+                                    <div class="col-sm-9 col-md-10">
+                                        <p class="help-block">Configure notifications per phase (problem / recovery / update). Per-operation: <em>Start in</em> (seconds), <em>Step duration</em> (seconds, 0 = use default above), <em>Steps from</em> / <em>Steps to</em> (escalation range; leave &ldquo;Steps to&rdquo; empty for no limit). <strong>Each operation must have at least one transport or group.</strong> Leave <strong>no operations</strong> to suppress all notifications for this rule (alerts can still appear in the UI). See <a href="https://www.zabbix.com/documentation/current/en/manual/config/notifications/action/operation" target="_blank" rel="noopener">Zabbix operations</a>.</p>
+                                        <input type="hidden" name="operations_json" id="operations_json" value="">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-condensed" id="operations-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Steps from</th>
+                                                        <th>Steps to</th>
+                                                        <th>Start in (s)</th>
+                                                        <th>Step dur. (s)</th>
+                                                        <th class="text-center" style="width: 3em;"></th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>
+                                        <button type="button" class="btn btn-default btn-sm" id="btn-add-operation">Add operation</button>
                                     </div>
                                 </div>
                             </div>
@@ -440,6 +443,7 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
         });
 
         $('#create-alert').on('show.bs.modal', function(e) {
+            $('#operations-form-error').hide().text('');
             //get data-id attribute of the clicked element
             var rule_id = $(e.relatedTarget).data('rule_id');
             $('#rule_id').val(rule_id);
