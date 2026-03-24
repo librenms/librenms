@@ -188,6 +188,20 @@ class SocialiteController extends Controller
         return true;
     }
 
+    private function normalizeAttributes(array $attributes): array
+    {
+        if (! empty($attributes) && is_object(current($attributes)) && method_exists(current($attributes), 'getName') && method_exists(current($attributes), 'getAllAttributeValues')) {
+            $parsed_attributes = [];
+            foreach ($attributes as $attribute_object) {
+                $parsed_attributes[$attribute_object->getName()] = $attribute_object->getAllAttributeValues();
+            }
+
+            return $parsed_attributes;
+        }
+
+        return $attributes;
+    }
+    
     private function pairUser(string $provider): RedirectResponse
     {
         $user = Auth::user();
