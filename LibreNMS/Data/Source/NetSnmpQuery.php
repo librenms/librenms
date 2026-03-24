@@ -230,16 +230,6 @@ class NetSnmpQuery implements SnmpQueryInterface
     }
 
     /**
-     * RandomLookup
-     */
-    public function randomLookup(): SnmpQueryInterface
-    {
-        $this->options = array_merge($this->options, ['-IR']);
-
-        return $this;
-    }
-
-    /**
      * Output enum values as strings instead of values. This could affect index output.
      */
     public function enumStrings(): SnmpQueryInterface

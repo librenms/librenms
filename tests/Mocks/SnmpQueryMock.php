@@ -376,7 +376,7 @@ class SnmpQueryMock implements SnmpQueryInterface
 
         $number = NetSnmpQuery::make()->mibDir($this->mibDir)
             ->mibs($this->mibs)
-            ->randomLookup()->numeric()->translate($oid);
+            ->numeric()->translate($oid);
 
         if (empty($number)) {
             throw new Exception('Could not translate oid: ' . $oid . PHP_EOL);
