@@ -597,6 +597,7 @@ class ModuleTestHelper
         if ($this->quiet) {
             Debug::setOnly();
             Debug::setVerbose();
+            Debug::enableCliDebugOutput();
         }
         ob_start();
         Log::setDefaultDriver('stdout');
@@ -607,6 +608,9 @@ class ModuleTestHelper
         if ($this->quiet) {
             Debug::setOnly($save_debug);
             Debug::setVerbose($save_vedbug);
+            if (! $save_debug) {
+                Debug::disableCliDebugOutput();
+            }
         } else {
             ob_flush();
         }
@@ -627,6 +631,7 @@ class ModuleTestHelper
         if ($this->quiet) {
             Debug::setOnly();
             Debug::setVerbose();
+            Debug::enableCliDebugOutput();
         }
         ob_start();
         Log::setDefaultDriver('stdout');
@@ -637,6 +642,9 @@ class ModuleTestHelper
         if ($this->quiet) {
             Debug::setOnly($save_debug);
             Debug::setVerbose($save_vedbug);
+            if (! $save_debug) {
+                Debug::disableCliDebugOutput();
+            }
         } else {
             ob_flush();
         }
