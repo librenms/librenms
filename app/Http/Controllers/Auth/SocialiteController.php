@@ -190,16 +190,12 @@ class SocialiteController extends Controller
 
     private function normalizeAttributes(array $attributes): array
     {
-        if (! empty($attributes) && is_object(current($attributes)) && method_exists(current($attributes), 'getName') && method_exists(current($attributes), 'getAllAttributeValues')) {
-            $parsed_attributes = [];
-            foreach ($attributes as $attribute_object) {
-                $parsed_attributes[$attribute_object->getName()] = $attribute_object->getAllAttributeValues();
-            }
-
-            return $parsed_attributes;
+        $first = current($attributes);
+        if (! is_object($first) || ! method_exists($first, 'getName') || ! method_exists($first, 'getAllAttributeValues')) {
+            return $attributes;
         }
 
-        return $attributes;
+        return collect($attributes)->keyBy->getName()->map->getAllAttributeValues()->all();
     }
 
     private function pairUser(string $provider): RedirectResponse
