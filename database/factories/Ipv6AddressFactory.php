@@ -24,7 +24,7 @@ class Ipv6AddressFactory extends Factory
             'ipv6_prefixlen' => $prefix,
             'ipv6_origin' => 'manual',
             'port_id' => function () {
-                $port = Port::factory()->create(); /** @var \App\Models\Port $port */
+                $port = Port::factory()->create(); /** @var Port $port */
 
                 return $port->port_id;
             },
