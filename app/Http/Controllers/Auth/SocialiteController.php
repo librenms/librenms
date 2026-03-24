@@ -201,7 +201,7 @@ class SocialiteController extends Controller
 
         return $attributes;
     }
-    
+
     private function pairUser(string $provider): RedirectResponse
     {
         $user = Auth::user();
