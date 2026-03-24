@@ -78,7 +78,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         $this->netsnmp->device($device);
 
         // Fall back to NetSnmp if new device is incompatible with PhpSnmp
-        if (! $this->worksFor($device)) {
+        if (! self::worksFor($device)) {
             return $this->netsnmp;
         }
 
