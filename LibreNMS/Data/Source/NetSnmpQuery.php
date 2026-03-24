@@ -233,7 +233,6 @@ class NetSnmpQuery implements SnmpQueryInterface
      * Try to avoid setting options this way to keep the API generic.
      *
      * @param  array|string|null  $options
-     * @return $this
      */
     public function options($options = []): SnmpQueryInterface
     {
