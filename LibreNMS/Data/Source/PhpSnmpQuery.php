@@ -111,9 +111,9 @@ class PhpSnmpQuery implements SnmpQueryInterface
         if ($old_snmp) {
             $this->snmp->oid_increasing_check = $old_snmp->oid_increasing_check;
             $this->snmp->enum_print = $old_snmp->enum_print;
-            $this->snmp->numeric_timeticks = $old_snmp->numeric_timeticks; /** @phpstan-ignore property.notFound */
-            $this->snmp->extended_index = $old_snmp->extended_index;  /** @phpstan-ignore property.notFound */
-            $this->snmp->dontprint_units = $old_snmp->dontprint_units;  /** @phpstan-ignore property.notFound */
+            $this->snmp->numeric_timeticks = $old_snmp->numeric_timeticks; /** @phpstan-ignore property.notFound, property.notFound */
+            $this->snmp->extended_index = $old_snmp->extended_index;  /** @phpstan-ignore property.notFound, property.notFound */
+            $this->snmp->dontprint_units = $old_snmp->dontprint_units;  /** @phpstan-ignore property.notFound, property.notFound */
             if ($old_snmp->oid_output_format) {
                 $this->snmp->oid_output_format = $old_snmp->oid_output_format;
             }
@@ -399,7 +399,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function next($oid): SnmpResponse
     {
-        $ret = [];
+        $response = new SnmpResponse('');
 
         foreach ($this->limitOids($this->parseOid($oid)) as $oids) {
             $response = $this->cmd('getnext', $oids, $response);
@@ -411,9 +411,8 @@ class PhpSnmpQuery implements SnmpQueryInterface
                 return $response;
             }
         }
-        Log::debug($ret);
 
-        return new SnmpResponse($ret);
+        return $response;
     }
 
     public function cmd(string $cmd, array|string $oids, SnmpResponse $response): SnmpResponse
@@ -546,15 +545,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
         }
 
         return $options;
-    }
-
-    private function logSnmpError(string $cmd, array $oids): void
-    {
-        Log::debug("Error running SNMP $cmd: " . $this->snmp->getError());
-
-        if (preg_match('/(Invalid object identifier: .*)/', $this->snmp->getError(), $errors)) {
-            throw new \Exception($this->snmp->getError());
-        }
     }
 
     private function logSnmpCmd(string $cmd, array $oids): void
