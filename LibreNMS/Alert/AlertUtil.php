@@ -66,6 +66,7 @@ class AlertUtil
         // UI-defined operations currently use problem phase only.
         // Keep all states mapped to problem until dedicated phase config is reintroduced.
         unset($state);
+
         return AlertRuleOperationPhase::PROBLEM;
     }
 
