@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Poller;
 use App\Models\User;
 
 class PollerPolicy
@@ -13,13 +14,15 @@ class PollerPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAny');
+        return $this->hasGlobalPermission($user, 'view')
+            || $this->hasGlobalPermission($user, 'update')
+            || $this->hasGlobalPermission($user, 'delete');
     }
 
     /**
      * Determine whether the user can view the poller.
      */
-    public function view(User $user): bool
+    public function view(User $user, Poller $poller): bool
     {
         return $this->hasGlobalPermission($user, 'view');
     }

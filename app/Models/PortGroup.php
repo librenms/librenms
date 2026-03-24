@@ -36,7 +36,7 @@ class PortGroup extends BaseModel
 
     public function scopeHasAccess($query, User $user)
     {
-        if (Gate::allows('viewAny', PortGroup::class)) {
+        if (Gate::allows('viewAll', PortGroup::class)) {
             return $query;
         }
 

@@ -57,7 +57,7 @@ class MapDataController extends Controller
                     ->where('disabled', 0)
                     ->where('ignore', 0);
 
-                if (Gate::denies('viewAny', Device::class)) {
+                if (Gate::denies('viewAll', Device::class)) {
                     $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
                 }
             })
@@ -70,7 +70,7 @@ class MapDataController extends Controller
                     ->where('disabled', 0)
                     ->where('ignore', 0);
 
-                if (Gate::denies('viewAny', Device::class)) {
+                if (Gate::denies('viewAll', Device::class)) {
                     $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
                 }
             })
@@ -112,7 +112,7 @@ class MapDataController extends Controller
         $group_id = $request->group;
         $device_id = $request->device;
 
-        if (is_null($disabled) && is_null($disabled_alerts) && ! $group_id && Gate::allows('viewAny', Device::class)) {
+        if (is_null($disabled) && is_null($disabled_alerts) && ! $group_id && Gate::allows('viewAll', Device::class)) {
             $device_filter = false;
         } else {
             $device_filter = true;
@@ -123,7 +123,7 @@ class MapDataController extends Controller
                 $remote_port_attr,
                 'device' => function ($q) use ($user, $disabled, $disabled_alerts, $group_id): void {
                     // Apply device filter to the list of local devices that we will load
-                    if (Gate::denies('viewAny', Device::class)) {
+                    if (Gate::denies('viewAll', Device::class)) {
                         $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
                     }
 
@@ -155,7 +155,7 @@ class MapDataController extends Controller
                 },
                 "$remote_port_attr.device" => function ($q) use ($user, $disabled, $disabled_alerts, $group_id): void {
                     // Apply device filter to the list of remote devices that we will load
-                    if (Gate::denies('viewAny', Device::class)) {
+                    if (Gate::denies('viewAll', Device::class)) {
                         $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
                     }
 
@@ -190,7 +190,7 @@ class MapDataController extends Controller
         if ($device_filter) {
             // Apply device level filter to the port list so we exclude ports that are not connected to devices we want to display
             $linkQuery->whereHas('device', function (Builder $q) use ($user, $disabled, $disabled_alerts, $group_id): void {
-                if (Gate::denies('viewAny', Device::class)) {
+                if (Gate::denies('viewAll', Device::class)) {
                     $q->whereIntegerInRaw($q->qualifyColumn('device_id'), \Permissions::devicesForUser($user));
                 }
 
@@ -223,7 +223,7 @@ class MapDataController extends Controller
 
             // Apply the same device level filter to the port list so we exclude ports that have no remote devices we want to display
             $linkQuery->whereHas("$remote_port_attr.device", function (Builder $q) use ($user, $disabled, $disabled_alerts, $group_id): void {
-                if (Gate::denies('viewAny', Device::class)) {
+                if (Gate::denies('viewAll', Device::class)) {
                     $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
                 }
 
