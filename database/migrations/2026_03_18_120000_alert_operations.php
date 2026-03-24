@@ -10,7 +10,6 @@
  * - global_alert_operations
  * - alert_operation_segments
  * - move_default_operation_step_duration_to_alert_operations
- *
  */
 
 use Illuminate\Database\Migrations\Migration;

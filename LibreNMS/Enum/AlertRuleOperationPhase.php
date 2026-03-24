@@ -2,7 +2,6 @@
 
 /**
  * Operation lists: Operations (problem), Recovery operations, Update operations.
- *
  */
 
 namespace LibreNMS\Enum;

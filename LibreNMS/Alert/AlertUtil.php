@@ -39,7 +39,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\AlertRuleOperationPhase;
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -60,7 +59,7 @@ class AlertUtil
      * Map the alert state to the operation phase
      *
      * @param  int  $state  The alert state
-     * @return string  The operation phase
+     * @return string The operation phase
      */
     public static function mapAlertStateToOperationPhase(int $state): string
     {
