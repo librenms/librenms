@@ -89,19 +89,18 @@ class SnmpQueryMock implements SnmpQueryInterface
     public function translate(string $oid): string
     {
         // call real snmptranslate
-        $options = $this->options;
+        $snmp = NetSnmpQuery::make()
+            ->mibDir($this->mibDir)
+            ->mibs($this->mibs);
+
         if ($this->numeric) {
-            $options[] = '-On';
+            $snmp = $snmp->numeric();
         }
         if ($this->hideMib) {
-            $options[] = '-Os';
+            $snmp = $snmp->hideMib();
         }
 
-        return NetSnmpQuery::make()
-            ->mibDir($this->mibDir)
-            ->mibs($this->mibs)
-            ->options($options)
-            ->translate($oid);
+        return $snmp->translate($oid);
     }
 
     public function abortOnFailure(): SnmpQueryInterface
@@ -142,6 +141,38 @@ class SnmpQueryMock implements SnmpQueryInterface
     {
         // TODO: Implement enumStrings() method, no idea how
         Log::error('enumStrings not implemented in SnmpQueryMock');
+
+        return $this;
+    }
+
+    public function defaultTimeticks(): SnmpQueryInterface
+    {
+        // TODO: Implement defaultTimeticks() method, no idea how
+        Log::error('defaultTimeticks not implemented in SnmpQueryMock');
+
+        return $this;
+    }
+
+    public function noExtendedIndex(): SnmpQueryInterface
+    {
+        // TODO: Implement noExtendedIndex() method, no idea how
+        Log::error('noExtendedIndex not implemented in SnmpQueryMock');
+
+        return $this;
+    }
+
+    public function noQuickPrint(): SnmpQueryInterface
+    {
+        // TODO: Implement noQuickPrint() method, no idea how
+        Log::error('noQuickPrint not implemented in SnmpQueryMock');
+
+        return $this;
+    }
+
+    public function printUnits(): SnmpQueryInterface
+    {
+        // TODO: Implement printUnits() method, no idea how
+        Log::error('printUnits not implemented in SnmpQueryMock');
 
         return $this;
     }
