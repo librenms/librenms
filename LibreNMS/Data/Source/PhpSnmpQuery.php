@@ -96,7 +96,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         $this->snmp = new \SNMP(
             $snmpver,
             ($hostname ?: 'localhost') . ':' . $this->device->port,
-            $this->device->snmpver === 'v3' ? ($this->device->authname ?: 'root') : $this->device->community,
+            $this->device->snmpver === 'v3' ? ($this->device->authname ?: 'root') : ($this->device->community ?: 'public'),
             ($this->device->timeout ?? LibrenmsConfig::get('snmp.timeout')) * 1000000,
             $this->device->retries ?? LibrenmsConfig::get('snmp.retries'),
         );
@@ -216,12 +216,27 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
         // Read it in immediately if we are initialised
         if ($this->mibinit) {
-            foreach ($mibs as $mib) {
-                snmp_read_mib($mib);
-            }
+            $this->readMibs($mibs);
         }
 
         return $this;
+    }
+
+    /**
+     * Read in a group of MIB files
+     */
+    private function readMibs(array $mibs): void
+    {
+        foreach ($mibs as $mib) {
+            foreach ($this->mibDirectories() as $dir) {
+                $mibfile = "$dir/$mib";
+                if (file_exists($mibfile)) {
+                    snmp_read_mib($mibfile);
+
+                    return;
+                }
+            }
+        }
     }
 
     /**
@@ -314,9 +329,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
         snmp_mib_allow_underscores(true); /** @phpstan-ignore function.notFound */
         snmp_init_mib(implode(':', $this->mibDirectories())); /** @phpstan-ignore function.notFound */
-        foreach ($this->mibs as $mib) {
-            snmp_read_mib($mib);
-        }
+        $this->readMibs($this->mibs);
 
         $this->mibinit = true;
     }
