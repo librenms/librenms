@@ -310,54 +310,16 @@ class PhpSnmpQuery implements SnmpQueryInterface
     {
         $response = new SnmpResponse('');
 
-        $this->initMibs();
-
-        $missing = [];
-        $errors = '';
-
-        set_error_handler(function (int $err_severity, string $err_msg, string $err_filename, int $err_line) use (&$missing, &$errors): bool {
-            if (preg_match('/\'([^\']+)\': (No Such Object available on this agent at this OID|No Such Instance currently exists at this OID)/', $err_msg, $matches)) {
-                $missing[$matches[1]] = $matches[2];
-            } elseif (preg_match('/Invalid object identifier: (\S+)/', $err_msg, $matches)) {
-                $errors .= "$matches[1]: Unknown Object Identifier\n";
-            } else {
-                $errors .= "$err_msg\n";
-            }
-
-            return true;
-        }, E_WARNING);
-
         foreach ($this->limitOids($this->parseOid($oid)) as $oids) {
-            $measure = Measurement::start('phpget');
-            $this->logSnmpCmd('GET', $oids);
-            $res = @$this->snmp->get($oids);
-            $measure->manager()->recordSnmp($measure->end());
-
-            $res_str = '';
-            if ($res) {
-                foreach ($res as $k => $v) {
-                    $res_str .= "$k = $v\n";
-                }
-            }
-            foreach ($missing as $k => $v) {
-                $res_str .= "$k = $v\n";
-            }
-
-            $this->logOutput($res_str, '');
-
-            $response = $response->append(new SnmpResponse($res_str, $errors, $errors ? 1 : 0));
+            $response = $this->cmd('get', $oids, $response);
 
             if ($this->abort && ! $response->isValid()) {
                 $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oids));
                 Log::info("SNMP failed getting $oid_list aborting.");
 
-                restore_error_handler();
-
                 return $response;
             }
         }
-
-        restore_error_handler();
 
         return $response;
     }
@@ -371,30 +333,70 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function walk($oid): SnmpResponse
     {
-        $max_repeaters = $this->device->getAttrib('snmp_max_repeaters') ?: LibrenmsConfig::getOsSetting($this->device->os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', false));
+        $response = new SnmpResponse('');
+
         $oids = $this->parseOid($oid);
         $ret = [];
 
-        $this->logSnmpCmd('WALK', $oids);
         foreach ($oids as $oid) {
-            $measure = Measurement::start('phpwalk');
-            $walkoutput = @$this->snmp->walk($oid, false, $max_repeaters > 0 ? $max_repeaters : null, null);
-            $measure->manager()->recordSnmp($measure->end());
+            $response = $this->cmd('walk', $oid, $response);
 
-            if ($walkoutput) {
-                $ret = array_merge($ret, $walkoutput);
+            if ($this->abort && ! $response->isValid()) {
+                $oid_list = implode(',', array_map(fn ($group) => is_array($group) ? implode(',', $group) : $group, $oids));
+                Log::info("SNMP failed getting $oid_list aborting.");
+
+                return $response;
             }
         }
 
-        if (! $ret) {
-            $this->logSnmpError('WALK', $oids);
+        return $response;
+    }
 
-            return new SnmpResponse($this->snmp->getError(), $this->snmp->getError(), 1);
+    public function cmd(string $cmd, array|string $oids, SnmpResponse $response): SnmpResponse
+    {
+        $this->initMibs();
+
+        $missing = [];
+        $errors = '';
+
+        $max_repeaters = $this->device->getAttrib('snmp_max_repeaters') ?: LibrenmsConfig::getOsSetting($this->device->os, 'snmp.max_repeaters', LibrenmsConfig::get('snmp.max_repeaters', false));
+
+        set_error_handler(function (int $err_severity, string $err_msg, string $err_filename, int $err_line) use (&$missing, &$errors): bool {
+            if (preg_match('/\'([^\']+)\': (No Such Object available on this agent at this OID|No Such Instance currently exists at this OID)/', $err_msg, $matches)) {
+                $missing[$matches[1]] = $matches[2];
+            } elseif (preg_match('/Invalid object identifier: (\S+)/', $err_msg, $matches)) {
+                $errors .= "$matches[1]: Unknown Object Identifier\n";
+            } else {
+                $errors .= "$err_msg\n";
+            }
+
+            return true;
+        }, E_WARNING);
+
+        $this->logSnmpCmd($cmd, is_array($oids) ? $oids : [$oids]);
+        $measure = Measurement::start('php' . $cmd);
+        $res = match ($cmd) {
+            'get' => $this->snmp->get($oids),
+            'walk' => $this->snmp->walk($oids, false, $max_repeaters > 0 ? $max_repeaters : 10, 0),
+            default => throw new \Exception("SNMP comand $cmd is not supported"),
+        };
+        $measure->manager()->recordSnmp($measure->end());
+
+        restore_error_handler();
+
+        $res_str = '';
+        if ($res) {
+            foreach ($res as $k => $v) {
+                $res_str .= "$k = $v\n";
+            }
+        }
+        foreach ($missing as $k => $v) {
+            $res_str .= "$k = $v\n";
         }
 
-        Log::debug($ret);
+        $this->logOutput($res_str, '');
 
-        return new SnmpResponse($ret);
+        return $response->append(new SnmpResponse($res_str, $errors, $errors ? 1 : 0));
     }
 
     /**
