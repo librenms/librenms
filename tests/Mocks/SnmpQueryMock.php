@@ -31,7 +31,7 @@ use DeviceCache;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\NetSnmpQuery;
+use LibreNMS\Data\Source\NetSnmpTranslate;
 use LibreNMS\Data\Source\SnmpQueryInterface;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Util\Mac;
@@ -46,8 +46,6 @@ class SnmpQueryMock implements SnmpQueryInterface
     private ?string $mibDir = null;
     private array $mibs = [];
     private bool $numeric = false;
-    private bool $hideMib = false;
-    private array $options = [];
     private bool $abort = false;
 
     public function __construct()
@@ -86,24 +84,6 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
-    public function translate(string $oid): string
-    {
-        // call real snmptranslate
-        $options = $this->options;
-        if ($this->numeric) {
-            $options[] = '-On';
-        }
-        if ($this->hideMib) {
-            $options[] = '-Os';
-        }
-
-        return NetSnmpQuery::make()
-            ->mibDir($this->mibDir)
-            ->mibs($this->mibs)
-            ->options($options)
-            ->translate($oid);
-    }
-
     public function abortOnFailure(): SnmpQueryInterface
     {
         $this->abort = true;
@@ -133,7 +113,8 @@ class SnmpQueryMock implements SnmpQueryInterface
 
     public function hideMib(): SnmpQueryInterface
     {
-        $this->hideMib = true;
+        // TODO: Implement hideMib() method
+        Log::error('hideMib not implemented in SnmpQueryMock');
 
         return $this;
     }
@@ -148,7 +129,8 @@ class SnmpQueryMock implements SnmpQueryInterface
 
     public function options($options = []): SnmpQueryInterface
     {
-        $this->options = $options === null ? [] : Arr::wrap($options);
+        // TODO: Implement options() method, no idea how
+        Log::error('options not implemented in SnmpQueryMock');
 
         return $this;
     }
@@ -296,7 +278,7 @@ class SnmpQueryMock implements SnmpQueryInterface
 
         if ($type == 6) {
             $mib = $oid->getMib();
-            $data = $this->numeric ? ".$data" : $this->mibs($mib ? [$mib] : [])->translate($data);
+            $data = $this->numeric ? ".$data" : NetSnmpTranslate::make()->mibs($mib ? [$mib] : [])->translate($data);
         }
 
         if ($this->numeric) {
@@ -304,7 +286,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         if (! empty($oid->oid) && $oid->isNumeric()) {
-            $oid = $this->translate($oid);
+            $oid = NetSnmpTranslate::make()->translate($oid);
         }
 
         return "$oid = $data";
@@ -343,11 +325,9 @@ class SnmpQueryMock implements SnmpQueryInterface
             return ltrim($oid, '.');
         }
 
-        $options = ['-IR'];
-
-        $number = NetSnmpQuery::make()->mibDir($this->mibDir)
+        $number = NetSnmpTranslate::make()->mibDir($this->mibDir)
             ->mibs($this->mibs)
-            ->options(array_merge($options, $this->options))->numeric()->translate($oid);
+            ->numeric()->translate($oid);
 
         if (empty($number)) {
             throw new Exception('Could not translate oid: ' . $oid . PHP_EOL);

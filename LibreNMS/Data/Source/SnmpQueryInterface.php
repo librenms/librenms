@@ -139,10 +139,4 @@ interface SnmpQueryInterface
      * @return SnmpResponse
      */
     public function next($oid): SnmpResponse;
-
-    /**
-     * Translate an OID.
-     * Call numeric method prior output numeric OID.
-     */
-    public function translate(string $oid): string;
 }
