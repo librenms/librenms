@@ -47,7 +47,6 @@ class SnmpQueryMock implements SnmpQueryInterface
     private array $mibs = [];
     private bool $numeric = false;
     private bool $hideMib = false;
-    private array $options = [];
     private bool $abort = false;
 
     public function __construct()
@@ -179,8 +178,6 @@ class SnmpQueryMock implements SnmpQueryInterface
 
     public function options($options = []): SnmpQueryInterface
     {
-        $this->options = $options === null ? [] : Arr::wrap($options);
-
         return $this;
     }
 
