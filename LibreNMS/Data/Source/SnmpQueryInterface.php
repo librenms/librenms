@@ -98,6 +98,11 @@ interface SnmpQueryInterface
     public function hideMib(): SnmpQueryInterface;
 
     /**
+     * Enable "random lookup" for MIBs
+     */
+    public function randomLookup(): SnmpQueryInterface;
+
+    /**
      * Output enum values as strings instead of values. This could affect index output.
      */
     public function enumStrings(): SnmpQueryInterface;

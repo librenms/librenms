@@ -152,11 +152,11 @@ class ModuleTestHelper
                 $this->qPrint(' ' . $oid_data['oid']);
 
                 if ($oid_data['method'] == 'walk') {
-                    $data = \SnmpQuery::context($context)->numericIndex()->numeric()->noQuickPrint()->noExtendedIndex()->defaultTimeticks()->mib($oid_data['mib'])->mibDir($oid_data['mibdir'] ?? null)->walk($oid_data['oid']);
+                    $data = \SnmpQuery::context($context)->numericIndex()->numeric()->noQuickPrint()->noExtendedIndex()->defaultTimeticks()->mibs([$oid_data['mib']])->mibDir($oid_data['mibdir'] ?? null)->walk($oid_data['oid']);
                 } elseif ($oid_data['method'] == 'get') {
-                    $data = \SnmpQuery::context($context)->numericIndex()->numeric()->noQuickPrint()->noExtendedIndex()->defaultTimeticks()->mib($oid_data['mib'])->mibDir($oid_data['mibdir'] ?? null)->get($oid_data['oid']);
+                    $data = \SnmpQuery::context($context)->numericIndex()->numeric()->noQuickPrint()->noExtendedIndex()->defaultTimeticks()->mibs([$oid_data['mib']])->mibDir($oid_data['mibdir'] ?? null)->get($oid_data['oid']);
                 } elseif ($oid_data['method'] == 'getnext') {
-                    $data = \SnmpQuery::context($context)->numericIndex()->numeric()->noQuickPrint()->noExtendedIndex()->defaultTimeticks()->mib($oid_data['mib'])->mibDir($oid_data['mibdir'] ?? null)->next($oid_data['oid']);
+                    $data = \SnmpQuery::context($context)->numericIndex()->numeric()->noQuickPrint()->noExtendedIndex()->defaultTimeticks()->mibs([$oid_data['mib']])->mibDir($oid_data['mibdir'] ?? null)->next($oid_data['oid']);
                 }
 
                 if (isset($data) && $data->getExitCode() === 0) {
