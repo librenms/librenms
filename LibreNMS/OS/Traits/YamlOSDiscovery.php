@@ -33,7 +33,7 @@ use Illuminate\Support\Arr;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\StringHelpers;
 use Log;
-use SnmpQuery;
+use SnmpTranslate;
 
 trait YamlOSDiscovery
 {
@@ -62,7 +62,7 @@ trait YamlOSDiscovery
         }
 
         if (isset($os_yaml['hardware_mib'])) {
-            $device->hardware = SnmpQuery::mibs([$os_yaml['hardware_mib']])->hideMib()->translate($device->sysObjectID);
+            $device->hardware = SnmpTranslate::mibs([$os_yaml['hardware_mib']])->hideMib()->translate($device->sysObjectID);
 
             if (! empty($os_yaml['hardware_regex'])) {
                 $this->parseRegex($os_yaml['hardware_regex'], $device->hardware);

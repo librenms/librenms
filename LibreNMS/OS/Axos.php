@@ -75,7 +75,7 @@ class Axos extends OS implements OSDiscovery, TransceiverDiscovery
         $inventory = new Collection;
         $physical_index = 1;
 
-        $physical_name = \SnmpQuery::hideMib()->mibs(['CALIX-PRODUCT-MIB'])->translate($this->getDevice()->sysObjectID);
+        $physical_name = \SnmpTranslate::hideMib()->mibs(['CALIX-PRODUCT-MIB'])->translate($this->getDevice()->sysObjectID);
         $serial_number = \SnmpQuery::get('Axos-System-MIB::axosSystemChassisSerialNumber.0')->value();
         $inventory->push(new EntPhysical([
             'entPhysicalIndex' => $physical_index++,

@@ -69,6 +69,7 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
+use SnmpTranslate;
 
 class Cisco extends OS implements
     OSDiscovery,
@@ -169,7 +170,7 @@ class Cisco extends OS implements
 
         $device->hardware = $hardware;
         if (empty($device->hardware) && $device->sysObjectID) {
-            $device->hardware = SnmpQuery::mibDir('cisco')->mibs(['SNMPv2-MIB', 'CISCO-PRODUCTS-MIB'])->hideMib()->translate($device->sysObjectID);
+            $device->hardware = SnmpTranslate::mibDir('cisco')->mibs(['SNMPv2-MIB', 'CISCO-PRODUCTS-MIB'])->hideMib()->translate($device->sysObjectID);
         }
     }
 
