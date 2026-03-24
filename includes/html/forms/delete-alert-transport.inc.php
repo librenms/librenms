@@ -10,8 +10,8 @@
  * the source code distribution for details.
  */
 
-use App\Models\AlertTransport;
 use App\Models\AlertOperationTransportMap;
+use App\Models\AlertTransport;
 use App\Models\TransportGroupTransport;
 use Illuminate\Support\Facades\Gate;
 

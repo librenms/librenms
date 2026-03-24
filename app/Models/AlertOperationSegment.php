@@ -7,6 +7,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * One escalation row / transport mapping inside a named {@see AlertOperation}.
+ *
+ * @property int $id
+ * @property int $alert_operation_id
+ * @property int $position
+ * @property string $operation_phase
+ * @property int $escalation_step_from
+ * @property int|null $escalation_step_to
+ * @property int $start_in_seconds
+ * @property int $step_duration_seconds
+ * @property bool $notifications_suppressed
  */
 class AlertOperationSegment extends BaseModel
 {

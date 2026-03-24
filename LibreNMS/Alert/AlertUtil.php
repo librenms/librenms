@@ -28,10 +28,10 @@ namespace LibreNMS\Alert;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Alert;
+use App\Models\AlertOperationSegment;
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
-use App\Models\AlertOperationSegment;
 use App\Models\User;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Builder;
@@ -57,22 +57,16 @@ class AlertUtil
     }
 
     /**
+     * Map the alert state to the operation phase
+     *
+     * @param  int  $state  The alert state
+     * @return string  The operation phase
      */
     public static function mapAlertStateToOperationPhase(int $state): string
     {
-        // For now we route all states through "problem" operations so recovery/acknowledgment
-        // notifications still send even when dedicated recovery/update operation rows are absent.
-        // TODO: Re-enable state-based routing (problem/recovery/update) once UI/workflows enforce
-        // explicit operation coverage for each phase.
-        return AlertRuleOperationPhase::PROBLEM;// Remove this when we intrduce other operation types
-        if ($state === AlertState::ACKNOWLEDGED) {
-            return AlertRuleOperationPhase::UPDATE;
-        }
-
-        if ($state === AlertState::RECOVERED || $state === AlertState::CLEAR) {
-            return AlertRuleOperationPhase::RECOVERY;
-        }
-
+        // UI-defined operations currently use problem phase only.
+        // Keep all states mapped to problem until dedicated phase config is reintroduced.
+        unset($state);
         return AlertRuleOperationPhase::PROBLEM;
     }
 
@@ -96,7 +90,10 @@ class AlertUtil
     {
         unset($rextra['_stop_notifications']);
 
-        $ruleRow = AlertRule::find($ruleId)->with('alertOperation:id,default_operation_step_duration_seconds')->first(['id', 'alert_operation_id']);
+        $ruleRow = AlertRule::query()
+            ->with('alertOperation:id,default_operation_step_duration_seconds')
+            ->whereKey($ruleId)
+            ->first(['id', 'alert_operation_id']);
         if ($ruleRow === null || $ruleRow->alert_operation_id === null) {
             $rextra['mute'] = true;
 
@@ -136,11 +133,7 @@ class AlertUtil
         $rextra['count'] = PHP_INT_MAX;
     }
 
-    /**
-     * @param  \Illuminate\Support\Collection<int, object>  $operations
-     * @return object|null
-     */
-    public static function selectOperationForEscalationStep(Collection $operations, int $escalationStep): ?object
+    public static function selectOperationForEscalationStep(Collection $operations, int $escalationStep): ?AlertOperationSegment
     {
         foreach ($operations as $op) {
             $from = (int) $op->escalation_step_from;
@@ -152,7 +145,9 @@ class AlertUtil
                 continue;
             }
 
-            return $op;
+            if ($op instanceof AlertOperationSegment) {
+                return $op;
+            }
         }
 
         return null;
@@ -199,7 +194,7 @@ class AlertUtil
         $group = collect();
         foreach ($phasesToTry as $phase) {
             // “Single” transports mapped per segment.
-            $single = AlertOperationSegment::query()
+            $single = DB::table('alert_operation_segments')
                 ->join('alert_operation_transport_map as m', 'm.segment_id', '=', 'alert_operation_segments.id')
                 ->join('alert_transports as b', 'b.transport_id', '=', 'm.transport_or_group_id')
                 ->where('m.target_type', '=', 'single')
@@ -215,7 +210,7 @@ class AlertUtil
                 ->get();
 
             // Transport groups: expand group membership via transport_group_transport.
-            $group = AlertOperationSegment::query()
+            $group = DB::table('alert_operation_segments')
                 ->join('alert_operation_transport_map as m', 'm.segment_id', '=', 'alert_operation_segments.id')
                 ->join('alert_transport_groups as g', 'g.transport_group_id', '=', 'm.transport_or_group_id')
                 ->join('transport_group_transport as c', 'c.transport_group_id', '=', 'g.transport_group_id')

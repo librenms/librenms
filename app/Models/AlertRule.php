@@ -22,6 +22,19 @@
  *
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $severity
+ * @property array<string, mixed>|null $extra
+ * @property bool|int $disabled
+ * @property string|null $proc
+ * @property string|null $notes
+ * @property string $query
+ * @property array<string, mixed>|null $builder
+ * @property bool|int $invert_map
+ * @property int|null $alert_operation_id
+ * @property AlertOperation|null $alertOperation
  */
 
 namespace App\Models;
@@ -179,7 +192,7 @@ class AlertRule extends BaseModel
      */
     public function toOperationsApiArray(): array
     {
-        $this->loadMissing([
+        $this->load([
             'alertOperation.segments.transportSingles:alert_transports.transport_id,transport_type,transport_name',
             'alertOperation.segments.transportGroups:alert_transport_groups.transport_group_id,transport_group_name',
         ]);

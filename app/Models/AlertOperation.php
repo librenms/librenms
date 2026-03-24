@@ -3,12 +3,14 @@
 namespace App\Models;
 
 /**
- * Named alert operation (Zabbix-style): contains one or more {@see AlertOperationSegment} rows
+ * Named alert operation: contains one or more {@see AlertOperationSegment} rows
  * (escalation ranges, timing, transports per segment).
  *
  * Assigned to alert rules via alert_rules.alert_operation_id.
  *
- * @see https://www.zabbix.com/documentation/current/en/manual/config/notifications/action/operation
+ * @property int $id
+ * @property string $name
+ * @property int|null $default_operation_step_duration_seconds
  */
 
 use Illuminate\Database\Eloquent\Relations\HasMany;

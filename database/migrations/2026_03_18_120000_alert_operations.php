@@ -11,7 +11,6 @@
  * - alert_operation_segments
  * - move_default_operation_step_duration_to_alert_operations
  *
- * @see https://www.zabbix.com/documentation/current/en/manual/config/notifications/action/operation
  */
 
 use Illuminate\Database\Migrations\Migration;

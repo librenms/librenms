@@ -198,5 +198,4 @@ class AlertRuleController extends Controller
         $alertRule->groups()->sync($groupIds);
         $alertRule->locations()->sync($locationIds);
     }
-
 }

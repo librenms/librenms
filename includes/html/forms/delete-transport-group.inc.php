@@ -12,10 +12,10 @@
  * the source code distribution for details.
  */
 
+use App\Models\AlertOperationTransportMap;
 use App\Models\AlertTransport;
 use App\Models\AlertTransportGroup;
 use App\Models\TransportGroupTransport;
-use App\Models\AlertOperationTransportMap;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
