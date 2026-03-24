@@ -384,7 +384,7 @@ class SnmpQueryMock implements SnmpQueryInterface
             throw new Exception('Could not translate oid: ' . $oid . PHP_EOL);
         }
 
-        return ltrim($number, '.');
+        return ltrim((string) $number, '.');
     }
 
     private function community(): string
