@@ -243,20 +243,53 @@ class NetSnmpQuery implements SnmpQueryInterface
     }
 
     /**
-     * Set option(s) for net-snmp command line. Overrides the default options.
-     * Some options may break parsing, but you can manually parse the raw output if needed.
-     * This will override other options set such as setting numeric.
-     * Calling with null will reset to the default options (-OQXUte).
-     * Try to avoid setting options this way to keep the API generic.
-     *
-     * @param  array|string|null  $options
-     * @return $this
+     * Default timeticks output
      */
-    public function options($options = []): SnmpQueryInterface
+    public function defaultTimeticks(): SnmpQueryInterface
     {
-        $this->options = $options !== null
-            ? Arr::wrap($options)
-            : [self::DEFAULT_FLAGS];
+        // remove -Ot from the default flags
+        if (isset($this->options[0]) && Str::contains($this->options[0], 't')) {
+            $this->options[0] = str_replace('t', '', $this->options[0]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Enable printing units
+     */
+    public function printUnits(): SnmpQueryInterface
+    {
+        // remove -OU from the default flags
+        if (isset($this->options[0]) && Str::contains($this->options[0], 'U')) {
+            $this->options[0] = str_replace('U', '', $this->options[0]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Disable extended index output
+     */
+    public function noExtendedIndex(): SnmpQueryInterface
+    {
+        // remove -OX from the default flags
+        if (isset($this->options[0]) && Str::contains($this->options[0], 'X')) {
+            $this->options[0] = str_replace('X', '', $this->options[0]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Disable quick print output
+     */
+    public function noQuickPrint(): SnmpQueryInterface
+    {
+        // remove -OQ from the default flags
+        if (isset($this->options[0]) && Str::contains($this->options[0], 'Q')) {
+            $this->options[0] = str_replace('Q', '', $this->options[0]);
+        }
 
         return $this;
     }

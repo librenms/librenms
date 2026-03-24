@@ -103,15 +103,24 @@ interface SnmpQueryInterface
     public function enumStrings(): SnmpQueryInterface;
 
     /**
-     * Set option(s) for net-snmp command line.
-     * Some options may break parsing, but you can manually parse the raw output if needed.
-     * This will override other options set such as setting numeric.  Call with no options to reset to default.
-     * Try to avoid setting options this way to keep the API generic.
-     *
-     * @param  array|string|null  $options
-     * @return $this
+     * Default timeticks output
      */
-    public function options($options = []): SnmpQueryInterface;
+    public function defaultTimeticks(): SnmpQueryInterface;
+
+    /**
+     * Enable printing units
+     */
+    public function printUnits(): SnmpQueryInterface;
+
+    /**
+     * Disable extended index output
+     */
+    public function noExtendedIndex(): SnmpQueryInterface;
+
+    /**
+     * Disable quick print output
+     */
+    public function noQuickPrint(): SnmpQueryInterface;
 
     /**
      * snmpget an OID
