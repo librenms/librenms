@@ -44,7 +44,7 @@
                                 @foreach($menu_hooks as [$view, $data])
                                     <li>@include($view, $data)</li>
                                 @endforeach
-                                @admin
+                                @can('plugin.admin')
                                 @if($has_v1_plugins || $has_v2_plugins)
                                     <li role="presentation" class="divider"></li>
                                 @endif
@@ -53,7 +53,7 @@
                                         <i class="fa fa-lock fa-fw fa-lg" aria-hidden="true"></i>{{ __('Plugin Admin') }}
                                     </a>
                                 </li>
-                                @endadmin
+                                @endcan
                             </ul>
                         </li>
                         @endif
@@ -150,6 +150,7 @@
                             </ul>
                         </li>
                     @endif
+                    @can('viewAny', \App\Models\Location::class)
                     @if($locations->isNotEmpty())
                         <li class="dropdown-submenu">
                             <a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> {{ __('Geo Locations') }}</a>
@@ -161,29 +162,37 @@
                             </ul>
                         </li>
                     @endif
+                    @endcan
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('outages') }}"><i class="fa fa-exclamation-triangle fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Outages') }}</a></li>
 
-                        @admin
+                        @if($show_device_extra_divider)
                         <li role="presentation" class="divider"></li>
+                        @endif
                         @can('viewAny', \App\Models\DeviceGroup::class)
                             <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('Manage Groups') }}
                                 </a></li>
                         @endcan
+                        @can('update', \App\Models\Device::class)
                         <li><a href="{{ url('device-dependencies') }}"><i class="fa fa-group fa-fw fa-lg"></i> {{ __('Device Dependencies') }}</a></li>
+                        @endcan
                         @if($show_vmwinfo)
                             <li><a href="{{ url('vminfo') }}"><i
                                         class="fa fa-cog fa-fw fa-lg"></i> {{ __('Virtual Machines') }}</a></li>
                         @endif
+                        @canany(['create', 'delete'], \App\Models\Device::class)
                         <li role="presentation" class="divider"></li>
+                        @endcanany
+                        @can('create', \App\Models\Device::class)
                         <li><a href="{{ url('addhost') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Add Device') }}</a></li>
+                        @endcan
+                        @can('delete', \App\Models\Device::class)
                         <li><a href="{{ url('delhost') }}"><i class="fa fa-trash fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Delete Device') }}</a></li>
-                    @endadmin
-
+                        @endcan
                     </ul>
                 </li>
 {{-- Maps --}}
@@ -265,7 +274,7 @@
                             </li>
                         @endif
                         @endif
-                        @admin
+                        @can('custom-map.update')
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ route('maps.custom.index') }}">
                             <i class="fa fa-pen fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Map Editor') }}
@@ -278,7 +287,7 @@
                         <li><a href="{{ route('maps.nodeimage.index') }}">
                             <i class="fa fa-image fa-fw fa-lg" aria-hidden="true"></i> {{ __('Custom Node Image Manager') }}
                         </a></li>
-                        @endadmin
+                        @endcan
 
                     </ul>
                 </li>
@@ -306,10 +315,10 @@
                         <li><a href="{{ route('vlans.index') }}"><i class="fa fa-tasks fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('VLANs') }}</a></li>
 
-                        @config('enable_billing')
+                        @can('viewAny', \App\Models\Bill::class)
                         <li><a href="{{ url('bills') }}"><i class="fa fa-money fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('Traffic Bills') }}</a></li>
-                        @endconfig
+                        @endCan
 
                         @if($port_counts['pseudowire'] > 0)
                             <li><a href="{{ url('pseudowires') }}"><i class="fa fa-arrows-alt fa-fw fa-lg"
@@ -406,6 +415,7 @@
                     </ul>
                 </li>
 {{-- Sensors --}}
+                @can('viewAny', \App\Models\Sensor::class)
                 <li class="dropdown">
                     <a href="{{ url('health') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons"
@@ -432,7 +442,9 @@
 
                     </ul>
                 </li>
+                @endcan
 {{-- Wireless --}}
+                @can('viewAny', \App\Models\WirelessSensor::class)
                 @if($wireless_menu->isNotEmpty())
                     <li class="dropdown">
                         <a href="{{ url('wireless') }}" class="dropdown-toggle" data-hover="dropdown"
@@ -446,8 +458,9 @@
                         </ul>
                     </li>
                 @endif
+                @endcan
 {{-- Services --}}
-            @config('show_services')
+            @can('viewAny', \App\Models\Service::class)
             <li class="dropdown">
                 <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
                    data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons"
@@ -478,16 +491,16 @@
                                 </a></li>
                         @endif
                     @endif
-                    @admin
+                    @can('service.create')
                     <li role="presentation" class="divider"></li>
                     <li><a href="{{ url('addsrv') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                          aria-hidden="true"></i> {{ __('Add Service') }}</a></li>
-                    @endadmin
+                    @endcan
                 </ul>
             </li>
-            @endconfig
+            @endcan
 {{-- App --}}
-                @if($app_menu->isNotEmpty())
+                @if(Gate::allows('viewAny', \App\Models\Application::class) && $app_menu->isNotEmpty())
                     <li class="dropdown">
                         <a href="{{ url('apps') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"
@@ -537,14 +550,14 @@
                                             aria-hidden="true"></i> {{ __('Alerted BGP :alert_count', ['alert_count' => $bgp_alerts]) }}
                                     </a></li>
                         @endif
-                        @admin
+                        @can('peering-db.view')
                             @if($show_peeringdb)
                                 <li role="presentation" class="divider"></li>
                                 <li><a href="{{ url('peering') }}"><i class="fa fa-hand-o-right fa-fw fa-lg"
                                                                       aria-hidden="true"></i> {{ __('PeeringDB') }}</a>
                                 </li>
                             @endif
-                        @endadmin
+                        @endcan
                         </ul>
                     </li>
                 @endif
@@ -560,20 +573,28 @@
                                                                 aria-hidden="true"></i> {{ __('Alert History') }}</a></li>
                         <li><a href="{{ url('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
-                        @admin
+                        @if($show_alert_divider)
                         <li role="presentation" class="divider"></li>
+                        @endif
+                        @can('viewAny', \App\Models\AlertRule::class)
                         <li><a href="{{ url('alert-rules') }}"><i class="fa fa-list fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Alert Rules') }}</a></li>
+                        @endcan
+                        @can('viewAny', \App\Models\AlertSchedule::class)
                         <li><a href="{{ url('alert-schedule') }}"><i class="fa fa-calendar fa-fw fa-lg"
                                                                      aria-hidden="true"></i> {{ __('Scheduled Maintenance') }}
                             </a></li>
+                        @endcan
+                        @can('viewAny', \App\Models\AlertTemplate::class)
                         <li><a href="{{ url('templates') }}"><i class="fa fa-file fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert Templates') }}</a>
                         </li>
+                        @endcan
+                        @can('viewAny', \App\Models\AlertTransport::class)
                         <li><a href="{{ url('alert-transports') }}"><i class="fa fa-bus fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Alert Transports') }}
                             </a></li>
-                        @endadmin
+                        @endcan
                     </ul>
                 </li>
                 @includeIf('menu.custom')
@@ -618,32 +639,42 @@
                        style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
                         <span class="visible-xs-inline-block">{{ __('settings.title') }}</span></a>
                     <ul class="dropdown-menu">
-                        @admin
+                        @canany(['settings.view', 'settings.update'])
                         <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Global Settings') }}</a></li>
                         <li><a href="{{ url('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Validate Config') }}</a></li>
+                        @endcanany
                         <li role="presentation" class="divider"></li>
+                        @can('viewAny', \App\Models\User::class)
                         <li><a href="{{ route('users.index') }}"><i class="fa fa-user-circle-o fa-fw fa-lg"
                                                                     aria-hidden="true"></i> {{ __('Manage Users') }}</a>
                         </li>
+                        @endcan
+                        @can('auth-log.view')
                         <li><a href="{{ url('authlog') }}"><i class="fa fa-shield fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Auth History') }}</a></li>
+                        @endcan
+                        @if(Gate::allows('viewAny', \App\Models\PollerCluster::class) || Gate::allows('viewAny', \App\Models\PollerGroup::class))
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a></li>
-                                @config('distributed_poller')
+                                @can('viewAny', \App\Models\PollerGroup::class)
                                 <li><a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Groups') }}</a></li>
-                                @endconfig
-                                @if($poller_clusters)
+                                @endcan
+                                @can('update', \App\Models\PollerCluster::class)
                                 <li><a href="{{ route('poller.settings') }}"><i class="fa fa-gears fa-fw fa-lg" aria-hidden="true"></i> {{ __('Settings') }}</a></li>
-                                @endif
+                                @endcan
+                                @can('viewAny', \App\Models\PollerCluster::class)
                                 <li><a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> {{ __('Performance') }}</a></li>
                                 <li><a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> {{ __('Log') }}</a></li>
+                                @endcan
                             </ul>
                         </li>
+                        @endif
+                        @can('api.access')
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> {{ __('API') }}</a>
@@ -656,8 +687,8 @@
                                 </li>
                             </ul>
                         </li>
+                        @endcan
                         <li role="presentation" class="divider"></li>
-                        @endadmin
                         <li class="dropdown-submenu" id="countdown_timer_menu" style="display: none">
                             <a href="#"><i class="fa fa-clock-o fa-fw fa-lg"></i> <span id="countdown_timer"></span></a>
                             <ul class="dropdown-menu">

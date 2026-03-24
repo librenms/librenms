@@ -15,7 +15,10 @@ class AlertPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAny');
+        return $this->hasGlobalPermission($user, 'view')
+            || $this->hasGlobalPermission($user, 'viewAll')
+            || $this->hasGlobalPermission($user, 'update')
+            || $this->hasGlobalPermission($user, 'delete');
     }
 
     /**
@@ -23,8 +26,12 @@ class AlertPolicy
      */
     public function view(User $user, Alert $alert): bool
     {
+        if ($this->hasGlobalPermission($user, 'viewAll')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'view')
-            || Permissions::canAccessDevice($alert->device_id, $user);
+            && Permissions::canAccessDevice($alert->device_id, $user);
     }
 
     public function detail(User $user): bool
