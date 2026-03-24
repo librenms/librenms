@@ -44,7 +44,8 @@ modules:
                     oid: CPQHLTH-MIB::cpqHeTemperatureTable
                     value: CPQHLTH-MIB::cpqHeTemperatureCelsius
                     num_oid: '.1.3.6.1.4.1.232.6.2.6.8.1.4.{{ $index }}'
-                    snmp_flags: '-OtQUSab'
+                    snmp_options: ['enumStrings', 'noExtendedIndex']
+                    snmp_flags: ['-OQUt']
                     index: 'cpqHeTemperatureCelsius.{{ $index }}'
                     descr: CPQHLTH-MIB::cpqHeTemperatureLocale
                     high_limit: '90' #cpqHeTemperatureThreshold

@@ -41,7 +41,7 @@ use LibreNMS\Util\Rewrite;
 use Log;
 use Symfony\Component\Process\Process;
 
-class NetSnmpQuery implements SnmpQueryInterface
+class NetSnmpQuery extends SnmpQueryBase implements SnmpQueryInterface
 {
     private const DEFAULT_FLAGS = '-OQXUte';
 

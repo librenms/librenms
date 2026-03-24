@@ -167,6 +167,11 @@
                                     "warn_percent": {
                                         "type": "string"
                                     },
+                                    "snmp_options": {
+                                        "type": [
+                                            "array"
+                                        ]
+                                    },
                                     "snmp_flags": {
                                         "type": [
                                             "string",
@@ -271,6 +276,11 @@
                                             },
                                             "skip_values": {
                                                 "$ref": "#/$defs/skip_values"
+                                            },
+                                            "snmp_options": {
+                                                "type": [
+                                                    "array"
+                                                ]
                                             },
                                             "snmp_flags": {
                                                 "type": [
@@ -427,6 +437,11 @@
             "type": "object",
             "properties": {
                 "oids": {"$ref": "#/$defs/oids"},
+                "snmp_options": {
+                    "type": [
+                        "array"
+                    ]
+                },
                 "snmp_flags": {
                     "type": [
                         "string",
@@ -451,6 +466,11 @@
                         "type": "object",
                         "properties": {
                             "oid": {"$ref": "#/$defs/oids"},
+                            "snmp_options": {
+                                "type": [
+                                    "array"
+                                ]
+                            },
                             "snmp_flags": {
                                 "type": [
                                     "string",
@@ -519,6 +539,11 @@
                             },
                             "skip_values": {
                                 "$ref": "#/$defs/skip_values"
+                            },
+                            "snmp_options": {
+                                "type": [
+                                    "array"
+                                ]
                             },
                             "snmp_flags": {
                                 "type": [

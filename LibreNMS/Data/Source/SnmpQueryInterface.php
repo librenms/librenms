@@ -154,4 +154,9 @@ interface SnmpQueryInterface
      * Call numeric method prior output numeric OID.
      */
     public function translate(string $oid): string;
+
+    /**
+     * Parse SNMP options
+     */
+    public function parseOptions(array $options): SnmpQueryInterface;
 }

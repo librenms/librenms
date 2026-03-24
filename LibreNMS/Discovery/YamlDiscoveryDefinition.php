@@ -117,7 +117,10 @@ class YamlDiscoveryDefinition
             $snmp_data = [];
             if (! empty($numeric_oids)) {
                 $snmpQuery = SnmpQuery::numeric();
-                if (isset($yamlItem['snmp_flags'])) {
+                if (isset($yamlItem['snmp_options'])) {
+                    $snmpQuery = $snmpQuery->parseOptions($yamlItem['snmp_options']);
+                } elseif (isset($yamlItem['snmp_flags'])) {
+                    // TODO: Remove once everything is converted to snmp_options
                     $snmpQuery->options($yamlItem['snmp_flags']);
                 }
                 $snmp_data = $snmpQuery->get($numeric_oids)->values();
@@ -126,7 +129,10 @@ class YamlDiscoveryDefinition
 
             if (! empty($oids)) {
                 $snmpQuery = SnmpQuery::enumStrings()->numericIndex();
-                if (isset($yamlItem['snmp_flags'])) {
+                if (isset($yamlItem['snmp_options'])) {
+                    $snmpQuery = $snmpQuery->parseOptions($yamlItem['snmp_options']);
+                } elseif (isset($yamlItem['snmp_flags'])) {
+                    // TODO: Remove once everything is converted to snmp_options
                     $snmpQuery->options($yamlItem['snmp_flags']);
                 }
                 $response = $snmpQuery->walk($oids);
@@ -186,7 +192,10 @@ class YamlDiscoveryDefinition
 
         $query = SnmpQuery::enumStrings()->numericIndex();
 
-        if (isset($data['snmp_flags'])) {
+        if (isset($yamlItem['snmp_options'])) {
+            $query = $query->parseOptions($yamlItem['snmp_options']);
+        } elseif (isset($data['snmp_flags'])) {
+            // TODO: Remove once everything is converted to snmp_options
             $query->options($data['snmp_flags']);
         }
 

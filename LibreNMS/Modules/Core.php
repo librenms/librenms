@@ -240,7 +240,6 @@ class Core implements Module
                 }
             } elseif ($key == 'snmpget') {
                 $get_value = SnmpQuery::device($device)
-                    ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
                     ->get($value['oid'])
                     ->value();
@@ -249,7 +248,6 @@ class Core implements Module
                 }
             } elseif ($key == 'snmpwalk') {
                 $walk_value = SnmpQuery::device($device)
-                    ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
                     ->walk($value['oid'])
                     ->raw;
