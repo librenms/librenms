@@ -227,6 +227,7 @@ nav:
 
   - Alerting:
     - Introduction: Alerting/index.md
+    - Operations: Alerting/Operations.md
     - Rules: Alerting/Rules.md
     - Templates: Alerting/Templates.md
     - Transport Overview: Alerting/Transports.md

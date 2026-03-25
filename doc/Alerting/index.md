@@ -1,7 +1,11 @@
 # Introduction
 
-To get started, you first need some alert rules which will react to
-changes with your devices before raising an alert.
+To get started, you should create an operation which is how you tell an alert to send a notification:
+
+[Creating alert operations](Operations.md)
+
+
+Then you need an alert rule which will react to changes with your devices before raising an alert.
 
 [Creating alert rules](Rules.md)
 
