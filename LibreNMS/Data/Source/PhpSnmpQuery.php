@@ -295,7 +295,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         // Update NetSnmp object in case we need to switch
         $this->netsnmp->numericIndex();
 
-        $this->snmp->numeric_index = true;
+        $this->snmp->numeric_index = true;  /** @phpstan-ignore property.notFound */
 
         return $this;
     }
