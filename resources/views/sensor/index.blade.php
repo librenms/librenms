@@ -10,6 +10,10 @@
                     <x-option-bar border="none" name="Health" :options="$metrics" :selected="$metric"></x-option-bar>
                 </div>
 
+                <div class="pull-left">
+                    <x-option-bar border="none" name="Status" :options="$status_bar" :selected="$status"></x-option-bar>
+                </div>
+
                 <div class="pull-right">
                     <x-option-bar border="none" :options="$views" :selected="$view"></x-option-bar>
                 </div>
@@ -39,7 +43,8 @@
             post: function () {
                 return {
                     view: '{{ $view }}',
-                    class: '{{ $metric }}'
+                    class: '{{ $metric }}',
+                    status: '{{ $status }}',
                 };
             }
         });
