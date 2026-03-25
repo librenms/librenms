@@ -28,6 +28,7 @@ namespace LibreNMS\Interfaces\Polling;
 
 use App\Models\Vminfo;
 use Illuminate\Support\Collection;
+use LibreNMS\Data\Metrics\MetricCollector;
 
 interface VminfoPolling
 {
@@ -35,7 +36,8 @@ interface VminfoPolling
      * Poll the given VMs
      *
      * @param  Collection<Vminfo>  $vms
+     * @param  MetricCollector<Vminfo>  $metrics
      * @return Collection<Vminfo>
      */
-    public function pollVminfo(Collection $vms): Collection;
+    public function pollVminfo(Collection $vms, MetricCollector $metrics): Collection;
 }
