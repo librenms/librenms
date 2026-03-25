@@ -259,7 +259,7 @@ class AppServiceProvider extends ServiceProvider
                 return true;  // super admin
             }
 
-            if ($user->hasRole('global-read') && preg_match('/^\s+\.view(All|Any)?$/', $ability)) {
+            if ($user->hasRole('global-read') && preg_match('/^(\s+\.)?view(All|Any)?$/', $ability, $match)) {
                 return true; // global read access
             }
 
