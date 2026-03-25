@@ -66,4 +66,3 @@ class AlertOperationPolicy
         return $this->hasGlobalPermission($user, 'delete');
     }
 }
-

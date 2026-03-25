@@ -39,4 +39,3 @@ return new class extends Migration
             ->delete();
     }
 };
-
