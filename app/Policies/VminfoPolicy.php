@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Facades\Permissions;
-use App\Models\Storage;
 use App\Models\User;
+use App\Models\Vminfo;
 
-class StoragePolicy
+class VminfoPolicy
 {
     use ChecksGlobalPermissions;
 
@@ -20,16 +20,24 @@ class StoragePolicy
     }
 
     /**
+     * Determine whether the user can view all models.
+     */
+    public function viewAll(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'viewAll');
+    }
+
+    /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Storage $storage): bool
+    public function view(User $user, Vminfo $vminfo): bool
     {
         if ($this->hasGlobalPermission($user, 'viewAll')) {
             return true;
         }
 
         return $this->hasGlobalPermission($user, 'view')
-            && Permissions::canAccessDevice($storage->device_id, $user);
+            && Permissions::canAccessDevice($vminfo->device_id, $user);
     }
 
     /**
