@@ -134,6 +134,9 @@ return new class extends Migration
                 ->all();
         }
 
+        /** @var array<string, array{op_id:int, segment_id:int}> $operationCache */
+        $operationCache = [];
+
         foreach (DB::table('alert_rules')->orderBy('id')->get() as $rule) {
             if ($rule->alert_operation_id !== null) {
                 continue;
@@ -159,44 +162,74 @@ return new class extends Migration
                 $to = $from;
             }
 
-            $baseName = trim((string) $rule->name) !== '' ? (string) $rule->name : 'Rule #' . $rule->id;
-            $opName = mb_substr($baseName . ' — operation', 0, 255);
-
-            $opId = DB::table('alert_operations')->insertGetId([
-                'name' => $opName,
-                'default_operation_step_duration_seconds' => max(0, $interval),
-            ]);
-
-            $segmentId = DB::table('alert_operation_segments')->insertGetId([
-                'alert_operation_id' => $opId,
-                'position' => 0,
-                'operation_phase' => 'problem',
-                'escalation_step_from' => $from,
-                'escalation_step_to' => $to,
-                'start_in_seconds' => max(0, $delay),
-                'step_duration_seconds' => 0,
-                'notifications_suppressed' => $mute,
-            ]);
-
+            $transportRows = [];
             if ($hasLegacyTransportMap) {
                 $maps = DB::table('alert_transport_map')->where('rule_id', $rule->id)->get();
                 foreach ($maps as $m) {
+                    $transportRows[] = [
+                        'transport_or_group_id' => (int) $m->transport_or_group_id,
+                        'target_type' => (string) $m->target_type,
+                    ];
+                }
+                if (empty($transportRows)) {
+                    foreach ($defaultTransportIds as $transportId) {
+                        $transportRows[] = [
+                            'transport_or_group_id' => (int) $transportId,
+                            'target_type' => 'single',
+                        ];
+                    }
+                }
+            }
+
+            // Create only unique operations: key off the legacy operation parameters + transport selection.
+            usort($transportRows, static function (array $a, array $b): int {
+                return ($a['target_type'] <=> $b['target_type']) ?: ($a['transport_or_group_id'] <=> $b['transport_or_group_id']);
+            });
+
+            $signature = sha1((string) json_encode([
+                'delay' => max(0, $delay),
+                'interval' => max(0, $interval),
+                'count' => $count,
+                'mute' => (bool) $mute,
+                'from' => $from,
+                'to' => $to,
+                'transports' => $transportRows,
+            ]));
+
+            if (isset($operationCache[$signature])) {
+                $opId = $operationCache[$signature]['op_id'];
+            } else {
+                $baseName = trim((string) $rule->name) !== '' ? (string) $rule->name : 'Rule #' . $rule->id;
+                $opName = mb_substr($baseName . ' — operation', 0, 255);
+
+                $opId = DB::table('alert_operations')->insertGetId([
+                    'name' => $opName,
+                    'default_operation_step_duration_seconds' => max(0, $interval),
+                ]);
+
+                $segmentId = DB::table('alert_operation_segments')->insertGetId([
+                    'alert_operation_id' => $opId,
+                    'position' => 0,
+                    'operation_phase' => 'problem',
+                    'escalation_step_from' => $from,
+                    'escalation_step_to' => $to,
+                    'start_in_seconds' => max(0, $delay),
+                    'step_duration_seconds' => 0,
+                    'notifications_suppressed' => $mute,
+                ]);
+
+                foreach ($transportRows as $row) {
                     DB::table('alert_operation_transport_map')->insert([
                         'segment_id' => $segmentId,
-                        'transport_or_group_id' => $m->transport_or_group_id,
-                        'target_type' => $m->target_type,
+                        'transport_or_group_id' => $row['transport_or_group_id'],
+                        'target_type' => $row['target_type'],
                     ]);
                 }
 
-                if ($maps->isEmpty()) {
-                    foreach ($defaultTransportIds as $transportId) {
-                        DB::table('alert_operation_transport_map')->insert([
-                            'segment_id' => $segmentId,
-                            'transport_or_group_id' => $transportId,
-                            'target_type' => 'single',
-                        ]);
-                    }
-                }
+                $operationCache[$signature] = [
+                    'op_id' => $opId,
+                    'segment_id' => $segmentId,
+                ];
             }
 
             DB::table('alert_rules')->where('id', $rule->id)->update([
