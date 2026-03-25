@@ -8,6 +8,7 @@ use App\Observers\VminfoObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\PowerState;
@@ -147,6 +148,11 @@ class Vminfo extends DeviceRelatedModel implements Keyable
     public function parentDevice(): HasOne
     {
         return $this->hasOne(Device::class, 'hostname', 'vmwVmDisplayName');
+    }
+
+    public function ports(): HasMany
+    {
+        return $this->hasMany(VmPort::class, 'vm_id');
     }
 
     public function getCompositeKey(): string

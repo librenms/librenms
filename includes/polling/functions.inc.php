@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\JsonAppBase64DecodeException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
 use LibreNMS\Exceptions\JsonAppExtendErroredException;
 use LibreNMS\Exceptions\JsonAppGzipDecodeException;
@@ -15,9 +14,8 @@ use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\Exceptions\JsonAppPollingFailedException;
 use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Util\Debug;
+use LibreNMS\Util\JsonApp;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Oid;
 use LibreNMS\Util\ProgressList;
 use LibreNMS\Util\UserFuncHelper;
 
@@ -391,72 +389,11 @@ function update_application($app, $response, $metrics = [], $status = '')
  * @throws JsonAppParsingFailedException
  * @throws JsonAppPollingFailedException
  * @throws JsonAppWrongVersionException
+ * @throws JsonAppGzipDecodeException
  */
-function json_app_get($device, $extend, $min_version = 1)
+function json_app_get($device, $extend, $min_version = 1): array
 {
-    $output = snmp_get($device, 'nsExtendOutputFull.' . Oid::encodeString($extend), '-Oqv', 'NET-SNMP-EXTEND-MIB');
-
-    // save for returning if not JSON
-    $orig_output = $output;
-
-    // make sure we actually get something back
-    if (empty($output)) {
-        throw new JsonAppPollingFailedException('Empty return from snmp_get.', -2);
-    }
-
-    // checks for base64 decoding and converts it to non-base64 so it can gunzip
-    if (preg_match('/^[A-Za-z0-9\/\+\n]+\=*\n*$/', $output) && ! preg_match('/^[0-9]+\n/', $output)) {
-        $output = base64_decode($output);
-        if (! $output) {
-            if (Debug::isEnabled()) {
-                echo "Decoding Base64 Failed...\n\n";
-            }
-            throw new JsonAppBase64DecodeException('Base64 decode failed.', $orig_output, -7);
-        }
-        $output = gzdecode($output);
-        if (! $output) {
-            if (Debug::isEnabled()) {
-                echo "Decoding GZip failed...\n\n";
-            }
-            throw new JsonAppGzipDecodeException('Gzip decode failed.', $orig_output, -8);
-        }
-        if (Debug::isVerbose()) {
-            echo 'Decoded Base64+GZip Output: ' . $output . "\n\n";
-        }
-    } else {
-        $output = stripslashes($output);
-        if (Debug::isVerbose()) {
-            echo 'Output post stripslashes: ' . $output . "\n\n";
-        }
-    }
-
-    //  turn the JSON into a array
-    $parsed_json = json_decode($output, true);
-
-    // improper JSON or something else was returned. Populate the variable with an error.
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new JsonAppParsingFailedException('Invalid JSON', $orig_output, -3);
-    }
-
-    // There no keys in the array, meaning '{}' was was returned
-    if (empty($parsed_json)) {
-        throw new JsonAppBlankJsonException('Blank JSON returned.', $output, -4);
-    }
-
-    // It is a legacy JSON app extend, meaning these are not set
-    if (! isset($parsed_json['error'], $parsed_json['data'], $parsed_json['errorString'], $parsed_json['version'])) {
-        throw new JsonAppMissingKeysException('Legacy script or extend error, missing one or more required keys.', $output, $parsed_json, -5);
-    }
-
-    if ($parsed_json['version'] < $min_version) {
-        throw new JsonAppWrongVersionException("Script,'" . $parsed_json['version'] . "', older than required version of '$min_version'", $output, $parsed_json, -6);
-    }
-
-    if ($parsed_json['error'] != 0) {
-        throw new JsonAppExtendErroredException("Script returned exception: {$parsed_json['errorString']}", $output, $parsed_json, $parsed_json['error']);
-    }
-
-    return $parsed_json;
+    return JsonApp::fetch($extend, (string) $min_version)->data;
 }
 
 /**
