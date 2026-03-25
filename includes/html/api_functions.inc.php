@@ -397,7 +397,7 @@ function list_devices(Illuminate\Http\Request $request)
         $sql = '1';
     }
 
-    if (Gate::denies('viewAny', Device::class)) {
+    if (Gate::denies('viewAll', Device::class)) {
         $sql .= ' AND `d`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $param[] = Auth::id();
     }
@@ -809,7 +809,7 @@ function list_cbgp(Illuminate\Http\Request $request)
         $sql = ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
     }
-    if (Gate::denies('viewAny', BgpPeer::class)) {
+    if (Gate::denies('viewAll', BgpPeer::class)) {
         $sql .= ' AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $sql_params[] = Auth::id();
     }
@@ -1703,7 +1703,8 @@ function delete_rule(Illuminate\Http\Request $request)
 {
     $rule_id = $request->route('id');
     if (is_numeric($rule_id)) {
-        if (dbDelete('alert_rules', '`id` =  ? LIMIT 1', [$rule_id])) {
+        $rule = \App\Models\AlertRule::find($rule_id);
+        if ($rule && $rule->delete()) {
             return api_success_noresult(200, 'Alert rule has been removed');
         } else {
             return api_success_noresult(200, 'No alert rule by that ID');
@@ -1927,7 +1928,7 @@ function list_bills(Illuminate\Http\Request $request)
     } else {
         $sql = '1';
     }
-    if (Gate::denies('viewAny', \App\Models\Bill::class)) {
+    if (Gate::denies('viewAll', \App\Models\Bill::class)) {
         $sql .= ' AND `bill_id` IN (SELECT `bill_id` FROM `bill_perms` WHERE `user_id` = ?)';
         $param[] = Auth::id();
     }
@@ -2107,13 +2108,12 @@ function delete_bill(Illuminate\Http\Request $request)
         return api_error(400, 'Could not remove bill with id ' . $bill_id . '. Invalid id');
     }
 
-    $res = dbDelete('bills', '`bill_id` =  ? LIMIT 1', [$bill_id]);
+    $res = \App\Models\Bill::where('bill_id', $bill_id)->delete();
     if ($res == 1) {
-        dbDelete('bill_ports', '`bill_id` =  ? ', [$bill_id]);
-        dbDelete('bill_data', '`bill_id` =  ? ', [$bill_id]);
-        dbDelete('bill_history', '`bill_id` =  ? ', [$bill_id]);
-        dbDelete('bill_history', '`bill_id` =  ? ', [$bill_id]);
-        dbDelete('bill_perms', '`bill_id` =  ? ', [$bill_id]);
+        \App\Models\BillPort::where('bill_id', $bill_id)->delete();
+        \App\Models\BillData::where('bill_id', $bill_id)->delete();
+        \App\Models\BillHistory::where('bill_id', $bill_id)->delete();
+        \App\Models\BillPerm::where('bill_id', $bill_id)->delete();
 
         return api_success_noresult(200, 'Bill has been removed');
     }
@@ -2271,7 +2271,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
 
     // set previously checked ports
     if (is_array($ports_add)) {
-        dbDelete('bill_ports', "`bill_id` =  $bill_id");
+        \App\Models\BillPort::where('bill_id', $bill_id)->delete();
         if (count($ports_add) > 0) {
             foreach ($ports_add as $port_id) {
                 dbInsert(['bill_id' => $bill_id, 'port_id' => $port_id, 'bill_port_autoadded' => 0], 'bill_ports');
@@ -2777,7 +2777,7 @@ function list_vrf(Illuminate\Http\Request $request)
         $sql = '  AND `vrfs`.`vrf_name`=?';
         $sql_params = [$vrfname];
     }
-    if (Gate::denies('viewAny', Vrf::class)) {
+    if (Gate::denies('viewAll', Vrf::class)) {
         $sql .= ' AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $sql_params[] = Auth::id();
     }
@@ -2863,7 +2863,7 @@ function list_vlans(Illuminate\Http\Request $request)
         $sql = ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
     }
-    if (Gate::denies('viewAny', Vlan::class)) {
+    if (Gate::denies('viewAll', Vlan::class)) {
         $sql .= ' AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $sql_params[] = Auth::id();
     }
@@ -2892,7 +2892,7 @@ function list_links(Illuminate\Http\Request $request)
         $sql = ' AND `links`.`local_device_id`=?';
         $sql_params = [$device_id];
     }
-    if (Gate::denies('viewAny', Link::class)) {
+    if (Gate::denies('viewAll', Link::class)) {
         $sql .= ' AND `links`.`local_device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $sql_params[] = Auth::id();
     }
@@ -3379,7 +3379,7 @@ function add_service_template_for_device_group(Illuminate\Http\Request $request)
 
 function get_service_templates(Illuminate\Http\Request $request)
 {
-    if ($request->user()->cannot('viewAny', ServiceTemplate::class)) {
+    if ($request->user()->cannot('viewAll', ServiceTemplate::class)) {
         return api_error(403, 'Insufficient permissions to access service templates');
     }
 
@@ -3410,7 +3410,7 @@ function add_service_for_host(Illuminate\Http\Request $request)
     $service_ignore = $data['ignore'] ? true : false; // Default false
     $service_disable = $data['disable'] ? true : false; // Default false
     $service_name = $data['name'];
-    $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int) $service_ignore, (int) $service_disable, 0, $service_name);
+    $service_id = \LibreNMS\Services::addService($device_id, $service_type, $service_desc, $service_ip, $service_param, (int) $service_ignore, (int) $service_disable, 0, $service_name);
     if ($service_id != false) {
         return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
     }
@@ -3557,7 +3557,7 @@ function del_location(Illuminate\Http\Request $request)
         'location_id' => 0,
     ];
     dbUpdate($data, 'devices', '`location_id` = ?', [$location_id]);
-    $result = dbDelete('locations', '`id` = ? ', [$location_id]);
+    $result = \App\Models\Location::where('id', $location_id)->delete();
     if ($result == 1) {
         return api_success_noresult(201, "Location $location has been deleted successfully");
     }

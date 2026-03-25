@@ -3971,6 +3971,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3990,6 +3991,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4009,6 +4011,7 @@
                     "entPhysicalContainedIn": 1000001,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4028,6 +4031,7 @@
                     "entPhysicalContainedIn": 1000002,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4047,6 +4051,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4066,6 +4071,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4085,6 +4091,7 @@
                     "entPhysicalContainedIn": 10000001,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4104,6 +4111,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4123,6 +4131,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4142,6 +4151,7 @@
                     "entPhysicalContainedIn": 10100000,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4161,6 +4171,7 @@
                     "entPhysicalContainedIn": 10100001,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4180,6 +4191,7 @@
                     "entPhysicalContainedIn": 10100001,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4199,6 +4211,7 @@
                     "entPhysicalContainedIn": 10100001,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4218,6 +4231,7 @@
                     "entPhysicalContainedIn": 10100300,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 101003
                 },
                 {
@@ -4237,6 +4251,7 @@
                     "entPhysicalContainedIn": 10100301,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4256,6 +4271,7 @@
                     "entPhysicalContainedIn": 10100301,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4275,6 +4291,7 @@
                     "entPhysicalContainedIn": 10100301,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4294,6 +4311,7 @@
                     "entPhysicalContainedIn": 10100301,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4313,6 +4331,7 @@
                     "entPhysicalContainedIn": 10100301,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4332,6 +4351,7 @@
                     "entPhysicalContainedIn": 10100301,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4351,6 +4371,7 @@
                     "entPhysicalContainedIn": 10100001,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4370,6 +4391,7 @@
                     "entPhysicalContainedIn": 10100400,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 101004
                 },
                 {
@@ -4389,6 +4411,7 @@
                     "entPhysicalContainedIn": 10100401,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4408,6 +4431,7 @@
                     "entPhysicalContainedIn": 10100401,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4427,6 +4451,7 @@
                     "entPhysicalContainedIn": 10100401,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4446,6 +4471,7 @@
                     "entPhysicalContainedIn": 10100401,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4465,6 +4491,7 @@
                     "entPhysicalContainedIn": 10100401,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4484,6 +4511,7 @@
                     "entPhysicalContainedIn": 10100401,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV FLEXOPTIX",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4503,6 +4531,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4522,6 +4551,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4541,6 +4571,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4560,6 +4591,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4579,6 +4611,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4598,6 +4631,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4617,6 +4651,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4636,6 +4671,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4655,6 +4691,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4674,6 +4711,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4693,6 +4731,7 @@
                     "entPhysicalContainedIn": 11100000,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4712,6 +4751,7 @@
                     "entPhysicalContainedIn": 11100001,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 111001
                 },
                 {
@@ -4731,6 +4771,7 @@
                     "entPhysicalContainedIn": 11100101,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4750,6 +4791,7 @@
                     "entPhysicalContainedIn": 11100001,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 111002
                 },
                 {
@@ -4769,6 +4811,7 @@
                     "entPhysicalContainedIn": 11100201,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4788,6 +4831,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4807,6 +4851,7 @@
                     "entPhysicalContainedIn": 11200000,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4826,6 +4871,7 @@
                     "entPhysicalContainedIn": 11200001,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 112001
                 },
                 {
@@ -4845,6 +4891,7 @@
                     "entPhysicalContainedIn": 11200101,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4864,6 +4911,7 @@
                     "entPhysicalContainedIn": 11200101,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4883,6 +4931,7 @@
                     "entPhysicalContainedIn": 11200101,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4902,6 +4951,7 @@
                     "entPhysicalContainedIn": 11200101,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4921,6 +4971,7 @@
                     "entPhysicalContainedIn": 11200001,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 112002
                 },
                 {
@@ -4940,6 +4991,7 @@
                     "entPhysicalContainedIn": 11200201,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4959,6 +5011,7 @@
                     "entPhysicalContainedIn": 11200201,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4978,6 +5031,7 @@
                     "entPhysicalContainedIn": 11200201,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -4997,6 +5051,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5016,6 +5071,7 @@
                     "entPhysicalContainedIn": 11300000,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5035,6 +5091,7 @@
                     "entPhysicalContainedIn": 11300001,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5054,6 +5111,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5073,6 +5131,7 @@
                     "entPhysicalContainedIn": 11400000,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5092,6 +5151,7 @@
                     "entPhysicalContainedIn": 11400001,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 114001
                 },
                 {
@@ -5111,6 +5171,7 @@
                     "entPhysicalContainedIn": 11400101,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5130,6 +5191,7 @@
                     "entPhysicalContainedIn": 11400101,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5149,6 +5211,7 @@
                     "entPhysicalContainedIn": 11400101,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5168,6 +5231,7 @@
                     "entPhysicalContainedIn": 11400101,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5187,6 +5251,7 @@
                     "entPhysicalContainedIn": 11400001,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 114002
                 },
                 {
@@ -5206,6 +5271,7 @@
                     "entPhysicalContainedIn": 11400201,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5225,6 +5291,7 @@
                     "entPhysicalContainedIn": 11400201,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5244,6 +5311,7 @@
                     "entPhysicalContainedIn": 11400201,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5263,6 +5331,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5282,6 +5351,7 @@
                     "entPhysicalContainedIn": 11500000,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5301,6 +5371,7 @@
                     "entPhysicalContainedIn": 11500001,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5320,6 +5391,7 @@
                     "entPhysicalContainedIn": 10000000,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5339,6 +5411,7 @@
                     "entPhysicalContainedIn": 11600000,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5358,6 +5431,7 @@
                     "entPhysicalContainedIn": 11600001,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 116001
                 },
                 {
@@ -5377,6 +5451,7 @@
                     "entPhysicalContainedIn": 11600101,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5396,6 +5471,7 @@
                     "entPhysicalContainedIn": 11600001,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5415,6 +5491,7 @@
                     "entPhysicalContainedIn": 11600001,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5434,6 +5511,7 @@
                     "entPhysicalContainedIn": 11600001,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 116004
                 },
                 {
@@ -5453,6 +5531,7 @@
                     "entPhysicalContainedIn": 11600401,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "MRV Communications",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

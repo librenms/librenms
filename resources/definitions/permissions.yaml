@@ -1,20 +1,19 @@
 groups:
     alert:
-        - alert.viewAny
+        - alert.viewAll
         - alert.view
         - alert.detail
         - alert.update
         - alert.delete
 
     alert-rule:
-        - alert-rule.viewAny
+        - alert-rule.viewAll
         - alert-rule.view
         - alert-rule.create
         - alert-rule.update
         - alert-rule.delete
 
     alert-schedule:
-        - alert-schedule.viewAny
         - alert-schedule.view
         - alert-schedule.create
         - alert-schedule.update
@@ -42,7 +41,7 @@ groups:
         - auth-log.view
 
     bill:
-        - bill.viewAny
+        - bill.viewAll
         - bill.view
         - bill.create
         - bill.update
@@ -52,7 +51,7 @@ groups:
         - component.update
 
     custom-map:
-        - custom-map.viewAny
+        - custom-map.viewAll
         - custom-map.view
         - custom-map.create
         - custom-map.update
@@ -62,7 +61,7 @@ groups:
         - dashboard.copy
 
     device:
-        - device.viewAny
+        - device.viewAll
         - device.view
         - device.create
         - device.update
@@ -72,17 +71,17 @@ groups:
         - device.updateNotes
 
     device-group:
-        - device-group.viewAny
+        - device-group.viewAll
         - device-group.view
         - device-group.create
         - device-group.update
         - device-group.delete
 
     link:
-        - link.viewAny
+        - link.viewAll
 
     location:
-        - location.viewAny
+        - location.viewAll
         - location.view
         - location.create
         - location.update
@@ -99,42 +98,47 @@ groups:
         - oxidized.refresh
         - oxidized.search
 
+    peering-db:
+        - peering-db.view
+
     plugin:
         - plugin.admin
 
     poller:
-        - poller.viewAny
         - poller.view
         - poller.update
         - poller.delete
 
     poller-group:
-        - poller-group.viewAny
         - poller-group.create
         - poller-group.update
         - poller-group.delete
 
     port:
-        - port.viewAny
+        - port.viewAll
         - port.view
         - port.update
         - port.delete
 
     port-group:
-        - port-group.viewAny
+        - port-group.viewAll
         - port-group.create
         - port-group.update
         - port-group.delete
 
     processor:
+        - processor.viewAll
+        - processor.view
         - processor.update
 
+    reporting:
+        - reporting.update
+
     role:
-        - role.viewAny
         - role.update
 
     routing:
-        - routing.viewAny
+        - routing.viewAll
         - routing.view
         - routing.update
 
@@ -145,28 +149,31 @@ groups:
         - service.delete
 
     service-template:
-        - service-template.viewAny
         - service-template.view
         - service-template.create
         - service-template.update
         - service-template.delete
 
     settings:
-        - settings.viewAny
+        - settings.view
         - settings.update
 
     syslog:
         - syslog.delete
 
     user:
-        - user.viewAny
         - user.view
         - user.create
         - user.update
         - user.delete
 
     vlan:
-        - vlan.viewAny
+        - vlan.viewAll
+
+    vminfo:
+        - vminfo.viewAll
+        - vminfo.view
+        - vminfo.update
 
     wireless-sensor:
         - wireless-sensor.update

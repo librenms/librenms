@@ -13,6 +13,7 @@
  */
 
 use App\Facades\LibrenmsConfig;
+use App\Models\AlertSchedulable;
 use App\Models\AlertSchedule;
 use App\Models\UserPref;
 use Illuminate\Support\Str;
@@ -148,7 +149,7 @@ if ($sub_type == 'new-maintenance') {
             $fail = 0;
 
             if ($update == 1) {
-                dbDelete('alert_schedulables', '`schedule_id`=?', [$alert_schedule->schedule_id]);
+                AlertSchedulable::where('schedule_id', $alert_schedule->schedule_id)->delete();
             }
 
             foreach ($maps as $target) {
@@ -176,10 +177,10 @@ if ($sub_type == 'new-maintenance') {
 
             if ($fail == 1 && $update == 0) {
                 foreach ($items as $item) {
-                    dbDelete('alert_schedulables', '`item_id`=?', [$item]);
+                    AlertSchedulable::where('item_id', $item)->delete();
                 }
 
-                dbDelete('alert_schedule', '`schedule_id`=?', [$alert_schedule->schedule_id]);
+                AlertSchedule::where('schedule_id', $alert_schedule->schedule_id)->delete();
                 $message = 'Issue scheduling maintenance';
             } else {
                 $status = 'ok';
@@ -232,8 +233,8 @@ if ($sub_type == 'new-maintenance') {
 } elseif ($sub_type == 'del-maintenance') {
     Gate::authorize('delete', AlertSchedule::class);
     $schedule_id = $_POST['del_schedule_id'];
-    dbDelete('alert_schedule', '`schedule_id`=?', [$schedule_id]);
-    dbDelete('alert_schedulables', '`schedule_id`=?', [$schedule_id]);
+    AlertSchedule::where('schedule_id', $schedule_id)->delete();
+    AlertSchedulable::where('schedule_id', $schedule_id)->delete();
     $status = 'ok';
     $message = 'Maintenance schedule has been removed';
     $response = [

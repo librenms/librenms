@@ -25,6 +25,8 @@
  */
 
 use App\Models\AlertTransport;
+use App\Models\AlertTransportGroup;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
@@ -67,8 +69,10 @@ if (empty($name)) {
     }
 
     if (is_numeric($group_id) && $group_id > 0) {
-        $sql = 'SELECT `transport_id` FROM `transport_group_transport` WHERE `transport_group_id`=?';
-        $db_members = dbFetchColumn($sql, [$group_id]);
+        $db_members = AlertTransportGroup::find($group_id)
+            ->transports()
+            ->pluck('alert_transports.transport_id')
+            ->all();
 
         // Compare arrays to get added and removed transports
         $add = array_diff($target_members, $db_members);
@@ -83,12 +87,12 @@ if (empty($name)) {
             ];
         }
         if (! empty($insert)) {
-            dbBulkInsert($insert, 'transport_group_transport');
+            DB::table('transport_group_transport')->insert($insert);
         }
 
         // Remove old transport group members
         if (! empty($remove)) {
-            dbDelete('transport_group_transport', 'transport_group_id=? AND `transport_id` IN ' . dbGenPlaceholders(count($remove)), array_merge([$group_id], $remove));
+            \App\Models\TransportGroupTransport::where('transport_group_id', $group_id)->whereIn('transport_id', $remove)->delete();
         }
         $message = 'Updated alert transport group';
     } else {

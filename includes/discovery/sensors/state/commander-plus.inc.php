@@ -26,7 +26,7 @@
 $start_oid = '.1.3.6.1.4.1.18642.1.2.4';
 $state_table = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.18642.1.2.4', [], 'CCPOWER-MIB');
 $x = 1;
-foreach ($state_table[0] as $state_name => $state_value) {
+foreach ($state_table[0] ?? [] as $state_name => $state_value) {
     //Create State Translation
     $states = [
         ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'inactive'],
