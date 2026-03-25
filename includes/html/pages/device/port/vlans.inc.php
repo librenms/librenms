@@ -4,20 +4,12 @@ use LibreNMS\Util\Rewrite;
 
 $vlans = dbFetchRows("SELECT * FROM `ports_vlans` AS PV, vlans AS V WHERE PV.`port_id` = '" . $port['port_id'] . "' and PV.`device_id` = '" . $device['device_id'] . "' AND V.`vlan_vlan` = PV.vlan AND V.device_id = PV.device_id");
 
-echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
+echo '<table class="table table-hover table-striped table-condensed">';
 
 echo '<tr><th>VLAN</th><th>Description</th><th>Cost</th><th>Priority</th><th>State</th><th>Other Ports</th></tr>';
 
-$row = 0;
 foreach ($vlans as $vlan) {
-    $row++;
-    if (is_int($row / 2)) {
-        $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
-    } else {
-        $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
-    }
-
-    echo '<tr bgcolor="' . $row_colour . '">';
+    echo '<tr>';
 
     echo '<td width=100 class=list-large> Vlan ' . $vlan['vlan'] . '</td>';
     echo '<td width=200 class=box-desc>' . $vlan['vlan_name'] . '</td>';
