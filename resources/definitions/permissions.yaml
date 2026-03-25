@@ -158,6 +158,11 @@ groups:
         - settings.view
         - settings.update
 
+    ssl-certificate:
+        - ssl-certificate.view
+        - ssl-certificate.create
+        - ssl-certificate.delete
+
     syslog:
         - syslog.delete
 

@@ -10,14 +10,14 @@ class SslCertificateController extends Controller
 {
     public function __construct()
     {
-        $this->authorizeResource(SslCertificate::class, 'ssl_certificate');
+        $this->authorizeResource(SslCertificate::class);
     }
-
     /**
      * Display a listing of SSL certificates.
      */
     public function index()
     {
+        $this->authorize('viewAny', SslCertificate::class);
         return view('ssl-certificates.index');
     }
 
@@ -26,9 +26,8 @@ class SslCertificateController extends Controller
      */
     public function create()
     {
-        $devices = Device::hasAccess(request()->user())->orderBy('hostname')->get(['device_id', 'hostname']);
-
-        return view('ssl-certificates.create', ['devices' => $devices]);
+        $this->authorize('create', SslCertificate::class);
+        return view('ssl-certificates.create');
     }
 
     /**
@@ -36,6 +35,7 @@ class SslCertificateController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', SslCertificate::class);
         $validated = $request->validate([
             'host' => 'required|string|max:255',
             'port' => 'nullable|integer|min:1|max:65535',
@@ -45,20 +45,7 @@ class SslCertificateController extends Controller
         $host = $validated['host'];
         $port = (int) ($validated['port'] ?? 443);
         $deviceId = $validated['device_id'] ?? null;
-
-        if ($deviceId !== null) {
-            $hasAccess = Device::hasAccess($request->user())
-                ->where('device_id', $deviceId)
-                ->exists();
-            if (! $hasAccess) {
-                return redirect()->route('ssl-certificates.create')
-                    ->withInput()
-                    ->withErrors([
-                        'device_id' => __('You are not allowed to use the selected device.'),
-                    ]);
-            }
-        }
-
+       
         try {
             $cert = SslCertificate::fetchAndParse($host, $port);
         } catch (\Throwable $e) {
@@ -84,6 +71,7 @@ class SslCertificateController extends Controller
      */
     public function show(SslCertificate $ssl_certificate)
     {
+        $this->authorize('viewAny', SslCertificate::class);
         $ssl_certificate->load('device');
 
         return view('ssl-certificates.show', ['certificate' => $ssl_certificate]);
@@ -94,6 +82,7 @@ class SslCertificateController extends Controller
      */
     public function update(Request $request, SslCertificate $ssl_certificate)
     {
+        $this->authorize('update', $ssl_certificate);
         $request->validate([
             'disabled' => 'sometimes|boolean',
         ]);
@@ -116,6 +105,7 @@ class SslCertificateController extends Controller
      */
     public function destroy(Request $request, SslCertificate $ssl_certificate)
     {
+        $this->authorize('delete', $ssl_certificate);
         $ssl_certificate->delete();
 
         if ($request->wantsJson()) {

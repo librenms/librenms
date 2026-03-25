@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
 use App\Models\SslCertificate;
 use App\Models\User;
 
@@ -14,16 +15,30 @@ class SslCertificatePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAny');
+        return $this->hasGlobalPermission($user, 'view')
+            || $this->hasGlobalPermission($user, 'viewAll')
+            || $this->hasGlobalPermission($user, 'create')
+            || $this->hasGlobalPermission($user, 'delete');
+    }
+
+    /**
+     * Determine whether the user can view all SSL certificates.
+     */
+    public function viewAll(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'viewAll');
     }
 
     /**
      * Determine whether the user can view the SSL certificate.
      */
-    public function view(User $user, SslCertificate $sslCertificate): bool
+    public function view(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
-            && SslCertificate::hasAccess($user)->where('id', $sslCertificate->id)->exists();
+        if ($this->hasGlobalPermission($user, 'viewAll')) {
+            return true;
+        }
+
+        return $this->hasGlobalPermission($user, 'view');
     }
 
     /**
@@ -35,20 +50,10 @@ class SslCertificatePolicy
     }
 
     /**
-     * Determine whether the user can update the SSL certificate.
-     */
-    public function update(User $user, SslCertificate $sslCertificate): bool
-    {
-        return $this->hasGlobalPermission($user, 'update')
-            && SslCertificate::hasAccess($user)->where('id', $sslCertificate->id)->exists();
-    }
-
-    /**
      * Determine whether the user can delete the SSL certificate.
      */
-    public function delete(User $user, SslCertificate $sslCertificate): bool
+    public function delete(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'delete')
-            && SslCertificate::hasAccess($user)->where('id', $sslCertificate->id)->exists();
+        return $this->hasGlobalPermission($user, 'delete');
     }
 }
