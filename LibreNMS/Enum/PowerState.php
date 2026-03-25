@@ -30,7 +30,7 @@ abstract class PowerState
     public static function parse(string $state): int
     {
         return match (strtolower($state)) {
-            'powered off', 'powerdoff', 'shut off' => self::OFF,
+            'powered off', 'powerdoff', 'shut off', 'stopped' => self::OFF,
             'powered on', 'poweredon', 'running' => self::ON,
             'suspended', 'paused' => self::SUSPENDED,
             default => self::UNKNOWN,

@@ -11,7 +11,6 @@ use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\Exceptions\JsonAppPollingFailedException;
 use LibreNMS\Exceptions\JsonAppWrongVersionException;
-use Psr\SimpleCache\InvalidArgumentException;
 use SnmpQuery;
 
 readonly class JsonApp
@@ -32,22 +31,18 @@ readonly class JsonApp
      * @throws JsonAppParsingFailedException
      * @throws JsonAppPollingFailedException
      * @throws JsonAppWrongVersionException
-     * @throws InvalidOidException
-     * @throws InvalidArgumentException
      * @throws JsonAppGzipDecodeException
      */
     public static function fetch(string $app, string $minVersion = '1.0'): self
     {
-        $agent_data = Cache::driver('array')->get('agent_data');
-        if (isset($agent_data['app'][$app])) {
-            $raw_output = $agent_data['app'][$app];
-        } else {
-            $snmp_response = SnmpQuery::walk("NET-SNMP-EXTEND-MIB::nsExtendOutputFull.\"$app\"");
-            $raw_output = $snmp_response->value();
+        $raw_output = Cache::driver('array')->get('agent_data')['app'][$app] ?? null;
 
-            // a bit cheeky caching
-//            $agent_data['app'][$app] = $raw_output;
-//            Cache::driver('array')->put('agent_data', $agent_data);
+        if ($raw_output === null) {
+            try {
+                $raw_output = SnmpQuery::walk("NET-SNMP-EXTEND-MIB::nsExtendOutputFull.\"$app\"")->value();
+            } catch (InvalidOidException) {
+                $raw_output = '';
+            }
         }
 
         $output = self::parseBase64Encoded(trim($raw_output));
