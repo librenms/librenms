@@ -101,14 +101,13 @@ class PhpSnmpQuery implements SnmpQueryInterface
             $this->device->retries ?? LibrenmsConfig::get('snmp.retries'),
         );
         $this->snmp->quick_print = true;
-        $this->snmp->valueretrieval = SNMP_VALUE_PLAIN;
 
         if ($this->device->snmpver === 'v3') {
             $this->snmp->setSecurity(...self::getSecurityOptions($this->device, null));
         }
 
-        // Copy settings from old SNMP object
         if ($old_snmp) {
+            // Copy settings from old SNMP object
             $this->snmp->oid_increasing_check = $old_snmp->oid_increasing_check;
             $this->snmp->enum_print = $old_snmp->enum_print;
             $this->snmp->numeric_timeticks = $old_snmp->numeric_timeticks; /** @phpstan-ignore property.notFound, property.notFound */
@@ -118,6 +117,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
                 $this->snmp->oid_output_format = $old_snmp->oid_output_format;
             }
         } else {
+            // Set default settings
             $this->snmp->oid_increasing_check = true;
             $this->snmp->enum_print = true;
             $this->snmp->numeric_timeticks = true;  /** @phpstan-ignore property.notFound */
