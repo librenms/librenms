@@ -608,9 +608,7 @@ class ModuleTestHelper
         if ($this->quiet) {
             Debug::setOnly($save_debug);
             Debug::setVerbose($save_vedbug);
-            if (! $save_debug) {
-                Debug::disableCliDebugOutput();
-            }
+            Debug::disableCliDebugOutput();
         } else {
             ob_flush();
         }
@@ -642,9 +640,7 @@ class ModuleTestHelper
         if ($this->quiet) {
             Debug::setOnly($save_debug);
             Debug::setVerbose($save_vedbug);
-            if (! $save_debug) {
-                Debug::disableCliDebugOutput();
-            }
+            Debug::disableCliDebugOutput();
         } else {
             ob_flush();
         }
