@@ -1,5 +1,3 @@
-# Microsoft Teams
-
 ## Microsoft Teams
 
 LibreNMS can send alerts to a Microsoft Teams channel using an Incoming Webhook. The transport supports both the **legacy Office 365 Connector** webhooks and the newer **Power Automate Workflow** webhooks, and automatically selects the correct payload format based on the webhook URL — no manual configuration is required.
