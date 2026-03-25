@@ -305,6 +305,9 @@ class ServiceTemplateController extends Controller
     public function applyDeviceAll(int $device_id): void
     {
         foreach (ServiceTemplate::all() as $template) {
+            if ($template->type == 'dynamic') {
+                $template->updateDevices();
+            }
             $this->applyDevice($template, $device_id);
         }
     }
