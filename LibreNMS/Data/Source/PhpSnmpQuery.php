@@ -214,9 +214,14 @@ class PhpSnmpQuery implements SnmpQueryInterface
 
         $this->mibs = array_merge($this->mibs, $mibs);
 
-        // Read it in immediately if we are initialised
         if ($this->mibinit) {
-            $this->readMibs($mibs);
+            if ($append) {
+                // Read new MIBs immediately if we are initialised and appending
+                $this->readMibs($mibs);
+            } else {
+                // Reset the mibinit flag if we need to reset the MIBs to the new list
+                $this->mibinit = false;
+            }
         }
 
         return $this;
