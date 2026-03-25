@@ -178,8 +178,8 @@ class PhpSnmpQuery implements SnmpQueryInterface
             if ($this->device->snmpver === 'v3') {
                 $this->snmp->setSecurity(...self::getSecurityOptions($this->device, $v3_prefix . $context));
             } else {
-                // Cannot change context for community based
-                throw new \Exception('Cannot change context for v1/v2c');
+                // php-snmp doesn't support changing community.  Fall back to NetSnmp
+                return $this->netsnmp;
             }
         } else {
             if ($this->device->snmpver === 'v3') {
