@@ -22,7 +22,18 @@
  *
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
- *
+ */
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Gate;
+use LibreNMS\Enum\AlertState;
+
+/**
  * @property int $id
  * @property string $name
  * @property string $severity
@@ -36,16 +47,6 @@
  * @property int|null $alert_operation_id
  * @property AlertOperation|null $alertOperation
  */
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Gate;
-use LibreNMS\Enum\AlertState;
-
 class AlertRule extends BaseModel
 {
     public $timestamps = false;

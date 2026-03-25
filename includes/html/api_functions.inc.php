@@ -1902,7 +1902,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
             api_assign_rule_alert_operation_from_legacy_api((int) $rule_id, $operations, $name, $defaultOperationStepDuration);
         } catch (\InvalidArgumentException $e) {
             return api_error(400, $e->getMessage());
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             return api_error(500, 'Failed to save alert rule operations');
         }
     }

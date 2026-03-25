@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 /**
  * Named alert operation: contains one or more {@see AlertOperationSegment} rows
  * (escalation ranges, timing, transports per segment).
@@ -12,9 +14,6 @@ namespace App\Models;
  * @property string $name
  * @property int|null $default_operation_step_duration_seconds
  */
-
-use Illuminate\Database\Eloquent\Relations\HasMany;
-
 class AlertOperation extends BaseModel
 {
     public $timestamps = false;

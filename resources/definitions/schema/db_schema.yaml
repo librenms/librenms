@@ -72,6 +72,42 @@ alert_log:
     alert_log_device_id_rule_id_time_logged_index: { Name: alert_log_device_id_rule_id_time_logged_index, Columns: [device_id, rule_id, time_logged], Unique: false, Type: BTREE }
     alert_log_rule_id_device_id_state_index: { Name: alert_log_rule_id_device_id_state_index, Columns: [rule_id, device_id, state], Unique: false, Type: BTREE }
     alert_log_time_logged_index: { Name: alert_log_time_logged_index, Columns: [time_logged], Unique: false, Type: BTREE }
+alert_operations:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: default_operation_step_duration_seconds, Type: 'int unsigned', 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+alert_operation_segments:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: alert_operation_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: position, Type: 'smallint unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: operation_phase, Type: varchar(16), 'Null': false, Extra: '', Default: problem }
+    - { Field: escalation_step_from, Type: 'int unsigned', 'Null': false, Extra: '', Default: '1' }
+    - { Field: escalation_step_to, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: start_in_seconds, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: step_duration_seconds, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: notifications_suppressed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    aos_ao_phase_idx: { Name: aos_ao_phase_idx, Columns: [alert_operation_id, operation_phase], Unique: false, Type: BTREE }
+    aos_ao_position_idx: { Name: aos_ao_position_idx, Columns: [alert_operation_id, position], Unique: false, Type: BTREE }
+  Constraints:
+    aos_ao_fk: { name: aos_ao_fk, foreign_key: alert_operation_id, table: alert_operations, key: id, extra: 'ON DELETE CASCADE' }
+alert_operation_transport_map:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: segment_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: transport_or_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: target_type, Type: varchar(16), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    ao_tm_ao_target_idx: { Name: ao_tm_ao_target_idx, Columns: [target_type], Unique: false, Type: BTREE }
+    ao_tm_seg_target_idx: { Name: ao_tm_seg_target_idx, Columns: [segment_id, target_type], Unique: false, Type: BTREE }
+  Constraints:
+    ao_tm_seg_fk: { name: ao_tm_seg_fk, foreign_key: segment_id, table: alert_operation_segments, key: id, extra: 'ON DELETE CASCADE' }
 alert_rules:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -87,7 +123,10 @@ alert_rules:
     - { Field: alert_operation_id, Type: 'int unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    alert_rules_alert_operation_fk: { Name: alert_rules_alert_operation_fk, Columns: [alert_operation_id], Unique: false, Type: BTREE }
     alert_rules_name_unique: { Name: alert_rules_name_unique, Columns: [name], Unique: true, Type: BTREE }
+  Constraints:
+    alert_rules_alert_operation_fk: { name: alert_rules_alert_operation_fk, foreign_key: alert_operation_id, table: alert_operations, key: id, extra: 'ON DELETE SET NULL' }
 alert_schedulables:
   Columns:
     - { Field: item_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -142,37 +181,6 @@ alert_transport_groups:
     - { Field: transport_group_name, Type: varchar(30), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [transport_group_id], Unique: true, Type: BTREE }
-alert_operations:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: name, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: default_operation_step_duration_seconds, Type: 'int unsigned', 'Null': true, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-alert_operation_segments:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: alert_operation_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: position, Type: 'smallint unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: operation_phase, Type: varchar(16), 'Null': false, Extra: '', Default: problem }
-    - { Field: escalation_step_from, Type: 'int unsigned', 'Null': false, Extra: '', Default: '1' }
-    - { Field: escalation_step_to, Type: 'int unsigned', 'Null': true, Extra: '' }
-    - { Field: start_in_seconds, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: step_duration_seconds, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: notifications_suppressed, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    aos_ao_position_idx: { Name: aos_ao_position_idx, Columns: [alert_operation_id, position], Unique: false, Type: BTREE }
-    aos_ao_phase_idx: { Name: aos_ao_phase_idx, Columns: [alert_operation_id, operation_phase], Unique: false, Type: BTREE }
-alert_operation_transport_map:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: segment_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: transport_or_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: target_type, Type: varchar(16), 'Null': false, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    ao_tm_seg_target_idx: { Name: ao_tm_seg_target_idx, Columns: [segment_id, target_type], Unique: false, Type: BTREE }
 api_tokens:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

@@ -154,7 +154,7 @@ if (isset($device_id) && $device_id > 0) {
 $full_query .= ' ORDER BY name ASC';
 
 $rule_list = dbFetchRows($full_query, $param);
-$opIdsAll = array_unique(array_filter(array_map('intval', array_column($rule_list, 'alert_operation_id'))));
+$opIdsAll = array_unique(array_filter(array_map(intval(...), array_column($rule_list, 'alert_operation_id'))));
 $opDefaults = $opIdsAll === [] ? [] : \App\Models\AlertOperation::query()->whereIn('id', $opIdsAll)->pluck('default_operation_step_duration_seconds', 'id')->all();
 $count = count($rule_list);
 

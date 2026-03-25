@@ -545,9 +545,7 @@ return new class extends Migration
             ]);
         }
 
-        Schema::table('alert_operation_transport_map', function (Blueprint $table) {
-            $table->dropForeign('ao_tm_seg_fk');
-        });
+        $this->dropAlertOperationTransportMapSegmentForeignKey();
 
         try {
             DB::statement('ALTER TABLE `alert_operation_transport_map` DROP INDEX `ao_tm_seg_target_idx`');
@@ -570,13 +568,71 @@ return new class extends Migration
 
         DB::statement('ALTER TABLE `alert_operation_transport_map` MODIFY `alert_operation_id` INT UNSIGNED NOT NULL');
 
-        Schema::table('alert_operation_transport_map', function (Blueprint $table) {
-            $table->foreign('alert_operation_id', 'ao_tm_ao_fk')
-                ->references('id')->on('alert_operations')->cascadeOnDelete();
-            $table->index(['alert_operation_id', 'target_type'], 'ao_tm_ao_target_idx');
-        });
+        try {
+            Schema::table('alert_operation_transport_map', function (Blueprint $table) {
+                $table->foreign('alert_operation_id', 'ao_tm_ao_fk')
+                    ->references('id')->on('alert_operations')->cascadeOnDelete();
+            });
+        } catch (\Throwable) {
+        }
+
+        try {
+            Schema::table('alert_operation_transport_map', function (Blueprint $table) {
+                $table->index(['alert_operation_id', 'target_type'], 'ao_tm_ao_target_idx');
+            });
+        } catch (\Throwable) {
+        }
 
         Schema::dropIfExists('alert_operation_segments');
+    }
+
+    /**
+     * MySQL may use an auto-generated FK name; partial rollbacks can leave the table without ao_tm_seg_fk.
+     */
+    private function dropAlertOperationTransportMapSegmentForeignKey(): void
+    {
+        if (! Schema::hasTable('alert_operation_transport_map') || ! Schema::hasColumn('alert_operation_transport_map', 'segment_id')) {
+            return;
+        }
+
+        try {
+            Schema::table('alert_operation_transport_map', function (Blueprint $table) {
+                $table->dropForeign(['segment_id']);
+            });
+
+            return;
+        } catch (\Throwable) {
+        }
+
+        $connection = Schema::getConnection();
+        if (in_array($connection->getDriverName(), ['mysql', 'mariadb'], true)) {
+            $db = $connection->getDatabaseName();
+            $names = DB::table('information_schema.KEY_COLUMN_USAGE')
+                ->where('TABLE_SCHEMA', $db)
+                ->where('TABLE_NAME', 'alert_operation_transport_map')
+                ->where('COLUMN_NAME', 'segment_id')
+                ->whereNotNull('REFERENCED_TABLE_NAME')
+                ->distinct()
+                ->pluck('CONSTRAINT_NAME');
+
+            foreach ($names as $name) {
+                try {
+                    DB::statement('ALTER TABLE `alert_operation_transport_map` DROP FOREIGN KEY `' . str_replace('`', '``', (string) $name) . '`');
+                } catch (\Throwable) {
+                }
+            }
+
+            return;
+        }
+
+        foreach (['ao_tm_seg_fk'] as $constraint) {
+            try {
+                Schema::table('alert_operation_transport_map', function (Blueprint $table) use ($constraint) {
+                    $table->dropForeign($constraint);
+                });
+            } catch (\Throwable) {
+            }
+        }
     }
 
     // ---- move_default_operation_step_duration_to_alert_operations ----
