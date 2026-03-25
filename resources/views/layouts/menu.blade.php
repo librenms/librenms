@@ -460,6 +460,7 @@
                 @endif
                 @endcan
 {{-- Services --}}
+        @config('show_services')
             @can('viewAny', \App\Models\Service::class)
             <li class="dropdown">
                 <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
@@ -499,6 +500,7 @@
                 </ul>
             </li>
             @endcan
+        @endconfig
 {{-- App --}}
                 @if(Gate::allows('viewAny', \App\Models\Application::class) && $app_menu->isNotEmpty())
                     <li class="dropdown">
