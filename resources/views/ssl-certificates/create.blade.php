@@ -36,19 +36,23 @@
                     <div class="form-group">
                         <label for="device_id" class="col-sm-2 control-label">{{ __('Device') }}</label>
                         <div class="col-sm-6">
-                            <select class="form-control" id="device_id" name="device_id">
-                                <option value="">{{ __('— None —') }}</option>
-                                @foreach ($devices as $device)
-                                    <option value="{{ $device->device_id }}" {{ old('device_id') == $device->device_id ? 'selected' : '' }}>{{ $device->hostname }}</option>
-                                @endforeach
-                            </select>
-                            <p class="help-block">{{ __('Optionally link this certificate to a device.') }}</p>
+                            @if ($devices->isEmpty())
+                                <div class="alert alert-warning">{{ __('You have no devices you can assign this certificate to.') }}</div>
+                            @else
+                                <select class="form-control" id="device_id" name="device_id" required>
+                                    <option value="" disabled {{ old('device_id') ? '' : 'selected' }}>{{ __('Select a device') }}</option>
+                                    @foreach ($devices as $device)
+                                        <option value="{{ $device->device_id }}" {{ (string) old('device_id') === (string) $device->device_id ? 'selected' : '' }}>{{ $device->hostname }}</option>
+                                    @endforeach
+                                </select>
+                                <p class="help-block">{{ __('The certificate must be linked to a device.') }}</p>
+                            @endif
                         </div>
                     </div>
 
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-6">
-                            <button type="submit" class="btn btn-primary">{{ __('Add Certificate') }}</button>
+                            <button type="submit" class="btn btn-primary" @if ($devices->isEmpty()) disabled @endif>{{ __('Add Certificate') }}</button>
                             <a href="{{ route('ssl-certificates.index') }}" class="btn btn-default">{{ __('Cancel') }}</a>
                         </div>
                     </div>

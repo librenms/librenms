@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Device;
 use App\Models\SslCertificate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SslCertificateController extends Controller
 {
@@ -29,7 +31,11 @@ class SslCertificateController extends Controller
     {
         $this->authorize('create', SslCertificate::class);
 
-        return view('ssl-certificates.create');
+        $devices = Device::hasAccess(Auth::user())
+            ->orderBy('hostname')
+            ->get(['device_id', 'hostname']);
+
+        return view('ssl-certificates.create', ['devices' => $devices]);
     }
 
     /**
@@ -41,12 +47,18 @@ class SslCertificateController extends Controller
         $validated = $request->validate([
             'host' => 'required|string|max:255',
             'port' => 'nullable|integer|min:1|max:65535',
-            'device_id' => 'nullable|exists:devices,device_id',
+            'device_id' => 'required|integer|exists:devices,device_id',
         ]);
+
+        if (! Device::hasAccess($request->user())->whereKey($validated['device_id'])->exists()) {
+            return redirect()->route('ssl-certificates.create')
+                ->withInput()
+                ->withErrors(['device_id' => __('You may only assign certificates to devices you can access.')]);
+        }
 
         $host = $validated['host'];
         $port = (int) ($validated['port'] ?? 443);
-        $deviceId = $validated['device_id'] ?? null;
+        $deviceId = (int) $validated['device_id'];
 
         try {
             $cert = SslCertificate::fetchAndParse($host, $port);
