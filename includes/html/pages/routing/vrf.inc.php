@@ -142,7 +142,6 @@ if (Gate::denies('viewAny', Vrf::class)) {
                             $port['height'] = '30';
                             $port['from'] = LibrenmsConfig::get('time.day');
                             $port['to'] = LibrenmsConfig::get('time.now');
-                            $port['bg'] = '#' . $bg;
                             $port['graph_type'] = 'port_' . $vars['graph'];
                             echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;
                             text-align: center; float: left;'>
