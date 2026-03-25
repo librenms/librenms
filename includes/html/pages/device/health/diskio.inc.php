@@ -6,10 +6,9 @@ $diskioViews = [
     'all' => 'All Drives',
 ];
 
-$selectedDiskioView = $vars['diskio_view'] ?? 'physical';
-if (! array_key_exists((string) $selectedDiskioView, $diskioViews)) {
-    $selectedDiskioView = 'physical';
-}
+$selection = \LibreNMS\Util\DiskIoFilter::normalizeSelection($vars['diskio_view'] ?? null, $vars['diskio_subtype'] ?? null);
+$selectedDiskioView = $selection['view'];
+$selectedDiskioSubtype = $selection['subtype'];
 
 $diskioSubtypes = [
     'physical' => [
@@ -28,11 +27,6 @@ $diskioSubtypes = [
         'other' => 'Other Logical',
     ],
 ];
-
-$selectedDiskioSubtype = $vars['diskio_subtype'] ?? 'all';
-if (! isset($diskioSubtypes[$selectedDiskioView][$selectedDiskioSubtype])) {
-    $selectedDiskioSubtype = 'all';
-}
 
 $diskioLinkArray = [
     'page' => 'device',
@@ -110,51 +104,11 @@ if (isset($subtypeDescriptions[$selectedDiskioView][$selectedDiskioSubtype])) {
 }
 echo '</div>';
 
-$diskType = static function (string $diskName): array {
-    if (preg_match('/^dm-\d+$/i', $diskName)) {
-        return ['view' => 'logical', 'subtype' => 'dm'];
-    }
-
-    if (preg_match('/^loop\d+$/i', $diskName)) {
-        return ['view' => 'logical', 'subtype' => 'loop'];
-    }
-
-    if (preg_match('/^md\d+$/i', $diskName)) {
-        return ['view' => 'logical', 'subtype' => 'md'];
-    }
-
-    if (preg_match('/^(sd[a-z]+\d+|hd[a-z]+\d+|vd[a-z]+\d+|xvd[a-z]+\d+)$/i', $diskName)
-        || preg_match('/^nvme\d+n\d+p\d+$/i', $diskName)
-        || preg_match('/^mmcblk\d+p\d+$/i', $diskName)
-        || preg_match('/^md\d+p\d+$/i', $diskName)) {
-        return ['view' => 'logical', 'subtype' => 'partitions'];
-    }
-
-    if (preg_match('/^(sd[a-z]+|hd[a-z]+|vd[a-z]+|xvd[a-z]+)$/i', $diskName)) {
-        return ['view' => 'physical', 'subtype' => 'sd_family'];
-    }
-
-    if (preg_match('/^nvme\d+n\d+$/i', $diskName)) {
-        return ['view' => 'physical', 'subtype' => 'nvme'];
-    }
-
-    if (preg_match('/^mmcblk\d+$/i', $diskName)) {
-        return ['view' => 'physical', 'subtype' => 'mmcblk'];
-    }
-
-    return ['view' => 'physical', 'subtype' => 'other'];
-};
-
 $row = 1;
 
 foreach (dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', [$device['device_id']]) as $drive) {
-    $driveType = $diskType($drive['diskio_descr']);
-
-    if ($selectedDiskioView !== 'all' && $driveType['view'] !== $selectedDiskioView) {
-        continue;
-    }
-
-    if ($selectedDiskioView !== 'all' && $selectedDiskioSubtype !== 'all' && $driveType['subtype'] !== $selectedDiskioSubtype) {
+    $driveType = \LibreNMS\Util\DiskIoFilter::classify($drive['diskio_descr']);
+    if (! \LibreNMS\Util\DiskIoFilter::matches($driveType, $selectedDiskioView, $selectedDiskioSubtype)) {
         continue;
     }
 
