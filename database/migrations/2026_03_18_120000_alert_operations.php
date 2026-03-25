@@ -418,7 +418,7 @@ return new class extends Migration
             }
 
             Schema::table('alert_rules', function (Blueprint $table) {
-                $table->dropForeign('alert_rules_alert_operation_fk');
+                $table->dropForeign(['alert_operation_id']);
                 $table->dropColumn('alert_operation_id');
             });
         }
@@ -475,7 +475,7 @@ return new class extends Migration
         }
 
         Schema::table('alert_operation_transport_map', function (Blueprint $table) {
-            $table->dropForeign('ao_tm_ao_fk');
+            $table->dropForeign(['alert_operation_id']);
         });
 
         Schema::table('alert_operation_transport_map', function (Blueprint $table) {
@@ -623,15 +623,6 @@ return new class extends Migration
             }
 
             return;
-        }
-
-        foreach (['ao_tm_seg_fk'] as $constraint) {
-            try {
-                Schema::table('alert_operation_transport_map', function (Blueprint $table) use ($constraint) {
-                    $table->dropForeign($constraint);
-                });
-            } catch (\Throwable) {
-            }
         }
     }
 
