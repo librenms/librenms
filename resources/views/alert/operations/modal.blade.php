@@ -34,7 +34,7 @@
                                         <th>{{ __('Steps from') }}</th>
                                         <th>{{ __('Steps to') }}</th>
                                         <th>{{ __('Start (s)') }}</th>
-                                        <th>{{ __('Step dur. (s)') }}</th>
+                                        <th>{{ __('Step duration (s)') }}</th>
                                         <th style="width:3em;"></th>
                                     </tr>
                                     </thead>
