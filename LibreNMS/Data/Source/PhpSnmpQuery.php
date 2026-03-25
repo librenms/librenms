@@ -110,6 +110,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
             // Copy settings from old SNMP object
             $this->snmp->oid_increasing_check = $old_snmp->oid_increasing_check;
             $this->snmp->enum_print = $old_snmp->enum_print;
+            $this->snmp->numeric_inex = $old_snmp->numeric_index; /** @phpstan-ignore property.notFound, property.notFound */
             $this->snmp->numeric_timeticks = $old_snmp->numeric_timeticks; /** @phpstan-ignore property.notFound, property.notFound */
             $this->snmp->extended_index = $old_snmp->extended_index;  /** @phpstan-ignore property.notFound, property.notFound */
             $this->snmp->dontprint_units = $old_snmp->dontprint_units;  /** @phpstan-ignore property.notFound, property.notFound */
@@ -120,6 +121,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
             // Set default settings
             $this->snmp->oid_increasing_check = true;
             $this->snmp->enum_print = true;
+            $this->snmp->numeric_index = false;  /** @phpstan-ignore property.notFound */
             $this->snmp->numeric_timeticks = true;  /** @phpstan-ignore property.notFound */
             $this->snmp->extended_index = true;  /** @phpstan-ignore property.notFound */
             $this->snmp->dontprint_units = true;  /** @phpstan-ignore property.notFound */
@@ -293,8 +295,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         // Update NetSnmp object in case we need to switch
         $this->netsnmp->numericIndex();
 
-        // This is the default output, so set the same either way
-        $this->snmp->oid_output_format = SNMP_OID_OUTPUT_MODULE;
+        $this->snmp->numeric_index = true;
 
         return $this;
     }
