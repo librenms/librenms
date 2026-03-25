@@ -2,8 +2,6 @@
 
 namespace App\Policies;
 
-use App\Facades\Permissions;
-use App\Models\SslCertificate;
 use App\Models\User;
 
 class SslCertificatePolicy

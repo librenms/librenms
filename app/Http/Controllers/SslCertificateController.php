@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Device;
 use App\Models\SslCertificate;
 use Illuminate\Http\Request;
 
@@ -12,12 +11,14 @@ class SslCertificateController extends Controller
     {
         $this->authorizeResource(SslCertificate::class);
     }
+
     /**
      * Display a listing of SSL certificates.
      */
     public function index()
     {
         $this->authorize('viewAny', SslCertificate::class);
+
         return view('ssl-certificates.index');
     }
 
@@ -27,6 +28,7 @@ class SslCertificateController extends Controller
     public function create()
     {
         $this->authorize('create', SslCertificate::class);
+
         return view('ssl-certificates.create');
     }
 
@@ -45,7 +47,7 @@ class SslCertificateController extends Controller
         $host = $validated['host'];
         $port = (int) ($validated['port'] ?? 443);
         $deviceId = $validated['device_id'] ?? null;
-       
+
         try {
             $cert = SslCertificate::fetchAndParse($host, $port);
         } catch (\Throwable $e) {
