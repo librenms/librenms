@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
@@ -71,7 +72,7 @@ class Rutos2xx extends OS implements
         $oid = '.1.3.6.1.4.1.48690.2.22.0'; // TELTONIKA-MIB::SINR.0
 
         return [
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'SINR', null, -1, 1),
+            new WirelessSensor(WirelessSensorType::Snr, $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'SINR', null, -1, 1),
         ];
     }
 
@@ -80,7 +81,7 @@ class Rutos2xx extends OS implements
         $oid = '.1.3.6.1.4.1.48690.2.23.0'; // TELTONIKA-MIB::RSRP.0
 
         return [
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'RSRP', null, 1, 1),
+            new WirelessSensor(WirelessSensorType::Rssi, $this->getDeviceId(), $oid, 'rutos-2xx', 1, 'RSRP', null, 1, 1),
         ];
     }
 }

@@ -31,7 +31,7 @@ use App\Models\Device;
 use App\Models\Port;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\DeviceStatus;
@@ -50,9 +50,9 @@ class Url
         }
 
         $class = match ($device->getDeviceStatus()) {
-            DeviceStatus::UP, DeviceStatus::IGNORED_UP => 'device-link-up',
-            DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED, DeviceStatus::IGNORED_DOWN => 'device-link-down',
-            DeviceStatus::DISABLED => 'device-link-disabled',
+            DeviceStatus::Up, DeviceStatus::IgnoredUp => 'device-link-up',
+            DeviceStatus::Down, DeviceStatus::NeverPolled, DeviceStatus::IgnoredDown => 'device-link-down',
+            DeviceStatus::Disabled => 'device-link-disabled',
         };
 
         return sprintf('<a href="%s" class="%s" x-data="deviceLink()">%s</a>%s',
@@ -79,7 +79,7 @@ class Url
             return $escape_text ? htmlentities((string) $text) : (string) $text;
         }
 
-        if (! $device->canAccess(Auth::user())) {
+        if (Gate::denies('view', $device)) {
             return $escape_text ? htmlentities($device->displayName()) : $device->displayName();
         }
 
@@ -203,7 +203,7 @@ class Url
 
         if (! $overlib) {
             return $content;
-        } elseif ($port->canAccess(Auth::user())) {
+        } elseif (Gate::allows('view', $port)) {
             return self::overlibLink(self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
         }
 
@@ -505,11 +505,11 @@ class Url
     private static function deviceLinkDisplayClass($device)
     {
         return match ($device->getDeviceStatus()) {
-            DeviceStatus::DISABLED => 'list-device-disabled',
-            DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED => 'list-device-down',
-            DeviceStatus::UP => 'list-device',
-            DeviceStatus::IGNORED_DOWN => 'list-device-ignored',
-            DeviceStatus::IGNORED_UP => 'list-device-ignored-up',
+            DeviceStatus::Disabled => 'list-device-disabled',
+            DeviceStatus::Down, DeviceStatus::NeverPolled => 'list-device-down',
+            DeviceStatus::Up => 'list-device',
+            DeviceStatus::IgnoredDown => 'list-device-ignored',
+            DeviceStatus::IgnoredUp => 'list-device-ignored-up',
         };
     }
 

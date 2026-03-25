@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\EntityState;
+
 /**
  * entity-state.inc.php
  *
@@ -85,15 +87,13 @@ if (! empty($entPhysical)) {
     }
 
     if (! empty($state_data)) {
-        dbBulkInsert($state_data, 'entityState');
+        foreach (array_chunk($state_data, 1000) as $chunk) {
+            EntityState::insert($chunk);
+        }
     }
 
     if (! empty($db_states)) {
-        dbDelete(
-            'entityState',
-            'entity_state_id IN ' . dbGenPlaceholders(count($db_states)),
-            array_column($db_states, 'entity_state_id')
-        );
+        \App\Models\EntityState::whereIn('entity_state_id', array_column($db_states, 'entity_state_id'))->delete();
     }
 }
 

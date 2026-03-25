@@ -10,6 +10,11 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
+use App\Models\Port;
+
+Gate::authorize('update', Port::class);
+
 header('Content-type: application/json');
 
 $status = 'error';

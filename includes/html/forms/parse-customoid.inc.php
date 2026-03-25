@@ -1,6 +1,6 @@
 <?php
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('customoid.view')) {
     $response = [
         'status' => 'error',
         'message' => 'Need to be admin',

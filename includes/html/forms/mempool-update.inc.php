@@ -12,9 +12,12 @@
  * the source code distribution for details.
  */
 
+use App\Models\Mempool;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', Mempool::class)) {
     $response = [
         'status' => 'error',
         'message' => 'Need to be admin',

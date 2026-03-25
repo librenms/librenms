@@ -77,7 +77,7 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=03022026') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=02032026') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
@@ -94,6 +94,7 @@
                 applySiteStyle(event.matches ? 'dark' : 'light');
             }
         });
+        window.tz = undefined;
     </script>
     @auth
         <script>
@@ -102,8 +103,9 @@
             if(tz !== '{{ session('preferences.timezone') }}') {
                 updateTimezone(tz, false);
             }
+        @else
+            window.tz = '{{ session('preferences.timezone') }}';
         @endif
-        window.tz = '{{ session('preferences.timezone') }}';
         </script>
         <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
     @endauth

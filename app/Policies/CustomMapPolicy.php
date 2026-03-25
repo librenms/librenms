@@ -2,26 +2,24 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
 use App\Models\CustomMap;
 use App\Models\User;
 
 class CustomMapPolicy
 {
-    public function before(User $user): ?bool
-    {
-        if ($user->isAdmin()) {
-            return true;
-        }
-
-        return null;
-    }
+    use ChecksGlobalPermissions;
 
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasGlobalRead();
+        return $this->hasGlobalPermission($user, 'view')
+            || $this->hasGlobalPermission($user, 'viewAll')
+            || $this->hasGlobalPermission($user, 'create')
+            || $this->hasGlobalPermission($user, 'update')
+            || $this->hasGlobalPermission($user, 'delete');
     }
 
     /**
@@ -29,7 +27,29 @@ class CustomMapPolicy
      */
     public function view(User $user, CustomMap $customMap): bool
     {
-        return $user->hasGlobalRead() || $customMap->hasReadAccess($user);
+        if ($this->hasGlobalPermission($user, 'viewAll')) {
+            return true;
+        }
+
+        if ($this->hasGlobalPermission($user, 'view')) {
+            $device_ids = $customMap->nodes()->whereNotNull('device_id')->pluck('device_id');
+
+            // Restricted users can only view maps that have at least one device
+            if (count($device_ids) === 0) {
+                return false;
+            }
+
+            // Deny access if we don't have permission on any device
+            foreach ($device_ids as $device_id) {
+                if (! Permissions::canAccessDevice($device_id, $user)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -37,7 +57,7 @@ class CustomMapPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $this->hasGlobalPermission($user, 'create');
     }
 
     /**
@@ -45,7 +65,7 @@ class CustomMapPolicy
      */
     public function update(User $user, CustomMap $customMap): bool
     {
-        return false;
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -53,22 +73,6 @@ class CustomMapPolicy
      */
     public function delete(User $user, CustomMap $customMap): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, CustomMap $customMap): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, CustomMap $customMap): bool
-    {
-        return false;
+        return $this->hasGlobalPermission($user, 'delete');
     }
 }

@@ -103,19 +103,19 @@ final class FunctionsTest extends TestCase
 
     public function testNumberAsUnsigned(): void
     {
-        $this->assertSame(42, Number::constrainInteger('42', IntegerType::int32));  /** @phpstan-ignore-line */
-        $this->assertSame(2147483647, Number::constrainInteger(2147483647, IntegerType::int32));
-        $this->assertSame(-2147483648, Number::constrainInteger(2147483648, IntegerType::int32));
-        $this->assertSame(-2147483647, Number::constrainInteger(2147483649, IntegerType::int32));
-        $this->assertSame(-1, Number::constrainInteger(4294967295, IntegerType::int32));
-        $this->assertSame(-3757, Number::constrainInteger(61779, IntegerType::int16));
-        $this->assertSame(0, Number::constrainInteger(0, IntegerType::uint32));
-        $this->assertSame(42, Number::constrainInteger(42, IntegerType::uint32));
-        $this->assertSame(4294967252, Number::constrainInteger(-42, IntegerType::uint32));
-        $this->assertSame(2147483648, Number::constrainInteger(-2147483646, IntegerType::uint32));
-        $this->assertSame(2147483647, Number::constrainInteger(-2147483647, IntegerType::uint32));
-        $this->assertSame(2147483646, Number::constrainInteger(-2147483648, IntegerType::uint32));
-        $this->assertSame(2147483645, Number::constrainInteger(-2147483649, IntegerType::uint32));
+        $this->assertSame(42, Number::constrainInteger('42', IntegerType::Int32));  /** @phpstan-ignore-line */
+        $this->assertSame(2147483647, Number::constrainInteger(2147483647, IntegerType::Int32));
+        $this->assertSame(-2147483648, Number::constrainInteger(2147483648, IntegerType::Int32));
+        $this->assertSame(-2147483647, Number::constrainInteger(2147483649, IntegerType::Int32));
+        $this->assertSame(-1, Number::constrainInteger(4294967295, IntegerType::Int32));
+        $this->assertSame(-3757, Number::constrainInteger(61779, IntegerType::Int16));
+        $this->assertSame(0, Number::constrainInteger(0, IntegerType::Uint32));
+        $this->assertSame(42, Number::constrainInteger(42, IntegerType::Uint32));
+        $this->assertSame(4294967252, Number::constrainInteger(-42, IntegerType::Uint32));
+        $this->assertSame(2147483648, Number::constrainInteger(-2147483646, IntegerType::Uint32));
+        $this->assertSame(2147483647, Number::constrainInteger(-2147483647, IntegerType::Uint32));
+        $this->assertSame(2147483646, Number::constrainInteger(-2147483648, IntegerType::Uint32));
+        $this->assertSame(2147483645, Number::constrainInteger(-2147483649, IntegerType::Uint32));
     }
 
     public function testNumberAsUnsignedValueExceedsMaxUnsignedValue(): void
@@ -123,6 +123,6 @@ final class FunctionsTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
 
         // Exceeds the maximum representable value for a 16-bit unsigned integer
-        Number::constrainInteger(4294967296, IntegerType::int16);
+        Number::constrainInteger(4294967296, IntegerType::Int16);
     }
 }

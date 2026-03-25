@@ -644,12 +644,12 @@ function mw_to_dbm($value)
 }
 
 /**
- * @param  $value
- * @param  null  $default
- * @param  int  $min
- * @return null
+ * @param  mixed  $value
+ * @param  mixed  $default
+ * @param  int|null  $min
+ * @return mixed
  */
-function set_null($value, $default = null, $min = null)
+function set_null(mixed $value, mixed $default = null, ?int $min = null)
 {
     if (! is_numeric($value)) {
         return $default;

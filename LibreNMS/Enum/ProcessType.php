@@ -28,30 +28,30 @@ namespace LibreNMS\Enum;
 
 enum ProcessType
 {
-    case poller;
-    case discovery;
+    case Poller;
+    case Discovery;
 
     public function verbPast(): string
     {
         return match ($this) {
-            ProcessType::discovery => 'discovered',
-            ProcessType::poller => 'polled',
+            ProcessType::Discovery => 'discovered',
+            ProcessType::Poller => 'polled',
         };
     }
 
     public function verbPresent(): string
     {
         return match ($this) {
-            ProcessType::discovery => 'discovering',
-            ProcessType::poller => 'polling',
+            ProcessType::Discovery => 'discovering',
+            ProcessType::Poller => 'polling',
         };
     }
 
     public function verb(): string
     {
         return match ($this) {
-            ProcessType::discovery => 'discover',
-            ProcessType::poller => 'poll',
+            ProcessType::Discovery => 'discover',
+            ProcessType::Poller => 'poll',
         };
     }
 }

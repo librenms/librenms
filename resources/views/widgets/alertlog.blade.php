@@ -29,7 +29,7 @@
             converters: {
                 datetime: {
                     to: function (value) {
-                        return LibreNMS.Time.format(value, {timeStyle: "short"});
+                        return LibreNMS.Date.display(value, {dateStyle: "medium", timeStyle: "short"});
                     }
                 }
             }

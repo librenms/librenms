@@ -26,7 +26,6 @@
 
 namespace App\Http\Controllers\Table;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
@@ -86,27 +85,15 @@ class OutagesController extends TableController
                     });
                 } else {
                     // All outages: use original logic (any overlap with range)
+                    // Outage starts within range
+                    $this->applyDateRangeCondition($query, 'going_down', $from_ts, $to_ts);
+
+                    // Outage either has not ended, or end is within date range
                     $query->where(function ($q) use ($from_ts, $to_ts): void {
-                        // Outage starts within range
-                        $this->applyDateRangeCondition($q, 'going_down', $from_ts, $to_ts);
-
                         // OR outage ends within range (if it has ended)
-                        $q->orWhere(function ($subQuery) use ($from_ts, $to_ts): void {
-                            $subQuery->whereNotNull('up_again');
+                        $q->where(function ($subQuery) use ($from_ts, $to_ts): void {
                             $this->applyDateRangeCondition($subQuery, 'up_again', $from_ts, $to_ts);
-                        });
-
-                        // OR outage spans the entire range (started before, still ongoing or ended after)
-                        $q->orWhere(function ($subQuery) use ($from_ts, $to_ts): void {
-                            if ($from_ts) {
-                                $subQuery->where('going_down', '<', $from_ts);
-                            }
-                            if ($to_ts) {
-                                $subQuery->where(function ($q) use ($to_ts): void {
-                                    $q->whereNull('up_again') // Still ongoing
-                                    ->orWhere('up_again', '>', $to_ts); // Ended after range
-                                });
-                            }
+                            $subQuery->orWhereNull('up_again');
                         });
                     });
                 }
@@ -151,8 +138,7 @@ class OutagesController extends TableController
         }
 
         // Convert epoch to local time
-        return Carbon::createFromTimestamp($timestamp, session('preferences.timezone'))
-            ->format(LibrenmsConfig::get('dateformat.compact'));
+        return Time::format($timestamp, 'compact');
     }
 
     private function statusLabel(DeviceOutage $outage): string
@@ -193,8 +179,8 @@ class OutagesController extends TableController
     {
         return [
             $outage->device ? $outage->device->displayName() : '',
-            Carbon::createFromTimestamp($outage->going_down)->toISOString(),
-            $outage->up_again ? Carbon::createFromTimestamp($outage->up_again)->toISOString() : '-',
+            Carbon::createFromTimestamp($outage->going_down)->toIso8601ZuluString(),
+            $outage->up_again ? Carbon::createFromTimestamp($outage->up_again)->toIso8601ZuluString() : '-',
             $this->asDuration($outage)->format('%H:%I:%S'),
         ];
     }

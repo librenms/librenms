@@ -295,6 +295,7 @@ nav:
     - SNMP Traps: Developing/SNMP-Traps.md
     - Dynamic Config: Developing/Dynamic-Config.md
     - Localization: Developing/Localization.md
+    - Time Handling: Developing/Time-Handling.md
     - Plugin System: Extensions/Plugin-System.md
     - Developer notes:
       - Merging Pull Requests: Developing/Merging-Pull-Requests.md

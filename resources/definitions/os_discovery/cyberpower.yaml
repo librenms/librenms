@@ -20,7 +20,7 @@ modules:
                     states:
                         - { value: 1, descr: Known, graph: 1, generic: 3 }
                         - { value: 2, descr: Normal, graph: 1, generic: 0 }
-                        - { value: 3, descr: Low, graph: 1, generic: 2 }
+                        - { value: 3, descr: Low, graph: 1, generic: 1 }
                 -
                     oid: CPS-MIB::upsAdvanceBatteryReplaceIndicator
                     num_oid: '.1.3.6.1.4.1.3808.1.1.1.2.2.5.{{ $index }}'
@@ -58,7 +58,7 @@ modules:
                     states:
                         - { value: 1, descr: 'Unknown', graph: 1, generic: 3 }
                         - { value: 2, descr: 'Online', graph: 1, generic: 0 }
-                        - { value: 3, descr: 'On Battery', graph: 1, generic: 2 }
+                        - { value: 3, descr: 'On Battery', graph: 1, generic: 1 }
                         - { value: 4, descr: 'On Boost', graph: 1, generic: 1 }
                         - { value: 5, descr: 'On Sleep', graph: 1, generic: 1 }
                         - { value: 6, descr: 'Off', graph: 1, generic: 2 }

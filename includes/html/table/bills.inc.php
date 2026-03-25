@@ -49,7 +49,7 @@ if ($prev) {
 }
 
 // Permissions check
-if (! Auth::user()->hasGlobalRead()) {
+if (Gate::denies('viewAll', \App\Models\Bill::class)) {
     $query .= ' INNER JOIN `bill_perms` AS `BP` ON `bills`.`bill_id` = `BP`.`bill_id` ';
     $wheres[] = '`BP`.`user_id`=?';
     $param[] = Auth::id();
@@ -153,7 +153,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     ]);
     $actions = '';
 
-    if (! $prev && Auth::user()->hasGlobalAdmin()) {
+    if (! $prev && Gate::allows('update', \App\Models\Bill::class)) {
         $actions .= "<a href='" . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit']) .
             "'><i class='fa fa-pencil fa-lg icon-theme' title='Edit' aria-hidden='true'></i> Edit</a> ";
     }

@@ -18,7 +18,7 @@
  **/
 
 // FSP3000 R7 Series
-$pre_cache['adva_fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'pmSnapshotCurrentEntry', $pre_cache['adva_fsp3kr7'], 'ADVA-FSPR7-MIB', null, '-OQUbs');
+$pre_cache['adva_fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'pmSnapshotCurrentEntry', [], 'ADVA-FSPR7-MIB', null, '-OQUbs');
 $pre_cache['adva_fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'entityFacilityOneIndex', $pre_cache['adva_fsp3kr7'], 'ADVA-FSPR7-MIB', null, '-OQUbs');
 $pre_cache['adva_fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'entityDcnOneIndex', $pre_cache['adva_fsp3kr7'], 'ADVA-FSPR7-MIB', null, '-OQUbs');
 $pre_cache['adva_fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'entityOpticalMuxOneIndex', $pre_cache['adva_fsp3kr7'], 'ADVA-FSPR7-MIB', null, '-OQUbs');
@@ -33,7 +33,7 @@ $pre_cache['adva_fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'plugTransmitChan
 $pre_cache['adva_fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'plugFiberType', $pre_cache['adva_fsp3kr7'], 'ADVA-FSPR7-MIB', null, '-OQUbs');
 $pre_cache['adva_fsp3kr7'] = snmpwalk_cache_multi_oid($device, 'plugReach', $pre_cache['adva_fsp3kr7'], 'ADVA-FSPR7-MIB', null, '-OQUbs');
 
-$pre_cache['adva_fsp3kr7_Card'] = snmpwalk_cache_multi_oid($device, 'entityEqptAidString', $pre_cache['adva_fsp3kr7_Card'], 'ADVA-FSPR7-MIB', null, '-OQUbs');
+$pre_cache['adva_fsp3kr7_Card'] = snmpwalk_cache_multi_oid($device, 'entityEqptAidString', [], 'ADVA-FSPR7-MIB', null, '-OQUbs');
 $pre_cache['adva_fsp3kr7_Card'] = snmpwalk_cache_multi_oid($device, 'eqptPhysInstValueEntry', $pre_cache['adva_fsp3kr7_Card'], 'ADVA-FSPR7-PM-MIB', null, '-OQUbs');
 $pre_cache['adva_fsp3kr7_Card'] = snmpwalk_cache_multi_oid($device, 'optMuxPhysInstValueTable', $pre_cache['adva_fsp3kr7_Card'], 'ADVA-FSPR7-PM-MIB', null, '-OQUbs');
 $pre_cache['adva_fsp3kr7_Card'] = snmpwalk_cache_multi_oid($device, 'entityMtosiSlotsAidString', $pre_cache['adva_fsp3kr7_Card'], 'ADVA-FSPR7-PM-MIB', null, '-OQUbs');

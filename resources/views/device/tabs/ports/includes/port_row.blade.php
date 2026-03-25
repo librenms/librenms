@@ -36,10 +36,10 @@
         </div>
         @if($data['tab'] != 'basic')
             @foreach($port->ipv4 as $ipv4)
-                <div><a class="tw:text-base" href="javascript:popUp('{{ url('ajax/netcmd?cmd=whois&query=' . $ipv4->ipv4_address) }}')">{{ $ipv4->ipv4_address }}/{{ $ipv4->ipv4_prefixlen }}</a></div>
+                <div class="tw:text-base">{{ $ipv4->ipv4_address }}/{{ $ipv4->ipv4_prefixlen }}</div>
             @endforeach
             @foreach($port->ipv6 as $ipv6)
-                <div><a class="tw:text-base" href="javascript:popUp('{{ url('ajax/netcmd?cmd=whois&query=' . $ipv6->ipv6_compressed) }}')">{{ $ipv6->ipv6_compressed }}/{{ $ipv6->ipv6_prefixlen }}</a></div>
+                <div class="tw:text-base">{{ $ipv6->ipv6_compressed }}/{{ $ipv6->ipv6_prefixlen }}</div>
             @endforeach
         @endif
         @if($port->portSecurity)

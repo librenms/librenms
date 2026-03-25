@@ -4,10 +4,10 @@ namespace LibreNMS\Enum;
 
 enum DeviceStatus
 {
-    case DISABLED;
-    case DOWN;
-    case IGNORED_DOWN;
-    case IGNORED_UP;
-    case NEVER_POLLED;
-    case UP;
+    case Disabled;
+    case Down;
+    case IgnoredDown;
+    case IgnoredUp;
+    case NeverPolled;
+    case Up;
 }

@@ -19,7 +19,7 @@ class StoreUserRequest extends FormRequest
     public function authorize(): bool
     {
         if ($this->user()->can('create', User::class)) {
-            if ($this->user()->cannot('manage', Role::class)) {
+            if ($this->user()->cannot('update', Role::class)) {
                 unset($this['roles']);
             }
 

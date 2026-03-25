@@ -23,12 +23,16 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+
+use App\Models\Application;
 use App\Models\Device;
 use App\Models\Eventlog;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\Severity;
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    $status = ['status' => 1, 'message' => 'You need to be admin'];
+if (Gate::denies('update', Application::class)) {
+    $status = ['status' => 1, 'message' => 'You need permission'];
 } else {
     $device = Device::find($_POST['device_id']);
     $app = $_POST['application'];

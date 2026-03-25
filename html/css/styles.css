@@ -1163,10 +1163,6 @@ a.sensor-ok:hover, a.sensor-low:hover, a.sensor-high:hover {
     border-collapse: collapse;
 }
 
-tr.iftype:nth-child(odd) {
-  background: #e0e5e5;
-}
-
 tr.iftype:nth-child(even) {
   background: #ffffff;
 }

@@ -8496,6 +8496,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8515,6 +8516,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8534,6 +8536,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8553,6 +8556,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8572,6 +8576,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8591,6 +8596,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8610,6 +8616,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8629,6 +8636,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8648,6 +8656,7 @@
                     "entPhysicalContainedIn": 28,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8667,6 +8676,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 1
                 },
                 {
@@ -8686,6 +8696,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 2
                 },
                 {
@@ -8705,6 +8716,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 3
                 },
                 {
@@ -8724,6 +8736,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 4
                 },
                 {
@@ -8743,6 +8756,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 5
                 },
                 {
@@ -8762,6 +8776,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 6
                 },
                 {
@@ -8781,6 +8796,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 7
                 },
                 {
@@ -8800,6 +8816,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 8
                 },
                 {
@@ -8819,6 +8836,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 9
                 },
                 {
@@ -8838,6 +8856,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 10
                 },
                 {
@@ -8857,6 +8876,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 11
                 },
                 {
@@ -8876,6 +8896,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 12
                 },
                 {
@@ -8895,6 +8916,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 13
                 },
                 {
@@ -8914,6 +8936,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 14
                 },
                 {
@@ -8933,6 +8956,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 15
                 },
                 {
@@ -8952,6 +8976,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 16
                 },
                 {
@@ -8971,6 +8996,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 17
                 },
                 {
@@ -8990,6 +9016,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 18
                 },
                 {
@@ -9009,6 +9036,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 19
                 },
                 {
@@ -9028,6 +9056,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 20
                 },
                 {
@@ -9047,6 +9076,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 21
                 },
                 {
@@ -9066,6 +9096,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 22
                 },
                 {
@@ -9085,6 +9116,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 23
                 },
                 {
@@ -9104,6 +9136,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 24
                 },
                 {
@@ -9123,6 +9156,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 25
                 },
                 {
@@ -9142,6 +9176,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 26
                 },
                 {
@@ -9161,6 +9196,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 27
                 },
                 {
@@ -9180,6 +9216,7 @@
                     "entPhysicalContainedIn": 35,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "Hewlett-Packard",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 28
                 }
             ]

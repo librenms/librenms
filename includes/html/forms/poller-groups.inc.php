@@ -12,10 +12,13 @@
  * the source code distribution for details.
  */
 
+use App\Models\PollerGroup;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: text/plain');
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    exit('ERROR: You need to be admin');
+if (Gate::none(['create', 'update'], PollerGroup::class)) {
+    exit('ERROR: You need permission');
 }
 
 $ok = '';
@@ -25,12 +28,14 @@ $group_name = $_POST['group_name'];
 $descr = $_POST['descr'];
 if (! empty($group_name)) {
     if (is_numeric($group_id)) {
+        Gate::authorize('update', PollerGroup::class);
         if (dbUpdate(['group_name' => $group_name, 'descr' => $descr], 'poller_groups', 'id = ?', [$group_id]) >= 0) {
             $ok = 'Updated poller group';
         } else {
             $error = 'Failed to update the poller group';
         }
     } else {
+        Gate::authorize('create', PollerGroup::class);
         if (dbInsert(['group_name' => $group_name, 'descr' => $descr], 'poller_groups') >= 0) {
             $ok = 'Added new poller group';
         } else {

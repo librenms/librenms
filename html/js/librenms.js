@@ -1,4 +1,3 @@
-var LibreNMS = {Time: {}};
 window.maps = {};
 
 function override_config(event, state, tmp_this) {
@@ -86,12 +85,12 @@ function submitCustomRange(frmdata) {
     return true;
 }
 
-function updateTimezone(tz, static)
+function updateTimezone(tz, staticTz)
 {
     $.post(ajax_url + '/set_timezone',
         {
             timezone: tz,
-            static: static
+            static: staticTz
         },
         function(data) {
             if(data === tz) {
@@ -768,13 +767,3 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
-
-LibreNMS.Time.format = function (value, options = {}) {
-    let compositeOptions = {...{
-        dateStyle: "medium",
-        timeStyle: "medium",
-        timeZone: window.tz
-    }, ...options};
-
-    return new Intl.DateTimeFormat(navigator.language, compositeOptions).format(new Date(value));
-};

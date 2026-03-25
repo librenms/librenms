@@ -29,10 +29,12 @@
 
 namespace LibreNMS\OS\Shared;
 
+use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Models\Component;
 use App\Models\Device;
 use App\Models\EntPhysical;
+use App\Models\MacAccounting;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
@@ -45,6 +47,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\Processor;
+use LibreNMS\Interfaces\Discovery\MacAccountingDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -55,6 +58,7 @@ use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
+use LibreNMS\Interfaces\Polling\MacAccountingPolling;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
@@ -72,6 +76,8 @@ class Cisco extends OS implements
     StpInstanceDiscovery,
     ProcessorDiscovery,
     QosDiscovery,
+    MacAccountingDiscovery,
+    MacAccountingPolling,
     MempoolsDiscovery,
     NacPolling,
     QosPolling,
@@ -762,6 +768,7 @@ class Cisco extends OS implements
                 'vendor' => $ent['entPhysicalMfgName'] ?? null,
                 'revision' => $ent['entPhysicalHardwareRev'] ?? null,
                 'model' => $ent['entPhysicalModelName'] ?? null,
+                'date' => $ent['entPhysicalMfgDate'] ?? null,
                 'serial' => $ent['entPhysicalSerialNum'] ?? null,
                 'entity_physical_index' => $ent['entPhysicalIndex'],
             ]);
@@ -972,9 +979,16 @@ class Cisco extends OS implements
 
         $vtpdomains = SnmpQuery::walk('CISCO-VTP-MIB::managementDomainName')->pluck();
         $current_domain = 0;
+        $os = $this->getName();
+        $ignore_vlans = (array) LibrenmsConfig::getOsSetting($os, 'ignore_vlans');
 
         return SnmpQuery::enumStrings()->walk('CISCO-VTP-MIB::vtpVlanTable')
-            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain) {
+            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain, $ignore_vlans) {
+                // Skip VLANs configured to be ignored
+                if (in_array($vlan_id, $ignore_vlans)) {
+                    return null;
+                }
+
                 if ($current_domain != $vtpdomain_id) {
                     $current_domain = $vtpdomain_id;
                     Log::info('VTP Domain ' . $vtpdomain_id . ' ' . ($vtpdomains[$vtpdomain_id] ?? 'none'));
@@ -987,7 +1001,8 @@ class Cisco extends OS implements
                     'vlan_type' => $vlan['CISCO-VTP-MIB::vtpVlanType'] ?? '',
                     'vlan_state' => isset($vlan['CISCO-VTP-MIB::vtpVlanState']) && $vlan['CISCO-VTP-MIB::vtpVlanState'] == 'operational',
                 ]);
-            });
+            })
+            ->filter(); // Remove null values from ignored VLANs
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection
@@ -1045,17 +1060,15 @@ class Cisco extends OS implements
         foreach ($vlans as $vlan) {
             $vlan_id = (int) $vlan->vlan_vlan;
 
-            // Ignore reserved VLAN IDs
-            if ($vlan->vlan_state && $vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
+            if ($vlan->vlan_state && $vlan_id) {
                 // collect BRIDGE-MIB in vlan context
-                $tmp_vlan_data = SnmpQuery::context($vlan_id === 1 ? '' : (string) $vlan_id, 'vlan-')
+                $vlanContext = $vlan_id == 1 ? '' : (string) $vlan_id;
+                $tmp_vlan_data = SnmpQuery::context($vlanContext, 'vlan-')
                     ->enumStrings()
                     ->abortOnFailure()
-                    ->walk([
-                        'BRIDGE-MIB::dot1dStpPortState',
-                        'BRIDGE-MIB::dot1dStpPortPriority',
-                        'BRIDGE-MIB::dot1dStpPortPathCost',
-                    ])->table(1);
+                    ->cache()
+                    ->walk('BRIDGE-MIB::dot1dStpPortTable')
+                    ->table(1);
 
                 foreach ($tmp_vlan_data as $baseport => $data) {
                     // use the collected untagged vlan info
@@ -1092,5 +1105,81 @@ class Cisco extends OS implements
         }
 
         return $ports;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discoverMacAccounting(): Collection
+    {
+        return SnmpQuery::walk('CISCO-IP-STAT-MIB::cipMacSwitchedBytes')
+            ->mapTable(function (array $data, int $ifIndex, string $direction, string $mac) {
+                $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDevice());
+
+                if ($port_id === null) {
+                    return null;
+                }
+
+                return new MacAccounting([
+                    'port_id' => $port_id,
+                    'mac' => Mac::parse($mac)->hex(),
+                    'ifIndex' => $ifIndex,
+                    'bps_in' => 0,
+                    'bps_out' => 0,
+                ]);
+            })->filter()->unique(fn (MacAccounting $m) => $m->getCompositeKey());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function pollMacAccounting(Collection $macs): Collection
+    {
+        $cip_response = SnmpQuery::walk([
+            'CISCO-IP-STAT-MIB::cipMacHCSwitchedBytes',
+            'CISCO-IP-STAT-MIB::cipMacHCSwitchedPkts',
+        ]);
+        if (! $cip_response->isValid()) {
+            $cip_response = SnmpQuery::walk([
+                'CISCO-IP-STAT-MIB::cipMacSwitchedBytes',
+                'CISCO-IP-STAT-MIB::cipMacSwitchedPkts',
+            ]);
+
+            if (! $cip_response->isValid()) {
+                return new Collection;
+            }
+        }
+
+        foreach ($cip_response->table(3) as $ifIndex => $port_data) {
+            foreach ($port_data as $direction => $dir_data) {
+                foreach ($dir_data as $mac => $mac_data) {
+                    $mac = Mac::parse($mac)->hex();
+                    $current = new MacAccounting([
+                        'mac' => Mac::parse($mac)->hex(),
+                        'ifIndex' => $ifIndex,
+                        'bps_in' => 0,
+                        'bps_out' => 0,
+                    ]);
+
+                    // get existing or add new
+                    $key = $current->getCompositeKey();
+                    if ($macs->has($key)) {
+                        $current = $macs->get($key);
+                    } else {
+                        $macs->put($key, $current);
+                    }
+
+                    if ($direction == 'input') {
+                        $current->bytes_in = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedBytes'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedBytes'] ?? null;
+                        $current->packets_in = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedPkts'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedPkts'] ?? null;
+                    } else {
+                        $current->bytes_out = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedBytes'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedBytes'] ?? null;
+                        $current->packets_out = $mac_data['CISCO-IP-STAT-MIB::cipMacHCSwitchedPkts'] ?? $mac_data['CISCO-IP-STAT-MIB::cipMacSwitchedPkts'] ?? null;
+                    }
+                }
+            }
+        }
+
+        return $macs;
     }
 }

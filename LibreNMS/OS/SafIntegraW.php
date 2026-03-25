@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
@@ -52,7 +53,7 @@ class SafIntegraW extends OS implements
         return [
             // SAF-INTEGRAW-MIB::integraWradioTxFrequency
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.2.2.0',
                 'saf-integra-tx',
@@ -64,7 +65,7 @@ class SafIntegraW extends OS implements
             ),
             // SAF-INTEGRAW-MIB::integraWradioRxFrequency
             new WirelessSensor(
-                'frequency',
+                WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.2.7.0',
                 'saf-integra-rx',
@@ -88,7 +89,7 @@ class SafIntegraW extends OS implements
         return [
             // SAF-INTEGRAW-MIB::integraWmodemMse
             new WirelessSensor(
-                'mse',
+                WirelessSensorType::Mse,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.3.2.0',
                 'saf-integraw-modem',
@@ -112,7 +113,7 @@ class SafIntegraW extends OS implements
         return [
             // SAF-INTEGRAW-MIB::integraWradioTxPower
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.2.1.0',
                 'saf-integra-tx',
@@ -121,7 +122,7 @@ class SafIntegraW extends OS implements
             ),
             // SAF-INTEGRAW-MIB::integraWradioRxLevel
             new WirelessSensor(
-                'power',
+                WirelessSensorType::Power,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.2.3.0',
                 'saf-integra-rx-level',
@@ -142,7 +143,7 @@ class SafIntegraW extends OS implements
         return [
             // SAF-INTEGRAW-MIB::integraWmodemRxCapacity
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.3.10.0',
                 'saf-integra-rx',
@@ -153,7 +154,7 @@ class SafIntegraW extends OS implements
             ),
             // SAF-INTEGRAW-MIB::integraWmodemTxCapacity
             new WirelessSensor(
-                'rate',
+                WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.3.11.0',
                 'saf-integra-tx',
@@ -176,7 +177,7 @@ class SafIntegraW extends OS implements
         return [
             // SAF-INTEGRAW-MIB::integraWmodemSignalQuality
             new WirelessSensor(
-                'quality',
+                WirelessSensorType::Quality,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.7571.100.1.1.7.2.3.14.0',
                 'saf-integra-quality',

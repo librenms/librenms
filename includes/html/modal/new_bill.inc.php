@@ -13,8 +13,7 @@
 
 use App\Facades\LibrenmsConfig;
 
-if (Auth::user()->hasGlobalAdmin()) {
-    $port_device_id = -1;
+$port_device_id = -1;
     if (isset($vars['port']) && is_numeric($vars['port'])) {
         $port = dbFetchRow('SELECT * FROM `ports` AS P, `devices` AS D WHERE `port_id` = ? AND D.device_id = P.device_id', [$vars['port']]);
         $bill_data['bill_name'] = $port['port_descr_descr'];
@@ -80,6 +79,3 @@ if (Auth::user()->hasGlobalAdmin()) {
       </div>
     </div>
 </div>
-
-    <?php
-}
