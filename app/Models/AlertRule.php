@@ -102,7 +102,7 @@ class AlertRule extends BaseModel
      */
     public function scopeHasAccess($query, User $user)
     {
-        if (Gate::allows('viewAny', AlertRule::class)) {
+        if (Gate::allows('viewAll', AlertRule::class)) {
             return $query;
         }
 
