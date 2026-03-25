@@ -417,8 +417,8 @@ return new class extends Migration
                 }
             }
 
+            $this->dropForeignKeysReferencingColumn('alert_rules', 'alert_operation_id');
             Schema::table('alert_rules', function (Blueprint $table) {
-                $table->dropForeign(['alert_operation_id']);
                 $table->dropColumn('alert_operation_id');
             });
         }
@@ -474,9 +474,7 @@ return new class extends Migration
                 ->update(['segment_id' => $segId]);
         }
 
-        Schema::table('alert_operation_transport_map', function (Blueprint $table) {
-            $table->dropForeign(['alert_operation_id']);
-        });
+        $this->dropForeignKeysReferencingColumn('alert_operation_transport_map', 'alert_operation_id');
 
         Schema::table('alert_operation_transport_map', function (Blueprint $table) {
             $table->dropColumn('alert_operation_id');
@@ -587,21 +585,13 @@ return new class extends Migration
     }
 
     /**
-     * MySQL may use an auto-generated FK name; partial rollbacks can leave the table without ao_tm_seg_fk.
+     * Laravel's column-based dropForeign() assumes a default constraint name; these tables use custom names (e.g. ao_tm_ao_fk).
+     * On MySQL/MariaDB, resolve the real name from information_schema. Other drivers use column-based drop.
      */
-    private function dropAlertOperationTransportMapSegmentForeignKey(): void
+    private function dropForeignKeysReferencingColumn(string $tableName, string $columnName): void
     {
-        if (! Schema::hasTable('alert_operation_transport_map') || ! Schema::hasColumn('alert_operation_transport_map', 'segment_id')) {
+        if (! Schema::hasTable($tableName) || ! Schema::hasColumn($tableName, $columnName)) {
             return;
-        }
-
-        try {
-            Schema::table('alert_operation_transport_map', function (Blueprint $table) {
-                $table->dropForeign(['segment_id']);
-            });
-
-            return;
-        } catch (\Throwable) {
         }
 
         $connection = Schema::getConnection();
@@ -609,21 +599,40 @@ return new class extends Migration
             $db = $connection->getDatabaseName();
             $names = DB::table('information_schema.KEY_COLUMN_USAGE')
                 ->where('TABLE_SCHEMA', $db)
-                ->where('TABLE_NAME', 'alert_operation_transport_map')
-                ->where('COLUMN_NAME', 'segment_id')
+                ->where('TABLE_NAME', $tableName)
+                ->where('COLUMN_NAME', $columnName)
                 ->whereNotNull('REFERENCED_TABLE_NAME')
                 ->distinct()
                 ->pluck('CONSTRAINT_NAME');
 
+            $qTable = str_replace('`', '``', $tableName);
             foreach ($names as $name) {
                 try {
-                    DB::statement('ALTER TABLE `alert_operation_transport_map` DROP FOREIGN KEY `' . str_replace('`', '``', (string) $name) . '`');
+                    DB::statement(
+                        'ALTER TABLE `' . $qTable . '` DROP FOREIGN KEY `' . str_replace('`', '``', (string) $name) . '`'
+                    );
                 } catch (\Throwable) {
                 }
             }
 
             return;
         }
+
+        try {
+            Schema::table($tableName, function (Blueprint $table) use ($columnName) {
+                $table->dropForeign([$columnName]);
+            });
+        } catch (\Throwable) {
+        }
+    }
+
+    private function dropAlertOperationTransportMapSegmentForeignKey(): void
+    {
+        if (! Schema::hasTable('alert_operation_transport_map') || ! Schema::hasColumn('alert_operation_transport_map', 'segment_id')) {
+            return;
+        }
+
+        $this->dropForeignKeysReferencingColumn('alert_operation_transport_map', 'segment_id');
     }
 
     // ---- move_default_operation_step_duration_to_alert_operations ----
