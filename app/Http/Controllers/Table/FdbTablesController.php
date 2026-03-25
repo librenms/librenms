@@ -162,7 +162,7 @@ class FdbTablesController extends TableController
     public function formatItem($fdb_entry)
     {
         $mac = Mac::parse($fdb_entry->mac_address);
-        $ips = $fdb_entry->ipv4Addresses->pluck('ipv4_address');
+        $ips = $fdb_entry->ipv4Addresses->pluck('ipv4_address')->unique();
 
         $item = [
             'device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $fdb_entry->device]),

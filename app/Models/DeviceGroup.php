@@ -95,7 +95,7 @@ class DeviceGroup extends BaseModel
 
     public function scopeHasAccess($query, User $user)
     {
-        if (Gate::allows('viewAny', DeviceGroup::class)) {
+        if (Gate::allows('viewAll', DeviceGroup::class)) {
             return $query;
         }
 

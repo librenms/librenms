@@ -15051,6 +15051,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Palo Alto Networks",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15070,6 +15071,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15089,6 +15091,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15108,6 +15111,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Palo Alto Networks",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15127,6 +15131,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15146,6 +15151,7 @@
                     "entPhysicalContainedIn": 5,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Palo Alto Networks",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15165,6 +15171,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Palo Alto Networks",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15184,6 +15191,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Palo Alto Networks",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15203,6 +15211,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Palo Alto Networks",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15222,6 +15231,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Palo Alto Networks",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15241,6 +15251,7 @@
                     "entPhysicalContainedIn": 7,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15260,6 +15271,7 @@
                     "entPhysicalContainedIn": 7,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15279,6 +15291,7 @@
                     "entPhysicalContainedIn": 7,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15298,6 +15311,7 @@
                     "entPhysicalContainedIn": 7,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15317,6 +15331,7 @@
                     "entPhysicalContainedIn": 8,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15336,6 +15351,7 @@
                     "entPhysicalContainedIn": 8,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15355,6 +15371,7 @@
                     "entPhysicalContainedIn": 8,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15374,6 +15391,7 @@
                     "entPhysicalContainedIn": 8,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15393,6 +15411,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15412,6 +15431,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15431,6 +15451,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15450,6 +15471,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15469,6 +15491,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15488,6 +15511,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15507,6 +15531,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15526,6 +15551,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15545,6 +15571,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15564,6 +15591,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15583,6 +15611,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 },
                 {
@@ -15602,6 +15631,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "12336-48-48,48:48:48.48,048:484848484848",
                     "ifIndex": null
                 }
             ]

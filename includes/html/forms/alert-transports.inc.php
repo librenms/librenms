@@ -108,7 +108,7 @@ if (empty($name)) {
         if ($status == 'error' && $newEntry) {
             //If error, we will have to delete the new entry in alert_transports tbl
             $where = '`transport_id`=?';
-            dbDelete('alert_transports', $where, [$transport_id]);
+            \App\Models\AlertTransport::where('transport_id', $transport_id)->delete();
         }
     } else {
         $status = 'error';

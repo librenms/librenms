@@ -20,7 +20,7 @@ class Transceiver extends PortRelatedModel implements Keyable
         'model', // model number or name
         'revision', // hardware revision
         'serial', // serial number
-        'date', // date of manufacture
+        'date', // date of manufacture as returned by module
         'ddm', // if the module supports DDM or DOM
         'encoding', // data encoding method
         'cable', // SM, MM, Copper, etc
