@@ -20,6 +20,14 @@ class ProcessorPolicy
     }
 
     /**
+     * Determine whether the user can view all models.
+     */
+    public function viewAll(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'viewAll');
+    }
+
+    /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, Processor $processor): bool

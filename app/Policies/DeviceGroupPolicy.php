@@ -22,6 +22,14 @@ class DeviceGroupPolicy
     }
 
     /**
+     * Determine whether the user can view all models.
+     */
+    public function viewAll(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'viewAll');
+    }
+
+    /**
      * Determine whether the user can view the device group.
      */
     public function view(User $user, DeviceGroup $deviceGroup): bool
