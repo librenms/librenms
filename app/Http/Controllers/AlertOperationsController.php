@@ -16,7 +16,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\AlertOperation;
-use App\Models\AlertRule;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Gate;
 
@@ -40,9 +39,9 @@ class AlertOperationsController extends Controller
 
         return view('alert.operations.index', [
             'operations' => $operations,
-            'canCreate' => Gate::allows('create', AlertRule::class),
-            'canUpdate' => Gate::allows('update', AlertRule::class),
-            'canDelete' => Gate::allows('delete', AlertRule::class),
+            'canCreate' => Gate::allows('create', AlertOperation::class),
+            'canUpdate' => Gate::allows('update', AlertOperation::class),
+            'canDelete' => Gate::allows('delete', AlertOperation::class),
         ]);
     }
 }

@@ -10,10 +10,10 @@
             </div>
         </div>
 
-        @if ($canCreate)
+        @can('create', \App\Models\AlertOperation::class)
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#edit-alert-operation"
                     data-operation_id="">{{ __('Create operation') }}</button>
-        @endif
+        @endcan
         <br><br>
 
         <div class="table-responsive">
@@ -68,19 +68,19 @@
                         <td class="col-sm-3"><small>{!! $tpStr !!}</small></td>
                         <td>{{ (int) $op->alert_rules_count }}</td>
                         <td>
-                            @if ($canUpdate)
+                            @can('update', \App\Models\AlertOperation::class)
                                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
                                         data-target="#edit-alert-operation" data-operation_id="{{ (int) $op->id }}"><i
                                         class="fa fa-pencil"></i></button>
-                            @endif
-                            @if ($canDelete)
+                            @endcan
+                            @can('delete', \App\Models\AlertOperation::class)
                                 @php $ruleCount = (int) $op->alert_rules_count; @endphp
                                 <button type="button" class="btn btn-danger btn-sm btn-delete-alert-operation"
                                         data-operation_id="{{ (int) $op->id }}"
                                         data-operation_name="{{ $op->name }}"
                                         @if($ruleCount > 0) disabled title="{{ __('Assigned to alert rules') }}" @endif><i
                                         class="fa fa-trash"></i></button>
-                            @endif
+                            @endcan
                         </td>
                     </tr>
                 @endforeach
