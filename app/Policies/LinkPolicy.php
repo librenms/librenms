@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Link;
 use App\Models\User;
 
 class LinkPolicy
@@ -13,14 +14,14 @@ class LinkPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAny');
+        return $this->hasGlobalPermission($user, 'viewAll');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user): bool
+    public function view(User $user, Link $link): bool
     {
-        return $this->hasGlobalPermission($user, 'view');
+        return $this->hasGlobalPermission($user, 'viewAll');
     }
 }

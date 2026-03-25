@@ -38,7 +38,7 @@ $device_id = (int) ($_POST['device_id'] ?? 0);
 $interface = $_POST['interface'] ?? '';
 $address = $_POST['address'] ?? '';
 
-if (Gate::denies('viewAny', \App\Models\Device::class)) {
+if (Gate::denies('viewAll', \App\Models\Device::class)) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
     $where .= ' WHERE `devices`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
