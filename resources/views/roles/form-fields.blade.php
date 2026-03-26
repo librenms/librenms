@@ -20,7 +20,7 @@
 {{-- Permissions --}}
 <div class="tw:px-4">
     {{-- Section header --}}
-    <div class="tw:flex tw:flex-col tw:md:flex-row tw:md:items-center tw:justify-between tw:mb-6 tw:gap-4 tw:w-full">
+    <div class="tw:flex tw:flex-col tw:md:flex-row tw:justify-between tw:mb-6 tw:gap-4 tw:w-full">
         <div class="tw:flex tw:flex-col tw:sm:flex-row tw:sm:items-center tw:gap-4 tw:md:w-1/4">
             <h4 class="tw:font-bold tw:m-0 tw:text-xl">
                 {{ __('permissions.rbac.permissions') }}
