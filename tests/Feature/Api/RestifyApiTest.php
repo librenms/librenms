@@ -3,11 +3,18 @@
 namespace LibreNMS\Tests\Feature\Api;
 
 use App\Http\Middleware\EnforceJsonApi;
+use App\Models\Alert;
 use App\Models\AlertRule;
+use App\Models\AlertSchedule;
 use App\Models\AlertTemplate;
+use App\Models\AlertTransport;
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\Location;
+use App\Models\PollerGroup;
 use App\Models\Port;
+use App\Models\PortGroup;
+use App\Models\ServiceTemplate;
 use App\Models\User;
 use Database\Seeders\RolesSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -754,5 +761,572 @@ class RestifyApiTest extends DBTestCase
 
         $this->getJson('/api/v1/alert-rules')
             ->assertStatus(403);
+    }
+
+    // ── Locations ─────────────────────────────────────────────
+
+    public function testAdminCanListLocations(): void
+    {
+        $user = User::factory()->admin()->create();
+        Location::factory()->count(3)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/locations')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testAdminCanShowLocation(): void
+    {
+        $user = User::factory()->admin()->create();
+        $location = Location::factory()->create(['location' => 'Server Room A']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/locations/{$location->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.location', 'Server Room A');
+    }
+
+    public function testLocationFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $location = Location::factory()->withCoordinates()->create([
+            'location' => 'DC East',
+        ]);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/locations/{$location->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.location', 'DC East')
+            ->assertJsonStructure(['data' => ['attributes' => ['location', 'lat', 'lng']]]);
+    }
+
+    public function testAdminCanCreateLocation(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/locations', [
+            'location' => 'New Data Center',
+            'lat' => 51.5074,
+            'lng' => -0.1278,
+        ])->assertStatus(201)
+            ->assertJsonPath('data.attributes.location', 'New Data Center');
+    }
+
+    public function testAdminCanUpdateLocation(): void
+    {
+        $user = User::factory()->admin()->create();
+        $location = Location::factory()->create(['location' => 'Old Name']);
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/locations/{$location->id}", [
+            'location' => 'Updated Name',
+        ])->assertStatus(200)
+            ->assertJsonPath('data.attributes.location', 'Updated Name');
+    }
+
+    public function testAdminCanDeleteLocation(): void
+    {
+        $user = User::factory()->admin()->create();
+        $location = Location::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->deleteJsonApi("/api/v1/locations/{$location->id}")
+            ->assertStatus(204);
+
+        $this->assertDatabaseMissing('locations', ['id' => $location->id]);
+    }
+
+    public function testReadOnlyUserCannotCreateLocation(): void
+    {
+        $user = User::factory()->read()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/locations', [
+            'location' => 'Forbidden',
+        ])->assertStatus(403);
+    }
+
+    public function testLocationSearchByName(): void
+    {
+        $user = User::factory()->admin()->create();
+        Location::factory()->create(['location' => 'Data Center East']);
+        Location::factory()->create(['location' => 'Office West']);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/locations?search=Data+Center')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 1);
+    }
+
+    // ── Port Groups ───────────────────────────────────────────
+
+    public function testAdminCanListPortGroups(): void
+    {
+        $user = User::factory()->admin()->create();
+        PortGroup::factory()->count(3)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-groups')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testAdminCanShowPortGroup(): void
+    {
+        $user = User::factory()->admin()->create();
+        $group = PortGroup::factory()->create(['name' => 'uplinks']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/port-groups/{$group->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.name', 'uplinks');
+    }
+
+    public function testAdminCanCreatePortGroup(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/port-groups', [
+            'name' => 'new-port-group',
+            'desc' => 'A new group',
+        ])->assertStatus(201)
+            ->assertJsonPath('data.attributes.name', 'new-port-group');
+    }
+
+    public function testAdminCanUpdatePortGroup(): void
+    {
+        $user = User::factory()->admin()->create();
+        $group = PortGroup::factory()->create(['name' => 'old-name']);
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/port-groups/{$group->id}", [
+            'name' => 'new-name',
+        ])->assertStatus(200)
+            ->assertJsonPath('data.attributes.name', 'new-name');
+    }
+
+    public function testAdminCanDeletePortGroup(): void
+    {
+        $user = User::factory()->admin()->create();
+        $group = PortGroup::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->deleteJsonApi("/api/v1/port-groups/{$group->id}")
+            ->assertStatus(204);
+
+        $this->assertDatabaseMissing('port_groups', ['id' => $group->id]);
+    }
+
+    public function testReadOnlyUserCannotCreatePortGroup(): void
+    {
+        $user = User::factory()->read()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/port-groups', [
+            'name' => 'forbidden',
+        ])->assertStatus(403);
+    }
+
+    // ── Alert Schedules ───────────────────────────────────────
+
+    public function testAdminCanListAlertSchedules(): void
+    {
+        $user = User::factory()->admin()->create();
+        AlertSchedule::factory()->count(3)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/alert-schedules')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testAdminCanShowAlertSchedule(): void
+    {
+        $user = User::factory()->admin()->create();
+        $schedule = AlertSchedule::factory()->create(['title' => 'Weekend Maintenance']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/alert-schedules/{$schedule->schedule_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.title', 'Weekend Maintenance');
+    }
+
+    public function testAlertScheduleFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $schedule = AlertSchedule::factory()->create([
+            'title' => 'Planned Outage',
+            'notes' => 'Router upgrade',
+            'recurring' => 0,
+        ]);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/alert-schedules/{$schedule->schedule_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.title', 'Planned Outage')
+            ->assertJsonPath('data.attributes.notes', 'Router upgrade');
+    }
+
+    public function testAdminCanDeleteAlertSchedule(): void
+    {
+        $user = User::factory()->admin()->create();
+        $schedule = AlertSchedule::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->deleteJsonApi("/api/v1/alert-schedules/{$schedule->schedule_id}")
+            ->assertStatus(204);
+
+        $this->assertDatabaseMissing('alert_schedule', ['schedule_id' => $schedule->schedule_id]);
+    }
+
+    public function testReadOnlyUserCannotCreateAlertSchedule(): void
+    {
+        $user = User::factory()->read()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-schedules', [
+            'title' => 'Forbidden',
+        ])->assertStatus(403);
+    }
+
+    // ── Alert Transports ──────────────────────────────────────
+
+    public function testAdminCanListAlertTransports(): void
+    {
+        $user = User::factory()->admin()->create();
+        AlertTransport::factory()->count(3)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/alert-transports')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testAdminCanShowAlertTransport(): void
+    {
+        $user = User::factory()->admin()->create();
+        $transport = AlertTransport::factory()->create(['transport_name' => 'Slack Alerts']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/alert-transports/{$transport->transport_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.transport_name', 'Slack Alerts');
+    }
+
+    public function testAlertTransportFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $transport = AlertTransport::factory()->create([
+            'transport_name' => 'Email Alert',
+            'transport_type' => 'mail',
+            'is_default' => 1,
+        ]);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/alert-transports/{$transport->transport_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.transport_name', 'Email Alert')
+            ->assertJsonPath('data.attributes.transport_type', 'mail')
+            ->assertJsonPath('data.attributes.is_default', true);
+    }
+
+    public function testAdminCanDeleteAlertTransport(): void
+    {
+        $user = User::factory()->admin()->create();
+        $transport = AlertTransport::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->deleteJsonApi("/api/v1/alert-transports/{$transport->transport_id}")
+            ->assertStatus(204);
+
+        $this->assertDatabaseMissing('alert_transports', ['transport_id' => $transport->transport_id]);
+    }
+
+    public function testReadOnlyUserCannotCreateAlertTransport(): void
+    {
+        $user = User::factory()->read()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-transports', [
+            'transport_name' => 'Forbidden',
+            'transport_type' => 'mail',
+        ])->assertStatus(403);
+    }
+
+    // ── Service Templates ─────────────────────────────────────
+
+    public function testAdminCanListServiceTemplates(): void
+    {
+        $user = User::factory()->admin()->create();
+        ServiceTemplate::factory()->count(3)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/service-templates')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testAdminCanShowServiceTemplate(): void
+    {
+        $user = User::factory()->admin()->create();
+        $template = ServiceTemplate::factory()->create(['name' => 'HTTP Check']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/service-templates/{$template->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.name', 'HTTP Check');
+    }
+
+    public function testServiceTemplateFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $template = ServiceTemplate::factory()->create([
+            'name' => 'DNS Monitor',
+            'check' => 'dns',
+            'type' => 'static',
+            'desc' => 'Monitor DNS servers',
+        ]);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/service-templates/{$template->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.name', 'DNS Monitor')
+            ->assertJsonPath('data.attributes.check', 'dns')
+            ->assertJsonPath('data.attributes.type', 'static')
+            ->assertJsonPath('data.attributes.desc', 'Monitor DNS servers');
+    }
+
+    public function testAdminCanDeleteServiceTemplate(): void
+    {
+        $user = User::factory()->admin()->create();
+        $template = ServiceTemplate::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->deleteJsonApi("/api/v1/service-templates/{$template->id}")
+            ->assertStatus(204);
+
+        $this->assertDatabaseMissing('service_templates', ['id' => $template->id]);
+    }
+
+    public function testReadOnlyUserCannotCreateServiceTemplate(): void
+    {
+        $user = User::factory()->read()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/service-templates', [
+            'name' => 'Forbidden',
+            'check' => 'http',
+            'type' => 'static',
+        ])->assertStatus(403);
+    }
+
+    // ── Poller Groups ─────────────────────────────────────────
+
+    public function testAdminCanListPollerGroups(): void
+    {
+        $user = User::factory()->admin()->create();
+        PollerGroup::factory()->count(3)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/poller-groups')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testAdminCanShowPollerGroup(): void
+    {
+        $user = User::factory()->admin()->create();
+        $group = PollerGroup::factory()->create(['group_name' => 'EU Pollers']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/poller-groups/{$group->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.group_name', 'EU Pollers');
+    }
+
+    public function testAdminCanCreatePollerGroup(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/poller-groups', [
+            'group_name' => 'US East Pollers',
+            'descr' => 'Pollers in US East region',
+        ])->assertStatus(201)
+            ->assertJsonPath('data.attributes.group_name', 'US East Pollers');
+    }
+
+    public function testAdminCanUpdatePollerGroup(): void
+    {
+        $user = User::factory()->admin()->create();
+        $group = PollerGroup::factory()->create(['group_name' => 'Old Name']);
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/poller-groups/{$group->id}", [
+            'group_name' => 'New Name',
+        ])->assertStatus(200)
+            ->assertJsonPath('data.attributes.group_name', 'New Name');
+    }
+
+    public function testAdminCanDeletePollerGroup(): void
+    {
+        $user = User::factory()->admin()->create();
+        $group = PollerGroup::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->deleteJsonApi("/api/v1/poller-groups/{$group->id}")
+            ->assertStatus(204);
+
+        $this->assertDatabaseMissing('poller_groups', ['id' => $group->id]);
+    }
+
+    public function testReadOnlyUserCannotCreatePollerGroup(): void
+    {
+        $user = User::factory()->read()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/poller-groups', [
+            'group_name' => 'Forbidden',
+        ])->assertStatus(403);
+    }
+
+    public function testPollerGroupSearchByName(): void
+    {
+        $user = User::factory()->admin()->create();
+        PollerGroup::factory()->create(['group_name' => 'EU Pollers']);
+        PollerGroup::factory()->create(['group_name' => 'US Pollers']);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/poller-groups?search=EU')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 1);
+    }
+
+    // ── Alerts ────────────────────────────────────────────────
+
+    public function testAdminCanListAlerts(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Alert::factory()->count(3)->create(['device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/alerts')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testAdminCanShowAlert(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $alert = Alert::factory()->create(['device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/alerts/{$alert->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.device_id', $device->device_id);
+    }
+
+    public function testAlertFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $alert = Alert::factory()->create([
+            'device_id' => $device->device_id,
+            'state' => 1,
+            'note' => 'Test note',
+        ]);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/alerts/{$alert->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.state', 1)
+            ->assertJsonPath('data.attributes.note', 'Test note')
+            ->assertJsonStructure(['data' => ['attributes' => ['device_id', 'rule_id', 'state', 'note', 'timestamp']]]);
+    }
+
+    public function testAdminCanAcknowledgeAlert(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $alert = Alert::factory()->create(['device_id' => $device->device_id, 'state' => 1]);
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/alerts/{$alert->id}", [
+            'state' => 2,
+            'note' => 'Acknowledged via API',
+        ])->assertStatus(200)
+            ->assertJsonPath('data.attributes.state', 2);
+    }
+
+    public function testAdminCanUnmuteAlert(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $alert = Alert::factory()->acknowledged()->create(['device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/alerts/{$alert->id}", [
+            'state' => 1,
+        ])->assertStatus(200)
+            ->assertJsonPath('data.attributes.state', 1);
+    }
+
+    public function testReadOnlyUserCannotUpdateAlert(): void
+    {
+        $user = User::factory()->read()->create();
+        $device = Device::factory()->create();
+        $alert = Alert::factory()->create(['device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->putJsonApi("/api/v1/alerts/{$alert->id}", [
+            'state' => 2,
+        ])->assertStatus(403);
+    }
+
+    public function testAlertsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alerts', [
+            'device_id' => 1,
+            'rule_id' => 1,
+            'state' => 1,
+        ])->assertStatus(403);
+    }
+
+    public function testAdminCanAcknowledgeViaAction(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $alert = Alert::factory()->create(['device_id' => $device->device_id, 'state' => 1]);
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi("/api/v1/alerts/{$alert->id}/acknowledge", [
+            'note' => 'Looking into it',
+        ])->assertStatus(200)
+            ->assertJsonPath('data.state', 2);
+
+        $this->assertDatabaseHas('alerts', ['id' => $alert->id, 'state' => 2]);
+    }
+
+    public function testAdminCanUnmuteViaAction(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $alert = Alert::factory()->acknowledged()->create(['device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi("/api/v1/alerts/{$alert->id}/unmute", [
+            'note' => 'Re-alerting',
+        ])->assertStatus(200)
+            ->assertJsonPath('data.state', 1);
+
+        $this->assertDatabaseHas('alerts', ['id' => $alert->id, 'state' => 1]);
     }
 }

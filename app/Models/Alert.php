@@ -27,13 +27,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\AlertState;
 
 class Alert extends Model
 {
+    use HasFactory;
     public $timestamps = false;
 
     /**
@@ -68,6 +71,15 @@ class Alert extends Model
     public function scopeAcknowledged($query)
     {
         return $query->where('state', '=', AlertState::ACKNOWLEDGED);
+    }
+
+    public function scopeHasAccess($query, User $user)
+    {
+        if (Gate::allows('viewAny', Device::class)) {
+            return $query;
+        }
+
+        return $query->whereIntegerInRaw('alerts.device_id', \Permissions::devicesForUser($user));
     }
 
     // ---- Define Relationships ----

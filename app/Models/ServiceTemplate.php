@@ -27,12 +27,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Log;
 
 class ServiceTemplate extends BaseModel
 {
+    use HasFactory;
     public $timestamps = false;
     protected $primaryKey = 'id';
     protected $fillable = [
