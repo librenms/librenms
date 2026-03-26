@@ -1,7 +1,7 @@
 <?php
 
 if (Rrd::checkRrdExists(Rrd::name(DeviceCache::getPrimary()->hostname, 'icmp-perf'))) {
-    $perf_url = Url('device') . '/device=' . DeviceCache::getPrimary()->device_id . '/tab=graphs/group=poller/';
+    $perf_url = url('device') . '/device=' . DeviceCache::getPrimary()->device_id . '/tab=graphs/group=poller/';
     echo '
         <div class="row">
         <div class="col-md-12">
@@ -17,7 +17,7 @@ if (Rrd::checkRrdExists(Rrd::name(DeviceCache::getPrimary()->hostname, 'icmp-per
     $graph = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
         'device' => DeviceCache::getPrimary()->device_id,
         'type' => 'device_icmp_perf',
-        'from' => \LibreNMS\Config::get('time.day'),
+        'from' => \App\Facades\LibrenmsConfig::get('time.day'),
         'legend' => 'yes',
         'popup_title' => DeviceCache::getPrimary()->hostname . ' - Ping Response',
     ]);

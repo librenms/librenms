@@ -31,7 +31,7 @@ use App\Models\Device;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class BasicApiTest extends DBTestCase
+final class BasicApiTest extends DBTestCase
 {
     use DatabaseTransactions;
 

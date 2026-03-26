@@ -26,7 +26,7 @@ if ($device['os_group'] == 'cisco') {
                 'denied' => $vpdn['cvpdnSystemDeniedUsersTotal'],
             ];
 
-            $tags = compact('type', 'rrd_name', 'rrd_def');
+            $tags = ['type' => $type, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
             app('Datastore')->put($device, 'vpdn', $tags, $fields);
 
             $os->enableGraph("vpdn_sessions_$type");

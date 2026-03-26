@@ -6271,5 +6271,26 @@
                 }
             ]
         }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.47196.4.1.1.1.100",
+                    "sysDescr": "HPE ANW JL658A 6300M 24SFP+ 4SFP56 Swch FL.10.15.0005",
+                    "sysContact": null,
+                    "version": "FL.10.15.0005",
+                    "hardware": "6300M 24SFP+ 4SFP56",
+                    "features": null,
+                    "location": null,
+                    "os": "arubaos-cx",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "aruba.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

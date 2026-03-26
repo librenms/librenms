@@ -45,7 +45,7 @@ if (! empty($oids)) {
             $ifExtModule = $data['ifExtModule'];
             unset($defrate);
             $mnr = $data['ifExtModule']; //module nr
-            $mname = $pre_cache['entPhysicalDescr'][$ifExtModule]['entPhysicalDescr'] ?? 'unknown'; //module name
+            $mname = $pre_cache['ENTITY-MIB::entPhysicalDescr'][$ifExtModule]['ENTITY-MIB::entPhysicalDescr'] ?? 'unknown'; //module name
             switch ($mname) {
                 case 'LAS-D':   // AsiOut
                 case 'LRT-C':   // DVB-T/T2

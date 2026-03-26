@@ -8,7 +8,5 @@ over:
     - { graph: device_dbm, text: 'Interface Power' }
 discovery:
     -
-        snmpget:
-            oid: '1.3.6.1.4.1.4515.1.3.6.1.1.1.2.0'
-            op: starts
-            value: [ 'PL', 'Pl', 'pl' ]
+        sysObjectID: .1.3.6.1.4.1.4515.100.1.
+        sysDescr_regex: '/^[Pp][Ll]/'

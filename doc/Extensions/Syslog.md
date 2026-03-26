@@ -2,7 +2,7 @@
 
 
 ## Syslog integration variants
-This section explain different ways to recieve and process syslog with LibreNMS.
+This section explain different ways to receive and process syslog with LibreNMS.
 Except of graylog, all Syslogs variants store their logs in the LibreNMS database. You need to enable the Syslog extension:
 
 ```bash
@@ -364,7 +364,7 @@ log host source <eth0>
 configure
 logging severity warning
 logging facility local6
-logging librenms.ip control-descr “LibreNMS”
+logging librenms.ip control-descr "LibreNMS"
 logging notify running-config-change
 write memory
 ```

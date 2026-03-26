@@ -26,33 +26,18 @@
 
 namespace LibreNMS\Device;
 
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Modules\Wireless;
 
 class WirelessSensor
 {
-    protected $type;
-    protected $device_id;
     protected $oids;
-    protected $subtype;
-    protected $index;
-    protected $description;
-    protected $current;
-    protected $multiplier;
-    protected $divisor;
-    protected $aggregator;
-    protected $high_limit;
-    protected $low_limit;
-    protected $high_warn;
-    protected $low_warn;
-    protected $entPhysicalIndex;
-    protected $entPhysicalMeasured;
     protected string $rrd_type = 'GAUGE';
-    protected $access_point_ip;
 
     /**
      * Sensor constructor. Create a new sensor to be discovered.
      *
-     * @param  string  $type  Class of this sensor, must be a supported class
+     * @param  WirelessSensorType  $type  Class of this sensor, must be a supported class
      * @param  int  $device_id  the device_id of the device that owns this sensor
      * @param  array|string  $oids  an array or single oid that contains the data for this sensor
      * @param  string  $subtype  the type of sensor an additional identifier to separate out sensors of the same class, generally this is the os name
@@ -67,46 +52,30 @@ class WirelessSensor
      * @param  int|float  $low_limit  Alerting: Minimum value
      * @param  int|float  $high_warn  Alerting: High warning value
      * @param  int|float  $low_warn  Alerting: Low warning value
-     * @param  int|float  $entPhysicalIndex  The entPhysicalIndex this sensor is associated, often a port
-     * @param  int|float  $entPhysicalMeasured  the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
+     * @param  string|int|null  $entPhysicalIndex  The entPhysicalIndex this sensor is associated, often a port
+     * @param  string|null  $entPhysicalMeasured  the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
      */
     public function __construct(
-        $type,
-        $device_id,
+        protected WirelessSensorType $type,
+        protected $device_id,
         $oids,
-        $subtype,
-        $index,
-        $description,
-        $current = null,
-        $multiplier = 1,
-        $divisor = 1,
-        $aggregator = 'sum',
-        $access_point_id = null,
-        $high_limit = null,
-        $low_limit = null,
-        $high_warn = null,
-        $low_warn = null,
-        $entPhysicalIndex = null,
-        $entPhysicalMeasured = null
+        protected $subtype,
+        protected $index,
+        protected $description,
+        protected $current = null,
+        protected $multiplier = 1,
+        protected $divisor = 1,
+        protected $aggregator = 'sum',
+        protected $access_point_id = null,
+        protected $high_limit = null,
+        protected $low_limit = null,
+        protected $high_warn = null,
+        protected $low_warn = null,
+        protected $entPhysicalIndex = null,
+        protected $entPhysicalMeasured = null
     ) {
-        $this->access_point_ip = $access_point_id;
-        $this->type = $type;
-        $this->device_id = $device_id;
         $this->oids = (array) $oids;
-        $this->subtype = $subtype;
-        $this->index = $index;
-        $this->description = $description;
-        $this->current = $current;
-        $this->multiplier = $multiplier;
-        $this->divisor = $divisor;
-        $this->aggregator = $aggregator;
-        $this->entPhysicalIndex = $entPhysicalIndex;
-        $this->entPhysicalMeasured = $entPhysicalMeasured;
-        $this->high_limit = $high_limit;
-        $this->low_limit = $low_limit;
-        $this->high_warn = $high_warn;
-        $this->low_warn = $low_warn;
-        $this->rrd_type = $this->type == 'errors' ? 'COUNTER' : 'GAUGE';
+        $this->rrd_type = $this->type === WirelessSensorType::Errors ? 'COUNTER' : 'GAUGE';
     }
 
     public function toModel(): \App\Models\WirelessSensor
@@ -127,114 +96,9 @@ class WirelessSensor
             'entPhysicalIndex' => $this->entPhysicalIndex,
             'entPhysicalMeasured' => $this->entPhysicalMeasured,
             'sensor_oids' => $this->oids,
-            'access_point_ip' => $this->access_point_ip,
+            'access_point_id' => $this->access_point_id,
             'rrd_type' => $this->rrd_type,
         ]);
-    }
-
-    /**
-     * Return a list of valid types with metadata about each type
-     * $class => array(
-     *  'short' - short text for this class
-     *  'long'  - long text for this class
-     *  'unit'  - units used by this class 'dBm' for example
-     *  'icon'  - font awesome icon used by this class
-     * )
-     *
-     * @param  bool  $valid  filter this list by valid types in the database
-     * @param  int  $device_id  when filtering, only return types valid for this device_id
-     * @return array
-     */
-    public static function getTypes($valid = false, $device_id = null): array
-    {
-        // Add new types here translations/descriptions/units in lang/<lang>/wireless.php
-        // FIXME I'm really bad with icons, someone please help!
-        static $types = [
-            'ap-count' => [
-                'icon' => 'wifi',
-            ],
-            'clients' => [
-                'icon' => 'tablet',
-            ],
-            'quality' => [
-                'icon' => 'feed',
-            ],
-            'capacity' => [
-                'icon' => 'feed',
-            ],
-            'utilization' => [
-                'icon' => 'percent',
-            ],
-            'rate' => [
-                'icon' => 'tachometer',
-            ],
-            'ccq' => [
-                'icon' => 'wifi',
-            ],
-            'snr' => [
-                'icon' => 'signal',
-            ],
-            'sinr' => [
-                'icon' => 'signal',
-            ],
-            'rsrp' => [
-                'icon' => 'signal',
-            ],
-            'rsrq' => [
-                'icon' => 'signal',
-            ],
-            'ssr' => [
-                'icon' => 'signal',
-            ],
-            'mse' => [
-                'icon' => 'signal',
-            ],
-            'xpi' => [
-                'icon' => 'signal',
-            ],
-            'rssi' => [
-                'icon' => 'signal',
-            ],
-            'power' => [
-                'icon' => 'bolt',
-            ],
-            'noise-floor' => [
-                'icon' => 'signal',
-            ],
-            'errors' => [
-                'icon' => 'exclamation-triangle',
-                'type' => 'counter',
-            ],
-            'error-ratio' => [
-                'icon' => 'exclamation-triangle',
-            ],
-            'error-rate' => [
-                'icon' => 'exclamation-triangle',
-            ],
-            'frequency' => [
-                'icon' => 'line-chart',
-            ],
-            'distance' => [
-                'icon' => 'space-shuttle',
-            ],
-            'cell' => [
-                'icon' => 'line-chart',
-            ],
-            'channel' => [
-                'icon' => 'line-chart',
-            ],
-        ];
-
-        if ($valid) {
-            $sensors = \App\Models\WirelessSensor::query()
-                ->when($device_id, fn ($q) => $q->where('device_id', $device_id))
-                ->groupBy('sensor_class')
-                ->pluck('sensor_class');
-
-            return array_intersect_key($types, $sensors->flip()->all());
-        }
-
-        return $types;
     }
 
     /**

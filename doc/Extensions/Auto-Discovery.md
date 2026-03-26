@@ -204,7 +204,7 @@ positional arguments:
 optional arguments:
   -h, --help       show this help message and exit
   -t THREADS       How many IPs to scan at a time.  More will increase the scan speed, but could overload your system. Default: 32
-  -g GROUP         The poller group all scanned devices will be added to. Default: The first group listed in 'distributed_poller_group', or 0 if not specificed
+  -g GROUP         The poller group all scanned devices will be added to. Default: The first group listed in 'distributed_poller_group', or 0 if not specified
   -l, --legend     Print the legend.
   -v, --verbose    Show debug output. Specifying multiple times increases the verbosity.
   --ping-fallback  Add the device as an ICMP only device if it replies to ping but not SNMP.

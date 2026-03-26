@@ -47,10 +47,10 @@ trait RuntimeClassCache
         if (! array_key_exists($name, $this->runtimeCache)) {
             if ($this->runtimeCacheExternalTTL) {
                 try {
-                    $this->runtimeCache[$name] = Cache::remember('runtimeCache' . __CLASS__ . $name, $this->runtimeCacheExternalTTL, $actual);
+                    $this->runtimeCache[$name] = Cache::remember('runtimeCache' . self::class . $name, $this->runtimeCacheExternalTTL, $actual);
 
                     return $this->runtimeCache[$name]; // system cache success, don't use local cache
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     // go to fallback code
                 }
             }

@@ -33,7 +33,7 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
     $fgHaStatsIndex_num = '.1.3.6.1.4.1.12356.101.13.2.1.1.1';
 
     // Fetch the cluster members
-    $haStatsEntries = SnmpQuery::hideMIB()->walk('FORTINET-FORTIGATE-MIB::fgHaStatsIndex')->table(1);
+    $haStatsEntries = SnmpQuery::hideMib()->walk('FORTINET-FORTIGATE-MIB::fgHaStatsIndex')->table(1);
 
     // As of July 2024:
     // FortiNet considers a single-node cluster a valid setup. Therefor, if a cluster node is removed or

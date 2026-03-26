@@ -126,10 +126,10 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('reqbyteratio5', 'GAUGE', 0)
     ->addDataset('reqbyteratio60', 'GAUGE', 0);
 
-$memmaxsize = $memmaxsize * 1000;
-$swapmaxsize = $swapmaxsize * 1000;
-$swaphighwm = $swaphighwm * 1000;
-$swaplowwm = $swaplowwm * 1000;
+$memmaxsize *= 1000;
+$swapmaxsize *= 1000;
+$swaphighwm *= 1000;
+$swaplowwm *= 1000;
 
 $fields = [
     'memmaxsize' => $memmaxsize,

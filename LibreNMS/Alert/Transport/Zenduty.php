@@ -44,7 +44,7 @@ class Zenduty extends Transport
             $alert_type = $alert_data['severity'];
         }
         // Set the standard data ZD expects to see
-        $msg = (json_decode($alert_data['msg'], true)) ? json_decode($alert_data['msg'], true) : $alert_data['msg'];
+        $msg = json_decode((string) $alert_data['msg'], true) ?: $alert_data['msg'];
         $data = [
             'message' => $alert_data['title'],
             'alert_type' => $alert_type,
@@ -84,7 +84,7 @@ class Zenduty extends Transport
             $data['escalation_policy'] = $this->config['escalation_policy_id'];
         }
 
-        $tmp_msg = json_decode($alert_data['msg'], true);
+        $tmp_msg = json_decode((string) $alert_data['msg'], true);
         if (isset($tmp_msg['message']) && isset($tmp_msg['summary'])) {
             $data = array_merge($data, $tmp_msg);
         } else {

@@ -51,7 +51,7 @@ class PortController extends SelectController
      */
     protected function searchFields($request)
     {
-        return (array) $request->get('field', ['ifAlias', 'ifName', 'ifDescr', 'devices.hostname', 'devices.sysName']);
+        return (array) $request->input('field', ['ifAlias', 'ifName', 'ifDescr', 'devices.hostname', 'devices.sysName']);
     }
 
     /**
@@ -66,22 +66,22 @@ class PortController extends SelectController
         $query = Port::hasAccess($request->user())
             ->isNotDeleted()
             ->has('device')
-            ->with(['device' => function ($query) {
-                $query->select('device_id', 'hostname', 'sysName', 'display');
+            ->with(['device' => function ($query): void {
+                $query->select(['device_id', 'hostname', 'sysName', 'display']);
             }])
-            ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
+            ->select(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr'])
             ->groupBy(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr']);
 
-        if ($request->get('term')) {
+        if ($request->input('term')) {
             // join with devices for searches
             $query->leftJoin('devices', 'devices.device_id', 'ports.device_id');
         }
 
-        if ($device_id = $request->get('device')) {
+        if ($device_id = $request->input('device')) {
             $query->where('ports.device_id', $device_id);
         }
 
-        if ($device_ids = $request->get('devices')) {
+        if ($device_ids = $request->input('devices')) {
             $query->whereIn('ports.device_id', $device_ids);
         }
 

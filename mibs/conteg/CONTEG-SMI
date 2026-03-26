@@ -1,0 +1,48 @@
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+
+CONTEG-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    enterprises
+        FROM SNMPv2-SMI;
+        
+conteg MODULE-IDENTITY
+    LAST-UPDATED
+        "202106160000Z" -- June 16th, 2021
+    ORGANIZATION
+        ""
+    CONTACT-INFO
+        ""
+    DESCRIPTION
+        ""
+    REVISION
+        "202106160000Z" -- June 16th, 2021
+    DESCRIPTION
+        "The initial revision of this MIB module"
+    ::= { enterprises 28402 }
+    
+contegProducts OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "contegProducts is the root OBJECT IDENTIFIER from which
+         sysObjectId values are assigned. Acutal values are defined in 
+         CONTEG-PRODUCTS-MIB."
+    ::= { conteg 11 }
+    
+contegMgmt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "contegMgmt is the main subtree for new mib development."
+    ::= { conteg 12 }
+    
+contegModules OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "contegModules provides a root object identifier from which
+         MODULE-IDENTITY values may be assigned."
+    ::= { conteg 13 }
+    
+END

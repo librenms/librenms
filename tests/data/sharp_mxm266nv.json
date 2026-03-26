@@ -13,7 +13,7 @@
                     "location": "<private>",
                     "os": "sharp",
                     "type": "printer",
-                    "serial": "0505250000Z",
+                    "serial": "0505571100",
                     "icon": "sharp.png"
                 }
             ]
@@ -845,5 +845,18 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "192.168.100.123",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.100.0/24",
+                    "ifIndex": 1
+                }
+            ]
+        }
     }
 }

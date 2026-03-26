@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Dns;
 
 /**
@@ -95,7 +96,7 @@ class Location extends Model
             return true;
         }
 
-        if ($hostname && \LibreNMS\Config::get('geoloc.dns')) {
+        if ($hostname && \App\Facades\LibrenmsConfig::get('geoloc.dns')) {
             $coord = app(Dns::class)->getCoordinates($hostname);
 
             if (! empty($coord)) {
@@ -105,7 +106,7 @@ class Location extends Model
             }
         }
 
-        if ($this->location && ! $this->hasCoordinates() && \LibreNMS\Config::get('geoloc.latlng', true)) {
+        if ($this->location && ! $this->hasCoordinates() && \App\Facades\LibrenmsConfig::get('geoloc.latlng', true)) {
             return $this->fetchCoordinates();
         }
 
@@ -145,7 +146,7 @@ class Location extends Model
             $this->fill($api->getCoordinates(preg_replace($this->location_ignore_regex, '', $this->location)));
 
             return true;
-        } catch (BindingResolutionException $e) {
+        } catch (BindingResolutionException) {
             // could not resolve geocoder, Laravel isn't booted. Fail silently.
         }
 
@@ -161,7 +162,7 @@ class Location extends Model
      */
     public function scopeHasAccess($query, $user)
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAll', Location::class)) {
             return $query;
         }
 
@@ -175,7 +176,7 @@ class Location extends Model
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
-        return $query->whereHas('devices.groups', function ($query) use ($deviceGroup) {
+        return $query->whereHas('devices.groups', function ($query) use ($deviceGroup): void {
             $query->where('device_groups.id', $deviceGroup);
         });
     }
@@ -189,8 +190,8 @@ class Location extends Model
         return $this->hasMany(Device::class, 'location_id');
     }
 
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->location;
+        return (string) $this->location;
     }
 }

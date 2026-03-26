@@ -18,6 +18,7 @@ class EntPhysical extends DeviceRelatedModel implements Keyable
         'entPhysicalSerialNum',
         'entPhysicalModelName',
         'entPhysicalMfgName',
+        'entPhysicalMfgDate',
         'entPhysicalVendorType',
         'entPhysicalParentRelPos',
         'entPhysicalHardwareRev',
@@ -29,8 +30,8 @@ class EntPhysical extends DeviceRelatedModel implements Keyable
         'ifIndex',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): int
     {
-        return $this->entPhysicalIndex;
+        return (int) $this->entPhysicalIndex;
     }
 }

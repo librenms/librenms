@@ -1,10 +1,10 @@
 -- *******************************************************************
 -- CISCO-LWAPP-DOT11-CLIENT-MIB.my: Dot11 Wireless Clients MIB
---   
+--
 -- June 2006, Devesh Pujari, Srinath Candadai
 -- March 2011 Suja Thangaveluchamy
---   
--- Copyright (c) 2006, 2010-2012, 2016-2018 by Cisco Systems Inc.
+--
+-- Copyright (c) 2006, 2010-2012, 2016-2018, 2020-2021, 2024 by Cisco Systems, Inc.
 -- All rights reserved.
 -- *******************************************************************
 
@@ -71,7 +71,7 @@ IMPORTS
 -- ********************************************************************
 
 ciscoLwappDot11ClientMIB MODULE-IDENTITY
-    LAST-UPDATED    "201804230000Z"
+    LAST-UPDATED    "202405130000Z"
     ORGANIZATION    "Cisco Systems Inc."
     CONTACT-INFO
             "Cisco Systems,
@@ -235,6 +235,23 @@ ciscoLwappDot11ClientMIB MODULE-IDENTITY
 
         [2] Draft-obara-capwap-lwapp-00.txt, IETF Light 
         Weight Access Point Protocol"
+    REVISION        "202011230000Z"
+    DESCRIPTION
+        "Added the following objects:
+        cldcMaxClientsTrapEnabled,
+        cldcMaxClientsTrapThreshold,
+        cldcMaxClientsTrapPeriod,
+        cldcMaxClientsCount,
+        cldcMaxThresholdReachedClear,
+        ciscoLwappDot11ClientMaxClientsReached,
+        and groups:
+        ciscoLwappDot11ClientMIBConfigGroupRev2,
+        ciscoLwappDot11ClientMIBNotifsGroupRev3,
+        ciscoLwappDot11ClientMIBNotifControlGroupRev2,
+        ciscoLwappDot11ClientMIBStatusGroupRev3"
+    REVISION        "202005130000Z"
+    DESCRIPTION
+        "Added cldcClientMobileStPolicyType"
     REVISION        "201804230000Z"
     DESCRIPTION
         "Added cldcClientiPSKTag."
@@ -371,7 +388,8 @@ CldcClientEntry ::= SEQUENCE {
         cldcClientHtCapable             TruthValue,
         cldcClientVhtCapable            TruthValue,
         cldcClientCurrentTxRate         Unsigned32,
-        cldcClientiPSKTag               OCTET STRING
+        cldcClientiPSKTag               OCTET STRING,
+        cldcClientMobileStPolicyType    INTEGER
 }
 
 cldcClientMacAddress OBJECT-TYPE
@@ -443,7 +461,10 @@ cldcClientProtocol OBJECT-TYPE
                         dot11n5(7),
                         ethernet(8),
                         dot3(9),
-                        dot11ac5(10)
+                        dot11ac5(10),
+                        dot11ax5(11),
+                        dot11ax24(12),
+                        dot11ax6(13)
                     }
     MAX-ACCESS      read-only
     STATUS          current
@@ -1155,10 +1176,28 @@ cldcClientiPSKTag OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object indicates the iPSK peer group that this client is part of.
-        The clients with same ipsk tag can be allowed to have peer to peer traffic by
+        "This object indicates the PSK peer group that this client is part of.
+        The clients with same psk tag can be allowed to have peer to peer traffic by
         configuring the wlan p2p blocking." 
     ::= { cldcClientEntry 51 }
+
+cldcClientMobileStPolicyType OBJECT-TYPE
+     SYNTAX          INTEGER  {
+                         unknown(0),
+                         dot1x(1),
+                         wpa1(2),
+                         wpa2(3),
+                         wpa2vff(4),
+                         notavailable(5),
+                         wpa2or3(6),
+                         wpaOsen(7),
+                         wpaOsenWithinRsn(8)
+                     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+         "Security policy of the AP to which the Mobile Station is associated."
+     ::= { cldcClientEntry 52 }
  
 
 
@@ -1803,6 +1842,53 @@ ciscoLwappDot11ClientStaticIpFailTrapEnabled OBJECT-TYPE
         notification."
     DEFVAL          { true } 
     ::= { cldcConfigObjects 5 }
+
+cldcMaxClientsTrapEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object specifies whether the
+         ciscoLwappDot11ClientMaxClientsReached notification would
+         be generated.
+         A value of 'true' indicates that the agent generates
+         ciscoLwappDot11ClientMaxClientsReached notifications.
+         A value of 'false' indicates that the agent doesn't
+         generate ciscoLwappDot11ClientMaxClientsReached
+         notification."
+         DEFVAL  { true }
+         ::= { cldcConfigObjects 6 }
+
+cldcMaxClientsTrapThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32 (50..100)
+    UNITS           "Percent"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the threshold for number
+         of clients on the controller to trigger a trap.
+         The trap ciscoLwappDot11ClientMaxClientsReached
+         will be triggered once the count of clients
+         on the controller reaches this limit and the
+         ciscoLwappDot11ClientMaxClientsTrapEnabled
+         is enabled. The admissible range goes from 50%
+         to 100%."
+    ::= { cldcConfigObjects 7 }
+
+cldcMaxClientsTrapPeriod OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..60)
+    UNITS           "Minutes"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the period of time for the 
+        controller to trigger a trap.
+        The trap ciscoLwappDot11ClientMaxClientsReached
+        will be triggered only once per period if  
+        ciscoLwappDot11ClientMaxClientsTrapEnabled
+        is enabled. The admissible range goes from 1 minute
+        to 60 minutes."
+    ::= { cldcConfigObjects 8 }
 
 -- ********************************************************************
 -- *    NOTIFICATIONS Objects
@@ -2476,6 +2562,29 @@ cldcClientPmipDownKey OBJECT-TYPE
         "This object indicates the downstream key of the PMIP client." 
     ::= { cldcNotifObjects 44 }
 
+cldcMaxClientsCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "This object represents the number of clients joined
+         to the controller when ciscoLwappDot11ClientMaxClientsReached
+         is sent."
+    ::= { cldcNotifObjects 45 }
+
+cldcMaxThresholdReachedClear OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "This object represents whether 
+         ciscoLwappDot11ClientMaxClientsReached is
+         raise or clear.
+         A value of 'true' indicates that this event is
+         cleared
+         A value of 'false' indicates that this event is
+         raised."
+    ::= { cldcNotifObjects 46 }
 -- ********************************************************************
 -- *    NOTIFICATIONS
 -- ********************************************************************
@@ -2970,6 +3079,18 @@ ciscoLwappDot11ClientMobilityTrap NOTIFICATION-TYPE
         "The notification shall be sent when the Station
         gets roamed."
    ::= { ciscoLwappDot11ClientMIBNotifs 12 }
+ciscoLwappDot11ClientMaxClientsReached NOTIFICATION-TYPE
+    OBJECTS         {
+                         cldcMaxClientsTrapThreshold,
+                         cldcMaxClientsCount,
+                         cldcMaxThresholdReachedClear
+                    }
+    STATUS          current
+    DESCRIPTION
+         "This notification is generated when the number of
+          clients on the controller exceeds the limit defined by
+          cldcMaxClientsTrapThreshold."
+     ::= { ciscoLwappDot11ClientMIBNotifs 13 }
 -- *******************************************************************
 -- *    Compliance statements
 -- ********************************************************************
@@ -3035,7 +3156,7 @@ ciscoLwappDot11ClientMIBComplianceRev3 MODULE-COMPLIANCE
     ::= { ciscoLwappDot11ClientMIBCompliances 3 }
 
 ciscoLwappDot11ClientMIBComplianceRev4 MODULE-COMPLIANCE
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The compliance statement for the SNMP entities that
         implement this MIB."
@@ -3052,6 +3173,29 @@ ciscoLwappDot11ClientMIBComplianceRev4 MODULE-COMPLIANCE
                         ciscoLwappDot11ClientMIBSup1Group
                     }
     ::= { ciscoLwappDot11ClientMIBCompliances 4 }
+
+ciscoLwappDot11ClientMIBComplianceRev5 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement this MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoLwappDot11ClientMIBConfigGroup,
+                        ciscoLwappDot11ClientMIBNotifsGroup,
+                        ciscoLwappDot11ClientMIBStatusGroup,
+                        ciscoLwappDot11ClientMIBStatusGroupRev2,
+                        ciscoLwappDot11ClientMIBNotifsGroupRev2,
+                        ciscoLwappDot11ClientMIBNotifControlGroup,
+                        ciscoLwappDot11ClientMIBStatusGroupRev2Sup,
+                        ciscoLwappDot11ClientMIBCcxGroup,
+                        ciscoLwappDot11ClientMIBSup1Group,
+                        ciscoLwappDot11ClientMIBConfigGroupRev2,
+                        ciscoLwappDot11ClientMIBNotifsGroupRev3,
+                        ciscoLwappDot11ClientMIBNotifControlGroupRev2,
+                        ciscoLwappDot11ClientMIBStatusGroupRev3
+                    }
+    ::= { ciscoLwappDot11ClientMIBCompliances 5 }
 
 -- ********************************************************************
 -- *    Units of conformance
@@ -3165,7 +3309,8 @@ ciscoLwappDot11ClientMIBStatusGroupRev2 OBJECT-GROUP
                         cldcClientRxDataPackets,
                         cldcClientRxDataBytes,
                         ciscoLwappDot11ClientStaticIpFailTrapEnabled,
-                        cldcClientCurrentTxRate
+                        cldcClientCurrentTxRate,
+                        cldcClientMobileStPolicyType
                     }
     STATUS          current
     DESCRIPTION
@@ -3289,6 +3434,49 @@ ciscoLwappDot11ClientMIBSup1Group OBJECT-GROUP
         clients notifications information."
     ::= { ciscoLwappDot11ClientMIBGroups 9 }
 
-END
+ciscoLwappDot11ClientMIBConfigGroupRev2 OBJECT-GROUP
+    OBJECTS         {
+                        cldcMaxClientsTrapPeriod,
+                        cldcMaxClientsTrapThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects specifies the required
+        configuration parameters for the 802.11 wireless
+        clients."
+    ::= { ciscoLwappDot11ClientMIBGroups 10 }
 
+ciscoLwappDot11ClientMIBNotifsGroupRev3 NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        ciscoLwappDot11ClientMaxClientsReached
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represents the
+        notifications for the 802.11 wireless clients."
+    ::= { ciscoLwappDot11ClientMIBGroups 11 }
+
+ciscoLwappDot11ClientMIBNotifControlGroupRev2 OBJECT-GROUP
+    OBJECTS         {
+                        cldcMaxClientsTrapEnabled
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represents the objects that
+        control the notifications for the 802.11 wireless
+        clients."
+    ::= { ciscoLwappDot11ClientMIBGroups 12 }
+
+ciscoLwappDot11ClientMIBStatusGroupRev3 OBJECT-GROUP
+    OBJECTS         {
+                        cldcMaxThresholdReachedClear,
+                        cldcMaxClientsCount
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects specifies the required
+        status parameters for the 802.11 wireless clients."
+    ::= { ciscoLwappDot11ClientMIBGroups 13 }
+
+END
 

@@ -1,4 +1,3 @@
-mib: APEX-MIB
 modules:
     os:
         hardware: BCS-IDENT-MIB::identUnitModel.0
@@ -8,16 +7,16 @@ modules:
         fanspeed:
             data:
                 -
-                    oid: apexPsStatusTable
-                    value: apexPsStatusFanSpeed
+                    oid: APEX-MIB::apexPsStatusTable
+                    value: APEX-MIB::apexPsStatusFanSpeed
                     num_oid: '.1.3.6.1.4.1.1166.1.31.4.2.2.1.5.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
                     index: 'apexPsStatusFanSpeed.{{ $index }}'
         current:
             data:
                 -
-                    oid: apexPsStatusTable
-                    value: apexPsStatusOutputCurrent
+                    oid: APEX-MIB::apexPsStatusTable
+                    value: APEX-MIB::apexPsStatusOutputCurrent
                     num_oid: '.1.3.6.1.4.1.1166.1.31.4.2.2.1.4.{{ $index }}'
                     descr: 'Power Supply Output {{ $index }}'
                     index: 'apexPsStatusOutputCurrent.{{ $index }}'
@@ -25,8 +24,8 @@ modules:
         voltage:
             data:
                 -
-                    oid: apexPsStatusTable
-                    value: apexPsStatusOutputVoltage
+                    oid: APEX-MIB::apexPsStatusTable
+                    value: APEX-MIB::apexPsStatusOutputVoltage
                     num_oid: '.1.3.6.1.4.1.1166.1.31.4.2.2.1.3.{{ $index }}'
                     descr: 'Power Supply Output {{ $index }}'
                     index: 'apexPsStatusOutputVoltage.{{ $index }}'
@@ -34,37 +33,41 @@ modules:
         temperature:
             data:
                 -
-                    oid: apexMainBoardTempFrontIntake
+                    oid: APEX-MIB::apexMainBoardTempFrontIntake
+                    value: APEX-MIB::apexMainBoardTempFrontIntake
                     num_oid: '.1.3.6.1.4.1.1166.1.31.3.2.2.1.{{ $index }}'
                     descr: 'Main Board Front Intake'
                     index: 1
                 -
-                    oid: apexMainBoardTempMuxFpga
+                    oid: APEX-MIB::apexMainBoardTempMuxFpga
+                    value: APEX-MIB::apexMainBoardTempMuxFpga
                     num_oid: '.1.3.6.1.4.1.1166.1.31.3.2.2.2.{{ $index }}'
                     descr: 'Main Board Mux FPGA'
                     index: 2
                 -
-                    oid: apexMainBoardTempAcpModule
+                    oid: APEX-MIB::apexMainBoardTempAcpModule
+                    value: APEX-MIB::apexMainBoardTempAcpModule
                     num_oid: '.1.3.6.1.4.1.1166.1.31.3.2.2.3.{{ $index }}'
                     descr: 'Main Board ACP Module'
                     index: 3
                 -
-                    oid: apexMainBoardTempHostProcessor
+                    oid: APEX-MIB::apexMainBoardTempHostProcessor
+                    value: APEX-MIB::apexMainBoardTempHostProcessor
                     num_oid: '.1.3.6.1.4.1.1166.1.31.3.2.2.4.{{ $index }}'
                     descr: 'Main Board Host Processor'
                     index: 4
         load:
             data:
                 -
-                    oid: apexGbeFrameBufferStatsTable
-                    value: apexGbeFrameBufferCurrPercentFull
+                    oid: APEX-MIB::apexGbeFrameBufferStatsTable
+                    value: APEX-MIB::apexGbeFrameBufferCurrPercentFull
                     num_oid: '.1.3.6.1.4.1.1166.1.31.7.2.7.2.1.4.{{ $index }}'
                     descr: 'Gigabit Frame Buffer Fullness {{ $index }}'
                     index: 'apexGbeFrameBufferCurrPercentFull.{{ $index }}'
                     group: 'Input'
                 -
-                    oid: apexOutputTsUtilizationTable
-                    value: apexOutputTsUtilizCurPercent
+                    oid: APEX-MIB::apexOutputTsUtilizationTable
+                    value: APEX-MIB::apexOutputTsUtilizCurPercent
                     num_oid: '.1.3.6.1.4.1.1166.1.31.14.2.2.2.1.6.{{ $index }}'
                     descr: 'QAM Port Utilization #{{ $index }}'
                     index: 'apexOutputTsUtilizCurPercent.{{ $index }}'
@@ -73,7 +76,8 @@ modules:
         state:
             data:
                 -
-                    oid: apexAlarmHardwareFault
+                    oid: APEX-MIB::apexAlarmHardwareFault
+                    value: APEX-MIB::apexAlarmHardwareFault
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8000.{{ $index }}'
                     descr: Hardware Fault
                     index: 'apexAlarmHardwareFault.{{ $index }}'
@@ -86,7 +90,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmInvalidInitData
+                    oid: APEX-MIB::apexAlarmInvalidInitData
+                    value: APEX-MIB::apexAlarmInvalidInitData
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8001.{{ $index }}'
                     descr: Invalid Init Data
                     index: 'apexAlarmInvalidInitData.{{ $index }}'
@@ -99,7 +104,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmTemperatureFault
+                    oid: APEX-MIB::apexAlarmTemperatureFault
+                    value: APEX-MIB::apexAlarmTemperatureFault
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8002.{{ $index }}'
                     descr: Temperature Fault
                     index: 'apexAlarmTemperatureFault.{{ $index }}'
@@ -112,7 +118,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmFanFault
+                    oid: APEX-MIB::apexAlarmFanFault
+                    value: APEX-MIB::apexAlarmFanFault
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8003.{{ $index }}'
                     descr: Fan Fault
                     index: 'apexAlarmFanFault.{{ $index }}'
@@ -125,7 +132,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmPowerFault
+                    oid: APEX-MIB::apexAlarmPowerFault
+                    value: APEX-MIB::apexAlarmPowerFault
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8004.{{ $index }}'
                     descr: Power Fault
                     index: 'apexAlarmPowerFault.{{ $index }}'
@@ -138,7 +146,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmGbeLossOfPhysicalInput
+                    oid: APEX-MIB::apexAlarmGbeLossOfPhysicalInput
+                    value: APEX-MIB::apexAlarmGbeLossOfPhysicalInput
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8020.{{ $index }}'
                     descr: Gigabit Ethernet Physical Input
                     index: 'apexAlarmGbeLossOfPhysicalInput.{{ $index }}'
@@ -151,7 +160,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmGbeBufferFullness
+                    oid: APEX-MIB::apexAlarmGbeBufferFullness
+                    value: APEX-MIB::apexAlarmGbeBufferFullness
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8021.{{ $index }}'
                     descr: Gigabit Ethernet Buffer Fullness
                     index: 'apexAlarmGbeBufferFullness.{{ $index }}'
@@ -164,7 +174,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmServiceInError
+                    oid: APEX-MIB::apexAlarmServiceInError
+                    value: APEX-MIB::apexAlarmServiceInError
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8026.{{ $index }}'
                     descr: Service In Error
                     index: 'apexAlarmServiceInError.{{ $index }}'
@@ -177,7 +188,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmGbeLossOfInputStream
+                    oid: APEX-MIB::apexAlarmGbeLossOfInputStream
+                    value: APEX-MIB::apexAlarmGbeLossOfInputStream
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8027.{{ $index }}'
                     descr: Loss of Input Stream
                     index: 'apexAlarmGbeLossOfInputStream.{{ $index }}'
@@ -190,7 +202,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmOutputOverflow
+                    oid: APEX-MIB::apexAlarmOutputOverflow
+                    value: APEX-MIB::apexAlarmOutputOverflow
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8041.{{ $index }}'
                     descr: Transport Stream Output Overflow
                     index: 'apexAlarmOutputOverflow.{{ $index }}'
@@ -203,7 +216,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmQamModuleFault
+                    oid: APEX-MIB::apexAlarmQamModuleFault
+                    value: APEX-MIB::apexAlarmQamModuleFault
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8042.{{ $index }}'
                     descr: QAM Module Fault
                     index: 'apexAlarmQamModuleFault.{{ $index }}'
@@ -216,7 +230,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmQamRfPortFault
+                    oid: APEX-MIB::apexAlarmQamRfPortFault
+                    value: APEX-MIB::apexAlarmQamRfPortFault
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8043.{{ $index }}'
                     descr: QAM RF Port Fault
                     index: 'apexAlarmQamRfPortFault.{{ $index }}'
@@ -229,7 +244,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmQamChannelFault
+                    oid: APEX-MIB::apexAlarmQamChannelFault
+                    value: APEX-MIB::apexAlarmQamChannelFault
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8044.{{ $index }}'
                     descr: QAM Channel Fault
                     index: 'apexAlarmQamChannelFault.{{ $index }}'
@@ -242,7 +258,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmRdsCommFault
+                    oid: APEX-MIB::apexAlarmRdsCommFault
+                    value: APEX-MIB::apexAlarmRdsCommFault
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8060.{{ $index }}'
                     descr: RDS Communication Fault
                     index: 'apexAlarmRdsCommFault.{{ $index }}'
@@ -255,7 +272,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmRemCommFault
+                    oid: APEX-MIB::apexAlarmRemCommFault
+                    value: APEX-MIB::apexAlarmRemCommFault
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8070.{{ $index }}'
                     descr: REM Communication Fault
                     index: 'apexAlarmRemCommFault.{{ $index }}'
@@ -268,7 +286,8 @@ modules:
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
                 -
-                    oid: apexAlarmRemFault
+                    oid: APEX-MIB::apexAlarmRemFault
+                    value: APEX-MIB::apexAlarmRemFault
                     num_oid: '.1.3.6.1.4.1.1166.1.31.100.8071.{{ $index }}'
                     descr: REM Fault
                     index: 'apexAlarmRemFault.{{ $index }}'
@@ -280,4 +299,3 @@ modules:
                         - { value:  4, generic: 1, graph: 0, descr: 'Minor' }
                         - { value:  5, generic: 2, graph: 0, descr: 'Major' }
                         - { value:  6, generic: 2, graph: 0, descr: 'Critical' }
-

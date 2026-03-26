@@ -26,9 +26,11 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
+use App\Models\PortSecurity;
 use App\Models\Pseudowire;
 use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
@@ -37,7 +39,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class PortsController implements DeviceTab
@@ -79,7 +80,7 @@ class PortsController implements DeviceTab
         Validator::validate($request->all(), [
             'page' => 'int',
             'perPage' => ['regex:/^(\d+|all)$/'],
-            'sort' => 'in:media,mac,port,traffic,speed',
+            'sort' => 'in:media,mac,port,traffic,speed,index',
             'order' => 'in:asc,desc',
             'disabled' => 'in:0,1',
             'ignored' => 'in:0,1',
@@ -88,6 +89,7 @@ class PortsController implements DeviceTab
             'type' => 'in:bits,upkts,nupkts,errors,etherlike',
             'from' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
             'to' => ['regex:/^(int|[+-]\d+[hdmy])$/'],
+            'searchPort' => 'nullable|string|max:255',
         ]);
 
         $this->loadSettings($request);
@@ -97,6 +99,7 @@ class PortsController implements DeviceTab
             'links' => $this->linksData($device),
             'transceivers' => $this->transceiversData($device),
             'xdsl' => $this->xdslData($device),
+            'portsecurity' => $this->portSecurityData($device),
             'graphs', 'mini_graphs' => $this->graphData($device, $request),
             default => $this->portData($device, $request),
         };
@@ -108,7 +111,7 @@ class PortsController implements DeviceTab
                 $this->getTabs($device),
                 __('Graphs') => $this->getGraphLinks(),
             ],
-            'page_links' => $this->pageLinks($request),
+            'dropdownLinks' => $this->pageLinks($request),
             'perPage' => $this->settings['perPage'],
             'sort' => $this->settings['sort'],
             'next_order' => $this->settings['order'] == 'asc' ? 'desc' : 'asc',
@@ -122,16 +125,22 @@ class PortsController implements DeviceTab
             $relationships[] = 'links';
             $relationships[] = 'transceivers';
             $relationships[] = 'pseudowires.endpoints';
-            $relationships[] = 'ipv4Networks.ipv4';
             $relationships[] = 'ipv6Networks.ipv6';
             $relationships['stackParent'] = fn ($q) => $q->select('port_id');
             $relationships['stackChildren'] = fn ($q) => $q->select('port_id');
+
+            if (LibrenmsConfig::get('ports_ipv4_neighbours') == 'arp') {
+                $relationships[] = 'macLinkedPorts';
+            } else {
+                $relationships[] = 'ipv4Networks.ipv4';
+            }
         }
 
         /** @var Collection<Port>|LengthAwarePaginator<Port> $ports */
-        $ports = $this->getFilteredPortsQuery($device, $relationships)
+        $ports = $this->getFilteredPortsQuery($device, $relationships, $request)
             ->paginate(fn ($total) => $this->settings['perPage'] == 'all' ? $total : (int) $this->settings['perPage']) // @phpstan-ignore-line missing closure type
-            ->appends('perPage', $this->settings['perPage']);
+            ->appends('perPage', $this->settings['perPage'])
+            ->appends('searchPort', $request->input('searchPort'));
 
         $data = [
             'ports' => $ports,
@@ -176,24 +185,24 @@ class PortsController implements DeviceTab
             }
         }
 
-        if ($this->detail) {
-            // IPv4 + IPv6 subnet if detailed
-            // fa-arrow-right green portlink on devicelink
-            if ($port->ipv4Networks->isNotEmpty()) {
-                $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4->pluck('port_id'))->flatten();
-                foreach ($ids as $port_id) {
-                    if ($port_id !== $port->port_id) {
-                        $this->addPortNeighbor($neighbors, 'ipv4_network', $port_id);
-                    }
-                }
-            }
+        // IPv4 + IPv6 subnet if detailed
+        // fa-arrow-right green portlink on devicelink
+        $ids = [];
+        if (LibrenmsConfig::get('ports_ipv4_neighbours') == 'arp') {
+            $ids = $port->macLinkedPorts->where('port_id', '<>', $port->port_id)->pluck('port_id');
+        } else {
+            $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4->where('port_id', '<>', $port->port_id)->pluck('port_id'))->flatten();
+        }
 
-            if ($port->ipv6Networks->isNotEmpty()) {
-                $ids = $port->ipv6Networks->map(fn ($net) => $net->ipv6->pluck('port_id'))->flatten();
-                foreach ($ids as $port_id) {
-                    if ($port_id !== $port->port_id) {
-                        $this->addPortNeighbor($neighbors, 'ipv6_network', $port_id);
-                    }
+        foreach ($ids as $port_id) {
+            $this->addPortNeighbor($neighbors, 'ipv4_network', $port_id);
+        }
+
+        if ($port->ipv6Networks->isNotEmpty()) {
+            $ids = $port->ipv6Networks->map(fn ($net) => $net->ipv6->pluck('port_id'))->flatten();
+            foreach ($ids as $port_id) {
+                if ($port_id !== $port->port_id) {
+                    $this->addPortNeighbor($neighbors, 'ipv6_network', $port_id);
                 }
             }
         }
@@ -247,8 +256,8 @@ class PortsController implements DeviceTab
     private function graphData(Device $device, Request $request): array
     {
         return [
-            'graph_type' => 'port_' . $request->get('type'),
-            'ports' => $this->getFilteredPortsQuery($device)->get(),
+            'graph_type' => 'port_' . $request->input('type'),
+            'ports' => $this->getFilteredPortsQuery($device, [], $request)->get(),
         ];
     }
 
@@ -279,11 +288,16 @@ class PortsController implements DeviceTab
         return ['links' => $device->links];
     }
 
+    private function portSecurityData(Device $device): array
+    {
+        return [];
+    }
+
     private function getTabs(Device $device): array
     {
         $tabs = [
             ['name' => __('Basic'), 'url' => 'basic'],
-            ['name' => __('Detail'), 'url' => ''],
+            ['name' => __('Detail'), 'url' => 'detail'],
         ];
 
         if ($device->macs()->exists()) {
@@ -308,6 +322,10 @@ class PortsController implements DeviceTab
 
         if ($device->portsAdsl()->exists() || $device->portsVdsl()->exists()) {
             $tabs[] = ['name' => __('port.tabs.xdsl'), 'url' => 'xdsl'];
+        }
+
+        if (PortSecurity::where('device_id', $device->device_id)->exists()) {
+            $tabs[] = ['name' => __('Port Security'), 'url' => 'portsecurity'];
         }
 
         return $tabs;
@@ -345,7 +363,7 @@ class PortsController implements DeviceTab
             ],
         ];
 
-        if (Config::get('enable_ports_etherlike')) {
+        if (LibrenmsConfig::get('enable_ports_etherlike')) {
             $graph_links[] = [
                 'name' => __('port.graphs.etherlike'),
                 'url' => 'graphs?type=etherlike',
@@ -373,7 +391,7 @@ class PortsController implements DeviceTab
         }
     }
 
-    private function getFilteredPortsQuery(Device $device, array $relationships = []): Builder
+    private function getFilteredPortsQuery(Device $device, array $relationships = [], ?Request $request = null): Builder
     {
         $orderBy = match ($this->settings['sort']) {
             'traffic' => \DB::raw('ports.ifInOctets_rate + ports.ifOutOctets_rate'),
@@ -384,6 +402,9 @@ class PortsController implements DeviceTab
             default => 'ifIndex',
         };
 
+        // Get search parameter
+        $searchPort = $request?->input('searchPort');
+
         return Port::where('device_id', $device->device_id)
             ->isNotDeleted()
             ->hasAccess(Auth::user())->with($relationships)
@@ -391,6 +412,11 @@ class PortsController implements DeviceTab
             ->when(! $this->settings['ignored'], fn (Builder $q, $disabled) => $q->where('ignore', 0))
             ->when($this->settings['admin'] != 'any', fn (Builder $q, $admin) => $q->where('ifAdminStatus', $this->settings['admin']))
             ->when($this->settings['status'] != 'any', fn (Builder $q, $admin) => $q->where('ifOperStatus', $this->settings['status']))
+            ->when($searchPort, fn (Builder $q) => $q->where(function (Builder $q) use ($searchPort): void {
+                $q->where('ifName', 'LIKE', '%' . $searchPort . '%')
+                    ->orWhere('ifDescr', 'LIKE', '%' . $searchPort . '%')
+                    ->orWhere('ifAlias', 'LIKE', '%' . $searchPort . '%');
+            }))
             ->when($this->settings['sort'] == 'port', fn (Builder $q, $sort) => $q
                 ->orderByRaw('SOUNDEX(ifName) ' . $this->settings['order'])
                 ->orderByRaw('CHAR_LENGTH(ifName) ' . $this->settings['order'])
@@ -411,7 +437,7 @@ class PortsController implements DeviceTab
             };
         }
 
-        return $request->route('vars', 'detail'); // fourth segment is called vars to handle legacy urls
+        return $request->route('vars', LibrenmsConfig::get('ports_page_default')); // fourth segment is called vars to handle legacy urls
     }
 
     private function pageLinks(Request $request): array

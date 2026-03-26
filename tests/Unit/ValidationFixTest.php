@@ -30,7 +30,7 @@ use LibreNMS\Tests\TestCase;
 use LibreNMS\Validations\Rrd\CheckRrdVersion;
 use Storage;
 
-class ValidationFixTest extends TestCase
+final class ValidationFixTest extends TestCase
 {
     public function testRrdVersionFix(): void
     {

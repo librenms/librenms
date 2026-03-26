@@ -212,6 +212,7 @@
     "Message": "Nachricht",
     "Facility": "Standort",
     "Total hosts": "Geräte insgesamt",
+    "Total alerts": "Geräte alarme",
     "ignored": "Ignoriert",
     "disabled": "Unterdrückt",
     "up": "Erreichbar",

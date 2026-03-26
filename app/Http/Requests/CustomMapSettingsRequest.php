@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\CustomMap;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -12,7 +13,11 @@ class CustomMapSettingsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->isAdmin();  // TODO permissions
+        if ($this->map) {
+            return $this->user()->can('update', $this->map);
+        }
+
+        return $this->user()->can('create', CustomMap::class);
     }
 
     /**
@@ -30,7 +35,7 @@ class CustomMapSettingsRequest extends FormRequest
             'edge_separation' => 'integer',
             'width_type' => 'in:px,%',
             'width' => [
-                function (string $attribute, mixed $value, Closure $fail) {
+                function (string $attribute, mixed $value, Closure $fail): void {
                     if (! preg_match('/^(\d+)(px|%)$/', $value, $matches)) {
                         $fail(__('map.custom.edit.validate.width_format'));
                     } elseif ($matches[2] == 'px' && $matches[1] < 200) {
@@ -42,7 +47,7 @@ class CustomMapSettingsRequest extends FormRequest
             ],
             'height_type' => 'in:px,%',
             'height' => [
-                function (string $attribute, mixed $value, Closure $fail) {
+                function (string $attribute, mixed $value, Closure $fail): void {
                     if (! preg_match('/^(\d+)(px|%)$/', $value, $matches)) {
                         $fail(__('map.custom.edit.validate.height_format'));
                     } elseif ($matches[2] == 'px' && $matches[1] < 200) {

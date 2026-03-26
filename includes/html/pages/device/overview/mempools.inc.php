@@ -10,10 +10,6 @@ $graph_type = 'mempool_usage';
 
 $mempools = \DeviceCache::getPrimary()->mempools;
 
-function print_mempool_percent_bar($mempool)
-{
-}
-
 if ($mempools->isNotEmpty()) {
     $mempools_url = url('device') . '/device=' . DeviceCache::getPrimary()->device_id . '/tab=health/metric=mempool/';
     echo '
@@ -34,7 +30,7 @@ if ($mempools->isNotEmpty()) {
     $graph = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
         'device' => DeviceCache::getPrimary()->device_id,
         'type' => 'device_mempool',
-        'from' => \LibreNMS\Config::get('time.day'),
+        'from' => \App\Facades\LibrenmsConfig::get('time.day'),
         'legend' => 'no',
         'popup_title' => DeviceCache::getPrimary()->hostname . ' - Memory Usage',
     ]);
@@ -64,8 +60,8 @@ if ($mempools->isNotEmpty()) {
             'id' => $mempool->mempool_id,
             'height' => 100,
             'width' => 210,
-            'from' => \LibreNMS\Config::get('time.day'),
-            'to' => \LibreNMS\Config::get('time.now'),
+            'from' => \App\Facades\LibrenmsConfig::get('time.day'),
+            'to' => \App\Facades\LibrenmsConfig::get('time.now'),
             'legend' => 'no',
         ];
 
@@ -78,9 +74,12 @@ if ($mempools->isNotEmpty()) {
         // the 00 at the end makes the area transparent.
         $minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
-        $percentageBar = $available_used_all
-            ? Html::percentageBar(200, 20, $mempool->mempool_perc, "$mempool->mempool_perc%", "$available_used_all%", $mempool->mempool_perc_warn, $available_used_all)
-            : Html::percentageBar(200, 20, $mempool->mempool_perc, "$mempool->mempool_perc%", '', $mempool->mempool_perc_warn);
+        $percentageBar = match ($mempool->mempool_class) {
+            'system' => Html::percentageBar(400, 10, $mempool->mempool_perc, "$used / $total ($mempool->mempool_perc%)", $free, $mempool->mempool_perc_warn, $available_used_all),
+            'virtual', 'swap' => Html::percentageBar(400, 10, $mempool->mempool_perc, "$used / $total ($mempool->mempool_perc%)", $free, $mempool->mempool_perc_warn),
+            default => Html::percentageBar(400, 10, $mempool->mempool_perc, "$used ($mempool->mempool_perc%)", '', $mempool->mempool_perc_warn),
+        };
+
         echo '<tr>
             <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $mempool->mempool_descr, $overlib_content) . '</td>
             <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>

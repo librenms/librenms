@@ -1,4 +1,3 @@
-mib: ENVIROMUX-1W-MIB:ENVIROMUXMICRO-MIB
 modules:
     sensors:
         temperature:
@@ -7,7 +6,7 @@ modules:
                     oid: ENVIROMUXMICRO-MIB::intSensorEntry
                     value: ENVIROMUXMICRO-MIB::intSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.1.1.1.4.{{ $index }}'
-                    descr: '{{ $ENVIROMUXMICRO-MIB::intSensorDescription }}'
+                    descr: '{{ ENVIROMUXMICRO-MIB::intSensorDescription }}'
                     index: 'intSensorEntry.{{ $index }}'
                     divisor: 10
                     group: Internal
@@ -17,15 +16,15 @@ modules:
                             op: '!='
                             value: 1
                 -
-                   oid: extSensorTable
-                   value: extSensorValue
+                   oid: ENVIROMUX-1W-MIB::extSensorTable
+                   value: ENVIROMUX-1W-MIB::extSensorValue
                    num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.2.1.1.4.{{ $index }}'
                    index: 'extSensorValue.{{ $index }}'
-                   descr: "{{ $extSensorDescription }}"
+                   descr: "{{ ENVIROMUX-1W-MIB::extSensorDescription }}"
                    divisor: 10
                    skip_values:
                       -
-                           oid: extSensorType
+                           oid: ENVIROMUX-1W-MIB::extSensorType
                            op: 'not_in_array'
                            value: ['1', '24']
         humidity:
@@ -34,7 +33,7 @@ modules:
                     oid: ENVIROMUXMICRO-MIB::intSensorEntry
                     value: ENVIROMUXMICRO-MIB::intSensorValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.1.1.1.4.{{ $index }}'
-                    descr: '{{ $ENVIROMUXMICRO-MIB::intSensorDescription }}'
+                    descr: '{{ ENVIROMUXMICRO-MIB::intSensorDescription }}'
                     index: 'intSensorEntry.{{ $index }}'
                     divisor: 10
                     group: Internal
@@ -44,34 +43,34 @@ modules:
                             op: '!='
                             value: 2
                 -
-                   oid: extSensorTable
-                   value: extSensorValue
+                   oid: ENVIROMUX-1W-MIB::extSensorTable
+                   value: ENVIROMUX-1W-MIB::extSensorValue
                    num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.2.1.1.4.{{ $index }}'
                    index: 'extSensorValue.{{ $index }}'
-                   descr: "{{ $extSensorDescription }}"
+                   descr: "{{ ENVIROMUX-1W-MIB::extSensorDescription }}"
                    divisor: 10
                    skip_values:
                        -
-                           oid: extSensorType
+                           oid: ENVIROMUX-1W-MIB::extSensorType
                            op: 'not_in_array'
                            value: ['2']
         state:
             data:
                 -
-                    oid: digInputEntry
-                    value: digInputValue
+                    oid: ENVIROMUX-1W-MIB::digInputEntry
+                    value: ENVIROMUX-1W-MIB::digInputValue
                     num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.3.1.1.3.{{ $index }}'
-                    descr: '{{ $digInputDescription }}'
+                    descr: '{{ ENVIROMUX-1W-MIB::digInputDescription }}'
                     state_name: DigitalInputs
                     group: Inputs
                     states:
                         - { descr: closed, graph: 1, value: 0, generic: 0 }
                         - { descr: open, graph: 1, value: 1, generic: 1 }
                 -
-                    oid: alertEntry
-                    value: alertStatus
+                    oid: ENVIROMUX-1W-MIB::alertEntry
+                    value: ENVIROMUX-1W-MIB::alertStatus
                     num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.5.1.1.7.{{ $index }}'
-                    descr: '{{ $alertSensor }}#{{ $index }}'
+                    descr: '{{ ENVIROMUX-1W-MIB::alertSensor }}#{{ $index }}'
                     group: Alerts
                     state_name: alertStatus
                     states:
@@ -85,6 +84,6 @@ modules:
                         - { descr: disconnected, graph: 1, value: 7, generic: 3 }
                     skip_values:
                         -
-                            oid: alertEnabled
+                            oid: ENVIROMUX-1W-MIB::alertEnabled
                             op: '='
                             value: 0

@@ -55,8 +55,10 @@ class StpController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        $active_vlan = Url::parseOptions('vlan', 1);
-        $stpInstances = $device->stpInstances;
+        $stpInstances = $device->stpInstances->sortBy('vlan');
+        // Get first available VLAN from instances (or default to 1 if no instances)
+        $active_vlan = Url::parseOptions('vlan') ?? $stpInstances->first()->vlan ?? 1;
+
         $vlanOptions = $stpInstances->pluck('vlan')->mapWithKeys(function ($vlan) use ($device) {
             if (empty($vlan)) {
                 $vlan = 1;
@@ -72,12 +74,8 @@ class StpController implements DeviceTab
             'vlans' => $vlanOptions->all(),
             'vlan' => $active_vlan,
             'device_id' => $device->device_id,
-            'stpInstances' => $stpInstances->filter(function ($instance) use ($active_vlan) {
-                return $active_vlan == 1 && $instance->vlan == null || $instance->vlan == $active_vlan;
-            }),
-            'stpPorts' => $device->stpPorts()->where('vlan', $active_vlan)->when($active_vlan == 1, function ($query) {
-                return $query->orWhereNull('vlan');
-            })->exists(),
+            'stpInstances' => $stpInstances->filter(fn ($instance) => $active_vlan == 1 && $instance->vlan == null || $instance->vlan == $active_vlan),
+            'stpPorts' => $device->stpPorts()->where('vlan', $active_vlan)->when($active_vlan == 1, fn ($query) => $query->orWhereNull('vlan'))->exists(),
             'bootgridUrl' => url('/ajax/table/'),
         ];
     }

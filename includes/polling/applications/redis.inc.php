@@ -7,7 +7,7 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'redis';
 $output = 'OK';
 if (! empty($agent_data['app'][$name])) {
-    $parsed_json = json_decode(stripslashes($agent_data['app'][$name]), true);
+    $parsed_json = json_decode(stripslashes((string) $agent_data['app'][$name]), true);
     if (json_last_error() !== JSON_ERROR_NONE || empty($parsed_json) || ! isset($parsed_json['error'], $parsed_json['data'], $parsed_json['errorString'], $parsed_json['version']) || $parsed_json['version'] < 1 || $parsed_json['error'] != 0) {
         update_application($app, '-10:No correct data retrieved', []);
 

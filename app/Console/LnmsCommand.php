@@ -29,7 +29,6 @@ namespace App\Console;
 use Illuminate\Console\Command;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use LibreNMS\Util\Debug;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Validator;
 
@@ -155,23 +154,25 @@ abstract class LnmsCommand extends Command
             $validator->validate();
 
             return $validator->validated();
-        } catch (ValidationException $e) {
-            collect($validator->getMessageBag()->all())->each(function ($message) {
+        } catch (ValidationException) {
+            collect($validator->getMessageBag()->all())->each(function ($message): void {
                 $this->error($message);
             });
             exit(1);
         }
     }
 
-    protected function configureOutputOptions(): void
+    protected function validatePromptInput(string $attributeName, string|array $rules): callable
     {
-        \Log::setDefaultDriver($this->getOutput()->isQuiet() ? 'stack' : 'console');
-        if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-            Debug::set();
-            if ($verbosity >= 256) {
-                Debug::setVerbose();
+        return function (string|array $value) use ($attributeName, $rules): ?string {
+            $validator = Validator::make([$attributeName => $value], [$attributeName => $rules]);
+
+            if ($validator->fails()) {
+                return $validator->errors()->first($attributeName);
             }
-        }
+
+            return null;
+        };
     }
 
     private function getCallable(string $type, string $name): ?callable
@@ -185,8 +186,6 @@ abstract class LnmsCommand extends Command
             return $values;
         }
 
-        return function () use ($values) {
-            return $values;
-        };
+        return fn () => $values;
     }
 }

@@ -30,7 +30,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class JnxPowerSupplyTest extends SnmpTrapTestCase
+final class JnxPowerSupplyTest extends SnmpTrapTestCase
 {
     public function testJnxPowerSupplyFailureTrap(): void
     {

@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data":  "{\"version\":1,\"pools\":[\"thefrog\"]}",
+                    "data": "{\"version\":1,\"pools\":[\"thefrog\"]}",
                     "deleted_at": null
                 }
             ],

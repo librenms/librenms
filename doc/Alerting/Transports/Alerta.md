@@ -10,7 +10,8 @@ alerts from many other monitoring tools on a single screen.
 | Config | Example |
 | ------ | ------- |
 | API Endpoint   | http://alerta.example.com/api/alert |
-| Environment | Production |
 | Apy key | api key with write permission |
+| Origin | LibreNMS |
+| Environment | Production |
 | Alert state | critical |
 | Recover state | cleared |

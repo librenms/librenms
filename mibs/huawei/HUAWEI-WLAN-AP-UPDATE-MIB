@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2021 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  The mib is used for update the ap's program version.
 -- Reference: HUAWEI-WLAN-MIB
--- Version: V1.21
+-- Version: V1.25
 -- ============================================================================
 -- Module definition
 
@@ -30,7 +30,7 @@
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.14
 		hwWlanApUpdate MODULE-IDENTITY
-			LAST-UPDATED "202007082018Z"		-- July 8, 2020 at 20:18 GMT
+			LAST-UPDATED "202111302000Z"		-- Nov 30, 2021 at 20:00 GMT
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -41,10 +41,22 @@
 				   Website: http://www.huawei.com
 				   Email: support@huawei.com
 				  "
-                                                         DESCRIPTION 
+			DESCRIPTION 
+				"V1.25, add ftpServerNotSupportRest for hwWlanApUpdateProgressStatus."
+                    REVISION "202111302000Z"                -- Nov 30, 2021 at 20:00 GMT
+			DESCRIPTION 
+				"V1.24, add hwWlanApUpdatePatchFileNextStartup."
+                    REVISION "202111081700Z"                -- Nov 8, 2021 at 17:00 GMT
+			DESCRIPTION 
+				"V1.23, add apNotSupportHoupModeUpdate for hwWlanApUpdateProgressStatus."				
+                    REVISION "202107211400Z"                -- June 21, 2021 at 14:00 GMT
+			DESCRIPTION 
+				"V1.22, add hwWlanApUpdateFTPIPv4Port, hwWlanApUpdateFTPIPv6Port , hwWlanApUpdateSFTPIPv4Port , hwWlanApUpdateSFTPIPv6Port  for hwWlanApUpdateConfig "				
+                    REVISION "202011111911Z"                -- November 11, 2020 at 19:11 GMT
+			DESCRIPTION 
 				"V1.21, add insufficientMemoryAsNgeEnable for hwWlanApUpdateProgressStatus"				
                     REVISION "202007082018Z"                -- July 8, 2020 at 20:18 GMT
-                                                        DESCRIPTION 
+			DESCRIPTION 
 				"V1.20, hwWlanApUpdateProgressStatus"				
                     REVISION "202004091508Z"                -- Apr 9, 2020 at 15:09 GMT
 			DESCRIPTION 
@@ -401,6 +413,46 @@
 				"This object indicates the maximum number of SFTP IPv6 connections."
 			::= { hwWlanApUpdateConfig 17 }
 		
+		-- 1.3.6.1.4.1.2011.6.139.14.3.1.18
+		hwWlanApUpdateFTPIPv4Port OBJECT-TYPE
+			SYNTAX Integer32 (1..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the port number of FTP IPv4 connections."
+			DEFVAL { 21 }
+			::= { hwWlanApUpdateConfig 18 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.14.3.1.19
+		hwWlanApUpdateFTPIPv6Port OBJECT-TYPE
+			SYNTAX Integer32 (1..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the port number of FTP IPv6 connections."
+			DEFVAL { 21 }
+			::= { hwWlanApUpdateConfig 19 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.14.3.1.20
+		hwWlanApUpdateSFTPIPv4Port OBJECT-TYPE
+			SYNTAX Integer32 (1..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the port number of SFTP IPv4 connections."
+			DEFVAL { 22 }
+			::= { hwWlanApUpdateConfig 20 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.14.3.1.21
+		hwWlanApUpdateSFTPIPv6Port OBJECT-TYPE
+			SYNTAX Integer32 (1..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates the port number of SFTP IPv6 connections."
+			DEFVAL { 22 }
+			::= { hwWlanApUpdateConfig 21 }
+		
 		-- 1.3.6.1.4.1.2011.6.139.14.3.2
 		hwWlanApUpdateTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanApUpdateEntry 
@@ -517,7 +569,7 @@
 			DESCRIPTION 
 				"This object indicates the Ipv6 address for reset partition."
 			::= { hwWlanApUpdateEntry 8 }
-        		
+
 		--1.3.6.1.4.1.2011.6.139.14.3.3
 		hwWlanApUpdateProgressTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanApUpdateProgressEntry 
@@ -559,8 +611,9 @@
                                 hwWlanApUpdateApPartitionId
 				        Integer32,
 		                hwWlanApUpdateApChannel
+				        Integer32,
+		                hwWlanApUpdatePatchFileNextStartup
 				        Integer32
-				
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.14.3.3.1.1
@@ -635,6 +688,10 @@
 				insufficientMemorySpaceInAc(66),			
 				patchVersionMismatch(67),
 				insufficientMemoryAsNgeEnable(68),
+				apNotSupportFtpSftpPort(69),
+				apNotSupportHoupModeUpdate(70),
+				apNotSupportPatchNextStartup(71),
+				ftpServerNotSupportRest(72),
 				noUpdateProgressStatus(255)
 				}
 			MAX-ACCESS read-only
@@ -733,7 +790,16 @@
 			DESCRIPTION 
 				"This object indicates the Ap channel of the APs upgraded."
 			::= { hwWlanApUpdateProgressEntry  10} 
-			
+
+	    	--1.3.6.1.4.1.2011.6.139.14.3.3.1.11
+		hwWlanApUpdatePatchFileNextStartup OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the Ap patch next startup of the APs upgraded."
+			::= { hwWlanApUpdateProgressEntry  11} 
+
 		--1.3.6.1.4.1.2011.6.139.14.3.4
 		hwWlanSingleApUpdateTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanSingleApUpdateEntry 

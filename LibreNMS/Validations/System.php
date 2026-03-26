@@ -26,8 +26,8 @@
 
 namespace LibreNMS\Validations;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
-use LibreNMS\Config;
 use LibreNMS\Validator;
 
 class System extends BaseValidation
@@ -41,8 +41,8 @@ class System extends BaseValidation
     {
         $install_dir = $validator->getBaseDir();
 
-        $lnms = str_replace('lnms:', '', rtrim(`whereis -b lnms 2>/dev/null`));
-        $path = rtrim(`echo "\$PATH"`);
+        $lnms = str_replace('lnms:', '', rtrim((string) `whereis -b lnms 2>/dev/null`));
+        $path = rtrim((string) `echo "\$PATH"`);
 
         // if couldn't find lnms and we have PATH
         if (empty($lnms) && ! empty($path)) {
@@ -63,7 +63,7 @@ class System extends BaseValidation
         }
 
         $rotation_file = '/etc/logrotate.d/librenms';
-        if (! file_exists($rotation_file) && ! Config::get('installed_from_package')) {
+        if (! file_exists($rotation_file) && ! LibrenmsConfig::get('installed_from_package')) {
             $validator->warn('Log rotation not enabled, could cause disk space issues', "sudo cp $install_dir/misc/librenms.logrotate $rotation_file");
         }
     }

@@ -26,13 +26,15 @@
 
 namespace LibreNMS\Data\Source;
 
+use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Device;
+use App\Models\DeviceStats;
 use Carbon\Carbon;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\RRD\RrdDefinition;
 
-class FpingResponse
+class FpingResponse implements \Stringable
 {
     const SUCESS = 0;
     const UNREACHABLE = 1;
@@ -61,7 +63,7 @@ class FpingResponse
         public readonly int $duplicates,
         public int $exit_code,
         public readonly ?string $host = null,
-        private bool $skipped = false)
+        private readonly bool $skipped = false)
     {
     }
 
@@ -127,7 +129,7 @@ class FpingResponse
         return $this->exit_code == 0 && $this->loss < 100;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $str = "$this->host : xmt/rcv/%loss = $this->transmitted/$this->received/$this->loss%";
 
@@ -140,12 +142,32 @@ class FpingResponse
 
     public function saveStats(Device $device): void
     {
+        $stats = $device->stats ?? new DeviceStats(['device_id' => $device->device_id]);
+        $stats->ping_last_timestamp = Carbon::now();
+        // Only update the latency if we have data
+        if ($this->avg_latency) {
+            $stats->ping_rtt_prev = $stats->ping_rtt_last ?: $this->avg_latency;
+            $stats->ping_rtt_last = $this->avg_latency;
+            // Average is calcualted as the exponential weighted moving average
+            $stats->ping_rtt_avg = $stats->ping_rtt_avg ? $stats->ping_rtt_avg + (($stats->ping_rtt_last - $stats->ping_rtt_avg) * LibrenmsConfig::get('device_stats_avg_factor')) : $stats->ping_rtt_last;
+        }
+        // Only update loss if we transmitted a packet
+        if ($this->transmitted) {
+            $stats->ping_loss_prev = $stats->ping_loss_last ?: 100 * ($this->transmitted - $this->received) / $this->transmitted;
+            $stats->ping_loss_last = 100 * ($this->transmitted - $this->received) / $this->transmitted;
+            // Average is calcualted as the exponential weighted moving average
+            $stats->ping_loss_avg = $stats->ping_loss_avg ? $stats->ping_loss_avg + (($stats->ping_loss_last - $stats->ping_loss_avg) * LibrenmsConfig::get('device_stats_avg_factor')) : $stats->ping_loss_last;
+        }
+        $stats->save();
+
+        // Update the stats stored in the device table until the field is removed
         $device->last_ping = Carbon::now();
         $device->last_ping_timetaken = $this->avg_latency ?: $device->last_ping_timetaken;
         $device->save();
 
         // detailed multi-ping capable graph
         app('Datastore')->put($device->toArray(), 'icmp-perf', [
+            'rrd_step' => LibrenmsConfig::get('ping_rrd_step'),
             'rrd_def' => RrdDefinition::make()
                 ->addDataset('avg', 'GAUGE', 0, 65535, source_ds: 'ping', source_file: Rrd::name($device->hostname, 'ping-perf'))
                 ->addDataset('xmt', 'GAUGE', 0, 65535)

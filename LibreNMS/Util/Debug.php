@@ -26,9 +26,6 @@
 
 namespace LibreNMS\Util;
 
-use App;
-use Log;
-
 class Debug
 {
     /** @var bool */
@@ -42,10 +39,9 @@ class Debug
      * Enable/disable debug output
      *
      * @param  bool  $debug  whether to enable or disable debug output
-     * @param  bool  $silence  Silence error output or output all errors except notices
      * @return bool returns $debug
      */
-    public static function set($debug = true, bool $silence = false): bool
+    public static function set($debug = true): bool
     {
         self::$debug = (bool) $debug;
 
@@ -54,8 +50,8 @@ class Debug
             self::enableCliDebugOutput();
             self::enableQueryDebug();
         } else {
-            self::disableErrorReporting($silence);
-            self::disableCliDebugOutput($silence);
+            self::disableErrorReporting();
+            self::disableCliDebugOutput();
             self::disableQueryDebug();
         }
 
@@ -92,17 +88,28 @@ class Debug
 
     public static function enableCliDebugOutput(): void
     {
-        if (Laravel::isBooted() && App::runningInConsole()) {
-            Log::setDefaultDriver('console_debug');
+        if (Laravel::isBooted()) {
+            config(['logging.channels.stdout.level' => 'debug']);
         } else {
-            putenv('LOG_CHANNEL=console_debug');
+            putenv('STDOUT_LOG_LEVEL=debug');
         }
     }
 
-    public static function disableCliDebugOutput(bool $silence): void
+    public static function disableCliDebugOutput(): void
     {
-        if (Laravel::isBooted() && Log::getDefaultDriver() !== 'stack') {
-            Log::setDefaultDriver(app()->runningInConsole() && ! $silence ? 'console' : 'stack');
+        if (Laravel::isBooted()) {
+            config(['logging.channels.stdout.level' => 'info']);
+        } else {
+            putenv('STDOUT_LOG_LEVEL=info');
+        }
+    }
+
+    public static function setCliQuietOutput(): void
+    {
+        if (Laravel::isBooted()) {
+            config(['logging.channels.stdout.level' => 'emergency']);
+        } else {
+            putenv('STDOUT_LOG_LEVEL=emergency');
         }
     }
 
@@ -119,12 +126,11 @@ class Debug
     /**
      * Disable error reporting, do not use with new code
      */
-    public static function disableErrorReporting(bool $silence = false): void
+    public static function disableErrorReporting(): void
     {
+        ini_set('display_startup_errors', '1');
         ini_set('display_errors', '0');
-        ini_set('display_startup_errors', '0');
         ini_set('log_errors', '1');
-        error_reporting($silence ? 0 : E_ERROR);
     }
 
     /**
@@ -132,9 +138,8 @@ class Debug
      */
     public static function enableErrorReporting(): void
     {
-        ini_set('display_errors', '1');
         ini_set('display_startup_errors', '1');
-        ini_set('log_errors', '0');
-        error_reporting(-1);
+        ini_set('display_errors', '1');
+        ini_set('log_errors', '1');
     }
 }

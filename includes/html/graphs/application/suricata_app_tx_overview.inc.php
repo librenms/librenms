@@ -406,7 +406,7 @@ if (! isset($rrd_list[0]) && Rrd::checkRrdExists($rrd_filename)) {
     ];
 }
 if (! isset($rrd_list[0])) {
-    d_echo('RRD "' . $app_layer__tx__tls_rrd_filename . '" not found');
+    throw new \LibreNMS\Exceptions\RrdGraphException('RRD "' . $app_layer__tx__tls_rrd_filename . '" not found', 'No Data');
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

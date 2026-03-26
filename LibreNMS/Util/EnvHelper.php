@@ -140,7 +140,7 @@ class EnvHelper
 
                 try {
                     config(['app.key' => $key]);
-                } catch (BindingResolutionException $e) {
+                } catch (BindingResolutionException) {
                     // called outside of Laravel, ignore config() failure
                 }
 
@@ -182,7 +182,7 @@ class EnvHelper
      */
     private static function escapeValue($value)
     {
-        if (strpos($value, ' ') !== false) {
+        if (str_contains($value, ' ')) {
             return "\"$value\"";
         }
 

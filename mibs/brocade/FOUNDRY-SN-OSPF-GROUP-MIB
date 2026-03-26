@@ -1,50 +1,51 @@
 FOUNDRY-SN-OSPF-GROUP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY, OBJECT-TYPE,Counter32, Gauge32, IpAddress,Integer32
+	MODULE-IDENTITY, OBJECT-TYPE,Counter32, Gauge32, IpAddress,Integer32 
 					 FROM SNMPv2-SMI
 	router
 		FROM FOUNDRY-SN-ROOT-MIB
 	TEXTUAL-CONVENTION
 		FROM SNMPv2-TC;
-
+	 
 snOspf MODULE-IDENTITY
-    LAST-UPDATED "201006020000Z"  -- 04 June 2010
-    ORGANIZATION "Brocade Communications Systems, Inc."
-    CONTACT-INFO
-             "Technical Support Center
-              130 Holger Way,
-              San Jose, CA  95134
-              Email:  ipsupport@brocade.com
-              Phone: 1-800-752-8061
-              URL:  www.brocade.com"
-    DESCRIPTION
-             "Copyright 1996-2010 Brocade Communications Systems, Inc.
-              All rights reserved.
-              This Brocade Communications Systems SNMP Management Information Base Specification
-              embodies Brocade Communications Systems' confidential and proprietary
-              intellectual property. Brocade Communications Systems retains all
-              title and ownership in the Specification, including any revisions.
-
-              This Specification is supplied AS IS, and Brocade Communications Systems makes
-              no warranty, either express or implied, as to the use,
-              operation, condition, or performance of the specification, and any unintended
-              consequence it may on the user environment."
-
-    REVISION        "201006020000Z"  -- 04 June 2010
-    DESCRIPTION
-        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
-
-    REVISION     "200909300000Z" -- September 30, 2009
-    DESCRIPTION
+	LAST-UPDATED "201708070000Z" -- Aug 7, 2017
+	ORGANIZATION "Ruckus Wireless, Inc."
+	CONTACT-INFO
+			"
+			Technical Support Center, Ruckus Wireless, Inc,
+			350 West Java Drive,
+			Sunnyvale, CA 94089, USA
+			Support URL: https://support.ruckuswireless.com
+			Phone: +1-855-782-5871
+			ROW TF Numbers: https://support.ruckuswireless.com/contact-us"
+	DESCRIPTION
+			"
+			Copyright 1996-2017 Ruckus Wireless, Inc..
+			All rights reserved.
+			This Ruckus Wireless, Inc SNMP Management Information Base Specification
+			embodies Ruckus Wireless, Inc' confidential and proprietary
+			intellectual property. Ruckus Wireless, Inc retains all
+			title and ownership in the Specification, including any
+			revisions.
+			
+			This Specification is supplied AS IS, and Ruckus Wireless, Inc makes
+			no warranty, either express or implied, as to the use,
+			operation, condition, or performance of the Specification.			
+			"    
+	REVISION     "200909300000Z" -- September 30, 2009
+	DESCRIPTION
 			"convert from SMIv1 to SMIv2"
-   ::= {router 4}
+	REVISION     "201708070000Z" -- Aug 7, 2017
+	DESCRIPTION
+             "Modified contact Info, Organization and Decscription"
+   ::= {router 4}	                  
 
 	--  Textual Conventions
 
-	AreaID::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	AreaID::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 		The Area ID, in OSPF, has the same format as an IP Address,
 		but has the function of defining a summarization point for
@@ -52,43 +53,43 @@ snOspf MODULE-IDENTITY
 		"
 	SYNTAX  IpAddress
 
-	RouterID::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	RouterID::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 		   The Router ID, in OSPF, has the same format as an IP Address,
-		   but identifies the router independent of its IP Address.
+		   but identifies the router independent of its IP Address.		
 		"
 	SYNTAX  IpAddress
 
-	Metric::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	Metric::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 		The OSPF Metric is defined as an unsigned value in the range
 		0..'FFFF'h
 		"
 	SYNTAX  INTEGER (0..65535)
-
-	BigMetric::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	
+	BigMetric::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 			0..'FFFFFF'h
 		"
 	SYNTAX      INTEGER (0..16777215)
 
-	TruthVal::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	TruthVal::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 		Boolean Values
 		"
 	SYNTAX  INTEGER { false (0), true (1)  }
 
-	RtrStatus::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	RtrStatus::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 			RtrStatus Values
 		"
@@ -96,59 +97,59 @@ snOspf MODULE-IDENTITY
 
 	 --  Time Durations measured in seconds
 
-	PositiveInteger::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	PositiveInteger::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 			0..'7FFFFFFF'h
 		"
 	SYNTAX  INTEGER (0..2147483647)
-
-	HelloRange::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	
+	HelloRange::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 		1..'FFFF'h
 		"
 	SYNTAX   INTEGER (1..65535)
-
-	UpToMaxAge::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	
+	UpToMaxAge::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 		"
 	SYNTAX  INTEGER (0..3600)
 
-	DesignatedRouterPriority::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	DesignatedRouterPriority::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 		The range of ifIndex, i.e. (1..ifNumber)
-		Potential Priorities for the Designated Router Election
+		Potential Priorities for the Designated Router Election		
 		"
 	SYNTAX  INTEGER (0..255)
 
 
-	TOSType::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	TOSType::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 		 Type of Service is defined as a mapping to the IP Type of
 		 Service Flags as defined in the Router Requirements
 		 Document:
-
+		 
 		 Type of Service is defined as a mapping to the IP Type of
 		 Service Flags as defined in the IP Forwarding Table MIB
-
+	
 		  +-----+-----+-----+-----+-----+-----+-----+-----+
 		  |                 |                       |     |
 		  |   PRECEDENCE    |    TYPE OF SERVICE    |  0  |
 		  |                 |                       |     |
 		  +-----+-----+-----+-----+-----+-----+-----+-----+
-
+	
 				   IP TOS                IP TOS
 			  Field     Policy      Field     Policy
-
+	
 			  Contents    Code      Contents    Code
 			  0 0 0 0  ==>   0      0 0 0 1  ==>   2
 			  0 0 1 0  ==>   4      0 0 1 1  ==>   6
@@ -158,8 +159,8 @@ snOspf MODULE-IDENTITY
 			  1 0 1 0  ==>  20      1 0 1 1  ==>  22
 			  1 1 0 0  ==>  24      1 1 0 1  ==>  26
 			  1 1 1 0  ==>  28      1 1 1 1  ==>  30
-
-		   The remaining values are left for future definition.
+	
+		   The remaining values are left for future definition.		
 		"
 	SYNTAX  INTEGER (0..30)
 
@@ -181,8 +182,8 @@ snOspfIfStatus		OBJECT IDENTIFIER ::= { snOspf 12 }
 snOspfVirtIfStatus	OBJECT IDENTIFIER ::= { snOspf 13 }
 snOspfRoutingInfo	OBJECT IDENTIFIER ::= { snOspf 14 }
 snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
-
-
+ 
+	
 
 --  Section 1:	OSPF General Variables
 
@@ -234,7 +235,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   current
 		 DESCRIPTION
 			"The Redistribution status of OSPF in the router.  The
-			value 'enabled' denotes that the OSPF Redistribution is
+			value 'enabled' denotes that the OSPF Redistribution is 
 			active; 'disabled' disables it on the router."
 		 ::= { snOspfGen 4 }
 
@@ -242,7 +243,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 	 snOspfDefaultOspfMetricValue OBJECT-TYPE
 		 SYNTAX   INTEGER (1..65535)
 		 MAX-ACCESS   read-write
-		 STATUS   current
+		 STATUS   current 
 		 DESCRIPTION
 			"The metric of using a default OSPF Metric value on this route."
 		 ::= { snOspfGen 5 }
@@ -299,25 +300,23 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 					type2(2)
 				  }
 		 MAX-ACCESS   read-write
-		 STATUS   current
+		 STATUS   current 
 		 DESCRIPTION
-			"type1: For External Type 1 (comparable value) the
-					intra-area and inter-area routes,
+			"type1: For External Type 1 (comparable value) the 
+					intra-area and inter-area routes, 
 					it is an OSPF metric plus the External Metric.
-			 type2: For external Type 2 (non-comparable value) routes,
+			 type2: For external Type 2 (non-comparable value) routes, 
 					it is the external metric."
 		 ::= { snOspfGen 10 }
 
 	 snOspfExtLsdbLimit OBJECT-TYPE
 		 SYNTAX   Integer32
 		 MAX-ACCESS   read-write
-		 STATUS   current
+		 STATUS   current 
 		 DESCRIPTION
 		   "The  maximum   number   of   non-default   AS-
 		   external-LSAs entries that can be stored in the
-		   link-state database.  If the value is -1,  then
-		   there is no limit.
-		   
+		   link-state database. 
 
 		   When the number of non-default AS-external-LSAs
 		   in   a  router's  link-state  database  reaches
@@ -334,7 +333,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 	snOspfExitOverflowInterval OBJECT-TYPE
 		 SYNTAX   INTEGER (0..86400)
 		 MAX-ACCESS   read-write
-		 STATUS   current
+		 STATUS   current 
 		 DESCRIPTION
 		   "The number of  seconds  that,  after  entering
 		   OverflowState,  a  router will attempt to leave
@@ -346,7 +345,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 
 	snOspfRfc1583Compatibility OBJECT-TYPE
 		SYNTAX  INTEGER {
-			disabled(0),
+			disabled(0),             
 			enabled(1)
 			}
 		MAX-ACCESS  read-write
@@ -355,7 +354,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 			"This allows the ospf routing either compatible with
 			RFC1583 or RFC2178.
 			enabled(1)........activate RFC1583 compatibility rather than RFC2178
-			disabled(0).......disable RFC1583 compatibility and compatible to RFC2178."
+			disabled(0).......disable RFC1583 compatibility and compatible to RFC2178."  
 	   ::= { snOspfGen 13 }
 
 	 snOspfRouterIdFormat OBJECT-TYPE
@@ -367,7 +366,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   current
 		 DESCRIPTION
 			"This object is used to specify whether
-			 RouterId is represented as IP Address or
+			 RouterId is represented as IP Address or 
 			 an Integer. The values
 			 that can be written are:
 			 integer(0).....as an integer.
@@ -443,9 +442,9 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 				 Integer32,
 			 snOspfStubMetric
 				 BigMetric,
-			 snOspfAreaRowStatus
+			 snOspfAreaRowStatus 
 				 INTEGER,
-			 snOspfAreaIdFormat
+			 snOspfAreaIdFormat 
 				 INTEGER
 		 }
 
@@ -466,7 +465,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   current
 		 DESCRIPTION
 			"The area's support for importing AS external link-
-			state advertisements.
+			state advertisements. 
 			0: 	Stub Area Type
 			1: 	Normal Area Type
 			2: 	NSSA Area Type"
@@ -482,11 +481,11 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   current
 		 DESCRIPTION
 			"The metric value applied at the default type of
-			service(ospfMetric).  By default, this equals the
-			least metric at the type of service among the
+			service(ospfMetric).  By default, this equals the 
+			least metric at the type of service among the 
 			interfaces to other areas.  This Object exist if
-			only if the value of snOspfAreaSummary is
-			snOspfAreaSummary(2); Otherwise, an SNMP_GET/GET_NEXT
+			only if the value of snOspfAreaSummary is 
+			snOspfAreaSummary(2); Otherwise, an SNMP_GET/GET_NEXT 
 			attempt of this Object will return NO_SUCH_NAME."
 		 ::= { snOspfAreaEntry 3 }
 
@@ -530,7 +529,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   current
 		 DESCRIPTION
 			"This object is used to specify whether
-			 AreaId is represented as IP Address or
+			 AreaId is represented as IP Address or 
 			 an Integer. The values
 			 that can be written are:
 			 integer(0).....as an integer.
@@ -585,7 +584,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 				 IpAddress,
 			 snOspfAreaRangeRowStatus
 				 INTEGER,
-			 snOspfAreaRangeAreaIdFormat
+			 snOspfAreaRangeAreaIdFormat 
 				 INTEGER
 		 }
 
@@ -660,7 +659,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   current
 		 DESCRIPTION
 			"This object is used to specify whether
-			 AreaId is represented as IP Address or
+			 AreaId is represented as IP Address or 
 			 an Integer. The values
 			 that can be written are:
 			 integer(0).....as an integer.
@@ -669,7 +668,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 
 
 
-
+ 
 
 --  Section 4:		OSPF Interface Configuration Table
 
@@ -725,15 +724,15 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 				 OCTET STRING,
 			 snOspfIfMetricValue
 				 INTEGER,
-			 snOspfIfRowStatus
-				 INTEGER,
+			 snOspfIfRowStatus 
+				 INTEGER, 
 			 snOspfIfMd5AuthKeyId
 				 INTEGER,
 			 snOspfIfMd5AuthKey
 				 OCTET STRING,
 			 snOspfIfMd5ActivationWaitTime
 				 INTEGER,
-			 snOspfIfAreaIdFormat
+			 snOspfIfAreaIdFormat 
 				 INTEGER,
 			 snOspfIfPassiveMode
 				 INTEGER,
@@ -920,7 +919,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 						  rendering it inoperative..
 			 valid(2)....the row exists and is valid"
 		 ::= { snOspfIfEntry 12 }
-
+	 
 	 snOspfIfMd5AuthKeyId OBJECT-TYPE
 		 SYNTAX   INTEGER (0..255)
 		 MAX-ACCESS   read-write
@@ -928,9 +927,9 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 DESCRIPTION
 			"The md5 authentication key ID.  If the snOspfVirtIfAuthType
 			is set to md5, the value of snOspfIfMd5AuthKeyId must be
-			(1 to 255). This field identifies the algorithm and secret
-			key used to create the message digest appended to the OSPF
-			packet.  Key Identifiers are unique per-interface
+			(1 to 255). This field identifies the algorithm and secret 
+			key used to create the message digest appended to the OSPF 
+			packet.  Key Identifiers are unique per-interface 
 			(or equivalently, per-subnet)."
 		 ::= { snOspfIfEntry 13 }
 
@@ -941,7 +940,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   deprecated
 		 DESCRIPTION
 			"The MD5 Authentication Key.  If the Area's Authorization
-			Type is md5, and the key length is shorter than 16 octets,
+			Type is md5, and the key length is shorter than 16 octets, 
 			the agent will left adjust and zero fill to 16 octets.
 			When read, snOspfIfMd5AuthKey always returns an Octet String
 			of length zero."
@@ -966,7 +965,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   deprecated
 		 DESCRIPTION
 			"This object is used to specify whether
-			 AreaId is represented as IP Address or
+			 AreaId is represented as IP Address or 
 			 an Integer. The values
 			 that can be written are:
 			 integer(0).....as an integer.
@@ -1072,15 +1071,15 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 				 OCTET STRING,
 			 snOspfIf2MetricValue
 				 INTEGER,
-			 snOspfIf2RowStatus
-				 INTEGER,
+			 snOspfIf2RowStatus 
+				 INTEGER, 
 			 snOspfIf2Md5AuthKeyId
 				 INTEGER,
 			 snOspfIf2Md5AuthKey
 				 OCTET STRING,
 			 snOspfIf2Md5ActivationWaitTime
 				 INTEGER,
-			 snOspfIf2AreaIdFormat
+			 snOspfIf2AreaIdFormat 
 				 INTEGER,
 			 snOspfIf2PassiveMode
 				 INTEGER,
@@ -1235,7 +1234,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 	 snOspfIf2MetricValue OBJECT-TYPE
 		 SYNTAX   INTEGER (1..65535)
 		 MAX-ACCESS   read-write
-		 STATUS   current
+		 STATUS   current 
 		 DESCRIPTION
 			"The metric of using this type  of  service  on
 			 this interface.  The default value of the TOS 0
@@ -1271,7 +1270,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 						  rendering it inoperative..
 			 valid(2)....the row exists and is valid"
 		 ::= { snOspfIf2Entry 12 }
-
+	 
 	 snOspfIf2Md5AuthKeyId OBJECT-TYPE
 		 SYNTAX   INTEGER (0..255)
 		 MAX-ACCESS   read-write
@@ -1279,9 +1278,9 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 DESCRIPTION
 			"The md5 authentication key ID.  If the snOspfVirtIfAuthType
 			is set to md5, the value of snOspfIf2Md5AuthKeyId must be
-			(1 to 255). This field identifies the algorithm and secret
-			key used to create the message digest appended to the OSPF
-			packet.  Key Identifiers are unique per-interface
+			(1 to 255). This field identifies the algorithm and secret 
+			key used to create the message digest appended to the OSPF 
+			packet.  Key Identifiers are unique per-interface 
 			(or equivalently, per-subnet)."
 		 ::= { snOspfIf2Entry 13 }
 
@@ -1292,7 +1291,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   current
 		 DESCRIPTION
 			"The MD5 Authentication Key.  If the Area's Authorization
-			Type is md5, and the key length is shorter than 16 octets,
+			Type is md5, and the key length is shorter than 16 octets, 
 			the agent will left adjust and zero fill to 16 octets.
 			When read, snOspfIf2Md5AuthKey always returns an Octet String
 			of length zero."
@@ -1302,7 +1301,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 	 snOspfIf2Md5ActivationWaitTime OBJECT-TYPE
 		 SYNTAX   INTEGER (0..14400)
 		 MAX-ACCESS   read-write
-		 STATUS   current
+		 STATUS   current 
 		 DESCRIPTION
 			"The md5 authentication key activation wait time is specified in second
 			and the maximum wait time is 14400 seconds (4 hours)."
@@ -1317,7 +1316,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   current
 		 DESCRIPTION
 			"This object is used to specify whether
-			 AreaId is represented as IP Address or
+			 AreaId is represented as IP Address or 
 			 an Integer. The values
 			 that can be written are:
 			 integer(0).....as an integer.
@@ -1437,14 +1436,14 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 			 snOspfVirtIfAuthKey
 				 OCTET STRING,
 			 snOspfVirtIfRowStatus
-				 INTEGER,
+				 INTEGER, 
 			 snOspfVirtIfMd5AuthKeyId
 				 INTEGER,
 			 snOspfVirtIfMd5AuthKey
 				 OCTET STRING,
 			 snOspfVirtIfMd5ActivationWaitTime
 				 INTEGER,
-			 snOspfVirtIfAreaIdFormat
+			 snOspfVirtIfAreaIdFormat 
 				 INTEGER
 		 }
 
@@ -1531,7 +1530,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 ::= { snOspfVirtIfEntry 7 }
 
 	 snOspfVirtIfAuthKey OBJECT-TYPE
-		 SYNTAX   OCTET STRING (SIZE (0..8))
+		 SYNTAX   OCTET STRING (SIZE (0..8)) 
 		 MAX-ACCESS   read-write
 		 STATUS   current
 		 DESCRIPTION
@@ -1574,7 +1573,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 			 invalid(1)...Setting it to 'invalid' has the effect of
 						  rendering it inoperative..
 			 valid(2)....the row exists and is valid"
-		 ::= { snOspfVirtIfEntry 9 }
+		 ::= { snOspfVirtIfEntry 9 } 
 
 	 snOspfVirtIfMd5AuthKeyId OBJECT-TYPE
 		 SYNTAX   INTEGER (0..255)
@@ -1583,9 +1582,9 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 DESCRIPTION
 			"The md5 authentication key ID.  If the snOspfVirtIfAuthType
 			is set to md5, the value of snOspfVirtIfMd5AuthKeyId must be
-			(1 to 255). This field identifies the algorithm and secret
-			key used to create the message digest appended to the OSPF
-			packet.  Key Identifiers are unique per-interface
+			(1 to 255). This field identifies the algorithm and secret 
+			key used to create the message digest appended to the OSPF 
+			packet.  Key Identifiers are unique per-interface 
 			(or equivalently, per-subnet)."
 		 ::= { snOspfVirtIfEntry 10 }
 
@@ -1596,7 +1595,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   current
 		 DESCRIPTION
 			"The MD5 Authentication Key.  If the Area's Authorization
-			Type is md5, and the key length is shorter than 16 octets,
+			Type is md5, and the key length is shorter than 16 octets, 
 			the agent will left adjust and zero fill to 16 octets.
 
 			When read, snOspfIfMd5AuthKey always returns an Octet String
@@ -1611,7 +1610,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 	 snOspfVirtIfMd5ActivationWaitTime OBJECT-TYPE
 		 SYNTAX   INTEGER (0..14400)
 		 MAX-ACCESS   read-write
-		 STATUS   current
+		 STATUS   current 
 		 DESCRIPTION
 			"The md5 authentication key activation wait time is specified in second
 			and the maximum wait time is 14400 seconds (4 hours)."
@@ -1627,7 +1626,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   current
 		 DESCRIPTION
 			"This object is used to specify whether
-			 AreaId is represented as IP Address or
+			 AreaId is represented as IP Address or 
 			 an Integer. The values
 			 that can be written are:
 			 integer(0).....as an integer.
@@ -1661,7 +1660,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 MAX-ACCESS   not-accessible
 		 STATUS   current
 		 DESCRIPTION
-			"The OSPF Redistribution Entry specifies a particular RIP
+			"The OSPF Redistribution Entry specifies a particular RIP 
 			or Static route to be imported into the OSPF domain."
 		 INDEX { snOspfRedisIndex }
 		 ::= { snOspfRedisTable 1 }
@@ -1696,7 +1695,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 MAX-ACCESS   read-only
 		 STATUS   current
 		 DESCRIPTION
-			"The destination IP address that associates with
+			"The destination IP address that associates with 
 			this particular route."
 		 ::= { snOspfRedisEntry 1 }
 
@@ -1705,7 +1704,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 MAX-ACCESS   read-write
 		 STATUS   current
 		 DESCRIPTION
-			"The destination IP address that associates with
+			"The destination IP address that associates with 
 			this particular route."
 		 ::= { snOspfRedisEntry 2 }
 
@@ -1725,9 +1724,9 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 MAX-ACCESS   read-write
 		 STATUS   current
 		 DESCRIPTION
-			"The action to be taken if the route match this entry.
+			"The action to be taken if the route match this entry. 
 				noImport(0):	- the route is NOT imported into OSPF
-								  Domain.
+								  Domain. 
 				import(1):		- the route is imported into OSPF
 								  Domain as external type 2 route."
 		 ::= { snOspfRedisEntry 4 }
@@ -1744,7 +1743,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 MAX-ACCESS   read-write
 		 STATUS   current
 		 DESCRIPTION
-			"The imported routes into OSPF domain is set in the following:
+			"The imported routes into OSPF domain is set in the following: 
 				rip(1):		- the RIP route.
 				all(2):		- all protocol route.
 				static(3):	- the static route.
@@ -1761,10 +1760,10 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 MAX-ACCESS   read-write
 		 STATUS   current
 		 DESCRIPTION
-			"The value indicates to which the route metric should match:
-				disabled(0):	- the route metric does NOT match the
+			"The value indicates to which the route metric should match: 
+				disabled(0):	- the route metric does NOT match the 
 								  OSPF metric field.
-				enabled(1):		- the route metric matches the OSPF
+				enabled(1):		- the route metric matches the OSPF 
 								  metric field."
 		 ::= { snOspfRedisEntry 6 }
 
@@ -1772,7 +1771,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 	snOspfRedisOspfMetricValue OBJECT-TYPE
 		 SYNTAX   Metric
 		 MAX-ACCESS   read-write
-		 STATUS   current
+		 STATUS   current 
 		 DESCRIPTION
 			"The metric of using OSPF Metric value on this route."
 		 ::= { snOspfRedisEntry 7 }
@@ -1786,10 +1785,10 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 MAX-ACCESS   read-write
 		 STATUS   current
 		 DESCRIPTION
-			"The value indicates to which the route metric should match:
-				disabled(0):	- the route metric does NOT match the
+			"The value indicates to which the route metric should match: 
+				disabled(0):	- the route metric does NOT match the 
 								  RIP metric field.
-				enabled(1):		- the route metric matches the RIP
+				enabled(1):		- the route metric matches the RIP 
 								  metric field."
 		 ::= { snOspfRedisEntry 8 }
 
@@ -1797,7 +1796,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 	 snOspfRedisRipMetricValue OBJECT-TYPE
 		 SYNTAX   INTEGER (1..15)
 		 MAX-ACCESS   read-write
-		 STATUS   current
+		 STATUS   current 
 		 DESCRIPTION
 			"The metric of using RIP Metric value (1 to 15 hops) on this route."
 		 ::= { snOspfRedisEntry 9 }
@@ -1895,7 +1894,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 DESCRIPTION
 			"The table entry index of this neighbor."
 		 ::= { snOspfNbrEntry 1 }
-
+	 
 	 snOspfNbrPort OBJECT-TYPE
 		 SYNTAX   Integer32
 		 MAX-ACCESS   read-only
@@ -1903,7 +1902,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 DESCRIPTION
 			"The physical port of this neighbor."
 		 ::= { snOspfNbrEntry 2 }
-
+	 
 
 	 snOspfNbrIpAddr OBJECT-TYPE
 		 SYNTAX   IpAddress
@@ -1921,7 +1920,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 DESCRIPTION
 			"The neighbor index of each port and each IP address."
 		 ::= { snOspfNbrEntry 4 }
-
+	 
 	 snOspfNbrRtrId OBJECT-TYPE
 		 SYNTAX   RouterID
 		 MAX-ACCESS   read-only
@@ -2067,7 +2066,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 				 Counter32,
 			 snOspfVirtNbrLSRetransQLen
 				 Gauge32,
-			 snOspfVirtNbrAreaIdFormat
+			 snOspfVirtNbrAreaIdFormat 
 				 INTEGER
 		 }
 
@@ -2158,7 +2157,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   current
 		 DESCRIPTION
 			"This object is used to specify whether
-			 AreaId is represented as IP Address or
+			 AreaId is represented as IP Address or 
 			 an Integer. The values
 			 that can be written are:
 			 integer(0).....as an integer.
@@ -2211,7 +2210,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 				 Integer32,
 			 snOspfLsdbAdvertisement
 				 OCTET STRING,
-			 snOspfLsdbAreaIdFormat
+			 snOspfLsdbAreaIdFormat 
 				 INTEGER
 		 }
 
@@ -2349,7 +2348,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 		 STATUS   current
 		 DESCRIPTION
 			"This object is used to specify whether
-			 AreaId is represented as IP Address or
+			 AreaId is represented as IP Address or 
 			 an Integer. The values
 			 that can be written are:
 			 integer(0).....as an integer.
@@ -2392,7 +2391,7 @@ snOspfTrapControl 	OBJECT IDENTIFIER ::= { snOspf 15 }
 
 SnOspfExtLsdbEntry ::=
 	SEQUENCE {
-	   snOspfExtLsdbEntryIndex
+	   snOspfExtLsdbEntryIndex 
 			Integer32,
 		snOspfExtLsdbType
 			INTEGER,
@@ -2558,9 +2557,9 @@ SnOspfExtLsdbEntry ::=
 
 	 SnOspfAreaStatusEntry ::=
 		 SEQUENCE {
-			 snOspfAreaStatusEntryIndex
+			 snOspfAreaStatusEntryIndex 
 				 Integer32,
-			 snOspfAreaStatusAreaId
+			 snOspfAreaStatusAreaId 
 				 AreaID,
 			 snOspfAreaStatusImportASExtern
 				 Integer32,
@@ -2576,7 +2575,7 @@ SnOspfExtLsdbEntry ::=
 				 Gauge32,
 			 snOspfAreaStatusLSACksumSum
 				 Integer32,
-			 snOspfAreaStatusAreaIdFormat
+			 snOspfAreaStatusAreaIdFormat 
 				 INTEGER
 		 }
 
@@ -2618,11 +2617,11 @@ SnOspfExtLsdbEntry ::=
 		 STATUS   current
 		 DESCRIPTION
 			"The metric value applied at the default type of
-			service(ospfMetric).  By default, this equals the
-			least metric at the type of service among the
+			service(ospfMetric).  By default, this equals the 
+			least metric at the type of service among the 
 			interfaces to other areas.  This Object exist if
-			only if the value of snOspfAreaSummary is
-			snOspfAreaSummary(2); Otherwise, an SNMP_GET/GET_NEXT
+			only if the value of snOspfAreaSummary is 
+			snOspfAreaSummary(2); Otherwise, an SNMP_GET/GET_NEXT 
 			attempt of this Object will return NO_SUCH_NAME."
 		 ::= { snOspfAreaStatusEntry 4 }
 
@@ -2695,13 +2694,13 @@ SnOspfExtLsdbEntry ::=
 		 STATUS   current
 		 DESCRIPTION
 			"This object is used to specify whether
-			 AreaId is represented as IP Address or
+			 AreaId is represented as IP Address or 
 			 an Integer. The values
 			 that can be written are:
 			 integer(0).....as an integer.
 			 ipAddress(1)...as IP Address."
 		 ::= { snOspfAreaStatusEntry 10 }
-
+	 
 
 
 --  Section 12:		OSPF Interface Status Table
@@ -2731,7 +2730,7 @@ SnOspfExtLsdbEntry ::=
 
 	 SnOspfIfStatusEntry ::=
 		 SEQUENCE {
-			 snOspfIfStatusEntryIndex
+			 snOspfIfStatusEntryIndex 
 				 Integer32,
 			 snOspfIfStatusPort
 				 Integer32,
@@ -2773,7 +2772,7 @@ SnOspfExtLsdbEntry ::=
 				 OCTET STRING,
 			 snOspfIfStatusMd5ActivationWaitTime
 				 INTEGER,
-			 snOspfIfStatusAreaIdFormat
+			 snOspfIfStatusAreaIdFormat 
 				 INTEGER
 		 }
 
@@ -2994,7 +2993,7 @@ SnOspfExtLsdbEntry ::=
 	 snOspfIfStatusMetricValue OBJECT-TYPE
 		 SYNTAX   Metric
 		 MAX-ACCESS   read-only
-		 STATUS   current
+		 STATUS   current 
 		 DESCRIPTION
 			"The metric of using this type  of  service  on
 			 this interface.  The default value of the TOS 0
@@ -3008,9 +3007,9 @@ SnOspfExtLsdbEntry ::=
 		 DESCRIPTION
 			"The md5 authentication key ID.  If the snOspfVirtIfAuthType
 			is set to md5, the value of snOspfIfMd5AuthKeyId must be
-			(1 to 255). This field identifies the algorithm and secret
-			key used to create the message digest appended to the OSPF
-			packet.  Key Identifiers are unique per-interface
+			(1 to 255). This field identifies the algorithm and secret 
+			key used to create the message digest appended to the OSPF 
+			packet.  Key Identifiers are unique per-interface 
 			(or equivalently, per-subnet)."
 		 ::= { snOspfIfStatusEntry 19 }
 
@@ -3021,7 +3020,7 @@ SnOspfExtLsdbEntry ::=
 		 STATUS   current
 		 DESCRIPTION
 			"The MD5 Authentication Key.  If the Area's Authorization
-			Type is md5, and the key length is shorter than 16 octets,
+			Type is md5, and the key length is shorter than 16 octets, 
 			the agent will left adjust and zero fill to 16 octets.
 			When read, snOspfIfMd5AuthKey always returns an Octet String
 			of length zero."
@@ -3031,7 +3030,7 @@ SnOspfExtLsdbEntry ::=
 	 snOspfIfStatusMd5ActivationWaitTime OBJECT-TYPE
 		 SYNTAX   INTEGER (0..14400)
 		 MAX-ACCESS   read-only
-		 STATUS   current
+		 STATUS   current 
 		 DESCRIPTION
 			"The md5 authentication key activation wait time is specified in second
 			and the maximum wait time is 14400 seconds (4 hours)."
@@ -3046,7 +3045,7 @@ SnOspfExtLsdbEntry ::=
 		 STATUS   current
 		 DESCRIPTION
 			"This object is used to specify whether
-			 AreaId is represented as IP Address or
+			 AreaId is represented as IP Address or 
 			 an Integer. The values
 			 that can be written are:
 			 integer(0).....as an integer.
@@ -3057,7 +3056,7 @@ SnOspfExtLsdbEntry ::=
 --  Section 13:		OSPF Virtual Interface Status Table
 
 --      The Virtual Interface Status Table describes the virtual
---      links status data.
+--      links status data. 
 
 
 
@@ -3082,7 +3081,7 @@ SnOspfExtLsdbEntry ::=
 
 	 SnOspfVirtIfStatusEntry ::=
 		 SEQUENCE {
-			 snOspfVirtIfStatusEntryIndex
+			 snOspfVirtIfStatusEntryIndex 
 				 Integer32,
 			 snOspfVirtIfStatusAreaID
 				 AreaID,
@@ -3110,7 +3109,7 @@ SnOspfExtLsdbEntry ::=
 				 OCTET STRING,
 			 snOspfVirtIfStatusMd5ActivationWaitTime
 				 INTEGER,
-			 snOspfVirtIfStatusAreaIdFormat
+			 snOspfVirtIfStatusAreaIdFormat 
 				 INTEGER
 		 }
 
@@ -3207,7 +3206,7 @@ SnOspfExtLsdbEntry ::=
 		 MAX-ACCESS   read-only
 		 STATUS   current
 		 DESCRIPTION
-			"The number of state changes or error events on
+			"The number of state changes or error events on 
 			this Virtual Link."
 		 ::= { snOspfVirtIfStatusEntry 9 }
 
@@ -3229,7 +3228,7 @@ SnOspfExtLsdbEntry ::=
 		 ::= { snOspfVirtIfStatusEntry 10 }
 
 	 snOspfVirtIfStatusAuthKey OBJECT-TYPE
-		 SYNTAX   OCTET STRING (SIZE (0..8))
+		 SYNTAX   OCTET STRING (SIZE (0..8)) 
 		 MAX-ACCESS   read-only
 		 STATUS   current
 		 DESCRIPTION
@@ -3251,9 +3250,9 @@ SnOspfExtLsdbEntry ::=
 		 DESCRIPTION
 			"The md5 authentication key ID.  If the snOspfVirtIfAuthType
 			is set to md5, the value of snOspfVirtIfMd5AuthKeyId must be
-			(1 to 255). This field identifies the algorithm and secret
-			key used to create the message digest appended to the OSPF
-			packet.  Key Identifiers are unique per-interface
+			(1 to 255). This field identifies the algorithm and secret 
+			key used to create the message digest appended to the OSPF 
+			packet.  Key Identifiers are unique per-interface 
 			(or equivalently, per-subnet)."
 		 ::= { snOspfVirtIfStatusEntry 12 }
 
@@ -3264,7 +3263,7 @@ SnOspfExtLsdbEntry ::=
 		 STATUS   current
 		 DESCRIPTION
 			"The MD5 Authentication Key.  If the Area's Authorization
-			Type is md5, and the key length is shorter than 16 octets,
+			Type is md5, and the key length is shorter than 16 octets, 
 			the agent will left adjust and zero fill to 16 octets.
 
 			When read, snOspfIfMd5AuthKey always returns an Octet String
@@ -3279,7 +3278,7 @@ SnOspfExtLsdbEntry ::=
 	 snOspfVirtIfStatusMd5ActivationWaitTime OBJECT-TYPE
 		 SYNTAX   INTEGER (0..14400)
 		 MAX-ACCESS   read-only
-		 STATUS   current
+		 STATUS   current 
 		 DESCRIPTION
 			"The md5 authentication key activation wait time is specified in second
 			and the maximum wait time is 14400 seconds (4 hours)."
@@ -3295,7 +3294,7 @@ SnOspfExtLsdbEntry ::=
 		 STATUS   current
 		 DESCRIPTION
 			"This object is used to specify whether
-			 AreaId is represented as IP Address or
+			 AreaId is represented as IP Address or 
 			 an Integer. The values
 			 that can be written are:
 			 integer(0).....as an integer.
@@ -3306,7 +3305,7 @@ SnOspfExtLsdbEntry ::=
 --  Section 14:		OSPF Routing Information Table
 
 --      The OSPF Routing Information Table describes the OSPF ABR/ASBR
---      routing information.
+--      routing information. 
 
 
 
@@ -3329,7 +3328,7 @@ SnOspfExtLsdbEntry ::=
 
 	 SnOspfRoutingInfoEntry ::=
 		 SEQUENCE {
-			 snOspfRoutingInfoIndex
+			 snOspfRoutingInfoIndex 
 				 Integer32,
 			 snOspfRoutingInfoRouterID
 				 RouterID,
@@ -3355,7 +3354,7 @@ SnOspfExtLsdbEntry ::=
 		 MAX-ACCESS   read-only
 		 STATUS   current
 		 DESCRIPTION
-			"The Router ID of the destination router."
+			"The Router ID of the destination router." 
 		 ::= { snOspfRoutingInfoEntry 2 }
 
 	 snOspfRoutingInfoRouterType OBJECT-TYPE
@@ -3460,8 +3459,8 @@ SnOspfExtLsdbEntry ::=
 			MAX-ACCESS   read-write
 			STATUS   current
 			DESCRIPTION
-			   "Indicates if the generation of any OSPF traps is permitted on the router.
-				The value 'enabled' denotes that the OSPF Traps can be generated by the
+			   "Indicates if the generation of any OSPF traps is permitted on the router. 
+				The value 'enabled' denotes that the OSPF Traps can be generated by the 
 				router; 'disabled' denotes that the OSPF Traps can not be generated by the
 				router even when snOspfSetTrap indicates the generation of specific OSPF Traps.
 				This object provides global control on the generation of ospf traps."

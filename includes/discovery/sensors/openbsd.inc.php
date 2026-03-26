@@ -49,7 +49,7 @@ if (is_array($oids)) {
                 if ($current < -40 || $current > 200) {
                     $bogus = true;
                 }
-                $descr = preg_replace('/ temperature/i', '', $descr);
+                $descr = preg_replace('/ temperature/i', '', (string) $descr);
             }
 
             // echo($descr . "|" . $index . "|" .$current . "|" . $bogus . "\n");

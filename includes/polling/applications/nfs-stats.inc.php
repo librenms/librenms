@@ -24,7 +24,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('readdirplus', 'GAUGE', 0)
     ->addDataset('fsstat', 'GAUGE', 0);
 
-$data = explode("\n", $nfsstats);
+$data = explode("\n", (string) $nfsstats);
 $fields = [
     'total' => $data[0],
     'null' => $data[1],

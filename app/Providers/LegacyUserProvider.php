@@ -64,9 +64,7 @@ class LegacyUserProvider implements UserProvider
      */
     public function retrieveByLegacyId($identifier)
     {
-        error_reporting(0);
         $legacy_user = LegacyAuth::get()->getUser($identifier);
-        error_reporting(-1);
 
         return $this->retrieveByCredentials(['username' => $legacy_user['username'] ?? null]);
     }
@@ -127,8 +125,6 @@ class LegacyUserProvider implements UserProvider
      */
     public function validateCredentials(Authenticatable $user, array $credentials)
     {
-        error_reporting(0);
-
         $authorizer = LegacyAuth::get();
 
         try {
@@ -149,11 +145,9 @@ class LegacyUserProvider implements UserProvider
             }
             toast()->error($auth_message);
 
-            $username = $username ?? Session::get('username', $credentials['username']);
+            $username = Session::get('username', $credentials['username']);
 
             DB::table('authlog')->insert(['user' => $username, 'address' => Request::ip(), 'result' => $auth_message]);
-        } finally {
-            error_reporting(-1);
         }
 
         return false;
@@ -167,8 +161,6 @@ class LegacyUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        error_reporting(0);
-
         $auth = LegacyAuth::get();
         $type = LegacyAuth::getType();
 
@@ -181,18 +173,12 @@ class LegacyUserProvider implements UserProvider
         $auth_id = $auth->getUserid($username);
         $new_user = $auth->getUser($auth_id);
 
-        error_reporting(-1);
-
         if (empty($new_user)) {
             // some legacy auth create users in the authenticate method, if it doesn't exist yet, lets try authenticate (Laravel calls retrieveByCredentials first)
             try {
-                error_reporting(0);
-
                 $auth->authenticate($credentials);
                 $auth_id = $auth->getUserid($username);
                 $new_user = $auth->getUser($auth_id);
-
-                error_reporting(-1);
             } catch (AuthenticationException $ae) {
                 toast()->error($ae->getMessage());
             }
@@ -207,9 +193,7 @@ class LegacyUserProvider implements UserProvider
         unset($new_user['user_id']);
 
         // remove null fields
-        $new_user = array_filter($new_user, function ($var) {
-            return ! is_null($var);
-        });
+        $new_user = array_filter($new_user, fn ($var) => ! is_null($var));
 
         // always create an entry in the users table, but separate by type
         $user = User::thisAuth()->firstOrNew(['username' => $username], $new_user);

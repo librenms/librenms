@@ -14,7 +14,7 @@ try {
     $phpfpm = $e->getOutput();
 
     [$pool,$start_time,$start_since,$accepted_conn,$listen_queue,$max_listen_queue,$listen_queue_len,$idle_processes,
-        $active_processes,$total_processes,$max_active_processes,$max_children_reached,$slow_requests] = explode("\n", $phpfpm);
+        $active_processes,$total_processes,$max_active_processes,$max_children_reached,$slow_requests] = explode("\n", (string) $phpfpm);
 
     $rrd_name = ['app', $name, $app->app_id];
     $rrd_def = RrdDefinition::make()

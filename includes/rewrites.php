@@ -1,9 +1,12 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 function rewrite_entity_descr($descr)
 {
+    if (is_null($descr)) {
+        return '';
+    }
     $descr = str_replace('Distributed Forwarding Card', 'DFC', $descr);
     $descr = preg_replace('/7600 Series SPA Interface Processor-/', '7600 SIP-', $descr);
     $descr = preg_replace('/Rev\.\ [0-9\.]+\ /', '', $descr);
@@ -50,39 +53,39 @@ function cleanPort($interface, $device = null)
         $device = device_by_id_cache($interface['device_id']);
     }
 
-    $os = strtolower($device['os']);
+    // set "label"
+    $interface['label'] = $interface['ifDescr'];
+    if (isset($device['os'])) {
+        $os = strtolower($device['os']);
+        if (LibrenmsConfig::get("os.$os.ifname")) {
+            $interface['label'] = $interface['ifName'];
 
-    if (Config::get("os.$os.ifname")) {
-        $interface['label'] = $interface['ifName'];
-
-        if ($interface['ifName'] == '') {
-            $interface['label'] = $interface['ifDescr'];
-        }
-    } elseif (Config::get("os.$os.ifalias")) {
-        $interface['label'] = $interface['ifAlias'];
-    } else {
-        $interface['label'] = $interface['ifDescr'];
-        if (Config::get("os.$os.ifindex")) {
+            if ($interface['ifName'] == '') {
+                $interface['label'] = $interface['ifDescr'];
+            }
+        } elseif (LibrenmsConfig::get("os.$os.ifalias")) {
+            $interface['label'] = $interface['ifAlias'];
+        } elseif (LibrenmsConfig::get("os.$os.ifindex")) {
             $interface['label'] = $interface['label'] . ' ' . $interface['ifIndex'];
         }
+
+        if ($os == 'speedtouch') {
+            [$interface['label']] = explode('thomson', $interface['label']);
+        }
     }
 
-    if ($device['os'] == 'speedtouch') {
-        [$interface['label']] = explode('thomson', $interface['label']);
-    }
-
-    if (is_array(Config::get('rewrite_if'))) {
-        foreach (Config::get('rewrite_if') as $src => $val) {
-            if (stristr($interface['label'], $src)) {
+    if (is_array(LibrenmsConfig::get('rewrite_if'))) {
+        foreach (LibrenmsConfig::get('rewrite_if') as $src => $val) {
+            if (stristr((string) $interface['label'], (string) $src)) {
                 $interface['label'] = $val;
             }
         }
     }
 
-    if (is_array(Config::get('rewrite_if_regexp'))) {
-        foreach (Config::get('rewrite_if_regexp') as $reg => $val) {
-            if (preg_match($reg . 'i', $interface['label'])) {
-                $interface['label'] = preg_replace($reg . 'i', $val, $interface['label']);
+    if (is_array(LibrenmsConfig::get('rewrite_if_regexp'))) {
+        foreach (LibrenmsConfig::get('rewrite_if_regexp') as $reg => $val) {
+            if (preg_match($reg . 'i', (string) $interface['label'])) {
+                $interface['label'] = preg_replace($reg . 'i', $val, (string) $interface['label']);
             }
         }
     }
@@ -121,7 +124,7 @@ function short_hrDeviceDescr($dev)
 
 function short_port_descr($desc)
 {
-    [$desc] = explode('(', $desc);
+    [$desc] = explode('(', (string) $desc);
     [$desc] = explode('[', $desc);
     [$desc] = explode('{', $desc);
     [$desc] = explode('|', $desc);
@@ -179,30 +182,17 @@ function ipmiSensorName($hardwareId, $sensorIpmi)
  */
 function get_nagios_state($descr)
 {
-    switch ($descr) {
-        case 'On':
-        case 'Okay':
-        case 'Ok':
-            return 0;
-            break;
-        case 'Standby':
-        case 'Idle':
-        case 'Maintenance':
-            return 1;
-            break;
-        case 'Under':
-        case 'Over':
-            return 2;
-            break;
-        default:
-            return 3;
-            break;
-    }
+    return match ($descr) {
+        'On', 'Okay', 'Ok' => 0,
+        'Standby', 'Idle', 'Maintenance' => 1,
+        'Under', 'Over' => 2,
+        default => 3,
+    };
 }
 
 /**
  * @param  $state
- * @return int
+ * @return int|void
  */
 function apc_relay_state($state)
 {
@@ -247,11 +237,7 @@ function parse_entity_state($state, $value)
         ],
     ];
 
-    if (isset($data[$state][$value])) {
-        return $data[$state][$value];
-    }
-
-    return ['text' => 'na', 'color' => 'default'];
+    return $data[$state][$value] ?? ['text' => 'na', 'color' => 'default'];
 }
 
 function parse_entity_state_alarm($bits)
@@ -267,7 +253,7 @@ function parse_entity_state_alarm($bits)
         6 => ['text' => 'indeterminate', 'color' => 'default'],
     ];
 
-    $alarms = str_split(base_convert($bits, 16, 2));
+    $alarms = str_split(base_convert((string) $bits, 16, 2));
     $active_alarms = array_filter($alarms);
 
     return array_intersect_key($data, $active_alarms);

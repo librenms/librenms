@@ -26,9 +26,9 @@
 
 namespace App\Http\Controllers\Install;
 
+use App\Facades\LibrenmsConfig;
 use Exception;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\FileWriteFailedException;
 use LibreNMS\Interfaces\InstallerStep;
 use LibreNMS\Util\EnvHelper;
@@ -59,11 +59,11 @@ class FinalizeController extends InstallationController implements InstallerStep
     {
         $request->validate([
             'update_channel' => 'in:master,release',
-            'site_style' => 'in:light,dark',
+            'site_style' => 'in:device,light,dark',
         ]);
 
-        $this->saveSetting('update_channel', $request->get('update_channel', 'master'));
-        $this->saveSetting('site_style', $request->get('site_style'));
+        $this->saveSetting('update_channel', $request->input('update_channel', 'master'));
+        $this->saveSetting('site_style', $request->input('site_style'));
         $this->saveSetting('reporting.error', $request->has('error_reporting'));
         $this->saveSetting('reporting.usage', $request->has('usage_reporting'));
 
@@ -172,8 +172,8 @@ class FinalizeController extends InstallationController implements InstallerStep
      */
     private function saveSetting(string $name, $value): void
     {
-        if (Config::get($name) !== $value) {
-            Config::persist($name, $value);
+        if (LibrenmsConfig::get($name) !== $value) {
+            LibrenmsConfig::persist($name, $value);
         }
     }
 

@@ -26,16 +26,16 @@
 
 namespace LibreNMS\Enum;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 enum ImageFormat: string
 {
-    case png = 'png';
-    case svg = 'svg';
+    case Png = 'png';
+    case Svg = 'svg';
 
     public static function forGraph(?string $type = null): ImageFormat
     {
-        return ImageFormat::tryFrom($type ?? Config::get('webui.graph_type')) ?? ImageFormat::png;
+        return ImageFormat::tryFrom($type ?? LibrenmsConfig::get('webui.graph_type')) ?? ImageFormat::Png;
     }
 
     public function contentType(): string

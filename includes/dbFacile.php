@@ -20,35 +20,11 @@
  * @see https://laravel.com/docs/eloquent
  */
 
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Event;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Laravel;
-
-/**
- * Performs a query using the given string.
- *
- * @param  string  $sql
- * @param  array  $parameters
- * @return bool if query was successful or not
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#building-queries
- * @see https://laravel.com/docs/eloquent#building-queries
- */
-function dbQuery($sql, $parameters = [])
-{
-    try {
-        if (empty($parameters)) {
-            // don't use prepared statements for queries without parameters
-            return Eloquent::DB()->getPdo()->exec($sql) !== false;
-        }
-
-        return Eloquent::DB()->statement($sql, (array) $parameters);
-    } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
-
-        return false;
-    }
-}
 
 /**
  * @param  array  $data
@@ -58,65 +34,26 @@ function dbQuery($sql, $parameters = [])
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
  * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
  */
-function dbInsert($data, $table)
+function dbInsert($data, $table): ?int
 {
     $sql = 'INSERT IGNORE INTO `' . $table . '` (`' . implode('`,`', array_keys($data)) . '`)  VALUES (' . implode(',', dbPlaceHolders($data)) . ')';
 
     try {
         $result = Eloquent::DB()->insert($sql, (array) $data);
+
+        if ($result) {
+            $lastInsertId = Eloquent::DB()->getPdo()->lastInsertId();
+
+            if ($lastInsertId) {
+                return (int) $lastInsertId;
+            }
+        }
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $data, $pdoe));
     }
 
-    if ($result) {
-        return Eloquent::DB()->getPdo()->lastInsertId();
-    } else {
-        return null;
-    }
+    return null;
 }//end dbInsert()
-
-/**
- * Passed an array and a table name, it attempts to insert the data into the table.
- * $data is an array (rows) of key value pairs.  keys are fields.  Rows need to have same fields.
- * Check for boolean false to determine whether insert failed
- *
- * @param  array  $data
- * @param  string  $table
- * @return bool
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
- * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
- */
-function dbBulkInsert($data, $table)
-{
-    // check that data isn't an empty array
-    if (empty($data)) {
-        return false;
-    }
-
-    // make sure we have fields to insert
-    $fields = array_keys(reset($data));
-    if (empty($fields)) {
-        return false;
-    }
-
-    // Break into managable chunks to prevent situations where insert
-    // fails due to prepared statement having too many placeholders.
-    $data_chunks = array_chunk($data, 10000, true);
-
-    foreach ($data_chunks as $data_chunk) {
-        try {
-            $result = Eloquent::DB()->table($table)->insert((array) $data_chunk);
-
-            return $result;
-        } catch (PDOException $pdoe) {
-            // FIXME query?
-            dbHandleException(new QueryException('dbFacile', "Bulk insert $table", $data_chunk, $pdoe));
-        }
-    }
-
-    return false;
-}//end dbBulkInsert()
 
 /**
  * Passed an array, table name, WHERE clause, and placeholder parameters, it attempts to update a record.
@@ -189,55 +126,6 @@ function dbDelete($table, $where = null, $parameters = [])
 }//end dbDelete()
 
 /**
- * Delete orphaned entries from a table that no longer have a parent in parent_table
- * Format of parents array is as follows table.table_key_column<.target_key_column>
- *
- * @param  string  $target_table  The table to delete entries from
- * @param  array  $parents  an array of parent tables to check.
- * @return bool|int
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#deleting-models
- * @see https://laravel.com/docs/eloquent#deleting-models
- */
-function dbDeleteOrphans($target_table, $parents)
-{
-    if (empty($parents)) {
-        // don't delete all entries if parents is missing
-        return false;
-    }
-
-    $target_table = $target_table;
-    $sql = "DELETE T FROM `$target_table` T";
-    $where = [];
-
-    foreach ((array) $parents as $parent) {
-        $parent_parts = explode('.', $parent);
-        if (count($parent_parts) == 2) {
-            [$parent_table, $parent_column] = $parent_parts;
-            $target_column = $parent_column;
-        } elseif (count($parent_parts) == 3) {
-            [$parent_table, $parent_column, $target_column] = $parent_parts;
-        } else {
-            // invalid input
-            return false;
-        }
-
-        $sql .= " LEFT JOIN `$parent_table` ON `$parent_table`.`$parent_column` = T.`$target_column`";
-        $where[] = " `$parent_table`.`$parent_column` IS NULL";
-    }
-
-    $query = "$sql WHERE" . implode(' AND', $where);
-
-    try {
-        $result = Eloquent::DB()->delete($query);
-    } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException('dbFacile', $query, [], $pdoe));
-    }
-
-    return $result;
-}
-
-/**
  * Fetches all of the rows (associatively) from the last performed query.
  * Most other retrieval functions build off this
  *
@@ -247,10 +135,17 @@ function dbDeleteOrphans($target_table, $parents)
 function dbFetchRows($sql, $parameters = [])
 {
     try {
-        $query = DB::connection()->getPdo()->prepare($sql);
-        $query->execute((array) $parameters);
+        $startTime = microtime(true);
+        $connection = DB::connection();
 
-        return $query->fetchAll(PDO::FETCH_ASSOC);
+        $query = $connection->getPdo()->prepare($sql);
+        $query->execute((array) $parameters);
+        $all = $query->fetchAll(PDO::FETCH_ASSOC);
+
+        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
+        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
+
+        return $all;
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
     }
@@ -268,9 +163,15 @@ function dbFetchRows($sql, $parameters = [])
 function dbFetchRow($sql = null, $parameters = []): ?array
 {
     try {
-        $query = DB::connection()->getPdo()->prepare($sql);
+        $startTime = microtime(true);
+        $connection = DB::connection();
+
+        $query = $connection->getPdo()->prepare($sql);
         $query->execute((array) $parameters);
         $row = $query->fetch(PDO::FETCH_ASSOC);
+
+        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
+        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
 
         return $row === false ? null : $row;
     } catch (PDOException $pdoe) {
@@ -289,9 +190,15 @@ function dbFetchRow($sql = null, $parameters = []): ?array
 function dbFetchCell($sql, $parameters = [])
 {
     try {
-        $query = DB::connection()->getPdo()->prepare($sql);
+        $startTime = microtime(true);
+        $connection = DB::connection();
+
+        $query = $connection->getPdo()->prepare($sql);
         $query->execute((array) $parameters);
         $value = $query->fetchColumn();
+
+        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
+        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
 
         return $value === false ? null : $value;
     } catch (PDOException $pdoe) {
@@ -300,27 +207,6 @@ function dbFetchCell($sql, $parameters = [])
 
     return null;
 }//end dbFetchCell()
-
-/**
- * This method is quite different from fetchCell(), actually
- * It fetches one cell from each row and places all the values in 1 array
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
- * @see https://laravel.com/docs/eloquent
- */
-function dbFetchColumn($sql, $parameters = [])
-{
-    try {
-        $query = DB::connection()->getPdo()->prepare($sql);
-        $query->execute((array) $parameters);
-
-        return $query->fetchAll(PDO::FETCH_COLUMN, 0);
-    } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
-    }
-
-    return [];
-}//end dbFetchColumn()
 
 /**
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
@@ -422,7 +308,7 @@ function dbSyncRelationship($table, $target_column = null, $target = null, $list
     }
     $deleted = (int) dbDelete($table, $delete_query, $delete_params);
 
-    $db_list = dbFetchColumn("SELECT `$list_column` FROM `$table` WHERE `$target_column`=?", [$target]);
+    $db_list = DB::table($table)->where($target_column, $target)->pluck($list_column)->all();
     foreach ($list as $item) {
         if (! in_array($item, $db_list)) {
             dbInsert([$target_column => $target, $list_column => $item], $table);

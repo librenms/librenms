@@ -23,7 +23,7 @@
  * @copyright  2020 Josh Baird
  * @author     Josh Baird <joshbaird@gmail.com>
  */
-$switch = snmp_get($device, '.1.3.6.1.4.1.32050.2.1.26.5.3', '-Ovqe');
+$switch = SnmpQuery::get('.1.3.6.1.4.1.32050.2.1.26.5.3')->value();
 
 if ($switch) {
     //Create State Index

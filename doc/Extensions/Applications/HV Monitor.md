@@ -14,7 +14,7 @@ or [MetaCPAN](https://metacpan.org/dist/HV-Monitor).
 
     === "Debian/Ubuntu"
         ```bash
-        apt-get install libjson-perl libmime-base64-perl cpanminus
+        apt-get install libjson-perl libmime-base64-perl cpanminus net-tools
         cpanm HV::Monitor
         ```
 

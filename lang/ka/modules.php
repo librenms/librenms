@@ -1,0 +1,36 @@
+<?php
+
+return [
+    'slas' => [
+        'types' => [
+            'dhcp' => 'DHCP',
+            'dlsw' => 'DLSW',
+            'dns' => 'DNS',
+            'DnsQuery' => 'DNS მოთხოვნა',
+            'echo' => 'ICMP Ping',
+            'ethernetJitter' => 'Ethernet-ის ჯიტერი',
+            'ethernetPing' => 'Ethernet Ping',
+            'fileIO' => 'ფაილის I/O',
+            'ftp' => 'FTP',
+            'http' => 'HTTP',
+            'HttpGet' => 'HTTP Get',
+            'HttpGetMetadata' => 'HTTP Get-ის მეტამონაცემები',
+            'IcmpEcho' => 'ICMP Echo',
+            'icmpjitter' => 'ICMP-ის ჯიტერი',
+            'IcmpTimeStamp' => 'ICMP-ის დროის შტამპი',
+            'jitter' => 'ჯიტერი',
+            'lspGroup' => 'LSP ჯგუფი',
+            'lspPing' => 'LSP Ping',
+            'lspPingPseudowire' => 'LSP-ის ფსევდომავთულის Ping"',
+            'lspTrace' => 'LSP-ის ტრასიფერბა',
+            'NtpQuery' => 'NTP-ის მთხოვნა',
+            'pathEcho' => 'Path ICMP Ping',
+            'rtp' => 'RTP',
+            'script' => 'სკრიპტი',
+            'tcpConnect' => 'TCP კავშირი',
+            'udpEcho' => 'UDP Ping',
+            'UdpTimestamp' => 'UDP-ის დროის შტამპი',
+            'voip' => 'VoIP',
+        ],
+    ],
+];

@@ -1,7 +1,7 @@
 --
 -- Accedian Enterprise Specific MIB
 --
--- Copyright (c) 2005-2011, Accedian Networks, Inc.
+-- Copyright (c) 2005-2016, Accedian Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -23,17 +23,43 @@ IMPORTS
 
 acdRegulator MODULE-IDENTITY
 
-    LAST-UPDATED "201110100100Z"
+    LAST-UPDATED "201702210100Z"
     ORGANIZATION "Accedian Networks, Inc."
     CONTACT-INFO
             "Accedian Technical Assistance Center
              Accedian Networks, Inc.
-             4878 Levy, suite 202
-             Saint-Laurent, Quebec Canada H4R 2P1
+             2351 Alfred-Nobel blvd., Suite N-410
+             Saint-Laurent, Quebec Canada H4S 2A9
              E-mail: support@accedian.com"
     DESCRIPTION
             "The Regulators database for this Accedian Networks device."
 
+    REVISION "201702210100Z"        -- 21 February 2017
+    DESCRIPTION
+            "Change the Unit of acdRegulatorCbs and acdRegulatorEbs
+             from Kbytes to KiB."
+
+    REVISION "201609230100Z"        -- 23 September 2016
+    DESCRIPTION
+            "Add acdRegulatorHistStatsID and acdRegulatorHistStatsSampleIndex
+             to acdRegulatorHistStatsGroup."
+
+    REVISION "201605260100Z"        -- 26 May 2016
+    DESCRIPTION
+            "Set access level to read-only for acdRegulatorHistStatsID,
+             acdRegulatorHistStatsSampleIndex."
+
+    REVISION "201406090000Z"        -- 09 Jun 2014
+    DESCRIPTION
+            "Added Green, Yellow, Red Stats to acdRegulatorStatsEntry."
+            
+    REVISION "201312010000Z"        -- 01.Dec 2013
+    DESCRIPTION
+            "Added CIR-MAX, EIR-MAX to AcdRegulatorEntry."
+
+    REVISION "201201100100Z"        -- 10 Jan 2012
+    DESCRIPTION
+            "Add acdRegulatorWorkingRate entry in acdRegulatorTable."
     REVISION "201110100100Z"        -- 10 October 2011
     DESCRIPTION
             "Add acdRegulatorTableLastChangeTid."
@@ -95,8 +121,10 @@ AcdRegulatorEntry ::= SEQUENCE {
     acdRegulatorEbs             Unsigned32,
     acdRegulatorIsBlind         TruthValue,
     acdRegulatorIsCouple        TruthValue,
-    acdRegulatorRowStatus       RowStatus
-
+    acdRegulatorRowStatus       RowStatus,
+    acdRegulatorWorkingRate     INTEGER,
+    acdRegulatorCirMax          Unsigned32,
+    acdRegulatorEirMax          Unsigned32
 }
 
 acdRegulatorID  OBJECT-TYPE
@@ -128,7 +156,7 @@ acdRegulatorCir OBJECT-TYPE
 
 acdRegulatorCbs OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "Kbytes"
+    UNITS       "KiB"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -148,7 +176,7 @@ acdRegulatorEir OBJECT-TYPE
 
 acdRegulatorEbs OBJECT-TYPE
     SYNTAX      Unsigned32
-    UNITS       "Kbytes"
+    UNITS       "KiB"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -184,6 +212,41 @@ acdRegulatorRowStatus OBJECT-TYPE
         an empty row with the RowStatus set to Create and Go. To delete the
         row you need to set the RowStatus to destroy."
     ::= { acdRegulatorEntry 9 }
+
+acdRegulatorWorkingRate OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    layer1(1),
+                    layer2(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The layer at which the regulator work. The layer-1 Ethernet Frame
+         contains all Ethernet Frame fields plus the Inter-Frame Gap (IPG),
+         Preamble and Start-Frame Delimiter (SFD). The layer-2 Ethernet
+         Frame contains all Ethernet Frame fields."
+    DEFVAL      { layer1 }
+    ::= { acdRegulatorEntry 10 }
+
+acdRegulatorCirMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum committed information rate."
+    DEFVAL      { 20000 }
+   ::= { acdRegulatorEntry 11 }
+
+acdRegulatorEirMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum excess information rate."
+    DEFVAL      { 1000 }
+   ::= { acdRegulatorEntry 12 }
 
 ---------------------------------------------------------------------------
  -- The Regulator Counters table
@@ -223,7 +286,16 @@ AcdRegulatorStatsEntry ::= SEQUENCE {
     acdRegulatorStatsDropPkts               Counter32,
     acdRegulatorStatsDropOverflowPkts       Counter32,
     acdRegulatorStatsDropHCPkts             Counter64,
-    acdRegulatorStatsDropRate               Gauge32
+    acdRegulatorStatsDropRate               Gauge32,
+    acdRegulatorStatsGreenHCOctets          Counter64,
+    acdRegulatorStatsGreenHCPkts            Counter64,
+    acdRegulatorStatsYellowHCOctets         Counter64,
+    acdRegulatorStatsYellowHCPkts           Counter64,
+    acdRegulatorStatsRedHCOctets            Counter64,
+    acdRegulatorStatsRedHCPkts              Counter64,
+    acdRegulatorStatsGreenRate              Gauge32,
+    acdRegulatorStatsYellowRate             Gauge32,
+    acdRegulatorStatsRedRate                Gauge32
 }
 
 acdRegulatorStatsID  OBJECT-TYPE
@@ -249,7 +321,6 @@ acdRegulatorStatsAcceptOctets OBJECT-TYPE
 
 acdRegulatorStatsAcceptOverflowOctets OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Octets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -282,7 +353,6 @@ acdRegulatorStatsAcceptPkts OBJECT-TYPE
 
 acdRegulatorStatsAcceptOverflowPkts OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Packets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -294,7 +364,7 @@ acdRegulatorStatsAcceptOverflowPkts OBJECT-TYPE
 
 acdRegulatorStatsAcceptHCPkts OBJECT-TYPE
     SYNTAX      Counter64
-    UNITS       "Octets"
+    UNITS       "Packets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -324,7 +394,6 @@ acdRegulatorStatsDropOctets OBJECT-TYPE
 
 acdRegulatorStatsDropOverflowOctets OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Octets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -357,7 +426,6 @@ acdRegulatorStatsDropPkts OBJECT-TYPE
 
 acdRegulatorStatsDropOverflowPkts OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Packets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -369,7 +437,7 @@ acdRegulatorStatsDropOverflowPkts OBJECT-TYPE
 
 acdRegulatorStatsDropHCPkts OBJECT-TYPE
     SYNTAX      Counter64
-    UNITS       "Octets"
+    UNITS       "Packets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -385,6 +453,86 @@ acdRegulatorStatsDropRate OBJECT-TYPE
         "The drop rate."
     ::= { acdRegulatorStatsEntry 15 }
 
+acdRegulatorStatsGreenHCOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Green octets received by this regulator."
+    ::= { acdRegulatorStatsEntry 16 }
+    
+acdRegulatorStatsGreenHCPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Green packets received by this regulator."
+    ::= { acdRegulatorStatsEntry 17 }
+
+acdRegulatorStatsYellowHCOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Yellow octets received by this regulator."
+    ::= { acdRegulatorStatsEntry 18 }
+    
+acdRegulatorStatsYellowHCPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Yellow packets received by this regulator."
+    ::= { acdRegulatorStatsEntry 19 }
+
+acdRegulatorStatsRedHCOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Red octets received by this regulator."
+    ::= { acdRegulatorStatsEntry 20 }
+    
+acdRegulatorStatsRedHCPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Red packets received by this regulator."
+    ::= { acdRegulatorStatsEntry 21 }
+
+acdRegulatorStatsGreenRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Green rate."
+    ::= { acdRegulatorStatsEntry 22 }
+
+acdRegulatorStatsYellowRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Yellow rate."
+    ::= { acdRegulatorStatsEntry 23 }
+
+acdRegulatorStatsRedRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Red rate."
+    ::= { acdRegulatorStatsEntry 24 }
 ---------------------------------------------------------------------------
  -- The Regulator History group
 
@@ -434,12 +582,27 @@ AcdRegulatorHistStatsEntry ::= SEQUENCE {
     acdRegulatorHistStatsDropHCPkts             Counter64,
     acdRegulatorHistStatsDropAvgRate            Gauge32,
     acdRegulatorHistStatsDropMinRate            Gauge32,
-    acdRegulatorHistStatsDropMaxRate            Gauge32
+    acdRegulatorHistStatsDropMaxRate            Gauge32,
+    acdRegulatorHistStatsGreenHCOctets          Counter64,
+    acdRegulatorHistStatsGreenHCPkts            Counter64,
+    acdRegulatorHistStatsYellowHCOctets         Counter64,
+    acdRegulatorHistStatsYellowHCPkts           Counter64,
+    acdRegulatorHistStatsRedHCOctets            Counter64,
+    acdRegulatorHistStatsRedHCPkts              Counter64,
+    acdRegulatorHistStatsGreenAvgRate           Gauge32,
+    acdRegulatorHistStatsGreenMinRate           Gauge32,
+    acdRegulatorHistStatsGreenMaxRate           Gauge32,
+    acdRegulatorHistStatsYellowAvgRate          Gauge32,
+    acdRegulatorHistStatsYellowMinRate          Gauge32,
+    acdRegulatorHistStatsYellowMaxRate          Gauge32,
+    acdRegulatorHistStatsRedAvgRate             Gauge32,
+    acdRegulatorHistStatsRedMinRate             Gauge32,
+    acdRegulatorHistStatsRedMaxRate             Gauge32
 }
 
 acdRegulatorHistStatsID  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Unique value for each regulator entry. Its value ranges from 1 to
@@ -448,7 +611,7 @@ acdRegulatorHistStatsID  OBJECT-TYPE
 
 acdRegulatorHistStatsSampleIndex  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "An index that uniquely identifies the particular sample this entry
@@ -498,7 +661,6 @@ acdRegulatorHistStatsAcceptOctets OBJECT-TYPE
 
 acdRegulatorHistStatsAcceptOverflowOctets OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Octets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -533,7 +695,6 @@ acdRegulatorHistStatsAcceptPkts OBJECT-TYPE
 
 acdRegulatorHistStatsAcceptOverflowPkts OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Packets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -546,7 +707,7 @@ acdRegulatorHistStatsAcceptOverflowPkts OBJECT-TYPE
 
 acdRegulatorHistStatsAcceptHCPkts OBJECT-TYPE
     SYNTAX      Counter64
-    UNITS       "Octets"
+    UNITS       "Packets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -595,7 +756,6 @@ acdRegulatorHistStatsDropOctets OBJECT-TYPE
 
 acdRegulatorHistStatsDropOverflowOctets OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Octets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -630,7 +790,6 @@ acdRegulatorHistStatsDropPkts OBJECT-TYPE
 
 acdRegulatorHistStatsDropOverflowPkts OBJECT-TYPE
     SYNTAX      Counter32
-    UNITS       "Packets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -643,7 +802,7 @@ acdRegulatorHistStatsDropOverflowPkts OBJECT-TYPE
 
 acdRegulatorHistStatsDropHCPkts OBJECT-TYPE
     SYNTAX      Counter64
-    UNITS       "Octets"
+    UNITS       "Packets"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -678,6 +837,147 @@ acdRegulatorHistStatsDropMaxRate OBJECT-TYPE
         "The maximum drop rate during this sampling interval."
     ::= { acdRegulatorHistStatsEntry 23 }
 
+acdRegulatorHistStatsGreenHCOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Green octets received by this regulator during this
+         sampling interval."
+    ::= { acdRegulatorHistStatsEntry 24 }    
+    
+acdRegulatorHistStatsGreenHCPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Green packets received by this regulator during this
+         sampling interval."
+    ::= { acdRegulatorHistStatsEntry 25 }
+
+acdRegulatorHistStatsYellowHCOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Yellow octets received by this regulator during this
+         sampling interval."
+    ::= { acdRegulatorHistStatsEntry 26 }    
+    
+acdRegulatorHistStatsYellowHCPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Yellow packets received by this regulator during this
+         sampling interval."
+    ::= { acdRegulatorHistStatsEntry 27 }
+
+acdRegulatorHistStatsRedHCOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Red octets received by this regulator during this
+         sampling interval."
+    ::= { acdRegulatorHistStatsEntry 28 }    
+    
+acdRegulatorHistStatsRedHCPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of Red packets received by this regulator during this
+         sampling interval."
+    ::= { acdRegulatorHistStatsEntry 29 }
+    
+
+acdRegulatorHistStatsGreenAvgRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average green rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 30 }
+
+acdRegulatorHistStatsGreenMinRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum green rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 31 }
+
+acdRegulatorHistStatsGreenMaxRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum green rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 32 }
+
+acdRegulatorHistStatsYellowAvgRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average Yellow rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 33 }
+
+acdRegulatorHistStatsYellowMinRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum Yellow rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 34 }
+
+acdRegulatorHistStatsYellowMaxRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum Yellow rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 35 }
+    
+acdRegulatorHistStatsRedAvgRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average Red rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 36 }
+
+acdRegulatorHistStatsRedMinRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum Red rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 37 }
+
+acdRegulatorHistStatsRedMaxRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "Kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum Red rate during this sampling interval."
+    ::= { acdRegulatorHistStatsEntry 38 }
 ---------------------------------------------------------------------------
  -- Transaction ID Information
 ---------------------------------------------------------------------------
@@ -712,7 +1012,10 @@ acdRegulatorGroup OBJECT-GROUP
         acdRegulatorEbs,
         acdRegulatorIsBlind,
         acdRegulatorIsCouple,
-        acdRegulatorRowStatus
+        acdRegulatorRowStatus,
+        acdRegulatorWorkingRate,
+        acdRegulatorCirMax,
+        acdRegulatorEirMax
     }
     STATUS      current
     DESCRIPTION
@@ -734,7 +1037,16 @@ acdRegulatorStatsGroup OBJECT-GROUP
         acdRegulatorStatsDropPkts,
         acdRegulatorStatsDropOverflowPkts,
         acdRegulatorStatsDropHCPkts,
-        acdRegulatorStatsDropRate
+        acdRegulatorStatsDropRate,
+        acdRegulatorStatsGreenHCOctets,
+        acdRegulatorStatsGreenHCPkts,
+        acdRegulatorStatsYellowHCOctets,
+        acdRegulatorStatsYellowHCPkts,
+        acdRegulatorStatsRedHCOctets,
+        acdRegulatorStatsRedHCPkts,
+        acdRegulatorStatsGreenRate,
+        acdRegulatorStatsYellowRate,
+        acdRegulatorStatsRedRate
     }
     STATUS      current
     DESCRIPTION
@@ -743,6 +1055,8 @@ acdRegulatorStatsGroup OBJECT-GROUP
 
 acdRegulatorHistStatsGroup OBJECT-GROUP
     OBJECTS {
+        acdRegulatorHistStatsID,
+        acdRegulatorHistStatsSampleIndex,
         acdRegulatorHistStatsStatus,
         acdRegulatorHistStatsDuration,
         acdRegulatorHistStatsIntervalEnd,
@@ -763,7 +1077,22 @@ acdRegulatorHistStatsGroup OBJECT-GROUP
         acdRegulatorHistStatsDropHCPkts,
         acdRegulatorHistStatsDropAvgRate,
         acdRegulatorHistStatsDropMinRate,
-        acdRegulatorHistStatsDropMaxRate
+        acdRegulatorHistStatsDropMaxRate,
+        acdRegulatorHistStatsGreenHCOctets,
+        acdRegulatorHistStatsGreenHCPkts,
+        acdRegulatorHistStatsYellowHCOctets,
+        acdRegulatorHistStatsYellowHCPkts,
+        acdRegulatorHistStatsRedHCOctets,
+        acdRegulatorHistStatsRedHCPkts,
+        acdRegulatorHistStatsGreenAvgRate,
+        acdRegulatorHistStatsGreenMinRate,
+        acdRegulatorHistStatsGreenMaxRate,
+        acdRegulatorHistStatsYellowAvgRate,
+        acdRegulatorHistStatsYellowMinRate,
+        acdRegulatorHistStatsYellowMaxRate,
+        acdRegulatorHistStatsRedAvgRate,
+        acdRegulatorHistStatsRedMinRate ,
+        acdRegulatorHistStatsRedMaxRate
     }
     STATUS      current
     DESCRIPTION
@@ -779,7 +1108,7 @@ acdRegulatorTidGroup OBJECT-GROUP
        "List of scalars to monitior changes in tables."
     ::= { acdRegulatorGroups 4 }
 
-acdPaaCompliance MODULE-COMPLIANCE
+acdRegulatorCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION
        "The compliance statement for support of the ACD-REGULATOR-MIB module."

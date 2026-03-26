@@ -1,4 +1,3 @@
-mib: TERRA-sdi480-MIB
 modules:
     os:
         version: TERRA-sdi480-MIB::infVersion.0

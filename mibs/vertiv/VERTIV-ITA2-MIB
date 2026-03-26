@@ -1,0 +1,730 @@
+------------------------------------------------------------
+-- MIB File Version: 1.2
+-- Harlan 2018/09/10
+------------------------------------------------------------
+------------------------------------------------------------
+-- VERTIV CO. TECH. LTD
+-- ITA2 MIB
+------------------------------------------------------------
+
+VERTIV-ITA2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+	Integer32, Counter32, enterprises
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString, DateAndTime
+		FROM SNMPv2-TC;
+		
+		
+------------------------------------------------------------
+-- Node definitions
+------------------------------------------------------------
+
+Vertiv OBJECT IDENTIFIER ::= { enterprises 13400 }
+
+products OBJECT IDENTIFIER ::= { Vertiv 2 }
+
+ita2MIB MODULE-IDENTITY
+	LAST-UPDATED "201802041512Z"
+	ORGANIZATION "
+		VERTIV CO. TECH. LTD"
+	CONTACT-INFO "
+		VERTIV"
+	DESCRIPTION "
+		VERTIV CO. TECH. LTD."
+	::= { products  54}
+
+
+------------------------------------------------------------
+-- Textual conventions
+------------------------------------------------------------
+
+Status ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "
+		The severity of the alarm. One of
+		(0) informational
+		(1) warning
+		(2) critical"
+	SYNTAX INTEGER {
+		informational(0),
+		warning(1),
+		critical(2) }
+		
+StatusChange ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "
+		Indicates 'activated' (0) or 'deactivated' (1) alarm events."
+	SYNTAX INTEGER {
+		activated(0),
+		deactivated(1) }
+
+
+------------------------------------------------------------
+-- 1.1 Identification of the plant { ita2MIB 1 }
+------------------------------------------------------------
+
+ident OBJECT IDENTIFIER ::= { ita2MIB 1 }
+
+identManufacturer OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The name of the device manufacturer."
+	::= { ident 1 }
+
+identModel OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The manufacturers model designation of the device."
+	::= { ident 2 }
+
+identIndex OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The sequence number of the device."
+	::= { ident 3 }
+	
+
+------------------------------------------------------------
+-- 1.2 system values { ita2MIB 2 }
+------------------------------------------------------------
+
+system OBJECT IDENTIFIER ::= { ita2MIB 2 }
+
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.1 the status group
+-- ------------------------------------------------------------------------ 
+
+status OBJECT IDENTIFIER ::= { system 1 }
+
+	systemStatus OBJECT-TYPE
+		SYNTAX Status
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION "
+			Status of the complete plant (highest alarm). One of
+			(0) normal
+			(1) warning
+			(2) critical"
+		::= { status 1 }
+
+	upsOutputSource OBJECT-TYPE
+        SYNTAX INTEGER { 
+            UPSNoOutput(0),
+            UPSOnMain(1),
+            UPSOnBattery(2),
+            UPSOnBypass(3),
+            UPSonUtilityandBattery(4),
+        }		
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION "
+			Status of the ups power suply mode. UPS No Output(0), UPS On Main(1), UPS On Battery(2), UPS On Bypass(3), UPS on Utility and Battery(4),"
+		::= { status 2 }
+
+		
+-- ------------------------------------------------------------------------ 
+-- 1.2.2 the input group
+-- ------------------------------------------------------------------------ 
+
+input OBJECT IDENTIFIER ::= { system 2 }
+
+    inputPhaseVoltageA OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Input phase voltage A, stored as 0.1 V."
+        ::= { input 1 }
+
+    inputPhaseVoltageB OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Input phase voltage B, stored as 0.1 V."
+        ::= { input 2 }
+
+	inputPhaseVoltageC OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Input phase voltage C, stored as 0.1 V."
+        ::= { input 3 }
+                     
+	inputFrequency OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Input Frequency, stored as 0.01 Hz."
+        ::= { input 4 }
+
+    inputPhaseCurrentA OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Input phase current A, stored as 0.1 A."
+        ::= { input 5 }
+
+    inputPhaseCurrentB OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Input phase current B, stored as 0.1 A."
+        ::= { input 6 }
+
+    inputPhaseCurrentC OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Input phase current C, stored as 0.1 A."
+        ::= { input 7 }
+-- ------------------------------------------------------------------------ 
+-- 1.2.3 the output group
+-- ------------------------------------------------------------------------ 
+
+output OBJECT IDENTIFIER ::= { system 3 }
+
+    outputPhaseVoltageA OBJECT-TYPE
+    	SYNTAX Integer32
+    	MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output phase voltage A, stored as 0.1 V."
+        ::= { output 1 }
+
+    outputPhaseVoltageB OBJECT-TYPE
+    	SYNTAX Integer32
+    	MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output phase voltage B, stored as 0.1 V."
+        ::= { output 2 }
+    
+    outputPhaseVoltageC OBJECT-TYPE
+    	SYNTAX Integer32
+    	MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output phase voltage C, stored as 0.1 V."
+        ::= { output 3 }    
+    
+    outputCurrentA OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output current A, stored as 0.1 A."
+        ::= { output 4 }
+
+    outputCurrentB OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output current B, stored as 0.1 A."
+        ::= { output 5 }
+
+    outputCurrentC OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output current C, stored as 0.1 A."
+        ::= { output 6 }
+
+    outputFrequency OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output frequency, stored as 0.01 Hz."
+        ::= { output 7 }
+
+    outputActivePowerA OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output active power A, stored as 0.01 kW."
+        ::= { output 8 }
+
+    outputActivePowerB OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output active power B, stored as 0.01 kW."
+        ::= { output 9 }
+
+    outputActivePowerC OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output active power C, stored as 0.01 kW."
+        ::= { output 10 }
+
+    outputApparentPowerA OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output apparent power A, stored as 0.01 kVA."
+        ::= { output 11 }
+
+    outputApparentPowerB OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output apparent power B, stored as 0.01 kVA."
+        ::= { output 12 }
+ 
+    outputApparentPowerC OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output apparent power C, stored as 0.01 kVA."
+        ::= { output 13 }
+ 
+    outputLoadA OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output load A, stored as 0.1 %."
+        ::= { output 14 }
+
+    outputLoadB OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output load B, stored as 0.1 %."
+        ::= { output 15 }
+
+    outputLoadC OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output load C, stored as 0.1 %."
+        ::= { output 16 }
+
+    outputPowerFactorA OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output Power Factor A, stored as 0.01."
+        ::= { output 17 }
+
+    outputPowerFactorB OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output Power Factor B, stored as 0.01."
+        ::= { output 18 }
+
+    outputPowerFactorC OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Output Power Factor C, stored as 0.01."
+        ::= { output 19 }
+
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.4 the bypass group
+-- ------------------------------------------------------------------------ 
+
+bypass OBJECT IDENTIFIER ::= { system 4 }
+
+    bypassVoltageA OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Bypass Voltage A, stored as 0.1 V."
+        ::= { bypass 1 }
+
+    bypassVoltageB OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Bypass Voltage B, stored as 0.1 V."
+        ::= { bypass 2 }
+
+    bypassVoltageC OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Bypass Voltage C, stored as 0.1 V."
+        ::= { bypass 3 }
+
+    bypassFrequency OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Bypass Frequency, stored as 0.01 Hz."
+        ::= { bypass 4 }
+
+        
+-- ------------------------------------------------------------------------ 
+-- 1.2.5 the battery group
+-- ------------------------------------------------------------------------ 
+
+battery OBJECT IDENTIFIER ::= { system 5 }
+
+    positiveBatteryVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "positive Battery Voltage, stored as 0.1 V."
+        ::= { battery 1 }
+
+    negativeBatteryVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "negative Battery Voltage, stored as 0.1 V."
+        ::= { battery 2 }
+
+    positiveBatteryChargingCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "positive Battery Charging Current, stored as 0.01 A."
+        ::= { battery 3 }
+
+    positiveBatteryDischargingCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "positive Battery Discharging Current, stored as 0.01 A."
+        ::= { battery 4 }
+
+    negativeBatteryChargingCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "negative Battery Charging Current, stored as 0.01 A."
+        ::= { battery 5 }
+
+    negativeBatteryDischargingCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "negative Battery Discharging Current, stored as 0.01 A."
+        ::= { battery 6 }
+
+    batteryRemainsTime OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Battery Remains Time, stored as 0.1 minute."
+        ::= { battery 7 }
+
+    batteryTemperature OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Battery Temperature, stored as 0.1 Celsius degree."
+        ::= { battery 8 }
+
+    batteryEnvironmentTemperature OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Battery Environment Temperature, stored as 0.1 Celsius degree."
+        ::= { battery 9 }
+
+    batteryCapacity OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Battery Capacity, stored as 1 %."
+        ::= { battery 10 }
+
+    batteryDischargeTimes OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Battery Discharge Times, stored as 1 ."
+        ::= { battery 11 }
+
+        
+-- ------------------------------------------------------------------------ 
+-- 1.2.6 the control group
+-- ------------------------------------------------------------------------ 
+
+control OBJECT IDENTIFIER ::= { system 6 }
+
+    ctrlBatteryTestStart OBJECT-TYPE
+        SYNTAX INTEGER { false(0), true(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Battery test start,false(0),true(1)"
+        ::= { control 1 }
+
+    ctrlBatteryTestEnd OBJECT-TYPE
+        SYNTAX INTEGER { false(0), true(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Battery test end,false(0),true(1)"
+        ::= { control 2 }
+
+    ctrlTurnOn OBJECT-TYPE
+        SYNTAX INTEGER { false(0), true(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Turn on ups instantly,false(0),true(1)"
+        ::= { control 3 }
+
+    ctrlTurnOff OBJECT-TYPE
+        SYNTAX INTEGER { false(0), true(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Turn off ups instantly,false(0),true(1)"
+        ::= { control 4 }
+
+    ctrlTurnOffOutput OBJECT-TYPE
+        SYNTAX INTEGER { false(0), true(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Turn off ups output instantly,false(0),true(1)"
+        ::= { control 5 }
+
+    ctrlTurnOnDelay OBJECT-TYPE
+        SYNTAX INTEGER { false(0), true(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Turn on ups Delay,false(0),true(1)"
+        ::= { control 6 }
+        
+    ctrlTurnOffOutputDelayStart OBJECT-TYPE
+        SYNTAX INTEGER { false(0), true(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Turn off output delay Start,false(0),true(1)"
+        ::= { control 7 }        
+        
+    ctrlTurnOffOutputDelayEnd OBJECT-TYPE
+        SYNTAX INTEGER { false(0), true(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Turn off output delay End,false(0),true(1)"
+        ::= { control 8 }        
+                
+    ctrlBatteryMaintenanceTestStart OBJECT-TYPE
+        SYNTAX INTEGER { false(0), true(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Battery maintenance test start,false(0),true(1)"
+        ::= { control 9 }        
+    
+    ctrlBatteryMaintenanceTestEnd OBJECT-TYPE
+        SYNTAX INTEGER { false(0), true(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Battery maintenance test end,false(0),true(1)"
+        ::= { control 10 }        
+
+        
+-- ------------------------------------------------------------------------ 
+-- 1.2.7 the config group
+-- ------------------------------------------------------------------------ 
+
+config OBJECT IDENTIFIER ::= { system 7 }
+
+    confSelfStartDelayTime OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Self Start Delay Time(unit:Second,range:0-999)."
+        ::= { config 1 }
+
+    confRemoteShutdownDelayTime OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Remote shutdown delay Time(unit:Second,range:0-999)."
+        ::= { config 2 }
+
+    confBatterySelfTestPeriod OBJECT-TYPE
+        SYNTAX INTEGER {            
+            disabled(0),
+            by-8-weeks(1),
+            by-12-weeks(2),
+            by-16-weeks(3),
+            by-20-weeks(4),
+            by-26-weeks(5),
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Battery self test Period,disabled(0),by-8-weeks(1),by-12-weeks(2),by-16-weeks(3),by-20-weeks(4),by-26-weeks(5)"
+        ::= { config 3 }
+
+    confRunMode OBJECT-TYPE
+        SYNTAX INTEGER { normal(0), eco(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "UPS run mode,normal(0),eco(1)"
+        ::= { config 4 }
+
+    confSelfStart OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), enabled(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "UPS self start setting,disabled(0),enabled(1)"
+        ::= { config 5 }
+    
+    confRedundanceSet OBJECT-TYPE
+        SYNTAX INTEGER { disabled(0), enabled(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "UPS Redundance setting,disabled(0),enabled(1)"
+        ::= { config 6 }
+    
+	confRemotePowerOnDelayTime OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Remote Power On delay Time(unit:Second,range:0-999)."
+        ::= { config 7 }
+
+		
+------------------------------------------------------------
+-- 1.3 Alarm trap table { ita2MIB 3 }
+------------------------------------------------------------
+
+alarmTrapTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AlarmTrapEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		Table holding information about the submitted alarm traps."
+	::= { ita2MIB 3 }
+
+alarmTrapEntry OBJECT-TYPE
+	SYNTAX AlarmTrapEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		An entry (conceptual row) in the alarmTrapTable."
+	INDEX { alarmIndex }
+	::= { alarmTrapTable 1 }
+
+AlarmTrapEntry ::= SEQUENCE {
+	alarmIndex Counter32,
+	alarmTime DisplayString,
+	alarmStatusChange StatusChange,
+	alarmSeverity Status,
+	alarmDescription DisplayString,
+	alarmId Integer32 }
+
+alarmIndex OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The unique sequence number of this alarm trap."
+	::= { alarmTrapEntry 1 }
+
+alarmTime OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Date and time when event occured."
+	::= { alarmTrapEntry 2 }
+
+alarmStatusChange OBJECT-TYPE
+	SYNTAX StatusChange
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Indicates 'activated' (0) or 'deactivated' (1) alarm events."
+	::= { alarmTrapEntry 3 }
+
+alarmSeverity OBJECT-TYPE
+	SYNTAX Status
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		The severity of the alarm. One of
+		(0) informational
+		(1) warning
+		(2) critical"
+	::= { alarmTrapEntry 4 }
+	
+alarmDescription OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Free-text description of alarm."
+	::= { alarmTrapEntry 5 }
+	
+alarmId OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Alarm id."
+	::= { alarmTrapEntry 6 }
+
+
+------------------------------------------------------------
+-- End of MIB definitions
+------------------------------------------------------------
+
+END

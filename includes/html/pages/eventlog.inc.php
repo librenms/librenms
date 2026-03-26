@@ -48,7 +48,7 @@ $pagetitle[] = 'Eventlog';
         '<select name="device" id="device" class="form-control">' +
         '<option value="">All Devices</option>' +
             <?php
-            if ($device instanceof Device) {
+            if (isset($device) && $device instanceof Device) {
                 echo "'<option value=$device->device_id>" . $device->displayName() . "</option>' +";
             } ?>
         '</select>' +
@@ -82,7 +82,7 @@ $pagetitle[] = 'Eventlog';
         allowClear: true,
         placeholder: "All Devices",
         ajax: {
-            url: '<?php echo url('/ajax/select/device'); ?>',
+            url: '<?php echo route('ajax.select.device'); ?>',
             delay: 200
         }
     })<?php echo $device_id ? ".val($device_id).trigger('change');" : ''; ?>;
@@ -95,7 +95,7 @@ $pagetitle[] = 'Eventlog';
         allowClear: true,
         placeholder: "All Types",
         ajax: {
-            url: '<?php echo url('/ajax/select/eventlog'); ?>',
+            url: '<?php echo route('ajax.select.eventlog'); ?>',
             delay: 200,
             data: function(params) {
                 return {

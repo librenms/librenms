@@ -23,7 +23,7 @@ A small shell script that exports apcacess ups status.
     extend ups-apcups /etc/snmp/ups-apcups
     ```
 
-    If 'apcaccess' is not in the PATH enviromental variable snmpd is using, you may need to do something like below.
+    If 'apcaccess' is not in the PATH environmental variable snmpd is using, you may need to do something like below.
 
     ```bash
     extend ups-apcups/usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /etc/snmp/ups-apcups

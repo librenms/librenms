@@ -26,14 +26,14 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Validate;
 
-class CommonFunctionsTest extends TestCase
+final class CommonFunctionsTest extends TestCase
 {
     public function testStrContains(): void
     {
@@ -198,7 +198,7 @@ class CommonFunctionsTest extends TestCase
         ];
 
         // default {{ $hostname }}
-        Config::set('device_display_default', null);
+        LibrenmsConfig::set('device_display_default', null);
         $this->assertEquals('test.librenms.org', format_hostname($device_dns));
         $this->assertEquals('Not DNS', format_hostname($invalid_dns));
         $this->assertEquals('192.168.1.2', format_hostname($device_ip));
@@ -206,7 +206,7 @@ class CommonFunctionsTest extends TestCase
         $this->assertEquals('Custom Display (test.librenms.org sysName)', format_hostname($custom_display));
 
         // ip to sysname
-        Config::set('device_display_default', '{{ $sysName_fallback }}');
+        LibrenmsConfig::set('device_display_default', '{{ $sysName_fallback }}');
         $this->assertEquals('test.librenms.org', format_hostname($device_dns));
         $this->assertEquals('Not DNS', format_hostname($invalid_dns));
         $this->assertEquals('Testing IP', format_hostname($device_ip));
@@ -214,7 +214,7 @@ class CommonFunctionsTest extends TestCase
         $this->assertEquals('Custom Display (test.librenms.org sysName)', format_hostname($custom_display));
 
         // sysname
-        Config::set('device_display_default', '{{ $sysName }}');
+        LibrenmsConfig::set('device_display_default', '{{ $sysName }}');
         $this->assertEquals('Testing DNS', format_hostname($device_dns));
         $this->assertEquals('Testing Invalid DNS', format_hostname($invalid_dns));
         $this->assertEquals('Testing IP', format_hostname($device_ip));

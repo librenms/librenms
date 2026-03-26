@@ -30,7 +30,7 @@ use Illuminate\Support\Arr;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\FileCategorizer;
 
-class FileCategorizerTest extends TestCase
+final class FileCategorizerTest extends TestCase
 {
     public function testEmptyFiles(): void
     {

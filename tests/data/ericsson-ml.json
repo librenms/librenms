@@ -1337,8 +1337,8 @@
                     "ifName": "WANXPort:slot=1;port=5",
                     "portName": null,
                     "ifIndex": 30105,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1437,8 +1437,8 @@
                     "ifName": "CarrierTermination:slot=1;ctNumber=1",
                     "portName": null,
                     "ifIndex": 110101,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1537,8 +1537,8 @@
                     "ifName": "RadioLinkTerminal:slot=1;rltNumber=1",
                     "portName": null,
                     "ifIndex": 120101,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -2320,6 +2320,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2339,6 +2340,7 @@
                     "entPhysicalContainedIn": 40100,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2358,6 +2360,7 @@
                     "entPhysicalContainedIn": 40100,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Optech",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2377,6 +2380,7 @@
                     "entPhysicalContainedIn": 40100,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

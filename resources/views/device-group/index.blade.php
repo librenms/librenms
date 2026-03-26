@@ -54,7 +54,8 @@
                                    href="{{ route('device-groups.edit', $device_group->id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i></a>
                                 <button type="button" class="btn btn-danger btn-sm" title="{{ __('delete Device Group') }}" aria-label="{{ __('Delete') }}"
-                                        onclick="delete_dg(this, '{{ $device_group->name }}', '{{ route('device-groups.destroy', $device_group->id) }}')">
+                                        data-group-name="{{ $device_group->name }}"
+                                        onclick="delete_dg(this, '{{ route('device-groups.destroy', $device_group->id) }}')">
                                     <i
                                         class="fa fa-trash" aria-hidden="true"></i></button>
                             </td>
@@ -69,8 +70,9 @@
 
 @section('scripts')
     <script>
-        function delete_dg(button, name, url) {
+        function delete_dg(button, url) {
             var index = button.parentNode.parentNode.rowIndex;
+            var name = button.dataset.groupName;
 
             if (confirm('{{ __('Are you sure you want to delete ') }}' + name + '?')) {
                 $.ajax({

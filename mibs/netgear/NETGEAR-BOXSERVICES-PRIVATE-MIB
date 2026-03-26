@@ -41,6 +41,10 @@ IMPORTS
           "200802220000Z" -- 22 Feb 2008 12:00:00 GMT
       DESCRIPTION
           "Netgear branding related changes."
+      REVISION
+          "201912230000Z" -- 23 Dec 2019 12:00:00 GMT
+      DESCRIPTION
+          "Support for Fiber port optics."
 
       ::= { ng7000managedswitch 43 }
 
@@ -230,7 +234,7 @@ BoxsTemperatureStatus ::= TEXTUAL-CONVENTION
 
 
       boxServicesFanSpeed OBJECT-TYPE
-             SYNTAX      OCTET STRING (SIZE (13))
+             SYNTAX      OCTET STRING (SIZE(0..13))
              MAX-ACCESS  read-only
              STATUS      current
              DESCRIPTION
@@ -238,7 +242,7 @@ BoxsTemperatureStatus ::= TEXTUAL-CONVENTION
          ::= { boxServicesFansEntry 4}
          
       boxServicesFanDutyLevel OBJECT-TYPE
-             SYNTAX      OCTET STRING (SIZE (13))
+             SYNTAX      OCTET STRING (SIZE(0..13))
              MAX-ACCESS  read-only
              STATUS      current
              DESCRIPTION
@@ -462,6 +466,126 @@ BoxsTemperatureStatus ::= TEXTUAL-CONVENTION
         DESCRIPTION
             "The highest temperature currently reported by any sensor on the unit"
         ::= { boxServicesTempUnitEntry 3 }
+
+    boxServicesFiberPortsOpticsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF BoxServicesFiberPortsOpticsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Fiber ports optics data table"
+        ::= { boxServicesGroup 16 }
+
+    boxServicesFiberPortsOpticsEntry OBJECT-TYPE
+        SYNTAX      BoxServicesFiberPortsOpticsEntry 
+        MAX-ACCESS  not-accessible 
+        STATUS      current
+        DESCRIPTION
+            "Box Services Fiber ports optics Entry"
+        INDEX { boxServicesFiberPortIndex }
+        ::= { boxServicesFiberPortsOpticsTable 1 }
+
+    BoxServicesFiberPortsOpticsEntry ::= SEQUENCE {
+        boxServicesFiberPortIndex
+           Unsigned32,
+        boxServicesFiberPortOpticsTemperature
+           DisplayString,
+        boxServicesFiberPortOpticsVoltage
+           DisplayString,
+        boxServicesFiberPortOpticsCurrent
+           DisplayString,
+        boxServicesFiberPortOpticsPowerOut
+           DisplayString,
+        boxServicesFiberPortOpticsPowerIn
+           DisplayString,
+        boxServicesFiberPortOpticsTxFault
+           DisplayString, 
+        boxServicesFiberPortOpticsLos
+           DisplayString,
+        boxServicesFiberPortOpticsFaultStatus
+           DisplayString  
+        }
+
+    boxServicesFiberPortIndex  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only 
+        STATUS      current
+        DESCRIPTION
+            "Port index for an entry in the Box Services Fiber ports optics table"
+        ::= { boxServicesFiberPortsOpticsEntry 1 }
+
+    boxServicesFiberPortOpticsTemperature OBJECT-TYPE
+        SYNTAX      DisplayString 
+        UNITS       "DEGREES"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The temperature measured at this fiber port. It is
+             measured in degree celcius."
+        ::= { boxServicesFiberPortsOpticsEntry 2 }
+
+    boxServicesFiberPortOpticsVoltage  OBJECT-TYPE
+        SYNTAX      DisplayString 
+        UNITS       "Volts"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The voltage measured at this fiber port. It is
+             measured in volts."
+        ::= { boxServicesFiberPortsOpticsEntry 3 }
+
+    boxServicesFiberPortOpticsCurrent  OBJECT-TYPE
+       SYNTAX      DisplayString 
+       UNITS       "Milliamps"
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The current measured at this fiber port. It is
+            measured in milli amps."
+       ::= { boxServicesFiberPortsOpticsEntry 4 }
+
+    boxServicesFiberPortOpticsPowerOut OBJECT-TYPE
+       SYNTAX      DisplayString 
+       UNITS       "dBm"
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The output power measured at this fiber port. It is
+            measured in dBm."
+       ::= { boxServicesFiberPortsOpticsEntry 5 }
+
+    boxServicesFiberPortOpticsPowerIn OBJECT-TYPE
+       SYNTAX      DisplayString 
+       UNITS       "dBm"
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The input power measured at this fiber port. It is
+            measured in dBm."
+       ::= { boxServicesFiberPortsOpticsEntry 6 }
+
+    boxServicesFiberPortOpticsTxFault OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The tx fault status of fiber port."
+       ::= { boxServicesFiberPortsOpticsEntry 7 }
+
+    boxServicesFiberPortOpticsLos OBJECT-TYPE
+       SYNTAX      DisplayString 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The Los status of fiber port."
+       ::= { boxServicesFiberPortsOpticsEntry 8 }
+
+    boxServicesFiberPortOpticsFaultStatus OBJECT-TYPE
+      SYNTAX      DisplayString 
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "The fault status of fiber port."
+      ::= { boxServicesFiberPortsOpticsEntry 9 }
 
 --**************************************************************************************
 --    boxServicesNotificationsGroup

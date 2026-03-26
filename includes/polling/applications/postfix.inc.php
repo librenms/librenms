@@ -9,11 +9,11 @@ $detailOID = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.15.112.111.115.116.102.105.120.100.1
 $mailq = snmp_walk($device, $queueOID, $options);
 $detail = snmp_walk($device, $detailOID, $options);
 
-[$incomingq, $activeq, $deferredq, $holdq] = explode("\n", $mailq);
+[$incomingq, $activeq, $deferredq, $holdq] = explode("\n", (string) $mailq);
 
 [$received, $delivered, $forwarded, $deferred, $bounced, $rejected, $rejectw, $held, $discarded, $bytesr,
     $bytesd, $senders, $sendinghd, $recipients, $recipienthd, $deferralcr, $deferralhid, $chr, $hcrnfqh, $sardnf,
-    $sarnobu, $bu, $raruu, $hcrin, $sarnfqa, $rardnf, $rarnfqa, $iuscp, $sce, $scp, $urr] = explode("\n", $detail);
+    $sarnobu, $bu, $raruu, $hcrin, $sarnfqa, $rardnf, $rarnfqa, $iuscp, $sce, $scp, $urr] = explode("\n", (string) $detail);
 
 $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()

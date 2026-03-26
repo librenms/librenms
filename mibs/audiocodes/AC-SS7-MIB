@@ -26,7 +26,7 @@ AC-SS7-MIB DEFINITIONS ::= BEGIN
 
        
 acSS7  MODULE-IDENTITY       
-    LAST-UPDATED "201207260528Z"          --Thursday, July 26 2012
+    LAST-UPDATED "201711020808Z"          --Thursday, November 2, 2017
     ORGANIZATION "AudioCodes Ltd"
     CONTACT-INFO
     "Postal: Support
@@ -62,7 +62,7 @@ acSS7  MODULE-IDENTITY
      acSS7MTP2M3bSlDiscardCongThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter concerns feature that prevents uncontrolled increase
 of the MTP2 Transmit queue when the upper levels ignores
@@ -82,7 +82,7 @@ AC INI-Param: SS7M3bSlDiscardCongThreshold"
      acSS7MTP2AttribTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7MTP2AttribEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7MTP2 21}
@@ -95,7 +95,7 @@ AC INI-Param: SS7M3bSlDiscardCongThreshold"
      acSS7MTP2AttribEntry OBJECT-TYPE
        SYNTAX AcSS7MTP2AttribEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7MTP2AttribIndex}
@@ -135,7 +135,7 @@ AC INI-Param: SS7M3bSlDiscardCongThreshold"
      acSS7MTP2AttribIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..3)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index Field for line.
 AC INI-Param: SS7Mtp2Parms_Index"
@@ -151,7 +151,7 @@ AC INI-Param: SS7Mtp2Parms_Index"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Is the row used by alink.
 If it is the entrow will be read.
@@ -163,7 +163,7 @@ AC INI-Param: N/A"
      acSS7MTP2AttribLinkRate OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..1))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SS7 SLI Link Rate. 
 Choose either: 
@@ -179,7 +179,7 @@ AC INI-Param: SS7Mtp2Parms_LinkRate"
      acSS7MTP2AttribErrorCorectionMethod OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..1))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SLI error correction method.
 B = Basic
@@ -193,7 +193,7 @@ AC INI-Param: SS7Mtp2Parms_ErrorCorrectionMethod"
      acSS7MTP2AttribIacCp OBJECT-TYPE
        SYNTAX Unsigned32 (0..10)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the number of aborted proving attempts before sending
 an out-of-service to MTP-3.
@@ -206,7 +206,7 @@ AC INI-Param: SS7Mtp2Parms_IacCp"
      acSS7MTP2AttribSUERMThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..256)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SS7 SUERM (Signal Unit Error Rate Monitor) T threshold.
 Access: Online.
@@ -218,7 +218,7 @@ AC INI-Param: SS7Mtp2Parms_SuermT"
      acSS7MTP2AttribAERMNormalThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..20)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Normal AERM (alignment error rate monitor) threshold [0 to 20].
 Access: Online.
@@ -230,7 +230,7 @@ AC INI-Param: SS7Mtp2Parms_AermTin"
      acSS7MTP2AttribAERMEmerglThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..10)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Emergency AERM (alignment error rate monitor) threshold [0 to
 10].
@@ -243,7 +243,7 @@ AC INI-Param: SS7Mtp2Parms_AermTie"
      acSS7MTP2AttribSUERMSigUnitDThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..256)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SS7 Signal Unit error rate monitor D threshold.
 Access: Online.
@@ -255,7 +255,7 @@ AC INI-Param: SS7Mtp2Parms_SuermSuD"
      acSS7MTP2AttribOctetCounting OBJECT-TYPE
        SYNTAX Unsigned32 (0..256)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SS7 MTP2 Octet received while the OCTET is in counting
 mode (# of Octets received - N Octets - while in Octet
@@ -269,7 +269,7 @@ AC INI-Param: SS7Mtp2Parms_OctetCounting"
      acSS7MTP2AttribTimerT1 OBJECT-TYPE
        SYNTAX Unsigned32 (0..100000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SS7 MTP2 T1 alignment ready timer (in msecs).
 Access: Online.
@@ -281,7 +281,7 @@ AC INI-Param: SS7Mtp2Parms_T1"
      acSS7MTP2AttribTimerT2 OBJECT-TYPE
        SYNTAX Unsigned32 (0..200000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SS7 MTP2 T2 unaligned timer (in msecs).
 Access: Online.
@@ -293,7 +293,7 @@ AC INI-Param: SS7Mtp2Parms_T2"
      acSS7MTP2AttribTimerT3 OBJECT-TYPE
        SYNTAX Unsigned32 (0..20000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SS7 MTP2 T3 timer aligned.
 Access: Online.
@@ -305,7 +305,7 @@ AC INI-Param: SS7Mtp2Parms_T3"
      acSS7MTP2AttribTimerT4Normal OBJECT-TYPE
        SYNTAX Unsigned32 (0..15000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SS7 MTP2 T4n Normal proving period timer.
 Access: Online.
@@ -317,7 +317,7 @@ AC INI-Param: SS7Mtp2Parms_T4n"
      acSS7MTP2AttribTimerT4Emerg OBJECT-TYPE
        SYNTAX Unsigned32 (0..5000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SS7 MTP2 T4e Emergency proving period timer (msec).
 Access: Online.
@@ -329,7 +329,7 @@ AC INI-Param: SS7Mtp2Parms_T4e"
      acSS7MTP2AttribTimerT5 OBJECT-TYPE
        SYNTAX Unsigned32 (0..2400)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SS7 MTP2 Sending SIB timer.
 Access: Online.
@@ -341,7 +341,7 @@ AC INI-Param: SS7Mtp2Parms_T5"
      acSS7MTP2AttribTimerT6 OBJECT-TYPE
        SYNTAX Unsigned32 (0..10000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SS7 MTP2 Remote Congestion timer (in msec).
 Access: Online.
@@ -353,7 +353,7 @@ AC INI-Param: SS7Mtp2Parms_T6"
      acSS7MTP2AttribTimerT7 OBJECT-TYPE
        SYNTAX Unsigned32 (0..5000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SS7 MTP2 excessive delay of the ack timer (in msec).
 Access: Online.
@@ -365,7 +365,7 @@ AC INI-Param: SS7Mtp2Parms_T7"
      acSS7MTP2AttribLSSULength OBJECT-TYPE
        SYNTAX Unsigned32 (1..2)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the SS7 MTP2 LSSU length as 1 or 2 (bytes).
 Access: Online.
@@ -377,7 +377,7 @@ AC INI-Param: SS7Mtp2Parms_LssuLength"
      acSS7MTP2AttribPcrN2 OBJECT-TYPE
        SYNTAX Unsigned32 (0..512)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to define Preventive Cyclic Retransmission
 - the number of message signal unit octets available for
@@ -408,7 +408,7 @@ AC INI-Param: N/A"
      acSS7SignalingNodeTimersTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7SignalingNodeTimersEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7Timers 21}
@@ -421,7 +421,7 @@ AC INI-Param: N/A"
      acSS7SignalingNodeTimersEntry OBJECT-TYPE
        SYNTAX AcSS7SignalingNodeTimersEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7SignalingNodeTimersIndex}
@@ -465,7 +465,7 @@ AC INI-Param: N/A"
      acSS7SignalingNodeTimersIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..4)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index Field for line.
 AC INI-Param: SS7_SNTIMERS_INDEX"
@@ -481,7 +481,7 @@ AC INI-Param: SS7_SNTIMERS_INDEX"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: N/A"
@@ -495,7 +495,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS.
 AC INI-Param: SS7_SNTIMERS_ACTION"
@@ -513,7 +513,7 @@ AC INI-Param: SS7_SNTIMERS_ACTION"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS RESULT.
 AC INI-Param: SS7_SNTIMERS_ACTION_RESULT"
@@ -524,7 +524,7 @@ AC INI-Param: SS7_SNTIMERS_ACTION_RESULT"
      acSS7SignalingNodeTimersName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "String name for SN timer-set.
 Access: Online.
@@ -536,7 +536,7 @@ AC INI-Param: SS7_SNTIMERS_NAME"
      acSS7SignalingNodeTimersT6 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Delay to avoid message mis-sequencing on controlled rerouting.
 Access: Online.
@@ -548,7 +548,7 @@ AC INI-Param: SS7_SNTIMERS_T6"
      acSS7SignalingNodeTimersT8 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Transfer prohibited inhibition timer (transient solution).
 Access: Online.
@@ -560,7 +560,7 @@ AC INI-Param: SS7_SNTIMERS_T8"
      acSS7SignalingNodeTimersT10 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Waiting to repeat signalling route set test message.
 Access: Online.
@@ -572,7 +572,7 @@ AC INI-Param: SS7_SNTIMERS_T10"
      acSS7SignalingNodeTimersT11 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Transfer restricted timer.
 Access: Online.
@@ -584,7 +584,7 @@ AC INI-Param: SS7_SNTIMERS_T11"
      acSS7SignalingNodeTimersT15 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Waiting to start signalling route set congestion test.
 Access: Online.
@@ -596,7 +596,7 @@ AC INI-Param: SS7_SNTIMERS_T15"
      acSS7SignalingNodeTimersT16 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Waiting for route set congestion status update.
 Access: Online.
@@ -608,7 +608,7 @@ AC INI-Param: SS7_SNTIMERS_T16"
      acSS7SignalingNodeTimersT18ITU OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Timer within a signalling point whose MTP restarts for supervising
 link and link set activation as well as the receipt of
@@ -622,7 +622,7 @@ AC INI-Param: SS7_SNTIMERS_T18_ITU"
      acSS7SignalingNodeTimersT19ITU OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Supervision timer during MTP restart to avoid possible ping-pong
 of TFP, TFR and TRA messages.
@@ -635,7 +635,7 @@ AC INI-Param: SS7_SNTIMERS_T19_ITU"
      acSS7SignalingNodeTimersT20ITU OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Overall MTP restart timer at the signalling point whose MTP
 restarts.
@@ -648,7 +648,7 @@ AC INI-Param: SS7_SNTIMERS_T20_ITU"
      acSS7SignalingNodeTimersT21ITU OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Overall MTP restart timer at a signalling point adjacent to
 one whose MTP restarts.
@@ -661,7 +661,7 @@ AC INI-Param: SS7_SNTIMERS_T21_ITU"
      acSS7SignalingNodeTimersT24ITU OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Stabilising timer after removal of local processor outage, used
 in LPO latching to RPO (national option).
@@ -674,7 +674,7 @@ AC INI-Param: SS7_SNTIMERS_T24_ITU"
      acSS7SignalingNodeTimersT22ANSI OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Timer at restarting SP waiting for signalling links to bacome
 available.
@@ -687,7 +687,7 @@ AC INI-Param: SS7_SNTIMERS_T22_ANSI"
      acSS7SignalingNodeTimersT23ANSI OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Timer at restarting SP, started after T22, waiting to receive
 all traffic restart allowed messages.
@@ -700,7 +700,7 @@ AC INI-Param: SS7_SNTIMERS_T23_ANSI"
      acSS7SignalingNodeTimersT24ANSI OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Timer at restarting SP with transfer function, started after
 T23, waiting to broadcast all traffic restart allowed messages.
@@ -713,7 +713,7 @@ AC INI-Param: SS7_SNTIMERS_T24_ANSI"
      acSS7SignalingNodeTimersT25ANSI OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Timer at SP adjacent to restarting SP waiting for traffic restart
 allowed message.
@@ -726,7 +726,7 @@ AC INI-Param: SS7_SNTIMERS_T25_ANSI"
      acSS7SignalingNodeTimersT26ANSI OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Timer at restarting SP waiting to repeat traffic restart waiting
 message.
@@ -739,7 +739,7 @@ AC INI-Param: SS7_SNTIMERS_T26_ANSI"
      acSS7SignalingNodeTimersT27ANSI OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to define the minimum duration of unavailability
 for a full restart.
@@ -752,7 +752,7 @@ AC INI-Param: SS7_SNTIMERS_T27_ANSI"
      acSS7SignalingNodeTimersT28ANSI OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Timer at SP adjacent to restarting SP waiting for traffic restart
 waiting message.
@@ -765,7 +765,7 @@ AC INI-Param: SS7_SNTIMERS_T28_ANSI"
      acSS7SignalingNodeTimersT29ANSI OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Timer started when TRA sent in response to unexpected TRA or
 TRW.
@@ -778,7 +778,7 @@ AC INI-Param: SS7_SNTIMERS_T29_ANSI"
      acSS7SignalingNodeTimersT30ANSI OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Timer to limit sending of TFPs and TFRs in response to unexpected
 TRA or TRW.
@@ -794,7 +794,7 @@ AC INI-Param: SS7_SNTIMERS_T30_ANSI"
      acSS7LinkSetTimersTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7LinkSetTimersEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7Timers 22}
@@ -807,7 +807,7 @@ AC INI-Param: SS7_SNTIMERS_T30_ANSI"
      acSS7LinkSetTimersEntry OBJECT-TYPE
        SYNTAX AcSS7LinkSetTimersEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7LinkSetTimersIndex}
@@ -847,7 +847,7 @@ AC INI-Param: SS7_SNTIMERS_T30_ANSI"
      acSS7LinkSetTimersIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..4)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index Field for line.
 AC INI-Param: acSS7LKSETTIMERS_PS_PARAMETER_INDEX"
@@ -863,7 +863,7 @@ AC INI-Param: acSS7LKSETTIMERS_PS_PARAMETER_INDEX"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: N/A"
@@ -877,7 +877,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS.
 AC INI-Param: SS7_LKSETTIMERS_ACTION"
@@ -895,7 +895,7 @@ AC INI-Param: SS7_LKSETTIMERS_ACTION"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS RESULT.
 AC INI-Param: SS7_LKSETTIMERS_ACTION_RESULT"
@@ -906,7 +906,7 @@ AC INI-Param: SS7_LKSETTIMERS_ACTION_RESULT"
      acSS7LinkSetTimersName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "String name for Linkset timer-set.
 Access: Online.
@@ -918,7 +918,7 @@ AC INI-Param: SS7_LKSETTIMERS_NAME"
      acSS7LinkSetTimersT1SLT OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Supervision timer for signalling link test acknowledgement message.
 Access: Online.
@@ -930,7 +930,7 @@ AC INI-Param: SS7_LKSETTIMERS_T1SLT"
      acSS7LinkSetTimersT2SLT OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Interval timer for sending signalling link test messages.
 Access: Online.
@@ -942,7 +942,7 @@ AC INI-Param: SS7_LKSETTIMERS_T2SLT"
      acSS7LinkSetTimersT1 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Delay to avoid message mis-sequencing on changeover.
 Access: Online.
@@ -954,7 +954,7 @@ AC INI-Param: SS7_LKSETTIMERS_T1"
      acSS7LinkSetTimersT2 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Waiting for changeover acknowledgement.
 Access: Online.
@@ -966,7 +966,7 @@ AC INI-Param: SS7_LKSETTIMERS_T2"
      acSS7LinkSetTimersT3 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Time controlled diversion-delay to avoid mis-sequencing on changeback.
 Access: Online.
@@ -978,7 +978,7 @@ AC INI-Param: SS7_LKSETTIMERS_T3"
      acSS7LinkSetTimersT4 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Waiting for changeback acknowledgement (first attempt).
 Access: Online.
@@ -990,7 +990,7 @@ AC INI-Param: SS7_LKSETTIMERS_T4"
      acSS7LinkSetTimersT5 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Waiting for changeback acknowledgement (second attempt).
 Access: Online.
@@ -1002,7 +1002,7 @@ AC INI-Param: SS7_LKSETTIMERS_T5"
      acSS7LinkSetTimersT7 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Waiting for signalling data link connection acknowledgement.
 Access: Online.
@@ -1014,7 +1014,7 @@ AC INI-Param: SS7_LKSETTIMERS_T7"
      acSS7LinkSetTimersT12 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Waiting for uninhibit acknowledgement.
 Access: Online.
@@ -1026,7 +1026,7 @@ AC INI-Param: SS7_LKSETTIMERS_T12"
      acSS7LinkSetTimersT13 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Waiting for force uninhibit.
 Access: Online.
@@ -1038,7 +1038,7 @@ AC INI-Param: SS7_LKSETTIMERS_T13"
      acSS7LinkSetTimersT14 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Waiting for inhibition acknowledgement.
 Access: Online.
@@ -1050,7 +1050,7 @@ AC INI-Param: SS7_LKSETTIMERS_T14"
      acSS7LinkSetTimersT17 OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Delay to avoid oscillation of initial alignment failure and
 link restart.
@@ -1063,7 +1063,7 @@ AC INI-Param: SS7_LKSETTIMERS_T17"
      acSS7LinkSetTimersT20ANSI OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Local inhibit test timer.
 Access: Online.
@@ -1075,7 +1075,7 @@ AC INI-Param: SS7_LKSETTIMERS_T20_ANSI"
      acSS7LinkSetTimersT21ANSI OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Remote inhibit test timer.
 Access: Online.
@@ -1087,7 +1087,7 @@ AC INI-Param: SS7_LKSETTIMERS_T21_ANSI"
      acSS7LinkSetTimersT22ITU OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Local inhibit test timer.
 Access: Online.
@@ -1099,7 +1099,7 @@ AC INI-Param: SS7_LKSETTIMERS_T22_ITU"
      acSS7LinkSetTimersT23ITU OBJECT-TYPE
        SYNTAX Unsigned32 (500..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Remote inhibit test timer.
 Access: Online.
@@ -1117,7 +1117,7 @@ AC INI-Param: SS7_LKSETTIMERS_T23_ITU"
      acSS7LinkCommonTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7LinkCommonEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7Links 21}
@@ -1130,7 +1130,7 @@ AC INI-Param: SS7_LKSETTIMERS_T23_ITU"
      acSS7LinkCommonEntry OBJECT-TYPE
        SYNTAX AcSS7LinkCommonEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7LinkCommonIndex}
@@ -1163,7 +1163,7 @@ AC INI-Param: SS7_LKSETTIMERS_T23_ITU"
      acSS7LinkCommonIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..63)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index Field for line.
 AC INI-Param: MAX_SIGNALING_LINKS_PER_CARD"
@@ -1174,7 +1174,7 @@ AC INI-Param: MAX_SIGNALING_LINKS_PER_CARD"
      acSS7LinkCommonRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS Field for line.
 AC INI-Param: SS7_LINK_ROWSTATUS"
@@ -1204,7 +1204,7 @@ AC INI-Param: SS7_LINK_ROWSTATUS"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS.
 AC INI-Param: SS7_LINK_ACTION"
@@ -1222,7 +1222,7 @@ AC INI-Param: SS7_LINK_ACTION"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS RESULT.
 AC INI-Param: SS7_LINK_ACTION_RESULT"
@@ -1233,7 +1233,7 @@ AC INI-Param: SS7_LINK_ACTION_RESULT"
      acSS7LinkCommonName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "String name for Link paramaters.
 Access: Online.
@@ -1250,7 +1250,7 @@ AC INI-Param: SS7_LINK_NAME"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Administrative state of singnalling link.
 AC INI-Param: SS7_LINK_ADMINISTRATIVE_STATE"
@@ -1268,7 +1268,7 @@ AC INI-Param: SS7_LINK_ADMINISTRATIVE_STATE"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Operational state of singnalling link.
 AC INI-Param: SS7_LINK_OPERATIONAL_STATE"
@@ -1284,7 +1284,7 @@ AC INI-Param: SS7_LINK_OPERATIONAL_STATE"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Trace level of singnalling link (level 2).
 Access: Online.
@@ -1305,7 +1305,7 @@ AC INI-Param: SS7_LINK_TRACE_LEVEL"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Link layer 2 type - defines level 2 media of signaling link.
 Access: Online.
@@ -1330,7 +1330,7 @@ AC INI-Param: SS7_LINK_L2_TYPE"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Link high layer type - defines level 3 or L2 high layer of signalling
 link.
@@ -1350,7 +1350,7 @@ AC INI-Param: SS7_LINK_L3_TYPE"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Variant (layer 2) of singnalling link (TDM).
 Access: Online.
@@ -1367,7 +1367,7 @@ AC INI-Param: SS7_LINK_LAYER2_VARIANT"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Link local busy indicator - if set, indicates link is busy due
 to local mtc action.
@@ -1386,7 +1386,7 @@ AC INI-Param: SS7_LINK_MTC_BUSY"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Board number in which the link is physically connected.
 Access: Online.
@@ -1407,7 +1407,7 @@ AC INI-Param: SS7_LINK_RDCY_BOARD"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "SS7 Monitoring link SU filter- Defines the type of SU message
 to filter. 0: Filter all types of SU messages
@@ -1426,7 +1426,7 @@ AC INI-Param: SS7_LINK_MON_SU_FILTER"
      acSS7LinkTDMTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7LinkTDMEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7Links 22}
@@ -1439,7 +1439,7 @@ AC INI-Param: SS7_LINK_MON_SU_FILTER"
      acSS7LinkTDMEntry OBJECT-TYPE
        SYNTAX AcSS7LinkTDMEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7LinkCommonIndex}
@@ -1465,7 +1465,7 @@ AC INI-Param: SS7_LINK_MON_SU_FILTER"
      acSS7LinkTDMTrunkNumber OBJECT-TYPE
        SYNTAX Integer32 (-1..84)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Trunk number of singnalling link (TDM).
 Access: Online.
@@ -1477,7 +1477,7 @@ AC INI-Param: SS7_LINK_TRUNK_NUMBER"
      acSS7LinkTDMTimeSlotNumber OBJECT-TYPE
        SYNTAX Unsigned32 (1..31)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Time-Slot number of singnalling link (TDM).
 Access: Online.
@@ -1494,7 +1494,7 @@ AC INI-Param: SS7_LINK_TIMESLOT_NUMBER"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Link inhibit indicator - if set, indicates link is inhibited..
 AC INI-Param: SS7_LINK_INHIBITION"
@@ -1514,7 +1514,7 @@ AC INI-Param: SS7_LINK_INHIBITION"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "MTP2 attributes of singnalling link (TDM).
 Access: Online.
@@ -1526,7 +1526,7 @@ AC INI-Param: SS7_LINK_MTP2_ATTRIBUTES"
      acSS7LinkTDMCongestionLowMark OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Link congestion low mark of signalling link (TDM).
 Access: Online.
@@ -1538,7 +1538,7 @@ AC INI-Param: SS7_CONGESTION_LOW_MARK"
      acSS7LinkTDMCongestionHighMark OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Link congestion high mark of signalling link (TDM).
 Access: Online.
@@ -1559,7 +1559,7 @@ AC INI-Param: SS7_CONGESTION_HIGH_MARK"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Link blocked indicator.
 AC INI-Param: SS7_LINK_BLOCKED"
@@ -1573,7 +1573,7 @@ AC INI-Param: SS7_LINK_BLOCKED"
      acSS7LinkSigTranTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7LinkSigTranEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7Links 23}
@@ -1586,7 +1586,7 @@ AC INI-Param: SS7_LINK_BLOCKED"
      acSS7LinkSigTranEntry OBJECT-TYPE
        SYNTAX AcSS7LinkSigTranEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7LinkCommonIndex}
@@ -1607,7 +1607,7 @@ AC INI-Param: SS7_LINK_BLOCKED"
      acSS7LinkSigTranGroupId OBJECT-TYPE
        SYNTAX Integer32 (-1..65534)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Group ID (M2UA) of signaling link.
 Access: Online.
@@ -1619,7 +1619,7 @@ AC INI-Param: SS7_LINK_GROUP_ID"
      acSS7LinkSigTranIfid OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Interface ID (M2UA) of singnalling link.
 Access: Online.
@@ -1739,7 +1739,7 @@ AC INI-Param: ATM_SAAL_LINK_VCI"
      acSS7LinkTNLTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7LinkTNLEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7Links 25}
@@ -1752,7 +1752,7 @@ AC INI-Param: ATM_SAAL_LINK_VCI"
      acSS7LinkTNLEntry OBJECT-TYPE
        SYNTAX AcSS7LinkTNLEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7LinkCommonIndex}
@@ -1777,7 +1777,7 @@ AC INI-Param: ATM_SAAL_LINK_VCI"
      acSS7LinkTNLOtherSideLinkNum OBJECT-TYPE
        SYNTAX Unsigned32 (0..128)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "MTP2 Tunneling: MGC link number (MTP2 'other side' of signaling
 link).
@@ -1795,7 +1795,7 @@ AC INI-Param: SS7_LINK_TNL_MGC_LINK_NUMBER"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "MTP2 Tunneling: Alignment mode of signalling links in tunnel.
 Access: Online.
@@ -1812,7 +1812,7 @@ AC INI-Param: SS7_LINK_TNL_ALIGNMENT_MODE"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "MTP2 Tunneling: Congestion mode of signalling links in tunnel.
 Access: Online.
@@ -1824,7 +1824,7 @@ AC INI-Param: SS7_LINK_TNL_CONGESTION_MODE"
      acSS7LinkTNLWaitStartCompTimer OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "MTP2 Tunneling: wait start complete timer.
 Access: Online.
@@ -1836,7 +1836,7 @@ AC INI-Param: SS7_LINK_TNL_WAIT_START_COMPLETE_TIMER"
      acSS7LinkTNLOosStartDelayTimer OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "MTP2 Tunneling: OOS start delay timer.
 Access: Online.
@@ -1848,7 +1848,7 @@ AC INI-Param: SS7_LINK_TNL_OOS_START_DELAY_TIMER"
      acSS7LinkTNLWaitOtherSideInsvTimer OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "MTP2 Tunneling: wait for other side to be in service timer.
 Access: Online.
@@ -1866,7 +1866,7 @@ AC INI-Param: SS7_LINK_TNL_WAIT_OTHER_SIDE_INSV_TIMER"
      acSS7SignalingNodeTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7SignalingNodeEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7Nodes 21}
@@ -1879,7 +1879,7 @@ AC INI-Param: SS7_LINK_TNL_WAIT_OTHER_SIDE_INSV_TIMER"
      acSS7SignalingNodeEntry OBJECT-TYPE
        SYNTAX AcSS7SignalingNodeEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7SignalingNodeIndex}
@@ -1921,7 +1921,7 @@ AC INI-Param: SS7_LINK_TNL_WAIT_OTHER_SIDE_INSV_TIMER"
      acSS7SignalingNodeIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..1)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: SS7_SN_INDEX"
@@ -1932,7 +1932,7 @@ AC INI-Param: SS7_SN_INDEX"
      acSS7SignalingNodeRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS Field for line.
 AC INI-Param: SS7_SN_ROWSTATUS"
@@ -1954,7 +1954,7 @@ AC INI-Param: SS7_SN_ROWSTATUS"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS.
 AC INI-Param: SS7_SN_ACTION"
@@ -1972,7 +1972,7 @@ AC INI-Param: SS7_SN_ACTION"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS RESULT.
 AC INI-Param: SS7_SN_ACTION_RESULT"
@@ -1983,7 +1983,7 @@ AC INI-Param: SS7_SN_ACTION_RESULT"
      acSS7SignalingNodeName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "String name for SN Params.
 Access: Online.
@@ -2000,7 +2000,7 @@ AC INI-Param: SS7_SN_NAME"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Trace level of singnalling node (level 3).
 Access: Online.
@@ -2017,7 +2017,7 @@ AC INI-Param: SS7_SN_TRACE_LEVEL"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Administrative state of singnalling node.
 AC INI-Param: SS7_SN_ADMINISTRATIVE_STATE"
@@ -2035,7 +2035,7 @@ AC INI-Param: SS7_SN_ADMINISTRATIVE_STATE"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Operational state of singnalling node.
 AC INI-Param: SS7_SN_OPERATIONAL_STATE"
@@ -2051,7 +2051,7 @@ AC INI-Param: SS7_SN_OPERATIONAL_STATE"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Manual busy status of singnalling node.
 AC INI-Param: SS7_SN_MTC_BUSY_STATUS"
@@ -2069,7 +2069,7 @@ AC INI-Param: SS7_SN_MTC_BUSY_STATUS"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Variant of singnalling node.
 Access: Online.
@@ -2090,7 +2090,7 @@ AC INI-Param: SS7_SN_VARIANT"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Network Indicator of singnalling node.
 Access: Online.
@@ -2107,7 +2107,7 @@ AC INI-Param: SS7_SN_NI"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Routing function of singnalling node.
 Access: Online.
@@ -2124,7 +2124,7 @@ AC INI-Param: SS7_SN_SP_STP"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "TFC function of singnalling node.
 Access: Online.
@@ -2136,7 +2136,7 @@ AC INI-Param: SS7_SN_TFC"
      acSS7SignalingNodeOpc OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Origination (local) point-code of singnalling node.
 Access: Online.
@@ -2148,7 +2148,7 @@ AC INI-Param: SS7_SN_OPC"
      acSS7SignalingNodeRouteSetCongestionWindow OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Routeset Congestion Size (messages) of singnalling node.
 Access: Online.
@@ -2171,7 +2171,7 @@ AC INI-Param: SS7_SN_ROUTESET_CONGESTION_WINSIZE"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index of SNTimers table used for this signaling node.
 Access: Online.
@@ -2190,7 +2190,7 @@ AC INI-Param: SS7_SN_TIMERS_INDEX"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Level 4 application that handles ISUP traffic for this singnalling
 node.
@@ -2210,7 +2210,7 @@ AC INI-Param: SS7_SN_ISUP_APP"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Level 4 application that handles SCCP traffic for this singnalling
 node.
@@ -2230,7 +2230,7 @@ AC INI-Param: SS7_SN_SCCP_APP"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Level 4 application that handles BISUP traffic for this singnalling
 node.
@@ -2252,7 +2252,7 @@ AC INI-Param: SS7_SN_BISUP_APP"
 
                   }
        MAX-ACCESS read-create
-       STATUS deprecated
+       STATUS obsolete
        DESCRIPTION
            "Level 4 application that handles ALCAP traffic for this singnalling
 node.
@@ -2265,7 +2265,7 @@ AC INI-Param: SS7_SN_ALCAP_APP"
      acSS7SignalingNodeRdcyOpc OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Internal point-code of singnalling node - in case of SS7 shared
 point code.
@@ -2284,7 +2284,7 @@ AC INI-Param: SS7_SN_RDCY_OPC"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Level 4 application that handles TUP traffic for this signaling
 node.
@@ -2302,7 +2302,7 @@ AC INI-Param: SS7_SN_TUP_APP"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Level 4 application that handles BICC traffic for this signaling
 node.
@@ -2321,7 +2321,7 @@ AC INI-Param: SS7_SN_BICC_APP"
      acSS7LinkSetTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7LinkSetEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7LinkSets 21}
@@ -2334,7 +2334,7 @@ AC INI-Param: SS7_SN_BICC_APP"
      acSS7LinkSetEntry OBJECT-TYPE
        SYNTAX AcSS7LinkSetEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7LinkSetSNIndex,acSS7LinkSetLksetIndex}
@@ -2366,7 +2366,7 @@ AC INI-Param: SS7_SN_BICC_APP"
      acSS7LinkSetSNIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..1)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "First Index Field for line.
 AC INI-Param: SS7_LINKSET_SN_INDEX"
@@ -2377,7 +2377,7 @@ AC INI-Param: SS7_LINKSET_SN_INDEX"
      acSS7LinkSetLksetIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..31)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Second Index Field for line.
 AC INI-Param: SS7_LINKSET_LINKSET_INDEX"
@@ -2388,7 +2388,7 @@ AC INI-Param: SS7_LINKSET_LINKSET_INDEX"
      acSS7LinkSetRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS Field for line.
 AC INI-Param: SS7_LINKSET_ROWSTATUS"
@@ -2410,7 +2410,7 @@ AC INI-Param: SS7_LINKSET_ROWSTATUS"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS.
 AC INI-Param: SS7_LINKSET_ACTION"
@@ -2428,7 +2428,7 @@ AC INI-Param: SS7_LINKSET_ACTION"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS RESULT.
 AC INI-Param: SS7_SN_ACTION_RESULT"
@@ -2439,7 +2439,7 @@ AC INI-Param: SS7_SN_ACTION_RESULT"
      acSS7LinkSetName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "String name for LINKSET Params.
 Access: Online.
@@ -2456,7 +2456,7 @@ AC INI-Param: SS7_LINKSET_NAME"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Administrative state of singnalling linkset.
 AC INI-Param: SS7_LINKSET_ADMINISTRATIVE_STATE"
@@ -2474,7 +2474,7 @@ AC INI-Param: SS7_LINKSET_ADMINISTRATIVE_STATE"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Operational state of singnalling linkset.
 AC INI-Param: SS7_LINKSET_OPERATIONAL_STATE"
@@ -2490,7 +2490,7 @@ AC INI-Param: SS7_LINKSET_OPERATIONAL_STATE"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Manual busy status of singnalling linkset.
 AC INI-Param: SS7_LINKSET_MTC_BUSY_STATUS"
@@ -2501,7 +2501,7 @@ AC INI-Param: SS7_LINKSET_MTC_BUSY_STATUS"
      acSS7LinkSetDPC OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Destination Point-Code of singnalling linkset.
 Access: Online.
@@ -2513,7 +2513,7 @@ AC INI-Param: SS7_LINKSET_DPC"
      acSS7LinkSetLinksMask OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mask for links within singnalling linkset.
 Access: Online.
@@ -2525,7 +2525,7 @@ AC INI-Param: SS7_LINKSET_MASK"
      acSS7LinkSetLinksAltMask OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Alternate mask for links within singnalling linkset.
 Access: Online.
@@ -2548,7 +2548,7 @@ AC INI-Param: SS7_LINKSET_ALTERNATE_MASK"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Timers Index of singnalling linkset.
 Access: Online.
@@ -2563,7 +2563,7 @@ AC INI-Param: SS7_LINKSET_TIMERS_INDEX"
      acSS7LinkSetLinkTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7LinkSetLinkEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7LinkSets 22}
@@ -2576,7 +2576,7 @@ AC INI-Param: SS7_LINKSET_TIMERS_INDEX"
      acSS7LinkSetLinkEntry OBJECT-TYPE
        SYNTAX AcSS7LinkSetLinkEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7LinkSetLinkSNIndex,acSS7LinkSetLinkLinksetIndex,acSS7LinkSetLinkInnerLinkIndex}
@@ -2603,7 +2603,7 @@ AC INI-Param: SS7_LINKSET_TIMERS_INDEX"
      acSS7LinkSetLinkSNIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..1)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "First Index Field for line: Signalling Node Number.
 AC INI-Param: SS7_LINKSETLINK_SN_INDEX"
@@ -2614,7 +2614,7 @@ AC INI-Param: SS7_LINKSETLINK_SN_INDEX"
      acSS7LinkSetLinkLinksetIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..31)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Second Index Field for line: Signalling Linkset Number.
 AC INI-Param: SS7_LINKSETLINK_LINKSET_INDEX"
@@ -2625,7 +2625,7 @@ AC INI-Param: SS7_LINKSETLINK_LINKSET_INDEX"
      acSS7LinkSetLinkInnerLinkIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..7)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Third Index Field for line: Inner Link Index in Signalling Linkset.
 AC INI-Param: SS7_LINKSETLINK_INNER_LINK_INDEX"
@@ -2636,7 +2636,7 @@ AC INI-Param: SS7_LINKSETLINK_INNER_LINK_INDEX"
      acSS7LinkSetLinkRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS Field for line.
 AC INI-Param: SS7_LINKSETLINK_ROWSTATUS"
@@ -2650,7 +2650,7 @@ AC INI-Param: SS7_LINKSETLINK_ROWSTATUS"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS.
 AC INI-Param: SS7_LINKSETLINK_ACTION"
@@ -2668,7 +2668,7 @@ AC INI-Param: SS7_LINKSETLINK_ACTION"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Management field for ACTIONS RESULT.
 AC INI-Param: SS7_LINKSETLINK_ACTION_RESULT"
@@ -2679,7 +2679,7 @@ AC INI-Param: SS7_LINKSETLINK_ACTION_RESULT"
      acSS7LinkSetLinkLinkNo OBJECT-TYPE
        SYNTAX Unsigned32 (0..128)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Physical number of signalling link which is part of the Linkset.
 Access: Online.
@@ -2691,7 +2691,7 @@ AC INI-Param: SS7_LINKSETLINK_LINK_NUMBER"
      acSS7LinkSetLinkLinkSlc OBJECT-TYPE
        SYNTAX Unsigned32 (0..15)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "SLC number of signaling link which is part of the Linkset.
 Access: Online.
@@ -2709,7 +2709,7 @@ AC INI-Param: SS7_LINKSETLINK_LINK_SLC"
      acSS7RouteSetTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7RouteSetEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7RouteSets 21}
@@ -2722,7 +2722,7 @@ AC INI-Param: SS7_LINKSETLINK_LINK_SLC"
      acSS7RouteSetEntry OBJECT-TYPE
        SYNTAX AcSS7RouteSetEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7RouteSetSNIndex,acSS7RouteSetIndex}
@@ -2751,7 +2751,7 @@ AC INI-Param: SS7_LINKSETLINK_LINK_SLC"
      acSS7RouteSetSNIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..1)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "First Index Field for line: Signalling Node Number.
 AC INI-Param: SS7_ROUTESET_SN_INDEX"
@@ -2762,7 +2762,7 @@ AC INI-Param: SS7_ROUTESET_SN_INDEX"
      acSS7RouteSetIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..29)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Second Index Field for line: Signalling Routeset Number.
 AC INI-Param: SS7_ROUTESET_INDEX"
@@ -2773,7 +2773,7 @@ AC INI-Param: SS7_ROUTESET_INDEX"
      acSS7RouteSetRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS Field for line.
 AC INI-Param: SS7_ROUTESET_ROWSTATUS"
@@ -2791,7 +2791,7 @@ AC INI-Param: SS7_ROUTESET_ROWSTATUS"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS.
 AC INI-Param: SS7_ROUTESET_ACTION"
@@ -2809,7 +2809,7 @@ AC INI-Param: SS7_ROUTESET_ACTION"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS RESULT.
 AC INI-Param: SS7_ROUTESET_ACTION_RESULT"
@@ -2820,7 +2820,7 @@ AC INI-Param: SS7_ROUTESET_ACTION_RESULT"
      acSS7RouteSetName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "String name for ROUTESET Params.
 Access: Online.
@@ -2837,7 +2837,7 @@ AC INI-Param: SS7_ROUTESET_NAME"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Administrative state of signalling route set.
 AC INI-Param: SS7_ROUTESET_ADMINISTRATIVE_STATE"
@@ -2855,7 +2855,7 @@ AC INI-Param: SS7_ROUTESET_ADMINISTRATIVE_STATE"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Operational state of signalling route set.
 AC INI-Param: SS7_ROUTESET_OPERATIONAL_STATE"
@@ -2866,7 +2866,7 @@ AC INI-Param: SS7_ROUTESET_OPERATIONAL_STATE"
      acSS7RouteSetDPC OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Destination Point-Code of singnalling routesetset.
 Access: Online.
@@ -2878,7 +2878,7 @@ AC INI-Param: SS7_ROUTESET_DPC"
      acSS7RouteSetRouteMask OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Mask for route within signaling routeset.
 Access: Online.
@@ -2893,7 +2893,7 @@ AC INI-Param: SS7_ROUTESET_MASK"
      acSS7RouteSetRouteTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7RouteSetRouteEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7RouteSets 22}
@@ -2906,7 +2906,7 @@ AC INI-Param: SS7_ROUTESET_MASK"
      acSS7RouteSetRouteEntry OBJECT-TYPE
        SYNTAX AcSS7RouteSetRouteEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7RouteSetRouteSNIndex,acSS7RouteSetRouteRoutesetIndex,acSS7RouteSetRouteInnerRouteIndex}
@@ -2933,7 +2933,7 @@ AC INI-Param: SS7_ROUTESET_MASK"
      acSS7RouteSetRouteSNIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..1)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "First Index Field for line: Signalling Node Number.
 AC INI-Param: SS7_ROUTESETROUTE_SN_INDEX"
@@ -2944,7 +2944,7 @@ AC INI-Param: SS7_ROUTESETROUTE_SN_INDEX"
      acSS7RouteSetRouteRoutesetIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..29)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Second Index Field for line: Signalling Routeset Number.
 AC INI-Param: SS7_ROUTESETROUTE_ROUTESET_INDEX"
@@ -2955,7 +2955,7 @@ AC INI-Param: SS7_ROUTESETROUTE_ROUTESET_INDEX"
      acSS7RouteSetRouteInnerRouteIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..3)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Third Index Field for line: Inner Route Index in Signalling
 Routeset.
@@ -2967,7 +2967,7 @@ AC INI-Param: SS7_ROUTESETROUTE_INNER_ROUTE_INDEX"
      acSS7RouteSetRouteRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS Field for line.
 AC INI-Param: SS7_ROUTESETROUTE_ROWSTATUS"
@@ -2981,7 +2981,7 @@ AC INI-Param: SS7_ROUTESETROUTE_ROWSTATUS"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS.
 AC INI-Param: SS7_ROUTESETROUTE_ACTION"
@@ -2999,7 +2999,7 @@ AC INI-Param: SS7_ROUTESETROUTE_ACTION"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS RESULT.
 AC INI-Param: SS7_ROUTESETROUTE_ACTION_RESULT"
@@ -3010,7 +3010,7 @@ AC INI-Param: SS7_ROUTESETROUTE_ACTION_RESULT"
      acSS7RouteSetRouteLinkSetNo OBJECT-TYPE
        SYNTAX Unsigned32 (0..128)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Number of signalling linkset which is part of the Routeset.
 Access: Online.
@@ -3022,7 +3022,7 @@ AC INI-Param: SS7_ROUTESETROUTE_LINKSET_NUMBER"
      acSS7RouteSetRoutePriority OBJECT-TYPE
        SYNTAX Unsigned32 (0..254)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Priority of route within routeset.
 Access: Online.
@@ -3040,7 +3040,7 @@ AC INI-Param: SS7_ROUTESETROUTE_PRIORITY"
      acSS7APCTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7APCEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7AliasPointCode 21}
@@ -3053,7 +3053,7 @@ AC INI-Param: SS7_ROUTESETROUTE_PRIORITY"
      acSS7APCEntry OBJECT-TYPE
        SYNTAX AcSS7APCEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7APCSNIndex,acSS7APCIndex}
@@ -3083,7 +3083,7 @@ AC INI-Param: SS7_ROUTESETROUTE_PRIORITY"
      acSS7APCSNIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..1)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "First Index Field for line: Signaling Node Number.
 AC INI-Param: SS7_APC_SN_INDEX"
@@ -3094,7 +3094,7 @@ AC INI-Param: SS7_APC_SN_INDEX"
      acSS7APCIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..1)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Second Index Field for line: Alias PC index.
 AC INI-Param: SS7_APC_INNER_INDEX"
@@ -3105,7 +3105,7 @@ AC INI-Param: SS7_APC_INNER_INDEX"
      acSS7APCRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS Field for line.
 AC INI-Param: SS7_APC_ROWSTATUS"
@@ -3127,7 +3127,7 @@ AC INI-Param: SS7_APC_ROWSTATUS"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Management field for ACTIONS.
 AC INI-Param: SS7_APC_ACTION"
@@ -3145,7 +3145,7 @@ AC INI-Param: SS7_APC_ACTION"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "management Field for ACTIONS RESULT.
 AC INI-Param: SS7_APC_ACTION_RESULT"
@@ -3156,7 +3156,7 @@ AC INI-Param: SS7_APC_ACTION_RESULT"
      acSS7APCPC OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Alias Point-Code of signaling node.
 Access: Online.
@@ -3168,7 +3168,7 @@ AC INI-Param: SS7_APC_PC"
      acSS7APCSNI OBJECT-TYPE
        SYNTAX Unsigned32 (2..5)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "SNI (Signaling Network Indicator) of Alias Point-Code.
 Access: Online.
@@ -3180,7 +3180,7 @@ AC INI-Param: SS7_APC_SNI"
      acSS7APCName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "String name for Alias PC parameters.
 Access: Online.
@@ -3197,7 +3197,7 @@ AC INI-Param: SS7_ALIAS_PC_NAME"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Manual busy status of Alias PC.
 AC INI-Param: SS7_ALIAS_PC_MTC_BUSY"
@@ -3215,7 +3215,7 @@ AC INI-Param: SS7_ALIAS_PC_MTC_BUSY"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Administrative state of Alias PC.
 AC INI-Param: SS7_ALIAS_PC_ADMINISTRATIVE_STATE"
@@ -3233,7 +3233,7 @@ AC INI-Param: SS7_ALIAS_PC_ADMINISTRATIVE_STATE"
 
                   }
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Operational state of Alias PC.
 AC INI-Param: SS7_ALIAS_PC_OPERATIONAL_STATE"
@@ -3254,7 +3254,7 @@ AC INI-Param: SS7_ALIAS_PC_OPERATIONAL_STATE"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the M3UA behavior when the SS7 links are up, but there
 is no association to the soft switch.
@@ -3274,7 +3274,7 @@ AC INI-Param: SS7M3UATrafficBehavior"
      acSS7SigTranIFGroupTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7SigTranIFGroupEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7SigTran 21}
@@ -3287,7 +3287,7 @@ AC INI-Param: SS7M3UATrafficBehavior"
      acSS7SigTranIFGroupEntry OBJECT-TYPE
        SYNTAX AcSS7SigTranIFGroupEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7SigTranIFGroupIndex}
@@ -3330,7 +3330,7 @@ AC INI-Param: SS7M3UATrafficBehavior"
      acSS7SigTranIFGroupIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..15)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index field for line.
 AC INI-Param: SS7_SIG_IF_GR_INDEX"
@@ -3341,7 +3341,7 @@ AC INI-Param: SS7_SIG_IF_GR_INDEX"
      acSS7SigTranIFGroupRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS field for line.
 AC INI-Param: SS7_SIG_IF_GR_ROWSTATUS"
@@ -3359,7 +3359,7 @@ AC INI-Param: SS7_SIG_IF_GR_ROWSTATUS"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Management field for ACTION.
 AC INI-Param: SS7_SIG_IF_GR_ACTION"
@@ -3370,7 +3370,7 @@ AC INI-Param: SS7_SIG_IF_GR_ACTION"
      acSS7SigTranIFGroupActionResult OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Management field for ACTION RESULT.
 AC INI-Param: SS7_SIG_IF_GR_ACTION_RESULT"
@@ -3381,7 +3381,7 @@ AC INI-Param: SS7_SIG_IF_GR_ACTION_RESULT"
      acSS7SigTranIFGroupId OBJECT-TYPE
        SYNTAX Unsigned32 (0..65534)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "SS7 (Signaling System 7) SIGTRAN (Signaling Transport) Interface
 Group Id.
@@ -3401,7 +3401,7 @@ AC INI-Param: SS7_IF_GR_ID"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Interface Group function - Signaling Gateway (SG) or Media Gateway
 Controller (MGC).
@@ -3427,7 +3427,7 @@ AC INI-Param: SS7_SIG_SG_MGC"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "UAL type of interface group: 
 0 = none
@@ -3452,7 +3452,7 @@ AC INI-Param: SS7_SIG_LAYER"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Traffic mode of interface group.
 Access: Online.
@@ -3464,7 +3464,7 @@ AC INI-Param: SS7_SIG_TRAF_MODE"
      acSS7SigTranIFGroupRecovTimer OBJECT-TYPE
        SYNTAX Unsigned32 (0..10000000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "T(r) - recovery timer (in msecs) of interface group.
 Access: Online.
@@ -3476,7 +3476,7 @@ AC INI-Param: SS7_SIG_T_REC"
      acSS7SigTranIFGroupAckTimer OBJECT-TYPE
        SYNTAX Unsigned32 (0..10000000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "T(ack) - wait timer for ASP_UP_ACK (in msecs) of interface group.
 Access: Online.
@@ -3488,7 +3488,7 @@ AC INI-Param: SS7_SIG_T_ACK"
      acSS7SigTranIFGroupHBTimer OBJECT-TYPE
        SYNTAX Unsigned32 (0..10000000)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "T(beat) - Heartbeat Timer (in msecs) of interface group.
 Access: Online.
@@ -3500,7 +3500,7 @@ AC INI-Param: SS7_SIG_T_HB"
      acSS7SigTranIFGroupMinAsp OBJECT-TYPE
        SYNTAX Unsigned32 (1..10)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Minimal ASP (Application Server Process) number in interface
 group(minimum = 1).
@@ -3513,7 +3513,7 @@ AC INI-Param: SS7_SIG_MIN_ASP"
      acSS7SigTranIFGroupBehavior OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Behavior bit of interface group.
 Access: Online.
@@ -3525,7 +3525,7 @@ AC INI-Param: SS7_SIG_BEHAVIOUR"
      acSS7SigTranIFGroupSCTPInst OBJECT-TYPE
        SYNTAX Unsigned32 (0..65534)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "SCTP (Stream Control Transmission Protocol) instance of interface
 group.
@@ -3537,7 +3537,7 @@ AC INI-Param: SS7_SCTP_INSTANCE"
      acSS7SigTranIFGroupSCTPLocalPort OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Local SCTP (Stream Control Transmission Protocol) port of interface
 group.
@@ -3557,7 +3557,7 @@ AC INI-Param: SS7_LOCAL_SCTP_PORT"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Network variant of interface group.
 Access: Online.
@@ -3569,7 +3569,7 @@ AC INI-Param: SS7_SIG_NETWORK"
      acSS7SigTranIFGroupSCTPDestPort OBJECT-TYPE
        SYNTAX Unsigned32 (0..65534)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Destination SCTP (Stream Control Transmission Protocol) port.
 Access: Online.
@@ -3581,7 +3581,7 @@ AC INI-Param: SS7_DEST_SCTP_PORT"
      acSS7SigTranIFGroupDestIp OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Destination SCTP (Stream Control Transmission Protocol) IP address.
 Access: Online.
@@ -3593,7 +3593,7 @@ AC INI-Param: SS7_DEST_IP"
      acSS7SigTranIFGroupSCTPMaxInbStreams OBJECT-TYPE
        SYNTAX Unsigned32 (2..65534)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Maximum inbound streams in interface group.
 Access: Online.
@@ -3605,7 +3605,7 @@ AC INI-Param: SS7_MGC_MX_IN_STREAM"
      acSS7SigTranIFGroupSCTPMaxOutbStreams OBJECT-TYPE
        SYNTAX Unsigned32 (2..65534)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Number of output streams required in interface group.
 Access: Online.
@@ -3617,7 +3617,7 @@ AC INI-Param: SS7_MGC_NUM_OUT_STREAM"
      acSS7SigTranIFGroupRdcyBoardNum OBJECT-TYPE
        SYNTAX Unsigned32 (0..255)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to specify the SIGTRAN (Signaling Transport)
 group redundancy board number.
@@ -3630,7 +3630,7 @@ AC INI-Param: RdcyBoardNum"
      acSS7SigTranIFGroupRoutingContextIndex OBJECT-TYPE
        SYNTAX Integer32 (-1..15)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Entry in Routing Context table, that contains the routing context
 rules for this interface group.
@@ -3643,7 +3643,7 @@ AC INI-Param: SS7_SIG_RC_INDEX"
      acSS7SigTranIFGroupRoutingContextValue OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Routing context value for this interface group (AS).
 Access: Online.
@@ -3655,7 +3655,7 @@ AC INI-Param: SS7_SIG_RC_VALUE"
      acSS7SigTranIFGroupNetworkAppearance OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Network Appearance value for this interface group (AS).
 Access: Online.
@@ -3670,7 +3670,7 @@ AC INI-Param: SS7_SIG_NETWORK_APPEARANCE"
      acSS7SigTranIFIDTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7SigTranIFIDEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7SigTran 22}
@@ -3683,7 +3683,7 @@ AC INI-Param: SS7_SIG_NETWORK_APPEARANCE"
      acSS7SigTranIFIDEntry OBJECT-TYPE
        SYNTAX AcSS7SigTranIFIDEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7SigTranIFIDIndex}
@@ -3712,7 +3712,7 @@ AC INI-Param: SS7_SIG_NETWORK_APPEARANCE"
      acSS7SigTranIFIDIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..83)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Index field for line.
 AC INI-Param: SS7_SIG_IF_ID_INDEX"
@@ -3723,7 +3723,7 @@ AC INI-Param: SS7_SIG_IF_ID_INDEX"
      acSS7SigTranIFIDRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS field for line.
 AC INI-Param: SS7_SIG_IF_ID_ROWSTATUS"
@@ -3741,7 +3741,7 @@ AC INI-Param: SS7_SIG_IF_ID_ROWSTATUS"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Management field for ACTION.
 AC INI-Param: SS7_SIG_IF_ID_ACTION"
@@ -3752,7 +3752,7 @@ AC INI-Param: SS7_SIG_IF_ID_ACTION"
      acSS7SigTranIFIDActionResult OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Management field for ACTION RESULT.
 AC INI-Param: SS7_SIG_IF_ID_ACTION_RESULT"
@@ -3763,7 +3763,7 @@ AC INI-Param: SS7_SIG_IF_ID_ACTION_RESULT"
      acSS7SigTranIFIDValue OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "SS7 (Signaling System 7) SIGTRAN (Signaling Transport) interface
 ID value.
@@ -3776,7 +3776,7 @@ AC INI-Param: SS7_SIG_IF_ID_VALUE"
      acSS7SigTranIFIDName OBJECT-TYPE
        SYNTAX SnmpAdminString (SIZE (0..15))
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "SS7 (Signaling System 7) SIGTRAN (Signaling Transport) interface
 ID name (text string).
@@ -3789,7 +3789,7 @@ AC INI-Param: SS7_SIG_IF_ID_NAME"
      acSS7SigTranIFIDOwnerGroup OBJECT-TYPE
        SYNTAX Integer32 (-1..65534)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Owner group of interface id.
 Access: Online.
@@ -3812,7 +3812,7 @@ AC INI-Param: SS7_SIG_IF_ID_OWNER_GROUP"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "UAL Type of interface id:
 0 = none
@@ -3829,7 +3829,7 @@ AC INI-Param: SS7_SIG_IF_ID_LAYER"
      acSS7SigTranIFIDNai OBJECT-TYPE
        SYNTAX Integer32 (-2..124)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "NAI of interface id.
 Access: Online.
@@ -3841,7 +3841,7 @@ AC INI-Param: SS7_SIG_IF_ID_NAI"
      acSS7SigTranIFIDM3UASpc OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to specify the SIGTRAN (Signaling Transport)
 M3UA (M3UA - SS7 MTP3-User Adaptation Layer) SPC.
@@ -4173,7 +4173,7 @@ AC INI-Param: M3UAROUTINGCLIST_UpperCICValue4"
      acSS7SigTranRoutingContextTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7SigTranRoutingContextEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7SigTran 24}
@@ -4186,7 +4186,7 @@ AC INI-Param: M3UAROUTINGCLIST_UpperCICValue4"
      acSS7SigTranRoutingContextEntry OBJECT-TYPE
        SYNTAX AcSS7SigTranRoutingContextEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7SigTranRoutingContextIndex,acSS7SigTranRoutingContextInnerIndex}
@@ -4220,7 +4220,7 @@ AC INI-Param: M3UAROUTINGCLIST_UpperCICValue4"
      acSS7SigTranRoutingContextIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..31)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "First index field for line.
 AC INI-Param: SS7_RC_INDEX"
@@ -4231,7 +4231,7 @@ AC INI-Param: SS7_RC_INDEX"
      acSS7SigTranRoutingContextInnerIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..3)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Second index field for line.
 AC INI-Param: SS7_RC_INNER_INDEX"
@@ -4242,7 +4242,7 @@ AC INI-Param: SS7_RC_INNER_INDEX"
      acSS7SigTranRoutingContextRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS field for line.
 AC INI-Param: SS7_RC_ROW_STATUS"
@@ -4260,7 +4260,7 @@ AC INI-Param: SS7_RC_ROW_STATUS"
 
                   }
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Management field for ACTIONS.
 AC INI-Param: RCAction"
@@ -4271,7 +4271,7 @@ AC INI-Param: RCAction"
      acSS7SigTranRoutingContextActionResult OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "RCActionRes.
 AC INI-Param: SS7_RC_ACTION_RES"
@@ -4282,7 +4282,7 @@ AC INI-Param: SS7_RC_ACTION_RES"
      acSS7SigTranRoutingContextSnIdx OBJECT-TYPE
        SYNTAX Unsigned32 (0..5)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to specify the M3UA Routing Context DPC
 SN-Index.
@@ -4295,7 +4295,7 @@ AC INI-Param: SS7_RC_SN_INDEX"
      acSS7SigTranRoutingContextSpc OBJECT-TYPE
        SYNTAX Integer32 (-1..16777215)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to specify the M3UA Routing Context DPC
 parameter.
@@ -4307,7 +4307,7 @@ AC INI-Param: SS7_RC_SPC"
      acSS7SigTranRoutingContextOpc1 OBJECT-TYPE
        SYNTAX Integer32 (-1..16777215)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to specify the M3UA Routing Context,First
 element of OPC list.
@@ -4320,7 +4320,7 @@ AC INI-Param: SS7_RC_OPC1"
      acSS7SigTranRoutingContextOpc2 OBJECT-TYPE
        SYNTAX Integer32 (-1..16777215)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to specify the M3UA Routing Context,Second
 element of OPC list.
@@ -4333,7 +4333,7 @@ AC INI-Param: SS7_RC_OPC2"
      acSS7SigTranRoutingContextOpc3 OBJECT-TYPE
        SYNTAX Integer32 (-1..16777215)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to specify the M3UA Routing Context,
 Third element of OPC list.
@@ -4346,7 +4346,7 @@ AC INI-Param: SS7_RC_OPC3"
      acSS7SigTranRoutingContextOpc4 OBJECT-TYPE
        SYNTAX Integer32 (-1..16777215)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to specify the M3UA Routing Context,
 Fourth element of OPC list.
@@ -4359,7 +4359,7 @@ AC INI-Param: SS7_RC_OPC4"
      acSS7SigTranRoutingContextSi1 OBJECT-TYPE
        SYNTAX Integer32 (-1..15)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to specify the M3UA Routing Context,
 First element of SI list.
@@ -4372,7 +4372,7 @@ AC INI-Param: SS7_RC_SI1"
      acSS7SigTranRoutingContextSi2 OBJECT-TYPE
        SYNTAX Integer32 (-1..15)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to specify the M3UA Routing Context,
  Second element of SI list.
@@ -4385,7 +4385,7 @@ AC INI-Param: SS7_RC_SI2"
      acSS7SigTranRoutingContextSi3 OBJECT-TYPE
        SYNTAX Integer32 (-1..15)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to specify the M3UA Routing Context,
  Third element of SI list.
@@ -4398,7 +4398,7 @@ AC INI-Param: SS7_RC_SI3"
      acSS7SigTranRoutingContextSi4 OBJECT-TYPE
        SYNTAX Integer32 (-1..15)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "This parameter is used to specify the M3UA Routing Context,
 Fourth element of SI list.
@@ -4419,7 +4419,7 @@ AC INI-Param: SS7_RC_SI4"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the cross-board connection media type for the MTP3 redundancy
 feature:
@@ -4439,7 +4439,7 @@ AC INI-Param: SS7MTP3RdcyTransferType"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the MTP3 Signaling redundancy mode:
 0 = Disabled
@@ -4454,7 +4454,7 @@ AC INI-Param: SS7MTP3RdcyMode"
      acSS7RedundancyBoardNum OBJECT-TYPE
        SYNTAX Unsigned32 (0..2)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the board number for the SS7 (Signaling System 7) MTP3
 redundancy mode. Each board is allocated a unique number.
@@ -4487,7 +4487,7 @@ AC INI-Param: SS7M3BRdcyXlinkTraceAll"
      acSS7RedundancyMTP3RdcyTblSyncInterval OBJECT-TYPE
        SYNTAX Unsigned32 (0..144000)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines the interval between SS7 tables automatic synchronizations,
 in minutes.
@@ -4508,7 +4508,7 @@ AC INI-Param: N/A"
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Provide SYNC all boards command.
 Access: Instant.
@@ -4520,7 +4520,7 @@ AC INI-Param: N/A"
      acSS7RedundancySyncBoard OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Provide SYNC between this board and another specific board (parameter
 is the remote board number).
@@ -4533,7 +4533,7 @@ AC INI-Param: N/A"
      acSS7RedundancyKeepAliveWindow OBJECT-TYPE
        SYNTAX Unsigned32 (1..15)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines redundancy X-link keep-alive tolerance window.
 (x-link between boards in Signaling System 7 (SS7) MTP3-User
@@ -4548,7 +4548,7 @@ AC INI-Param: SS7MTP3RdcyKeepAliveWindow"
      acSS7RedundancyKeepAliveInterval OBJECT-TYPE
        SYNTAX Unsigned32 (0..100)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Defines redundancy X-link keep-alive interval in secs.
 (x-link between boards in Signaling System 7 (SS7) MTP3-User
@@ -4567,7 +4567,7 @@ AC INI-Param: SS7MTP3RdcyKeepAliveInterval"
      acSS7RedundantSNTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcSS7RedundantSNEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        ::= {acSS7Redundancy 21}
@@ -4580,7 +4580,7 @@ AC INI-Param: SS7MTP3RdcyKeepAliveInterval"
      acSS7RedundantSNEntry OBJECT-TYPE
        SYNTAX AcSS7RedundantSNEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acSS7RedundantSNBoardIndex,acSS7RedundantSNIndex}
@@ -4607,7 +4607,7 @@ AC INI-Param: SS7MTP3RdcyKeepAliveInterval"
      acSS7RedundantSNBoardIndex OBJECT-TYPE
        SYNTAX Unsigned32 (1..4)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "First index for a line: board number.
 AC INI-Param: SS7_RDCYSN_BOARD_INDEX"
@@ -4618,7 +4618,7 @@ AC INI-Param: SS7_RDCYSN_BOARD_INDEX"
      acSS7RedundantSNIndex OBJECT-TYPE
        SYNTAX Unsigned32 (0..2)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Second index for a line: SN number in the board.
 AC INI-Param: SS7_RDCYSN_SN_INDEX"
@@ -4629,7 +4629,7 @@ AC INI-Param: SS7_RDCYSN_SN_INDEX"
      acSS7RedundantSNRowStatus OBJECT-TYPE
        SYNTAX RowStatus
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "ROWSTATUS field for line.
 AC INI-Param: SS7_RDCYSN_ROWSTATUS"
@@ -4640,7 +4640,7 @@ AC INI-Param: SS7_RDCYSN_ROWSTATUS"
      acSS7RedundantSNAction OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Management field for ACTION.
 AC INI-Param: SS7_RDCYSN_ACTION"
@@ -4651,7 +4651,7 @@ AC INI-Param: SS7_RDCYSN_ACTION"
      acSS7RedundantSNActionRes OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Management field for ACTION RESULT.
 AC INI-Param: SS7_RDCYSN_ACTIONRES"
@@ -4662,7 +4662,7 @@ AC INI-Param: SS7_RDCYSN_ACTIONRES"
      acSS7RedundantSNBoardIp OBJECT-TYPE
        SYNTAX IpAddress
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "IP address of the board.
 Access: Online.
@@ -4674,7 +4674,7 @@ AC INI-Param: SS7_RDCYSN_BOARD_IP"
      acSS7RedundantSNOPC OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Internal point-code of the SN (Signaling Node).
 Access: Online.
@@ -4686,7 +4686,7 @@ AC INI-Param: SS7_RDCYSN_OPC"
      acSS7RedundantSNALCAPOPC OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-create
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Internal point-code of ALCAP instance on a given board.
 Access: Online.
@@ -4704,7 +4704,7 @@ AC INI-Param: SS7_RDCYSN_ALCAP_OPC"
      acSS7ConstantsNumberOfNodes OBJECT-TYPE
        SYNTAX Unsigned32 (0..1000)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: N/A"
@@ -4715,7 +4715,7 @@ AC INI-Param: N/A"
      acSS7ConstantsNumberOfLinks OBJECT-TYPE
        SYNTAX Unsigned32 (0..1000)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: N/A"
@@ -4726,7 +4726,7 @@ AC INI-Param: N/A"
      acSS7ConstantsNumberOfLinkSetsPerSN OBJECT-TYPE
        SYNTAX Unsigned32 (0..1000)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: N/A"
@@ -4737,7 +4737,7 @@ AC INI-Param: N/A"
      acSS7ConstantsNumberOfLinksPerLinkSet OBJECT-TYPE
        SYNTAX Unsigned32 (0..1000)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: N/A"
@@ -4748,7 +4748,7 @@ AC INI-Param: N/A"
      acSS7ConstantsNumberOfRouteSetsPerSN OBJECT-TYPE
        SYNTAX Unsigned32 (0..1000)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: N/A"
@@ -4759,7 +4759,7 @@ AC INI-Param: N/A"
      acSS7ConstantsNumberOfRoutesPerRouteSets OBJECT-TYPE
        SYNTAX Unsigned32 (0..1000)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: N/A"
@@ -4770,7 +4770,7 @@ AC INI-Param: N/A"
      acSS7ConstantsNumberOfNodeTimerSets OBJECT-TYPE
        SYNTAX Unsigned32 (0..1000)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: N/A"
@@ -4781,7 +4781,7 @@ AC INI-Param: N/A"
      acSS7ConstantsNumberOfLinkSetTimerSets OBJECT-TYPE
        SYNTAX Unsigned32 (0..1000)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "
 AC INI-Param: N/A"

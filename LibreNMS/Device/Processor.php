@@ -26,7 +26,9 @@
 
 namespace LibreNMS\Device;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
@@ -55,7 +57,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     public $processor_precision;
     public $entPhysicalIndex;
     public $hrDeviceIndex;
-    public $processor_perc_warn = 75;
+    public $processor_perc_warn;
 
     /**
      * Processor constructor.
@@ -80,7 +82,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         $description = 'Processor',
         $precision = 1,
         $current_usage = null,
-        $warn_percent = 75,
+        $warn_percent = null,
         $entPhysicalIndex = null,
         $hrDeviceIndex = null
     ) {
@@ -96,15 +98,11 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
         // handle string indexes
         if (Str::contains($oid, '"')) {
-            $oid = preg_replace_callback('/"([^"]+)"/', function ($matches) {
-                return Oid::encodeString($matches[1])->oid;
-            }, $oid);
+            $oid = preg_replace_callback('/"([^"]+)"/', fn ($matches) => Oid::encodeString($matches[1])->oid, $oid);
         }
-        $proc->processor_oid = '.' . ltrim($oid, '.');
+        $proc->processor_oid = '.' . ltrim((string) $oid, '.');
 
-        if (! is_null($warn_percent)) {
-            $proc->processor_perc_warn = $warn_percent;
-        }
+        $proc->processor_perc_warn = $warn_percent ?? LibrenmsConfig::get('processor_perc_warn', 75);
 
         // validity not checked yet
         if (is_null($proc->processor_usage)) {
@@ -113,10 +111,10 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             if (! $proc->valid) {
                 return $proc;
             }
-            $proc->processor_usage = static::processData($data, $proc->processor_precision);
+            $proc->processor_usage = self::processData($data, $proc->processor_precision);
         }
 
-        d_echo('Discovered ' . get_called_class() . ' ' . print_r($proc->toArray(), true));
+        d_echo('Discovered ' . static::class . ' ' . print_r($proc->toArray(), true));
 
         return $proc;
     }
@@ -129,10 +127,10 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             empty($data['type']) ? $os->getName() : $data['type'],
             $os->getDeviceId(),
             $data['num_oid'],
-            isset($data['index']) ? $data['index'] : $index,
-            empty($data['descr']) ? 'Processor' : trim($data['descr']),
+            $data['index'] ?? $index,
+            empty($data['descr']) ? 'Processor' : trim((string) $data['descr']),
             $precision,
-            static::processData($data['value'], $precision),
+            self::processData($data['value'], $precision),
             $data['warn_percent'] ?? null,
             $data['entPhysicalIndex'] ?? null,
             $data['hrDeviceIndex'] ?? null
@@ -150,8 +148,8 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         }
 
         foreach ($processors as $processor) {
-            $processor->processor_descr = substr($processor->processor_descr, 0, 64);
-            $processor->processor_type = substr($processor->processor_type, 0, 16);
+            $processor->processor_descr = substr((string) $processor->processor_descr, 0, 64);
+            $processor->processor_type = substr((string) $processor->processor_type, 0, 16);
         }
 
         if (isset($processors) && is_array($processors)) {
@@ -163,7 +161,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             );
         }
 
-        dbDeleteOrphans(static::$table, ['devices.device_id']);
+        \App\Models\Processor::doesntHave('device')->delete();
 
         echo PHP_EOL;
     }
@@ -175,12 +173,12 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         if ($os instanceof ProcessorPolling) {
             $data = $os->pollProcessors($processors);
         } else {
-            $data = static::pollProcessors($os, $processors);
+            $data = self::pollProcessors($os, $processors);
         }
 
         $rrd_def = RrdDefinition::make()->addDataset('usage', 'GAUGE', -273, 1000);
 
-        foreach ($processors as $index => $processor) {
+        foreach ($processors as $processor) {
             extract($processor); // extract db fields to variables
             /** @var int $processor_id */
             /** @var string $processor_type */
@@ -189,11 +187,11 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             /** @var string $processor_descr */
             if (array_key_exists($processor_id, $data)) {
                 $usage = round($data[$processor_id], 2);
-                echo "$processor_descr: $usage%\n";
+                Log::info("$processor_descr: $usage%");
 
                 $rrd_name = ['processor', $processor_type, $processor_index];
-                $fields = compact('usage');
-                $tags = compact('processor_type', 'processor_index', 'rrd_name', 'rrd_def');
+                $fields = ['usage' => $usage];
+                $tags = ['processor_type' => $processor_type, 'processor_index' => $processor_index, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
                 app('Datastore')->put($os->getDeviceArray(), 'processors', $tags, $fields);
 
                 if ($usage != $processor_usage) {
@@ -223,7 +221,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         $results = [];
         foreach ($processors as $processor) {
             if (isset($snmp_data[$processor['processor_oid']])) {
-                $value = static::processData(
+                $value = self::processData(
                     $snmp_data[$processor['processor_oid']],
                     $processor['processor_precision']
                 );
@@ -239,7 +237,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     private static function processData($data, $precision)
     {
-        if (preg_match('/([0-9]{1,5}(\.[0-9]+)?)/', $data, $matches) !== 1) {
+        if (preg_match('/([0-9]{1,5}(\.[0-9]+)?)/', (string) $data, $matches) !== 1) {
             return null;
         }
         $value = (float) $matches[1];
@@ -248,7 +246,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             // idle value, subtract from 100
             $value = 100 - ($value / ($precision * -1));
         } elseif ($precision > 1) {
-            $value = $value / $precision;
+            $value /= $precision;
         }
 
         return $value;
@@ -264,7 +262,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             return [];
         }
 
-        return YamlDiscovery::discover($os, get_called_class(), $discovery);
+        return YamlDiscovery::discover($os, static::class, $discovery);
     }
 
     /**
@@ -304,7 +302,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     }
 
     /**
-     * @param  Processor  $processor
+     * @param  static  $processor
      */
     public static function onCreate($processor)
     {
@@ -315,7 +313,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     }
 
     /**
-     * @param  Processor  $processor
+     * @param  static  $processor
      */
     public static function onDelete($processor)
     {

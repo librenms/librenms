@@ -10,12 +10,15 @@
  * the source code distribution for details.
  */
 
+use App\Models\AlertTransport;
+use Illuminate\Support\Facades\Gate;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('view', AlertTransport::class)) {
     exit(json_encode([
         'status' => 'error',
-        'message' => 'You need to be admin',
+        'message' => 'You need permission',
     ]));
 }
 
@@ -31,7 +34,7 @@ if (is_numeric($transport_id) && $transport_id > 0) {
     }
     $details = [];
     // Get alert transport configuration details
-    foreach (json_decode($transport['transport_config'], true) as $key => $value) {
+    foreach (json_decode((string) $transport['transport_config'], true) as $key => $value) {
         $details[] = [
             'name' => $key,
             'value' => $value,

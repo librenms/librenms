@@ -1,0 +1,223 @@
+STORMSHIELD-VPNIKESA-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+         Unsigned32, Counter64                FROM SNMPv2-SMI
+      DisplayString                           FROM RFC1213-MIB
+      snsVPN                                  FROM STORMSHIELD-VPN-MIB;
+
+   snsVPNIKESATable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsVPNIKESAEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "List of Internet Key Exchange Security Association"
+      ::= { snsVPN 2 }
+
+   snsVPNIKESAEntry OBJECT-TYPE
+      SYNTAX  SnsVPNIKESAEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "Each entry in the snsVPNIKESATable holds a set of parameters."
+      INDEX   { snsVPNIKESAIndex }
+      ::= { snsVPNIKESATable 1 }
+
+   SnsVPNIKESAEntry ::= SEQUENCE {
+      snsVPNIKESAIndex       INTEGER,
+      snsVPNIKESARulename    DisplayString,
+      snsVPNIKESAVersion     INTEGER,
+      snsVPNIKESAIPSrc       DisplayString,
+      snsVPNIKESAIPDst       DisplayString,
+      snsVPNIKESAState       DisplayString,
+      snsVPNIKESASide        INTEGER,
+      snsVPNIKESANat         INTEGER,
+      snsVPNIKESACookiei     DisplayString,
+      snsVPNIKESACookier     DisplayString,
+      snsVPNIKESALocalid     DisplayString,
+      snsVPNIKESARemoteid    DisplayString,
+      snsVPNIKESAEnc         DisplayString,
+      snsVPNIKESAAuth        DisplayString,
+      snsVPNIKESAPrf         DisplayString,
+      snsVPNIKESAPfs         DisplayString,
+      snsVPNIKESALifetime    Counter64,
+      snsVPNIKESAMaxLifetime Counter64,
+      snsVPNIKESAGlobal      INTEGER,
+      snsVPNIKESAPPK         INTEGER
+   }
+
+   snsVPNIKESAIndex OBJECT-TYPE
+      SYNTAX  INTEGER  (1..65535)
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+         "A unique value for phase one table. Its value
+         may not be contigous. The index has no other
+         meaning but a pure index"
+      ::= { snsVPNIKESAEntry 1 }
+
+   snsVPNIKESARulename OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "IKE_SA rulename"
+      ::= { snsVPNIKESAEntry 2 }
+
+   snsVPNIKESAVersion OBJECT-TYPE
+      SYNTAX INTEGER {
+         both(0),
+         ikev1(1),
+         ikev2(2)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "IKE version"
+      ::= { snsVPNIKESAEntry 3 }
+
+   snsVPNIKESAIPSrc OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "IP source"
+      ::= { snsVPNIKESAEntry 4 }
+
+   snsVPNIKESAIPDst OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "IP destination"
+      ::= { snsVPNIKESAEntry 5 }
+
+   snsVPNIKESAState OBJECT-TYPE
+       SYNTAX DisplayString
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+          "IKE_SA State"
+       ::= { snsVPNIKESAEntry 6 }
+
+   snsVPNIKESASide OBJECT-TYPE
+      SYNTAX INTEGER {
+         initiator(0),
+         responder(1)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Side of regociation"
+      ::= { snsVPNIKESAEntry 7 }
+
+   snsVPNIKESANat OBJECT-TYPE
+      SYNTAX INTEGER {
+         none(0),
+         local(1),
+         remote(2),
+         both(3)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "NAT Detection"
+      ::= { snsVPNIKESAEntry 8 }
+
+   snsVPNIKESACookiei OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Initiator cookie"
+      ::= { snsVPNIKESAEntry 9 }
+
+   snsVPNIKESACookier OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Reponder cookie"
+      ::= { snsVPNIKESAEntry 10 }
+
+   snsVPNIKESALocalid OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Local id"
+      ::= { snsVPNIKESAEntry 11 }
+
+   snsVPNIKESARemoteid OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Remote id"
+      ::= { snsVPNIKESAEntry 12 }
+
+   snsVPNIKESAEnc OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Enc"
+      ::= { snsVPNIKESAEntry 13 }
+
+   snsVPNIKESAAuth OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Auth"
+      ::= { snsVPNIKESAEntry 14 }
+
+   snsVPNIKESAPrf OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Pseudo-Random function"
+      ::= { snsVPNIKESAEntry 15 }
+
+   snsVPNIKESAPfs OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Perfect Forward Secrecy"
+      ::= { snsVPNIKESAEntry 16 }
+
+   snsVPNIKESALifetime OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Lifetime"
+      ::= { snsVPNIKESAEntry 17 }
+
+   snsVPNIKESAMaxLifetime OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "MaxLifetime"
+      ::= { snsVPNIKESAEntry 18 }
+
+   snsVPNIKESAGlobal OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Global"
+      ::= { snsVPNIKESAEntry 19 }
+
+   snsVPNIKESAPPK OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "PPK"
+      ::= { snsVPNIKESAEntry 20 }
+
+END

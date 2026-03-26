@@ -5442,7 +5442,7 @@
                 },
                 {
                     "state_name": "cpiPduBranchStatus",
-                    "state_descr": "Aalrm",
+                    "state_descr": "Alarm",
                     "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
@@ -9758,7 +9758,7 @@
                 },
                 {
                     "state_name": "cpiPduBranchStatus",
-                    "state_descr": "Aalrm",
+                    "state_descr": "Alarm",
                     "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
@@ -9973,6 +9973,26 @@
                     "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
+                    "ifIndex": 4
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.17.65.61",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.17.65.0/24",
                     "ifIndex": 4
                 }
             ]

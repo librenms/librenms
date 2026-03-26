@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Sensor;
+use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Validation\Rule;
+use LibreNMS\Enum\SensorState;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Url;
@@ -21,7 +23,8 @@ class SensorsController extends TableController
     {
         return [
             'view' => Rule::in(['detail', 'graphs']),
-            'class' => Rule::in(Sensor::getTypes()),
+            'class' => Rule::in(array_merge(\LibreNMS\Enum\Sensor::values(), ['all'])),
+            'status' => 'nullable|string',
         ];
     }
 
@@ -40,6 +43,7 @@ class SensorsController extends TableController
     {
         return [
             'hostname',
+            'display',
             'sensor_descr',
             'sensor_current',
         ];
@@ -48,29 +52,46 @@ class SensorsController extends TableController
     protected function baseQuery(Request $request): Builder
     {
         $class = $request->input('class');
+        $status = $request->input('status');
         $relations = [];
-        if ($class == 'state') {
+        if ($class == 'state' || $class == 'all') {
             $relations[] = 'translations';
         }
 
         return Sensor::query()
             ->hasAccess($request->user())
-            ->where('sensor_class', $class)
-            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'sensors.device_id'))
+            ->when($request->input('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'sensors.device_id'))
+            ->when($class != 'all', fn ($q) => $q->where('sensor_class', $class))
             ->with($relations)
-            ->withAggregate('device', 'hostname');
+            ->withAggregate('device', 'hostname')
+            ->when($status == 'unknown', fn ($q) => (new Sensor)->scopeStateUnknown($q))
+            ->when($status == 'alert', fn ($q) => $q->where('sensor_alert', 1))
+            ->when(in_array($status, ['alert', 'error']), function ($q): void {
+                $q->where(function ($q): void {
+                    (new Sensor)->scopeIsCritical($q)
+                        ->orWhere(fn ($q) => (new Sensor)->scopeStateEq($q, SensorState::Error));
+                });
+            })
+            ->when($status == 'warning', function ($q): void {
+                $q->where(function ($q): void {
+                    (new Sensor)->scopeStateEq($q, SensorState::Warning)
+                        ->orWhere(function ($q): void {
+                            $q->whereNot(fn ($q) => (new Sensor)->scopeIsCritical($q));
+                            (new Sensor)->scopeIsWarning($q);
+                        });
+                });
+            });
     }
 
     /**
-     * @param  Sensor  $sensor
+     * @param  Sensor|WirelessSensor  $sensor
      */
     public function formatItem($sensor): array
     {
         $request = \Illuminate\Support\Facades\Request::instance();
-        $graph_type = 'sensor_' . $request->input('class');
         $graph_array = [
-            'type' => $graph_type,
-            'popup_title' => htmlentities(strip_tags($sensor->device->displayName() . ': ' . $sensor->sensor_descr)),
+            'type' => $sensor->getGraphType(),
+            'popup_title' => htmlentities(strip_tags($sensor->device?->displayName() . ': ' . $sensor->sensor_descr)),
             'id' => $sensor->sensor_id,
             'from' => '-1d',
             'height' => 20,
@@ -78,9 +99,10 @@ class SensorsController extends TableController
         ];
 
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $sensor->device]);
-        $link = Url::generate(['page' => 'device', 'device' => $sensor['device_id'], 'tab' => 'health', 'metric' => $sensor->sensor_class]);
+        $sensor_class = $sensor->sensor_class instanceof \BackedEnum ? $sensor->sensor_class->value : $sensor->sensor_class;
+        $link = Url::generate(['page' => 'device', 'device' => $sensor['device_id'], 'tab' => 'health', 'metric' => $sensor_class]);
         $descr = Url::graphPopup($graph_array, $sensor->sensor_descr, $link);
-        $mini_graph = Url::graphPopup($graph_array, null, $link);
+        $mini_graph = Url::graphPopup($graph_array);
         $sensor_current = Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
         $alert = $sensor->currentStatus() == Severity::Error ? '<i class="fa fa-flag fa-lg" style="color:red" aria-hidden="true"></i>' : '';
 
@@ -125,7 +147,7 @@ class SensorsController extends TableController
     /**
      * Format a row for CSV export
      *
-     * @param  Sensor  $sensor
+     * @param  Sensor|WirelessSensor  $sensor
      * @return array
      */
     protected function formatExportRow($sensor)
@@ -136,7 +158,7 @@ class SensorsController extends TableController
             $sensor->formatValue(),
             $sensor->formatValue('sensor_limit_low'),
             $sensor->formatValue('sensor_limit'),
-            $sensor->sensor_class,
+            $sensor->sensor_class instanceof \BackedEnum ? $sensor->sensor_class->value : $sensor->sensor_class,
             $sensor->sensor_type,
         ];
     }

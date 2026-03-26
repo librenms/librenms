@@ -26,12 +26,17 @@
 
 namespace App\Models;
 
+use App\Facades\LibrenmsConfig;
+use App\Models\Traits\HasThresholds;
 use Illuminate\Support\Arr;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
 class WirelessSensor extends DeviceRelatedModel implements Keyable
 {
+    use HasThresholds;
+
     const CREATED_AT = null;
     const UPDATED_AT = 'lastupdate';
     protected $primaryKey = 'sensor_id';
@@ -60,11 +65,12 @@ class WirelessSensor extends DeviceRelatedModel implements Keyable
     ];
 
     /**
-     * @return array{sensor_oids: 'array'}
+     * @return array{sensor_class: 'LibreNMS\Enum\WirelessSensorType', sensor_oids: 'array'}
      */
     protected function casts(): array
     {
         return [
+            'sensor_class' => WirelessSensorType::class,
             'sensor_oids' => 'array',
         ];
     }
@@ -73,19 +79,48 @@ class WirelessSensor extends DeviceRelatedModel implements Keyable
 
     public function classDescr()
     {
-        return __("wireless.$this->sensor_class.short");
+        return __('wireless.' . $this->sensor_class->value . '.short');
     }
 
-    public function icon()
+    public function icon(): string
     {
-        return collect(collect(\LibreNMS\Device\WirelessSensor::getTypes())
-            ->get($this->sensor_class, []))
-            ->get('icon', 'signal');
+        return $this->sensor_class->icon();
+    }
+
+    public function unit(): string
+    {
+        return __('wireless.' . $this->sensor_class->value . '.unit');
+    }
+
+    public function getGraphType(): string
+    {
+        return 'wireless_' . $this->sensor_class->value;
+    }
+
+    public function formatValue($field = 'sensor_current'): string
+    {
+        $value = $this->$field;
+
+        if ($value === null) {
+            return $field == 'sensor_current' ? 'NaN' : '-';
+        }
+
+        if (in_array($this->rrd_type, ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
+            //compute and display an approx rate for this sensor
+            $value = Number::formatSi(max(0, $value - $this->sensor_prev) / LibrenmsConfig::get('rrd.step', 300), 2, 3, '');
+        }
+
+        return match ($this->sensor_class) {
+            WirelessSensorType::Power, WirelessSensorType::Rate => Number::formatSi($value, 3, 0, $this->unit()),
+            WirelessSensorType::Frequency => Number::formatSi($value * 1000000, 3, 0, 'Hz'),
+            WirelessSensorType::Distance => Number::formatSi($value * 1000, 2, 3, 'm'),
+            default => $value . ' ' . $this->unit(),
+        };
     }
 
     public function getCompositeKey(): string
     {
-        return "$this->sensor_class-$this->sensor_type-$this->sensor_index";
+        return "{$this->sensor_class->value}-$this->sensor_type-$this->sensor_index";
     }
 
     public function fillValue(array $values): self
@@ -111,7 +146,7 @@ class WirelessSensor extends DeviceRelatedModel implements Keyable
         $sensor_value = Number::extract($sensor_value);
 
         if ($this->sensor_divisor) {
-            $sensor_value = $sensor_value / $this->sensor_divisor;
+            $sensor_value /= $this->sensor_divisor;
         }
 
         $this->sensor_current = $sensor_value * $this->sensor_multiplier;

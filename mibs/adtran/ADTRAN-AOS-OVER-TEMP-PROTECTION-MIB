@@ -11,7 +11,7 @@ IMPORTS
         FROM ADTRAN-AOS;
 
 adGenAOSOverTempProtectionMib MODULE-IDENTITY
-    LAST-UPDATED "201411041615Z"
+    LAST-UPDATED "201712270000Z"
     ORGANIZATION "ADTRAN, Inc."
     CONTACT-INFO
            "        Technical Support Dept.
@@ -24,6 +24,9 @@ adGenAOSOverTempProtectionMib MODULE-IDENTITY
             E-mail: support@adtran.com"
     DESCRIPTION
             "The MIB module defines over-temperature configuration information and traps for AdtranOS products."
+    REVISION "201712270000Z"  -- December 27, 2017 / YYYYMMDDHHMMZ
+    DESCRIPTION
+            "OverTempProtection resume traps added."
     REVISION "201411041615Z"  -- November 4, 2014 / YYYYMMDDHHMMZ
     DESCRIPTION
             "Created the adGenAosOverTempProtection MIB. Revision R11.6"
@@ -45,6 +48,18 @@ adGenAOSOverTempProtectionShutdown NOTIFICATION-TYPE
     DESCRIPTION
             "An over-temperature shutdown trap signifies that the shutdown temperature threshold has been exceeded, and the unit will restart into low-power mode."
     ::= { adGenAOSOverTempProtectionTrap 2 }
+
+adGenAOSOverTempProtectionWarningResume NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "An over-temperature warning resume trap signifies that the warning temperature threshold has been resumed back to normal."
+    ::= { adGenAOSOverTempProtectionTrap 3 }
+
+adGenAOSOverTempProtectionShutdownResume NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "An over-temperature shutdown resume trap signifies that the shutdown temperature threshold has been resumed, and the unit has come back to normal mode from low-power mode."
+    ::= { adGenAOSOverTempProtectionTrap 4 }
     
     ------------------------------------------------------------
 -- Conformance information
@@ -79,7 +94,10 @@ adGenAOSOverTempProtectionCompliances OBJECT IDENTIFIER
             ::= { adGenAOSOverTempProtectionCompliances 1 }
  	
      adGenAOSOverTempProtectionNotificationGroup NOTIFICATION-GROUP
-         NOTIFICATIONS { adGenAOSOverTempProtectionWarning, adGenAOSOverTempProtectionShutdown }
+         NOTIFICATIONS { adGenAOSOverTempProtectionWarning, 
+                         adGenAOSOverTempProtectionShutdown,
+                         adGenAOSOverTempProtectionWarningResume,
+                         adGenAOSOverTempProtectionShutdownResume }        
          STATUS  current
          DESCRIPTION
             "Traps which may be used to enhance event driven

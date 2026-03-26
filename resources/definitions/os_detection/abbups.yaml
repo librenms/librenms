@@ -1,0 +1,19 @@
+os: abbups
+text: ABB UPS
+group: ups
+type: power
+icon: abb
+mib_dir: abb
+rfc1628_compat: true
+over:
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_current, text: Current }
+    - { graph: device_frequency, text: Load }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: .1.3.6.1.4.1.53973.1.1.1.1.1.1.0
+            op: contains
+            value: ABB

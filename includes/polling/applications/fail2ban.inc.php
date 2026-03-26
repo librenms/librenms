@@ -11,7 +11,7 @@ try {
     $f2b = json_app_get($device, $name);
 } catch (JsonAppParsingFailedException $e) {
     // Legacy script, build compatible array
-    $legacy = explode("\n", $e->getOutput());
+    $legacy = explode("\n", (string) $e->getOutput());
     $f2b = [
         'data' => [
             'total' => array_shift($legacy), // total was first line in legacy app
@@ -43,7 +43,7 @@ $rrd_def = RrdDefinition::make()
 
 $fields = ['banned' => $f2b['total']];
 $metrics['total'] = $fields; // don't include legacy ds in db
-$fields['firewalled'] = 'U'; // legacy ds
+$fields['firewalled'] = null; // legacy ds
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 app('Datastore')->put($device, 'app', $tags, $fields);

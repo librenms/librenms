@@ -1,0 +1,12 @@
+os: vertiv-ita2
+text: 'ITA2'
+type: power
+icon: vertiv
+group: vertiv
+mib_dir: vertiv
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.13400.2.54
+over:
+    - { graph: device_runtime, text: 'Battery Runtime' }
+    - { graph: device_charge, text: 'Battery %' }

@@ -4,8 +4,6 @@
 -- * June 2020, Cliff Hones
 -- *
 -- * Copyright (c) 2020 by Andrews & Arnold
--- * 
--- * See the Firebrick Manuals for more information
 -- *------------------------------------------------
 
 FIREBRICK-CPU-MIB DEFINITIONS ::= BEGIN
@@ -24,11 +22,11 @@ IMPORTS
     OBJECT-GROUP
         FROM SNMPv2-CONF
     firebrickNewStyle
-	FROM FIREBRICK-MIB
+        FROM FIREBRICK-MIB
         ;
 
 fbCpuMib MODULE-IDENTITY
-    LAST-UPDATED "202006170000Z"
+    LAST-UPDATED "202207150000Z"
     ORGANIZATION "Andrews & Arnold Limited"
     CONTACT-INFO
         "Andrews & Arnold
@@ -38,8 +36,9 @@ fbCpuMib MODULE-IDENTITY
 
         Tel: +44 3333 400 999
         Email: support@aa.net.uk"
-    DESCRIPTION
-        "This is a MIB Module for monitoring Firebrick CPU usage."
+    DESCRIPTION "Firebrick CPU usage"
+    REVISION "202207150000Z"
+    DESCRIPTION "Additional validation"
     REVISION "202006170000Z"
     DESCRIPTION "Initial version of this MIB module"
     ::= { firebrickNewStyle 2 }
@@ -49,7 +48,7 @@ fbCpuUsageTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table of CPU usage for this Firebrick"
+        "CPU usage for this Firebrick"
     ::= { fbCpuMib 1 }
 
 fbCpuUsageEntry OBJECT-TYPE
@@ -76,7 +75,8 @@ fbCpuPeriod OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The period in minutes covered by this table entry.
-         Zero indicates that an instantaneous value is required."
+         Zero indicates that an instantaneous value is required.
+         Max is 30 minutes."
     ::= { fbCpuUsageEntry 5 }
 
 fbCpuCore OBJECT-TYPE
@@ -85,7 +85,7 @@ fbCpuCore OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The CPU core number covered by this table entry.
-	 The numbering starts at 1, so CPU0 (CORE) is 1 and CPU1 (NET) is 2."
+         The numbering starts at 1, so CPU0 1, CPU1 is 2 etc."
     ::= { fbCpuUsageEntry 6 }
 
 fbCpuIRQ OBJECT-TYPE
@@ -94,8 +94,8 @@ fbCpuIRQ OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The percentage of CPU time spent in interrupt processing for this period.
-	 If period is 0 the instantaneous usage in the last second is used.
-	 Units are 100ths of a percent, so 10000 indicates 100%."
+         If period is 0 the instantaneous usage in the last second is used.
+         Units are 100ths of a percent, so 10000 indicates 100%."
     ::= { fbCpuUsageEntry 1 }
 
 fbCpuAll OBJECT-TYPE
@@ -104,8 +104,8 @@ fbCpuAll OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The total percentage of CPU time spent non-idle for this period.
-	 If period is 0 the instantaneous usage in the last second is used.
-	 Units are 100ths of a percent, so 10000 indicates 100%."
+         If period is 0 the instantaneous usage in the last second is used.
+         Units are 100ths of a percent, so 10000 indicates 100%."
     ::= { fbCpuUsageEntry 2 }
 
 fbCpuIRQPeak OBJECT-TYPE
@@ -114,8 +114,8 @@ fbCpuIRQPeak OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The peak percentage of CPU time in interrupt processing during this period.
-	 If period is 0 the peak usage in the current minute is used.
-	 Units are 100ths of a percent, so 10000 indicates 100%."
+         If period is 0 the peak usage in the current minute is used.
+         Units are 100ths of a percent, so 10000 indicates 100%."
     ::= { fbCpuUsageEntry 3 }
 
 fbCpuAllPeak OBJECT-TYPE
@@ -124,7 +124,7 @@ fbCpuAllPeak OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The peak percentage of CPU time non-idle during this period.
-	 If period is 0 the peak usage in the current minute is used.
-	 Units are 100ths of a percent, so 10000 indicates 100%."
+         If period is 0 the peak usage in the current minute is used.
+         Units are 100ths of a percent, so 10000 indicates 100%."
     ::= { fbCpuUsageEntry 4 }
 END

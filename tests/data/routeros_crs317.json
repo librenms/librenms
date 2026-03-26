@@ -5795,6 +5795,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -5969,6 +5970,19 @@
                     "ipv6_origin": "other",
                     "context_name": "",
                     "ipv6_network": null,
+                    "ifIndex": 18
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.10.12.2",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.10.12.0/24",
                     "ifIndex": 18
                 }
             ]

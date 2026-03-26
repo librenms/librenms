@@ -40,12 +40,11 @@ use Symfony\Component\Yaml\Yaml;
 
 class LegacyModule implements Module
 {
-    /** @var array */
-    private $module_deps = [
+    private array $module_deps = [
         'arp-table' => ['ports'],
         'bgp-peers' => ['ports', 'vrf', 'ipv4-addresses', 'ipv6-addresses'],
-        'cisco-mac-accounting' => ['ports'],
         'fdb-table' => ['ports', 'vlans'],
+        'transceivers' => ['ports'],
         'vlans' => ['ports'],
         'vrf' => ['ports'],
     ];
@@ -58,14 +57,8 @@ class LegacyModule implements Module
         return $this->module_deps[$this->name] ?? [];
     }
 
-    /**
-     * @var string
-     */
-    private $name;
-
-    public function __construct(string $name)
+    public function __construct(private readonly string $name)
     {
-        $this->name = $name;
     }
 
     public function shouldDiscover(OS $os, ModuleStatus $status): bool
@@ -82,6 +75,7 @@ class LegacyModule implements Module
         }
 
         $device = &$os->getDeviceArray();
+        $module = $this->name;
         Debug::disableErrorReporting(); // ignore errors in legacy code
 
         include_once base_path('includes/dbFacile.php');
@@ -106,13 +100,10 @@ class LegacyModule implements Module
         }
 
         $device = &$os->getDeviceArray();
-        Debug::disableErrorReporting(); // ignore errors in legacy code
 
         include_once base_path('includes/dbFacile.php');
         include_once base_path('includes/rewrites.php');
         include base_path("includes/polling/$this->name.inc.php");
-
-        Debug::enableErrorReporting(); // and back to normal
     }
 
     public function dataExists(Device $device): bool
@@ -165,8 +156,8 @@ class LegacyModule implements Module
 
                     $default_select = [];
                 } else {
-                    [$left, $lkey] = explode('.', $join_info['left']);
-                    [$right, $rkey] = explode('.', $join_info['right']);
+                    [$left, $lkey] = explode('.', (string) $join_info['left']);
+                    [$right, $rkey] = explode('.', (string) $join_info['right']);
                     $join .= " LEFT JOIN `$right` ON (`$left`.`$lkey` = `$right`.`$rkey`)";
 
                     $default_select = ["`$right`.*"];
@@ -188,14 +179,10 @@ class LegacyModule implements Module
             // remove unwanted fields
             if (isset($info['included_fields'])) {
                 $keys = array_flip($info['included_fields']);
-                $rows = array_map(function ($row) use ($keys) {
-                    return array_intersect_key((array) $row, $keys);
-                }, $rows);
+                $rows = array_map(fn ($row) => array_intersect_key((array) $row, $keys), $rows);
             } elseif (isset($info['excluded_fields'])) {
                 $keys = array_flip($info['excluded_fields']);
-                $rows = array_map(function ($row) use ($keys) {
-                    return array_diff_key((array) $row, $keys);
-                }, $rows);
+                $rows = array_map(fn ($row) => array_diff_key((array) $row, $keys), $rows);
             }
 
             $data[$table] = $rows;
@@ -219,9 +206,7 @@ class LegacyModule implements Module
     private function collectComponents(int $device_id): array
     {
         $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
-        $components = Arr::sort($components, function ($item) {
-            return $item['type'] . $item['label'];
-        });
+        $components = Arr::sort($components, fn ($item) => $item['type'] . $item['label']);
 
         return array_values($components);
     }

@@ -63,6 +63,7 @@ return [
             'graphite' => ['name' => 'Datastore: Graphite'],
             'influxdb' => ['name' => 'Datastore: InfluxDB'],
             'influxdbv2' => ['name' => 'Datastore: InfluxDBv2'],
+            'kafka' => ['name' => 'Datastore: Kafka'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Datastore: Prometheus'],
@@ -614,8 +615,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -1033,9 +1034,21 @@ return [
                 'description' => 'Nome de Usuário',
                 'help' => 'Nome de usuário para conectar ao InfluxDB, se necessário',
             ],
+            'batch_size' => [
+                'description' => 'Batch Size',
+                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+            ],
+            'measurements' => [
+                'description' => 'Measurements',
+                'help' => 'List of measurements to send to InfluxDB, leave empty to send all',
+            ],
             'verifySSL' => [
                 'description' => 'Verificar SSL',
                 'help' => 'Verificar se o certificado SSL é válido e confiável',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
             ],
         ],
         'influxdbv2' => [
@@ -1102,6 +1115,122 @@ return [
             'max_retry' => [
                 'description' => 'Número máximo de tentativas',
                 'help' => 'Quantidade de tentativas a serem realizadas',
+            ],
+        ],
+        'kafka' => [
+            'enable' => [
+                'description' => 'Habilitar',
+                'help' => 'Exporta métricas para o Kafka usando o idealo/php-rdkafka-ffi',
+            ],
+            'groups-exclude' => [
+                'description' => 'Identificador de Grupos de dispositivos excluídos',
+                'help' => 'Identificador de Grupos de dispositivos excluídos do envio de dados para o Kafka.',
+            ],
+            'measurement-exclude' => [
+                'description' => 'Medições excluídas',
+                'help' => 'Módulos de descoberta a serem excluídos do envio para o kafka.',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'Habilita logs detalhados sobre o processo interno de armazenamento do kafka',
+            ],
+            'security' => [
+                'debug' => [
+                    'description' => 'Debug de Segurança',
+                    'help' => 'Mostrar informações mais detalhadas sobre comunicação de segurança com brokers Kafka',
+                ],
+            ],
+            'broker' => [
+                'list' => [
+                    'description' => 'Lista de servidores Kafka Brokers no formato host!:porta',
+                    'help' => 'Lista de brokers kafka no formato host!:porta. https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md',
+                ],
+            ],
+            'idempotence' => [
+                'description' => 'Idempotência',
+                'help' => 'Quando definido como verdadeiro, o produtor garantirá que as mensagens sejam produzidas com sucesso exatamente uma vez e na ordem de produção original',
+            ],
+            'topic' => [
+                'description' => 'Tópico',
+                'help' => 'As categorias usadas para organizar mensagens',
+            ],
+            'ssl' => [
+                'enable' => [
+                    'description' => 'Habilitar SSL',
+                    'help' => 'Habilita suporte SSL no Kafka',
+                ],
+                'protocol' => [
+                    'description' => 'Protocolo SSL',
+                    'help' => 'Protocolo usado para comunicar com brokers',
+                ],
+                'ca' => [
+                    'location' => [
+                        'description' => 'Localização da Autoridade Certificadora SSL',
+                        'help' => 'Caminho do arquivo ou diretório para certificado(s) CA para verificar a chave do broker.',
+                    ],
+                ],
+                'certificate' => [
+                    'location' => [
+                        'description' => 'Localização do Certificado SSL',
+                        'help' => 'Caminho para a chave pública do cliente (PEM) usada para autenticação.',
+                    ],
+                ],
+                'key' => [
+                    'location' => [
+                        'description' => 'Localização da Chave do Certificado SSL',
+                        'help' => 'Caminho para a chave privada do cliente (PEM) usada para autenticação.',
+                    ],
+                    'password' => [
+                        'description' => 'Senha da Chave do Certificado SSL',
+                        'help' => 'Frase secreta da chave privada (para ser usada com kafka.ssl.key.location).',
+                    ],
+                ],
+                'keystore' => [
+                    'location' => [
+                        'description' => 'Localização do Certificado Keystore SSL',
+                        'help' => 'Caminho para o keystore do cliente (PKCS#12) usado para autenticação.',
+                    ],
+                    'password' => [
+                        'description' => 'Senha da Chave Keystore SSL',
+                        'help' => 'Senha do keystore do cliente (PKCS#12).',
+                    ],
+                ],
+            ],
+            'flush' => [
+                'timeout' => [
+                    'description' => 'Timeout de Flush do Kafka',
+                    'help' => 'Kafka aguarda este timeout para descarregar mensagens na fila',
+                ],
+            ],
+            'buffer' => [
+                'max' => [
+                    'message' => [
+                        'description' => 'Número máximo de mensagens no buffer do Kafka mantidas na memória do poller',
+                        'help' => 'Número máximo permitido de mensagens no buffer do Kafka mantidas na memória do poller',
+                    ],
+                ],
+            ],
+            'batch' => [
+                'max' => [
+                    'message' => [
+                        'description' => 'Número máximo de mensagens em lote do Kafka enviadas a cada chamada para os servidores kafka',
+                        'help' => 'Número máximo de mensagens em lote do Kafka enviadas a cada chamada para os servidores kafka',
+                    ],
+                ],
+            ],
+            'linger' => [
+                'ms' => [
+                    'description' => 'Tempo de espera do Kafka em ms para acumular mensagens na memória do poller antes de enviar o lote',
+                    'help' => 'Tempo de espera do Kafka em ms para acumular mensagens na memória do poller antes de enviar o lote',
+                ],
+            ],
+            'request' => [
+                'required' => [
+                    'acks' => [
+                        'description' => 'Confirmações obrigatórias de requisição do Kafka',
+                        'help' => 'Confirmações obrigatórias de requisição do Kafka',
+                    ],
+                ],
             ],
         ],
         'ipmitool' => [
@@ -1187,9 +1316,6 @@ return [
         'nfsen_suffix' => [
             'description' => 'Sufixo do Nome do Arquivo',
             'help' => 'Isso é muito importante, pois os nomes dos dispositivos no NfSen são limitados a 21 caracteres. Isso significa que nomes de domínio completos para dispositivos podem ser muito problemáticos para encaixar, então, geralmente, esse pedaço é removido.',
-        ],
-        'nmap' => [
-            'description' => 'Caminho para nmap',
         ],
         'no_proxy' => [
             'description' => 'Exceções de Proxy',
@@ -1368,8 +1494,8 @@ return [
             'slas' => [
                 'description' => 'Rastreamento de Acordo de Nível de Serviço',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cipsec-tunnels' => [
                 'description' => 'Túneis Cipsec',
@@ -1582,7 +1708,7 @@ return [
                 'help' => 'Método de agendamento de tarefas de descoberta. O modo legado usará cron se a entrada do crontab existir e o serviço de dispatcher se a opção de configuração legada service_discovery_enabled estiver definida como verdadeiro.',
                 'options' => [
                     'legacy' => 'Legado (Irrestrito)',
-                    'cron' => 'Cron (discovery.php)',
+                    'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Serviço de Dispatcher',
                 ],
             ],
@@ -1678,9 +1804,6 @@ return [
         'service_watchdog_log' => [
             'description' => 'Arquivo de Log a ser Monitorado',
             'help' => 'O padrão é o arquivo de log do LibreNMS. Valor padrão para todos os nós.',
-        ],
-        'sfdp' => [
-            'description' => 'Caminho para sfdp',
         ],
         'shorthost_target_length' => [
             'description' => 'Comprimento máximo do nome de host encurtado',
@@ -1905,9 +2028,6 @@ return [
         'device_location_map_show_device_dependencies' => [
             'description' => 'Exibir dependências dos dispositivos no mapa de localização',
             'help' => 'Exibir links entre dispositivos no mapa de localização com base nas dependências dos pais',
-        ],
-        'whois' => [
-            'description' => 'Caminho para whois',
         ],
         'smokeping.integration' => [
             'description' => 'Habilitar',

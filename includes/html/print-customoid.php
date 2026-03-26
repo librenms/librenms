@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Gate as Gate;
+
 require_once 'includes/html/modal/new_customoid.inc.php';
 require_once 'includes/html/modal/delete_customoid.inc.php';
 
@@ -40,9 +42,13 @@ if (isset($_POST['num_of_rows']) && $_POST['num_of_rows'] > 0) {
 
 <?php
 echo '<tr>
-<td colspan="4">
-<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-oid-form" data-device_id="' . $device['device_id'] . '"' . (Auth::user()->hasGlobalAdmin() ? '' : ' disabled') . '><i class="fa fa-plus"></i> Add New OID</button>
-</td>
+<td colspan="4">';
+
+if (Gate::allows('customoid.create')) {
+    echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-oid-form" data-device_id="' . $device['device_id'] . '"><i class="fa fa-plus"></i> Add New OID</button>';
+}
+
+echo '</td>
 <th><small>High</small></th>
 <th><small>Low</small></th>
 <th><small>High</small></th>
@@ -84,20 +90,20 @@ $full_query = "SELECT * $query $where ORDER BY customoid_descr ASC LIMIT $start,
 
 foreach (dbFetchRows($full_query, $param) as $oid) {
     echo "<tr class='" . $oid['customoid_id'] . "' id='row_" . $oid['customoid_id'] . "'>";
-    echo '<td>' . htmlentities($oid['customoid_descr']) . '</td>';
-    echo '<td>' . htmlentities($oid['customoid_oid']) . '</td>';
-    echo '<td>' . htmlentities($oid['customoid_current']) . '</td>';
-    echo '<td>' . htmlentities($oid['customoid_unit']) . '</td>';
-    echo '<td>' . htmlentities($oid['customoid_limit']) . '</td>';
-    echo '<td>' . htmlentities($oid['customoid_limit_low']) . '</td>';
-    echo '<td>' . htmlentities($oid['customoid_limit_warn']) . '</td>';
-    echo '<td>' . htmlentities($oid['customoid_limit_low_warn']) . '</td>';
+    echo '<td>' . htmlentities((string) $oid['customoid_descr']) . '</td>';
+    echo '<td>' . htmlentities((string) $oid['customoid_oid']) . '</td>';
+    echo '<td>' . htmlentities((string) $oid['customoid_current']) . '</td>';
+    echo '<td>' . htmlentities((string) $oid['customoid_unit']) . '</td>';
+    echo '<td>' . htmlentities((string) $oid['customoid_limit']) . '</td>';
+    echo '<td>' . htmlentities((string) $oid['customoid_limit_low']) . '</td>';
+    echo '<td>' . htmlentities((string) $oid['customoid_limit_warn']) . '</td>';
+    echo '<td>' . htmlentities((string) $oid['customoid_limit_low_warn']) . '</td>';
     echo "<td><input id='" . $oid['customoid_id'] . "' type='checkbox' name='alert'" . ($oid['customoid_alert'] ? ' checked' : '') . ' disabled></td>';
     echo "<td><input id='" . $oid['customoid_id'] . "' type='checkbox' name='passed'" . ($oid['customoid_passed'] ? ' checked' : '') . ' disabled></td>';
     echo '<td>';
     echo "<div class='btn-group btn-group-sm' role='group'>";
-    echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#create-oid-form' data-customoid_id='" . $oid['customoid_id'] . "' name='edit-oid' data-content='' data-container='body'" . (Auth::user()->hasGlobalAdmin() ? '' : ' disabled') . "><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button>";
-    echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#delete-oid-form' data-customoid_id='" . $oid['customoid_id'] . "' name='delete-oid' data-content='' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'" . (Auth::user()->hasGlobalAdmin() ? '' : ' disabled') . '></i></button>';
+    echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#create-oid-form' data-customoid_id='" . $oid['customoid_id'] . "' name='edit-oid' data-content='' data-container='body'" . (Gate::allows('customoid.update') ? '' : ' disabled') . "><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button>";
+    echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-toggle='modal' data-target='#delete-oid-form' data-customoid_id='" . $oid['customoid_id'] . "' name='delete-oid' data-content='' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'" . (Gate::allows('customoid.delete') ? '' : ' disabled') . '></i></button>';
     echo '</div>';
     echo '</td>';
     echo "</tr>\r\n";
@@ -112,7 +118,7 @@ if (($count % $rows) > 0) {
 echo '</table>
 </div>
 <input type="hidden" name="page_num" id="page_num" value="' . htmlspecialchars($page_num) . '">
-<input type="hidden" name="num_of_rows" id="num_of_rows" value="' . htmlspecialchars($rows) . '">
+<input type="hidden" name="num_of_rows" id="num_of_rows" value="' . htmlspecialchars((string) $rows) . '">
 </form>';
 
 ?>

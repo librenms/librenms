@@ -26,13 +26,15 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Config;
+use Illuminate\Support\Facades\Gate;
+use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
@@ -99,23 +101,23 @@ class DeviceController extends TableController
             ->withCount(['ports', 'sensors', 'wirelessSensors']);
 
         // if searching or sorting the location field, join the locations table
-        if ($request->get('searchPhrase') || in_array('location', array_keys($request->get('sort', [])))) {
+        if ($request->input('searchPhrase') || in_array('location', array_keys($request->input('sort', [])))) {
             $query->leftJoin('locations', 'locations.id', 'devices.location_id');
         }
 
         // filter device group, not sure this is the most efficient query
-        if ($group = $request->get('group')) {
+        if ($group = $request->input('group')) {
             if ($group == 'none') {
                 $query->whereDoesntHave('groups');
             } else {
-                $query->whereHas('groups', function ($query) use ($group) {
+                $query->whereHas('groups', function ($query) use ($group): void {
                     $query->where('id', $group);
                 });
             }
         }
 
-        if ($request->get('poller_group') !== null) {
-            $query->where('poller_group', $request->get('poller_group'));
+        if ($request->input('poller_group') !== null) {
+            $query->where('poller_group', $request->input('poller_group'));
         }
 
         return $query;
@@ -149,37 +151,27 @@ class DeviceController extends TableController
      */
     public function formatItem($device)
     {
+        $deviceStatus = $device->getDeviceStatus();
+        $status = match ($deviceStatus) {
+            DeviceStatus::Down, DeviceStatus::NeverPolled => 'down',
+            DeviceStatus::IgnoredUp, DeviceStatus::Up => 'up',
+            DeviceStatus::IgnoredDown, DeviceStatus::Disabled => 'disabled',
+        };
+
         return [
             'extra' => $this->getLabel($device),
-            'status' => $this->getStatus($device),
+            'status' => $status,
             'maintenance' => $device->isUnderMaintenance(),
-            'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
-            'hostname' => $this->getHostname($device),
+            'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo((string) $device->icon, PATHINFO_FILENAME) . '">',
+            'hostname' => Url::modernDeviceLink($device, extra: $this->isDetailed() ? $device->name() : ''),
             'metrics' => $this->getMetrics($device),
             'hardware' => htmlspecialchars(Rewrite::ciscoHardware($device)),
             'os' => $this->getOsText($device),
-            'uptime' => (! $device->status && ! $device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : (int) $device->downSince()->diffInSeconds(null, true), true),
+            'uptime' => $deviceStatus == DeviceStatus::NeverPolled ? __('device.never_polled') : Time::formatInterval($device->status ? $device->uptime : (int) $device->downSince()->diffInSeconds(null, true), true),
             'location' => htmlspecialchars($this->getLocation($device)),
             'actions' => view('device.actions', ['actions' => $this->getActions($device)])->__toString(),
             'device_id' => $device->device_id,
         ];
-    }
-
-    /**
-     * Get the device up/down status
-     *
-     * @param  Device  $device
-     * @return string
-     */
-    private function getStatus($device)
-    {
-        if ($device->disabled == 1) {
-            return 'disabled';
-        } elseif ($device->status == 0) {
-            return 'down';
-        }
-
-        return 'up';
     }
 
     /**
@@ -199,7 +191,7 @@ class DeviceController extends TableController
         } elseif ($device->status == 0) {
             return 'label-danger';
         } else {
-            $warning_time = Config::get('uptime_warning', 86400);
+            $warning_time = LibrenmsConfig::get('uptime_warning', 86400);
             if ($device->uptime < $warning_time && $device->uptime != 0) {
                 return 'label-warning';
             }
@@ -212,21 +204,9 @@ class DeviceController extends TableController
      * @param  Device  $device
      * @return string
      */
-    private function getHostname($device)
-    {
-        return (string) view('device.list.hostname', [
-            'device' => $device,
-            'detailed' => $this->isDetailed(),
-        ]);
-    }
-
-    /**
-     * @param  Device  $device
-     * @return string
-     */
     private function getOsText($device)
     {
-        $os_text = htmlspecialchars(Config::getOsSetting($device->os, 'text'));
+        $os_text = htmlspecialchars(LibrenmsConfig::getOsSetting($device->os, 'text'));
 
         if ($this->isDetailed()) {
             $os_text .= '<br />' . htmlspecialchars($device->version . ($device->features ? " ($device->features)" : ''));
@@ -243,7 +223,7 @@ class DeviceController extends TableController
     {
         $port_count = $device->ports_count;
         $sensor_count = $device->sensors_count;
-        $wireless_count = $device->wirelessSensors_count;
+        $wireless_count = $device->wireless_sensors_count;
 
         $metrics = [];
         if ($port_count) {
@@ -312,7 +292,7 @@ class DeviceController extends TableController
             ],
         ];
 
-        if (\Auth::user()->hasGlobalAdmin()) {
+        if (Gate::allows('update', Device::class)) {
             $actions[0][] = [
                 'title' => 'Edit device',
                 'href' => Url::deviceUrl($device, ['tab' => 'edit']),
@@ -329,8 +309,8 @@ class DeviceController extends TableController
         ];
 
         $ssh_href = 'ssh://' . $device->hostname;
-        if ($server = Config::get('gateone.server')) {
-            $ssh_href = Config::get('gateone.use_librenms_user')
+        if ($server = LibrenmsConfig::get('gateone.server')) {
+            $ssh_href = LibrenmsConfig::get('gateone.use_librenms_user')
                 ? $server . '?ssh=ssh://' . Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname
                 : $server . '?ssh=ssh://' . $device->hostname . '&location=' . $device->hostname;
         }
@@ -348,7 +328,7 @@ class DeviceController extends TableController
             'icon' => 'fa-globe',
         ];
 
-        foreach (array_values(Arr::wrap(Config::get('html.device.links'))) as $index => $custom) {
+        foreach (array_values(Arr::wrap(LibrenmsConfig::get('html.device.links'))) as $index => $custom) {
             if ($custom['action'] ?? false) {
                 $row = $this->isDetailed() ? $index % 2 : 0;
                 $custom['href'] = Blade::render($custom['url'], ['device' => $device]);
@@ -404,7 +384,7 @@ class DeviceController extends TableController
             'hostname' => $device->displayName(),
             'ip' => $device->ip,
             'hardware' => Rewrite::ciscoHardware($device),
-            'os' => Config::getOsSetting($device->os, 'text', $device->os),
+            'os' => LibrenmsConfig::getOsSetting($device->os, 'text', $device->os),
             'version' => $device->version,
             'features' => $device->features,
             'location' => $location,

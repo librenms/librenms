@@ -1,4 +1,3 @@
-mib: Brocade-REG-MIB
 modules:
     os:
         serial: ENTITY-MIB::entPhysicalSerialNum.1
@@ -48,6 +47,7 @@ modules:
                 value: SYSTEM-MIB::swSensorStatus
                 num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{{ $index }}'
                 descr: SYSTEM-MIB::swSensorInfo
+                state_name: SYSTEM-MIB::swSensorTable
                 states:
                     - { value: 1, generic: 3, graph: 0, descr: unknown }
                     - { value: 2, generic: 2, graph: 0, descr: faulty }

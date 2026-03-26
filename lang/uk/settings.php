@@ -59,6 +59,7 @@ return [
             'distributed' => ['name' => 'Розподілений опитувач'],
             'graphite' => ['name' => 'Сховище даних: Graphite'],
             'influxdb' => ['name' => 'Сховище даних: InfluxDB'],
+            'kafka' => ['name' => 'Сховище даних: Kafka'],
             'opentsdb' => ['name' => 'Сховище даних: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Сховище даних: Prometheus'],
@@ -465,8 +466,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -849,9 +850,21 @@ return [
                 'description' => 'Користувач',
                 'help' => 'КОристувач для з\'єднання з сервером InfluxDB',
             ],
+            'batch_size' => [
+                'description' => 'Batch Size',
+                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+            ],
+            'measurements' => [
+                'description' => 'Measurements',
+                'help' => 'List of measurements to send to InfluxDB, leave empty to send all',
+            ],
             'verifySSL' => [
                 'description' => 'Перевіряти SSL',
                 'help' => 'Перевіряти чи сертифікат SSL валідний та довірений',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
             ],
         ],
         'ipmitool' => [
@@ -925,9 +938,6 @@ return [
         'nfsen_suffix' => [
             'description' => 'Суфікс імені файлу',
             'help' => 'Важливе налаштування та як імена пристроїв в NfSen обмежені 21 символом. Це значить що повні доменні імена пристроїв можуть не вміщатися, тому дане налаштування зазвичай не використовується.',
-        ],
-        'nmap' => [
-            'description' => 'Шлях до nmap',
         ],
         'opentsdb' => [
             'enable' => [
@@ -1010,9 +1020,6 @@ return [
             'description' => 'Погані інтерфейси',
             'help' => 'Типи мережевих інтерфейсів щр мають бути проігноровані',
         ],
-        'ping' => [
-            'description' => 'Шлях до ping',
-        ],
         'ping_rrd_step' => [
             'description' => 'Частота Ping',
             'help' => 'Частота перевірок. Є значенням за замовчуванням для всіх пристроїв. Увага! При зміні цього значення необхідно ввести додаткоі зміни.  Зверніться до документації Fast Ping.',
@@ -1090,8 +1097,8 @@ return [
             'slas' => [
                 'description' => 'Service Level Agreement Tracking',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cipsec-tunnels' => [
                 'description' => 'Тунелі Cipsec',
@@ -1302,9 +1309,6 @@ return [
             'description' => 'Спостережуваний лог файл',
             'help' => 'За замовчуванням лог файл LibreNMS. Визначає значення за замовчуванням для всіх вузлів.',
         ],
-        'sfdp' => [
-            'description' => 'Шлях до sfdp',
-        ],
         'shorthost_target_length' => [
             'description' => 'Максимальний розмір скороченого імені хоста',
             'help' => 'Скорочує ім\'я хоста до вказаної довжини, при цьому зберігаючи піддомен',
@@ -1508,9 +1512,6 @@ return [
         'device_location_map_open' => [
             'description' => 'Відкрита мапа місцезнаходження',
             'help' => 'Мапа місцезнаходження показана за замовчуванням',
-        ],
-        'whois' => [
-            'description' => 'Шлях до whois',
         ],
         'smokeping.integration' => [
             'description' => 'Увімкнути',

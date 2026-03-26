@@ -26,10 +26,10 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Port;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Config;
 use LibreNMS\Util\Html;
 
 class CustomersController extends TableController
@@ -136,6 +136,6 @@ class CustomersController extends TableController
 
     private function getTypeStrings()
     {
-        return Arr::wrap(Config::get('customers_descr', ['cust']));
+        return Arr::wrap(LibrenmsConfig::get('customers_descr', ['cust']));
     }
 }

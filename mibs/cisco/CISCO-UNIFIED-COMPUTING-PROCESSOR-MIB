@@ -4,9 +4,9 @@
 -- MIB representation of the Cisco Unified Computing System
 -- PROCESSOR management information model package
 -- 
--- Created October 2017 by Charles Bullis
+-- Created July 2018 by Charles Bullis
 -- 
--- Copyright (c) 2005-2017 Cisco Systems, Inc. All rights reserved.
+-- Copyright (c) 2005-2018 Cisco Systems, Inc. All rights reserved.
 -- 
 -- *********************************************************************
 
@@ -62,7 +62,7 @@ IMPORTS
         FROM CISCO-UNIFIED-COMPUTING-TC-MIB;
 
 cucsProcessorObjects MODULE-IDENTITY
-    LAST-UPDATED    "201710060000Z"
+    LAST-UPDATED    "201807260000Z"
     ORGANIZATION    "Cisco Systems Inc."
     CONTACT-INFO
         "Cisco Systems
@@ -157,16 +157,16 @@ CucsProcessorEnvStatsEntry ::= SEQUENCE {
     cucsProcessorEnvStatsInstanceId                                  CucsManagedObjectId,
     cucsProcessorEnvStatsDn                                          CucsManagedObjectDn,
     cucsProcessorEnvStatsRn                                          SnmpAdminString,
-    cucsProcessorEnvStatsInputCurrent                                SnmpAdminString,
-    cucsProcessorEnvStatsInputCurrentAvg                             SnmpAdminString,
-    cucsProcessorEnvStatsInputCurrentMax                             SnmpAdminString,
-    cucsProcessorEnvStatsInputCurrentMin                             SnmpAdminString,
+    cucsProcessorEnvStatsInputCurrent                                INTEGER,
+    cucsProcessorEnvStatsInputCurrentAvg                             INTEGER,
+    cucsProcessorEnvStatsInputCurrentMax                             INTEGER,
+    cucsProcessorEnvStatsInputCurrentMin                             INTEGER,
     cucsProcessorEnvStatsIntervals                                   Gauge32,
     cucsProcessorEnvStatsSuspect                                     TruthValue,
-    cucsProcessorEnvStatsTemperature                                 SnmpAdminString,
-    cucsProcessorEnvStatsTemperatureAvg                              SnmpAdminString,
-    cucsProcessorEnvStatsTemperatureMax                              SnmpAdminString,
-    cucsProcessorEnvStatsTemperatureMin                              SnmpAdminString,
+    cucsProcessorEnvStatsTemperature                                 INTEGER,
+    cucsProcessorEnvStatsTemperatureAvg                              INTEGER,
+    cucsProcessorEnvStatsTemperatureMax                              INTEGER,
+    cucsProcessorEnvStatsTemperatureMin                              INTEGER,
     cucsProcessorEnvStatsThresholded                                 CucsProcessorEnvStatsThresholded,
     cucsProcessorEnvStatsTimeCollected                               DateAndTime,
     cucsProcessorEnvStatsUpdate                                      Gauge32
@@ -197,7 +197,7 @@ cucsProcessorEnvStatsRn OBJECT-TYPE
     ::= { cucsProcessorEnvStatsEntry 3 }
 
 cucsProcessorEnvStatsInputCurrent OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -206,7 +206,7 @@ cucsProcessorEnvStatsInputCurrent OBJECT-TYPE
     ::= { cucsProcessorEnvStatsEntry 4 }
 
 cucsProcessorEnvStatsInputCurrentAvg OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -215,7 +215,7 @@ cucsProcessorEnvStatsInputCurrentAvg OBJECT-TYPE
     ::= { cucsProcessorEnvStatsEntry 5 }
 
 cucsProcessorEnvStatsInputCurrentMax OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -224,7 +224,7 @@ cucsProcessorEnvStatsInputCurrentMax OBJECT-TYPE
     ::= { cucsProcessorEnvStatsEntry 6 }
 
 cucsProcessorEnvStatsInputCurrentMin OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -249,7 +249,7 @@ cucsProcessorEnvStatsSuspect OBJECT-TYPE
     ::= { cucsProcessorEnvStatsEntry 9 }
 
 cucsProcessorEnvStatsTemperature OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -257,7 +257,7 @@ cucsProcessorEnvStatsTemperature OBJECT-TYPE
     ::= { cucsProcessorEnvStatsEntry 10 }
 
 cucsProcessorEnvStatsTemperatureAvg OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -266,7 +266,7 @@ cucsProcessorEnvStatsTemperatureAvg OBJECT-TYPE
     ::= { cucsProcessorEnvStatsEntry 11 }
 
 cucsProcessorEnvStatsTemperatureMax OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -275,7 +275,7 @@ cucsProcessorEnvStatsTemperatureMax OBJECT-TYPE
     ::= { cucsProcessorEnvStatsEntry 12 }
 
 cucsProcessorEnvStatsTemperatureMin OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -330,16 +330,16 @@ CucsProcessorEnvStatsHistEntry ::= SEQUENCE {
     cucsProcessorEnvStatsHistDn                                      CucsManagedObjectDn,
     cucsProcessorEnvStatsHistRn                                      SnmpAdminString,
     cucsProcessorEnvStatsHistId                                      Unsigned64,
-    cucsProcessorEnvStatsHistInputCurrent                            SnmpAdminString,
-    cucsProcessorEnvStatsHistInputCurrentAvg                         SnmpAdminString,
-    cucsProcessorEnvStatsHistInputCurrentMax                         SnmpAdminString,
-    cucsProcessorEnvStatsHistInputCurrentMin                         SnmpAdminString,
+    cucsProcessorEnvStatsHistInputCurrent                            INTEGER,
+    cucsProcessorEnvStatsHistInputCurrentAvg                         INTEGER,
+    cucsProcessorEnvStatsHistInputCurrentMax                         INTEGER,
+    cucsProcessorEnvStatsHistInputCurrentMin                         INTEGER,
     cucsProcessorEnvStatsHistMostRecent                              TruthValue,
     cucsProcessorEnvStatsHistSuspect                                 TruthValue,
-    cucsProcessorEnvStatsHistTemperature                             SnmpAdminString,
-    cucsProcessorEnvStatsHistTemperatureAvg                          SnmpAdminString,
-    cucsProcessorEnvStatsHistTemperatureMax                          SnmpAdminString,
-    cucsProcessorEnvStatsHistTemperatureMin                          SnmpAdminString,
+    cucsProcessorEnvStatsHistTemperature                             INTEGER,
+    cucsProcessorEnvStatsHistTemperatureAvg                          INTEGER,
+    cucsProcessorEnvStatsHistTemperatureMax                          INTEGER,
+    cucsProcessorEnvStatsHistTemperatureMin                          INTEGER,
     cucsProcessorEnvStatsHistThresholded                             CucsProcessorEnvStatsHistThresholded,
     cucsProcessorEnvStatsHistTimeCollected                           DateAndTime
 }
@@ -377,7 +377,7 @@ cucsProcessorEnvStatsHistId OBJECT-TYPE
     ::= { cucsProcessorEnvStatsHistEntry 4 }
 
 cucsProcessorEnvStatsHistInputCurrent OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -386,7 +386,7 @@ cucsProcessorEnvStatsHistInputCurrent OBJECT-TYPE
     ::= { cucsProcessorEnvStatsHistEntry 5 }
 
 cucsProcessorEnvStatsHistInputCurrentAvg OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -395,7 +395,7 @@ cucsProcessorEnvStatsHistInputCurrentAvg OBJECT-TYPE
     ::= { cucsProcessorEnvStatsHistEntry 6 }
 
 cucsProcessorEnvStatsHistInputCurrentMax OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -404,7 +404,7 @@ cucsProcessorEnvStatsHistInputCurrentMax OBJECT-TYPE
     ::= { cucsProcessorEnvStatsHistEntry 7 }
 
 cucsProcessorEnvStatsHistInputCurrentMin OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -430,7 +430,7 @@ cucsProcessorEnvStatsHistSuspect OBJECT-TYPE
     ::= { cucsProcessorEnvStatsHistEntry 10 }
 
 cucsProcessorEnvStatsHistTemperature OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -439,7 +439,7 @@ cucsProcessorEnvStatsHistTemperature OBJECT-TYPE
     ::= { cucsProcessorEnvStatsHistEntry 11 }
 
 cucsProcessorEnvStatsHistTemperatureAvg OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -448,7 +448,7 @@ cucsProcessorEnvStatsHistTemperatureAvg OBJECT-TYPE
     ::= { cucsProcessorEnvStatsHistEntry 12 }
 
 cucsProcessorEnvStatsHistTemperatureMax OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -457,7 +457,7 @@ cucsProcessorEnvStatsHistTemperatureMax OBJECT-TYPE
     ::= { cucsProcessorEnvStatsHistEntry 13 }
 
 cucsProcessorEnvStatsHistTemperatureMin OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -1156,7 +1156,7 @@ CucsProcessorQualEntry ::= SEQUENCE {
     cucsProcessorQualMinProcs                                        Gauge32,
     cucsProcessorQualMinThreads                                      Gauge32,
     cucsProcessorQualModel                                           SnmpAdminString,
-    cucsProcessorQualSpeed                                           SnmpAdminString,
+    cucsProcessorQualSpeed                                           INTEGER,
     cucsProcessorQualStepping                                        Gauge32
 }
 
@@ -1249,7 +1249,7 @@ cucsProcessorQualModel OBJECT-TYPE
     ::= { cucsProcessorQualEntry 11 }
 
 cucsProcessorQualSpeed OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -1286,10 +1286,10 @@ CucsProcessorRuntimeEntry ::= SEQUENCE {
     cucsProcessorRuntimeDn                                           CucsManagedObjectDn,
     cucsProcessorRuntimeRn                                           SnmpAdminString,
     cucsProcessorRuntimeIntervals                                    Gauge32,
-    cucsProcessorRuntimeLoad                                         SnmpAdminString,
-    cucsProcessorRuntimeLoadAvg                                      SnmpAdminString,
-    cucsProcessorRuntimeLoadMax                                      SnmpAdminString,
-    cucsProcessorRuntimeLoadMin                                      SnmpAdminString,
+    cucsProcessorRuntimeLoad                                         INTEGER,
+    cucsProcessorRuntimeLoadAvg                                      INTEGER,
+    cucsProcessorRuntimeLoadMax                                      INTEGER,
+    cucsProcessorRuntimeLoadMin                                      INTEGER,
     cucsProcessorRuntimeSuspect                                      TruthValue,
     cucsProcessorRuntimeThresholded                                  CucsProcessorRuntimeThresholded,
     cucsProcessorRuntimeTimeCollected                                DateAndTime,
@@ -1330,7 +1330,7 @@ cucsProcessorRuntimeIntervals OBJECT-TYPE
     ::= { cucsProcessorRuntimeEntry 4 }
 
 cucsProcessorRuntimeLoad OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -1338,7 +1338,7 @@ cucsProcessorRuntimeLoad OBJECT-TYPE
     ::= { cucsProcessorRuntimeEntry 5 }
 
 cucsProcessorRuntimeLoadAvg OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -1346,7 +1346,7 @@ cucsProcessorRuntimeLoadAvg OBJECT-TYPE
     ::= { cucsProcessorRuntimeEntry 6 }
 
 cucsProcessorRuntimeLoadMax OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -1354,7 +1354,7 @@ cucsProcessorRuntimeLoadMax OBJECT-TYPE
     ::= { cucsProcessorRuntimeEntry 7 }
 
 cucsProcessorRuntimeLoadMin OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -1424,10 +1424,10 @@ CucsProcessorRuntimeHistEntry ::= SEQUENCE {
     cucsProcessorRuntimeHistDn                                       CucsManagedObjectDn,
     cucsProcessorRuntimeHistRn                                       SnmpAdminString,
     cucsProcessorRuntimeHistId                                       Unsigned64,
-    cucsProcessorRuntimeHistLoad                                     SnmpAdminString,
-    cucsProcessorRuntimeHistLoadAvg                                  SnmpAdminString,
-    cucsProcessorRuntimeHistLoadMax                                  SnmpAdminString,
-    cucsProcessorRuntimeHistLoadMin                                  SnmpAdminString,
+    cucsProcessorRuntimeHistLoad                                     INTEGER,
+    cucsProcessorRuntimeHistLoadAvg                                  INTEGER,
+    cucsProcessorRuntimeHistLoadMax                                  INTEGER,
+    cucsProcessorRuntimeHistLoadMin                                  INTEGER,
     cucsProcessorRuntimeHistMostRecent                               TruthValue,
     cucsProcessorRuntimeHistSuspect                                  TruthValue,
     cucsProcessorRuntimeHistThresholded                              CucsProcessorRuntimeHistThresholded,
@@ -1467,7 +1467,7 @@ cucsProcessorRuntimeHistId OBJECT-TYPE
     ::= { cucsProcessorRuntimeHistEntry 4 }
 
 cucsProcessorRuntimeHistLoad OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -1475,7 +1475,7 @@ cucsProcessorRuntimeHistLoad OBJECT-TYPE
     ::= { cucsProcessorRuntimeHistEntry 5 }
 
 cucsProcessorRuntimeHistLoadAvg OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -1483,7 +1483,7 @@ cucsProcessorRuntimeHistLoadAvg OBJECT-TYPE
     ::= { cucsProcessorRuntimeHistEntry 6 }
 
 cucsProcessorRuntimeHistLoadMax OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -1491,7 +1491,7 @@ cucsProcessorRuntimeHistLoadMax OBJECT-TYPE
     ::= { cucsProcessorRuntimeHistEntry 7 }
 
 cucsProcessorRuntimeHistLoadMin OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION
@@ -1623,7 +1623,7 @@ CucsProcessorUnitEntry ::= SEQUENCE {
     cucsProcessorUnitRevision                                        SnmpAdminString,
     cucsProcessorUnitSerial                                          SnmpAdminString,
     cucsProcessorUnitSocketDesignation                               SnmpAdminString,
-    cucsProcessorUnitSpeed                                           SnmpAdminString,
+    cucsProcessorUnitSpeed                                           INTEGER,
     cucsProcessorUnitStepping                                        Gauge32,
     cucsProcessorUnitThermal                                         CucsEquipmentSensorThresholdStatus,
     cucsProcessorUnitThreads                                         Gauge32,
@@ -1764,7 +1764,7 @@ cucsProcessorUnitSocketDesignation OBJECT-TYPE
     ::= { cucsProcessorUnitEntry 16 }
 
 cucsProcessorUnitSpeed OBJECT-TYPE
-    SYNTAX       SnmpAdminString
+    SYNTAX       INTEGER
     MAX-ACCESS   read-only
     STATUS       current
     DESCRIPTION

@@ -1,11 +1,10 @@
-mib: CAREL-RITTAL-LCP-3311-MIB
 modules:
     sensors:
         temperature:
             data:
                 -
-                    oid: lcpSetpoint
-                    value: lcpSetpoint
+                    oid: CAREL-RITTAL-LCP-3311-MIB::lcpSetpoint
+                    value: CAREL-RITTAL-LCP-3311-MIB::lcpSetpoint
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.48.{{ $index }}'
                     descr: LCP setpoint
@@ -13,8 +12,8 @@ modules:
                     low_limit: 150
                     high_limit: 280
                 -
-                    oid: inputTemperatureAverage
-                    value: inputTemperatureAverage
+                    oid: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureAverage
+                    value: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureAverage
                     divisor: 10
                     group: Input
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.21.{{ $index }}'
@@ -26,8 +25,8 @@ modules:
                     high_limit: 440
                 -
                     # Temps according to ASHRAE standards
-                    oid: outputTemperatureAverage
-                    value: outputTemperatureAverage
+                    oid: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureAverage
+                    value: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureAverage
                     divisor: 10
                     group: Output
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.22.{{ $index }}'
@@ -38,8 +37,8 @@ modules:
                     warn_limit: 280
                     high_limit: 300
                 -
-                    oid: inputTemperatureTopSensor
-                    value: inputTemperatureTopSensor
+                    oid: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureTopSensor
+                    value: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureTopSensor
                     divisor: 10
                     group: Input
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.6.{{ $index }}'
@@ -50,8 +49,8 @@ modules:
                     warn_limit: 400
                     high_limit: 440
                 -
-                    oid: inputTemperatureMidSensor
-                    value: inputTemperatureMidSensor
+                    oid: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureMidSensor
+                    value: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureMidSensor
                     divisor: 10
                     group: Input
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.7.{{ $index }}'
@@ -62,8 +61,8 @@ modules:
                     warn_limit: 400
                     high_limit: 440
                 -
-                    oid: inputTemperatureBottomSensor
-                    value: inputTemperatureBottomSensor
+                    oid: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureBottomSensor
+                    value: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureBottomSensor
                     divisor: 10
                     group: Input
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.8.{{ $index }}'
@@ -74,8 +73,8 @@ modules:
                     warn_limit: 400
                     high_limit: 440
                 -
-                    oid: outputTemperatureTopSensor
-                    value: outputTemperatureTopSensor
+                    oid: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureTopSensor
+                    value: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureTopSensor
                     divisor: 10
                     group: Output
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.2.{{ $index }}'
@@ -86,8 +85,8 @@ modules:
                     warn_limit: 280
                     high_limit: 300
                 -
-                    oid: outputTemperatureMidSensor
-                    value: outputTemperatureMidSensor
+                    oid: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureMidSensor
+                    value: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureMidSensor
                     divisor: 10
                     group: Output
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.3.{{ $index }}'
@@ -98,8 +97,8 @@ modules:
                     warn_limit: 280
                     high_limit: 300
                 -
-                    oid: outputTemperatureBottomSensor
-                    value: outputTemperatureBottomSensor
+                    oid: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureBottomSensor
+                    value: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureBottomSensor
                     divisor: 10
                     group: Output
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.4.{{ $index }}'
@@ -110,8 +109,8 @@ modules:
                     warn_limit: 280
                     high_limit: 300
                 -
-                    oid: driverTemperature
-                    value: driverTemperature
+                    oid: CAREL-RITTAL-LCP-3311-MIB::driverTemperature
+                    value: CAREL-RITTAL-LCP-3311-MIB::driverTemperature
                     divisor: 10
                     group: Unit
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.4.{{ $index }}'
@@ -122,8 +121,8 @@ modules:
                     warn_limit: 100
                     high_limit: 120
                 -
-                    oid: compressorDischargeTemperature
-                    value: compressorDischargeTemperature
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorDischargeTemperature
+                    value: CAREL-RITTAL-LCP-3311-MIB::compressorDischargeTemperature
                     divisor: 10
                     group: Unit
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.9.{{ $index }}'
@@ -134,8 +133,8 @@ modules:
                     warn_limit: 880
                     high_limit: 900
                 -
-                    oid: compressorSuctionTemperature
-                    value: compressorSuctionTemperature
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorSuctionTemperature
+                    value: CAREL-RITTAL-LCP-3311-MIB::compressorSuctionTemperature
                     divisor: 10
                     group: Unit
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.10.{{ $index }}'
@@ -146,8 +145,8 @@ modules:
                     warn_limit: 880
                     high_limit: 900
                 -
-                    oid: evaporatorTemperature
-                    value: evaporatorTemperature
+                    oid: CAREL-RITTAL-LCP-3311-MIB::evaporatorTemperature
+                    value: CAREL-RITTAL-LCP-3311-MIB::evaporatorTemperature
                     divisor: 10
                     group: Unit
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.13.{{ $index }}'
@@ -158,8 +157,8 @@ modules:
                     warn_limit: 150
                     high_limit: 200
                 -
-                    oid: condensingTemperature
-                    value: condensingTemperature
+                    oid: CAREL-RITTAL-LCP-3311-MIB::condensingTemperature
+                    value: CAREL-RITTAL-LCP-3311-MIB::condensingTemperature
                     divisor: 10
                     group: Unit
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.14.{{ $index }}'
@@ -173,8 +172,8 @@ modules:
         pressure:
             data:
                 -
-                    oid: compressorDischargePressure
-                    value: compressorDischargePressure
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorDischargePressure
+                    value: CAREL-RITTAL-LCP-3311-MIB::compressorDischargePressure
                     multiplier: 10
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.11.{{ $index }}'
                     descr: Compressor discharge pressure
@@ -182,8 +181,8 @@ modules:
                     warn_limit: 2800
                     high_limit: 2900
                 -
-                    oid: compressorSuctionPressure
-                    value: compressorSuctionPressure
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorSuctionPressure
+                    value: CAREL-RITTAL-LCP-3311-MIB::compressorSuctionPressure
                     multiplier: 10
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.12.{{ $index }}'
                     descr: Compressor suction pressure
@@ -194,8 +193,8 @@ modules:
         # LCP DX has a max cooling capacity of 12Kw. Measurement is done in %
             data:
                 -
-                    oid: coolingCapacity
-                    value: coolingCapacity
+                    oid: CAREL-RITTAL-LCP-3311-MIB::coolingCapacity
+                    value: CAREL-RITTAL-LCP-3311-MIB::coolingCapacity
                     multiplier: 120
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.16.{{ $index }}'
                     descr: Free cooling capacity
@@ -205,8 +204,8 @@ modules:
         fanspeed:
             data:
                 -
-                    oid: fanSpeedRpm
-                    value: fanSpeedRpm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::fanSpeedRpm
+                    value: CAREL-RITTAL-LCP-3311-MIB::fanSpeedRpm
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.29.{{ $index }}'
                     descr: Fan speed
                     index: 'fanSpeedRpm.{{ $index }}'
@@ -214,8 +213,8 @@ modules:
                     high_limit: 3600
                 -
                     # See documentation pg 47
-                    oid: compressorRotorSpeedHz
-                    value: compressorRotorSpeedHz
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorRotorSpeedHz
+                    value: CAREL-RITTAL-LCP-3311-MIB::compressorRotorSpeedHz
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.1.{{ $index }}'
                     descr: Compressor rotor speed
                     index: 'compressorRotorSpeed.{{ $index }}'
@@ -226,8 +225,8 @@ modules:
         current:
             data:
                 -
-                    oid: compressorMotorCurrent
-                    value: compressorMotorCurrent
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorMotorCurrent
+                    value: CAREL-RITTAL-LCP-3311-MIB::compressorMotorCurrent
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.2.46.{{ $index }}'
                     descr: Compressor motor current
@@ -235,8 +234,8 @@ modules:
         voltage:
             data:
                 -
-                    oid: dcBusVoltage
-                    value: dcBusVoltage
+                    oid: CAREL-RITTAL-LCP-3311-MIB::dcBusVoltage
+                    value: CAREL-RITTAL-LCP-3311-MIB::dcBusVoltage
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.5.{{ $index }}'
                     descr: Power+ DC voltage
@@ -246,8 +245,8 @@ modules:
                     warn_limit: 565
                     high_limit: 570
                 -
-                    oid: motorVoltage
-                    value: motorVoltage
+                    oid: CAREL-RITTAL-LCP-3311-MIB::motorVoltage
+                    value: CAREL-RITTAL-LCP-3311-MIB::motorVoltage
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.6.{{ $index }}'
                     descr: Motor voltage
@@ -259,41 +258,45 @@ modules:
         state:
             data:
                 -
-                    oid: unitOnOff
+                    oid: CAREL-RITTAL-LCP-3311-MIB::unitOnOff
                     group: Power
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.13.{{ $index }}'
                     descr: Unit
                     index: 'unitOnOff.{{ $index }}'
+                    state_name: unitOnOff
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'off' }
                         - { value: 1, generic: 0, graph: 0, descr: 'on' }
                         - { value: 2, generic: 0, graph: 0, descr: 'energy-save' }
                         - { value: 3, generic: 0, graph: 0, descr: 'auto' }
                 -
-                    oid: driverPowerStatus
+                    oid: CAREL-RITTAL-LCP-3311-MIB::driverPowerStatus
                     group: Power
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.13.{{ $index }}'
                     descr: Power+ drive status
                     index: 'driverPowerStatus.{{ $index }}'
+                    state_name: driverPowerStatus
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: 'stop' }
                         - { value: 2, generic: 0, graph: 0, descr: 'run' }
                         - { value: 3, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: inverterOnOff
+                    oid: CAREL-RITTAL-LCP-3311-MIB::inverterOnOff
                     group: Power
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.17.{{ $index }}'
                     descr: Inverter
                     index: 'inverterOnOff.{{ $index }}'
+                    state_name: inverterOnOff
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'off' }
                         - { value: 1, generic: 0, graph: 0, descr: 'on' }
                 -
-                    oid: envelopeZone
+                    oid: CAREL-RITTAL-LCP-3311-MIB::envelopeZone
                     group: Operating envelop
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.14.{{ $index }}'
                     descr: Cooling envelope zone
                     index: 'envelopeZone.{{ $index }}'
+                    state_name: envelopeZone
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 0, graph: 0, descr: 'maximum compression ratio' }
@@ -305,56 +308,62 @@ modules:
                         - { value: 7, generic: 0, graph: 0, descr: 'minimum discharge power' }
                         - { value: 8, generic: 0, graph: 0, descr: 'minimum suction power' }
                 -
-                    oid: compressorOverloadAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorOverloadAlarm
                     group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.2.{{ $index }}'
                     descr: Compressor overload
                     index: 'compressorOverloadAlarm.{{ $index }}'
+                    state_name: compressorOverloadAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: highPressureAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::highPressureAlarm
                     group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.3.{{ $index }}'
                     descr: High pressure
                     index: 'highPressureAlarm.{{ $index }}'
+                    state_name: highPressureAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: inverterAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::inverterAlarm
                     group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.11.{{ $index }}'
                     descr: Inverter
                     index: 'inverterAlarm.{{ $index }}'
+                    state_name: inverterAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: driveAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::driveAlarm
                     group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.12.{{ $index }}'
                     descr: Power+ drive
                     index: 'driveAlarm.{{ $index }}'
+                    state_name: driveAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: generalAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::generalAlarm
                     group: Alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.23.{{ $index }}'
                     descr: General alarm
                     index: 'generalAlarm.{{ $index }}'
+                    state_name: generalAlarm
                     states:
                         - { value: 0, generic: 2, graph: 0, descr: 'alarm' }
                         - { value: 1, generic: 0, graph: 0, descr: 'ok' }
                 -
-                    oid: currentErrorCode
+                    oid: CAREL-RITTAL-LCP-3311-MIB::currentErrorCode
                     group: Alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.3.3.{{ $index }}'
                     descr: Current Error code
                     index: 'currentErrorCode.{{ $index }}'
+                    state_name: currentErrorCode
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }    
                         - { value: 2, generic: 2, graph: 0, descr: 'ALA02 - Probe B2 faulty or disconnected' }
@@ -390,137 +399,152 @@ modules:
                         - { value: 32, generic: 2, graph: 0, descr: 'ALL99 - Unexpected inverter stop' }
                         - { value: 33, generic: 2, graph: 0, descr: 'ALW04 - Max temperature (warning)' }
                 -
-                    oid: compressorEnvelopeAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorEnvelopeAlarm
                     group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.30.{{ $index }}'
                     descr: Compressor envelope
                     index: 'compressorEnvelopeAlarm.{{ $index }}'
+                    state_name: compressorEnvelopeAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: compressorStartupFailureAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorStartupFailureAlarm
                     group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.31.{{ $index }}'
                     descr: Compressor startup (max retries)
                     index: 'compressorStartupFailureAlarm.{{ $index }}'
+                    state_name: compressorStartupFailureAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: maxDischargeTemperatureAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::maxDischargeTemperatureAlarm
                     group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.33.{{ $index }}'
                     descr: Maximum discharge temperature
                     index: 'maxDischargeTemperatureAlarm.{{ $index }}'
+                    state_name: maxDischargeTemperatureAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: compressorDeltaPressureAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorDeltaPressureAlarm
                     group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.35.{{ $index }}'
                     descr: Compressor delta pressure
                     index: 'compressorDeltaPressureAlarm.{{ $index }}'
+                    state_name: compressorDeltaPressureAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: oilReturnAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::oilReturnAlarm
                     group: Component alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.36.{{ $index }}'
                     descr: Oil return (lubrication issue)
                     index: 'oilReturnAlarm.{{ $index }}'
+                    state_name: oilReturnAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: outputTemperatureTopProbeAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureTopProbeAlarm
                     group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.38.{{ $index }}'
                     descr: Output top probe
                     index: 'outputTemperatureTopProbeAlarm.{{ $index }}'
+                    state_name: outputTemperatureTopProbeAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: outputTemperatureMidProbeAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureMidProbeAlarm
                     group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.39.{{ $index }}'
                     descr: Output mid probe
                     index: 'outputTemperatureMidProbeAlarm.{{ $index }}'
+                    state_name: outputTemperatureMidProbeAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: outputTemperatureBottomProbeAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureBottomProbeAlarm
                     group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.40.{{ $index }}'
                     descr: Output bottom probe
                     index: 'outputTemperatureBottomProbeAlarm.{{ $index }}'
+                    state_name: outputTemperatureBottomProbeAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: inputTemperatureTopProbeAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureTopProbeAlarm
                     group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.42.{{ $index }}'
                     descr: Input top probe
                     index: 'inputTemperatureTopProbeAlarm.{{ $index }}'
+                    state_name: inputTemperatureTopProbeAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: inputTemperatureMidProbeAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureMidProbeAlarm
                     group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.43.{{ $index }}'
                     descr: Input mid probe
                     index: 'inputTemperatureMidProbeAlarm.{{ $index }}'
+                    state_name: inputTemperatureMidProbeAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: inputTemperatureBottomProbeAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureBottomProbeAlarm
                     group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.44.{{ $index }}'
                     descr: Input bottom probe
                     index: 'inputTemperatureBottomProbeAlarm.{{ $index }}'
+                    state_name: inputTemperatureBottomProbeAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: compressorDischargeTemperatureProbeAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorDischargeTemperatureProbeAlarm
                     group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.45.{{ $index }}'
                     descr: Compressor discharge temperature probe
                     index: 'compressorDischargeTemperatureProbeAlarm.{{ $index }}'
+                    state_name: compressorDischargeTemperatureProbeAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: compressorSuctionTemperatureProbeAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorSuctionTemperatureProbeAlarm
                     group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.46.{{ $index }}'
                     descr: Compressor suction temperature probe
                     index: 'compressorSuctionTemperatureProbeAlarm.{{ $index }}'
+                    state_name: compressorSuctionTemperatureProbeAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: compressorDischargePressureProbeAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorDischargePressureProbeAlarm
                     group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.47.{{ $index }}'
                     descr: Compressor discharge pressure probe
                     index: 'compressorDischargePressureProbeAlarm.{{ $index }}'
+                    state_name: compressorDischargePressureProbeAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: compressorSuctionPressureProbeAlarm
+                    oid: CAREL-RITTAL-LCP-3311-MIB::compressorSuctionPressureProbeAlarm
                     group: Probe alarms
                     num_oid: '.1.3.6.1.4.1.9839.2606.2.1.1.48.{{ $index }}'
                     descr: Compressor suction pressure probe
                     index: 'compressorSuctionPressureProbeAlarm.{{ $index }}'
+                    state_name: compressorSuctionPressureProbeAlarm
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 1, generic: 2, graph: 0, descr: 'alarm' }

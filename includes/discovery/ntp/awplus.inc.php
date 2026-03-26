@@ -18,7 +18,7 @@ $component = new LibreNMS\Component();
 $components = $component->getComponents($device['device_id'], ['type' => $module]);
 
 // We only care about our device id.
-$components = $components[$device['device_id']];
+$components = $components[$device['device_id']] ?? [];
 
 // Begin our master array, all other values will be processed into this array.
 $tblComponents = [];
@@ -100,7 +100,7 @@ if (is_null($atNtpAssociationEntry)) {
         // Guilty until proven innocent
         $found = false;
 
-        foreach ($tblComponents as $k => $v) {
+        foreach ($tblComponents as $v) {
             if ($array['UID'] == $v['UID']) {
                 // Yay, we found it...
                 $found = true;
@@ -125,5 +125,5 @@ if (count($components) > 0) {
         dbInsert(['device_id' => $device['device_id'], 'app_type' => $module, 'app_status' => '', 'app_instance' => ''], 'applications');
     }
 } else {
-    dbDelete('applications', '`device_id` = ? AND `app_type` = ?', [$device['device_id'], $module]);
+    \App\Models\Application::where('device_id', $device['device_id'])->where('app_type', $module)->delete();
 }

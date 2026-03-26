@@ -24,11 +24,14 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
+use App\Models\Eventlog;
 use Exception;
 use Illuminate\Support\Str;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\Transport;
-use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use Spatie\Permission\Models\Role;
 
@@ -43,14 +46,21 @@ class Mail extends Transport
             default => $this->config['email'] ?? $alert_data['contacts'] ?? [], // contacts is only used by legacy synthetic transport
         };
 
-        $html = Config::get('email_html');
+        if (is_array($emails) && count($emails) == 0) {
+            $device = DeviceCache::get($alert_data['device_id']);
+            Eventlog::log('No e-mail recipients found for transport ' . $alert_data['transport_name'], $device, 'alert', Severity::Notice);
+
+            return true;
+        }
+
+        $html = LibrenmsConfig::get('email_html');
 
         if ($html && ! $this->isHtmlContent($alert_data['msg'])) {
             // if there are no html tags in the content, but we are sending an html email, use br for line returns instead
-            $msg = preg_replace("/\r?\n/", "<br />\n", $alert_data['msg']);
+            $msg = preg_replace("/\r?\n/", "<br />\n", (string) $alert_data['msg']);
         } else {
             // fix line returns for windows mail clients
-            $msg = preg_replace("/(?<!\r)\n/", "\r\n", $alert_data['msg']);
+            $msg = preg_replace("/(?<!\r)\n/", "\r\n", (string) $alert_data['msg']);
         }
 
         try {

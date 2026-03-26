@@ -49,7 +49,7 @@ class Smseagle extends Transport
             $params['access_token'] = $this->config['smseagle-token'];
         }
 
-        $params['to'] = implode(',', preg_split('/([,\r\n]+)/', $this->config['smseagle-mobiles']));
+        $params['to'] = implode(',', preg_split('/([,\r\n]+)/', (string) $this->config['smseagle-mobiles']));
         $params['message'] = $alert_data['title'];
 
         $res = Http::client()->get($url, $params);

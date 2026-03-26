@@ -18,13 +18,13 @@ physical change or just because the device has misreported) the max
 value is set. If you don't want to wait until a port speed changes
 then you can run the included script:
 
-`./scripts/tune_port.php -h <hostname> -p <ifName>`
+`lnms port:tune <hostname> <ifName>` 
 
-Wildcards are supported using *, i.e:
+Wildcards are supported using * and ifName is optional, i.e:
 
-`./scripts/tune_port.php -h local* -p eth*`
+`lnms port:tune local* eth*`
 
 This script will then perform the rrdtool tune on each port found
 using the provided ifSpeed for that port.
 
-Run `./scripts/tune_port.php` to see help page.
+Run `lnms port:tune -h` to see help page.

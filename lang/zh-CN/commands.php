@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'errors' => [
+        'db_connect' => '连接数据库失败。请检查数据库服务是否正在运行以及连接设置。',
+        'db_auth' => '连接数据库失败。请检查凭据：:error',
+        'no_devices' => '找不到匹配您给出的设备规范的设备。',
+    ],
     'config:get' => [
         'description' => '获取配置值',
         'arguments' => [
@@ -117,13 +122,10 @@ return [
             'no-data' => '不更新数据存储（RRD，InfluxDB等）',
         ],
         'errors' => [
-            'db_connect' => '连接数据库失败。请检查数据库服务是否正在运行以及连接设置。',
-            'db_auth' => '连接数据库失败。请检查凭据：:error',
-            'no_devices' => '找不到匹配您给出的设备规范的设备。',
             'none_up' => '设备处于离线状态，无法轮询。|所有设备都处于离线状态，无法轮询。',
-            'none_polled' => '没有设备被轮询。',
+            'none_actioned' => '没有设备被轮询。',
         ],
-        'polled' => '在:time内轮询了:count台设备',
+        'actioned' => '在:time内轮询了:count台设备',
     ],
     'key:rotate' => [
         'description' => '旋转APP_KEY，此操作会使用给定的旧密钥解密所有加密数据，并使用新密钥存储在APP_KEY中。',

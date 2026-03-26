@@ -27,7 +27,7 @@ foreach ($components as $oid => $overlay) {
         <a class="list-group-item <?php echo $gli?>" data-toggle="collapse" data-target="#<?php echo $overlay['index']?>" data-parent="#overlays"><?php echo $overlay['label']?> - <?php echo $overlay['transport']?> <?php echo $overlay_status?></a>
         <div id="<?php echo $overlay['index']?>" class="sublinks collapse">
         <?php
-        foreach ($components as $aid => $adjacency) {
+        foreach ($components as $adjacency) {
             if (($adjacency['otvtype'] == 'adjacency') && ($adjacency['index'] == $overlay['index'])) {
                 if ($adjacency['status'] == 0) {
                     $adj_status = "<span class='green pull-right'>Normal</span>";
@@ -59,7 +59,7 @@ $graph_array = [];
 $graph_array['device'] = $device['device_id'];
 $graph_array['height'] = '100';
 $graph_array['width'] = '215';
-$graph_array['to'] = \LibreNMS\Config::get('time.now');
+$graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
 $graph_array['type'] = 'device_cisco-otv-vlan';
 require 'includes/html/print-graphrow.inc.php';
 
@@ -78,7 +78,7 @@ $graph_array = [];
 $graph_array['device'] = $device['device_id'];
 $graph_array['height'] = '100';
 $graph_array['width'] = '215';
-$graph_array['to'] = \LibreNMS\Config::get('time.now');
+$graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
 $graph_array['type'] = 'device_cisco-otv-mac';
 require 'includes/html/print-graphrow.inc.php';
 

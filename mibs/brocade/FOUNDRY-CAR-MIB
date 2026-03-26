@@ -4,7 +4,7 @@ IMPORTS
 
 	MODULE-IDENTITY, OBJECT-TYPE,Gauge32, Counter64,Integer32
 		FROM SNMPv2-SMI
-	TEXTUAL-CONVENTION
+	RowStatus,TEXTUAL-CONVENTION
 		FROM SNMPv2-TC
 	snSwitch
 		FROM FOUNDRY-SN-SWITCH-GROUP-MIB
@@ -12,74 +12,74 @@ IMPORTS
 		FROM IF-MIB;
 
 snCAR MODULE-IDENTITY
-    LAST-UPDATED "201006020000Z"  -- 04 June 2010
-    ORGANIZATION "Brocade Communications Systems, Inc."
-    CONTACT-INFO
-             "Technical Support Center
-              130 Holger Way,
-              San Jose, CA  95134
-              Email:  ipsupport@brocade.com
-              Phone: 1-800-752-8061
-              URL:  www.brocade.com"
-    DESCRIPTION
-             "Copyright 1996-2010 Brocade Communications Systems, Inc.
-              All rights reserved.
-              This Brocade Communications Systems SNMP Management Information Base Specification
-              embodies Brocade Communications Systems' confidential and proprietary
-              intellectual property. Brocade Communications Systems retains all
-              title and ownership in the Specification, including any revisions.
-
-              This Specification is supplied AS IS, and Brocade Communications Systems makes
-              no warranty, either express or implied, as to the use,
-              operation, condition, or performance of the specification, and any unintended
-              consequence it may on the user environment."
-
-    REVISION        "201006020000Z"  -- 04 June 2010
-    DESCRIPTION
-        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
-
-    REVISION     "200909300000Z" -- September 30, 2009
-    DESCRIPTION
+	LAST-UPDATED "201708070000Z" -- Aug 7, 2017
+	ORGANIZATION "Ruckus Wireless, Inc."
+	CONTACT-INFO
+			"
+			Technical Support Center, Ruckus Wireless, Inc,
+			350 West Java Drive,
+			Sunnyvale, CA 94089, USA
+			Support URL: https://support.ruckuswireless.com
+			Phone: +1-855-782-5871
+			ROW TF Numbers: https://support.ruckuswireless.com/contact-us"
+	DESCRIPTION
+			"
+			Copyright 1996-2017 Ruckus Wireless, Inc..
+			All rights reserved.
+			This Ruckus Wireless, Inc SNMP Management Information Base Specification
+			embodies Ruckus Wireless, Inc' confidential and proprietary
+			intellectual property. Ruckus Wireless, Inc retains all
+			title and ownership in the Specification, including any
+			revisions.
+			
+			This Specification is supplied AS IS, and Ruckus Wireless, Inc makes
+			no warranty, either express or implied, as to the use,
+			operation, condition, or performance of the Specification.			
+			"        
+	REVISION     "200909300000Z" -- September 30, 2009
+	DESCRIPTION
 			"convert from SMIv1 to SMIv2"
-
-   ::= { snSwitch 16}
+	REVISION     "201708070000Z" -- Aug 7, 2017
+ 	DESCRIPTION
+              "Modified contact Info, Organization and Decscription"
+   ::= { snSwitch 16}	
 snPortCARs	OBJECT IDENTIFIER ::= { snCAR 1 }
 
 	--  Textual Conventions
 
-	PacketSource::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	PacketSource::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 		"
-	SYNTAX  INTEGER {
+	SYNTAX  INTEGER { 
 		input(0), --for inbound traffic
 		output(1) --for outbound traffic
 	}
+	
 
-
-	RateLimitType::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	RateLimitType::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 		"
-	SYNTAX   INTEGER{
-		all(3), 		--	all traffic.
+	SYNTAX   INTEGER{ 
+		all(3), 		--	all traffic.                             
 		quickAcc(2), 	--	traffic matches rate-limit's access list.
-		standardAcc(1) 	--	traffic matches standard access list.
+		standardAcc(1) 	--	traffic matches standard access list.    
 	}
 
-	RateLimitAction::= TEXTUAL-CONVENTION
-	STATUS      current
-	DESCRIPTION
+	RateLimitAction::= TEXTUAL-CONVENTION 
+	STATUS      current 
+	DESCRIPTION 
 		"
 		"
 	SYNTAX  INTEGER {
-		continue(1),
-		drop(2),
+		continue(1), 
+		drop(2), 
 		precedCont(3),
-		precedXmit(4),
-		xmit(5)
+		precedXmit(4), 
+		xmit(5) 
 	}
 
 
@@ -100,7 +100,7 @@ snPortCAREntry OBJECT-TYPE
 		MAX-ACCESS  not-accessible
 		STATUS  current
 		DESCRIPTION
-			"A collection of rate-limit configuration objects on this
+			"A collection of rate-limit configuration objects on this 
 		interface."
 		INDEX { snPortCARifIndex, snPortCARDirection, snPortCARRowIndex }
 		::= { snPortCARTable 1 }
@@ -136,10 +136,12 @@ SnPortCAREntry ::=
 		snPortCARStatFilteredBytes
 						Counter64,
 		snPortCARStatCurBurst
-						Gauge32
+						Gauge32,
+        snPortCARRowStatus
+                        RowStatus
 	}
 snPortCARifIndex OBJECT-TYPE
-	SYNTAX     InterfaceIndex
+	SYNTAX     InterfaceIndex 
 	MAX-ACCESS     read-only
 	STATUS     current
 	DESCRIPTION
@@ -151,7 +153,7 @@ snPortCARDirection OBJECT-TYPE
 		MAX-ACCESS  read-only
 		STATUS  current
 		DESCRIPTION
-			"The input or output transmission direction for the
+			"The input or output transmission direction for the 
 				Rate Limit object.
 				input (0), --for inbound traffic
 				output(1) --for outbound traffic "
@@ -189,19 +191,19 @@ snPortCARAccIdx OBJECT-TYPE
 
 snPortCARRate OBJECT-TYPE
 	SYNTAX  Integer32
-		MAX-ACCESS  read-only
+		MAX-ACCESS  read-create
 		STATUS  current
 		DESCRIPTION
 		"The comitted access rate. This determines the long term
 		average transmission rate. Traffic that falls under this
-		rate always conforms. This is average rate in bits per
+		rate always conforms. This is average rate in bits per 
 		second."
 
 	::= { snPortCAREntry 6 }
 
 snPortCARLimit OBJECT-TYPE
 	SYNTAX  Integer32
-		MAX-ACCESS  read-only
+		MAX-ACCESS  read-create
 		STATUS  current
 		DESCRIPTION
 		"This is the normal burst size that determines how large traffic
@@ -247,7 +249,7 @@ snPortCARExceedAction OBJECT-TYPE
 	STATUS	current
 	DESCRIPTION
 		"Action to be taken when the traffic exceeds
-		the Rate Limit.drop
+		the Rate Limit.drop		
 		drop the packet.
 		xmit		transmit the packet.
 		continue	continue to evaluate to the subsequent
@@ -303,6 +305,16 @@ snPortCARStatCurBurst OBJECT-TYPE
 	DESCRIPTION
 		"The current received burst size."
 	::= { snPortCAREntry 15 }
+
+
+snPortCARRowStatus OBJECT-TYPE
+	SYNTAX  RowStatus
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		"The variable is used to create new row in the rate limit table, only CreateAndGo(4) and destroy(6) are supported values"
+	::= { snPortCAREntry 16 }
+
 
 -- end of snPortCARTable
 
@@ -371,6 +383,3 @@ agRateLimitCounterTotalOctets OBJECT-TYPE
 	::= { agRateLimitCounterEntry 4 }
 
 END
--- *****************************************************************
--- Foundry Commited Access Rate MIB file.
--- *****************************************************************

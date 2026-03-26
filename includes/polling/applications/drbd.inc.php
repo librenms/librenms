@@ -4,7 +4,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'drbd';
 $drbd_data = $agent_data['app'][$name][$app->app_instance];
-foreach (explode('|', $drbd_data) as $part) {
+foreach (explode('|', (string) $drbd_data) as $part) {
     [$stat, $val] = explode('=', $part);
     if (! empty($stat)) {
         $drbd[$stat] = $val;

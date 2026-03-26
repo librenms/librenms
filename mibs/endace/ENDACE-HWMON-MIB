@@ -1,0 +1,198 @@
+-- LEGAL NOTICE:
+-- This source code:
+-- 
+-- a) is a proprietary trade secret of Endace Technology Limited or any of
+-- its related or affiliated companies, a New Zealand company, and its
+-- suppliers and licensors ('Endace'). You must keep it strictly
+-- confidential, and you must not copy, modify, disclose or distribute any
+-- part of it to anyone else, without the prior written authorisation of
+-- Endace Limited;
+-- 
+-- b) may also be part of inventions that are protected by patents and
+-- patent applications; and
+-- 
+-- c) is copyright (C) to Endace, 2023 to 2023. All rights reserved.
+
+ENDACE-HWMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    endace
+        FROM ENDACE-MIB
+    NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+    ;
+
+hwmonMIB MODULE-IDENTITY
+    LAST-UPDATED  "202306140244Z" -- June 14, 2023
+    ORGANIZATION
+        "Endace Technology Ltd"
+    CONTACT-INFO
+        "postal: Endace Technology
+         6th floor
+         KPMG Centre
+         85 Alexandra Street
+         Hamilton 3204
+         New Zealand
+
+         email:   support@endace.com"
+    DESCRIPTION
+        "Endace Probe Hardware Monitoring."
+    REVISION      "202306080200Z" -- June 08, 2023
+    DESCRIPTION
+        "Initial version."
+    ::= { endace 16 }
+
+hwmonNotifications OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Notifications"
+    ::= { hwmonMIB 0 }
+
+hwmonFanFault NOTIFICATION-TYPE
+    STATUS        current
+    DESCRIPTION
+        "Indicates that at least one fan has failed."
+    ::= { hwmonNotifications 1 }
+
+hwmonFanNormal NOTIFICATION-TYPE
+    STATUS        current
+    DESCRIPTION
+        "Indicates that all fans operate normally."
+    ::= { hwmonNotifications 2 }
+
+hwmonPSUFault NOTIFICATION-TYPE
+    STATUS        current
+    DESCRIPTION
+        "Indicates that at least one power supply has failed."
+    ::= { hwmonNotifications 3 }
+
+hwmonPSUNormal NOTIFICATION-TYPE
+    STATUS        current
+    DESCRIPTION
+        "Indicates that all power supplies operate normally."
+    ::= { hwmonNotifications 4 }
+
+hwmonIntrusionAlarm NOTIFICATION-TYPE
+    STATUS        current
+    DESCRIPTION
+        "Indicates that the chassis was opened."
+    ::= { hwmonNotifications 5 }
+
+hwmonIntrusionNormal NOTIFICATION-TYPE
+    STATUS        current
+    DESCRIPTION
+        "Indicates that the chassis was closed."
+    ::= { hwmonNotifications 6 }
+
+hwmonSystemTempHigh NOTIFICATION-TYPE
+    OBJECTS
+        { hwmonSystemTemp }
+    STATUS        current
+    DESCRIPTION
+        "Indicates that the system temperature is above the set upper
+         threshold. See EndaceProbe 'Statistics Reports and Alarms' page
+         for details."
+    ::= { hwmonNotifications 7 }
+
+hwmonSystemTempNormal NOTIFICATION-TYPE
+    OBJECTS
+        { hwmonSystemTemp }
+    STATUS        current
+    DESCRIPTION
+        "Indicates that the system temperature is within a normal
+         operating range. See EndaceProbe 'Statistics Reports and
+         Alarms' page for details."
+    ::= { hwmonNotifications 8 }
+
+hwmonSystemTempLow NOTIFICATION-TYPE
+    OBJECTS
+        { hwmonSystemTemp }
+    STATUS        current
+    DESCRIPTION
+        "Indicates that the system temperature is below the set lower
+         threshold. See EndaceProbe 'Statistics Reports and Alarms' page
+         for details."
+    ::= { hwmonNotifications 9 }
+
+hwmonObjects OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Managed object of the hardware monitoring module."
+    ::= { hwmonMIB 1 }
+
+hwmonFanRedundancy OBJECT-TYPE
+    SYNTAX        INTEGER {
+        -- All fans ok.
+        normal(1),
+        -- Fan failure.
+        fault(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates that all fans are OK."
+    ::= { hwmonObjects 1 }
+
+hwmonPsuRedundancy OBJECT-TYPE
+    SYNTAX        INTEGER {
+        -- All PSU ok.
+        normal(1),
+        -- PSU failure.
+        fault(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates that all Power Supply Units are OK."
+    ::= { hwmonObjects 2 }
+
+hwmonIntrusionStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+        -- Chassis open.
+        alarm(1),
+        -- Chassis closed.
+        normal(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A False value (0) indicates that the Chassis Intrusion sensor
+         is in a normal state and that the chassis is closed. If the
+         chassis is opened, the value is True (1)."
+    ::= { hwmonObjects 3 }
+
+hwmonSystemTemp OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "System temperature measured at air inlet or front panel in
+         degrees C."
+    ::= { hwmonObjects 4 }
+
+hwmonConformance OBJECT IDENTIFIER ::= { hwmonMIB 2 }
+
+hwmonObjectGroup OBJECT-GROUP
+    OBJECTS
+        { hwmonFanRedundancy, hwmonIntrusionStatus, hwmonPsuRedundancy,
+        hwmonSystemTemp }
+    STATUS        current
+    DESCRIPTION
+        "Includes all hardware monitor objects."
+    ::= { hwmonConformance 1 }
+
+hwmonNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS
+        { hwmonFanFault, hwmonFanNormal, hwmonIntrusionAlarm,
+        hwmonIntrusionNormal, hwmonPSUFault, hwmonPSUNormal,
+        hwmonSystemTempHigh, hwmonSystemTempNormal, hwmonSystemTempLow
+        }
+    STATUS        current
+    DESCRIPTION
+        "Contains all hardware monitoring notifications."
+    ::= { hwmonConformance 2 }
+
+END

@@ -15,7 +15,7 @@ echo ' | Slugs: ';
 $slugs = $app->data['slugs'];
 
 foreach (array_keys($slugs) as $index => $slug) {
-    $slug = htmlspecialchars($slug);
+    $slug = htmlspecialchars((string) $slug);
     $label = $vars['slug'] == $slug
         ? '<span class="pagemenu-selected">' . $slug . '</span>'
         : $slug;
@@ -65,7 +65,7 @@ foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 

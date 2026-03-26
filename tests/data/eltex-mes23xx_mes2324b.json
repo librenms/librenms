@@ -11480,56 +11480,6 @@
                 },
                 {
                     "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.89.90.1.2.1.3.105.11",
-                    "sensor_index": "SfpLOS105",
-                    "sensor_type": "rlPhyTestGetTable",
-                    "sensor_descr": "SfpLOS-te1/0/1",
-                    "group": "transceiver",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": "105",
-                    "entPhysicalIndex_measured": "ports",
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": "rlPhyTestGetTable"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.89.90.1.2.1.3.107.11",
-                    "sensor_index": "SfpLOS107",
-                    "sensor_type": "rlPhyTestGetTable",
-                    "sensor_descr": "SfpLOS-te1/0/3",
-                    "group": "transceiver",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": "107",
-                    "entPhysicalIndex_measured": "ports",
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": "rlPhyTestGetTable"
-                },
-                {
-                    "sensor_deleted": 0,
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.89.53.15.1.10.1",
@@ -11730,20 +11680,6 @@
                     "state_descr": "Critical",
                     "state_draw_graph": 1,
                     "state_value": 3,
-                    "state_generic_value": 2
-                },
-                {
-                    "state_name": "rlPhyTestGetTable",
-                    "state_descr": "False",
-                    "state_draw_graph": 1,
-                    "state_value": 0,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "rlPhyTestGetTable",
-                    "state_descr": "True",
-                    "state_draw_graph": 1,
-                    "state_value": 1,
                     "state_generic_value": 2
                 }
             ]
@@ -12101,6 +12037,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12120,6 +12057,7 @@
                     "entPhysicalContainedIn": 68424793,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "TP-LINK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 105
                 },
                 {
@@ -12139,6 +12077,7 @@
                     "entPhysicalContainedIn": 68424795,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 107
                 },
                 {
@@ -12158,6 +12097,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Eltex",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12177,6 +12117,7 @@
                     "entPhysicalContainedIn": 67108992,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12196,6 +12137,7 @@
                     "entPhysicalContainedIn": 67108992,
                     "entPhysicalParentRelPos": 32,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12215,6 +12157,7 @@
                     "entPhysicalContainedIn": 67108992,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12234,6 +12177,7 @@
                     "entPhysicalContainedIn": 68157952,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12253,6 +12197,7 @@
                     "entPhysicalContainedIn": 68157952,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12272,6 +12217,7 @@
                     "entPhysicalContainedIn": 68420352,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12291,6 +12237,7 @@
                     "entPhysicalContainedIn": 68420288,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12310,6 +12257,7 @@
                     "entPhysicalContainedIn": 68420288,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12329,6 +12277,7 @@
                     "entPhysicalContainedIn": 68420288,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12348,6 +12297,7 @@
                     "entPhysicalContainedIn": 68420352,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12367,6 +12317,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 61
                 },
                 {
@@ -12386,6 +12337,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 49
                 },
                 {
@@ -12405,6 +12357,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 62
                 },
                 {
@@ -12424,6 +12377,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 50
                 },
                 {
@@ -12443,6 +12397,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 63
                 },
                 {
@@ -12462,6 +12417,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 51
                 },
                 {
@@ -12481,6 +12437,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 64
                 },
                 {
@@ -12500,6 +12457,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 52
                 },
                 {
@@ -12519,6 +12477,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 65
                 },
                 {
@@ -12538,6 +12497,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 53
                 },
                 {
@@ -12557,6 +12517,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 66
                 },
                 {
@@ -12576,6 +12537,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 54
                 },
                 {
@@ -12595,6 +12557,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 67
                 },
                 {
@@ -12614,6 +12577,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 55
                 },
                 {
@@ -12633,6 +12597,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 68
                 },
                 {
@@ -12652,6 +12617,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 56
                 },
                 {
@@ -12671,6 +12637,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 69
                 },
                 {
@@ -12690,6 +12657,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 57
                 },
                 {
@@ -12709,6 +12677,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 70
                 },
                 {
@@ -12728,6 +12697,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 58
                 },
                 {
@@ -12747,6 +12717,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 71
                 },
                 {
@@ -12766,6 +12737,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 59
                 },
                 {
@@ -12785,6 +12757,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 72
                 },
                 {
@@ -12804,6 +12777,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 60
                 },
                 {
@@ -12823,6 +12797,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 105
                 },
                 {
@@ -12842,6 +12817,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 106
                 },
                 {
@@ -12861,6 +12837,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 107
                 },
                 {
@@ -12880,6 +12857,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 108
                 },
                 {
@@ -12899,6 +12877,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12918,6 +12897,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12937,6 +12917,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12956,6 +12937,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12975,6 +12957,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12994,6 +12977,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13013,6 +12997,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -15892,7 +15877,7 @@
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "169.254.2.1",
-                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 0
                 },
                 {
@@ -15906,7 +15891,7 @@
                     "inetCidrRouteDest": "169.254.2.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 24
                 }
             ]
@@ -15916,158 +15901,151 @@
         "discovery": {
             "vlans": [
                 {
-                    "vlan_vlan": 1,
-                    "vlan_domain": 1,
-                    "vlan_name": "VLAN 1",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                },
-                {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
                     "vlan_name": "guest@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 6,
                     "vlan_domain": 1,
                     "vlan_name": "skupstina@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 19,
                     "vlan_domain": 1,
                     "vlan_name": "fin@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 20,
                     "vlan_domain": 1,
                     "vlan_name": "sofka@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 21,
                     "vlan_domain": 1,
                     "vlan_name": "jum@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 25,
                     "vlan_domain": 1,
                     "vlan_name": "gradjevinska@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 31,
                     "vlan_domain": 1,
                     "vlan_name": "kam@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 35,
                     "vlan_domain": 1,
                     "vlan_name": "ler@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 39,
                     "vlan_domain": 1,
                     "vlan_name": "mkr@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 40,
                     "vlan_domain": 1,
                     "vlan_name": "lpa@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 98,
                     "vlan_domain": 1,
                     "vlan_name": "mobile@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "pos@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 100,
                     "vlan_domain": 1,
                     "vlan_name": "prn@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
                     "vlan_name": "lan@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 255,
                     "vlan_domain": 1,
                     "vlan_name": "mgmn@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1000,
                     "vlan_domain": 1,
                     "vlan_name": "srv@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1001,
                     "vlan_domain": 1,
                     "vlan_name": "docker@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2000,
                     "vlan_domain": 1,
                     "vlan_name": "pub@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2010,
                     "vlan_domain": 1,
                     "vlan_name": "route10@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2601,
                     "vlan_domain": 1,
                     "vlan_name": "tlk_mfin@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3200,
                     "vlan_domain": 1,
                     "vlan_name": "tlk_wan@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -16248,14 +16226,6 @@
                     "untagged": 1
                 },
                 {
-                    "vlan": 1,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 2,
                     "baseport": 49,
                     "priority": 0,
@@ -16360,14 +16330,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 2,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 6,
                     "baseport": 51,
                     "priority": 0,
@@ -16422,14 +16384,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 6,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 19,
@@ -16502,14 +16456,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 19,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 20,
@@ -16552,14 +16498,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 20,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 21,
                     "baseport": 50,
                     "priority": 0,
@@ -16592,14 +16530,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 21,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 25,
                     "baseport": 50,
                     "priority": 0,
@@ -16630,14 +16560,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 25,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 31,
@@ -16688,14 +16610,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 31,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 35,
                     "baseport": 49,
                     "priority": 0,
@@ -16718,14 +16632,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 35,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 39,
@@ -16814,14 +16720,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 39,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 40,
@@ -16918,14 +16816,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 40,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 98,
@@ -17024,14 +16914,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 98,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 99,
                     "baseport": 49,
                     "priority": 0,
@@ -17118,14 +17000,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 99,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 100,
@@ -17240,14 +17114,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 100,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 200,
                     "baseport": 49,
                     "priority": 0,
@@ -17334,14 +17200,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 200,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 255,
@@ -17456,14 +17314,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 255,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 1000,
                     "baseport": 50,
                     "priority": 0,
@@ -17496,14 +17346,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 1000,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 1001,
                     "baseport": 57,
                     "priority": 0,
@@ -17526,14 +17368,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 1001,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 2000,
@@ -17568,14 +17402,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 2000,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 2010,
                     "baseport": 57,
                     "priority": 0,
@@ -17598,14 +17424,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 2010,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 2601,
@@ -17624,14 +17442,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 2601,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3200,
                     "baseport": 50,
                     "priority": 0,
@@ -17662,14 +17472,26 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "169.254.102.22",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.102.0/24",
+                    "ifIndex": 100253
                 },
                 {
-                    "vlan": 3200,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "ipv4_address": "169.254.2.22",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.2.0/24",
+                    "ifIndex": 100000
                 }
             ]
         }

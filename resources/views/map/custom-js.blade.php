@@ -32,7 +32,7 @@
                 x_pos =  x_pos;
                 let y_inc = font_size + 10;
 
-                let legend_header = {id: "legend_header", label: "<b>Legend</b>", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {multi: 'html', size: font_size}, color: {background: "white"}};
+                let legend_header = {id: "legend_header", label: "<b>{{ trans('map.custom.view.legend') }}</b>", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {multi: 'html', size: font_size}, color: {background: "white"}};
                 nodes.add(legend_header);
                 y_pos += y_inc;
 
@@ -41,7 +41,7 @@
                     if(colours) {
                         this_colour = colours['-1'];
                     }
-                    let legend_invalid = {id: "legend_invalid", label: "???", title: "Link is down or link speed is not defined", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {face: 'courier new', size: font_size, color: "white"}, color: {background: this_colour}};
+                    let legend_invalid = {id: "legend_invalid", label: "{{ trans('map.custom.view.unknown') }}", title: "{{ trans('map.custom.view.invalid_link') }}", shape: "box", borderWidth: 0, x: x_pos, y: y_pos, font: {face: 'courier new', size: font_size, color: "white"}, color: {background: this_colour}};
                     y_pos += y_inc;
                     nodes.add(legend_invalid);
                 }
@@ -107,7 +107,7 @@
             node_cfg.id = nodeid;
 
             if(node.linked_map_name) {
-                node_cfg.title = "Go to " + node.linked_map_name;
+                node_cfg.title = "{{ trans('map.custom.view.go_to') }} " + node.linked_map_name;
             } else if(node.device_id) {
                 node_cfg.title = document.createElement("div");
                 node_cfg.title.innerHTML = node.device_info;

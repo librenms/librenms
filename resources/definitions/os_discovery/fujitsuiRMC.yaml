@@ -1,4 +1,3 @@
-mib: FSC-SERVERCONTROL2-MIB
 modules:
     os:
         hardware: FSC-SERVERCONTROL2-MIB::sc2UnitModelName.1 # if MIB is not named here, value is not displayed. 
@@ -8,9 +7,10 @@ modules:
         state:
             data:
                 -
-                    oid: sc2AgentStatus
-                    value: sc2AgentStatus
+                    oid: FSC-SERVERCONTROL2-MIB::sc2AgentStatus
+                    value: FSC-SERVERCONTROL2-MIB::sc2AgentStatus
                     num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.8.1.{{ $index }}'
+                    state_name: sc2AgentStatus
                     descr: 'Global System Status'
                     states:
                         - { value: 1, descr: 'ok', graph: 1, generic: 0 }
@@ -20,10 +20,11 @@ modules:
                         - { value: 6, descr: 'notPresent', graph: 1, generic: 3 }
                         - { value: 7, descr: 'notManageable', graph: 1, generic: 3 }
                 -
-                    oid: sc2PowerSupplyTable
-                    value: sc2PowerSupplyStatus
+                    oid: FSC-SERVERCONTROL2-MIB::sc2PowerSupplyTable
+                    value: FSC-SERVERCONTROL2-MIB::sc2PowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.6.2.1.5.{{ $index }}'
-                    descr: sc2PowerSupplyDesignation
+                    state_name: sc2PowerSupplyTable
+                    descr: FSC-SERVERCONTROL2-MIB::sc2PowerSupplyDesignation
                     states:
                         - { value: 1, descr: unknown, graph: 1, generic: 3 }
                         - { value: 2, descr: not-present, graph: 1, generic: 2 }
@@ -33,10 +34,11 @@ modules:
                         - { value: 6, descr: dc-fail, graph: 1, generic: 1 }
                         - { value: 7, descr: critical-temp, graph: 1, generic: 1 }
                 -
-                    oid: sc2FanTable
-                    value: sc2fanStatus
+                    oid: FSC-SERVERCONTROL2-MIB::sc2FanTable
+                    value: FSC-SERVERCONTROL2-MIB::sc2fanStatus
                     num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.5.2.1.5.{{ $index }}'
-                    descr: sc2fanDesignation
+                    descr: FSC-SERVERCONTROL2-MIB::sc2fanDesignation
+                    state_name: sc2FanTable
                     states:
                         - { value: 1, descr: unknown, graph: 1, generic: 3 }
                         - { value: 2, descr: disabled, graph: 1, generic: 3 }
@@ -47,10 +49,11 @@ modules:
                         - { value: 7, descr: non-manageable, graph: 1, generic: 3 }
                         - { value: 8, descr: not-present, graph: 1, generic: 3 }
                 -
-                    oid: sc2Voltage
-                    value: sc2VoltageStatus
+                    oid: FSC-SERVERCONTROL2-MIB::sc2VoltageTable
+                    value: FSC-SERVERCONTROL2-MIB::sc2VoltageStatus
                     num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.6.3.1.4.{{ $index }}'
-                    descr: sc2VoltageDesignation
+                    descr: FSC-SERVERCONTROL2-MIB::sc2VoltageDesignation
+                    state_name: sc2Voltage
                     states:
                         - { value: 1, descr: unknown, graph: 1, generic: 3 }
                         - { value: 2, descr: disabled, graph: 1, generic: 3 }
@@ -60,10 +63,11 @@ modules:
                         - { value: 6, descr: out-of-range, graph: 1, generic: 2 }
                         - { value: 7, descr: warning, graph: 1, generic: 1 }
                 -
-                    oid: sc2ComponentStatusSensor
-                    value: sc2cssSensorStatus
+                    oid: FSC-SERVERCONTROL2-MIB::sc2ComponentStatusSensorTable
+                    value: FSC-SERVERCONTROL2-MIB::sc2cssSensorStatus
                     num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.8.3.1.8.{{ $index }}'
-                    descr: sc2cssSensorDesignation
+                    descr: FSC-SERVERCONTROL2-MIB::sc2cssSensorDesignation
+                    state_name: sc2ComponentStatusSensor
                     states:
                         - { value: 1, descr: unknown, graph: 1, generic: 3 }
                         - { value: 2, descr: ok, graph: 1, generic: 0 }
@@ -74,31 +78,31 @@ modules:
         temperature:
             data:
                 -
-                    oid: sc2TemperatureSensors
-                    value: sc2tempCurrentTemperature
+                    oid: FSC-SERVERCONTROL2-MIB::sc2TemperatureSensors
+                    value: FSC-SERVERCONTROL2-MIB::sc2tempCurrentTemperature
                     num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.5.1.1.6.{{ $index }}'
-                    descr: sc2tempSensorIdentifier
+                    descr: FSC-SERVERCONTROL2-MIB::sc2tempSensorIdentifier
         voltage:
             data:
                 -
-                    oid: sc2Voltage
-                    value: sc2VoltageNominalValue
+                    oid: FSC-SERVERCONTROL2-MIB::sc2VoltageTable
+                    value: FSC-SERVERCONTROL2-MIB::sc2VoltageNominalValue
                     num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.6.3.1.6.{{ $index }}'
-                    descr: sc2VoltageDesignation
-                    high_limit: sc2VoltageMaximumLevel
-                    low_limit: sc2VoltageMinimumLevel
+                    descr: FSC-SERVERCONTROL2-MIB::sc2VoltageDesignation
+                    high_limit: FSC-SERVERCONTROL2-MIB::sc2VoltageMaximumLevel
+                    low_limit: FSC-SERVERCONTROL2-MIB::sc2VoltageMinimumLevel
                     divisor: 1000
         power:
             data:
                 -
-                    oid: sc2PowerSupply
-                    value: sc2psPowerSupplyLoad
+                    oid: FSC-SERVERCONTROL2-MIB::sc2PowerSupplyTable
+                    value: FSC-SERVERCONTROL2-MIB::sc2psPowerSupplyLoad
                     num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.6.2.1.6.{{ $index }}'
                     descr: 'PSU {{ $index }}'
         fanspeed:
             data:
                 -
-                    oid: sc2Fans
-                    value: sc2fanCurrentSpeed
+                    oid: FSC-SERVERCONTROL2-MIB::sc2FanTable
+                    value: FSC-SERVERCONTROL2-MIB::sc2fanCurrentSpeed
                     num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.5.2.1.6.{{ $index }}'
-                    descr: sc2fanDesignation
+                    descr: FSC-SERVERCONTROL2-MIB::sc2fanDesignation

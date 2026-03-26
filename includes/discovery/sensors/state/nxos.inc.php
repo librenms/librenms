@@ -31,7 +31,7 @@ $fan_trays = SnmpQuery::hideMib()->numeric(true)->walk('CISCO-ENTITY-FRU-CONTROL
 
 if (is_array($fan_trays)) {
     foreach ($fan_trays as $current_oid => $current_value) {
-        $split_oid = explode('.', $current_oid);
+        $split_oid = explode('.', (string) $current_oid);
         $index = $split_oid[count($split_oid) - 1];
 
         $entity_oid = '.1.3.6.1.2.1.47.1.1.1.1.7';

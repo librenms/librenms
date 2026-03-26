@@ -74,7 +74,7 @@ class Allied extends OS implements OSDiscovery
           sysDescr.0 = STRING: "Allied Telesyn AT-8948 version 2.7.4-02 22-Aug-2005"
           sysDescr.0 = STRING: "Allied Telesis AT-8624T/2M version 2.9.1-13 11-Dec-2007"
         Use sysDescr to get Hardware, SW version, and Serial*/
-        [$a, $b, $c, $d, $e, $f] = array_pad(explode(' ', $this->getDeviceArray()['sysDescr']), 6, null);
+        [$a, $b, $c, $d, $e, $f] = array_pad(explode(' ', (string) $this->getDeviceArray()['sysDescr']), 6, null);
         if (! $hardware && ! $version) {
             if ($a == 'Allied' && $d == 'version') {
                 $version = $e;

@@ -37,7 +37,7 @@ use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 use Log;
 
-class CommonTrapTest extends SnmpTrapTestCase
+final class CommonTrapTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

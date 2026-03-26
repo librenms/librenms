@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Util;
 
+use InvalidArgumentException;
 use LibreNMS\Enum\IntegerType;
 use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Exceptions\UncorrectableNegativeException;
@@ -71,21 +72,21 @@ class Number
         $value = (float) $value;
         $neg = $value < 0;
         if ($neg) {
-            $value = $value * -1;
+            $value *= -1;
         }
 
         if ($value >= '0.1') {
             $sizes = ['', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
             $ext = $sizes[0];
             for ($i = 1; ($i < count($sizes)) && ($value >= 1000); $i++) {
-                $value = $value / 1000;
+                $value /= 1000;
                 $ext = $sizes[$i];
             }
         } else {
             $sizes = ['', 'm', 'u', 'n', 'p'];
             $ext = $sizes[0];
             for ($i = 1; ($i < count($sizes)) && ($value != 0) && ($value <= 0.1); $i++) {
-                $value = $value * 1000;
+                $value *= 1000;
                 $ext = $sizes[$i];
             }
         }
@@ -94,7 +95,7 @@ class Number
         $round = self::calcRound($value, $round, $sf);
 
         if ($neg) {
-            $value = $value * -1;
+            $value *= -1;
         }
 
         return self::cast(number_format($value, $round, '.', '')) . " $ext$suffix";
@@ -105,12 +106,12 @@ class Number
         $value = (float) $value;
         $neg = $value < 0;
         if ($neg) {
-            $value = $value * -1;
+            $value *= -1;
         }
         $sizes = ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'];
         $ext = $sizes[0];
         for ($i = 1; ($i < count($sizes)) && ($value >= 1024); $i++) {
-            $value = $value / 1024;
+            $value /= 1024;
             $ext = $sizes[$i];
         }
 
@@ -118,7 +119,7 @@ class Number
         $round = self::calcRound($value, $round, $sf);
 
         if ($neg) {
-            $value = $value * -1;
+            $value *= -1;
         }
 
         return self::cast(number_format($value, $round, '.', '')) . " $ext$suffix";
@@ -135,10 +136,53 @@ class Number
             $base = $baseIndicator == 'i' ? 1024 : 1000;
             $exponent = ['k' => 1, 'K' => 1, 'M' => 2, 'G' => 3, 'T' => 4, 'P' => 5, 'E' => 6, 'Z' => 7, 'Y' => 8];
 
-            return self::cast($number) * pow($base, $exponent[$magnitude] ?? 0);
+            return self::cast($number) * $base ** ($exponent[$magnitude] ?? 0);
         }
 
         return NAN;
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public static function toBaseUnits(string $input): float
+    {
+        $input = strtolower(trim($input));
+
+        if (! preg_match('/^([-+]?[0-9]*\.?[0-9]+)\s*([a-zµ]{1,3})$/', $input, $matches)) {
+            throw new InvalidArgumentException("Invalid format: '$input'");
+        }
+
+        $value = (float) $matches[1];
+        $unitSuffix = $matches[2];
+        $prefix = substr($unitSuffix, 0, -1);
+
+        $multiplier = match ($prefix) {
+            'y' => 1e-24,
+            'z' => 1e-21,
+            'a' => 1e-18,
+            'f' => 1e-15,
+            'p' => 1e-12,
+            'n' => 1e-9,
+            'µ', 'u' => 1e-6,
+            'm' => 1e-3,
+            'c' => 1e-2,
+            'd' => 1e-1,
+            '' => 1,
+            'da' => 1e1,
+            'h' => 1e2,
+            'k' => 1e3,
+            'M' => 1e6,
+            'G' => 1e9,
+            'T' => 1e12,
+            'P' => 1e15,
+            'E' => 1e18,
+            'Z' => 1e21,
+            'Y' => 1e24,
+            default => throw new InvalidArgumentException("Unknown prefix '$unitSuffix'"),
+        };
+
+        return $value * $multiplier;
     }
 
     /**
@@ -170,7 +214,7 @@ class Number
     public static function extract(mixed $string): float|int
     {
         if (! is_numeric($string)) {
-            preg_match('/-?\d*\.?\d+/', $string, $matches);
+            preg_match('/-?\d*\.?\d+/', (string) $string, $matches);
             if (! empty($matches[0])) {
                 $string = $matches[0];
             }
@@ -207,7 +251,7 @@ class Number
 
                 // if conversion was successful, the number will still be in the valid range
                 if ($signedValue > $maxSignedValue) {
-                    throw new \InvalidArgumentException('Unsigned value exceeds the maximum representable value of ' . $integerSize->name);
+                    throw new InvalidArgumentException('Unsigned value exceeds the maximum representable value of ' . $integerSize->name);
                 }
 
                 return $signedValue;
@@ -221,7 +265,7 @@ class Number
             $unsignedValue = $value + $integerSize->maxValue() - 1;
 
             if ($unsignedValue < 0) {
-                throw new \InvalidArgumentException('Unsigned value exceeds the minimum representable value of ' . $integerSize->name);
+                throw new InvalidArgumentException('Unsigned value exceeds the minimum representable value of ' . $integerSize->name);
             }
 
             return $unsignedValue;
@@ -324,9 +368,65 @@ class Number
         $percent = floatval($percent);
 
         while ($percent > 100) {
-            $percent = $percent / 10;
+            $percent /= 10;
         }
 
         return $percent;
+    }
+
+    /**
+     * Calculate a rate from a counter (uint32 or unit64) that could possibly overflow.
+     *
+     * This is using string input for the values to handle possible uint64 values.
+     */
+    public static function calculateRate(string $prevValue, string $currValue, float $prevTime, float $currTime, ?int $bitSize = null): float
+    {
+        if ($currTime <= $prevTime) {
+            throw new InvalidArgumentException('Current time must be greater than previous time');
+        }
+
+        if (! ctype_digit($prevValue) || ! ctype_digit($currValue)) {
+            throw new InvalidArgumentException("Counter values must be non-negative integers ($prevValue, $currValue)");
+        }
+
+        // Auto-detect bit size based on both values
+        if ($bitSize === null) {
+            $uint32Max = (string) IntegerType::Uint32->maxValue();
+            $bitSize = (strlen($prevValue) > 10 || strcmp($prevValue, $uint32Max) > 0 ||
+                strlen($currValue) > 10 || strcmp($currValue, $uint32Max) > 0) ? 64 : 32;
+        }
+        $maxValue = (string) ($bitSize === 32 ? IntegerType::Uint32->maxValue() : IntegerType::Uint64->maxValue());
+        $timeInterval = $currTime - $prevTime;
+
+        if (extension_loaded('gmp')) {
+            $prev = gmp_init($prevValue);
+            $curr = gmp_init($currValue);
+            $diff = gmp_cmp($curr, $prev) >= 0
+                ? gmp_sub($curr, $prev)
+                : gmp_add(gmp_sub(gmp_init($maxValue), $prev), gmp_add($curr, 1));
+
+            return (float) gmp_strval($diff) / $timeInterval;
+        }
+
+        if (extension_loaded('bcmath')) {
+            $diff = bccomp($currValue, $prevValue) >= 0
+                ? bcsub($currValue, $prevValue)
+                : bcadd(bcsub($maxValue, $prevValue), bcadd($currValue, '1'));
+
+            return (float) bcdiv($diff, (string) $timeInterval, 10);
+        }
+
+        // Fallback to float with precision check
+        $prev = (float) $prevValue;
+        $curr = (float) $currValue;
+        $max = (float) $maxValue;
+
+        if ($bitSize === 64 && ($prev > PHP_FLOAT_MAX || $curr > PHP_FLOAT_MAX)) {
+            trigger_error('Possible precision loss with 64-bit counter using float', E_USER_WARNING);
+        }
+
+        $diff = $curr >= $prev ? $curr - $prev : ($max - $prev) + $curr + 1;
+
+        return $diff / $timeInterval;
     }
 }

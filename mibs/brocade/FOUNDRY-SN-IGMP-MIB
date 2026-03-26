@@ -6,41 +6,42 @@ IMPORTS
 	router
 		FROM FOUNDRY-SN-ROOT-MIB
 		;
-
+		
 snIgmp MODULE-IDENTITY
-    LAST-UPDATED "201006020000Z"  -- 04 June 2010
-    ORGANIZATION "Brocade Communications Systems, Inc."
-    CONTACT-INFO
-             "Technical Support Center
-              130 Holger Way,
-              San Jose, CA  95134
-              Email:  ipsupport@brocade.com
-              Phone: 1-800-752-8061
-              URL:  www.brocade.com"
-    DESCRIPTION
-             "Copyright 1996-2010 Brocade Communications Systems, Inc.
-              All rights reserved.
-              This Brocade Communications Systems SNMP Management Information Base Specification
-              embodies Brocade Communications Systems' confidential and proprietary
-              intellectual property. Brocade Communications Systems retains all
-              title and ownership in the Specification, including any revisions.
-
-              This Specification is supplied AS IS, and Brocade Communications Systems makes
-              no warranty, either express or implied, as to the use,
-              operation, condition, or performance of the specification, and any unintended
-              consequence it may on the user environment."
-
-    REVISION        "201006020000Z"  -- 04 June 2010
-    DESCRIPTION
-        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
-
-    REVISION     "200909300000Z" -- September 30, 2009
-    DESCRIPTION
+	LAST-UPDATED "201708070000Z" -- Aug 7, 2017
+	ORGANIZATION "Ruckus Wireless, Inc."
+	CONTACT-INFO
+			"
+			Technical Support Center, Ruckus Wireless, Inc,
+			350 West Java Drive,
+			Sunnyvale, CA 94089, USA
+			Support URL: https://support.ruckuswireless.com
+			Phone: +1-855-782-5871
+			ROW TF Numbers: https://support.ruckuswireless.com/contact-us"
+	DESCRIPTION
+			"
+			Copyright 1996-2017 Ruckus Wireless, Inc..
+			All rights reserved.
+			This Ruckus Wireless, Inc SNMP Management Information Base Specification
+			embodies Ruckus Wireless, Inc' confidential and proprietary
+			intellectual property. Ruckus Wireless, Inc retains all
+			title and ownership in the Specification, including any
+			revisions.
+			
+			This Specification is supplied AS IS, and Ruckus Wireless, Inc makes
+			no warranty, either express or implied, as to the use,
+			operation, condition, or performance of the Specification.			
+			"            
+	REVISION     "200909300000Z" -- September 30, 2009
+	DESCRIPTION
 			""
+	REVISION     "201708070000Z" -- Aug 7, 2017
+	DESCRIPTION
+             "Modified contact Info, Organization and Decscription"
    ::= { router 6}
 
 
--- SECTION 2: MIB
+-- SECTION 2: MIB 
 
 -- IGMP MIB
 
@@ -59,7 +60,7 @@ snIgmpQueryInterval OBJECT-TYPE
 			to 'querier' before this object is writen.
 			Value 0 cannot be used for SET operations. This value
 			is returned if IGMP is not configured within the system.
-			For FI platform the configurable range for this object is
+			For FI platform the configurable range for this object is 
 			10 .. 3600"
 	DEFVAL     { 60 }
 	::= { snIgmpMIBObjects 1 }
@@ -76,7 +77,7 @@ snIgmpGroupMembershipTime OBJECT-TYPE
 			this object is writen.
 			Value 0 cannot be used for SET operations. This value
 			is returned if IGMP is not configured within the system.
-			For FI platform the configurable range for this object is
+			For FI platform the configurable range for this object is 
 			20 .. 7200"
 	DEFVAL     { 140 }
 	::= { snIgmpMIBObjects 2 }

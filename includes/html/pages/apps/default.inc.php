@@ -5,16 +5,14 @@ use LibreNMS\Util\Url;
 
 $graph_array['height'] = '100';
 $graph_array['width'] = '220';
-$graph_array['to'] = \LibreNMS\Config::get('time.now');
-$graph_array['from'] = \LibreNMS\Config::get('time.day');
+$graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+$graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
 $graph_array_zoom = $graph_array;
 $graph_array_zoom['height'] = '150';
 $graph_array_zoom['width'] = '400';
 $graph_array['legend'] = 'no';
 
-$apps = Application::query()->hasAccess(Auth::user())->where('app_type', $vars['app'])->with('device')->get()->sortBy(function ($app) {
-    return $app->device->hostname;
-});
+$apps = Application::query()->hasAccess(Auth::user())->where('app_type', $vars['app'])->with('device')->get()->sortBy(fn ($app) => $app->device->hostname);
 
 foreach ($apps as $app) {
     $app_state = \LibreNMS\Util\Html::appStateIcon($app['app_state']);

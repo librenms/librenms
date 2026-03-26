@@ -543,9 +543,6 @@ return [
             'description' => 'Dateinamensuffix',
             'help' => 'Dies ist sehr wichtig da Gerätenamen in NfSen auf 21 Zeichen limitiert sind. Dies bedeutet das es problematisch werden kann full domain names zu kürzen, daher wird unnützes gewöhnlich entfernt.',
         ],
-        'nmap' => [
-            'description' => 'Pfad zu nmap',
-        ],
         'own_hostname' => [
             'description' => 'LibreNMS hostname',
             'help' => 'Sollte auf den hostname/ip des LibreNMS Servers gesetzt werden',
@@ -579,9 +576,6 @@ return [
                 'description' => 'Aktiviere PeeringDB lookup',
                 'help' => 'Aktiviere PeeringDB lookup (Daten werden mit daily.sh heruntergeladen)',
             ],
-        ],
-        'ping' => [
-            'description' => 'Pfad zu ping',
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB Einträge älter als',
@@ -625,9 +619,6 @@ return [
         'rrdtool_tune' => [
             'description' => 'Tune alle RRD port Dateien zur Nutzung maximaler Werte',
             'help' => 'Automatisches Tuning auf maximale Werte für RRD port Dateien',
-        ],
-        'sfdp' => [
-            'description' => 'Pfad zu sfdp',
         ],
         'shorthost_target_length' => [
             'description' => 'Verkürzt einen Hostnamen auf diese maximale Länge',
@@ -782,9 +773,6 @@ return [
                 'description' => 'Definiere die minimale Graphen Höhe',
                 'help' => 'Minimale Graphen Höhe (Standard: 300)',
             ],
-        ],
-        'whois' => [
-            'description' => 'Pfad zu whois',
         ],
     ],
     'twofactor' => [

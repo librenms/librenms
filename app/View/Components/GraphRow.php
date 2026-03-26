@@ -8,42 +8,8 @@ use Illuminate\View\Component;
 
 class GraphRow extends Component
 {
-    /**
-     * @var string
-     */
-    public $type;
-    /**
-     * @var string
-     */
-    public $loading;
-    /**
-     * @var null
-     */
-    public $device;
-    /**
-     * @var null
-     */
-    public $port;
-    /**
-     * @var array|string[][]
-     */
-    public $graphs;
-    /**
-     * @var string|null
-     */
-    public $title;
-    /**
-     * @var float|int
-     */
-    public $rowWidth;
-    /**
-     * @var bool
-     */
-    public $responsive;
-    /**
-     * @var string
-     */
-    public $aspect;
+    public bool $responsive;
+    public ?int $rowWidth;
 
     /**
      * Create a new component instance.
@@ -57,15 +23,16 @@ class GraphRow extends Component
      * @param  Device|int|null  $device
      * @param  Port|int|null  $port
      */
-    public function __construct(string $type = '', ?string $title = null, string $loading = 'eager', string $aspect = 'normal', int|string $columns = 2, array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']], int|Device|null $device = null, int|Port|null $port = null)
+    public function __construct(
+        public string $type = '',
+        public ?string $title = null,
+        public string $loading = 'eager',
+        public string $aspect = 'normal',
+        public int|string $columns = 2,
+        public array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']],
+        public int|Device|null $device = null,
+        public int|Port|null $port = null)
     {
-        $this->type = $type;
-        $this->aspect = $aspect;
-        $this->loading = $loading;
-        $this->device = $device;
-        $this->port = $port;
-        $this->graphs = $graphs;
-        $this->title = $title;
         $this->responsive = $columns == 'responsive';
         $this->rowWidth = $this->calculateRowWidth((int) $columns);
     }

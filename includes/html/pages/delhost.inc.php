@@ -1,22 +1,24 @@
 <?php
 
-if (! Auth::user()->hasGlobalAdmin()) {
+use App\Models\Device;
+
+if (Gate::denies('delete', Device::class)) {
     require 'includes/html/error-no-perm.inc.php';
     exit;
 }
 
 $pagetitle[] = 'Delete device';
 
-if (Auth::user()->isDemo()) {
-    demo_account();
+if (Gate::allows('demo')) {
+    print_error("You are logged in as a demo account, this page isn't accessible to you");
 } else {
-    if (is_numeric($_REQUEST['id'])) {
+    if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
         echo '
             <div class="row">
             <div class="col-sm-offset-2 col-sm-7">
             ';
-        if ($_REQUEST['confirm']) {
-            print_message(nl2br(delete_device($_REQUEST['id'])) . "\n");
+        if (! empty($_REQUEST['confirm'])) {
+            print_message(nl2br((string) delete_device($_REQUEST['id'])) . "\n");
         } else {
             $device = device_by_id_cache($_REQUEST['id']);
             print_error('Are you sure you want to delete device ' . $device['hostname'] . '?'); ?>
@@ -29,7 +31,6 @@ if (Auth::user()->isDemo()) {
     <div class="form-group">
       <input type="hidden" name="id" value="<?php echo htmlspecialchars($_REQUEST['id']) ?>" />
       <input type="hidden" name="confirm" value="1" />
-      <!--<input type="hidden" name="remove_rrd" value="<?php echo htmlspecialchars($_POST['remove_rrd']); ?>">-->
       <button type="submit" class="btn btn-danger">Confirm device deletion</button>
     </div>
   </form>

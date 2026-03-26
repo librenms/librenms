@@ -1,0 +1,20 @@
+modules:
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: PACKETFLUX-SENSORS-MIB::voltageSensorTable
+                    value: PACKETFLUX-SENSORS-MIB::voltageSensorValue
+                    descr: PACKETFLUX-SENSORS-MIB::voltageSensorFunction
+                    index: 'voltageSensorFunction.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.32050.3.2.1.1.4.{{ $index }}'
+                    divisor: 1000000
+        temperature:
+            data:
+                -
+                    oid: PACKETFLUX-SENSORS-MIB::temperatureSensorTable
+                    value: PACKETFLUX-SENSORS-MIB::temperatureSensorValue
+                    descr: PACKETFLUX-SENSORS-MIB::temperatureSensorFunction
+                    index: 'temperatureSensorFunction.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.32050.3.2.3.1.4.{{ $index }}'
+                    divisor: 100

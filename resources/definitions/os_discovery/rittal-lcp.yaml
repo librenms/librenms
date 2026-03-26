@@ -1,4 +1,3 @@
-mib: RITTAL-CMC-III-MIB
 modules:
     os:
         hardware: RITTAL-CMC-III-MIB::cmcIIIDevName.1
@@ -8,8 +7,8 @@ modules:
         state:
             data:
                 -
-                    oid: cmcIIIUnitStatus
-                    value: cmcIIIUnitStatus
+                    oid: RITTAL-CMC-III-MIB::cmcIIIUnitStatus
+                    value: RITTAL-CMC-III-MIB::cmcIIIUnitStatus
                     state_name: cmcIIIUnitStatus
                     num_oid: '.1.3.6.1.4.1.2606.7.2.1.{{ $index }}'
                     index: 'cmcIIIUnitStatus.{{ $index }}'

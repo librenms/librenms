@@ -26,24 +26,24 @@
 
 namespace App\Http\Controllers\Ajax;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
 
 abstract class SearchController
 {
     public function __invoke(Request $request): JsonResponse
     {
-        $search = $request->get('search');
+        $search = $request->input('search');
         if (empty($search)) {
             return new JsonResponse;
         }
 
         $query = $this->buildQuery($search, $request)
-            ->limit((int) Config::get('webui.global_search_result_limit'));
+            ->limit((int) LibrenmsConfig::get('webui.global_search_result_limit'));
 
-        return response()->json($query->get()->map([$this, 'formatItem']));
+        return response()->json($query->get()->map($this->formatItem(...)));
     }
 
     abstract public function buildQuery(string $search, Request $request): Builder;

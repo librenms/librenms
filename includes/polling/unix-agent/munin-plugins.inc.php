@@ -32,7 +32,7 @@ if (! empty($agent_data['munin'])) {
 
         d_echo("\n[$plugin_data]\n");
 
-        foreach (explode("\n", $plugin_data) as $line) {
+        foreach (explode("\n", (string) $plugin_data) as $line) {
             [$key, $value] = explode(' ', $line, 2);
             if (preg_match('/^graph_/', $key)) {
                 [,$key] = explode('_', $key);

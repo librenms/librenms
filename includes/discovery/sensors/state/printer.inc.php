@@ -1,9 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\StringHelpers;
 
 echo 'Printer Status and Error State ';
-$state = snmp_get($device, 'hrDeviceStatus.1', '-Ovqe', 'HOST-RESOURCES-MIB');
+$state = SnmpQuery::get('HOST-RESOURCES-MIB::hrDeviceStatus.1')->value();
 if (is_numeric($state)) {
     //Create State Index
     $state_name = 'hrDeviceStatus';
@@ -38,7 +39,7 @@ if (is_numeric($state)) {
     );
 }
 
-$state = snmp_get($device, 'hrPrinterDetectedErrorState.1', '-Ovqe', 'HOST-RESOURCES-MIB');
+$state = SnmpQuery::get('HOST-RESOURCES-MIB::hrPrinterDetectedErrorState.1')->value();
 if ($state) {
     // https://www.ietf.org/rfc/rfc1759.txt hrPrinterDetectedErrorState
     //Create State Index
@@ -56,7 +57,7 @@ if ($state) {
             ['value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'Warning, multiple issues'],
             ['value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'Critical, multiple issues'],
         ];
-    $bit_flags = q_bridge_bits2indices($state);
+    $bit_flags = StringHelpers::bitsToIndices($state);
     $is_critical = false;
     if (count($bit_flags) == 0) {
         $state = 0;

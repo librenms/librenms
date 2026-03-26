@@ -12,13 +12,9 @@
  * the source code distribution for details.
  */
 
-if (! Auth::user()->hasGlobalAdmin()) {
-    header('Content-type: text/plain');
-    exit('ERROR: You need to be admin');
-}
+use App\Models\AlertTemplate;
 
-$template_id = $vars['template_id'];
-$template_edit = is_numeric($template_id) && $template_id > 0;
+$template = AlertTemplate::find($vars['template_id'] ?? 0);
 
 $rules = [];
 $output = [
@@ -26,23 +22,21 @@ $output = [
     'name' => '',
     'title' => '',
     'title_rec' => '',
-    'type' => '',
     'rules' => $rules,
 ];
 
-if ($template_edit) {
-    $template = dbFetchRow('SELECT * FROM `alert_templates` WHERE `id` = ? LIMIT 1', [$template_id]);
+if ($template) {
+    Gate::authorize('view', $template);
     $output = [
-        'template' => $template['template'],
-        'name' => $template['name'],
-        'title' => $template['title'],
-        'title_rec' => $template['title_rec'],
-        'type' => $template['type'],
+        'template' => $template->template,
+        'name' => $template->name,
+        'title' => $template->title,
+        'title_rec' => $template->title_rec,
     ];
 }
 
-foreach (dbFetchRows('SELECT `id`,`rule`,`name` FROM `alert_rules` order by `name`', []) as $rule) {
-    $is_selected = $template_edit ? dbFetchCell('SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ? AND `alert_templates_id` = ?', [$rule['id'], $template_id]) : null;
+foreach (dbFetchRows('SELECT `id`,`name` FROM `alert_rules` order by `name`', []) as $rule) {
+    $is_selected = $template ? dbFetchCell('SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ? AND `alert_templates_id` = ?', [$rule['id'], $template->id]) : null;
     $is_available = dbFetchCell('SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ?', [$rule['id']]);
     $rules[] = [
         'id' => $rule['id'],

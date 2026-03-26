@@ -1,5 +1,5 @@
 <x-popup>
-    <a class="tw:font-bold @if($status=='disabled') tw:text-gray-400 tw:visited:text-gray-400 @elseif($status=='down') tw:text-red-600 tw:visited:text-red-600 @else tw:text-blue-900 tw:visited:textc-blue-900 tw:dark:text-dark-white-100 tw:dark:visited:text-dark-white-100 @endif" href="{{ $href }}">
+    <a class="device-link-{{ $status }}" href="{{ $href }}">
         {{ $slot->isNotEmpty() ? $slot : $device->displayName() }}
     </a>
     <x-slot name="title">
@@ -8,7 +8,7 @@
             {{ $device->hardware }}
         </span>
         <span class="tw:text-nowrap tw:pl-2 tw:pr-1">
-            @if($device->os){{ \LibreNMS\Config::getOsSetting($device->os, 'text') }}@endif
+            @if($device->os){{ \App\Facades\LibrenmsConfig::getOsSetting($device->os, 'text') }}@endif
             {{ $device->version }}
         </span>
         <span class="tw:text-nowrap tw:pl-2">

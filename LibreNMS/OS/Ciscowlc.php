@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 
 use App\Models\AccessPoint;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -71,7 +72,7 @@ class Ciscowlc extends Cisco implements
             'NUMCLIENTS' => $numClients,
         ];
 
-        $tags = compact('rrd_def');
+        $tags = ['rrd_def' => $rrd_def];
         $datastore->put($device, 'ciscowlc', $tags, $fields);
 
         $db_aps = $this->getDevice()->accessPoints->keyBy->getCompositeKey();
@@ -169,7 +170,7 @@ class Ciscowlc extends Cisco implements
             $total += $count;
 
             $sensors[] = new WirelessSensor(
-                'clients',
+                WirelessSensorType::Clients,
                 $this->getDeviceId(),
                 $oid,
                 'ciscowlc-ssid',
@@ -180,7 +181,7 @@ class Ciscowlc extends Cisco implements
         }
 
         $sensors[] = new WirelessSensor(
-            'clients',
+            WirelessSensorType::Clients,
             $this->getDeviceId(),
             $total_oids,
             'ciscowlc',
@@ -210,7 +211,7 @@ class Ciscowlc extends Cisco implements
         if (isset($data['CISCO-LWAPP-AP-MIB::cLApGlobalAPConnectCount.0'])) {
             return [
                 new WirelessSensor(
-                    'ap-count',
+                    WirelessSensorType::ApCount,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.9.9.513.1.3.35.0',
                     'ciscowlc',
@@ -230,7 +231,7 @@ class Ciscowlc extends Cisco implements
         if (isset($data['CISCO-LWAPP-SYS-MIB::clsSysApConnectCount.0'])) {
             return [
                 new WirelessSensor(
-                    'ap-count',
+                    WirelessSensorType::ApCount,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.9.9.618.1.8.4.0',
                     'ciscowlc',

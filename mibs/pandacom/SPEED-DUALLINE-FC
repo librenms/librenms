@@ -1,0 +1,1524 @@
+SPEED-DUALLINE-FC DEFINITIONS ::= BEGIN
+
+--*****************************************************************************************
+--*****   Version History   ***************************************************************
+--=========================================================================================
+
+--V0.0  14.12.2009 ML: Erste Version SPEED-DUALLINE-FC
+--Supported Modules:
+--
+--*****************************************************************************************
+
+IMPORTS
+	DisplayString	FROM SNMPv2-TC
+	Integer32, IpAddress, TimeTicks, MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+	converter	FROM SPEEDCARRIER-MIB
+; -- END of IMPORTS
+
+--*******************************************************************
+
+    speedDuallineFC MODULE-IDENTITY
+        LAST-UPDATED "201911070000Z"
+        ORGANIZATION "Pan Dacom Direkt GmbH"
+        CONTACT-INFO
+            "Pan Dacom Direkt GmbH
+            Dreieich Plaza 1B
+            63303 Dreieich
+            Germany
+            Tel. : +49 6103/932-333
+            Fax. : +49 6103/932-444
+            email: kontakt@pandacomdirekt.de
+            web  : www.pandacomdirekt.de"
+        DESCRIPTION "MIB objects for the SPEED-Dualline FC XFP / FC SFP / 10G XFP / 10G SFP / 16G XFP / 16G SFP / 16G XFP 2R card"
+
+        REVISION "201911070000Z"
+        DESCRIPTION "Rev. 7.2.3
+        - integer syntax correction"
+        
+        REVISION "201904250000Z"
+        DESCRIPTION "Rev. 7.2.3
+        - integer syntax correction"
+        
+        REVISION "201712070000Z"
+        DESCRIPTION "Rev. 7.0.2
+                - syntax correction"
+
+        REVISION "201312120000Z"
+        DESCRIPTION "Revision 5.2.0
+        - change of table indexes
+        - corrective actions "
+
+        ::= { converter 3 }
+
+--*******************************************************************
+
+	speedDuallineFCMOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedDuallineFCMOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Speed-Dualline FC Module Overview table"
+		::= { speedDuallineFC 1 }
+
+	speedDuallineFCMOverviewEntry OBJECT-TYPE
+		SYNTAX SpeedDuallineFCMOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module Overview entries"
+		INDEX { speedDuallineFCSlot }
+		::= { speedDuallineFCMOverviewTable 1 }
+
+	SpeedDuallineFCMOverviewEntry ::=
+		SEQUENCE
+		{
+			speedDuallineFCSlot Integer32,
+			speedDuallineFCMDevice INTEGER,
+			speedDuallineFCMState INTEGER,
+			speedDuallineFCMSysName DisplayString,
+			speedDuallineFCMSysUpTime TimeTicks,
+			speedDuallineFCMTemperature Integer32,
+			speedDuallineFCMAlarmState INTEGER,
+			speedDuallineFCMKernelImage DisplayString,
+			speedDuallineFCMAppImage DisplayString,
+			speedDuallineFCMHwVersion DisplayString,
+			speedDuallineFCMSerialNumber DisplayString,
+			speedDuallineFCMEthPortState INTEGER,
+			speedDuallineFCMUploadState INTEGER,
+			speedDuallineFCMUpdateState INTEGER
+		}
+
+	speedDuallineFCSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { speedDuallineFCMOverviewEntry 2 }
+
+	speedDuallineFCMDevice OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			speedDuallineFCXFP(6),
+			speedDuallineFCSFP(7),
+			speedDualline10GXFP(8),
+			speedDualline10GSFP(9),
+			speedDualline16GXFP(10),
+			speedDualline16GSFP(11),
+			speedDualline10GXFP2R(12),
+            speedDualline16GSFPH(32),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"device type"
+		::= { speedDuallineFCMOverviewEntry 3 }
+
+	speedDuallineFCMState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			running(1),
+			resetSoftware(2),
+			resetConfig(3),
+			resetCAN(4),
+			resetHardware(5),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Device oper state. If setting resetConfig, you also have to reset the hardware."
+		::= { speedDuallineFCMOverviewEntry 4 }
+
+	speedDuallineFCMSysName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Modules name or description"
+		::= { speedDuallineFCMOverviewEntry 5 }
+
+	speedDuallineFCMSysUpTime OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"System Up Time in Seconds"
+		::= { speedDuallineFCMOverviewEntry 6 }
+
+	speedDuallineFCMTemperature OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Board temperature"
+		::= { speedDuallineFCMOverviewEntry 7 }
+
+	speedDuallineFCMAlarmState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			noAlarm(1),
+			activeAlarms(2),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"global device alarm state"
+		::= { speedDuallineFCMOverviewEntry 8 }
+
+	speedDuallineFCMKernelImage OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"kernel version"
+		::= { speedDuallineFCMOverviewEntry 9 }
+
+	speedDuallineFCMAppImage OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"software version"
+		::= { speedDuallineFCMOverviewEntry 10 }
+
+	speedDuallineFCMHwVersion OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"board hardware version"
+		::= { speedDuallineFCMOverviewEntry 11 }
+
+	speedDuallineFCMSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..17))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"board serial number"
+		::= { speedDuallineFCMOverviewEntry 12 }
+
+	speedDuallineFCMEthPortState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notavailable(0),
+			linkDown(1),
+			hdx10(2),
+			fdx10(3),
+			hdx100(4),
+			fdx100(5),
+			off(6),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Ethernet Port State (copper management port)"
+		::= { speedDuallineFCMOverviewEntry 13 }
+
+
+	speedDuallineFCMUploadState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			ready(1),
+			startUpload(2),
+			uploadActive(3),
+			uploadFailure(4),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"software update state"
+		::= { speedDuallineFCMOverviewEntry 14 }
+
+	speedDuallineFCMUpdateState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			idle(1),
+			activateKernel (2),
+			activateApplication (3),
+			unknown(255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"software update state"
+		::= { speedDuallineFCMOverviewEntry 15 }
+
+-- *********************************
+
+	speedDuallineFCMConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedDuallineFCMConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Speed-Dualline FC module config table"
+		::= { speedDuallineFC 2 }
+
+	speedDuallineFCMConfigEntry OBJECT-TYPE
+		SYNTAX SpeedDuallineFCMConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module config entries"
+		INDEX { speedDuallineFCMSlot }
+		::= { speedDuallineFCMConfigTable 1 }
+
+	SpeedDuallineFCMConfigEntry ::=
+		SEQUENCE
+		{
+			speedDuallineFCMSlot Integer32,
+			speedDuallineFCMIpAddress IpAddress,
+			speedDuallineFCMIpNetmask IpAddress,
+			speedDuallineFCMIpGateway IpAddress,
+			speedDuallineFCMTrapSink1 IpAddress,
+			speedDuallineFCMTrapSink2 IpAddress,
+			speedDuallineFCMTrapSink3 IpAddress,
+			speedDuallineFCMTrapSink4 IpAddress,
+			speedDuallineFCMTrapSink5 IpAddress,
+			speedDuallineFCMSNMPReadCommunity DisplayString,
+			speedDuallineFCMSNMPWriteCommunity DisplayString,
+			speedDuallineFCMTempWarningLevel Integer32,
+			speedDuallineFCMTempAlarmLevel Integer32,
+			speedDuallineFCMSNMPSyscontact DisplayString,
+			speedDuallineFCMSNMPSyslocation DisplayString,
+			speedDuallineFCMPortTxConnection INTEGER,
+			speedDuallineFCMUserTimeout Integer32,
+			speedDuallineFCMEthPortMode INTEGER,
+			speedDuallineFCMAccess INTEGER
+		}
+
+    speedDuallineFCMSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { speedDuallineFCMConfigEntry 2 }
+
+	speedDuallineFCMIpAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"device IP-address"
+		DEFVAL { 'c0a80066'H }	-- 192.168.0.102
+		::= { speedDuallineFCMConfigEntry 3 }
+
+	speedDuallineFCMIpNetmask OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"device IP-mask"
+		DEFVAL { 'ffffff00'H }	-- 255.255.255.0
+		::= { speedDuallineFCMConfigEntry 4 }
+
+	speedDuallineFCMIpGateway OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"device default gateway"
+		::= { speedDuallineFCMConfigEntry 5 }
+
+	speedDuallineFCMTrapSink1 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp trapsink 1"
+		::= { speedDuallineFCMConfigEntry 6 }
+
+	speedDuallineFCMTrapSink2 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp trapsink 2"
+		::= { speedDuallineFCMConfigEntry 7 }
+
+	speedDuallineFCMTrapSink3 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp trapsink 3"
+		::= { speedDuallineFCMConfigEntry 8 }
+
+	speedDuallineFCMTrapSink4 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp trapsink 4"
+		::= { speedDuallineFCMConfigEntry 9 }
+
+	speedDuallineFCMTrapSink5 OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp trapsink 5"
+		::= { speedDuallineFCMConfigEntry 10 }
+
+	speedDuallineFCMSNMPReadCommunity OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp read community"
+		::= { speedDuallineFCMConfigEntry 11 }
+
+	speedDuallineFCMSNMPWriteCommunity OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp write community"
+		::= { speedDuallineFCMConfigEntry 12 }
+
+	speedDuallineFCMTempWarningLevel OBJECT-TYPE
+		SYNTAX Integer32 (5..60)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"high temperature warning level"
+		::= { speedDuallineFCMConfigEntry 13 }
+
+	speedDuallineFCMTempAlarmLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"high temperature alarm level"
+		::= { speedDuallineFCMConfigEntry 14 }
+
+	speedDuallineFCMSNMPSyscontact OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp syscontact"
+		::= { speedDuallineFCMConfigEntry 15 }
+
+	speedDuallineFCMSNMPSyslocation OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"snmp syslocation"
+		::= { speedDuallineFCMConfigEntry 16 }
+
+	speedDuallineFCMPortTxConnection OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			connect1to3and2to4(1),
+			connect1to4and2to3(2),
+            connect1to2and3to4fixed(3),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"port tx connection"
+		::= { speedDuallineFCMConfigEntry 17 }
+
+	speedDuallineFCMUserTimeout OBJECT-TYPE
+		SYNTAX Integer32 (120..3600)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"CLI user timeout. Valid from 120 to 3600 seconds."
+		::= { speedDuallineFCMConfigEntry 18 }
+
+	speedDuallineFCMEthPortMode OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notavailable(0),
+			autoneg(1),
+			hdx10(2),
+			fdx10(3),
+			hdx100(4),
+			fdx100(5),
+			off(6),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Admin config for Ethernet port on FC card."
+		::= { speedDuallineFCMConfigEntry 19 }
+
+	speedDuallineFCMAccess OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notavailable(0),
+			off(1),
+			telnet(2),
+			ssh2(3),
+			notImplemented(254),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"access method to this system"
+		::= { speedDuallineFCMConfigEntry 20 }
+
+-- *********************************
+
+	speedDuallineFCMProtectionTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedDuallineFCMProtectionEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Speed-Dualline FC module Protection table"
+		::= { speedDuallineFC 3 }
+
+	speedDuallineFCMProtectionEntry OBJECT-TYPE
+		SYNTAX SpeedDuallineFCMProtectionEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module Protection entries"
+		INDEX { speedDuallineFCMLinkProtectionSlot }
+		::= { speedDuallineFCMProtectionTable 1 }
+
+	SpeedDuallineFCMProtectionEntry ::=
+		SEQUENCE
+		{
+			speedDuallineFCMLinkProtectionSlot Integer32,
+			speedDuallineFCMLinkProtectionConfig INTEGER,
+			speedDuallineFCMLinkProtectionState INTEGER,
+			speedDuallineFCMLinkProtectionFallbackTime Integer32,
+			speedDuallineFCMLinkProtectionRXLevelPort1 Integer32,
+			speedDuallineFCMLinkProtectionRXLevelPort2 Integer32,
+			speedDuallineFCMLinkProtectionClientPort INTEGER,
+			speedDuallineFCMLinkProtectionMode INTEGER
+		}
+		
+	speedDuallineFCMLinkProtectionSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { speedDuallineFCMProtectionEntry 2 }
+
+	speedDuallineFCMLinkProtectionConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unknown(0),
+			protectionOFF(1),
+			protectionOn(2),
+			notAvailable(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"enable/disable the link protection"
+		::= { speedDuallineFCMProtectionEntry 3 }
+
+	speedDuallineFCMLinkProtectionState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unknown(0),
+			port1active(1),
+			port2active(2),
+			testingPort1(3),
+			testingPort2(4),
+			noneActive(5),
+			notAvailable(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"link protection state"
+		::= { speedDuallineFCMProtectionEntry 4 }
+
+	speedDuallineFCMLinkProtectionFallbackTime OBJECT-TYPE
+		SYNTAX Integer32 (5..3600)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"fallback time in seconds to main link."
+		::= { speedDuallineFCMProtectionEntry 5 }
+
+	speedDuallineFCMLinkProtectionRXLevelPort1 OBJECT-TYPE
+		SYNTAX Integer32 (-4000..500)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"min RX-power level for switch over"
+		::= { speedDuallineFCMProtectionEntry 6 }
+
+	speedDuallineFCMLinkProtectionRXLevelPort2 OBJECT-TYPE
+		SYNTAX Integer32 (-4000..500)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"min RX-power level for switch over"
+		::= { speedDuallineFCMProtectionEntry 7 }
+
+	speedDuallineFCMLinkProtectionClientPort OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notavailable(0),
+			port3(1),
+			port4(2),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"choose prefered client port"
+		::= { speedDuallineFCMProtectionEntry 8 }
+
+	speedDuallineFCMLinkProtectionMode OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notavailable(0),
+			fallbackPort1(1),
+			fallbackPort2(2),
+			staticPort1(3),
+			staticPort2(4),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"protection working mode"
+		::= { speedDuallineFCMProtectionEntry 9 }
+
+-- *********************************
+
+	speedDuallineFCPortOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedDuallineFCPortOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Speed-Dualline FC port overview table"
+		::= { speedDuallineFC 4 }
+
+	speedDuallineFCPortOverviewEntry OBJECT-TYPE
+		SYNTAX SpeedDuallineFCPortOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module port overview entries"
+		INDEX { speedDuallineFCPortIndex }
+		::= { speedDuallineFCPortOverviewTable 1 }
+
+	SpeedDuallineFCPortOverviewEntry ::=
+		SEQUENCE
+		{
+			speedDuallineFCPortIndex Integer32,
+			speedDuallineFCPortSlot Integer32,
+			speedDuallineFCPortPort Integer32,
+			speedDuallineFCPortDescription DisplayString,
+			speedDuallineFCPortAdminConfig INTEGER,
+			speedDuallineFCPortOperState INTEGER,
+			speedDuallineFCPortXCVState INTEGER,
+			speedDuallineFCPortLLCFconfig INTEGER,
+			speedDuallineFCPortLoopConfig INTEGER,
+			speedDuallineFCPortSpeedConfig INTEGER,
+			speedDuallineFCPortAlarmState INTEGER,
+			speedDuallineFCPortAlarmDeactivation INTEGER,
+			speedDuallineFCPortAlarmSchedule  Integer32
+		}
+
+
+	speedDuallineFCPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port Index"
+		::= { speedDuallineFCPortOverviewEntry 1 }
+
+	speedDuallineFCPortSlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { speedDuallineFCPortOverviewEntry 2 }
+
+	speedDuallineFCPortPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { speedDuallineFCPortOverviewEntry 3 }
+
+	speedDuallineFCPortDescription OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"port description"
+		::= { speedDuallineFCPortOverviewEntry 4 }
+
+	speedDuallineFCPortAdminConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			adminDown(1),
+			adminUp(2),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"port admin config"
+		::= { speedDuallineFCPortOverviewEntry 5 }
+
+	speedDuallineFCPortOperState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			down(1),
+			up(2),
+			loop(3),
+			downLLCF(4),
+			downTxFault(5),
+			downRxLevel(6),
+			downTxLevel(7),
+			bertRunnung(8),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port operational state"
+		::= { speedDuallineFCPortOverviewEntry 6 }
+
+	speedDuallineFCPortXCVState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			xcvRemoved(1),
+			xcvInstalled(2),
+			xcvTxFault(3),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver installation state"
+		::= { speedDuallineFCPortOverviewEntry 7 }
+
+	speedDuallineFCPortLLCFconfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			off(1),
+			on(2),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"port link loss cary forward config"
+		::= { speedDuallineFCPortOverviewEntry 8 }
+
+	speedDuallineFCPortLoopConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			off(1),
+			on(2),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"port loop config"
+		::= { speedDuallineFCPortOverviewEntry 9 }
+
+	speedDuallineFCPortSpeedConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			fibrechannel1G (1),
+			fibrechannel2G (2),
+			fibrechannel4G (3),
+			fibrechannel8G (4),
+			fibrechannel16G (5),
+			sfp9930-11300 (6),
+			bypass (16)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"port 3R speed in kbit/s"
+		::= { speedDuallineFCPortOverviewEntry 10 }
+
+	speedDuallineFCPortAlarmState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			noAlarms(1),
+			activeAlarms(2),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port alarm state"
+		::= { speedDuallineFCPortOverviewEntry 11 }
+
+	speedDuallineFCPortAlarmDeactivation OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			alarmReportingEnabled(1),
+			alarmReportingDisabledbySchedule(2),
+			alarmReportingDisabledPermanent(3),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Port alarm deactivation schedule"
+		::= { speedDuallineFCPortOverviewEntry 12 }
+
+	speedDuallineFCPortAlarmSchedule OBJECT-TYPE
+		SYNTAX Integer32 (0..1200)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Port alarm deactivation schedule. Value in hours. After this time has elapsed, the alarms are active again. Valid range: 1..1200. 0 means less then 1 hour"
+		::= { speedDuallineFCPortOverviewEntry 13 }
+
+-- *********************************
+
+	speedDuallineFCXCVOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedDuallineFCXCVOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Speed-Dualline FC transceiver overview table"
+		::= { speedDuallineFC 5 }
+
+	speedDuallineFCXCVOverviewEntry OBJECT-TYPE
+		SYNTAX SpeedDuallineFCXCVOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module transceiver overview entries"
+		INDEX { speedDuallineFCPortXCVIndex }
+		::= { speedDuallineFCXCVOverviewTable 1 }
+
+	SpeedDuallineFCXCVOverviewEntry ::=
+		SEQUENCE
+		{
+			speedDuallineFCPortXCVIndex Integer32,
+			speedDuallineFCPortXCVSlot Integer32,
+			speedDuallineFCPortXCVPort Integer32,
+			speedDuallineFCPortXCVVendorName DisplayString,
+			speedDuallineFCPortXCVVendorPartNumber DisplayString,
+			speedDuallineFCPortXCVVendorSerialNumber DisplayString,
+			speedDuallineFCPortXCVType INTEGER,
+			speedDuallineFCPortXCVConnector INTEGER,
+			speedDuallineFCPortXCVWavelength Integer32,
+			speedDuallineFCPortXCVDMIState INTEGER
+		}
+
+	speedDuallineFCPortXCVIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port Index"
+		::= { speedDuallineFCXCVOverviewEntry 1 }
+
+	speedDuallineFCPortXCVSlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { speedDuallineFCXCVOverviewEntry 2 }
+
+	speedDuallineFCPortXCVPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { speedDuallineFCXCVOverviewEntry 3 }
+
+	speedDuallineFCPortXCVVendorName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver vendor name"
+		::= { speedDuallineFCXCVOverviewEntry 4 }
+
+	speedDuallineFCPortXCVVendorPartNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver part number"
+		::= { speedDuallineFCXCVOverviewEntry 5 }
+
+	speedDuallineFCPortXCVVendorSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver serial number"
+		::= { speedDuallineFCXCVOverviewEntry 6 }
+
+	speedDuallineFCPortXCVType OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unspecified(0),
+			tGBIC(1),
+			tModuleSolderedToMotherboard(2),
+			tSFPTransceiver(3),
+			t300PinXBI(4),
+			tXENPAK(5),
+			tXFP(6),
+			tXFF(7),
+			tXFP-E(8),
+			tXPAK(9),
+			tX2(10),
+			tDWDMSFPTransceiver(11),
+			tCopperSFPTransceiver(254),
+			vendorSpecific(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver type"
+		::= { speedDuallineFCXCVOverviewEntry 7 }
+
+	speedDuallineFCPortXCVConnector OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unspecified(0),
+			cSC(1),
+			cFibreChannelStyle1CopperConnector(2),
+			cFibreChannelStyle2CopperConnector(3),
+			cBncTnc(4),
+			cFibreChannerCoaxialHeader(5),
+			cFibreJack(6),
+			cLC(7),
+			cMTRJ(8),
+			cMU(9),
+			cSG(10),
+			cOpticalPigtail(11),
+			cHSSDCII(32),
+			cCopperPigtail(33),
+			cRJ45(34),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver connector"
+		::= { speedDuallineFCXCVOverviewEntry 8 }
+
+	speedDuallineFCPortXCVWavelength OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver supported wavelength (value * 100)"
+		::= { speedDuallineFCXCVOverviewEntry 9 }
+
+	speedDuallineFCPortXCVDMIState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			sff8472V93(1),
+			sff8472V95(2),
+			sff8472V102(3),
+			sff8472V104(4),
+			sff8472V11(5),
+			dmiAvailable(253),
+			notImplemented(254),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver DMI compliance"
+		::= { speedDuallineFCXCVOverviewEntry 10 }
+
+-- *********************************
+
+	speedDuallineFCXCVFeatureTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedDuallineFCXCVFeatureEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Speed-Dualline FC transceiver feature table"
+		::= { speedDuallineFC 6 }
+
+	speedDuallineFCXCVFeatureEntry OBJECT-TYPE
+		SYNTAX SpeedDuallineFCXCVFeatureEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module transceiver feature entries"
+		INDEX { speedDuallineFCPortXCVFIndex }
+		::= { speedDuallineFCXCVFeatureTable 1 }
+
+	SpeedDuallineFCXCVFeatureEntry ::=
+		SEQUENCE
+		{
+			speedDuallineFCPortXCVFIndex Integer32,
+			speedDuallineFCPortXCVFSlot Integer32,
+			speedDuallineFCPortXCVFPort Integer32,
+			speedDuallineFCPortXCVBitrateMax INTEGER,
+			speedDuallineFCPortXCVBitrateMin INTEGER,
+			speedDuallineFCPortXCVLengthSMkm Integer32,
+			speedDuallineFCPortXCVLength50 Integer32,
+			speedDuallineFCPortXCVLength62 Integer32,
+			speedDuallineFCPortXCVLengthCopper Integer32
+		}
+
+	speedDuallineFCPortXCVFIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port Index"
+		::= { speedDuallineFCXCVFeatureEntry 1 }
+
+	speedDuallineFCPortXCVFSlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { speedDuallineFCXCVFeatureEntry 2 }
+
+	speedDuallineFCPortXCVFPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { speedDuallineFCXCVFeatureEntry 3 }
+
+	speedDuallineFCPortXCVBitrateMax OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unspecified(0)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The upper bit rate limit at which the SFP transceiver will still meet its specifications is specified in units of 1 Megabit per second. A value of 0 indicates that this field is not specified."
+		::= { speedDuallineFCXCVFeatureEntry 4 }
+
+	speedDuallineFCPortXCVBitrateMin OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			unspecified(0)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The lower bit rate limit at which the SFP transceiver will still meet its specifications is specified in units of 1 Megabit per second. A value of 0 indicates that this field is not specified."
+		::= { speedDuallineFCXCVFeatureEntry 5 }
+
+	speedDuallineFCPortXCVLengthSMkm OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This value specifies the link length that is supported by the SFP transceiver while operating in compliance with the applicable standards using single mode fiber. The value is in units of kilometers. A value of 255 means that the transceiver supports a link greater than 254 km. A value of 0 means that the transceiver does not support single mode fiber or that the length information must be determined from the transceiver technology."
+		::= { speedDuallineFCXCVFeatureEntry 6 }
+
+	speedDuallineFCPortXCVLength50 OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This value specifies the link length that is supported by the SFP transceiver while operating in compliance with the applicable standards using 50 micron OM2 multi mode fiber. The value is in units of 10 meters. A value of 255 means that the transceiver supports a link greater than 2.54 km. A value of 0 means that the transceiver does not support 50 micron multi mode fiber or that the length information must be determined from the transceiver technology."
+		::= { speedDuallineFCXCVFeatureEntry 7 }
+
+	speedDuallineFCPortXCVLength62 OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This value specifies the link length that is supported	by the SFP transceiver while operating in compliance with the applicable standards using 62.5 micron multi mode fiber. The value is in units of 10 meters. A value of 255 means that the transceiver supports a link greater than 2.54 km. A value of 0 means that the transceiver does not support 62.5 micron multi mode fiber or that the length information must be determined from the transceiver technology."
+		::= { speedDuallineFCXCVFeatureEntry 8 }
+
+	speedDuallineFCPortXCVLengthCopper OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This value specifies the link length that is supported by the SFP transceiver while operating in compliance with the applicable standards using copper cable. The value is in units of 1 meter. A value of 255 means that the transceiver supports a link greater than 254 m. A value of 0 means that the transceiver does not support copper cable or that the length information must be determined from the transceiver technology. Further information about the cable design, equalization, and connectors is usually required to guarantee meeting of particular length information."
+		::= { speedDuallineFCXCVFeatureEntry 9 }
+
+-- *********************************
+
+	speedDuallineFCXCVMeassurementTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedDuallineFCXCVMeassurementEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Speed-Dualline FC transceiver DMI meassurement table"
+		::= { speedDuallineFC 7 }
+
+	speedDuallineFCXCVMeassurementEntry OBJECT-TYPE
+		SYNTAX SpeedDuallineFCXCVMeassurementEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module transceiver DMI meassurement entries"
+		INDEX { speedDuallineFCPortXCVDMIIndex }
+		::= { speedDuallineFCXCVMeassurementTable 1 }
+
+	SpeedDuallineFCXCVMeassurementEntry ::=
+		SEQUENCE
+		{
+			speedDuallineFCPortXCVDMIIndex Integer32,
+			speedDuallineFCPortXCVDMISlot Integer32,
+			speedDuallineFCPortXCVDMIPort Integer32,
+			speedDuallineFCPortXCVDMIRxLevel Integer32,
+			speedDuallineFCPortXCVDMITxLevel Integer32,
+			speedDuallineFCPortXCVDMITxBias Integer32,
+			speedDuallineFCPortXCVDMITemp Integer32
+		}
+
+	speedDuallineFCPortXCVDMIIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port Index"
+		::= { speedDuallineFCXCVMeassurementEntry 1 }
+
+	speedDuallineFCPortXCVDMISlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { speedDuallineFCXCVMeassurementEntry 2 }
+
+	speedDuallineFCPortXCVDMIPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { speedDuallineFCXCVMeassurementEntry 3 }
+
+	speedDuallineFCPortXCVDMIRxLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"optical receive level (dBm value * 100)"
+		::= { speedDuallineFCXCVMeassurementEntry 4 }
+
+	speedDuallineFCPortXCVDMITxLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"optical transmit level (dBm value * 100)"
+		::= { speedDuallineFCXCVMeassurementEntry 5 }
+
+	speedDuallineFCPortXCVDMITxBias OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transmitter TX bias current (mA)"
+		::= { speedDuallineFCXCVMeassurementEntry 6 }
+
+	speedDuallineFCPortXCVDMITemp OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transmitter temperature (degree Celsius)"
+		::= { speedDuallineFCXCVMeassurementEntry 7 }
+
+-- *********************************
+
+	speedDuallineFCXCVAlarmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedDuallineFCXCVAlarmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Speed-Dualline FC transceiver alarm table"
+		::= { speedDuallineFC 8 }
+
+	speedDuallineFCXCVAlarmEntry OBJECT-TYPE
+		SYNTAX SpeedDuallineFCXCVAlarmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module transceiver alarm entries"
+		INDEX { speedDuallineFCPortAIndex }
+		::= { speedDuallineFCXCVAlarmTable 1 }
+
+	SpeedDuallineFCXCVAlarmEntry ::=
+		SEQUENCE
+		{
+			speedDuallineFCPortAIndex Integer32,
+			speedDuallineFCPortASlot Integer32,
+			speedDuallineFCPortAPort Integer32,
+			speedDuallineFCPortXCVDMIRxPowerAlarm INTEGER,
+			speedDuallineFCPortXCVDMITxLowAlarm INTEGER,
+			speedDuallineFCPortXCVDMIBiasAlarmEvent INTEGER,
+			speedDuallineFCPortXCVDWDMLaserTempAlarmEvent INTEGER,
+			speedDuallineFCPortXCVDWDMTECAlarmEvent INTEGER,
+			speedDuallineFCPortXCVTempHighAlarm INTEGER,
+			speedDuallineFCPortXCVCDRALARM INTEGER,
+			speedDuallineFCPortXCVTuningAlarm INTEGER
+		}
+
+	speedDuallineFCPortAIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port Index"
+		::= { speedDuallineFCXCVAlarmEntry 1 }
+
+	speedDuallineFCPortASlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { speedDuallineFCXCVAlarmEntry 2 }
+
+	speedDuallineFCPortAPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { speedDuallineFCXCVAlarmEntry 3 }
+
+	speedDuallineFCPortXCVDMIRxPowerAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable(0),
+			noAlarm(1),
+			rxLowWarning(2),
+			rxLowAlarm(3),
+			rxHighAlarm(4),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver RX power event"
+		::= { speedDuallineFCXCVAlarmEntry 4 }
+
+	speedDuallineFCPortXCVDMITxLowAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			noAlarm(1),
+			activeAlarms(2),
+			unknown (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver TX power event"
+		::= { speedDuallineFCXCVAlarmEntry 5 }
+
+	speedDuallineFCPortXCVDMIBiasAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			noAlarm(1),
+			activeAlarms(2),
+			unknown (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver bias current event"
+		::= { speedDuallineFCXCVAlarmEntry 6 }
+
+	speedDuallineFCPortXCVDWDMLaserTempAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			noAlarm (1),
+			lowAlarm (2),
+			highAlarm(3),
+			unknown (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver DWDM laser temperature event"
+		::= { speedDuallineFCXCVAlarmEntry 7 }
+
+	speedDuallineFCPortXCVDWDMTECAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			noAlarm(1),
+			activeAlarms(2),
+			unknown (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver DWDM TEC event"
+		::= { speedDuallineFCXCVAlarmEntry 8 }
+
+	speedDuallineFCPortXCVTempHighAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable(0),
+			noAlarm(1),
+			highWarning(2),
+			highAlarm(3),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver temperature event"
+		::= { speedDuallineFCXCVAlarmEntry 9 }
+
+	speedDuallineFCPortXCVCDRALARM OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable(0),
+			noAlarm(1),
+			activeAlarm(2),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"clock data recovery event"
+		::= { speedDuallineFCXCVAlarmEntry 10 }
+
+	speedDuallineFCPortXCVTuningAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable(0),
+			noAlarm(1),
+			activeAlarm(2),
+			notImplemented(254),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Tunable Transceiver tuning alarm"
+		::= { speedDuallineFCXCVAlarmEntry 11 }
+
+-- *********************************
+
+	speedDuallineFCMBoardAlarmTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedDuallineFCMBoardAlarmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Speed-Dualline FC module board alarm table"
+		::= { speedDuallineFC 9 }
+
+	speedDuallineFCMBoardAlarmEntry OBJECT-TYPE
+		SYNTAX SpeedDuallineFCMBoardAlarmEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module board alarm entries"
+		INDEX { speedDuallineFCMBoardSlot }
+		::= { speedDuallineFCMBoardAlarmTable 1 }
+
+	SpeedDuallineFCMBoardAlarmEntry ::=
+		SEQUENCE
+		{
+			speedDuallineFCMBoardSlot Integer32,
+			speedDuallineFCMBoardTempAlarm INTEGER
+		}
+
+	speedDuallineFCMBoardSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { speedDuallineFCMBoardAlarmEntry 2 }
+
+	speedDuallineFCMBoardTempAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable(0),
+			noAlarm(1),
+			highWarning(2),
+			highAlarm(3),
+			unknown(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"board temperature event"
+		::= { speedDuallineFCMBoardAlarmEntry 3 }
+
+-- *********************************
+
+	speedDuallineFCXCVTunableTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SpeedDuallineFCXCVTunableEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Speed-Dualline FC tunable transceiver table"
+		::= { speedDuallineFC 10 }
+
+	speedDuallineFCXCVTunableEntry OBJECT-TYPE
+		SYNTAX SpeedDuallineFCXCVTunableEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"transceiver tunable entries"
+		INDEX { speedDuallineFCPortXCVTunIndex }
+		::= { speedDuallineFCXCVTunableTable 1 }
+
+	SpeedDuallineFCXCVTunableEntry ::=
+		SEQUENCE
+		{
+			speedDuallineFCPortXCVTunIndex Integer32,
+			speedDuallineFCPortXCVTunSlot Integer32,
+			speedDuallineFCPortXCVTunPort Integer32,
+			speedDuallineFCPortXCVChannelSpacing Integer32,
+			speedDuallineFCPortXCVNumberOfChannels Integer32,
+			speedDuallineFCPortXCVCenterWavlength Integer32,
+			speedDuallineFCPortXCVTunableFeature INTEGER,
+			speedDuallineFCPortXCVTunableMinMaxChannel DisplayString,
+			speedDuallineFCPortXCVTunableWavelengthConfig Integer32,
+			speedDuallineFCPortXCVTunableChannelConfig DisplayString,
+			speedDuallineFCPortXCVTunableConfigSelection INTEGER
+		}
+		
+	speedDuallineFCPortXCVTunIndex OBJECT-TYPE
+		SYNTAX Integer32 (1..1900)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Port Index"
+		::= { speedDuallineFCXCVTunableEntry 1 }
+
+	speedDuallineFCPortXCVTunSlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Slot number"
+		::= { speedDuallineFCXCVTunableEntry 2 }
+
+	speedDuallineFCPortXCVTunPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { speedDuallineFCXCVTunableEntry 3 }
+
+	speedDuallineFCPortXCVChannelSpacing OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XCV channel spacing"
+		::= { speedDuallineFCXCVTunableEntry 4 }
+
+	speedDuallineFCPortXCVNumberOfChannels OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XCV supported number channels"
+		::= { speedDuallineFCXCVTunableEntry 5 }
+
+	speedDuallineFCPortXCVCenterWavlength OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XCV center wavelength"
+		::= { speedDuallineFCXCVTunableEntry 6 }
+
+	speedDuallineFCPortXCVTunableFeature OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			notTunable (1),
+			byWavelength (2),
+			byChannel (4),
+			byChannelAndWavelength (6)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"is transceiver tunable?"
+		::= { speedDuallineFCXCVTunableEntry 7 }
+
+	speedDuallineFCPortXCVTunableMinMaxChannel OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..9))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Set parameter for transceiver channel config. "
+		::= { speedDuallineFCXCVTunableEntry 8 }
+
+	speedDuallineFCPortXCVTunableWavelengthConfig OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"XCV wavelength control. Min value is 1528000 and max value is 1564000. Wavelength value in units of picometer!"
+		::= { speedDuallineFCXCVTunableEntry 9 }
+
+	speedDuallineFCPortXCVTunableChannelConfig OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..4))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Set parameter for transceiver channel config. Allowed channels are from C1..H61. 'C' represents the 100GHz channel and 'H' is 50 GHz above the corresponding 100GHz channel."
+		::= { speedDuallineFCXCVTunableEntry 10 }
+
+	speedDuallineFCPortXCVTunableConfigSelection OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable(0),
+			xcvInternal(1),
+			configFile(2),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"selects which config should be used (internal XCV or transponder card config)"
+		::= { speedDuallineFCXCVTunableEntry 11 }
+
+
+END

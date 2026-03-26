@@ -3,18 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\PollerGroup;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 
-class PollerGroupController extends Controller
+class PollerGroupController
 {
-    public function destroy(Request $request, PollerGroup $pollergroup)
+    public function destroy(PollerGroup $pollergroup): JsonResponse
     {
-        if ($request->user()->isAdmin()) {
+        if (Gate::allows('delete', $pollergroup)) {
             $pollergroup->delete();
 
             return response()->json(['status' => 'success']);
-        } else {
-            return response()->json(['status' => 'failure']);
         }
+
+        return response()->json(['status' => 'failure']);
     }
 }

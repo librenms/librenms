@@ -26,10 +26,10 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\RRD\RrdDefinition;
 
-class RrdDefinitionTest extends TestCase
+final class RrdDefinitionTest extends TestCase
 {
     public function testEmpty(): void
     {
@@ -39,17 +39,17 @@ class RrdDefinitionTest extends TestCase
     public function testWrongType(): void
     {
         $this->expectException(\LibreNMS\Exceptions\InvalidRrdTypeException::class);
-        Config::set('rrd.step', 300);
-        Config::set('rrd.heartbeat', 600);
+        LibrenmsConfig::set('rrd.step', 300);
+        LibrenmsConfig::set('rrd.heartbeat', 600);
         $def = new RrdDefinition();
         $def->addDataset('badtype', 'Something unexpected');
     }
 
     public function testNameEscaping(): void
     {
-        Config::set('rrd.step', 300);
-        Config::set('rrd.heartbeat', 600);
-        $expected = 'DS:bad_name-is_too_lon:GAUGE:600:0:100 ';
+        LibrenmsConfig::set('rrd.step', 300);
+        LibrenmsConfig::set('rrd.heartbeat', 600);
+        $expected = 'DS:bad_name-is_too_lon:GAUGE:600:0:100';
         $def = RrdDefinition::make()->addDataset('b a%d$_n:a^me-is_too_lon%g.', 'GAUGE', 0, 100, 600);
 
         $this->assertEquals($expected, (string) $def);
@@ -57,15 +57,37 @@ class RrdDefinitionTest extends TestCase
 
     public function testCreation(): void
     {
-        Config::set('rrd.step', 300);
-        Config::set('rrd.heartbeat', 600);
-        $expected = 'DS:pos:COUNTER:600:0:125000000000 ' .
-            'DS:unbound:DERIVE:600:U:U ';
+        LibrenmsConfig::set('rrd.step', 300);
+        LibrenmsConfig::set('rrd.heartbeat', 600);
+        $expected = 'DS:pos:COUNTER:600:0:125000000000 DS:unbound:DERIVE:600:U:U';
 
         $def = new RrdDefinition();
         $def->addDataset('pos', 'COUNTER', 0, 125000000000);
         $def->addDataset('unbound', 'DERIVE');
 
-        $this->assertEquals($expected, $def);
+        $this->assertEquals($expected, (string) $def);
+    }
+
+    public function testCreationWithSource(): void
+    {
+        LibrenmsConfig::set('rrd.step', 300);
+        LibrenmsConfig::set('rrd.heartbeat', 600);
+        $def = new RrdDefinition();
+        $def->addDataset('migrated', 'COUNTER', 0, 125000000000, null, 'source_ds');
+        $def->addDataset('other', 'DERIVE');
+        $this->assertEquals([
+            'DS:migrated=source_ds:COUNTER:600:0:125000000000',
+            'DS:other:DERIVE:600:U:U',
+        ], $def->getArguments());
+
+        // use __FILE__ to satisify the file exists check
+        $def->addDataset('fromfile', 'COUNTER', source_ds: 'other', source_file: __FILE__);
+        $this->assertEquals([
+            '--source',
+            __FILE__,
+            'DS:migrated=source_ds:COUNTER:600:0:125000000000',
+            'DS:other:DERIVE:600:U:U',
+            'DS:fromfile=other[1]:COUNTER:600:U:U',
+        ], $def->getArguments());
     }
 }

@@ -1,7 +1,7 @@
 -- *****************************************************************
 -- Cisco Class-Based QoS Configuration and Statistics MIB
 --   
--- Copyright (c) 2000-2004, 2007-2009-2014 by Cisco Systems Inc.
+-- Copyright (c) 2000-2004, 2007-2009-2014, 2020 by Cisco Systems Inc.
 --   
 -- All rights reserved.
 --   
@@ -17,7 +17,8 @@ IMPORTS
     Gauge32,
     Unsigned32,
     Counter64,
-    dod
+    dod,
+    Opaque
         FROM SNMPv2-SMI
     MODULE-COMPLIANCE,
     OBJECT-GROUP
@@ -34,6 +35,9 @@ IMPORTS
         FROM Q-BRIDGE-MIB
     CounterBasedGauge64
         FROM HCNUM-TC
+    InetAddress,
+    InetAddressType
+        FROM INET-ADDRESS-MIB
     Unsigned64,
     EntPhysicalIndexOrZero
         FROM CISCO-TC
@@ -44,7 +48,7 @@ IMPORTS
 
 
 ciscoCBQosMIB MODULE-IDENTITY
-    LAST-UPDATED    "201401240000Z"
+    LAST-UPDATED    "202007270000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -421,6 +425,27 @@ ciscoCBQosMIB MODULE-IDENTITY
         Users can uniquely identify each QoS object defined on the 
         router and query the entries in each stats table on a per 
         QoS object basis."
+    REVISION        "202007270000Z"
+    DESCRIPTION
+        "Added cbQosServiceGroupIndex in CbQosServicePolicyEntry
+        Added cbQoSTSStatsQSizeLastTenSecMin in CbQosTSStatsEntry
+        Added cbQoSTSStatsQSizeLastTenSecMax in CbQosTSStatsEntry
+        Added cbQoSTSStatsQSizeLastTenSecAvg in CbQosTSStatsEntry
+        Added cbQoSTSStatsQSizeLastOneMinMin in CbQosTSStatsEntry
+        Added cbQoSTSStatsQSizeLastOneMinMax in CbQosTSStatsEntry
+        Added cbQoSTSStatsQSizeLastOneMinAvg in CbQosTSStatsEntry
+        Added cbQoSTSStatsQSizeLastFiveMinMin in CbQosTSStatsEntry
+        Added cbQoSTSStatsQSizeLastFiveMinMax in CbQosTSStatsEntry
+        Added cbQoSTSStatsQSizeLastFiveMinAvg in CbQosTSStatsEntry"
+    REVISION        "201410130000Z"
+    DESCRIPTION
+        "Added tunnel(8) in InterfaceType TC
+        Added wirelessInterface(9) in InterfaceType TC
+        Added cbQosTunDstAddrType in CbQosServicePolicyEntry
+        Added cbQosTunDstAddr in CbQosServicePolicyEntry
+        Added cbQosWirelessIifid in CbQosServicePolicyEntry
+        Added cbQosTSStatsTargetShapeRate in cbQosTSStatsEntry
+           Added cbQosTSCfgAdaptivePercentRateValue in cbQosTSCfgEntry"
     REVISION        "201401240000Z"
     DESCRIPTION
         "Added new object cbQosParentPolicyIndex in
@@ -787,7 +812,10 @@ InterfaceType ::= TEXTUAL-CONVENTION
                       vlan of a layer 2 interface that can carry
                       traffic on multiple vlans.
         EVC              - Service policy is attached to the Ethernet
-                           Virtual Connections."
+                           Virtual Connections.
+        Tunnel           - Service policy is attached to DMVPN tunnel
+        Wireless Interface - Service policy is attached on the
+                              wireless interface."
     SYNTAX          INTEGER  {
                         mainInterface(1),
                         subInterface(2),
@@ -795,7 +823,9 @@ InterfaceType ::= TEXTUAL-CONVENTION
                         atmPVC(4),
                         controlPlane(5),
                         vlanPort(6),
-                        evc(7)
+                        evc(7),
+                        tunnel(8),
+                        wirelessInterface(9)
                     }
 
 QueueingBandwidthUnits ::= TEXTUAL-CONVENTION
@@ -1446,7 +1476,11 @@ CbQosServicePolicyEntry ::= SEQUENCE {
         cbQosVlanIndex               VlanIndex,
         cbQosEVC                     Unsigned32,
         cbQosPolicyDiscontinuityTime TimeStamp,
-        cbQosParentPolicyIndex       Unsigned32
+        cbQosParentPolicyIndex       Unsigned32,
+        cbQosTunDstAddrType          InetAddressType,
+        cbQosTunDstAddr              InetAddress,
+        cbQosWirelessIifid           Unsigned64,
+        cbQosServiceGroupIndex       Unsigned32
 }
 
 cbQosPolicyIndex OBJECT-TYPE
@@ -1578,6 +1612,44 @@ cbQosParentPolicyIndex OBJECT-TYPE
         of a virtual interface. Value zero implies the entry is for a 
         interface on which PolicyMap applied directly." 
     ::= { cbQosServicePolicyEntry 12 }
+
+cbQosTunDstAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object is instantiated if cbQoSIfType object has the value
+        of tunnel(8)." 
+    ::= { cbQosServicePolicyEntry 13 }
+
+cbQosTunDstAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object is instantiated if cbQoSIfType
+        object has the value of tunnel(8)." 
+    ::= { cbQosServicePolicyEntry 14 }
+
+cbQosWirelessIifid OBJECT-TYPE
+    SYNTAX          Unsigned64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object is instantiated if cbQoSIfType
+        object has the value of wirelessInterface(9)." 
+    ::= { cbQosServicePolicyEntry 15 }
+
+cbQosServiceGroupIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "If the service policy is attached to a particular
+        service-group, then this object specifies the 
+        corresponding Service-group id. In all other cases 
+        the value of this object is '0'." 
+    ::= { cbQosServicePolicyEntry 16 }
  
 
 -- End of the cbQosServicePolicy group
@@ -3041,19 +3113,20 @@ cbQosTSCfgEntry OBJECT-TYPE
     ::= { cbQosTSCfgTable 1 }
 
 CbQosTSCfgEntry ::= SEQUENCE {
-        cbQosTSCfgRate             Integer32,
-        cbQosTSCfgBurstSize        Integer32,
-        cbQosTSCfgExtBurstSize     Integer32,
-        cbQosTSCfgAdaptiveEnabled  TruthValue,
-        cbQosTSCfgAdaptiveRate     Integer32,
-        cbQosTSCfgLimitType        TrafficShapingLimit,
-        cbQosTSCfgRateType         CbQosRateType,
-        cbQosTSCfgPercentRateValue Unsigned32,
-        cbQosTSCfgBurstTime        Unsigned32,
-        cbQosTSCfgExtBurstTime     Unsigned32,
-        cbQosTSCfgRate64           Unsigned64,
-        cbQosTSCfgBurstSize64      Unsigned64,
-        cbQosTSCfgExtBurstSize64   Unsigned64
+        cbQosTSCfgRate                     Integer32,
+        cbQosTSCfgBurstSize                Integer32,
+        cbQosTSCfgExtBurstSize             Integer32,
+        cbQosTSCfgAdaptiveEnabled          TruthValue,
+        cbQosTSCfgAdaptiveRate             Integer32,
+        cbQosTSCfgLimitType                TrafficShapingLimit,
+        cbQosTSCfgRateType                 CbQosRateType,
+        cbQosTSCfgPercentRateValue         Unsigned32,
+        cbQosTSCfgBurstTime                Unsigned32,
+        cbQosTSCfgExtBurstTime             Unsigned32,
+        cbQosTSCfgRate64                   Unsigned64,
+        cbQosTSCfgBurstSize64              Unsigned64,
+        cbQosTSCfgExtBurstSize64           Unsigned64,
+        cbQosTSCfgAdaptivePercentRateValue Unsigned32
 }
 
 cbQosTSCfgRate OBJECT-TYPE
@@ -3210,6 +3283,17 @@ cbQosTSCfgExtBurstSize64 OBJECT-TYPE
         If a device implements cbQosTSCfgExtBurstSize64, then
         it should not implement cbQosTSCfgExtBurstSize." 
     ::= { cbQosTSCfgEntry 13 }
+
+cbQosTSCfgAdaptivePercentRateValue OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "percentage"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The committed lower traffic-shaping rate in percentage.
+        Its value is valid only when cbQosTSCfgRateType
+        equals to 2." 
+    ::= { cbQosTSCfgEntry 14 }
  
 
 -- end of cbQosTSCfgTable
@@ -4399,7 +4483,17 @@ CbQosTSStatsEntry ::= SEQUENCE {
         cbQosTSStatsDropPkt             Counter32,
         cbQosTSStatsDropPkt64           Counter64,
         cbQosTSStatsActive              TruthValue,
-        cbQosTSStatsCurrentQSize        Gauge32
+        cbQosTSStatsCurrentQSize        Gauge32,
+        cbQosTSStatsTargetShapeRate     Unsigned64,
+        cbQoSTSStatsQSizeLastTenSecMin  Gauge32,
+        cbQoSTSStatsQSizeLastTenSecMax  Gauge32,
+        cbQoSTSStatsQSizeLastTenSecAvg  Gauge32,
+        cbQoSTSStatsQSizeLastOneMinMin  Gauge32,
+        cbQoSTSStatsQSizeLastOneMinMax  Gauge32,
+        cbQoSTSStatsQSizeLastOneMinAvg  Gauge32,
+        cbQoSTSStatsQSizeLastFiveMinMin Gauge32,
+        cbQoSTSStatsQSizeLastFiveMinMax Gauge32,
+        cbQoSTSStatsQSizeLastFiveMinAvg Gauge32
 }
 
 cbQosTSStatsDelayedByteOverflow OBJECT-TYPE
@@ -4543,6 +4637,106 @@ cbQosTSStatsCurrentQSize OBJECT-TYPE
         "This object indicates the current traffic-shaping
         queue depth in packets." 
     ::= { cbQosTSStatsEntry 14 }
+
+cbQosTSStatsTargetShapeRate OBJECT-TYPE
+    SYNTAX          Unsigned64
+    UNITS           "bits per second"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The committed traffic-shaping rate.  This is the
+        sustained rate permitted by the traffic-shaping." 
+    ::= { cbQosTSStatsEntry 15 }
+
+cbQoSTSStatsQSizeLastTenSecMin OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the minimum traffic-shaping
+        queue depth(in packets) in last 10 seconds." 
+    ::= { cbQosTSStatsEntry 16 }
+
+cbQoSTSStatsQSizeLastTenSecMax OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the maximum traffic-shaping
+        queue depth(in packets) in last 10 seconds." 
+    ::= { cbQosTSStatsEntry 17 }
+
+cbQoSTSStatsQSizeLastTenSecAvg OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average traffic-shaping
+        queue depth(in packets) in last 10 seconds." 
+    ::= { cbQosTSStatsEntry 18 }
+
+cbQoSTSStatsQSizeLastOneMinMin OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the minimum traffic-shaping
+        queue depth(in packets) in last 1 minute." 
+    ::= { cbQosTSStatsEntry 19 }
+
+cbQoSTSStatsQSizeLastOneMinMax OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the maximum traffic-shaping
+        queue depth(in packets) in last 1 minute." 
+    ::= { cbQosTSStatsEntry 20 }
+
+cbQoSTSStatsQSizeLastOneMinAvg OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the average traffic-shaping
+        queue depth(in packets) in last 1 minute." 
+    ::= { cbQosTSStatsEntry 21 }
+
+cbQoSTSStatsQSizeLastFiveMinMin OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the minimum traffic-shaping
+        queue depth(in packets) in last 5 minutes." 
+    ::= { cbQosTSStatsEntry 22 }
+
+cbQoSTSStatsQSizeLastFiveMinMax OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the maximum traffic-shaping
+        queue depth(in packets) in last 5 minutes." 
+    ::= { cbQosTSStatsEntry 23 }
+
+cbQoSTSStatsQSizeLastFiveMinAvg OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the Average traffic-shaping
+        queue depth(in packets) in last 5 minutes." 
+    ::= { cbQosTSStatsEntry 24 }
  
 
 -- end of cbQosTSStats Group
@@ -10144,10 +10338,11 @@ cbQosEBStatsGroup OBJECT-GROUP
 
 cbQosServicePolicyExtGroup OBJECT-GROUP
     OBJECTS         { cbQosVlanIndex }
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Optional objects to provide more information about a
-        particular service policy instance."
+        particular service policy instance.
+        cbQosServicePolicyExtGroup object is superseded by cbQosServicePolicyExtGroupRev3."
     ::= { ciscocbQosMIBGroups 63 }
 
 cbQosMeasureIPSLACfgGroup OBJECT-GROUP
@@ -10162,11 +10357,12 @@ cbQosMeasureIPSLACfgGroup OBJECT-GROUP
 
 cbQosTSCfgExtGroup OBJECT-GROUP
     OBJECTS         { cbQosTSCfgRate64 }
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "Objects to provide the information of the
         committed shaping rate that is greater than the
-        maximum value reportable by cbQosTSCfgRate."
+        maximum value reportable by cbQosTSCfgRate.
+        cbQosTSCfgExtGroup object is superseded by cbQosTSCfgExtGroupRev1."
     ::= { ciscocbQosMIBGroups 65 }
 
 cbQosQueueingCfgGroupRev2 OBJECT-GROUP
@@ -10434,21 +10630,45 @@ cbQosQueueingStatsGroupRev1 OBJECT-GROUP
 
 cbQosServicePolicyExtGroupRev2 OBJECT-GROUP
     OBJECTS         { cbQosParentPolicyIndex }
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
-        "Added cbQosParentPolicyIndex to cbQosServicePolicyTable."
+        "Added cbQosParentPolicyIndex to cbQosServicePolicyTable.
+        cbQosServicePolicyExtGroupRev2 object is superseded by cbQosServicePolicyExtGroupRev3."
     ::= { ciscocbQosMIBGroups 83 }
 
+cbQosServicePolicyExtGroupRev3 OBJECT-GROUP
+    OBJECTS         {
+                        cbQosTunDstAddrType,
+                        cbQosTunDstAddr,
+                        cbQosWirelessIifid,
+                        cbQosVlanIndex,
+                        cbQosParentPolicyIndex
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Optional objects to provide more information about a
+        particular service policy instance."
+    ::= { ciscocbQosMIBGroups 84 }
+
+cbQosTSCfgExtGroupRev1 OBJECT-GROUP
+    OBJECTS         {
+                        cbQosTSCfgAdaptiveRate,
+                        cbQosTSCfgRate64
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Optional objects to provide CB QoS objects configuration
+        information."
+    ::= { ciscocbQosMIBGroups 85 }
+
+cbQosTSStatsExtGroup OBJECT-GROUP
+    OBJECTS         { cbQosTSStatsTargetShapeRate }
+    STATUS          current
+    DESCRIPTION
+        "Optional objects to provide CB QoS object statistics
+        information."
+    ::= { ciscocbQosMIBGroups 86 }
+
 END
-
-
-
-
-
-
-
-
-
-
 
 

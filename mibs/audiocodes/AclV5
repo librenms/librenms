@@ -1,0 +1,421 @@
+AclV5 DEFINITIONS ::= BEGIN
+
+IMPORTS
+       OBJECT-TYPE, 
+	   MODULE-IDENTITY                             FROM SNMPv2-SMI
+       DisplayString, 
+	   DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+	   IpAddress                                   FROM RFC1155-SMI
+	   acV5InterfaceTrunkGroupId                   FROM AcBoard;
+
+	 --  acBoardMibs                                 FROM AcBoard;
+
+    audioCodes       OBJECT IDENTIFIER ::= {enterprises 5003}
+	acRegistrations  OBJECT IDENTIFIER ::= {audioCodes 7}
+	acGeneric        OBJECT IDENTIFIER ::= {audioCodes 8}
+	acProducts       OBJECT IDENTIFIER ::= {audioCodes 9}	
+    acBoardMibs     OBJECT IDENTIFIER ::= {acProducts 10}
+
+
+aclV5  MODULE-IDENTITY       
+    LAST-UPDATED "200204300000Z"  -- Midnight 30 April 2002
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+            "Chai Forsher       
+    Postal: AudioCodes LTD
+	        4 Horesh Road
+			Yehud 56470, ISRAEL
+    Tel:    972-3-5394028
+    Email:  chai-f@AudioCodes.com"               
+		
+    DESCRIPTION       
+
+    "
+	   V5.
+	"
+
+    REVISION     "200205150000Z"  -- Midnight 15 May 2002.   
+
+    DESCRIPTION  "4.0Beta1"   
+
+	::= {acBoardMibs 21}  
+
+
+V5ParameterStats ::= TEXTUAL-CONVENTION
+    STATUS       obsolete
+    DESCRIPTION
+            "Represents a status of parameter of V5."
+    SYNTAX       INTEGER { acOK(0), acError(1), acUnkown (2) }
+
+
+
+acV5ParamsTable OBJECT-TYPE       
+    SYNTAX          SEQUENCE OF AcV5ParamsEntry
+    MAX-ACCESS      not-accessible       
+    STATUS          obsolete
+    DESCRIPTION
+      "V5.2 Params Table."
+    ::= {aclV5 1}
+
+acV5ParamsEntry  OBJECT-TYPE       
+    SYNTAX          AcV5ParamsEntry
+    MAX-ACCESS      not-accessible       
+    STATUS          obsolete
+    DESCRIPTION          
+      "V5.2 parameters for specific interface trunk Group" 
+    INDEX {acV5InterfaceTrunkGroupId}       
+	::= {acV5ParamsTable 1}
+
+
+AcV5ParamsEntry ::= SEQUENCE { 
+        acV5InterfaceIdUpp             Integer32,
+        acV5InterfaceIdMid             Integer32,
+        acV5InterfaceIdLow             Integer32,
+        acV5VariantId                  Integer32,
+        acV5PrimaryTrunkId             Integer32,
+        acV5SecondaryTrunkId           Integer32,
+        acV5PrimaryLogicalCChannelId   Integer32,
+        acV5L3BaseAddr                 Integer32,
+        acV5NumOfPSTNUsers             Integer32,
+        acV5NumOfLinks                 Integer32,
+        acV5TraceLevel                 INTEGER
+       }
+
+acV5InterfaceIdUpp     OBJECT-TYPE
+    SYNTAX  Integer32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+            "The V5 Interface ID upper Octet."
+    ::= {acV5ParamsEntry 2}
+
+acV5InterfaceIdMid     OBJECT-TYPE
+    SYNTAX  Integer32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+            "The V5 Interface ID mid Octet."
+    ::= {acV5ParamsEntry 3}
+
+acV5InterfaceIdLow     OBJECT-TYPE
+    SYNTAX  Integer32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+            "The V5 Interface ID low Octet."
+    ::= {acV5ParamsEntry 4}
+
+acV5VariantId   OBJECT-TYPE
+    SYNTAX  Integer32 (0..127)
+    MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+            "The V5 Variant ID ."
+    ::= {acV5ParamsEntry 5}
+
+acV5PrimaryTrunkId   OBJECT-TYPE
+    SYNTAX  Integer32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+            "The E1 TrunkId which is provisioned to serve as the Primary Link."
+    ::= {acV5ParamsEntry 6}
+
+acV5SecondaryTrunkId     OBJECT-TYPE
+    SYNTAX  Integer32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+            "The E1 TrunkId which is provisioned to serve as the Secondary Link."
+    ::= {acV5ParamsEntry 7}
+
+acV5PrimaryLogicalCChannelId     OBJECT-TYPE
+    SYNTAX  Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+            "The Logical Communication Channel Id of the C-paths assigned to the Primary Link on Time Slot 16.
+			 Default=0. "
+    ::= {acV5ParamsEntry 8}
+
+acV5L3BaseAddr     OBJECT-TYPE
+    SYNTAX  Integer32 (0..30000)
+    MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+             "An base offset  of the L3 Address.
+			  The L3 Address of each PSTN user will be in the range of [L3BaseAdd .. L3BaseAddr+ NumOfPSTNUsers]."
+    ::= {acV5ParamsEntry 9}
+
+acV5NumOfPSTNUsers     OBJECT-TYPE
+    SYNTAX  Integer32 (0..1000)
+    MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+            "The maximum Number of PSTN users for this Trunk group."
+    ::= {acV5ParamsEntry 10}
+
+acV5NumOfLinks     OBJECT-TYPE
+    SYNTAX  Integer32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+            "The number of trunks (links) of this Trunk Group."
+    ::= {acV5ParamsEntry 11}
+
+acV5TraceLevel     OBJECT-TYPE
+    SYNTAX  INTEGER {
+	            acNoTrace (0), 
+            	acV5-FULL-TRACE-No-Duplication (20),
+	            acV5-FULL-TRACE-With-Duplication (21),
+	            acV5-LAYER3-UP-TRACE-No-Duplication (22),
+	            acV5-LAYER3-UP-TRACE-With-Duplication (23)
+			}
+    MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+            "V5 Trace Level."
+    ::= {acV5ParamsEntry 12}
+
+
+--V5 Status
+
+acV5StatusTable OBJECT-TYPE       
+    SYNTAX          SEQUENCE OF AcV5StatusEntry
+    MAX-ACCESS      not-accessible       
+    STATUS          obsolete
+    DESCRIPTION
+      "V5 status Table."
+    ::= { aclV5 2}
+
+acV5StatusEntry  OBJECT-TYPE       
+    SYNTAX          AcV5StatusEntry
+    MAX-ACCESS      not-accessible       
+    STATUS          obsolete
+    DESCRIPTION          
+      "V5 status of specific interface trunk group" 
+    INDEX {acV5InterfaceTrunkGroupId}       
+	::= { acV5StatusTable 1 }
+
+AcV5StatusEntry ::= SEQUENCE {  
+        acV5AlarmReportCause           INTEGER,
+        acV5InterfaceIdCheck           V5ParameterStats,
+        acV5VariantIdCheck             V5ParameterStats,
+        acV5IDCheckTimeOut             V5ParameterStats,
+        acV5L2Startup                    V5ParameterStats,
+        acV5Restart                      V5ParameterStats,
+        acV5ControlProtocolDataLink      V5ParameterStats,
+		acV5LinkControlProtocolDataLink  V5ParameterStats,
+        acV5BCCProtocolDataLink          V5ParameterStats,
+        acV5PSTNProtocolDataLink         V5ParameterStats,
+        acV5ProtectionDL1                V5ParameterStats,
+        acV5ProtectionDL2                V5ParameterStats
+       }
+
+acV5AlarmReportCause     OBJECT-TYPE
+    SYNTAX  INTEGER {
+	            acV5AlarmStatus                      (0),
+	            acV5InterfaceIdIsNotEqual            (1),
+	            acV5VariantIdIsNotEqual              (2),
+	            acV5IDCheckTimeOutError              (3),
+	            acV5L2StartupNotOK                   (4),
+	            acV5RestartNotOK                     (5),
+	            acV5PSTNPRotocolDataLinkError        (6),
+	            acV5ControlProtocolDataLinkError     (7),
+	            acV5BCCProtocolDataLinkError         (8),
+	            acV5LinkProtocolDataLinkError        (9),
+	            acV5ProtectionDL1Error               (10),
+	            acV5ProtectionDL2Error               (11),
+	            acV5PSTNPRotocolDataLinkEstablish    (12),
+	            acV5ControlProtocolDataLinkEstablish (13),
+	            acV5BCCProtocolDataLinkEstablish     (14),
+	            acV5LinkProtocolDataLinkEstablish    (15),
+	            acV5ProtectionDL1Establish           (16),
+	            acV5ProtectionDL2Establish           (17),
+	            acV5StartConfirm                     (18)
+			}
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "V5 Alarm Report Cause."
+    ::= {acV5StatusEntry 1}
+
+
+acV5InterfaceIdCheck     OBJECT-TYPE
+    SYNTAX  V5ParameterStats
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "V5.2 Interface ID Check Status."
+    ::= {acV5StatusEntry 2}
+
+acV5VariantIdCheck   OBJECT-TYPE
+    SYNTAX  V5ParameterStats
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            " V5.2  Variant ID check Status"
+    ::= {acV5StatusEntry 3}
+
+acV5IDCheckTimeOut     OBJECT-TYPE
+    SYNTAX  V5ParameterStats
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            " V5.2 Interface & Variant ID  Check Time Out. "
+    ::= {acV5StatusEntry 4}
+
+acV5L2Startup     OBJECT-TYPE
+    SYNTAX  V5ParameterStats
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "The status of Layer 2 Start up procedure. "
+    ::= {acV5StatusEntry 5}
+
+acV5Restart     OBJECT-TYPE
+    SYNTAX  V5ParameterStats
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "The status of the PSTN Restart procedure. "
+    ::= {acV5StatusEntry 6}
+
+acV5ControlProtocolDataLink     OBJECT-TYPE
+    SYNTAX  V5ParameterStats
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "The status of Control Protocol Data Link. "
+    ::= {acV5StatusEntry 7}
+
+acV5LinkControlProtocolDataLink     OBJECT-TYPE
+    SYNTAX  V5ParameterStats
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "The status of Link Control Protocol Data Link . "
+    ::= {acV5StatusEntry 8}
+
+acV5BCCProtocolDataLink     OBJECT-TYPE
+    SYNTAX  V5ParameterStats
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "The status of . "
+    ::= {acV5StatusEntry 9}
+
+acV5PSTNProtocolDataLink     OBJECT-TYPE
+    SYNTAX  V5ParameterStats
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "The status of BCC Protocol Data Link. "
+    ::= {acV5StatusEntry 10}
+
+acV5ProtectionDL1     OBJECT-TYPE
+    SYNTAX  V5ParameterStats
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "The status of Protection DL1 . "
+    ::= {acV5StatusEntry 12}
+
+acV5ProtectionDL2     OBJECT-TYPE
+    SYNTAX  V5ParameterStats
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "The status of Protection DL2. "
+    ::= {acV5StatusEntry 13}
+
+
+--V5 Ports
+
+acV5PortsTable      OBJECT-TYPE       
+    SYNTAX          SEQUENCE OF AcV5PortsEntry
+    MAX-ACCESS      not-accessible       
+    STATUS          obsolete
+    DESCRIPTION
+      "V5.2 User Ports."
+    ::= { aclV5 3}
+
+acV5PortsEntry  OBJECT-TYPE       
+    SYNTAX          AcV5PortsEntry
+    MAX-ACCESS      not-accessible       
+    STATUS          obsolete
+    DESCRIPTION          
+      "V5 User Ports status and control" 
+    INDEX {acV5InterfaceTrunkGroupId, acV5UserPortId, acV5UserPortType}       
+	::= { acV5PortsTable 1 }
+
+AcV5PortsEntry ::= SEQUENCE {  
+        acV5UserPortId Integer32,
+		acV5UserPortType INTEGER,
+        acV5PSTNANState INTEGER,
+		acV5PortBlockControl INTEGER
+}
+
+acV5UserPortId     OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "User Port Id."
+    ::= {acV5PortsEntry	1}
+
+
+acV5UserPortType          OBJECT-TYPE
+    SYNTAX  INTEGER {
+	            acV5PSTNUserType    (0),
+	            acV5ISDNBraUserType (1),
+	            acV5PSTNPraUserType (2)
+				}
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "User Port Type."
+    ::= {acV5PortsEntry 2}
+
+acV5PSTNANState          OBJECT-TYPE
+    SYNTAX  INTEGER {
+	            acV5-PSTN-STATE-AN0-OUT-OF-SERVICE (0),
+	            acV5-PSTN-STATE-AN1-NULL           (1),
+	            acV5-PSTN-STATE-AN2-PATH-INIT-AN   (2),
+	            acV5-PSTN-STATE-AN3-PATH-ABORT-RQ  (3),
+	            acV5-PSTN-STATE-AN4-LINE-INFO      (4),
+	            acV5-PSTN-STATE-AN5-PATH-ACTIVE    (5),
+	            acV5-PSTN-STATE-AN6-PORT-BLOCKED   (6),
+	            acV5-PSTN-STATE-AN7-DISC-RQ        (7)
+				}
+    MAX-ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "The PSTN User Port status ."
+    ::= {acV5PortsEntry 3}
+
+acV5PortBlockControl          OBJECT-TYPE
+    SYNTAX  INTEGER {
+	            acV5PortBlock         (1),
+	            acV5PortDeferredBlock (2),
+	            acV5PortUnBlock       (3)
+				}
+    MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+            "The User Port Control Commands : Block / Deferred Block / Unblock"
+    ::= {acV5PortsEntry 4}
+
+-- V5 Trap 
+
+
+acV5Alarm   NOTIFICATION-TYPE
+    OBJECTS {acV5AlarmReportCause}
+    STATUS  obsolete
+    DESCRIPTION
+            "This trap is sent when there is a change in the status of a V5 Interface Group."
+     ::= { aclV5 4}
+
+
+END
+

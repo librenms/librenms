@@ -1,5 +1,3 @@
 <?php
 
-use LibreNMS\Config;
-
-include Config::get('install_dir') . '/includes/discovery/sensors/voltage/unix.inc.php';
+include base_path('includes/discovery/sensors/voltage/unix.inc.php');

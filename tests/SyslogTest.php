@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Tests;
 
-class SyslogTest extends TestCase
+final class SyslogTest extends TestCase
 {
     // The format is:
     // $SOURCEIP||$FACILITY||$PRIORITY||$LEVEL||$TAG||$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC||$MSG||$PROGRAM
@@ -35,7 +35,7 @@ class SyslogTest extends TestCase
     private function fillLine($line)
     {
         $entry = [];
-        [$entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']] = explode('||', trim($line));
+        [$entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']] = explode('||', trim((string) $line));
 
         return $entry;
     }

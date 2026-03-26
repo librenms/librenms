@@ -26,6 +26,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Location;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
@@ -38,10 +39,15 @@ class Bats extends OS implements
 {
     public function fetchLocation(): Location
     {
-        $location = parent::fetchLocation();
-        $lat = snmp_get($this->getDeviceArray(), 'AATS-MIB::networkGPSLatitudeFloat.0', '-Oqv');
-        $lng = snmp_get($this->getDeviceArray(), 'AATS-MIB::networkGPSLongitudeFloat.0', '-Oqv');
-        $pointing = snmp_get($this->getDeviceArray(), 'AATS-MIB::status.0', '-Oqv');
+        $response = \SnmpQuery::get([
+            'AATS-MIB::networkGPSLatitudeFloat.0',
+            'AATS-MIB::networkGPSLongitudeFloat.0',
+            'AATS-MIB::status.0',
+        ]);
+
+        $lat = $response->value('AATS-MIB::networkGPSLatitudeFloat.0');
+        $lng = $response->value('AATS-MIB::networkGPSLongitudeFloat.0');
+        $pointing = $response->value('AATS-MIB::status.0');
 
         return new Location([
             'location' => 'At ' . (string) $lat . ', ' . (string) $lng . '. ' . $pointing,
@@ -55,7 +61,7 @@ class Bats extends OS implements
         $oid = '.1.3.6.1.4.1.37069.1.2.5.3.0';
 
         return [
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'bats', 0, 'SNR'),
+            new WirelessSensor(WirelessSensorType::Snr, $this->getDeviceId(), $oid, 'bats', 0, 'SNR'),
         ];
     }
 
@@ -64,7 +70,7 @@ class Bats extends OS implements
         $oid = '.1.3.6.1.4.1.37069.1.2.4.3.0';
 
         return [
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'bats', 0, 'RSSI'),
+            new WirelessSensor(WirelessSensorType::Rssi, $this->getDeviceId(), $oid, 'bats', 0, 'RSSI'),
         ];
     }
 }

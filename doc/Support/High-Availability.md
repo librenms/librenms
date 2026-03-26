@@ -19,13 +19,12 @@ For simplicity, the web-ui and poller can be configured to use the same Redis Se
 
 ## Note about RRD Files
 
-Pollers need to write RRD data to files on disk to store polled data. To ensure high availability, it's recommended to 
-use RRDCached which accept RRD data over TCP/IP. 
-This allows multiple pollers to write to the same RRD files using network connection.
+Pollers need to write RRD data to files on disk to store polled data. It's recommended
+to use RRDCached which accept RRD data over TCP/IP. This doesn't provide HA for RRD
+data but does allows multiple pollers to write to the same RRD files using network connection.
 This is outlined in [RRDCached.md](../Extensions/RRDCached.md).
 
-You can also use a shared storage for the RRD files over NFS with GlusterFS or similar.
-
+One way to add HA support for RRD is to use a shared storage over NFS with GlusterFS or similar.
 
 ## WebUI High Availability
 
@@ -49,6 +48,7 @@ The WebUI achieves HA through multiple LibreNMS instances sharing these backend 
    - Install LibreNMS on multiple servers
    - Configure each instance to use the same database and Redis Sentinel cluster
    - Ensure identical `.env` configurations across all instances. Remember to set `APP_KEY` to the same value on all instances.
+   - Each install should have a unique `NODE_ID` in your `.env`.
 
 4. **Configure RRD Access**:
     Either use Use RRDCached that allows all instances to access the same RRD files. Or use a shared storage for the RRD files over NFS or similar.
@@ -57,8 +57,9 @@ The WebUI achieves HA through multiple LibreNMS instances sharing these backend 
 
 Distributed polling allows multiple pollers to work together, providing load distribution and failover capability.
 
-Important! The poller does not support MySQL Galera clustering, so you need to use a TCP load balancer such as Nginx or HAProxy
-in front of the cluster to point to the cluster nodes.
+!!! warning
+    The poller does not support MySQL Galera clustering, so you need to use a TCP load balancer such as Nginx or HAProxy
+    in front of the cluster to point to the cluster nodes.
 
 ### Implementation
 

@@ -36,7 +36,7 @@ class Edgeosolt extends \LibreNMS\OS
 
         $hw = snmpwalk_cache_oid($this->getDeviceArray(), 'hrSWRunParameters', [], 'HOST-RESOURCES-MIB');
         foreach ($hw as $entry) {
-            if (preg_match('/(?<=UBNT )(.*)(?= running on)/', $entry['hrSWRunParameters'], $matches)) {
+            if (preg_match('/(?<=UBNT )(.*)(?= running on)/', (string) $entry['hrSWRunParameters'], $matches)) {
                 $this->getDevice()->hardware = $matches[0];
                 break;
             }

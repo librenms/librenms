@@ -1,4 +1,3 @@
-mib: DELL-SNMP-UPS-MIB
 modules:
     os:
         hardware: DELL-SNMP-UPS-MIB::productIDDisplayName.0
@@ -11,9 +10,10 @@ modules:
         state:
             data:
                 -
-                    oid: productStatusGlobalStatus
-                    value: productStatusGlobalStatus
+                    oid: DELL-SNMP-UPS-MIB::productStatusGlobalStatus
+                    value: DELL-SNMP-UPS-MIB::productStatusGlobalStatus
                     num_oid: '.1.3.6.1.4.1.674.10902.2.110.1.{{ $index }}'
+                    state_name: productStatusGlobalStatus
                     descr: 'Current Status'
                     index: '{{ $index }}'
                     states:
@@ -23,3 +23,16 @@ modules:
                         - { value: 4, descr: non-critical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: non-recoverable, graph: 1, generic: 2 }
+        runtime:
+            data:
+                -
+                    oid: DELL-SNMP-UPS-MIB::physicalBatterySecondsRemaining
+                    value: DELL-SNMP-UPS-MIB::physicalBatterySecondsRemaining
+                    num_oid: '.1.3.6.1.4.1.674.10902.2.120.5.3.{{ $index }}'
+                    descr: 'Runtime'
+                    index: '{{ $index }}'
+                    divisor: 60
+                    high_limit: 3000
+                    warn_limit: 2000
+                    low_warn_limit: 10
+                    low_limit: 5

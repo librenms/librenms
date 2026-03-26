@@ -1,0 +1,275 @@
+STORMSHIELD-MODEL-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+         Unsigned32                            FROM SNMPv2-SMI
+      DisplayString                            FROM RFC1213-MIB
+      TruthValue                               FROM SNMPv2-TC
+      stormshieldMIB                           FROM STORMSHIELD-SMI-MIB;
+
+   snsModelName MODULE-IDENTITY
+      LAST-UPDATED  "202409250000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         https://www.stormshield.eu"
+      DESCRIPTION   "Stormshield Model Name"
+      REVISION      "202409250000Z"
+      DESCRIPTION   "Update (6 models added)"
+      REVISION      "202312140000Z"
+      DESCRIPTION   "Initial revision (29 models)"
+      ::= { stormshieldMIB 20 }
+
+snsSN160 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 160"
+      ::= { snsModelName 1 }
+
+snsSN160W OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 160 Wifi"
+      ::= { snsModelName 2 }
+
+snsSN210 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 210"
+      ::= { snsModelName 3 }
+
+snsSN210W OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 210 Wifi"
+      ::= { snsModelName 4 }
+
+snsSN-S-Series-220 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 220"
+      ::= { snsModelName 5 }
+
+snsSN310 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 310"
+      ::= { snsModelName 6 }
+
+snsSN-S-Series-320 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 320"
+      ::= { snsModelName 7 }
+
+snsSN510 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 510"
+      ::= { snsModelName 8 }
+
+snsSN520 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 520"
+      ::= { snsModelName 9 }
+
+snsSN710 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 710"
+      ::= { snsModelName 10 }
+
+snsSN-M-Series-720 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 720"
+      ::= { snsModelName 11 }
+
+snsSNi20 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model i20"
+      ::= { snsModelName 12 }
+
+snsSNi40 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model i40"
+      ::= { snsModelName 13 }
+
+snsSNxr1200 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model xr1200"
+      ::= { snsModelName 14 }
+
+snsSN910 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 910"
+      ::= { snsModelName 15 }
+
+snsSN-M-Series-920 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 920"
+      ::= { snsModelName 16 }
+
+snsSN1100 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 1100"
+      ::= { snsModelName 17 }
+
+snsSN2000 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 2000"
+      ::= { snsModelName 18 }
+
+snsSN2100 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 2100"
+      ::= { snsModelName 19 }
+
+snsSN3000 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 3000"
+      ::= { snsModelName 20 }
+
+snsSN3100 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 3100"
+      ::= { snsModelName 21 }
+
+snsSN6000 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 6000"
+      ::= { snsModelName 22 }
+
+snsSN6100 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 6100"
+      ::= { snsModelName 23 }
+
+snsEVA1 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security virtual appliance model EVA1"
+      ::= { snsModelName 24 }
+
+snsEVA2 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security virtual appliance model EVA2"
+      ::= { snsModelName 25 }
+
+snsEVA3 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security virtual appliance model EVA3"
+      ::= { snsModelName 26 }
+
+snsEVA4 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security virtual appliance model EVA4"
+      ::= { snsModelName 27 }
+
+snsEVAU OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security virtual appliance model EVAU"
+      ::= { snsModelName 28 }
+
+snsVPAYG OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Virtual Pay-As-You-Go appliance"
+      ::= { snsModelName 29 }
+
+snsSNi10 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model i10"
+      ::= { snsModelName 30 }
+
+snsSN-XS-Series-170 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 170"
+      ::= { snsModelName 31 }
+
+snsSN-L-Series-2200 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 2200"
+      ::= { snsModelName 32 }
+
+snsSN-L-Series-3200 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 3200"
+      ::= { snsModelName 33 }
+
+snsSN-XL-Series-5200 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 5200"
+      ::= { snsModelName 34 }
+
+snsSN-XL-Series-6200 OBJECT-TYPE
+      SYNTAX          DisplayString (SIZE (0..255))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION     "Stormshield Network Security appliance model 6200"
+      ::= { snsModelName 35 }
+
+END

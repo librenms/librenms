@@ -26,6 +26,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\Util\Laravel;
@@ -34,12 +35,12 @@ use ReflectionException;
 
 class Validator
 {
-    /** @var array */
-    private $validation_groups = [];
-    /** @var array */
-    private $results = [];
-    /** @var string|null */
-    private $username;
+    /** @var array<string, ValidationGroup> */
+    private array $validation_groups = [];
+    /** @var array<string, ValidationResult[]> */
+    private array $results = [];
+
+    private ?string $username = null;
 
     /**
      * Validator constructor.
@@ -61,9 +62,17 @@ class Validator
                     $this->validation_groups[$validation_name] = new $class();
                     $this->results[$validation_name] = [];
                 }
-            } catch (ReflectionException $e) {
+            } catch (ReflectionException) {
             }
         }
+    }
+
+    /**
+     * @return array<string, bool>
+     */
+    public function getValidationGroups(): array
+    {
+        return array_map(fn (ValidationGroup $validator) => $validator->isDefault(), $this->validation_groups);
     }
 
     /**
@@ -113,9 +122,7 @@ class Validator
     {
         $results = $this->getResults($validation_group);
 
-        return array_reduce($results, function ($compound, ValidationResult $result) {
-            return min($compound, $result->getStatus());
-        }, ValidationResult::SUCCESS);
+        return array_reduce($results, fn ($compound, ValidationResult $result) => min($compound, $result->getStatus()), ValidationResult::SUCCESS);
     }
 
     /**
@@ -144,7 +151,7 @@ class Validator
             return $this->results[$validation_group] ?? [];
         }
 
-        return array_reduce($this->results, 'array_merge', []);
+        return array_reduce($this->results, array_merge(...), []);
     }
 
     /**
@@ -160,8 +167,6 @@ class Validator
 
     /**
      * Print all ValidationResults or a group of them.
-     *
-     * @param  string|null  $validation_group
      */
     public function printResults(?string $validation_group = null): void
     {
@@ -300,7 +305,7 @@ class Validator
      */
     public function getBaseURL(): string
     {
-        $url = function_exists('get_url') ? get_url() : Config::get('base_url');
+        $url = function_exists('get_url') ? get_url() : LibrenmsConfig::get('base_url');
 
         return rtrim(str_replace('validate', '', $url), '/');  // get base_url from current url
     }
@@ -312,18 +317,13 @@ class Validator
 
     public function getStatusText(int $status): string
     {
-        switch ($status) {
-            case ValidationResult::SUCCESS:
-                return 'Ok';
-            case ValidationResult::FAILURE:
-                return 'Failure';
-            case ValidationResult::WARNING:
-                return 'Warning';
-            case ValidationResult::INFO:
-                return 'Info';
-            default:
-                return '';
-        }
+        return match ($status) {
+            ValidationResult::SUCCESS => 'Ok',
+            ValidationResult::FAILURE => 'Failure',
+            ValidationResult::WARNING => 'Warning',
+            ValidationResult::INFO => 'Info',
+            default => '',
+        };
     }
 
     public function toArray(): array
@@ -336,9 +336,7 @@ class Validator
                 'name' => ucfirst($group),
                 'status' => $groupStatus,
                 'statusText' => $this->getStatusText($groupStatus),
-                'results' => array_map(function (ValidationResult $result) {
-                    return $result->toArray();
-                }, $results),
+                'results' => array_map(fn (ValidationResult $result) => $result->toArray(), $results),
             ];
         }, $this->getAllResults(), array_keys($this->getAllResults()));
     }

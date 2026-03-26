@@ -50,7 +50,7 @@ class Config extends BaseModel
 
     public function getConfigValueAttribute($value)
     {
-        return json_decode($value, true);
+        return json_decode((string) $value, true);
     }
 
     public function setConfigValueAttribute($value)

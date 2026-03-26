@@ -64,7 +64,7 @@ class Snmpsim extends Process
             return $type == Process::ERR && str_contains($buffer, $listen);
         });
 
-        return trim($last);
+        return trim((string) $last);
     }
 
     public function isVenvSetUp(): bool
@@ -96,7 +96,7 @@ class Snmpsim extends Process
                 Log::error($setupProcess->getErrorOutput());
             }
 
-            $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'snmpsim>=1.1.7']);
+            $installProcess = new Process([$snmpsim_venv_path . '/bin/pip', 'install', 'snmpsim==1.1.7']);
             $installProcess->setTty($print_output);
             $installProcess->run();
 

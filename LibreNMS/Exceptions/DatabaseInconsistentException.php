@@ -39,13 +39,13 @@ use Throwable;
 class DatabaseInconsistentException extends \Exception implements UpgradeableException
 {
     /**
+     * @param  \LibreNMS\ValidationResult[]  $validationResults
+     */
+    public function __construct(/**
      * @var \LibreNMS\ValidationResult[]
      */
-    private $validationResults;
-
-    public function __construct($validationResults, $message = '', $code = 0, ?Throwable $previous = null)
+    private $validationResults, $message = '', $code = 0, ?Throwable $previous = null)
     {
-        $this->validationResults = $validationResults;
         parent::__construct($message, $code, $previous);
     }
 
@@ -57,9 +57,7 @@ class DatabaseInconsistentException extends \Exception implements UpgradeableExc
                 (new Database())->validate($validator);
 
                 // get only failed results
-                $results = array_filter($validator->getResults('database'), function (ValidationResult $result) {
-                    return $result->getStatus() === ValidationResult::FAILURE;
-                });
+                $results = array_filter($validator->getResults('database'), fn (ValidationResult $result) => $result->getStatus() === ValidationResult::FAILURE);
 
                 if ($results) {
                     return new static($results, $exception->getMessage(), 0, $exception);

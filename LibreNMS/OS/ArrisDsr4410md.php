@@ -3,6 +3,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessQualityDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
@@ -19,7 +20,7 @@ class ArrisDsr4410md extends OS implements
 
         return [
             new WirelessSensor(
-                'rssi',
+                WirelessSensorType::Rssi,
                 $this->getDeviceId(),
                 $oid,
                 'arris-dsr4410md',
@@ -36,7 +37,7 @@ class ArrisDsr4410md extends OS implements
 
         return [
             new WirelessSensor(
-                'snr',
+                WirelessSensorType::Snr,
                 $this->getDeviceId(),
                 $oid,
                 'arris-dsr4410md',
@@ -53,7 +54,7 @@ class ArrisDsr4410md extends OS implements
 
         return [
             new WirelessSensor(
-                'quality',
+                WirelessSensorType::Quality,
                 $this->getDeviceId(),
                 $oid,
                 'arris-dsr4410md',

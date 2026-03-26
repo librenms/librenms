@@ -150,9 +150,9 @@ class Xdsl implements Module
                 if (isset($data[$oid])) {
                     if ($oid == 'adslAtucCurrOutputPwr') {
                         // workaround Cisco Bug CSCvj53634
-                        $data[$oid] = Number::constrainInteger($data[$oid], IntegerType::int32);
+                        $data[$oid] = Number::constrainInteger($data[$oid], IntegerType::Int32);
                     }
-                    $data[$oid] = $data[$oid] / 10;
+                    $data[$oid] /= 10;
                 }
             }
 
@@ -203,7 +203,7 @@ class Xdsl implements Module
 
             foreach ($this->vdslTenthValues as $oid) {
                 if (isset($data[$oid])) {
-                    $data[$oid] = $data[$oid] / 10;
+                    $data[$oid] /= 10;
                 }
             }
 

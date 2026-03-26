@@ -29,11 +29,44 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\AlertState;
 
 class AlertRule extends BaseModel
 {
     public $timestamps = false;
+
+    protected static function booted(): void
+    {
+        static::deleting(function (AlertRule $rule): void {
+            $rule->alerts()->delete();
+            $rule->logs()->delete();
+            $rule->templateMaps()->delete();
+
+            $rule->devices()->detach();
+            $rule->groups()->detach();
+            $rule->locations()->detach();
+            $rule->transportSingles()->detach();
+            $rule->transportGroups()->detach();
+        });
+    }
+
+    protected $fillable = [
+        'severity',
+        'extra',
+        'disabled',
+        'name',
+        'proc',
+        'notes',
+        'query',
+        'builder',
+        'invert_map',
+    ];
+
+    protected $casts = [
+        'builder' => 'array',
+        'extra' => 'array',
+    ];
 
     // ---- Query scopes ----
 
@@ -69,7 +102,7 @@ class AlertRule extends BaseModel
      */
     public function scopeHasAccess($query, User $user)
     {
-        if ($user->hasGlobalRead()) {
+        if (Gate::allows('viewAll', AlertRule::class)) {
             return $query;
         }
 
@@ -81,12 +114,29 @@ class AlertRule extends BaseModel
     }
 
     // ---- Define Relationships ----
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Alert, $this>
      */
     public function alerts(): HasMany
     {
         return $this->hasMany(Alert::class, 'rule_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertLog, $this>
+     */
+    public function logs(): HasMany
+    {
+        return $this->hasMany(AlertLog::class, 'rule_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertTemplateMap, $this>
+     */
+    public function templateMaps(): HasMany
+    {
+        return $this->hasMany(AlertTemplateMap::class, 'alert_rule_id');
     }
 
     /**
@@ -111,5 +161,25 @@ class AlertRule extends BaseModel
     public function locations(): BelongsToMany
     {
         return $this->belongsToMany(Location::class, 'alert_location_map', 'rule_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\AlertTransport, $this>
+     */
+    public function transportSingles(): BelongsToMany
+    {
+        return $this->belongsToMany(AlertTransport::class, 'alert_transport_map', 'rule_id', 'transport_or_group_id')
+            ->withPivot('target_type')
+            ->wherePivot('target_type', 'single');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\AlertTransportGroup, $this>
+     */
+    public function transportGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(AlertTransportGroup::class, 'alert_transport_map', 'rule_id', 'transport_or_group_id')
+            ->withPivot('target_type')
+            ->wherePivot('target_type', 'group');
     }
 }

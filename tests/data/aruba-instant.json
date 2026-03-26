@@ -5059,6 +5059,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5078,6 +5079,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5097,6 +5099,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5116,10 +5119,59 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.128.0.11",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.128.0.0/24",
+                    "ifIndex": 500
+                },
+                {
+                    "ipv4_address": "169.254.128.1",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "169.254.128.0/22",
+                    "ifIndex": 55
+                },
+                {
+                    "ipv4_address": "172.31.98.1",
+                    "ipv4_prefixlen": 23,
+                    "context_name": "",
+                    "ipv4_network": "172.31.98.0/23",
+                    "ifIndex": 500
+                },
+                {
+                    "ipv4_address": "192.168.126.25",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.126.0/24",
+                    "ifIndex": 500
+                },
+                {
+                    "ipv4_address": "192.168.126.27",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.126.0/24",
+                    "ifIndex": 500
+                },
+                {
+                    "ipv4_address": "192.168.126.30",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.126.0/24",
+                    "ifIndex": 500
+                }
+            ]
+        }
     }
 }

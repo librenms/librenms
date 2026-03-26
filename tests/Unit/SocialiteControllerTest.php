@@ -31,7 +31,7 @@ use App\Models\User;
 use Laravel\Socialite\AbstractUser;
 use LibreNMS\Tests\TestCase;
 
-class SocialiteControllerTest extends TestCase
+final class SocialiteControllerTest extends TestCase
 {
     /**
      * Helper to test setRolesFromClaim().
@@ -51,9 +51,9 @@ class SocialiteControllerTest extends TestCase
         array $scopes = ['groups']
     ): bool {
         // Inject scopes & claims.
-        \LibreNMS\Config::set('auth.socialite.scopes', $scopes);
-        \LibreNMS\Config::set('auth.socialite.claims', $claimMap);
-        \LibreNMS\Config::set('auth.socialite.debug', false);
+        \App\Facades\LibrenmsConfig::set('auth.socialite.scopes', $scopes);
+        \App\Facades\LibrenmsConfig::set('auth.socialite.claims', $claimMap);
+        \App\Facades\LibrenmsConfig::set('auth.socialite.debug', false);
 
         // Stub the Socialite user.
         $socialiteUserStub = $this->createMock(AbstractUser::class);
@@ -65,7 +65,6 @@ class SocialiteControllerTest extends TestCase
         $controller = new SocialiteController();
         $reflectionClass = new \ReflectionClass($controller);
         $prop = $reflectionClass->getProperty('socialite_user');
-        $prop->setAccessible(true);
         $prop->setValue($controller, $socialiteUserStub);
 
         // Stub the User model and assert syncRoles().
@@ -80,7 +79,6 @@ class SocialiteControllerTest extends TestCase
 
         // Invoke the private method with the chosen provider.
         $method = $reflectionClass->getMethod('setRolesFromClaim');
-        $method->setAccessible(true);
 
         return $method->invokeArgs($controller, [$provider, $userMock]);
     }

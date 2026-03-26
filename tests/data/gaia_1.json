@@ -2074,5 +2074,167 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.1.0.1",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.1.0.0/30",
+                    "ifIndex": 4
+                },
+                {
+                    "ipv4_address": "10.10.10.18",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.10.10.0/24",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "10.10.11.18",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.10.11.0/24",
+                    "ifIndex": 5
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "192.168.122.18",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.122.0/24",
+                    "ifIndex": 3
+                }
+            ]
+        }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 768,
+                    "hrDeviceDescr": "GenuineIntel: QEMU Virtual CPU version 2.5+",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 2
+                },
+                {
+                    "hrDeviceIndex": 769,
+                    "hrDeviceDescr": "GenuineIntel: QEMU Virtual CPU version 2.5+",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 1
+                },
+                {
+                    "hrDeviceIndex": 1025,
+                    "hrDeviceDescr": "network interface lo",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1026,
+                    "hrDeviceDescr": "network interface eth0",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1027,
+                    "hrDeviceDescr": "network interface eth1",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1028,
+                    "hrDeviceDescr": "network interface eth2",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1029,
+                    "hrDeviceDescr": "network interface eth3",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1536,
+                    "hrDeviceDescr": "QEMU HARDDISK",
+                    "hrDeviceType": "hrDeviceDiskStorage",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1538,
+                    "hrDeviceDescr": "QEMU DVD-ROM",
+                    "hrDeviceType": "hrDeviceDiskStorage",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 3072,
+                    "hrDeviceDescr": "Guessing that there's a floating point co-processor",
+                    "hrDeviceType": "hrDeviceCoprocessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                }
+            ]
+        }
+    },
+    "ucd-diskio": {
+        "discovery": {
+            "disks": [
+                {
+                    "diskio_index": 21,
+                    "diskio_descr": "dm-0"
+                },
+                {
+                    "diskio_index": 22,
+                    "diskio_descr": "dm-1"
+                },
+                {
+                    "diskio_index": 17,
+                    "diskio_descr": "hda"
+                },
+                {
+                    "diskio_index": 18,
+                    "diskio_descr": "hda1"
+                },
+                {
+                    "diskio_index": 19,
+                    "diskio_descr": "hda2"
+                },
+                {
+                    "diskio_index": 20,
+                    "diskio_descr": "hda3"
+                },
+                {
+                    "diskio_index": 24,
+                    "diskio_descr": "hdc"
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

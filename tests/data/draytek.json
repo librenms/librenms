@@ -1031,7 +1031,7 @@
         }
     },
     "mempools": {
-        "discovery": {},
+        "discovery": [],
         "poller": "matches discovery"
     }
 }

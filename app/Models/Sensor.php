@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Traits\HasThresholds;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use LibreNMS\Enum\Sensor as SensorEnum;
-use LibreNMS\Enum\Severity;
+use LibreNMS\Enum\SensorState;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -18,6 +18,7 @@ use LibreNMS\Util\Time;
 class Sensor extends DeviceRelatedModel implements Keyable
 {
     use HasFactory;
+    use HasThresholds;
 
     public $timestamps = false;
     protected $primaryKey = 'sensor_id';
@@ -30,6 +31,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
         'sensor_type',
         'sensor_descr',
         'sensor_divisor',
+        'sensor_current',
         'sensor_multiplier',
         'sensor_limit',
         'sensor_limit_warn',
@@ -84,44 +86,9 @@ class Sensor extends DeviceRelatedModel implements Keyable
         return __('sensors.' . $this->sensor_class . '.unit_long');
     }
 
-    public function icon()
+    public function getGraphType(): string
     {
-        return SensorEnum::from($this->sensor_class)->icon();
-    }
-
-    public static function getTypes()
-    {
-        return SensorEnum::values();
-    }
-
-    public function guessLimits(bool $high, bool $low): void
-    {
-        if ($high) {
-            $this->sensor_limit = match ($this->sensor_class) {
-                'temperature' => $this->sensor_current + 20,
-                'voltage' => $this->sensor_current * 1.15,
-                'humidity' => 70,
-                'fanspeed' => $this->sensor_current * 1.80,
-                'power_factor' => 1,
-                'signal' => -30,
-                'load' => 80,
-                'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 1.05,
-                default => null,
-            };
-        }
-
-        if ($low) {
-            $this->sensor_limit_low = match ($this->sensor_class) {
-                'temperature' => $this->sensor_current - 10,
-                'voltage' => $this->sensor_current * 0.85,
-                'humidity' => 30,
-                'fanspeed' => $this->sensor_current * 0.80,
-                'power_factor' => -1,
-                'signal' => -80,
-                'airflow', 'snr', 'frequency', 'pressure', 'cooling' => $this->sensor_current * 0.95,
-                default => null,
-            };
-        }
+        return 'sensor_' . $this->sensor_class;
     }
 
     /**
@@ -144,7 +111,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
         $user = auth()->user();
 
         return match ($this->sensor_class) {
-            'temperature' => $user && UserPref::getPref($user, 'temp_units') == 'f' ? Rewrite::celsiusToFahrenheit($value) . ' °F' : "$value °C",
+            'temperature' => $user && UserPref::getPref($user, 'temp_units') == 'f' ? Rewrite::celsiusToFahrenheit($value) . ' °F' : round($value, 2) . ' °C',
             'state' => $this->currentTranslation()->state_descr ?? 'Unknown',
             'current', 'power' => Number::formatSi($value, 3, 0, $this->unit()),
             'runtime' => Time::formatInterval($value * 60),
@@ -161,47 +128,6 @@ class Sensor extends DeviceRelatedModel implements Keyable
         }
 
         return $this->translations->firstWhere('state_value', $this->sensor_current);
-    }
-
-    public function currentStatus(): Severity
-    {
-        if ($this->sensor_class == 'state') {
-            return $this->currentTranslation()?->severity() ?? Severity::Unknown;
-        }
-
-        if ($this->sensor_current === null) {
-            return Severity::Unknown;
-        }
-
-        if ($this->sensor_limit !== null && $this->sensor_current >= $this->sensor_limit) {
-            return Severity::Error;
-        }
-        if ($this->sensor_limit_low !== null && $this->sensor_current <= $this->sensor_limit_low) {
-            return Severity::Error;
-        }
-
-        if ($this->sensor_limit_warn !== null && $this->sensor_current >= $this->sensor_limit_warn) {
-            return Severity::Warning;
-        }
-
-        if ($this->sensor_limit_low_warn !== null && $this->sensor_current <= $this->sensor_limit_low_warn) {
-            return Severity::Warning;
-        }
-
-        return Severity::Ok;
-    }
-
-    public function hasThresholds(): bool
-    {
-        return $this->sensor_limit_low !== null
-            || $this->sensor_limit_low_warn !== null
-            || $this->sensor_limit_warn !== null
-            || $this->sensor_limit !== null;
-    }
-
-    public function doesntHaveThresholds(): bool
-    {
-        return ! $this->hasThresholds();
     }
 
     // ---- Define Relationships ----
@@ -241,6 +167,34 @@ class Sensor extends DeviceRelatedModel implements Keyable
 
     /**
      * @param  Builder  $query
+     * @param  SensorState  $state
+     * @return Builder
+     */
+    public function scopeStateEq($query, $state)
+    {
+        return $query->whereHas('translations', function ($q) use ($state): void {
+            $q->where('state_generic_value', $state)
+                ->whereColumn('sensor_current', '=', 'state_value');
+        });
+    }
+
+    /**
+     * @param  Builder  $query
+     * @return Builder
+     */
+    public function scopeStateUnknown($query)
+    {
+        return $query->whereHas('translations', function ($q): void {
+            $q->whereColumn('sensor_current', '=', 'state_value')
+                ->where(function ($q): void {
+                    $q->where('state_generic_value', '<', SensorState::Ok)
+                        ->orWhere('state_generic_value', '>', SensorState::Error);
+                });
+        });
+    }
+
+    /**
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeIsCritical($query)
@@ -253,12 +207,22 @@ class Sensor extends DeviceRelatedModel implements Keyable
      * @param  Builder  $query
      * @return Builder
      */
+    public function scopeIsWarning($query)
+    {
+        return $query->whereColumn('sensor_current', '<', 'sensor_limit_low_warn')
+            ->orWhereColumn('sensor_current', '>', 'sensor_limit_warn');
+    }
+
+    /**
+     * @param  Builder  $query
+     * @return Builder
+     */
     public function scopeIsDisabled($query)
     {
         return $query->where('sensor_alert', 0);
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $data = $this->only([
             'sensor_oid',

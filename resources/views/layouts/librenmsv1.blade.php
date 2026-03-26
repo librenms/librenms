@@ -41,8 +41,8 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
-    <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=16042501" rel="stylesheet">
-    <link href="{{ asset('css/tw_dark.css?ver=03052025') }}" rel="stylesheet">
+    <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=02132026" rel="stylesheet">
+    <link href="{{ asset('css/tw_dark.css?ver=19112025') }}" rel="stylesheet">
     @if(!in_array(session('applied_site_style', 'light'), ['light', 'dark']))
     <link href="{{ asset('css/' . session('applied_site_style') . '.css?ver=732417643') }}" rel="stylesheet">
     @endif
@@ -53,7 +53,6 @@
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
-    <script src="{{ asset('js/alpine.min.js') }}" defer></script>
     <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js?ver=05072021') }}"></script>
@@ -78,13 +77,13 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=16052025') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=02032026') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
     <script>
         window.siteStyle = '{{ session('applied_site_style') }}';
-        window.siteStylePreference = '{{ session('preferences.site_style') }}';
+        window.siteStylePreference = '{{ session('preferences.site_style') ?? session('applied_site_style', 'device') }}';
 
         // Apply color scheme
         applySiteStyle(window.siteStylePreference);
@@ -95,16 +94,19 @@
                 applySiteStyle(event.matches ? 'dark' : 'light');
             }
         });
+        window.tz = undefined;
     </script>
     @auth
-        @if(session('preferences.timezone_static') == null || ! session('preferences.timezone_static'))
         <script>
+        @if(session('preferences.timezone_static') === null || ! session('preferences.timezone_static'))
             var tz = window.Intl.DateTimeFormat().resolvedOptions().timeZone;
             if(tz !== '{{ session('preferences.timezone') }}') {
                 updateTimezone(tz, false);
             }
-        </script>
+        @else
+            window.tz = '{{ session('preferences.timezone') }}';
         @endif
+        </script>
         <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
     @endauth
     @yield('javascript')
@@ -113,7 +115,7 @@
 @if(Auth::check())
     <script>
         // only update resolution if it doesn't match what is stored in the session
-        if (document.documentElement.clientWidth !== {{ session('screen_width') }} || document.documentElement.clientHeight !== {{ session('screen_height') }}) {
+        if (document.documentElement.clientWidth !== {{ (int) session('screen_width') }} || document.documentElement.clientHeight !== {{ (int) session('screen_height') }}) {
             updateResolution(false);
         }
     </script>

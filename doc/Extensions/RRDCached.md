@@ -21,7 +21,7 @@ or newer, in addition to your rrdcached version.
 
 ## High-Availability
 
-It's adviced to only run one active instance of RRDCached and have a failover instance ready to take over in case of failure.
+It's advised to only run one active instance of RRDCached and have a failover instance ready to take over in case of failure.
 A recommended setup is to use a network socket for RRDCached and have a load balancer in front of it such as Nginx.
 See [Securing RRDCached](#securing-rrcached) for more information.
 

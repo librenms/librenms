@@ -1,4 +1,3 @@
-mib: EXCELIANCE-MIB
 modules:
     os:
         hardware: EXCELIANCE-MIB::alHardwareModel
@@ -9,11 +8,11 @@ modules:
         state:
             data:
                 -
-                    oid: alFrontendTable
-                    value: alFrontendStatus
+                    oid: EXCELIANCE-MIB::alFrontendTable
+                    value: EXCELIANCE-MIB::alFrontendStatus
                     num_oid: '.1.3.6.1.4.1.23263.4.2.1.3.2.1.13.{{ $index }}'
                     index: 'alFrontendStatus.{{ $index }}'
-                    descr: alFrontendName
+                    descr: EXCELIANCE-MIB::alFrontendName
                     state_name: alFrontendStatus
                     group: "Frontend status"
                     states:
@@ -21,11 +20,11 @@ modules:
                         - { value: 1, generic: 0, graph: 1, descr: OPEN }
 
                 -
-                    oid: alBackendTable
-                    value: alBackendStatus
+                    oid: EXCELIANCE-MIB::alBackendTable
+                    value: EXCELIANCE-MIB::alBackendStatus
                     num_oid: '.1.3.6.1.4.1.23263.4.2.1.3.3.1.20.{{ $index }}'
                     index: 'alBackendStatus.{{ $index }}'
-                    descr: alBackendName
+                    descr: EXCELIANCE-MIB::alBackendName
                     group: "Backend status"
                     state_name: alBackendStatus
                     states:
@@ -33,11 +32,11 @@ modules:
                         - { value: 1, generic: 0, graph: 1, descr: UP }
 
                 -
-                    oid: alServerTable
-                    value: alServerStatus
+                    oid: EXCELIANCE-MIB::alServerTable
+                    value: EXCELIANCE-MIB::alServerStatus
                     num_oid: '.1.3.6.1.4.1.23263.4.2.1.3.4.1.19.{{ $index }}'
                     index: 'alServerStatus.{{ $index }}'
-                    descr: alServerName
+                    descr: EXCELIANCE-MIB::alServerName
                     #group: "{{ $alBackendTable }}.{{ $alServerBackendID }}"
                     group: 'Server status'
                     state_name: alServerStatus

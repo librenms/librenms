@@ -41,10 +41,15 @@ class Stats
         if ($stats->isEnabled()) {
             Http::client()
                 ->asForm()
-                ->post(\LibreNMS\Config::get('callback_post'), [
+                ->post(\App\Facades\LibrenmsConfig::get('callback_post'), [
                     'data' => json_encode($stats->collectData()),
                 ]);
         }
+    }
+
+    public function dump(): array
+    {
+        return $this->collectData();
     }
 
     public function isEnabled(): bool
@@ -66,7 +71,7 @@ class Stats
 
         $response = Http::client()
             ->asForm()
-            ->post(\LibreNMS\Config::get('callback_clear'), ['uuid' => $uuid]);
+            ->post(\App\Facades\LibrenmsConfig::get('callback_clear'), ['uuid' => $uuid]);
 
         if ($response->successful()) {
             Callback::where('name', 'uuid')->delete();
@@ -127,6 +132,7 @@ class Stats
             'ospfv3_links' => $this->selectTotal('ospfv3_ports', ['ospfv3IfType']),
             'arch' => $this->selectTotal('packages', ['arch']),
             'pollers' => $this->selectTotal('pollers'),
+            'port_assoc' => $this->selectTotal('devices', ['port_association_mode']),
             'port_type' => $this->selectTotal('ports', ['ifType']),
             'port_ifspeed' => DB::table('ports')->select([DB::raw('COUNT(*) AS `total`'), DB::raw('ROUND(`ifSpeed`/1000/1000) as ifSpeed')])->groupBy(['ifSpeed'])->get(),
             'port_vlans' => $this->selectTotal('ports_vlans', ['state']),
@@ -163,19 +169,15 @@ class Stats
         // sanitize sysDescr
         return $device_info->map(function ($entry) {
             // remove hostnames from linux, macosx, and SunOS
-            $entry->sysDescr = preg_replace_callback('/^(Linux |Darwin |FreeBSD |SunOS )[A-Za-z0-9._\-]+ ([0-9.]{3,9})/', function ($matches) {
-                return $matches[1] . 'hostname ' . $matches[2];
-            }, $entry->sysDescr);
+            $entry->sysDescr = preg_replace_callback('/^(Linux |Darwin |FreeBSD |SunOS )[A-Za-z0-9._\-]+ ([0-9.]{3,9})/', fn ($matches) => $matches[1] . 'hostname ' . $matches[2], (string) $entry->sysDescr);
 
             // wipe serial numbers, preserve the format
             $sn_patterns = ['/[A-Z]/', '/[a-z]/', '/[0-9]/'];
             $sn_replacements = ['A', 'a', '0'];
             $entry->sysDescr = preg_replace_callback(
                 '/((s\/?n|serial num(ber)?)[:=]? ?)([a-z0-9.\-]{4,16})/i',
-                function ($matches) use ($sn_patterns, $sn_replacements) {
-                    return $matches[1] . preg_replace($sn_patterns, $sn_replacements, $matches[4]);
-                },
-                $entry->sysDescr
+                fn ($matches) => $matches[1] . preg_replace($sn_patterns, $sn_replacements, $matches[4]),
+                (string) $entry->sysDescr
             );
 
             return $entry;

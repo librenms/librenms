@@ -85,12 +85,12 @@ function submitCustomRange(frmdata) {
     return true;
 }
 
-function updateTimezone(tz, static)
+function updateTimezone(tz, staticTz)
 {
     $.post(ajax_url + '/set_timezone',
         {
             timezone: tz,
-            static: static
+            static: staticTz
         },
         function(data) {
             if(data === tz) {
@@ -240,15 +240,16 @@ $(document).ready(function () {
 });
 
 // Add export button to bootgrid tables
-$(document).on('initialized.rs.jquery.bootgrid', function (e) {
+$(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
     var grid = $(e.target);
     var tableId = grid.attr('id');
 
     if ($('#' + tableId + '-export-button').length === 0) {
-        var ajaxUrl = grid.data('ajaxurl');
+        var ajaxUrl = grid.data('url');
+        var params = grid.data('params');
 
         if (ajaxUrl) {
-            var exportUrl = ajaxUrl + '/export';
+            var exportUrl = ajaxUrl + '/export' + (params ? '?' + params : '');
             var actionsContainer = null;
 
             var panel = grid.closest('div.panel');
@@ -263,7 +264,8 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e) {
                     '<i class="fa fa-download"></i> <span class="caret"></span>' +
                     '</button>' +
                     '<ul class="dropdown-menu">' +
-                    '<li><a href="' + exportUrl + '" class="export-link" data-grid-id="' + tableId + '"><i class="fa fa-file-text-o"></i> Export to CSV</a></li>' +
+                    '<li><a href="' + exportUrl + '" class="export-link" data-grid-id="' + tableId + '" data-export-type="visible"><i class="fa-solid fa-fw fa-file-csv"></i> Export page</a></li>' +
+                    '<li><a href="' + exportUrl + '" class="export-link" data-grid-id="' + tableId + '" data-export-type="all"><i class="fa-solid fa-fw fa-file-csv"></i> Export all results</a></li>' +
                     '</ul>' +
                     '</div>'
                 );
@@ -276,6 +278,7 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e) {
                     e.preventDefault();
 
                     var gridId = $(this).data('grid-id');
+                    var exportType = $(this).data('export-type');
                     var grid = $('#' + gridId);
                     var currentUrl = $(this).attr('href');
                     var urlParams = [];
@@ -285,11 +288,13 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e) {
                         urlParams.push('searchPhrase=' + encodeURIComponent(searchPhrase));
                     }
 
-                    // pagination and row count
-                    var currentPage = grid.bootgrid('getCurrentPage');
-                    var rowCount = grid.bootgrid('getRowCount');
-                    urlParams.push('current=' + currentPage);
-                    urlParams.push('rowCount=' + rowCount);
+                    // Only include pagination for visible records export
+                    if (exportType === 'visible') {
+                        var currentPage = grid.bootgrid('getCurrentPage');
+                        var rowCount = grid.bootgrid('getRowCount');
+                        urlParams.push('current=' + currentPage);
+                        urlParams.push('rowCount=' + rowCount);
+                    }
 
                     // get all filters from the header
                     var headerContainer = $('.' + gridId + '-headers-table-menu');
@@ -647,21 +652,18 @@ function http_fallback(link) {
 }
 
 function init_select2(selector, type, data, selected, placeholder, config) {
-    var $select = $(selector);
+    const $select = $(selector);
 
     // allow function to be assigned to pass data
-    var data_function = function(params) {
+    const data_function = $.isFunction(data) ? data : function (params) {
         data.term = params.term;
         data.page = params.page || 1;
         return data;
     };
-    if ($.isFunction(data)) {
-        data_function = data;
-    }
 
-    var init = {
+    const init = {
         theme: "bootstrap",
-        dropdownAutoWidth : true,
+        dropdownAutoWidth: true,
         width: "auto",
         placeholder: placeholder,
         allowClear: true,
@@ -744,35 +746,24 @@ function applySiteStyle(newStyle) {
     }
 }
 
-// popup component javascript.  Hopefully temporary.
-document.addEventListener("alpine:init", () => {
-    Alpine.data("popup", () => ({
-        popupShow: false,
-        showTimeout: null,
-        hideTimeout: null,
-        ignoreNextShownEvent: false,
-        delay: 300,
-        show(timeout) {
-            clearTimeout(this.hideTimeout);
-            this.showTimeout = setTimeout(() => {
-                this.popupShow = true;
-                Popper.createPopper(this.$refs.targetRef, this.$refs.popupRef, {
-                    padding: 8
-                });
+// prevent dropdown menus from overflowing the viewport
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.dropdown-submenu:not(:has(.dropdown-submenu))').forEach(function (submenuParent) {
+        const submenu = submenuParent.querySelector('.dropdown-menu');
+        if (!submenu) return;
 
-                // close other popups, except this one
-                this.ignoreNextShownEvent = true;
-                this.$dispatch('librenms-popup-shown', this.$el);
-            }, timeout);
-        },
-        hide(timeout) {
-            if (this.ignoreNextShownEvent) {
-                this.ignoreNextShownEvent = false;
-                return;
+        submenuParent.addEventListener('mouseenter', function () {
+            const rect = submenu.getBoundingClientRect();
+            const availableHeight = window.innerHeight - rect.top - 10;
+
+            if (rect.bottom > window.innerHeight) {
+                submenu.style.maxHeight = availableHeight + 'px';
+                submenu.style.overflowY = 'auto';
             }
+        });
 
-            clearTimeout(this.showTimeout);
-            this.hideTimeout = setTimeout(() => this.popupShow = false, timeout)
-        }
-    }));
+        submenuParent.addEventListener('mouseleave', function () {
+            submenu.style.maxHeight = '';
+        });
+    });
 });

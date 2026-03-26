@@ -34,7 +34,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class JnxLdpSesTest extends SnmpTrapTestCase
+final class JnxLdpSesTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;

@@ -39,7 +39,7 @@
         "poller": "matches discovery"
     },
     "mempools": {
-        "discovery": {},
+        "discovery": [],
         "poller": "matches discovery"
     }
 }

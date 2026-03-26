@@ -5,7 +5,7 @@ $psu_oid = '.1.3.6.1.4.1.232.22.2.5.1.1.1.16';
 $psu_usage_oid = '.1.3.6.1.4.1.232.22.2.5.1.1.1.10.';
 $psu_max_usage_oid = '.1.3.6.1.4.1.232.22.2.5.1.1.1.9.';
 
-$psus = trim(snmp_walk($device, $psu_oid, '-Osqn'));
+$psus = trim((string) snmp_walk($device, $psu_oid, '-Osqn'));
 
 foreach (explode("\n", $psus) as $psu) {
     $psu = trim($psu);
@@ -17,8 +17,8 @@ foreach (explode("\n", $psus) as $psu) {
             $current_oid = $psu_usage_oid . $current_id;
             $psu_max_oid = $psu_max_usage_oid . $current_id;
             $descr = 'PSU ' . $current_id . ' output';
-            $value = snmp_get($device, $current_oid, '-Oqv');
-            $max_value = snmp_get($device, $psu_max_oid, '-Oqv');
+            $value = SnmpQuery::get($current_oid)->value();
+            $max_value = SnmpQuery::get($psu_max_oid)->value();
             discover_sensor(null, 'power', $device, $current_oid, $current_id, $sensor_type, $descr, 1, 1, null, null, null, $max_value, $value);
         }
     }

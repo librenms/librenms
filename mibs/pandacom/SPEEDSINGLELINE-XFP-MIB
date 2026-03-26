@@ -1,0 +1,1536 @@
+SPEEDSINGLELINE-XFP-MIB DEFINITIONS ::= BEGIN
+
+--*****************************************************************************************
+--*****   Version History   ***************************************************************
+--=========================================================================================
+
+--V1.0  22.10.2007 ML: Erste Version SPEEDSINGLELINE-XFP-MIB
+--  Supported Modules:
+--                             SPEED-SINGLELINE XFP
+--*****************************************************************************************
+
+IMPORTS
+	DisplayString	FROM SNMPv2-TC
+	Integer32, TimeTicks, MODULE-IDENTITY, OBJECT-TYPE	FROM SNMPv2-SMI
+	converter	FROM SPEEDCARRIER-MIB
+; -- END of IMPORTS
+
+--*******************************************************************
+
+        convSpeedSingleLineXFP MODULE-IDENTITY
+            LAST-UPDATED "201904250000Z"
+            ORGANIZATION "Pan Dacom Direkt GmbH"
+            CONTACT-INFO
+                "Pan Dacom Direkt GmbH
+                Dreieich Plaza 1B
+                63303 Dreieich
+                Germany
+                Tel. : +49 6103/932-333
+                Fax. : +49 6103/932-444
+                email: kontakt@pandacomdirekt.de
+                web  : www.pandacomdirekt.de"
+            DESCRIPTION "MIB objects for the SPEED-SingleLine XFP (3R) card"
+            
+            REVISION "201904250000Z"
+            DESCRIPTION "Rev. 7.2.3
+                - integer syntax correction"
+                
+            REVISION "201712110000Z"
+            DESCRIPTION "Rev. 7.0.2
+                        - syntax correction"
+
+            REVISION "201312120000Z"
+            DESCRIPTION "Revision 5.2.0
+                - change of indexes
+                - corrective actions"
+            ::= { converter 2 }
+
+--*******************************************************************
+
+	convSSLXFPModuleOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSSLXFPModuleOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SPEED-SINGLELINE XFP Module Overview Table"
+		::= { convSpeedSingleLineXFP 1 }
+
+	convSSLXFPModuleOverviewEntry OBJECT-TYPE
+		SYNTAX ConvSSLXFPModuleOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module Overview Entries"
+		INDEX { convSSLXFPMSlot }
+		::= { convSSLXFPModuleOverviewTable 1 }
+
+	ConvSSLXFPModuleOverviewEntry ::=
+		SEQUENCE
+		{
+			convSSLXFPMSlot Integer32,
+			convSSLXFPMDevice INTEGER,
+			convSSLXFPMStatus INTEGER,
+			convSSLXFPMSysUpTime TimeTicks,
+			convSSLXFPMTemp Integer32,
+			convSSLXFPMAlarmState INTEGER,
+			convSSLXFPMSerialNumber DisplayString
+		}
+
+	convSSLXFPMSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  "Slot number in Carrier"
+		::= { convSSLXFPModuleOverviewEntry 2 }
+
+	convSSLXFPMDevice OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			devSpeedSingleLineXFP3R (4),
+			devSpeedSingleLineXFP (5),
+			devunknown (255)
+		}
+			MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Module DeviceType"
+		::= { convSSLXFPModuleOverviewEntry 3 }
+
+        convSSLXFPMStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			running (0),
+			resetSoftware (1),
+			resetConfig (2),
+			resetCAN (3),
+			resetHardware (4),
+			unknown (255)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+				"Reset States of Module"
+		::= { convSSLXFPModuleOverviewEntry 4 }
+
+	convSSLXFPMSysUpTime OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"System Up Time in Seconds"
+		::= { convSSLXFPModuleOverviewEntry 5 }
+
+        convSSLXFPMTemp OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Module Temperature"
+		::= { convSSLXFPModuleOverviewEntry 6 }
+
+	convSSLXFPMAlarmState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			noAlarm (0),
+			activeAlarmsH1 (1),
+			cdrAlarmRxP1 (2),
+			activeAlarmsH3 (3),
+			cdrAlarmTxP1 (4),
+			activeAlarmsH5 (5),
+			cdrAlarmRxP1TxP1 (6),
+			activeAlarmsH7 (7),
+			cdrAlarmRxP2 (32),
+			activeAlarmsH33 (33),
+			cdrAlarmRxP2RxP1 (34),
+			activeAlarmsH35 (35),
+			cdrAlarmRxP2TxP1 (36),
+			activeAlarmsH37 (37),
+			cdrAlarmRxP2RxP1TxP1 (38),
+			activeAlarmsH39 (39),
+			cdrAlarmTxP2 (64),
+			activeAlarmsH65 (65),
+			cdrAlarmTxP2RxP1 (66),
+			activeAlarmsH67 (67),
+			cdrAlarmTxP2TxP1 (68),
+			activeAlarmsH69 (69),
+			cdrAlarmTxP2RxP1TxP1 (70),
+			activeAlarmsH71 (71),
+			cdrAlarmRxP2TxP2 (96),
+			activeAlarmsH97 (97),
+			cdrAlarmRxP2TxP2RxP1 (98),
+			activeAlarmsH99 (99),
+			cdrAlarmRxP2TxP2TxP1 (100),
+			activeAlarmsH101 (101),
+			cdrAlarmRxP2TxP2RxP1TxP1 (102),
+			activeAlarmsH103 (103),
+			unknown (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Module Alarm States, if there are active see
+			Event-Table. The activeAlarms with extension HXX means
+			a internal HEX representative of the alarm."
+		::= { convSSLXFPModuleOverviewEntry 7 }
+
+        convSSLXFPMSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..19))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Modules Serial Number"
+		::= { convSSLXFPModuleOverviewEntry 8 }
+
+-- *********************************
+-- ConvSSLXFPModuleImagesOverview
+
+	convSSLXFPModuleImagesOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSSLXFPModuleImagesOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-SINGLELINE XFP Module Images Table"
+		::= { convSpeedSingleLineXFP 2 }
+
+	convSSLXFPModuleImagesOverviewEntry OBJECT-TYPE
+		SYNTAX ConvSSLXFPModuleImagesOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"Module Images Overview Entries"
+		INDEX { convSSLXFPSWSlot }
+		::= { convSSLXFPModuleImagesOverviewTable 1 }
+
+	ConvSSLXFPModuleImagesOverviewEntry ::=
+		SEQUENCE
+		{
+			convSSLXFPSWSlot			Integer32,
+			convSSLXFPSWBootImage		DisplayString,
+			convSSLXFPSWAppImage1		DisplayString,
+			convSSLXFPSWAppImage2		DisplayString,
+			convSSLXFPSWUploadStatus	INTEGER,
+			convSSLXFPSWUpdateStatus	INTEGER,
+			convSSLXFPMHWVersion		DisplayString
+		}
+		
+	convSSLXFPSWSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  "Slot number in Carrier"
+		::= { convSSLXFPModuleImagesOverviewEntry 2 }
+
+	convSSLXFPSWBootImage OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..36))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Identification of Bootimage"
+		::= { convSSLXFPModuleImagesOverviewEntry 3 }
+
+	convSSLXFPSWAppImage1 OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..36))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Identification of Application Image1"
+		::= { convSSLXFPModuleImagesOverviewEntry 4 }
+
+	convSSLXFPSWAppImage2 OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..36))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Identification of Application Image2"
+		::= { convSSLXFPModuleImagesOverviewEntry 5 }
+
+	convSSLXFPSWUploadStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			ready (0),
+			startUpload (1),
+			uploadActive (2),
+			uploadFailure (3),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Control and Status of UploadProcedure"
+		::= { convSSLXFPModuleImagesOverviewEntry 6 }
+
+
+	convSSLXFPSWUpdateStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			idle (0),
+			activateImage1 (1),
+			activateImage2 (2),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"activates SW-Image after netxt reset"
+		::= { convSSLXFPModuleImagesOverviewEntry 7 }
+
+	convSSLXFPMHWVersion OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..36))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"Identification of Hardware Version"
+		::= { convSSLXFPModuleImagesOverviewEntry 8 }
+
+
+-- *********************************
+
+	convSSLXFPModuleBoardConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSSLXFPModuleBoardConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SPEED-SINGLELINE XFP Module config Table"
+		::= { convSpeedSingleLineXFP 3 }
+
+	convSSLXFPModuleBoardConfigEntry OBJECT-TYPE
+		SYNTAX ConvSSLXFPModuleBoardConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Module Overview Entries"
+		INDEX { convSSLXFPModuleSlot }
+		::= { convSSLXFPModuleBoardConfigTable 1 }
+
+	ConvSSLXFPModuleBoardConfigEntry ::=
+		SEQUENCE
+		{
+			convSSLXFPModuleSlot Integer32,
+			convSSLXFPModulePortSpeedConfig INTEGER,
+			convSSLXFPModuleTempHighWarning INTEGER,
+			convSSLXFPModuleTempHighAlarm INTEGER,
+			convSSLXFPModuleCliTimeout Integer32,
+			convSSLXFPModuleEthPortConfig INTEGER,
+			convSSLXFPModuleEthPortState INTEGER
+		}
+
+				
+	convSSLXFPModuleSlot OBJECT-TYPE
+		SYNTAX Integer32 (1..19)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION  "Slot number in Carrier"
+		::= { convSSLXFPModuleBoardConfigEntry 2 }
+
+
+		
+	convSSLXFPModulePortSpeedConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			stm64 (0),
+			stm64rs238 (1),
+			stm64rs237 (2),
+			ethernet10g64b66b (3),
+			ethernet10g237RS (4),
+			ethernet10g238RS (5),
+			fibreChannel10G64B66B (6),
+			fibreChannel10G237RS (7),
+			fibreChannel10G238RS (8),
+			notAvalilable (255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"port data rate configuration"
+		::= { convSSLXFPModuleBoardConfigEntry 3 }
+
+	convSSLXFPModuleTempHighWarning OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notImplemented (0)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This parameter is not implemented at the moment."
+		::= { convSSLXFPModuleBoardConfigEntry 4 }
+
+	convSSLXFPModuleTempHighAlarm OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvalilable (0)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This parameter is not implemented at the moment."
+		::= { convSSLXFPModuleBoardConfigEntry 5 }
+
+	convSSLXFPModuleCliTimeout OBJECT-TYPE
+		SYNTAX Integer32 (120..3600)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"time without user interaction before exiting CLI. Value in seconds."
+		::= { convSSLXFPModuleBoardConfigEntry 6 }
+
+	convSSLXFPModuleEthPortConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvalilable (0),
+			portDown (1),
+			portUp (2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Ethernet port state of Transponder card"
+		::= { convSSLXFPModuleBoardConfigEntry 7 }
+
+	convSSLXFPModuleEthPortState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvalilable (0),
+			portDown (1),
+			portUp (2)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Ethernet port config of Transponder card"
+		::= { convSSLXFPModuleBoardConfigEntry 8 }
+
+-- ****************************
+-- ConvSSLXFPModulePortOverview
+	convSSLXFPPortOverviewTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSSLXFPPortOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SPEED-SINGLELINE XFP port overview table"
+		::= { convSpeedSingleLineXFP 4 }
+
+	convSSLXFPPortOverviewEntry OBJECT-TYPE
+		SYNTAX ConvSSLXFPPortOverviewEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"port overview entries"
+		INDEX { convSSLXFPMPortIndex }
+		::= { convSSLXFPPortOverviewTable 1 }
+
+	ConvSSLXFPPortOverviewEntry ::=
+		SEQUENCE
+		{
+			convSSLXFPMPortIndex Integer32,
+			convSSLXFPMPortSlot Integer32,
+			convSSLXFPMPortPort Integer32,
+			convSSLXFPMPortDes DisplayString,
+			convSSLXFPMPortAdminState INTEGER,
+			convSSLXFPMPortXFPState INTEGER,
+			convSSLXFPMPortTXOperState INTEGER,
+			convSSLXFPMPortRXOperState INTEGER,
+			convSSLXFPMPortAlarmState INTEGER
+		}
+
+	convSSLXFPMPortIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..1999)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"port index"
+		::= { convSSLXFPPortOverviewEntry 1 }
+
+	convSSLXFPMPortSlot OBJECT-TYPE
+		SYNTAX Integer32 (0..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"slot number of port"
+		::= { convSSLXFPPortOverviewEntry 2 }
+
+	convSSLXFPMPortPort OBJECT-TYPE
+		SYNTAX Integer32 (0..34)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { convSSLXFPPortOverviewEntry 3 }
+
+	convSSLXFPMPortDes OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port description or port name"
+		::= { convSSLXFPPortOverviewEntry 4 }
+
+	convSSLXFPMPortAdminState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			adminDown (0),
+			adminUp (1),
+			notAvalilable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"administrativ port status"
+		::= { convSSLXFPPortOverviewEntry 5 }
+
+	convSSLXFPMPortXFPState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			xfpRemoved (0),
+			xfpInstalled (1),
+			xfpTxFault (2),
+			notAvalilable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP installed / alarm status"
+		::= { convSSLXFPPortOverviewEntry 6 }
+
+	convSSLXFPMPortTXOperState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			down(0),
+			up(1),
+			loop(2),
+			downLLCF(3),
+			downTxFault(4),
+			downTxLevel(5),
+			bertRunning(6),
+			notAvalilable(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP operational/alarm status"
+		::= { convSSLXFPPortOverviewEntry 7 }
+
+	convSSLXFPMPortRXOperState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			down(0),
+			up(1),
+			loop(2),
+			downLLCF(3),
+			downRxFault(4),
+			downRxLevel(5),
+			bertRunning(6),
+			notAvalilable(255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP operational/alarm status"
+		::= { convSSLXFPPortOverviewEntry 8 }
+
+	convSSLXFPMPortAlarmState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			noAlarm (0),
+			activeAlarms (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port alarm states"
+		::= { convSSLXFPPortOverviewEntry 9 }
+
+
+--********************************************
+
+	convSSLXFPModulePortConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSSLXFPModulePortConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-SINGLELINE XFP port config table"
+		::= { convSpeedSingleLineXFP 5 }
+
+	convSSLXFPModulePortConfigEntry OBJECT-TYPE
+		SYNTAX ConvSSLXFPModulePortConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"port config Entries"
+		INDEX { convSSLXFPMPortConfIndex }
+		::= { convSSLXFPModulePortConfigTable 1 }
+
+	ConvSSLXFPModulePortConfigEntry ::=
+		SEQUENCE
+		{
+			convSSLXFPMPortConfIndex Integer32,
+			convSSLXFPMPortConfSlot Integer32,
+			convSSLXFPMPortConfPort	Integer32,
+			convSSLXFPMPortAdminConfig INTEGER,
+			convSSLXFPMPortDescription DisplayString,
+			convSSLXFPMPortLLCFConfig INTEGER,
+			convSSLXFPMPortLoopConfig INTEGER,
+			convSSLXFPMPortAlarmDeactivation INTEGER,
+			convSSLXFPMPortAlarmSchedule Integer32,
+			convSSLXFPMPortOTNConfig INTEGER,
+			convSSLXFPMPortOTNMapping INTEGER
+		}
+
+	convSSLXFPMPortConfIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..1999)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"port index"
+		::= { convSSLXFPModulePortConfigEntry 1 }
+
+	convSSLXFPMPortConfSlot OBJECT-TYPE
+		SYNTAX Integer32 (0..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"slot number of port"
+		::= { convSSLXFPModulePortConfigEntry 2 }
+
+	convSSLXFPMPortConfPort OBJECT-TYPE
+		SYNTAX Integer32 (0..34)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { convSSLXFPModulePortConfigEntry 3 }
+		
+	convSSLXFPMPortAdminConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			adminDown (0),
+			adminUp (1),
+			notAvalilable (255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"port administrative configuration"
+		::= { convSSLXFPModulePortConfigEntry 4 }
+
+	convSSLXFPMPortDescription OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"port description or port name configuration"
+		::= { convSSLXFPModulePortConfigEntry 5 }
+
+	convSSLXFPMPortLLCFConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			off(0),
+			on(1),
+			notAvalilable (255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Link Loss Carry Forward config"
+		::= { convSSLXFPModulePortConfigEntry 6 }
+
+	convSSLXFPMPortLoopConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			off(0),
+			externalLoop(1),
+			internalLoop(2),
+			notAvalilable (255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"port loop configuration"
+		::= { convSSLXFPModulePortConfigEntry 7 }
+
+	convSSLXFPMPortAlarmDeactivation OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			alarmReportingEnabled(1),
+			alarmReportingDisabledbySchedule(2),
+			alarmReportingDisabledPermanent(3),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Port alarm deactivation schedule"
+		::= { convSSLXFPModulePortConfigEntry 8 }
+
+	convSSLXFPMPortAlarmSchedule OBJECT-TYPE
+		SYNTAX Integer32 (0..1200)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Port alarm deactivation schedule. Value in hours.
+			After this time has elapsed, the alarms are active
+			again."
+		::= { convSSLXFPModulePortConfigEntry 9 }
+
+	convSSLXFPMPortOTNConfig OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			otnBypass(1),
+			otnWithFEC(2),
+			otnWithoutFEC(3)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"OTN Transceiver configuration"
+		::= { convSSLXFPModulePortConfigEntry 10 }
+
+	convSSLXFPMPortOTNMapping OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			otnFixedByteStuffing(1),
+			otnWithoutFixedByteStuffing(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Port alarm deactivation schedule"
+		::= { convSSLXFPModulePortConfigEntry 11 }
+
+--***************************************
+-- ConvSSLXFPModulePortGeneralXFPInfos
+
+	convSSLXFPModulePortGeneralXFPInfosTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSSLXFPModulePortGeneralXFPInfosEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-SINGLELINE XFP general information table"
+		::= { convSpeedSingleLineXFP 6 }
+
+	convSSLXFPModulePortGeneralXFPInfosEntry OBJECT-TYPE
+		SYNTAX ConvSSLXFPModulePortGeneralXFPInfosEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"XFP general information Entries"
+		INDEX { convSSLXFPMPortGenIndex }
+		::= { convSSLXFPModulePortGeneralXFPInfosTable 1 }
+
+	ConvSSLXFPModulePortGeneralXFPInfosEntry ::=
+		SEQUENCE
+		{
+			convSSLXFPMPortGenIndex	Integer32,
+            convSSLXFPMPortGenSlot			Integer32,
+			convSSLXFPMPortGenPort			Integer32,
+			convSSLXFPMPortXFPPowerclass	INTEGER,
+			convSSLXFPMPortXFPSmFiberLength	Integer32,
+			convSSLXFPMPortVendorName	DisplayString,
+			convSSLXFPMPortSerialNumber	DisplayString,
+			convSSLXFPMPortWavelength	DisplayString,
+			convSSLXFPMPortPartNumber	DisplayString
+		}
+
+	convSSLXFPMPortGenIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..1999)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"port index"
+		::= { convSSLXFPModulePortGeneralXFPInfosEntry 1 }
+
+	convSSLXFPMPortGenSlot OBJECT-TYPE
+		SYNTAX Integer32 (0..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"slot number of port"
+		::= { convSSLXFPModulePortGeneralXFPInfosEntry 2 }
+
+	convSSLXFPMPortGenPort OBJECT-TYPE
+		SYNTAX Integer32 (0..34)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { convSSLXFPModulePortGeneralXFPInfosEntry 3 }
+
+	convSSLXFPMPortXFPPowerclass OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			upTo1-5W (1),
+			upTo2-5W (2),
+			upTo3-5W (3),
+			greater3-5W (4),
+			notAvalilable (255)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"power class - max power consumption"
+		::= { convSSLXFPModulePortGeneralXFPInfosEntry 4 }
+
+	convSSLXFPMPortXFPSmFiberLength OBJECT-TYPE
+		SYNTAX Integer32 (0..255)
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"max single mode fiber length"
+		::= { convSSLXFPModulePortGeneralXFPInfosEntry 5 }
+
+	convSSLXFPMPortVendorName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..16))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP vendor name"
+		::= { convSSLXFPModulePortGeneralXFPInfosEntry 6 }
+
+	convSSLXFPMPortSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..16))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP serial number"
+		::= { convSSLXFPModulePortGeneralXFPInfosEntry 7 }
+
+	convSSLXFPMPortWavelength OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..8))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP center wavelength at romm temperature"
+		::= { convSSLXFPModulePortGeneralXFPInfosEntry 8 }
+
+	convSSLXFPMPortPartNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..16))
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP part number"
+		::= { convSSLXFPModulePortGeneralXFPInfosEntry 9 }
+
+-- ****************************************
+-- ConvSSLXFPModulePortXFPMessurement
+
+	convSSLXFPModulePortXFPMessurementTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSSLXFPModulePortXFPMessurementEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SPEED-SINGLELINE XFP messurement table"
+		::= { convSpeedSingleLineXFP 7 }
+
+	convSSLXFPModulePortXFPMessurementEntry OBJECT-TYPE
+		SYNTAX ConvSSLXFPModulePortXFPMessurementEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"XFP messurement Entries"
+		INDEX { convSSLXFPMPortMesIndex }
+		::= { convSSLXFPModulePortXFPMessurementTable 1 }
+
+	ConvSSLXFPModulePortXFPMessurementEntry ::=
+		SEQUENCE
+		{
+            convSSLXFPMPortMesIndex Integer32,
+			convSSLXFPMPortMesSlot Integer32,
+			convSSLXFPMPortMesPort Integer32,
+			convSSLXFPMPortRxPower Integer32,
+			convSSLXFPMPortTxPower Integer32,
+			convSSLXFPMPortXFPTemp Integer32,
+			convSSLXFPMPortTxBias Integer32,
+			convSSLXFPMPortFECRate Integer32
+		}
+
+	convSSLXFPMPortMesIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..1999)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"port index"
+		::= { convSSLXFPModulePortXFPMessurementEntry 1 }
+
+	convSSLXFPMPortMesSlot OBJECT-TYPE
+		SYNTAX Integer32 (0..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"slot number of port"
+		::= { convSSLXFPModulePortXFPMessurementEntry 2 }
+
+	convSSLXFPMPortMesPort OBJECT-TYPE
+		SYNTAX Integer32 (0..34)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { convSSLXFPModulePortXFPMessurementEntry 3 }
+
+	convSSLXFPMPortRxPower OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP optical receive power"
+		::= { convSSLXFPModulePortXFPMessurementEntry 4 }
+
+	convSSLXFPMPortTxPower OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP optical transmit power"
+		::= { convSSLXFPModulePortXFPMessurementEntry 5 }
+
+	convSSLXFPMPortXFPTemp OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"XFP temperature"
+		::= { convSSLXFPModulePortXFPMessurementEntry 6 }
+
+	convSSLXFPMPortTxBias OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS  current
+		DESCRIPTION
+			"XFP TX Bias"
+		::= { convSSLXFPModulePortXFPMessurementEntry 7 }
+
+	convSSLXFPMPortFECRate OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Forward error correction error rate. The given value is the exponent 10^-x"
+		::= { convSSLXFPModulePortXFPMessurementEntry 8 }
+
+-- **************************************
+-- ConvSSLXFPModuleThresholdsConfig
+
+	convSSLXFPModuleThresholdsConfigTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSSLXFPModuleThresholdsConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"SPEED-SINGLELINE XFP Threshold config table"
+		::= { convSpeedSingleLineXFP 8 }
+
+	convSSLXFPModuleThresholdsConfigEntry OBJECT-TYPE
+		SYNTAX ConvSSLXFPModuleThresholdsConfigEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+				"XFP threshold Entries"
+		INDEX { convSSLXFPMPortThresIndex }
+		::= { convSSLXFPModuleThresholdsConfigTable 1 }
+
+	ConvSSLXFPModuleThresholdsConfigEntry ::=
+		SEQUENCE
+		{
+            convSSLXFPMPortThresIndex Integer32,
+			convSSLXFPMPortThresSlot Integer32,
+			convSSLXFPMPortThresPort	Integer32,
+			convSSLXFPMPortRxLowAlarmLevel Integer32,
+			convSSLXFPMPortRxHighAlarmLevel Integer32,
+			convSSLXFPMPortRxLowWarningLevel Integer32,
+			convSSLXFPMPortRxHighWarningLevel Integer32,
+			convSSLXFPMPortTxLowAlarmLevel Integer32,
+			convSSLXFPMPortTxHighAlarmLevel Integer32,
+			convSSLXFPMPortTxLowWarningLevel Integer32,
+			convSSLXFPMPortTxHighWarningLevel Integer32,
+			convSSLXFPMPortTxBiasLowAlarmLevel Integer32,
+			convSSLXFPMPortTxBiasHighAlarmLevel Integer32,
+			convSSLXFPMPortTxBiasLowWarningLevel Integer32,
+			convSSLXFPMPortTxBiasHighWarningLevel Integer32,
+			convSSLXFPMPortTempLowAlarmLevel Integer32,
+			convSSLXFPMPortTempHighAlarmLevel Integer32,
+			convSSLXFPMPortTempLowWarningLevel Integer32,
+			convSSLXFPMPortTempHighWarningLevel Integer32
+		}
+
+	convSSLXFPMPortThresIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..1999)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"port index"
+		::= { convSSLXFPModuleThresholdsConfigEntry 1 }
+
+	convSSLXFPMPortThresSlot OBJECT-TYPE
+		SYNTAX Integer32 (0..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"slot number of port"
+		::= { convSSLXFPModuleThresholdsConfigEntry 2 }
+
+	convSSLXFPMPortThresPort OBJECT-TYPE
+		SYNTAX Integer32 (0..34)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { convSSLXFPModuleThresholdsConfigEntry 3 }
+
+	convSSLXFPMPortRxLowAlarmLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP receiver input low alarm level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 4 }
+
+	convSSLXFPMPortRxHighAlarmLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP receiver input high alarm level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 5 }
+
+	convSSLXFPMPortRxLowWarningLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP receiver input low warning level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 6 }
+
+	convSSLXFPMPortRxHighWarningLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP receiver input high warning level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 7 }
+
+	convSSLXFPMPortTxLowAlarmLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP transmitter output low alarm level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 8 }
+
+	convSSLXFPMPortTxHighAlarmLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP transmitter output high alarm level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 9 }
+
+	convSSLXFPMPortTxLowWarningLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP transmitter output low warning level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 10 }
+
+	convSSLXFPMPortTxHighWarningLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP transmitter output high warning level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 11 }
+
+	convSSLXFPMPortTxBiasLowAlarmLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP transmitter bias low alarm level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 12 }
+
+	convSSLXFPMPortTxBiasHighAlarmLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP transmitter bias high alarm level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 13 }
+
+	convSSLXFPMPortTxBiasLowWarningLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP transmitter bias low warning level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 14 }
+
+	convSSLXFPMPortTxBiasHighWarningLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP transmitter bias high warning level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 15 }
+
+	convSSLXFPMPortTempLowAlarmLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP temperature low alarm level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 16 }
+
+	convSSLXFPMPortTempHighAlarmLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP temperature high alarm level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 17 }
+
+	convSSLXFPMPortTempLowWarningLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP temperature low warning level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 18 }
+
+	convSSLXFPMPortTempHighWarningLevel OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+				"XFP temperature high warning level"
+		::= { convSSLXFPModuleThresholdsConfigEntry 19 }
+
+-- **************************************
+-- ConvSSLXFPModuleEventTable
+
+	convSSLXFPModuleEventTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSSLXFPModuleEventEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"SPEED-SINGLELINE XFP Threshold config table"
+		::= { convSpeedSingleLineXFP 9 }
+
+	convSSLXFPModuleEventEntry OBJECT-TYPE
+		SYNTAX ConvSSLXFPModuleEventEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"XFP threshold Entries"
+		INDEX { convSSLXFPPIndex }
+		::= { convSSLXFPModuleEventTable 1 }
+
+	ConvSSLXFPModuleEventEntry ::=
+		SEQUENCE
+		{
+            convSSLXFPPIndex Integer32,
+			convSSLXFPPSlot Integer32,
+			convSSLXFPPPort	Integer32,
+			convSSLXFPPPortRxLowAlarmEvent INTEGER,
+			convSSLXFPPPortRxHighAlarmEvent INTEGER,
+			convSSLXFPPPortRxLowWarningEvent INTEGER,
+			convSSLXFPPPortRxHighWarningEvent INTEGER,
+			convSSLXFPPPortTxLowAlarmEvent INTEGER,
+			convSSLXFPPPortTxHighAlarmEvent INTEGER,
+			convSSLXFPPPortTxLowWarningEvent INTEGER,
+			convSSLXFPPPortTxHighWarningEvent INTEGER,
+			convSSLXFPPPortTxBiasLowAlarmEvent INTEGER,
+			convSSLXFPPPortTxBiasHighAlarmEvent INTEGER,
+			convSSLXFPPPortTxBiasLowWarningEvent INTEGER,
+			convSSLXFPPPortTxBiasHighWarningEvent INTEGER,
+			convSSLXFPPPortTempLowAlarmEvent INTEGER,
+			convSSLXFPPPortTempHighAlarmEvent INTEGER,
+			convSSLXFPPPortTempLowWarningEvent INTEGER,
+			convSSLXFPPPortTempHighWarningEvent INTEGER,
+			convSSLXFPPPortOtnAlarmEvent INTEGER
+		}
+
+	convSSLXFPPIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..1999)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"port index"
+		::= { convSSLXFPModuleEventEntry 1 }
+
+	convSSLXFPPSlot OBJECT-TYPE
+		SYNTAX Integer32 (0..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"slot number of port"
+		::= { convSSLXFPModuleEventEntry 2 }
+
+	convSSLXFPPPort OBJECT-TYPE
+		SYNTAX Integer32 (0..34)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { convSSLXFPModuleEventEntry 3 }
+
+	convSSLXFPPPortRxLowAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP receiver input low alarm event"
+		::= { convSSLXFPModuleEventEntry 4 }
+
+	convSSLXFPPPortRxHighAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP receiver input high alarm event"
+		::= { convSSLXFPModuleEventEntry 5 }
+
+	convSSLXFPPPortRxLowWarningEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP receiver input low warning event"
+		::= { convSSLXFPModuleEventEntry 6 }
+
+	convSSLXFPPPortRxHighWarningEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP receiver input high warning event"
+		::= { convSSLXFPModuleEventEntry 7 }
+
+	convSSLXFPPPortTxLowAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP transmitter output low alarm event"
+		::= { convSSLXFPModuleEventEntry 8 }
+
+	convSSLXFPPPortTxHighAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP transmitter output high alarm event"
+		::= { convSSLXFPModuleEventEntry 9 }
+
+	convSSLXFPPPortTxLowWarningEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP transmitter output low warning event"
+		::= { convSSLXFPModuleEventEntry 10 }
+
+	convSSLXFPPPortTxHighWarningEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP transmitter output high warning event"
+		::= { convSSLXFPModuleEventEntry 11 }
+
+	convSSLXFPPPortTxBiasLowAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP transmitter bias low alarm event"
+		::= { convSSLXFPModuleEventEntry 12 }
+
+	convSSLXFPPPortTxBiasHighAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP transmitter bias high alarm event"
+		::= { convSSLXFPModuleEventEntry 13 }
+
+	convSSLXFPPPortTxBiasLowWarningEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP transmitter bias low warning event"
+		::= { convSSLXFPModuleEventEntry 14 }
+
+	convSSLXFPPPortTxBiasHighWarningEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP transmitter bias high warning event"
+		::= { convSSLXFPModuleEventEntry 15 }
+
+	convSSLXFPPPortTempLowAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP temperature low alarm event"
+		::= { convSSLXFPModuleEventEntry 16 }
+
+	convSSLXFPPPortTempHighAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP temperature high alarm event"
+		::= { convSSLXFPModuleEventEntry 17 }
+
+	convSSLXFPPPortTempLowWarningEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP temperature low warning event"
+		::= { convSSLXFPModuleEventEntry 18 }
+
+	convSSLXFPPPortTempHighWarningEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1),
+			notAvailable (255)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP temperature high warning event"
+		::= { convSSLXFPModuleEventEntry 19 }
+
+	convSSLXFPPPortOtnAlarmEvent OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			normal (0),
+			active (1)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP OTN Alarm event"
+		::= { convSSLXFPModuleEventEntry 20 }
+
+--*************************************
+
+	convSSLXFPPortTunableTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ConvSSLXFPPortTunableEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Speed-Dualline FC tunable transceiver table"
+		::= { convSpeedSingleLineXFP 10 }
+
+	convSSLXFPPortTunableEntry OBJECT-TYPE
+		SYNTAX ConvSSLXFPPortTunableEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"transceiver tunable entries"
+		INDEX { convSSLXFPPortXCVIndex }
+		::= { convSSLXFPPortTunableTable 1 }
+
+	ConvSSLXFPPortTunableEntry ::=
+		SEQUENCE
+		{
+			convSSLXFPPortXCVIndex Integer32,
+			convSSLXFPPortXCVSlot Integer32,
+			convSSLXFPPortXCVPort	Integer32,
+			convSSLXFPPortXCVChannelSpacing Integer32,
+			convSSLXFPPortXCVNumberOfChannels Integer32,
+			convSSLXFPPortXCVCenterWavlength Integer32,
+			convSSLXFPPortXCVTunableFeature INTEGER,
+			convSSLXFPPortXCVTunableMinMaxChannel DisplayString,
+			convSSLXFPPortXCVTunableWavelengthConfig Integer32,
+			convSSLXFPPortXCVTunableChannelConfig DisplayString,
+			convSSLXFPPortXCVTunableConfigSelection INTEGER
+		}
+
+	convSSLXFPPortXCVIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..1999)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"port index"
+		::= { convSSLXFPPortTunableEntry 1 }
+
+	convSSLXFPPortXCVSlot OBJECT-TYPE
+		SYNTAX Integer32 (0..19)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"slot number of port"
+		::= { convSSLXFPPortTunableEntry 2 }
+
+	convSSLXFPPortXCVPort OBJECT-TYPE
+		SYNTAX Integer32 (0..34)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"port number"
+		::= { convSSLXFPPortTunableEntry 3 }
+
+	convSSLXFPPortXCVChannelSpacing OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XCV channel spacing"
+		::= { convSSLXFPPortTunableEntry 4 }
+
+	convSSLXFPPortXCVNumberOfChannels OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XCV supported number channels"
+		::= { convSSLXFPPortTunableEntry 5 }
+
+	convSSLXFPPortXCVCenterWavlength OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XCV center wavelength"
+		::= { convSSLXFPPortTunableEntry 6 }
+
+	convSSLXFPPortXCVTunableFeature OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable (0),
+			notTunable (1),
+			byWavelength (2),
+			byChannel (4),
+			byChannelAndWavelength (6)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"is transceiver tunable?"
+		::= { convSSLXFPPortTunableEntry 7 }
+
+	convSSLXFPPortXCVTunableMinMaxChannel OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..9))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Set parameter for transceiver channel config. "
+		::= { convSSLXFPPortTunableEntry 8 }
+
+	convSSLXFPPortXCVTunableWavelengthConfig OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"XCV wavelength control. Min value is 1528000 and max value is 1564000. Wavelength value in units of picometer!"
+		::= { convSSLXFPPortTunableEntry 9 }
+
+	convSSLXFPPortXCVTunableChannelConfig OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..4))
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Set parameter for transceiver channel config. Allowed channels are from C1..H61. 'C' represents the 100GHz channel and 'H' is 50 GHz above the corresponding 100GHz channel."
+		::= { convSSLXFPPortTunableEntry 10 }
+
+	convSSLXFPPortXCVTunableConfigSelection OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailiable(0),
+			xcvInternal(1),
+			configFile(2),
+			unknown(255)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"selects which config should be used (internal XCV or transponder card config)"
+		::= { convSSLXFPPortTunableEntry 11 }
+
+
+END

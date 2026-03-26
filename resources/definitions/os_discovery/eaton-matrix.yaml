@@ -1,4 +1,3 @@
-mib: TELECOM-MIB
 modules:
     os:
         hardware: TELECOM-MIB::matConName.0
@@ -8,15 +7,15 @@ modules:
         current:
             data:
                 -
-                    oid: matInvTable
-                    value: matInvOutputCurrent
+                    oid: TELECOM-MIB::matInvTable
+                    value: TELECOM-MIB::matInvOutputCurrent
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.7.{{ $index }}"
                     divisor: 10
                     descr: "Inverter {{ $index }} Output"
                     index: "matInvOutputCurrent.{{ $index }}"
                 -
-                    oid: matStsTable
-                    value: matStsOutputCurrent
+                    oid: TELECOM-MIB::matStsTable
+                    value: TELECOM-MIB::matStsOutputCurrent
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.12.{{ $index }}"
                     divisor: 10
                     descr: "STS Output"
@@ -24,79 +23,79 @@ modules:
         voltage:
             data:
                 -
-                    oid: matStsTable
-                    value: matStsMainInputVoltage
+                    oid: TELECOM-MIB::matStsTable
+                    value: TELECOM-MIB::matStsMainInputVoltage
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.7.{{ $index }}"
                     divisor: 10
                     descr: "STS Input - Mains"
                     index: "matStsMainInputVoltage.{{ $index }}"
-                    high_limit: matStsMainHighLossVoltage
-                    low_limit: matStsMainLowLossVoltage
+                    high_limit: TELECOM-MIB::matStsMainHighLossVoltage
+                    low_limit: TELECOM-MIB::matStsMainLowLossVoltage
                 -
-                    oid: matStsTable
-                    value: matStsInvInputVoltage
+                    oid: TELECOM-MIB::matStsTable
+                    value: TELECOM-MIB::matStsInvInputVoltage
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.9.{{ $index }}"
                     divisor: 10
                     descr: "STS Input - Inverter"
                     index: "matStsInvInputVoltage.{{ $index }}"
-                    high_limit: matStsInvHighLossVoltage
-                    low_limit: matStsInvLosLossVoltage
+                    high_limit: TELECOM-MIB::matStsInvHighLossVoltage
+                    low_limit: TELECOM-MIB::matStsInvLosLossVoltage
                 -
-                    oid: matStsTable
-                    value: matStsOutputVoltage
+                    oid: TELECOM-MIB::matStsTable
+                    value: TELECOM-MIB::matStsOutputVoltage
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.11.{{ $index }}"
                     divisor: 10
                     descr: "STS Output"
                     index: "matStsOutputVoltage.{{ $index }}"
                 -
-                    oid: matInvTable
-                    value: matInvBatteryVoltage
+                    oid: TELECOM-MIB::matInvTable
+                    value: TELECOM-MIB::matInvBatteryVoltage
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.8.{{ $index }}"
                     descr: "Inverter {{ $index }} Input"
                     index: "matInvBatteryVoltage.{{ $index }}"
                     divisor: 10
                 -
-                    oid: matInvTable
-                    value: matInvOutputVoltage
+                    oid: TELECOM-MIB::matInvTable
+                    value: TELECOM-MIB::matInvOutputVoltage
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.6.{{ $index }}"
                     descr: "Inverter {{ $index }} Output"
                     index: "matInvOutputVoltage.{{ $index }}"
                     divisor: 10
-                    high_limit: matConfInvOutputVoltHighLoss
-                    low_limit: matConfInvOutputVoltLowLoss
+                    high_limit: TELECOM-MIB::matConfInvOutputVoltHighLoss
+                    low_limit: TELECOM-MIB::matConfInvOutputVoltLowLoss
 
         power:
             data:
                 -
-                    oid: matStsOutputPower
+                    oid: TELECOM-MIB::matStsOutputPower
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.13.{{ $index }}"
                     index: "matStsOutputPower.{{ $index }}"
                     descr: "STS Output Power"
                 -
-                    oid: matInvTable
-                    value: matInvOutputPower
+                    oid: TELECOM-MIB::matInvTable
+                    value: TELECOM-MIB::matInvOutputPower
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.10.{{ $index }}"
                     descr: "Inverter {{ $index }} Output Power"
                     index: "matInvOutputPower.{{ $index }}"
-                    high_limit: matConfInvOutputPower
+                    high_limit: TELECOM-MIB::matConfInvOutputPower
 
         temperature:
             data:
                 -
-                    oid: matStsTemperature
+                    oid: TELECOM-MIB::matStsTemperature
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.16.{{ $index }}"
                     index: "matStsTemperature.{{ $index }}"
                     descr: STS Temperature
                     divisor: 10
                 -
-                    oid: matConTemperature
+                    oid: TELECOM-MIB::matConTemperature
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.1.4.{{ $index }}"
                     index: "matConTemperature.{{ $index }}"
                     descr: Controller Temperature
                     divisor: 10
                 -
-                    oid: matInvTable
-                    value: matInvTemperature
+                    oid: TELECOM-MIB::matInvTable
+                    value: TELECOM-MIB::matInvTemperature
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.13.{{ $index }}"
                     descr: "Inverter {{ $index }} Temperature"
                     index: "matInvTemperature.{{ $index }}"
@@ -105,18 +104,18 @@ modules:
         state:
             data:
                 -
-                    oid: matInvTable
-                    value: matInvOnOffStatus
+                    oid: TELECOM-MIB::matInvTable
+                    value: TELECOM-MIB::matInvOnOffStatus
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.2.2.1.26.{{ $index }}"
-                    descr: "Inverter {{ $index }} Status ({{ $matInvSerialNum }})"
+                    descr: "Inverter {{ $index }} Status ({{ TELECOM-MIB::matInvSerialNum }})"
                     index: "{{ $index }}"
                     state_name: matInvOnOff
                     states:
                         - { value: 1, generic: 1, graph: 0, descr: "Off" }
                         - { value: 2, generic: 0, graph: 0, descr: "On" }
                 -
-                    oid: matConfStsPriority
-                    value: matConfStsPriority
+                    oid: TELECOM-MIB::matConfStsPriority
+                    value: TELECOM-MIB::matConfStsPriority
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.5.15.{{ $index }}"
                     descr: "STS Priority"
                     index: "{{ $index }}"
@@ -125,8 +124,8 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: "Inverter" }
                         - { value: 2, generic: 0, graph: 0, descr: "Mains" }
                 -
-                    oid: matStsMbsStatus
-                    value: matStsMbsStatus
+                    oid: TELECOM-MIB::matStsMbsStatus
+                    value: TELECOM-MIB::matStsMbsStatus
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.17.{{ $index }}"
                     descr: "MBS Switch"
                     index: "{{ $index }}"
@@ -139,18 +138,18 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: "Bypass - Mains Power" }
                         - { value: 6, generic: 3, graph: 0, descr: "MBS Switch Error" }
                 -
-                    oid: matStsTable
-                    value: matStsStatus
+                    oid: TELECOM-MIB::matStsTable
+                    value: TELECOM-MIB::matStsStatus
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.18.{{ $index }}"
-                    descr: "STS Status ({{ $matStsSerialNum }})"
+                    descr: "STS Status ({{ TELECOM-MIB::matStsSerialNum }})"
                     index: "{{ $index }}"
                     state_name: matStsStatus
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: "Online" }
                         - { value: 2, generic: 2, graph: 0, descr: "Offline" }
                 -
-                    oid: matStsRunningMode
-                    value: matStsRunningMode
+                    oid: TELECOM-MIB::matStsRunningMode
+                    value: TELECOM-MIB::matStsRunningMode
                     num_oid: ".1.3.6.1.4.1.935.10.2.1.3.2.1.19.{{ $index }}"
                     descr: "STS Running Mode"
                     index: "{{ $index }}"

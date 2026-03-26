@@ -17,15 +17,11 @@ $array = [
 $colours = 'mixed';
 $rrd_list = [];
 
-if (Rrd::checkRrdExists($rrd_filename)) {
-    foreach ($array as $ds) {
-        $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr'] = strtoupper($ds);
-        $rrd_list[$i]['ds'] = $ds;
-        $i++;
-    }
-} else {
-    echo "file missing: $rrd_filename";
+foreach ($array as $ds) {
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    $rrd_list[$i]['descr'] = strtoupper($ds);
+    $rrd_list[$i]['ds'] = $ds;
+    $i++;
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

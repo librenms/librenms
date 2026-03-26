@@ -1,6 +1,6 @@
 -- **********************************************************
 -- Airespace Wireless MIB
--- Copyright 2005, 2010-2011, 2014 Cisco Systems Inc. All rights reserved.
+-- Copyright (c) 2005-2024 by Cisco Systems, Inc. All rights reserved.
 --   
 -- This SNMP Management Information Specification
 -- embodies Cisco's confidential and proprietary
@@ -18,24 +18,6 @@
 -- Internal Source Code Version:1.268
 -- Date: 01 Jan 2006
 -- **********************************************************
---   
--- %DNP%  FYI:  Lines containing a comment starting with the "Do Not
--- %DNP%  Publish" prefix "%DNP%" (such as these) are automagicially
--- %DNP%  stripped from MIBS prior to publishing on ftp and cio, and
--- %DNP%  should be used for comments intended for cisco engineering
--- %DNP%  eyes only, or for new product identifiers that are not yet
--- %DNP%  announced.
---   
--- %DNP%   ****************************************************
--- %DNP%   ** As approver for the 3.x review of this this MIB
--- %DNP%   ** it is essential that I indicate that many of the
--- %DNP%   ** changes are illegal(see RFC 2578).  In fact,
--- %DNP%   ** these modifications will break existing applications
--- %DNP%   ** and force those applications to become aware of
--- %DNP%   ** which image level supports a particiular version
--- %DNP%   ** of this MIB.  For example,the order and number of
--- %DNP%   ** object in many of the notifications were changed.
--- %DNP%   ****************************************************
 
 AIRESPACE-WIRELESS-MIB DEFINITIONS ::= BEGIN
 
@@ -71,7 +53,7 @@ IMPORTS
 -- ********************************************************************
 
 bsnWireless MODULE-IDENTITY
-    LAST-UPDATED    "201406260000Z"
+    LAST-UPDATED    "202401120000Z"
     ORGANIZATION    "Airespace, Inc."
     CONTACT-INFO
             "Cisco Systems,
@@ -190,12 +172,52 @@ bsnWireless MODULE-IDENTITY
 
         [2] Draft-obara-capwap-lwapp-00.txt, IETF Light 
         Weight Access Point Protocol."
+    REVISION        "202401120000Z"
+    DESCRIPTION
+        "Fix syntax errors"
+    REVISION        "202209160000Z"
+    DESCRIPTION
+        "Added new table bsnGlobalDot11System.
+         Added bsnGlobalDot11SystemMobileStations to the above table.
+
+         Added below entries to table bsnDot11EssEntry
+         bsnDot11EssNumApsUp
+         bsnDot11EssNumApsDown"
+    REVISION        "202012020000Z"
+    DESCRIPTION
+        "Added enumerated values 7 to 8 to 
+        bsnRogueAPDetectingAPRadioType object.
+
+        Added enumerated values 10 to 12 to
+        bsnRogueAPMaxRssiRadioType object.
+
+        Added enumerated values 10 to 12 to
+        bsnRogueAPRadioType object.
+        
+        Added enumerated value 4 to 
+        bsnRogueClientRadioType object.
+
+        Added:-
+        bsnRogueAPPhysicalAPSlot,
+        bsnRogueClientPhysicalAPSlot"
+    REVISION        "201509140000Z"
+    DESCRIPTION
+        "Added enumerated values 5 to 6 to 
+        bsnRogueAPDetectingAPRadioType object.
+
+        Added enumerated values 3 to 12 to
+        bsnAAARadiusCallStationIdType object.
+
+        Added enumerated value 55 - 58 to bsnAPType."
     REVISION        "201406260000Z"
     DESCRIPTION
-        "Added enumerated value 9 - 10 to bsnMobileStationProtocol.
+        "Added enumerated value 9 - 10 to
+        bsnMobileStationProtocol.
         Added enumerated value 29 - 50 to bsnAPType. 
-        Updated description for bsnDot11EssStaticWEPKeyIndex, 
-        bsnRrmDot11aThroughputThreshold and bsnRrmDot11bThroughputThreshold."
+        Updated description for 
+        bsnDot11EssStaticWEPKeyIndex, 
+        bsnRrmDot11aThroughputThreshold and
+        bsnRrmDot11bThroughputThreshold."
     REVISION        "201109270000Z"
     DESCRIPTION
         "Modified the following variables with
@@ -613,6 +635,8 @@ BsnDot11EssEntry ::= SEQUENCE {
         bsnDot11Ess80211ePolicySetting       INTEGER,
         bsnDot11EssWebPassthroughEmail       INTEGER,
         bsnDot11Ess7920PhoneSupport          INTEGER,
+        bsnDot11EssNumApsUp                  Unsigned32,
+        bsnDot11EssNumApsDown                Unsigned32,
         bsnDot11EssRadiusAuthPrimaryServer   DisplayString,
         bsnDot11EssRadiusAuthSecondaryServer DisplayString,
         bsnDot11EssRadiusAuthTertiaryServer  DisplayString,
@@ -1063,12 +1087,12 @@ bsnDot11EssBlacklistTimeout OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "Set the timeout for blacklisted Mobile Stations after
+        "Set the timeout for excluded Mobile Stations after
         which the mobile station will be automatically 
-        de-authenticated. Mobile Station are blacklisted by MAC 
+        de-authenticated. Mobile Station excluded by MAC 
         address and their status can be obtained from 
         bsnMobileStationStatus.
-        A timeout setting of 0 indicates no blacklist timeout is 
+        A timeout setting of 0 indicates no exclusion timeout is 
         set and administrative control 
         (bsnMobileStationDeleteAction ) is required to 
         deauthenticate the station."
@@ -1130,11 +1154,11 @@ bsnDot11EssBlacklistingCapability OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This is the flag that can enable or disable the
-        client backlisting feature for a WLAN. If enabled, 
-        the clients can be blacklisted by the Switch in case
+        client exclusion feature for a WLAN. If enabled, 
+        the clients can be excluded by the Switch in case
         of repetitive auth failure and other reasons like it.
-        If disabled, the clients cannot be blacklisted by 
-        the switch. The blacklist timeout value will only 
+        If disabled, the clients cannot be excluded by 
+        the switch. The exclusion timeout value will only 
         be effective if this feature is turned on."
     DEFVAL          { disable } 
     ::= { bsnDot11EssEntry 41 }
@@ -1436,6 +1460,25 @@ bsnDot11Ess7920PhoneSupport OBJECT-TYPE
     DEFVAL          { disable } 
     ::= { bsnDot11EssEntry 64 }
 
+bsnDot11EssNumApsUp OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "It indicates the number of AP's that are broadcasting specific
+        WLAN.Access point shall be considered up if it broadcasts specific
+        WLAN on atleast one slot."
+    ::= { bsnDot11EssEntry 66 }
+
+bsnDot11EssNumApsDown OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "It indicates the number of AP's that are not broadcasting WLAN
+        per AP on either of the slots."
+    ::= { bsnDot11EssEntry 67 }
+
 bsnDot11EssRadiusAuthPrimaryServer OBJECT-TYPE
     SYNTAX          DisplayString (SIZE  (0..21))
     MAX-ACCESS      read-create
@@ -1690,7 +1733,8 @@ BsnMobileStationEntry ::= SEQUENCE {
         bsnMobileStationEapType                        INTEGER,
         bsnMobileStationCcxVersion                     INTEGER,
         bsnMobileStationE2eVersion                     INTEGER,
-        bsnMobileStationStatusCode                     INTEGER
+        bsnMobileStationStatusCode                     INTEGER,
+        bsnMobileStationAAAOverridePassphrase          TruthValue
 }
 
 bsnMobileStationMacAddress OBJECT-TYPE
@@ -1803,8 +1847,333 @@ bsnMobileStationReasonCode OBJECT-TYPE
                         unSpecifieQosFailure(200),
                         qosPolicyMismatch(201),
                         inSufficientBandwidth(202),
-                        inValidQosParams(203)
-                    }
+                        inValidQosParams(203),
+                        noOperation(1000), 
+                        none(1001),
+                        deauthOrDisassocReq(1002),
+                        sessionAwareModuleInitiated(1003),
+                        l3authFail(1004),
+                        apInitiatedDelete(1005),
+                        bssidDown(1006),
+                        capwapDown(1007),
+                        connectTimeout(1008),
+                        mabFailed(1009),
+                        datapathFailure(1010),
+                        wlanChange(1011),
+                        vlanChange(1012),
+                        adminReset(1013),
+                        qosFailure(1014),
+                        keyExchangeTimeout(1015),
+                        groupKeyUpdateTimeout(1016),
+                        maxSaqueries(1017),
+                        restartPurge(1018),
+                        clientBlacklist(1019),
+                        interWncdRoamSuccess(1020),
+                        interWncdRoamFailure(1021),
+                        interCtrlRoamSuccess(1022),
+                        mobilityFailure(1023),
+                        sessionTimeout(1024),
+                        idleTimeout(1025),
+                        userRequest(1026),
+                        nasError(1027),
+                        serviceUnavailable(1028),
+                        mbssidDown(1029),
+                        mmTunnelDown(1030),
+                        dot11vSmartRoamFailed(1031),
+                        dot11vTimerTimeout(1032),
+                        dot11vAssocFailed(1033),
+                        ftAuthResponse(1034),
+                        saeAuthFailure(1035),
+                        dot11UnspecifiedFailure(1036),
+                        dot11FailureIgnoreReq(1037),
+                        dot11CcxQosAddtsNoBandwidth(1038),
+                        dot11CapsUnsupported(1039),
+                        dot11AssocDeniedUnspec(1040),
+                        dot11MaxSta(1041),
+                        dot11DeniedRates(1042),
+                        dot11PoorChannelConditions(1043),
+                        dot11InvalidQosParameter(1044),
+                        dot11InvalidIe(1045),
+                        dot11GroupCipherInvalid(1046),
+                        dot11UnicastCipherInvalid(1047),
+                        dot11AkmpInvalid(1048),
+                        dot11UnsupportedRsnVersion(1049),
+                        dot11InvalidRsnIeCapabilities(1050),
+                        dot11CipherSuiteRejected(1051),
+                        dot11DeniedHtCapabiliies(1052),
+                        dot11InvalidFtActionFrameCount(1053),
+                        dot11InvalidPmkid(1054),
+                        dot11InvalidMdie(1055),
+                        dot11InvalidFtie(1056),
+                        dot11CcxQosPolicy(1057),
+                        dot11CcxInsufficientBandwidth(1058),
+                        dot11CcxInvalidQosParameter(1059),
+                        dot11CcxNonOptimalAssociationChoice(1060),
+                        wiredIappDisassoc(1061),
+                        wiredWgbChange(1062),
+                        wiredVlanChange(1063),
+                        wiredWgbDelete(1064),
+                        avcReanchoring(1065),
+                        wgbClientDirectAssoc(1066),
+                        apUpgrade(1067),
+                        clientDhcpFailure(1068),
+                        clientEapTimeoutFailure(1069),
+                        client8021xFailure(1070),
+                        clientDeviceIdle(1071),
+                        clientCaptivePortalSecurityFailure(1072),
+                        clientDecryptionFailure(1073),
+                        clientInterfaceDisabled(1074),
+                        clientUserTriggeredDisassoc(1075),
+                        clientMiscReason(1076),
+                        clientUnknownReason(1077),
+                        clientPeerTriggered(1078),
+                        clientBeaconLoss(1079),
+                        clientEapIdTimeout(1080),
+                        clientDot1xTimeout(1081),
+                        keyMgmtInvalidFrame(1082),
+                        keyMgmtInstallBit(1083),
+                        keyMgmtErrorBit(1084),
+                        keyMgmtAckBit(1085),
+                        keyMgmtInvalidKey(1086),
+                        keyMgmtSecureBit(1087),
+                        keyMgmtKeyDescVer(1088),
+                        keyMgmtWrongReplayCounter(1089),
+                        keyMgmtNoMicBit(1090),
+                        keyMgmtMicValidation(1091),
+                        keyMgmtPtkComputation(1092),
+                        clientCredentialFailure(1093),
+                        lostCarrier(1094),
+                        reauthFailure(1095),
+                        portAdminDisabled(1096),
+                        supplicantRestart(1097),
+                        ipDownNoIp(1098),
+                        anchorThrottled(1099),
+                        anchorNoMemory(1100),
+                        anchorInvalidMbssid(1101),
+                        anchorCreateReqFail(1102),
+                        dbPopulateFail(1103),
+                        danglingCleanupTimer(1104),
+                        excludeConfig(1105),
+                        excludeAssocFail(1106),
+                        excludeDot11AuthFail(1107),
+                        excludeDot1xTimeout(1108),
+                        excludeDot1xAuthFail(1109),
+                        excludeWebAuthFail(1110),
+                        excludePolicyBindFail(1111),
+                        excludeIpTheft(1112),
+                        excludeMacTheft(1113),
+                        excludeMacAndIpTheft(1114),
+                        excludeQosPolicyFail(1115),
+                        excludeQosPolicyApSendFail(1116),
+                        excludeQosPolicyApBindFail(1117),
+                        excludeQosPolicyApUnbindFail(1118),
+                        excludeStaticIpAnchorFail(1119),
+                        excludeVlanFail(1120),
+                        excludeAclFail(1121),
+                        excludePuntAclFail(1122),
+                        excludeAccountingFail(1123),
+                        excludeCtsFail(1124),
+                        excludeFqdnNoDefFail(1125),
+                        excludeFqdnPostauthMismatchFail(1126),
+                        excludeFqdnPreauthMismatchFail(1127),
+                        excludeFqdnZeroGidFail(1128),
+                        excludeMiscFail(1129),
+                        excludeReauthFailure(1130),
+                        excludeWrongPsk(1131),
+                        excludePolicyFailure(1132),
+                        mnIdleTimeout(1133),
+                        mnClientAclMismatch(1134),
+                        mnApAuthStop(1135),
+                        mnAssocExpiredAtAp(1136),
+                        mn4wayHandshakeFailed(1137),
+                        mnDhcpTimeout(1138),
+                        mnReassocTimeout(1139),
+                        mnSaQueryTimeout(1140),
+                        mnIntraApRoam(1141),
+                        mnChannelSwitchAtAp(1142),
+                        mnDelBadAid(1143),
+                        mnDelRequest(1144),
+                        mnDelIntfReset(1145),
+                        mnDelAllOnSlot(1146),
+                        mnDelReaperRadio(1147),
+                        mnDelSlotDisable(1148),
+                        mnDelMicFail(1149),
+                        mnDelVlanDel(1150),
+                        mnDelChannelChange(1151),
+                        mnDelStopReassoc(1152),
+                        mnDelPakMaxRetry(1153),
+                        mnDelTxDeauth(1154),
+                        mnDelSensorStaTimeout(1155),
+                        mnDelAgeTimeout(1156),
+                        mnDelTxFailThold(1157),
+                        mnDelUplinkRcvTimeout(1158),
+                        mnDelSnsrScanNxtRadio(1159),
+                        mnDelSnsrScanOtherBssid(1160),
+                        aaaServerUnavailable(1161),
+                        aaaNotReady(1162),
+                        noDot1xAuthConfig(1163),
+                        abortReceived(1164),
+                        assocConnectTimeout(1165),
+                        macauthConnectTimeout(1166),
+                        l2authConnectTimeout(1167),
+                        l3authConnectTimeout(1168),
+                        mobilityConnectTimeout(1169),
+                        sIpAnchorConnectTimeout(1170),
+                        smSessionConnectTimeout(1171),
+                        iplearnConnectTimeout(1172),
+                        nackIfidExists(1173),
+                        radioDown(1174),
+                        fabricReject(1175),
+                        guestLanInvalidMbssid(1176),
+                        guestLanNoMemory(1177),
+                        guestLanCreateReqFail(1178),
+                        tunnelEogreReset(1179),
+                        tunnelEogreJoinFail(1180),
+                        tunnelEogreReconciliation(1181),
+                        wiredIdleTimeout(1182),
+                        ipUpdateTimeout(1183),
+                        remoteMobilityDelete(1184),
+                        saeAuthInAssociatedState(1185),
+                        nackIfidMismatch(1186),
+                        tunnelEogreInvalidVlan(1187),
+                        tunnelEogreEmptyDomain(1188),
+                        tunnelEogreInvalidDomain(1189),
+                        tunnelEogreDomainShut(1190),
+                        tunnelEogreInvalidGw(1191),
+                        tunnelEogreGwDown(1192),
+                        tunnelEogreFlexNoActiveGw(1193),
+                        tunnelEogreRuleMatch(1194),
+                        tunnelEogreAaaOverride(1195),
+                        tunnelEogreMspayload(1196),
+                        tunnelEogreHandoffError(1197),
+                        invalidPmkLen(1198),
+                        l3VlanOverrideConnectTimeout(1199),
+                        userTriggeredUnspecified(1200),
+                        userTriggeredPwroffWifioff(1201),
+                        userTriggeredConnectToAnotherSsid(1202),
+                        userTriggeredRemoveSsid(1203),
+                        userTriggeredAirplaneMode(1204),
+                        l2connectionUnspecified(1205),
+                        l2connectionAssociation(1206),
+                        fourWayHandshakeUnspecified(1207),
+                        keyM1Failure(1208),
+                        keyM3Failure(1209),
+                        m3M4KeyXchngTimeout(1210),
+                        dhcpFailUnspecified(1211),
+                        dhcpFailTimeout(1212),
+                        dhcpFailTimeoutAfterRoaming(1213),
+                        dhcpFailLeaseExpired(1214),
+                        dhcpFailNakInRenew(1215),
+                        dhcpFailRenewLeaseWrongIp(1216),
+                        dhcpFailInternalError(1217),
+                        eapFailUnspecified(1218),
+                        eapFailCodeFail(1219),
+                        eapFailInfoNotEntered(1220),
+                        eapFailMschapError(1221),
+                        eapFailSimAuthFail(1222),
+                        eapFailTimeout(1223),
+                        eapFailTlsCertError(1224),
+                        noInternetUnspecified(1225),
+                        noInternetDns(1226),
+                        noInternetArp(1227),
+                        exclusionPolicyTemplateFail(1228),
+                        mnDelAuthExpired(1229),
+                        mnDelDisassoc(1230),
+                        mnDelTxDisassoc(1231),
+                        fastroamMobilityFailure(1232),
+                        roamAcrossPolicyProfileDeny(1233),
+                        dot11AidAllocConflictReq(1234),
+                        zoneChange(1235),
+                        wlanIdAttrMismatch(1236),
+                        easypskAAAUnknown(1237),
+                        easypskUnspecified(1238),
+                        easypskPskMismatch(1239),
+                        easypskRadiusBusy(1240),
+                        easypskLimitReached(1241),
+                        easypskBadFrame(1242),
+                        easypskMissingParameter(1243),
+                        supplicantNameFail(1244),
+                        userNameFail(1245),
+                        serviceSetIdFail(1246),
+                        anchorVlanIdFail(1247),
+                        pskFail(1248),
+                        pskModeFail(1249),
+                        interimIntervalFail(1250),
+                        randomMac(1251),
+                        mnapiplearntimeout(1252),
+                        mnapbyflexgroupchange(1253),
+                        mnapeapollogoff(1254),
+                        mnapeapreqtimeout(1255),
+                        mnap4wayhandshakefailed(1256),
+                        mnapmicvalidation(1257),
+                        mnapwrongreplaycounter(1258),
+                        mnaptunneldown(1259),
+                        mnapinteraproam(1260),
+                        mnapunknownclient(1261),
+                        mnapreauthtimeout(1262),
+                        mnapcontidletimeout(1263),
+                        mnaprldpcleanup(1264),
+                        mnapintraswitchroam(1265),
+                        mnappemcleanup(1266),
+                        mnaprlancentralswitch(1267),
+                        mnaprlandpaddfail(1268),
+                        mnaprlandelete(1269),
+                        mnaprlaninactivetimeout(1270),
+                        mnaprlanmabfailure(1271),
+                        mnapclsmnomemory(1272),
+                        mnapclsmbssidmismatch(1273),
+                        mnapclsmdeletenoacl(1274),
+                        mnapclsmdeletenoparentwgb(1275),
+                        mnapclsmkeyplumbfail(1276),
+                        mnapclsmmeshkeyplumbfail(1277),
+                        mnapclsmdpaddfail(1278),
+                        mnapclsmauthrespreject(1279),
+                        mnapclsmauthrespsendfail(1280),
+                        mnapclsmassocrespsendfail(1281),
+                        mnapclsmassocrespwithfailurestatus(1282),
+                        mnapclsmwebauthtimerexpired(1283),
+                        mnapclsmdot1xtimerexpired(1284),
+                        mnapclsmdeauthdisassocsendfail(1285),
+                        mnapdrivereventclass3recv(1286),
+                        mnapdrivereventpspwhenunauth(1287),
+                        mnapdrivereventioctlerror(1288),
+                        mnapflexftfailure(1289),
+                        mnapclsmdriveraddfail(1290),
+                        mnapdriverclientnotfound(1291),
+                        mnapdrivermgmtpktallocfail(1292),
+                        mnapdriverinvalidcipher(1293),
+                        mnapdriverinvalidaid(1294),
+                        mnapdriverinvalidkey(1295),
+                        mnapdriverfwkeysetfailed(1296),
+                        mnapdriverinvalidhtvhtrates(1297),
+                        mnapdriverinvalidlegacyrates(1298),
+                        mnapdrivernooverlaplegacyrates(1299),
+                        mnapdrivermaxvhtstreams(1300),
+                        mnapdriveraidinuse(1301),
+                        mnapdriverassoctoomany(1302),
+                        mnapdrivercipherattachfail(1303),
+                        mnapdriveralgorithmmismatch(1304),
+                        mnapdriverinvalidkeylength(1305),
+                        mnapdriverinvalidkeyindex(1306),
+                        mnapdriverassocscbnotauthenticated(1307),
+                        mnapdriverstadbinitfailed(1308),
+                        mnapdriveraddingentryfailed(1309),
+                        mnapdriveraddingentryinfirmwarefailed(1310),
+                        mnapreasonapmax(1311),
+                        linklocalbridgevlanfail(1312),
+                        maxstaonap(1313),
+                        maxstaonvap(1314),
+                        maxstaonbssid(1315),
+                        maxstaonradio(1316),
+                        mnapmaxstaonap(1317),
+                        mnapmaxstaonbssid(1318),
+                        mnapmaxstaonradio(1319),
+                        pmkTimeoutOnSTA(1320),
+                        excessarprate(1321),
+                        excessndprate(1322),
+                        vrfvlanMismatch(1323),
+                        dpathencodefailed(1324)
+					}
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -1991,7 +2360,11 @@ bsnMobileStationProtocol OBJECT-TYPE
                         dot11n5(7),
                         ethernet(8),
                         dot3(9),
-                        dot11ac(10)
+                        dot11ac(10),
+                        dot11ax5(11),
+                        dot11ax24(12),
+                        dot11ax6(13)
+
                     }
     MAX-ACCESS      read-only
     STATUS          current
@@ -2051,7 +2424,10 @@ bsnMobileStationPolicyType OBJECT-TYPE
                         wpa2(2),
                         wpa2vff(3),
                         notavailable(4),
-                        unknown(5)
+                        unknown(5),
+                        wpa2or3(6),
+                        wpaOsen(7),
+                        wpaOsenWithinRsn(8)
                     }
     MAX-ACCESS      read-only
     STATUS          current
@@ -2067,8 +2443,13 @@ bsnMobileStationEncryptionCypher OBJECT-TYPE
                         wep104(3),
                         wep128(4),
                         none(5),
-                        notavailable(6),
-                        unknown(7)
+                        tkipWep40(6), 
+                        tkipWep104(7), 
+                        gcmp128(8),
+                        gcmp256(9),
+                        ccmp256(10),
+                        notavailable(11),
+                        unknown(12)
                     }
     MAX-ACCESS      read-only
     STATUS          current
@@ -2133,6 +2514,15 @@ bsnMobileStationStatusCode OBJECT-TYPE
     DESCRIPTION
         "Status Code of the Mobile Station" 
     ::= { bsnMobileStationEntry 42 }
+
+bsnMobileStationAAAOverridePassphrase OBJECT-TYPE
+    SYNTAX          TruthValue 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Flag to check wheather AAA override passphrase is enabled
+         for a MAB+PSK client or not." 
+    ::= { bsnMobileStationEntry 43 }
  
 
 -- ***************************************************************
@@ -2996,7 +3386,12 @@ bsnRogueAPDetectingAPRadioType OBJECT-TYPE
                         dot11a(1),
                         dot11g(2),
                         dot11n24(3),
-                        dot11n5(4)
+                        dot11n5(4),
+                        dot11abgn(5),
+                        dot11ac(6),
+                        dot11ax24(7),
+                        dot11ax5(8),
+                        dot11ax6(9)
                     }
     MAX-ACCESS      read-only
     STATUS          current
@@ -3017,10 +3412,15 @@ bsnRogueAPMaxRssiRadioType OBJECT-TYPE
     SYNTAX          INTEGER  {
                         dot11b(1),
                         dot11a(2),
+                        dot11abgn(3),
                         uwb(4),
                         dot11g(5),
                         dot11n24(6),
-                        dot11n5(7)
+                        dot11n5(7),
+                        dot11ac(8),
+                        dot11ax24(9),
+                        dot11ax5(10),
+                        dot11ax6(11)
                     }
     MAX-ACCESS      read-only
     STATUS          current
@@ -3083,7 +3483,9 @@ bsnRogueAPChannel OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This is the channel  number of the last detecting APs,
-        which has detected this rogue." 
+        which has detected this rogue.
+        Use in conjuction with bsnRogueAPMaxRssiRadioType to resolve ambiguity
+        between channels numbers of 2.4GHz and 5GHz bands versus 6GHz band."
     ::= { bsnRogueAPEntry 26 }
 
 bsnRogueAPDetectingAPName OBJECT-TYPE
@@ -3137,7 +3539,8 @@ BsnRogueAPAirespaceAPEntry ::= SEQUENCE {
         bsnRogueAPAirespaceAPPreamble     INTEGER,
         bsnRogueAPAirespaceAPWpaMode      INTEGER,
         bsnRogueAPAirespaceAPSNR          Integer32,
-        bsnRogueAPChannelWidth            INTEGER
+        bsnRogueAPChannelWidth            INTEGER,
+        bsnRogueAPPhysicalAPSlot          Integer32
 }
 
 bsnRogueAPAirespaceAPMacAddress OBJECT-TYPE
@@ -3154,8 +3557,9 @@ bsnRogueAPAirespaceAPSlotId OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "The slot ID of the Airespace AP Interface that detected the
-        Rogue." 
+        "The slot and band index of the Airespace AP Interface that 
+        detected the Rogue. Use bsnRogueAPPhysicalAPSlot for Slot ID
+        of the Detecting AP Interface." 
     ::= { bsnRogueAPAirespaceAPEntry 2 }
 
 bsnRogueAPRadioType OBJECT-TYPE
@@ -3166,7 +3570,11 @@ bsnRogueAPRadioType OBJECT-TYPE
                         uwb(4),
                         dot11g(5),
                         dot11n24(6),
-                        dot11n5(7)
+                        dot11n5(7),
+                        dot11ac(9),
+                        dot11ax24(10),
+                        dot11ax5(11),
+                        dot11ax6(12)
                     }
     MAX-ACCESS      read-only
     STATUS          current
@@ -3188,7 +3596,9 @@ bsnRogueAPChannelNumber OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "The advertised Channel Number of the Airespace AP
-        Interface picked up from the Rogue." 
+        Interface picked up from the Rogue.
+        Use in conjuction with bsnRogueAPRadioType to resolve ambiguity between
+        channels numbers of 2.4GHz and 5GHz bands versus 6GHz band."
     ::= { bsnRogueAPAirespaceAPEntry 5 }
 
 bsnRogueAPSsid OBJECT-TYPE
@@ -3304,6 +3714,13 @@ bsnRogueAPChannelWidth OBJECT-TYPE
         "This object represents the channel width of the rogue." 
     ::= { bsnRogueAPAirespaceAPEntry 28 }
  
+bsnRogueAPPhysicalAPSlot OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Reporting AP Physical Slot ID" 
+    ::= { bsnRogueAPAirespaceAPEntry 29 }
 
 -- *****************************************************************
 -- *  bsnRogueClientPerRogueAPTable
@@ -3513,7 +3930,8 @@ BsnRogueClientAirespaceAPEntry ::= SEQUENCE {
         bsnRogueClientChannelNumber         Integer32,
         bsnRogueClientAirespaceAPRSSI       Integer32,
         bsnRogueClientAirespaceAPLastHeard  DisplayString,
-        bsnRogueClientAirespaceAPSNR        Integer32
+        bsnRogueClientAirespaceAPSNR        Integer32,
+        bsnRogueClientPhysicalAPSlot        Integer32
 }
 
 bsnRogueClientAirespaceAPMacAddress OBJECT-TYPE
@@ -3530,15 +3948,17 @@ bsnRogueClientAirespaceAPSlotId OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "The slotId of the Airespace AP Interface that detected the
-        Rogue." 
+        "The slot and band index of the Airespace AP Interface that
+        detected the Rogue. Use bsnRogueClientPhysicalAPSlot for Slot ID
+        of the Detecting AP Interface." 
     ::= { bsnRogueClientAirespaceAPEntry 2 }
 
 bsnRogueClientRadioType OBJECT-TYPE
     SYNTAX          INTEGER  {
                         dot11b(1),
                         dot11a(2),
-                        unknown(3)
+                        unknown(3),
+                        dot11ax6(4)
                     }
     MAX-ACCESS      read-only
     STATUS          current
@@ -3562,7 +3982,9 @@ bsnRogueClientChannelNumber OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "The advertised Channel Number of that the Airespace
-        AP Interface picked up from the Rogue." 
+        AP Interface picked up from the Rogue.
+        Use in conjuction with bsnRogueClientRadioType to resolve ambiguity 
+        between channels numbers of 2.4GHz and 5GHz bands versus 6GHz band."
     ::= { bsnRogueClientAirespaceAPEntry 5 }
 
 bsnRogueClientAirespaceAPRSSI OBJECT-TYPE
@@ -3589,6 +4011,14 @@ bsnRogueClientAirespaceAPSNR OBJECT-TYPE
     DESCRIPTION
         "SNR seen by Airespace AP Interface from Rogue" 
     ::= { bsnRogueClientAirespaceAPEntry 27 }
+
+bsnRogueClientPhysicalAPSlot OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Reporting AP Physical Slot ID" 
+    ::= { bsnRogueClientAirespaceAPEntry 28 }
  
 
 -- ********************************************************************
@@ -4010,12 +4440,86 @@ bsnAPType OBJECT-TYPE
                         ap1700i(51),
                         ap1700e(52),
                         ap1570e(53),
-                        ap1570i(54)
+                        ap1570i(54),
+                        ap1852e(55),
+                        ap1852i(56),
+                        ap1832i(57),
+                        ap752t(58),
+                        apmr24(59),
+                        ap3702(60),
+                        ap1802i(61),
+                        ap1810w(62),
+                        apoeap1810(63),
+                        ap3802e(64),
+                        ap3802i(65),
+                        ap3802p(66),
+                        ap3802q(67),
+                        ap2802e(68),
+                        ap2802i(69),
+                        ap2802q(70),
+                        ap1815w(71),
+                        apoeap1815(72),
+                        ap1815I(73),
+                        ap1562e(74),
+                        ap1562i(75),
+                        ap1562d(76),
+                        ap1562ps(77),
+                        ap1800I(78),
+                        ap1800S(79),
+                        ap1815M(80),
+                        ap1542D(81),
+                        ap1542I(82),
+                        ap1100ac(83),
+                        ap1101ac(84),
+                        ap1582e(85),
+                        ap1582i(86),
+                        ap1542E2(87),
+                        ap1542E4(88),
+                        ap9117I(89),
+                        ap9115AXI(90),
+                        ap9115AXE(91),
+                        ap1840I(92),
+                        ap9120AXI(93),
+                        ap9120AXE(94),
+                        ap9120AXP(95),
+                        iw6300HD(97),
+                        iw6300HA(98),
+                        iw6300HW(99),
+                        esw6300(100),
+                        ap9130AXI(101),
+                        ap9130AXE(102),
+                        pwifiac2(110),
+                        ap9136I(115),
+                        wpwifi6(116),
+                        isr1101ax(129),
+                        cw9162I(130),
+                        cw9164I(131),
+                        cw9166I(132),
+                        iw9167eh(133),
+                        cw9166D1(134),
+                        iw9165DH(135),
+                        iw9167ih(136),
+                        cw9163E(137),
+                        cw9178I(138),
+                        iw9165E(139),
+                        cw9176I(140),
+                        cw9176D(141)
                     }
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This is the model of the AP in enumeration." 
+        "This is the model of the AP in enumeration.
+        Ap models start with wap are called panda
+        ap models.Ap models ended with different suffix
+        have different functionalities.
+
+        i     : Ap with internal antenna
+        e     : Ap with external antena
+        t     : teleworker Aps
+        p     : stadium Aps
+        w     : wall mountable Aps
+        agn   : supports dot11(a),dot11(g),dot11(n)
+        gn    : supports dot11(g),dot11(n)" 
     ::= { bsnAPEntry 22 }
 
 bsnAPSecondaryMwarName OBJECT-TYPE
@@ -4198,6 +4702,7 @@ BsnAPIfEntry ::= SEQUENCE {
         bsnAPIfChannelList             DisplayString,
         bsnAPIfAbsolutePowerList       DisplayString,
         bsnAPIfRegulatoryDomainSupport INTEGER,
+        bsnAPIfPhyS80EightyChannelNumber INTEGER,
         bsnAPIfAdminStatus             INTEGER
 }
 
@@ -4213,7 +4718,9 @@ bsnAPIfType OBJECT-TYPE
     SYNTAX          INTEGER  {
                         dot11b(1),
                         dot11a(2),
-                        uwb(4)
+                        uwb(4),
+                        dot116ghz(6),
+                        dot11xor56ghz(7)
                     }
     MAX-ACCESS      read-only
     STATUS          current
@@ -4569,6 +5076,16 @@ bsnAPIfRegulatoryDomainSupport OBJECT-TYPE
         "If the regulatory domain on radio is supported or notSupported
         on the controller" 
     ::= { bsnAPIfEntry 23 }
+
+bsnAPIfPhyS80EightyChannelNumber OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION
+        "Secondary 80MHz channel number of the AP Interface.
+        Allowed channel numbers also depends on the current
+        Country Code set in the Switch."
+    ::= { bsnAPIfEntry 28 }
 
 bsnAPIfAdminStatus OBJECT-TYPE
     SYNTAX          INTEGER  {
@@ -6141,7 +6658,7 @@ bsnMeshNodeBlacklistPackets OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "the number of blacklist packets received" 
+        "the number of excluded list packets received" 
     ::= { bsnMeshNodeEntry 11 }
 
 bsnMeshNodeInsufficientMemory OBJECT-TYPE
@@ -7218,7 +7735,7 @@ bsnExcessive80211AssocFailures OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This flag specifies if client should be excluded
-        (blacklisted) if repeated 802.11 Association 
+        (exclusion list) if repeated 802.11 Association 
         Failures occurs with a client." 
     ::= { bsnClientExclusionPolicyConfig 1 }
 
@@ -7231,7 +7748,7 @@ bsnExcessive80211AuthFailures OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This flag specifies if client should be excluded
-        (blacklisted) if repeated 802.11 Authentication 
+        (exclusion list) if repeated 802.11 Authentication 
         Failures occurs with a client." 
     ::= { bsnClientExclusionPolicyConfig 2 }
 
@@ -7244,9 +7761,22 @@ bsnExcessive8021xAuthFailures OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This flag specifies if client should be excluded
-        (blacklisted) if repeated 802.1x Authentication 
+        (exclusion list) if repeated 802.1x Authentication 
         Failures occurs with a client." 
     ::= { bsnClientExclusionPolicyConfig 3 }
+
+bsnExcessive8021xTimeout OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        disable(0),
+                        enable(1)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This flag specifies if client should be excluded
+        (exclusion list) if repeated 802.1x Timeout
+        occurs with a client."
+    ::= { bsnClientExclusionPolicyConfig 7 }
 
 bsnExternalPolicyServerFailures OBJECT-TYPE
     SYNTAX          INTEGER  {
@@ -7257,7 +7787,7 @@ bsnExternalPolicyServerFailures OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This flag specifies if client should be excluded
-        (blacklisted) if repeated external policy server 
+        (exclusion list) if repeated external policy server 
         failures occurs with a client." 
     ::= { bsnClientExclusionPolicyConfig 4 }
 
@@ -7270,7 +7800,7 @@ bsnExcessiveWebAuthFailures OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This flag specifies if client should be excluded
-        (blacklisted) if repeated Web Authentication Failures
+        (exclusion list) if repeated Web Authentication Failures
         occurs with a client." 
     ::= { bsnClientExclusionPolicyConfig 5 }
 
@@ -7283,7 +7813,7 @@ bsnIPTheftORReuse OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This flag specifies if client should be excluded
-        (blacklisted) if it appears to be reusing an IP 
+        (exclusion list) if it appears to be reusing an IP 
         Address.(Possible IP Theft)" 
     ::= { bsnClientExclusionPolicyConfig 6 }
 -- *******************************************************************
@@ -8074,6 +8604,9 @@ bsnGlobalDot11a  OBJECT IDENTIFIER
 bsnGlobalDot11h  OBJECT IDENTIFIER
     ::= { bsnGlobalDot11 4 }
 
+bsnGlobalDot11System  OBJECT IDENTIFIER
+    ::= { bsnGlobalDot11 5 }
+
 -- ********************************************************************
 -- *  BSN Global Parameters for Dot11B
 -- ********************************************************************
@@ -8530,6 +9063,23 @@ bsnGlobalDot11bDTPCSupport OBJECT-TYPE
         means that the radio's transmit power will be advertised in the 
         beacons and probe responses." 
     ::= { bsnGlobalDot11bConfig 34 }
+
+bsnGlobalDot11bRxSopThreshold OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        auto(0),
+                        low(1),
+                        medium(2),
+                        high(3),
+                        custom(4)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This attribute may be used to configure Rxsop or receiver start 
+        of packet custom values for 802.11b/g radios." 
+    DEFVAL          { auto } 
+    ::= { bsnGlobalDot11bConfig 35 }
+
 -- ********************************************************************
 -- *  Begin of bsnGlobalDot11bPhy
 -- ********************************************************************
@@ -9183,6 +9733,23 @@ bsnGlobalDot11aDTPCSupport OBJECT-TYPE
         means that the radio's transmit power will be advertised in the 
         beacons and probe responses." 
     ::= { bsnGlobalDot11aConfig 32 }
+
+bsnGlobalDot11aRxSopThreshold OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        auto(0),
+                        low(1),
+                        medium(2),
+                        high(3),
+                        custom(4)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This attribute may be used to configure Rxsop or receiver start 
+        of packet custom values for 802.11a radios." 
+    DEFVAL          { auto } 
+    ::= { bsnGlobalDot11aConfig 33 }
+
 -- ********************************************************************
 -- *  Begin of bsnGlobalDot11aPhy
 -- ********************************************************************
@@ -9460,6 +10027,25 @@ bsnGlobalDot11hChannelSwitchMode OBJECT-TYPE
         STA." 
     ::= { bsnGlobalDot11hConfig 3 }
 -- ********************************************************************
+-- *  BSN Global Parameters for Dot11 System
+-- ********************************************************************
+
+bsnGlobalDot11SystemInfo  OBJECT IDENTIFIER
+    ::= { bsnGlobalDot11System 1 }
+
+
+-- *******************************************************************
+-- * These global attributes are at System level
+-- *******************************************************************
+
+bsnGlobalDot11SystemMobileStations OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Total number of clients per controller."
+    ::= { bsnGlobalDot11SystemInfo 1 }
+-- ********************************************************************
 -- *  bsnRrm - Information about RF Groups that this Airespace Switch
 -- *  belongs to
 -- ********************************************************************
@@ -9630,11 +10216,11 @@ bsnRrmDot11aThroughputThreshold OBJECT-TYPE
     ::= { bsnRrmDot11aAPDefault 4 }
 
 bsnRrmDot11aMobilesThreshold OBJECT-TYPE
-    SYNTAX          INTEGER (1..75)
+    SYNTAX          INTEGER (1..200)
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "802.11A mobiles threshold between 1 and 75" 
+        "802.11A mobiles threshold between 1 and 200" 
     ::= { bsnRrmDot11aAPDefault 5 }
 
 bsnRrmDot11aCoverageThreshold OBJECT-TYPE
@@ -9719,6 +10305,17 @@ bsnRrmDot11aChannelMonitorList OBJECT-TYPE
         implies that the monitor channel list will include those channels
         that are used by automatic channel assignment." 
     ::= { bsnRrmDot11aAPDefault 13 }
+
+bsnRrmDot11aSignalTimeoutFactor OBJECT-TYPE
+    SYNTAX          Unsigned32 (5..60)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This factor times Neighbor Packet Frequency specifies how
+         long a neighbor expires if not receiving its neighbor packets.
+         Default is 20 secs"
+    DEFVAL          { 20 } 
+    ::= { bsnRrmDot11aAPDefault 14 }
 
 -- *********************************************************************
 -- *  Set Factory Defaults
@@ -9902,11 +10499,11 @@ bsnRrmDot11bThroughputThreshold OBJECT-TYPE
     ::= { bsnRrmDot11bAPDefault 4 }
 
 bsnRrmDot11bMobilesThreshold OBJECT-TYPE
-    SYNTAX          INTEGER (1..75)
+    SYNTAX          INTEGER (1..200)
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "802.11A Airespace AP mobiles threshold between 1 and 75" 
+        "802.11bg Airespace AP mobiles threshold between 1 and 200" 
     ::= { bsnRrmDot11bAPDefault 5 }
 
 bsnRrmDot11bCoverageThreshold OBJECT-TYPE
@@ -9993,6 +10590,17 @@ bsnRrmDot11bChannelMonitorList OBJECT-TYPE
         monitor channel list will include those channels
         that are used by automatic channel assignment." 
     ::= { bsnRrmDot11bAPDefault 13 }
+
+bsnRrmDot11bSignalTimeoutFactor OBJECT-TYPE
+    SYNTAX          Unsigned32 (5..60)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This factor times Neighbor Packet Frequency specifies how
+         long a neighbor expires if not receiving its neighbor packets.
+         Default is 20 secs"
+    DEFVAL          { 20 } 
+    ::= { bsnRrmDot11bAPDefault 14 }
 
 -- *********************************************************************
 -- *  Set Factory Defaults
@@ -11556,14 +12164,37 @@ bsnAAARadiusCallStationIdType OBJECT-TYPE
     SYNTAX          INTEGER  {
                         ipAddr(0),
                         macAddr(1),
-                        apMacAddress(2)
+                        apMacAddress(2),
+                        apMacAddressSsid(3),
+                        apNameSsid(4),
+                        apName(5),
+                        apGroupName(6),
+                        apLocation(7),
+                        apVlanId(8),
+                        apMacEthAddress(9),
+                        apMacEthAddressSsid(10),
+                        apLabelAddress(11),
+                        apLabelAddressSsid(12)
                     }
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
         "This attribute configures the call station ID information
         sent in RADIUS messages. The value undefined cannot be 
-        set during the write operation." 
+        set during the write operation.
+        ipAddr              : system IP Address
+        macAddr             : system MAC address
+        apMacAddress        : AP Radio MAC Address
+        apMacAddressSsid    : AP radio MAC Address and SSID
+        apNameSsid          : AP name and SSID
+        apName              : AP Name
+        apGroupName         : AP Group Name
+        apLocation          : AP Location
+        apVlanId            : VLAN id
+        apMacEthAddress     : Ethernet MAC address
+        apMacEthAddressSsid : AP EthernetMAC address and SSID
+        apLabelAddress      : AP MAC address on APLabel
+        apLabelAddressSsid  : AP Label MAC address and SSID" 
     ::= { bsnAAA 17 }
 
 bsnAAALocalDatabaseSize OBJECT-TYPE
@@ -11574,7 +12205,7 @@ bsnAAALocalDatabaseSize OBJECT-TYPE
         "This attribute is the total number of entries permitted
         in the local users database. This is the combined total 
         of entries for Local Management Users, Local Net Users, 
-        Disabled Clients (previously known as blacklistclients 
+        Disabled Clients (previously known as blacklistclients
         and the MAC Filters. If the database size limit is 
         reached, no more entries in any of these user lists are 
         allowed to be created. To continue creating more entries,
@@ -11604,7 +12235,7 @@ bsnBlackListClientTable OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "The table listing Wlan Black Listed Clients"
+        "The table listing Wlan excluded Clients"
     ::= { bsnAAA 6 }
 
 bsnBlackListClientEntry OBJECT-TYPE
@@ -11627,7 +12258,7 @@ bsnBlackListClientMacAddress OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "Black Listed Client MAC Address" 
+        "Excluded Client MAC Address" 
     ::= { bsnBlackListClientEntry 1 }
 
 bsnBlackListClientDescription OBJECT-TYPE
@@ -11635,7 +12266,7 @@ bsnBlackListClientDescription OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "Black Listed Client Description" 
+        "Excluded Client Description" 
     ::= { bsnBlackListClientEntry 2 }
 
 bsnBlackListClientRowStatus OBJECT-TYPE
@@ -12085,13 +12716,13 @@ bsnDot11StationBlacklisted NOTIFICATION-TYPE
                     }
     STATUS          current
     DESCRIPTION
-        "The station blacklisted notification shall be sent when the
-        client is blacklisted.  The reason could be repeated auth or 
+        "The station exclusion notification shall be sent when the
+        client is excluded.  The reason could be repeated auth or 
         association failures or IP Address theft.
         The value of the notification shall include the MAC address 
         of the MAC to which the Authentication frame was sent, the 
         MAC and Slot Id of AP that client was associated to and the 
-        reason for black listing."
+        reason for exclusion listing."
    ::= { bsnTraps 52 }
 
 bsnDot11StationAssociate NOTIFICATION-TYPE
@@ -13318,7 +13949,332 @@ bsnStationReasonCode OBJECT-TYPE
                         unSpecifiedQosFailure(200),
                         qosPolicyMismatch(201),
                         inSufficientBandwidth(202),
-                        inValidQosParams(203)
+                        inValidQosParams(203),
+                        noOperation(1000), 
+                        none(1001),
+                        deauthOrDisassocReq(1002),
+                        sessionAwareModuleInitiated(1003),
+                        l3authFail(1004),
+                        apInitiatedDelete(1005),
+                        bssidDown(1006),
+                        capwapDown(1007),
+                        connectTimeout(1008),
+                        mabFailed(1009),
+                        datapathFailure(1010),
+                        wlanChange(1011),
+                        vlanChange(1012),
+                        adminReset(1013),
+                        qosFailure(1014),
+                        keyExchangeTimeout(1015),
+                        groupKeyUpdateTimeout(1016),
+                        maxSaqueries(1017),
+                        restartPurge(1018),
+                        clientBlacklist(1019),
+                        interWncdRoamSuccess(1020),
+                        interWncdRoamFailure(1021),
+                        interCtrlRoamSuccess(1022),
+                        mobilityFailure(1023),
+                        sessionTimeout(1024),
+                        idleTimeout(1025),
+                        userRequest(1026),
+                        nasError(1027),
+                        serviceUnavailable(1028),
+                        mbssidDown(1029),
+                        mmTunnelDown(1030),
+                        dot11vSmartRoamFailed(1031),
+                        dot11vTimerTimeout(1032),
+                        dot11vAssocFailed(1033),
+                        ftAuthResponse(1034),
+                        saeAuthFailure(1035),
+                        dot11UnspecifiedFailure(1036),
+                        dot11FailureIgnoreReq(1037),
+                        dot11CcxQosAddtsNoBandwidth(1038),
+                        dot11CapsUnsupported(1039),
+                        dot11AssocDeniedUnspec(1040),
+                        dot11MaxSta(1041),
+                        dot11DeniedRates(1042),
+                        dot11PoorChannelConditions(1043),
+                        dot11InvalidQosParameter(1044),
+                        dot11InvalidIe(1045),
+                        dot11GroupCipherInvalid(1046),
+                        dot11UnicastCipherInvalid(1047),
+                        dot11AkmpInvalid(1048),
+                        dot11UnsupportedRsnVersion(1049),
+                        dot11InvalidRsnIeCapabilities(1050),
+                        dot11CipherSuiteRejected(1051),
+                        dot11DeniedHtCapabiliies(1052),
+                        dot11InvalidFtActionFrameCount(1053),
+                        dot11InvalidPmkid(1054),
+                        dot11InvalidMdie(1055),
+                        dot11InvalidFtie(1056),
+                        dot11CcxQosPolicy(1057),
+                        dot11CcxInsufficientBandwidth(1058),
+                        dot11CcxInvalidQosParameter(1059),
+                        dot11CcxNonOptimalAssociationChoice(1060),
+                        wiredIappDisassoc(1061),
+                        wiredWgbChange(1062),
+                        wiredVlanChange(1063),
+                        wiredWgbDelete(1064),
+                        avcReanchoring(1065),
+                        wgbClientDirectAssoc(1066),
+                        apUpgrade(1067),
+                        clientDhcpFailure(1068),
+                        clientEapTimeoutFailure(1069),
+                        client8021xFailure(1070),
+                        clientDeviceIdle(1071),
+                        clientCaptivePortalSecurityFailure(1072),
+                        clientDecryptionFailure(1073),
+                        clientInterfaceDisabled(1074),
+                        clientUserTriggeredDisassoc(1075),
+                        clientMiscReason(1076),
+                        clientUnknownReason(1077),
+                        clientPeerTriggered(1078),
+                        clientBeaconLoss(1079),
+                        clientEapIdTimeout(1080),
+                        clientDot1xTimeout(1081),
+                        keyMgmtInvalidFrame(1082),
+                        keyMgmtInstallBit(1083),
+                        keyMgmtErrorBit(1084),
+                        keyMgmtAckBit(1085),
+                        keyMgmtInvalidKey(1086),
+                        keyMgmtSecureBit(1087),
+                        keyMgmtKeyDescVer(1088),
+                        keyMgmtWrongReplayCounter(1089),
+                        keyMgmtNoMicBit(1090),
+                        keyMgmtMicValidation(1091),
+                        keyMgmtPtkComputation(1092),
+                        clientCredentialFailure(1093),
+                        lostCarrier(1094),
+                        reauthFailure(1095),
+                        portAdminDisabled(1096),
+                        supplicantRestart(1097),
+                        ipDownNoIp(1098),
+                        anchorThrottled(1099),
+                        anchorNoMemory(1100),
+                        anchorInvalidMbssid(1101),
+                        anchorCreateReqFail(1102),
+                        dbPopulateFail(1103),
+                        danglingCleanupTimer(1104),
+                        excludeConfig(1105),
+                        excludeAssocFail(1106),
+                        excludeDot11AuthFail(1107),
+                        excludeDot1xTimeout(1108),
+                        excludeDot1xAuthFail(1109),
+                        excludeWebAuthFail(1110),
+                        excludePolicyBindFail(1111),
+                        excludeIpTheft(1112),
+                        excludeMacTheft(1113),
+                        excludeMacAndIpTheft(1114),
+                        excludeQosPolicyFail(1115),
+                        excludeQosPolicyApSendFail(1116),
+                        excludeQosPolicyApBindFail(1117),
+                        excludeQosPolicyApUnbindFail(1118),
+                        excludeStaticIpAnchorFail(1119),
+                        excludeVlanFail(1120),
+                        excludeAclFail(1121),
+                        excludePuntAclFail(1122),
+                        excludeAccountingFail(1123),
+                        excludeCtsFail(1124),
+                        excludeFqdnNoDefFail(1125),
+                        excludeFqdnPostauthMismatchFail(1126),
+                        excludeFqdnPreauthMismatchFail(1127),
+                        excludeFqdnZeroGidFail(1128),
+                        excludeMiscFail(1129),
+                        excludeReauthFailure(1130),
+                        excludeWrongPsk(1131),
+                        excludePolicyFailure(1132),
+                        mnIdleTimeout(1133),
+                        mnClientAclMismatch(1134),
+                        mnApAuthStop(1135),
+                        mnAssocExpiredAtAp(1136),
+                        mn4wayHandshakeFailed(1137),
+                        mnDhcpTimeout(1138),
+                        mnReassocTimeout(1139),
+                        mnSaQueryTimeout(1140),
+                        mnIntraApRoam(1141),
+                        mnChannelSwitchAtAp(1142),
+                        mnDelBadAid(1143),
+                        mnDelRequest(1144),
+                        mnDelIntfReset(1145),
+                        mnDelAllOnSlot(1146),
+                        mnDelReaperRadio(1147),
+                        mnDelSlotDisable(1148),
+                        mnDelMicFail(1149),
+                        mnDelVlanDel(1150),
+                        mnDelChannelChange(1151),
+                        mnDelStopReassoc(1152),
+                        mnDelPakMaxRetry(1153),
+                        mnDelTxDeauth(1154),
+                        mnDelSensorStaTimeout(1155),
+                        mnDelAgeTimeout(1156),
+                        mnDelTxFailThold(1157),
+                        mnDelUplinkRcvTimeout(1158),
+                        mnDelSnsrScanNxtRadio(1159),
+                        mnDelSnsrScanOtherBssid(1160),
+                        aaaServerUnavailable(1161),
+                        aaaNotReady(1162),
+                        noDot1xAuthConfig(1163),
+                        abortReceived(1164),
+                        assocConnectTimeout(1165),
+                        macauthConnectTimeout(1166),
+                        l2authConnectTimeout(1167),
+                        l3authConnectTimeout(1168),
+                        mobilityConnectTimeout(1169),
+                        sIpAnchorConnectTimeout(1170),
+                        smSessionConnectTimeout(1171),
+                        iplearnConnectTimeout(1172),
+                        nackIfidExists(1173),
+                        radioDown(1174),
+                        fabricReject(1175),
+                        guestLanInvalidMbssid(1176),
+                        guestLanNoMemory(1177),
+                        guestLanCreateReqFail(1178),
+                        tunnelEogreReset(1179),
+                        tunnelEogreJoinFail(1180),
+                        tunnelEogreReconciliation(1181),
+                        wiredIdleTimeout(1182),
+                        ipUpdateTimeout(1183),
+                        remoteMobilityDelete(1184),
+                        saeAuthInAssociatedState(1185),
+                        nackIfidMismatch(1186),
+                        tunnelEogreInvalidVlan(1187),
+                        tunnelEogreEmptyDomain(1188),
+                        tunnelEogreInvalidDomain(1189),
+                        tunnelEogreDomainShut(1190),
+                        tunnelEogreInvalidGw(1191),
+                        tunnelEogreGwDown(1192),
+                        tunnelEogreFlexNoActiveGw(1193),
+                        tunnelEogreRuleMatch(1194),
+                        tunnelEogreAaaOverride(1195),
+                        tunnelEogreMspayload(1196),
+                        tunnelEogreHandoffError(1197),
+                        invalidPmkLen(1198),
+                        l3VlanOverrideConnectTimeout(1199),
+                        userTriggeredUnspecified(1200),
+                        userTriggeredPwroffWifioff(1201),
+                        userTriggeredConnectToAnotherSsid(1202),
+                        userTriggeredRemoveSsid(1203),
+                        userTriggeredAirplaneMode(1204),
+                        l2connectionUnspecified(1205),
+                        l2connectionAssociation(1206),
+                        fourWayHandshakeUnspecified(1207),
+                        keyM1Failure(1208),
+                        keyM3Failure(1209),
+                        m3M4KeyXchngTimeout(1210),
+                        dhcpFailUnspecified(1211),
+                        dhcpFailTimeout(1212),
+                        dhcpFailTimeoutAfterRoaming(1213),
+                        dhcpFailLeaseExpired(1214),
+                        dhcpFailNakInRenew(1215),
+                        dhcpFailRenewLeaseWrongIp(1216),
+                        dhcpFailInternalError(1217),
+                        eapFailUnspecified(1218),
+                        eapFailCodeFail(1219),
+                        eapFailInfoNotEntered(1220),
+                        eapFailMschapError(1221),
+                        eapFailSimAuthFail(1222),
+                        eapFailTimeout(1223),
+                        eapFailTlsCertError(1224),
+                        noInternetUnspecified(1225),
+                        noInternetDns(1226),
+                        noInternetArp(1227),
+                        exclusionPolicyTemplateFail(1228),
+                        mnDelAuthExpired(1229),
+                        mnDelDisassoc(1230),
+                        mnDelTxDisassoc(1231),
+                        fastroamMobilityFailure(1232),
+                        roamAcrossPolicyProfileDeny(1233),
+                        dot11AidAllocConflictReq(1234),
+                        zoneChange(1235),
+                        wlanIdAttrMismatch(1236),
+                        easypskAAAUnknown(1237),
+                        easypskUnspecified(1238),
+                        easypskPskMismatch(1239),
+                        easypskRadiusBusy(1240),
+                        easypskLimitReached(1241),
+                        easypskBadFrame(1242),
+                        easypskMissingParameter(1243),
+                        supplicantNameFail(1244),
+                        userNameFail(1245),
+                        serviceSetIdFail(1246),
+                        anchorVlanIdFail(1247),
+                        pskFail(1248),
+                        pskModeFail(1249),
+                        interimIntervalFail(1250),
+                        randomMac(1251),
+                        mnapiplearntimeout(1252),
+                        mnapbyflexgroupchange(1253),
+                        mnapeapollogoff(1254),
+                        mnapeapreqtimeout(1255),
+                        mnap4wayhandshakefailed(1256),
+                        mnapmicvalidation(1257),
+                        mnapwrongreplaycounter(1258),
+                        mnaptunneldown(1259),
+                        mnapinteraproam(1260),
+                        mnapunknownclient(1261),
+                        mnapreauthtimeout(1262),
+                        mnapcontidletimeout(1263),
+                        mnaprldpcleanup(1264),
+                        mnapintraswitchroam(1265),
+                        mnappemcleanup(1266),
+                        mnaprlancentralswitch(1267),
+                        mnaprlandpaddfail(1268),
+                        mnaprlandelete(1269),
+                        mnaprlaninactivetimeout(1270),
+                        mnaprlanmabfailure(1271),
+                        mnapclsmnomemory(1272),
+                        mnapclsmbssidmismatch(1273),
+                        mnapclsmdeletenoacl(1274),
+                        mnapclsmdeletenoparentwgb(1275),
+                        mnapclsmkeyplumbfail(1276),
+                        mnapclsmmeshkeyplumbfail(1277),
+                        mnapclsmdpaddfail(1278),
+                        mnapclsmauthrespreject(1279),
+                        mnapclsmauthrespsendfail(1280),
+                        mnapclsmassocrespsendfail(1281),
+                        mnapclsmassocrespwithfailurestatus(1282),
+                        mnapclsmwebauthtimerexpired(1283),
+                        mnapclsmdot1xtimerexpired(1284),
+                        mnapclsmdeauthdisassocsendfail(1285),
+                        mnapdrivereventclass3recv(1286),
+                        mnapdrivereventpspwhenunauth(1287),
+                        mnapdrivereventioctlerror(1288),
+                        mnapflexftfailure(1289),
+                        mnapclsmdriveraddfail(1290),
+                        mnapdriverclientnotfound(1291),
+                        mnapdrivermgmtpktallocfail(1292),
+                        mnapdriverinvalidcipher(1293),
+                        mnapdriverinvalidaid(1294),
+                        mnapdriverinvalidkey(1295),
+                        mnapdriverfwkeysetfailed(1296),
+                        mnapdriverinvalidhtvhtrates(1297),
+                        mnapdriverinvalidlegacyrates(1298),
+                        mnapdrivernooverlaplegacyrates(1299),
+                        mnapdrivermaxvhtstreams(1300),
+                        mnapdriveraidinuse(1301),
+                        mnapdriverassoctoomany(1302),
+                        mnapdrivercipherattachfail(1303),
+                        mnapdriveralgorithmmismatch(1304),
+                        mnapdriverinvalidkeylength(1305),
+                        mnapdriverinvalidkeyindex(1306),
+                        mnapdriverassocscbnotauthenticated(1307),
+                        mnapdriverstadbinitfailed(1308),
+                        mnapdriveraddingentryfailed(1309),
+                        mnapdriveraddingentryinfirmwarefailed(1310),
+                        mnapreasonapmax(1311),
+                        linklocalbridgevlanfail(1312),
+                        maxstaonap(1313),
+                        maxstaonvap(1314),
+                        maxstaonbssid(1315),
+                        maxstaonradio(1316),
+                        mnapmaxstaonap(1317),
+                        mnapmaxstaonbssid(1318),
+                        mnapmaxstaonradio(1319),
+                        pmkTimeoutOnSTA(1320),
+                        excessarprate(1321),
+                        excessndprate(1322),
+                        vrfvlanMismatch(1323),
+                        dpathencodefailed(1324)
                     }
     MAX-ACCESS      accessible-for-notify
     STATUS          current
@@ -15240,6 +16196,8 @@ bsnEssGroup OBJECT-GROUP
                         bsnDot11Ess80211ePolicySetting,
                         bsnDot11EssWebPassthroughEmail,
                         bsnDot11Ess7920PhoneSupport,
+                        bsnDot11EssNumApsUp,
+                        bsnDot11EssNumApsDown,
                         bsnDot11EssRadiusAuthPrimaryServer,
                         bsnDot11EssRadiusAuthSecondaryServer,
                         bsnDot11EssRadiusAuthTertiaryServer,
@@ -15281,6 +16239,7 @@ bsnEssGroup OBJECT-GROUP
                         bsnMobileStationCcxVersion,
                         bsnMobileStationE2eVersion,
                         bsnMobileStationStatusCode,
+                        bsnMobileStationAAAOverridePassphrase,
                         bsnMobileStationPerRadioPerVapIndex,
                         bsnMobileStationMacAddr,
                         bsnMobileStationRSSI,
@@ -15603,6 +16562,7 @@ bsnGlobalDot11Group OBJECT-GROUP
                         bsnExcessive80211AssocFailures,
                         bsnExcessive80211AuthFailures,
                         bsnExcessive8021xAuthFailures,
+                        bsnExcessive8021xTimeout,
                         bsnExternalPolicyServerFailures,
                         bsnExcessiveWebAuthFailures,
                         bsnIPTheftORReuse,
@@ -15690,6 +16650,7 @@ bsnGlobalDot11Group OBJECT-GROUP
                         bsnGlobalDot11bFastRoamingVoipPercentage,
                         bsnGlobalDot11b80211eMaxBandwidth,
                         bsnGlobalDot11bDTPCSupport,
+                        bsnGlobalDot11bRxSopThreshold,
                         bsnGlobalDot11bMediumOccupancyLimit,
                         bsnGlobalDot11bCFPPeriod,
                         bsnGlobalDot11bCFPMaxDuration,
@@ -15740,6 +16701,7 @@ bsnGlobalDot11Group OBJECT-GROUP
                         bsnGlobalDot11aFastRoamingVoipPercentage,
                         bsnGlobalDot11a80211eMaxBandwidth,
                         bsnGlobalDot11aDTPCSupport,
+                        bsnGlobalDot11aRxSopThreshold,
                         bsnGlobalDot11aMediumOccupancyLimit,
                         bsnGlobalDot11aCFPPeriod,
                         bsnGlobalDot11aCFPMaxDuration,
@@ -15760,6 +16722,7 @@ bsnGlobalDot11Group OBJECT-GROUP
                         bsnGlobalDot11hPowerConstraint,
                         bsnGlobalDot11hChannelSwitchEnable,
                         bsnGlobalDot11hChannelSwitchMode,
+                        bsnGlobalDot11SystemMobileStations,
                         bsnRrmDot11aGlobalAutomaticGrouping
                     }
     STATUS          deprecated
@@ -16343,6 +17306,8 @@ bsnEssGroupRev1 OBJECT-GROUP
                         bsnDot11Ess80211ePolicySetting,
                         bsnDot11EssWebPassthroughEmail,
                         bsnDot11Ess7920PhoneSupport,
+                        bsnDot11EssNumApsUp,
+                        bsnDot11EssNumApsDown,
                         bsnDot11EssRadiusAuthPrimaryServer,
                         bsnDot11EssRadiusAuthSecondaryServer,
                         bsnDot11EssRadiusAuthTertiaryServer,
@@ -16384,6 +17349,7 @@ bsnEssGroupRev1 OBJECT-GROUP
                         bsnMobileStationCcxVersion,
                         bsnMobileStationE2eVersion,
                         bsnMobileStationStatusCode,
+                        bsnMobileStationAAAOverridePassphrase,
                         bsnMobileStationPerRadioPerVapIndex,
                         bsnMobileStationMacAddr,
                         bsnMobileStationRSSI,
@@ -16412,6 +17378,7 @@ bsnEssGroupRev1 OBJECT-GROUP
                         bsnRogueAPChannel,
                         bsnRogueAPDetectingAPName,
                         bsnRogueAPChannelWidth,
+                        bsnRogueAPPhysicalAPSlot,
                         bsnRogueAPAirespaceAPMacAddress,
                         bsnRogueAPAirespaceAPSlotId,
                         bsnRogueAPRadioType,
@@ -16446,6 +17413,7 @@ bsnEssGroupRev1 OBJECT-GROUP
                         bsnRogueClientAirespaceAPRSSI,
                         bsnRogueClientAirespaceAPLastHeard,
                         bsnRogueClientAirespaceAPSNR,
+                        bsnRogueClientPhysicalAPSlot,
                         bsnRogueClientTotalDetectingAPs,
                         bsnRogueClientFirstReported,
                         bsnRogueClientLastReported,
@@ -16530,6 +17498,7 @@ bsnGlobalDot11GroupRev1 OBJECT-GROUP
                         bsnExcessive80211AssocFailures,
                         bsnExcessive80211AuthFailures,
                         bsnExcessive8021xAuthFailures,
+                        bsnExcessive8021xTimeout,
                         bsnExternalPolicyServerFailures,
                         bsnExcessiveWebAuthFailures,
                         bsnIPTheftORReuse,
@@ -16617,6 +17586,7 @@ bsnGlobalDot11GroupRev1 OBJECT-GROUP
                         bsnGlobalDot11bFastRoamingVoipPercentage,
                         bsnGlobalDot11b80211eMaxBandwidth,
                         bsnGlobalDot11bDTPCSupport,
+                        bsnGlobalDot11bRxSopThreshold,
                         bsnGlobalDot11bMediumOccupancyLimit,
                         bsnGlobalDot11bCFPPeriod,
                         bsnGlobalDot11bCFPMaxDuration,
@@ -16664,6 +17634,7 @@ bsnGlobalDot11GroupRev1 OBJECT-GROUP
                         bsnGlobalDot11aFastRoamingVoipPercentage,
                         bsnGlobalDot11a80211eMaxBandwidth,
                         bsnGlobalDot11aDTPCSupport,
+                        bsnGlobalDot11aRxSopThreshold,
                         bsnGlobalDot11aMediumOccupancyLimit,
                         bsnGlobalDot11aCFPPeriod,
                         bsnGlobalDot11aCFPMaxDuration,
@@ -16680,7 +17651,8 @@ bsnGlobalDot11GroupRev1 OBJECT-GROUP
                         bsnGlobalDot11aChannelAgilityEnabled,
                         bsnGlobalDot11hPowerConstraint,
                         bsnGlobalDot11hChannelSwitchEnable,
-                        bsnGlobalDot11hChannelSwitchMode
+                        bsnGlobalDot11hChannelSwitchMode,
+                        bsnGlobalDot11SystemMobileStations
                     }
     STATUS          current
     DESCRIPTION
@@ -17237,5 +18209,4 @@ bsnWrasObsTrap NOTIFICATION-GROUP
     ::= { bsnWrasGroups 21 }
 
 END
-
 

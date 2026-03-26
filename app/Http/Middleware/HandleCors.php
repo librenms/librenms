@@ -42,9 +42,9 @@ class HandleCors extends \Illuminate\Http\Middleware\HandleCors
     public function __construct(Container $container, CorsService $cors)
     {
         // load legacy config settings before booting the CorsService
-        if (\LibreNMS\Config::get('api.cors.enabled')) {
+        if (\App\Facades\LibrenmsConfig::get('api.cors.enabled')) {
             $laravel_config = $container['config']->get('cors');
-            $legacy = \LibreNMS\Config::get('api.cors');
+            $legacy = \App\Facades\LibrenmsConfig::get('api.cors');
 
             $laravel_config['paths'][] = 'api/*';
 

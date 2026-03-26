@@ -41,8 +41,8 @@ class Api extends Transport
         $password = $this->config['api-auth-password'];
         $as_form = $this->config['api-as-form'] ?? false;
 
-        $method = strtolower($this->config['api-method']);
-        $host = explode('?', $this->config['api-url'], 2)[0]; //we don't use the parameter part, cause we build it out of options.
+        $method = strtolower((string) $this->config['api-method']);
+        $host = explode('?', (string) $this->config['api-url'], 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
         //get each line of key-values and process the variables for Options
         $query = $this->parseUserOptions($this->config['api-options'], $alert_data);

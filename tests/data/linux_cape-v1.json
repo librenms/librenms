@@ -462,7 +462,7 @@
                 },
                 {
                     "metric": "s3files_written",
-                    "value": 1.0,
+                    "value": 1,
                     "value_prev": null,
                     "app_type": "cape"
                 },

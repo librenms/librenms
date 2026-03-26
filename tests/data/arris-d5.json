@@ -4837,8 +4837,8 @@
                     "ifName": "Internal Interface",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -5037,8 +5037,8 @@
                     "ifName": "CAS",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -7437,8 +7437,8 @@
                     "ifName": "Switch 0/24",
                     "portName": null,
                     "ifIndex": 27,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -7537,8 +7537,8 @@
                     "ifName": "DTI 1",
                     "portName": null,
                     "ifIndex": 28,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7637,8 +7637,8 @@
                     "ifName": "DTI 2",
                     "portName": null,
                     "ifIndex": 29,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7737,8 +7737,8 @@
                     "ifName": "Subinterface: FastEthernet 0/1.0",
                     "portName": null,
                     "ifIndex": 30,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7837,8 +7837,8 @@
                     "ifName": "Subinterface: FastEthernet 0/2.0",
                     "portName": null,
                     "ifIndex": 31,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -7937,8 +7937,8 @@
                     "ifName": "Subinterface: GigabitEthernet 0/1.0",
                     "portName": null,
                     "ifIndex": 32,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -8037,8 +8037,8 @@
                     "ifName": "Subinterface: GigabitEthernet 0/2.0",
                     "portName": null,
                     "ifIndex": 33,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -8137,8 +8137,8 @@
                     "ifName": "Subinterface: GigabitEthernet 0/3.0",
                     "portName": null,
                     "ifIndex": 34,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -8237,8 +8237,8 @@
                     "ifName": "Subinterface: GigabitEthernet 0/4.0",
                     "portName": null,
                     "ifIndex": 35,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -8337,8 +8337,8 @@
                     "ifName": "Subinterface: GigabitEthernet 0/2.1",
                     "portName": null,
                     "ifIndex": 36,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -8437,8 +8437,8 @@
                     "ifName": "Subinterface: GigabitEthernet 0/2.2",
                     "portName": null,
                     "ifIndex": 37,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -8537,8 +8537,8 @@
                     "ifName": "Subinterface: GigabitEthernet 0/2.3",
                     "portName": null,
                     "ifIndex": 38,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -8637,8 +8637,8 @@
                     "ifName": "Subinterface: GigabitEthernet 0/2.4",
                     "portName": null,
                     "ifIndex": 39,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -8737,8 +8737,8 @@
                     "ifName": "Subinterface: GigabitEthernet 0/2.5",
                     "portName": null,
                     "ifIndex": 40,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -10570,77 +10570,77 @@
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-20",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 21,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-21",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 22,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-22",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 23,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-23",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 32,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-32",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 33,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-33",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4090,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-4090",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4091,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-4091",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4092,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-4092",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4093,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-4093",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4094,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-4094",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -11155,6 +11155,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "2009-6-18,0:0:0.0,+0:0",
                     "ifIndex": null
                 },
                 {
@@ -11174,6 +11175,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11193,6 +11195,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11212,6 +11215,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11231,6 +11235,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11250,6 +11255,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11269,6 +11275,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11288,6 +11295,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11307,6 +11315,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11326,6 +11335,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11345,6 +11355,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11364,6 +11375,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11383,6 +11395,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11402,6 +11415,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11421,6 +11435,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11440,6 +11455,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11459,6 +11475,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "2009-6-17,0:0:0.0,+0:0",
                     "ifIndex": null
                 },
                 {
@@ -11478,6 +11495,7 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11497,6 +11515,7 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11516,6 +11535,7 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11535,6 +11555,7 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11554,6 +11575,7 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11573,6 +11595,7 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11592,6 +11615,7 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11611,6 +11635,7 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11630,6 +11655,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "2008-12-4,0:0:0.0,+0:0",
                     "ifIndex": null
                 },
                 {
@@ -11649,6 +11675,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11668,6 +11695,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11687,6 +11715,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11706,6 +11735,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11725,6 +11755,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11744,6 +11775,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11763,6 +11795,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11782,6 +11815,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11801,6 +11835,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11820,6 +11855,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11839,6 +11875,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11858,6 +11895,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11877,6 +11915,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11896,6 +11935,7 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11915,6 +11955,7 @@
                     "entPhysicalContainedIn": 213,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11934,6 +11975,7 @@
                     "entPhysicalContainedIn": 213,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11953,6 +11995,7 @@
                     "entPhysicalContainedIn": 213,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11972,6 +12015,7 @@
                     "entPhysicalContainedIn": 213,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11991,6 +12035,7 @@
                     "entPhysicalContainedIn": 214,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12010,6 +12055,7 @@
                     "entPhysicalContainedIn": 214,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12029,6 +12075,7 @@
                     "entPhysicalContainedIn": 214,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12048,6 +12095,7 @@
                     "entPhysicalContainedIn": 214,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12067,6 +12115,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "2009-6-1,0:0:0.0,+0:0",
                     "ifIndex": null
                 },
                 {
@@ -12086,6 +12135,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12105,6 +12155,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12124,6 +12175,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12143,6 +12195,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12162,6 +12215,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12181,6 +12235,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12200,6 +12255,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12219,6 +12275,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12238,6 +12295,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12257,6 +12315,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12276,6 +12335,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12295,6 +12355,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12314,6 +12375,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12333,6 +12395,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12352,6 +12415,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12371,6 +12435,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12390,6 +12455,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12409,6 +12475,7 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12428,6 +12495,7 @@
                     "entPhysicalContainedIn": 11,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "2009-6-16,0:0:0.0,+0:0",
                     "ifIndex": null
                 },
                 {
@@ -12447,6 +12515,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12466,6 +12535,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12485,6 +12555,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12504,6 +12575,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12523,6 +12595,7 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12542,6 +12615,7 @@
                     "entPhysicalContainedIn": 13,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12561,6 +12635,7 @@
                     "entPhysicalContainedIn": 1200,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12580,6 +12655,7 @@
                     "entPhysicalContainedIn": 1200,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12599,6 +12675,7 @@
                     "entPhysicalContainedIn": 1200,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12618,6 +12695,7 @@
                     "entPhysicalContainedIn": 1200,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12637,6 +12715,7 @@
                     "entPhysicalContainedIn": 1200,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12656,10 +12735,59 @@
                     "entPhysicalContainedIn": 15,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 }
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "169.254.0.8",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.0.0/24",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.20.24.143",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.20.24.0/24",
+                    "ifIndex": 33
+                },
+                {
+                    "ipv4_address": "192.168.125.3",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.125.0/24",
+                    "ifIndex": 36
+                },
+                {
+                    "ipv4_address": "192.168.125.4",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.125.0/24",
+                    "ifIndex": 39
+                },
+                {
+                    "ipv4_address": "192.168.125.5",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.125.0/24",
+                    "ifIndex": 40
+                },
+                {
+                    "ipv4_address": "192.168.250.235",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.250.0/24",
+                    "ifIndex": 30
+                }
+            ]
+        }
     }
 }

@@ -8,37 +8,43 @@ IMPORTS
         FROM SNMPv2-TC;
 
 lldpV2TcMIB MODULE-IDENTITY
-    LAST-UPDATED "200906080000Z" -- June 08, 2009 
--- <<Editor's Note: Date will need updating before publication>>
-    ORGANIZATION "IEEE 802.1 Working Group"
+    LAST-UPDATED "201603110000Z" -- March 11, 2016 
+ORGANIZATION "IEEE 802.1 Working Group"
     CONTACT-INFO 
-            "WG-URL: http://grouper.ieee.org/groups/802/1/index.html
-             WG-EMail: STDS-802-1-L@LISTSERV.IEEE.ORG
+        "  WG-URL: http://www.ieee802.org/1/
+         WG-EMail: stds-802-1-L@ieee.org
 
-             Contact: Tony Jeffree
-             Postal:  11a Poplar Grove
-                      Sale 
-                      Cheshire M33 3AX
-                      UK
-             Tel:     +44-161-973-4278
-             E-mail:  tony@jeffree.co.uk"
+          Contact: IEEE 802.1 Working Group Chair
+           Postal: C/O IEEE 802.1 Working Group
+                   IEEE Standards Association
+                   445 Hoes Lane
+                   Piscataway
+                   NJ 08854
+                   USA
+           E-mail: stds-802-1-L@ieee.org"
     DESCRIPTION
             "Textual conventions used throughout the IEEE Std 802.1AB
             version 2 and later MIB modules.
 
             Unless otherwise indicated, the references in this
-            MIB module are to IEEE 802.1AB-2009.
+            MIB module are to IEEE 802.1AB-2016.
 
             The TCs in this MIB are taken from the original LLDP-MIB,
             LLDP-EXT-DOT1-MIB, and LLDP-EXT-DOT3-MIB published in
-            IEEE Std 802-1D-2005, with the addition of TCs to support
+            IEEE Std 802-1D-2004, with the addition of TCs to support
             the management address table. They have been made available
             as a separate TC MIB module to facilitate referencing from
             other MIB modules.
 
-            Copyright (C) IEEE (2009). This version of this MIB module
-            is published as subclause 11.5.1 of IEEE Std 802.1AB-2009;
+            Copyright (C) IEEE (2016). This version of this MIB module
+            is published as 11.5.1 of IEEE Std 802.1AB-2016;
             see the standard itself for full legal notices."
+
+    REVISION "201603110000Z" -- March 11, 2016 
+
+    DESCRIPTION
+            "Published as part of IEEE Std 802.1AB-2016.
+            This revision updated referencees."
 
     REVISION "200906080000Z" -- June 08, 2009
 
@@ -71,7 +77,7 @@ LldpV2ChassisIdSubtype ::= TEXTUAL-CONVENTION
 
             The enumeration 'chassisComponent(1)' represents a chassis
             identifier based on the value of entPhysicalAlias object
-            (defined in IETF RFC 4133) for a chassis component (i.e.,
+            (defined in IETF RFC 6933) for a chassis component (i.e.,
             an entPhysicalClass value of 'chassis(3)').
 
             The enumeration 'interfaceAlias(2)' represents a chassis
@@ -80,7 +86,7 @@ LldpV2ChassisIdSubtype ::= TEXTUAL-CONVENTION
 
             The enumeration 'portComponent(3)' represents a chassis
             identifier based on the value of entPhysicalAlias object
-            (defined in IETF RFC 4133) for a port or backplane
+            (defined in IETF RFC 6933) for a port or backplane
             component (i.e., entPhysicalClass value of 'port(10)' or
             'backplane(4)'), within the containing chassis.
 
@@ -126,7 +132,7 @@ LldpV2ChassisId ::= TEXTUAL-CONVENTION
             If the associated LldpChassisIdSubtype object has a value of
             'chassisComponent(1)', then the octet string identifies
             a particular instance of the entPhysicalAlias object
-            (defined in IETF RFC 4133) for a chassis component (i.e.,
+            (defined in IETF RFC 6933) for a chassis component (i.e.,
             an entPhysicalClass value of 'chassis(3)').
 
             If the associated LldpChassisIdSubtype object has a value
@@ -139,7 +145,7 @@ LldpV2ChassisId ::= TEXTUAL-CONVENTION
             If the associated LldpChassisIdSubtype object has a value
             of 'portComponent(3)', then the octet string identifies a
             particular instance of the entPhysicalAlias object (defined
-            in IETF RFC 4133) for a port or backplane component within
+            in IETF RFC 6933) for a port or backplane component within
             the containing chassis.
 
             If the associated LldpChassisIdSubtype object has a value of
@@ -180,7 +186,7 @@ LldpV2PortIdSubtype ::= TEXTUAL-CONVENTION
 
             The enumeration 'portComponent(2)' represents a port
             identifier based on the value of entPhysicalAlias (defined in
-            IETF RFC 4133) for a port component (i.e., entPhysicalClass
+            IETF RFC 6933) for a port component (i.e., entPhysicalClass
             value of 'port(10)'), within the containing chassis.
 
             The enumeration 'macAddress(3)' represents a port identifier
@@ -199,7 +205,7 @@ LldpV2PortIdSubtype ::= TEXTUAL-CONVENTION
 
             The enumeration 'agentCircuitId(6)' represents a port
             identifier based on the agent-local identifier of the circuit
-            (defined in RFC 3046), detected by the agent and associated
+            (defined in IETF RFC 3046), detected by the agent and associated
             with a particular port.
 
             The enumeration 'local(7)' represents a port identifier
@@ -233,7 +239,7 @@ LldpV2PortId ::= TEXTUAL-CONVENTION
             If the associated LldpPortIdSubtype object has a value of
             'portComponent(2)', then the octet string identifies a
             particular instance of the entPhysicalAlias object (defined
-            in IETF RFC 4133) for a port or backplane component.
+            in IETF RFC 6933) for a port or backplane component.
 
             If the associated LldpPortIdSubtype object has a value of
             'macAddress(3)', then this string identifies a particular
@@ -256,7 +262,7 @@ LldpV2PortId ::= TEXTUAL-CONVENTION
 
             If the associated LldpPortIdSubtype object has a value of
             'agentCircuitId(6)', then this string identifies a agent-local
-            identifier of the circuit (defined in RFC 3046).
+            identifier of the circuit (defined in IETF RFC 3046).
 
             If the associated LldpPortIdSubtype object has a value of
             'local(7)', then this string identifies a locally
@@ -370,21 +376,6 @@ LldpV2DestAddressTableIndex ::= TEXTUAL-CONVENTION
             by fields of type  ifIndex, in order to associate 
             a destination address with each row of the table."
     SYNTAX  Unsigned32(1..4096)
-
-LldpV2LinkAggStatusMap ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION
-            "This TC describes the link aggregation status.
-
-            The bit 'aggCapable(0)' indicates the link is capable of being
-            aggregated. 
-
-            The bit 'aggEnabled(1)' indicates the link is currently in
-            aggregation."
-    SYNTAX  BITS {
-            aggCapable(0),
-            aggEnabled(1)
-    }
 
 LldpV2PowerPortClass ::= TEXTUAL-CONVENTION
     STATUS      current

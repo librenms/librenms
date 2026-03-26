@@ -1,10 +1,10 @@
-mib: PNETMOD-MIB
 modules:
     sensors:
         temperature:
             data:
                 -
-                    oid: accuTemperature
+                    oid: PNETMOD-MIB::accuTemperature
+                    value: PNETMOD-MIB::accuTemperature
                     num_oid: '.1.3.6.1.4.1.27533.5.3.3.{{ $index }}'
                     index: 'accuTemperature.{{ $index }}'
                     descr: Temperature
@@ -12,56 +12,68 @@ modules:
 
                     skip_values:
                         -
-                            oid: accuTemperature
+                            oid: PNETMOD-MIB::accuTemperature
                             op: '>='
                             value: 100000
 
         state:
             data:
                 -
-                    oid: powerSourceState
+                    oid: PNETMOD-MIB::powerSourceState
+                    value: PNETMOD-MIB::powerSourceState
                     num_oid: '.1.3.6.1.4.1.27533.5.2.1.{{ $index }}'
                     index: 'powerSourceState.{{ $index }}'
+                    state_name: powerSourceState
                     descr: 'Power state'
                     states:
                         - { descr: Battery, graph: 0, value: 1, generic: 1 }
                         - { descr: Online, graph: 0, value: 0, generic: 0 }
                 -
-                    oid: gridState
+                    oid: PNETMOD-MIB::gridState
+                    value: PNETMOD-MIB::gridState
                     num_oid: '.1.3.6.1.4.1.27533.5.1.1.{{ $index }}'
                     index: 'gridState.{{ $index }}'
+                    state_name: gridState
                     descr: 'Grid state'
                     states:
                         - { descr: Fail, graph: 0, value: 1, generic: 1 }
                         - { descr: Ok, graph: 0, value: 0, generic: 0 }
                 -
-                    oid: gridFuse
+                    oid: PNETMOD-MIB::gridFuse
+                    value: PNETMOD-MIB::gridFuse
                     num_oid: '.1.3.6.1.4.1.27533.5.1.2.{{ $index }}'
                     index: 'gridFuse.{{ $index }}'
+                    state_name: gridFuse
                     descr: 'Grid fuse state'
                     states:
                         - { descr: Fail, graph: 0, value: 1, generic: 1 }
                         - { descr: Ok, graph: 0, value: 0, generic: 0 }
                 -
-                    oid: outState
+                    oid: PNETMOD-MIB::outState
+                    value: PNETMOD-MIB::outState
                     num_oid: '.1.3.6.1.4.1.27533.5.4.2.{{ $index }}'
                     index: 'outState.{{ $index }}'
+                    state_name: outState
                     descr: 'Output state'
                     states:
                         - { descr: On, graph: 0, value: 1, generic: 0 }
                         - { descr: Off, graph: 0, value: 2, generic: 1 }
                 -
-                    oid: outFuse
+                    oid: PNETMOD-MIB::outFuse
+                    value: PNETMOD-MIB::outFuse
                     num_oid: '.1.3.6.1.4.1.27533.5.4.1.{{ $index }}'
                     index: 'outFuse.{{ $index }}'
+                    state_name: outFuse
                     descr: 'Output fuse state'
                     states:
                         - { descr: Fail, graph: 0, value: 1, generic: 1 }
                         - { descr: Ok, graph: 0, value: 0, generic: 0 }
                 -
-                    oid: accuFuse
+                    oid: PNETMOD-MIB::accuFuse
+                    value: PNETMOD-MIB::accuFuse
                     num_oid: '.1.3.6.1.4.1.27533.5.3.4.{{ $index }}'
                     index: 'accuFuse.{{ $index }}'
+                    state_name: accuFuse
                     descr: 'Accumulator fuse state'
                     states:
                         - { descr: Fail, graph: 0, value: 1, generic: 1 }
@@ -70,13 +82,15 @@ modules:
         current:
             data:
                 -
-                    oid: powerSourceCurrent
+                    oid: PNETMOD-MIB::powerSourceCurrent
+                    value: PNETMOD-MIB::powerSourceCurrent
                     num_oid: '.1.3.6.1.4.1.27533.5.2.2.{{ $index }}'
                     index: 'powerSourceCurrent.{{ $index }}'
                     descr: 'Power source current'
                     divisor: 10
                 -
-                    oid: accuCurrent
+                    oid: PNETMOD-MIB::accuCurrent
+                    value: PNETMOD-MIB::accuCurrent
                     num_oid: '.1.3.6.1.4.1.27533.5.3.2.{{ $index }}'
                     index: 'accuCurrent.{{ $index }}'
                     descr: 'Charge current'
@@ -85,7 +99,8 @@ modules:
         voltage:
             data:
                 -
-                    oid: accuVoltage
+                    oid: PNETMOD-MIB::accuVoltage
+                    value: PNETMOD-MIB::accuVoltage
                     num_oid: '.1.3.6.1.4.1.27533.5.3.1.{{ $index }}'
                     index: 'accuVoltage.{{ $index }}'
                     descr: 'Voltage'

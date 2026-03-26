@@ -3,10 +3,6 @@
 $unit_text = 'Bytes';
 
 $stats_list = [
-    'bytes_max' => [
-        'stat' => 'bytes_max',
-        'descr' => 'Max',
-    ],
     'bytes_mean' => [
         'stat' => 'bytes_mean',
         'descr' => 'Mean',

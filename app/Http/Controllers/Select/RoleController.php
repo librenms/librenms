@@ -33,6 +33,8 @@ use Spatie\Permission\Models\Role;
 
 class RoleController extends SelectController
 {
+    protected ?string $idField = 'name';
+
     protected function searchFields(Request $request): array
     {
         return ['name'];
@@ -40,7 +42,7 @@ class RoleController extends SelectController
 
     protected function baseQuery(Request $request): \Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder
     {
-        $this->authorize('viewAny', Role::class);
+        $this->authorize('viewAll', Role::class);
 
         if (Role::exists()) {
             return Role::query()->select('name');

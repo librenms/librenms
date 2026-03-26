@@ -46,13 +46,13 @@ class Nagios extends Transport
 
         $format = '';
         $format .= "[HOSTPERFDATA]\t";
-        $format .= strtotime($alert_data['timestamp']) . "\t";
+        $format .= strtotime((string) $alert_data['timestamp']) . "\t";
         $format .= $alert_data['hostname'] . "\t";
-        $format .= md5($alert_data['rule']) . "\t"; //FIXME: Better entity
+        $format .= md5((string) $alert_data['rule']) . "\t"; //FIXME: Better entity
         $format .= ($alert_data['state'] ? $alert_data['severity'] : 'ok') . "\t";
         $format .= "0\t";
         $format .= "0\t";
-        $format .= str_replace("\n", '', nl2br($alert_data['msg'])) . "\t";
+        $format .= str_replace("\n", '', nl2br((string) $alert_data['msg'])) . "\t";
         $format .= 'NULL'; //FIXME: What's the HOSTPERFDATA equivalent for LibreNMS? Oo
         $format .= "\n";
 

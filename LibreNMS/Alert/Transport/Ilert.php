@@ -53,10 +53,10 @@ class Ilert extends Transport
             'alertKey' => (string) $alert_data['alert_id'],
             'summary' => $alert_data['title'],
             'details' => $alert_data['msg'],
-            'priority' => ($alert_data['severity'] == 'Critical') ? 'HIGH' : 'LOW',
+            'priority' => ($alert_data['severity'] == 'critical') ? 'HIGH' : 'LOW',
         ];
 
-        $tmp_msg = json_decode($alert_data['msg'], true);
+        $tmp_msg = json_decode((string) $alert_data['msg'], true);
         if (isset($tmp_msg['summary']) && isset($tmp_msg['details'])) {
             $data = array_merge($data, $tmp_msg);
         }

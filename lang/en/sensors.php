@@ -150,9 +150,9 @@ return [
         'unit' => 'dBmV',
         'unit_long' => 'Decibel-Millivolts',
     ],
-    'toner' => [
-        'short' => 'Toner',
-        'long' => 'Toner',
+    'printer-supply' => [
+        'short' => 'Printer',
+        'long' => 'Printer Supplies',
         'unit' => '%',
         'unit_long' => 'Percent',
     ],
@@ -178,10 +178,12 @@ return [
         'long' => 'Temperature',
         'unit' => '°C',
         'unit_long' => '° Celsius',
+        'unit_f' => '°F',
+        'unit_long_f' => '° Fahrenheit',
     ],
     'voltage' => [
         'short' => 'Voltage',
-        'long' => 'voltage',
+        'long' => 'Voltage',
         'unit' => 'V',
         'unit_long' => 'Volts',
     ],
@@ -196,5 +198,11 @@ return [
         'long' => 'Percent',
         'unit' => '%',
         'unit_long' => 'Percent',
+    ],
+    'signal_loss' => [
+        'short' => 'SL',
+        'long' => 'Signal Loss',
+        'unit' => 'dB',
+        'unit_long' => 'Decibels',
     ],
 ];

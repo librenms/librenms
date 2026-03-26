@@ -1,7 +1,6 @@
-mib: PROSTAR-PWM:TRISTAR
 modules:
     os:
-        hardware: 
+        hardware:
             - PROSTAR-PWM::subModel.0
             - TRISTAR::subModel.0
         serial:

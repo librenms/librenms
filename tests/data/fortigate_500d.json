@@ -8,7 +8,7 @@
                     "sysDescr": "",
                     "sysContact": "<private>",
                     "version": "v5.6.6,build1630,180913 (GA)",
-                    "hardware": "FGT_500D",
+                    "hardware": "FortiGate 500D",
                     "features": null,
                     "location": "<private>",
                     "os": "fortigate",
@@ -4537,8 +4537,8 @@
                     "ifName": "modem",
                     "portName": null,
                     "ifIndex": 19,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -4637,8 +4637,8 @@
                     "ifName": "ssl.root",
                     "portName": null,
                     "ifIndex": 22,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -4737,8 +4737,8 @@
                     "ifName": "npu0_vlink0",
                     "portName": null,
                     "ifIndex": 23,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -4837,8 +4837,8 @@
                     "ifName": "npu0_vlink1",
                     "portName": null,
                     "ifIndex": 24,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -5137,8 +5137,8 @@
                     "ifName": "KMB.canteen",
                     "portName": null,
                     "ifIndex": 27,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -5337,8 +5337,8 @@
                     "ifName": "KMB_LDAP",
                     "portName": null,
                     "ifIndex": 29,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6648,7 +6648,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 25
                 }
             ],
             "ospf_instances": [
@@ -6674,7 +6674,7 @@
             "ospf_areas": [
                 {
                     "ospfAreaId": "0.0.0.16",
-                    "ospfAuthType": "NULL",
+                    "ospfAuthType": null,
                     "ospfImportAsExtern": "importNssa",
                     "ospfSpfRuns": 19,
                     "ospfAreaBdrRtrCount": 2,
@@ -6771,6 +6771,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Fortinet",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -6790,6 +6791,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1
                 },
                 {
@@ -6809,6 +6811,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2
                 },
                 {
@@ -6828,6 +6831,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 3
                 },
                 {
@@ -6847,6 +6851,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 4
                 },
                 {
@@ -6866,6 +6871,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 5
                 },
                 {
@@ -6885,6 +6891,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 6
                 },
                 {
@@ -6904,6 +6911,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 7
                 },
                 {
@@ -6923,6 +6931,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 8
                 },
                 {
@@ -6942,6 +6951,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 9
                 },
                 {
@@ -6961,6 +6971,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 10
                 },
                 {
@@ -6980,6 +6991,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 11
                 },
                 {
@@ -6999,6 +7011,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 12
                 },
                 {
@@ -7018,6 +7031,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 13
                 },
                 {
@@ -7037,6 +7051,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 14
                 },
                 {
@@ -7056,6 +7071,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 15
                 },
                 {
@@ -7075,6 +7091,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 16
                 },
                 {
@@ -7094,6 +7111,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 17
                 },
                 {
@@ -7113,6 +7131,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 18
                 },
                 {
@@ -7132,6 +7151,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 19
                 },
                 {
@@ -7151,6 +7171,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 20
                 },
                 {
@@ -7170,10 +7191,104 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 21
                 }
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.253.16.100",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.253.16.0/24",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.30.101.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.30.101.0/24",
+                    "ifIndex": 26
+                },
+                {
+                    "ipv4_address": "172.30.102.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.30.102.0/24",
+                    "ifIndex": 27
+                },
+                {
+                    "ipv4_address": "172.30.113.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.30.113.0/24",
+                    "ifIndex": 29
+                },
+                {
+                    "ipv4_address": "192.168.106.93",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "192.168.106.92/30",
+                    "ifIndex": 28
+                },
+                {
+                    "ipv4_address": "192.168.107.225",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "192.168.107.224/29",
+                    "ifIndex": 25
+                },
+                {
+                    "ipv4_address": "192.168.2.99",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.2.0/24",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "220.241.122.1",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "220.241.122.0/29",
+                    "ifIndex": 13
+                }
+            ]
+        }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 25,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 25,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 26,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 28,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 28,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
     }
 }

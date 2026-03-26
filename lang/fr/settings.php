@@ -376,8 +376,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -719,9 +719,6 @@ return [
             'description' => 'Suffixe de nom de fichier',
             'help' => 'This is a very important bit as device names in NfSen are limited to 21 characters. This means full domain names for devices can be very problematic to squeeze in, so therefor this chunk is usually removed.',
         ],
-        'nmap' => [
-            'description' => 'Chemin vers `nmap`',
-        ],
         'own_hostname' => [
             'description' => 'Nom d\'hôte LibreNMS',
             'help' => 'Doit être configuré avec le nom d\'hôte/IP du serveur LibreNMS.',
@@ -762,9 +759,6 @@ return [
                     'description' => 'Activer les permissions par groupes d\'équipements dynamiques',
                 ],
             ],
-        ],
-        'ping' => [
-            'description' => 'Chemin vers `ping`',
         ],
         'poller_modules' => [
             'unix-agent' => [
@@ -836,8 +830,8 @@ return [
             'slas' => [
                 'description' => 'Service Level Agreement Tracking',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cipsec-tunnels' => [
                 'description' => 'Ipsec Tunnels',
@@ -950,9 +944,6 @@ return [
         'rrdtool_tune' => [
             'description' => 'Configurer tous les RRDs d\'interfaces pour utiliser la valuer `max`',
             'help' => 'Auto tune maximum value for rrd port files',
-        ],
-        'sfdp' => [
-            'description' => 'Chemin vers `sfdp`',
         ],
         'site_style' => [
             'description' => 'Changer la feuille de style',
@@ -1117,9 +1108,6 @@ return [
                 'description' => 'Configurer la hauteur minimale',
                 'help' => 'Hauteur minimale des graphes (défaut: 300)',
             ],
-        ],
-        'whois' => [
-            'description' => 'Chemin vers `whois`',
         ],
     ],
     'twofactor' => [

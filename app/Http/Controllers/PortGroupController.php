@@ -45,7 +45,7 @@ class PortGroupController extends Controller
             'name' => 'required|string|unique:port_groups',
         ]);
 
-        $portGroup = PortGroup::make($request->only(['name', 'desc']));
+        $portGroup = new PortGroup($request->only(['name', 'desc']));
         $portGroup->save();
 
         $toast->success(__('Port Group :name created', ['name' => $portGroup->name]));
@@ -80,7 +80,7 @@ class PortGroupController extends Controller
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('port_groups', 'name')->where(function ($query) use ($portGroup) {
+                Rule::unique('port_groups', 'name')->where(function ($query) use ($portGroup): void {
                     $query->where('id', '!=', $portGroup->id);
                 }),
             ],

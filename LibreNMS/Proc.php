@@ -183,7 +183,7 @@ class Proc
                 if (is_resource($this->_pipes[0])) {
                     $this->sendInput($this->checkAddEOL($command));
                 }
-            } catch (\ErrorException $e) {
+            } catch (\ErrorException) {
                 // might have closed already
             }
         }

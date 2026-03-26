@@ -32,7 +32,7 @@
                             <td><img src="{{ asset($device->icon) }}" width="32px" height="32px"></td>
                             <td class="device-name">{{ $device->displayName() }}</td>
                             <td>{{ $device->hardware }} {{ $device->features }}</td>
-                            <td>{{ $device->formatDownUptime(true) }}<br>{{ substr($device->location, 0, 32) }}</td>
+                            <td>{{ $device->formatDownUptime(true) }}<br>{{ substr((string) $device->location, 0, 32) }}</td>
                         </tr>
                     @endforeach
                 </table>

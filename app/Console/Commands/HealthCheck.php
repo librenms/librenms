@@ -42,6 +42,8 @@ class HealthCheck extends Command
             return 1;
         }
 
+        $this->okMessage($redisResult->getMessage());
+
         // check database
         $dbResult = (new CheckDatabaseConnected)->validate();
         $dbStatus = $dbResult->getStatus();
@@ -51,11 +53,13 @@ class HealthCheck extends Command
             return 1;
         }
 
+        $this->okMessage($dbResult->getMessage());
+
         // docker specific checks
         if (EnvHelper::librenmsDocker()) {
             if (getenv('SIDECAR_DISPATCHER')) {
                 // check dispatcher
-                $health_file = \LibreNMS\Config::get('service_health_file');
+                $health_file = \App\Facades\LibrenmsConfig::get('service_health_file');
 
                 if (! $health_file) {
                     $this->warn('Dispatcher service health file not enabled, set service_health_file');
@@ -74,6 +78,8 @@ class HealthCheck extends Command
 
                     return 1;
                 }
+
+                $this->okMessage('Dispatcher service is live');
             } else {
                 // check webui
                 try {
@@ -89,9 +95,18 @@ class HealthCheck extends Command
 
                     return 1;
                 }
+
+                $this->okMessage('Web UI is accessible');
             }
         }
 
         return 0; // all ok
+    }
+
+    private function okMessage(string $message): void
+    {
+        if ($this->getOutput()->isVerbose()) {
+            $this->info($message);
+        }
     }
 }

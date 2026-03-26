@@ -1,4 +1,3 @@
-mib: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB:CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB:CISCO-UNIFIED-COMPUTING-MEMORY-MIB:CISCO-UNIFIED-COMPUTING-STORAGE-MIB:CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
 modules:
     os:
         sysDescr_regex: '/Firmware Version (?<version>[^\s]+\))/'
@@ -12,69 +11,69 @@ modules:
         current:
             data:
                 -
-                    oid: cucsComputeMbPowerStatsTable
-                    value: cucsComputeMbPowerStatsInputCurrent
+                    oid: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeMbPowerStatsTable
+                    value: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeMbPowerStatsInputCurrent
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.9.14.1.8.{{ $index }}'
                     descr: MB Input Current
                     index: 'mb-input-current'
         voltage:
             data:
                 -
-                    oid: cucsComputeMbPowerStatsTable
-                    value: cucsComputeMbPowerStatsInputVoltage
+                    oid: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeMbPowerStatsTable
+                    value: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeMbPowerStatsInputVoltage
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.9.14.1.12.{{ $index }}'
                     descr: MB Input Voltage
                     index: 'mb-input-voltage'
         power:
             data:
                 -
-                    oid: cucsComputeMbPowerStatsTable
-                    value: cucsComputeMbPowerStatsConsumedPower
+                    oid: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeMbPowerStatsTable
+                    value: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeMbPowerStatsConsumedPower
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.9.14.1.4.{{ $index }}'
                     descr: MB Input Power
                     index: 'mb-input-power'
         temperature:
             data:
                 -
-                    oid: cucsComputeRackUnitMbTempStatsTable
-                    value: cucsComputeRackUnitMbTempStatsAmbientTemp
+                    oid: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeRackUnitMbTempStatsTable
+                    value: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeRackUnitMbTempStatsAmbientTemp
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.9.44.1.4.{{ $index }}'
                     descr: 'Rack Unit Ambient Temperature'
                     index: 'ambient.{{ $index }}'
                 -
-                    oid: cucsComputeRackUnitMbTempStatsTable
-                    value: cucsComputeRackUnitMbTempStatsIoh1Temp
+                    oid: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeRackUnitMbTempStatsTable
+                    value: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeRackUnitMbTempStatsIoh1Temp
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.9.44.1.13.{{ $index }}'
                     descr: 'IO Hub 1 Temperature'
                     index: 'ioh1.{{ $index }}'
                 -
-                    oid: cucsComputeRackUnitMbTempStatsTable
-                    value: cucsComputeRackUnitMbTempStatsIoh2Temp
+                    oid: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeRackUnitMbTempStatsTable
+                    value: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeRackUnitMbTempStatsIoh2Temp
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.9.44.1.17.{{ $index }}'
                     descr: 'IO Hub 2 Temperature'
                     index: 'ioh2.{{ $index }}'
                 -
-                    oid: cucsComputeRackUnitMbTempStatsTable
-                    value: cucsComputeRackUnitMbTempStatsFrontTemp
+                    oid: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeRackUnitMbTempStatsTable
+                    value: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeRackUnitMbTempStatsFrontTemp
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.9.44.1.8.{{ $index }}'
                     descr: 'Rack Unit Front Temperature'
                     index: 'front.{{ $index }}'
                 -
-                    oid: cucsComputeRackUnitMbTempStatsTable
-                    value: cucsComputeRackUnitMbTempStatsRearTemp
+                    oid: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeRackUnitMbTempStatsTable
+                    value: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB::cucsComputeRackUnitMbTempStatsRearTemp
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.9.44.1.21.{{ $index }}'
                     descr: 'Rack Unit Rear Temperature'
                     index: 'rear.{{ $index }}'
                 -
-                    oid: cucsMemoryUnitEnvStatsTable
-                    value: cucsMemoryUnitEnvStatsTemperature
+                    oid: CISCO-UNIFIED-COMPUTING-MEMORY-MIB::cucsMemoryUnitEnvStatsTable
+                    value: CISCO-UNIFIED-COMPUTING-MEMORY-MIB::cucsMemoryUnitEnvStatsTemperature
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.30.12.1.6.{{ $index }}'
                     warn_limit: 40
                     descr: 'Memory {{ $index }} Temperature'
                     index: 'mem.{{ $index }}'
                 -
-                    oid: cucsProcessorEnvStatsTable
-                    value: cucsProcessorEnvStatsTemperature
+                    oid: CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB::cucsProcessorEnvStatsTable
+                    value: CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB::cucsProcessorEnvStatsTemperature
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.41.2.1.10.{{ $index }}'
                     warn_limit: 40
                     descr: 'CPU {{ $index }} Temperature'
@@ -82,15 +81,16 @@ modules:
         state:
             data:
                 -
-                    oid: cucsStorageLocalDiskTable
-                    value: cucsStorageLocalDiskOperability
+                    oid: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageLocalDiskTable
+                    value: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageLocalDiskOperability
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.45.4.1.9.{{ $index }}'
-                    descr: 'Physical Drive {{ $cucsStorageLocalDiskRn }}'
+                    state_name: 'cucsStorageLocalDiskTable'
+                    descr: 'Physical Drive {{ CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageLocalDiskRn }}'
                     index: 'local-disk-operability.{{ $index }}'
                     group: 'Local Storage'
                     skip_values:
                         -
-                            oid: cucsStorageLocalDiskOperability
+                            oid: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageLocalDiskOperability
                             op: '='
                             value: '6'
                     states:
@@ -108,10 +108,11 @@ modules:
                         - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
                         - { value:  13, generic: 1, graph: 0, descr: disabled }
                 -
-                    oid: cucsStorageLocalLunTable
-                    value: cucsStorageLocalLunOperability
+                    oid: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageLocalLunTable
+                    value: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageLocalLunOperability
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.45.8.1.9.{{ $index }}'
-                    descr: 'Virtual Drive {{ $cucsStorageLocalLunRn }}'
+                    state_name: 'cucsStorageLocalLunTable'
+                    descr: 'Virtual Drive {{ CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageLocalLunRn }}'
                     index: 'virtual-drive-operability.{{ $index }}'
                     group: 'Local Storage'
                     states:
@@ -129,9 +130,10 @@ modules:
                         - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
                         - { value:  13, generic: 1, graph: 0, descr: disabled }
                 -
-                    oid: cucsStorageControllerTable
-                    value: cucsStorageControllerOperability
+                    oid: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageControllerTable
+                    value: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageControllerOperability
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.45.1.1.7.{{ $index }}'
+                    state_name: 'cucsStorageControllerTable'
                     descr: 'Storage Controller {{ $index }}'
                     index: 'storage-controller-operability.{{ $index }}'
                     group: 'Storage Controller'
@@ -150,9 +152,10 @@ modules:
                         - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
                         - { value:  13, generic: 1, graph: 0, descr: disabled }
                 -
-                    oid: cucsStorageFlexFlashControllerTable
-                    value: cucsStorageFlexFlashControllerOperability
+                    oid: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageFlexFlashControllerTable
+                    value: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageFlexFlashControllerOperability
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.45.35.1.11.{{ $index }}'
+                    state_name: 'cucsStorageFlexFlashControllerTable'
                     descr: 'Flex Flash Controller {{ $index }}'
                     index: 'flexflash-controller-operability.{{ $index }}'
                     group: 'Storage Controller'
@@ -171,9 +174,10 @@ modules:
                         - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
                         - { value:  13, generic: 1, graph: 0, descr: disabled }
                 -
-                    oid: cucsStorageRaidBatteryTable
-                    value: cucsStorageRaidBatteryOperability
+                    oid: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageRaidBatteryTable
+                    value: CISCO-UNIFIED-COMPUTING-STORAGE-MIB::cucsStorageRaidBatteryOperability
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.45.11.1.9.{{ $index }}'
+                    state_name: 'cucsStorageRaidBatteryTable'
                     descr: 'RAID Battery {{ $index }}'
                     index: 'raid-battery-operability.{{ $index }}'
                     group: 'Storage Controller'
@@ -192,10 +196,11 @@ modules:
                         - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
                         - { value:  13, generic: 1, graph: 0, descr: disabled }
                 -
-                    oid: cucsEquipmentFanTable
-                    value: cucsEquipmentFanOperability
+                    oid: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentFanTable
+                    value: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentFanOperability
+                    state_name: 'cucsEquipmentFanTable'
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.15.12.1.10.{{ $index }}'
-                    descr: 'Module {{ $cucsEquipmentFanModule }}/{{ $cucsEquipmentFanRn }}'
+                    descr: 'Module {{ CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentFanModule }}/{{ CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentFanRn }}'
                     index: 'fan-operability.{{ $index }}'
                     group: 'Fans'
                     states:
@@ -213,9 +218,10 @@ modules:
                         - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
                         - { value:  13, generic: 1, graph: 0, descr: disabled }
                 -
-                    oid: cucsEquipmentPsuTable
-                    value: cucsEquipmentPsuOperability
+                    oid: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentPsuTable
+                    value: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentPsuOperability
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.15.56.1.8.{{ $index }}'
+                    state_name: 'cucsEquipmentPsuTable'
                     descr: 'Power Supply {{ $index }}'
                     index: 'power-supply-operability.{{ $index }}'
                     group: 'Power Supply'
@@ -234,15 +240,16 @@ modules:
                         - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
                         - { value:  13, generic: 1, graph: 0, descr: disabled }
                 -
-                    oid: cucsMemoryUnitTable
-                    value: cucsMemoryUnitOperability
+                    oid: CISCO-UNIFIED-COMPUTING-MEMORY-MIB::cucsMemoryUnitTable
+                    value: CISCO-UNIFIED-COMPUTING-MEMORY-MIB::cucsMemoryUnitOperability
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.30.11.1.14.{{ $index }}'
-                    descr: '{{ $cucsMemoryUnitLocation }}'
+                    state_name: 'cucsMemoryUnitTable'
+                    descr: '{{ CISCO-UNIFIED-COMPUTING-MEMORY-MIB::cucsMemoryUnitLocation }}'
                     index: 'memory-operability.{{ $index }}'
                     group: 'Memory'
                     skip_values:
                         -
-                            oid: cucsMemoryUnitOperability
+                            oid: CISCO-UNIFIED-COMPUTING-MEMORY-MIB::cucsMemoryUnitOperability
                             op: '='
                             value: '0'
                     states:
@@ -260,15 +267,16 @@ modules:
                         - { value:  11, generic: 2, graph: 0, descr: identity Unestablishable }
                         - { value:  13, generic: 1, graph: 0, descr: disabled }
                 -
-                    oid: cucsProcessorUnitTable
-                    value: cucsProcessorUnitOperability
+                    oid: CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB::cucsProcessorUnitTable
+                    value: CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB::cucsProcessorUnitOperability
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.41.9.1.10.{{ $index }}'
-                    descr: 'Proccessor {{ $cucsProcessorUnitRn }}'
+                    state_name: 'cucsProcessorUnitTable'
+                    descr: 'Proccessor {{ CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB::cucsProcessorUnitRn }}'
                     index: 'proccessor-operability.{{ $index }}'
                     group: 'Proccessor'
                     skip_values:
                         -
-                            oid: cucsProcessorUnitPresence
+                            oid: CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB::cucsProcessorUnitPresence
                             op: '='
                             value: '11'
                     states:

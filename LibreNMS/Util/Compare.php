@@ -43,53 +43,37 @@ class Compare
      */
     public static function values($a, $b, $comparison = '=')
     {
-        // handle PHP8 change to implicit casting
-        if (is_numeric($a) || is_numeric($b)) {
-            $a = Number::cast($a);
-            $b = is_array($b) ? $b : Number::cast($b);
+        $numeric_comparisons = ['=', '!=', '==', '!==', '>=', '<=', '>', '<'];
+
+        if (in_array($comparison, $numeric_comparisons)) {
+            // handle PHP8 change to implicit casting
+            if (is_numeric($a) || is_numeric($b)) {
+                $a = Number::cast($a);
+                $b = is_array($b) ? $b : Number::cast($b);
+            }
         }
 
-        switch ($comparison) {
-            case '=':
-                return $a == $b;
-            case '!=':
-                return $a != $b;
-            case '==':
-                return $a === $b;
-            case '!==':
-                return $a !== $b;
-            case '>=':
-                return $a >= $b;
-            case '<=':
-                return $a <= $b;
-            case '>':
-                return $a > $b;
-            case '<':
-                return $a < $b;
-            case 'contains':
-                return Str::contains($a, $b);
-            case 'not_contains':
-                return ! Str::contains($a, $b);
-            case 'starts':
-                return Str::startsWith($a, $b);
-            case 'not_starts':
-                return ! Str::startsWith($a, $b);
-            case 'ends':
-                return Str::endsWith($a, $b);
-            case 'not_ends':
-                return ! Str::endsWith($a, $b);
-            case 'regex':
-                return (bool) preg_match($b, $a);
-            case 'not_regex':
-                return ! ((bool) preg_match($b, $a));
-            case 'in_array':
-                return in_array($a, $b);
-            case 'not_in_array':
-                return ! in_array($a, $b);
-            case 'exists':
-                return isset($a) == $b;
-            default:
-                return false;
-        }
+        return match ($comparison) {
+            '=' => $a == $b,
+            '!=' => $a != $b,
+            '==' => $a === $b,
+            '!==' => $a !== $b,
+            '>=' => $a >= $b,
+            '<=' => $a <= $b,
+            '>' => $a > $b,
+            '<' => $a < $b,
+            'contains' => Str::contains($a, $b),
+            'not_contains' => ! Str::contains($a, $b),
+            'starts' => Str::startsWith($a, $b),
+            'not_starts' => ! Str::startsWith($a, $b),
+            'ends' => Str::endsWith($a, $b),
+            'not_ends' => ! Str::endsWith($a, $b),
+            'regex' => Str::isMatch($b, $a),
+            'not_regex' => ! Str::isMatch($b, $a),
+            'in_array' => in_array($a, $b),
+            'not_in_array' => ! in_array($a, $b),
+            'exists' => isset($a) == $b,
+            default => false,
+        };
     }
 }

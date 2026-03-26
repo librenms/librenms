@@ -18684,15 +18684,6 @@
     },
     "vlans": {
         "discovery": {
-            "vlans": [
-                {
-                    "vlan_vlan": 1,
-                    "vlan_domain": 1,
-                    "vlan_name": "VLAN 1",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                }
-            ],
             "ports_vlans": [
                 {
                     "vlan": 1,
@@ -18813,6 +18804,19 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 1
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.2.2.250",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.2.2.0/24",
+                    "ifIndex": 76
                 }
             ]
         }

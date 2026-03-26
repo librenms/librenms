@@ -1,9 +1,12 @@
 <?php
 
+use App\Models\Bill;
+use Illuminate\Support\Facades\Gate;
+
 $no_refresh = true;
 
-if ($_POST['addbill'] == 'yes') {
-    if (! Auth::user()->hasGlobalAdmin()) {
+if (isset($_POST['addbill']) && $_POST['addbill'] == 'yes') {
+    if (Gate::denies('create', Bill::class)) {
         include 'includes/html/error-no-perm.inc.php';
         exit;
     }
@@ -14,18 +17,18 @@ if ($_POST['addbill'] == 'yes') {
         if ($_POST['bill_type'] == 'quota') {
             if (isset($_POST['bill_quota_type'])) {
                 if ($_POST['bill_quota_type'] == 'MB') {
-                    $multiplier = (1 * \LibreNMS\Config::get('billing.base'));
+                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 if ($_POST['bill_quota_type'] == 'GB') {
-                    $multiplier = (1 * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base'));
+                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 if ($_POST['bill_quota_type'] == 'TB') {
-                    $multiplier = (1 * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base'));
+                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
-                $bill_quota = (is_numeric($_POST['bill_quota']) ? $_POST['bill_quota'] * \LibreNMS\Config::get('billing.base') * $multiplier : 0);
+                $bill_quota = (is_numeric($_POST['bill_quota']) ? $_POST['bill_quota'] * \App\Facades\LibrenmsConfig::get('billing.base') * $multiplier : 0);
                 $bill_cdr = 0;
             }
         }
@@ -33,15 +36,15 @@ if ($_POST['addbill'] == 'yes') {
         if ($_POST['bill_type'] == 'cdr') {
             if (isset($_POST['bill_cdr_type'])) {
                 if ($_POST['bill_cdr_type'] == 'Kbps') {
-                    $multiplier = (1 * \LibreNMS\Config::get('billing.base'));
+                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 if ($_POST['bill_cdr_type'] == 'Mbps') {
-                    $multiplier = (1 * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base'));
+                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 if ($_POST['bill_cdr_type'] == 'Gbps') {
-                    $multiplier = (1 * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base') * \LibreNMS\Config::get('billing.base'));
+                    $multiplier = (1 * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base') * \App\Facades\LibrenmsConfig::get('billing.base'));
                 }
 
                 $bill_cdr = (is_numeric($_POST['bill_cdr']) ? $_POST['bill_cdr'] * $multiplier : 0);
@@ -114,7 +117,7 @@ include 'includes/html/modal/new_bill.inc.php';
     <div id="{{ctx.id}}" class="{{css.header}}">
         <div class="row">
             <div class="col-sm-4">
-            <?php if (Auth::user()->hasGlobalAdmin()) {  ?>
+            <?php if (Gate::allows('create', Bill::class)) {  ?>
                 <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#create-bill"><i class="fa fa-plus"></i> Create Bill</button>
             <?php } ?>
             </div>
@@ -129,13 +132,13 @@ include 'includes/html/modal/new_bill.inc.php';
                       <option value=''>All Types</option>
                       <option value='cdr'
                             <?php
-                            if ($_GET['bill_type'] === 'cdr') {
+                            if (isset($_GET['bill_type']) && $_GET['bill_type'] === 'cdr') {
                                 echo 'selected';
                             }
                             ?>>CDR</option>
                       <option value='quota'
                             <?php
-                            if ($_GET['bill_type'] === 'quota') {
+                            if (isset($_GET['bill_type']) && $_GET['bill_type'] === 'quota') {
                                 echo 'selected';
                             }
                             ?>>Quota</option>
@@ -144,13 +147,13 @@ include 'includes/html/modal/new_bill.inc.php';
                       <option value=''>All States</option>
                       <option value='under'
                             <?php
-                            if ($_GET['state'] === 'under') {
+                            if (isset($_GET['state']) && $_GET['state'] === 'under') {
                                 echo 'selected';
                             }
                             ?>>Under Quota</option>
                       <option value='over'
                             <?php
-                            if ($_GET['state'] === 'over') {
+                            if (isset($_GET['state']) && $_GET['state'] === 'over') {
                                 echo 'selected';
                             }
                             ?>>Over Quota</option>
@@ -186,7 +189,7 @@ include 'includes/html/modal/new_bill.inc.php';
     $('#table-filters select').on('change', function() { grid.bootgrid('reload'); });
 
 <?php
-if ($vars['view'] == 'add') {
+if (isset($vars['view']) && $vars['view'] == 'add') {
                                 ?>
 $(function() {
     $('#create-bill').modal('show');

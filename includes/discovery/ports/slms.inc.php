@@ -5,8 +5,8 @@ $zhone_interface_translations = snmpwalk_cache_oid($device, 'zhonePhysicalIfInde
 $good_ifs = [];
 
 foreach ($zhone_interface_translations as $key => $value) {
-    $type = explode('.', $key)[4];
-    $subtype = explode('.', $key)[5];
+    $type = explode('.', (string) $key)[4];
+    $subtype = explode('.', (string) $key)[5];
     if ($type == 'other') {
         $type = $subtype;
     }

@@ -1,9 +1,9 @@
-
 IEEE8021-BRIDGE-MIB DEFINITIONS ::= BEGIN
 
 -- =============================================================
--- MIB for IEEE 802.1D devices
+-- Bridge MIB for IEEE 802.1Q devices
 -- =============================================================
+
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,
     Integer32, Counter64
@@ -27,33 +27,41 @@ IMPORTS
     ;
 
 ieee8021BridgeMib MODULE-IDENTITY
-    LAST-UPDATED "201208100000Z" -- August 10, 2012
+    LAST-UPDATED "201806280000Z" -- June 28, 2018 
     ORGANIZATION "IEEE 802.1 Working Group"
     CONTACT-INFO
-        "  WG-URL: http://grouper.ieee.org/groups/802/1/index.html
-         WG-EMail: stds-802-1@ieee.org
+        "  WG-URL: http://www.ieee802.org/1/
+         WG-EMail: stds-802-1-L@ieee.org
 
-          Contact: David Levi
+          Contact: IEEE 802.1 Working Group Chair
            Postal: C/O IEEE 802.1 Working Group
                    IEEE Standards Association
                    445 Hoes Lane
-                   P.O. Box 1331
                    Piscataway
-                   NJ 08855-1331
+                   NJ 08854
                    USA
-           E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG"
+           E-mail: STDS-802-1-L@IEEE.ORG"
     DESCRIPTION
         "The Bridge MIB module for managing devices that support
-        IEEE 802.1D.  This MIB module is derived from the IETF
+        IEEE Std 802.1Q.  This MIB module is derived from the IETF
         BRIDGE-MIB, RFC 4188.
 
         Unless otherwise indicated, the references in this MIB
-        module are to IEEE Std 802.1Q-2011.
+        module are to IEEE Std 802.1Q.
 
-        Copyright (C) IEEE.
-        This version of this MIB module is part of IEEE802.1Q;
+        Copyright (C) IEEE (2014).
+        This version of this MIB module is part of IEEE Std 802.1Q;
         see the draft itself for full legal notices."
         
+    REVISION "201806280000Z" -- June 28, 2018
+    DESCRIPTION
+            "Published as part of IEEE Std 802.1Q 2017 revision.
+            Cross references updated and corrected."
+
+    REVISION "201412150000Z" -- December 15, 2014
+    DESCRIPTION  "Published as part of IEEE Std 802.1Q 2014 revision.
+                  Cross references updated and corrected."
+            
     REVISION     "201208100000Z" -- August 10, 2012
     DESCRIPTION  "Added an enumeration for tComponent in
                   ieee8021BridgeBaseComponentType
@@ -70,17 +78,15 @@ ieee8021BridgeMib MODULE-IDENTITY
                   as part of IEEE Std 802.1Qbg."
                   
     REVISION     "201104060000Z" -- April 6, 2011
-    DESCRIPTION
-         "Modifications to support Remote Customer Service
-          Interfaces."
+    DESCRIPTION  "Modifications to support Remote Customer Service
+                 Interfaces."
+
     REVISION     "201102270000Z" -- February 27, 2011
-    DESCRIPTION
-         "Minor edits to contact information etc. as part of 
-          2011 revision of IEEE Std 802.1Q."
+    DESCRIPTION  "Minor edits to contact information etc. as part of 
+                 2011 revision of IEEE Std 802.1Q."
 
     REVISION     "200810150000Z" -- October 15, 2008
-    DESCRIPTION
-         "Initial revision, derived from RFC 4188."
+    DESCRIPTION  "Initial revision, derived from RFC 4188."
     ::= { ieee802dot1mibs 2 }
 
 -- =============================================================
@@ -115,7 +121,7 @@ ieee8021BridgeDot1d
 -- the ieee8021BridgeBase subtree
 -- =============================================================
 -- Implementation of the ieee8021BridgeBase subtree is mandatory
--- for all bridges.
+-- for all Bridges.
 -- =============================================================
 
 -- =============================================================
@@ -127,7 +133,7 @@ ieee8021BridgeBaseTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A table that contains generic information about every
-        bridge component.  All writable objects in this table
+        Bridge component.  All writable objects in this table
         MUST be persistent over power up restart/reboot."
     REFERENCE   "12.4.1"
     ::= { ieee8021BridgeBase 1 }
@@ -137,7 +143,7 @@ ieee8021BridgeBaseEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "A list of objects containing information for each bridge
+        "A list of objects containing information for each Bridge
         component."
     INDEX  { ieee8021BridgeBaseComponentId }
     ::= { ieee8021BridgeBaseTable 1 }
@@ -168,7 +174,7 @@ ieee8021BridgeBaseComponentId OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The component identifier is used to distinguish between the
-        multiple virtual bridge instances within a PBB.  In simple
+        multiple virtual Bridge instances within a PBB.  In simple
         situations where there is only a single component the default
         value is 1."
     ::= { ieee8021BridgeBaseEntry 1 }
@@ -178,10 +184,10 @@ ieee8021BridgeBaseBridgeAddress OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The MAC address used by this bridge when it is
+        "The MAC address used by this Bridge when it is
         referred to in a unique fashion.  It is recommended
         that this be the numerically smallest MAC address of
-        all ports that belong to this bridge.  However, it is
+        all ports that belong to this Bridge.  However, it is
         only required to be unique.  When concatenated with
         ieee8021SpanningTreePriority, a unique BridgeIdentifier
         is formed, which is used in the Spanning Tree Protocol.
@@ -218,7 +224,7 @@ ieee8021BridgeBaseComponentType OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Indicates the component type(s) of this bridge.  The
+        "Indicates the component type(s) of this Bridge.  The
         following component types are possible:
 
             iComponent(1) - An S-VLAN component of a Backbone
@@ -230,14 +236,14 @@ ieee8021BridgeBaseComponentType OBJECT-TYPE
                 into B-VLANs.
 
             cVlanComponent(3) - A C-VLAN component of an
-                enterprise VLAN bridge or of a Provider Bridge used
+                enterprise VLAN Bridge or of a Provider Bridge used
                 to process C-tagged frames.
 
             sVlanComponent(4) - An S-VLAN component of a
                 Provider Bridge.
 
             dBridgeComponent(5) - A VLAN unaware component of an
-                802.1D bridge.
+                IEEE 802.1Q Bridge.
             
             erComponent (6) - An Edge Relay component of an EVB Station.
 
@@ -265,7 +271,7 @@ ieee8021BridgeBaseDeviceCapabilities OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Indicates the optional parts of IEEE 802.1D and 802.1Q
+        "Indicates the optional parts of IEEE Std 802.1Q
         that are implemented by this device and are manageable
         through this MIB.  Capabilities that are allowed on a
         per-port basis are indicated in
@@ -276,7 +282,7 @@ ieee8021BridgeBaseDeviceCapabilities OBJECT-TYPE
                               -- individual multicast addresses
                               -- controlled by MMRP.
         dot1dTrafficClasses(1),
-                              -- can map user priority to
+                              -- can map priority to
                               -- multiple traffic classes.
         dot1qStaticEntryIndividualPort(2),
                               -- dot1qStaticUnicastReceivePort &
@@ -295,8 +301,8 @@ ieee8021BridgeBaseDeviceCapabilities OBJECT-TYPE
                               -- each port.
         dot1dLocalVlanCapable(7)
                               -- can support multiple local
-                              -- bridges, outside of the scope
-                              -- of 802.1Q defined VLANs.
+                              -- Bridges, outside of the scope
+                              -- of IEEE 802.1Q defined VLANs.
 
         This object may not be modified while the corresponding
         instance of ieee8021BridgeBaseRowStatus is active(1).
@@ -312,7 +318,7 @@ ieee8021BridgeBaseTrafficClassesEnabled OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value true(1) indicates that Traffic Classes are
-        enabled on this bridge.  When false(2), the bridge
+        enabled on this Bridge.  When false(2), the Bridge
         operates with a single priority level for all traffic.
 
         This object may be modified while the corresponding
@@ -385,7 +391,7 @@ ieee8021BridgeBasePortTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A table that contains generic information about every
-        port that is associated with this bridge.  Transparent,
+        port that is associated with this Bridge.  Transparent,
         and source-route ports are included."
     REFERENCE   "12.4.2"
     ::= { ieee8021BridgeBase 4 }
@@ -397,7 +403,7 @@ ieee8021BridgeBasePortEntry OBJECT-TYPE
 
     DESCRIPTION
         "A list of objects containing information for each port
-         of the bridge."
+         of the Bridge."
     INDEX  { ieee8021BridgeBasePortComponentId,
              ieee8021BridgeBasePort }
     ::= { ieee8021BridgeBasePortTable 1 }
@@ -436,7 +442,7 @@ ieee8021BridgeBasePortComponentId OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The component identifier is used to distinguish between the
-        multiple virtual bridge instances within a PBB.  In simple
+        multiple virtual Bridge instances within a PBB.  In simple
         situations where there is only a single component the default
         value is 1."
     ::= { ieee8021BridgeBasePortEntry 1 }
@@ -447,8 +453,8 @@ ieee8021BridgeBasePort OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The port number of the port for which this entry
-        contains bridge management information."
-    REFERENCE   "12.4.2.1.2 a)"
+        contains Bridge management information."
+    REFERENCE   "12.4.2.1"
     ::= { ieee8021BridgeBasePortEntry 2 }
 
 ieee8021BridgeBasePortIfIndex OBJECT-TYPE
@@ -475,9 +481,9 @@ ieee8021BridgeBasePortDelayExceededDiscards OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The number of frames discarded by this port due
-        to excessive transit delay through the bridge.  It
+        to excessive transit delay through the Bridge.  It
         is incremented by both transparent and source
-        route bridges.
+        route Bridges.
 
         Discontinuities in the value of the counter can occur
         at re-initialization of the management system, and at
@@ -495,7 +501,7 @@ ieee8021BridgeBasePortMtuExceededDiscards OBJECT-TYPE
     DESCRIPTION
         "The number of frames discarded by this port due
         to an excessive size.  It is incremented by both
-        transparent and source route bridges.
+        transparent and source route Bridges.
 
         Discontinuities in the value of the counter can occur
         at re-initialization of the management system, and at
@@ -514,11 +520,11 @@ ieee8021BridgeBasePortCapabilities OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "Indicates the parts of IEEE 802.1D and 802.1Q that are
+        "Indicates the parts of IEEE 802.1Q that are
         optional on a per-port basis, that are implemented by
         this device, and that are manageable through this MIB.
 
-        dot1qDot1qTagging(0), -- supports 802.1Q VLAN tagging of
+        dot1qDot1qTagging(0), -- supports IEEE 802.1Q VLAN tagging of
                               -- frames and MVRP.
         dot1qConfigurableAcceptableFrameTypes(1),
                               -- allows modified values of
@@ -554,38 +560,38 @@ ieee8021BridgeBasePortTypeCapabilities OBJECT-TYPE
          any of the values for which the corresponding bit in this
          object is 1.  The possible port types are as follows:
 
-             customerVlanPort(0) - Indicates the port can be a C-tag
-                 aware port of an enterprise VLAN aware bridge.
+             customerVlanPort(0) - Indicates the port can be a C-TAG-
+                 aware port of an enterprise VLAN-aware Bridge.
 
              providerNetworkPort(1) - Indicates the port can be an
-                 S-tag aware port of a Provider Bridge or Backbone
+                 S-TAG-aware port of a Provider Bridge or Backbone
                  Edge Bridge used for connections within a PBN or
                  PBBN.
 
              customerNetworkPort(2) - Indicates the port can be an
-                 S-tag aware port of a Provider Bridge or Backbone
+                 S-TAG-aware port of a Provider Bridge or Backbone
                  Edge Bridge used for connections to the exterior of
                  a PBN or PBBN.
 
-             customerEdgePort(3) - Indicates the port can be a C-tag
+             customerEdgePort(3) - Indicates the port can be a C-TAG-
                  aware port of a Provider Bridge used for connections
                  to the exterior of a PBN or PBBN.
 
              customerBackbonePort(4) - Indicates the port can be a
-                 I-tag aware port of a Backbone Edge Bridge's
+                 I-TAG-aware port of a Backbone Edge Bridge's
                  B-component.
 
              virtualInstancePort(5) - Indicates the port can be a
-                 virtual S-tag aware port within a Backbone Edge
+                 virtual S-TAG-aware port within a Backbone Edge
                  Bridge's I-component which is responsible for
                  handling S-tagged traffic for a specific backbone
                  service instance.
 
              dBridgePort(6) - Indicates the port can be a VLAN-unaware
-                 member of an 802.1D bridge.
+                 member of an IEEE 802.1Q Bridge.
 
              remoteCustomerAccessPort(7) - Indicates the port can be an
-                 S-tag aware port of a Provider Bridge capable of providing
+                 S-TAG-aware port of a Provider Bridge capable of providing
                  Remote Customer Service Interfaces.
                  
              stationFacingBridgePort(8) - Indicates the station-facing
@@ -597,9 +603,8 @@ ieee8021BridgeBasePortTypeCapabilities OBJECT-TYPE
              uplinkRelayPort (10)  - Indicates the uplink relay port
                  in an EVB station."     
                  
-    REFERENCE   "12.16.1.1.3 h4), 12.16.2.1/2,
-                 12.13.1.1, 12.13.1.2, 12.15.2.1, 12.15.2.2,
-                 12.26.2, 12.26.4.1, 12.26.5.1"
+    REFERENCE   "40.4, 12.13.1.1, 12.13.1.2, 12.16, 
+                 12.16.2.1, 12.26"
     ::= { ieee8021BridgeBasePortEntry 7 }
 
 ieee8021BridgeBasePortType OBJECT-TYPE
@@ -609,9 +614,8 @@ ieee8021BridgeBasePortType OBJECT-TYPE
     DESCRIPTION
         "The port type.  This value MUST be persistent over power up
          restart/reboot."
-    REFERENCE   "12.16.1.1.3 h4), 12.16.2.1/2,
-                 12.13.1.1, 12.13.1.2, 12.15.2.1, 12.15.2.2, 
-                 12.26.2, 12.26.4.1, 12.26.5.1"
+    REFERENCE   "40.4, 12.13.1.1, 12.13.1.2, 12.16, 
+                 12.16.2.1, 12.26"
     ::= { ieee8021BridgeBasePortEntry 8 }
 
 ieee8021BridgeBasePortExternal OBJECT-TYPE
@@ -622,7 +626,7 @@ ieee8021BridgeBasePortExternal OBJECT-TYPE
         "A boolean indicating whether the port is external.  A value of
         true(1) means the port is external.  A value of false(2) means
         the port is internal."
-    REFERENCE   "12.16.1.1.3 h4)"
+    REFERENCE   "12.4.2.1"
     ::= { ieee8021BridgeBasePortEntry 9 }
 
 ieee8021BridgeBasePortAdminPointToPoint OBJECT-TYPE
@@ -637,7 +641,7 @@ ieee8021BridgeBasePortAdminPointToPoint OBJECT-TYPE
          "For a port running spanning tree, this object represents the 
          administrative point-to-point status of the LAN segment
          attached to this port, using the enumeration values of
-         6.4.3.  A value of forceTrue(1) indicates
+         IEEE Std 802.1AC.  A value of forceTrue(1) indicates
          that this port should always be treated as if it is
          connected to a point-to-point link.  A value of
          forceFalse(2) indicates that this port should be treated as
@@ -668,7 +672,7 @@ ieee8021BridgeBasePortAdminPointToPoint OBJECT-TYPE
 
          The value of this object MUST be retained across
          reinitializations of the management system."
-    REFERENCE   "6.6.3, 6.10, 12.8.2.1.3 o), 12.8.2.3.2 f), 26.4.1"
+    REFERENCE   "IEEE Std 802.1AC, 6.10, 12.8.2.1.3 o), 12.8.2.3.2 f), 26.4.1"
     DEFVAL { forceFalse }
     ::= { ieee8021BridgeBasePortEntry 10 }
 
@@ -684,7 +688,7 @@ ieee8021BridgeBasePortOperPointToPoint OBJECT-TYPE
          If adminPointToPointMAC is set to auto(2), then the value
          of operPointToPointMAC is determined in accordance with the
          specific procedures defined for the MAC entity concerned,
-         as defined in 6.7.  The value is
+         as defined in IEEE Std 802.1AC.  The value is
          determined dynamically; that is, it is re-evaluated whenever
          the value of adminPointToPointMAC changes, and whenever
          the specific procedures defined for the MAC entity evaluate
@@ -695,7 +699,8 @@ ieee8021BridgeBasePortOperPointToPoint OBJECT-TYPE
          The value will be true(1) if that object is forceTrue(1), and
          the value will be false(2) if the value of that object is either
          forceFalse(2) or auto(3)."
-    REFERENCE   "6.6.3, 6.7, 6.10, 12.8.2.1.3 p), 12.8.2.3.2 f), 26.4.1"
+    REFERENCE   "IEEE Std 802.1AC, 6.10, 12.8.2.1.3 p),
+                12.8.2.3.2 f), 26.4.1"
     ::= { ieee8021BridgeBasePortEntry 11 }
 
 ieee8021BridgeBasePortName OBJECT-TYPE
@@ -703,8 +708,9 @@ ieee8021BridgeBasePortName OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "A text string of up to 32 characters, of locally determined significance."
-    REFERENCE   "12.4.2.1.3 a)"
+        "A text string of up to 32 characters, of
+        locally determined significance."
+    REFERENCE   "12.4.2.1"
     ::= { ieee8021BridgeBasePortEntry 12 }
     
 -- =============================================================
@@ -716,7 +722,7 @@ ieee8021BridgeBaseIfToPortTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A table that contains generic information about every
-        ifIndex that is associated with this bridge."
+        ifIndex that is associated with this Bridge."
     REFERENCE   "17.2.2"
     ::= { ieee8021BridgeBase 5 }
 
@@ -727,7 +733,7 @@ ieee8021BridgeBaseIfToPortEntry OBJECT-TYPE
 
     DESCRIPTION
         "A list of objects containing information for each ifIndex
-         of the bridge."
+         of the Bridge."
     INDEX  {   ifIndex  }
     ::= { ieee8021BridgeBaseIfToPortTable 1 }
 
@@ -765,7 +771,7 @@ ieee8021BridgePhyPortTable OBJECT-TYPE
    MAX-ACCESS  not-accessible
    STATUS      current
    DESCRIPTION
-   "A table that contains ISS port number to bridge 
+   "A table that contains ISS port number to Bridge 
     componentID and port number mapping."
    REFERENCE   "12.5.1"
    ::= { ieee8021BridgeBase 6}
@@ -776,7 +782,7 @@ ieee8021BridgePhyPortEntry OBJECT-TYPE
    STATUS      current
    DESCRIPTION
    "A list of objects containing mapping for ISS port
-    numbers to bridge componentID and port numbers "
+    numbers to Bridge componentID and port numbers "
    INDEX  { ieee8021BridgePhyPort }
    ::= { ieee8021BridgePhyPortTable 1 }
 
@@ -849,8 +855,8 @@ ieee8021BridgePhyPortToInternalPort   OBJECT-TYPE
 -- =============================================================
 -- the ieee8021BridgeTp subtree
 -- =============================================================
--- This is implemented by those bridges that support the
--- transparent bridging mode.  A transparent bridge will
+-- This is implemented by those Bridges that support the
+-- transparent bridging mode.  A transparent Bridge will
 -- implement this subtree.
 -- =============================================================
 
@@ -864,7 +870,7 @@ ieee8021BridgeTpPortTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A table that contains information about every port that
-        is associated with this transparent bridge."
+        is associated with this transparent Bridge."
     REFERENCE   "12.4.2"
     ::= { ieee8021BridgeTp 1 }
 
@@ -874,7 +880,7 @@ ieee8021BridgeTpPortEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A list of objects containing information for each port of
-         a transparent bridge."
+         a transparent Bridge."
     INDEX   { ieee8021BridgeTpPortComponentId,
               ieee8021BridgeTpPort }
     ::= { ieee8021BridgeTpPortTable 1 }
@@ -901,7 +907,7 @@ ieee8021BridgeTpPortComponentId OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The component identifier is used to distinguish between the
-        multiple virtual bridge instances within a PBB.  In simple
+        multiple virtual Bridge instances within a PBB.  In simple
         situations where there is only a single component the default
         value is 1."
     ::= { ieee8021BridgeTpPortEntry 1 }
@@ -936,7 +942,7 @@ ieee8021BridgeTpPortInFrames OBJECT-TYPE
         interface corresponding to this port is only counted by
         this object if and only if it is for a protocol being
         processed by the local bridging function, including
-        bridge management frames.
+        Bridge management frames.
 
         Discontinuities in the value of the counter can occur
         at re-initialization of the management system, and at
@@ -957,7 +963,7 @@ ieee8021BridgeTpPortOutFrames OBJECT-TYPE
         the interface corresponding to this port is only counted
         by this object if and only if it is for a protocol being
         processed by the local bridging function, including
-        bridge management frames.
+        Bridge management frames.
 
         Discontinuities in the value of the counter can occur
         at re-initialization of the management system, and at
@@ -998,7 +1004,7 @@ ieee8021BridgePortPriorityTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A table that contains information about every port that
-        is associated with this transparent bridge."
+        is associated with this transparent Bridge."
     ::= { ieee8021BridgePriority 1 }
 
 ieee8021BridgePortPriorityEntry OBJECT-TYPE
@@ -1007,7 +1013,7 @@ ieee8021BridgePortPriorityEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A list of Default User Priorities for each port of a
-        transparent bridge.  This is indexed by
+        transparent Bridge.  This is indexed by
         ieee8021BridgeBasePortComponentId and
         ieee8021BridgeBasePort."
     AUGMENTS { ieee8021BridgeBasePortEntry }
@@ -1034,9 +1040,9 @@ ieee8021BridgePortDefaultUserPriority OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The default ingress User Priority for this port.  This
+        "The default ingress priority for this port.  This
         only has effect on media, such as Ethernet, that do not
-        support native User Priority.
+        support native priority.
 
         The value of this object MUST be retained across
         reinitializations of the management system."
@@ -1078,7 +1084,7 @@ ieee8021BridgePortUseDEI OBJECT-TYPE
         the received PCP value. If the Use_DEI parameter is false(2),
         the DEI shall be transmitted as zero and ignored on receipt.
         The default value of the Use_DEI parameter is false(2)."
-    REFERENCE   "12.6.2.12, 12.6.2.13"
+    REFERENCE   "12.6.2.11, 12.6.2.12"
     ::= { ieee8021BridgePortPriorityEntry 4 }
 
 ieee8021BridgePortRequireDropEncoding OBJECT-TYPE
@@ -1094,7 +1100,7 @@ ieee8021BridgePortRequireDropEncoding OBJECT-TYPE
         encode particular priorities with drop_eligible, then frames
         queued with those priorities and drop_eligible true(1) shall
         be discarded and not transmitted."
-    REFERENCE   "12.6.2.14, 12.6.2.15"
+    REFERENCE   "12.6.2.13, 12.6.2.14"
     DEFVAL { false }
     ::= { ieee8021BridgePortPriorityEntry 5 }
 
@@ -1107,11 +1113,11 @@ ieee8021BridgePortServiceAccessPrioritySelection OBJECT-TYPE
         function is supported on the Customer Bridge Port to request
         priority handling of the frame from a Port-based service
         interface."
-    REFERENCE   "12.6.2.16, 12.6.2.17"
+    REFERENCE   "12.6.2.15, 12.6.2.16"
     ::= { ieee8021BridgePortPriorityEntry 6 }
 
 -- =============================================================
--- User Priority Regeneration Table
+-- Priority Regeneration Table
 -- =============================================================
 
 ieee8021BridgeUserPriorityRegenTable OBJECT-TYPE
@@ -1120,13 +1126,13 @@ ieee8021BridgeUserPriorityRegenTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A list of Regenerated User Priorities for each received
-        User Priority on each port of a bridge.  The Regenerated
-        User Priority value may be used to index the Traffic
+        priority on each port of a Bridge.  The regenerated
+        priority value may be used to index the Traffic
         Class Table for each input port.  This only has effect
-        on media that support native User Priority.  The default
+        on media that support native priority.  The default
         values for Regenerated User Priorities are the same as
         the User Priorities."
-    REFERENCE   "6.5"
+    REFERENCE   "6.5.9, 6.9.4"
     ::= { ieee8021BridgePriority 2 }
 
 ieee8021BridgeUserPriorityRegenEntry OBJECT-TYPE
@@ -1134,8 +1140,8 @@ ieee8021BridgeUserPriorityRegenEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "A mapping of incoming User Priority to a Regenerated
-        User Priority."
+        "A mapping of incoming priority to a regenerated
+        priority."
     INDEX   { ieee8021BridgeBasePortComponentId,
               ieee8021BridgeBasePort,
               ieee8021BridgeUserPriority }
@@ -1154,7 +1160,7 @@ ieee8021BridgeUserPriority OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The User Priority for a frame received on this port."
+        "The priority for a frame received on this port."
     ::= { ieee8021BridgeUserPriorityRegenEntry 1 }
 
 ieee8021BridgeRegenUserPriority OBJECT-TYPE
@@ -1162,7 +1168,7 @@ ieee8021BridgeRegenUserPriority OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The Regenerated User Priority that the incoming User
+        "The regenerated priority that the incoming User
         Priority is mapped to for this port.
 
         The value of this object MUST be retained across
@@ -1178,10 +1184,10 @@ ieee8021BridgeTrafficClassTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "A table mapping evaluated User Priority to Traffic
-        Class, for forwarding by the bridge.  Traffic class is a
+        "A table mapping evaluated priority to Traffic
+        Class, for forwarding by the Bridge.  Traffic class is a
         number in the range (0..(ieee8021BridgePortNumTrafficClasses-1))."
-    REFERENCE   "Table 8-4"
+    REFERENCE   "8.6.6, Table 8-5"
     ::= { ieee8021BridgePriority 3 }
 
 ieee8021BridgeTrafficClassEntry OBJECT-TYPE
@@ -1189,7 +1195,7 @@ ieee8021BridgeTrafficClassEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "User Priority to Traffic Class mapping."
+        "Priority to Traffic Class mapping."
     INDEX   { ieee8021BridgeBasePortComponentId,
               ieee8021BridgeBasePort,
               ieee8021BridgeTrafficClassPriority }
@@ -1218,7 +1224,7 @@ ieee8021BridgeTrafficClassPriority OBJECT-TYPE
 
         For untagged frames received from non-Ethernet media,
         this value is equal to the ieee8021BridgeRegenUserPriority value
-        for the ingress port and media-specific user priority."
+        for the ingress port and media-specific priority."
     ::= { ieee8021BridgeTrafficClassEntry 1 }
 
 ieee8021BridgeTrafficClass OBJECT-TYPE
@@ -1241,10 +1247,10 @@ ieee8021BridgePortOutboundAccessPriorityTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "A table mapping Regenerated User Priority to Outbound
+        "A table mapping regenerated priority to Outbound
         Access Priority.  This is a fixed mapping for all port
-        types, with three options for 802.17 RPR."
-    REFERENCE   "6.6.1 and 6.7.3"
+        types, with three options for IEEE 802.17 RPR."
+    REFERENCE   "IEEE Std 802.1AC"
     ::= { ieee8021BridgePriority 4 }
 
 ieee8021BridgePortOutboundAccessPriorityEntry OBJECT-TYPE
@@ -1252,7 +1258,7 @@ ieee8021BridgePortOutboundAccessPriorityEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Regenerated User Priority to Outbound Access Priority
+        "Regenerated priority to Outbound Access Priority
         mapping."
     INDEX   { ieee8021BridgeBasePortComponentId,
               ieee8021BridgeBasePort,
@@ -1284,9 +1290,9 @@ ieee8021BridgePortDecodingTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A table that contains information about Priority Code
-        Point Decoding Table for a Port of a provider bridge.
+        Point Decoding Table for a Port of a provider Bridge.
         Alternative values for each table are specified as rows
-        in Table 6-4 (6.7.3), with each alternative labeled by
+        in Table 6-3 (6.9.3), with each alternative labeled by
         the number of distinct priorities that can be communicated,
         and the number of these for which drop precedence can
         be communicated.  All writable objects in this table MUST
@@ -1299,7 +1305,7 @@ ieee8021BridgePortDecodingEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A list of objects containing Priority Code Point Decoding
-        information for a port of a provider bridge."
+        information for a port of a provider Bridge."
     INDEX { ieee8021BridgePortDecodingComponentId,
             ieee8021BridgePortDecodingPortNum,
             ieee8021BridgePortDecodingPriorityCodePointRow,
@@ -1327,7 +1333,7 @@ ieee8021BridgePortDecodingComponentId OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The component identifier is used to distinguish between the
-        multiple virtual bridge instances within a PBB.  In simple
+        multiple virtual Bridge instances within a PBB.  In simple
         situations where there is only a single component the default
         value is 1."
     ::= { ieee8021BridgePortDecodingEntry 1 }
@@ -1346,7 +1352,7 @@ ieee8021BridgePortDecodingPriorityCodePointRow OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The specific row in Table 6-3 (6.7.3) indicating the PCP."
+        "The specific row in Table 6-2 (6.9.3) indicating the PCP."
     ::= { ieee8021BridgePortDecodingEntry 3 }
 
 ieee8021BridgePortDecodingPriorityCodePoint OBJECT-TYPE
@@ -1354,7 +1360,7 @@ ieee8021BridgePortDecodingPriorityCodePoint OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The specific PCP value in Table 6-3 (6.7.3)."
+        "The specific PCP value in Table 6-2 (6.9.3)."
     ::= { ieee8021BridgePortDecodingEntry 4 }
 
 ieee8021BridgePortDecodingPriority OBJECT-TYPE
@@ -1362,8 +1368,8 @@ ieee8021BridgePortDecodingPriority OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The specific priority value in Table 6-3 (6.7.3)."
-    REFERENCE   "12.6.2.8, 12.6.2.9"
+        "The specific priority value in Table 6-2 (6.9.3)."
+    REFERENCE   "6.9.3, 12.6.2.8, 12.6.2.9"
     ::= { ieee8021BridgePortDecodingEntry 5 }
 
 ieee8021BridgePortDecodingDropEligible OBJECT-TYPE
@@ -1372,7 +1378,7 @@ ieee8021BridgePortDecodingDropEligible OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The drop eligibility value in Table 6-3 (6.7.3)."
-    REFERENCE   "12.6.2.8, 12.6.2.9"
+    REFERENCE   "6.9.3, 12.6.2.8, 12.6.2.9"
     ::= { ieee8021BridgePortDecodingEntry 6 }
 
 -- =============================================================
@@ -1385,9 +1391,9 @@ ieee8021BridgePortEncodingTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A table that contains information about Priority Code
-        Point Decoding Table for a Port of a provider bridge.
+        Point Decoding Table for a Port of a provider Bridge.
         Alternative values for each table are specified as rows
-        in Table 6-3 (6.7.3), with each alternative labeled by
+        in Table 6-2 (6.9.3), with each alternative labeled by
         the number of distinct priorities that can be communicated,
         and the number of these for which drop precedence can be
         communicated.  All writable objects in this table MUST be
@@ -1400,7 +1406,7 @@ ieee8021BridgePortEncodingEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A list of objects containing Priority Code Point Encoding
-        information for a port of a provider bridge."
+        information for a port of a provider Bridge."
     INDEX { ieee8021BridgePortEncodingComponentId,
             ieee8021BridgePortEncodingPortNum,
             ieee8021BridgePortEncodingPriorityCodePointRow,
@@ -1429,7 +1435,7 @@ ieee8021BridgePortEncodingComponentId OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The component identifier is used to distinguish between the
-        multiple virtual bridge instances within a PBB.  In simple
+        multiple virtual Bridge instances within a PBB.  In simple
         situations where there is only a single component the default
         value is 1."
     ::= { ieee8021BridgePortEncodingEntry 1 }
@@ -1448,8 +1454,8 @@ ieee8021BridgePortEncodingPriorityCodePointRow OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The specific row in Table 6-3 (6.7.3)indicating the PCP row.
-         (i.e. 8P0D, 7P1D, 6P2D, 5P3D)"
+        "The specific row in Table 6-2 (6.9.3) indicating the PCP row.
+         (i.e., 8P0D, 7P1D, 6P2D, 5P3D)"
     ::= { ieee8021BridgePortEncodingEntry 3 }
 
 ieee8021BridgePortEncodingPriorityCodePoint OBJECT-TYPE
@@ -1457,7 +1463,7 @@ ieee8021BridgePortEncodingPriorityCodePoint OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The specific row in Table 6-3 (6.7.3) indicating the PCP.
+        "The specific row in Table 6-2 (6.9.3) indicating the PCP.
          (i.e., 0,1,2,3,4,5,6,7)."
     ::= { ieee8021BridgePortEncodingEntry 4 }
 
@@ -1466,7 +1472,7 @@ ieee8021BridgePortEncodingDropEligible OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The specific row in Table 6-3 (6.7.3) indicating the drop
+        "The specific row in Table 6-2 (6.9.3) indicating the drop
          eligibility.  A value of true(1) means eligible for drop."
     ::= { ieee8021BridgePortEncodingEntry 5 }
 
@@ -1475,8 +1481,8 @@ ieee8021BridgePortEncodingPriority OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The encoding priority in Table 6-3 (6.7.3)."
-    REFERENCE   "12.6.2.10, 12.6.2.11"
+        "The encoding priority in Table 6-2 (6.9.3)."
+    REFERENCE   "6.9.3, 12.6.2.9, 12.6.2.10"
     ::= { ieee8021BridgePortEncodingEntry 6 }
 
 -- =============================================================
@@ -1489,7 +1495,7 @@ ieee8021BridgeServiceAccessPriorityTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A table that contains information about the  Service Access
-        Priority Selection function for a provider bridge.  The use
+        Priority Selection function for a provider Bridge.  The use
         of this table enables a mechanism for a Customer Bridge
         attached to a Provider Bridged Network to request priority
         handling of frames.  All writable objects in this table MUST
@@ -1502,7 +1508,7 @@ ieee8021BridgeServiceAccessPriorityEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A list of objects containing information about the Service
-         Access Priority Selection function for a provider bridge."
+         Access Priority Selection function for a provider Bridge."
     INDEX { ieee8021BridgeServiceAccessPriorityComponentId,
             ieee8021BridgeServiceAccessPriorityPortNum,
             ieee8021BridgeServiceAccessPriorityReceived }
@@ -1525,7 +1531,7 @@ ieee8021BridgeServiceAccessPriorityComponentId OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The component identifier is used to distinguish between the
-        multiple virtual bridge instances within a PBB.  In simple
+        multiple virtual Bridge instances within a PBB.  In simple
         situations where there is only a single component the default
         value is 1."
     ::= { ieee8021BridgeServiceAccessPriorityEntry 1 }
@@ -1544,7 +1550,7 @@ ieee8021BridgeServiceAccessPriorityReceived OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The default received priority value in Table 6-3 (6.7.3).
+        "The default received priority value in Table 6-4.
          (i.e., 0,1,2,3,4,5,6,7)"
     ::= { ieee8021BridgeServiceAccessPriorityEntry 3 }
 
@@ -1553,9 +1559,9 @@ ieee8021BridgeServiceAccessPriorityValue OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The regenerated priority value in Table 6-3 (6.7.3).
+        "The regenerated priority value in Table 6-4.
          (i.e., 0,1,2,3,4,5,6,7)"
-    REFERENCE   "12.6.2.18, 12.6.2.19"
+    REFERENCE   "12.6.2.17, 112.6.2.18"
     ::= { ieee8021BridgeServiceAccessPriorityEntry 4 }
 
 -- =============================================================
@@ -1571,7 +1577,7 @@ ieee8021BridgePortMrpTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "A table of MRP control information about every bridge
+        "A table of MRP control information about every Bridge
         port.  This is indexed by ieee8021BridgeBasePortComponentId
         and ieee8021BridgeBasePort."
     ::= { ieee8021BridgeMrp 1 }
@@ -1581,7 +1587,7 @@ ieee8021BridgePortMrpEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "MRP control information for a bridge port."
+        "MRP control information for a Bridge Port."
     AUGMENTS { ieee8021BridgeBasePortEntry }
     ::= { ieee8021BridgePortMrpTable 1 }
 
@@ -1644,7 +1650,7 @@ ieee8021BridgePortMmrpTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "A table of MMRP control and status information about
-        every bridge port.  Augments the ieee8021BridgeBasePortTable."
+        every Bridge Port.  Augments the ieee8021BridgeBasePortTable."
     ::= { ieee8021BridgeMmrp 1 }
 
 ieee8021BridgePortMmrpEntry OBJECT-TYPE
@@ -1652,7 +1658,7 @@ ieee8021BridgePortMmrpEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "MMRP control and status information for a bridge port."
+        "MMRP control and status information for a Bridge Port."
     AUGMENTS { ieee8021BridgeBasePortEntry }
     ::= { ieee8021BridgePortMmrpTable 1 }
 
@@ -1741,11 +1747,11 @@ ieee8021BridgeILanIfTable OBJECT-TYPE
     DESCRIPTION
          "This table is a sparse augmentation of ifTable and controls
           the creation of the I-LAN Interface.  An I-LAN Interface is
-          used to create internal connections between bridge ports in a
+          used to create internal connections between Bridge Ports in a
           802.1 device.  An I-LAN Interfaces can be directly associated
-          with a set of bridge ports.  An I-LAN Interfaces can also be
+          with a set of Bridge Ports.  An I-LAN Interfaces can also be
           used as a stacking interface to relate other interfaces before
-          association to bridge ports.
+          association to Bridge Ports.
 
           For example, an I-LAN interface can be created to link traffic
           between a PIP and a CBP.  In this case a CBP is created on the
@@ -1785,7 +1791,7 @@ ieee8021BridgeILanIfRowStatus OBJECT-TYPE
     ::= { ieee8021BridgeILanIfEntry 1 }
 
 -- ===========================================================
--- 802.1D Dynamic Port Creation table
+-- Dynamic Port Creation table
 -- ===========================================================
 
 ieee8021BridgeDot1dPortTable OBJECT-TYPE
@@ -1794,7 +1800,7 @@ ieee8021BridgeDot1dPortTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
          "This table provides the capability to dynamically create and
-          delete 802.1D bridge ports.  Each entry in this table MUST
+          delete MAC Bridge Ports.  Each entry in this table MUST
           have a corresponding entry in the ieee8021BridgeBasePortTable.
 
           Entries in this table MUST be persistent over power up
@@ -1829,7 +1835,7 @@ ieee8021BridgeDot1dPortRowStatus OBJECT-TYPE
 
 
 -- =============================================================
--- IEEE 802.1D MIB - Conformance Information
+-- IEEE 802.1Q Bridge MIB - Conformance Information
 -- =============================================================
 
 ieee8021BridgeCompliances
@@ -1891,7 +1897,7 @@ ieee8021BridgeDeviceMmrpGroup OBJECT-GROUP
     STATUS      current
     DESCRIPTION
         "A collection of objects providing device-level control
-        for the Multicast Filtering extended bridge services."
+        for the Multicast Filtering extended Bridge services."
     ::= { ieee8021BridgeGroups 4 }
 
 -- =============================================================
@@ -1935,9 +1941,9 @@ ieee8021BridgeDefaultPriorityGroup OBJECT-GROUP
     }
     STATUS      current
     DESCRIPTION
-        "A collection of objects defining the User Priority
+        "A collection of objects defining the priority
         applicable to each port for media that do not support
-        native User Priority."
+        native priority."
     ::= { ieee8021BridgeGroups 8 }
 
 ieee8021BridgeRegenPriorityGroup OBJECT-GROUP
@@ -1948,7 +1954,7 @@ ieee8021BridgeRegenPriorityGroup OBJECT-GROUP
     DESCRIPTION
         "A collection of objects defining the User Priorities
         applicable to each port for media that support native
-        User Priority."
+        priority."
     ::= { ieee8021BridgeGroups 9 }
 
 ieee8021BridgePriorityGroup OBJECT-GROUP
@@ -1959,7 +1965,7 @@ ieee8021BridgePriorityGroup OBJECT-GROUP
     STATUS      current
     DESCRIPTION
         "A collection of objects defining the traffic classes
-        within a bridge for each evaluated User Priority."
+        within a Bridge for each evaluated priority."
     ::= { ieee8021BridgeGroups 10 }
 
 ieee8021BridgeAccessPriorityGroup OBJECT-GROUP
@@ -2005,7 +2011,7 @@ ieee8021BridgePortDecodingGroup OBJECT-GROUP
     STATUS      current
     DESCRIPTION
         "A collection of objects providing statistics counters for
-        decoding priority and drop eligibility for bridge ports."
+        decoding priority and drop eligibility for Bridge Ports."
     ::= { ieee8021BridgeGroups 14 }
 
 ieee8021BridgePortEncodingGroup OBJECT-GROUP
@@ -2015,7 +2021,7 @@ ieee8021BridgePortEncodingGroup OBJECT-GROUP
     STATUS      current
     DESCRIPTION
         "A collection of objects providing statistics counters for
-        encoding priority and drop eligibility for bridge ports."
+        encoding priority and drop eligibility for Bridge Ports."
     ::= { ieee8021BridgeGroups 15 }
 
 ieee8021BridgeServiceAccessPriorityGroup OBJECT-GROUP
@@ -2067,7 +2073,7 @@ ieee8021BridgeDot1dDynamicPortCreationGroup OBJECT-GROUP
     STATUS      current
     DESCRIPTION
         "A collection of objects providing dynamic creation and
-        deletion of 802.1D bridge ports."
+        deletion of MAC Bridge Ports."
     ::= { ieee8021BridgeGroups 19 }
     
     
@@ -2084,7 +2090,7 @@ ieee8021BridgeBaseIfToPortGroup OBJECT-GROUP
     STATUS      current
     DESCRIPTION
         "A collection of objects providing a map between interface
-        index and component ID and bridge ports."
+        index and component ID and Bridge Ports."
     ::= { ieee8021BridgeGroups 20 }
 
 
@@ -2112,12 +2118,13 @@ ieee8021BridgePhyPortGroup   OBJECT-GROUP
 ieee8021BridgeCompliance1 MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION
-        "The compliance statement for devices supporting bridging
-        services as defined in 802.1D-2004.  Such devices support
-        path cost values of 32-bits, and bridge and port priority
-        values are more restricted than in 802.1D-1995.
+        "The compliance statement for devices supporting
+        VLAN-unaware bridging services as defined in 
+        IEEE Std 802.1Q.  Such devices support
+        path cost values of 32-bits, and Bridge and port priority
+        values are more restricted than in IEEE Std 802.1D-1995.
 
-        Full support for the 802.1D management objects requires
+        Full support for the IEEE 802.1Q management objects requires
         implementation of the objects listed in the systemGroup
         from the SNMPv2-MIB [RFC3418], as well as the objects
         listed in the ifGeneralInformationGroup from the
@@ -2142,34 +2149,34 @@ ieee8021BridgeCompliance1 MODULE-COMPLIANCE
     GROUP ieee8021BridgeCreatableBaseBridgeGroup
     DESCRIPTION
         "Implementation of this group is mandatory for
-         bridges that allow management systems to add and delete
-         bridge components.  Provider Backbone Edge Bridges would
+         Bridges that allow management systems to add and delete
+         Bridge components.  Provider Backbone Edge Bridges would
          typically fall in this category."
 
     GROUP   ieee8021BridgeTpPortGroup
     DESCRIPTION
         "Implementation of this group is mandatory for
-        bridges that support the transparent bridging
-        mode.  A transparent bridge will implement
+        Bridges that support the transparent bridging
+        mode.  A transparent Bridge will implement
         this group."
 
     GROUP   ieee8021BridgeInternalLANGroup
     DESCRIPTION
         "Implementation of this group is optional.  It can be supported
         to provide control over the relationship between interfaces and
-        bridge ports where such relationships are more complex than a
+        Bridge Ports where such relationships are more complex than a
         simple 1-to-1 mapping."
 
     GROUP   ieee8021BridgeDot1dDynamicPortCreationGroup
     DESCRIPTION
         "Implementation of this group is optional.  It can be supported
-        to provide the ability to dynamically create and deleted 802.1D
-        bridge ports."
+        to provide the ability to dynamically create and delete
+        MAC Bridge Ports."
         
     GROUP  ieee8021BridgeBaseIfToPortGroup
     DESCRIPTION
          "A collection of objects providing a map between interface
-        index and component ID and bridge ports."
+        index and component ID and Bridge Ports."
     GROUP   ieee8021BridgePhyPortGroup
     DESCRIPTION
          "A colelction of objects providing a map between port numbers
@@ -2181,12 +2188,13 @@ ieee8021BridgeCompliance1 MODULE-COMPLIANCE
 ieee8021BridgeCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION
-        "The compliance statement for devices supporting bridging
-        services as defined in 802.1D-2004.  Such devices support
-        path cost values of 32-bits, and bridge and port priority
-        values are more restricted than in 802.1D-1995.
+        "The compliance statement for devices supporting
+        VLAN-unaware bridging services as defined in 
+        IEEE Std 802.1Q.  Such devices support
+        path cost values of 32-bits, and Bridge and port priority
+        values are more restricted than in IEEE Std 802.1D-1995.
 
-        Full support for the 802.1D management objects requires
+        Full support for the IEEE 802.1Q management objects requires
         implementation of the objects listed in the systemGroup
         from the SNMPv2-MIB [RFC3418], as well as the objects
         listed in the ifGeneralInformationGroup from the
@@ -2211,29 +2219,29 @@ ieee8021BridgeCompliance MODULE-COMPLIANCE
     GROUP ieee8021BridgeCreatableBaseBridgeGroup
     DESCRIPTION
         "Implementation of this group is mandatory for
-         bridges that allow management systems to add and delete
-         bridge components.  Provider Backbone Edge Bridges would
+         Bridges that allow management systems to add and delete
+         Bridge components.  Provider Backbone Edge Bridges would
          typically fall in this category."
 
     GROUP   ieee8021BridgeTpPortGroup
     DESCRIPTION
         "Implementation of this group is mandatory for
-        bridges that support the transparent bridging
-        mode.  A transparent bridge will implement
+        Bridges that support the transparent bridging
+        mode.  A transparent Bridge will implement
         this group."
 
     GROUP   ieee8021BridgeInternalLANGroup
     DESCRIPTION
         "Implementation of this group is optional.  It can be supported
         to provide control over the relationship between interfaces and
-        bridge ports where such relationships are more complex than a
+        Bridge Ports where such relationships are more complex than a
         simple 1-to-1 mapping."
 
     GROUP   ieee8021BridgeDot1dDynamicPortCreationGroup
     DESCRIPTION
         "Implementation of this group is optional.  It can be supported
-        to provide the ability to dynamically create and deleted 802.1D
-        bridge ports."
+        to provide the ability to dynamically create and delete
+        Bridge Ports."
 
     ::= { ieee8021BridgeCompliances 1 }
 
@@ -2249,69 +2257,70 @@ ieee8021BridgePriorityAndMulticastFilteringCompliance MODULE-COMPLIANCE
         GROUP       ieee8021BridgeDeviceMmrpGroup
         DESCRIPTION
             "This group is mandatory for devices supporting the MMRP
-            application, defined by IEEE 802.1D Extended Filtering
+            application, defined by IEEE 802.1Q Extended Filtering
             Services."
 
         GROUP       ieee8021BridgeDevicePriorityGroup
         DESCRIPTION
             "This group is mandatory only for devices supporting
             the priority forwarding operations defined by IEEE
-            802.1D."
+            802.1Q."
 
         GROUP       ieee8021BridgeDefaultPriorityGroup
         DESCRIPTION
             "This group is mandatory only for devices supporting
             the priority forwarding operations defined by the
-            extended bridge services with media types, such as
-            Ethernet, that do not support native User Priority."
+            extended Bridge services with media types, such as
+            Ethernet, that do not support native priority."
 
         GROUP       ieee8021BridgeRegenPriorityGroup
         DESCRIPTION
             "This group is mandatory only for devices supporting
-            the priority forwarding operations defined by IEEE 802.1D
-            and that have interface media types that support
-            native User Priority, e.g., IEEE 802.17."
+            the priority forwarding operations defined by IEEE Std
+            802.1Q and that have interface media types that support
+            native priority, e.g., IEEE Std 802.17."
 
         GROUP       ieee8021BridgePriorityGroup
         DESCRIPTION
             "This group is mandatory only for devices supporting
-            the priority forwarding operations defined by IEEE 802.1D."
+            the priority forwarding operations defined by 
+            IEEE Std 802.1Q."
 
         GROUP       ieee8021BridgeAccessPriorityGroup
         DESCRIPTION
             "This group is optional and is relevant only for devices
             supporting the priority forwarding operations defined by
-            IEEE 802.1D and that have interface media types that
+            IEEE Std 802.1Q and that have interface media types that
             support native Access Priority, e.g., IEEE 802.17."
 
         GROUP       ieee8021BridgePortMrpGroup
         DESCRIPTION
             "This group is mandatory for devices supporting any
             of the MRP applications: e.g., MMRP, defined by the
-            extended filtering services of 802.1D; or MVRP,
-            defined by 802.1Q (refer to the Q-BRIDGE-MIB for
-            conformance statements for MVRP)."
+            extended filtering services; or MVRP.
+            Rrefer to the Q-BRIDGE-MIB for
+            conformance statements for MVRP."
 
         GROUP       ieee8021BridgePortMmrpGroup
         DESCRIPTION
             "This group is mandatory for devices supporting the
-            MMRP application, as defined by IEEE 802.1D Extended
+            MMRP application, as defined by IEEE 802.1Q Extended
             Filtering Services."
 
         GROUP       ieee8021BridgePortDecodingGroup
         DESCRIPTION
             "This group is optional and supports Priority Code Point
-            Decoding Table for a Port of a provider bridge."
+            Decoding Table for a Port of a provider Bridge."
 
         GROUP       ieee8021BridgePortEncodingGroup
         DESCRIPTION
             "This group is optional and supports Priority Code Point
-            Encoding Table for a Port of a provider bridge."
+            Encoding Table for a Port of a provider Bridge."
 
         GROUP       ieee8021BridgeServiceAccessPriorityGroup
         DESCRIPTION
             "This group is optional and supports Priority Code Point
-            Encoding Table for a Port of a provider bridge."
+            Encoding Table for a Port of a provider Bridge."
 
         OBJECT      ieee8021BridgePortNumTrafficClasses
         MIN-ACCESS  read-only
@@ -2331,4 +2340,3 @@ ieee8021BridgePriorityAndMulticastFilteringCompliance MODULE-COMPLIANCE
        ::= { ieee8021BridgeCompliances 2 }
 
 END
-

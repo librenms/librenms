@@ -3,10 +3,10 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
-use Hash;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use LibreNMS\Config;
+use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 
 class UpdateUserRequest extends FormRequest
@@ -20,17 +20,13 @@ class UpdateUserRequest extends FormRequest
     {
         /** @var User|null $user */
         $user = $this->route('user');
-        if ($user && $this->user()->can('update', $user)) {
-            // normal users cannot update their roles or ability to modify a password
-            if ($this->user()->cannot('manage', Role::class)) {
+        if ($user) {
+            // normal users cannot update their roles
+            if ($this->user()->cannot('update', Role::class)) {
                 unset($this['roles']);
             }
 
-            if ($user->is($this->user())) {
-                unset($this['can_modify_passwd']);
-            }
-
-            return true;
+            return $this->user()->can('update', $user);
         }
 
         return false;
@@ -43,27 +39,29 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        if ($this->user()->can('update', User::class)) {
+        $user = $this->route('user');
+
+        if ($this->user()->can('update', User::class) && (! $user || ! $user->is($this->user()))) {
             return [
-                'realname' => 'nullable|max:64|alpha_space',
+                'realname' => 'nullable|max:64|string',
                 'email' => 'nullable|email|max:64',
-                'descr' => 'nullable|max:30|alpha_space',
-                'new_password' => 'nullable|confirmed|min:' . Config::get('password.min_length', 8),
+                'descr' => 'nullable|max:30|string',
+                'new_password' => ['nullable', 'confirmed', Password::defaults()],
                 'new_password_confirmation' => 'nullable|same:new_password',
                 'dashboard' => 'int',
                 'roles' => 'array',
                 'roles.*' => Rule::in(Role::query()->pluck('name')),
-                'enabled' => 'nullable',
-                'can_modify_passwd' => 'nullable',
+                'enabled' => 'boolean',
+                'can_modify_passwd' => 'boolean',
             ];
         }
 
         return [
-            'realname' => 'nullable|max:64|alpha_space',
+            'realname' => 'nullable|max:64|string',
             'email' => 'nullable|email|max:64',
-            'descr' => 'nullable|max:30|alpha_space',
+            'descr' => 'nullable|max:30|string',
             'old_password' => 'nullable|string',
-            'new_password' => 'nullable|confirmed|min:' . Config::get('password.min_length', 8),
+            'new_password' => ['nullable', 'confirmed', Password::defaults()],
             'new_password_confirmation' => 'nullable|same:new_password',
             'dashboard' => 'int',
         ];
@@ -77,14 +75,12 @@ class UpdateUserRequest extends FormRequest
      */
     public function withValidator($validator)
     {
-        $validator->after(function ($validator) {
-            // if not an admin and new_password is set, check old password matches
+        $validator->after(function ($validator): void {
             $user = $this->route('user');
-            if ($user && $this->user()->can('update', $user) && $this->user()->is($user)) {
-                if ($this->get('new_password')) {
-                    if ($this->get('old_password')) {
-                        $user = $this->route('user');
-                        if ($user && ! Hash::check($this->old_password, $user->password)) {
+            if ($user && $user->is($this->user())) {
+                if ($this->input('new_password')) {
+                    if ($this->input('old_password')) {
+                        if (! Hash::check($this->old_password, $user->password)) {
                             $validator->errors()->add('old_password', __('Existing password did not match'));
                         }
                     } else {
@@ -93,5 +89,23 @@ class UpdateUserRequest extends FormRequest
                 }
             }
         });
+    }
+
+    /**
+     * Prepare the data for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation(): void
+    {
+        $user = $this->route('user');
+
+        // Only handle checkboxes for admins updating other users (where the checkboxes exist in the UI)
+        if ($this->user()->can('update', User::class) && (! $user || ! $user->is($this->user()))) {
+            $this->merge([
+                'enabled' => $this->boolean('enabled'),
+                'can_modify_passwd' => $this->boolean('can_modify_passwd'),
+            ]);
+        }
     }
 }

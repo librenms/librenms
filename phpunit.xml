@@ -17,6 +17,7 @@
     <exclude>
       <group>browser</group>
       <group>mibs</group>
+      <group>external-dependencies</group>
     </exclude>
   </groups>
   <php>

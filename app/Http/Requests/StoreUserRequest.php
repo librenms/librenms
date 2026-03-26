@@ -5,8 +5,8 @@ namespace App\Http\Requests;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
 use Spatie\Permission\Models\Role;
 
 class StoreUserRequest extends FormRequest
@@ -19,7 +19,7 @@ class StoreUserRequest extends FormRequest
     public function authorize(): bool
     {
         if ($this->user()->can('create', User::class)) {
-            if ($this->user()->cannot('manage', Role::class)) {
+            if ($this->user()->cannot('update', Role::class)) {
                 unset($this['roles']);
             }
 
@@ -48,7 +48,7 @@ class StoreUserRequest extends FormRequest
             'descr' => 'nullable|max:30|alpha_space',
             'roles' => 'array',
             'roles.*' => 'exists:roles,name',
-            'new_password' => 'required|confirmed|min:' . Config::get('password.min_length', 8),
+            'new_password' => ['required', 'confirmed', Password::defaults()],
             'dashboard' => 'int',
         ];
     }

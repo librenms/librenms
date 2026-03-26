@@ -27,16 +27,17 @@
 namespace App\Http\Controllers\Widgets;
 
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class NotesController extends WidgetController
 {
-    protected $title = 'Notes';
+    protected string $name = 'notes';
     protected $defaults = [
         'title' => null,
         'notes' => null,
     ];
 
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $settings = $this->getSettings();
 
@@ -53,10 +54,5 @@ class NotesController extends WidgetController
         $output = \LibreNMS\Util\Clean::html(nl2br($settings['notes']), $purifier_config);
 
         return $output;
-    }
-
-    public function getSettingsView(Request $request)
-    {
-        return view('widgets.settings.notes', $this->getSettings(true));
     }
 }

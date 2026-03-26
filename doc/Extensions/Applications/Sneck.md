@@ -24,7 +24,7 @@ metrics below are provided.
 | critical            | Total CRITICAL checks                                                                                                 |
 | unknown             | Total UNKNOWN checks                                                                                                  |
 | errored             | Total checks that errored                                                                                             |
-| time_to_polling     | Differnce in seconds between when polling data was generated and when polled                                          |
+| time_to_polling     | Difference in seconds between when polling data was generated and when polled                                         |
 | time_to_polling_abs | The absolute value of time_to_polling.                                                                                |
 | check_$CHECK        | Exit status of a specific check `$CHECK` is equal to the name of the check in question. So `foo` would be `check_foo` |
 

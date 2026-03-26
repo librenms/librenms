@@ -1,9 +1,9 @@
 --==================================================================
--- Copyright (C) 2006 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Transmission Alarm Damping MIB
 -- Reference:
--- Version: V1.0
+-- Version: V2.01
 -- History:
 -- <author>,  <date>,  <contents>
 -- Jiangwei   2006-6-28
@@ -18,11 +18,14 @@
 HUAWEI-TAD-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32, OBJECT-IDENTITY
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, OBJECT-IDENTITY
         FROM SNMPv2-SMI  
         
     TEXTUAL-CONVENTION, DisplayString, DateAndTime
       FROM SNMPv2-TC
+      
+    OBJECT-GROUP, MODULE-COMPLIANCE            
+      FROM SNMPv2-CONF    
       
     hwDatacomm
         FROM HUAWEI-MIB
@@ -31,19 +34,28 @@ IMPORTS
         FROM IF-MIB ;
         
     hwTAD MODULE-IDENTITY
-        LAST-UPDATED "200606281600Z"        
-    ORGANIZATION 
-        "Huawei Technologies co.,Ltd."
-    CONTACT-INFO 
-        "VRP Platform Team Huawei Technologies co.,Ltd.
-        Huawei Bld.,NO.3 Xinxi Rd., 
-        Shang-Di Information Industry Base,
-        Hai-Dian District Beijing P.R. China
-        http://www.huawei.com
-            Zip:100085"
-    DESCRIPTION
+       LAST-UPDATED "201403191100Z"        
+         ORGANIZATION
+            "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO 
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com
+              "
+          DESCRIPTION
             "The Custom damping MIB module is defined to manage the configuration under system or interface view."
+
+      REVISION "201403191100Z"        
+            DESCRIPTION  
+              "Update hwTADAlarmType , add object-type prefectca(40)."
+      REVISION "200606281600Z"        
+            DESCRIPTION  
+              "The Custom damping MIB module is defined to manage the configuration under system or interface view."
             ::= { hwDatacomm 128 }
+              
 
 HWEnableValue ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -94,7 +106,10 @@ hwTADObjects OBJECT IDENTIFIER ::= { hwTAD 1 }
         hwTADResetTime   DateAndTime   ,
         hwTADB3tcaThreshold  Integer32   ,
         hwTADSdbereThreshold  Integer32   ,
-        hwTADSfbereThreshold  Integer32
+        hwTADSfbereThreshold  Integer32   ,
+        hwTADB1tcaThreshold  Integer32   ,
+        hwTADB2tcaThreshold  Integer32   ,
+        hwTADBip2tcaThreshold  Integer32
         }
 
 
@@ -227,6 +242,33 @@ hwTADObjects OBJECT IDENTIFIER ::= { hwTAD 1 }
         DEFVAL      { 3 }
         ::= { hwTADInterfaceEntry 14 }
 
+
+    hwTADB1tcaThreshold OBJECT-TYPE
+        SYNTAX  Integer32(3..9) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "B1tca threshold in form of 10e-n."
+        DEFVAL      { 6 }
+        ::= { hwTADInterfaceEntry 15 }    
+
+
+    hwTADB2tcaThreshold OBJECT-TYPE
+        SYNTAX  Integer32(3..9) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "B2tca threshold in form of 10e-n."
+        DEFVAL      { 6 }
+        ::= { hwTADInterfaceEntry 16 }
+
+
+    hwTADBip2tcaThreshold OBJECT-TYPE
+        SYNTAX  Integer32(3..9) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "Bip2tca threshold in form of 10e-n."
+        DEFVAL      { 6 }
+        ::= { hwTADInterfaceEntry 17 }     
+
   
 -- ======================= alarm table =========================
 
@@ -293,13 +335,32 @@ hwTADObjects OBJECT IDENTIFIER ::= { hwTAD 1 }
         trool(19),
         puneq(20),
         lcd(21),
-        wlnk(22)
+        wlnk(22),
+        oduais(23),
+        odulck(24),
+        oduoci(25),
+        otuais(26),
+        otuom(27),
+        otusdber(28),
+        otusfber(29),
+        pmbdi(30),
+        pmtim(31),
+        rlof(32),
+        rlos(33),
+        roof(34),
+        smbdi(35),
+        smiae(36),
+        smtim(37),
+        b1tca(38),
+        b2tca(39),
+        prefectca(40)
         }
         MAX-ACCESS not-accessible
         STATUS current
-        DESCRIPTION "Index number of the alarm. The range is from 1 to 22, corresponding to:
-        auais, batca, lais, lof, lom, lop, los, lrdi, lrei, oof, pais, prdi, prei, pplm, rdool,
-        rrool, sdbere, sfbere, trool, puneq, lcd, wlnk."
+        DESCRIPTION "Index number of the alarm. The range is from 1 to 39, corresponding to:
+        auais, b3tca, lais, lof, lom, lop, los, lrdi, lrei, oof, pais, prdi, prei, pplm, rdool,
+        rrool, sdbere, sfbere, trool, puneq, lcd, wlnk, oduais, odulck, oduoci, otuais, otulom,
+        otusdber, otusfber, pmbdi, pmtim, rlof, rlos, roof, smbdi, smiae, smtim, b1tca, b2tca, prefectca."
         ::= { hwTADAlarmEntry 2 }
         
 
@@ -381,18 +442,18 @@ hwTADObjects OBJECT IDENTIFIER ::= { hwTAD 1 }
         ::= { hwTADAlarmEntry 10 }  
 
         
--- -------------------------------------------------------------
+-- ==================================================================
 -- HUAWEI-CUSTOM-DAMPING-MIB MIB - Conformance Information
--- -------------------------------------------------------------        
+-- ==================================================================        
         
     hwTADConformance OBJECT IDENTIFIER ::= { hwTAD 2 }
 
     hwTADGroups OBJECT IDENTIFIER ::= { hwTADConformance 1 }
 
 
--- -------------------------------------------------------------
+-- ==================================================================
 -- Units of conformance
--- -------------------------------------------------------------
+-- ==================================================================
 
 hwTADInterfaceGroup OBJECT-GROUP
     OBJECTS {
@@ -432,5 +493,17 @@ hwTADAlarmGroup OBJECT-GROUP
         "A collection of objects providing device level control
         and status information for the alarm."
     ::= { hwTADGroups 2 } 
-
+  
+hwTADCompliances OBJECT IDENTIFIER ::= { hwTADConformance 2 }  
+    hwTADCompliance MODULE-COMPLIANCE
+         STATUS current
+         DESCRIPTION
+            "The core compliance statement for all TAD implementations."
+         MODULE
+         MANDATORY-GROUPS  {
+             hwTADInterfaceGroup,
+             hwTADAlarmGroup
+         }
+         ::= { hwTADCompliances 1 }
+         
 END

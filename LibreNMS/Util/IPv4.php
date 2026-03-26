@@ -132,12 +132,45 @@ class IPv4 extends IP
     }
 
     /**
-     * Convert this IP to an snmp index hex encoded
+     * Convert this IP to an snmp index decimal encoded
      *
      * @return string
      */
     public function toSnmpIndex()
     {
         return (string) $this->ip;
+    }
+
+    /**
+     * Convert this IP to an snmp string
+     *
+     * @return string
+     */
+    public function toSnmpString()
+    {
+        return (string) $this->ip;
+    }
+
+    /**
+     * Calculate missing prefix from IPv4 according to RFC
+     *
+     * @return string
+     */
+    public static function classfullNetmaskFromRfc($ipv4 = '')
+    {
+        $prefix = '';
+        if (preg_match('/(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/', (string) $ipv4, $tmp)) {
+            if ($tmp[1] < 128) { // class A
+                $prefix = '255.0.0.0';
+            }
+            if ($tmp[1] >= 128 && $tmp[1] < 192) { // class B
+                $prefix = '255.255.0.0';
+            }
+            if ($tmp[1] >= 192 && $tmp[1] < 224) { // class C
+                $prefix = '255.255.255.0';
+            }
+        }
+
+        return $prefix;
     }
 }

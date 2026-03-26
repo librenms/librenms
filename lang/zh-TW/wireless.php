@@ -13,7 +13,7 @@ return [
 
     'title' => '無線網路',
     'ap-count' => [
-        'short' => 'AP 數量',
+        'short' => 'APs',
         'long' => 'AP 數量',
         'unit' => '',
     ],
@@ -29,17 +29,17 @@ return [
     ],
     'ccq' => [
         'short' => 'CCQ',
-        'long' => '客戶端連線品質',
+        'long' => '用戶端連線品質',
         'unit' => '%',
     ],
     'errors' => [
         'short' => '錯誤',
-        'long' => '錯誤數量',
+        'long' => '錯誤計數',
         'unit' => '',
     ],
     'error-ratio' => [
-        'short' => '錯誤率',
-        'long' => '位元/封包錯誤率',
+        'short' => '錯誤比例',
+        'long' => '位元/封包錯誤比例',
         'unit' => '%',
     ],
     'error-rate' => [
@@ -59,17 +59,17 @@ return [
     ],
     'mse' => [
         'short' => 'MSE',
-        'long' => '平均誤差',
+        'long' => '均方誤差',
         'unit' => 'dB',
     ],
     'noise-floor' => [
-        'short' => '背景雜訊',
-        'long' => '背景雜訊',
+        'short' => '底噪',
+        'long' => '底噪',
         'unit' => 'dBm',
     ],
     'power' => [
-        'short' => '電力/訊號',
-        'long' => 'TX/RX 電力或訊號',
+        'short' => '功率/訊號',
+        'long' => 'TX/RX 功率或訊號',
         'unit' => 'dBm',
     ],
     'quality' => [
@@ -92,6 +92,21 @@ return [
         'long' => '訊號噪訊比',
         'unit' => 'dB',
     ],
+    'sinr' => [
+        'short' => 'SINR',
+        'long' => '訊號對干擾加噪訊比',
+        'unit' => 'dB',
+    ],
+    'rsrq' => [
+        'short' => 'RSRQ',
+        'long' => '參考訊號接收品質',
+        'unit' => 'dB',
+    ],
+    'rsrp' => [
+        'short' => 'RSRP',
+        'long' => '參考訊號接收功率',
+        'unit' => 'dBm',
+    ],
     'ssr' => [
         'short' => 'SSR',
         'long' => '訊號強度比',
@@ -107,5 +122,14 @@ return [
         'long' => '交互極化干擾',
         'unit' => 'dB',
     ],
-
+    'cell' => [
+        'short' => '細胞',
+        'long' => '細胞',
+        'unit' => '',
+    ],
+    'channel' => [
+        'short' => '頻道',
+        'long' => '頻道',
+        'unit' => '',
+    ],
 ];

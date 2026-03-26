@@ -1,1 +1,1 @@
-<img width="{{ $width }}" height="{{ $height }}" src="{{ $src }}" alt="{{ $type }}" {{ $attributes->filter($filterAttributes)->merge(['class' => 'graph-image']) }} {{ $attributes->only('loading') }}>
+<img width="{{ $width }}" height="{{ $height }}" src="{{ $src }}" alt="{{ $type }}" {{ $attributes->filter($filterAttributes)->merge(['class' => 'graph-image ' . ($attributes->get('img-class') ?? '')]) }} {{ $attributes->only('loading') }}>

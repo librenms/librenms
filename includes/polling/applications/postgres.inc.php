@@ -10,7 +10,7 @@ $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.115.116.103.114.101.115';
 $postgres = snmp_walk($device, $oid, $options);
 
 [$backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
-    $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del] = explode("\n", $postgres);
+    $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del] = explode("\n", (string) $postgres);
 
 $rrd_name = ['app', $name, $app->app_id];
 $metrics = [];
@@ -59,7 +59,7 @@ $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_
 app('Datastore')->put($device, 'app', $tags, $fields);
 
 //process each database
-$db_lines = explode("\n", $postgres);
+$db_lines = explode("\n", (string) $postgres);
 $db_lines_int = 17;
 $databases = [];
 

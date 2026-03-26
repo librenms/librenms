@@ -21,7 +21,7 @@ Connect to the server command line and follow the instructions below.
 === "Ubuntu 24.04"
     === "NGINX"
         ```
-        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd unzip python3-command-runner python3-pymysql python3-dotenv python3-redis python3-setuptools python3-psutil python3-systemd python3-pip whois traceroute
+        apt install acl curl fping git mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip python3-command-runner python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd traceroute unzip whois
         ```
 
 === "Ubuntu 22.04"
@@ -30,7 +30,7 @@ Connect to the server command line and follow the instructions below.
         apt install software-properties-common
         LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
         apt update
-        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php8.3-cli php8.3-curl php8.3-fpm php8.3-gd php8.3-gmp php8.3-mbstring php8.3-mysql php8.3-snmp php8.3-xml php8.3-zip rrdtool snmp snmpd unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-psutil python3-systemd python3-pip whois traceroute
+        apt install acl curl fping git mariadb-client mariadb-server mtr-tiny nginx-full nmap php8.3-cli php8.3-curl php8.3-fpm php8.3-gd php8.3-gmp php8.3-mbstring php8.3-mysql php8.3-snmp php8.3-xml php8.3-zip python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd traceroute unzip whois
         ```
 
     === "Apache"
@@ -39,7 +39,7 @@ Connect to the server command line and follow the instructions below.
         add-apt-repository universe
         LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
         apt update
-        apt install acl curl apache2 fping git graphviz imagemagick libapache2-mod-fcgid mariadb-client mariadb-server mtr-tiny nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip unzip traceroute
+        apt install acl apache2 curl fping git libapache2-mod-fcgid mariadb-client mariadb-server mtr-tiny nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd traceroute unzip whois
         ```
 
 === "CentOS 8"
@@ -49,7 +49,7 @@ Connect to the server command line and follow the instructions below.
         dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         dnf module reset php
         dnf module enable php:8.2
-        dnf install bash-completion cronie fping git ImageMagick mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
+        dnf install bash-completion cronie fping git mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
         ```
 
     === "Apache"
@@ -58,19 +58,19 @@ Connect to the server command line and follow the instructions below.
         dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         dnf module reset php
         dnf module enable php:8.2
-        dnf install bash-completion cronie fping gcc git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-devel python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip 
+        dnf install bash-completion cronie fping gcc git httpd mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-devel python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
         ```
 
 === "Debian 12"
     === "NGINX"
         ```
-        apt install lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd unzip whois
+        apt install acl ca-certificates curl fping git lsb-release mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd unzip wget whois
         ```
 
 === "Debian 13"
     === "NGINX"
         ```
-        apt install lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-command-runner python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd unzip whois
+        apt install acl ca-certificates curl fping git lsb-release mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-command-runner python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd unzip wget whois
         ```
 
 ## Add librenms user
@@ -107,12 +107,15 @@ Then run the composer wrapper script and exit back to the root user:
 ./scripts/composer_wrapper.php install --no-dev
 exit
 ```
-Sometimes when there is a proxy used to gain internet access, the above script may fail. The workaround is to install the `composer` package manually. For a global installation:
-```
-wget https://getcomposer.org/composer-stable.phar
-mv composer-stable.phar /usr/bin/composer
-chmod +x /usr/bin/composer
-```
+
+!!! note
+    Sometimes when there is a proxy used to gain internet access, the above script may fail.
+    The workaround is to install the `composer` package manually. For a global installation:
+    ```
+    wget https://getcomposer.org/composer-stable.phar
+    mv composer-stable.phar /usr/bin/composer
+    chmod +x /usr/bin/composer
+    ```
 
 ## Set timezone
 
@@ -162,10 +165,24 @@ timedatectl set-timezone Etc/UTC
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
+    
+    Within the `[mysqld]` section add:
+
+    ```
+    innodb_file_per_table=1
+    lower_case_table_names=0
+    ```
 
 === "Ubuntu 22.04"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
+    ```
+
+    Within the `[mysqld]` section add:
+
+    ```
+    innodb_file_per_table=1
+    lower_case_table_names=0
     ```
 
 === "CentOS 8"
@@ -173,22 +190,37 @@ timedatectl set-timezone Etc/UTC
     vi /etc/my.cnf.d/mariadb-server.cnf
     ```
 
+    Within the `[mysqld]` section add:
+
+    ```
+    innodb_file_per_table=1
+    lower_case_table_names=0
+    ```
+
 === "Debian 12"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
+
+    Within the `[mysqld]` section add:
+
+    ```
+    innodb_file_per_table=1
+    lower_case_table_names=0
+    ```    
 
 === "Debian 13"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
 
-Within the `[mysqld]` section add:
+    Within the `[mariadbd]` section add:
 
-```
-innodb_file_per_table=1
-lower_case_table_names=0
-```
+    ```
+    innodb_file_per_table=1
+    lower_case_table_names=0
+    ```
+
 
 Then restart MariaDB
 
@@ -202,7 +234,8 @@ Start MariaDB client
 mysql -u root
 ```
 
-> NOTE: Change the 'password' below to something secure.
+!!! warning
+    Change the 'password' below to something secure.
 
 ```sql
 CREATE DATABASE librenms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -566,6 +599,9 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
 === "Debian 12"
     SELinux not enabled by default
 
+=== "Debian 13"
+    SELinux not enabled by default
+
 ## Allow access through firewall
 === "Ubuntu 24.04"
     Firewall not enabled by default
@@ -599,7 +635,9 @@ cp /opt/librenms/misc/lnms-completion.bash /etc/bash_completion.d/
 `lnms config` is the preferred method for [Configuration](../Support/Configuration.md)
 
 
-## Configure snmpd
+## Configure snmpd (v2c)
+
+If you would like to use SNMPv3 then please [see here](../Support/SNMP-Configuration-Examples.md/#linux-snmpd-v3)
 
 ```
 cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
@@ -624,13 +662,14 @@ systemctl restart snmpd
 cp /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
 ```
 
-> NOTE: Keep in mind  that cron, by default, only uses a very limited
-> set of environment variables. You may need to configure proxy
-> variables for the cron invocation. Alternatively adding the proxy
-> settings in config.php is possible too. The config.php file will be
-> created in the upcoming steps. Review the following URL after you
-> finished librenms install steps:
-> <@= config.site_url =@/Support/Configuration/#proxy-support>
+!!! note
+    Keep in mind  that cron, by default, only uses a very limited
+    set of environment variables. You may need to configure proxy
+    variables for the cron invocation. Alternatively adding the proxy
+    settings in config.php is possible too. The config.php file will be
+    created in the upcoming steps. Review the following URL after you
+    finished librenms install steps:
+    <@= config.site_url =@/Support/Configuration/#proxy-support>
 
 ## Enable the scheduler
 
@@ -641,7 +680,7 @@ systemctl enable librenms-scheduler.timer
 systemctl start librenms-scheduler.timer
 ```
 
-## Copy logrotate config
+## Enable logrotate
 
 LibreNMS keeps logs in `/opt/librenms/logs`. Over time these can
 become large and be rotated out.  To rotate out the old logs you can
@@ -670,19 +709,24 @@ chown librenms:librenms /opt/librenms/config.php
 ## Final steps
 
 That's it!  You now should be able to log in to
-<http://librenms.example.com/>.  Please note that we have not covered
- HTTPS setup in this example, so your LibreNMS install is not secure
- by default.  Please do not expose it to the public Internet unless
- you have configured HTTPS and taken appropriate web server hardening
- steps.
+<http://librenms.example.com/>.
+
+!!! danger
+    Please note that we have not covered
+    HTTPS setup in this example, so your LibreNMS install is not secure
+    by default.  Please do not expose it to the public Internet unless
+    you have configured HTTPS and taken appropriate web server hardening
+    steps.
 
 ## Add the first device
 
 We now suggest that you add localhost as your first device from within the WebUI.
+<https://librenms.example.com/addhost>
 
 ## Troubleshooting
 
-If you ever have issues with your install, run validate.php:
+If you ever have issues with your install, you should run validate which will perform
+some base checks and provide the recommended fixes:
 
 ```
 sudo su - librenms

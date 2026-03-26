@@ -10,18 +10,8 @@ class PollingDevice
 {
     use Dispatchable, SerializesModels;
 
-    /**
-     * @var Device
-     */
-    public $device;
-
-    /**
-     * Create a new event instance.
-     *
-     * @return void
-     */
-    public function __construct(Device $device)
-    {
-        $this->device = $device;
+    public function __construct(
+        public Device $device
+    ) {
     }
 }

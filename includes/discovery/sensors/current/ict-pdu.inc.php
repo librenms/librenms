@@ -25,7 +25,7 @@
  */
 
 // Output Current
-$oids = snmpwalk_cache_oid($device, 'outputEntry', [], 'ICT-DISTRIBUTION-PANEL-MIB');
+$oids = snmpwalk_cache_oid($device, 'outputEntry', [], 'ICT-PDU-MIB');
 
 foreach ($oids as $index => $entry) {
     $output_number = (int) $entry['outputNumber'] + 1;
@@ -44,7 +44,7 @@ foreach ($oids as $index => $entry) {
 }
 
 // System Current
-$systemCurrent = trim(snmp_get($device, 'systemCurrent.0', '-Oqv', 'ICT-DISTRIBUTION-PANEL-MIB'), '" ');
+$systemCurrent = trim((string) SnmpQuery::get('ICT-PDU-MIB::systemCurrent.0')->value(), '" ');
 if (! empty($systemCurrent)) {
     $divisor = 1;
     $index = '7.0';

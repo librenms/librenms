@@ -16,6 +16,9 @@
 
 /* FIXME: is there a central place we can put this? */
 
+use App\Models\Alert;
+use Illuminate\Support\Facades\Gate;
+
 $alert_states = [
     // divined from librenms/alerts.php
     'recovered' => 0,
@@ -35,19 +38,20 @@ $alert_severities = [
     'warning only' => 5,
     'critical only' => 6,
 ];
-if (Auth::user()->hasGlobalAdmin()) {
+$admin_verbose_details = '';
+if (Gate::allows('detail', Alert::class)) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 
 //if( defined('SHOW_SETTINGS') || empty($widget_settings) ) {
 if (defined('SHOW_SETTINGS')) {
-    $current_acknowledged = isset($widget_settings['acknowledged']) ? $widget_settings['acknowledged'] : '';
-    $current_fired = isset($widget_settings['fired']) ? $widget_settings['fired'] : '';
-    $current_severity = isset($widget_settings['severity']) ? $widget_settings['severity'] : '';
-    $current_state = isset($widget_settings['state']) ? $widget_settings['state'] : '';
-    $current_group = isset($widget_settings['group']) ? $widget_settings['group'] : '';
-    $current_proc = isset($widget_settings['proc']) ? $widget_settings['proc'] : '';
-    $current_sorting = isset($widget_settings['sort']) ? $widget_settings['sort'] : '';
+    $current_acknowledged = $widget_settings['acknowledged'] ?? '';
+    $current_fired = $widget_settings['fired'] ?? '';
+    $current_severity = $widget_settings['severity'] ?? '';
+    $current_state = $widget_settings['state'] ?? '';
+    $current_group = $widget_settings['group'] ?? '';
+    $current_proc = $widget_settings['proc'] ?? '';
+    $current_sorting = $widget_settings['sort'] ?? '';
 
     $common_output[] = '
 <form class="form" onsubmit="widget_settings(this); return false;">
@@ -176,7 +180,7 @@ if (defined('SHOW_SETTINGS')) {
     $group = $widget_settings['group'] ?? '';
     $proc = $widget_settings['proc'] ?? '';
     $sort = $widget_settings['sort'] ?? '';
-    $unique_id = $unique_id ?? '';
+    $unique_id ??= '';
 
     $title = 'Alerts';
 

@@ -5,11 +5,10 @@ namespace App\Policies;
 use App\Facades\Permissions;
 use App\Models\Device;
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DevicePolicy
 {
-    use HandlesAuthorization;
+    use ChecksGlobalPermissions;
 
     /**
      * Determine whether the user can view any devices.
@@ -18,18 +17,32 @@ class DevicePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasGlobalRead();
+        return $this->hasGlobalPermission($user, 'view')
+            || $this->hasGlobalPermission($user, 'viewAll')
+            || $this->hasGlobalPermission($user, 'create')
+            || $this->hasGlobalPermission($user, 'update')
+            || $this->hasGlobalPermission($user, 'delete');
+    }
+
+    /**
+     * Determine whether the user can view all models.
+     */
+    public function viewAll(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'viewAll');
     }
 
     /**
      * Determine whether the user can view the device.
-     *
-     * @param  User  $user
-     * @param  Device  $device
      */
     public function view(User $user, Device $device): bool
     {
-        return $this->viewAny($user) || Permissions::canAccessDevice($device, $user);
+        if ($this->hasGlobalPermission($user, 'viewAll')) {
+            return true;
+        }
+
+        return $this->hasGlobalPermission($user, 'view')
+            || Permissions::canAccessDevice($device, $user);
     }
 
     /**
@@ -39,73 +52,41 @@ class DevicePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasGlobalAdmin();
+        return $this->hasGlobalPermission($user, 'create');
     }
 
     /**
      * Determine whether the user can update the device.
-     *
-     * @param  User  $user
-     * @param  Device  $device
      */
-    public function update(User $user, Device $device): bool
+    public function update(User $user): bool
     {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
      * Determine whether the user can delete the device.
-     *
-     * @param  User  $user
-     * @param  Device  $device
      */
-    public function delete(User $user, Device $device): bool
+    public function delete(User $user): bool
     {
-        return $user->isAdmin();
-    }
-
-    /**
-     * Determine whether the user can restore the device.
-     *
-     * @param  User  $user
-     * @param  Device  $device
-     */
-    public function restore(User $user, Device $device): bool
-    {
-        return $user->hasGlobalAdmin();
-    }
-
-    /**
-     * Determine whether the user can permanently delete the device.
-     *
-     * @param  User  $user
-     * @param  Device  $device
-     */
-    public function forceDelete(User $user, Device $device): bool
-    {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'delete');
     }
 
     /**
      * Determine whether the user can view the stored configuration of the device
      * from Oxidized or Rancid
-     *
-     * @param  User  $user
-     * @param  Device  $device
      */
     public function showConfig(User $user, Device $device): bool
     {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'showConfig')
+            && $this->view($user, $device);
     }
 
     /**
      * Determine whether the user can update device notes.
-     *
-     * @param  User  $user
-     * @param  Device  $device
      */
     public function updateNotes(User $user, Device $device): bool
     {
-        return $user->isAdmin();
+        return $this->hasGlobalPermission($user, 'updateNotes')
+            && $this->view($user, $device);
     }
 }

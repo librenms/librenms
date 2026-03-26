@@ -1,4 +1,3 @@
-mib: NETBOTZV2-MIB
 modules:
     os:
         version: .1.3.6.1.4.1.318.1.4.2.4.1.4.1
@@ -7,44 +6,44 @@ modules:
         airflow:
             data:
                 -
-                    oid: airFlowSensorTable
-                    value: airFlowSensorValue
+                    oid: NETBOTZV2-MIB::airFlowSensorTable
+                    value: NETBOTZV2-MIB::airFlowSensorValue
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.5528.100.4.1.5.1.2.{{ $index }}'
-                    descr: airFlowSensorLabel
+                    descr: NETBOTZV2-MIB::airFlowSensorLabel
                     group: Airflow
                     index: 'airFlowSensorValue.{{ $index }}'
         temperature:
             data:
                 -
-                    oid: dewPointSensorTable
-                    value: dewPointSensorValue
+                    oid: NETBOTZV2-MIB::dewPointSensorTable
+                    value: NETBOTZV2-MIB::dewPointSensorValue
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.5528.100.4.1.3.1.2.{{ $index }}'
-                    descr: dewPointSensorLabel
+                    descr: NETBOTZV2-MIB::dewPointSensorLabel
                     group: Dew Point
                     index: 'dewPointSensorValue.{{ $index }}'
                 -
-                    oid: tempSensorTable
-                    value: tempSensorValueInt
+                    oid: NETBOTZV2-MIB::tempSensorTable
+                    value: NETBOTZV2-MIB::tempSensorValueInt
                     num_oid: '.1.3.6.1.4.1.5528.100.4.1.1.1.8.{{ $index }}'
-                    descr: tempSensorLabel
+                    descr: NETBOTZV2-MIB::tempSensorLabel
                     index: '{{ $index }}'
         humidity:
             data:
                 -
-                    oid: humiSensorTable
-                    value: humiSensorValue
+                    oid: NETBOTZV2-MIB::humiSensorTable
+                    value: NETBOTZV2-MIB::humiSensorValue
                     num_oid: '.1.3.6.1.4.1.5528.100.4.1.2.1.8.{{ $index }}'
-                    descr: humiSensorLabel
+                    descr: NETBOTZV2-MIB::humiSensorLabel
                     index: '{{ $index }}'
         state:
             data:
                 -
-                    oid: dryContactSensorTable
-                    value: dryContactSensorValue
+                    oid: NETBOTZV2-MIB::dryContactSensorTable
+                    value: NETBOTZV2-MIB::dryContactSensorValue
                     num_oid: '.1.3.6.1.4.1.5528.100.4.2.1.1.2.{{ $index }}'
-                    descr: dryContactSensorLabel
+                    descr: NETBOTZV2-MIB::dryContactSensorLabel
                     group: Dry Contacts
                     index: 'dryContactSensor.{{ $index }}'
                     state_name: dryContactSensor
@@ -53,10 +52,10 @@ modules:
                         - { descr: open, graph: 0, value: 0, generic: 0 }
                         - { descr: closed, graph: 0, value: 1, generic: 2 }
                 -
-                    oid: doorSwitchSensorTable
-                    value: doorSwitchSensorValue
+                    oid: NETBOTZV2-MIB::doorSwitchSensorTable
+                    value: NETBOTZV2-MIB::doorSwitchSensorValue
                     num_oid: '.1.3.6.1.4.1.5528.100.4.2.2.1.2.{{ $index }}'
-                    descr: doorSwitchSensorLabel
+                    descr: NETBOTZV2-MIB::doorSwitchSensorLabel
                     group: Door Switches
                     index: 'doorSwitchSensor.{{ $index }}'
                     state_name: doorSwitchSensor
@@ -65,10 +64,10 @@ modules:
                         - { descr: open, graph: 0, value: 0, generic: 0 }
                         - { descr: closed, graph: 0, value: 1, generic: 2 }
                 -
-                    oid: cameraMotionSensorTable
-                    value: cameraMotionSensorValue
+                    oid: NETBOTZV2-MIB::cameraMotionSensorTable
+                    value: NETBOTZV2-MIB::cameraMotionSensorValue
                     num_oid: '.1.3.6.1.4.1.5528.100.4.2.3.1.2.{{ $index }}'
-                    descr: cameraMotionSensorLabel
+                    descr: NETBOTZV2-MIB::cameraMotionSensorLabel
                     group: Camera Motion Sensors
                     index: 'cameraMotionSensor.{{ $index }}'
                     state_name: cameraMotionSensor
@@ -77,10 +76,10 @@ modules:
                         - { descr: noMotion, graph: 0, value: 0, generic: 0 }
                         - { descr: motionDetected, graph: 0, value: 1, generic: 2 }
                 -
-                    oid: otherStateSensorTable
-                    value: otherStateSensorErrorStatus
+                    oid: NETBOTZV2-MIB::otherStateSensorTable
+                    value: NETBOTZV2-MIB::otherStateSensorErrorStatus
                     num_oid: '.1.3.6.1.4.1.5528.100.4.2.10.1.3.{{ $index }}'
-                    descr: otherStateSensorLabel
+                    descr: NETBOTZV2-MIB::otherStateSensorLabel
                     index: '{{ $index }}'
                     state_name: otherStateSensorErrorStatus
                     states:

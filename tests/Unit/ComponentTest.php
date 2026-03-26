@@ -33,7 +33,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Component;
 use LibreNMS\Tests\DBTestCase;
 
-class ComponentTest extends DBTestCase
+final class ComponentTest extends DBTestCase
 {
     use DatabaseTransactions;
 
@@ -155,7 +155,7 @@ class ComponentTest extends DBTestCase
 
     public function testCreateComponent(): void
     {
-        $device_id = rand(1, 32);
+        $device_id = random_int(1, 32);
         $type = Str::random(9);
         $component = (new Component())->createComponent($device_id, $type);
 
@@ -196,14 +196,12 @@ class ComponentTest extends DBTestCase
     {
         $collection = $target instanceof \App\Models\Component ? collect([$target]) : $target;
 
-        return $collection->groupBy('device_id')->map(function ($group) {
-            return $group->keyBy('id')->map(function ($model) {
-                $base = ['type' => null, 'label' => null, 'status' => 0, 'ignore' => 0, 'disabled' => 0, 'error' => null];
-                $merge = $model->toArray();
-                unset($merge['device_id'], $merge['id']);
+        return $collection->groupBy('device_id')->map(fn ($group) => $group->keyBy('id')->map(function ($model) {
+            $base = ['type' => null, 'label' => null, 'status' => 0, 'ignore' => 0, 'disabled' => 0, 'error' => null];
+            $merge = $model->toArray();
+            unset($merge['device_id'], $merge['id']);
 
-                return array_merge($base, $merge);
-            });
-        })->toArray();
+            return array_merge($base, $merge);
+        }))->toArray();
     }
 }

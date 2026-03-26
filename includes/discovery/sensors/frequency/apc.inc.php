@@ -9,7 +9,7 @@ if ($oids) {
 
 $divisor = 1;
 $type = 'apc';
-foreach (explode("\n", $oids) as $data) {
+foreach (explode("\n", (string) $oids) as $data) {
     $data = trim($data);
     if ($data) {
         [$oid,$current] = explode(' ', $data, 2);
@@ -30,7 +30,7 @@ if ($oids) {
 
 $divisor = 1;
 $type = 'apc';
-foreach (explode("\n", $oids) as $data) {
+foreach (explode("\n", (string) $oids) as $data) {
     $data = trim($data);
     if ($data) {
         [$oid,$current] = explode(' ', $data, 2);
@@ -38,7 +38,7 @@ foreach (explode("\n", $oids) as $data) {
         $index = $split_oid[count($split_oid) - 3];
         $oid = '.1.3.6.1.4.1.318.1.1.8.5.4.2.1.4.' . $index;
         $descr = 'Output Feed';
-        if (count(explode("\n", $oids)) > 1) {
+        if (count(explode("\n", (string) $oids)) > 1) {
             $descr .= " $index";
         }
 

@@ -64,11 +64,11 @@ abstract class TableController extends PaginatedAjaxController
         $query = $this->baseQuery($request);
 
         $this->filter($request, $query, $this->filterFields($request));
-        $this->search($request->get('searchPhrase'), $query, $this->searchFields($request));
+        $this->search($request->input('searchPhrase'), $query, $this->searchFields($request));
         $this->sort($request, $query);
 
-        $limit = $request->get('rowCount', 25);
-        $page = $request->get('current', 1);
+        $limit = $request->input('rowCount', 25);
+        $page = $request->input('current', 1);
         if ($limit < 0) {
             $limit = $query->count();
             $page = null;
@@ -87,7 +87,7 @@ abstract class TableController extends PaginatedAjaxController
         return response()->json([
             'current' => $paginator->currentPage(),
             'rowCount' => $paginator->count(),
-            'rows' => collect($paginator->items())->map([$this, 'formatItem']),
+            'rows' => collect($paginator->items())->map($this->formatItem(...)),
             'total' => $paginator->total(),
         ]);
     }
@@ -135,13 +135,13 @@ abstract class TableController extends PaginatedAjaxController
 
         $this->filter($request, $query, $this->filterFields($request));
 
-        if ($request->has('searchPhrase') && ! empty($request->get('searchPhrase'))) {
-            $this->search($request->get('searchPhrase'), $query, $this->searchFields($request));
+        if ($request->has('searchPhrase') && ! empty($request->input('searchPhrase'))) {
+            $this->search($request->input('searchPhrase'), $query, $this->searchFields($request));
         }
 
         if ($request->has('current') && $request->has('rowCount')) {
-            $limit = $request->get('rowCount');
-            $page = $request->get('current');
+            $limit = $request->input('rowCount');
+            $page = $request->input('current');
 
             if ($limit > 0) {
                 $offset = ($page - 1) * $limit;
@@ -173,9 +173,7 @@ abstract class TableController extends PaginatedAjaxController
             $fields = \Schema::getColumnListing((new $this->model)->getTable());
 
             // Convert DB column names to human-readable format
-            return array_map(function ($field) {
-                return ucwords(str_replace('_', ' ', $field));
-            }, $fields);
+            return array_map(fn ($field) => ucwords(str_replace('_', ' ', $field)), $fields);
         }
 
         return [];
@@ -194,9 +192,7 @@ abstract class TableController extends PaginatedAjaxController
 
         // If formatItem returns an array, process it to remove HTML
         if (is_array($formatted)) {
-            return array_map(function ($value) {
-                return is_string($value) ? trim(strip_tags($value)) : $value;
-            }, $formatted);
+            return array_map(fn ($value) => is_string($value) ? trim(strip_tags($value)) : $value, $formatted);
         }
 
         if (method_exists($item, 'toArray')) {
@@ -217,7 +213,7 @@ abstract class TableController extends PaginatedAjaxController
     protected function generateCsvResponse($data, $headers, $filename)
     {
         return response()->stream(
-            function () use ($data, $headers) {
+            function () use ($data, $headers): void {
                 $output = fopen('php://output', 'w');
 
                 fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));

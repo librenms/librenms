@@ -292,7 +292,7 @@ the default User Role for Authorized users.   Appropriate care should be taken.
 
 ###  Claims / Access Scopes
 
-Socialite can specifiy scopes that should be included with in the authentication request.
+Socialite can specify scopes that should be included with in the authentication request.
 (see [Larvel docs](https://laravel.com/docs/10.x/socialite#access-scopes) )
 
 For example, if Okta is configured to expose group information it is possible to use these group
@@ -318,7 +318,25 @@ Then setup mappings from the returned claim arrays to the User levels you want
     lnms config:set auth.socialite.claims.RETURN_FROM_CLAIM.roles '["admin"]'
     lnms config:set auth.socialite.claims.OTHER_RETURN_FROM_CLAIM.roles '["global-read","cleaner"]'
     ```
+## Claim Field (advanced)
 
+Some providers deliver role or group membership under a token claim field that
+is **not** a valid OAuth scope name.  Microsoft is a common example: app-role
+assignments arrive in the `roles` claim, but adding `roles` to
+`auth.socialite.scopes` causes Microsoft to return:
+
+```
+AADSTS650053: The application asked for scope 'roles' that doesn't exist
+```
+
+The `claim_field` option solves this by separating *what is requested from the
+IdP* (scopes) from *what key is read in the returned token* (claim_field).  It
+is configured per provider under `auth.socialite.configs.<provider>.claim_field`
+and accepts an array of strings.
+
+```bash
+lnms config:set auth.socialite.configs.microsoft.claim_field roles
+```
 
 ## SAML2 Example
 
@@ -348,7 +366,7 @@ It is up the IdP to provide the relevant details that you will need for configur
 
     ACS URL = https://*your-librenms-url*/auth/saml2/callback
     Entity ID = https://*your-librenms-url*/auth/saml2
-    Name ID format = PERSISTANT
+    Name ID format = PERSISTENT
     Name ID = Basic Information > Primary email
 
     ![socialite-saml-google-4](../img/socialite-saml-google-4.png)
@@ -399,7 +417,7 @@ It is up the IdP to provide the relevant details that you will need for configur
 #### Using an Identity Provider metadata URL
 
 !!! note
-    This is the prefered and easiest way, if your IdP supports it!
+    This is the preferred and easiest way, if your IdP supports it!
 
 !!! setting "settings/auth/socialite"
     ```bash

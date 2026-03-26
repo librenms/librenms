@@ -9,7 +9,7 @@ $oids = SnmpQuery::cache()->hideMib()->numericIndex()->walk('FCMGMT-MIB::connUni
 
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
-        if (preg_match('/ Temp.* ([: 0-9]+ C)/', $entry['connUnitSensorMessage'], $temp_value)) {
+        if (preg_match('/ Temp.* ([: 0-9]+ C)/', (string) $entry['connUnitSensorMessage'], $temp_value)) {
             [$value, $dump] = explode(' ', $temp_value[1]);
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',

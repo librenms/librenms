@@ -39,7 +39,7 @@ class Lcossx extends OS implements ProcessorDiscovery, ProcessorPolling
     private function convertProcessorData(array $input)
     {
         $data = [];
-        $cpuList = explode(',', reset($input)[0]);
+        $cpuList = explode(',', (string) reset($input)[0]);
         foreach ($cpuList as $cpuPart) {
             $cpuValues = explode(':', $cpuPart);
             $cpuName = trim($cpuValues[0]);
@@ -88,7 +88,7 @@ class Lcossx extends OS implements ProcessorDiscovery, ProcessorPolling
         $data = [];
         foreach ($processors as $processor) {
             $processor_id = $processor['processor_id'];
-            $key = explode(' ', $processor['processor_descr'])[1];
+            $key = explode(' ', (string) $processor['processor_descr'])[1];
             $value = $cpuList[$key];
             $data[$processor_id] = $value;
         }

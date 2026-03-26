@@ -28,7 +28,7 @@ namespace LibreNMS;
 
 use App\Facades\LibrenmsConfig;
 
-// not yet: @deprecated Please use the facade App\Facades\LibrenmsConfig instead
+/** @deprecated Please use the facade App\Facades\LibrenmsConfig instead */
 class Config
 {
     /**
@@ -137,11 +137,11 @@ class Config
      * This will effectively set it back to default.
      *
      * @param  string  $key
-     * @return int|false
+     * @return bool
      */
-    public static function erase($key): bool|int
+    public static function erase($key): bool
     {
-        return LibrenmsConfig::erase($key);
+        return LibrenmsConfig::erase((string) $key);
     }
 
     /**

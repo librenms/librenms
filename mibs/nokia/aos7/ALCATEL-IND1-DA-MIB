@@ -21,30 +21,28 @@ ALCATEL-IND1-DA-MIB DEFINITIONS ::= BEGIN
                         FROM SNMP-FRAMEWORK-MIB
                 TmnxEncapVal
                         FROM ALCATEL-IND1-TIMETRA-TC-MIB
+                systemServicesDate, systemServicesTime      
+                        FROM ALCATEL-IND1-SYSTEM-MIB
+                sysName
+                        FROM SNMPv2-MIB
                         ;
-
+                        
         alcatelIND1DaMIB MODULE-IDENTITY
-                LAST-UPDATED "201008160000Z"
-                ORGANIZATION "Alcatel-Lucent"
-                CONTACT-INFO
-            "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
+            LAST-UPDATED "201911270000Z"
+            ORGANIZATION "ALE USA Inc."
+            CONTACT-INFO
+             "Please consult with Customer Service to ensure the most appropriate
+              version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                              ALE USA Inc. Enterprise
+                                26801 West Agoura Road
+                             Agoura Hills, CA  91301-5122
+                               United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+             Telephone:          +1 800 995 2696
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+             Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+             World Wide Web:     https://www.al-enterprise.com"
 
                 DESCRIPTION
                         "This module describes an authoritative enterprise-specific Simple
@@ -61,14 +59,18 @@ ALCATEL-IND1-DA-MIB DEFINITIONS ::= BEGIN
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+        REVISION      "201911270000Z"
+        DESCRIPTION
+                "Updated the latest contact and Copyright information for ALE USA Inc."
 
-                REVISION      "200704030000Z"
+        REVISION      "200704030000Z"
         DESCRIPTION
             "DA module is taking care of the authentication and classification of MACs
-			on a DA port. The pkts from the MAC would be allowed to enter the network
-			only if the authentication and/or classification is done by the DA task."
+            on a DA port. The pkts from the MAC would be allowed to enter the network
+            only if the authentication and/or classification is done by the DA task."
                 ::= { softentIND1Da 1}
 
 
@@ -416,7 +418,35 @@ alaIND1DaMIBObjects OBJECT-IDENTITY
                                     macouiVlanRuleUnpTagMismatchBlk	( 309 ),
                                     l2authVlanRuleUnpTagMismatchBlk	( 310 ),
                                     dmGroupVlanRuleUnpTagMismatchBlk	( 311 ),
-                                    cportalPauseTimerFilter	( 312 )
+                                    cportalPauseTimerFilter	( 312 ),
+                                    noSpbResourceAuthSrvDownUnp		( 313 ),
+                                    authSrvDowniVoiceUnp (314),
+                                    authSrvDownVoiceUnpTagMismatchBlk (315),
+                                    sysMacCollision (316),
+                                    noGreResource (317),
+                                    ovEnforced (318),
+                                    tcamTtiRuleExhaust(319),
+                                    spbNoControlBvlanBlk(320),
+                                    spbServiceIdMismatchBlk(321),
+                                    vxlanServiceIdMismatchBlk(322),
+                                    l2greServiceIdMismatchBlk(323),
+                                    staticServiceIdMismatchBlk(324),
+                                    spbServiceParamMismatchBlk(325),
+                                    vxlanServiceParamMismatchBlk(326),
+                                    l2greServiceParamMismatchBlk(327),
+                                    staticServiceParamMismatchBlk(328),
+                                    staticServiceIdNotFoundBlk(329),
+                                    serviceInternalErrorBlk(330),
+                                    serviceDisabled(331),
+                                    vpConflict(332),
+                                    noVplsResource(333),
+                                    sysDefVpls(334),
+                                    vplsServiceParamMismatchBlk(335),
+                                    vplsServiceIdMismatchBlk(336),
+                                    noVplsResourceAuthSrvDownUnp(337),
+                                    maxUnpUsersExhaust(338),
+                                    radiusTrustTagVlan(339)
+
                 }
 
        AlaDaAuthenticationType ::= TEXTUAL-CONVENTION
@@ -1241,12 +1271,22 @@ AlaDaUNPPortEntry ::=
         alaDaUNPPortDynamicService
             INTEGER,
         alaDaUNPPortPVlanPortType
+            INTEGER,
+        alaDaUNPPortL2Profile
+            SnmpAdminString,
+        alaDaUNPPortApMode
+            INTEGER,
+        alaDaUNPPortApModeSecurity
+            INTEGER,
+        alaDaUNPPortSwSuppSecureMode
+            INTEGER,
+        alaDaUNPPortBpduLldpLearn
             INTEGER
     }
 
 alaDaUNPPortIfIndex OBJECT-TYPE
     SYNTAX      InterfaceIndexOrZero
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
         "The interface index of the UNP enabled port."
@@ -1764,13 +1804,14 @@ alaDaUNPPortDynamicService OBJECT-TYPE
     SYNTAX      INTEGER {
                     none (1),
                     spb  (2),
-                    vxlan (3)
+                    vxlan (3),
+                    vpls (4)
                 }
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
         "Indicates the type of dynamic service for the port. 
-	Dynamic Service type SPB/VXLAN are applicable for Access type UNP port."
+	Dynamic Service type SPB,VXLAN/VPLS are applicable for Access type UNP port."
     DEFVAL          { none }
     ::= { alaDaUNPPortEntry 52 }
 
@@ -1786,6 +1827,62 @@ alaDaUNPPortPVlanPortType OBJECT-TYPE
         "The Port type in PVLAN Domain."
     DEFVAL      { none }
     ::= { alaDaUNPPortEntry 53 }
+
+alaDaUNPPortL2Profile OBJECT-TYPE
+    SYNTAX      SnmpAdminString ( SIZE( 0 .. 32 ) )
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Service L2-Profile to be bound to UNP Dynamic Access Ports 
+        for controlling L2-Traffic passing through that port."
+    ::= { alaDaUNPPortEntry 54 }
+
+alaDaUNPPortApMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable  (1),
+                    disable (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The flag to indicate whether AP-mode is enabled or disabled on port."
+    ::= { alaDaUNPPortEntry 55 }
+
+alaDaUNPPortApModeSecurity OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable  (1),
+                    disable (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The flag to indicate whether AP-mode security is enabled or disabled on port."
+    DEFVAL      { disable } 
+    ::= { alaDaUNPPortEntry 56 }
+
+alaDaUNPPortSwSuppSecureMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable  (1),
+                    disable (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The flag to indicate whether switch supplicant secure mode is enabled or disabled on port."
+    DEFVAL      { disable } 
+    ::= { alaDaUNPPortEntry 57 }
+
+alaDaUNPPortBpduLldpLearn OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable  (1),
+                    disable (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The flag to indicate whether BPDU LLDP learn is enabled or disabled on port."
+    DEFVAL      { disable } 
+    ::= { alaDaUNPPortEntry 58 }
 
 --------------------------------------------------------------
 --  UNP Global configuration
@@ -1815,7 +1912,7 @@ alaDaUNPAuthServerDownUnp OBJECT-TYPE
     ::= { alaDaUNPGlobalConfiguration 2 }
 
 alaDaUNPAuthServerDownTimeout OBJECT-TYPE
-    SYNTAX      Integer32 (10..1000)
+    SYNTAX      Integer32 (10..43200)
     UNITS       "Seconds"
     MAX-ACCESS  read-write
     STATUS      current
@@ -1924,7 +2021,7 @@ alaDaUNPEdgeUserFlush OBJECT-TYPE
 alaDaUNP8021XEdgeUserFlush OBJECT-TYPE
     SYNTAX      TruthValue 
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
         "Global configuration to flush Edge User based on auth 802.1X ."
     DEFVAL   { false } 
@@ -1933,7 +2030,7 @@ alaDaUNP8021XEdgeUserFlush OBJECT-TYPE
 alaDaUNPMacEdgeUserFlush OBJECT-TYPE
     SYNTAX      TruthValue 
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
         "Global configuration to flush Edge User based on auth mac ."
     DEFVAL   { false } 
@@ -1942,7 +2039,7 @@ alaDaUNPMacEdgeUserFlush OBJECT-TYPE
 alaDaUNPNoAuthEdgeUserFlush OBJECT-TYPE
     SYNTAX      TruthValue 
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
         "For no authentication , Global configuration to flush Edge User ."
     DEFVAL   { false } 
@@ -1980,7 +2077,8 @@ alaDaUNPRedirectProxyServerPort OBJECT-TYPE
 alaDaUNPRedirectServerIPType  OBJECT-TYPE
     SYNTAX        InetAddressType  {
                       ipv4(1),
-                      ipv6(2)
+                      ipv6(2),
+                      dns(16)
                   }
     MAX-ACCESS  read-write
     STATUS      current
@@ -2065,15 +2163,282 @@ alaDaUNPAuthServerDownProfile3 OBJECT-TYPE
         "The profile to be used for classification if the authentication server
          is not reachable."
     ::= { alaDaUNPGlobalConfiguration 27 }
-
+	
 alaDaUNPVlanUserFlush OBJECT-TYPE
     SYNTAX      TruthValue 
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
         "Global configuration to flush Vlan User ."
     DEFVAL   { false } 
     ::= { alaDaUNPGlobalConfiguration 28 }
+
+alaDaUNP8021XPassThrough  OBJECT-TYPE
+    SYNTAX     INTEGER {
+      enable (1),
+      disable (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration for 802.1x-pass-through functionality."
+    ::= { alaDaUNPGlobalConfiguration 29 }
+
+alaDaUNPApMode OBJECT-TYPE
+    SYNTAX    INTEGER {
+            enable(1),
+            disable(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration AP mode status"
+    DEFVAL   { enable } 
+    ::= { alaDaUNPGlobalConfiguration 30 } 
+    
+alaDaUNPServiceModule OBJECT-TYPE
+    SYNTAX    Integer32 (1 .. 4096)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration Service Modulo value"
+    DEFVAL   { 512 } 
+    ::= { alaDaUNPGlobalConfiguration 31 } 
+
+alaDaUNPServiceBase OBJECT-TYPE
+    SYNTAX    Integer32 (1 .. 10000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration Service Base value"
+    DEFVAL   { 10000000 } 
+    ::= { alaDaUNPGlobalConfiguration 32 } 
+    
+alaDaUNPServiceMulticastMode OBJECT-TYPE
+    SYNTAX     INTEGER { headend(1), tandem(2), hybrid(3)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration Service Multicast Mode"
+    DEFVAL   { headend } 
+    ::= { alaDaUNPGlobalConfiguration 33 }     
+    
+alaDaUNPServiceVlanXlation OBJECT-TYPE
+    SYNTAX     INTEGER { enable(1), disable(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration Service VlanXlation"
+    DEFVAL   { enable } 
+    ::= { alaDaUNPGlobalConfiguration 34 }     
+    
+alaDaUNPServiceMulticastGroup OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Global configuration Service Multicast Group"
+    ::= { alaDaUNPGlobalConfiguration 35 } 
+    
+alaDaUNPServiceFarEndIpList OBJECT-TYPE
+    SYNTAX     SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration Service Far end ip list"
+    ::= { alaDaUNPGlobalConfiguration 36 }    
+
+alaDaUNPIpv6Drop OBJECT-TYPE
+    SYNTAX    INTEGER {
+            enable(1),
+            disable(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration ipv6 drop status"
+    DEFVAL   { disable } 
+    ::= { alaDaUNPGlobalConfiguration 37 } 
+
+alaDaUNPAuthServerDownVoiceProfile1 OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The profile to be used for classification of IP-phones, if the authentication server
+         is not reachable."
+    ::= { alaDaUNPGlobalConfiguration 38 }	
+
+alaDaUNPAuthServerDownVoiceProfile2 OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The profile to be used for classification of IP-phones, if the authentication server
+         is not reachable."
+    ::= { alaDaUNPGlobalConfiguration 39 }	
+
+alaDaUNPAuthServerDownVoiceProfile3 OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The profile to be used for classification of IP-phones, if the authentication server
+         is not reachable."
+    ::= { alaDaUNPGlobalConfiguration 40 }	
+
+alaDaUNPDelayLearning OBJECT-TYPE
+    SYNTAX    Integer32 (0 .. 600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration Delay Learning"
+    DEFVAL   { 0 } 
+    ::= { alaDaUNPGlobalConfiguration 41 } 
+    
+alaDaUNPAuthServerDownPortBounce OBJECT-TYPE
+    SYNTAX    INTEGER {
+                          enable(1),
+                          disable(2)
+                      }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration for authentication server down."
+    DEFVAL   { disable } 
+    ::= { alaDaUNPGlobalConfiguration 42 }
+
+alaDaUNPMacMobility OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  enable(1),
+                  disable(2)
+              }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration for allowing mac-mobility."
+    DEFVAL   { disable }
+    ::= { alaDaUNPGlobalConfiguration 43 }
+
+alaDaUNPEapolVersion OBJECT-TYPE
+    SYNTAX     INTEGER { v1(1), v3(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration EAPOL version."
+    DEFVAL   { v1 } 
+    ::= { alaDaUNPGlobalConfiguration 44 }
+
+alaDaUNPApModeSecurity OBJECT-TYPE
+    SYNTAX    INTEGER {
+            enable(1),
+            disable(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration AP mode security status"
+    DEFVAL   { disable } 
+    ::= { alaDaUNPGlobalConfiguration 45 } 
+
+alaDaUNPServiceMulticastGroupIPType OBJECT-TYPE
+    SYNTAX     InetAddressType { ipv4(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration Service Multicast Group IP address type. Only ipv4 type will be supported at this time"
+    ::= { alaDaUNPGlobalConfiguration 46 }
+
+alaDaUNPServiceMulticastGroupIP OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration Service Multicast Group IP address"
+    ::= { alaDaUNPGlobalConfiguration 47 } 
+
+alaDaUNPMultiUntagSap OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  enable(1),
+                  disable(2)
+              }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration for multi untag sap."
+    DEFVAL   { disable }
+    ::= { alaDaUNPGlobalConfiguration 48 }
+
+alaDaUNPRedirectAllowedWebServerPollingInterval OBJECT-TYPE
+    SYNTAX      Integer32 (30..120)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object will be used to configure a polling interval (in minutes)
+         to resolve the allowed web server(s) configured using FQDN."
+    DEFVAL   { 30 }
+    ::= { alaDaUNPGlobalConfiguration 49 }
+
+alaDaUNPRedirectAllowedWebServerRefresh OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    refresh(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object will be used to trigger refreshing the FQDN names at run-time,
+         before waiting for polling interval to expire."
+    ::= { alaDaUNPGlobalConfiguration 50 }
+
+alaDaUNPServiceVplsSignaling OBJECT-TYPE
+    SYNTAX    INTEGER {
+            ldp(1),
+            bgp(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration Service Vpls signaling."
+    DEFVAL   { ldp } 
+    ::= { alaDaUNPGlobalConfiguration 51 } 
+
+alaDaUNPServiceVplsLdpFarEndIPList OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0 .. 32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration vpls signaling name of the Far End IP List."
+    ::= { alaDaUNPGlobalConfiguration 52 }
+
+alaDaUNPServiceVplsBgpVeID OBJECT-TYPE
+    SYNTAX    Unsigned32 (0|1..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration Service vpls signaling bgp ve ID."
+    DEFVAL   { 0 }
+    ::= { alaDaUNPGlobalConfiguration 53 } 
+
+alaDaUNPServiceBvlanModulo OBJECT-TYPE
+    SYNTAX    Integer32 (1..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration Service bvlan modulo."
+    DEFVAL   { 8 } 
+    ::= { alaDaUNPGlobalConfiguration 54 } 
+
+alaDaUNPApModeType OBJECT-TYPE
+    SYNTAX    INTEGER {
+            stellar(1),
+            all(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global configuration AP mode type"
+    DEFVAL   { stellar } 
+    ::= { alaDaUNPGlobalConfiguration 55 } 
 
 --------------------------------------------------------------
 -- DA MAC VLAN User Table
@@ -2178,7 +2543,15 @@ AlaDaMacVlanUserEntry ::=
 				alaDaMacVlanUserSpbBVlan
 					Unsigned32,
                                 alaDaMacVlanUserKerberosStatus
-                    			INTEGER
+                    			INTEGER,
+				alaDaMacVlanUserL2greVpnid
+					Unsigned32,
+                alaDaMacVlanUserImplicitTrustTagSource
+                    INTEGER,
+                alaDaMacVlanUserRadiusTrustVlanStr
+					SnmpAdminString
+                
+
         }
 
 alaDaMacVlanUserIntfNum OBJECT-TYPE
@@ -2470,7 +2843,8 @@ alaDaMacVlanUserType  OBJECT-TYPE
 		bridge (1),
 		spbAccess (2),
         	edge (3),
-        	vxlanAccess (4)
+        	vxlanAccess (4),
+        	l2greAccess (5)
             	}
         MAX-ACCESS  read-only
         STATUS      current
@@ -2534,6 +2908,35 @@ alaDaMacVlanUserKerberosStatus OBJECT-TYPE
         "The mac vlan user Kerberos authentication status."
     ::= { alaDaMacVlanUserEntry 39 }
 
+alaDaMacVlanUserL2greVpnid OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "VPN ID assigned to the L2GRE UNP user."
+        ::= { alaDaMacVlanUserEntry 40 }
+
+alaDaMacVlanUserImplicitTrustTagSource OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        none (1),
+                        unpProfile (2),
+                        radius (3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "Implict trust tagged vlan source."
+        DEFVAL     { none }
+        ::= { alaDaMacVlanUserEntry 41 }
+
+alaDaMacVlanUserRadiusTrustVlanStr OBJECT-TYPE
+    SYNTAX       SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Radius returned trust tagged vlan string."
+    ::= { alaDaMacVlanUserEntry 42 }
+
 --
 --  Trap Definitions
 --
@@ -2571,6 +2974,7 @@ unpMcLagConfigInconsistency NOTIFICATION-TYPE
 
 alaDaKerberosReqTimeoutTrap NOTIFICATION-TYPE
    OBJECTS  	{
+	        alaDaKerberosIpAddressType,
 		alaDaKerberosIpAddress,
 		alaDaKerberosUserMac
 		}
@@ -2594,12 +2998,134 @@ alaDaKerberosRateLimitExceed NOTIFICATION-TYPE
 	OBJECTS {
 		alaDaKerberosRateLimitString
 		}
-STATUS   current
+STATUS   obsolete
 DESCRIPTION
 "This trap shall be raised when the kerberos packets exceed the Limit."
 ::= { alaIND1DaMIBNotifications 5 }
 
+alaDaRouterAuthUserPassedAuthThreshold  NOTIFICATION-TYPE
+    OBJECTS      {
+                    sysName,
+                    systemServicesDate,
+                    systemServicesTime,
+                    alaDaRouterAuthNumberOfUsersPassedAuthentication
+                 }
+    STATUS       current
+    DESCRIPTION
+        "This trap will be generated when the number of IP addresses 
+         that passed authentication reaches the threshold (default 16)."
+    ::= { alaIND1DaMIBNotifications 6 }
 
+alaDaRouterAuthUserMaxRetryFailed  NOTIFICATION-TYPE
+    OBJECTS      {
+                    sysName,
+                    systemServicesDate,
+                    systemServicesTime,
+                    alaDaRouterAuthUserSourceIpAddressType,
+                    alaDaRouterAuthUserSourceIpAddress,
+                    alaDaRouterAuthUserDestinationIpAddressType,
+                    alaDaRouterAuthUserDestinationIpAddress,
+                    alaDaRouterAuthUserName,
+                    alaDaRouterAuthUserAttempts  
+                 }
+    STATUS       current
+    DESCRIPTION
+        "This trap will be generated for every IP address whose number of authentication failure
+        exceeds maximum attempts (default is 3 times)."
+    ::= { alaIND1DaMIBNotifications 7 }
+    
+alaDaRouterAuthUserFailedAuthThreshold NOTIFICATION-TYPE
+    OBJECTS      {
+                    sysName,
+                    systemServicesDate,
+                    systemServicesTime,
+                    alaDaRouterAuthNumberOfUsersFailedAuthentication
+                 }
+    STATUS       current
+    DESCRIPTION
+        "This trap will be generated if the number of IP addresses that failed 
+        to authenticate reaches the threshold (default 16)."
+    ::= { alaIND1DaMIBNotifications 8 }
+      
+alaDaRouterAuthConfigThresholdExceed  NOTIFICATION-TYPE
+    OBJECTS      {
+                    sysName,
+                    systemServicesDate,
+                    systemServicesTime,
+                    alaDaRouterAuthNumberOfConfigUsed
+                 }
+    STATUS       current
+    DESCRIPTION
+        "This trap will be generated if more than 50 percent of slice or the reserved 
+        block is used up for programming the trap rule. It indicates that no more
+        source or destination subnets can be added."
+    ::= { alaIND1DaMIBNotifications 9 }
+    
+alaDaRouterAuthMaxCapacityReached  NOTIFICATION-TYPE
+    OBJECTS      {
+                    sysName,
+                    systemServicesDate,
+                    systemServicesTime,
+                    alaDaRouterAuthNumberOfAuthenticatedUsers 
+                 }
+    STATUS       current
+    DESCRIPTION
+        "This trap will be generated when the total slice capacity of 256 is reached."
+    ::= { alaIND1DaMIBNotifications 10 }
+
+alaDaUnpMaxUserExceeded  NOTIFICATION-TYPE
+    OBJECTS      {
+                    sysName,
+                    systemServicesDate,
+                    systemServicesTime,
+                    alaDaUnpMaxUserSupported,
+                    alaDaUnpMaxUserCurrentNumberOfUsers
+                 }
+    STATUS       current
+    DESCRIPTION
+        "This trap will be generated when max UNP user exceeded in system."
+    ::= { alaIND1DaMIBNotifications 11 }
+
+alaDaUnpHWResourceExhaust  NOTIFICATION-TYPE
+    OBJECTS      {
+                    sysName,
+                    systemServicesDate,
+                    systemServicesTime,
+                    alaDaUnpHWResourceChassisId,
+                    alaDaUnpHWResourceSlot,
+                    alaDaUnpHWResourceTtiAllocated
+                 }
+    STATUS       current
+    DESCRIPTION
+        "This trap will be generated when the exhaust of TTI resources on a NI slot (chassis/slot)."
+    ::= { alaIND1DaMIBNotifications 12 }
+
+alaDaUnpDnsServerNotReachable  NOTIFICATION-TYPE
+    OBJECTS      {
+                    alaDaUNPRedirectAllowedWebServerName
+                 }
+    STATUS       current
+    DESCRIPTION
+        "The trap will be raised when allowed web server FQDN could not be resolved."
+    ::= { alaIND1DaMIBNotifications 13 }
+
+alaDaUnpUserAuthSupplicantFails  NOTIFICATION-TYPE
+    OBJECTS      {
+                    sysName,
+                    systemServicesDate,
+                    systemServicesTime,
+                    alaDaUNPPortIfIndex,
+                    alaDaUnpAuthMACAddress,
+                    alaDaUnpAuthStatus,
+                    alaDaUnpAuthRADIUSServerIPType,
+                    alaDaUnpAuthRADIUSServerIP,
+                    alaDaUnpAuthServerReplyMsg,
+                    alaDaUnpAuthFailureReason
+                 }
+    STATUS       current
+    DESCRIPTION
+        "The trap will be raised when switch fails authentication."
+    ::= { alaIND1DaMIBNotifications 14 }
 
 alaDaUnpMacAddr OBJECT-TYPE
     SYNTAX        MacAddress
@@ -2697,7 +3223,7 @@ alaDaUnpIpAddr OBJECT-TYPE
     ::= { alaDaUNPNotificationObjects 10 }
 
 alaDaUnpIpMask OBJECT-TYPE
-    SYNTAX       InetAddress
+    SYNTAX       IpAddress
     MAX-ACCESS   accessible-for-notify
     STATUS       current
     DESCRIPTION
@@ -2715,12 +3241,186 @@ alaDaUnpVlanTag OBJECT-TYPE
 
 
 alaDaKerberosRateLimitString   OBJECT-TYPE
-SYNTAX               SnmpAdminString (SIZE(1..32))
-MAX-ACCESS           accessible-for-notify
-STATUS               current
-DESCRIPTION          "Failure string for Rate Limit Trap."
-::= { alaDaUNPNotificationObjects 13 }
+    SYNTAX               SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS           accessible-for-notify
+    STATUS                current
+    DESCRIPTION          "Failure string for Rate Limit Trap."
+    ::= { alaDaUNPNotificationObjects 13 }
+    
+alaDaRouterAuthNumberOfUsersPassedAuthentication OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Number of users passed authentication."
+    ::= { alaDaUNPNotificationObjects 14 }
+ 
+alaDaRouterAuthUserSourceIpAddressType  OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+        "The type of the source IP address of the user."
+    ::= { alaDaUNPNotificationObjects 15 }
+ 
+alaDaRouterAuthUserSourceIpAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Source IP address of the user."
+    ::= { alaDaUNPNotificationObjects 16 }   
+    
+alaDaRouterAuthUserDestinationIpAddressType  OBJECT-TYPE
+    SYNTAX  InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+        "The type of destination IP in the packet."
+    ::= { alaDaUNPNotificationObjects 17 }
+ 
+alaDaRouterAuthUserDestinationIpAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Destination IP in the packet."
+    ::= { alaDaUNPNotificationObjects 18 }    
+    
+alaDaRouterAuthUserName   OBJECT-TYPE
+    SYNTAX               SnmpAdminString 
+    MAX-ACCESS           accessible-for-notify
+    STATUS                current
+    DESCRIPTION          "User name."
+    ::= { alaDaUNPNotificationObjects 19 }  
+    
+alaDaRouterAuthUserAttempts   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Number of attempts by the user."
+    ::= { alaDaUNPNotificationObjects 20 }
 
+alaDaRouterAuthNumberOfUsersFailedAuthentication OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Number of users failed authentication."
+    ::= { alaDaUNPNotificationObjects 21 }    
+    
+alaDaRouterAuthNumberOfAuthenticatedUsers OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Total number of router authenticated users on the system."
+    ::= { alaDaUNPNotificationObjects 22 } 
+    
+alaDaRouterAuthNumberOfConfigUsed OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Total number of Router Auth Config used on the system."
+    ::= { alaDaUNPNotificationObjects 23 }
+ 
+alaDaUnpMaxUserSupported OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Maximum number of users supported on the system."
+    ::= { alaDaUNPNotificationObjects 24 }
+
+alaDaUnpMaxUserCurrentNumberOfUsers OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Maximum current number of users."
+    ::= { alaDaUNPNotificationObjects 25 }
+
+alaDaUnpHWResourceChassisId OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The chassis ID of the switch."
+    ::= { alaDaUNPNotificationObjects 26 }
+
+alaDaUnpHWResourceSlot OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The slot number for the chassis."
+    ::= { alaDaUNPNotificationObjects 27 }
+
+alaDaUnpHWResourceTtiAllocated OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The number of TTI resources has been allocated."
+    ::= { alaDaUNPNotificationObjects 28}
+
+alaDaUnpAuthMACAddress OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "MAC address of the switch which was subjected to authentication."
+    ::= { alaDaUNPNotificationObjects 29}
+
+alaDaUnpAuthStatus OBJECT-TYPE
+    SYNTAX       INTEGER {
+                idle (1),
+                inProgress (2),
+                authenticated (3),
+                failed (4),
+                failedTimeout (5),
+                failedNoServer (6),
+                failedNoResources (7)
+            }
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Authentication Result of the AOS switch."
+    ::= { alaDaUNPNotificationObjects 30}
+
+alaDaUnpAuthRADIUSServerIPType OBJECT-TYPE
+    SYNTAX       InetAddressType
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "IP address type of the RADIUS server used for authentication."
+    ::= { alaDaUNPNotificationObjects 31}
+
+alaDaUnpAuthRADIUSServerIP OBJECT-TYPE
+    SYNTAX       InetAddress
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "IP address of the RADIUS server used for authentication."
+    ::= { alaDaUNPNotificationObjects 32}
+
+alaDaUnpAuthServerReplyMsg OBJECT-TYPE
+    SYNTAX       SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Reply message for the failed user from RADIUS."
+    ::= { alaDaUNPNotificationObjects 33}
+
+alaDaUnpAuthFailureReason OBJECT-TYPE
+    SYNTAX       SnmpAdminString (SIZE(0..255))
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Reason for failed authentication of AOS switch returned from RADIUS."
+    ::= { alaDaUNPNotificationObjects 34}
 
 -- UNP Customer Domain Table configuration MIB --
 
@@ -2781,7 +3481,7 @@ DESCRIPTION          "Failure string for Rate Limit Trap."
 alaDaSpbProfileTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF AlaDaSpbProfileEntry
     MAX-ACCESS    not-accessible
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "This table stores the Service Classification profiles created in the system.
          The entries provides information to classify device in the Service domain."
@@ -2790,7 +3490,7 @@ alaDaSpbProfileTable OBJECT-TYPE
 alaDaSpbProfileEntry OBJECT-TYPE
     SYNTAX        AlaDaSpbProfileEntry
     MAX-ACCESS    not-accessible
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "Service Classification Profile entry"
     INDEX {alaDaSpbProfileName}
@@ -2812,7 +3512,7 @@ AlaDaSpbProfileEntry ::= SEQUENCE   {
 alaDaSpbProfileName OBJECT-TYPE
     SYNTAX        SnmpAdminString ( SIZE( 1 .. 32 ) )
     MAX-ACCESS    not-accessible
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "The name of this profile."
     ::= { alaDaSpbProfileEntry 1 }
@@ -2820,7 +3520,7 @@ alaDaSpbProfileName OBJECT-TYPE
 alaDaSpbProfileEncapVal OBJECT-TYPE
     SYNTAX        TmnxEncapVal
     MAX-ACCESS    read-create
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "The encapsulation to be used for the SAP connecting to the service."
     ::= { alaDaSpbProfileEntry 2 }
@@ -2828,7 +3528,7 @@ alaDaSpbProfileEncapVal OBJECT-TYPE
 alaDaSpbProfileQosPolicyListName OBJECT-TYPE
     SYNTAX        SnmpAdminString ( SIZE( 0 .. 32 ) )
     MAX-ACCESS    read-create
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "The name of the QoS Policy List name that will be used if this
          User Network Profile is applied for a given device along with
@@ -2838,7 +3538,7 @@ alaDaSpbProfileQosPolicyListName OBJECT-TYPE
 alaDaSpbProfileIsid OBJECT-TYPE
     SYNTAX        Unsigned32 (256..16777214)
     MAX-ACCESS    read-create
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "The object represnet the I-SID that is to be dynamically created when 
          alaDaSpbProfileServiceID does not exist in the system and must be 
@@ -2848,7 +3548,7 @@ alaDaSpbProfileIsid OBJECT-TYPE
 alaDaSpbProfileBVlan OBJECT-TYPE
     SYNTAX        Unsigned32 (1..4094)
     MAX-ACCESS    read-create
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "The Backbone VLAN ID (BVLAN) used for the I-SID specified in alaDaSpbProfileIsid.
          This object must be specified along with alaDaSpbProfileIsid."
@@ -2857,7 +3557,7 @@ alaDaSpbProfileBVlan OBJECT-TYPE
 alaDaSpbProfileRowStatus OBJECT-TYPE
     SYNTAX        RowStatus
     MAX-ACCESS    read-create
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "The row status of this table entry."
     ::= { alaDaSpbProfileEntry 6}
@@ -2865,7 +3565,7 @@ alaDaSpbProfileRowStatus OBJECT-TYPE
 alaDaSpbProfileMulticastMode OBJECT-TYPE
     SYNTAX          INTEGER { headend(1), tandem(2) }
     MAX-ACCESS      read-create
-    STATUS          deprecated
+    STATUS          obsolete
     DESCRIPTION   
         "To configure the multicast replication mode for each service:
          Head-end(1) where a non-unicast packet entering the SAP port
@@ -2882,7 +3582,7 @@ alaDaSpbProfileSapVlanXlation OBJECT-TYPE
                         disable (2) 
                     }
     MAX-ACCESS      read-create
-    STATUS          deprecated
+    STATUS          obsolete
     DESCRIPTION 
         "To enable/disable the vlan translation for all the SAPs configured
          in this service if the corresponding access ports for the SAPs also
@@ -2896,7 +3596,7 @@ alaDaSpbProfileMobileTag   OBJECT-TYPE
                     disable (2)
                 }
     MAX-ACCESS  read-create
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "SPB Profile Mobile Tag ."
     DEFVAL { disable }
@@ -2908,7 +3608,7 @@ alaDaSpbProfileAFDConfig OBJECT-TYPE
                      autoFabric  (2)
                  }
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
          "Configuration is made by admin or auto-fabric on
          this profile"
@@ -3051,7 +3751,7 @@ AlaDaUNPCustDomainVlanTagRuleEntry ::= SEQUENCE {
 }
 
 alaDaUNPCustDomainVlanTagRuleDomainId  OBJECT-TYPE
-    SYNTAX  Integer32 (0..4294967295)
+    SYNTAX  Integer32 (0..2147483647)
     MAX-ACCESS  not-accessible
     STATUS  current
     DESCRIPTION
@@ -3212,7 +3912,7 @@ AlaDaUNPCustDomainIpNetRuleEntry ::= SEQUENCE {
 }
 
 alaDaUNPCustDomainIpNetRuleDomainId  OBJECT-TYPE
-    SYNTAX  Integer32 (0..4294967295)
+    SYNTAX  Integer32 (0..2147483647)
     MAX-ACCESS  not-accessible
     STATUS  current
     DESCRIPTION
@@ -3392,7 +4092,7 @@ AlaDaUNPCustDomainMacRuleEntry ::= SEQUENCE {
 }
 
 alaDaUNPCustDomainMacRuleDomainId  OBJECT-TYPE
-    SYNTAX  Integer32 (0..4294967295)
+    SYNTAX  Integer32 (0..2147483647)
     MAX-ACCESS  not-accessible
     STATUS  current
     DESCRIPTION
@@ -3474,7 +4174,7 @@ alaDaUNPCustDomainMacRuleVxlanProfileName  OBJECT-TYPE
     ::= { alaDaUNPCustDomainMacRuleEntry 9 }
 
 alaDaUNPCustDomainMacRuleProfile1  OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -3482,7 +4182,7 @@ alaDaUNPCustDomainMacRuleProfile1  OBJECT-TYPE
     ::= { alaDaUNPCustDomainMacRuleEntry 10 }
 
 alaDaUNPCustDomainMacRuleProfile2  OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -3490,7 +4190,7 @@ alaDaUNPCustDomainMacRuleProfile2  OBJECT-TYPE
     ::= { alaDaUNPCustDomainMacRuleEntry 11 }
 
 alaDaUNPCustDomainMacRuleProfile3  OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -3550,7 +4250,7 @@ AlaDaUNPCustDomainMacRangeRuleEntry ::= SEQUENCE {
 }
 
 alaDaUNPCustDomainMacRangeRuleDomainId  OBJECT-TYPE
-    SYNTAX  Integer32 (0..4294967295)
+    SYNTAX  Integer32 (0..2147483647)
     MAX-ACCESS  not-accessible
     STATUS  current
     DESCRIPTION
@@ -3777,7 +4477,8 @@ alaDaUNPCustDomainMacRangeRuleProfile3  OBJECT-TYPE
         SYNTAX      INTEGER
                     {
                        internal(1),
-                       external(2)
+                       external(2),
+                       internalDhcp(3)
                      }  
         MAX-ACCESS  read-write
         STATUS      current
@@ -3850,6 +4551,33 @@ alaDaUNPCustDomainMacRangeRuleProfile3  OBJECT-TYPE
         DESCRIPTION
         "Captive Portal Global UNP Profile Status"
     ::= { alaDaCPortalGlobalConfig 11 }
+
+    alaDaCPortalDHCPLeaseTime OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Configures the DHCP lease time. The default value is 30 seconds."
+        DEFVAL { 30 }
+    ::= { alaDaCPortalGlobalConfig 12 }
+
+    alaDaCPortalDHCPRenewTime OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Configures the DHCP renew time. The default value is 15 seconds."
+        DEFVAL { 15 }
+    ::= { alaDaCPortalGlobalConfig 13 }
+
+    alaDaCPortalDHCPRebindingTime OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+        "Configures DHCP rebinding time, default value is set to 22 seconds."
+        DEFVAL { 22 }
+    ::= { alaDaCPortalGlobalConfig 14 }
 
     alaDaCPortalAuthPassTable  OBJECT-TYPE
         SYNTAX      SEQUENCE OF AlaDaCPortalAuthPassEntry
@@ -4540,8 +5268,8 @@ AlaDaUNPETmplEntry ::= SEQUENCE {
     alaDaUNPETmplMacAllowEap            INTEGER,
     alaDaUNPETmplAdminControlledDirections  INTEGER,
     alaDaUNPETmplTrustTagStatus         INTEGER,
-    alaDaUNPETmplForceL3Learning         INTEGER,
-    alaDaUNPETmplForceL3LearningPortBounce INTEGER
+    alaDaUNPETmplForceL3Learning        INTEGER,
+    alaDaUNPETmplForceL3LearningPortBounce  INTEGER
 }
 
 alaDaUNPETmplName OBJECT-TYPE
@@ -4778,26 +5506,26 @@ alaDaUNPETmplTrustTagStatus OBJECT-TYPE
          and classification rules dont match."
     ::= { alaDaUNPETmplEntry 22 }
 
-alaDaUNPETmplForceL3Learning  OBJECT-TYPE
-    SYNTAX     INTEGER {
-        enable (1),
+alaDaUNPETmplForceL3Learning OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable  (1),
         disable (2)
     }
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
-              "UNP force L3 learning status on the Edge-Template."
+        "UNP force L3 learning status on the Edge-Template."
     ::= { alaDaUNPETmplEntry 23 }
 
 alaDaUNPETmplForceL3LearningPortBounce OBJECT-TYPE
-    SYNTAX     INTEGER {
-        enable (1),
+    SYNTAX      INTEGER {
+        enable  (1),
         disable (2)
     }
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
-              "Port-Bounce associated with UNP force L3 learning status on the Edge-Template."
+        "Port-Bounce associated with UNP force L3 learning status on the Edge-Template."
     ::= { alaDaUNPETmplEntry 24 }
 
 --------------------------------------------------------
@@ -5246,7 +5974,7 @@ alaDaUNPMacOuiRuleVlanTag  OBJECT-TYPE
     ::= { alaDaUNPMacOuiRuleEntry 4 }
 
 alaDaUNPMacOuiRuleProfile1   OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -5255,7 +5983,7 @@ alaDaUNPMacOuiRuleProfile1   OBJECT-TYPE
     ::= { alaDaUNPMacOuiRuleEntry 5 }
 
 alaDaUNPMacOuiRuleProfile2   OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -5264,7 +5992,7 @@ alaDaUNPMacOuiRuleProfile2   OBJECT-TYPE
     ::= { alaDaUNPMacOuiRuleEntry 6 }
 
 alaDaUNPMacOuiRuleProfile3   OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -5306,7 +6034,8 @@ AlaDaUNPEndPoinRuleEntry ::= SEQUENCE  {
 
 alaDaUNPEndPoinRuleId   OBJECT-TYPE
     SYNTAX        INTEGER {
-                      ipPhone(1)
+                      ipPhone(1),
+                      accessPoint(2)
                   }   
     MAX-ACCESS    not-accessible
     STATUS        current
@@ -5332,7 +6061,7 @@ alaDaUNPEndPoinRuleRowStatus OBJECT-TYPE
     ::= { alaDaUNPEndPoinRuleEntry 3 }
 
 alaDaUNPEndPoinProfile1 OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 | 1 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -5341,7 +6070,7 @@ alaDaUNPEndPoinProfile1 OBJECT-TYPE
     ::= { alaDaUNPEndPoinRuleEntry 4 }
 
 alaDaUNPEndPoinProfile2 OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 | 1 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -5350,7 +6079,7 @@ alaDaUNPEndPoinProfile2 OBJECT-TYPE
     ::= { alaDaUNPEndPoinRuleEntry 5 }
 
 alaDaUNPEndPoinProfile3 OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 | 1 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -5517,7 +6246,8 @@ AlaDaUNPClassifRuleEntry    ::= SEQUENCE {
     alaDaUNPClassifRuleCustomerDomain        Integer32,
     alaDaUNPClassifRuleProfile1              SnmpAdminString,
     alaDaUNPClassifRuleProfile2              SnmpAdminString,
-    alaDaUNPClassifRuleProfile3              SnmpAdminString
+    alaDaUNPClassifRuleProfile3              SnmpAdminString,
+    alaDaUNPClassifRuleDeviceType            SnmpAdminString
 }
 
 alaDaUNPClassifRuleName OBJECT-TYPE
@@ -5607,7 +6337,8 @@ alaDaUNPClassifRuleMacOuiAddr OBJECT-TYPE
 alaDaUNPClassifRuleEndPoin  OBJECT-TYPE
     SYNTAX        INTEGER {
                       none(0),
-                      ipPhone(1)
+                      ipPhone(1),
+                      accessPoint(2)
                   }   
     MAX-ACCESS   read-create 
     STATUS        current
@@ -5686,7 +6417,7 @@ alaDaUNPClassifRuleVlanTag   OBJECT-TYPE
     ::= { alaDaUNPClassifRuleEntry 18 }
 
 alaDaUNPClassifRuleCustomerDomain  OBJECT-TYPE
-    SYNTAX      Integer32(-1|0..4294967295)
+    SYNTAX      Integer32(-1|0..2147483647)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -5719,6 +6450,14 @@ alaDaUNPClassifRuleProfile3 OBJECT-TYPE
     DESCRIPTION
         "Profile with priority 3 associated with the Classification Rule."
     ::= { alaDaUNPClassifRuleEntry  22 }
+
+alaDaUNPClassifRuleDeviceType OBJECT-TYPE
+    SYNTAX          SnmpAdminString ( SIZE( 0 .. 32 ) )
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Device type associates with the Classification Rule."
+    ::= { alaDaUNPClassifRuleEntry  23 }
 
 ----------------------------------------------
 -- MAC, PORT Based classification table 
@@ -5919,7 +6658,7 @@ alaDaUNPIpPortRuleVlanTag  OBJECT-TYPE
     ::= { alaDaUNPIpPortRuleEntry 6 }
 
 alaDaUNPIpPortRuleProfile1 OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -5928,7 +6667,7 @@ alaDaUNPIpPortRuleProfile1 OBJECT-TYPE
     ::= { alaDaUNPIpPortRuleEntry 7 }
 
 alaDaUNPIpPortRuleProfile2 OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -5937,7 +6676,7 @@ alaDaUNPIpPortRuleProfile2 OBJECT-TYPE
     ::= { alaDaUNPIpPortRuleEntry 8 }
 
 alaDaUNPIpPortRuleProfile3 OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -6068,7 +6807,7 @@ alaDaUNPMacIpPortRuleVlanTag  OBJECT-TYPE
     ::= { alaDaUNPMacIpPortRuleEntry 7 }
 
 alaDaUNPMacIpPortRuleProfile1 OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -6077,7 +6816,7 @@ alaDaUNPMacIpPortRuleProfile1 OBJECT-TYPE
     ::= { alaDaUNPMacIpPortRuleEntry 8 }
 
 alaDaUNPMacIpPortRuleProfile2 OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -6086,7 +6825,7 @@ alaDaUNPMacIpPortRuleProfile2 OBJECT-TYPE
     ::= { alaDaUNPMacIpPortRuleEntry 9 }
 
 alaDaUNPMacIpPortRuleProfile3 OBJECT-TYPE
-    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
     MAX-ACCESS  read-create
     STATUS  current
     DESCRIPTION
@@ -7360,7 +8099,8 @@ SEQUENCE
   alaDaUNPLocationPolicyPortStatus                          INTEGER,
   alaDaUNPLocationPolicySystemName                          SnmpAdminString,
   alaDaUNPLocationPolicySystemLocation                      SnmpAdminString,
-  alaDaUNPLocationPolicyRowStatus                           RowStatus
+  alaDaUNPLocationPolicyRowStatus                           RowStatus,
+  alaDaUNPLocationPolicyDomainId                            Integer32
 }
 
 alaDaUNPLocationPolicyName OBJECT-TYPE
@@ -7397,7 +8137,7 @@ alaDaUNPLocationPolicyName OBJECT-TYPE
   ::= { alaDaUNPLocationPolicyEntry 4 }
 
   alaDaUNPLocationPolicySystemName OBJECT-TYPE
-  SYNTAX      SnmpAdminString (SIZE(0..31))
+  SYNTAX      SnmpAdminString (SIZE(0..64))
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "System Name criterion of the Location Policy"
@@ -7417,6 +8157,15 @@ alaDaUNPLocationPolicyName OBJECT-TYPE
   DESCRIPTION "Used to create/delete location policies according
   to the RowStatus convention"
   ::= { alaDaUNPLocationPolicyEntry 7 }
+
+  alaDaUNPLocationPolicyDomainId OBJECT-TYPE
+  SYNTAX      Integer32 (-1|0..511)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "The Domain ID of the Location Policy. The range domain id supported is 0-511.
+               When domainId is it set to -1, it is considered to be not configured."
+  DEFVAL      { -1 }
+  ::= { alaDaUNPLocationPolicyEntry 8 }
 
   alaDaUNPRedirectAllowedServerTable OBJECT-TYPE
   SYNTAX      SEQUENCE OF AlaDaUNPRedirectAllowedServerEntry
@@ -7575,7 +8324,7 @@ alaDaMacVlanUserExtAppName OBJECT-TYPE
 alaDaUNPVxlanProfileTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF AlaDaUNPVxlanProfileEntry
     MAX-ACCESS    not-accessible
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "This table stores the Service Classification profiles created in the system.
          The entries provides information to classify device in the VXLAN Service domain."
@@ -7584,7 +8333,7 @@ alaDaUNPVxlanProfileTable OBJECT-TYPE
 alaDaUNPVxlanProfileEntry OBJECT-TYPE
     SYNTAX        AlaDaUNPVxlanProfileEntry
     MAX-ACCESS    not-accessible
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "VXLAN Service Classification Profile entry"
     INDEX {alaDaUNPVxlanProfileName}
@@ -7607,7 +8356,7 @@ AlaDaUNPVxlanProfileEntry ::= SEQUENCE  {
 alaDaUNPVxlanProfileName OBJECT-TYPE
     SYNTAX        SnmpAdminString (SIZE(1 .. 32))
     MAX-ACCESS    not-accessible
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "The name of the profile."
     ::= { alaDaUNPVxlanProfileEntry 1 }
@@ -7615,7 +8364,7 @@ alaDaUNPVxlanProfileName OBJECT-TYPE
 alaDaUNPVxlanProfileEncapVal OBJECT-TYPE
     SYNTAX        TmnxEncapVal
     MAX-ACCESS    read-create
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "The encapsulation to be used for the SAP connecting to the service."
     ::= { alaDaUNPVxlanProfileEntry 2 }
@@ -7623,7 +8372,7 @@ alaDaUNPVxlanProfileEncapVal OBJECT-TYPE
 alaDaUNPVxlanProfileVnid OBJECT-TYPE
     SYNTAX        Unsigned32 (1..16777214)
     MAX-ACCESS    read-create
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "The object represnet the VNID that is to be used to dynamically 
          create a VXLAN service." 
@@ -7632,7 +8381,7 @@ alaDaUNPVxlanProfileVnid OBJECT-TYPE
 alaDaUNPVxlanProfileQosPolicyListName OBJECT-TYPE
     SYNTAX        SnmpAdminString (SIZE(0 .. 32))
     MAX-ACCESS    read-create
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "The name of the QoS Policy List name that will be used if this
          User Network Profile is applied for a given device."
@@ -7641,7 +8390,7 @@ alaDaUNPVxlanProfileQosPolicyListName OBJECT-TYPE
 alaDaUNPVxlanProfileFarEndIPListName OBJECT-TYPE
     SYNTAX        SnmpAdminString (SIZE(0 .. 32))
     MAX-ACCESS    read-create
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "The name of the Far End IP List that will be used if this
          User Network Profile is applied for a given device."
@@ -7650,7 +8399,7 @@ alaDaUNPVxlanProfileFarEndIPListName OBJECT-TYPE
 alaDaUNPVxlanProfileMulticastIPAddressType OBJECT-TYPE
     SYNTAX  	InetAddressType
     MAX-ACCESS 	read-create 
-    STATUS 		deprecated  
+    STATUS 		obsolete  
     DESCRIPTION
         "The IP address type of the multicast group IP address." 
     ::= { alaDaUNPVxlanProfileEntry 6 }
@@ -7658,7 +8407,7 @@ alaDaUNPVxlanProfileMulticastIPAddressType OBJECT-TYPE
 alaDaUNPVxlanProfileMulticastIPAddress OBJECT-TYPE
     SYNTAX  	InetAddress
     MAX-ACCESS 	read-create 
-    STATUS  	deprecated 
+    STATUS  	obsolete 
     DESCRIPTION
         "The multicast group IP address." 
     ::= { alaDaUNPVxlanProfileEntry 7 }
@@ -7669,7 +8418,7 @@ alaDaUNPVxlanProfileSapVlanXlation OBJECT-TYPE
                         disable (2) 
                    }
     MAX-ACCESS         read-create
-    STATUS          deprecated
+    STATUS          obsolete
     DESCRIPTION 
         "To enable/disable the vlan translation for all the SAPs configured
          in this service if the corresponding access ports for the SAPs also
@@ -7683,7 +8432,7 @@ alaDaUNPVxlanProfileMobileTagStatus OBJECT-TYPE
                     disable (2) 
                 }
     MAX-ACCESS  read-create
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "VXLAN Profile Mobile Tag status. When enabled, the packets egressing out on the SAP
          will be tagged."
@@ -7697,7 +8446,7 @@ alaDaUNPVxlanProfileMulticastMode OBJECT-TYPE
                     hybrid (3) 
                  }
     MAX-ACCESS      read-create
-    STATUS          deprecated
+    STATUS          obsolete
     DESCRIPTION
          "To configure the multicast replication mode for each service:
           Head-end(1) where a non-unicast packet entering the SAP port
@@ -7711,7 +8460,7 @@ alaDaUNPVxlanProfileMulticastMode OBJECT-TYPE
 alaDaUNPVxlanProfileRowStatus OBJECT-TYPE
     SYNTAX        RowStatus
     MAX-ACCESS    read-create
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "The row status of this table entry."
     ::= { alaDaUNPVxlanProfileEntry 11 }
@@ -7724,7 +8473,7 @@ alaDaUNPVxlanProfileRowStatus OBJECT-TYPE
 alaDaUNPVxlanFlushTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF AlaDaUNPVxlanFlushEntry
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Table to flush the VXLAN access users based on some criteria 
          such as MAC Address, Authentication Type, SAP, Service and/or Profile."
@@ -7733,7 +8482,7 @@ alaDaUNPVxlanFlushTable OBJECT-TYPE
 alaDaUNPVxlanFlushEntry OBJECT-TYPE
     SYNTAX      AlaDaUNPVxlanFlushEntry
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "One entry  to flush VXLAN access users on the basis of user criteria."
     INDEX { alaDaUNPVxlanFlushIndex }
@@ -7753,7 +8502,7 @@ AlaDaUNPVxlanFlushEntry ::= SEQUENCE {
 alaDaUNPVxlanFlushIndex OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Flush index."
     ::= { alaDaUNPVxlanFlushEntry 1 }
@@ -7764,7 +8513,7 @@ alaDaUNPVxlanFlushComplete OBJECT-TYPE
                    all (2) 
                } 
     MAX-ACCESS  read-write  
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Flush all users learnt on all VXLAN-access type ports."
     DEFVAL { none }
@@ -7777,7 +8526,7 @@ alaDaUNPVxlanFlushAuthType OBJECT-TYPE
                    mac (3) 
                } 
     MAX-ACCESS  read-write  
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Flush based on the authentication type of the user."
     ::= { alaDaUNPVxlanFlushEntry 3 }
@@ -7785,7 +8534,7 @@ alaDaUNPVxlanFlushAuthType OBJECT-TYPE
 alaDaUNPVxlanFlushMacAddress OBJECT-TYPE
     SYNTAX     MacAddress(SIZE(6))
     MAX-ACCESS  read-write  
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Flush based on a single MAC address."
     ::= { alaDaUNPVxlanFlushEntry 4 }
@@ -7793,7 +8542,7 @@ alaDaUNPVxlanFlushMacAddress OBJECT-TYPE
 alaDaUNPVxlanFlushSapIDIfIndex OBJECT-TYPE
     SYNTAX        InterfaceIndex
     MAX-ACCESS    read-write
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "Flush the users learnt on the given SAP-ID Interface Index."
     ::= { alaDaUNPVxlanFlushEntry 5 }
@@ -7801,7 +8550,7 @@ alaDaUNPVxlanFlushSapIDIfIndex OBJECT-TYPE
 alaDaUNPVxlanFlushSapIDEncapVal OBJECT-TYPE
     SYNTAX        TmnxEncapVal 
     MAX-ACCESS    read-write
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "Flush the users learnt on the given SAP-ID Encapsulation."
     ::= { alaDaUNPVxlanFlushEntry 6 }
@@ -7809,7 +8558,7 @@ alaDaUNPVxlanFlushSapIDEncapVal OBJECT-TYPE
 alaDaUNPVxlanFlushServiceID OBJECT-TYPE
     SYNTAX        Unsigned32 
     MAX-ACCESS    read-write
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "Flush the users learnt of the given VXLAN service." 
     ::= { alaDaUNPVxlanFlushEntry 7 }
@@ -7817,7 +8566,7 @@ alaDaUNPVxlanFlushServiceID OBJECT-TYPE
 alaDaUNPVxlanFlushVxlanProfile OBJECT-TYPE
     SYNTAX        SnmpAdminString (SIZE( 0..32 ))
     MAX-ACCESS    read-write
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "Flush the users learnt on the given VXLAN Profile."
     ::= { alaDaUNPVxlanFlushEntry 8 }
@@ -7942,7 +8691,7 @@ alaDaUNPVxlanFlushVxlanProfile OBJECT-TYPE
 alaDaUNPSpbFlushTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF AlaDaUNPSpbFlushEntry
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Table to flush the VXLAN access users based on some criteria 
          such as MAC Address, Authentication Type, SAP, Service and/or Profile."
@@ -7951,7 +8700,7 @@ alaDaUNPSpbFlushTable OBJECT-TYPE
 alaDaUNPSpbFlushEntry OBJECT-TYPE
     SYNTAX      AlaDaUNPSpbFlushEntry
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "One entry to flush SPB access users on the basis of user criteria."
     INDEX { alaDaUNPSpbFlushIndex }
@@ -7971,7 +8720,7 @@ AlaDaUNPSpbFlushEntry ::= SEQUENCE  {
 alaDaUNPSpbFlushIndex OBJECT-TYPE
     SYNTAX      Integer32(1)
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Flush index."
     ::= { alaDaUNPSpbFlushEntry 1 }
@@ -7982,7 +8731,7 @@ alaDaUNPSpbFlushComplete OBJECT-TYPE
                    all (2) 
                } 
     MAX-ACCESS  read-write  
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Flush all users learnt on all SPB-access type ports."
     DEFVAL { none }
@@ -7995,7 +8744,7 @@ alaDaUNPSpbFlushAuthType OBJECT-TYPE
                    mac (3) 
                } 
     MAX-ACCESS  read-write  
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Flush based on the authentication type of the user."
     ::= { alaDaUNPSpbFlushEntry 3 }
@@ -8003,7 +8752,7 @@ alaDaUNPSpbFlushAuthType OBJECT-TYPE
 alaDaUNPSpbFlushMacAddress OBJECT-TYPE
     SYNTAX     MacAddress(SIZE(6))
     MAX-ACCESS  read-write  
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Flush based on a single mac-address."
     ::= { alaDaUNPSpbFlushEntry 4 }
@@ -8011,7 +8760,7 @@ alaDaUNPSpbFlushMacAddress OBJECT-TYPE
 alaDaUNPSpbFlushSapIDIfIndex OBJECT-TYPE
     SYNTAX        InterfaceIndex
     MAX-ACCESS    read-write
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "Flush the users learnt on the given SAP-ID Interface Index."
     ::= { alaDaUNPSpbFlushEntry 5 }
@@ -8019,7 +8768,7 @@ alaDaUNPSpbFlushSapIDIfIndex OBJECT-TYPE
 alaDaUNPSpbFlushSapIDEncapVal OBJECT-TYPE
     SYNTAX        TmnxEncapVal 
     MAX-ACCESS    read-write
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "Flush the users learnt on the given SAP-ID Encapsulation."
     ::= { alaDaUNPSpbFlushEntry 6 }
@@ -8027,7 +8776,7 @@ alaDaUNPSpbFlushSapIDEncapVal OBJECT-TYPE
 alaDaUNPSpbFlushServiceID OBJECT-TYPE
     SYNTAX        Unsigned32 
     MAX-ACCESS    read-write
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "Flush the users learnt of the given VXLAN service." 
     ::= { alaDaUNPSpbFlushEntry 7 }
@@ -8035,7 +8784,7 @@ alaDaUNPSpbFlushServiceID OBJECT-TYPE
 alaDaUNPSpbFlushSpbProfile OBJECT-TYPE
     SYNTAX        SnmpAdminString (SIZE( 0..32 ))
     MAX-ACCESS    read-write
-    STATUS        deprecated
+    STATUS        obsolete
     DESCRIPTION
         "Flush the users learnt on the given SPB Profile."
     ::= { alaDaUNPSpbFlushEntry 8 }
@@ -8095,15 +8844,14 @@ alaDaKerberosGlobalPolicy OBJECT-TYPE
 
 alaDaKerberosGlobalPolicyStatus OBJECT-TYPE
    SYNTAX        INTEGER {
-                    none(1), 
-                    active(2),
-                    inactive(3)
+                    active(1),
+                    inactive(2)
                     }
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
       "The status of global policy list. This can be Active or Inactive if 
-       alaDaKerberosGlobalPolicy is configured else it will be none." 
+       alaDaKerberosGlobalPolicy is configured."
    ::= { alaDaKerberosGlobalConfig 4}
 
 -- *******************************************************************
@@ -8113,7 +8861,7 @@ alaDaKerberosGlobalPolicyStatus OBJECT-TYPE
 alaDaKerberosClientPktHwDiscardStats  OBJECT-TYPE
    SYNTAX        Counter32
    MAX-ACCESS    read-only
-   STATUS        current
+   STATUS        deprecated
    DESCRIPTION
       "The total number of packets dropped due to hardware rate limiter, destined to Kerberos server."
    ::= { alaDaKerberosGlobalConfig 5}
@@ -8121,7 +8869,7 @@ alaDaKerberosClientPktHwDiscardStats  OBJECT-TYPE
 alaDaKerberosServerPktHwDiscardStats  OBJECT-TYPE
    SYNTAX        Counter32
    MAX-ACCESS    read-only
-   STATUS        current
+   STATUS        deprecated
    DESCRIPTION
       "The total number of packets from kerberos server, dropped due to hardware rate limiter."
 
@@ -8146,7 +8894,7 @@ alaDaKerberosTotalServerPktRxStats  OBJECT-TYPE
 alaDaKerberosClientPktSwDiscardStats  OBJECT-TYPE
    SYNTAX        Counter32
    MAX-ACCESS    read-only
-   STATUS        current
+   STATUS        deprecated
    DESCRIPTION
       "Total number of packtes discarded by software, destined to kerberos server."
    ::= { alaDaKerberosGlobalConfig 9}
@@ -8155,7 +8903,7 @@ alaDaKerberosClientPktSwDiscardStats  OBJECT-TYPE
 alaDaKerberosServerPktSwDiscardStats  OBJECT-TYPE
    SYNTAX        Counter32
    MAX-ACCESS    read-only
-   STATUS        current
+   STATUS        deprecated
    DESCRIPTION
       "Total number of packets discarded by software, received from kerberos server."
    ::= { alaDaKerberosGlobalConfig 10}
@@ -8346,7 +9094,7 @@ AlaDaKerberosUserEntry ::= SEQUENCE
 
 alaDaKerberosUserMac OBJECT-TYPE
    SYNTAX        MacAddress
-   MAX-ACCESS    not-accessible
+   MAX-ACCESS    accessible-for-notify
    STATUS        current
    DESCRIPTION
       "Mac address of the user."
@@ -8428,7 +9176,7 @@ alaDaKerberosUserState  OBJECT-TYPE
 alaDaKerberosPortStatsTable  OBJECT-TYPE
    SYNTAX        SEQUENCE OF AlaDaKerberosPortStatsEntry
    MAX-ACCESS    not-accessible
-   STATUS        current
+   STATUS        deprecated
    DESCRIPTION
        "This table contains the statistics for kerberos on per port basis."
    ::= { alaDaKerberosMIBObjects 4 }
@@ -8436,7 +9184,7 @@ alaDaKerberosPortStatsTable  OBJECT-TYPE
 alaDaKerberosPortStatsEntry OBJECT-TYPE
    SYNTAX        AlaDaKerberosPortStatsEntry
    MAX-ACCESS    not-accessible
-   STATUS        current
+   STATUS        deprecated
    DESCRIPTION
       "Kerberos statistics table entry."
    INDEX {alaDaKerberosStatsIfIndex}
@@ -8460,7 +9208,7 @@ AlaDaKerberosPortStatsEntry ::= SEQUENCE
 alaDaKerberosStatsIfIndex   OBJECT-TYPE
     SYNTAX          InterfaceIndex
     MAX-ACCESS      not-accessible
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The ifindex of the port on which Kerberos Snooping is running."
     ::= { alaDaKerberosPortStatsEntry 1 }
@@ -8471,7 +9219,7 @@ alaDaKerberosPortClearStats   OBJECT-TYPE
                     reset(2)
                      }
     MAX-ACCESS     read-write
-    STATUS         current
+    STATUS         deprecated
     DESCRIPTION
         "When this object is set to reset(1), all statistics parameters
          corresponding to this port gets cleared (reset)."
@@ -8482,7 +9230,7 @@ alaDaKerberosPortClearStats   OBJECT-TYPE
 alaDaKerberosPortClientPktRxStats  OBJECT-TYPE
     SYNTAX         Counter32
     MAX-ACCESS     read-only
-    STATUS         current
+    STATUS         deprecated
     DESCRIPTION
         "Number of packets received by software on a port, destined to the kerberos server."
     ::= { alaDaKerberosPortStatsEntry 3 }
@@ -8491,7 +9239,7 @@ alaDaKerberosPortClientPktRxStats  OBJECT-TYPE
 alaDaKerberosPortServerPktRxStats  OBJECT-TYPE
     SYNTAX         Counter32
     MAX-ACCESS     read-only
-    STATUS         current
+    STATUS         deprecated
     DESCRIPTION
         "Number of packets from kerberos server received by software on a port."
     ::= { alaDaKerberosPortStatsEntry 4 }
@@ -8500,7 +9248,7 @@ alaDaKerberosPortServerPktRxStats  OBJECT-TYPE
 alaDaKerberosPortClientPktSwDiscardStats  OBJECT-TYPE
     SYNTAX         Counter32
     MAX-ACCESS     read-only
-    STATUS         current
+    STATUS         deprecated
     DESCRIPTION
         "Number of packets discarded by software on a port, destined to the kerberos server."
     ::= { alaDaKerberosPortStatsEntry 5 }
@@ -8509,7 +9257,7 @@ alaDaKerberosPortClientPktSwDiscardStats  OBJECT-TYPE
 alaDaKerberosPortServerPktSwDiscardStats  OBJECT-TYPE
     SYNTAX         Counter32
     MAX-ACCESS     read-only
-    STATUS         current
+    STATUS         deprecated
     DESCRIPTION
         "Number of packets from kerberos server discarded by software on a port."
     ::= { alaDaKerberosPortStatsEntry 6 }
@@ -8518,7 +9266,7 @@ alaDaKerberosPortServerPktSwDiscardStats  OBJECT-TYPE
 alaDaKerberosPortASREQRxStats  OBJECT-TYPE
     SYNTAX         Counter32
     MAX-ACCESS     read-only
-    STATUS         current
+    STATUS         deprecated
     DESCRIPTION
         "Number of AS-REQ packets received on a port."
     ::= { alaDaKerberosPortStatsEntry 7 }
@@ -8527,7 +9275,7 @@ alaDaKerberosPortASREQRxStats  OBJECT-TYPE
 alaDaKerberosPortASREPRxStats  OBJECT-TYPE
     SYNTAX         Counter32
     MAX-ACCESS     read-only
-    STATUS         current
+    STATUS         deprecated
     DESCRIPTION
         "Number of AS-REP packets received on a port."
     ::= { alaDaKerberosPortStatsEntry 8 }
@@ -8536,7 +9284,7 @@ alaDaKerberosPortASREPRxStats  OBJECT-TYPE
 alaDaKerberosPortTGSREQRxStats  OBJECT-TYPE
     SYNTAX         Counter32
     MAX-ACCESS     read-only
-    STATUS         current
+    STATUS         deprecated
     DESCRIPTION
         "Number of TGS-REQ packets received on a port."
     ::= { alaDaKerberosPortStatsEntry 9 }
@@ -8545,7 +9293,7 @@ alaDaKerberosPortTGSREQRxStats  OBJECT-TYPE
 alaDaKerberosPortTGSREPRxStats  OBJECT-TYPE
     SYNTAX         Counter32
     MAX-ACCESS     read-only
-    STATUS         current
+    STATUS         deprecated
     DESCRIPTION
         "Number of TGS-REP packets received on a port."
     ::= { alaDaKerberosPortStatsEntry 10 }
@@ -8553,7 +9301,7 @@ alaDaKerberosPortTGSREPRxStats  OBJECT-TYPE
 alaDaKerberosPortErrorRxStats  OBJECT-TYPE
    SYNTAX        Counter32
    MAX-ACCESS    read-only
-   STATUS        current
+   STATUS        deprecated
    DESCRIPTION
       "Number of KRB-ERROR packet received on a port."
    ::= { alaDaKerberosPortStatsEntry 11}
@@ -8588,7 +9336,7 @@ AlaDaKerberosServerEntry ::= SEQUENCE
 
 alaDaKerberosIpAddressType   OBJECT-TYPE
     SYNTAX          InetAddressType
-    MAX-ACCESS      not-accessible
+    MAX-ACCESS      accessible-for-notify
     STATUS          current
     DESCRIPTION
         "The ip-address type of the Kerberos server."
@@ -8596,7 +9344,7 @@ alaDaKerberosIpAddressType   OBJECT-TYPE
 
 alaDaKerberosIpAddress   OBJECT-TYPE
     SYNTAX          InetAddress
-    MAX-ACCESS      not-accessible
+    MAX-ACCESS      accessible-for-notify
     STATUS          current
     DESCRIPTION
         "The ip-address of the Kerberos server."
@@ -8644,7 +9392,8 @@ alaDaUNPPortVlanEntry OBJECT-TYPE
 AlaDaUNPPortVlanEntry ::= SEQUENCE 
     {
         alaDaUNPPortVlanVID        Unsigned32,
-        alaDaUNPPortVlanRowStatus  RowStatus
+        alaDaUNPPortVlanRowStatus  RowStatus,
+        alaDaUNPPortVlanType       INTEGER
     }
 
 alaDaUNPPortVlanVID OBJECT-TYPE
@@ -8665,6 +9414,18 @@ alaDaUNPPortVlanRowStatus OBJECT-TYPE
       alaDaUNPPortTable would result in deletion of all entries for that Port/Linkagg in the
       alaDaUNPPortVlanEntry"
     ::= { alaDaUNPPortVlanEntry 2 }
+
+alaDaUNPPortVlanType  OBJECT-TYPE
+    SYNTAX        INTEGER {
+                            unpQtag(1),
+                            unpUntag(2)
+                          }
+    MAX-ACCESS  read-create
+    STATUS        current
+    DESCRIPTION
+     "The type of the vpa - unpUntag or unpQtag"
+    DEFVAL { unpUntag }
+    ::= { alaDaUNPPortVlanEntry 3 }
 
 ------------------------------------------------
 -- DA Vlan Tag rule  --
@@ -8755,8 +9516,8 @@ alaDaUNPETmplVlanEntry OBJECT-TYPE
 
 AlaDaUNPETmplVlanEntry ::= SEQUENCE 
     {
-        alaDaUNPETmplVlanVID		Unsigned32,
-        alaDaUNPETmplVlanRowStatus	RowStatus
+        alaDaUNPETmplVlanVID        Unsigned32,
+        alaDaUNPETmplVlanRowStatus  RowStatus
     }
 
 alaDaUNPETmplVlanVID OBJECT-TYPE
@@ -9026,8 +9787,13 @@ AlaDaUNPPortTemplateEntry ::= SEQUENCE  {
     alaDaUNPPortTemplateMACAuthPassAlternate    SnmpAdminString,
     alaDaUNPPortTemplateMACAuthAllowEAP         INTEGER,
     alaDaUNPPortTemplateForceL3Learning         INTEGER,
-    alaDaUNPPortTemplateForceL3LearningPortBounce INTEGER,
-    alaDaUNPPortTemplateRowStatus               RowStatus
+    alaDaUNPPortTemplateForceL3LearningPortBounce         INTEGER,
+    alaDaUNPPortTemplateRowStatus               RowStatus,
+    alaDaUNPPortTemplateL2Profile               SnmpAdminString,
+    alaDaUNPPortTemplateApMode            INTEGER,
+    alaDaUNPPortTemplateApModeSecurity            INTEGER,
+    alaDaUNPPortTemplateSwSuppSecureMode            INTEGER,
+    alaDaUNPPortTemplateBpduLldpLearn            INTEGER
 }
 
 alaDaUNPPortTemplateName OBJECT-TYPE
@@ -9052,9 +9818,9 @@ alaDaUNPPortTemplateAdminState OBJECT-TYPE
 
 alaDaUNPPortTemplateDirection OBJECT-TYPE
     SYNTAX          INTEGER {
-                    both    (1),
-                    in      (2),
-                    noVal   (3)
+                        both    (1),
+                        in      (2),
+                        noVal   (3)
                     }
     MAX-ACCESS      read-create
     STATUS          current
@@ -9135,7 +9901,7 @@ alaDaUNPPortTemplateRedirectPortBounce OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "To enable/disable Redirect Port bounce on the Port Template."
-    DEFVAL          { enable }
+    DEFVAL          { disable }
     ::= { alaDaUNPPortTemplateEntry 10 }
 
 alaDaUNPPortTemplate8021XAuth OBJECT-TYPE
@@ -9143,7 +9909,7 @@ alaDaUNPPortTemplate8021XAuth OBJECT-TYPE
                         enable (1),
                         disable (2)
                     }
-    MAX-ACCESS      read-create
+    MAX-ACCESS              read-create
     STATUS          current
     DESCRIPTION
         "To enable/disable 802.1x authentication on the Port Template."
@@ -9245,26 +10011,26 @@ alaDaUNPPortTemplateMACAuthAllowEAP OBJECT-TYPE
     DEFVAL          { none }
     ::= { alaDaUNPPortTemplateEntry 20 }
 
-alaDaUNPPortTemplateForceL3Learning  OBJECT-TYPE
-    SYNTAX     INTEGER {
+alaDaUNPPortTemplateForceL3Learning OBJECT-TYPE
+    SYNTAX  INTEGER {
         enable (1),
         disable (2)
     }
-    MAX-ACCESS  read-create
-    STATUS      current
+    MAX-ACCESS      read-create
+    STATUS          current
     DESCRIPTION
-              "UNP force L3 learning status on the UNP Port-Template."
+        "UNP force L3 learning status on the UNP Port-Template."
     ::= { alaDaUNPPortTemplateEntry 21 }
 
 alaDaUNPPortTemplateForceL3LearningPortBounce OBJECT-TYPE
-    SYNTAX     INTEGER {
+    SYNTAX  INTEGER {
         enable (1),
         disable (2)
     }
-    MAX-ACCESS  read-create
-    STATUS      current
+    MAX-ACCESS      read-create
+    STATUS          current
     DESCRIPTION
-              "Port-Bounce associated with UNP force L3 learning status on the UNP Port-Template."
+        "Port-Bounce associated with UNP force L3 learning status on the UNP Port-Template."
     ::= { alaDaUNPPortTemplateEntry 22 }
 
 alaDaUNPPortTemplateRowStatus OBJECT-TYPE
@@ -9274,6 +10040,62 @@ alaDaUNPPortTemplateRowStatus OBJECT-TYPE
     DESCRIPTION     
         "Row Status for this table."
     ::= { alaDaUNPPortTemplateEntry 23 }
+
+alaDaUNPPortTemplateL2Profile OBJECT-TYPE
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "Service L2-Profile to be bound to UNP Dynamic Access Ports 
+        for controlling L2-Traffic passing through that port."
+    ::= { alaDaUNPPortTemplateEntry 24 }
+
+alaDaUNPPortTemplateApMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    enable  (1),
+                    disable (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "To enable/disable AP-mode on the port template."
+    ::= { alaDaUNPPortTemplateEntry 25 }
+
+alaDaUNPPortTemplateApModeSecurity OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    enable  (1),
+                    disable (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "To enable/disable AP-mode security on the port template."
+    DEFVAL          { disable }
+    ::= { alaDaUNPPortTemplateEntry 26 }
+
+alaDaUNPPortTemplateSwSuppSecureMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    enable  (1),
+                    disable (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "To enable/disable switch supplicant secure mode on the port template."
+    DEFVAL          { disable }
+    ::= { alaDaUNPPortTemplateEntry 27 }
+
+alaDaUNPPortTemplateBpduLldpLearn OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    enable  (1),
+                    disable (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "To enable/disable BPDU LLDP learn on the port template."
+    DEFVAL          { disable }
+    ::= { alaDaUNPPortTemplateEntry 28 }
 
 ------------------------------------------------------------
 -- Profile Table configuration MIB --
@@ -9314,7 +10136,8 @@ AlaDaUNPProfileEntry ::= SEQUENCE {
     alaDaUNPProfileMaxIngressDepth          Integer32,
     alaDaUNPProfileMaxEgressDepth           Integer32,
     alaDaUNPProfileRowStatus                RowStatus,
-    alaDaUNPProfileAFDConfig                INTEGER
+    alaDaUNPProfileAFDConfig                INTEGER,
+    alaDaUNPProfileMacMobility              INTEGER
 }
 
 alaDaUNPProfileName OBJECT-TYPE
@@ -9498,6 +10321,17 @@ alaDaUNPProfileAFDConfig OBJECT-TYPE
     DEFVAL { admin }	 
     ::= { alaDaUNPProfileEntry 18 }
 
+alaDaUNPProfileMacMobility OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  enable(1),
+                  disable(2)
+              }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Profile configuration for allowing mac-mobility."
+    ::= { alaDaUNPProfileEntry 19 }
+
 --------------------------------------------------
 -- VLAN Profile MAP Table configuration MIB --
 --------------------------------------------------
@@ -9565,12 +10399,18 @@ alaDaUNPProfileMapSpbEntry OBJECT-TYPE
     ::= { alaDaUNPProfileMapSpbTable 1 }
 
 AlaDaUNPProfileMapSpbEntry ::= SEQUENCE  {
-    alaDaUNPProfileMapSpbEncapVal          TmnxEncapVal,
-    alaDaUNPProfileMapSpbIsid              Unsigned32,
-    alaDaUNPProfileMapSpbBVlan             Unsigned32,
-    alaDaUNPProfileMapSpbMulticastMode     INTEGER,
-    alaDaUNPProfileMapSpbVlanXlation    INTEGER,
-    alaDaUNPProfileMapSpbRowStatus         RowStatus
+    alaDaUNPProfileMapSpbEncapVal              TmnxEncapVal,
+    alaDaUNPProfileMapSpbIsid                  Unsigned32,
+    alaDaUNPProfileMapSpbBVlan                 Unsigned32,
+    alaDaUNPProfileMapSpbMulticastMode         INTEGER,
+    alaDaUNPProfileMapSpbVlanXlation           INTEGER,
+    alaDaUNPProfileMapSpbRowStatus             RowStatus,
+    alaDaUNPProfileMapSpbIgmpSnooping             INTEGER,
+    alaDaUNPProfileMapSpbIgmpProfile           SnmpAdminString,
+    alaDaUNPProfileMapSpbMldSnooping              INTEGER,
+    alaDaUNPProfileMapSpbMldProfile            SnmpAdminString,
+    alaDaUNPProfileMapSpbRemoveIngressTag         INTEGER,
+    alaDaUNPProfileMapSpbETree                 INTEGER
 }
 
 alaDaUNPProfileMapSpbEncapVal OBJECT-TYPE
@@ -9633,6 +10473,72 @@ alaDaUNPProfileMapSpbRowStatus OBJECT-TYPE
         "The row status of this table entry."
     ::= { alaDaUNPProfileMapSpbEntry 6 }
 
+alaDaUNPProfileMapSpbIgmpSnooping OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable  (1),
+                   disable (2)
+               }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "To enable/disable the IGMP-snooping."
+    DEFVAL { disable }
+    ::= { alaDaUNPProfileMapSpbEntry 7 }
+
+alaDaUNPProfileMapSpbIgmpProfile OBJECT-TYPE
+    SYNTAX        SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The name of the IGMP-snooping IPMS profile."
+    ::= { alaDaUNPProfileMapSpbEntry 8 }
+
+alaDaUNPProfileMapSpbMldSnooping OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   enable  (1),
+                   disable (2)
+               }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "To enable/disable the MLD-snooping."
+    DEFVAL { disable }
+    ::= { alaDaUNPProfileMapSpbEntry 9 }
+
+alaDaUNPProfileMapSpbMldProfile OBJECT-TYPE
+    SYNTAX        SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The name of the MLD-snooping IPMS profile."
+    ::= { alaDaUNPProfileMapSpbEntry 10 }
+
+alaDaUNPProfileMapSpbRemoveIngressTag OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable (1),
+                        disable (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS      current
+    DESCRIPTION   
+        "To enable/disable the remove ingress tag option for the 
+        dynamic service."
+    DEFVAL          { disable }
+    ::= { alaDaUNPProfileMapSpbEntry 11 }
+
+alaDaUNPProfileMapSpbETree OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable (1),
+                        disable (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS      current
+    DESCRIPTION   
+        "To enable/disable the e-tree option for the 
+        dynamic service."
+    DEFVAL          { disable }
+    ::= { alaDaUNPProfileMapSpbEntry 12 }
+
 ------------------------------------------------------------
 -- VXLAN Profile Map Table configuration MIB --
 ------------------------------------------------------------
@@ -9658,12 +10564,16 @@ alaDaUNPProfileMapVxlanEntry OBJECT-TYPE
 AlaDaUNPProfileMapVxlanEntry ::= SEQUENCE  {
     alaDaUNPProfileMapVxlanEncapVal                 TmnxEncapVal,
     alaDaUNPProfileMapVxlanVnid                     Unsigned32,
-    alaDaUNPProfileMapVxlanFarEndIPList		    SnmpAdminString,
+    alaDaUNPProfileMapVxlanFarEndIPList             SnmpAdminString,
     alaDaUNPProfileMapVxlanMulticastIPAddressType   InetAddressType,
     alaDaUNPProfileMapVxlanMulticastIPAddress       InetAddress,
     alaDaUNPProfileMapVxlanVlanXlation              INTEGER,
     alaDaUNPProfileMapVxlanMulticastMode            INTEGER,
-    alaDaUNPProfileMapVxlanRowStatus                RowStatus
+    alaDaUNPProfileMapVxlanRowStatus                RowStatus,
+    alaDaUNPProfileMapVxlanMacOrchestration         INTEGER,
+    alaDaUNPProfileMapVxlanRemoveIngressTag         INTEGER,
+    alaDaUNPProfileMapVxlanTcpMss                   Integer32,
+    alaDaUNPProfileMapVxlanTcpMssOverlayProfile     SnmpAdminString
 }
 
 alaDaUNPProfileMapVxlanEncapVal OBJECT-TYPE
@@ -9675,7 +10585,7 @@ alaDaUNPProfileMapVxlanEncapVal OBJECT-TYPE
     ::= { alaDaUNPProfileMapVxlanEntry 1 }
 
 alaDaUNPProfileMapVxlanVnid OBJECT-TYPE
-    SYNTAX        Unsigned32 (1..16777214)
+    SYNTAX        Unsigned32 (1..16777215)
     MAX-ACCESS    read-create
     STATUS        current
     DESCRIPTION
@@ -9748,6 +10658,45 @@ alaDaUNPProfileMapVxlanRowStatus OBJECT-TYPE
         "The row status of this table entry."
     ::= { alaDaUNPProfileMapVxlanEntry 8 }
 
+alaDaUNPProfileMapVxlanMacOrchestration OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable (1),
+                        disable (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS      current
+    DESCRIPTION
+        "To enable/disable the MAC orchestration."
+    DEFVAL          { disable }
+    ::= { alaDaUNPProfileMapVxlanEntry 9 }
+
+alaDaUNPProfileMapVxlanRemoveIngressTag OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable (1),
+                        disable (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS      current
+    DESCRIPTION
+        "To enable/disable the remove ingress tag option for the 
+        dynamic service."
+    DEFVAL          { disable }
+    ::= { alaDaUNPProfileMapVxlanEntry 10 }
+
+alaDaUNPProfileMapVxlanTcpMss OBJECT-TYPE
+     SYNTAX          Integer32 (500 .. 1410)
+     MAX-ACCESS      read-create
+     STATUS          current
+     DESCRIPTION     "TCP MSS config value"
+     ::= { alaDaUNPProfileMapVxlanEntry 11 }
+ 
+alaDaUNPProfileMapVxlanTcpMssOverlayProfile OBJECT-TYPE
+     SYNTAX          SnmpAdminString
+     MAX-ACCESS      read-create
+     STATUS          current
+     DESCRIPTION     "TCP MSS overlay profile"
+     ::= { alaDaUNPProfileMapVxlanEntry 12 }
+ 
 --------------------------------------------------
 -- Static Profile MAP Table configuration MIB --
 --------------------------------------------------
@@ -9963,7 +10912,8 @@ alaDaUNPPortTemplateVlanEntry OBJECT-TYPE
 AlaDaUNPPortTemplateVlanEntry ::= SEQUENCE 
     {
         alaDaUNPPortTemplateVlanVID        Unsigned32,
-        alaDaUNPPortTemplateVlanRowStatus  RowStatus
+        alaDaUNPPortTemplateVlanRowStatus  RowStatus,
+        alaDaUNPPortTemplateVlanType       INTEGER
     }
 
 alaDaUNPPortTemplateVlanVID OBJECT-TYPE
@@ -9984,6 +10934,1229 @@ alaDaUNPPortTemplateVlanRowStatus OBJECT-TYPE
       alaDaUNPPortTemplateTable would result in deletion of all entries for that Port Template in the
       alaDaUNPPortTmplVlanTable."
     ::= { alaDaUNPPortTemplateVlanEntry 2 }
+
+alaDaUNPPortTemplateVlanType  OBJECT-TYPE
+    SYNTAX        INTEGER {
+                             unpQtag(1),
+                             unpUntag(2)
+                           }
+    MAX-ACCESS        read-create
+    STATUS        current
+    DESCRIPTION
+     "The type of the vpa - unpUntag or unpQtag"
+    DEFVAL { unpUntag }
+    ::= { alaDaUNPPortTemplateVlanEntry 3 }
+
+--------------------------------------------------------------
+--  UNP Wlan configuration
+--------------------------------------------------------------
+
+alaDaUNPWlanConfiguration    OBJECT IDENTIFIER ::= { alaIND1DaMIBObjects 67 }
+
+alaDaUNPWlanMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable  (1),
+                    disable (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicated whether WLAN configuration is enabled or not."
+    DEFVAL      { disable }
+    ::= { alaDaUNPWlanConfiguration 1 }
+
+alaDaUNPWlanManagementVlan  OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4094)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The VLAN to be used for WLAN."
+    ::= { alaDaUNPWlanConfiguration 2 }
+
+alaDaUNPWlanAuthenticationFlag OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable  (1),
+                    disable (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicated whether the authentication flag on the DefaultWLANProfile profile is enabled or not."
+    DEFVAL      { disable }
+    ::= { alaDaUNPWlanConfiguration 3 }
+
+alaDaUNPWlanForceDefWlanProfile OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable  (1),
+                    disable (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicated whether classification engine is force to run or not."
+    DEFVAL      { disable }
+    ::= { alaDaUNPWlanConfiguration 4 }
+
+alaDaUNPWlanAuthServerDownFallback OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable  (1),
+                    disable (2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicated whether the auth-server-down profile is implicitly map to DefaultWLANProfile or not."
+    DEFVAL      { disable }
+    ::= { alaDaUNPWlanConfiguration 5 }
+
+alaDaUNPWlanSecurityLevel OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none (1),
+                    macAuth (2),
+                    dot1X (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The object defines the configured authentications to be associated with DefaultWLANProfile profile none(1), lldp(2), mac-auth(3), mac-auth+lldp(4) and 802.1x(5)."
+    DEFVAL { none } 
+    ::= { alaDaUNPWlanConfiguration 6 }
+
+--
+-- UNP Profile MAP L2Gre Table
+--
+
+alaDaUNPProfileMapL2GreTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AlaDaUNPProfileL2GreEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table stores the Service Classification profiles created in the system.
+        The entries provides information to classify device in the L2Gre Service domain."
+    ::= { alaIND1DaMIBObjects 68 }
+
+alaDaUNPProfileL2GreEntry OBJECT-TYPE
+    SYNTAX        AlaDaUNPProfileL2GreEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "L2Gre Service Classification Profile entry."
+    INDEX { alaDaUNPProfileName }
+    ::= { alaDaUNPProfileMapL2GreTable 1 }
+
+AlaDaUNPProfileL2GreEntry ::= SEQUENCE  {
+    alaDaUNPProfileMapL2GreEncapVal                 TmnxEncapVal,
+    alaDaUNPProfileMapL2GreVpnid                       Unsigned32,
+    alaDaUNPProfileMapL2GreFarEndIPAddressType      InetAddressType,
+    alaDaUNPProfileMapL2GreFarEndIPAddress          InetAddress,
+    alaDaUNPProfileMapL2GreFarEndIPList             SnmpAdminString,
+    alaDaUNPProfileMapL2GreRowStatus                RowStatus,
+    alaDaUNPProfileMapL2GreVlanXlation              INTEGER,
+    alaDaUNPProfileMapL2GreRemoveIngressTag         INTEGER
+}
+
+alaDaUNPProfileMapL2GreEncapVal OBJECT-TYPE
+    SYNTAX        TmnxEncapVal
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The encapsulation to be used for the SAP connecting to the service."
+    ::= { alaDaUNPProfileL2GreEntry 1 }
+
+alaDaUNPProfileMapL2GreVpnid OBJECT-TYPE
+    SYNTAX        Unsigned32 (1 .. 16777215)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The object represent the VPNID that is to be used to dynamically 
+        create a L2GRE service."
+    ::= { alaDaUNPProfileL2GreEntry 2 }
+
+alaDaUNPProfileMapL2GreFarEndIPAddressType OBJECT-TYPE
+    SYNTAX         InetAddressType { ipv4(1) }   
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+        "The IP address type. This feature only supports IPv4."
+    ::= { alaDaUNPProfileL2GreEntry 3 }
+
+alaDaUNPProfileMapL2GreFarEndIPAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(0|4))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address. This feature only supports IPv4."
+    ::= { alaDaUNPProfileL2GreEntry 4 }
+
+alaDaUNPProfileMapL2GreFarEndIPList OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0 .. 32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the Far End IP List that will be used if this
+         User Network Profile is applied for a given device."
+    ::= { alaDaUNPProfileL2GreEntry 5 }
+
+alaDaUNPProfileMapL2GreRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The row status of this table entry."
+    ::= { alaDaUNPProfileL2GreEntry 6 }
+
+alaDaUNPProfileMapL2GreVlanXlation OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable (1),
+                    disable (2)
+                }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "To enable/disable the vlan translation for L2GRE ."
+    DEFVAL        { disable }
+    ::= { alaDaUNPProfileL2GreEntry 7 }
+
+alaDaUNPProfileMapL2GreRemoveIngressTag OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enable (1),
+                        disable (2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS      current
+    DESCRIPTION
+        "To enable/disable the remove ingress tag option for the 
+        dynamic service."
+    DEFVAL          { disable }
+    ::= { alaDaUNPProfileL2GreEntry 8 }
+
+------------------------------------------------------------
+-- L2GRE Far-End-IP-List Table 
+------------------------------------------------------------
+  
+alaDaUNPL2GreFarEndIPListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDaUNPL2GreFarEndIPListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table shows all the Far-End-IP-Lists configured." 
+    ::= { alaIND1DaMIBObjects 69 }
+
+alaDaUNPL2GreFarEndIPListEntry OBJECT-TYPE
+    SYNTAX      AlaDaUNPL2GreFarEndIPListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Far-end IP List entry."
+    INDEX { alaDaUNPL2GreFarEndIPListName }
+    ::= { alaDaUNPL2GreFarEndIPListTable 1 }
+
+AlaDaUNPL2GreFarEndIPListEntry ::= SEQUENCE
+{
+    alaDaUNPL2GreFarEndIPListName           SnmpAdminString,
+    alaDaUNPL2GreFarEndIPListIPAddressCount Unsigned32,
+    alaDaUNPL2GreFarEndIPListRemove         INTEGER 
+}
+
+alaDaUNPL2GreFarEndIPListName OBJECT-TYPE
+    SYNTAX        SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS    not-accessible 
+    STATUS        current
+    DESCRIPTION
+        "Name of the Far-End-IP list configured."
+    ::= { alaDaUNPL2GreFarEndIPListEntry 1 }
+
+alaDaUNPL2GreFarEndIPListIPAddressCount OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of the IP Addresses configured for the corresponding Far-End-IP-List."
+    ::= { alaDaUNPL2GreFarEndIPListEntry 2 }
+
+alaDaUNPL2GreFarEndIPListRemove OBJECT-TYPE
+    SYNTAX      INTEGER { 
+		      no (1), 
+		      yes (2) 
+			  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "This object is used to remove a Far-End-IP-List."
+    DEFVAL { no }
+    ::= { alaDaUNPL2GreFarEndIPListEntry 3 }
+
+------------------------------------------------------------
+-- L2GRE Far-End-IP-List Address Table 
+------------------------------------------------------------
+  
+alaDaUNPL2GreFarEndIPAddressListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDaUNPL2GreFarEndIPAddressListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to configure the Far-End-List and the IP Addresses for that list." 
+    ::= { alaIND1DaMIBObjects 70 }
+
+alaDaUNPL2GreFarEndIPAddressListEntry OBJECT-TYPE
+    SYNTAX      AlaDaUNPL2GreFarEndIPAddressListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Far-end IP Address List entry."
+    INDEX { alaDaUNPL2GreFarEndIPListName, alaDaUNPL2GreFarEndIPAddressListIPType, alaDaUNPL2GreFarEndIPAddressListIP }
+    ::= { alaDaUNPL2GreFarEndIPAddressListTable 1 }
+
+AlaDaUNPL2GreFarEndIPAddressListEntry ::= SEQUENCE
+{
+    alaDaUNPL2GreFarEndIPAddressListIPType 		InetAddressType,
+    alaDaUNPL2GreFarEndIPAddressListIP		InetAddress,
+    alaDaUNPL2GreFarEndIPAddressListRowStatus 	RowStatus
+}
+
+alaDaUNPL2GreFarEndIPAddressListIPType OBJECT-TYPE
+    SYNTAX          InetAddressType { ipv4(1) }
+    MAX-ACCESS      not-accessible
+    STATUS          current  
+    DESCRIPTION
+        "The IP address type of the IP address." 
+    ::= { alaDaUNPL2GreFarEndIPAddressListEntry 1 }
+
+alaDaUNPL2GreFarEndIPAddressListIP OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4)) 
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION
+        "The Far-End IP address." 
+    ::= { alaDaUNPL2GreFarEndIPAddressListEntry 2 }
+
+alaDaUNPL2GreFarEndIPAddressListRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The row status of this table entry."
+    ::= { alaDaUNPL2GreFarEndIPAddressListEntry 3 }
+
+-----------------------------------------------
+-- Network Group Table 
+-----------------------------------------------
+alaDaUNPNetworkGroupTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlaDaUNPNetworkGroupEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Network-group is basic building for defining any number of network groups"
+    ::= { alaIND1DaMIBObjects 71 }
+
+alaDaUNPNetworkGroupEntry OBJECT-TYPE
+    SYNTAX  AlaDaUNPNetworkGroupEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry of network groups"
+    INDEX { alaDaUNPNetworkGroupName, alaDaUNPNetworkGroupIpAddrType,
+            alaDaUNPNetworkGroupIpAddr,alaDaUNPNetworkGroupIpMask}
+    ::= { alaDaUNPNetworkGroupTable 1 }
+
+AlaDaUNPNetworkGroupEntry ::= SEQUENCE  {
+    alaDaUNPNetworkGroupName             SnmpAdminString,
+    alaDaUNPNetworkGroupIpAddrType       InetAddressType,
+    alaDaUNPNetworkGroupIpAddr           InetAddress,
+    alaDaUNPNetworkGroupIpMask           InetAddress,
+    alaDaUNPNetworkGroupRowStatus        RowStatus
+}
+
+alaDaUNPNetworkGroupName OBJECT-TYPE
+    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The name of the network group entry"
+    ::= { alaDaUNPNetworkGroupEntry 1 }
+
+alaDaUNPNetworkGroupIpAddrType  OBJECT-TYPE
+    SYNTAX        InetAddressType  {
+                      ipv4(1),
+                      ipv6(2)
+                  }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Address type of the network group entry"
+    DEFVAL { ipv4 }
+    ::= { alaDaUNPNetworkGroupEntry 2 }
+
+alaDaUNPNetworkGroupIpAddr  OBJECT-TYPE
+    SYNTAX     InetAddress(SIZE(4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IP address of network group"
+    ::= { alaDaUNPNetworkGroupEntry 3 }
+
+alaDaUNPNetworkGroupIpMask OBJECT-TYPE
+    SYNTAX        InetAddress(SIZE(4|16))
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "IP Mask of the network group entry"
+    DEFVAL      { 'FFFFFFFF'H }
+    ::= { alaDaUNPNetworkGroupEntry 4 }
+
+alaDaUNPNetworkGroupRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "Status of the network group entry"
+    ::= { alaDaUNPNetworkGroupEntry 5 }
+-----------------------------------------------
+-- Router Authentication Table
+-----------------------------------------------
+
+alaDaUNPRouterAuthUserGroupTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlaDaUNPRouterAuthUserGroupEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Configures a condition for L3-Authentication using a condition as either source- network-group
+        or destination- network-group or both"
+    ::= { alaIND1DaMIBObjects 72 }
+
+alaDaUNPRouterAuthUserGroupEntry OBJECT-TYPE
+    SYNTAX  AlaDaUNPRouterAuthUserGroupEntry 
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Router Authentication Entry"
+    INDEX {  alaDaUNPRouterAuthenticationName }
+    ::= { alaDaUNPRouterAuthUserGroupTable 1 }
+
+AlaDaUNPRouterAuthUserGroupEntry ::= SEQUENCE  {
+    alaDaUNPRouterAuthenticationName        SnmpAdminString,
+    alaDaUNPRouterAuthenticationSrcGroup    SnmpAdminString,
+    alaDaUNPRouterAuthenticationDestGroup   SnmpAdminString,
+    alaDaUNPRouterAuthenticationRowStatus   RowStatus
+}
+
+alaDaUNPRouterAuthenticationName OBJECT-TYPE
+    SYNTAX  SnmpAdminString ( SIZE( 1 .. 32 ) )
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The name of the condition for router-authentication trigger"
+    ::= { alaDaUNPRouterAuthUserGroupEntry 1 }
+
+alaDaUNPRouterAuthenticationSrcGroup OBJECT-TYPE
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The source-network-group configured group of IPv4 addresse(s) 
+        which needs to be used in defining source and/or dest-network-group condition for
+        challenging authentication on traffic matching it "
+    ::= { alaDaUNPRouterAuthUserGroupEntry 2 }
+
+alaDaUNPRouterAuthenticationDestGroup OBJECT-TYPE
+    SYNTAX  SnmpAdminString ( SIZE( 0 .. 32 ) )
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The destination-network-group configuredgroup of IPv4 addresse(s)
+        which needs to be used in defining source and/or dest-network-group
+        condition for challenging authentication on traffic matching it"
+    ::= { alaDaUNPRouterAuthUserGroupEntry 3 }
+
+alaDaUNPRouterAuthenticationRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "Router Authentication Row Status"
+    ::= { alaDaUNPRouterAuthUserGroupEntry 4}
+
+------------------------------------------------------------
+-- UNP Router Authentication User Flush Table 
+------------------------------------------------------------
+alaDaUNPRouterAuthenticationFlushTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDaUNPRouterAuthenticationFlushEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to flush the UNP router authentication."
+    ::= { alaIND1DaMIBObjects 74 }
+
+alaDaUNPRouterAuthenticationFlushEntry OBJECT-TYPE
+    SYNTAX      AlaDaUNPRouterAuthenticationFlushEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of router authentication flush."
+    INDEX { alaDaUNPRouterAuthenticationFlushIndex }
+    ::= { alaDaUNPRouterAuthenticationFlushTable 1 }
+
+AlaDaUNPRouterAuthenticationFlushEntry ::= SEQUENCE  {
+    alaDaUNPRouterAuthenticationFlushIndex          Integer32,
+    alaDaUNPRouterAuthenticationFlushComplete       INTEGER,
+    alaDaUNPRouterAuthenticationFlushUserGroupName  SnmpAdminString,
+    alaDaUNPRouterAuthenticationFlushType           INTEGER,
+    alaDaUNPRouterAuthenticationFlushUserName       SnmpAdminString,
+    alaDaUNPRouterAuthenticationFlushIpAddressType  InetAddressType,
+    alaDaUNPRouterAuthenticationFlushIpAddress      InetAddress
+}
+
+alaDaUNPRouterAuthenticationFlushIndex OBJECT-TYPE
+    SYNTAX      Integer32(1)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Flush index."
+    ::= { alaDaUNPRouterAuthenticationFlushEntry 1 }
+
+alaDaUNPRouterAuthenticationFlushComplete OBJECT-TYPE
+    SYNTAX     INTEGER { 
+                   none (1), 
+                   all (2) 
+               } 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Flush all users learnt on all access type ports."
+    DEFVAL { none }
+    ::= { alaDaUNPRouterAuthenticationFlushEntry 2 }
+
+alaDaUNPRouterAuthenticationFlushUserGroupName OBJECT-TYPE
+    SYNTAX        SnmpAdminString (SIZE( 0..32 ))
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The router authentication flush group name."
+    ::= { alaDaUNPRouterAuthenticationFlushEntry 3 }
+
+alaDaUNPRouterAuthenticationFlushType OBJECT-TYPE
+    SYNTAX     INTEGER { 
+                   cp (1), 
+                   ip (2) 
+               } 
+    MAX-ACCESS  read-create  
+    STATUS      current
+    DESCRIPTION
+        "The router authentication flush type ."
+    ::= { alaDaUNPRouterAuthenticationFlushEntry 4 }
+
+alaDaUNPRouterAuthenticationFlushUserName OBJECT-TYPE
+    SYNTAX  SnmpAdminString (SIZE( 1 .. 32 ))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The username of router authentication flush."
+    ::= { alaDaUNPRouterAuthenticationFlushEntry 5 }
+
+alaDaUNPRouterAuthenticationFlushIpAddressType  OBJECT-TYPE
+    SYNTAX        InetAddressType  {
+                      ipv4(1),
+                      ipv6(2)
+                  }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address type of router authentication flush"
+    DEFVAL { ipv4 }
+    ::= { alaDaUNPRouterAuthenticationFlushEntry 6 }
+    
+alaDaUNPRouterAuthenticationFlushIpAddress OBJECT-TYPE
+    SYNTAX  InetAddress
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The IP address of router authentication flush."
+    ::= { alaDaUNPRouterAuthenticationFlushEntry 7 }
+
+-----------------------------------------------
+--SCALAR Router Authentication configuration MIB
+-----------------------------------------------
+
+alaDaUNPRouterAuthenticationConfig    OBJECT IDENTIFIER ::= { alaIND1DaMIBObjects 73 }
+
+alaDaUNPRouterAuthCpProfileName OBJECT-TYPE
+        SYNTAX        SnmpAdminString ( SIZE( 0 .. 255 ) )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The name of captive-portal-profile ."
+        ::= { alaDaUNPRouterAuthenticationConfig 1 }
+
+ --
+ -- UNP Port Profile Table
+ --
+ 
+ alaDaUNPPortProfileTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF AlaDaUNPPortProfileEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This table contains a list of persistent profile configured for an 
+          UNP Port/Linkagg. This is applicable only to UNP Port-Type Access."
+     ::= { alaIND1DaMIBObjects 75 }
+ 
+ alaDaUNPPortProfileEntry OBJECT-TYPE
+     SYNTAX      AlaDaUNPPortProfileEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Each of these entries represents a persistent UNP-Profile associated 
+          with UNP Access Port/Linkagg."
+     INDEX { alaDaUNPPortIfIndex, alaDaUNPPortProfileName }
+     ::= { alaDaUNPPortProfileTable 1 }
+ 
+ AlaDaUNPPortProfileEntry ::= SEQUENCE
+     {
+         alaDaUNPPortProfileName    SnmpAdminString,
+         alaDaUNPPortProfileRowStatus  RowStatus
+     }
+ 
+ alaDaUNPPortProfileName OBJECT-TYPE
+     SYNTAX          SnmpAdminString (SIZE ( 1 .. 32 ) )
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+      "Persistent UNP-Profile Name assigned on UNP Access Port/Linkagg."
+     ::= { alaDaUNPPortProfileEntry 1 }
+ 
+ alaDaUNPPortProfileRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+      "On create, the specified UNP Port/Linkagg must exist in alaDaUNPPortTable,
+       otherwise an entry creation in this table would not be allowed. Deletion of an UNP Port/Linkagg entry in 
+       alaDaUNPPortTable would result in deletion of all entries for that Port/Linkagg in the
+       alaDaUNPPortProfileEntry."
+     ::= { alaDaUNPPortProfileEntry 2 }
+ 
+ --
+ -- UNP Port Template Profile Table
+ --
+ 
+ alaDaUNPPortTemplateProfileTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF AlaDaUNPPortTemplateProfileEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This table contains a list of persistent profile configured for an 
+          UNP Port Template." 
+     ::= { alaIND1DaMIBObjects 76 }
+ 
+ alaDaUNPPortTemplateProfileEntry OBJECT-TYPE
+     SYNTAX      AlaDaUNPPortTemplateProfileEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Each of these entries represents a persistent UNP-Profile associated 
+          with an UNP Port Template."
+     INDEX { alaDaUNPPortTemplateName, alaDaUNPPortTemplateProfileName }
+     ::= { alaDaUNPPortTemplateProfileTable 1 }
+ 
+ AlaDaUNPPortTemplateProfileEntry ::= SEQUENCE
+     {
+         alaDaUNPPortTemplateProfileName            SnmpAdminString,
+         alaDaUNPPortTemplateProfileRowStatus       RowStatus
+     }
+ 
+ alaDaUNPPortTemplateProfileName OBJECT-TYPE
+     SYNTAX          SnmpAdminString (SIZE ( 1 .. 32 ) )
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+      "Persistent UNP-Profile Name assigned on UNP Port Template."
+     ::= { alaDaUNPPortTemplateProfileEntry 1 }
+ 
+ alaDaUNPPortTemplateProfileRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+      "On create, the specified UNP Port Template must exist in alaDaUNPPortTemplateTable,
+       otherwise an entry creation in this table would not be allowed. Deletion of an UNP PortTemplate entry in 
+       alaDaUNPPortTemplateTable would result in deletion of all entries for that Port Template in the
+       alaDaUNPPortTemplateProfileEntry."
+     ::= { alaDaUNPPortTemplateProfileEntry 2 }
+
+------------------------------------------------------------
+-- UNP Router Authentication User Table 
+------------------------------------------------------------
+
+alaDaUnpRouterAuthenticationUserTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDaUnpRouterAuthenticationUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A table of router authentication users."
+::= { alaIND1DaMIBObjects 77 }
+
+alaDaUnpRouterAuthenticationUserEntry OBJECT-TYPE
+    SYNTAX      AlaDaUnpRouterAuthenticationUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "The entry of router authentication user."
+    INDEX { alaDaUNPRouterAuthenticationUserIpType,
+            alaDaUNPRouterAuthenticationUserIpAddress
+          }
+::= { alaDaUnpRouterAuthenticationUserTable 1 }
+
+AlaDaUnpRouterAuthenticationUserEntry ::=SEQUENCE {
+    alaDaUNPRouterAuthenticationUserIpType                     InetAddressType,
+    alaDaUNPRouterAuthenticationUserIpAddress                  InetAddress,
+    alaDaUNPRouterAuthenticationUserName                       SnmpAdminString,
+    alaDaUNPRouterAuthenticationUserDestinationGroup           SnmpAdminString,
+    alaDaUNPRouterAuthenticationUserInterfaceName              SnmpAdminString,
+    alaDaUNPRouterAuthenticationUserVlan                       Unsigned32,
+    alaDaUNPRouterAuthenticationUserAuthType                   INTEGER,
+    alaDaUNPRouterAuthenticationUserAuthStatus                 INTEGER,
+    alaDaUNPRouterAuthenticationUserLoginTime                  DateAndTime,
+    alaDaUNPRouterAuthenticationUserSessionRemainingTime       Unsigned32 
+        }
+
+alaDaUNPRouterAuthenticationUserIpType OBJECT-TYPE
+    SYNTAX      InetAddressType {
+                                ipv4(1),
+                                ipv6(2)
+                                }
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "The address type of the router authentication user."
+    ::= { alaDaUnpRouterAuthenticationUserEntry 1 }
+
+alaDaUNPRouterAuthenticationUserIpAddress OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE(4|16))
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "The IP address of the router authentication user."
+    ::= { alaDaUnpRouterAuthenticationUserEntry 2 }
+
+alaDaUNPRouterAuthenticationUserName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The name of the condition for router authentication user."
+    ::= { alaDaUnpRouterAuthenticationUserEntry 3 }
+
+alaDaUNPRouterAuthenticationUserDestinationGroup OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The destination group configured group of IPv4 address(s)."
+    ::= { alaDaUnpRouterAuthenticationUserEntry 4 }
+
+alaDaUNPRouterAuthenticationUserInterfaceName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The name of the router authentication user interface."
+    ::= { alaDaUnpRouterAuthenticationUserEntry 5 }
+
+alaDaUNPRouterAuthenticationUserVlan OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The Vlan of the router authentication user."
+    ::= { alaDaUnpRouterAuthenticationUserEntry 6 }
+
+alaDaUNPRouterAuthenticationUserAuthType    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                ip (1),
+                cp (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The type of the router authentication user."
+    ::= { alaDaUnpRouterAuthenticationUserEntry 7 }
+
+alaDaUNPRouterAuthenticationUserAuthStatus    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                pass (1),
+                fail (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The status of the router authentication user. "
+    ::= { alaDaUnpRouterAuthenticationUserEntry 8 }
+
+alaDaUNPRouterAuthenticationUserLoginTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The login time stamp of the router authentication user."
+    ::= { alaDaUnpRouterAuthenticationUserEntry 9 }
+
+alaDaUNPRouterAuthenticationUserSessionRemainingTime    OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The number of seconds after which the session is disabled."
+    ::= { alaDaUnpRouterAuthenticationUserEntry 10 }
+
+------------------------------------------------------------
+-- UNP Redirect allowed web server Table 
+------------------------------------------------------------
+
+  alaDaUNPRedirectAllowedWebServerTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF AlaDaUNPRedirectAllowedWebServerEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of UNP Redirect allowed web server"
+  ::= { alaIND1DaMIBObjects 78 }
+
+  alaDaUNPRedirectAllowedWebServerEntry OBJECT-TYPE
+  SYNTAX      AlaDaUNPRedirectAllowedWebServerEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of UNP Redirect allowed web server"
+  INDEX {
+      alaDaUNPRedirectAllowedWebServerName
+  }
+  ::= { alaDaUNPRedirectAllowedWebServerTable 1 }
+
+  AlaDaUNPRedirectAllowedWebServerEntry ::=
+  SEQUENCE
+  {
+    alaDaUNPRedirectAllowedWebServerName                     SnmpAdminString,
+    alaDaUNPRedirectAllowedWebServerIpAddressType            InetAddressType,
+    alaDaUNPRedirectAllowedWebServerIpAddress                InetAddress,
+    alaDaUNPRedirectAllowedWebServerFQDN                     SnmpAdminString,
+    alaDaUNPRedirectAllowedWebServerFQDNResolvedTime         SnmpAdminString,
+    alaDaUNPRedirectAllowedWebServerRowStatus                RowStatus,
+    alaDaUNPRedirectAllowedWebServerIpAddrStatus             INTEGER
+  }
+
+  alaDaUNPRedirectAllowedWebServerName OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE(1..32))
+  MAX-ACCESS  accessible-for-notify
+  STATUS      current
+  DESCRIPTION "Name of Redirect allowed web server."
+  ::= { alaDaUNPRedirectAllowedWebServerEntry 1 }
+
+  alaDaUNPRedirectAllowedWebServerIpAddressType OBJECT-TYPE
+  SYNTAX      InetAddressType{
+                  ipv4(1)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "IP Address type of Redirect allowed web server."
+  ::= { alaDaUNPRedirectAllowedWebServerEntry 2 }
+
+  alaDaUNPRedirectAllowedWebServerIpAddress OBJECT-TYPE
+  SYNTAX      InetAddress
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "IP Address of Redirect allowed web server."
+  ::= { alaDaUNPRedirectAllowedWebServerEntry 3 }
+
+  alaDaUNPRedirectAllowedWebServerFQDN OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE(1..255))
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "FQDN of Redirect allowed web server."
+  ::= { alaDaUNPRedirectAllowedWebServerEntry 4 }
+
+  alaDaUNPRedirectAllowedWebServerFQDNResolvedTime OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE (0..255))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "FQDN resolved time of Redirect allowed web server."
+  ::= { alaDaUNPRedirectAllowedWebServerEntry 5 }
+
+  alaDaUNPRedirectAllowedWebServerRowStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "The row status of this table entry."
+  ::= { alaDaUNPRedirectAllowedWebServerEntry 6 }
+
+  alaDaUNPRedirectAllowedWebServerIpAddrStatus OBJECT-TYPE
+  SYNTAX      INTEGER
+      {
+         programmed(1),
+         notProgrammed(2),
+         notApplicable(3)
+      }
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "The allowed web server ipaadr status defines wheather the configured Ip is programmed in HW or not"
+  DEFVAL { programmed }
+  ::= { alaDaUNPRedirectAllowedWebServerEntry 7 }
+
+------------------------------------------------------------
+-- UNP FQDN resolved ip addresses Table 
+------------------------------------------------------------
+
+  alaDaUNPFQDNResolvedIPTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF AlaDaUNPFQDNResolvedIPEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of UNP FQDN resolved ip addresses."
+  ::= { alaIND1DaMIBObjects 79 }
+
+  alaDaUNPFQDNResolvedIPEntry OBJECT-TYPE
+  SYNTAX      AlaDaUNPFQDNResolvedIPEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of UNP FQDN resolved ip addresses."
+  INDEX { alaDaUNPFQDNResolvedIPName, alaDaUNPFQDNResolvedIPAddressType, alaDaUNPFQDNResolvedIPAddress }
+  ::= { alaDaUNPFQDNResolvedIPTable 1 }
+
+  AlaDaUNPFQDNResolvedIPEntry ::=
+  SEQUENCE
+  {
+    alaDaUNPFQDNResolvedIPName              SnmpAdminString,
+    alaDaUNPFQDNResolvedIPAddressType       InetAddressType,
+    alaDaUNPFQDNResolvedIPAddress           InetAddress,
+    alaDaUNPFQDNResolvedIPAddressStatus     INTEGER
+  }
+
+  alaDaUNPFQDNResolvedIPName OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE(1..255))
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Name of FQDN resolved ip addresses."
+  ::= { alaDaUNPFQDNResolvedIPEntry 1 }
+
+  alaDaUNPFQDNResolvedIPAddressType OBJECT-TYPE
+  SYNTAX      InetAddressType { ipv4(1) }
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "IP Address type of FQDN resolved ip."
+  ::= { alaDaUNPFQDNResolvedIPEntry 2 }
+
+  alaDaUNPFQDNResolvedIPAddress OBJECT-TYPE
+  SYNTAX      InetAddress
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "IP Address of FQDN resolved ip."
+  ::= { alaDaUNPFQDNResolvedIPEntry 3 }
+
+  alaDaUNPFQDNResolvedIPAddressStatus OBJECT-TYPE
+  SYNTAX      INTEGER
+        {
+          programmed(1),
+          notProgrammed(2)
+        }
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+   "The FQDN ipaadr status defines wheather the configured Ip is programmed in HW or not"
+  ::= { alaDaUNPFQDNResolvedIPEntry 4 }
+
+------------------------------------------------------------
+-- UNP Profile MAP Vpls Table
+------------------------------------------------------------
+
+alaDaUNPProfileMapVplsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AlaDaUNPProfileVplsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table stores the Service Classification profiles created in the system.
+        The entries provides information to classify device in the Vpls Service domain."
+    ::= { alaIND1DaMIBObjects 80 }
+
+alaDaUNPProfileVplsEntry OBJECT-TYPE
+    SYNTAX        AlaDaUNPProfileVplsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Vpls Service Classification Profile entry."
+    INDEX { alaDaUNPProfileName }
+    ::= { alaDaUNPProfileMapVplsTable 1 }
+
+AlaDaUNPProfileVplsEntry ::= SEQUENCE  {
+    alaDaUNPProfileMapVplsEncapVal              TmnxEncapVal,
+    alaDaUNPProfileMapVplsID                    Unsigned32,
+    alaDaUNPProfileMapVplsLdpFarEndIPList       SnmpAdminString,
+    alaDaUNPProfileMapVplsBgpVeID               Unsigned32,
+    alaDaUNPProfileMapVplsVlanXlation           INTEGER,
+    alaDaUNPProfileMapVplsRemoveIngressTag      INTEGER,
+    alaDaUNPProfileMapVplsRowStatus             RowStatus
+}
+
+alaDaUNPProfileMapVplsEncapVal OBJECT-TYPE
+    SYNTAX        TmnxEncapVal
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The encapsulation to be used for the SAP connecting to the service."
+    ::= { alaDaUNPProfileVplsEntry 1 }
+
+alaDaUNPProfileMapVplsID OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..2147483647)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The object represent the Vpls ID that is to be used to dynamically 
+        create a Vpls service."
+    ::= { alaDaUNPProfileVplsEntry 2 }
+
+alaDaUNPProfileMapVplsLdpFarEndIPList OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0 .. 32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the Far End IP List that will be used if this
+         User Network Profile is applied for a given device."
+    ::= { alaDaUNPProfileVplsEntry 3 }
+
+alaDaUNPProfileMapVplsBgpVeID OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..16777215)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The object represent the Vpls bgp ve ID."
+    ::= { alaDaUNPProfileVplsEntry 4 }
+
+alaDaUNPProfileMapVplsVlanXlation OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable (1),
+                    disable (2)
+                }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "To enable/disable the vlan translation for Vpls ."
+    DEFVAL        { disable }
+    ::= { alaDaUNPProfileVplsEntry 5 }
+
+alaDaUNPProfileMapVplsRemoveIngressTag OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enable (1),
+                    disable (2)
+                }
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "To enable/disable the remove ingress tag for Vpls ."
+    DEFVAL        { disable }
+    ::= { alaDaUNPProfileVplsEntry 6 }
+
+alaDaUNPProfileMapVplsRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The row status of this table entry."
+    ::= { alaDaUNPProfileVplsEntry 7 }
+
+------------------------------------------------------------
+-- Vpls Far-End-IP-List Table 
+------------------------------------------------------------
+  
+alaDaUNPVplsFarEndIPListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDaUNPVplsFarEndIPListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table shows all the Far-End-IP-Lists configured." 
+    ::= { alaIND1DaMIBObjects 81 }
+
+alaDaUNPVplsFarEndIPListEntry OBJECT-TYPE
+    SYNTAX      AlaDaUNPVplsFarEndIPListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Far-end IP List entry."
+    INDEX { alaDaUNPVplsFarEndIPListName }
+    ::= { alaDaUNPVplsFarEndIPListTable 1 }
+
+AlaDaUNPVplsFarEndIPListEntry ::= SEQUENCE
+{
+    alaDaUNPVplsFarEndIPListName           SnmpAdminString,
+    alaDaUNPVplsFarEndIPListIPAddressCount Unsigned32,
+    alaDaUNPVplsFarEndIPListRemove         INTEGER 
+}
+
+alaDaUNPVplsFarEndIPListName OBJECT-TYPE
+    SYNTAX        SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS    not-accessible 
+    STATUS        current
+    DESCRIPTION
+        "Name of the Far-End-IP list configured."
+    ::= { alaDaUNPVplsFarEndIPListEntry 1 }
+
+alaDaUNPVplsFarEndIPListIPAddressCount OBJECT-TYPE
+    SYNTAX        Unsigned32 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The count of the IP Addresses configured for the corresponding Far-End-IP-List."
+    ::= { alaDaUNPVplsFarEndIPListEntry 2 }
+
+alaDaUNPVplsFarEndIPListRemove OBJECT-TYPE
+    SYNTAX      INTEGER { 
+		      no (1), 
+		      yes (2) 
+			  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+            "This object is used to remove a Far-End-IP-List."
+    DEFVAL { no }
+    ::= { alaDaUNPVplsFarEndIPListEntry 3 }
+
+------------------------------------------------------------
+-- Vpls Far-End-IP-List Address Table 
+------------------------------------------------------------
+  
+alaDaUNPVplsFarEndIPAddressListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDaUNPVplsFarEndIPAddressListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table to configure the Far-End-List and the IP Addresses for that list." 
+    ::= { alaIND1DaMIBObjects 82 }
+
+alaDaUNPVplsFarEndIPAddressListEntry OBJECT-TYPE
+    SYNTAX      AlaDaUNPVplsFarEndIPAddressListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Far-end IP Address List entry."
+    INDEX { alaDaUNPVplsFarEndIPListName, alaDaUNPVplsFarEndIPAddressListIPType, alaDaUNPVplsFarEndIPAddressListIP }
+    ::= { alaDaUNPVplsFarEndIPAddressListTable 1 }
+
+AlaDaUNPVplsFarEndIPAddressListEntry ::= SEQUENCE
+{
+    alaDaUNPVplsFarEndIPAddressListIPType 		InetAddressType,
+    alaDaUNPVplsFarEndIPAddressListIP		InetAddress,
+    alaDaUNPVplsFarEndIPAddressListRowStatus 	RowStatus
+}
+
+alaDaUNPVplsFarEndIPAddressListIPType OBJECT-TYPE
+    SYNTAX          InetAddressType { ipv4(1) }
+    MAX-ACCESS      not-accessible
+    STATUS          current  
+    DESCRIPTION
+        "The IP address type of the IP address." 
+    ::= { alaDaUNPVplsFarEndIPAddressListEntry 1 }
+
+alaDaUNPVplsFarEndIPAddressListIP OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION
+        "The Far-End IP address." 
+    ::= { alaDaUNPVplsFarEndIPAddressListEntry 2 }
+
+alaDaUNPVplsFarEndIPAddressListRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The row status of this table entry."
+    ::= { alaDaUNPVplsFarEndIPAddressListEntry 3 }
+
+--------------------------------------------------
+-- Trust Tagged VLAN Profile Table configuration MIB --
+--------------------------------------------------
+
+alaDaUNPProfileTrustTaggedVlanTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AlaDaUNPProfileTrustTaggedVlanEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table stores the trust tagged VLAN Profile config."
+    ::= { alaIND1DaMIBObjects 83 }
+
+alaDaUNPProfileTrustTaggedVlanEntry OBJECT-TYPE
+    SYNTAX        AlaDaUNPProfileTrustTaggedVlanEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Trust tagged VLAN Profile entry."
+    INDEX { alaDaUNPProfileName,  alaDaUNPProfileTrustTaggedVlanIDStart}
+    ::= { alaDaUNPProfileTrustTaggedVlanTable 1 }
+
+AlaDaUNPProfileTrustTaggedVlanEntry ::= SEQUENCE  {
+     alaDaUNPProfileTrustTaggedVlanIDStart      Unsigned32,
+     alaDaUNPProfileTrustTaggedVlanIDEnd        Unsigned32,
+    alaDaUNPProfileTrustTaggedVlanRowStatus     RowStatus
+}
+
+alaDaUNPProfileTrustTaggedVlanIDStart OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4096)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Trust tagged vlan start ID."
+    ::= { alaDaUNPProfileTrustTaggedVlanEntry 1 }
+
+alaDaUNPProfileTrustTaggedVlanIDEnd OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..4096)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "Trust tagged vlan End ID."
+    ::= { alaDaUNPProfileTrustTaggedVlanEntry 2 }
+
+alaDaUNPProfileTrustTaggedVlanRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The row status of this table entry."
+    ::= { alaDaUNPProfileTrustTaggedVlanEntry 3 }
+
+--------------------------------------------------
+-- Ap Mode Mac Oui Table configuration MIB --
+--------------------------------------------------
+
+alaDaUNPApModeMacOuiTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AlaDaUNPApModeMacOuiEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table stores the ap mode mac oui config."
+    ::= { alaIND1DaMIBObjects 84 }
+
+alaDaUNPApModeMacOuiEntry OBJECT-TYPE
+    SYNTAX        AlaDaUNPApModeMacOuiEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Ap mode mac oui entry."
+    INDEX { alaDaUNPApModeMacOui }
+    ::= { alaDaUNPApModeMacOuiTable 1 }
+
+AlaDaUNPApModeMacOuiEntry ::= SEQUENCE  {
+    alaDaUNPApModeMacOui      MacOui,
+    alaDaUNPApModeMacOuiRowStatus     RowStatus
+}
+
+alaDaUNPApModeMacOui OBJECT-TYPE
+    SYNTAX        MacOui
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Ap mode mac oui."
+    ::= { alaDaUNPApModeMacOuiEntry 1 }
+
+alaDaUNPApModeMacOuiRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The row status of this table entry."
+    ::= { alaDaUNPApModeMacOuiEntry 2 }
 
 ----------------------------------------------------------------
 -- MIB compliance
@@ -10052,7 +12225,22 @@ alaIND1DaMIBCompliances MODULE-COMPLIANCE
             alaDaUNPProfileMapVxlanGroup,
             alaDaUNPProfileMapStaticGroup,
             alaDaUNPCustDomainMacIpRuleGroup,
-            alaDaUNPPortTemplateVlanGroup
+            alaDaUNPPortTemplateVlanGroup,
+            alaDaUNPWlanConfigurationGroup,
+            alaDaUNPProfileMapL2GreGroup,
+            alaDaUNPNetworkGroupNameGroup,
+            alaDaUNPRouterAuthUserGroup,
+            alaDaUNPRouterAuthenticationConfigGroup,
+            alaDaUNPRouterAuthenticationFlushGroup,
+            alaDaUNPPortProfileGroup,
+            alaDaUNPPortTemplateProfileGroup,
+            alaDaUNPRedirectAllowedWebServerGroup,
+            alaDaUNPFQDNResolvedIPGroup,
+            alaDaUNPProfileMapVplsGroup,
+            alaDaUNPVplsFarEndIPListGroup,
+            alaDaUNPVplsFarEndIPAddressListGroup,
+            alaDaUNPProfileTrustTaggedVlanGroup,
+            alaDaUNPApModeMacOuiGroup
         } 
         ::= { alaIND1DaMIBConformance 2 }
 
@@ -10144,6 +12332,7 @@ alaDaMacUserGroup OBJECT-GROUP
 
 alaDaUNPPortGroup OBJECT-GROUP
     OBJECTS  {
+        alaDaUNPPortIfIndex,
         alaDaUNPPortDefaultProfileName,
         alaDaUNPPortPassAltProfileName,
         alaDaUNPPortRowStatus,
@@ -10171,9 +12360,9 @@ alaDaUNPGlobalGroup OBJECT-GROUP
         alaDaUNPAuthSrvDownEdgeProfName, --deprecated
         alaDaUNPAuthServerDowneEdgeProfTimeout, --deprecated
         alaDaUNPEdgeUserFlush, --deprecated
-        alaDaUNP8021XEdgeUserFlush,
-        alaDaUNPMacEdgeUserFlush,
-        alaDaUNPNoAuthEdgeUserFlush,
+        alaDaUNP8021XEdgeUserFlush, --deprecated
+        alaDaUNPMacEdgeUserFlush, --deprecated
+        alaDaUNPNoAuthEdgeUserFlush, --deprecated
         alaDaUNPRedirectPortBounce,
         alaDaUNPRedirectPauseTimer,
         alaDaUNPRedirectProxyServerPort,
@@ -10186,7 +12375,34 @@ alaDaUNPGlobalGroup OBJECT-GROUP
         alaDaUNPAuthServerDownProfile1,
         alaDaUNPAuthServerDownProfile2,
         alaDaUNPAuthServerDownProfile3,
-        alaDaUNPVlanUserFlush
+        alaDaUNPVlanUserFlush, --deprecated
+        alaDaUNP8021XPassThrough,
+        alaDaUNPApMode,
+        alaDaUNPServiceModule,
+        alaDaUNPServiceBase,
+        alaDaUNPServiceMulticastMode,
+        alaDaUNPServiceVlanXlation,
+        alaDaUNPServiceMulticastGroup, --deprecated
+        alaDaUNPServiceFarEndIpList,
+        alaDaUNPAuthServerDownVoiceProfile1,
+        alaDaUNPAuthServerDownVoiceProfile2,
+        alaDaUNPAuthServerDownVoiceProfile3,
+        alaDaUNPIpv6Drop,
+        alaDaUNPDelayLearning,
+        alaDaUNPAuthServerDownPortBounce,
+        alaDaUNPMacMobility,
+        alaDaUNPEapolVersion,
+        alaDaUNPApModeSecurity,
+        alaDaUNPServiceMulticastGroupIPType,
+        alaDaUNPServiceMulticastGroupIP,
+        alaDaUNPMultiUntagSap,
+        alaDaUNPRedirectAllowedWebServerPollingInterval,
+        alaDaUNPRedirectAllowedWebServerRefresh,
+        alaDaUNPServiceVplsSignaling,
+        alaDaUNPServiceVplsLdpFarEndIPList,
+        alaDaUNPServiceVplsBgpVeID,
+        alaDaUNPServiceBvlanModulo,
+        alaDaUNPApModeType
     }
     STATUS  current
     DESCRIPTION
@@ -10207,7 +12423,28 @@ alaDaNotificationObjectGroup OBJECT-GROUP
         alaDaUnpIpAddr,
         alaDaUnpIpMask,
         alaDaUnpVlanTag,
-        alaDaKerberosRateLimitString   
+        alaDaKerberosRateLimitString,
+        alaDaRouterAuthNumberOfUsersPassedAuthentication,
+        alaDaRouterAuthUserSourceIpAddressType,
+        alaDaRouterAuthUserSourceIpAddress,
+        alaDaRouterAuthUserDestinationIpAddressType,
+        alaDaRouterAuthUserDestinationIpAddress,
+        alaDaRouterAuthUserName,
+        alaDaRouterAuthUserAttempts  ,
+        alaDaRouterAuthNumberOfUsersFailedAuthentication,
+        alaDaRouterAuthNumberOfAuthenticatedUsers,
+        alaDaRouterAuthNumberOfConfigUsed,
+        alaDaUnpMaxUserSupported,
+        alaDaUnpMaxUserCurrentNumberOfUsers,
+        alaDaUnpHWResourceChassisId,
+        alaDaUnpHWResourceSlot,
+        alaDaUnpHWResourceTtiAllocated,
+        alaDaUnpAuthMACAddress,
+        alaDaUnpAuthStatus,
+        alaDaUnpAuthRADIUSServerIPType,
+        alaDaUnpAuthRADIUSServerIP,
+        alaDaUnpAuthServerReplyMsg,
+        alaDaUnpAuthFailureReason
     }
     STATUS  current
     DESCRIPTION
@@ -10220,7 +12457,16 @@ alaDaNotificationsGroup NOTIFICATION-GROUP
         unpMcLagConfigInconsistency,
         alaDaKerberosReqTimeoutTrap,
         alaDaKerberosInactivityTimerExpiryTrap,
-        alaDaKerberosRateLimitExceed
+        alaDaKerberosRateLimitExceed,
+        alaDaRouterAuthUserPassedAuthThreshold,
+        alaDaRouterAuthUserMaxRetryFailed,
+        alaDaRouterAuthUserFailedAuthThreshold,
+        alaDaRouterAuthConfigThresholdExceed,
+        alaDaRouterAuthMaxCapacityReached,
+        alaDaUnpMaxUserExceeded,
+        alaDaUnpHWResourceExhaust,
+        alaDaUnpDnsServerNotReachable,
+        alaDaUnpUserAuthSupplicantFails
     }
     STATUS  current
     DESCRIPTION
@@ -10264,7 +12510,11 @@ alaDaMacVlanUserGroup OBJECT-GROUP
         alaDaMacVlanUserVxlanVnid,
         alaDaMacVlanUserSpbIsid,
         alaDaMacVlanUserSpbBVlan,
-        alaDaMacVlanUserKerberosStatus
+        alaDaMacVlanUserKerberosStatus,
+        alaDaMacVlanUserL2greVpnid,
+        alaDaMacVlanUserImplicitTrustTagSource,
+        alaDaMacVlanUserRadiusTrustVlanStr
+
     }
     STATUS  current
     DESCRIPTION
@@ -10293,7 +12543,7 @@ alaDaSpbProfileGroup OBJECT-GROUP
         alaDaSpbProfileMobileTag,
         alaDaSpbProfileAFDConfig
     }
-    STATUS  deprecated
+    STATUS  obsolete
     DESCRIPTION
         "Collection of DA objects for Service Classification Profile."
     ::= { alaIND1DaMIBGroups 13 }
@@ -10423,12 +12673,17 @@ alaDaUNPGroupObjects OBJECT-GROUP
         alaDaUNPPortEgressSourceProfile,
         alaDaUNPPortForceL3Learning,
         alaDaUNPPortForceL3LearningPortBounce,
-	alaDaUNPPort8021XPassAltProfileName,
+        alaDaUNPPort8021XPassAltProfileName,
         alaDaUNPPortPortTemplateName,
         alaDaUNPPortDomainID,
         alaDaUNPPortAdminState,
         alaDaUNPPortDynamicService,
-        alaDaUNPPortPVlanPortType
+        alaDaUNPPortPVlanPortType,
+        alaDaUNPPortL2Profile,
+        alaDaUNPPortApMode,
+        alaDaUNPPortApModeSecurity,
+        alaDaUNPPortSwSuppSecureMode,
+        alaDaUNPPortBpduLldpLearn
     }
     STATUS  current
     DESCRIPTION
@@ -10477,7 +12732,10 @@ alaDaSaaProfileGroup OBJECT-GROUP
 	    alaDaCPortalUNPProfile,
 	    alaDaCPortalUNPProfileChange,
 	    alaDaCPortalProfDomainUNPProfile,
-	    alaDaCPortalProfDomainUNPProfileChange
+	    alaDaCPortalProfDomainUNPProfileChange,
+	    alaDaCPortalDHCPLeaseTime,
+	    alaDaCPortalDHCPRenewTime,
+	    alaDaCPortalDHCPRebindingTime 
         }    
         STATUS  current
         DESCRIPTION
@@ -10657,7 +12915,8 @@ alaDaUNPRuleGroup   OBJECT-GROUP
         alaDaUNPClassifRuleCustomerDomain,
         alaDaUNPClassifRuleProfile1,
         alaDaUNPClassifRuleProfile2,
-        alaDaUNPClassifRuleProfile3
+        alaDaUNPClassifRuleProfile3,
+        alaDaUNPClassifRuleDeviceType
     }    
     STATUS  current
     DESCRIPTION
@@ -10888,7 +13147,8 @@ alaDaUNPLocationPolicyGroup OBJECT-GROUP
         alaDaUNPLocationPolicyPortStatus,
         alaDaUNPLocationPolicySystemName,
         alaDaUNPLocationPolicySystemLocation,
-        alaDaUNPLocationPolicyRowStatus
+        alaDaUNPLocationPolicyRowStatus,
+        alaDaUNPLocationPolicyDomainId
     }
     STATUS  current
     DESCRIPTION
@@ -10930,7 +13190,7 @@ alaDaUNPVxlanProfileGroup OBJECT-GROUP
         alaDaUNPVxlanProfileMulticastMode,
         alaDaUNPVxlanProfileRowStatus
     }
-    STATUS  deprecated
+    STATUS  obsolete
     DESCRIPTION
         "Collection of DA objects for VXLAN Service Classification Profile."
     ::= { alaIND1DaMIBGroups 50 }
@@ -10945,7 +13205,7 @@ alaDaUNPVxlanFlushGroup OBJECT-GROUP
         alaDaUNPVxlanFlushServiceID,
         alaDaUNPVxlanFlushVxlanProfile
     }
-    STATUS  deprecated
+    STATUS  obsolete
     DESCRIPTION
         "Collection of DA objects for VXLAN Users Flush Table."
     ::= { alaIND1DaMIBGroups 51 }
@@ -10979,7 +13239,7 @@ alaDaUNPSpbFlushGroup OBJECT-GROUP
         alaDaUNPSpbFlushServiceID,
         alaDaUNPSpbFlushSpbProfile
     }
-    STATUS  deprecated
+    STATUS  obsolete
     DESCRIPTION
         "Collection of DA objects for SPB Users Flush Table."
     ::= { alaIND1DaMIBGroups 54 }
@@ -11007,6 +13267,7 @@ alaDaKerberosGroup OBJECT-GROUP
         alaDaKerberosPolicyName,
         alaDaKerberosPolicyStatus,
         alaDaKerberosPolicyRowStatus,
+        alaDaKerberosUserMac,
         alaDaKerberosUserPort,
         alaDaKerberosUserName,
         alaDaKerberosUserDomain,
@@ -11024,6 +13285,8 @@ alaDaKerberosGroup OBJECT-GROUP
         alaDaKerberosPortTGSREQRxStats,
         alaDaKerberosPortTGSREPRxStats,
         alaDaKerberosPortErrorRxStats,
+        alaDaKerberosIpAddressType,
+        alaDaKerberosIpAddress,
         alaDaKerberosUdpPort,
         alaDaKerberosRowStatus
     }
@@ -11045,7 +13308,8 @@ alaDaUNPVlanGroup   OBJECT-GROUP
 
 alaDaUNPPortVlanGroup OBJECT-GROUP
     OBJECTS  {
-        alaDaUNPPortVlanRowStatus
+        alaDaUNPPortVlanRowStatus,
+        alaDaUNPPortVlanType
     }
     STATUS          current
     DESCRIPTION
@@ -11116,7 +13380,12 @@ alaDaUNPPortTemplateGroup OBJECT-GROUP
         alaDaUNPPortTemplateMACAuthAllowEAP,
         alaDaUNPPortTemplateForceL3Learning,
         alaDaUNPPortTemplateForceL3LearningPortBounce,
-        alaDaUNPPortTemplateRowStatus
+        alaDaUNPPortTemplateRowStatus,
+        alaDaUNPPortTemplateL2Profile,
+        alaDaUNPPortTemplateApMode,
+        alaDaUNPPortTemplateApModeSecurity,
+        alaDaUNPPortTemplateSwSuppSecureMode,
+        alaDaUNPPortTemplateBpduLldpLearn
     }
     STATUS          current
     DESCRIPTION
@@ -11142,7 +13411,8 @@ alaDaUNPProfileGroup OBJECT-GROUP
         alaDaUNPProfileMaxIngressDepth,
         alaDaUNPProfileMaxEgressDepth,
         alaDaUNPProfileRowStatus,
-        alaDaUNPProfileAFDConfig
+        alaDaUNPProfileAFDConfig,
+        alaDaUNPProfileMacMobility
     }
     STATUS  current
     DESCRIPTION
@@ -11166,7 +13436,13 @@ alaDaUNPProfileMapSpbGroup OBJECT-GROUP
         alaDaUNPProfileMapSpbBVlan,
         alaDaUNPProfileMapSpbMulticastMode,
         alaDaUNPProfileMapSpbVlanXlation,
-        alaDaUNPProfileMapSpbRowStatus
+        alaDaUNPProfileMapSpbRowStatus,
+        alaDaUNPProfileMapSpbIgmpSnooping,
+        alaDaUNPProfileMapSpbIgmpProfile,
+        alaDaUNPProfileMapSpbMldSnooping,
+        alaDaUNPProfileMapSpbMldProfile,
+        alaDaUNPProfileMapSpbRemoveIngressTag,
+        alaDaUNPProfileMapSpbETree
     }
     STATUS  current
     DESCRIPTION
@@ -11182,7 +13458,11 @@ alaDaUNPProfileMapVxlanGroup OBJECT-GROUP
         alaDaUNPProfileMapVxlanMulticastIPAddress,
         alaDaUNPProfileMapVxlanVlanXlation,
         alaDaUNPProfileMapVxlanMulticastMode,
-        alaDaUNPProfileMapVxlanRowStatus
+        alaDaUNPProfileMapVxlanRowStatus,
+        alaDaUNPProfileMapVxlanMacOrchestration,
+        alaDaUNPProfileMapVxlanRemoveIngressTag,
+        alaDaUNPProfileMapVxlanTcpMss,
+        alaDaUNPProfileMapVxlanTcpMssOverlayProfile
     }
     STATUS  current
     DESCRIPTION
@@ -11218,12 +13498,220 @@ alaDaUNPCustDomainMacIpRuleGroup OBJECT-GROUP
 
 alaDaUNPPortTemplateVlanGroup OBJECT-GROUP
     OBJECTS {
-        alaDaUNPPortTemplateVlanRowStatus
+        alaDaUNPPortTemplateVlanRowStatus,
+        alaDaUNPPortTemplateVlanType
     }
     STATUS          current
     DESCRIPTION
         "Collection of objects for the management of
          UNP Port Template configuration."
     ::={ alaIND1DaMIBGroups 68 }
+
+alaDaUNPWlanConfigurationGroup OBJECT-GROUP
+    OBJECTS {
+        alaDaUNPWlanMode,
+        alaDaUNPWlanManagementVlan,
+        alaDaUNPWlanAuthenticationFlag,
+        alaDaUNPWlanForceDefWlanProfile,
+        alaDaUNPWlanAuthServerDownFallback,
+        alaDaUNPWlanSecurityLevel
+    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of objects for the management of
+         WLAN configuration."
+    ::={ alaIND1DaMIBGroups 69 }
+
+alaDaUNPProfileMapL2GreGroup OBJECT-GROUP
+    OBJECTS {
+        alaDaUNPProfileMapL2GreEncapVal,
+        alaDaUNPProfileMapL2GreVpnid,
+        alaDaUNPProfileMapL2GreFarEndIPAddressType,
+        alaDaUNPProfileMapL2GreFarEndIPAddress,
+        alaDaUNPProfileMapL2GreFarEndIPList,
+        alaDaUNPProfileMapL2GreRowStatus,
+        alaDaUNPProfileMapL2GreVlanXlation,
+        alaDaUNPProfileMapL2GreRemoveIngressTag
+    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of objects for the management of
+         UNP profile map with Vpn Id."
+    ::={ alaIND1DaMIBGroups 70 }
+
+alaDaUNPL2GreFarEndIPListGroup OBJECT-GROUP
+    OBJECTS  {
+        alaDaUNPL2GreFarEndIPListIPAddressCount,
+        alaDaUNPL2GreFarEndIPListRemove
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for L2GRE Far-End-IP Lists Table."
+    ::= { alaIND1DaMIBGroups 71 }
+
+alaDaUNPL2GreFarEndIPAddressListGroup OBJECT-GROUP
+    OBJECTS  {
+        alaDaUNPL2GreFarEndIPAddressListRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for L2GRE Far-End-IP Lists Table."
+    ::= { alaIND1DaMIBGroups 72 }
+
+alaDaUNPNetworkGroupNameGroup OBJECT-GROUP
+    OBJECTS  {
+        alaDaUNPNetworkGroupRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for the management Network Group Name."
+    ::= { alaIND1DaMIBGroups 73 }
+
+alaDaUNPRouterAuthUserGroup OBJECT-GROUP
+    OBJECTS  {
+        alaDaUNPRouterAuthenticationSrcGroup,
+        alaDaUNPRouterAuthenticationDestGroup,
+        alaDaUNPRouterAuthenticationRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for the management Router Authentication Group."
+    ::= { alaIND1DaMIBGroups 74 }
+
+alaDaUNPRouterAuthenticationConfigGroup OBJECT-GROUP
+    OBJECTS  {
+        alaDaUNPRouterAuthCpProfileName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for the management Router Authentication Config Group."
+    ::= { alaIND1DaMIBGroups 75 }
+
+alaDaUNPRouterAuthenticationFlushGroup OBJECT-GROUP
+    OBJECTS  {
+    alaDaUNPRouterAuthenticationFlushComplete,
+    alaDaUNPRouterAuthenticationFlushUserGroupName,
+    alaDaUNPRouterAuthenticationFlushType,
+    alaDaUNPRouterAuthenticationFlushUserName,
+    alaDaUNPRouterAuthenticationFlushIpAddressType,
+    alaDaUNPRouterAuthenticationFlushIpAddress
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for the management Router Authentication Flush Group."
+    ::= { alaIND1DaMIBGroups 76 }
+
+alaDaUNPPortProfileGroup OBJECT-GROUP
+    OBJECTS {
+        alaDaUNPPortProfileRowStatus
+    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of objects for the management of
+         UNP Port Profile configuration."
+    ::={ alaIND1DaMIBGroups 77 }
+
+alaDaUNPPortTemplateProfileGroup OBJECT-GROUP
+    OBJECTS {
+        alaDaUNPPortTemplateProfileRowStatus
+    }
+    STATUS          current
+    DESCRIPTION
+        "Collection of objects for the management of
+         UNP Port Template Profile configuration."
+    ::={ alaIND1DaMIBGroups 78 }
+
+alaDaUNPRouterAuthenticationUserGroup OBJECT-GROUP
+    OBJECTS  {
+    alaDaUNPRouterAuthenticationUserName,
+    alaDaUNPRouterAuthenticationUserDestinationGroup,
+    alaDaUNPRouterAuthenticationUserInterfaceName,
+    alaDaUNPRouterAuthenticationUserVlan,
+    alaDaUNPRouterAuthenticationUserAuthType,
+    alaDaUNPRouterAuthenticationUserAuthStatus,
+    alaDaUNPRouterAuthenticationUserLoginTime,
+    alaDaUNPRouterAuthenticationUserSessionRemainingTime
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for the management UNP Router Authentication User."
+    ::= { alaIND1DaMIBGroups 79 }
+
+alaDaUNPRedirectAllowedWebServerGroup OBJECT-GROUP
+    OBJECTS  {
+    alaDaUNPRedirectAllowedWebServerName,
+    alaDaUNPRedirectAllowedWebServerIpAddressType,
+    alaDaUNPRedirectAllowedWebServerIpAddress,
+    alaDaUNPRedirectAllowedWebServerFQDN,
+    alaDaUNPRedirectAllowedWebServerFQDNResolvedTime,
+    alaDaUNPRedirectAllowedWebServerRowStatus,
+    alaDaUNPRedirectAllowedWebServerIpAddrStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for the management UNP Redirect allowed web server."
+    ::= { alaIND1DaMIBGroups 80 }
+
+alaDaUNPFQDNResolvedIPGroup OBJECT-GROUP
+    OBJECTS  {
+    alaDaUNPFQDNResolvedIPAddressStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for the management UNP FQDN resolved ip addresses."
+    ::= { alaIND1DaMIBGroups 81 }
+
+alaDaUNPProfileMapVplsGroup OBJECT-GROUP
+    OBJECTS  {
+    alaDaUNPProfileMapVplsEncapVal,
+    alaDaUNPProfileMapVplsID,
+    alaDaUNPProfileMapVplsLdpFarEndIPList,
+    alaDaUNPProfileMapVplsBgpVeID,
+    alaDaUNPProfileMapVplsVlanXlation,
+    alaDaUNPProfileMapVplsRemoveIngressTag,
+    alaDaUNPProfileMapVplsRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for the management of UNP profile map Vpls service domain."
+    ::= { alaIND1DaMIBGroups 82 }
+
+alaDaUNPVplsFarEndIPListGroup OBJECT-GROUP
+    OBJECTS  {
+        alaDaUNPVplsFarEndIPListIPAddressCount,
+        alaDaUNPVplsFarEndIPListRemove
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for Vpls Far-End-IP Lists Table."
+    ::= { alaIND1DaMIBGroups 83 }
+
+alaDaUNPVplsFarEndIPAddressListGroup OBJECT-GROUP
+    OBJECTS  {
+        alaDaUNPVplsFarEndIPAddressListRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for Vpls Far-End-IP Lists Table."
+    ::= { alaIND1DaMIBGroups 84 }
+
+alaDaUNPProfileTrustTaggedVlanGroup OBJECT-GROUP
+    OBJECTS  {
+        alaDaUNPProfileTrustTaggedVlanIDEnd,
+        alaDaUNPProfileTrustTaggedVlanRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for profile trust tagged VLAN Table."
+    ::= { alaIND1DaMIBGroups 85 }
+
+alaDaUNPApModeMacOuiGroup OBJECT-GROUP
+    OBJECTS  {
+        alaDaUNPApModeMacOuiRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Collection of objects for ap mode mac oui Table."
+    ::= { alaIND1DaMIBGroups 86 }
 
 END

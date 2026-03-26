@@ -351,7 +351,7 @@ fapWtpEthBridgeVlans OBJECT-TYPE
 fapLedState OBJECT-TYPE
     SYNTAX      INTEGER { disable(0),
                           enable(1),
-                          controledByAC(2) }
+                          controlledByAC(2) }
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -701,6 +701,62 @@ fapFortiPresenceServerFQDN OBJECT-TYPE
             "The Forti presence server(fqdn) name."
         ::= { fapWTPStatus 37 }
 
+fapWtpUptime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The uptime of the FortiAP in ticks (hundredths of a second)."
+        ::= { fapWTPStatus 38 }
+
+fapByteRxCount OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The RX bytes of the FortiAP."
+        ::= { fapWTPStatus 39 }
+
+fapByteTxCount OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The TX bytes of the FortiAP."
+        ::= { fapWTPStatus 40 }
+
+fapCpuUsage OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current CPU usage of the FortiAP in percent."
+        ::= { fapWTPStatus 41 }
+
+fapMemoryUsage OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current memory usage of the FortiAP in percent."
+        ::= { fapWTPStatus 42 }
+
+fapStationCount OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current station count of the FortiAP."
+        ::= { fapWTPStatus 43 }
+
+fapTemperature OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current temperature of the FortiAP in degrees Celsius."
+        ::= { fapWTPStatus 44 }
+
 -- fortinet.fnFortiAPMib.fapRadioTables
 fapRadioTables OBJECT IDENTIFIER
         ::= { fnFortiAPMib 4 }
@@ -757,7 +813,7 @@ FapRadioEntry ::= SEQUENCE {
     }
 
 fapRadioIndex OBJECT-TYPE
-        SYNTAX      Integer32 (0..3)
+        SYNTAX      Integer32 (0..2)
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION
@@ -815,11 +871,6 @@ fapRadioType OBJECT-TYPE
                               ieee80211ax5G(9),
                               ieee80211ax(10),
                               ieee80211ax6G(11),
-
-                              ieee80211be24G(12),
-                              ieee80211be5G(13),
-                              ieee80211be(14),
-                              ieee80211be6G(15),
                               radioTypeInvalid(255) }
         MAX-ACCESS  read-only
         STATUS      current
@@ -872,14 +923,11 @@ fapRadioChannelWidth OBJECT-TYPE
         SYNTAX      INTEGER { bw20Mhz(0),
                               bw40Mhz(1),
                               bw80Mhz(2),
-                              bw160Mhz(3),
-                              bw8080Mhz(4),
-                              bw240Mhz(5),
-                              bw320Mhz(6) }
+                              bw160Mhz(3) }
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
-            "Channel bandwidth: 320, 240, 80_80, 160, 80, 40, or 20MHz."
+            "Channel bandwidth: 160, 80, 40, or 20MHz."
         ::= { fapRadioEntry 12 }
 
 fapRadioSGI OBJECT-TYPE
@@ -1911,7 +1959,7 @@ fapWagDhcpAddr OBJECT-TYPE
 -- fortinet.fnFortiAPMib.fapModel
 --
 -- Model_number(e.g. 221, 249 for 24J) + FAP_family(FAP=1, FAP-U=2, FAP-S=3, FAP-C=4) +
--- FAP_Generation (E=1, F=2, G=3, K=4, …) + FAP_Variant (Light=1, Rugged=2)
+-- FAP_Generation (E=1, F=2, G=3, …) + FAP_Variant (Light=1, Rugged=2)
 fapModel OBJECT IDENTIFIER ::= { fnFortiAPMib 10 }
 
 -- fapModel start
@@ -1923,8 +1971,6 @@ fap233g          OBJECT IDENTIFIER ::= { fapModel 23313 }
 fap234f          OBJECT IDENTIFIER ::= { fapModel 23412 }
 fap234g          OBJECT IDENTIFIER ::= { fapModel 23413 }
 fap23jf          OBJECT IDENTIFIER ::= { fapModel 23912 }
-fap241k          OBJECT IDENTIFIER ::= { fapModel 24114 }
-fap243k          OBJECT IDENTIFIER ::= { fapModel 24314 }
 fap431f          OBJECT IDENTIFIER ::= { fapModel 43112 }
 fap431fl         OBJECT IDENTIFIER ::= { fapModel 431121 }
 fap431g          OBJECT IDENTIFIER ::= { fapModel 43113 }
@@ -1934,8 +1980,6 @@ fap432g          OBJECT IDENTIFIER ::= { fapModel 43213 }
 fap433f          OBJECT IDENTIFIER ::= { fapModel 43312 }
 fap433fl         OBJECT IDENTIFIER ::= { fapModel 433121 }
 fap433g          OBJECT IDENTIFIER ::= { fapModel 43313 }
-fap441k          OBJECT IDENTIFIER ::= { fapModel 44114 }
-fap443k          OBJECT IDENTIFIER ::= { fapModel 44314 }
 fap831f          OBJECT IDENTIFIER ::= { fapModel 83112 }
 
 fap221e          OBJECT IDENTIFIER ::= { fapModel 22111 }
@@ -2021,7 +2065,8 @@ fapWtpStatusGroup OBJECT-GROUP
               fapFortiPresenceInterval, fapFsmState, fapWtpIpAddr, fapAcIpAddr, fapAcPort,
               fapIpFragmentPrevent, fapAeroScout, fapLanMode, fapLanPortCount, fapDataChannelStatus,
               fapDataChannelSecurityOper, fapFortiPresenceServer, fapFortiPresencePort, fapFortiPresenceProject,
-              fapWtpLocation, fapFortiPresenceServerFQDN}
+              fapWtpLocation, fapFortiPresenceServerFQDN, fapWtpUptime, fapByteRxCount, fapByteTxCount,
+              fapCpuUsage, fapMemoryUsage, fapStationCount, fapTemperature }
     STATUS      current
     DESCRIPTION
         "Object pertaining to the status of the AP."

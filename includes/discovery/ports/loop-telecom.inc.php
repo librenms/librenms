@@ -7,8 +7,8 @@ $eth_stats = snmpwalk_group($device, 'ethernetStatusTable', 'L-AM3440-A-Private'
 $eth_traffic = snmpwalk_group($device, 'ethernetCountTable', 'L-AM3440-A-Private'); //Get eth traffic
 
 //Set eth interfaces
-foreach ($eth_stats as $index => $port) {
-    $curIfIndex = $curIfIndex + 1;
+foreach ($eth_stats as $port) {
+    $curIfIndex += 1;
     $portname = snmp_hexstring($port['ethernetStatusName']); // Convert hex to readable string
     $port_stats[$curIfIndex]['ifName'] = $portname;
     $port_stats[$curIfIndex]['ifOperStatus'] = ($port['ethernetStatusLink'] == 1) ? 'up' : 'down';
@@ -49,7 +49,7 @@ foreach ($eth_stats as $index => $port) {
     }
 
     //Loop over eth ports and match ports to get correct data. The SNMP port is not defined in the ethernetCountTable oid
-    foreach ($eth_traffic as $key => $value) {
+    foreach ($eth_traffic as $value) {
         $portCountername = snmp_hexstring($value['ethernetCountName']); // Convert hex to readable string
         if ($portname == $portCountername) {
             $port_stats[$curIfIndex]['ifInOctets'] = abs($value['ethernetRxGoodPkt']);

@@ -1511,6 +1511,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "ALCL",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -1530,6 +1531,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "TI",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -1549,6 +1551,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "TI",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 }
             ]
@@ -2114,5 +2117,18 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.3.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "127.0.3.0/24",
+                    "ifIndex": 20972544
+                }
+            ]
+        }
     }
 }

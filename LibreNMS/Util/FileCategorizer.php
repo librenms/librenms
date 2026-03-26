@@ -38,38 +38,22 @@ class FileCategorizer extends Categorizer
         parent::__construct($items);
 
         if (getenv('CIHELPER_DEBUG')) {
-            $this->setSkippable(function ($item) {
-                return in_array($item, [
-                    '.github/workflows/test.yml',
-                    'LibreNMS/Util/CiHelper.php',
-                    'LibreNMS/Util/FileCategorizer.php',
-                    'app/Console/Commands/DevCheckCommand.php',
-                    'tests/Unit/CiHelperTest.php',
-                ]);
-            });
+            $this->setSkippable(fn ($item) => in_array($item, [
+                '.github/workflows/test.yml',
+                'LibreNMS/Util/CiHelper.php',
+                'LibreNMS/Util/FileCategorizer.php',
+                'app/Console/Commands/DevCheckCommand.php',
+                'tests/Unit/CiHelperTest.php',
+            ]));
         }
 
-        $this->addCategory('php', function ($item) {
-            return Str::endsWith($item, '.php') ? $item : false;
-        });
-        $this->addCategory('docs', function ($item) {
-            return (Str::startsWith($item, 'doc/') || $item == 'mkdocs.yml') ? $item : false;
-        });
-        $this->addCategory('python', function ($item) {
-            return Str::endsWith($item, '.py') ? $item : false;
-        });
-        $this->addCategory('bash', function ($item) {
-            return Str::endsWith($item, '.sh') ? $item : false;
-        });
-        $this->addCategory('svg', function ($item) {
-            return Str::endsWith($item, '.svg') ? $item : false;
-        });
-        $this->addCategory('resources', function ($item) {
-            return (str_starts_with($item, 'resources/') && ! str_starts_with($item, 'resources/definitions/os_')) ? $item : false;
-        });
-        $this->addCategory('full-checks', function ($item) {
-            return in_array($item, ['composer.lock', '.github/workflows/test.yml']) ? $item : false;
-        });
+        $this->addCategory('php', fn ($item) => Str::endsWith($item, '.php') ? $item : false);
+        $this->addCategory('docs', fn ($item) => (Str::startsWith($item, 'doc/') || $item == 'mkdocs.yml') ? $item : false);
+        $this->addCategory('python', fn ($item) => Str::endsWith($item, '.py') ? $item : false);
+        $this->addCategory('bash', fn ($item) => Str::endsWith($item, '.sh') ? $item : false);
+        $this->addCategory('svg', fn ($item) => Str::endsWith($item, '.svg') ? $item : false);
+        $this->addCategory('resources', fn ($item) => (str_starts_with((string) $item, 'resources/') && ! str_starts_with((string) $item, 'resources/definitions/os_')) ? $item : false);
+        $this->addCategory('full-checks', fn ($item) => in_array($item, ['composer.lock', '.github/workflows/test.yml']) ? $item : false);
         $this->addCategory('os-files', function ($item) {
             if (($os_name = $this->osFromFile($item)) !== null) {
                 return ['os' => $os_name, 'file' => $item];
@@ -109,7 +93,7 @@ class FileCategorizer extends Categorizer
 
         foreach ($this->items as $file) {
             if (Str::startsWith($file, 'mibs/')) {
-                $mibs[] = basename($file, '.mib');
+                $mibs[] = basename((string) $file, '.mib');
             }
         }
 
@@ -147,12 +131,12 @@ class FileCategorizer extends Categorizer
     private function osFromFile($file)
     {
         if (Str::startsWith($file, 'resources/definitions/os_')) {
-            return basename($file, '.yaml');
+            return basename((string) $file, '.yaml');
         } elseif (Str::startsWith($file, ['includes/polling', 'includes/discovery'])) {
-            return $this->validateOs(basename($file, '.inc.php'));
-        } elseif (preg_match('#LibreNMS/OS/[^/]+.php#', $file)) {
-            return $this->osFromClass(basename($file, '.php'));
-        } elseif (preg_match(self::TESTS_REGEX, $file, $matches)) {
+            return $this->validateOs(basename((string) $file, '.inc.php'));
+        } elseif (preg_match('#LibreNMS/OS/[^/]+.php#', (string) $file)) {
+            return $this->osFromClass(basename((string) $file, '.php'));
+        } elseif (preg_match(self::TESTS_REGEX, (string) $file, $matches)) {
             if ($this->validateOs($matches[3])) {
                 return $matches[3];
             }
@@ -173,7 +157,7 @@ class FileCategorizer extends Categorizer
     private function osFromClass($class)
     {
         preg_match_all('/[A-Z][a-z0-9]*/', $class, $segments);
-        $osname = implode('-', array_map('strtolower', $segments[0]));
+        $osname = implode('-', array_map(strtolower(...), $segments[0]));
         $osname = preg_replace(
             ['/^zero-/', '/^one-/', '/^two-/', '/^three-/', '/^four-/', '/^five-/', '/^six-/', '/^seven-/', '/^eight-/', '/^nine-/'],
             ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],

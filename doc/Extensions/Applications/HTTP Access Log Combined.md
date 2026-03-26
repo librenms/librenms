@@ -26,7 +26,7 @@
         apt-get install libfile-slurp-perl libmime-base64-perl libjson-perl libstatistics-lite-perl libfile-readbackwards-perl
         ```
 
-4. Configure it if neeeded. Uses
+4. Configure it if needed. Uses
    `/usr/local/etc/http_access_log_combined_extend.json`, unless
    specified via `-c`. See further below for configuration
    information.

@@ -1,4 +1,3 @@
-mib: Argus-Power-System-MIB
 modules:
     os:
         hardware: Argus-Power-System-MIB::upsIdentProductCode.0
@@ -9,32 +8,32 @@ modules:
                 divisor: 10
             data:
                 -
-                    oid: upsOutputTable
-                    value: upsOutputVoltage
+                    oid: Argus-Power-System-MIB::upsOutputTable
+                    value: Argus-Power-System-MIB::upsOutputVoltage
                     num_oid: '.1.3.6.1.4.1.7309.6.1.4.4.1.2.{{ $index }}'
                     index: 'upsOutputVoltage.{{ $index }}'
                     descr: 'Output #{{ $index }}'
                 -
-                    oid: upsInputTable
-                    value: upsInputVoltage
+                    oid: Argus-Power-System-MIB::upsInputTable
+                    value: Argus-Power-System-MIB::upsInputVoltage
                     num_oid: '.1.3.6.1.4.1.7309.6.1.3.2.1.3.{{ $index }}'
                     index: 'upsInputVoltage.{{ $index }}'
                     descr: 'Input #{{ $index }}'
                 -
-                    oid: upsBatteryVoltage
+                    oid: Argus-Power-System-MIB::upsBatteryVoltage
                     num_oid: '.1.3.6.1.4.1.7309.6.1.2.3.{{ $index }}'
                     index: 'upsBatteryVoltage.{{ $index }}'
                     descr: Battery
         frequency:
             data:
                 -
-                    oid: upsInputTable
-                    value: upsInputFrequency
+                    oid: Argus-Power-System-MIB::upsInputTable
+                    value: Argus-Power-System-MIB::upsInputFrequency
                     num_oid: '.1.3.6.1.4.1.7309.6.1.3.2.1.2.{{ $index }}'
                     index: 'upsInputFrequency.{{ $index }}'
                     descr: 'Input #{{ $index }}'
                 -
-                    oid: upsOutputFrequency
+                    oid: Argus-Power-System-MIB::upsOutputFrequency
                     num_oid: '.1.3.6.1.4.1.7309.6.1.4.2.{{ $index }}'
                     index: 'upsOutputFrequency.{{ $index }}'
                     descr: Output
@@ -44,36 +43,36 @@ modules:
                 divisor: 10
             data:
                 -
-                    oid: upsOutputTable
-                    value: upsOutputCurrent
+                    oid: Argus-Power-System-MIB::upsOutputTable
+                    value: Argus-Power-System-MIB::upsOutputCurrent
                     num_oid: '.1.3.6.1.4.1.7309.6.1.4.4.1.3.{{ $index }}'
                     index: 'upsOutputCurrent.{{ $index }}'
                     descr: 'Output #{{ $index }}'
         power:
             data:
                 -
-                    oid: upsOutputTable
-                    value: upsOutputPowerWatt
+                    oid: Argus-Power-System-MIB::upsOutputTable
+                    value: Argus-Power-System-MIB::upsOutputPowerWatt
                     num_oid: '.1.3.6.1.4.1.7309.6.1.4.4.1.5.{{ $index }}'
                     index: 'upsOutputPowerWatt.{{ $index }}'
                     descr: 'Output #{{ $index }}'
         load:
             data:
                 -
-                    oid: upsOutputTable
-                    value: upsOutputPercentLoad
+                    oid: Argus-Power-System-MIB::upsOutputTable
+                    value: Argus-Power-System-MIB::upsOutputPercentLoad
                     num_oid: '.1.3.6.1.4.1.7309.6.1.4.4.1.7.{{ $index }}'
                     index: 'upsOutputPercentLoad.{{ $index }}'
                     descr: 'Output {{ $index }}'
         temperature:
             data:
                 -
-                    oid: upsConfigFanOnTemperature
+                    oid: Argus-Power-System-MIB::upsConfigFanOnTemperature
                     num_oid: '.1.3.6.1.4.1.7309.6.1.6.4.{{ $index }}'
                     index: 'upsConfigFanOnTemperature.{{ $index }}'
                     descr: Fan On
                 -
-                    oid: upsBatteryTemperature
+                    oid: Argus-Power-System-MIB::upsBatteryTemperature
                     num_oid: '.1.3.6.1.4.1.7309.6.1.2.6.{{ $index }}'
                     index: 'upsBatteryTemperature.{{ $index }}'
                     descr: Battery
@@ -82,14 +81,14 @@ modules:
                 divisor: 60
             data:
                 -
-                    oid: upsMinutesOnBattery
+                    oid: Argus-Power-System-MIB::upsMinutesOnBattery
                     num_oid: '.1.3.6.1.4.1.7309.6.1.2.2.{{ $index }}'
                     index: 'upsMinutesOnBattery.{{ $index }}'
                     descr: Minutes on battery
         state:
             data:
                 -
-                    oid: upsOutputSource
+                    oid: Argus-Power-System-MIB::upsOutputSource
                     num_oid: '.1.3.6.1.4.1.7309.6.1.4.1.{{ $index }}'
                     descr: Output Source
                     index: 'upsOutputSource.{{ $index }}'
@@ -107,7 +106,7 @@ modules:
                         - { value: 10, generic: 2, graph: 1, descr: shutdown }
                         - { value: 11, generic: 2, graph: 1, descr: bypass }
                 -
-                    oid: upsBatteryStatus
+                    oid: Argus-Power-System-MIB::upsBatteryStatus
                     num_oid: '.1.3.6.1.4.1.7309.6.1.2.1.{{ $index }}'
                     descr: Battery Status
                     index: 'upsBatteryStatus.{{ $index }}'

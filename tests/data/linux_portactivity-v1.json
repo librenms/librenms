@@ -29,253 +29,253 @@
             ],
             "application_metrics": [
                 {
-                    "metric": "ssh_from_CLOSE_WAIT",
+                    "metric": "ssh.from.CLOSE_WAIT",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_from_CLOSED",
+                    "metric": "ssh.from.CLOSED",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_from_CLOSING",
+                    "metric": "ssh.from.CLOSING",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_from_ESTABLISHED",
+                    "metric": "ssh.from.ESTABLISHED",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_from_FIN_WAIT_1",
+                    "metric": "ssh.from.FIN_WAIT_1",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_from_FIN_WAIT_2",
+                    "metric": "ssh.from.FIN_WAIT_2",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_from_LAST_ACK",
+                    "metric": "ssh.from.LAST_ACK",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_from_LISTEN",
+                    "metric": "ssh.from.LISTEN",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_from_other",
+                    "metric": "ssh.from.other",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_from_SYN_RECEIVED",
+                    "metric": "ssh.from.SYN_RECEIVED",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_from_SYN_SENT",
+                    "metric": "ssh.from.SYN_SENT",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_from_TIME_WAIT",
+                    "metric": "ssh.from.TIME_WAIT",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_from_UNKNOWN",
+                    "metric": "ssh.from.UNKNOWN",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_to_CLOSE_WAIT",
+                    "metric": "ssh.to.CLOSE_WAIT",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_to_CLOSED",
+                    "metric": "ssh.to.CLOSED",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_to_CLOSING",
+                    "metric": "ssh.to.CLOSING",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_to_ESTABLISHED",
+                    "metric": "ssh.to.ESTABLISHED",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_to_FIN_WAIT_1",
+                    "metric": "ssh.to.FIN_WAIT_1",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_to_FIN_WAIT_2",
+                    "metric": "ssh.to.FIN_WAIT_2",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_to_LAST_ACK",
+                    "metric": "ssh.to.LAST_ACK",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_to_LISTEN",
+                    "metric": "ssh.to.LISTEN",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_to_other",
+                    "metric": "ssh.to.other",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_to_SYN_RECEIVED",
+                    "metric": "ssh.to.SYN_RECEIVED",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_to_SYN_SENT",
+                    "metric": "ssh.to.SYN_SENT",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_to_TIME_WAIT",
+                    "metric": "ssh.to.TIME_WAIT",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_to_UNKNOWN",
+                    "metric": "ssh.to.UNKNOWN",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_total_CLOSE_WAIT",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "portactivity"
-                },
-                {
-                    "metric": "ssh_total_CLOSED",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "portactivity"
-                },
-                {
-                    "metric": "ssh_total_CLOSING",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "portactivity"
-                },
-                {
-                    "metric": "ssh_total_conns",
+                    "metric": "ssh.total_conns",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_total_ESTABLISHED",
+                    "metric": "ssh.total_from",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh.total_to",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_total_FIN_WAIT_1",
+                    "metric": "ssh.total.CLOSE_WAIT",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_total_FIN_WAIT_2",
+                    "metric": "ssh.total.CLOSED",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_total_from",
+                    "metric": "ssh.total.CLOSING",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_total_LAST_ACK",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "portactivity"
-                },
-                {
-                    "metric": "ssh_total_LISTEN",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "portactivity"
-                },
-                {
-                    "metric": "ssh_total_other",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "portactivity"
-                },
-                {
-                    "metric": "ssh_total_SYN_RECEIVED",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "portactivity"
-                },
-                {
-                    "metric": "ssh_total_SYN_SENT",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "portactivity"
-                },
-                {
-                    "metric": "ssh_total_TIME_WAIT",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "portactivity"
-                },
-                {
-                    "metric": "ssh_total_to",
+                    "metric": "ssh.total.ESTABLISHED",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "portactivity"
                 },
                 {
-                    "metric": "ssh_total_UNKNOWN",
+                    "metric": "ssh.total.FIN_WAIT_1",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh.total.FIN_WAIT_2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh.total.LAST_ACK",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh.total.LISTEN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh.total.other",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh.total.SYN_RECEIVED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh.total.SYN_SENT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh.total.TIME_WAIT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh.total.UNKNOWN",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "portactivity"

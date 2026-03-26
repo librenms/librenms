@@ -76,7 +76,7 @@ class F5 extends OS implements OSPolling
                 $fields = [
                     $info['dataset'] => $data[$key],
                 ];
-                $tags = compact('rrd_def');
+                $tags = ['rrd_def' => $rrd_def];
                 $datastore->put($this->getDeviceArray(), $info['name'], $tags, $fields);
                 $this->enableGraph($info['name']);
             }
@@ -91,7 +91,7 @@ class F5 extends OS implements OSPolling
                 'TotNativeConns' => $data['F5-BIGIP-SYSTEM-MIB::sysClientsslStatTotNativeConns.0'],
                 'TotCompatConns' => $data['F5-BIGIP-SYSTEM-MIB::sysClientsslStatTotCompatConns.0'],
             ];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'bigip_system_tps', $tags, $fields);
             $this->enableGraph('bigip_system_tps');
         }

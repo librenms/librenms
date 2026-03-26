@@ -26,8 +26,8 @@
 
 namespace App\Http\Controllers\Select;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
 
 class DeviceFieldController extends SelectController
 {
@@ -51,7 +51,7 @@ class DeviceFieldController extends SelectController
      */
     protected function searchFields($request)
     {
-        return [$request->get('field')];
+        return [$request->input('field')];
     }
 
     /**
@@ -62,11 +62,11 @@ class DeviceFieldController extends SelectController
      */
     protected function baseQuery($request)
     {
-        $field = $request->get('field');
+        $field = $request->input('field');
         $query = Device::hasAccess($request->user())
             ->select($field)->orderBy($field)->distinct();
 
-        if ($device_id = $request->get('device')) {
+        if ($device_id = $request->input('device')) {
             $query->where('ports.device_id', $device_id);
         }
 
@@ -83,9 +83,9 @@ class DeviceFieldController extends SelectController
 
         $text = $device[$field];
         if ($field == 'os') {
-            $text = Config::getOsSetting($text, 'text');
+            $text = LibrenmsConfig::getOsSetting($text, 'text');
         } elseif ($field == 'type') {
-            $text = ucfirst($text);
+            $text = ucfirst((string) $text);
         }
 
         return [

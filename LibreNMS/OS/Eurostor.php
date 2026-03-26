@@ -26,16 +26,16 @@ class Eurostor extends OS implements OSDiscovery
         $device->features = $info['proware-SNMP-MIB::siVendor.0'] ?? null;
         $device->serial = $info['proware-SNMP-MIB::siSerial.0'] ?? null;
 
-        if (preg_match('/^ES/', $device->hardware)) {
+        if (preg_match('/^ES/', (string) $device->hardware)) {
             $device->hardware = 'EUROstore [' . $device->hardware . ']';
         }
 
-        if (preg_match('/^ARC/', $device->features)) {
+        if (preg_match('/^ARC/', (string) $device->features)) {
             $device->features = 'Controller: Areca ' . $device->features;
         }
 
         // Sometimes firmware outputs serial as hex-string
-        if (StringHelpers::isHex($device->serial)) {
+        if (StringHelpers::isHex($device->serial, ' ')) {
             $device->serial = StringHelpers::hexToAscii($device->serial, ' ');
         }
     }

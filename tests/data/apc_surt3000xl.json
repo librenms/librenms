@@ -626,7 +626,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "0",
+                    "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
@@ -788,14 +788,14 @@
                 {
                     "state_name": "upsAdvBatteryReplaceIndicator",
                     "state_descr": "noBatteryNeedsReplacing",
-                    "state_draw_graph": 0,
+                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsAdvBatteryReplaceIndicator",
                     "state_descr": "batteryNeedsReplacing",
-                    "state_draw_graph": 0,
+                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
@@ -1220,7 +1220,7 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "0",
+                    "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
@@ -1382,14 +1382,14 @@
                 {
                     "state_name": "upsAdvBatteryReplaceIndicator",
                     "state_descr": "noBatteryNeedsReplacing",
-                    "state_draw_graph": 0,
+                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsAdvBatteryReplaceIndicator",
                     "state_descr": "batteryNeedsReplacing",
-                    "state_draw_graph": 0,
+                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
@@ -1616,6 +1616,26 @@
                     "state_draw_graph": 0,
                     "state_value": 22,
                     "state_generic_value": 0
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.33.160.229",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.33.160.0/24",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
                 }
             ]
         }

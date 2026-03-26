@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "avocent",
-                    "type": "network",
+                    "type": "management",
                     "serial": "0520227802",
                     "icon": "avocent.svg"
                 }
@@ -730,6 +730,20 @@
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "172.28.232.254",
                     "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePfxLen": 0
+                },
+                {
+                    "context_name": "",
+                    "inetCidrRouteIfIndex": 2,
+                    "inetCidrRouteType": 3,
+                    "inetCidrRouteProto": 2,
+                    "inetCidrRouteNextHopAS": 0,
+                    "inetCidrRouteMetric1": 3,
+                    "inetCidrRouteDestType": "ipv4",
+                    "inetCidrRouteDest": "0.0.0.0",
+                    "inetCidrRouteNextHopType": "ipv4",
+                    "inetCidrRouteNextHop": "0.0.0.0",
+                    "inetCidrRoutePolicy": "zeroDotZero.2",
                     "inetCidrRoutePfxLen": 0
                 },
                 {
@@ -2148,5 +2162,25 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.28.232.202",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.28.232.0/24",
+                    "ifIndex": 2
+                }
+            ]
+        }
     }
 }

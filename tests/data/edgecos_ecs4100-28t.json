@@ -6837,8 +6837,8 @@
                     "ifName": "Console73",
                     "portName": null,
                     "ifIndex": 73,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -6937,8 +6937,8 @@
                     "ifName": "Loopback0",
                     "portName": null,
                     "ifIndex": 1000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7037,8 +7037,8 @@
                     "ifName": "VLAN1",
                     "portName": null,
                     "ifIndex": 1001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -7137,8 +7137,8 @@
                     "ifName": "VLAN51",
                     "portName": null,
                     "ifIndex": 1051,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7237,8 +7237,8 @@
                     "ifName": "VLAN201",
                     "portName": null,
                     "ifIndex": 1201,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7337,8 +7337,8 @@
                     "ifName": "VLAN231",
                     "portName": null,
                     "ifIndex": 1231,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7437,8 +7437,8 @@
                     "ifName": "VLAN268",
                     "portName": null,
                     "ifIndex": 1268,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7537,8 +7537,8 @@
                     "ifName": "VLAN301",
                     "portName": null,
                     "ifIndex": 1301,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7637,8 +7637,8 @@
                     "ifName": "VLAN501",
                     "portName": null,
                     "ifIndex": 1501,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7737,8 +7737,8 @@
                     "ifName": "VLAN2005",
                     "portName": null,
                     "ifIndex": 3005,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7837,8 +7837,8 @@
                     "ifName": "VLAN3001",
                     "portName": null,
                     "ifIndex": 4001,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -7937,8 +7937,8 @@
                     "ifName": "VLAN4024",
                     "portName": null,
                     "ifIndex": 5024,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -8038,70 +8038,70 @@
                     "vlan_domain": 1,
                     "vlan_name": "DefaultVlan",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 51,
                     "vlan_domain": 1,
                     "vlan_name": "management1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 201,
                     "vlan_domain": 1,
                     "vlan_name": "data201",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 231,
                     "vlan_domain": 1,
                     "vlan_name": "prepajaky1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 268,
                     "vlan_domain": 1,
                     "vlan_name": "garant:kia",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 301,
                     "vlan_domain": 1,
                     "vlan_name": "mcast301",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 501,
                     "vlan_domain": 1,
                     "vlan_name": "data501",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2005,
                     "vlan_domain": 1,
                     "vlan_name": "wifi:msumi",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3001,
                     "vlan_domain": 1,
                     "vlan_name": "kamery:msumi",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4024,
                     "vlan_domain": 1,
                     "vlan_name": "battery",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -8808,6 +8808,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8827,6 +8828,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8846,6 +8848,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8865,6 +8868,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8884,6 +8888,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8903,6 +8908,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8922,6 +8928,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8941,6 +8948,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8960,6 +8968,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8979,6 +8988,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8998,6 +9008,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9017,6 +9028,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9036,6 +9048,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9055,6 +9068,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9074,6 +9088,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9093,6 +9108,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9112,6 +9128,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9131,6 +9148,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9150,6 +9168,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9169,6 +9188,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9188,6 +9208,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9207,6 +9228,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9226,6 +9248,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9245,6 +9268,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9264,6 +9288,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9283,6 +9308,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9302,6 +9328,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9321,6 +9348,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9340,6 +9368,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9359,6 +9388,7 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9378,10 +9408,308 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "Edge-Core",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.0.51.12",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.0.51.0/24",
+                    "ifIndex": 1051
+                }
+            ]
+        }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 1301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 1301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 1301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 1301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 3005,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 4001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 5024,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1051,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1231,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1268,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 3005,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 4001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1051,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1201,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1231,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1301,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 1501,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 3005,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 4001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1051,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1231,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 1268,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 3005,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 4001,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "hu17-sw",
+                    "remote_port": "9 (b4fbe456a0b3)",
+                    "remote_platform": null,
+                    "remote_version": "EdgeSwitch 8-Port 150W, 1.8.2, Linux 3.6.5-1b505fb7, 1.0.0.4827685",
+                    "ifAlias": "hu17-sw",
+                    "ifDescr": "Ethernet Port on unit 1, port 28",
+                    "ifName": "Port28"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "ma104-1",
+                    "remote_port": "00 12 CF 48 D8 54 (0012cf48d854)",
+                    "remote_platform": null,
+                    "remote_version": "Edge-Core FE L2 Switch ES3528M",
+                    "ifAlias": "ma104-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 25",
+                    "ifName": "Port25"
+                }
+            ]
+        }
     }
 }

@@ -52,6 +52,7 @@ return [
             'distributed' => ['name' => '分散式輪詢器'],
             'graphite' => ['name' => '資料存放區: Graphite'],
             'influxdb' => ['name' => '資料存放區: InfluxDB'],
+            'kafka' => ['name' => '資料存放區: Kafka'],
             'opentsdb' => ['name' => '資料存放區: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => '資料存放區: Prometheus'],
@@ -659,9 +660,6 @@ return [
             'description' => '檔案名稱首碼',
             'help' => 'This is a very important bit as device names in NfSen are limited to 21 characters. This means full domain names for devices can be very problematic to squeeze in, so therefor this chunk is usually removed.',
         ],
-        'nmap' => [
-            'description' => 'nmap 路徑',
-        ],
         'own_hostname' => [
             'description' => 'LibreNMS 主機名稱',
             'help' => 'Should be set to the hostname/ip the librenms server is added as',
@@ -794,9 +792,6 @@ return [
         'rrdtool_tune' => [
             'description' => '調整所有 rrd 連接埠檔案使用最大值',
             'help' => '自動調整 rrd 連接埠檔案的最大值',
-        ],
-        'sfdp' => [
-            'description' => 'sfdp 路徑',
         ],
         'shorthost_target_length' => [
             'description' => 'Shortened hostname maximum length',
@@ -977,9 +972,6 @@ return [
         'device_location_map_open' => [
             'description' => '開啟位置圖',
             'help' => 'Location Map is shown by default',
-        ],
-        'whois' => [
-            'description' => 'whois 路徑',
         ],
         'smokeping.integration' => [
             'description' => '啟用',

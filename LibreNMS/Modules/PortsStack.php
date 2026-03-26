@@ -30,6 +30,7 @@ use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\PortStack;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
@@ -75,7 +76,13 @@ class PortsStack implements Module
             return;
         }
 
-        $portStacks = $data->mapTable(function ($data, $lowIfIndex, $highIfIndex) use ($os) {
+        $portStacks = $data->mapTable(function ($data, $lowIfIndex, $highIfIndex = null) use ($os) {
+            if ($highIfIndex === null) {
+                Log::debug('Skipping ' . $lowIfIndex . ' due to bad table index from the device');
+
+                return null;
+            }
+
             if ($lowIfIndex == '0' || $highIfIndex == '0') {
                 return null;  // we don't care about the default entries for ports that have stacking enabled
             }

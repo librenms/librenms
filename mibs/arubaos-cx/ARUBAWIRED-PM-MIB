@@ -1,7 +1,7 @@
 --**MOD+***********************************************************************
 --* Module:    ARUBAWIRED-PM-MIB.mib
 --*
---* (c) Copyright 2024 Hewlett Packard Enterprise Development LP
+--* (c) Copyright 2024-2025 Hewlett Packard Enterprise Development LP
 --* All Rights Reserved.
 --*
 --* The contents of this software are proprietary and confidential
@@ -17,7 +17,8 @@
 ARUBAWIRED-PM-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS
-        OBJECT-TYPE, MODULE-IDENTITY, Unsigned32
+        OBJECT-TYPE, MODULE-IDENTITY, Unsigned32,
+        TimeTicks
             FROM SNMPv2-SMI
         TruthValue, DisplayString
             FROM SNMPv2-TC
@@ -29,13 +30,17 @@ ARUBAWIRED-PM-MIB DEFINITIONS ::= BEGIN
             FROM IF-MIB;
 
     arubaWiredPmMIB   MODULE-IDENTITY
-        LAST-UPDATED "202401060000Z" -- January 06, 2024
+        LAST-UPDATED "202411190000Z" -- November 19, 2024
         ORGANIZATION "HPE/Aruba Networking Division"
         CONTACT-INFO "Hewlett-Packard Company
                       8000 Foothills Blvd.
                       Roseville, CA 95747"
         DESCRIPTION  "This MIB module describes management objects
                       that manage pluggable modules."
+
+        REVISION     "202411190000Z" -- November 19, 2024
+        DESCRIPTION  "Added tables arubaWiredPmXcvrDomTable and
+                      arubaWiredPmXcvrLaneDomTable"
 
         REVISION     "202401060000Z" -- January 06, 2024
         DESCRIPTION  "Initial revision."
@@ -348,6 +353,507 @@ arubaWiredPmXcvrInfo         OBJECT IDENTIFIER
         DESCRIPTION "Flag to indicate if DOM is supported on the transceiver."
         ::= { arubaWiredPmXcvrEntry 28 }
 
+arubaWiredPmXcvrDomInfo         OBJECT IDENTIFIER
+                                ::= { arubaWiredPmObjects 2 }
+
+    arubaWiredPmXcvrDomTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredPmXcvrDomEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Details of DOM (Digital Optical Monitoring) parameters
+                     for the transceiver plugged in the port."
+        ::= { arubaWiredPmXcvrDomInfo 1 }
+
+    arubaWiredPmXcvrDomEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredPmXcvrDomEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Pluggable module transceiver DOM information."
+        INDEX       {
+                      arubaWiredPmXcvrPortIfIndex
+                    }
+        ::= { arubaWiredPmXcvrDomTable 1 }
+
+    ArubaWiredPmXcvrDomEntry ::= SEQUENCE {
+            arubaWiredPmXcvrDomPortDesc                 DisplayString,
+            arubaWiredPmXcvrDomTemp                     DisplayString,
+            arubaWiredPmXcvrDomTempHiAlarmThreshold     DisplayString,
+            arubaWiredPmXcvrDomTempHiAlarm              TruthValue,
+            arubaWiredPmXcvrDomTempLoAlarmThreshold     DisplayString,
+            arubaWiredPmXcvrDomTempLoAlarm              TruthValue,
+            arubaWiredPmXcvrDomTempHiWarnThreshold      DisplayString,
+            arubaWiredPmXcvrDomTempHiWarn               TruthValue,
+            arubaWiredPmXcvrDomTempLoWarnThreshold      DisplayString,
+            arubaWiredPmXcvrDomTempLoWarn               TruthValue,
+            arubaWiredPmXcvrDomVoltage                  DisplayString,
+            arubaWiredPmXcvrDomVccHiAlarmThreshold      DisplayString,
+            arubaWiredPmXcvrDomVccHiAlarm               TruthValue,
+            arubaWiredPmXcvrDomVccLoAlarmThreshold      DisplayString,
+            arubaWiredPmXcvrDomVccLoAlarm               TruthValue,
+            arubaWiredPmXcvrDomVccHiWarnThreshold       DisplayString,
+            arubaWiredPmXcvrDomVccHiWarn                TruthValue,
+            arubaWiredPmXcvrDomVccLoWarnThreshold       DisplayString,
+            arubaWiredPmXcvrDomVccLoWarn                TruthValue,
+            arubaWiredPmXcvrDomTxBiasHiAlarmThreshold   DisplayString,
+            arubaWiredPmXcvrDomTxBiasLoAlarmThreshold   DisplayString,
+            arubaWiredPmXcvrDomTxBiasHiWarnThreshold    DisplayString,
+            arubaWiredPmXcvrDomTxBiasLoWarnThreshold    DisplayString,
+            arubaWiredPmXcvrDomTxPwrHiAlarmThreshold    DisplayString,
+            arubaWiredPmXcvrDomTxPwrLoAlarmThreshold    DisplayString,
+            arubaWiredPmXcvrDomTxPwrHiWarnThreshold     DisplayString,
+            arubaWiredPmXcvrDomTxPwrLoWarnThreshold     DisplayString,
+            arubaWiredPmXcvrDomRxPwrHiAlarmThreshold    DisplayString,
+            arubaWiredPmXcvrDomRxPwrLoAlarmThreshold    DisplayString,
+            arubaWiredPmXcvrDomRxPwrHiWarnThreshold     DisplayString,
+            arubaWiredPmXcvrDomRxPwrLoWarnThreshold     DisplayString,
+            arubaWiredPmXcvrDomTimeStamp                TimeTicks
+        }
+
+    arubaWiredPmXcvrDomPortDesc OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The interface port description in which transceiver is
+                     plugged in."
+        ::= { arubaWiredPmXcvrDomEntry 1 }
+
+    arubaWiredPmXcvrDomTemp OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Internally measured transceiver temperature, ranging
+                     from -128 to 128, in units of degree Celsius."
+        ::= { arubaWiredPmXcvrDomEntry 2 }
+
+    arubaWiredPmXcvrDomTempHiAlarmThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "High alarm threshold value of transceiver internal
+                     temperature, ranging from -128 to 128, in units of
+                     degree Celsius."
+        ::= { arubaWiredPmXcvrDomEntry 3 }
+
+    arubaWiredPmXcvrDomTempHiAlarm OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate internal temperature of transceiver
+                     exceeds high alarm threshold."
+        ::= { arubaWiredPmXcvrDomEntry 4 }
+
+    arubaWiredPmXcvrDomTempLoAlarmThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Low alarm threshold value of transceiver internal
+                     temperature, ranging from -128 to 128, in units of
+                     degree Celsius."
+        ::= { arubaWiredPmXcvrDomEntry 5 }
+
+    arubaWiredPmXcvrDomTempLoAlarm OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate internal temperature of transceiver
+                     is below low alarm threshold."
+        ::= { arubaWiredPmXcvrDomEntry 6 }
+
+    arubaWiredPmXcvrDomTempHiWarnThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "High warning threshold value of transceiver internal
+                     temperature, ranging from -128 to 128, in units of
+                     degree Celsius."
+        ::= { arubaWiredPmXcvrDomEntry 7 }
+
+    arubaWiredPmXcvrDomTempHiWarn OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate internal temperature of transceiver
+                     exceeds high warning threshold."
+        ::= { arubaWiredPmXcvrDomEntry 8 }
+
+    arubaWiredPmXcvrDomTempLoWarnThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Low warning threshold value of internal temperature of
+                     transceiver, ranging from -128 to 128, in units of
+                     degree Celsius."
+        ::= { arubaWiredPmXcvrDomEntry 9 }
+
+    arubaWiredPmXcvrDomTempLoWarn OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate internal temperature of transceiver
+                     is below low warning threshold."
+        ::= { arubaWiredPmXcvrDomEntry 10 }
+
+    arubaWiredPmXcvrDomVoltage OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Internally measured transceiver supply voltage,
+                     ranging from 0 to 6.55, in units of Volts."
+        ::= { arubaWiredPmXcvrDomEntry 11 }
+
+    arubaWiredPmXcvrDomVccHiAlarmThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "High alarm threshold value of internal supply voltage
+                     of transceiver, ranging from 0 to 6.55, in units of Volts."
+        ::= { arubaWiredPmXcvrDomEntry 12 }
+
+    arubaWiredPmXcvrDomVccHiAlarm OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate internal supply voltage of transceiver
+                     exceeds high alarm threshold."
+        ::= { arubaWiredPmXcvrDomEntry 13 }
+
+    arubaWiredPmXcvrDomVccLoAlarmThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Low alarm threshold value of internal supply voltage
+                     of transceiver, ranging from 0 to 6.55, in units of Volts."
+        ::= { arubaWiredPmXcvrDomEntry 14 }
+
+    arubaWiredPmXcvrDomVccLoAlarm OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate internal supply voltage of transceiver
+                     is below low alarm threshold."
+        ::= { arubaWiredPmXcvrDomEntry 15 }
+
+    arubaWiredPmXcvrDomVccHiWarnThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "High warning threshold value of internal supply voltage
+                     of transceiver, ranging from 0 to 6.55, in units of Volts."
+        ::= { arubaWiredPmXcvrDomEntry 16 }
+
+    arubaWiredPmXcvrDomVccHiWarn OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate internal supply voltage of transceiver
+                     exceeds high warning threshold."
+        ::= { arubaWiredPmXcvrDomEntry 17 }
+
+    arubaWiredPmXcvrDomVccLoWarnThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Low warning threshold value of internal supply voltage
+                     of transceiver, ranging from 0 to 6.55, in units of Volts."
+        ::= { arubaWiredPmXcvrDomEntry 18 }
+
+    arubaWiredPmXcvrDomVccLoWarn OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate internal supply voltage of transceiver
+                     is below low warning threshold."
+        ::= { arubaWiredPmXcvrDomEntry 19 }
+
+    arubaWiredPmXcvrDomTxBiasHiAlarmThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "High alarm threshold value of transceiver Tx Bias current,
+                     ranging from 0 to 131, in units of milliampere."
+        ::= { arubaWiredPmXcvrDomEntry 20 }
+
+    arubaWiredPmXcvrDomTxBiasLoAlarmThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Low alarm threshold value of transceiver Tx Bias current,
+                     ranging from 0 to 131, in units of milliampere."
+        ::= { arubaWiredPmXcvrDomEntry 21 }
+
+    arubaWiredPmXcvrDomTxBiasHiWarnThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "High warning threshold value of transceiver Tx Bias current,
+                     ranging from 0 to 131, in units of milliampere."
+        ::= { arubaWiredPmXcvrDomEntry 22 }
+
+    arubaWiredPmXcvrDomTxBiasLoWarnThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Low warning threshold value of transceiver Tx Bias current,
+                     ranging from 0 to 131, in units of milliampere."
+        ::= { arubaWiredPmXcvrDomEntry 23 }
+
+    arubaWiredPmXcvrDomTxPwrHiAlarmThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "High alarm threshold value of transceiver output power,
+                     ranging from 0 to 6.5535, in units of milliwatts.
+                     For a transceiver where this is not applicable, the OID
+                     value is 'n/a'."
+        ::= { arubaWiredPmXcvrDomEntry 24 }
+
+    arubaWiredPmXcvrDomTxPwrLoAlarmThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Low alarm threshold value of transceiver output power,
+                     ranging from 0 to 6.5535, in units of milliwatts.
+                     For a transceiver where this is not applicable, the OID
+                     value is 'n/a'."
+        ::= { arubaWiredPmXcvrDomEntry 25 }
+
+    arubaWiredPmXcvrDomTxPwrHiWarnThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "High warning threshold value of transceiver output power,
+                     ranging from 0 to 6.5535, in units of milliwatts.
+                     For a transceiver where this is not applicable, the OID
+                     value is 'n/a'."
+        ::= { arubaWiredPmXcvrDomEntry 26 }
+
+    arubaWiredPmXcvrDomTxPwrLoWarnThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Low warning threshold value of transceiver output power,
+                     ranging from 0 to 6.5535, in units of milliwatts.
+                     For a transceiver where this is not applicable, the OID
+                     value is 'n/a'."
+        ::= { arubaWiredPmXcvrDomEntry 27 }
+
+    arubaWiredPmXcvrDomRxPwrHiAlarmThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "High alarm threshold value of receive average optical
+                     power for the transceiver. The valid value range is
+                     0 to 6.5535, in units of milliwatts."
+        ::= { arubaWiredPmXcvrDomEntry 28 }
+
+    arubaWiredPmXcvrDomRxPwrLoAlarmThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Low alarm threshold value of receive average optical
+                     power for the transceiver. The valid value range is
+                     0 to 6.5535, in units of milliwatts."
+        ::= { arubaWiredPmXcvrDomEntry 29 }
+
+    arubaWiredPmXcvrDomRxPwrHiWarnThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "High warning threshold value of receive average optical
+                     power for the transceiver. The valid value range is
+                     0 to 6.5535, in units of milliwatts."
+        ::= { arubaWiredPmXcvrDomEntry 30 }
+
+    arubaWiredPmXcvrDomRxPwrLoWarnThreshold OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Low warning threshold value of receive average optical
+                     power for the transceiver. The valid value range is
+                     0 to 6.5535, in units of milliwatts."
+        ::= { arubaWiredPmXcvrDomEntry 31 }
+
+    arubaWiredPmXcvrDomTimeStamp OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The time in hundreths of a second since the device booted when DOM
+                     information was last updated."
+        ::= { arubaWiredPmXcvrDomEntry 32 }
+
+    arubaWiredPmXcvrLaneDomTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredPmXcvrLaneDomEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Details of the Transceiver DOM (Digital Optical Monitoring)
+                     parameters for each lane, plugged in the port."
+        ::= { arubaWiredPmXcvrDomInfo 2 }
+
+    arubaWiredPmXcvrLaneDomEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredPmXcvrLaneDomEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Pluggable module transceiver per lane DOM information."
+        INDEX       {
+                      arubaWiredPmXcvrPortIfIndex,
+                      arubaWiredPmXcvrLaneDomIndex
+                    }
+        ::= { arubaWiredPmXcvrLaneDomTable 1 }
+
+    ArubaWiredPmXcvrLaneDomEntry ::= SEQUENCE {
+            arubaWiredPmXcvrLaneDomIndex           Unsigned32,
+            arubaWiredPmXcvrLaneDomTxBias          DisplayString,
+            arubaWiredPmXcvrLaneDomTxBiasHiAlarm   TruthValue,
+            arubaWiredPmXcvrLaneDomTxBiasLoAlarm   TruthValue,
+            arubaWiredPmXcvrLaneDomTxBiasHiWarn    TruthValue,
+            arubaWiredPmXcvrLaneDomTxBiasLoWarn    TruthValue,
+            arubaWiredPmXcvrLaneDomTxPower         DisplayString,
+            arubaWiredPmXcvrLaneDomTxPwrHiAlarm    TruthValue,
+            arubaWiredPmXcvrLaneDomTxPwrLoAlarm    TruthValue,
+            arubaWiredPmXcvrLaneDomTxPwrHiWarn     TruthValue,
+            arubaWiredPmXcvrLaneDomTxPwrLoWarn     TruthValue,
+            arubaWiredPmXcvrLaneDomRxPower         DisplayString,
+            arubaWiredPmXcvrLaneDomRxPwrHiAlarm    TruthValue,
+            arubaWiredPmXcvrLaneDomRxPwrLoAlarm    TruthValue,
+            arubaWiredPmXcvrLaneDomRxPwrHiWarn     TruthValue,
+            arubaWiredPmXcvrLaneDomRxPwrLoWarn     TruthValue
+        }
+
+    arubaWiredPmXcvrLaneDomIndex OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..8)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Index for each transceiver host lane"
+        ::= { arubaWiredPmXcvrLaneDomEntry 1 }
+
+    arubaWiredPmXcvrLaneDomTxBias OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver TX bias current, ranging from 0 to 131, in
+                     units of milliampere."
+        ::= { arubaWiredPmXcvrLaneDomEntry 2 }
+
+    arubaWiredPmXcvrLaneDomTxBiasHiAlarm OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate transceiver Tx Bias current exceeds
+                     high alarm threshold."
+        ::= { arubaWiredPmXcvrLaneDomEntry 3 }
+
+    arubaWiredPmXcvrLaneDomTxBiasLoAlarm OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate transceiver Tx Bias current is below
+                     low alarm threshold."
+        ::= { arubaWiredPmXcvrLaneDomEntry 4 }
+
+    arubaWiredPmXcvrLaneDomTxBiasHiWarn OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate transceiver Tx Bias current exceeds
+                     high warning threshold."
+        ::= { arubaWiredPmXcvrLaneDomEntry 5 }
+
+    arubaWiredPmXcvrLaneDomTxBiasLoWarn OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate transceiver Tx Bias current is below
+                     low warning threshold."
+        ::= { arubaWiredPmXcvrLaneDomEntry 6 }
+
+    arubaWiredPmXcvrLaneDomTxPower OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver output power, ranging from 0 to 6.5535,
+                     in units of milliwatts. For a transceiver where this
+                     is not applicable, the OID value is 'n/a'."
+        ::= { arubaWiredPmXcvrLaneDomEntry 7 }
+
+    arubaWiredPmXcvrLaneDomTxPwrHiAlarm OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate transceiver Tx Power exceeds
+                     high alarm threshold. For a transceiver where
+                     Tx power is not applicable, value of this OID
+                     is False(2)."
+        ::= { arubaWiredPmXcvrLaneDomEntry 8 }
+
+    arubaWiredPmXcvrLaneDomTxPwrLoAlarm OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate transceiver Tx Power is below
+                     low alarm threshold. For a transceiver where
+                     Tx power is not applicable, value of this OID
+                     is False(2)."
+        ::= { arubaWiredPmXcvrLaneDomEntry 9 }
+
+    arubaWiredPmXcvrLaneDomTxPwrHiWarn OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate transceiver Tx Power exceeds
+                     high warning threshold. For a transceiver where
+                     Tx power is not applicable, value of this OID
+                     is False(2)."
+        ::= { arubaWiredPmXcvrLaneDomEntry 10 }
+
+    arubaWiredPmXcvrLaneDomTxPwrLoWarn OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate transceiver Tx Power is below
+                     low warning threshold. For a transceiver where
+                     Tx power is not applicable, value of this OID
+                     is False(2)."
+        ::= { arubaWiredPmXcvrLaneDomEntry 11 }
+
+    arubaWiredPmXcvrLaneDomRxPower OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..10))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver received average optical power, ranging
+                     from 0 to 6.5535, in units of milliwatts."
+        ::= { arubaWiredPmXcvrLaneDomEntry 12 }
+
+    arubaWiredPmXcvrLaneDomRxPwrHiAlarm OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate transceiver Rx Power exceeds
+                     high alarm threshold."
+        ::= { arubaWiredPmXcvrLaneDomEntry 13 }
+
+    arubaWiredPmXcvrLaneDomRxPwrLoAlarm OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate transceiver Rx Power is below
+                     low alarm threshold."
+        ::= { arubaWiredPmXcvrLaneDomEntry 14 }
+
+    arubaWiredPmXcvrLaneDomRxPwrHiWarn OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate transceiver Rx Power exceeds
+                     high warning threshold."
+        ::= { arubaWiredPmXcvrLaneDomEntry 15 }
+
+    arubaWiredPmXcvrLaneDomRxPwrLoWarn OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Flag to indicate transceiver Rx Power is below
+                     low warning threshold."
+        ::= { arubaWiredPmXcvrLaneDomEntry 16 }
 
 -- **********************************************************************
 -- PM Conformance information
@@ -395,13 +901,72 @@ arubaWiredPmXcvrInfo         OBJECT IDENTIFIER
 
         ::= {arubaWiredPmGroups 1 }
 
+    arubaWiredPmXcvrDomInfoGroup OBJECT-GROUP
+        OBJECTS     {
+                      arubaWiredPmXcvrDomPortDesc,
+                      arubaWiredPmXcvrDomTemp,
+                      arubaWiredPmXcvrDomTempHiAlarmThreshold,
+                      arubaWiredPmXcvrDomTempHiAlarm,
+                      arubaWiredPmXcvrDomTempLoAlarmThreshold,
+                      arubaWiredPmXcvrDomTempLoAlarm,
+                      arubaWiredPmXcvrDomTempHiWarnThreshold,
+                      arubaWiredPmXcvrDomTempHiWarn,
+                      arubaWiredPmXcvrDomTempLoWarnThreshold,
+                      arubaWiredPmXcvrDomTempLoWarn,
+                      arubaWiredPmXcvrDomVoltage,
+                      arubaWiredPmXcvrDomVccHiAlarmThreshold,
+                      arubaWiredPmXcvrDomVccHiAlarm,
+                      arubaWiredPmXcvrDomVccLoAlarmThreshold,
+                      arubaWiredPmXcvrDomVccLoAlarm,
+                      arubaWiredPmXcvrDomVccHiWarnThreshold,
+                      arubaWiredPmXcvrDomVccHiWarn,
+                      arubaWiredPmXcvrDomVccLoWarnThreshold,
+                      arubaWiredPmXcvrDomVccLoWarn,
+                      arubaWiredPmXcvrDomTxBiasHiAlarmThreshold,
+                      arubaWiredPmXcvrDomTxBiasLoAlarmThreshold,
+                      arubaWiredPmXcvrDomTxBiasHiWarnThreshold,
+                      arubaWiredPmXcvrDomTxBiasLoWarnThreshold,
+                      arubaWiredPmXcvrDomTxPwrHiAlarmThreshold,
+                      arubaWiredPmXcvrDomTxPwrLoAlarmThreshold,
+                      arubaWiredPmXcvrDomTxPwrHiWarnThreshold,
+                      arubaWiredPmXcvrDomTxPwrLoWarnThreshold,
+                      arubaWiredPmXcvrDomRxPwrHiAlarmThreshold,
+                      arubaWiredPmXcvrDomRxPwrLoAlarmThreshold,
+                      arubaWiredPmXcvrDomRxPwrHiWarnThreshold,
+                      arubaWiredPmXcvrDomRxPwrLoWarnThreshold,
+                      arubaWiredPmXcvrDomTimeStamp,
+                      arubaWiredPmXcvrLaneDomTxBias,
+                      arubaWiredPmXcvrLaneDomTxBiasHiAlarm,
+                      arubaWiredPmXcvrLaneDomTxBiasLoAlarm,
+                      arubaWiredPmXcvrLaneDomTxBiasHiWarn,
+                      arubaWiredPmXcvrLaneDomTxBiasLoWarn,
+                      arubaWiredPmXcvrLaneDomTxPower,
+                      arubaWiredPmXcvrLaneDomTxPwrHiAlarm,
+                      arubaWiredPmXcvrLaneDomTxPwrLoAlarm,
+                      arubaWiredPmXcvrLaneDomTxPwrHiWarn,
+                      arubaWiredPmXcvrLaneDomTxPwrLoWarn,
+                      arubaWiredPmXcvrLaneDomRxPower,
+                      arubaWiredPmXcvrLaneDomRxPwrHiAlarm,
+                      arubaWiredPmXcvrLaneDomRxPwrLoAlarm,
+                      arubaWiredPmXcvrLaneDomRxPwrHiWarn,
+                      arubaWiredPmXcvrLaneDomRxPwrLoWarn
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing details of Transceiver
+                     DOM (Digital Optical Monitoring) parameters plugged in
+                     the port."
+
+        ::= {arubaWiredPmGroups 2 }
+
     arubaWiredPmCompliance MODULE-COMPLIANCE
         STATUS      current
         DESCRIPTION "The compliance statement for HP Switches with
                      support for arubaWired Pluggable module objects."
 
         MODULE
-            MANDATORY-GROUPS { arubaWiredPmXcvrInfoGroup }
+            MANDATORY-GROUPS { arubaWiredPmXcvrInfoGroup,
+                               arubaWiredPmXcvrDomInfoGroup
+                             }
 
         ::= { arubaWiredPmCompliances 1 }
 

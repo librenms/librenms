@@ -51,13 +51,14 @@ class BgpPeer extends DeviceRelatedModel
         'bgpPeerFsmEstablishedTime',
         'bgpPeerInUpdateElapsedTime',
         'bgpPeerDescr',
+        'bgpPeerIface',
         'astext',
     ];
     // ---- Query scopes ----
 
     public function scopeInAlarm(Builder $query)
     {
-        return $query->where(function (Builder $query) {
+        return $query->where(function (Builder $query): void {
             $query->where('bgpPeerAdminStatus', 'start')
                 ->orWhere('bgpPeerAdminStatus', 'running');
         })->where('bgpPeerState', '!=', 'established');

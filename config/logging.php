@@ -22,47 +22,22 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single', 'flare'],
+            'channels' => ['log_file', 'flare'],
             'ignore_exceptions' => false,
         ],
 
         'console' => [
             'driver' => 'stack',
-            'channels' => ['single', 'stdout', 'flare'],
+            'channels' => ['log_file', 'stdout', 'flare'],
             'ignore_exceptions' => false,
         ],
 
-        'console_debug' => [
-            'driver' => 'stack',
-            'channels' => ['single', 'stdout_debug'],
-            'ignore_exceptions' => false,
-        ],
-
-        'single' => [
+        'log_file' => [
             'driver' => 'single',
             'path' => env('APP_LOG', base_path('logs/librenms.log')),
             'formatter' => App\Logging\LogFileFormatter::class,
             'level' => env('LOG_LEVEL', 'warning'),
             'replace_placeholders' => true,
-        ],
-
-        'daily' => [
-            'driver' => 'daily',
-            'path' => env('APP_LOG', base_path('logs/librenms.log')),
-            'formatter' => App\Logging\NoColorFormatter::class,
-            'level' => env('LOG_LEVEL', 'error'),
-            'days' => 14,
-            'replace_placeholders' => true,
-        ],
-
-        'stdout_debug' => [
-            'driver' => 'monolog',
-            'handler' => StreamHandler::class,
-            'formatter' => App\Logging\CliColorFormatter::class,
-            'with' => [
-                'stream' => 'php://output',
-            ],
-            'level' => 'debug',
         ],
 
         'stdout' => [
@@ -72,7 +47,7 @@ return [
             'with' => [
                 'stream' => 'php://output',
             ],
-            'level' => 'info',
+            'level' => env('STDOUT_LOG_LEVEL', 'info'),
         ],
 
         'stderr' => [

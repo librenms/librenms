@@ -33,6 +33,7 @@
     "pdu_over_amperage_apc": "%sensors.sensor_class = \"current\" && %sensors.sensor_descr = \"Bank Total\" && %sensors.sensor_current > %sensors.sensor_limit && %devices.os = \"apc\"",
     "sensor": "(%sensors.sensor_alert = 1)",
     "sensor_port_link": "(%sensors.entPhysicalIndex_measured = 'ports' && %sensors.entPhysicalIndex = %ports.ifIndex && %macros.port_up)",
+    "service": "(%services.service_disabled = 0 && %services.service_ignore = 0)",
     "state_sensor_critical": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 2",
     "state_sensor_ok": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 0",
     "state_sensor_unknown": "%sensors.sensor_current = %state_translations.state_value && %state_translations.state_generic_value = 3",

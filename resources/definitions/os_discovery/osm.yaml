@@ -1,0 +1,123 @@
+modules:
+    os:
+        hardware:
+            - ENDACE-SYSTEM-MIB::systemModel.0
+        version:
+            - ENDACE-SYSTEM-MIB::systemVersion.0
+        version_regex: '/endace OSm(?<version>\S+)/'
+        serial:
+            - ENDACE-SYSTEM-MIB::systemSerial.0
+
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: ENDACE-MODULE-MIB::modoptTable
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.11.{{ $index }}'
+                    value: ENDACE-MODULE-MIB::modoptVolt
+                    descr: "{{ ENDACE-MODULE-MIB::modoptName }} Voltage"
+                    index: "modoptVolt.{{ $index }}"
+                    group: "DAG Module(s)"
+        dbm:
+            data:
+                -
+                    oid: ENDACE-MODULE-MIB::modoptTable
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.5.{{ $index }}'
+                    value: ENDACE-MODULE-MIB::modoptRxPower
+                    descr: "{{ ENDACE-MODULE-MIB::modoptName }} RX Power"
+                    index: "modoptRxPower.{{ $index }}"
+                    group: "DAG Module(s)"
+                -
+                    oid: ENDACE-MODULE-MIB::modoptTable
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.7.{{ $index }}'
+                    value: ENDACE-MODULE-MIB::modoptTxPower
+                    descr: "{{ ENDACE-MODULE-MIB::modoptName }} TX Power"
+                    index: "modoptTxPower.{{ $index }}"
+                    group: "DAG Module(s)"
+        temperature:
+            data:
+            -
+                    oid: ENDACE-HWMON-MIB::hwmonSystemTemp
+                    num_oid: '.1.3.6.1.4.1.18418.16.1.4.{{ $index }}'
+                    descr: "System Temperature (C)"
+                    index: 0
+            -
+                    oid: ENDACE-MODULE-MIB::modoptTable
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.9.{{ $index }}'
+                    value: ENDACE-MODULE-MIB::modoptTemp
+                    descr: "{{ ENDACE-MODULE-MIB::modoptName }} Temperature"
+                    index: "modoptTemp.{{ $index }}"
+                    group: "DAG Module(s)"
+        state:
+            data:
+                -
+                    oid: ENDACE-HWMON-MIB::hwmonFanRedundancy
+                    num_oid: '.1.3.6.1.4.1.18418.16.1.1.{{ $index }}'
+                    descr: "Fan Redundancy"
+                    index: 0
+                    state_name: hwmonFanRedundancy
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'normal' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'fault' }
+                -
+                    oid: ENDACE-HWMON-MIB::hwmonPsuRedundancy
+                    num_oid: '.1.3.6.1.4.1.18418.16.1.2.{{ $index }}'
+                    descr: "PSU Redundancy"
+                    index: 0
+                    state_name: hwmonPsuRedundancy
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'normal' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'fault' }
+                -
+                    oid: ENDACE-HWMON-MIB::hwmonIntrusionStatus
+                    num_oid: '.1.3.6.1.4.1.18418.16.1.3.{{ $index }}'
+                    descr: "Intrusion Status"
+                    index: 0
+                    state_name: hwmonIntrusionStatus
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: 'alarm' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'normal' }
+                -
+                    oid: ENDACE-MODULE-MIB::modoptTable
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.6.{{ $index }}'
+                    value: ENDACE-MODULE-MIB::modoptRxPowerOk
+                    descr: "{{ ENDACE-MODULE-MIB::modoptName }} RX Power Ok"
+                    index: "modoptRxPowerOk.{{ $index }}"
+                    group: "DAG Module(s)"
+                    state_name: modoptRxPowerOk
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'true' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'false' }
+                -
+                    oid: ENDACE-MODULE-MIB::modoptTable
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.8.{{ $index }}'
+                    value: ENDACE-MODULE-MIB::modoptTxPowerOk
+                    descr: "{{ ENDACE-MODULE-MIB::modoptName }} TX Power Ok"
+                    index: "modoptTxPowerOk.{{ $index }}"
+                    group: "DAG Module(s)"
+                    state_name: modoptTxPowerOk
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'true' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'false' }
+                -
+                    oid: ENDACE-MODULE-MIB::modoptTable
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.12.{{ $index }}'
+                    value: ENDACE-MODULE-MIB::modoptVoltOk
+                    descr: "{{ ENDACE-MODULE-MIB::modoptName }} Voltage Ok"
+                    index: "modoptVoltOk.{{ $index }}"
+                    group: "DAG Module(s)"
+                    state_name: modoptVoltOk
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'true' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'false' }
+                -
+                    oid: ENDACE-MODULE-MIB::modoptTable
+                    num_oid: '.1.3.6.1.4.1.18418.2.1.2.3.1.10.{{ $index }}'
+                    value: ENDACE-MODULE-MIB::modoptTempOk
+                    descr: "{{ ENDACE-MODULE-MIB::modoptName }} Temperature Ok"
+                    index: "modoptTempOk.{{ $index }}"
+                    group: "DAG Module(s)"
+                    state_name: modoptTempOk
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'true' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'false' }

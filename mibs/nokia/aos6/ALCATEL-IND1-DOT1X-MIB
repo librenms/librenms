@@ -1,0 +1,2078 @@
+ALCATEL-IND1-DOT1X-MIB DEFINITIONS ::= BEGIN
+
+     	IMPORTS
+		MODULE-IDENTITY,
+		OBJECT-IDENTITY,
+		OBJECT-TYPE,
+		Integer32, IpAddress
+
+			FROM SNMPv2-SMI
+		DisplayString, MacAddress, TimeStamp, TEXTUAL-CONVENTION, TruthValue
+
+			FROM SNMPv2-TC
+		softentIND1Dot1X
+			FROM ALCATEL-IND1-BASE
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		InterfaceIndex, InterfaceIndexOrZero
+			FROM IF-MIB
+
+		SnmpAdminString
+			FROM SNMP-FRAMEWORK-MIB
+		dot1xPaePortNumber
+			FROM IEEE8021-PAE-MIB
+			;
+
+        alcatelIND1Dot1XMIB MODULE-IDENTITY
+                LAST-UPDATED "201910070000Z"
+                ORGANIZATION "ALE USA Inc"
+                CONTACT-INFO
+            "Please consult with Customer Service to ensure the most appropriate
+             version of this document is used with the products in question:
+
+                             Alcatel-Lucent Enterprise, 
+                               26801 West Agoura Road
+                            Agoura Hills, CA  91301-5122
+                              United States Of America
+
+            Telephone:               +1 800 995 2696 
+ 				     
+            Electronic Mail:         ebg_global_supportcenter@al-enterprise.com 
+            World Wide Web:          https://www.al-enterprise.com"
+            
+
+                DESCRIPTION
+			"This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+
+                 The Port Access Entity module for managing 802.1X for
+                 the OmniSwitch Product Line
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+			
+                         Copyright (C) ALE USA Inc. 2014-2019
+                         Copyright (C) 1995-2013 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
+
+
+		REVISION      "201910070000Z"
+                DESCRIPTION
+                   "Updated the latest contact and Copyright information for ALE USA Inc."
+                 ::= { softentIND1Dot1X 1}
+
+alaIND1Dot1XMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For 802.1X
+            Subsystem Managed Objects."
+        ::= { alcatelIND1Dot1XMIB 1 }
+
+
+    alaIND1Dot1XMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For 802.1X
+            Subsystem Conformance Information."
+        ::= { alcatelIND1Dot1XMIB 2 }
+
+
+    alaIND1Dot1XMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For 802.1X
+            Subsystem Units Of Conformance."
+        ::= { alaIND1Dot1XMIBConformance 1 }
+
+    ALADot1xClassificationPolicyType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+               "This policy type is the classification policy used to classify
+                a device onto the system. "
+       SYNTAX  INTEGER {
+                   dotXAuthentication          (0),
+                   macAuthentication           (1),
+                   groupMobilityRules          (2),
+                   vlanId                      (3),
+                   defaultVlan                 (4),
+                   block                       (5),
+                   internalUseOnlyA            (6),
+                   internalUseOnlyB            (7),
+                   internalUseOnlyC            (8),
+                   captivePortalAuthentication (9),
+                   captivePortalGroupMobility (10),
+                   captivePortalDefaultVlan   (11),
+                   captivePortalVlanId        (12),
+                   captivePortalBlock         (13),
+                   captivePortalUnknown       (14),
+                   captivePortalUnpAuthSrv    (15),
+                   captivePortalUnpUsrCfg     (16),
+                   captivePortalUnpAAArule    (17),
+                   authServerUNP              (18),
+                   userConfigUNP              (19),
+                   aaaRuleUNP                 (20),
+                   aaaAuthSvrDownUNP          (21),
+		   aaaAuthSvrDownBlock        (22),
+		   aaaAuthSvrDownVpUnp        (29)
+       }
+
+       ALADot1xAuthenticationType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+               "The type of authentication used"
+       SYNTAX  INTEGER {
+                   noAuthentication   (0),
+                   dotXAuthentication (1),
+                   macAuthentication  (2),
+                   captivePortal      (3)
+       }
+
+      ALADot1xAuthenticationResult ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+               "The result of the authentication.  If the ALADot1xAuthenticationType of this
+                 device is noAuthentication then this object will return notApplicable.  If the
+                 authentication has not completed then this object will return inProgress."
+       SYNTAX  INTEGER {
+                   notApplicable (0),
+                   inProgress    (1),
+                   success       (2),
+                   fail          (3)
+       }
+
+      ALADot1xMacLearntState ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+               "The state of MAC address in the system"
+       SYNTAX  INTEGER {
+                   bridging      (0), -- Normal access to the network.
+                   filtering     (1), -- Access to the network blocked.
+                   hicInProgress (2), -- Host Integrity Check in progress.
+                   qmrInProgress (3)  -- QMR in progress.
+       }
+
+      ALADot1xMacQueryType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+               "The query type of MAC address in the system.  This query MAC address type
+                 is used to specify which type of MAC address to query from the
+                  alaDot1xDeviceStatusTable."
+       SYNTAX  INTEGER {
+                   all           (0), -- All devices on the port.
+                   supplicant    (1), -- All supplicants on the port.
+                   nonSupplicant (2), -- All non-supplicant on the port.
+                   captivePortal (3)  -- All devices on the port that used Captive Portal.
+       }
+
+      ALADot1xDeviceType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+               "The type of device.  Either supplicant or non-supplicant."
+       SYNTAX  INTEGER {
+                   supplicant    (1),
+                   nonSupplicant (2)
+       }
+
+  ALADot1xHicFlag ::= TEXTUAL-CONVENTION
+	STATUS       current
+	DESCRIPTION
+	      " Flag to specify whether MAC is classified based on HIC "
+	SYNTAX INTEGER {
+		    enabled      (1),
+		    disabled     (2)
+	}
+
+
+
+----------------------------------------------------------
+---------- Logical Port table ----------------------------
+----------------------------------------------------------
+alaDot1xPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDot1xPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A table of system level information for each port
+        supported by the Port Access Entity.  An entry appears
+        in this table for each port of this system."
+    REFERENCE
+        "9.6.1"
+    ::= { alaIND1Dot1XMIBObjects 1 }
+
+alaDot1xPortEntry OBJECT-TYPE
+    SYNTAX      AlaDot1xPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "TP DO: Add description here   "
+    INDEX { dot1xPaePortNumber }
+    ::= { alaDot1xPortTable 1 }
+
+
+AlaDot1xPortEntry ::=
+    SEQUENCE {
+        alaDot1xPortSlotNumber
+            INTEGER,
+        alaDot1xPortPortNumber
+            INTEGER,
+        alaDot1xPortMACAddress
+            MacAddress,
+        alaDot1xPortVlan
+            INTEGER,
+        alaDot1xPortProtocol
+            INTEGER,
+        alaDot1xPortUserName
+            DisplayString,
+        alaDot1xPortState
+            INTEGER,
+	alaDot1xSupplicantPolicyUsed
+	    ALADot1xClassificationPolicyType,
+	alaDot1xAuthFailReason
+	    DisplayString,
+	alaDot1xReAuthCount
+	    INTEGER,
+	alaDot1xLastSuccessTime
+	    DisplayString
+        }
+
+alaDot1xPortSlotNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..16)
+    MAX-ACCESS  not-accessible 
+    STATUS      deprecated
+    DESCRIPTION
+        "The slot that the logical port represented by the dot1xPaePortNumber resides."
+    ::= { alaDot1xPortEntry 1 }
+
+alaDot1xPortPortNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..48)
+    MAX-ACCESS  not-accessible 
+    STATUS      deprecated
+    DESCRIPTION
+        "The user port that the logical port represented by the dot1xPaePortNumber resides."
+    ::= { alaDot1xPortEntry 2 }
+
+alaDot1xPortMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible 
+    STATUS      deprecated
+    DESCRIPTION
+        "The MAC address of the supplicant that along with the slot and port uniquely
+         form the logical port represented by the dot1xPaePortNumber."
+    ::= { alaDot1xPortEntry 3 }
+
+alaDot1xPortVlan OBJECT-TYPE
+    SYNTAX      INTEGER (1..4096)
+    MAX-ACCESS  not-accessible 
+    STATUS      deprecated
+    DESCRIPTION
+        "The vlan that the supplicant is authorized to access."
+    ::= { alaDot1xPortEntry 4 }
+
+alaDot1xPortProtocol OBJECT-TYPE
+    SYNTAX      INTEGER (1..6)
+    MAX-ACCESS  not-accessible 
+    STATUS      deprecated
+    DESCRIPTION
+        "The protocol that is authorized for the supplicant.  This is used in conjunction
+         with the alaDot1xPortVlan object.  Supplicant can be authorized to different vlans
+         for different protocol."
+    ::= { alaDot1xPortEntry 5 }
+
+alaDot1xPortUserName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible 
+    STATUS      deprecated
+    DESCRIPTION
+        "The user name of the supplicant used for authentication."
+    ::= { alaDot1xPortEntry 6 }
+
+alaDot1xPortState OBJECT-TYPE
+    SYNTAX      INTEGER{
+		   initialize (1),
+		   disconnected (2),
+		   connecting (3),
+		   authenticating (4),
+		   authenticated (5),
+		   aborting (6),
+		   held (7),
+		   forceAuthenticated (8),
+		   forceUnauthenticated (9),
+		   authenticatedLocally (10)
+		}
+    MAX-ACCESS  not-accessible 
+    STATUS      deprecated
+    DESCRIPTION
+    	"The State of the port."
+    ::= { alaDot1xPortEntry 7 }
+
+alaDot1xSupplicantPolicyUsed  OBJECT-TYPE
+    SYNTAX      ALADot1xClassificationPolicyType
+    MAX-ACCESS  not-accessible 
+    STATUS      deprecated
+    DESCRIPTION
+        "Classification Policy under which the 802.1x supplicant is learned."
+    ::= { alaDot1xPortEntry 8 }
+
+alaDot1xAuthFailReason  OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  not-accessible 
+    STATUS      deprecated
+    DESCRIPTION
+	"Authentication Failure reasons for 802.1x supplicant client."
+    ::= { alaDot1xPortEntry 9 }
+
+alaDot1xReAuthCount  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible 
+    STATUS      deprecated
+    DESCRIPTION
+	"Authentication Retry Count for 802.1x supplicant client."
+    ::= { alaDot1xPortEntry 10 }
+
+alaDot1xLastSuccessTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible 
+    STATUS      deprecated
+    DESCRIPTION
+	"Last successful time when client is authenticated."
+    ::= { alaDot1xPortEntry 11 }
+
+----------------------------------------------------------
+----------Dot1x MAC table --------------------------------
+----------------------------------------------------------
+
+alaDot1xMacTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AlaDot1xMacEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Provide the list of users currently authenticated into the
+         switch for bridging purpose."
+    ::= { alaIND1Dot1XMIBObjects 4 }
+
+alaDot1xMacEntry OBJECT-TYPE
+    SYNTAX        AlaDot1xMacEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "An entry in the AaaAuthenticatedUserTable."
+    INDEX {alaDot1xMACAddress}
+    ::= { alaDot1xMacTable 1 }
+
+AlaDot1xMacEntry ::=
+    SEQUENCE {
+        alaDot1xMACAddress
+            MacAddress,
+        alaDot1xMacIfIndex
+            InterfaceIndex,
+        alaDot1xMacSlotNumber
+            Integer32,
+        alaDot1xMacPortNumber
+            Integer32,
+        alaDot1xMacVlan
+            Integer32,
+        alaDot1xMacProtocol
+            Integer32,
+        alaDot1xMacUserName
+            DisplayString,
+        alaDot1xMacState
+            INTEGER,
+        alaDot1xMacSupplicantPolicyUsed
+            ALADot1xClassificationPolicyType,
+        alaDot1xHicEnabledMAC
+            ALADot1xHicFlag
+        }
+
+alaDot1xMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the supplicant that along with the slot and port uniquely
+         form the logical port represented by the dot1xPaePortNumber."
+    ::= { alaDot1xMacEntry 1 }
+
+alaDot1xMacIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interface index in which alaDot1xMACAddress was learned."
+    ::= { alaDot1xMacEntry 2 }
+
+
+alaDot1xMacSlotNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The slot in which alaDot1xMACAddress was learned."
+    ::= { alaDot1xMacEntry 3 }
+
+alaDot1xMacPortNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..48)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The user port in which alaDot1xMACAddress was learned."
+    ::= { alaDot1xMacEntry 4 }
+
+alaDot1xMacVlan OBJECT-TYPE
+    SYNTAX      Integer32 (1..4096)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vlan that the supplicant is authorized to access."
+    ::= { alaDot1xMacEntry 5 }
+
+alaDot1xMacProtocol OBJECT-TYPE
+    SYNTAX      Integer32 (1..6)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The protocol that is authorized for the supplicant.  This is used in conjunction
+         with the alaDot1xMacVlan object.  Supplicant can be authorized to different vlans
+         for different protocol."
+    ::= { alaDot1xMacEntry 6 }
+
+alaDot1xMacUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The user name of the supplicant used for authentication."
+    ::= { alaDot1xMacEntry 7 }
+
+alaDot1xMacState OBJECT-TYPE
+    SYNTAX      INTEGER{
+                   initialize (1),
+                   disconnected (2),
+                   connecting (3),
+                   authenticating (4),
+                   authenticated (5),
+                   aborting (6),
+                   held (7),
+                   forceAuthenticated (8),
+                   forceUnauthenticated (9),
+                   authenticatedLocally (10)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The State of the port in which the current mac-address was learned."
+    ::= { alaDot1xMacEntry 8 }
+
+alaDot1xMacSupplicantPolicyUsed  OBJECT-TYPE
+    SYNTAX      ALADot1xClassificationPolicyType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Classification Policy under which the 802.1x supplicant is learned."
+    ::= { alaDot1xMacEntry 9 }
+
+alaDot1xHicEnabledMAC OBJECT-TYPE
+    SYNTAX       ALADot1xHicFlag
+    MAX-ACCESS   read-only
+    STATUS       deprecated
+    DESCRIPTION
+	"Flag to notify that MAC has been classified based on HIC policy"
+ ::= { alaDot1xMacEntry 10 }
+		
+
+
+----------------------------------------------------------
+
+----------------------------------------------------------
+-------------- Reverse lookup table ----------------------
+----------------------------------------------------------
+alaDot1xPortLookupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDot1xPortLookupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of which allows to find the logical port number
+        given the physical slot/port/MAC. An entry appears
+        in this table for each logical port of this system."
+    ::= { alaIND1Dot1XMIBObjects 2 }
+
+alaDot1xPortLookupEntry OBJECT-TYPE
+    SYNTAX      AlaDot1xPortLookupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The translation table to look up the dot1xPaePortNumber."
+    INDEX { alaDot1xPortLookupSlotNumber,
+     	    alaDot1xPortLookupPortNumber,
+     	    alaDot1xPortLookupMACAddress }
+    ::= { alaDot1xPortLookupTable 1 }
+
+AlaDot1xPortLookupEntry ::=
+    SEQUENCE {
+        alaDot1xPortLookupSlotNumber
+            INTEGER,
+        alaDot1xPortLookupPortNumber
+            INTEGER,
+        alaDot1xPortLookupMACAddress
+            MacAddress,
+        alaDot1xPortLookupInterfaceNumber
+            InterfaceIndex
+        }
+
+alaDot1xPortLookupSlotNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The slot that the logical port represented by the dot1xPaePortNumber resides."
+    ::= { alaDot1xPortLookupEntry 1 }
+
+alaDot1xPortLookupPortNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..48)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The physical port that the logical port represented by the dot1xPaePortNumber resides."
+    ::= { alaDot1xPortLookupEntry 2 }
+
+alaDot1xPortLookupMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the supplicant that along with the slot and port uniquely
+         form the logical port represented by the dot1xPaePortNumber."
+    ::= { alaDot1xPortLookupEntry 3 }
+
+alaDot1xPortLookupInterfaceNumber OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex that represnets the slot and port where the dot1xPaePortNumber resides."
+    ::= { alaDot1xPortLookupEntry 4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Guest VLAN Configuration table - WILL NEVER BE SUPPORTED
+-- but keep the OID reserved
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- alaDot1xGuestVlanConfTable OBJECT-TYPE
+--	SYNTAX      SEQUENCE OF AlaDot1xGuestVlanConfEntry
+--	MAX-ACCESS  not-accessible
+--	STATUS      current
+--	DESCRIPTION
+--	"A table of guest vlan ID supported by the Port Access Entity.
+--	An entry appears in this table for each port of this system."
+-- ::= { alaIND1Dot1XMIBObjects 3 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Non 802.1x supplicant table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaDot1xNonSupplicantTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AlaDot1xNonSupplicantEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "A table of non 802.1x supplicants learned on 802.1x authenticated ports."
+::= { alaIND1Dot1XMIBObjects 5 }
+
+alaDot1xNonSupplicantEntry OBJECT-TYPE
+        SYNTAX      AlaDot1xNonSupplicantEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Non 802.1x supplicant information."
+        INDEX { alaDot1xNonSupplicantIntfNum,
+                alaDot1xNonSupplicantMACAddress }
+::= { alaDot1xNonSupplicantTable 1 }
+
+
+AlaDot1xNonSupplicantEntry ::=
+        SEQUENCE {
+                alaDot1xNonSupplicantIntfNum    InterfaceIndex,
+                alaDot1xNonSupplicantMACAddress MacAddress,
+                alaDot1xNonSupplicantVlanID     INTEGER,
+		alaDot1xNonSupplicantPolicyUsed ALADot1xClassificationPolicyType,
+                alaDot1xAuthenticationStatus    INTEGER,
+		alaDot1xNonSupplicantHicEnabledMAC ALADot1xHicFlag,
+		alaDot1xNonSupplicantUserName   DisplayString
+                }
+
+alaDot1xNonSupplicantIntfNum OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex represneting the slot and port where the non 802.1x supplicant is learned."
+    ::= { alaDot1xNonSupplicantEntry 1 }
+
+alaDot1xNonSupplicantMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the non 802.1x supplicant."
+    ::= { alaDot1xNonSupplicantEntry 2 }
+
+alaDot1xNonSupplicantVlanID OBJECT-TYPE
+        SYNTAX      INTEGER (1..4096)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "The Id of the VLAN on which the non 802.1x supplicant is learned."
+    ::= { alaDot1xNonSupplicantEntry 3 }
+
+alaDot1xNonSupplicantPolicyUsed  OBJECT-TYPE
+        SYNTAX      ALADot1xClassificationPolicyType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Classification policy under which the non 802.1x supplicant is learned."
+    ::= { alaDot1xNonSupplicantEntry 4 }
+
+alaDot1xAuthenticationStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                idle (1),
+		inProgress (2),
+                authenticated (3),
+		failed (4),
+		failedTimeout (5),
+		failedNoServer (6),
+		failedNoResources (7)
+            }
+
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Authentication status of the non 802.1x supplicant."
+    ::= { alaDot1xNonSupplicantEntry 5 }
+
+alaDot1xNonSupplicantHicEnabledMAC OBJECT-TYPE
+	SYNTAX      ALADot1xHicFlag
+	MAX-ACCESS  read-only
+        STATUS      current
+	DESCRIPTION
+	"Flag to specify whether non supplicant is classified based on HIC."
+   ::= { alaDot1xNonSupplicantEntry  6 }
+
+alaDot1xNonSupplicantUserName OBJECT-TYPE	 
+SYNTAX      DisplayString	 
+MAX-ACCESS  read-only	 
+STATUS      current	 
+DESCRIPTION	 
+"The user name of the non-supplicant used for authentication."	 
+::= { alaDot1xNonSupplicantEntry 7 }
+
+-- alaDot1xNonSuppPolicy
+-- alaDot1xSuppPolicy
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Authentication Policy Configuration table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaDot1xAuthPolicyTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF AlaDot1xAuthPolicyEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"A table of supplicant and non supplicant device classification policies
+	as they are configured on 802.1x authenticated ports."
+::= { alaIND1Dot1XMIBObjects 6 }
+
+alaDot1xAuthPolicyEntry OBJECT-TYPE
+	SYNTAX      AlaDot1xAuthPolicyEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"Device classification policies information."
+	INDEX { alaDot1xAuthPolicyIntfNumber }
+::= { alaDot1xAuthPolicyTable 1 }
+
+
+AlaDot1xAuthPolicyEntry ::=
+	SEQUENCE {
+		alaDot1xAuthPolicyIntfNumber 	InterfaceIndex,
+		alaDot1xNonSuppPolicy     	DisplayString,
+		alaDot1xSuppPolicy        	DisplayString,
+                alaDot1xPollingCnt        	Integer32,
+		alaDot1xCaptivePortalPolicy    	DisplayString,
+                alaDot1xCPortalSessionLimit    	Integer32,
+                alaDot1xCPortalRetryCnt        	Integer32,
+                alaDot1xSupplicantBypass        INTEGER,
+                alaDot1xSBAllowEAP	        INTEGER,
+                alaDot1xCPortalInactivityLogout INTEGER,
+  		alaDot1xNonSuppSessTimeoutStatus INTEGER,
+		alaDot1xNonSuppSessTimeoutIntrvl Integer32,
+		alaDot1xNonSuppSessTimeoutTrustRadStatus INTEGER,
+		alaDot1xSuppTrustRadiusEnabled INTEGER,
+        	alaDot1xNonSupInactivityLogout INTEGER,
+		alaDot1xPerPortAPModeStatus     INTEGER,
+                alaDot1xPerPortForceL3Learning  INTEGER,
+                alaDot1xPerPortForceL3LearningPortBounce INTEGER
+	}
+alaDot1xAuthPolicyIntfNumber OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex that represnets the slot and port where the device classification
+        policies are configured."
+    ::= { alaDot1xAuthPolicyEntry 1 }
+
+alaDot1xNonSuppPolicy OBJECT-TYPE
+     	SYNTAX     DisplayString (SIZE (0..127))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION	
+ 	"MAC based authentication 	-> M
+ 	 Group Mobility			-> G
+ 	 VLAN ID			-> <vlan id>
+ 	 Default VLAN			-> D
+ 	 Block				-> B
+	 Fail				-> ,
+	 Captive Portal			-> C
+         UNP                            -> '<String>'
+
+ 	 Examples: MGD,GB. The default value is B (block).  If the string size is zero (0), the
+         default value is used."
+    ::= { alaDot1xAuthPolicyEntry 2 }
+
+alaDot1xSuppPolicy OBJECT-TYPE
+     	SYNTAX     DisplayString (SIZE (0..127))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+ 	"802.1x authentication  	-> X
+ 	 Group Mobility			-> G
+ 	 VLAN ID			-> <vlan id>
+ 	 Default VLAN			-> D
+ 	 Block				-> B
+	 Fail				-> ,
+	 Captive Portal			-> C
+         Mac-authentication             -> F
+         UNP                            -> '<String>'
+
+ 	 Default value: XGD,B.  If the string size is zero (0), the default value is used."
+    ::= { alaDot1xAuthPolicyEntry 3 }
+
+alaDot1xPollingCnt OBJECT-TYPE
+	SYNTAX      Integer32 (0..99)
+	MAX-ACCESS  read-write
+	STATUS      current
+        DESCRIPTION
+        	"Number of retries to poll the end station for EAPoL frame before
+        	classifying the end station with group mobility or guest vlan ID configured.
+                If the value is set to zero (0), it indicates a special case where the port will
+                ignore any EAP frame from the client and this will force all devices to the
+                non-supplicant policy for classification."
+    ::= { alaDot1xAuthPolicyEntry 4 }
+
+alaDot1xCaptivePortalPolicy OBJECT-TYPE
+     	SYNTAX     DisplayString (SIZE (0..127))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+ 	"Web authentication 		-> W
+ 	 Group Mobility			-> G
+ 	 VLAN ID			-> <vlan id>
+ 	 Default VLAN			-> D
+ 	 Block				-> B
+	 Fail				-> ,
+
+ 	 Default value: XGD,B, if string size is zero, the default value is used."
+    ::= { alaDot1xAuthPolicyEntry 5 }
+
+alaDot1xCPortalSessionLimit OBJECT-TYPE
+	SYNTAX      Integer32 (0..999)
+	MAX-ACCESS  read-write
+	STATUS      current
+        DESCRIPTION
+        	"Captive Portal Session limit is the interval that a Captive Portal user can login.
+                 User is to be logged off after the session limit. If the session limit is set to
+                 zero (0), it means the session is unlimited, user will not be automatically logged off."
+    ::= { alaDot1xAuthPolicyEntry 6 }
+
+alaDot1xCPortalRetryCnt OBJECT-TYPE
+	SYNTAX      Integer32 (0..999)
+	MAX-ACCESS  read-write
+	STATUS      current
+        DESCRIPTION
+        	"Number of retries for the Captive Portal user to provide the user
+                 credential before the software will classify the user to the failed
+                 policy according the the alaDot1xCaptivePortalPolicy."
+    ::= { alaDot1xAuthPolicyEntry 7 }
+
+alaDot1xSupplicantBypass OBJECT-TYPE
+        SYNTAX    INTEGER {
+		  enable (1),
+		  disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "Supplicant Bypass configuration Status."
+        DEFVAL { disable }
+    ::= { alaDot1xAuthPolicyEntry 8 }
+
+alaDot1xSBAllowEAP OBJECT-TYPE
+        SYNTAX INTEGER {
+                 pass   (1),
+                 fail   (2),
+                 noauth (3),
+                 none   (4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "Supplicant Bypass Allow EAP configuration."
+        DEFVAL { none }
+    ::= { alaDot1xAuthPolicyEntry 9 }
+
+alaDot1xCPortalInactivityLogout OBJECT-TYPE
+        SYNTAX  INTEGER {
+        	enable (1),
+       		disable (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "Captive portal inactivity logout entry."
+        DEFVAL { disable }
+    ::= { alaDot1xAuthPolicyEntry 10 }
+
+alaDot1xNonSuppSessTimeoutStatus OBJECT-TYPE         	 
+      SYNTAX INTEGER {         	 
+                  enable(1),         	 
+                  disable(2)         	 
+                  }         	 
+      MAX-ACCESS read-write         	 
+      STATUS current         	 
+      DESCRIPTION         	 
+          "Session Timeout Status for MAC users."	 
+      DEFVAL { disable }         	 
+     ::= { alaDot1xAuthPolicyEntry 11 }         	 
+          	 
+alaDot1xNonSuppSessTimeoutIntrvl OBJECT-TYPE         	 
+      SYNTAX Integer32         	 
+      MAX-ACCESS read-write         	 
+      STATUS current         	 
+      DESCRIPTION         	 
+          "Session Timeout Status Interval for MAC users." 	 
+      DEFVAL { 43200 }         	 
+     ::= { alaDot1xAuthPolicyEntry 12 }          	 
+          	 
+alaDot1xNonSuppSessTimeoutTrustRadStatus OBJECT-TYPE         	 
+      SYNTAX INTEGER {         	 
+                  enable(1),         	 
+                  disable(2)         	 
+                  }         	 
+      MAX-ACCESS read-write         	 
+      STATUS current         	 
+      DESCRIPTION         	 
+          "Session Timeout Radius Status for Mac based authenticated users." 	 
+      DEFVAL { disable }         	 
+     ::= { alaDot1xAuthPolicyEntry 13 }	 
+	 
+alaDot1xSuppTrustRadiusEnabled OBJECT-TYPE         	 
+ SYNTAX  INTEGER {         	 
+         enable (1),         	 
+         disable (2)         	 
+ }         	 
+ MAX-ACCESS  read-write         	 
+ STATUS      current         	 
+ DESCRIPTION         	 
+ "Enable/disable control to take the session timeout from the server"         	 
+ DEFVAL { disable }         	 
+ ::= { alaDot1xAuthPolicyEntry 14 }
+
+alaDot1xNonSupInactivityLogout OBJECT-TYPE
+SYNTAX INTEGER {
+enable(1),
+disable(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Mac Aging Timeout for non suplicant"
+DEFVAL { enable }
+::= { alaDot1xAuthPolicyEntry 15 }
+
+alaDot1xPerPortAPModeStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		enable(1),
+		disable(2)
+		}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+	    "This object is to enable or disable AP-mode on per port basis."
+	::= { alaDot1xAuthPolicyEntry 16 }
+
+alaDot1xPerPortForceL3Learning  OBJECT-TYPE
+        SYNTAX     INTEGER {
+                    enable (1),
+                    disable (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+              "UNP force L3 learning status."
+        ::= { alaDot1xAuthPolicyEntry 17 }
+
+alaDot1xPerPortForceL3LearningPortBounce OBJECT-TYPE
+        SYNTAX     INTEGER {
+                    enable (1),
+                    disable (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+              "Port-Bounce associated with UNP force L3 learning status."
+        ::= { alaDot1xAuthPolicyEntry 18 }
+
+alaDot1xCportalConfig    OBJECT IDENTIFIER ::= { alaIND1Dot1XMIBObjects 7 }
+
+alaDot1xCPortalIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "The factory default Captive Portal IP address is 10.123.0.1.
+                 If the 10.123.0.0 subnet is already in use, user can change
+                 the Captive Portal IP address to another 10.x.0.0 subnet.
+                 Only the second octet of the Captive Portal IP address can
+                 be changed."
+        ::= { alaDot1xCportalConfig 1 }
+
+alaDot1xCPortalProxyURL  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..64))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                 "The factory default for Captive Portal working with proxy
+                  server url has the key word proxy.  If the user's proxy
+                  server url does not have the key work proxy, user can use
+                  this object to specify the proxy server url.  If none is specified
+                  this object will return the default value - proxy."
+       ::= { alaDot1xCportalConfig 2 }
+
+alaDot1xCPortalPostAuthSuccessRedirectURL  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                 "Captive Portal's Redirect URL upon successful authentication."
+       ::= { alaDot1xCportalConfig 3 }
+
+alaDot1xCPortalPostAuthFailRedirectURL  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                 "Captive Portal's Redirect URL upon failed authentication."
+       ::= { alaDot1xCportalConfig 4 }
+
+alaDot1xCPortalDNSKeyword1  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                 "Captive Portal's DNS keyword string."
+       ::= { alaDot1xCportalConfig 5 }
+
+alaDot1xCPortalDNSKeyword2  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                 "Captive Portal's DNS keyword string."
+       ::= { alaDot1xCportalConfig 6 }
+
+alaDot1xCPortalDNSKeyword3  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                 "Captive Portal's DNS keyword string."
+       ::= { alaDot1xCportalConfig 7 }
+
+alaDot1xCPortalDNSKeyword4  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                 "Captive Portal's DNS keyword string."
+       ::= { alaDot1xCportalConfig 8 }
+
+alaDot1xCPortalProxyPort  OBJECT-TYPE
+        SYNTAX  Integer32  (1..65535 )
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+    	             "Captive Portal's user defined proxy port number."
+    		   ::= { alaDot1xCportalConfig 9 }
+
+alaDot1xCPortalRedirectString  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                     "Captive Portal redirect url key string."
+                   ::= { alaDot1xCportalConfig 10 }
+
+
+
+----------------------------------------------------------
+---------- Device Status Table ----------------------------
+----------------------------------------------------------
+alaDot1xDeviceStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlaDot1xDeviceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of system level information for each port
+        supported by the Port Access Entity.  An entry appears
+        in this table for each port of this system."
+    ::= { alaIND1Dot1XMIBObjects 8 }
+
+alaDot1xDeviceStatusEntry OBJECT-TYPE
+    SYNTAX      AlaDot1xDeviceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One entry of the Device Status Table.   "
+    INDEX { alaDot1xDeviceStatusMacQueryType,
+            alaDot1xDeviceStatusSlotNumber,
+            alaDot1xDeviceStatusPortNumber,
+            alaDot1xDeviceStatusMACAddress,
+            alaDot1xDeviceStatusDeviceType }
+    ::= { alaDot1xDeviceStatusTable 1 }
+
+
+AlaDot1xDeviceStatusEntry ::=
+    SEQUENCE {
+        alaDot1xDeviceStatusMacQueryType
+            ALADot1xMacQueryType,
+        alaDot1xDeviceStatusSlotNumber
+            INTEGER,
+        alaDot1xDeviceStatusPortNumber
+            INTEGER,
+        alaDot1xDeviceStatusMACAddress
+            MacAddress,
+        alaDot1xDeviceStatusDeviceType
+            ALADot1xDeviceType,
+        alaDot1xDeviceStatusVlan
+            INTEGER,
+        alaDot1xDeviceStatusIPAddress
+            IpAddress,
+        alaDot1xDeviceStatusUserName
+            SnmpAdminString,
+        alaDot1xDeviceStatusProfileUsed
+            SnmpAdminString,
+        alaDot1xDeviceStatusAuthType
+            ALADot1xAuthenticationType,
+        alaDot1xDeviceStatusPolicyUsed
+            ALADot1xClassificationPolicyType,
+        alaDot1xDeviceStatusAuthResult
+            ALADot1xAuthenticationResult,
+        alaDot1xDeviceStatusMacLearntState
+            ALADot1xMacLearntState,
+        alaDot1xDeviceStatusTimeLearned
+            TimeStamp,
+        alaDot1xDeviceStatusCaptivePortalUsed
+            TruthValue,
+	 alaDot1xDeviceStatusHicResult
+	    Integer32
+        }
+
+alaDot1xDeviceStatusMacQueryType OBJECT-TYPE
+    SYNTAX      ALADot1xMacQueryType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of MAC address to query."
+    ::= { alaDot1xDeviceStatusEntry 1 }
+
+alaDot1xDeviceStatusSlotNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The slot that the device reporting the status resides."
+    ::= { alaDot1xDeviceStatusEntry 2 }
+
+alaDot1xDeviceStatusPortNumber OBJECT-TYPE
+    SYNTAX      INTEGER (1..48)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The user port that the device reporting the status resides."
+    ::= { alaDot1xDeviceStatusEntry 3 }
+
+alaDot1xDeviceStatusMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address of the device reporting the status."
+    ::= { alaDot1xDeviceStatusEntry 4 }
+
+alaDot1xDeviceStatusDeviceType OBJECT-TYPE
+    SYNTAX      ALADot1xDeviceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of device.  Either supplicant or non-supplicant."
+    ::= { alaDot1xDeviceStatusEntry 5 }
+
+alaDot1xDeviceStatusVlan OBJECT-TYPE
+    SYNTAX      INTEGER (1..4096)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vlan that the device reporting the status is authorized to access."
+    ::= { alaDot1xDeviceStatusEntry 6 }
+
+alaDot1xDeviceStatusIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the device reporting the status."
+    ::= { alaDot1xDeviceStatusEntry 7 }
+
+alaDot1xDeviceStatusUserName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The user name of the device reporting the status."
+    ::= { alaDot1xDeviceStatusEntry 8 }
+
+alaDot1xDeviceStatusProfileUsed OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the User Network Profile entry used when the
+         device reporting the status is classified."
+    ::= { alaDot1xDeviceStatusEntry 9 }
+
+alaDot1xDeviceStatusAuthType  OBJECT-TYPE
+    SYNTAX      ALADot1xAuthenticationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of authentication used by the device reporting
+         the status to obtain network access."
+    ::= { alaDot1xDeviceStatusEntry 10 }
+
+alaDot1xDeviceStatusPolicyUsed  OBJECT-TYPE
+    SYNTAX      ALADot1xClassificationPolicyType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Classification Policy under which the device is learned."
+    ::= { alaDot1xDeviceStatusEntry 11 }
+
+alaDot1xDeviceStatusAuthResult OBJECT-TYPE
+    SYNTAX      ALADot1xAuthenticationResult
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    	"The State of the port."
+    ::= { alaDot1xDeviceStatusEntry 12 }
+
+alaDot1xDeviceStatusMacLearntState OBJECT-TYPE
+    SYNTAX      ALADot1xMacLearntState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    	"The State of the MAC classified in the switch."
+    ::= { alaDot1xDeviceStatusEntry 13 }
+
+alaDot1xDeviceStatusTimeLearned  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time that the MAC address is learned in the system."
+    ::= { alaDot1xDeviceStatusEntry 14 }
+
+alaDot1xDeviceStatusCaptivePortalUsed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object indicates if the device is classified in the system using
+         Captive Portal. A value of True means that the device has used Captive Portal
+         to authenticate its credential and a value of False means that the device
+         has not used Captive Portal to authenticate its credential."
+    ::= { alaDot1xDeviceStatusEntry 15 }
+
+alaDot1xDeviceStatusHicResult OBJECT-TYPE
+    SYNTAX      Integer32( 0 .. 9 )
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Hic result of the device reporting the status is authorized to access. Default value is 0, indicates HIC process has not started"
+    DEFVAL { 0 }
+
+    ::= { alaDot1xDeviceStatusEntry 16 }
+
+
+alaDot1xAdminLogoutParams    OBJECT IDENTIFIER ::= { alaIND1Dot1XMIBObjects 9 }
+
+--
+--    ala Dot1x Admin Logout Parameters group
+--
+
+   alaDot1xAdminLogoutType OBJECT-TYPE
+       SYNTAX   INTEGER {
+                  noOperation        (0),
+                  macAddress         (1),
+                  username           (2),
+                  networkProfileName (3),
+                  interfaceId        (4)
+                }
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+           "When this variable is set, the switch is to logout the user based on the
+            logout type.  The associated MIB object should be correctly set
+            based on the logout type.  If the corresponding MIB object that contain the
+            criteria is not set correctly the switch will not be able to perform the
+            logout operation.  After the logout operation is done, the switch will set
+            the corresponding criteria to back to its default value.  Also when the
+            logout operation is done, the switch is to set this variable back to zero (0)."
+       ::= { alaDot1xAdminLogoutParams    1}
+
+   alaDot1xAdminLogoutMacAddress OBJECT-TYPE
+       SYNTAX        MacAddress
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+           "This value is used only if alaDot1xAdminLogoutType is set to MAC address.
+            The default value is set to ff:ff:ff:ff:ff:ff.  This well know broadcast MAC
+            address will not be learned by the switch.  The switch will reset this to the
+            default value after the logout operation is performed"
+       ::= { alaDot1xAdminLogoutParams    2}
+
+   alaDot1xAdminLogoutUserName OBJECT-TYPE
+       SYNTAX        SnmpAdminString (SIZE(0..32))
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+           "This value is used only if alaDot1xAdminLogoutType is set to username.
+            The default is a NULL string.  The switch will reset this to the default value
+            after the logout operation is performed.  User is not allowed to set the value
+            to NULL."
+       ::= { alaDot1xAdminLogoutParams    3}
+
+   alaDot1xAdminLogoutNetworkProfileName OBJECT-TYPE
+       SYNTAX        SnmpAdminString (SIZE(0..32))
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+           "This value is used only if alaDot1xAdminLogoutType is set to networkprofilename.
+            The default is a NULL string.  The switch will reset this to the default value
+            after the logout operation is performed.  User is not allowed to set the value
+            to NULL."
+       ::= { alaDot1xAdminLogoutParams    4}
+
+   alaDot1xAdminLogoutInterfaceId OBJECT-TYPE
+       SYNTAX        InterfaceIndexOrZero
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+           "This value is used only if alaDot1xAdminLogoutType is set to interfaceId.
+            The default value is zero (0).  The switch will reset this to the default value
+            after the logout operation is performed."
+       ::= { alaDot1xAdminLogoutParams    5}
+
+alaDot1xAuthServerTimeout    OBJECT IDENTIFIER ::= { alaIND1Dot1XMIBObjects 10 }
+
+alaDot1xAuthSvrTimeoutPolicy OBJECT-TYPE
+     	SYNTAX     DisplayString (SIZE (0..127))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+ 	 "Block				-> B
+	  User Network Profile 		-> 'user network profile name'
+
+ 	  Default value is B."
+    ::= { alaDot1xAuthServerTimeout 1 }
+
+alaDot1xAuthSvrTimeoutReAuthPeriod OBJECT-TYPE
+        SYNTAX      Integer32 (30..43200)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "This is the time interval in second that the supplicant is to be
+                 classified according to the Auth Server Down Policy
+                 (alaDot1xAuthServerTimeoutPolicy).  When this time is expired,
+                 the supplicant will be prompted to re-authenticate and see if
+                 the Auth Server is back up.  The default value is 30 seconds."
+    ::= { alaDot1xAuthServerTimeout 2 }
+
+alaDot1xAuthSvrTimeoutStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled (1),
+                disabled(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+              "This object is to enable or disable the use of alaDot1xAuthSvrTimeoutPolicy,
+               alaDot1xAuthSvrTimeoutVoicePolicy and alaDot1xAuthSvrTimeoutReAuthPeriod.  Default is disabled."
+        DEFVAL { disabled }
+    ::= { alaDot1xAuthServerTimeout 3 }
+
+alaDot1xAuthSvrTimeoutVoicePolicy OBJECT-TYPE
+
+        SYNTAX     DisplayString (SIZE (0..127))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+         "None                          -> None
+          User Network Profile          -> 'user network profile name'
+          Default value is None."
+    ::= { alaDot1xAuthServerTimeout 4 }
+
+alaDot1xAuthSvrPollingStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled (1),
+                disabled(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+              "This is object is to enable or disable the radius server polling feature. Default is disabled."
+        DEFVAL { disabled }
+    ::= { alaDot1xAuthServerTimeout 5 }
+
+alaDot1xAuthSvrDownMacPersistency OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled (1),
+                disabled(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+              "This is the object to enable or disable the functionality to stop flushing SL context of the mac when
+               an Eap Start is received when the auth server down is enabled  and  the server is still unreachable and if 
+               the client again claassifies in the same vlan and classification policy.In the normal case,server becomes reachable ,
+               delete the entire context and add.Default is disabled." 
+        DEFVAL { disabled }
+    ::= { alaDot1xAuthServerTimeout 6 } 
+
+ alaDot1xDelayLearningPeriod OBJECT-TYPE
+         SYNTAX      Integer32 
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                 "This is the time interval in seconds that is sent to all NIs
+                  for delaying authentication process after reboot.
+                  The default value is 120 seconds."
+     ::= { alaDot1xAuthServerTimeout 7 }
+
+ alaDot1xAPModeStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enabled (1),
+		disabled(2)
+		}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	    "This object is to enable or disable AP-mode globally in switch. Default is Enabled"
+	DEFVAL { enabled }
+	::= { alaDot1xAuthServerTimeout 8 }
+
+ alaDot1xEAPVersionStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled (1),
+                disabled(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is to enable or disable eap-version3 globally in switch. Default is Disabled"
+        DEFVAL { disabled }
+        ::= { alaDot1xAuthServerTimeout 9 }
+
+ alaDot1xForceL3Learning  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable (1),
+                disable (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+              "UNP force L3 learning status."
+        ::= { alaDot1xAuthServerTimeout 10 }
+
+ alaDot1xForceL3LearningPortBounce OBJECT-TYPE
+        SYNTAX  INTEGER {    
+                enable (1),
+                disable (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+              "Port-Bounce associated with UNP force L3 learning status."
+        ::= { alaDot1xAuthServerTimeout 11 }
+
+ ----------------------------------------------------------
+ ---------- Passthrough Mode Status Table -----------------
+ ----------------------------------------------------------
+
+ AlaPassThroughStatus ::= TEXTUAL-CONVENTION
+        STATUS     current
+        DESCRIPTION
+             " Admin status"
+        SYNTAX  INTEGER { enabled(1),
+                          disabled(2)
+                         }
+
+ alaPassthroughConfig    OBJECT IDENTIFIER ::= { alaIND1Dot1XMIBObjects 11 }
+
+ alaDot1xPassthroughStatus  OBJECT-TYPE
+         SYNTAX       AlaPassThroughStatus
+         MAX-ACCESS  read-write
+         STATUS     current
+         DESCRIPTION
+                  "Passthrough of 802.1x packets.
+                   Force the 802.1x packet to flood in the VLAN."
+        ::= { alaPassthroughConfig 1 }
+
+ alaAvlanPassthroughStatus  OBJECT-TYPE
+         SYNTAX      AlaPassThroughStatus
+         MAX-ACCESS  read-write
+         STATUS     current
+         DESCRIPTION
+                  "Passthrough of AVLAN packets.
+                   Force the AVLAN packet to flood in the VLAN."
+        ::= { alaPassthroughConfig 2 }
+
+alaCportalPassthroughStatus  OBJECT-TYPE
+        SYNTAX      AlaPassThroughStatus
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                 "Passthrough of CAPITIVE packets.
+                  Force the AVLAN packet to flood in the VLAN."
+       ::= { alaPassthroughConfig 3 }
+ 
+----------------------------------------------------------
+----------Kerberos Port table --------------------------------
+----------------------------------------------------------
+ 
+alaKerberosPortTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF AlaKerberosPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table of 802.1x ports which are configured as
+        Kerberos enabled/disabled ports."
+    ::= { alaIND1Dot1XMIBObjects 12 }
+ 
+alaKerberosPortEntry OBJECT-TYPE
+    SYNTAX        AlaKerberosPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "Kerberos Port Information."
+    INDEX {alaKerberosPortIfIndex}
+    ::= { alaKerberosPortTable 1 }
+AlaKerberosPortEntry ::=
+    SEQUENCE {
+        alaKerberosPortIfIndex
+            InterfaceIndex,
+        alaKerberosPortStatus
+            INTEGER
+        }
+ 
+ 
+alaKerberosPortIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index of the port on which Kerberos is configured."
+    ::= { alaKerberosPortEntry 1 }
+ 
+ 
+alaKerberosPortStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                enable (1),
+                disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Kerberos status on Port."
+    DEFVAL { disable }
+    ::= { alaKerberosPortEntry 2 }
+
+ --    Current Rate Limit Table On Dot1x Port MIB
+ 
+     alaDot1xCrlUnpTable OBJECT-TYPE
+         SYNTAX        SEQUENCE OF AlaDot1xCrlUnpEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "Current Rate Limit Table On 8021x Port"
+         ::= { alaIND1Dot1XMIBObjects 13 }
+ 
+  alaDot1xCrlUnpEntry OBJECT-TYPE
+        SYNTAX        AlaDot1xCrlUnpEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Current Rate Limit Table entry on a 8021X port."
+        INDEX {alaDot1xCrlIfIndex }
+        ::= { alaDot1xCrlUnpTable 1 }
+
+  AlaDot1xCrlUnpEntry ::= SEQUENCE
+        {
+            alaDot1xCrlIfIndex 	         InterfaceIndex,
+            alaDot1xCrlIngBw              Integer32,
+            alaDot1xCrlEgrBw              Integer32,
+            alaDot1xCrlIngTypeFlag        INTEGER,
+            alaDot1xCrlEgrTypeFlag        INTEGER,
+            alaDot1xCrlDefDepth           Integer32,
+            alaDot1xCrlIngProfile         SnmpAdminString,
+            alaDot1xCrlEgrProfile         SnmpAdminString
+        }
+
+  alaDot1xCrlIfIndex OBJECT-TYPE
+  SYNTAX      InterfaceIndex 
+  MAX-ACCESS  not-accessible 
+  STATUS      current
+  DESCRIPTION
+       "The ifIndex of the port."
+      ::= { alaDot1xCrlUnpEntry 1 }
+
+  alaDot1xCrlIngBw  OBJECT-TYPE
+          SYNTAX      Integer32 (-1 .. 10485760)
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                   "Current Ingress BW active on 8021x Port in Kbps.
+                    Default value is -1 which means no Ingress Bandwidth exist on port."
+         DEFVAL        { -1 }
+         ::= { alaDot1xCrlUnpEntry 2 }
+
+  alaDot1xCrlEgrBw  OBJECT-TYPE
+          SYNTAX      Integer32 (-1 .. 10485760)
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                   "Current Egress BW active on 8021x Port in Kbps.
+                    Default value is -1 which means no Egress Bandwidth exist on port."
+         DEFVAL        { -1 }
+         ::= { alaDot1xCrlUnpEntry 3 }
+
+  alaDot1xCrlIngTypeFlag  OBJECT-TYPE
+          SYNTAX      INTEGER
+                {
+                        notapplicable(0),
+                        unp(1),
+                        qos(2)
+                }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                   "Application responsible for setting Ingress BW on port.
+                    Default is - which means no application has set BW on port."
+         DEFVAL        { 0 }
+         ::= { alaDot1xCrlUnpEntry 4 }
+
+  alaDot1xCrlEgrTypeFlag  OBJECT-TYPE
+          SYNTAX      INTEGER
+                {
+                        notapplicable(0),
+                        unp(1),
+                        qos(2)
+                }
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                   "Application responsible for setting Egress BW on port.
+                    Default is - which means no application has set BW on port."
+		    DEFVAL        { 0 }
+         ::= { alaDot1xCrlUnpEntry 5 }
+
+  alaDot1xCrlDefDepth  OBJECT-TYPE
+          SYNTAX      Integer32 (-1 .. 131072)
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                   "Latest Default Depth applied on port.
+                    Default depth is -1 which means no depth is configured. BW is programmed with default optimal depth."
+         DEFVAL        { -1 }
+         ::= { alaDot1xCrlUnpEntry 6 }
+
+  alaDot1xCrlIngProfile  OBJECT-TYPE
+          SYNTAX      SnmpAdminString ( SIZE( 1 .. 32 ) )
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                   "The name of the UNP Profile Name responsible for setting current Ingress
+                   Bandwidth limitation on port. Applicable only if current bandwidth set is
+                   due to UNP classification on port."
+         ::= { alaDot1xCrlUnpEntry 7 }
+
+  alaDot1xCrlEgrProfile  OBJECT-TYPE
+          SYNTAX      SnmpAdminString ( SIZE( 1 .. 32 ) )
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+                   "The name of the UNP Profile Name responsible for setting current Egress
+                   Bandwidth limitation on port. Applicable only if current bandwidth set is
+                   due to UNP classification on port"
+         ::= { alaDot1xCrlUnpEntry 8 }
+
+--  BYOD Host and UNP Status
+ alaRedirectByodHostTable  OBJECT-TYPE
+ SYNTAX                 SEQUENCE OF AlaRedirectByodHostEntry
+ MAX-ACCESS             not-accessible
+ STATUS                 current
+ DESCRIPTION
+   "This table shows list of BYOD Hosts and their progress status."
+ ::= { alaIND1Dot1XMIBObjects 14 }
+
+ alaRedirectByodHostEntry  OBJECT-TYPE
+ SYNTAX                 AlaRedirectByodHostEntry
+ MAX-ACCESS             not-accessible
+ STATUS                 current
+ DESCRIPTION
+  "BYOD Hosts status information."
+ INDEX { alaByodHostStateQueryType,
+         alaByodHostStateSlotNumber,
+         alaByodHostStatePortNumber,
+         alaByodHostStateMacAddress,
+         alaByodHostStateDeviceType }
+ ::= { alaRedirectByodHostTable 1 }
+
+ AlaRedirectByodHostEntry ::= SEQUENCE
+ {
+   alaByodHostStateQueryType ALADot1xMacQueryType,
+   alaByodHostStateSlotNumber Integer32,
+   alaByodHostStatePortNumber Integer32,
+   alaByodHostStateMacAddress MacAddress,
+   alaByodHostStateDeviceType ALADot1xDeviceType,
+   alaByodHostProgressStatus  SnmpAdminString
+ }
+
+ alaByodHostStateQueryType OBJECT-TYPE
+ SYNTAX                    ALADot1xMacQueryType
+ MAX-ACCESS                read-only
+ STATUS                    current
+ DESCRIPTION
+  "The type of the mac address whether supplicant or non-supplicant."
+ ::= { alaRedirectByodHostEntry 1 }
+
+ alaByodHostStateSlotNumber   OBJECT-TYPE
+ SYNTAX                       Integer32 (1..16)
+ MAX-ACCESS                   read-only
+ STATUS                       current
+ DESCRIPTION
+  "The slot Number."
+ ::= { alaRedirectByodHostEntry 2 }
+
+ alaByodHostStatePortNumber OBJECT-TYPE
+ SYNTAX                     Integer32 (1..48)
+ MAX-ACCESS                 read-only
+ STATUS                     current
+ DESCRIPTION
+  "The port number."
+ ::= { alaRedirectByodHostEntry 3 }
+
+ alaByodHostStateMacAddress OBJECT-TYPE
+ SYNTAX                     MacAddress
+ MAX-ACCESS                 read-only
+ STATUS                     current
+ DESCRIPTION
+   "The Client MAc Address which is Index."
+ ::= { alaRedirectByodHostEntry 4 }
+
+ alaByodHostStateDeviceType OBJECT-TYPE
+ SYNTAX                     ALADot1xDeviceType 
+ MAX-ACCESS                 read-only    
+ STATUS                     current 
+ DESCRIPTION
+  "To find the device either supplicant or non-supplicnat."
+ ::= { alaRedirectByodHostEntry 5 }
+
+ alaByodHostProgressStatus OBJECT-TYPE
+ SYNTAX                    SnmpAdminString ( SIZE( 0 .. 31 ) )
+ MAX-ACCESS                read-only
+ STATUS                    current 
+ DESCRIPTION
+  "The status of the BYOD Host."
+ ::= { alaRedirectByodHostEntry 6 }
+
+ alaRedirectByodHostUnpTable OBJECT-TYPE
+ SYNTAX            SEQUENCE OF AlaRedirectByodHostUnpEntry
+ MAX-ACCESS        not-accessible
+ STATUS            current
+ DESCRIPTION
+   "This table shows list of BYOD Hosts with restricted and new UNP status."
+ ::= { alaIND1Dot1XMIBObjects 15 }
+
+ alaRedirectByodHostUnpEntry  OBJECT-TYPE
+ SYNTAX                       AlaRedirectByodHostUnpEntry
+ MAX-ACCESS             not-accessible
+ STATUS                 current  
+ DESCRIPTION
+  "BYOD Client UNP information."
+ INDEX { alaByodClientMacQueryType,
+         alaByodClientSlotNumber,
+         alaByodClientPortNumber,  
+         alaByodClientMacAddress,
+         alaByodClientDeviceType }
+ ::= { alaRedirectByodHostUnpTable 1 }
+
+ AlaRedirectByodHostUnpEntry ::= SEQUENCE
+ {
+   alaByodClientMacQueryType ALADot1xMacQueryType,
+   alaByodClientSlotNumber  Integer32,
+   alaByodClientPortNumber  Integer32,
+   alaByodClientMacAddress  MacAddress,
+   alaByodClientDeviceType  ALADot1xDeviceType,
+   alaByodPreviousUNP       SnmpAdminString, 
+   alaByodNewUNP            SnmpAdminString,
+   alaByodCOAStatus         SnmpAdminString
+ }
+
+ alaByodClientMacQueryType  OBJECT-TYPE
+ SYNTAX                     ALADot1xMacQueryType
+ MAX-ACCESS                 read-only
+ STATUS                     current
+ DESCRIPTION
+  "The type of MAC address whether supplicant or non-supplicant."
+ ::= { alaRedirectByodHostUnpEntry 1 }
+
+ alaByodClientSlotNumber  OBJECT-TYPE
+ SYNTAX                   Integer32 (1..16)
+ MAX-ACCESS               read-only
+ STATUS                   current
+ DESCRIPTION
+   "The slot number."
+ ::= { alaRedirectByodHostUnpEntry 2 }
+    
+ alaByodClientPortNumber  OBJECT-TYPE
+ SYNTAX                   Integer32 (1..48)
+ MAX-ACCESS               read-only
+ STATUS                   current
+ DESCRIPTION
+   "The port  number."
+ ::= { alaRedirectByodHostUnpEntry 3 }
+ 
+alaByodClientMacAddress OBJECT-TYPE
+ SYNTAX                  MacAddress
+ MAX-ACCESS              read-only 
+ STATUS                  current
+ DESCRIPTION
+  "The Client MAc Address which is Index."
+ ::= { alaRedirectByodHostUnpEntry 4 }
+
+ alaByodClientDeviceType  OBJECT-TYPE
+ SYNTAX                   ALADot1xDeviceType
+ MAX-ACCESS               read-only
+ STATUS                   current
+ DESCRIPTION
+  "To find the device either supplicant or non-supplicnat."
+ ::= { alaRedirectByodHostUnpEntry 5 }
+
+ alaByodPreviousUNP       OBJECT-TYPE
+ SYNTAX                   SnmpAdminString ( SIZE( 0 .. 31 ) )
+ MAX-ACCESS               read-only
+ STATUS                   current
+ DESCRIPTION
+   "The UNP assigned to the clinet when BYOD is in progress."
+ ::= { alaRedirectByodHostUnpEntry 6 }
+
+ alaByodNewUNP            OBJECT-TYPE
+ SYNTAX                   SnmpAdminString ( SIZE( 0 .. 31 ) )
+ MAX-ACCESS               read-only
+ STATUS                   current
+ DESCRIPTION
+   "The redirect UNP assigned to client once bYOD complete."
+ ::= { alaRedirectByodHostUnpEntry 7 }
+
+ alaByodCOAStatus       OBJECT-TYPE
+ SYNTAX                 SnmpAdminString ( SIZE( 0 .. 31 ) )
+ MAX-ACCESS             read-only
+ STATUS                 current
+ DESCRIPTION
+  "BYOD status of each BYOD Host."
+ ::= { alaRedirectByodHostUnpEntry 8 }
+ 
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- COMPLIANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    alaIND1Dot1XMIBCompliances MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for Alcatel 802.1x."
+        MODULE
+            MANDATORY-GROUPS
+            {
+                --alaINDDot1XPortGroup,
+                alaDot1xPortLookupGroup,
+                alaINDDot1XPolicyGroup,
+                alaINDDot1XDeviceStatusGroup,
+                alaDot1xAuthSvrTimeoutGroup,
+				alaPassthroughConfigGroup ,
+				alaDot1xAdminLogoutParamsGroup,
+				alaDot1xNonSupplicantEntryGroup,
+				alaDot1xCportalConfigGroup,
+				alaDot1xMacEntryGroup,
+                alaKerberosPortGroup,
+                alaDot1xCrlUnpStatusGroup,
+				alaINDDot1XRedirectByodHostGroup,
+				alaINDDot1XRedirectByodHostUnpGroup
+            }
+
+        ::= { alaIND1Dot1XMIBConformance 2 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- UNITS OF CONFORMANCE
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+    --alaINDDot1XPortGroup OBJECT-GROUP
+    --    OBJECTS
+    --    {
+    --        alaDot1xPortSlotNumber,
+    --        alaDot1xPortPortNumber,
+    --        alaDot1xPortMACAddress,
+    --        alaDot1xPortVlan,
+    --        alaDot1xPortProtocol,
+    --        alaDot1xPortUserName,
+    --        alaDot1xPortState,
+    --        alaDot1xSupplicantPolicyUsed,
+    -- 	      alaDot1xAuthFailReason,
+    -- 	      alaDot1xReAuthCount,
+    -- 	      alaDot1xLastSuccessTime
+    --    }
+    --    STATUS  current
+    --    DESCRIPTION
+    --        "Collection of 802.1x objects for port status."
+    --    ::= { alaIND1Dot1XMIBGroups 1 }
+
+
+    alaDot1xPortLookupGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDot1xPortLookupSlotNumber,
+            alaDot1xPortLookupPortNumber,
+            alaDot1xPortLookupMACAddress,
+            alaDot1xPortLookupInterfaceNumber
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of 802.1x objects for port lookup."
+        ::= { alaIND1Dot1XMIBGroups 2 }
+
+    alaINDDot1XPolicyGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDot1xNonSuppPolicy,
+	    alaDot1xSuppPolicy,
+            alaDot1xPollingCnt,
+	    alaDot1xCaptivePortalPolicy,
+            alaDot1xCPortalSessionLimit,
+            alaDot1xCPortalRetryCnt,
+            alaDot1xSupplicantBypass,
+            alaDot1xSBAllowEAP,
+            alaDot1xCPortalInactivityLogout
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of 802.1x objects for supplicant and non-supplicant policies."
+        ::= { alaIND1Dot1XMIBGroups 3 }
+
+
+    alaINDDot1XDeviceStatusGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDot1xDeviceStatusVlan,
+            alaDot1xDeviceStatusIPAddress,
+            alaDot1xDeviceStatusUserName,
+            alaDot1xDeviceStatusProfileUsed,
+            alaDot1xDeviceStatusAuthType,
+            alaDot1xDeviceStatusPolicyUsed,
+            alaDot1xDeviceStatusAuthResult,
+            alaDot1xDeviceStatusMacLearntState,
+            alaDot1xDeviceStatusTimeLearned,
+            alaDot1xDeviceStatusCaptivePortalUsed,
+	    alaDot1xDeviceStatusHicResult
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of 802.1x objects for the status of the devices on an 802.1X enable port."
+        ::= { alaIND1Dot1XMIBGroups 4 }
+
+    alaDot1xAuthSvrTimeoutGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDot1xAuthSvrTimeoutPolicy,
+            alaDot1xAuthSvrTimeoutReAuthPeriod,
+            alaDot1xAuthSvrTimeoutStatus,
+            alaDot1xAuthSvrTimeoutVoicePolicy,
+            alaDot1xAuthSvrPollingStatus,
+            alaDot1xAuthSvrDownMacPersistency,
+ 	    alaDot1xDelayLearningPeriod,
+	    alaDot1xAPModeStatus,
+	    alaDot1xEAPVersionStatus,
+            alaDot1xForceL3Learning,
+            alaDot1xForceL3LearningPortBounce 
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of 802.1x objects for the Authentication Server Timeout."
+        ::= { alaIND1Dot1XMIBGroups 5 }
+
+    alaPassthroughConfigGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDot1xPassthroughStatus,
+            alaAvlanPassthroughStatus,
+            alaCportalPassthroughStatus
+        }
+        STATUS current
+        DESCRIPTION
+            " Status of passthrough for 802.1x and avlan configuration in devices."
+        ::= { alaIND1Dot1XMIBGroups 6 }
+
+	alaDot1xAdminLogoutParamsGroup OBJECT-GROUP
+        OBJECTS
+        {
+        	alaDot1xAdminLogoutType,
+            alaDot1xAdminLogoutMacAddress,
+            alaDot1xAdminLogoutUserName,
+            alaDot1xAdminLogoutNetworkProfileName,
+            alaDot1xAdminLogoutInterfaceId
+
+        }
+        STATUS current
+        DESCRIPTION
+            "Dot1x Admin Logout Parameters group."
+        ::= { alaIND1Dot1XMIBGroups 7 }
+
+        alaDot1xNonSupplicantEntryGroup OBJECT-GROUP
+        OBJECTS
+        {
+        	alaDot1xNonSupplicantIntfNum,
+        	alaDot1xNonSupplicantMACAddress,
+        	alaDot1xNonSupplicantVlanID,
+        	alaDot1xNonSupplicantPolicyUsed,
+        	alaDot1xAuthenticationStatus,
+        	alaDot1xNonSupplicantHicEnabledMAC
+        }
+        STATUS current
+        DESCRIPTION
+            "non 802.1x supplicants learned on 802.1x authenticated ports."
+        ::= { alaIND1Dot1XMIBGroups 8 }
+		
+		alaDot1xCportalConfigGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaDot1xCPortalIpAddress,
+                alaDot1xCPortalProxyURL,
+        	    alaDot1xCPortalPostAuthSuccessRedirectURL,
+        	    alaDot1xCPortalPostAuthFailRedirectURL,
+        	    alaDot1xCPortalDNSKeyword1,
+        	    alaDot1xCPortalDNSKeyword2,
+        	    alaDot1xCPortalDNSKeyword3,
+        	    alaDot1xCPortalDNSKeyword4,
+        	    alaDot1xCPortalProxyPort,
+        	    alaDot1xCPortalRedirectString
+        	
+        }
+        STATUS current
+        DESCRIPTION
+            "Captive portal Config Group."
+        ::= { alaIND1Dot1XMIBGroups 9 }
+
+        alaDot1xMacEntryGroup OBJECT-GROUP
+        OBJECTS
+        {
+        	alaDot1xMacIfIndex ,
+           alaDot1xHicEnabledMAC ,
+           alaDot1xMacSlotNumber,
+           alaDot1xMacPortNumber,
+           alaDot1xMacVlan,
+          alaDot1xMacProtocol,
+          alaDot1xMacUserName  ,
+          alaDot1xMacState ,
+          alaDot1xMacSupplicantPolicyUsed
+
+        }
+        STATUS current
+        DESCRIPTION
+            "Captive portal Config Group."
+        ::= { alaIND1Dot1XMIBGroups 10 }
+
+        alaKerberosPortGroup   OBJECT-GROUP
+        OBJECTS
+        {
+           alaKerberosPortStatus
+        }
+        STATUS current
+        DESCRIPTION
+            "Kerberos Snooping Config Group."
+        ::= { alaIND1Dot1XMIBGroups 11 }
+
+     alaDot1xCrlUnpStatusGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDot1xCrlIngBw,
+            alaDot1xCrlEgrBw,
+            alaDot1xCrlIngTypeFlag,
+            alaDot1xCrlEgrTypeFlag,
+            alaDot1xCrlDefDepth,
+            alaDot1xCrlIngProfile,
+            alaDot1xCrlEgrProfile
+        }
+        STATUS current
+        DESCRIPTION
+            " Status of Current Ingress and Egress BW rate limitation present on 8021x port."
+        ::= { alaIND1Dot1XMIBGroups 12 }
+    
+	alaINDDot1XRedirectByodHostGroup   OBJECT-GROUP
+      OBJECTS
+        {
+          alaByodHostProgressStatus
+        }
+      STATUS  current
+      DESCRIPTION
+        "Collection of BYOD clients and its status."
+      ::= { alaIND1Dot1XMIBGroups 13 }
+      
+      alaINDDot1XRedirectByodHostUnpGroup OBJECT-GROUP
+        OBJECTS
+        {
+          alaByodPreviousUNP,
+          alaByodNewUNP,
+          alaByodCOAStatus
+        }
+        STATUS  current
+        DESCRIPTION
+         "Collection of BYOD clients UNP and BYOD status."
+        ::= { alaIND1Dot1XMIBGroups 14 } 
+		
+        END
+

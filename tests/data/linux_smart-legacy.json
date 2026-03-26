@@ -47,20 +47,8 @@
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_Z304VCFY_exit",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
                     "metric": "disk_Z304VCFY_extended",
                     "value": 6,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
-                    "metric": "disk_Z304VCFY_health",
-                    "value": 0,
                     "value_prev": null,
                     "app_type": "smart"
                 },
@@ -149,12 +137,6 @@
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_Z304VCFY_id232",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
                     "metric": "disk_Z304VCFY_id233",
                     "value": 0,
                     "value_prev": null,
@@ -179,12 +161,6 @@
                     "app_type": "smart"
                 },
                 {
-                    "metric": "disk_Z304VCFY_max_temp",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "smart"
-                },
-                {
                     "metric": "disk_Z304VCFY_readfailure",
                     "value": 0,
                     "value_prev": null,
@@ -196,8 +172,6 @@
                     "value_prev": null,
                     "app_type": "smart"
                 },
-
-
                 {
                     "metric": "disk_Z304VCFY_short",
                     "value": 0,

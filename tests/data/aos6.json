@@ -18341,140 +18341,140 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
                     "vlan_name": "Server",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
                     "vlan_name": "Data",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 127,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 127",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 148,
                     "vlan_domain": 1,
                     "vlan_name": "Aulas_Gandia",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 203,
                     "vlan_domain": 1,
                     "vlan_name": "AULAS-ADE",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 248,
                     "vlan_domain": 1,
                     "vlan_name": "WAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 249,
                     "vlan_domain": 1,
                     "vlan_name": "VPN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 333,
                     "vlan_domain": 1,
                     "vlan_name": "PBX",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 360,
                     "vlan_domain": 1,
                     "vlan_name": "PBX-SIP_Provider",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 600,
                     "vlan_domain": 1,
                     "vlan_name": "FirewallDMZ",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 626,
                     "vlan_domain": 1,
                     "vlan_name": "APS_ADE7J",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 700,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Office",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 750,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Mobile",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 770,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Guest",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 998,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 998",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 999,
                     "vlan_domain": 1,
                     "vlan_name": "Gestion",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2400,
                     "vlan_domain": 1,
                     "vlan_name": "No_Internet",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2500,
                     "vlan_domain": 1,
                     "vlan_name": "Examen_Poliformat",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2600,
                     "vlan_domain": 1,
                     "vlan_name": "Examen",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -19901,6 +19901,7 @@
                     "entPhysicalContainedIn": 569,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ALCATEL",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -19920,6 +19921,7 @@
                     "entPhysicalContainedIn": 570,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ALCATEL",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -19939,6 +19941,7 @@
                     "entPhysicalContainedIn": 569,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ALCATEL",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -19958,6 +19961,7 @@
                     "entPhysicalContainedIn": 570,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ALCATEL",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -19977,6 +19981,7 @@
                     "entPhysicalContainedIn": 569,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -19996,6 +20001,7 @@
                     "entPhysicalContainedIn": 569,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20015,6 +20021,7 @@
                     "entPhysicalContainedIn": 570,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20034,6 +20041,7 @@
                     "entPhysicalContainedIn": 570,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20053,6 +20061,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ALCATEL",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20072,6 +20081,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "SFP-10G-T",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20091,6 +20101,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "SFP-10G-C3M",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20110,6 +20121,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20129,6 +20141,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20148,6 +20161,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 49,
                     "entPhysicalMfgName": "SFP-10G-LR",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20167,6 +20181,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 50,
                     "entPhysicalMfgName": "SFP-10G-LR",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20186,6 +20201,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ALCATEL",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20205,6 +20221,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "SFP-10G-T",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20224,6 +20241,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "SFP-10G-LR",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20243,6 +20261,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20262,6 +20281,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20281,6 +20301,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "ALCATEL",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20300,6 +20321,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "ALCATEL",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -20517,6 +20539,61 @@
                     "ifAlias": "Alcatel-Lucent Enterprise 2/26",
                     "ifDescr": "Alcatel-Lucent Enterprise 2/26",
                     "ifName": "2/26"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.150.134.113",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.150.134.0/25",
+                    "ifIndex": 13600003
+                },
+                {
+                    "ipv4_address": "10.150.134.243",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.150.134.128/25",
+                    "ifIndex": 13600002
+                },
+                {
+                    "ipv4_address": "10.169.96.243",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.96.128/25",
+                    "ifIndex": 13600001
+                },
+                {
+                    "ipv4_address": "10.169.96.54",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "10.169.96.0/26",
+                    "ifIndex": 13600002
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 13600010
+                },
+                {
+                    "ipv4_address": "172.31.34.238",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "172.31.32.0/21",
+                    "ifIndex": 13600001
+                },
+                {
+                    "ipv4_address": "172.31.64.11",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "172.31.64.0/22",
+                    "ifIndex": 13600001
                 }
             ]
         }

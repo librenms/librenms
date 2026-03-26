@@ -1,0 +1,157 @@
+INSYDE-IPMI-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Top-level infrastructure of the INSYDE CORP. enterprise MIB tree
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32 FROM SNMPv2-SMI
+    DisplayString FROM SNMPv2-TC
+;
+
+insyde MODULE-IDENTITY
+    LAST-UPDATED "201710031400Z"
+    ORGANIZATION "www.insyde.com"
+    CONTACT-INFO "email:contact.tw@insyde.com"
+    DESCRIPTION  "Top-level infrastructure of the INSYDE CORP. enterprise MIB tree"
+
+    REVISION     "201710031400Z"
+    DESCRIPTION  "Add web object"
+
+    REVISION     "200903201150Z"
+    DESCRIPTION  "First draft"
+    ::= { enterprises 45065 }
+
+--
+--  INSYDE CORP. enterprise-specific management objects
+--
+
+web    OBJECT IDENTIFIER ::= { insyde 1 }
+
+system    OBJECT IDENTIFIER ::= { web 1 }
+
+serverHealth    OBJECT IDENTIFIER ::= { web 2 }
+
+--
+--  MIB Module Object Types
+--
+systemInfo        OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "System Information"
+    ::= { system 1 }
+
+hostPwrStatus     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   Off(0),
+                   On(1),
+                   Reset(2)
+                }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Host Power"
+    ::= { systemInfo 1 }
+
+bmcFWBLDTime      OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "BMC Firmware Build Times"
+    ::= { systemInfo 2 }
+
+bmcFWversion      OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "BMC Firmware Version"
+    ::= { systemInfo 3 }
+
+bakBmcFWversion   OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Backup BMC Firmware Version"
+    ::= { systemInfo 4 }
+
+buildID           OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Build ID"
+    ::= { systemInfo 5 }
+
+baseboardSN       OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Baseboard Serial Number"
+    ::= { systemInfo 6 }
+
+sysLEDStatus     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   Off(0),
+                   On(1),
+                   Blink(2)
+                }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "Sys LED Status"
+    ::= { systemInfo 8 }
+
+sensorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of sensors.  The number of entries is
+            given by the value of ifNumber."
+    ::= { serverHealth 1 }
+
+sensorEntry     OBJECT-TYPE
+    SYNTAX      SensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular sensor."
+    INDEX   { sensorNumber }
+    ::= { sensorTable 1 }
+
+SensorEntry ::=
+    SEQUENCE {
+        sensorName                  DisplayString,
+        sensorNumber                Integer32,
+        sensorHumanReading          DisplayString
+    }
+
+sensorName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Sensor name"
+    ::= { sensorEntry 22 }
+
+sensorNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each interface.  It
+            is recommended that values are assigned contiguously
+            starting from 1.  The value for each interface sub-layer
+            must remain constant at least from one re-initialization of
+            the entity's network management system to the next re-
+            initialization."
+    ::= { sensorEntry 1 }
+
+sensorHumanReading OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Human readable sensor reading"
+    ::= { sensorEntry 13 }
+
+END

@@ -26,15 +26,15 @@
 
 namespace LibreNMS\Authentication;
 
+use App\Facades\LibrenmsConfig;
 use Carbon\Carbon;
-use LibreNMS\Config;
 use Session;
 
 trait LdapSessionCache
 {
     protected function authLdapSessionCacheGet($attr)
     {
-        $ttl = Config::get('auth_ldap_cache_ttl', 300);
+        $ttl = LibrenmsConfig::get('auth_ldap_cache_ttl', 300);
 
         // no session, don't cache
         if (! class_exists('Session')) {

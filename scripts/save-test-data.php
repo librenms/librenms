@@ -4,6 +4,7 @@
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
@@ -60,7 +61,7 @@ Examples:
     exit;
 }
 
-$os_name = false;
+$os_name = null;
 if (isset($options['o'])) {
     $os_name = $options['o'];
 } elseif (isset($options['os'])) {
@@ -95,7 +96,7 @@ if (isset($options['v'])) {
 $os_list = [];
 
 if (isset($os_name) && isset($variant)) {
-    $os_list = [$full_os_name => [$os_name, $variant]];
+    $os_list = [$full_os_name => [$os_name, $variant, ModuleList::fromUserOverrides($modules)->overrides]];
 } elseif (isset($os_name)) {
     $os_list = ModuleTestHelper::findOsWithData($modules, $os_name);
 } else {
@@ -134,8 +135,7 @@ echo "\n";
 
 try {
     $no_save = isset($options['n']) || isset($options['no-save']);
-    foreach ($os_list as $full_os_name => $parts) {
-        [$target_os, $target_variant] = $parts;
+    foreach ($os_list as [$target_os, $target_variant, $resolved_modules]) {
         echo "OS: $target_os\n";
         echo "Module: $modules_input\n";
         if ($target_variant) {
@@ -144,7 +144,7 @@ try {
         echo PHP_EOL;
 
         LibrenmsConfig::invalidateAndReload();
-        $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
+        $tester = new ModuleTestHelper(new ModuleList($resolved_modules), $target_os, $target_variant);
         if (! $no_save && ! empty($output_file)) {
             $tester->setJsonSavePath($output_file);
         }

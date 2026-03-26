@@ -26,10 +26,10 @@
 
 namespace App\Http\Controllers\Select;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 
 class GraphAggregateController extends Controller
 {
@@ -49,7 +49,7 @@ class GraphAggregateController extends Controller
             'core',
         ];
 
-        foreach ((array) Config::get('custom_descr', []) as $custom) {
+        foreach ((array) LibrenmsConfig::get('custom_descr', []) as $custom) {
             $custom = is_array($custom) ? $custom[0] : $custom;
             if ($custom) {
                 $types[] = $custom;
@@ -57,20 +57,16 @@ class GraphAggregateController extends Controller
         }
 
         // handle search
-        if ($search = strtolower($request->get('term'))) {
-            $types = array_filter($types, function ($type) use ($search) {
-                return ! Str::contains(strtolower($type), $search);
-            });
+        if ($search = strtolower((string) $request->input('term'))) {
+            $types = array_filter($types, fn ($type) => ! Str::contains(strtolower((string) $type), $search));
         }
 
         // format results
         return response()->json([
-            'results' => array_map(function ($type) {
-                return [
-                    'id' => $type,
-                    'text' => ucwords($type),
-                ];
-            }, $types),
+            'results' => array_map(fn ($type) => [
+                'id' => $type,
+                'text' => ucwords((string) $type),
+            ], $types),
             'pagination' => ['more' => false],
         ]);
     }

@@ -103,7 +103,7 @@
                             </button>
                         </div>
                     </div>
-                    <textarea readonly id="db-update" class="form-control" rows="20" placeholder="{{ __('install.migrate.wait') }}"></textarea>
+                    <textarea readonly id="db-update" class="form-control" rows="20" placeholder="{{ __('install.migrate.wait') }}" style="display: none;"></textarea>
                 </div>
             </div>
         </div>
@@ -140,6 +140,7 @@
 
         $('#migrate-btn').on("click", function () {
             $('#migrate-warning').show()
+            $('#db-update').show()
             $('#migrate-status>i').attr('class', 'fa-solid fa-lg fa-spinner fa-spin');
             $('#error-box').empty();
             $('#migrate-btn').prop('disabled', true).addClass('disabled')

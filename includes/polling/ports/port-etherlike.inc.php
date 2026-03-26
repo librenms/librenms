@@ -33,7 +33,7 @@ if ($this_port['dot3StatsIndex'] and $port['ifType'] == 'ethernetCsmacd') {
         $fields[$oid] = $data;
     }
 
-    $tags = compact('ifName', 'rrd_name', 'rrd_def', 'rrd_oldname');
+    $tags = ['ifName' => $ifName, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'rrd_oldname' => $rrd_oldname];
     app('Datastore')->put($device, 'dot3', $tags, $fields);
 
     echo 'EtherLike ';

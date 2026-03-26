@@ -11047,53 +11047,45 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN #1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 20,
                     "vlan_domain": 1,
                     "vlan_name": "data",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 21,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN #21",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 22,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN #22",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 100,
                     "vlan_domain": 1,
                     "vlan_name": "mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 103,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN #103",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
                 {
                     "vlan": 1,
                     "baseport": 13,
@@ -11400,14 +11392,6 @@
                 },
                 {
                     "vlan": 20,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 20,
                     "baseport": 1,
                     "priority": 0,
                     "state": "unknown",
@@ -11512,14 +11496,6 @@
                 },
                 {
                     "vlan": 21,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 21,
                     "baseport": 2,
                     "priority": 0,
                     "state": "unknown",
@@ -11537,14 +11513,6 @@
                 {
                     "vlan": 21,
                     "baseport": 50,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 22,
-                    "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -11576,14 +11544,6 @@
                 },
                 {
                     "vlan": 100,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 100,
                     "baseport": 49,
                     "priority": 0,
                     "state": "unknown",
@@ -11593,14 +11553,6 @@
                 {
                     "vlan": 100,
                     "baseport": 50,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 0
-                },
-                {
-                    "vlan": 103,
-                    "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -11653,6 +11605,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "12848-49-54,45:48:57.45,050",
                     "ifIndex": null
                 },
                 {
@@ -11672,6 +11625,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1
                 },
                 {
@@ -11691,6 +11645,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2
                 },
                 {
@@ -11710,6 +11665,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 3
                 },
                 {
@@ -11729,6 +11685,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 4
                 },
                 {
@@ -11748,6 +11705,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 5
                 },
                 {
@@ -11767,6 +11725,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 6
                 },
                 {
@@ -11786,6 +11745,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 7
                 },
                 {
@@ -11805,6 +11765,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 8
                 },
                 {
@@ -11824,6 +11785,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 9
                 },
                 {
@@ -11843,6 +11805,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 10
                 },
                 {
@@ -11862,6 +11825,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 11
                 },
                 {
@@ -11881,6 +11845,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 12
                 },
                 {
@@ -11900,6 +11865,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 13
                 },
                 {
@@ -11919,6 +11885,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 14
                 },
                 {
@@ -11938,6 +11905,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 15
                 },
                 {
@@ -11957,6 +11925,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 16
                 },
                 {
@@ -11976,6 +11945,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 17
                 },
                 {
@@ -11995,6 +11965,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 18
                 },
                 {
@@ -12014,6 +11985,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 19
                 },
                 {
@@ -12033,6 +12005,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 20
                 },
                 {
@@ -12052,6 +12025,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 21
                 },
                 {
@@ -12071,6 +12045,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 22
                 },
                 {
@@ -12090,6 +12065,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 23
                 },
                 {
@@ -12109,6 +12085,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 24
                 },
                 {
@@ -12128,6 +12105,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 25
                 },
                 {
@@ -12147,6 +12125,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 26
                 },
                 {
@@ -12166,6 +12145,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 27
                 },
                 {
@@ -12185,6 +12165,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 28
                 },
                 {
@@ -12204,6 +12185,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 29,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 29
                 },
                 {
@@ -12223,6 +12205,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 30,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 30
                 },
                 {
@@ -12242,6 +12225,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 31
                 },
                 {
@@ -12261,6 +12245,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 32,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 32
                 },
                 {
@@ -12280,6 +12265,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 33,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 33
                 },
                 {
@@ -12299,6 +12285,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 34,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 34
                 },
                 {
@@ -12318,6 +12305,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 35,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 35
                 },
                 {
@@ -12337,6 +12325,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 36,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 36
                 },
                 {
@@ -12356,6 +12345,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 37,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 37
                 },
                 {
@@ -12375,6 +12365,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 38,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 38
                 },
                 {
@@ -12394,6 +12385,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 39,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 39
                 },
                 {
@@ -12413,6 +12405,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 40,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 40
                 },
                 {
@@ -12432,6 +12425,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 41,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 41
                 },
                 {
@@ -12451,6 +12445,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 42,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 42
                 },
                 {
@@ -12470,6 +12465,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 43,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 43
                 },
                 {
@@ -12489,6 +12485,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 44,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 44
                 },
                 {
@@ -12508,6 +12505,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 45,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 45
                 },
                 {
@@ -12527,6 +12525,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 46,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 46
                 },
                 {
@@ -12546,6 +12545,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 47,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 47
                 },
                 {
@@ -12565,6 +12565,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 48,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 48
                 },
                 {
@@ -12584,6 +12585,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 101,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12603,6 +12605,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 102,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12622,6 +12625,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 197,
                     "entPhysicalMfgName": "Extreme Networks",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 }
             ]

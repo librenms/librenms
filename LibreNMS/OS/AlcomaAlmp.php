@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
@@ -49,9 +50,9 @@ class AlcomaAlmp extends OS implements
     {
         return [
             // ALCOMA-MIB::alMPTuneTX.0
-            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.12140.2.3.1.0', 'alcoma-tx', 1, 'TX Frequency', null, 1, 1),
+            new WirelessSensor(WirelessSensorType::Frequency, $this->getDeviceId(), '.1.3.6.1.4.1.12140.2.3.1.0', 'alcoma-tx', 1, 'TX Frequency', null, 1, 1),
             // ALCOMA-MIB::alMPTuneRX.0
-            new WirelessSensor('frequency', $this->getDeviceId(), '.1.3.6.1.4.1.12140.2.3.2.0', 'alcoma-rx', 1, 'RX Frequency', null, 1, 1),
+            new WirelessSensor(WirelessSensorType::Frequency, $this->getDeviceId(), '.1.3.6.1.4.1.12140.2.3.2.0', 'alcoma-rx', 1, 'RX Frequency', null, 1, 1),
         ];
     }
 
@@ -65,9 +66,9 @@ class AlcomaAlmp extends OS implements
     {
         return [
             // ALCOMA-MIB::alMPTX-PWR.0
-            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.12140.2.3.3.0', 'alcoma-pow-cur', 1, 'Tx Power Current'),
+            new WirelessSensor(WirelessSensorType::Power, $this->getDeviceId(), '.1.3.6.1.4.1.12140.2.3.3.0', 'alcoma-pow-cur', 1, 'Tx Power Current'),
             // ALCOMA-MIB::alMPPTX.0
-            new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.12140.2.3.13.0', 'alcoma-pow-conf', 1, 'Tx Power Configured'),
+            new WirelessSensor(WirelessSensorType::Power, $this->getDeviceId(), '.1.3.6.1.4.1.12140.2.3.13.0', 'alcoma-pow-conf', 1, 'Tx Power Configured'),
         ];
     }
 
@@ -82,7 +83,7 @@ class AlcomaAlmp extends OS implements
         $oid = '.1.3.6.1.4.1.12140.2.3.4.0'; // ALCOMA-MIB::alMPRX-Level.0
 
         return [
-            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'alcoma', 1, 'RSSI', null, 1, 1),
+            new WirelessSensor(WirelessSensorType::Rssi, $this->getDeviceId(), $oid, 'alcoma', 1, 'RSSI', null, 1, 1),
         ];
     }
 
@@ -97,7 +98,7 @@ class AlcomaAlmp extends OS implements
         $oid = '.1.3.6.1.4.1.12140.2.4.2.0'; // ALCOMA-MIB::alMPSNR.0
 
         return [
-            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'alcoma', 1, 'CINR', null, 1, 1),
+            new WirelessSensor(WirelessSensorType::Snr, $this->getDeviceId(), $oid, 'alcoma', 1, 'CINR', null, 1, 1),
         ];
     }
 }

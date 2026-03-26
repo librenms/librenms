@@ -1,40 +1,40 @@
-mib: NUTANIX-MIB
 modules:
     sensors:
         state:
             data:
                 -
-                    oid: diskStatusTable
-                    value: dstState
+                    oid: NUTANIX-MIB::diskStatusTable
+                    value: NUTANIX-MIB::dstState
                     num_oid: '.1.3.6.1.4.1.41263.3.1.13.{{ $index }}'
-                    index: 'DISKSTATE-{{ $dstDiskId }}'
-                    descr: 'Disk {{ $dstDiskId }}'
+                    index: 'DISKSTATE-{{ NUTANIX-MIB::dstDiskId }}'
+                    descr: 'Disk {{ NUTANIX-MIB::dstDiskId }}'
+                    state_name: diskStatusTable
                     states:
                         - { descr: ok , graph: 0, value: 1, generic: 0 }
                         - { descr: error  , graph: 0, value: 2, generic: 1 }
         count:
             data:
                 -
-                    oid: hypervisorInformationTable
-                    value: hypervisorVmCount
+                    oid: NUTANIX-MIB::hypervisorInformationTable
+                    value: NUTANIX-MIB::hypervisorVmCount
                     num_oid: '.1.3.6.1.4.1.41263.9.1.4.{{ $index }}'
-                    descr: '{{ $hypervisorName }} VM Count'
-                    index: 'VMS-{{ $hypervisorName }}'
+                    descr: '{{ NUTANIX-MIB::hypervisorName }} VM Count'
+                    index: 'VMS-{{ NUTANIX-MIB::hypervisorName }}'
         percent:
             data:
                 -
-                    oid: hypervisorInformationTable
-                    value: hypervisorMemoryUsagePercent
+                    oid: NUTANIX-MIB::hypervisorInformationTable
+                    value: NUTANIX-MIB::hypervisorMemoryUsagePercent
                     num_oid: '.1.3.6.1.4.1.41263.9.1.8.{{ $index }}'
-                    descr: '{{ $hypervisorName }} RAM'
-                    index: 'RAM-{{ $hypervisorName }}'
+                    descr: '{{ NUTANIX-MIB::hypervisorName }} RAM'
+                    index: 'RAM-{{ NUTANIX-MIB::hypervisorName }}'
                     warn_limit: 90
                     high_limit: 95
                 -
-                    oid: hypervisorInformationTable
-                    value: hypervisorCpuUsagePercent
+                    oid: NUTANIX-MIB::hypervisorInformationTable
+                    value: NUTANIX-MIB::hypervisorCpuUsagePercent
                     num_oid: '.1.3.6.1.4.1.41263.9.1.6.{{ $index }}'
-                    descr: '{{ $hypervisorName }} CPU'
-                    index: 'CPU-{{ $hypervisorName }}'
+                    descr: '{{ NUTANIX-MIB::hypervisorName }} CPU'
+                    index: 'CPU-{{ NUTANIX-MIB::hypervisorName }}'
                     warn_limit: 90
                     high_limit: 95

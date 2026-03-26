@@ -35,7 +35,7 @@ use Illuminate\View\View;
 
 class TopErrorsController extends WidgetController
 {
-    protected $title = 'Top Errors';
+    protected string $name = 'top-errors';
     protected $defaults = [
         'interface_count' => 5,
         'time_interval' => 15,
@@ -44,35 +44,23 @@ class TopErrorsController extends WidgetController
         'port_group' => null,
     ];
 
-    /**
-     * @param  Request  $request
-     * @return View
-     */
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $data = $this->getSettings();
 
-        $query = Port::hasAccess($request->user())->with(['device' => function ($query) {
+        $query = Port::hasAccess($request->user())->with(['device' => function ($query): void {
             $query->select('device_id', 'hostname', 'sysName', 'display', 'status', 'os');
         }])
             ->isValid()
             ->select(['port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias'])
             ->groupBy('port_id', 'device_id', 'ifName', 'ifDescr', 'ifAlias')
             ->where('poll_time', '>', Carbon::now()->subMinutes($data['time_interval'])->timestamp)
-            ->where(function ($query) {
-                return $query
-                    ->where('ifInErrors_rate', '>', 0)
-                    ->orWhere('ifOutErrors_rate', '>', 0);
-            })
+            ->where(fn ($query) => $query
+                ->where('ifInErrors_rate', '>', 0)
+                ->orWhere('ifOutErrors_rate', '>', 0))
             ->isUp()
-            ->when($data['device_group'], function ($query) use ($data) {
-                return $query->inDeviceGroup($data['device_group']);
-            }, function ($query) {
-                return $query->has('device');
-            })
-            ->when($data['port_group'], function ($query) use ($data) {
-                return $query->inPortGroup($data['port_group']);
-            })
+            ->when($data['device_group'], fn ($query) => $query->inDeviceGroup($data['device_group']), fn ($query) => $query->has('device'))
+            ->when($data['port_group'], fn ($query) => $query->inPortGroup($data['port_group']))
             ->orderByRaw('SUM(LEAST(ifInErrors_rate, 9223372036854775807) + LEAST(ifOutErrors_rate, 9223372036854775807)) DESC')
             ->limit($data['interface_count']);
 
@@ -83,10 +71,5 @@ class TopErrorsController extends WidgetController
         $data['ports'] = $query->get();
 
         return view('widgets.top-errors', $data);
-    }
-
-    public function getSettingsView(Request $request)
-    {
-        return view('widgets.settings.top-errors', $this->getSettings(true));
     }
 }

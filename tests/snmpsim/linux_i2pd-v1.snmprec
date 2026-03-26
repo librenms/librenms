@@ -1,0 +1,4 @@
+1.3.6.1.2.1.1.1.0|4|Linux i2pd 6.1.0-41-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.158-1 (2025-11-09) x86_64
+1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.8072.3.2.10
+1.3.6.1.4.1.8072.1.3.2.2.1.21.4.105.50.112.100|2|1
+1.3.6.1.4.1.8072.1.3.2.3.1.2.4.105.50.112.100|4|{"data":{"i2p.router.uptime":387357000,"i2p.router.net.status":0,"i2p.router.net.bw.inbound.1s":1117439,"i2p.router.net.bw.inbound.15s":1171506,"i2p.router.net.bw.outbound.1s":1138790,"i2p.router.net.bw.outbound.15s":1222119,"i2p.router.net.tunnels.participating":7186,"i2p.router.net.tunnels.successrate":17,"i2p.router.netdb.knownpeers":17593,"i2p.router.netdb.activepeers":6786,"i2p.router.net.total.received.bytes":409639317959,"i2p.router.net.total.sent.bytes":421342772467},"version":"1","error":"0","errorString":""}

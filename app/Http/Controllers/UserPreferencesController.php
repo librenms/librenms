@@ -26,15 +26,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\UserPref;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\TwoFactor;
-use LibreNMS\Config;
 use LibreNMS\Util\DynamicConfig;
 use Session;
 
@@ -60,7 +61,7 @@ class UserPreferencesController extends Controller
         $locales = $this->getValidLocales();
         $styles = $this->getValidStyles();
         $default_locale = \config('app.default_locale'); // always the system default
-        $default_style = Config::get('site_style');
+        $default_style = LibrenmsConfig::get('site_style');
 
         $data = [
             'user' => $user,
@@ -80,7 +81,7 @@ class UserPreferencesController extends Controller
             'global_search_ctrlf_focus' => UserPref::getPref($user, 'global_search_ctrlf_focus'),
         ];
 
-        if (Config::get('twofactor')) {
+        if (LibrenmsConfig::get('twofactor')) {
             $twofactor = UserPref::getPref($user, 'twofactor');
             if ($twofactor) {
                 $data['twofactor_uri'] = TwoFactor::generateUri($user->username, $twofactor['key'], $twofactor['counter'] !== false);
@@ -88,7 +89,7 @@ class UserPreferencesController extends Controller
             $data['twofactor'] = $twofactor;
         }
 
-        if (! $user->hasGlobalRead()) {
+        if (Gate::denies('viewAll', Device::class)) {
             $data['devices'] = Device::hasAccess($user)->get();
         }
 

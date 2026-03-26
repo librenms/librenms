@@ -16655,31 +16655,6 @@
                 },
                 {
                     "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.89.90.1.2.1.3.105.11",
-                    "sensor_index": "SfpLOS105",
-                    "sensor_type": "rlPhyTestGetTable",
-                    "sensor_descr": "SfpLOS-te1/0/1",
-                    "group": "transceiver",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": "105",
-                    "entPhysicalIndex_measured": "ports",
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": "rlPhyTestGetTable"
-                },
-                {
-                    "sensor_deleted": 0,
                     "sensor_class": "temperature",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.89.108.3.1.6.1",
@@ -16814,20 +16789,6 @@
                     "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
-                },
-                {
-                    "state_name": "rlPhyTestGetTable",
-                    "state_descr": "False",
-                    "state_draw_graph": 1,
-                    "state_value": 0,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "rlPhyTestGetTable",
-                    "state_descr": "True",
-                    "state_draw_graph": 1,
-                    "state_value": 1,
-                    "state_generic_value": 2
                 }
             ]
         },
@@ -16860,373 +16821,358 @@
         "discovery": {
             "vlans": [
                 {
-                    "vlan_vlan": 1,
-                    "vlan_domain": 1,
-                    "vlan_name": "VLAN 1",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                },
-                {
                     "vlan_vlan": 94,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 94",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 95,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 95",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 96,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 96",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 97,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 97",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 98,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 98",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 99",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 331,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 331",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 480,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 480",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 481,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 481",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3003,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3003",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3103,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3103",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3601,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3601",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3602,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3602",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3603,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3603",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3604,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3604",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3605,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3605",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3606,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3606",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3607,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3607",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3608,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3608",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3609,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3609",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3610,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3610",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3611,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3611",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3612,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3612",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3613,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3613",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3701,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3701",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3702,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3702",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3703,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3703",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3704,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3704",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3705,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3705",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3706,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3706",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3707,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3707",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3708,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3708",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3709,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3709",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3710,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3710",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3711,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3711",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3712,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3712",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3713,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3713",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3801,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3801",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3802,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3802",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3803,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3803",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3804,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3804",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3805,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3805",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3806,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3806",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3807,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3807",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3808,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3808",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3809,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3809",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3810,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3810",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3811,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3811",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3812,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3812",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3813,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 3813",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
                 {
-                    "vlan": 1,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 94,
                     "baseport": 71,
                     "priority": 0,
@@ -17273,14 +17219,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 94,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 95,
@@ -17331,14 +17269,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 95,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 96,
                     "baseport": 71,
                     "priority": 0,
@@ -17385,14 +17315,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 96,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 97,
@@ -17443,14 +17365,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 97,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 98,
                     "baseport": 71,
                     "priority": 0,
@@ -17499,14 +17413,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 98,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 99,
                     "baseport": 71,
                     "priority": 0,
@@ -17553,14 +17459,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 99,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 331,
@@ -17649,14 +17547,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 331,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 480,
@@ -17755,14 +17645,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 480,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 481,
                     "baseport": 71,
                     "priority": 0,
@@ -17809,14 +17691,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 481,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3003,
@@ -17891,14 +17765,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3003,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3103,
                     "baseport": 71,
                     "priority": 0,
@@ -17945,14 +17811,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3103,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3601,
@@ -18003,14 +17861,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3601,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3602,
                     "baseport": 71,
                     "priority": 0,
@@ -18057,14 +17907,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3602,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3603,
@@ -18115,14 +17957,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3603,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3604,
                     "baseport": 71,
                     "priority": 0,
@@ -18169,14 +18003,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3604,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3605,
@@ -18227,14 +18053,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3605,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3606,
                     "baseport": 71,
                     "priority": 0,
@@ -18281,14 +18099,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3606,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3607,
@@ -18339,14 +18149,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3607,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3608,
                     "baseport": 71,
                     "priority": 0,
@@ -18393,14 +18195,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3608,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3609,
@@ -18451,14 +18245,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3609,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3610,
                     "baseport": 71,
                     "priority": 0,
@@ -18505,14 +18291,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3610,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3611,
@@ -18563,14 +18341,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3611,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3612,
                     "baseport": 71,
                     "priority": 0,
@@ -18617,14 +18387,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3612,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3613,
@@ -18675,14 +18437,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3613,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3701,
                     "baseport": 71,
                     "priority": 0,
@@ -18729,14 +18483,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3701,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3702,
@@ -18787,14 +18533,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3702,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3703,
                     "baseport": 71,
                     "priority": 0,
@@ -18841,14 +18579,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3703,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3704,
@@ -18899,14 +18629,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3704,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3705,
                     "baseport": 71,
                     "priority": 0,
@@ -18953,14 +18675,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3705,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3706,
@@ -19011,14 +18725,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3706,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3707,
                     "baseport": 71,
                     "priority": 0,
@@ -19065,14 +18771,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3707,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3708,
@@ -19123,14 +18821,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3708,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3709,
                     "baseport": 71,
                     "priority": 0,
@@ -19177,14 +18867,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3709,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3710,
@@ -19235,14 +18917,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3710,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3711,
                     "baseport": 71,
                     "priority": 0,
@@ -19289,14 +18963,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3711,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3712,
@@ -19347,14 +19013,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3712,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3713,
                     "baseport": 71,
                     "priority": 0,
@@ -19401,14 +19059,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3713,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3801,
@@ -19459,14 +19109,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3801,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3802,
                     "baseport": 71,
                     "priority": 0,
@@ -19513,14 +19155,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3802,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3803,
@@ -19571,14 +19205,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3803,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3804,
                     "baseport": 71,
                     "priority": 0,
@@ -19625,14 +19251,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3804,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3805,
@@ -19683,14 +19301,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3805,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3806,
                     "baseport": 71,
                     "priority": 0,
@@ -19737,14 +19347,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3806,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3807,
@@ -19795,14 +19397,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3807,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3808,
                     "baseport": 71,
                     "priority": 0,
@@ -19849,14 +19443,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3808,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3809,
@@ -19907,14 +19493,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3809,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3810,
                     "baseport": 71,
                     "priority": 0,
@@ -19961,14 +19539,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3810,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3811,
@@ -20019,14 +19589,6 @@
                     "untagged": 0
                 },
                 {
-                    "vlan": 3811,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
                     "vlan": 3812,
                     "baseport": 71,
                     "priority": 0,
@@ -20073,14 +19635,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3812,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 },
                 {
                     "vlan": 3813,
@@ -20161,14 +19715,6 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 0
-                },
-                {
-                    "vlan": 3813,
-                    "baseport": 163,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 }
             ]
         }
@@ -20445,6 +19991,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20464,6 +20011,7 @@
                     "entPhysicalContainedIn": 68424793,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 105
                 },
                 {
@@ -20483,6 +20031,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Eltex",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20502,6 +20051,7 @@
                     "entPhysicalContainedIn": 67108992,
                     "entPhysicalParentRelPos": 41,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20521,6 +20071,7 @@
                     "entPhysicalContainedIn": 67108992,
                     "entPhysicalParentRelPos": 42,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20540,6 +20091,7 @@
                     "entPhysicalContainedIn": 67108992,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20559,6 +20111,7 @@
                     "entPhysicalContainedIn": 68157952,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20578,6 +20131,7 @@
                     "entPhysicalContainedIn": 68157952,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20597,6 +20151,7 @@
                     "entPhysicalContainedIn": 68420352,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20616,6 +20171,7 @@
                     "entPhysicalContainedIn": 68420352,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20635,6 +20191,7 @@
                     "entPhysicalContainedIn": 68420288,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20654,6 +20211,7 @@
                     "entPhysicalContainedIn": 68420288,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20673,6 +20231,7 @@
                     "entPhysicalContainedIn": 68420288,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20692,6 +20251,7 @@
                     "entPhysicalContainedIn": 68420352,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20711,6 +20271,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 61
                 },
                 {
@@ -20730,6 +20291,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 49
                 },
                 {
@@ -20749,6 +20311,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 62
                 },
                 {
@@ -20768,6 +20331,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 50
                 },
                 {
@@ -20787,6 +20351,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 63
                 },
                 {
@@ -20806,6 +20371,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 51
                 },
                 {
@@ -20825,6 +20391,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 64
                 },
                 {
@@ -20844,6 +20411,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 52
                 },
                 {
@@ -20863,6 +20431,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 65
                 },
                 {
@@ -20882,6 +20451,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 53
                 },
                 {
@@ -20901,6 +20471,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 66
                 },
                 {
@@ -20920,6 +20491,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 54
                 },
                 {
@@ -20939,6 +20511,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 67
                 },
                 {
@@ -20958,6 +20531,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 55
                 },
                 {
@@ -20977,6 +20551,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 68
                 },
                 {
@@ -20996,6 +20571,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 56
                 },
                 {
@@ -21015,6 +20591,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 69
                 },
                 {
@@ -21034,6 +20611,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 57
                 },
                 {
@@ -21053,6 +20631,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 70
                 },
                 {
@@ -21072,6 +20651,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 58
                 },
                 {
@@ -21091,6 +20671,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 71
                 },
                 {
@@ -21110,6 +20691,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 59
                 },
                 {
@@ -21129,6 +20711,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 72
                 },
                 {
@@ -21148,6 +20731,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 60
                 },
                 {
@@ -21167,6 +20751,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 105
                 },
                 {
@@ -21186,6 +20771,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 106
                 },
                 {
@@ -21205,6 +20791,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 107
                 },
                 {
@@ -21224,6 +20811,7 @@
                     "entPhysicalContainedIn": 68424704,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 108
                 },
                 {
@@ -21243,6 +20831,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -21262,6 +20851,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -21281,6 +20871,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -21300,6 +20891,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -21319,6 +20911,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -21338,6 +20931,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -21357,6 +20951,7 @@
                     "entPhysicalContainedIn": 64,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -24272,6 +23867,26 @@
                     "connector": "SC",
                     "channels": 1,
                     "ifIndex": 105
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "0.1.134.160",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 100000
+                },
+                {
+                    "ipv4_address": "10.119.236.17",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.119.236.16/29",
+                    "ifIndex": 103102
                 }
             ]
         }

@@ -2,11 +2,11 @@
 
 namespace LibreNMS\Authentication;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\User;
 use Dapphp\Radius\Radius;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Util\Debug;
@@ -23,7 +23,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
 
     public function __construct()
     {
-        $this->radius = new Radius(Config::get('radius.hostname'), Config::get('radius.secret'), Config::get('radius.suffix'), Config::get('radius.timeout'), Config::get('radius.port'));
+        $this->radius = new Radius(LibrenmsConfig::get('radius.hostname'), LibrenmsConfig::get('radius.secret'), LibrenmsConfig::get('radius.suffix'), LibrenmsConfig::get('radius.timeout'), LibrenmsConfig::get('radius.port'));
     }
 
     public function authenticate($credentials)
@@ -51,7 +51,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
                 $this->roles[$credentials['username']] = [substr($filter_id_attribute, 14)];
             }
 
-            if (Config::get('radius.enforce_roles') || $new_user) {
+            if (LibrenmsConfig::get('radius.enforce_roles') || $new_user) {
                 $user->syncRoles($this->roles[$credentials['username']] ?? $this->getDefaultRoles());
             }
 
@@ -69,7 +69,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
     private function getDefaultRoles(): array
     {
         // return roles or translate from the old radius.default_level
-        return Config::get('radius.default_roles')
-            ?: Arr::wrap(LegacyAuthLevel::from(Config::get('radius.default_level') ?? 1)->getName());
+        return LibrenmsConfig::get('radius.default_roles')
+            ?: Arr::wrap(LegacyAuthLevel::from(LibrenmsConfig::get('radius.default_level') ?? 1)->getName());
     }
 }

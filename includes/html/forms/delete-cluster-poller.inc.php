@@ -23,7 +23,11 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-if (! Auth::user()->hasGlobalAdmin()) {
+
+use App\Models\PollerCluster;
+use Illuminate\Support\Facades\Gate;
+
+if (Gate::denies('delete', PollerCluster::class)) {
     $status = ['status' => 1, 'message' => 'ERROR: You need to be admin to delete poller entries'];
 } else {
     $id = $vars['id'];
@@ -31,7 +35,8 @@ if (! Auth::user()->hasGlobalAdmin()) {
         $status = ['status' => 1, 'message' => 'No poller has been selected'];
     } else {
         $poller_name = dbFetchCell('SELECT `poller_name` FROM `pollers` WHERE `id`=?', [$id]);
-        if (dbDelete('poller_cluster', 'id=?', [$id]) && dbDelete('poller_cluster_stats', 'parent_poller=?', [$id])) {
+        $pollerCluster = PollerCluster::find($id);
+        if ($pollerCluster && $pollerCluster->stats()->delete() !== false && $pollerCluster->delete()) {
             $status = ['status' => 0, 'message' => "Poller: <i>$poller_name ($id), has been deleted.</i>"];
         } else {
             $status = ['status' => 1, 'message' => "Poller: <i>$poller_name ($id), has NOT been deleted.</i>"];

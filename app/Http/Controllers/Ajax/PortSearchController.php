@@ -40,7 +40,7 @@ class PortSearchController extends SearchController
             ->with('device')
             ->where('deleted', 0)
             ->where(function (Builder $query) use ($request) {
-                $search = $request->get('search');
+                $search = $request->input('search');
                 $like_search = "%$search%";
 
                 return $query->orWhere('ifAlias', 'LIKE', $like_search)
