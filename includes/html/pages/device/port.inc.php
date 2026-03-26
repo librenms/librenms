@@ -1,9 +1,13 @@
 <?php
 
 use App\Models\Bill;
+use App\Models\JuniAtmVp;
+use App\Models\MacAccounting;
 use App\Models\PortAdsl;
 use App\Models\PortsNac;
 use App\Models\PortVdsl;
+use App\Models\PortVlan;
+use App\Models\Sensor;
 use App\Plugins\Hooks\PortTabHook;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Rewrite;
@@ -108,7 +112,7 @@ if ($port->transceivers()->exists()) {
     $menu_options['transceiver'] = __('port.transceiver');
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ?  AND entPhysicalIndex_measured = 'ports'", [$device['device_id'], $port->ifIndex])) {
+if (Sensor::where('device_id', $device['device_id'])->where('entPhysicalIndex', $port->ifIndex)->where('entPhysicalIndex_measured', 'ports')->exists()) {
     $menu_options['sensors'] = 'Health';
 }
 
@@ -126,7 +130,7 @@ if (DeviceCache::getPrimary()->ports()->where('pagpGroupIfIndex', $port->ifIndex
     $menu_options['pagp'] = 'PAgP';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports_vlans` WHERE `port_id` = '" . $port->port_id . "' and `device_id` = '" . $device['device_id'] . "'")) {
+if (PortVlan::where('port_id', $port->port_id)->where('device_id', $device['device_id'])->exists()) {
     $menu_options['vlans'] = 'VLANs';
 }
 
@@ -156,7 +160,7 @@ foreach ($menu_options as $option => $text) {
 
 unset($sep);
 
-if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE port_id = '" . $port->port_id . "'") > '0') {
+if (MacAccounting::where('port_id', $port->port_id)->exists()) {
     echo ' | MAC Accounting : ';
     if ($vars['view'] == 'macaccounting' && $vars['graph'] == 'bits' && $vars['subview'] == 'graphs') {
         echo "<span class='pagemenu-selected'>";
@@ -222,7 +226,7 @@ if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE port_id = '" . $port-
     echo ')';
 }//end if
 
-if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port->port_id . "'") > '0') {
+if (JuniAtmVp::where('port_id', $port->port_id)->exists()) {
     // FIXME ATM VPs
     // FIXME URLs BROKEN
     echo ' | ATM VPs : ';
