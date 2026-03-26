@@ -3,6 +3,7 @@
 namespace App\Restify;
 
 use App\Models\Location;
+use Binaryk\LaravelRestify\Fields\HasMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -16,6 +17,13 @@ class LocationRepository extends Repository
     public static array $search = [
         'location',
     ];
+
+    public static function related(): array
+    {
+        return [
+            'devices' => HasMany::make('devices', DeviceRepository::class),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {

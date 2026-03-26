@@ -3,6 +3,7 @@
 namespace App\Restify;
 
 use App\Models\AlertRule;
+use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -16,6 +17,15 @@ class AlertRuleRepository extends Repository
     public static array $search = [
         'name',
     ];
+
+    public static function related(): array
+    {
+        return [
+            'devices' => BelongsToMany::make('devices', DeviceRepository::class),
+            'groups' => BelongsToMany::make('groups', DeviceGroupRepository::class),
+            'locations' => BelongsToMany::make('locations', LocationRepository::class),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {

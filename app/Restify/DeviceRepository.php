@@ -3,6 +3,9 @@
 namespace App\Restify;
 
 use App\Models\Device;
+use Binaryk\LaravelRestify\Fields\BelongsTo;
+use Binaryk\LaravelRestify\Fields\BelongsToMany;
+use Binaryk\LaravelRestify\Fields\HasMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -20,6 +23,15 @@ class DeviceRepository extends Repository
         "sysName",
         "os",
     ];
+
+    public static function related(): array
+    {
+        return [
+            'ports' => HasMany::make('ports', PortRepository::class),
+            'location' => BelongsTo::make('location', LocationRepository::class),
+            'groups' => BelongsToMany::make('groups', DeviceGroupRepository::class),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {

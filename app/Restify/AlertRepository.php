@@ -3,6 +3,7 @@
 namespace App\Restify;
 
 use App\Models\Alert;
+use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -17,6 +18,14 @@ class AlertRepository extends Repository
     public static string $title = 'id';
 
     public static array $search = [];
+
+    public static function related(): array
+    {
+        return [
+            'device' => BelongsTo::make('device', DeviceRepository::class),
+            'rule' => BelongsTo::make('rule', AlertRuleRepository::class),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {

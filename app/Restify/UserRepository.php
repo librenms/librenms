@@ -3,6 +3,7 @@
 namespace App\Restify;
 
 use App\Models\User;
+use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -20,6 +21,14 @@ class UserRepository extends Repository
         "realname",
         "email",
     ];
+
+    public static function related(): array
+    {
+        return [
+            'devicesOwned' => BelongsToMany::make('devicesOwned', DeviceRepository::class),
+            'portsOwned' => BelongsToMany::make('portsOwned', PortRepository::class),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {

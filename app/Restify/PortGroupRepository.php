@@ -3,6 +3,7 @@
 namespace App\Restify;
 
 use App\Models\PortGroup;
+use Binaryk\LaravelRestify\Fields\BelongsToMany;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -17,6 +18,13 @@ class PortGroupRepository extends Repository
         'name',
         'desc',
     ];
+
+    public static function related(): array
+    {
+        return [
+            'ports' => BelongsToMany::make('ports', PortRepository::class),
+        ];
+    }
 
     public function fields(RestifyRequest $request): array
     {
