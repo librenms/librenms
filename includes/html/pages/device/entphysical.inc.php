@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\EntPhysical;
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Util\Html;
 
@@ -130,8 +131,7 @@ function printEntPhysical($device, $ent, $level, $class)
         }
         echo '</div>';
 
-        $count = dbFetchCell("SELECT COUNT(*) FROM `entPhysical` WHERE device_id = '" . $device['device_id'] . "' AND entPhysicalContainedIn = '" . $ent['entPhysicalIndex'] . "'");
-        if ($count) {
+        if (EntPhysical::where('device_id', $device['device_id'])->where('entPhysicalContainedIn', $ent['entPhysicalIndex'])->exists()) {
             echo '<ul>';
             printEntPhysical($device, $ent['entPhysicalIndex'], $level + 1, 'liClosed');
             echo '</ul>';
