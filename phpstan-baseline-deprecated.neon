@@ -4043,15 +4043,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbUpdate\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/alert-templates.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchCell\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -4210,7 +4201,7 @@ parameters:
 			'''
 			identifier: function.deprecated
 			count: 1
-			path: includes/html/forms/poller-groups.inc.php
+			path: includes/html/forms/processor-update.inc.php
 
 		-
 			message: '''
@@ -4233,15 +4224,6 @@ parameters:
 		-
 			message: '''
 				#^Call to deprecated function dbInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/schedule-maintenance.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbUpdate\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
 			identifier: function.deprecated
@@ -4296,15 +4278,6 @@ parameters:
 		-
 			message: '''
 				#^Call to deprecated function dbInsert\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/transport-groups.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbUpdate\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
 			identifier: function.deprecated
@@ -5024,15 +4997,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: includes/html/pages/device/edit.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchRows\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -5057,15 +5021,6 @@ parameters:
 			identifier: function.deprecated
 			count: 1
 			path: includes/html/pages/device/edit/wireless-sensors.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/pages/device/entphysical.inc.php
 
 		-
 			message: '''
@@ -5258,15 +5213,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 4
-			path: includes/html/pages/device/port.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchRows\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -5426,15 +5372,6 @@ parameters:
 			identifier: function.deprecated
 			count: 6
 			path: includes/html/pages/device/routing/mpls.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 6
-			path: includes/html/pages/device/routing/ospf.inc.php
 
 		-
 			message: '''
@@ -5642,15 +5579,6 @@ parameters:
 			identifier: function.deprecated
 			count: 6
 			path: includes/html/pages/routing/mpls.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 4
-			path: includes/html/pages/routing/ospf.inc.php
 
 		-
 			message: '''

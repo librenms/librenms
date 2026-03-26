@@ -39,6 +39,7 @@ use App\Http\Controllers\PortGroupController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\RealtimeDataController;
 use App\Http\Controllers\RealtimeGraphController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Search\PortSecuritySearchController;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
@@ -197,6 +198,8 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('settings/{tab?}/{section?}', [SettingsController::class, 'index'])->name('settings');
         Route::put('settings/{name}', [SettingsController::class, 'update'])->name('settings.update');
         Route::delete('settings/{name}', [SettingsController::class, 'destroy'])->name('settings.destroy');
+
+        Route::resource('roles', RoleController::class);
 
         Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
         Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);

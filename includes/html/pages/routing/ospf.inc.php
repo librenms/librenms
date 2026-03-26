@@ -1,6 +1,9 @@
 <?php
 
+use App\Models\OspfArea;
 use App\Models\OspfInstance;
+use App\Models\OspfNbr;
+use App\Models\OspfPort;
 
 echo '
 <div>
@@ -25,10 +28,10 @@ $data = OspfInstance::where('ospfAdminStat', 'enabled')
 
 /** @var OspfInstance $instance */
 foreach ($data as $instance) {
-    $area_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_areas` WHERE `device_id` = '" . $instance->device_id . "'");
-    $port_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `device_id` = '" . $instance->device_id . "'");
-    $port_count_enabled = dbFetchCell("SELECT COUNT(*) FROM `ospf_ports` WHERE `ospfIfAdminStat` = 'enabled' AND `device_id` = '" . $instance->device_id . "'");
-    $nbr_count = dbFetchCell("SELECT COUNT(*) FROM `ospf_nbrs` WHERE `device_id` = '" . $instance->device_id . "'");
+    $area_count = OspfArea::where('device_id', $instance->device_id)->count();
+    $port_count = OspfPort::where('device_id', $instance->device_id)->count();
+    $port_count_enabled = OspfPort::where('ospfIfAdminStat', 'enabled')->where('device_id', $instance->device_id)->count();
+    $nbr_count = OspfNbr::where('device_id', $instance->device_id)->count();
 
     $status_color = $instance->ospfAdminStat == 'enabled' ? 'success' : 'default';
     $abr_status_color = $instance->ospfAreaBdrRtrStatus == 'true' ? 'success' : 'default';
