@@ -9,6 +9,7 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Util\StringHelpers;
 
 class HrDevice implements Module
 {
@@ -50,6 +51,7 @@ class HrDevice implements Module
                 'HOST-RESOURCES-MIB::hrProcessorLoad',
                 'HOST-RESOURCES-MIB::hrDeviceTable',
             ])->mapTable(function (array $hrDevice, int $hrDeviceIndex) {
+                $hrDevice['hrDeviceDescr'] = StringHelpers::inferEncoding($hrDevice['hrDeviceDescr'] ?? null);
                 $model = new \App\Models\HrDevice($hrDevice);
                 $model->hrDeviceIndex = $hrDeviceIndex;
 
