@@ -1,0 +1,11 @@
+os: exeltech-xfersw
+text: "Exeltech XFERSW"
+type: power
+discovery:
+    -   sysObjectID_regex: '/^$/'
+        snmpget:
+            oid: '.1.3.6.1.4.1.30320.1.0.0.1.0'
+            op: '!=='
+            value: ''
+icon: exeltech
+mib_dir: exeltech
