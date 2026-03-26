@@ -15,6 +15,7 @@
 use App\Facades\LibrenmsConfig;
 use App\Models\AlertSchedulable;
 use App\Models\AlertSchedule;
+use App\Models\Device;
 use App\Models\UserPref;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\MaintenanceBehavior;
@@ -166,7 +167,7 @@ if ($sub_type == 'new-maintenance') {
                 if ($notes && $type = 'device' && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
                     $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', [$target]);
                     $device_notes .= ((empty($device_notes)) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
-                    dbUpdate(['notes' => $device_notes], 'devices', '`device_id` = ?', [$target]);
+                    Device::where('device_id', $target)->update(['notes' => $device_notes]);
                 }
                 if ($item > 0) {
                     array_push($items, $item);
