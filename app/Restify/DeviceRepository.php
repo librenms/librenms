@@ -28,6 +28,13 @@ class DeviceRepository extends Repository
     {
         return [
             'ports' => HasMany::make('ports', PortRepository::class),
+            'sensors' => HasMany::make('sensors', SensorRepository::class),
+            'processors' => HasMany::make('processors', ProcessorRepository::class),
+            'mempools' => HasMany::make('mempools', MempoolRepository::class),
+            'storage' => HasMany::make('storage', StorageRepository::class),
+            'services' => HasMany::make('services', ServiceRepository::class),
+            'components' => HasMany::make('components', ComponentRepository::class),
+            'applications' => HasMany::make('applications', ApplicationRepository::class),
             'location' => BelongsTo::make('location', LocationRepository::class),
             'groups' => BelongsToMany::make('groups', DeviceGroupRepository::class),
         ];

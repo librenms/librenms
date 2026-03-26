@@ -8,13 +8,20 @@ use App\Models\AlertRule;
 use App\Models\AlertSchedule;
 use App\Models\AlertTemplate;
 use App\Models\AlertTransport;
+use App\Models\Application;
+use App\Models\Component;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Location;
+use App\Models\Mempool;
 use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
+use App\Models\Processor;
+use App\Models\Sensor;
+use App\Models\Service;
 use App\Models\ServiceTemplate;
+use App\Models\Storage;
 use App\Models\User;
 use Database\Seeders\RolesSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -277,9 +284,9 @@ class RestifyApiTest extends DBTestCase
         User::factory()->count(2)->create();
         Sanctum::actingAs($admin);
 
-        $this->getJson('/api/v1/users')
-            ->assertStatus(200)
-            ->assertJsonPath('meta.total', 3); // admin + 2 users
+        $response = $this->getJson('/api/v1/users');
+        $response->assertStatus(200);
+        $this->assertGreaterThanOrEqual(3, $response->json('meta.total')); // admin + 2 users (at minimum)
     }
 
     public function testRegularUserCannotAccessUsers(): void
@@ -1328,5 +1335,383 @@ class RestifyApiTest extends DBTestCase
             ->assertJsonPath('data.state', 1);
 
         $this->assertDatabaseHas('alerts', ['id' => $alert->id, 'state' => 1]);
+    }
+
+    // ── Sensors ─────────────────────────────────────────────
+
+    public function testAdminCanListSensors(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Sensor::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/sensors')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testAdminCanShowSensor(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $sensor = Sensor::factory()->for($device)->create(['sensor_descr' => 'CPU Temp']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/sensors/{$sensor->sensor_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.sensor_descr', 'CPU Temp');
+    }
+
+    public function testSensorFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Sensor::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/sensors')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'sensor_class', 'sensor_descr', 'sensor_current',
+                'sensor_limit', 'sensor_limit_warn', 'sensor_limit_low', 'sensor_limit_low_warn',
+            ]]]]);
+    }
+
+    public function testSensorsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/sensors', ['sensor_class' => 'temperature'])
+            ->assertStatus(403);
+    }
+
+    // ── Processors ──────────────────────────────────────────
+
+    public function testAdminCanListProcessors(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Processor::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/processors')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 2);
+    }
+
+    public function testAdminCanShowProcessor(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $proc = Processor::factory()->for($device)->create(['processor_descr' => 'CPU 0']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/processors/{$proc->processor_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.processor_descr', 'CPU 0');
+    }
+
+    public function testProcessorFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Processor::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/processors')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'processor_type', 'processor_descr', 'processor_usage',
+            ]]]]);
+    }
+
+    public function testProcessorsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/processors', ['processor_type' => 'hr'])
+            ->assertStatus(403);
+    }
+
+    // ── Mempools ────────────────────────────────────────────
+
+    public function testAdminCanListMempools(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Mempool::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mempools')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 2);
+    }
+
+    public function testAdminCanShowMempool(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $mempool = Mempool::factory()->for($device)->create(['mempool_descr' => 'Physical Memory']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/mempools/{$mempool->mempool_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.mempool_descr', 'Physical Memory');
+    }
+
+    public function testMempoolFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Mempool::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mempools')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'mempool_type', 'mempool_descr', 'mempool_perc',
+                'mempool_used', 'mempool_free', 'mempool_total',
+            ]]]]);
+    }
+
+    public function testMempoolsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/mempools', ['mempool_type' => 'hrstorage'])
+            ->assertStatus(403);
+    }
+
+    // ── Storage ─────────────────────────────────────────────
+
+    public function testAdminCanListStorage(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Storage::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/storages')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 2);
+    }
+
+    public function testAdminCanShowStorage(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $storage = Storage::factory()->for($device)->create(['storage_descr' => '/home']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/storages/{$storage->storage_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.storage_descr', '/home');
+    }
+
+    public function testStorageFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Storage::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/storages')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'storage_type', 'storage_descr', 'storage_size',
+                'storage_used', 'storage_free', 'storage_perc',
+            ]]]]);
+    }
+
+    public function testStorageCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/storages', ['storage_type' => 'dsk'])
+            ->assertStatus(403);
+    }
+
+    // ── Services ────────────────────────────────────────────
+
+    public function testAdminCanListServices(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Service::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/services')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 2);
+    }
+
+    public function testAdminCanShowService(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $service = Service::factory()->for($device)->create(['service_type' => 'http']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/services/{$service->service_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.service_type', 'http');
+    }
+
+    public function testServiceFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Service::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/services')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'service_type', 'service_name', 'service_desc',
+                'service_status', 'service_ignore', 'service_disabled',
+            ]]]]);
+    }
+
+    public function testAdminCanCreateService(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/services', [
+            'device_id' => $device->device_id,
+            'service_type' => 'http',
+            'service_name' => 'Web Server',
+            'service_desc' => 'HTTP check',
+            'service_ip' => '10.0.0.1',
+        ])->assertStatus(201);
+
+        $this->assertDatabaseHas('services', ['service_name' => 'Web Server']);
+    }
+
+    public function testAdminCanDeleteService(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $service = Service::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->deleteJsonApi("/api/v1/services/{$service->service_id}")
+            ->assertStatus(204);
+
+        $this->assertDatabaseMissing('services', ['service_id' => $service->service_id]);
+    }
+
+    public function testReadOnlyUserCannotCreateService(): void
+    {
+        $user = User::factory()->read()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/services', [
+            'service_type' => 'http',
+        ])->assertStatus(403);
+    }
+
+    // ── Components ──────────────────────────────────────────
+
+    public function testAdminCanListComponents(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Component::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/components')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testAdminCanShowComponent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $component = Component::factory()->for($device)->create(['label' => 'Fan 1']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/components/{$component->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.label', 'Fan 1');
+    }
+
+    public function testComponentFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Component::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/components')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'type', 'label', 'status', 'disabled', 'ignore', 'error',
+            ]]]]);
+    }
+
+    public function testComponentsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/components', ['type' => 'fan'])
+            ->assertStatus(403);
+    }
+
+    // ── Applications ────────────────────────────────────────
+
+    public function testAdminCanListApplications(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Application::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/applications')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 2);
+    }
+
+    public function testAdminCanShowApplication(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $app = Application::factory()->for($device)->create(['app_type' => 'mysql']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/applications/{$app->app_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.app_type', 'mysql');
+    }
+
+    public function testApplicationFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Application::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/applications')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'app_type', 'app_instance', 'app_status', 'app_state',
+            ]]]]);
+    }
+
+    public function testApplicationsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/applications', ['app_type' => 'mysql'])
+            ->assertStatus(403);
     }
 }

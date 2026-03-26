@@ -2,18 +2,25 @@
 
 namespace App\Providers;
 
+use App\Restify\ApplicationRepository;
 use App\Restify\AlertRepository;
 use App\Restify\AlertRuleRepository;
 use App\Restify\AlertScheduleRepository;
 use App\Restify\AlertTemplateRepository;
 use App\Restify\AlertTransportRepository;
+use App\Restify\ComponentRepository;
 use App\Restify\DeviceGroupRepository;
 use App\Restify\DeviceRepository;
 use App\Restify\LocationRepository;
+use App\Restify\MempoolRepository;
 use App\Restify\PollerGroupRepository;
 use App\Restify\PortGroupRepository;
 use App\Restify\PortRepository;
+use App\Restify\ProcessorRepository;
+use App\Restify\SensorRepository;
+use App\Restify\ServiceRepository;
 use App\Restify\ServiceTemplateRepository;
+use App\Restify\StorageRepository;
 use App\Restify\UserRepository;
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot;
 use Binaryk\LaravelRestify\Restify;
@@ -56,18 +63,25 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
         parent::boot();
 
         Restify::repositories([
+            ApplicationRepository::class,
             AlertRepository::class,
             AlertRuleRepository::class,
             AlertScheduleRepository::class,
             AlertTemplateRepository::class,
             AlertTransportRepository::class,
+            ComponentRepository::class,
             DeviceGroupRepository::class,
             DeviceRepository::class,
             LocationRepository::class,
+            MempoolRepository::class,
             PollerGroupRepository::class,
             PortGroupRepository::class,
             PortRepository::class,
+            ProcessorRepository::class,
+            SensorRepository::class,
+            ServiceRepository::class,
             ServiceTemplateRepository::class,
+            StorageRepository::class,
             UserRepository::class,
         ]);
     }

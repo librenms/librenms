@@ -4,12 +4,19 @@ namespace LibreNMS\Tests\Feature\Api;
 
 use App\Models\Alert;
 use App\Models\AlertRule;
+use App\Models\Application;
+use App\Models\Component;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Location;
+use App\Models\Mempool;
 use App\Models\Port;
 use App\Models\PortGroup;
+use App\Models\Processor;
+use App\Models\Sensor;
+use App\Models\Service;
 use App\Models\ServiceTemplate;
+use App\Models\Storage;
 use App\Models\User;
 use Database\Seeders\RolesSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -344,6 +351,125 @@ class RestifyRelationshipsTest extends DBTestCase
 
         $response->assertStatus(200)
             ->assertJsonCount(2, 'data.relationships.portsOwned');
+    }
+
+    // ── Core monitoring relationships ─────────────────────
+
+    public function testDeviceShowIncludesSensors(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Sensor::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=sensors");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(3, 'data.relationships.sensors');
+    }
+
+    public function testDeviceShowIncludesProcessors(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Processor::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=processors");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data.relationships.processors');
+    }
+
+    public function testDeviceShowIncludesMempools(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Mempool::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=mempools");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data.relationships.mempools');
+    }
+
+    public function testDeviceShowIncludesStorage(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Storage::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=storage");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data.relationships.storage');
+    }
+
+    public function testDeviceShowIncludesServices(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Service::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=services");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data.relationships.services');
+    }
+
+    public function testDeviceShowIncludesComponents(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Component::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=components");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(3, 'data.relationships.components');
+    }
+
+    public function testDeviceShowIncludesApplications(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Application::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=applications");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data.relationships.applications');
+    }
+
+    public function testComponentShowIncludesDevice(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $component = Component::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/components/{$component->id}?related=device");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.relationships.device.attributes.hostname', $device->hostname);
+    }
+
+    public function testSensorShowIncludesDevice(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $sensor = Sensor::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/sensors/{$sensor->sensor_id}?related=device");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.relationships.device.attributes.hostname', $device->hostname);
     }
 
     // ── Multiple relationships in one request ───────────────

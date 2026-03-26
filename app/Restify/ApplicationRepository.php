@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Restify;
+
+use App\Models\Application;
+use Binaryk\LaravelRestify\Fields\BelongsTo;
+use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
+
+class ApplicationRepository extends Repository
+{
+    public static string $model = Application::class;
+
+    public static string $id = 'app_id';
+
+    public static string $title = 'app_type';
+
+    public static array $search = [
+        'app_type',
+        'app_instance',
+    ];
+
+    public static function related(): array
+    {
+        return [
+            'device' => BelongsTo::make('device', DeviceRepository::class),
+        ];
+    }
+
+    public function fields(RestifyRequest $request): array
+    {
+        return [
+            field('device_id')->readonly(),
+            field('app_type')->readonly(),
+            field('app_instance')->readonly(),
+            field('app_status')->readonly(),
+            field('app_state')->readonly(),
+            field('discovered')->readonly(),
+        ];
+    }
+
+    public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
+    {
+        if ($user = $request->user()) {
+            return $query->hasAccess($user);
+        }
+
+        return $query->whereRaw('1 = 0');
+    }
+
+    public static function showQuery(RestifyRequest $request, Builder|Relation $query)
+    {
+        return static::indexQuery($request, $query);
+    }
+
+    public static function authorizedToStore(Request $request): bool
+    {
+        return false;
+    }
+
+    public function authorizedToDelete(Request $request): bool
+    {
+        return false;
+    }
+}

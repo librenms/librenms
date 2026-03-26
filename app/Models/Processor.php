@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Processor extends DeviceRelatedModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $primaryKey = 'processor_id';
 
