@@ -122,6 +122,7 @@ groups:
 
     port-group:
         - port-group.viewAll
+        - port-group.view
         - port-group.create
         - port-group.update
         - port-group.delete
@@ -143,6 +144,7 @@ groups:
         - routing.update
 
     service:
+        - service.viewAll
         - service.view
         - service.create
         - service.update
