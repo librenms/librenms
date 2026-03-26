@@ -1,16 +1,16 @@
 {{-- Role Name --}}
-<div class="form-group @error('name') has-error @enderror">
-    <label for="name" class="col-sm-3 control-label">
+<div class="tw:px-4 tw:mb-6 tw:flex tw:flex-col tw:sm:flex-row tw:sm:items-center tw:gap-4">
+    <div for="name" class="tw:font-bold tw:text-xl">
         {{ __('permissions.rbac.role_name') }}
-    </label>
-    <div class="col-sm-9">
+    </div>
+    <div class="tw:flex-1 tw:max-w-md">
         <input type="text" name="name" id="name" required
-               class="form-control"
+               class="form-control @error('name') tw:border-red-500 @enderror"
                placeholder="{{ __('permissions.rbac.role_name_placeholder') }}"
                value="{{ old('name', $role->name ?? '') }}"
                @if(isset($role) && in_array(strtolower($role->name), ['admin', 'global-read', 'user'])) readonly @endif>
         @error('name')
-            <span class="help-block">{{ $message }}</span>
+            <p class="tw:mt-1 tw:text-xs tw:text-red-500">{{ $message }}</p>
         @enderror
     </div>
 </div>
@@ -20,13 +20,15 @@
 {{-- Permissions --}}
 <div class="tw:px-4">
     {{-- Section header --}}
-    <div class="tw:flex tw:items-center tw:justify-between tw:mb-4">
-        <div class="tw:flex tw:items-center tw:gap-4">
-            <h4 class="tw:font-bold tw:m-0 tw:text-lg">
+    <div class="tw:flex tw:flex-col tw:md:flex-row tw:md:items-center tw:justify-between tw:mb-6 tw:gap-4 tw:w-full">
+        <div class="tw:flex tw:flex-col tw:sm:flex-row tw:sm:items-center tw:gap-4 tw:md:w-1/4">
+            <h4 class="tw:font-bold tw:m-0 tw:text-xl">
                 {{ __('permissions.rbac.permissions') }}
             </h4>
+        </div>
+        <div class="tw:flex tw:flex-col tw:sm:flex-row tw:justify-end tw:gap-4 tw:flex-1">
             {{-- Search --}}
-            <div class="tw:relative">
+            <div class="tw:relative tw:w-full tw:max-w-md">
                 <span class="tw:absolute tw:inset-y-0 tw:left-0 tw:pl-3 tw:flex tw:items-center tw:text-slate-400 tw:pointer-events-none">
                     <i class="fas fa-search tw:text-sm"></i>
                 </span>
@@ -34,18 +36,19 @@
                        placeholder="{{ __('permissions.rbac.search_permissions') }}"
                        class="form-control input-sm tw:pl-9">
             </div>
-        </div>
-        <div class="tw:flex tw:items-center tw:gap-2">
-            <button type="button"
-                    @click="permissions = Array.from(document.querySelectorAll('input[name=\'permissions[]\']')).map(el => el.value)"
-                    class="btn btn-default">
-                <i class="fas fa-check-square tw:mr-1"></i>{{ __('permissions.rbac.select_all') }}
-            </button>
-            <button type="button"
-                    @click="permissions = []"
-                    class="btn btn-default">
-                <i class="fas fa-square tw:mr-1"></i>{{ __('permissions.rbac.clear_all') }}
-            </button>
+
+            <div class="tw:flex tw:items-center tw:gap-2 tw:whitespace-nowrap">
+                <button type="button"
+                        @click="permissions = Array.from(document.querySelectorAll('input[name=\'permissions[]\']')).map(el => el.value)"
+                        class="btn btn-default btn-sm">
+                    <i class="fas fa-check-square tw:mr-1"></i>{{ __('permissions.rbac.select_all') }}
+                </button>
+                <button type="button"
+                        @click="permissions = []"
+                        class="btn btn-default btn-sm">
+                    <i class="fas fa-square tw:mr-1"></i>{{ __('permissions.rbac.clear_all') }}
+                </button>
+            </div>
         </div>
     </div>
 
