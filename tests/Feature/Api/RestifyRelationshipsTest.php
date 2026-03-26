@@ -391,4 +391,170 @@ class RestifyRelationshipsTest extends DBTestCase
         $response->assertStatus(200)
             ->assertJsonPath('data.relationships.groups', []);
     }
+
+    // ── Relationship permission tests ───────────────────────
+
+    private function createCustomRoleUser(array $permissions): User
+    {
+        $role = Role::findOrCreate('custom-test-role');
+        foreach ($permissions as $perm) {
+            Permission::findOrCreate($perm);
+        }
+        $role->syncPermissions($permissions);
+        $user = User::factory()->create();
+        $user->assignRole('custom-test-role');
+
+        return $user;
+    }
+
+    public function testUserWithoutApiAccessCannotReachRelationships(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        Port::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/devices/{$device->device_id}?related=ports")
+            ->assertStatus(403);
+    }
+
+    public function testGlobalReadCanSeeRelatedResources(): void
+    {
+        $user = User::factory()->read()->create();
+        $device = Device::factory()->create();
+        Port::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=ports");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data.relationships.ports');
+    }
+
+    public function testCustomRoleCannotSeeUnauthorizedBelongsToManyRelated(): void
+    {
+        // User can access alert-rules but NOT devices
+        $user = $this->createCustomRoleUser([
+            'api.access',
+            'alert-rule.viewAny',
+            'alert-rule.view',
+        ]);
+        $rule = AlertRule::factory()->create();
+        $devices = Device::factory()->count(2)->create();
+        $rule->devices()->attach($devices->pluck('device_id'));
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/alert-rules/{$rule->id}?related=devices");
+
+        $response->assertStatus(200);
+
+        // Devices should be filtered out (null) since user lacks device.view permission
+        $relationships = $response->json('data.relationships.devices');
+        $nonNullDevices = collect($relationships)->filter()->values();
+        $this->assertEmpty($nonNullDevices, 'User without device.view should not see related devices');
+    }
+
+    public function testCustomRoleCannotSeeUnauthorizedBelongsToRelated(): void
+    {
+        // User can access alerts but NOT devices
+        $user = $this->createCustomRoleUser([
+            'api.access',
+            'alert.viewAny',
+            'alert.view',
+        ]);
+        $device = Device::factory()->create();
+        $alert = Alert::factory()->create(['device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        // BelongsTo aborts with 403 when the related resource is unauthorized
+        $response = $this->getJson("/api/v1/alerts/{$alert->id}?related=device");
+
+        // Either 403 (BelongsTo abort) or 200 with null relationship
+        $this->assertTrue(
+            $response->status() === 403
+            || $response->json('data.relationships.device') === null,
+            'Unauthorized BelongsTo should return 403 or null relationship'
+        );
+    }
+
+    public function testAdminCanSeeAllRelatedResources(): void
+    {
+        $user = User::factory()->admin()->create();
+        $rule = AlertRule::factory()->create();
+        $devices = Device::factory()->count(3)->create();
+        $rule->devices()->attach($devices->pluck('device_id'));
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/alert-rules/{$rule->id}?related=devices");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(3, 'data.relationships.devices');
+
+        // Verify none are null
+        $relationships = $response->json('data.relationships.devices');
+        $nullCount = collect($relationships)->filter(fn ($item) => $item === null)->count();
+        $this->assertEquals(0, $nullCount, 'Admin should see all related devices without null entries');
+    }
+
+    public function testDeviceGroupRelatedDevicesFilteredByPermission(): void
+    {
+        // User can access device-groups and has device view, but only for specific devices
+        $user = $this->createCustomRoleUser([
+            'api.access',
+            'device-group.viewAny',
+            'device-group.view',
+            // No device.view — user relies on per-device permission via devices_perms
+        ]);
+
+        $group = DeviceGroup::factory()->create(['type' => 'static']);
+        $deviceAccessible = Device::factory()->create();
+        $deviceInaccessible = Device::factory()->create();
+        $group->devices()->attach([
+            $deviceAccessible->device_id,
+            $deviceInaccessible->device_id,
+        ]);
+
+        // Grant access to only one device
+        $user->devicesOwned()->attach($deviceAccessible->device_id);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/device-groups/{$group->id}?related=devices");
+
+        $response->assertStatus(200);
+
+        // Filter out nulls — only the permitted device should remain
+        $relationships = $response->json('data.relationships.devices');
+        $visibleDevices = collect($relationships)->filter()->values();
+        $this->assertCount(1, $visibleDevices, 'User should only see the device they have access to');
+        $this->assertEquals(
+            (string) $deviceAccessible->device_id,
+            $visibleDevices->first()['id'],
+            'The visible device should be the one the user has permission for'
+        );
+    }
+
+    public function testCustomRoleCannotSeeUnauthorizedDeviceGroupsViaAlertRule(): void
+    {
+        // User can access alert-rules but NOT device-groups
+        $user = $this->createCustomRoleUser([
+            'api.access',
+            'alert-rule.viewAny',
+            'alert-rule.view',
+        ]);
+        $rule = AlertRule::factory()->create();
+        $groups = DeviceGroup::factory()->count(2)->create(['type' => 'static']);
+        $rule->groups()->attach($groups->pluck('id'));
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/alert-rules/{$rule->id}?related=groups");
+
+        $response->assertStatus(200);
+
+        // Device groups should be filtered out since user lacks device-group.view
+        $relationships = $response->json('data.relationships.groups');
+        $nonNullGroups = collect($relationships)->filter()->values();
+        $this->assertEmpty($nonNullGroups, 'User without device-group.view should not see related groups');
+    }
 }

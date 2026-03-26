@@ -259,7 +259,9 @@ class AppServiceProvider extends ServiceProvider
                 return true;  // super admin
             }
 
-            if ((str_ends_with($ability, 'view') || str_ends_with($ability, 'viewAny')) && $user->hasRole('global-read')) {
+            // Restify uses 'show' instead of 'view' for single-resource authorization
+            // (see vendor/binaryk/laravel-restify/src/Traits/AuthorizableModels.php)
+            if ((str_ends_with($ability, 'view') || str_ends_with($ability, 'viewAny') || $ability === 'show') && $user->hasRole('global-read')) {
                 return true; // global read access
             }
 
