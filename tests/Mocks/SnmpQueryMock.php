@@ -67,13 +67,6 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
-    public function deviceArray(array $device): SnmpQueryInterface
-    {
-        $this->device = new Device($device);
-
-        return $this;
-    }
-
     public function cache(): SnmpQueryInterface
     {
         return $this; // ignore, always cached

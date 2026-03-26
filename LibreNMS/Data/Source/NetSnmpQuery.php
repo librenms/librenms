@@ -108,23 +108,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         return $this;
     }
 
-    /**
-     * Specify a device by a device array.
-     * The device will be fetched from the cache if it is loaded, otherwise, it will fill the array into a new Device
-     */
-    public function deviceArray(array $device): SnmpQueryInterface
-    {
-        if (isset($device['device_id']) && DeviceCache::has($device['device_id'])) {
-            $this->device = DeviceCache::get($device['device_id']);
-
-            return $this;
-        }
-
-        $this->device = new Device($device);
-
-        return $this;
-    }
-
     public function cache(): SnmpQueryInterface
     {
         $this->cache = true;
