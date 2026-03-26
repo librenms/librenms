@@ -3,7 +3,7 @@
 @section('title', __('permissions.rbac.title'))
 
 @section('content')
-    <div class="container-fluid">
+    <div class="container">
         <div class="alert alert-warning">
             <i class="fas fa-exclamation-triangle tw:mr-2"></i>
             <strong>{{ __('permissions.rbac.beta_warning_title') }}:</strong>

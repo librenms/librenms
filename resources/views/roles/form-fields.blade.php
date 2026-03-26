@@ -67,7 +67,7 @@
 
                 {{-- Group header --}}
                 <div class="panel-heading">
-                    <h5 class="panel-title tw:text-xs tw:font-bold tw:uppercase tw:tracking-wider">
+                    <h5 class="panel-title tw:font-bold tw:uppercase tw:tracking-wider">
                         {{ $labels[$group]['title'] ?? $group }}
                     </h5>
                 </div>
@@ -82,11 +82,11 @@
                                        x-model="permissions"
                                        class="tw:mt-1 tw:w-4 tw:h-4">
                                 <div class="tw:flex-1">
-                                    <div class="tw:font-bold tw:text-base">
+                                    <div class="tw:font-bold">
                                         {{ $p['label'] }}
                                     </div>
                                     @if($p['description'])
-                                        <div class="tw:text-sm tw:text-slate-500 tw:dark:text-dark-white-400">
+                                        <div class="tw:text-base tw:text-slate-500 tw:dark:text-dark-white-400">
                                             {{ $p['description'] }}
                                         </div>
                                     @endif

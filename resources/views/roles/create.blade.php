@@ -3,7 +3,7 @@
 @section('title', __('permissions.rbac.create_role'))
 
 @section('content')
-    <div class="container-fluid" x-data="roleForm()">
+    <div class="container" x-data="roleForm()">
         <x-panel>
             <x-slot name="title">
                 <div class="tw:flex tw:items-center tw:justify-between tw:w-full">
