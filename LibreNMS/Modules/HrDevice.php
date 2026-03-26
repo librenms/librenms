@@ -51,7 +51,7 @@ class HrDevice implements Module
                 'HOST-RESOURCES-MIB::hrProcessorLoad',
                 'HOST-RESOURCES-MIB::hrDeviceTable',
             ])->mapTable(function (array $hrDevice, int $hrDeviceIndex) {
-                $hrDevice['hrDeviceDescr'] = StringHelpers::inferEncoding($hrDevice['hrDeviceDescr'] ?? null);
+                $hrDevice['hrDeviceDescr'] = StringHelpers::inferEncoding($hrDevice['hrDeviceDescr'] ?? '') ?: '';
                 $model = new \App\Models\HrDevice($hrDevice);
                 $model->hrDeviceIndex = $hrDeviceIndex;
 
