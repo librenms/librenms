@@ -12,6 +12,7 @@ use App\Models\BgpPeer;
 use App\Models\Bill;
 use App\Models\Component;
 use App\Models\Device;
+use App\Models\EntPhysical;
 use App\Models\Eventlog;
 use App\Models\Syslog;
 use App\Models\DeviceGroup;
@@ -541,6 +542,32 @@ class RestifyRelationshipsTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $response = $this->getJson("/api/v1/bgp-peers/{$peer->bgpPeer_id}?related=device");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.relationships.device.attributes.hostname', $device->hostname);
+    }
+
+    public function testDeviceShowIncludesInventory(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        EntPhysical::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=inventory");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(3, 'data.relationships.inventory');
+    }
+
+    public function testEntPhysicalShowIncludesDevice(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $entity = EntPhysical::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/inventory/{$entity->entPhysical_id}?related=device");
 
         $response->assertStatus(200)
             ->assertJsonPath('data.relationships.device.attributes.hostname', $device->hostname);

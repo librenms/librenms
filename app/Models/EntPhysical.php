@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class EntPhysical extends DeviceRelatedModel implements Keyable
 {
+    use HasFactory;
+
     protected $table = 'entPhysical';
     protected $primaryKey = 'entPhysical_id';
     public $timestamps = false;

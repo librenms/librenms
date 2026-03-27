@@ -16,6 +16,7 @@ use App\Restify\AuthLogRepository;
 use App\Restify\DeviceGroupRepository;
 use App\Restify\DeviceRepository;
 use App\Restify\EventlogRepository;
+use App\Restify\InventoryRepository;
 use App\Restify\LocationRepository;
 use App\Restify\MempoolRepository;
 use App\Restify\PollerClusterRepository;
@@ -85,6 +86,7 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
             DeviceGroupRepository::class,
             DeviceRepository::class,
             EventlogRepository::class,
+            InventoryRepository::class,
             LocationRepository::class,
             MempoolRepository::class,
             PollerClusterRepository::class,

@@ -36,6 +36,7 @@ class DeviceRepository extends Repository
             'bgpPeers' => HasMany::make('bgpPeers', BgpPeerRepository::class),
             'components' => HasMany::make('components', ComponentRepository::class),
             'applications' => HasMany::make('applications', ApplicationRepository::class),
+            'inventory' => HasMany::make('entityPhysical', InventoryRepository::class),
             'eventlogs' => HasMany::make('eventlogs', EventlogRepository::class),
             'syslogs' => HasMany::make('syslogs', SyslogRepository::class),
             'alertLogs' => HasMany::make('alertLogs', AlertLogRepository::class),

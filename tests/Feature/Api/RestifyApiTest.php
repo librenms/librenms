@@ -15,6 +15,7 @@ use App\Models\BgpPeer;
 use App\Models\Bill;
 use App\Models\Component;
 use App\Models\Device;
+use App\Models\EntPhysical;
 use App\Models\Eventlog;
 use App\Models\Syslog;
 use App\Models\DeviceGroup;
@@ -2084,6 +2085,56 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->postJsonApi('/api/v1/poller-clusters', ['poller_name' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── Inventory (EntPhysical) ─────────────────────────────
+
+    public function testAdminCanListEntPhysicals(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        EntPhysical::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/inventory')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testAdminCanShowEntPhysical(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $entity = EntPhysical::factory()->for($device)->create(['entPhysicalName' => 'Chassis']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/inventory/{$entity->entPhysical_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.entPhysicalName', 'Chassis');
+    }
+
+    public function testEntPhysicalFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        EntPhysical::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/inventory')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'entPhysicalIndex', 'entPhysicalDescr', 'entPhysicalClass',
+                'entPhysicalName', 'entPhysicalSerialNum', 'entPhysicalModelName',
+            ]]]]);
+    }
+
+    public function testEntPhysicalsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/inventory', ['entPhysicalName' => 'test'])
             ->assertStatus(403);
     }
 }
