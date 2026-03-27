@@ -34,10 +34,10 @@ $now = time();
 $days = 90;
 $start = $now - ($days * 86400);
 
-$outages = DeviceOutage::where('device_id', $device_id)
-    ->where('going_down', '>=', $start)
-    ->orderBy('going_down')
-    ->get();
+// Determine when the device was added
+$inserted = $device_obj->inserted
+    ? strtotime($device_obj->inserted)
+    : $now;
 
 // Build per-day availability data
 $day_data = [];
@@ -68,14 +68,16 @@ for ($i = 0; $i < $days; $i++) {
 
     $availability = max(0, min(100, 100 - ($outage_seconds / 86400 * 100)));
 
-    if ($availability >= 99) {
+    if ($day_start < $inserted) {
+        $color = '#cccccc';
+        $outage_lines = ['no_data'];
+    } elseif ($availability >= 99) {
         $color = '#2ecc71';
     } elseif ($availability >= 95) {
         $color = '#f39c12';
     } else {
         $color = '#e74c3c';
     }
-
     $day_data[] = [
         'date' => date('d M Y', $day_start),
         'avail' => round($availability, 2),
@@ -128,14 +130,15 @@ echo '<div class="avail-wrap">';
 foreach ($day_data as $day) {
     $tip = '<div class="avail-tip-date">' . $day['date'] . '</div>';
 
-    if (empty($day['outages'])) {
+    if ($day['outages'] === ['no_data']) {
+        $tip .= '<div class="avail-tip-ok" style="color:#999;">— No data</div>';
+    } elseif (empty($day['outages'])) {
         $tip .= '<div class="avail-tip-ok">&#10003; No outage</div>';
     } else {
         foreach ($day['outages'] as $line) {
             $tip .= '<div class="avail-tip-err">&#10007; ' . $line . '</div>';
         }
     }
-
     echo '<div class="avail-bar" style="background:' . $day['color'] . ';">';
     echo '<div class="avail-tip">' . $tip . '</div>';
     echo '</div>';
