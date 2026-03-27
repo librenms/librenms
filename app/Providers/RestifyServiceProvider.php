@@ -3,14 +3,19 @@
 namespace App\Providers;
 
 use App\Restify\ApplicationRepository;
+use App\Restify\BgpPeerRepository;
+use App\Restify\BillRepository;
+use App\Restify\AlertLogRepository;
 use App\Restify\AlertRepository;
 use App\Restify\AlertRuleRepository;
 use App\Restify\AlertScheduleRepository;
 use App\Restify\AlertTemplateRepository;
 use App\Restify\AlertTransportRepository;
 use App\Restify\ComponentRepository;
+use App\Restify\AuthLogRepository;
 use App\Restify\DeviceGroupRepository;
 use App\Restify\DeviceRepository;
+use App\Restify\EventlogRepository;
 use App\Restify\LocationRepository;
 use App\Restify\MempoolRepository;
 use App\Restify\PollerGroupRepository;
@@ -21,6 +26,7 @@ use App\Restify\SensorRepository;
 use App\Restify\ServiceRepository;
 use App\Restify\ServiceTemplateRepository;
 use App\Restify\StorageRepository;
+use App\Restify\SyslogRepository;
 use App\Restify\UserRepository;
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot;
 use Binaryk\LaravelRestify\Restify;
@@ -64,7 +70,11 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
 
         Restify::repositories([
             ApplicationRepository::class,
+            AlertLogRepository::class,
             AlertRepository::class,
+            AuthLogRepository::class,
+            BgpPeerRepository::class,
+            BillRepository::class,
             AlertRuleRepository::class,
             AlertScheduleRepository::class,
             AlertTemplateRepository::class,
@@ -72,6 +82,7 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
             ComponentRepository::class,
             DeviceGroupRepository::class,
             DeviceRepository::class,
+            EventlogRepository::class,
             LocationRepository::class,
             MempoolRepository::class,
             PollerGroupRepository::class,
@@ -82,6 +93,7 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
             ServiceRepository::class,
             ServiceTemplateRepository::class,
             StorageRepository::class,
+            SyslogRepository::class,
             UserRepository::class,
         ]);
     }

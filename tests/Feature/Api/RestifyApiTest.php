@@ -4,13 +4,19 @@ namespace LibreNMS\Tests\Feature\Api;
 
 use App\Http\Middleware\EnforceJsonApi;
 use App\Models\Alert;
+use App\Models\AlertLog;
 use App\Models\AlertRule;
 use App\Models\AlertSchedule;
 use App\Models\AlertTemplate;
 use App\Models\AlertTransport;
 use App\Models\Application;
+use App\Models\AuthLog;
+use App\Models\BgpPeer;
+use App\Models\Bill;
 use App\Models\Component;
 use App\Models\Device;
+use App\Models\Eventlog;
+use App\Models\Syslog;
 use App\Models\DeviceGroup;
 use App\Models\Location;
 use App\Models\Mempool;
@@ -1713,5 +1719,322 @@ class RestifyApiTest extends DBTestCase
 
         $this->postJsonApi('/api/v1/applications', ['app_type' => 'mysql'])
             ->assertStatus(403);
+    }
+
+    // ── BGP Peers ───────────────────────────────────────────
+
+    public function testAdminCanListBgpPeers(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        BgpPeer::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/bgp-peers')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testAdminCanShowBgpPeer(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $peer = BgpPeer::factory()->for($device)->create(['bgpPeerState' => 'established']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/bgp-peers/{$peer->bgpPeer_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.bgpPeerState', 'established');
+    }
+
+    public function testBgpPeerFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        BgpPeer::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/bgp-peers')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'bgpPeerIdentifier', 'bgpPeerRemoteAs',
+                'bgpPeerState', 'bgpPeerAdminStatus', 'bgpLocalAddr', 'bgpPeerRemoteAddr',
+            ]]]]);
+    }
+
+    public function testBgpPeersCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/bgp-peers', ['bgpPeerRemoteAs' => 65000])
+            ->assertStatus(403);
+    }
+
+    // ── Eventlog ────────────────────────────────────────────
+
+    public function testAdminCanListEventlogs(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Eventlog::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson('/api/v1/eventlogs');
+        $response->assertStatus(200);
+        $this->assertGreaterThanOrEqual(3, $response->json('meta.total'));
+    }
+
+    public function testAdminCanShowEventlog(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $log = Eventlog::factory()->for($device)->create(['message' => 'Interface up']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/eventlogs/{$log->event_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.message', 'Interface up');
+    }
+
+    public function testEventlogFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Eventlog::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/eventlogs')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'datetime', 'message', 'type', 'severity',
+            ]]]]);
+    }
+
+    public function testEventlogsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/eventlogs', ['message' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── Syslog ──────────────────────────────────────────────
+
+    public function testAdminCanListSyslogs(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Syslog::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/syslogs')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testAdminCanShowSyslog(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $log = Syslog::factory()->for($device)->create(['msg' => 'kernel: test message']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/syslogs/{$log->seq}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.msg', 'kernel: test message');
+    }
+
+    public function testSyslogFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Syslog::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/syslogs')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'facility', 'priority', 'level', 'tag', 'program', 'msg',
+            ]]]]);
+    }
+
+    public function testSyslogsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/syslogs', ['msg' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── Alert Log ───────────────────────────────────────────
+
+    public function testAdminCanListAlertLogs(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        AlertLog::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/alert-logs')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 2);
+    }
+
+    public function testAdminCanShowAlertLog(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $log = AlertLog::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/alert-logs/{$log->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.device_id', $device->device_id);
+    }
+
+    public function testAlertLogFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        AlertLog::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/alert-logs')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'rule_id', 'state', 'time_logged',
+            ]]]]);
+    }
+
+    public function testAlertLogsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/alert-logs', ['state' => 1])
+            ->assertStatus(403);
+    }
+
+    // ── Auth Log ────────────────────────────────────────────
+
+    public function testAdminCanListAuthLogs(): void
+    {
+        $user = User::factory()->admin()->create();
+        AuthLog::factory()->count(3)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson('/api/v1/auth-logs');
+        $response->assertStatus(200);
+        $this->assertGreaterThanOrEqual(3, $response->json('meta.total'));
+    }
+
+    public function testAdminCanShowAuthLog(): void
+    {
+        $user = User::factory()->admin()->create();
+        $log = AuthLog::factory()->create(['user' => 'admin', 'result' => 'Logged In']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/auth-logs/{$log->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.user', 'admin')
+            ->assertJsonPath('data.attributes.result', 'Logged In');
+    }
+
+    public function testAuthLogFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        AuthLog::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/auth-logs')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'datetime', 'user', 'address', 'result',
+            ]]]]);
+    }
+
+    public function testAuthLogsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/auth-logs', ['user' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── Bills ───────────────────────────────────────────────
+
+    public function testAdminCanListBills(): void
+    {
+        $user = User::factory()->admin()->create();
+        Bill::factory()->count(3)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/bills')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testAdminCanShowBill(): void
+    {
+        $user = User::factory()->admin()->create();
+        $bill = Bill::factory()->create(['bill_name' => 'Transit Link']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/bills/{$bill->bill_id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.bill_name', 'Transit Link');
+    }
+
+    public function testBillFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        Bill::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/bills')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'bill_name', 'bill_type', 'rate_95th', 'total_data',
+                'rate_average', 'bill_last_calc',
+            ]]]]);
+    }
+
+    public function testAdminCanCreateBill(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/bills', [
+            'bill_name' => 'New Transit',
+            'bill_type' => 'quota',
+        ])->assertStatus(201);
+
+        $this->assertDatabaseHas('bills', ['bill_name' => 'New Transit']);
+    }
+
+    public function testAdminCanDeleteBill(): void
+    {
+        $user = User::factory()->admin()->create();
+        $bill = Bill::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->deleteJsonApi("/api/v1/bills/{$bill->bill_id}")
+            ->assertStatus(204);
+
+        $this->assertDatabaseMissing('bills', ['bill_id' => $bill->bill_id]);
+    }
+
+    public function testReadOnlyUserCannotCreateBill(): void
+    {
+        $user = User::factory()->read()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/bills', [
+            'bill_name' => 'Forbidden',
+        ])->assertStatus(403);
     }
 }

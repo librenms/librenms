@@ -33,8 +33,12 @@ class DeviceRepository extends Repository
             'mempools' => HasMany::make('mempools', MempoolRepository::class),
             'storage' => HasMany::make('storage', StorageRepository::class),
             'services' => HasMany::make('services', ServiceRepository::class),
+            'bgpPeers' => HasMany::make('bgpPeers', BgpPeerRepository::class),
             'components' => HasMany::make('components', ComponentRepository::class),
             'applications' => HasMany::make('applications', ApplicationRepository::class),
+            'eventlogs' => HasMany::make('eventlogs', EventlogRepository::class),
+            'syslogs' => HasMany::make('syslogs', SyslogRepository::class),
+            'alertLogs' => HasMany::make('alertLogs', AlertLogRepository::class),
             'location' => BelongsTo::make('location', LocationRepository::class),
             'groups' => BelongsToMany::make('groups', DeviceGroupRepository::class),
         ];

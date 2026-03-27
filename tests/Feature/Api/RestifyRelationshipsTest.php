@@ -3,10 +3,15 @@
 namespace LibreNMS\Tests\Feature\Api;
 
 use App\Models\Alert;
+use App\Models\AlertLog;
 use App\Models\AlertRule;
 use App\Models\Application;
+use App\Models\BgpPeer;
+use App\Models\Bill;
 use App\Models\Component;
 use App\Models\Device;
+use App\Models\Eventlog;
+use App\Models\Syslog;
 use App\Models\DeviceGroup;
 use App\Models\Location;
 use App\Models\Mempool;
@@ -444,6 +449,114 @@ class RestifyRelationshipsTest extends DBTestCase
 
         $response->assertStatus(200)
             ->assertJsonCount(2, 'data.relationships.applications');
+    }
+
+    public function testDeviceShowIncludesBgpPeers(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        BgpPeer::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=bgpPeers");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data.relationships.bgpPeers');
+    }
+
+    public function testDeviceShowIncludesEventlogs(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Eventlog::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=eventlogs");
+
+        $response->assertStatus(200);
+        // Device creation may auto-create eventlog entries
+        $this->assertGreaterThanOrEqual(3, count($response->json('data.relationships.eventlogs')));
+    }
+
+    public function testDeviceShowIncludesSyslogs(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Syslog::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=syslogs");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data.relationships.syslogs');
+    }
+
+    public function testDeviceShowIncludesAlertLogs(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        AlertLog::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/devices/{$device->device_id}?related=alertLogs");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data.relationships.alertLogs');
+    }
+
+    public function testAlertLogShowIncludesDevice(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $log = AlertLog::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/alert-logs/{$log->id}?related=device");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.relationships.device.attributes.hostname', $device->hostname);
+    }
+
+    public function testAlertLogShowIncludesRule(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $rule = AlertRule::factory()->create();
+        $log = AlertLog::factory()->for($device)->create(['rule_id' => $rule->id]);
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/alert-logs/{$log->id}?related=rule");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.relationships.rule.attributes.name', $rule->name);
+    }
+
+    public function testBgpPeerShowIncludesDevice(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $peer = BgpPeer::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/bgp-peers/{$peer->bgpPeer_id}?related=device");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.relationships.device.attributes.hostname', $device->hostname);
+    }
+
+    public function testBillShowIncludesPorts(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $bill = Bill::factory()->create();
+        $ports = Port::factory()->count(2)->for($device)->create();
+        $bill->ports()->attach($ports->pluck('port_id'));
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/bills/{$bill->bill_id}?related=ports");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(2, 'data.relationships.ports');
     }
 
     public function testComponentShowIncludesDevice(): void
