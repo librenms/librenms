@@ -25,10 +25,6 @@
  * @author     Your Name <your@email.address>
  */
 
-
-use App\Facades\DeviceCache;
-use App\Models\DeviceOutage;
-
 $device_obj = DeviceCache::getPrimary();
 $device_id = $device_obj->device_id;
 $now = time();
@@ -39,6 +35,11 @@ $start = $now - ($days * 86400);
 $inserted = $device_obj->inserted
     ? strtotime($device_obj->inserted)
     : $now;
+
+$outages = \App\Models\DeviceOutage::where('device_id', $device_id)
+    ->where('going_down', '>=', $start)
+    ->orderBy('going_down')
+    ->get();
 
 // Build per-day availability data
 $day_data = [];
