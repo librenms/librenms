@@ -25,13 +25,9 @@
  */
 
 use App\Facades\DeviceCache;
-use App\Models\AlertDeviceMap;
-use App\Models\AlertGroupMap;
-use App\Models\AlertLocationMap;
 use App\Models\AlertRule;
 use App\Models\AlertTransport;
 use App\Models\AlertTransportGroup;
-use App\Models\AlertTransportMap;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
 
@@ -201,7 +197,8 @@ foreach ($rule_list as $rule) {
     }
 
     $sub = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY `state` DESC, `id` DESC LIMIT 1', [$rule['id']]);
-    $severity = AlertRule::where('id', $rule['id'])->value('severity');
+    $alertRule = AlertRule::find($rule['id']);
+    $severity = $rule['severity'];
     $ico = 'check';
     $col = 'success';
     $extra = '';
@@ -237,9 +234,9 @@ foreach ($rule_list as $rule) {
 
     $rule_extra = json_decode((string) $rule['extra'], true);
 
-    $has_devices = AlertDeviceMap::where('rule_id', $rule['id'])->exists();
-    $has_groups = AlertGroupMap::where('rule_id', $rule['id'])->exists();
-    $has_locations = AlertLocationMap::where('rule_id', $rule['id'])->exists();
+    $has_devices = $alertRule->devices()->exists();
+    $has_groups = $alertRule->groups()->exists();
+    $has_locations = $alertRule->locations()->exists();
 
     $popover_msg_parts = [];
 
@@ -334,7 +331,7 @@ foreach ($rule_list as $rule) {
     echo '</td>';
 
     // Transports
-    $has_transports = AlertTransportMap::where('rule_id', $rule['id'])->exists();
+    $has_transports = $alertRule->transportSingles()->exists() || $alertRule->transportGroups()->exists();
 
     $transports_popover = 'right';
 
