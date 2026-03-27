@@ -1,4 +1,5 @@
 <?php
+
 /**
  * availability_bar.inc.php
  *
@@ -27,10 +28,10 @@ use App\Facades\DeviceCache;
 use App\Models\DeviceOutage;
 
 $device_obj = DeviceCache::getPrimary();
-$device_id  = $device_obj->device_id;
-$now        = time();
-$days       = 90;
-$start      = $now - ($days * 86400);
+$device_id = $device_obj->device_id;
+$now = time();
+$days = 90;
+$start = $now - ($days * 86400);
 
 $outages = DeviceOutage::where('device_id', $device_id)
     ->where('going_down', '>=', $start)
@@ -40,22 +41,22 @@ $outages = DeviceOutage::where('device_id', $device_id)
 // Build per-day availability data
 $day_data = [];
 for ($i = 0; $i < $days; $i++) {
-    $day_start      = $start + ($i * 86400);
-    $day_end        = $day_start + 86400;
+    $day_start = $start + ($i * 86400);
+    $day_end = $day_start + 86400;
     $outage_seconds = 0;
-    $outage_lines   = [];
+    $outage_lines = [];
 
     foreach ($outages as $outage) {
         $down = max($outage->going_down, $day_start);
-        $up   = min($outage->up_again ?: $now, $day_end);
+        $up = min($outage->up_again ?: $now, $day_end);
 
         if ($up > $down) {
-            $duration       = $up - $down;
+            $duration = $up - $down;
             $outage_seconds += $duration;
-            $hours          = (int) floor($duration / 3600);
-            $minutes        = (int) floor(($duration % 3600) / 60);
-            $time_str       = date('H:i', $outage->going_down);
-            $duration_str   = $hours > 0
+            $hours = (int) floor($duration / 3600);
+            $minutes = (int) floor(($duration % 3600) / 60);
+            $time_str = date('H:i', $outage->going_down);
+            $duration_str = $hours > 0
                 ? "{$hours} hrs {$minutes} mins"
                 : "{$minutes} mins";
 
@@ -86,7 +87,7 @@ for ($i = 0; $i < $days; $i++) {
 $total_outage = 0;
 foreach ($outages as $outage) {
     $down = max($outage->going_down, $start);
-    $up   = min($outage->up_again ?: $now, $now);
+    $up = min($outage->up_again ?: $now, $now);
 
     if ($up > $down) {
         $total_outage += ($up - $down);
