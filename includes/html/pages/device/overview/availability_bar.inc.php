@@ -25,6 +25,7 @@
  * @author     Your Name <your@email.address>
  */
 
+
 use App\Facades\DeviceCache;
 use App\Models\DeviceOutage;
 
