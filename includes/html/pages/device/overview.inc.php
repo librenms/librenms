@@ -24,6 +24,7 @@ foreach (PluginManager::call(DeviceOverviewHook::class, ['device' => DeviceCache
     echo $view;
 }
 
+require 'overview/availability_bar.inc.php';
 require 'overview/ports.inc.php';
 require 'overview/transceivers.inc.php';
 
