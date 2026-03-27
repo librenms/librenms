@@ -2,12 +2,10 @@
 
 namespace App\Policies;
 
-use App\Facades\LibrenmsConfig;
-use App\Facades\Permissions;
-use App\Models\Service;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
-class ServicePolicy
+class RolePolicy
 {
     use ChecksGlobalPermissions;
 
@@ -16,32 +14,18 @@ class ServicePolicy
      */
     public function viewAny(User $user): bool
     {
-        if (! LibrenmsConfig::get('show_services')) {
-            return false;
-        }
-
         return $this->hasGlobalPermission($user, 'view')
             || $this->hasGlobalPermission($user, 'create')
             || $this->hasGlobalPermission($user, 'update')
             || $this->hasGlobalPermission($user, 'delete');
     }
 
-    public function viewAll(User $user): bool
-    {
-        return $this->hasGlobalPermission($user, 'viewAll');
-    }
-
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Service $service): bool
+    public function view(User $user): bool
     {
-        if ($this->hasGlobalPermission($user, 'viewAll')) {
-            return true;
-        }
-
-        return $this->hasGlobalPermission($user, 'view')
-            && Permissions::canAccessDevice($service->device_id, $user);
+        return $this->hasGlobalPermission($user, 'view');
     }
 
     /**
@@ -63,8 +47,12 @@ class ServicePolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, Role $role): bool
     {
+        if (in_array(strtolower($role->name), ['admin', 'global-read', 'user'])) {
+            return false;
+        }
+
         return $this->hasGlobalPermission($user, 'delete');
     }
 }
