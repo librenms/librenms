@@ -31,6 +31,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\StringHelpers;
 use Log;
 
 class SnmpResponse implements \Stringable
@@ -172,9 +173,9 @@ class SnmpResponse implements \Stringable
 
             if (Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
                 // unformatted string from net-snmp, remove extra escapes
-                $this->values[$oid] = trim(stripslashes($value), "\" \n\r");
+                $this->values[$oid] = StringHelpers::inferEncoding(trim(stripslashes($value), "\" \n\r")) ?? '';
             } else {
-                $this->values[$oid] = trim($value);
+                $this->values[$oid] = StringHelpers::inferEncoding(trim($value)) ?? '';
             }
         }
 

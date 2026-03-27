@@ -306,6 +306,31 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $this->assertEquals('internal\\backslash', $response->value());
     }
 
+    public function testNonUtf8Encoding(): void
+    {
+        // Windows-1252 encoded string with ® (0xAE) - e.g. "david® Hybrid Mail Printer"
+        $win1252String = "david\xAE Hybrid Mail Printer";
+        $response = new SnmpResponse("HOST-RESOURCES-MIB::hrDeviceDescr[1] = \"$win1252String\"\n");
+
+        $this->assertTrue($response->isValid());
+        $this->assertEquals('david® Hybrid Mail Printer', $response->value());
+
+        // Latin-1/ISO-8859-1 encoded string with Ø (0xD8) - e.g. "Øverbyvegen"
+        $latin1String = "\xD8verbyvegen";
+        $response = new SnmpResponse("SNMPv2-MIB::sysLocation.0 = $latin1String\n");
+
+        $this->assertTrue($response->isValid());
+        $this->assertEquals('Øverbyvegen', $response->value());
+
+        // Already valid UTF-8 should pass through unchanged
+        $response = new SnmpResponse("HOST-RESOURCES-MIB::hrDeviceDescr[1] = \"Normal ASCII text\"\n");
+        $this->assertEquals('Normal ASCII text', $response->value());
+
+        // UTF-8 encoded string should pass through unchanged
+        $response = new SnmpResponse("SNMPv2-MIB::sysLocation.0 = Øverbyvegen\n");
+        $this->assertEquals('Øverbyvegen', $response->value());
+    }
+
     public function testErrorHandling(): void
     {
         // no response
