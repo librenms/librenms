@@ -4025,15 +4025,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbUpdate\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/alert-notes.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbInsert\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
@@ -4268,30 +4259,12 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbUpdate\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/token-item-disable.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbInsert\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
 			'''
 			identifier: function.deprecated
 			count: 1
 			path: includes/html/forms/transport-groups.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbUpdate\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent\#inserting\-and\-updating\-models$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/update-ifalias.inc.php
 
 		-
 			message: '''
