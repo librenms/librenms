@@ -20,6 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2026 Your Name <your@email.address>
  * @author     Your Name <your@email.address>
  */
@@ -76,9 +77,9 @@ for ($i = 0; $i < $days; $i++) {
     }
 
     $day_data[] = [
-        'date'    => date('d M Y', $day_start),
-        'avail'   => round($availability, 2),
-        'color'   => $color,
+        'date' => date('d M Y', $day_start),
+        'avail' => round($availability, 2),
+        'color' => $color,
         'outages' => $outage_lines,
     ];
 }
