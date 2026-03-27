@@ -32,7 +32,7 @@ $start = $now - ($days * 86400);
 
 // Determine when the device was added
 $inserted = $device_obj->inserted
-    ? strtotime((string) $device_obj->inserted)
+    ? $device_obj->inserted->timestamp
     : $now;
 
 $outages = \App\Models\DeviceOutage::where('device_id', $device_id)
