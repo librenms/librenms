@@ -18,6 +18,8 @@ use App\Restify\DeviceRepository;
 use App\Restify\EventlogRepository;
 use App\Restify\LocationRepository;
 use App\Restify\MempoolRepository;
+use App\Restify\PollerClusterRepository;
+use App\Restify\PollerClusterStatRepository;
 use App\Restify\PollerGroupRepository;
 use App\Restify\PortGroupRepository;
 use App\Restify\PortRepository;
@@ -85,6 +87,8 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
             EventlogRepository::class,
             LocationRepository::class,
             MempoolRepository::class,
+            PollerClusterRepository::class,
+            PollerClusterStatRepository::class,
             PollerGroupRepository::class,
             PortGroupRepository::class,
             PortRepository::class,

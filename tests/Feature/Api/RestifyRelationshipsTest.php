@@ -5,6 +5,8 @@ namespace LibreNMS\Tests\Feature\Api;
 use App\Models\Alert;
 use App\Models\AlertLog;
 use App\Models\AlertRule;
+use App\Models\PollerCluster;
+use App\Models\PollerClusterStat;
 use App\Models\Application;
 use App\Models\BgpPeer;
 use App\Models\Bill;
@@ -542,6 +544,19 @@ class RestifyRelationshipsTest extends DBTestCase
 
         $response->assertStatus(200)
             ->assertJsonPath('data.relationships.device.attributes.hostname', $device->hostname);
+    }
+
+    public function testPollerClusterShowIncludesStats(): void
+    {
+        $user = User::factory()->admin()->create();
+        $cluster = PollerCluster::factory()->create();
+        PollerClusterStat::factory()->count(3)->create(['parent_poller' => $cluster->id]);
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/v1/poller-clusters/{$cluster->id}?related=stats");
+
+        $response->assertStatus(200)
+            ->assertJsonCount(3, 'data.relationships.stats');
     }
 
     public function testBillShowIncludesPorts(): void

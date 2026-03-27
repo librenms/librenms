@@ -20,6 +20,8 @@ use App\Models\Syslog;
 use App\Models\DeviceGroup;
 use App\Models\Location;
 use App\Models\Mempool;
+use App\Models\PollerCluster;
+use App\Models\PollerClusterStat;
 use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
@@ -2036,5 +2038,52 @@ class RestifyApiTest extends DBTestCase
         $this->postJsonApi('/api/v1/bills', [
             'bill_name' => 'Forbidden',
         ])->assertStatus(403);
+    }
+
+    // ── Poller Clusters ─────────────────────────────────────
+
+    public function testAdminCanListPollerClusters(): void
+    {
+        $user = User::factory()->admin()->create();
+        PollerCluster::factory()->count(2)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson('/api/v1/poller-clusters');
+        $response->assertStatus(200);
+        $this->assertGreaterThanOrEqual(2, $response->json('meta.total'));
+    }
+
+    public function testAdminCanShowPollerCluster(): void
+    {
+        $user = User::factory()->admin()->create();
+        $cluster = PollerCluster::factory()->create(['poller_name' => 'poller-01']);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/v1/poller-clusters/{$cluster->id}")
+            ->assertStatus(200)
+            ->assertJsonPath('data.attributes.poller_name', 'poller-01');
+    }
+
+    public function testPollerClusterFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        PollerCluster::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/poller-clusters')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'node_id', 'poller_name', 'poller_version', 'poller_groups',
+                'last_report', 'master',
+            ]]]]);
+    }
+
+    public function testPollerClustersCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/poller-clusters', ['poller_name' => 'test'])
+            ->assertStatus(403);
     }
 }
