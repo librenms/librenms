@@ -49,7 +49,9 @@ class Openwrt extends OS implements
      */
     public function discoverOS(Device $device): void
     {
-        [, $device->version] = explode(' ', snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"', '-Osqnv'));
+        $distro = trim((string) snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"', '-Osqnv'));
+        $distroParts = preg_split('/\s+/', $distro, 2);
+        $device->version = $distroParts[1] ?? $distro;
         $device->hardware = snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"', '-Osqnv');
     }
 
@@ -61,15 +63,84 @@ class Openwrt extends OS implements
      */
     private function getInterfaces()
     {
-        // Need to use PHP_EOL, found newline (\n) not near as reliable / consistent! And this is as PHP says it should be done.
-        $interfaces = explode(PHP_EOL, snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv'));
+        $rawInterfaces = (string) snmp_get($this->getDeviceArray(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv');
+        $interfaces = preg_split('/\r\n|\r|\n/', trim($rawInterfaces)) ?: [];
         $arrIfaces = [];
         foreach ($interfaces as $interface) {
-            [$k, $v] = explode(',', $interface);
-            $arrIfaces[$k] = $v;
+            $interface = trim($interface);
+
+            // Skip empty and comment lines
+            if ($interface === '' || str_starts_with($interface, '#')) {
+                continue;
+            }
+
+            $parsed = $this->parseInterfaceLine($interface);
+            if ($parsed !== null) {
+                [$k, $v] = $parsed;
+                $arrIfaces[$k] = $v;
+            }
         }
 
         return $arrIfaces;
+    }
+
+    /**
+     * Parse a single interface mapping line.
+     *
+     * Supported formats:
+     * - current: "wlan0,radio0 (SSID)"
+     * - legacy:  "wlan0 wl-2.4G"
+     * - fallback: "wlan0" (name maps to itself)
+     *
+     * @return array<string>|null [interface, description]
+     */
+    private function parseInterfaceLine(string $interface): ?array
+    {
+        // Preferred format used by current OpenWrt helper scripts.
+        $parts = explode(',', $interface, 2);
+        if (count($parts) === 2) {
+            [$key, $value] = array_map(trim(...), $parts);
+
+            if ($key !== '' && $value !== '') {
+                return [$key, $value];
+            }
+        }
+
+        // Legacy wlInterfaces.txt style with whitespace separator.
+        $legacyParts = preg_split('/\s+/', $interface, 2) ?: [];
+        if (count($legacyParts) === 2) {
+            [$key, $value] = array_map(trim(...), $legacyParts);
+
+            if ($key !== '' && $value !== '') {
+                return [$key, $value];
+            }
+        }
+
+        // Final fallback for single-token lines.
+        if ($interface !== '') {
+            return [$interface, $interface];
+        }
+
+        return null;
+    }
+
+    /**
+     * Extract SSID from interface description
+     *
+     * @param  string  $interface  Interface description in format "iface (SSID)" or just "iface"
+     * @return string SSID or interface name
+     */
+    private function extractSSID($interface)
+    {
+        // Match "interface (SSID)" pattern and extract SSID
+        if (preg_match('/\(([^)]+)\)/', $interface, $matches)) {
+            $ssid = trim($matches[1]);
+
+            // Return SSID if not empty, otherwise return interface name
+            return $ssid !== '' ? $ssid : preg_replace('/\s*\(.*?\)\s*/', '', $interface);
+        }
+
+        return $interface;
     }
 
     /**
@@ -97,15 +168,21 @@ class Openwrt extends OS implements
 
         // Loop over interfaces, adding sensors
         foreach ($interfaces as $index => $interface) {
+            $ssid = $this->extractSSID($interface);
+
             // Loop over stats, appending to sensors as needed (only a single, blank, addition if no stats)
             foreach ($statstr as $stat) {
                 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.1.' . Oid::encodeString("{$type->value}$query-$index$stat");
-                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, "openwrt$query", $count, "$interface$query$stat");
+
+                // Format description: use SSID if available, otherwise interface name
+                $description = $ssid . $query . $stat;
+
+                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, "openwrt$query", $count, $description);
                 $count += 1;
             }
         }
         // If system level (i.e. overall) sensor desired, add that one as well
-        if ($system and (count($interfaces) > 1)) {
+        if ($system && (count($interfaces) > 1)) {
             $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.1.' . Oid::encodeString("{$type->value}$query-wlan");
             $sensors[] = new WirelessSensor($type, $this->getDeviceId(), $oid, "openwrt$query", $count, 'wlan');
         }

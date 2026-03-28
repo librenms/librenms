@@ -103,7 +103,7 @@ if (LibrenmsConfig::get('enable_vrf_lite_cisco')) {
     //Delete all vrf that changed
     foreach ($tmpVrfC as $vrfC) {
         if (! in_array($vrfC['vrf_lite_cisco_id'], $ids)) {
-            \App\Models\VrfLite::where('vrf_lite_cisco_id', $vrfC['vrf_lite_cisco_id'])->delete();
+            dbDelete('vrf_lite_cisco', 'vrf_lite_cisco_id = ? ', [$vrfC['vrf_lite_cisco_id']]);
         }
     }
     unset($ids);

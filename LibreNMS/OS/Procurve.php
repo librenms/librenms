@@ -29,6 +29,7 @@ namespace LibreNMS\OS;
 use App\Facades\PortCache;
 use App\Models\PortsNac;
 use App\Models\Transceiver;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
@@ -146,7 +147,7 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling, Transceive
             'index' => $ifIndex,
             'entity_physical_index' => $ifIndex,
             'type' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrType'] ?? null,
-            'date' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrManufacDate'] ?? null,
+            'date' => isset($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrManufacDate']) ? Carbon::createFromFormat('mdy', $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrManufacDate'])->toDateString() : null,
             'model' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrModel'] ?? null,
             'serial' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrSerial'] ?? null,
             'ddm' => empty($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrDiagnostics']) ? 0 : 1,

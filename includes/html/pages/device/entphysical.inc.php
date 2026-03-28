@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\EntPhysical;
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Util\Html;
 
@@ -113,7 +112,7 @@ function printEntPhysical($device, $ent, $level, $class)
         }
 
         if ($ent['entPhysicalSerialNum']) {
-            echo " <br /><span class='text-info'>Serial No. " . $ent['entPhysicalSerialNum'] . '</span> ';
+            echo " <br /><span style='color: #000099;'>Serial No. " . $ent['entPhysicalSerialNum'] . '</span> ';
         }
 
         // Display sensors values with their descr, as we have more than one attached to this entPhysical
@@ -122,7 +121,7 @@ function printEntPhysical($device, $ent, $level, $class)
             foreach ($sensors as $sensor) {
                 $disp_name = str_replace([$ent['entPhysicalDescr'], $ent['entPhysicalName']], ['', ''], $sensor->sensor_descr);
                 echo "<a href='graphs/id=" . $sensor->sensor_id . '/type=sensor_' . $sensor->sensor_class . "/' onmouseover=\"return overlib('<img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'><img src=\'graph.php?id=" . $sensor->sensor_id . '&amp;type=sensor_' . $sensor->sensor_class . '&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=' . $ent['entPhysical_id'] . "\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\">";
-                echo "<span class='text-info'>" . $disp_name . ' ' . $sensor->sensor_class . '</span>';
+                echo "<span style='color: #000099;'>" . $disp_name . ' ' . $sensor->sensor_class . '</span>';
                 echo ' ';
                 echo Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());
                 echo '</a><br>';
@@ -131,7 +130,8 @@ function printEntPhysical($device, $ent, $level, $class)
         }
         echo '</div>';
 
-        if (EntPhysical::where('device_id', $device['device_id'])->where('entPhysicalContainedIn', $ent['entPhysicalIndex'])->exists()) {
+        $count = dbFetchCell("SELECT COUNT(*) FROM `entPhysical` WHERE device_id = '" . $device['device_id'] . "' AND entPhysicalContainedIn = '" . $ent['entPhysicalIndex'] . "'");
+        if ($count) {
             echo '<ul>';
             printEntPhysical($device, $ent['entPhysicalIndex'], $level + 1, 'liClosed');
             echo '</ul>';

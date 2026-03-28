@@ -25,8 +25,8 @@ if (! is_numeric($_POST['template_id'])) {
     echo 'ERROR: No template selected';
     exit;
 } else {
-    if (AlertTemplate::where('id', $_POST['template_id'])->delete()) {
-        \App\Models\AlertTemplateMap::where('alert_templates_id', $_POST['template_id'])->delete();
+    if (dbDelete('alert_templates', '`id` =  ?', [$_POST['template_id']])) {
+        dbDelete('alert_template_map', 'alert_templates_id = ?', [$_POST['template_id']]);
         echo 'Alert template has been deleted.';
         exit;
     } else {

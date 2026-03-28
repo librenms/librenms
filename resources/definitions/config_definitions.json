@@ -2272,7 +2272,7 @@
         "enable_ports_etherlike": {
             "group": "webui",
             "section": "device",
-            "order": 23,
+            "order": 22,
             "default": false,
             "type": "boolean"
         },
@@ -6308,17 +6308,6 @@
                 "fdb": "FDB"
             }
         },
-        "ports_ipv4_neighbours": {
-            "default": "subnet",
-            "type": "select",
-            "group": "webui",
-            "section": "device",
-            "order": 22,
-            "options":{
-                "subnet": "Subnet",
-                "arp": "ARP"
-            }
-        },
         "ports_purge": {
             "group": "system",
             "section": "cleanup",
@@ -6455,9 +6444,6 @@
             "type": "text",
             "group": "external",
             "section": "rancid",
-            "validate": {
-                "value": "url"
-            },
             "order": 3
         },
         "reporting.error": {
@@ -7020,13 +7006,6 @@
             "order": 12,
             "type": "executable"
         },
-        "snmptrap": {
-            "default": "/usr/bin/snmptrap",
-            "group": "external",
-            "section": "binaries",
-            "order": 13,
-            "type": "executable"
-        },
         "sso.create_users": {
             "default": true,
             "type": "boolean",
@@ -7437,24 +7416,6 @@
         "xirrus_disable_stations": {
             "default": false,
             "type": "boolean"
-        },
-        "ssl_certificates.auto_discover": {
-            "default": false,
-            "group": "apps",
-            "section": "ssl-certificates",
-            "order": 0,
-            "type": "boolean"
-        },
-        "ssl_certificates.skip_hosts": {
-            "default": [],
-            "group": "apps",
-            "section": "ssl-certificates",
-            "order": 1,
-            "type": "array",
-            "validate": {
-                "value": "array",
-                "value.*": "string"
-            }
         },
         "smokeping.integration": {
             "default": false,

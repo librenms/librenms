@@ -3387,7 +3387,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Edge-Core",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3407,7 +3406,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Edge-Core",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3427,7 +3425,6 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Edge-Core",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3447,7 +3444,6 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Edge-Core",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3467,7 +3463,6 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Edge-Core",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3487,7 +3482,6 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Edge-Core",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3507,7 +3501,6 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Edge-Core",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3527,7 +3520,6 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Edge-Core",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3547,7 +3539,6 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Edge-Core",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3567,7 +3558,6 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Edge-Core",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3587,7 +3577,6 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Edge-Core",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3607,7 +3596,6 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Edge-Core",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -3627,7 +3615,6 @@
                     "entPhysicalContainedIn": 101,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Edge-Core",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

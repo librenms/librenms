@@ -8831,7 +8831,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Huawei",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8851,7 +8850,6 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8871,7 +8869,6 @@
                     "entPhysicalContainedIn": 16842752,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Huawei",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8891,7 +8888,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 40
                 },
                 {
@@ -8911,7 +8907,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8931,7 +8926,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8951,7 +8945,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8971,7 +8964,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8991,7 +8983,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9011,7 +9002,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9031,7 +9021,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9051,7 +9040,6 @@
                     "entPhysicalContainedIn": 16843520,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9071,7 +9059,6 @@
                     "entPhysicalContainedIn": 16843776,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9091,7 +9078,6 @@
                     "entPhysicalContainedIn": 16844032,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9111,7 +9097,6 @@
                     "entPhysicalContainedIn": 16844288,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9131,7 +9116,6 @@
                     "entPhysicalContainedIn": 16844544,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9151,7 +9135,6 @@
                     "entPhysicalContainedIn": 16845056,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Vapel",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9171,7 +9154,6 @@
                     "entPhysicalContainedIn": 16845312,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Vapel",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9191,7 +9173,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "PRECISION",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 2
                 },
                 {
@@ -9211,7 +9192,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "PRECISION",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 3
                 },
                 {
@@ -9231,7 +9211,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "PRECISION",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 4
                 },
                 {
@@ -9251,7 +9230,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "HISILICON",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 5
                 },
                 {
@@ -9271,7 +9249,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "FIBERLAND",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 6
                 },
                 {
@@ -9291,7 +9268,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "4LAN_HW",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 7
                 },
                 {
@@ -9311,7 +9287,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "OEM",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 8
                 },
                 {
@@ -9331,7 +9306,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "PRECISION",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 9
                 },
                 {
@@ -9351,7 +9325,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 10
                 },
                 {
@@ -9371,7 +9344,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 11
                 },
                 {
@@ -9391,7 +9363,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "PRECISION",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 12
                 },
                 {
@@ -9411,7 +9382,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "PRECISION",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 13
                 },
                 {
@@ -9431,7 +9401,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 14
                 },
                 {
@@ -9451,7 +9420,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 15
                 },
                 {
@@ -9471,7 +9439,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 16
                 },
                 {
@@ -9491,7 +9458,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 17
                 },
                 {
@@ -9511,7 +9477,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 18
                 },
                 {
@@ -9531,7 +9496,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 19
                 },
                 {
@@ -9551,7 +9515,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 20
                 },
                 {
@@ -9571,7 +9534,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 29,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 21
                 },
                 {
@@ -9591,7 +9553,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 30,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 22
                 },
                 {
@@ -9611,7 +9572,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 23
                 },
                 {
@@ -9631,7 +9591,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 32,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 24
                 },
                 {
@@ -9651,7 +9610,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 33,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 25
                 },
                 {
@@ -9671,7 +9629,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 34,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 26
                 },
                 {
@@ -9691,7 +9648,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 35,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 27
                 },
                 {
@@ -9711,7 +9667,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 36,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 28
                 },
                 {
@@ -9731,7 +9686,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 37,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 29
                 },
                 {
@@ -9751,7 +9705,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 38,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 30
                 },
                 {
@@ -9771,7 +9724,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 39,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 31
                 },
                 {
@@ -9791,7 +9743,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 40,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 32
                 },
                 {
@@ -9811,7 +9762,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 41,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 33
                 },
                 {
@@ -9831,7 +9781,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 42,
                     "entPhysicalMfgName": "4LAN",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 34
                 },
                 {
@@ -9851,7 +9800,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 43,
                     "entPhysicalMfgName": "4LAN",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 35
                 },
                 {
@@ -9871,7 +9819,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 44,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 36
                 },
                 {
@@ -9891,7 +9838,6 @@
                     "entPhysicalContainedIn": 16842753,
                     "entPhysicalParentRelPos": 45,
                     "entPhysicalMfgName": "FIBERLAND",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 37
                 },
                 {
@@ -9911,7 +9857,6 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9931,7 +9876,6 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9951,7 +9895,6 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9971,7 +9914,6 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9991,7 +9933,6 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -10011,7 +9952,6 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -10031,7 +9971,6 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -10051,7 +9990,6 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

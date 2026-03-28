@@ -1,0 +1,10 @@
+modules:
+  sensors:
+    temperature:
+      data:
+        - oid: LM-SENSORS-MIB::lmTempSensorsTable
+          value: LM-SENSORS-MIB::lmTempSensorsValue
+          divisor: 1000
+          num_oid: '.1.3.6.1.4.1.2021.13.16.2.1.3.{{ $index }}'
+          descr: '{{ LM-SENSORS-MIB::lmTempSensorsDevice }}'
+          group: LM-SENSORS

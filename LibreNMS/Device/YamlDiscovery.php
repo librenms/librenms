@@ -36,7 +36,6 @@ use LibreNMS\OS;
 use LibreNMS\Util\Compare;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
-use SnmpQuery;
 
 class YamlDiscovery
 {
@@ -350,10 +349,9 @@ class YamlDiscovery
             return $pre_cache;
         }
 
-        $discovery_yaml = $os->getDiscovery();
-        if (! empty($discovery_yaml['modules'])) {
+        if (! empty($os->getDiscovery()['modules'])) {
             echo 'Caching data: ';
-            foreach ($discovery_yaml['modules'] as $module => $discovery_data) {
+            foreach ($os->getDiscovery()['modules'] as $module => $discovery_data) {
                 echo "$module ";
                 foreach ($discovery_data as $key => $data_array) {
                     // find the data array, we could already be at for simple modules
@@ -385,10 +383,8 @@ class YamlDiscovery
                                     LibrenmsConfig::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
                                 }
 
-                                $pre_cache[$oid] ??= [];
-                                SnmpQuery::mibs(Arr::wrap($discovery_yaml['mib'] ?? []))
-                                    ->numericIndex()->options($snmp_flag)
-                                    ->walk($oid)->valuesByIndex($pre_cache[$oid]);
+                                $mib = $os->getDiscovery()['mib'] ?? null;
+                                $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
 
                                 LibrenmsConfig::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
                             }

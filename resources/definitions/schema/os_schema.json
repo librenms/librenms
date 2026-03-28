@@ -571,7 +571,7 @@
             "type": "object",
             "properties": {
                 "oid": {
-                    "$ref": "oid_types.json#/$defs/oid"
+                    "type": "string"
                 },
                 "op": {
                     "$ref": "#/$defs/comparison"
@@ -591,6 +591,9 @@
                             }
                         }
                     ]
+                },
+                "mib": {
+                    "type": "string"
                 },
                 "mib_dir": {
                     "type": "string"

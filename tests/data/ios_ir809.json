@@ -2662,7 +2662,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Cisco Systems, Inc",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2682,7 +2681,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Cisco Systems, Inc",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2702,7 +2700,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Cisco",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2722,7 +2719,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Cisco Systems, Inc",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 1
                 },
                 {
@@ -2742,7 +2738,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Cisco Systems, Inc",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 2
                 },
                 {
@@ -2762,7 +2757,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Cisco Systems, Inc",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 3
                 },
                 {
@@ -2782,7 +2776,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Cisco Systems, Inc",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 4
                 },
                 {
@@ -2802,7 +2795,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Cisco Systems, Inc",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 5
                 },
                 {
@@ -2822,7 +2814,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Cisco Systems, Inc",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 7
                 },
                 {
@@ -2842,7 +2833,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Cisco Systems, Inc",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 8
                 },
                 {
@@ -2862,7 +2852,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Cisco Systems, Inc",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 12
                 },
                 {
@@ -2882,7 +2871,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Cisco Systems, Inc",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 13
                 },
                 {
@@ -2902,7 +2890,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2922,7 +2909,6 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Sierra Wireless",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 8
                 },
                 {
@@ -2942,7 +2928,6 @@
                     "entPhysicalContainedIn": 14,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2962,7 +2947,6 @@
                     "entPhysicalContainedIn": 14,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2982,7 +2966,6 @@
                     "entPhysicalContainedIn": 14,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

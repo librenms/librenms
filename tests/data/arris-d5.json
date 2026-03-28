@@ -11155,7 +11155,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "2009-6-18,0:0:0.0,+0:0",
                     "ifIndex": null
                 },
                 {
@@ -11175,7 +11174,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11195,7 +11193,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11215,7 +11212,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11235,7 +11231,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11255,7 +11250,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11275,7 +11269,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11295,7 +11288,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11315,7 +11307,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11335,7 +11326,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11355,7 +11345,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11375,7 +11364,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11395,7 +11383,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11415,7 +11402,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11435,7 +11421,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11455,7 +11440,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11475,7 +11459,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "2009-6-17,0:0:0.0,+0:0",
                     "ifIndex": null
                 },
                 {
@@ -11495,7 +11478,6 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11515,7 +11497,6 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11535,7 +11516,6 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11555,7 +11535,6 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11575,7 +11554,6 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11595,7 +11573,6 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11615,7 +11592,6 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11635,7 +11611,6 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11655,7 +11630,6 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "2008-12-4,0:0:0.0,+0:0",
                     "ifIndex": null
                 },
                 {
@@ -11675,7 +11649,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11695,7 +11668,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11715,7 +11687,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11735,7 +11706,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11755,7 +11725,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11775,7 +11744,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11795,7 +11763,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11815,7 +11782,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11835,7 +11801,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11855,7 +11820,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11875,7 +11839,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11895,7 +11858,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11915,7 +11877,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11935,7 +11896,6 @@
                     "entPhysicalContainedIn": 200,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11955,7 +11915,6 @@
                     "entPhysicalContainedIn": 213,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11975,7 +11934,6 @@
                     "entPhysicalContainedIn": 213,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -11995,7 +11953,6 @@
                     "entPhysicalContainedIn": 213,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12015,7 +11972,6 @@
                     "entPhysicalContainedIn": 213,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12035,7 +11991,6 @@
                     "entPhysicalContainedIn": 214,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12055,7 +12010,6 @@
                     "entPhysicalContainedIn": 214,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12075,7 +12029,6 @@
                     "entPhysicalContainedIn": 214,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12095,7 +12048,6 @@
                     "entPhysicalContainedIn": 214,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12115,7 +12067,6 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "2009-6-1,0:0:0.0,+0:0",
                     "ifIndex": null
                 },
                 {
@@ -12135,7 +12086,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12155,7 +12105,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12175,7 +12124,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12195,7 +12143,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12215,7 +12162,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12235,7 +12181,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12255,7 +12200,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12275,7 +12219,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12295,7 +12238,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12315,7 +12257,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12335,7 +12276,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12355,7 +12295,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12375,7 +12314,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12395,7 +12333,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12415,7 +12352,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12435,7 +12371,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12455,7 +12390,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12475,7 +12409,6 @@
                     "entPhysicalContainedIn": 800,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12495,7 +12428,6 @@
                     "entPhysicalContainedIn": 11,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "2009-6-16,0:0:0.0,+0:0",
                     "ifIndex": null
                 },
                 {
@@ -12515,7 +12447,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12535,7 +12466,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12555,7 +12485,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12575,7 +12504,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12595,7 +12523,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12615,7 +12542,6 @@
                     "entPhysicalContainedIn": 13,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12635,7 +12561,6 @@
                     "entPhysicalContainedIn": 1200,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12655,7 +12580,6 @@
                     "entPhysicalContainedIn": 1200,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12675,7 +12599,6 @@
                     "entPhysicalContainedIn": 1200,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12695,7 +12618,6 @@
                     "entPhysicalContainedIn": 1200,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12715,7 +12637,6 @@
                     "entPhysicalContainedIn": 1200,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12735,7 +12656,6 @@
                     "entPhysicalContainedIn": 15,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ARRIS, Inc.",
-                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 }
             ]

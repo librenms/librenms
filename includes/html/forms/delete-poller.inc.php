@@ -34,7 +34,7 @@ if (Gate::denies('delete', Poller::class)) {
         $status = ['status' => 1, 'message' => 'No poller has been selected'];
     } else {
         $poller_name = dbFetchCell('SELECT `poller_name` FROM `pollers` WHERE `id`=?', [$id]);
-        if (Poller::where('id', $id)->delete()) {
+        if (dbDelete('pollers', 'id=?', [$id])) {
             $status = ['status' => 0, 'message' => "Poller: <i>$poller_name ($id), has been deleted.</i>"];
         } else {
             $status = ['status' => 1, 'message' => "Poller: <i>$poller_name ($id), has NOT been deleted.</i>"];

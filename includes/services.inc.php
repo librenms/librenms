@@ -11,8 +11,15 @@ use LibreNMS\Util\IP;
 
 function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0, $template_id = '', $name = '')
 {
-    // keep legacy signature, delegate to modern implementation
-    return \LibreNMS\Services::addService($device, $type, $desc, $ip, $param, $ignore, $disabled, $template_id, $name);
+    $device = DeviceCache::get(is_array($device) ? $device['device_id'] : $device);
+
+    if (empty($ip)) {
+        $ip = $device->pollerTarget();
+    }
+
+    $insert = ['device_id' => $device->device_id, 'service_ip' => $ip, 'service_type' => $type, 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
+
+    return Service::create($insert);
 }
 
 function service_get($device = null, $service = null)
@@ -51,12 +58,11 @@ function delete_service($service = null)
 
 function discover_service($device, $service)
 {
-    $created = \LibreNMS\Services::discover($device, $service);
-
-    if ($created) {
+    if (Service::query()->where('service_type', $service)->where('device_id', $device['device_id'])->doesntExist()) {
+        add_service($device, $service, "$service Monitoring (Auto Discovered)", null, null, 0, 0, 0, "AUTO: $service");
+        Eventlog::log('Autodiscovered service: type ' . $service, $device['device_id'], 'service', Severity::Info);
         echo '+';
     }
-
     echo "$service ";
 }
 

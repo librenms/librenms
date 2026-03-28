@@ -38516,7 +38516,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38536,7 +38535,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38556,7 +38554,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38576,7 +38573,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38596,7 +38592,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38616,7 +38611,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38636,7 +38630,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38656,7 +38649,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38676,7 +38668,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38696,7 +38687,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38716,7 +38706,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38736,7 +38725,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38756,7 +38744,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38776,7 +38763,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38796,7 +38782,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38816,7 +38801,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38836,7 +38820,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38856,7 +38839,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38876,7 +38858,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38896,7 +38877,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38916,7 +38896,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38936,7 +38915,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38956,7 +38934,6 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38976,7 +38953,6 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -38996,7 +38972,6 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39016,7 +38991,6 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39036,7 +39010,6 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39056,7 +39029,6 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39076,7 +39048,6 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39096,7 +39067,6 @@
                     "entPhysicalContainedIn": 25,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "NOK",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39116,7 +39086,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": null,
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39136,7 +39105,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": null,
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -39156,7 +39124,6 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": null,
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -39175,7 +39142,7 @@
                     "model": "3AL82081AAAA",
                     "revision": "-",
                     "serial": "LU22--HL5000085200",
-                    "date": "0722",
+                    "date": null,
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39194,7 +39161,7 @@
                     "model": "3AL82074AAAA",
                     "revision": "----",
                     "serial": "ALLU22--AN19Y000YY",
-                    "date": "220513",
+                    "date": "2022-05-13",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39213,7 +39180,7 @@
                     "model": "3AL82074AAAA",
                     "revision": "----",
                     "serial": "ALLU22--AN19Y00106",
-                    "date": "220513",
+                    "date": "2022-05-13",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39232,7 +39199,7 @@
                     "model": "3KC93809AABF",
                     "revision": "-",
                     "serial": "LBALLU-PJ240600975",
-                    "date": "240208",
+                    "date": "2024-02-08",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39251,7 +39218,7 @@
                     "model": "3AL82074AAAA",
                     "revision": "----",
                     "serial": "ALLU23--AN52Y0002T",
-                    "date": "240106",
+                    "date": "2024-01-06",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39270,7 +39237,7 @@
                     "model": "3AL82074AAAA",
                     "revision": "----",
                     "serial": "ALLU23--AN52Y0002M",
-                    "date": "240106",
+                    "date": "2024-01-06",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39289,7 +39256,7 @@
                     "model": "3AL82074AAAA",
                     "revision": "----",
                     "serial": "ALLU23--AN52Y0008A",
-                    "date": "240103",
+                    "date": "2024-01-03",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39308,7 +39275,7 @@
                     "model": "3AL82074AAAA",
                     "revision": "----",
                     "serial": "ALLU23--AN52Y000BP",
-                    "date": "240103",
+                    "date": "2024-01-03",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39327,7 +39294,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN68000479",
-                    "date": "211124",
+                    "date": "2021-11-24",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39346,7 +39313,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN68000355",
-                    "date": "211124",
+                    "date": "2021-11-24",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39365,7 +39332,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN68000596",
-                    "date": "211124",
+                    "date": "2021-11-24",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39384,7 +39351,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN68000729",
-                    "date": "211124",
+                    "date": "2021-11-24",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39403,7 +39370,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN67003359",
-                    "date": "211123",
+                    "date": "2021-11-23",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39422,7 +39389,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN67003475",
-                    "date": "211123",
+                    "date": "2021-11-23",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39441,7 +39408,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN67004130",
-                    "date": "211123",
+                    "date": "2021-11-23",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39460,7 +39427,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN67002844",
-                    "date": "211123",
+                    "date": "2021-11-23",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39479,7 +39446,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN67002650",
-                    "date": "211123",
+                    "date": "2021-11-23",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39498,7 +39465,7 @@
                     "model": "1AB390930002",
                     "revision": "-",
                     "serial": "ALLU21--AN67003019",
-                    "date": "211123",
+                    "date": "2021-11-23",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39517,7 +39484,7 @@
                     "model": "3AL82081AAAA",
                     "revision": "-",
                     "serial": "LU23-LTC6000006200",
-                    "date": "1008",
+                    "date": null,
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -39536,7 +39503,7 @@
                     "model": "3AL82081AAAA",
                     "revision": "-",
                     "serial": "LU23-LTC6300000700",
-                    "date": "1025",
+                    "date": null,
                     "ddm": null,
                     "encoding": null,
                     "cable": null,

@@ -1323,14 +1323,6 @@ class Device extends BaseModel
     }
 
     /**
-     * @return HasMany<SslCertificate, $this>
-     */
-    public function sslCertificates(): HasMany
-    {
-        return $this->hasMany(SslCertificate::class, 'device_id');
-    }
-
-    /**
      * @return HasMany<Syslog, $this>
      */
     public function syslogs(): HasMany

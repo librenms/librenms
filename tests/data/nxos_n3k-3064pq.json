@@ -12981,7 +12981,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Cisco Systems, Inc.",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13001,7 +13000,6 @@
                     "entPhysicalContainedIn": 214,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Cisco Systems, Inc.",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13021,7 +13019,6 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Cisco Systems, Inc.",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13041,7 +13038,6 @@
                     "entPhysicalContainedIn": 149,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13061,7 +13057,6 @@
                     "entPhysicalContainedIn": 116950,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13081,7 +13076,6 @@
                     "entPhysicalContainedIn": 116950,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13101,7 +13095,6 @@
                     "entPhysicalContainedIn": 149,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13121,7 +13114,6 @@
                     "entPhysicalContainedIn": 278,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Cisco Systems, Inc.",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13141,7 +13133,6 @@
                     "entPhysicalContainedIn": 342,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13161,7 +13152,6 @@
                     "entPhysicalContainedIn": 470,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Cisco Systems, Inc.",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13181,7 +13171,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13201,7 +13190,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436207616
                 },
                 {
@@ -13221,7 +13209,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436211712
                 },
                 {
@@ -13241,7 +13228,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436215808
                 },
                 {
@@ -13261,7 +13247,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436219904
                 },
                 {
@@ -13281,7 +13266,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436224000
                 },
                 {
@@ -13301,7 +13285,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436228096
                 },
                 {
@@ -13321,7 +13304,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436232192
                 },
                 {
@@ -13341,7 +13323,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436236288
                 },
                 {
@@ -13361,7 +13342,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436240384
                 },
                 {
@@ -13381,7 +13361,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436244480
                 },
                 {
@@ -13401,7 +13380,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436248576
                 },
                 {
@@ -13421,7 +13399,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436252672
                 },
                 {
@@ -13441,7 +13418,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436256768
                 },
                 {
@@ -13461,7 +13437,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436260864
                 },
                 {
@@ -13481,7 +13456,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436264960
                 },
                 {
@@ -13501,7 +13475,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436269056
                 },
                 {
@@ -13521,7 +13494,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436273152
                 },
                 {
@@ -13541,7 +13513,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436277248
                 },
                 {
@@ -13561,7 +13532,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436281344
                 },
                 {
@@ -13581,7 +13551,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436285440
                 },
                 {
@@ -13601,7 +13570,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436289536
                 },
                 {
@@ -13621,7 +13589,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436293632
                 },
                 {
@@ -13641,7 +13608,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436297728
                 },
                 {
@@ -13661,7 +13627,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436301824
                 },
                 {
@@ -13681,7 +13646,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436305920
                 },
                 {
@@ -13701,7 +13665,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436310016
                 },
                 {
@@ -13721,7 +13684,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436314112
                 },
                 {
@@ -13741,7 +13703,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436318208
                 },
                 {
@@ -13761,7 +13722,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 29,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436322304
                 },
                 {
@@ -13781,7 +13741,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 30,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436326400
                 },
                 {
@@ -13801,7 +13760,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436330496
                 },
                 {
@@ -13821,7 +13779,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 32,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436334592
                 },
                 {
@@ -13841,7 +13798,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 33,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436338688
                 },
                 {
@@ -13861,7 +13817,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 34,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436342784
                 },
                 {
@@ -13881,7 +13836,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 35,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436346880
                 },
                 {
@@ -13901,7 +13855,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 36,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436350976
                 },
                 {
@@ -13921,7 +13874,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 37,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436355072
                 },
                 {
@@ -13941,7 +13893,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 38,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436359168
                 },
                 {
@@ -13961,7 +13912,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 39,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436363264
                 },
                 {
@@ -13981,7 +13931,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 40,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436367360
                 },
                 {
@@ -14001,7 +13950,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 41,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436371456
                 },
                 {
@@ -14021,7 +13969,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 42,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436375552
                 },
                 {
@@ -14041,7 +13988,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 43,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436379648
                 },
                 {
@@ -14061,7 +14007,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 44,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436383744
                 },
                 {
@@ -14081,7 +14026,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 45,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436387840
                 },
                 {
@@ -14101,7 +14045,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 46,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436391936
                 },
                 {
@@ -14121,7 +14064,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 47,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436396032
                 },
                 {
@@ -14141,7 +14083,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 48,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436400128
                 },
                 {
@@ -14161,7 +14102,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 49,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436404224
                 },
                 {
@@ -14181,7 +14121,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 50,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436408320
                 },
                 {
@@ -14201,7 +14140,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 51,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436412416
                 },
                 {
@@ -14221,7 +14159,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 52,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436416512
                 },
                 {
@@ -14241,7 +14178,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14261,7 +14197,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14281,7 +14216,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14301,7 +14235,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14321,7 +14254,6 @@
                     "entPhysicalContainedIn": 5206,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CISCOSOLIDOPTICS",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436207616
                 },
                 {
@@ -14341,7 +14273,6 @@
                     "entPhysicalContainedIn": 5207,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CISCOSOLIDOPTICS",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436211712
                 },
                 {
@@ -14361,7 +14292,6 @@
                     "entPhysicalContainedIn": 5208,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CISCOSOLIDOPTICS",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436215808
                 },
                 {
@@ -14381,7 +14311,6 @@
                     "entPhysicalContainedIn": 5209,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CISCOSOLIDOPTICS",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436219904
                 },
                 {
@@ -14401,7 +14330,6 @@
                     "entPhysicalContainedIn": 5210,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "SOLID-OPTICS",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436224000
                 },
                 {
@@ -14421,7 +14349,6 @@
                     "entPhysicalContainedIn": 5211,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CISCOSOLIDOPTICS",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436228096
                 },
                 {
@@ -14441,7 +14368,6 @@
                     "entPhysicalContainedIn": 5212,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CISCOSOLIDOPTICS",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436232192
                 },
                 {
@@ -14461,7 +14387,6 @@
                     "entPhysicalContainedIn": 5213,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "SOLID-OPTICS",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436236288
                 },
                 {
@@ -14481,7 +14406,6 @@
                     "entPhysicalContainedIn": 5249,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "CISCO-Skylane",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436383744
                 },
                 {
@@ -14501,7 +14425,6 @@
                     "entPhysicalContainedIn": 5254,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "FS",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": 436404224
                 },
                 {
@@ -14521,7 +14444,6 @@
                     "entPhysicalContainedIn": 149,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14541,7 +14463,6 @@
                     "entPhysicalContainedIn": 48854,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14561,7 +14482,6 @@
                     "entPhysicalContainedIn": 48854,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14581,7 +14501,6 @@
                     "entPhysicalContainedIn": 48854,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14601,7 +14520,6 @@
                     "entPhysicalContainedIn": 48854,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14621,7 +14539,6 @@
                     "entPhysicalContainedIn": 48854,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14641,7 +14558,6 @@
                     "entPhysicalContainedIn": 48855,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14661,7 +14577,6 @@
                     "entPhysicalContainedIn": 48855,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14681,7 +14596,6 @@
                     "entPhysicalContainedIn": 48855,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14701,7 +14615,6 @@
                     "entPhysicalContainedIn": 48855,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14721,7 +14634,6 @@
                     "entPhysicalContainedIn": 48855,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14741,7 +14653,6 @@
                     "entPhysicalContainedIn": 48856,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14761,7 +14672,6 @@
                     "entPhysicalContainedIn": 48856,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14781,7 +14691,6 @@
                     "entPhysicalContainedIn": 48856,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14801,7 +14710,6 @@
                     "entPhysicalContainedIn": 48856,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14821,7 +14729,6 @@
                     "entPhysicalContainedIn": 48856,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14841,7 +14748,6 @@
                     "entPhysicalContainedIn": 48857,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14861,7 +14767,6 @@
                     "entPhysicalContainedIn": 48857,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14881,7 +14786,6 @@
                     "entPhysicalContainedIn": 48857,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14901,7 +14805,6 @@
                     "entPhysicalContainedIn": 48857,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14921,7 +14824,6 @@
                     "entPhysicalContainedIn": 48857,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14941,7 +14843,6 @@
                     "entPhysicalContainedIn": 48858,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14961,7 +14862,6 @@
                     "entPhysicalContainedIn": 48858,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14981,7 +14881,6 @@
                     "entPhysicalContainedIn": 48858,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15001,7 +14900,6 @@
                     "entPhysicalContainedIn": 48858,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15021,7 +14919,6 @@
                     "entPhysicalContainedIn": 48858,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15041,7 +14938,6 @@
                     "entPhysicalContainedIn": 48859,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15061,7 +14957,6 @@
                     "entPhysicalContainedIn": 48859,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15081,7 +14976,6 @@
                     "entPhysicalContainedIn": 48859,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15101,7 +14995,6 @@
                     "entPhysicalContainedIn": 48859,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15121,7 +15014,6 @@
                     "entPhysicalContainedIn": 48859,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15141,7 +15033,6 @@
                     "entPhysicalContainedIn": 48860,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15161,7 +15052,6 @@
                     "entPhysicalContainedIn": 48860,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15181,7 +15071,6 @@
                     "entPhysicalContainedIn": 48860,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15201,7 +15090,6 @@
                     "entPhysicalContainedIn": 48860,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15221,7 +15109,6 @@
                     "entPhysicalContainedIn": 48860,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15241,7 +15128,6 @@
                     "entPhysicalContainedIn": 48861,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15261,7 +15147,6 @@
                     "entPhysicalContainedIn": 48861,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15281,7 +15166,6 @@
                     "entPhysicalContainedIn": 48861,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15301,7 +15185,6 @@
                     "entPhysicalContainedIn": 48861,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -15321,7 +15204,6 @@
                     "entPhysicalContainedIn": 48861,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Cisco Systems",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

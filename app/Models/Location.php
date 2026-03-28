@@ -162,7 +162,7 @@ class Location extends Model
      */
     public function scopeHasAccess($query, $user)
     {
-        if (Gate::allows('viewAll', Location::class)) {
+        if (Gate::allows('viewAny', Location::class)) {
             return $query;
         }
 

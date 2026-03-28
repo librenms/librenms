@@ -2650,7 +2650,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Cisco Systems Inc",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2670,7 +2669,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2690,7 +2688,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Cisco Systems Inc",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2710,7 +2707,6 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2730,7 +2726,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2750,7 +2745,6 @@
                     "entPhysicalContainedIn": 22,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Cisco Systems Inc",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2770,7 +2764,6 @@
                     "entPhysicalContainedIn": 23,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2790,7 +2783,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2810,7 +2802,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Cisco Systems Inc",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2830,7 +2821,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -2850,7 +2840,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "12849-51-48,55:48:54.52,350",
                     "ifIndex": null
                 },
                 {
@@ -2870,7 +2859,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "12849-51-48,55:48:54.52,350",
                     "ifIndex": null
                 },
                 {
@@ -2890,7 +2878,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "12849-51-48,55:48:54.52,350",
                     "ifIndex": 3
                 },
                 {
@@ -2910,7 +2897,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "12849-51-48,55:48:54.52,350",
                     "ifIndex": 4
                 },
                 {
@@ -2930,7 +2916,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "12849-51-48,55:48:54.52,350",
                     "ifIndex": 5
                 },
                 {
@@ -2950,7 +2935,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "12849-51-48,55:48:54.52,350",
                     "ifIndex": 6
                 },
                 {
@@ -2970,7 +2954,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "12849-51-48,55:48:54.52,350",
                     "ifIndex": 7
                 },
                 {
@@ -2990,7 +2973,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "12849-51-48,55:48:54.52,350",
                     "ifIndex": 8
                 },
                 {
@@ -3010,7 +2992,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "12849-51-48,55:48:54.52,350",
                     "ifIndex": 9
                 },
                 {
@@ -3030,7 +3011,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "12849-51-48,55:48:54.52,350",
                     "ifIndex": 10
                 },
                 {
@@ -3050,7 +3030,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "12849-51-48,55:48:54.52,350",
                     "ifIndex": 11
                 },
                 {
@@ -3070,7 +3049,6 @@
                     "entPhysicalContainedIn": 1060,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "FS",
-                    "entPhysicalMfgDate": "12598-51-49,52:50:53.56,154",
                     "ifIndex": null
                 },
                 {
@@ -3090,7 +3068,6 @@
                     "entPhysicalContainedIn": 1121,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3110,7 +3087,6 @@
                     "entPhysicalContainedIn": 1121,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3130,7 +3106,6 @@
                     "entPhysicalContainedIn": 1121,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3150,7 +3125,6 @@
                     "entPhysicalContainedIn": 1121,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3170,7 +3144,6 @@
                     "entPhysicalContainedIn": 1121,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3190,7 +3163,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -3210,7 +3182,6 @@
                     "entPhysicalContainedIn": 1000,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 }
             ]
@@ -3375,7 +3346,7 @@
                     "model": "GLC-SX-MMD",
                     "revision": "V01",
                     "serial": "F2220416514",
-                    "date": "12598-51-49,52:50:53.56,154",
+                    "date": null,
                     "ddm": null,
                     "encoding": null,
                     "cable": null,

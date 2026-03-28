@@ -2,8 +2,6 @@
 
 namespace App\Policies;
 
-use App\Facades\LibrenmsConfig;
-use App\Models\PortGroup;
 use App\Models\User;
 
 class PortGroupPolicy
@@ -15,22 +13,15 @@ class PortGroupPolicy
      */
     public function viewAny(User $user): bool
     {
-        if (! LibrenmsConfig::get('distributed_poller')) {
-            return false;
-        }
-
-        return $this->hasGlobalPermission($user, 'viewAll')
-            || $this->hasGlobalPermission($user, 'create')
-            || $this->hasGlobalPermission($user, 'update')
-            || $this->hasGlobalPermission($user, 'delete');
+        return $this->hasGlobalPermission($user, 'viewAny');
     }
 
     /**
      * Determine whether the user can view the port group.
      */
-    public function view(User $user, PortGroup $portGroup): bool
+    public function view(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAll');
+        return $this->hasGlobalPermission($user, 'view');
     }
 
     /**

@@ -19901,7 +19901,6 @@
                     "entPhysicalContainedIn": 569,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ALCATEL",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -19921,7 +19920,6 @@
                     "entPhysicalContainedIn": 570,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ALCATEL",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -19941,7 +19939,6 @@
                     "entPhysicalContainedIn": 569,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ALCATEL",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -19961,7 +19958,6 @@
                     "entPhysicalContainedIn": 570,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ALCATEL",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -19981,7 +19977,6 @@
                     "entPhysicalContainedIn": 569,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20001,7 +19996,6 @@
                     "entPhysicalContainedIn": 569,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20021,7 +20015,6 @@
                     "entPhysicalContainedIn": 570,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20041,7 +20034,6 @@
                     "entPhysicalContainedIn": 570,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20061,7 +20053,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ALCATEL",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20081,7 +20072,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "SFP-10G-T",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20101,7 +20091,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "SFP-10G-C3M",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20121,7 +20110,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20141,7 +20129,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20161,7 +20148,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 49,
                     "entPhysicalMfgName": "SFP-10G-LR",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20181,7 +20167,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 50,
                     "entPhysicalMfgName": "SFP-10G-LR",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20201,7 +20186,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "ALCATEL",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20221,7 +20205,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "SFP-10G-T",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20241,7 +20224,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "SFP-10G-LR",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20261,7 +20243,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20281,7 +20262,6 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20301,7 +20281,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "ALCATEL",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -20321,7 +20300,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "ALCATEL",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

@@ -20,7 +20,7 @@ $message = '';
 if (! empty($vars['addsrv'])) {
     $updated = true;
 
-    $service_id = \LibreNMS\Services::addService($vars['device'], $vars['type'], strip_tags((string) $vars['descr']), $vars['ip'], $vars['params'], $vars['ignore'] ?? 0, $vars['disabled'] ?? 0, 0, strip_tags((string) $vars['name']));
+    $service_id = add_service($vars['device'], $vars['type'], strip_tags((string) $vars['descr']), $vars['ip'], $vars['params'], $vars['ignore'] ?? 0, $vars['disabled'] ?? 0, 0, strip_tags((string) $vars['name']));
     if ($service_id) {
         $message .= $message_break . 'Service added (' . $service_id . ')!';
         $message_break .= '<br />';

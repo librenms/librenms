@@ -2,8 +2,6 @@
 
 namespace App\Policies;
 
-use App\Facades\Permissions;
-use App\Models\IsisAdjacency;
 use App\Models\User;
 
 class IsisAdjacencyPolicy
@@ -20,30 +18,15 @@ class IsisAdjacencyPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
-            || $this->hasGlobalPermission($user, 'viewAll')
-            || $this->hasGlobalPermission($user, 'update');
-    }
-
-    /**
-     * Determine whether the user can view all models.
-     */
-    public function viewAll(User $user): bool
-    {
-        return $this->hasGlobalPermission($user, 'viewAll');
+        return $this->hasGlobalPermission($user, 'viewAny');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, IsisAdjacency $isisAdjacency): bool
+    public function view(User $user): bool
     {
-        if ($this->hasGlobalPermission($user, 'viewAll')) {
-            return true;
-        }
-
-        return $this->hasGlobalPermission($user, 'view')
-            && Permissions::canAccessPort($isisAdjacency->port_id, $user);
+        return $this->hasGlobalPermission($user, 'view');
     }
 
     /**

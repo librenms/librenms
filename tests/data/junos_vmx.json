@@ -12472,7 +12472,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12492,7 +12491,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12512,7 +12510,6 @@
                     "entPhysicalContainedIn": 7,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12532,7 +12529,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12552,7 +12548,6 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12572,7 +12567,6 @@
                     "entPhysicalContainedIn": 7,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12592,7 +12586,6 @@
                     "entPhysicalContainedIn": 7,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Juniper",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12612,7 +12605,6 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Juniper",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12632,7 +12624,6 @@
                     "entPhysicalContainedIn": 8,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Juniper",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12652,7 +12643,6 @@
                     "entPhysicalContainedIn": 20,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Juniper",
-                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

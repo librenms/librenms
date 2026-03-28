@@ -315,7 +315,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
         $vrf_id = $row['vrf_id'];
         if (! $valid_vrf[$vrf_id]) {
             echo '-';
-            \App\Models\Vrf::where('vrf_id', $vrf_id)->delete();
+            dbDelete('vrfs', '`vrf_id` = ?', [$vrf_id]);
         } else {
             echo '.';
         }

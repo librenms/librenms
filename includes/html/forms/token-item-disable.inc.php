@@ -12,8 +12,6 @@
  * the source code distribution for details.
  */
 
-use App\Models\ApiToken;
-
 header('Content-type: text/plain');
 
 if (Gate::denies('api.access')) {
@@ -32,7 +30,7 @@ if (! is_numeric($_POST['token_id'])) {
         $state = 0;
     }
 
-    $update = ApiToken::where('id', $_POST['token_id'])->update(['disabled' => $state]);
+    $update = dbUpdate(['disabled' => $state], 'api_tokens', '`id` = ?', [$_POST['token_id']]);
     if (! empty($update) || $update == '0') {
         echo 'success';
         exit;

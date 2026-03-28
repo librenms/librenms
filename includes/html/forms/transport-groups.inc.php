@@ -26,7 +26,6 @@
 
 use App\Models\AlertTransport;
 use App\Models\AlertTransportGroup;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
@@ -58,7 +57,9 @@ if (empty($name)) {
     $message = 'Not enough group members';
 } else {
     if (is_numeric($group_id) && $group_id > 0) {
-        AlertTransportGroup::where('transport_group_id', $group_id)->update(['transport_group_name' => $name]);
+        dbUpdate([
+            'transport_group_name' => $name,
+        ], 'alert_transport_groups', '`transport_group_id`=?', [$group_id]);
     } else {
         // Insert into db
         $group_id = dbInsert([
@@ -69,7 +70,7 @@ if (empty($name)) {
     if (is_numeric($group_id) && $group_id > 0) {
         $db_members = AlertTransportGroup::find($group_id)
             ->transports()
-            ->pluck('alert_transports.transport_id')
+            ->pluck('transport_id')
             ->all();
 
         // Compare arrays to get added and removed transports
@@ -85,12 +86,12 @@ if (empty($name)) {
             ];
         }
         if (! empty($insert)) {
-            DB::table('transport_group_transport')->insert($insert);
+            dbBulkInsert($insert, 'transport_group_transport');
         }
 
         // Remove old transport group members
         if (! empty($remove)) {
-            \App\Models\TransportGroupTransport::where('transport_group_id', $group_id)->whereIn('transport_id', $remove)->delete();
+            dbDelete('transport_group_transport', 'transport_group_id=? AND `transport_id` IN ' . dbGenPlaceholders(count($remove)), array_merge([$group_id], $remove));
         }
         $message = 'Updated alert transport group';
     } else {

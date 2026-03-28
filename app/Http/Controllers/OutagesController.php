@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -28,6 +29,8 @@ class OutagesController extends Controller
 
         $from = $request->input('from');
         $to = $request->input('to');
+
+        $date_format = LibrenmsConfig::get('dateformat.byminute', 'Y-m-d H:i');
 
         return view('outages.index', [
             'device' => $device,

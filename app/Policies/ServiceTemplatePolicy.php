@@ -16,10 +16,7 @@ class ServiceTemplatePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
-            || $this->hasGlobalPermission($user, 'create')
-            || $this->hasGlobalPermission($user, 'update')
-            || $this->hasGlobalPermission($user, 'delete');
+        return $this->hasGlobalPermission($user, 'viewAny');
     }
 
     /**

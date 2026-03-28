@@ -29,7 +29,7 @@ foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
             $fdbPort_table = SnmpQuery::context($vlan_raw, 'vlan-')->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
 
             $portid_dict = [];
-            $dot1dBasePortIfIndex = SnmpQuery::context($vlan_raw, 'vlan-')->cache()->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table(1);
+            $dot1dBasePortIfIndex = SnmpQuery::context($vlan_raw, 'vlan-')->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table(1);
             foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
                 $portid_dict[$portLocal] = PortCache::getIdFromIfIndex($data['BRIDGE-MIB::dot1dBasePortIfIndex'], $device['device_id']);
             }

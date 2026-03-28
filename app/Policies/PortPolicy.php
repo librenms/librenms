@@ -15,18 +15,7 @@ class PortPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
-            || $this->hasGlobalPermission($user, 'viewAll')
-            || $this->hasGlobalPermission($user, 'update')
-            || $this->hasGlobalPermission($user, 'delete');
-    }
-
-    /**
-     * Determine whether the user can view all models.
-     */
-    public function viewAll(User $user): bool
-    {
-        return $this->hasGlobalPermission($user, 'viewAll');
+        return $this->hasGlobalPermission($user, 'viewAny');
     }
 
     /**
@@ -34,10 +23,6 @@ class PortPolicy
      */
     public function view(User $user, Port $port): bool
     {
-        if ($this->hasGlobalPermission($user, 'viewAll')) {
-            return true;
-        }
-
         return $this->hasGlobalPermission($user, 'view')
             || Permissions::canAccessDevice($port->device_id, $user)
             || Permissions::canAccessPort($port, $user);

@@ -8,7 +8,6 @@ enum WirelessSensorType: string
 {
     use EnumToArray;
 
-    // order is used for ui tabs
     case ApCount = 'ap-count';
     case Clients = 'clients';
     case Quality = 'quality';

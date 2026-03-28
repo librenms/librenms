@@ -3533,7 +3533,6 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Teleste",
-                    "entPhysicalMfgDate": "12288",
                     "ifIndex": null
                 },
                 {
@@ -3553,7 +3552,6 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Teleste",
-                    "entPhysicalMfgDate": "12288",
                     "ifIndex": null
                 },
                 {
@@ -3573,7 +3571,6 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Teleste",
-                    "entPhysicalMfgDate": "12288",
                     "ifIndex": null
                 },
                 {
@@ -3593,7 +3590,6 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Teleste",
-                    "entPhysicalMfgDate": "12288",
                     "ifIndex": null
                 }
             ]

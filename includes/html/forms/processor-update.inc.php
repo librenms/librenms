@@ -12,8 +12,6 @@
  * the source code distribution for details.
  */
 
-use App\Models\Processor;
-
 header('Content-type: application/json');
 
 if (Gate::denies('processor.update')) {
@@ -39,7 +37,7 @@ if (! is_numeric($device_id)) {
 } elseif (! is_numeric($data)) {
     $message = 'Missing value';
 } else {
-    if (Processor::where('processor_id', $processor_id)->where('device_id', $device_id)->update(['processor_perc_warn' => $data]) >= 0) {
+    if (dbUpdate(['processor_perc_warn' => $data], 'processors', '`processor_id`=? AND `device_id`=?', [$processor_id, $device_id]) >= 0) {
         $message = 'Processor information updated';
         $status = 'ok';
     } else {

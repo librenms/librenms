@@ -2,8 +2,6 @@
 
 namespace LibreNMS;
 
-use Illuminate\Support\Facades\DB;
-
 abstract class Model
 {
     protected static $table;
@@ -73,7 +71,7 @@ abstract class Model
             static::onDelete(static::create($row));
         }
         if (! empty($rows)) {
-            DB::table($table)->whereRaw($where, $params)->delete();
+            dbDelete($table, $where, $params);
         }
     }
 

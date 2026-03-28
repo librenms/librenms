@@ -1842,10 +1842,6 @@ return [
             'description' => 'Port FDB entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
-        'ports_ipv4_neighbours' => [
-            'description' => 'Port IPv4 neighbour lookup method',
-            'help' => 'Method to use for looking up IPv4 neighours when viewing port details.  ARP will use the ARP table to find devices with matching IP and MAC addresses.  Subnet will just look for devices with IP addresses in the same subnet.',
-        ],
         'ports_nac_purge' => [
             'description' => 'Port NAC entries older than',
             'help' => 'Cleanup done by daily.sh',
@@ -2269,16 +2265,6 @@ return [
         ],
         'snmpwalk' => [
             'description' => 'Path to snmpwalk',
-        ],
-        'ssl_certificates' => [
-            'auto_discover' => [
-                'description' => 'Auto Discover SSL Certificates',
-                'help' => 'Auto discover SSL certificates',
-            ],
-            'skip_hosts' => [
-                'description' => 'Skip Hosts',
-                'help' => 'Skip hosts from SSL certificate discovery',
-            ],
         ],
         'sso' => [
             'create_users' => [

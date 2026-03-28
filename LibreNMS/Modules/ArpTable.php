@@ -118,18 +118,6 @@ class ArpTable implements Module
                 );
 
                 foreach ($port_arp as $ip => $raw_mac) {
-                    // Some SNMP agents add an extra prefix byte to IpAddress indexes, so instead of:
-                    //   '1.2.3.4' => 'aa:bb:cc:dd:ee:ff'
-                    // table() returns:
-                    //   '0.1.2.3' => [ '4' => 'aa:bb:cc:dd:ee:ff' ]
-                    // Reconstruct the correct IP by dropping the prefix octet and appending the spilled one.
-                    if (is_array($raw_mac)) {
-                        $octets = explode('.', ltrim((string) $ip, '.'));
-                        $spilled_octet = ltrim((string) array_key_first($raw_mac), '.');
-                        $ip = implode('.', array_slice($octets, 1)) . '.' . $spilled_octet;
-                        $raw_mac = array_values($raw_mac)[0];
-                    }
-
                     // avoid invalid output IP-MIB::ipNetToPhysicalPhysAddress[17][ipv4][.10.19.0.9 = 18:94:ef:13:eb:88
                     $ip = Str::chopStart($ip, '.');
 

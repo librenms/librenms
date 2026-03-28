@@ -52,7 +52,6 @@ if (! empty($fdbPort_table)) {
     foreach ($fdbPort_table as $vlan => $data) {
         Log::debug("VLAN: $vlan\n");
         $dot1dBasePortIfIndex = SnmpQuery::context($vlan, 'vlan-')
-            ->cache()
             ->walk('BRIDGE-MIB::dot1dBasePortIfIndex')
             ->table(1, $dot1dBasePortIfIndex);
     }
@@ -74,7 +73,10 @@ if (! empty($fdbPort_table)) {
                 continue;
             }
 
-            $port_id = $portid_dict[$dot1dBasePort] ?? 0;
+            $port_id = $portid_dict[$dot1dBasePort];
+            if ($port_id === null) {
+                $port_id = 0;
+            }
             $vlan_id = $vlans_dict[$vlan] ?? 0;
 
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;

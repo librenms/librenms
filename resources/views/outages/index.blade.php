@@ -37,11 +37,12 @@ $refresh = request()->input('refresh', 30);
                                 id="date_range" name="date_range"
                                 start="{{ $from }}"
                                 end="{{ $to }}"
+                                output-format="timestamp"
                                 class="form-control tw:min-w-64"
                                 x-on:date-range-changed="refreshOutagesGrid"
                             ></x-date-range-picker>
                         </div>
-                        <button type="button" id="apply-filters" class="btn btn-default">{{ __('Update URL') }}</button>
+                        <button type="button" id="apply-filters" class="btn btn-default">{{ __('Filter') }}</button>
                     </form>
                 </template>
 
@@ -95,8 +96,8 @@ $refresh = request()->input('refresh', 30);
             return {
                 device: document.getElementById('device').value,
                 status: document.getElementById('status').value,
-                to: LibreNMS.Date.toBackend(range.end),
-                from: LibreNMS.Date.toBackend(range.start),
+                to: range.end?.toISOString(),
+                from: range.start?.toISOString(),
             };
         },
     }).on("loaded.rs.jquery.bootgrid", function() {

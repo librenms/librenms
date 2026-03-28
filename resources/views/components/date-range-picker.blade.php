@@ -1,6 +1,7 @@
 @props([
     'start' => '',
     'end' => '',
+    'outputFormat' => '', // iso, timestamp, or format string
     'presets' => true,
     'placeholder' => 'Select date range...',
     'class' => 'tw:w-full tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md'
@@ -12,6 +13,7 @@
      data-start="{{ $start }}"
      data-end="{{ $end }}"
      data-presets=" {{ is_array($presets) ? implode(',', $presets) : (string) $presets }}"
+     data-output-format="{{ $outputFormat }}"
      data-placeholder="{{ $placeholder }}">
     <div
         x-text="displayText"
@@ -32,9 +34,9 @@
          x-transition:leave="tw:transition tw:ease-in tw:duration-150"
          x-transition:leave-start="tw:opacity-100 tw:transform tw:translate-y-0"
          x-transition:leave-end="tw:opacity-0 tw:transform tw:-translate-y-2"
-         style="    display: none;">
+         style="display: none;">
         @if($presets)
-            <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(40px,max-content))] tw:gap-2 tw:justify-center tw:mb-3 tw:dark:text-white">
+            <div class="tw:flex tw:flex-wrap tw:gap-2 tw:mb-3 tw:dark:text-white">
                 <template x-for="(preset, idx) in presets">
                     <button type="button"
                             class="preset-btn tw:px-3 tw:py-2 tw:text-sm tw:hover:bg-gray-200 tw:dark:hover:bg-gray-600 tw:rounded-md tw:transition-colors tw:min-w-[40px] tw:dark:text-gray-400"
@@ -45,29 +47,27 @@
                 </template>
             </div>
         @endif
-        <div class="tw:flex-1 tw:mb-3">
-            <label class="tw:block tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">{{ __('From') }} <span x-show="preset || ! start" x-text="'(' + (preset || '{{ __('All') }}') + ')'"></span></label>
-            <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
-                <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
-                <input type="time" x-model="startTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
+        <div class="tw:mb-3">
+            <div class="tw:flex-1">
+                <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">From</label>
+                <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
+                    <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="time" x-model="startTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                </div>
+            </div>
+            <div class="tw:flex-1">
+                <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">To</label>
+                <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
+                    <input type="date" x-model="endDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="time" x-model="endTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                </div>
             </div>
         </div>
-        <div class="tw:flex-1 tw:mb-4">
-            <label class="tw:block tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">{{ __('To')  }} <span x-show="! end">({{ __('Now') }})</span></label>
-            <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
-                <input type="date" x-model="endDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
-                <input type="time" x-model="endTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white tw:w-full">
-            </div>
-        </div>
-        <div class="tw:flex tw:justify-between tw:items-center tw:gap-2">
+        <div class="tw:flex tw:justify-between tw:dark:text-white">
             <button type="button" x-on:click="clearRange"
-                    class="tw:px-4 tw:py-1.5 tw:font-medium tw:text-gray-500 tw:dark:text-gray-400 tw:border tw:border-gray-200 tw:dark:border-gray-600 tw:rounded tw:hover:bg-gray-50 tw:dark:hover:bg-gray-800 tw:hover:text-gray-700 tw:dark:hover:text-gray-300 tw:transition-colors tw:duration-150">
-                {{ __('Clear') }}
-            </button>
+                    class="tw:px-3 tw:py-1 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400 tw:hover:text-gray-700 tw:dark:hover:text-gray-300">Clear</button>
             <button type="button" x-on:click="applyRange"
-                    class="tw:px-4 tw:py-1.5 tw:font-medium tw:text-white! tw:bg-blue-500 tw:dark:bg-blue-600 tw:rounded tw:shadow-sm tw:hover:bg-blue-600 tw:dark:hover:bg-blue-700 tw:active:scale-95 tw:transition-all tw:duration-150">
-                {{ __('Apply') }}
-            </button>
+                    class="tw:px-3 tw:py-1 tw:text-sm tw:bg-blue-500 tw:text-white tw:rounded tw:hover:bg-blue-600 tw:dark:bg-blue-600 tw:dark:hover:bg-blue-700">Apply</button>
         </div>
     </div>
 </div>
@@ -84,6 +84,7 @@
             placeholder: 'Select date range...',
             relativeStartSeconds: null,
             relativeEndSeconds: null,
+            outputFormat: '',
             presets: [
                 '6h',
                 '24h',
@@ -96,13 +97,14 @@
                 '2y',
             ],
 
+            // Computed properties
             get start() {
                 if (this.relativeStartSeconds !== null) {
-                    return LibreNMS.Date.now().minus({ seconds: this.relativeStartSeconds });
+                    return new Date(Date.now() - (this.relativeStartSeconds * 1000));
                 }
 
                 if (this.startDate) {
-                    return LibreNMS.Date.parse(this.startTime ? `${this.startDate}T${this.startTime}` : `${this.startDate}T00:00`);
+                    return new Date(`${this.startDate} ${this.startTime}`);
                 }
 
                 return null;
@@ -110,43 +112,39 @@
 
             get end() {
                 if (this.relativeStartSeconds !== null || !this.endDate) {
-                    return null;
+                    return null
                 }
 
+                // if no end time, we want to include the entire day
                 if (!this.endTime) {
-                    // No time supplied, include the entire day
-                    return LibreNMS.Date.parse(`${this.endDate}T23:59:59`);
+                    return new Date(new Date(this.endDate).getTime() + 86400000);
                 }
 
-                return LibreNMS.Date.parse(`${this.endDate}T${this.endTime}`);
+                return new Date(`${this.endDate} ${this.endTime}`);
             },
 
             get outStartString() {
                 if (this.relativeStartSeconds !== null) {
-                    return this.toShortOffset(this.relativeStartSeconds);
+                    return this.toShortOffset(this.relativeStartSeconds)
                 }
 
-                return LibreNMS.Date.toUrl(this.start);
+                return this.formatDate(this.start, this.startTime, this.outputFormat);
             },
 
             get outEndString() {
                 if (this.relativeEndSeconds !== null) {
-                    return this.toShortOffset(this.relativeEndSeconds);
+                    return this.toShortOffset(this.relativeEndSeconds)
                 }
 
                 if (this.relativeStartSeconds !== null) {
                     return '';
                 }
 
-                return LibreNMS.Date.toUrl(this.end);
+                return this.formatDate(this.end, this.endTime, this.outputFormat);
             },
 
             get hasValue() {
                 return !!(this.start || this.end);
-            },
-
-            get preset() {
-                return this.presets.find(preset => this.isPresetSelected(preset));
             },
 
             get displayText() {
@@ -164,7 +162,7 @@
                     return `${startString} to ${endString}`;
                 } else if (startString) {
                     return `From ${startString}`;
-                } else if (endString) {
+                } else if (this.endString) {
                     return `Until ${endString}`;
                 }
 
@@ -182,6 +180,7 @@
                 };
 
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
+                if (this.$el.dataset.outputFormat) this.outputFormat = this.$el.dataset.outputFormat;
 
                 this.setRange(this.$el.dataset.start, this.$el.dataset.end);
             },
@@ -229,6 +228,7 @@
                 this.endTime = '';
                 this.relativeStartSeconds = null;
                 this.relativeEndSeconds = null;
+                this.closeDropdown();
                 this.emitChange();
             },
 
@@ -249,7 +249,7 @@
 
                 const input = dateInput.trim();
 
-                if (!input || input === 'now') {
+                if (input === 'now') {
                     return ['', '', null];
                 }
 
@@ -257,23 +257,36 @@
                     return ['', '', this.parseRelativeOffset(input)];
                 }
 
-                const dt = LibreNMS.Date.parse(input);
+                let d;
+                let includeTime = false;
 
-                if (!dt || !dt.isValid) {
+                // Check for Unix timestamp
+                if (/^\d{10,}$/.test(input)) {
+                    const timestamp = parseInt(input);
+                    // If less than 13 digits, it's in seconds, otherwise milliseconds
+                    d = new Date(input.length < 13 ? timestamp * 1000 : timestamp);
+                    // For Unix timestamps, include time unless it's midnight
+                    includeTime = !(d.getHours() === 0 && d.getMinutes() === 0 && d.getSeconds() === 0);
+                } else {
+                    d = new Date(input);
+                    includeTime = /\d{1,2}:\d{2}/.test(input);
+                }
+
+                if (isNaN(d.getTime())) {
                     return ['', '', null];
                 }
 
-                const hasTime = !(dt.hour === 0 && dt.minute === 0 && dt.second === 0);
-                const pickerString = LibreNMS.Date.toPicker(dt);
-                const [datePart, timePart] = pickerString.split('T');
-
-                return [datePart, hasTime ? timePart : '', null];
+                // output the correct formats for the input fields
+                const date = d.toLocaleDateString('en-CA');
+                const time = includeTime ? d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '';
+                return [date, time, null];
             },
 
             // Determine if a string is a relative time like 10m, -2h, 7d, 1w, 1y
             isRelative(input) {
                 if (!input || typeof input !== 'string') return false;
-                return /^[-+]?\d+\s*(s|m|h|d|w|mo|y)$/.test(input.trim());
+                const trimmed = input.trim();
+                return /^[-+]?\d+\s*(s|m|h|d|w|mo|y)$/.test(trimmed);
             },
 
             // Returns seconds offset from now: positive for past (e.g., 10m => 600), negative for future (+1h => -3600)
@@ -286,7 +299,8 @@
                 const unit = m[3];
                 const map = { s: 1, m: 60, h: 3600, d: 86400, w: 604800, mo: 2592000, y: 31536000 };
                 const seconds = num * (map[unit] || 0);
-                return sign === '+' ? -seconds : seconds; // '+' => future => negative
+                if (sign === '+') return -seconds; // future
+                return seconds; // past (or explicit '-')
             },
 
             // Select and format a human relative string using Intl.RelativeTimeFormat
@@ -334,14 +348,31 @@
                 return this.relativeStartSeconds !== null && sec !== null && sec === this.relativeStartSeconds && !this.endDate && !this.endTime;
             },
 
-            formatDate(dt, timeString) {
-                if (!dt || !dt.isValid) return '';
+            formatDate(fullDate, time, format = 'local') {
+                if (!fullDate) {
+                    return '';
+                }
 
-                const opts = !!(timeString) || !(dt.hour === 0 && dt.minute === 0 && dt.second === 0)
-                    ? { month: 'numeric', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' }
-                    : { month: 'numeric', day: 'numeric', year: 'numeric' };
+                if (format === 'iso') {
+                    return fullDate.toISOString();
+                }
 
-                return LibreNMS.Date.display(dt, opts);
+                if (format === 'timestamp') {
+                    return Math.floor(fullDate.getTime() / 1000).toString();
+                }
+
+                let options = {
+                    month: 'numeric',
+                    day: 'numeric',
+                    year: 'numeric',
+                };
+
+                if (time) {
+                    options['hour'] = 'numeric';
+                    options['minute'] = 'numeric';
+                }
+
+                return fullDate.toLocaleDateString(undefined, options);
             },
 
             emitChange() {

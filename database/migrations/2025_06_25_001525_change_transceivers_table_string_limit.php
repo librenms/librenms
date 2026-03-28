@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('vendor')->nullable()->change();
             $table->string('oui')->nullable()->change();
             $table->string('model')->nullable()->change();
-            $table->string('date')->nullable()->change();
             $table->string('revision')->nullable()->change();
             $table->string('serial')->nullable()->change();
             $table->string('encoding')->nullable()->change();

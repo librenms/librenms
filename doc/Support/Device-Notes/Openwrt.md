@@ -1,143 +1,102 @@
-To use Wireless Sensors on Openwrt, an agent of sorts is required. The
-purpose of the agent is to execute on the client (Openwrt) side, to ensure
-that the needed Wireless Sensor information is returned for SNMP queries (from LibreNMS).
+To use wireless sensors on OpenWrt, install the OpenWrt scripts from
+`librenms-agent/snmp/Openwrt` on the device. These scripts return per-radio and
+aggregate wireless metrics via NET-SNMP extends.
 
 # Installation
 
-## Openwrt
+## Recommended setup (automatic generation)
 
-Two items are required on the Openwrt side - scripts to generate the necessary information (for
-SNMP replies), and an SNMP extend configuration update (to return the information vs. the expected
-query).
+1. Copy scripts to `/etc/librenms` on OpenWrt:
 
-1: Install the scripts:
-
-Copy the scripts from librenms-agent repository - preferably inside /etc/librenms on Openwrt (and add this
-directory to /etc/sysupgrade.conf, to survive firmware updates):
-```
+```bash
+mkdir -p /etc/librenms
+wget -O /etc/librenms/distro.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/distro.sh
+wget -O /etc/librenms/wlInterfaces.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlInterfaces.sh
 wget -O /etc/librenms/wlClients.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlClients.sh
 wget -O /etc/librenms/wlFrequency.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlFrequency.sh
-wget -O /etc/librenms/wlInterfaces.txt https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlInterfaces.txt
 wget -O /etc/librenms/wlNoiseFloor.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlNoiseFloor.sh
 wget -O /etc/librenms/wlRate.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlRate.sh
 wget -O /etc/librenms/wlSNR.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/wlSNR.sh
-wget -O /etc/librenms/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
+wget -O /etc/librenms/lm-sensors-pass.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/lm-sensors-pass.sh
+wget -O /etc/librenms/snmpd-config-generator.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/snmpd-config-generator.sh
+wget -O /etc/librenms/setup-snmpd.sh https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/Openwrt/setup-snmpd.sh
 chmod +x /etc/librenms/*.sh
-chmod +x /etc/librenms/distro
 ```
 
-The only file that needs to be edited is wlInterfaces.txt, which is a mapping from the wireless interfaces, to
-the desired display name in LibreNMS. For example,
-```
-wlan0,wl-2.4G
-wlan1,wl-5.0G
-```
+2. Apply/refresh OpenWrt extends in `/etc/config/snmpd` using the setup helper:
 
-2: Update the Openwrt SNMP configuration, adding extend support for the OS detection and the Wireless Sensor queries:
-
-`vi /etc/config/snmpd`, adding the following entries (assuming the scripts are installed in /etc/librenms, and are executable),
-and update the network interfaces as needed to match the hardware,
-
-```
-config extend
-        option name	distro
-        option prog	'/etc/librenms/distro'
-config extend
-        option name	hardware
-        option prog	'/bin/cat'
-        option args	'/sys/firmware/devicetree/base/model'
-config extend
-        option name     interfaces
-        option prog     "/bin/cat /etc/librenms/wlInterfaces.txt"
-config extend
-        option name     clients-wlan0
-        option prog     "/etc/librenms/wlClients.sh wlan0"
-config extend
-        option name     clients-wlan1
-        option prog     "/etc/librenms/wlClients.sh wlan1"
-config extend
-        option name     clients-wlan
-        option prog     "/etc/librenms/wlClients.sh"
-config extend
-        option name     frequency-wlan0
-        option prog     "/etc/librenms/wlFrequency.sh wlan0"
-config extend
-        option name     frequency-wlan1
-        option prog     "/etc/librenms/wlFrequency.sh wlan1"
-config extend
-        option name     rate-tx-wlan0-min
-        option prog     "/etc/librenms/wlRate.sh wlan0 tx min"
-config extend
-        option name     rate-tx-wlan0-avg
-        option prog     "/etc/librenms/wlRate.sh wlan0 tx avg"
-config extend
-        option name     rate-tx-wlan0-max
-        option prog     "/etc/librenms/wlRate.sh wlan0 tx max"
-config extend
-        option name     rate-tx-wlan1-min
-        option prog     "/etc/librenms/wlRate.sh wlan1 tx min"
-config extend
-        option name     rate-tx-wlan1-avg
-        option prog     "/etc/librenms/wlRate.sh wlan1 tx avg"
-config extend
-        option name     rate-tx-wlan1-max
-        option prog     "/etc/librenms/wlRate.sh wlan1 tx max"
-config extend
-        option name     rate-rx-wlan0-min
-        option prog     "/etc/librenms/wlRate.sh wlan0 rx min"
-config extend
-        option name     rate-rx-wlan0-avg
-        option prog     "/etc/librenms/wlRate.sh wlan0 rx avg"
-config extend
-        option name     rate-rx-wlan0-max
-        option prog     "/etc/librenms/wlRate.sh wlan0 rx max"
-config extend
-        option name     rate-rx-wlan1-min
-        option prog     "/etc/librenms/wlRate.sh wlan1 rx min"
-config extend
-        option name     rate-rx-wlan1-avg
-        option prog     "/etc/librenms/wlRate.sh wlan1 rx avg"
-config extend
-        option name     rate-rx-wlan1-max
-        option prog     "/etc/librenms/wlRate.sh wlan1 rx max"
-config extend
-        option name     noise-floor-wlan0
-        option prog     "/etc/librenms/wlNoiseFloor.sh wlan0"
-config extend
-        option name     noise-floor-wlan1
-        option prog     "/etc/librenms/wlNoiseFloor.sh wlan1"
-config extend
-        option name     snr-wlan0-min
-        option prog     "/etc/librenms/wlSNR.sh wlan0 min"
-config extend
-        option name     snr-wlan0-avg
-        option prog     "/etc/librenms/wlSNR.sh wlan0 avg"
-config extend
-        option name     snr-wlan0-max
-        option prog     "/etc/librenms/wlSNR.sh wlan0 max"
-config extend
-        option name     snr-wlan1-min
-        option prog     "/etc/librenms/wlSNR.sh wlan1 min"
-config extend
-        option name     snr-wlan1-avg
-        option prog     "/etc/librenms/wlSNR.sh wlan1 avg"
-config extend
-        option name     snr-wlan1-max
-        option prog     "/etc/librenms/wlSNR.sh wlan1 max"
+```bash
+/etc/librenms/setup-snmpd.sh --yes
 ```
 
-NOTE, any of the scripts above can be tested simply by running the corresponding command.
+This script:
 
-NOTE, to check the output data from any of these extensions, on the LibreNMS machine, run (for example),
+- Installs scripts from its own directory (`/etc/librenms`)
+- Backs up `/etc/config/snmpd`
+- Removes old LibreNMS-managed OpenWrt wireless blocks
+- Appends one fresh autogenerated block from `snmpd-config-generator.sh`
+- Restarts `snmpd`
 
-`snmpwalk -v 2c -c public -Osqnv <openwrt-host> 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."frequency-wlan0"'`
+Optional: skip the restart during staged changes:
 
-NOTE, on the LibreNMS machine, ensure that snmp-mibs-downloader is installed.
+```bash
+/etc/librenms/setup-snmpd.sh --yes --no-restart
+```
 
-NOTE, on the AsuswrtMerlin machine, ensure that distro is installed (i.e. that the OS is correctly detected!).
+If you need to inspect the generated block before applying:
 
-3: Restart the snmp service on Openwrt:
+```bash
+/etc/librenms/snmpd-config-generator.sh
+```
 
-`service snmpd restart`
+The generator dynamically discovers hostapd interfaces (for example
+`wlan01`, `wlan02`, `wlan12`, `wlan22`) and creates matching `clients-*`,
+`frequency-*`, `noise-floor-*`, `rate-*`, and `snr-*` extends.
 
-And then wait for discovery and polling on LibreNMS!
+## Manual setup (legacy)
+
+Manual `config extend` entries are still supported, but dynamic generation is
+recommended to avoid stale interface names after WLAN/SSID changes.
+
+# What gets discovered
+
+- Client count (per interface + aggregate `clients-wlan`)
+- Frequency (MHz)
+- Noise floor (dBm)
+- Rate TX/RX stats (`min`, `avg`, `max`)
+- SNR stats (`min`, `avg`, `max`)
+- Temperature sensors through `lm-sensors-pass.sh`
+
+# Validation and troubleshooting
+
+Validate script outputs directly on OpenWrt:
+
+```bash
+/etc/librenms/wlInterfaces.sh
+/etc/librenms/wlClients.sh
+/etc/librenms/wlClients.sh wlan02
+```
+
+Validate SNMP extend outputs from LibreNMS host:
+
+```bash
+snmpwalk -v2c -c <community> <openwrt-host> NET-SNMP-EXTEND-MIB::nsExtendCommand
+snmpwalk -v2c -c <community> <openwrt-host> 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."clients-wlan"'
+```
+
+If extends are missing or stale:
+
+- Re-run setup helper to refresh the managed block
+
+```bash
+/etc/librenms/setup-snmpd.sh --yes
+```
+
+- Restart `snmpd` (if you used `--no-restart`)
+- Re-run LibreNMS discovery for wireless module
+
+```bash
+lnms device:discover <openwrt-host> -m wireless
+```
+
+On the LibreNMS server, ensure SNMP MIB support is installed (`snmp-mibs-downloader`).

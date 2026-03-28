@@ -99,10 +99,7 @@ class MenuComposer
         $vars['locations'] = (LibrenmsConfig::get('show_locations') && LibrenmsConfig::get('show_locations_dropdown')) ?
             Location::hasAccess($user)->where('location', '!=', '')->orderBy('location')->get(['location', 'id']) :
             new Collection();
-        $vars['show_vmwinfo'] = $user->can('viewAny', \App\Models\Vminfo::class) && Vminfo::hasAccess($user)->exists();
-        $vars['show_device_extra_divider'] = $vars['show_vmwinfo']
-            || $user->can('viewAny', \App\Models\DeviceGroup::class)
-            || $user->can('update', \App\Models\Device::class);
+        $vars['show_vmwinfo'] = Vminfo::hasAccess($user)->exists();
 
         //Maps
         $vars['links'] = Link::exists();
@@ -171,7 +168,7 @@ class MenuComposer
         // Routing menu
         // FIXME queries use relationships to user
         $routing_menu = [];
-        if (Gate::any(['routing.view', 'routing.viewAll', 'routing.update'])) {
+        if (Gate::any(['routing.view', 'routing.viewAny'])) {
             $routing_count = ObjectCache::routing();
 
             if ($routing_count['vrf']) {
@@ -288,10 +285,6 @@ class MenuComposer
         } else {
             $vars['alert_menu_class'] = 'success';
         }
-        $vars['show_alert_divider'] = $user->can('viewAny', \App\Models\AlertRule::class)
-            || $user->can('viewAny', \App\Models\AlertSchedule::class)
-            || $user->can('viewAny', \App\Models\AlertTemplate::class)
-            || $user->can('viewAny', \App\Models\AlertTransport::class);
 
         // User menu
         $vars['notification_count'] = Notification::isSticky()
