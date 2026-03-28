@@ -23,7 +23,13 @@
                 <td>{{ $poller['devices'] }}</td>
                 <td>{{ $poller['time_taken'] }} Seconds</td>
                 <td>{{ \LibreNMS\Util\Time::format($poller['last_polled'], 'compact') }}</td>
-                <td>@if( $poller['long_not_polled'] )<button type='button' class='btn btn-danger btn-sm' aria-label={{ __('Delete') }} data-toggle='modal' data-target='#confirm-delete' data-id='{{ $poller['id'] }}' data-pollertype='delete-poller' name='delete-poller'><i class='fa fa-trash' aria-hidden='true'></i></button>@endif</td>
+                <td>
+                    @can('delete', $poller)
+                    @if($poller['long_not_polled'])
+                        <button type='button' class='btn btn-danger btn-sm' aria-label={{ __('Delete') }} data-toggle='modal' data-target='#confirm-delete' data-id='{{ $poller['id'] }}' data-pollertype='delete-poller' name='delete-poller'><i class='fa fa-trash' aria-hidden='true'></i></button>
+                    @endif
+                    @endcan
+                </td>
             </tr>
             @endforeach
         </table>
@@ -80,7 +86,6 @@
 </x-panel>
 @endif
 
-@if(auth()->user()->isAdmin())
 <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="{{ __('Delete') }}" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -106,11 +111,9 @@
         </div>
     </div>
 </div>
-@endif
 @endsection
 
 @section('scripts')
-@if(auth()->user()->isAdmin())
 <script>
     $('#confirm-delete').on('show.bs.modal', function (e) {
         id = $(e.relatedTarget).data('id');
@@ -144,5 +147,4 @@
         });
     });
 </script>
-@endif
 @endsection

@@ -1,11 +1,13 @@
 <?php
 
+use App\Models\Port;
+
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::denies('update', Port::class)) {
     $response = [
         'status' => 'error',
-        'message' => 'Need to be admin',
+        'message' => 'You need permission',
     ];
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
@@ -32,7 +34,7 @@ foreach ($_POST as $key => $val) {
             continue;
         }
 
-        $n = dbUpdate(['ignore' => $newign], 'ports', '`device_id` = ? AND `port_id` = ?', [$device_id, $port_id]);
+        $n = Port::where('device_id', $device_id)->where('port_id', $port_id)->update(['ignore' => $newign]);
 
         if ($n < 0) {
             $rows_updated = -1;
@@ -53,7 +55,7 @@ foreach ($_POST as $key => $val) {
             continue;
         }
 
-        $n = dbUpdate(['disabled' => $newdis], 'ports', '`device_id` = ? AND `port_id` = ?', [$device_id, $port_id]);
+        $n = Port::where('device_id', $device_id)->where('port_id', $port_id)->update(['disabled' => $newdis]);
 
         if ($n < 0) {
             $rows_updated = -1;

@@ -26,13 +26,13 @@ if (isset($oids) && $oids) {
             // rPDULoadPhaseConfigLowLoadThreshold
             $warnlimit_oid = '.1.3.6.1.4.1.318.1.1.12.2.2.1.1.3.' . $index;
             // rPDULoadPhaseConfigNearOverloadThreshold
-            $phase = snmp_get($device, $phase_oid, '-Oqv', '');
-            $current = (snmp_get($device, $current_oid, '-Oqv', '') / $precision);
-            $limit = snmp_get($device, $limit_oid, '-Oqv', '');
+            $phase = SnmpQuery::get($phase_oid)->value();
+            $current = (SnmpQuery::get($current_oid)->value() / $precision);
+            $limit = SnmpQuery::get($limit_oid)->value();
             // No / $precision here! Nice, APC!
-            $lowlimit = snmp_get($device, $lowlimit_oid, '-Oqv', '');
+            $lowlimit = SnmpQuery::get($lowlimit_oid)->value();
             // No / $precision here! Nice, APC!
-            $warnlimit = snmp_get($device, $warnlimit_oid, '-Oqv', '');
+            $warnlimit = SnmpQuery::get($warnlimit_oid)->value();
             // No / $precision here! Nice, APC!
             if (count(explode("\n", $oids)) != 1) {
                 $descr = "Phase $phase";
@@ -73,13 +73,13 @@ if (isset($oids) && $oids) {
             // rPDULoadPhaseConfigLowLoadThreshold
             $warnlimit_oid = '.1.3.6.1.4.1.318.1.1.12.2.2.1.1.3.' . $phasenum;
             // rPDULoadPhaseConfigNearOverloadThreshold
-            $phase = snmp_get($device, $phase_oid, '-Oqv', '');
-            $current = (snmp_get($device, $current_oid, '-Oqv', '') / $precision);
-            $limit = snmp_get($device, $limit_oid, '-Oqv', '');
+            $phase = SnmpQuery::get($phase_oid)->value();
+            $current = (SnmpQuery::get($current_oid)->value() / $precision);
+            $limit = SnmpQuery::get($limit_oid)->value();
             // No / $precision here! Nice, APC!
-            $lowlimit = snmp_get($device, $lowlimit_oid, '-Oqv', '');
+            $lowlimit = SnmpQuery::get($lowlimit_oid)->value();
             // No / $precision here! Nice, APC!
-            $warnlimit = snmp_get($device, $warnlimit_oid, '-Oqv', '');
+            $warnlimit = SnmpQuery::get($warnlimit_oid)->value();
             // No / $precision here! Nice, APC!
             if (count(explode("\n", $oids)) != 1) {
                 $descr = "Phase $phase";
@@ -92,7 +92,7 @@ if (isset($oids) && $oids) {
 }
 unset($oids);
 // v2 firmware- first bank is total, v3 firmware, 3rd bank is total
-$bank_count = snmp_get($device, 'rPDULoadDevNumBanks.0', '-Oqv', 'PowerNet-MIB');
+$bank_count = SnmpQuery::get('PowerNet-MIB::rPDULoadDevNumBanks.0')->value();
 if ($bank_count > 0) {
     $oids = snmp_walk($device, 'rPDULoadStatusBankNumber', '-OsqnU', 'PowerNet-MIB');
 }
@@ -124,11 +124,11 @@ if (isset($oids) && $oids) {
             // rPDULoadBankConfigLowLoadThreshold
             $warnlimit_oid = '.1.3.6.1.4.1.318.1.1.12.2.4.1.1.3.' . $banknum;
             // rPDULoadBankConfigNearOverloadThreshold
-            $bank = snmp_get($device, $bank_oid, '-Oqv', '');
-            $current = (snmp_get($device, $current_oid, '-Oqv', '') / $precision);
-            $limit = snmp_get($device, $limit_oid, '-Oqv', '');
-            $lowlimit = snmp_get($device, $lowlimit_oid, '-Oqv', '');
-            $warnlimit = snmp_get($device, $warnlimit_oid, '-Oqv', '');
+            $bank = SnmpQuery::get($bank_oid)->value();
+            $current = (SnmpQuery::get($current_oid)->value() / $precision);
+            $limit = SnmpQuery::get($limit_oid)->value();
+            $lowlimit = SnmpQuery::get($lowlimit_oid)->value();
+            $warnlimit = SnmpQuery::get($warnlimit_oid)->value();
             if ($limit != -1 && $lowlimit != -1 && $warnlimit != -1) {
                 discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
             }
@@ -163,20 +163,20 @@ if (isset($oids) && $oids) {
             // rPDU2OutletMeteredConfigNearOverloadCurrentThreshold
             $name_oid = '.1.3.6.1.4.1.318.1.1.26.9.4.3.1.3.' . $index;
             // rPDU2OutletMeteredStatusName
-            $voltage = snmp_get($device, $voltage_oid, '-Oqv', '');
-            $current = (snmp_get($device, $current_oid, '-Oqv', '') / $precision);
+            $voltage = SnmpQuery::get($voltage_oid)->value();
+            $current = (SnmpQuery::get($current_oid)->value() / $precision);
 
             $limit = null;
             $lowlimit = null;
             $warnlimit = null;
 
             if ($voltage) {
-                $limit = (snmp_get($device, $limit_oid, '-Oqv', '') / $voltage);
-                $lowlimit = (snmp_get($device, $lowlimit_oid, '-Oqv', '') / $voltage);
-                $warnlimit = (snmp_get($device, $warnlimit_oid, '-Oqv', '') / $voltage);
+                $limit = (SnmpQuery::get($limit_oid)->value() / $voltage);
+                $lowlimit = (SnmpQuery::get($lowlimit_oid)->value() / $voltage);
+                $warnlimit = (SnmpQuery::get($warnlimit_oid)->value() / $voltage);
             }
 
-            $descr = 'Outlet ' . $index . ' - ' . snmp_get($device, $name_oid, '-Oqv', '');
+            $descr = 'Outlet ' . $index . ' - ' . SnmpQuery::get($name_oid)->value();
             discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
         }
     }
@@ -201,12 +201,12 @@ if (isset($oids) && $oids) {
     $warnlimit_oid = '.1.3.6.1.4.1.318.1.1.8.4.16.1.4.1';
     // atsConfigPhaseNearOverLoadThreshold
     $index = 1;
-    $current = (snmp_get($device, $current_oid, '-Oqv', '') / $precision);
-    $limit = snmp_get($device, $limit_oid, '-Oqv', '');
+    $current = (SnmpQuery::get($current_oid)->value() / $precision);
+    $limit = SnmpQuery::get($limit_oid)->value();
     // No / $precision here! Nice, APC!
-    $lowlimit = snmp_get($device, $lowlimit_oid, '-Oqv', '');
+    $lowlimit = SnmpQuery::get($lowlimit_oid)->value();
     // No / $precision here! Nice, APC!
-    $warnlimit = snmp_get($device, $warnlimit_oid, '-Oqv', '');
+    $warnlimit = SnmpQuery::get($warnlimit_oid)->value();
     // No / $precision here! Nice, APC!
     $descr = 'Output Feed';
     discover_sensor(null, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);

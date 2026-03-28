@@ -14,6 +14,8 @@
 * @author     LibreNMS Contributors
 */
 
+use App\Models\Alert;
+
 $param = [];
 
 $pagetitle[] = 'Alert Log';
@@ -36,7 +38,8 @@ $alert_severities = [
     'OK' => 1,
 ];
 
-if (Auth::user()->hasGlobalAdmin()) {
+$admin_verbose_details = '';
+if (Gate::allows('detail', Alert::class)) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 
@@ -72,7 +75,7 @@ $common_output[] = '
 </div>
 
 <script>
-
+document.addEventListener("DOMContentLoaded", function () {
     var grid = $("#alertlog").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
@@ -122,7 +125,7 @@ $common_output[] = '</select> \
         },
         converters: {
             datetime: {
-              to: LibreNMS.Date.format
+              to: LibreNMS.Date.display
             }
         }
     }).on("loaded.rs.jquery.bootgrid", function () {
@@ -189,6 +192,7 @@ $common_output[] = '</select> \
         window.history.pushState({path: newUrl}, "", newUrl);
         grid.bootgrid("reload");
     });
+});
 </script>
 <style>
 .severity-select-box .select2-search--inline {

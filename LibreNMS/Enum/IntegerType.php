@@ -37,17 +37,17 @@ enum IntegerType
     case Uint32;
     case Uint64;
 
-    public function maxValue(): int
+    public function maxValue(): string|int
     {
         return match ($this) {
             self::Int8 => 127,
             self::Int16 => 32767,
             self::Int32 => 2147483647,
-            self::Int64 => 4611686018427387903,
+            self::Int64 => 9223372036854775807,
             self::Uint8 => 255,
             self::Uint16 => 65535,
             self::Uint32 => 4294967295,
-            self::Uint64 => 9223372036854775807,
+            self::Uint64 => '18446744073709551615',
         };
     }
 

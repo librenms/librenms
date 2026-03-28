@@ -92,12 +92,12 @@ if ($device['sysContact']) {
     echo '<div class="row">
         <div class="col-sm-4">Contact</div>';
 
-    $contactText = get_dev_attrib($device, 'override_sysContact_bool') 
+    $contactText = get_dev_attrib($device, 'override_sysContact_bool')
         ? get_dev_attrib($device, 'override_sysContact_string')
         : $device['sysContact'];
 
     $emails = \LibreNMS\Util\Mail::parseEmails($contactText);
-    
+
     if (is_array($emails) && count($emails) > 0) {
         $email = key($emails);
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -111,9 +111,9 @@ if ($device['sysContact']) {
             );
         }
     }
-    
+
     $displayText ??= Clean::html($contactText);
-    
+
     if (get_dev_attrib($device, 'override_sysContact_bool')) {
         echo '<div class="col-sm-8">' . $displayText . '</div>
             </div>
@@ -300,7 +300,7 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
                   });
                 device_map.addLayer(device_marker_cluster);
         ';
-    } elseif (Auth::user()->isAdmin()) {
+    } elseif (Gate::allows('update', Location::class)) {
         echo '
                 device_marker = L.marker(device_location).addTo(device_map);
                 device_marker.dragging.enable();

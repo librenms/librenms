@@ -7,7 +7,7 @@ use LibreNMS\Enum\PortAssociationMode;
 $device = DeviceCache::getPrimary();
 
 if (isset($_POST['editing'])) {
-    if (Auth::user()->hasGlobalAdmin()) {
+    if (Gate::allows('update', $device)) {
         $force_save = isset($_POST['force_save']) && $_POST['force_save'] == 'on';
         $device->poller_group = $_POST['poller_group'] ?? 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');

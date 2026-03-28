@@ -2,7 +2,7 @@
 
 header('Content-type: application/json');
 
-if (! Auth::user()->hasGlobalAdmin()) {
+if (Gate::none(['customoid.create', 'customoid.update'])) {
     exit(json_encode([
         'status' => 'error',
         'message' => 'Need to be admin',
@@ -66,6 +66,7 @@ if ($action == 'test') {
     }
 } else {
     if (is_numeric($id) && $id > 0) {
+        Gate::authorize('customoid.update');
         if (dbUpdate(
             [
                 'customoid_descr' => $name,
@@ -96,6 +97,7 @@ if ($action == 'test') {
     } elseif (dbFetchCell('SELECT 1 FROM `customoids` WHERE `customoid_descr` = ? AND `device_id`=?', [$name, $device_id])) {
         $message = "OID named <i>$name</i> on this device already exists";
     } else {
+        Gate::authorize('customoid.create');
         $id = dbInsert(
             [
                 'device_id' => $device_id,

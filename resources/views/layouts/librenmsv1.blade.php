@@ -94,6 +94,7 @@
                 applySiteStyle(event.matches ? 'dark' : 'light');
             }
         });
+        window.tz = undefined;
     </script>
     @auth
         <script>
@@ -102,8 +103,9 @@
             if(tz !== '{{ session('preferences.timezone') }}') {
                 updateTimezone(tz, false);
             }
+        @else
+            window.tz = '{{ session('preferences.timezone') }}';
         @endif
-        window.tz = '{{ session('preferences.timezone') }}' || undefined;
         </script>
         <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
     @endauth

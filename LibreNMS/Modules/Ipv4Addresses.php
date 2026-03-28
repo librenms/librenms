@@ -199,6 +199,10 @@ class Ipv4Addresses implements Module
                 $entAddr = $data['ipAdEntAddr'] ?? '';
                 $addr = (preg_match('/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/', (string) $entAddr, $tmp)) ? $entAddr : $ipAddr;
 
+                if (! IPv4::isValid($addr)) {
+                    return null;
+                }
+
                 return new Ipv4Address([
                     'port_id' => PortCache::getIdFromIfIndex($data['ipAdEntIfIndex'] ?? 0, $device),
                     'ipv4_address' => $addr,

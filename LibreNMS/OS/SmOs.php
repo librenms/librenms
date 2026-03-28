@@ -3,7 +3,6 @@
 namespace LibreNMS\OS;
 
 use App\Models\Transceiver;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
@@ -77,7 +76,7 @@ class SmOs extends OS implements
                     $this->getDeviceId(),
                     $totalOids['rx'],
                     'total-rx',
-                    $index,
+                    $link,
                     $this->getLinkLabel($link) . ' Total Rx',
                     array_sum(array_column($radioEntry, 'linkRxETHCapacity')),
                     1000
@@ -90,7 +89,7 @@ class SmOs extends OS implements
                     $this->getDeviceId(),
                     $totalOids['tx'],
                     'total-tx',
-                    $index,
+                    $link,
                     $this->getLinkLabel($link) . ' Total Tx',
                     array_sum(array_column($radioEntry, 'linkTxETHCapacity')),
                     1000
@@ -278,7 +277,7 @@ class SmOs extends OS implements
                 'entity_physical_index' => $ifIndex,
                 'type' => null,
                 'vendor' => $data['SIAE-SFP-MIB::sfpVendorName'] ?? null,
-                'date' => empty($data['SIAE-SFP-MIB::sfpVendorDateCode']) ? null : Carbon::createFromFormat('ymd', $data['SIAE-SFP-MIB::sfpVendorDateCode'])->toDateString(),
+                'date' => $data['SIAE-SFP-MIB::sfpVendorDateCode'] ?? null,
                 'model' => $data['SIAE-SFP-MIB::sfpVendorPartNumber'] ?? null,
                 'serial' => $data['SIAE-SFP-MIB::sfpVendorSN'] ?? null,
                 'ddm' => empty($data['SIAE-SFP-MIB::sfpDiagMonitorCode']) ? 0 : 1,

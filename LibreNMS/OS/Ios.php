@@ -90,6 +90,7 @@ class Ios extends Cisco implements
                 40,
                 null,
                 30,
+                null,
                 $entry['entPhysicalIndex'],
                 'ports'
             );

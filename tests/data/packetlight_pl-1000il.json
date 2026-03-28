@@ -3347,6 +3347,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "PacketLight Networks",
+                    "entPhysicalMfgDate": "3744-11-4,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3366,6 +3367,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3385,6 +3387,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3404,6 +3407,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3423,6 +3427,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3442,6 +3447,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3461,6 +3467,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3480,6 +3487,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3499,6 +3507,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3518,6 +3527,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3537,6 +3547,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3556,6 +3567,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 501,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3575,6 +3587,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 502,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3594,6 +3607,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 503,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3613,6 +3627,7 @@
                     "entPhysicalContainedIn": 3101,
                     "entPhysicalParentRelPos": 501,
                     "entPhysicalMfgName": "PacketLight Networks",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3632,6 +3647,7 @@
                     "entPhysicalContainedIn": 3102,
                     "entPhysicalParentRelPos": 502,
                     "entPhysicalMfgName": "PacketLight Networks",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3651,6 +3667,7 @@
                     "entPhysicalContainedIn": 3103,
                     "entPhysicalParentRelPos": 503,
                     "entPhysicalMfgName": "PacketLight Networks",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3670,6 +3687,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 208,
                     "entPhysicalMfgName": "--",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3689,6 +3707,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 101,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3708,6 +3727,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 102,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3727,6 +3747,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 103,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 },
                 {
@@ -3746,6 +3767,7 @@
                     "entPhysicalContainedIn": 1001,
                     "entPhysicalParentRelPos": 104,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0,.0:0",
                     "ifIndex": null
                 }
             ]

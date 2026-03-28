@@ -27,32 +27,6 @@ use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Laravel;
 
 /**
- * Performs a query using the given string.
- *
- * @param  string  $sql
- * @param  array  $parameters
- * @return bool if query was successful or not
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#building-queries
- * @see https://laravel.com/docs/eloquent#building-queries
- */
-function dbQuery($sql, $parameters = [])
-{
-    try {
-        if (empty($parameters)) {
-            // don't use prepared statements for queries without parameters
-            return Eloquent::DB()->getPdo()->exec($sql) !== false;
-        }
-
-        return Eloquent::DB()->statement($sql, (array) $parameters);
-    } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
-
-        return false;
-    }
-}
-
-/**
  * @param  array  $data
  * @param  string  $table
  * @return null|int
@@ -80,49 +54,6 @@ function dbInsert($data, $table): ?int
 
     return null;
 }//end dbInsert()
-
-/**
- * Passed an array and a table name, it attempts to insert the data into the table.
- * $data is an array (rows) of key value pairs.  keys are fields.  Rows need to have same fields.
- * Check for boolean false to determine whether insert failed
- *
- * @param  array  $data
- * @param  string  $table
- * @return bool
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
- * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
- */
-function dbBulkInsert($data, $table)
-{
-    // check that data isn't an empty array
-    if (empty($data)) {
-        return false;
-    }
-
-    // make sure we have fields to insert
-    $fields = array_keys(reset($data));
-    if (empty($fields)) {
-        return false;
-    }
-
-    // Break into managable chunks to prevent situations where insert
-    // fails due to prepared statement having too many placeholders.
-    $data_chunks = array_chunk($data, 10000, true);
-
-    foreach ($data_chunks as $data_chunk) {
-        try {
-            $result = Eloquent::DB()->table($table)->insert((array) $data_chunk);
-
-            return $result;
-        } catch (PDOException $pdoe) {
-            // FIXME query?
-            dbHandleException(new QueryException('dbFacile', "Bulk insert $table", $data_chunk, $pdoe));
-        }
-    }
-
-    return false;
-}//end dbBulkInsert()
 
 /**
  * Passed an array, table name, WHERE clause, and placeholder parameters, it attempts to update a record.
@@ -278,34 +209,6 @@ function dbFetchCell($sql, $parameters = [])
 }//end dbFetchCell()
 
 /**
- * This method is quite different from fetchCell(), actually
- * It fetches one cell from each row and places all the values in 1 array
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
- * @see https://laravel.com/docs/eloquent
- */
-function dbFetchColumn($sql, $parameters = [])
-{
-    try {
-        $startTime = microtime(true);
-        $connection = DB::connection();
-
-        $query = $connection->getPdo()->prepare($sql);
-        $query->execute((array) $parameters);
-        $column = $query->fetchAll(PDO::FETCH_COLUMN, 0);
-
-        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
-        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
-
-        return $column;
-    } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
-    }
-
-    return [];
-}//end dbFetchColumn()
-
-/**
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
  * @see https://laravel.com/docs/eloquent
  */
@@ -405,7 +308,7 @@ function dbSyncRelationship($table, $target_column = null, $target = null, $list
     }
     $deleted = (int) dbDelete($table, $delete_query, $delete_params);
 
-    $db_list = dbFetchColumn("SELECT `$list_column` FROM `$table` WHERE `$target_column`=?", [$target]);
+    $db_list = DB::table($table)->where($target_column, $target)->pluck($list_column)->all();
     foreach ($list as $item) {
         if (! in_array($item, $db_list)) {
             dbInsert([$target_column => $target, $list_column => $item], $table);

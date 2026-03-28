@@ -400,11 +400,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.4{{ $noindex }}'
                     descr: 'BMS 01 Current'
                     index: 'BMS01-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 01'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS01-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS01-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -413,11 +413,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.17{{ $noindex }}'
                     descr: 'BMS 02 Current'
                     index: 'BMS02-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 02'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS02-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS02-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -426,11 +426,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.30{{ $noindex }}'
                     descr: 'BMS 03 Current'
                     index: 'BMS03-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 03'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS03-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS03-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -439,11 +439,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.43{{ $noindex }}'
                     descr: 'BMS 04 Current'
                     index: 'BMS04-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 04'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS04-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS04-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -452,11 +452,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.56{{ $noindex }}'
                     descr: 'BMS 05 Current'
                     index: 'BMS05-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 05'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS05-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS05-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -465,11 +465,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.69{{ $noindex }}'
                     descr: 'BMS 06 Current'
                     index: 'BMS06-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 06'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS06-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS06-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -478,11 +478,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.82{{ $noindex }}'
                     descr: 'BMS 07 Current'
                     index: 'BMS07-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 07'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS07-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS07-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -491,11 +491,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.95{{ $noindex }}'
                     descr: 'BMS 08 Current'
                     index: 'BMS08-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 08'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS08-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS08-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -504,11 +504,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.108{{ $noindex }}'
                     descr: 'BMS 09 Current'
                     index: 'BMS09-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 09'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS09-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS09-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -517,11 +517,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.121{{ $noindex }}'
                     descr: 'BMS 10 Current'
                     index: 'BMS10-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 10'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS10-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS10-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -530,11 +530,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.134{{ $noindex }}'
                     descr: 'BMS 11 Current'
                     index: 'BMS11-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 11'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS11-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS11-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -543,11 +543,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.147{{ $noindex }}'
                     descr: 'BMS 12 Current'
                     index: 'BMS12-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 12'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS12-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS12-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -556,11 +556,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.160{{ $noindex }}'
                     descr: 'BMS 13 Current'
                     index: 'BMS13-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 13'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS13-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS13-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -569,11 +569,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.173{{ $noindex }}'
                     descr: 'BMS 14 Current'
                     index: 'BMS14-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 14'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS14-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS14-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -582,11 +582,11 @@ modules:
                     num_oid: '.1.3.6.1.2.1.555.1.1.1.186{{ $noindex }}'
                     descr: 'BMS 15 Current'
                     index: 'BMS15-Current'
-                    divisor: 10
+                    divisor: 100
                     group: 'BMS 15'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS15-Current
+                            oid: SUPERCAPBATTERY-MIB::BMS15-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -599,7 +599,7 @@ modules:
                     group: 'BMS 01'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS01-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS01-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -637,7 +637,7 @@ modules:
                     group: 'BMS 02'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS02-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS02-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -674,7 +674,7 @@ modules:
                     group: 'BMS 03'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS03-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS03-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -712,7 +712,7 @@ modules:
                     group: 'BMS 04'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS04-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS04-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -750,7 +750,7 @@ modules:
                     group: 'BMS 05'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS05-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS05-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -788,7 +788,7 @@ modules:
                     group: 'BMS 06'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS06-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS06-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -826,7 +826,7 @@ modules:
                     group: 'BMS 07'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS07-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS07-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -863,7 +863,7 @@ modules:
                     group: 'BMS 08'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS08-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS08-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -901,7 +901,7 @@ modules:
                     group: 'BMS 09'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS09-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS09-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -939,7 +939,7 @@ modules:
                     group: 'BMS 10'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS10-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS10-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -977,7 +977,7 @@ modules:
                     group: 'BMS 11'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS11-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS11-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -1053,7 +1053,7 @@ modules:
                     group: 'BMS 13'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS13-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS13-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -1091,7 +1091,7 @@ modules:
                     group: 'BMS 14'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS14-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS14-TotalCapacity
                             op: '='
                             value: 0
                 -
@@ -1129,7 +1129,7 @@ modules:
                     group: 'BMS 15'
                     skip_values:
                         -
-                            oid: SUPERCAPBATTERY-MIB::BMS15-RemainingCapacity
+                            oid: SUPERCAPBATTERY-MIB::BMS15-TotalCapacity
                             op: '='
                             value: 0
                 -

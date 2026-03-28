@@ -33,6 +33,7 @@ use App\Models\User;
 use Cache;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Validations\Php;
 
@@ -53,7 +54,7 @@ class Checks
         /** @var User $user */
         $user = Auth::user();
 
-        if ($user->isAdmin()) {
+        if (Gate::allows('notification.update')) { // FIXME correct permission check?
             $notifications = Notification::isUnread($user)->where('severity', '>', Severity::Ok->value)->get();
             foreach ($notifications as $notification) {
                 toast()->warning($notification->title, "<a href='notifications/'>$notification->body</a>");

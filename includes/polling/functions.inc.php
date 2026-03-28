@@ -324,11 +324,9 @@ function update_application($app, $response, $metrics = [], $status = '')
 
         // remove no longer existing metrics (generally should not happen
         foreach ($db_metrics as $db_metric) {
-            dbDelete(
-                'application_metrics',
-                'app_id=? && metric=?',
-                [$app['app_id'], $db_metric['metric']]
-            );
+            \App\Models\ApplicationMetric::where('app_id', $app['app_id'])
+                ->where('metric', $db_metric['metric'])
+                ->delete();
             echo '-';
         }
 
