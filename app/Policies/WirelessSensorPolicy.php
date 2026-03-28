@@ -2,7 +2,9 @@
 
 namespace App\Policies;
 
+use App\Facades\Permissions;
 use App\Models\User;
+use App\Models\WirelessSensor;
 
 class WirelessSensorPolicy
 {
@@ -13,15 +15,22 @@ class WirelessSensorPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAny');
+        return $this->hasGlobalPermission($user, 'view')
+            || $this->hasGlobalPermission($user, 'update')
+            || $this->hasGlobalPermission($user, 'delete');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user): bool
+    public function view(User $user, WirelessSensor $wirelessSensor): bool
     {
-        return $this->hasGlobalPermission($user, 'view');
+        if ($this->hasGlobalPermission($user, 'viewAll')) {
+            return true;
+        }
+
+        return $this->hasGlobalPermission($user, 'view')
+            && Permissions::canAccessDevice($wirelessSensor->device_id, $user);
     }
 
     /**

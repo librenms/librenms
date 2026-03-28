@@ -234,6 +234,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function bootAuth(): void
     {
+        Gate::policy(\Spatie\Permission\Models\Role::class, \App\Policies\RolePolicy::class);
+
         Auth::provider('legacy', fn ($app, array $config) => new LegacyUserProvider());
 
         Auth::provider('token_provider', fn ($app, array $config) => new TokenUserProvider());
@@ -259,7 +261,7 @@ class AppServiceProvider extends ServiceProvider
                 return true;  // super admin
             }
 
-            if ((str_ends_with($ability, 'view') || str_ends_with($ability, 'viewAny')) && $user->hasRole('global-read')) {
+            if ($user->hasRole('global-read') && preg_match('/^(\s+\.)?view(All|Any)?$/', $ability, $match)) {
                 return true; // global read access
             }
 

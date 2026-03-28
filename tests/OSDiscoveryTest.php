@@ -28,6 +28,7 @@ namespace LibreNMS\Tests;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Modules\Core;
@@ -142,14 +143,20 @@ final class OSDiscoveryTest extends TestCase
         $start = microtime(true);
 
         $community = $filename ?: $expected_os;
+        $log_driver = Log::getDefaultDriver();
+
         Debug::set();
         Debug::setVerbose();
+        Debug::enableCliDebugOutput();
         ob_start();
+        Log::setDefaultDriver('stdout');
         $os = Core::detectOS($this->genDevice($community));
         $output = ob_get_contents();
+        Log::setDefaultDriver($log_driver);
         ob_end_clean();
         Debug::set(false);
         Debug::setVerbose(false);
+        Debug::disableCliDebugOutput();
 
         $this->assertLessThan(10, microtime(true) - $start, "OS $expected_os took longer than 10s to detect");
         $this->assertEquals($expected_os, $os, "Test file: $community.snmprec\n$output");

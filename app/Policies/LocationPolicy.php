@@ -14,7 +14,19 @@ class LocationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAny');
+        return $this->hasGlobalPermission($user, 'view')
+            || $this->hasGlobalPermission($user, 'viewAll')
+            || $this->hasGlobalPermission($user, 'create')
+            || $this->hasGlobalPermission($user, 'update')
+            || $this->hasGlobalPermission($user, 'delete');
+    }
+
+    /**
+     * Determine whether the user can view all models.
+     */
+    public function viewAll(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'viewAll');
     }
 
     /**
@@ -22,6 +34,10 @@ class LocationPolicy
      */
     public function view(User $user, Location $location): bool
     {
+        if ($this->hasGlobalPermission($user, 'viewAll')) {
+            return true;
+        }
+
         return $this->hasGlobalPermission($user, 'view')
             || Location::hasAccess($user)->where('id', $location->id)->exists(); // FIXME not a db query
     }

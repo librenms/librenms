@@ -622,21 +622,24 @@ The included templates apart from the default template are:
 
 ```php
 @php
-    $state_color = match ($alert->state) {
-        0 => 'Good',
-        1 => 'Warning',
-        2 => 'Attention',
-        default => 'Default'
+    $state_color = match ((int) $alert->state) {
+        0  => 'Good',       // CLEAR, RECOVERED
+        1  => 'Attention',  // ACTIVE
+        2  => 'Accent',     // ACKNOWLEDGED
+        3  => 'Attention',  // WORSE
+        4  => 'Warning',    // BETTER
+        5  => 'Warning',    // CHANGED
+        default => 'Default',
     };
     $severity_color = match ($alert->severity) {
-        'Ok' => 'Good',
-        'Warning' => 'Warning',
-        'Critical' => 'Attention',
-        default => 'Default'
+        'ok', 'Ok' => 'Good',
+        'warning', 'Warning' => 'Warning',
+        'critical', 'Critical' => 'Attention',
+        default => 'Default',
     };
 @endphp
 {
-    "type": "LibreNMS AdaptiveCard Alert",
+    "type": "message"
     "attachments": [
         {
             "contentType": "application/vnd.microsoft.card.adaptive",

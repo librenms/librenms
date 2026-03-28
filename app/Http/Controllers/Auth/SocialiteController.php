@@ -160,41 +160,42 @@ class SocialiteController extends Controller
         $scopes = LibrenmsConfig::get('auth.socialite.scopes');
         $claims = LibrenmsConfig::get('auth.socialite.claims');
 
-        if (is_array($scopes) &&
-            $this->socialite_user instanceof \Laravel\Socialite\AbstractUser &&
-            ! empty($claims)
-        ) {
-            $roles = [];
-            $attributes = $this->socialite_user->getRaw();
-
-            if (is_object(current($attributes)) && method_exists(current($attributes), 'getName') && method_exists(current($attributes), 'getAllAttributeValues')) {
-                $parsed_attributes = [];
-                foreach ($attributes as $attribute_object) {
-                    $attribute_name = $attribute_object->getName();
-                    $attribute_values = $attribute_object->getAllAttributeValues();
-                    $parsed_attributes[$attribute_name] = $attribute_values;
-                }
-                $attributes = $parsed_attributes;
-            }
-
-            foreach ($scopes as $scope) {
-                foreach ($attributes as $attribute_name => $attribute_values) {
-                    if (str_contains((string) $attribute_name, (string) $scope)) {
-                        foreach (Arr::wrap($attributes[$attribute_name] ?? []) as $scope_data) {
-                            $roles = array_merge($roles, $claims[$scope_data]['roles'] ?? []);
-                        }
-                    }
-                }
-            }
-
-            if (count($roles) > 0) {
-                $user->syncRoles(array_unique($roles));
-
-                return true;
-            }
+        if (! is_array($scopes) || ! $this->socialite_user instanceof \Laravel\Socialite\AbstractUser || empty($claims)) {
+            return false;
         }
 
-        return false;
+        $attributes = $this->normalizeAttributes($this->socialite_user->getRaw());
+
+        $claimField = LibrenmsConfig::get("auth.socialite.configs.$provider.claim_field");
+        $scopeValues = $claimField !== null
+            ? Arr::wrap($attributes[$claimField] ?? [])
+            : collect($attributes)
+                ->filter(fn ($values, $name) => collect($scopes)->contains(fn ($scope) => str_contains((string) $name, (string) $scope)))
+                ->flatten()
+                ->all();
+
+        $roles = [];
+        foreach ($scopeValues as $value) {
+            $roles = array_merge($roles, $claims[$value]['roles'] ?? []);
+        }
+
+        if (empty($roles)) {
+            return false;
+        }
+
+        $user->syncRoles(array_unique($roles));
+
+        return true;
+    }
+
+    private function normalizeAttributes(array $attributes): array
+    {
+        $first = current($attributes);
+        if (! is_object($first) || ! method_exists($first, 'getName') || ! method_exists($first, 'getAllAttributeValues')) {
+            return $attributes;
+        }
+
+        return collect($attributes)->keyBy->getName()->map->getAllAttributeValues()->all();
     }
 
     private function pairUser(string $provider): RedirectResponse
