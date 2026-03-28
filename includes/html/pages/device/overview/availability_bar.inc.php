@@ -96,7 +96,7 @@ for ($i = 0; $i < $days; $i++) {
     ];
 }
 
-// Calculate total availability over the full period
+// Calculate total availability over the full period.
 $total_outage = 0;
 foreach ($outages as $outage) {
     $down = max($outage->going_down, $start);
