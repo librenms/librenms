@@ -36,11 +36,11 @@ $inserted = $device_obj->inserted
     : $now;
 
 $outages = \App\Models\DeviceOutage::where('device_id', $device_id)
-    ->where(function ($q) use ($start) {
+    ->where(function ($q) use ($start): void {
         $q->where('going_down', '>=', $start)
-          ->orWhere(function ($q2) use ($start) {
+          ->orWhere(function ($q2) use ($start): void {
               $q2->where('going_down', '<', $start)
-                 ->where(function ($q3) use ($start) {
+                 ->where(function ($q3) use ($start): void {
                      $q3->whereNull('up_again')
                         ->orWhere('up_again', '>', $start);
                  });
