@@ -133,26 +133,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
         return $this;
     }
 
-    /**
-     * Specify a device by a device array.
-     * The device will be fetched from the cache if it is loaded, otherwise, it will fill the array into a new Device
-     */
-    public function deviceArray(array $device): SnmpQueryInterface
-    {
-        // Update NetSnmp object in case we need to switch
-        $this->netsnmp->deviceArray($device);
-
-        if (isset($device['device_id']) && DeviceCache::has($device['device_id'])) {
-            $this->device = DeviceCache::get($device['device_id']);
-
-            return $this;
-        }
-
-        $this->device = new Device($device);
-
-        return $this;
-    }
-
     public function cache(): SnmpQueryInterface
     {
         // Update NetSnmp object in case we need to switch
@@ -333,7 +313,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
             return;
         }
 
-        snmp_set_mib_option(SNMP_MIB_ALLOW_UNDERSCORES, true); /** @phpstan-ignore function.notFound */
+        snmp_set_mib_option(SNMP_MIB_ALLOW_UNDERSCORES, true); /** @phpstan-ignore function.notFound, constant.notFound */
         snmp_init_mib(implode(':', $this->mibDirectories())); /** @phpstan-ignore function.notFound */
         $this->readMibs($this->mibs);
 
