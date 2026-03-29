@@ -1,6 +1,7 @@
 @import './toast.css';
 
 @import "tailwindcss" prefix(tw);
+@source "../../includes/html/pages/**/*.php";
 @import "../../html/css/bootstrap.min.css" layer(components);
 @custom-variant dark (&:where(.dark, .dark *));
 @layer base {
