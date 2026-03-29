@@ -30,7 +30,6 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
-use Illuminate\Support\Facades\Cache;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
