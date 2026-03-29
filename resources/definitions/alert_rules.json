@@ -748,12 +748,32 @@
   {
     "name": "SMART: one or more disk is unhealthy",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"unhealthy"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"unhealthy"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
   },
   {
-    "name": "SMART: one or more disk could not be polled",
+    "name": "SMART: one or more disk have a smartctl exit value of non-zero",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"exit_nonzero"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"exit_nonzero"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "SMART: one or more disk reporting device error poll from smartctl",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"dev_error"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "SMART: one or more disk has failed tests",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"disks_with_failed_tests"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "SMART: one or more disk reporting as unhealthy",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"unhealthy"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "SMART: one or more disk reporting as over heating",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"disks_with_over_temp"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
   },
   {
     "name": "SS TCP TIME-WAIT Sessions > 100",
@@ -961,17 +981,17 @@
     "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"cape"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"error"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
   },
   {
-    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*fail.*"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*fail.*"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
     "name": "SMART: one or more disk is has failures",
     "severity": "critical"
   },
   {
-    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*readfailure"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"readfailure"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
     "name": "SMART: one or more disk is has self test read failures",
     "severity": "critical"
   },
   {
-    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*unknownfail"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"unknownfail"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
     "name": "SMART: one or more disk is has self test unknown failures",
     "severity": "critical"
   },
