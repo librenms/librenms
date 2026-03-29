@@ -120,43 +120,33 @@ echo '<div class="panel-heading">';
 echo '<i class="fa fa-check-circle fa-lg icon-theme" aria-hidden="true">';
 echo '</i><strong> Availability (90 days)</strong>';
 echo '</div>';
-echo '<div class="panel-body" style="padding:10px 15px;">';
-echo '<style>';
-echo '.avail-wrap{display:flex;gap:2px;align-items:center;}';
-echo '.avail-bar{flex:1;height:34px;border-radius:2px;';
-echo 'cursor:pointer;position:relative;}';
-echo '.avail-tip{display:none;position:absolute;bottom:42px;';
-echo 'left:50%;transform:translateX(-50%);background:#fff;';
-echo 'border:1px solid #ccc;border-radius:4px;padding:7px 10px;';
-echo 'font-size:12px;white-space:nowrap;z-index:9999;';
-echo 'box-shadow:0 2px 6px rgba(0,0,0,0.15);pointer-events:none;}';
-echo '.avail-bar:hover .avail-tip{display:block;}';
-echo '.avail-tip-date{font-weight:bold;margin-bottom:4px;color:#333;}';
-echo '.avail-tip-ok{color:#27ae60;}';
-echo '.avail-tip-err{color:#e74c3c;}';
-echo '</style>';
-echo '<div class="avail-wrap">';
+echo '<div class="panel-body tw:px-4 tw:py-2.5">';
+echo '<div class="tw:flex tw:gap-0.5 tw:items-center">';
 
 foreach ($day_data as $day) {
-    $tip = '<div class="avail-tip-date">' . $day['date'] . '</div>';
+    $tip = '<div class="tw:font-bold tw:mb-1 tw:text-gray-800">' . $day['date'] . '</div>';
 
     if ($day['outages'] === ['no_data']) {
-        $tip .= '<div class="avail-tip-ok" style="color:#999;">— No data</div>';
+        $tip .= '<div class="tw:text-gray-400">— No data</div>';
     } elseif (empty($day['outages'])) {
-        $tip .= '<div class="avail-tip-ok">&#10003; No outage</div>';
+        $tip .= '<div class="tw:text-green-600">&#10003; No outage</div>';
     } else {
         foreach ($day['outages'] as $line) {
-            $tip .= '<div class="avail-tip-err">&#10007; ' . $line . '</div>';
+            $tip .= '<div class="tw:text-red-500">&#10007; ' . $line . '</div>';
         }
     }
-    echo '<div class="avail-bar" style="background:' . $day['color'] . ';">';
-    echo '<div class="avail-tip">' . $tip . '</div>';
+
+    echo '<div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false"';
+    echo ' class="tw:flex-1 tw:h-[34px] tw:rounded-sm tw:cursor-pointer tw:relative" style="background:' . $day['color'] . ';">';
+    echo '<div x-show="open" x-cloak';
+    echo ' class="tw:absolute tw:bottom-[42px] tw:left-1/2 tw:-translate-x-1/2 tw:bg-white tw:border tw:border-gray-300 tw:rounded tw:px-2.5 tw:py-1.5 tw:text-xs tw:whitespace-nowrap tw:z-[9999] tw:shadow-md tw:pointer-events-none">';
+    echo $tip;
+    echo '</div>';
     echo '</div>';
 }
 
 echo '</div>';
-echo '<div style="display:flex;justify-content:space-between;';
-echo 'font-size:11px;color:#888;margin-top:4px;">';
+echo '<div class="tw:flex tw:justify-between tw:text-[11px] tw:text-gray-400 tw:mt-1">';
 echo '<span>90 days ago</span>';
 echo '<span><strong>' . $total_avail . '% uptime</strong></span>';
 echo '<span>Today</span>';
