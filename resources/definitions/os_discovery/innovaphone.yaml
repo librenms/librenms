@@ -1,46 +1,44 @@
-mib: INNO-MIB
 modules:
     sensors:
         state:
             data:
                 -
-                    oid: l2Table
-                    value: l2State
+                    oid: INNO-MIB::l2Table
+                    value: INNO-MIB::l2State
                     num_oid: '.1.3.6.1.4.1.6666.1.1.1.2.{{ $index }}'
-                    descr: 'LAPD {{ $l2Label }}'
-                    group: '{{ $l2Label }}'
+                    descr: 'LAPD {{ INNO-MIB::l2Label }}'
+                    group: '{{ INNO-MIB::l2Label }}'
                     state_name: L2State
                     states:
                         - { descr: down, graph: 0, value: 1, generic: 2 }
                         - { descr: up,   graph: 0, value: 2, generic: 0 }
                 -
-                    oid: l2Table
-                    value: l2Mode
+                    oid: INNO-MIB::l2Table
+                    value: INNO-MIB::l2Mode
                     num_oid: '.1.3.6.1.4.1.6666.1.1.1.3.{{ $index }}'
-                    descr: 'Mode {{ $l2Label }}'
+                    descr: 'Mode {{ INNO-MIB::l2Label }}'
                     state_name: L2Mode
-                    group: '{{ $l2Label }}'
+                    group: '{{ INNO-MIB::l2Label }}'
                     states:
                         - { descr: TE, graph: 0, value: 1, generic: 0 }
                         - { descr: NT, graph: 0, value: 2, generic: 0 }
-
                 -
-                    oid: l1BriTable
-                    value: l1BriState
+                    oid: INNO-MIB::l1BriTable
+                    value: INNO-MIB::l1BriState
                     num_oid: '.1.3.6.1.4.1.6666.1.3.1.2.{{ $index }}'
-                    descr: 'Basic rate interface {{ $l1BriLabel }}'
+                    descr: 'Basic rate interface {{ INNO-MIB::l1BriLabel }}'
                     state_name: l1BriLabel
-                    group: '{{ $l1BriLabel }}'
+                    group: '{{ INNO-MIB::l1BriLabel }}'
                     states:
                         - { descr: down, graph: 0, value: 1, generic: 2 }
                         - { descr: up,   graph: 0, value: 2, generic: 0 }
                 -
-                    oid: l3Table
-                    value: l3Protocol
+                    oid: INNO-MIB::l3Table
+                    value: INNO-MIB::l3Protocol
                     num_oid: '.1.3.6.1.4.1.6666.1.4.1.2.{{ $index }}'
-                    descr: 'ISDN signaling protocol {{ $l3Label }}'
+                    descr: 'ISDN signaling protocol {{ INNO-MIB::l3Label }}'
                     state_name: l3Label
-                    group: '{{ $l3Label }}'
+                    group: '{{ INNO-MIB::l3Label }}'
                     states:
                         - { descr: none, graph: 0, value: 1, generic: 3 }
                         - { descr: other,   graph: 0, value: 2, generic: 3 }
@@ -49,20 +47,20 @@ modules:
         count:
             data:
                 -
-                    oid: l3Table
-                    value: l3NumBchanActive
+                    oid: INNO-MIB::l3Table
+                    value: INNO-MIB::l3NumBchanActive
                     num_oid: '.1.3.6.1.4.1.6666.1.4.1.4.{{ $index }}'
-                    descr: 'Active calls {{ $l3Label }}'
+                    descr: 'Active calls {{ INNO-MIB::l3Label }}'
                     index: 'l3NumBchanActive.{{ $index }}'
                 -
-                    oid: l3Table
-                    value: l3CallsBoot
+                    oid: INNO-MIB::l3Table
+                    value: INNO-MIB::l3CallsBoot
                     num_oid: '.1.3.6.1.4.1.6666.1.4.1.5.{{ $index }}'
-                    descr: "Calls since boot {{ $l3Label }}"
+                    descr: "Calls since boot {{ INNO-MIB::l3Label }}"
                     index: 'l3CallsBoot.{{ $index }}'
                 -
-                    oid: l3Table
-                    value: l3NumBchan
+                    oid: INNO-MIB::l3Table
+                    value: INNO-MIB::l3NumBchan
                     num_oid: '.1.3.6.1.4.1.6666.1.4.1.3.{{ $index }}'
-                    descr: 'Available Channels {{ $l3Label }}'
+                    descr: 'Available Channels {{ INNO-MIB::l3Label }}'
                     index: 'l3NumBchan.{{ $index }}'

@@ -1,4 +1,3 @@
-mib: TERRA-sdi410C-MIB
 modules:
     os:
         version: TERRA-sdi410C-MIB::infVersion.0

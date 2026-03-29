@@ -1,4 +1,3 @@
-mib: ESPHOME-ESP8266-SNMP-MIB:HOST-RESOURCES-MIB:SNMPv2-MIB
 modules:
     os:
         hardware:
@@ -21,8 +20,8 @@ modules:
                 total: HOST-RESOURCES-MIB::hrStorageSize
                 used: HOST-RESOURCES-MIB::hrStorageUsed
                 precision: 1
-                descr: '{{ $HOST-RESOURCES-MIB::hrStorageDescr }}'
-                class: '{{ $HOST-RESOURCES-MIB::hrStorageDescr }}'
+                descr: '{{ HOST-RESOURCES-MIB::hrStorageDescr }}'
+                class: '{{ HOST-RESOURCES-MIB::hrStorageDescr }}'
                 index: '{{ $index }}'
                 skip_values:
                     - #Skip flash as the storage module should load that
@@ -34,8 +33,8 @@ modules:
             data:
                 - # RSSI
                     oid: ESPHOME-ESP8266-SNMP-MIB::wifi
-                    descr: 'BSSID: {{ $ESPHOME-ESP8266-SNMP-MIB::bssi }}'
-                    group: 'RSSI of SSID: {{ $ESPHOME-ESP8266-SNMP-MIB::ssid }}'
+                    descr: 'BSSID: {{ ESPHOME-ESP8266-SNMP-MIB::bssi }}'
+                    group: 'RSSI of SSID: {{ ESPHOME-ESP8266-SNMP-MIB::ssid }}'
                     value: ESPHOME-ESP8266-SNMP-MIB::rssi
                     num_oid: .1.3.9999.4.{{ $index }}
         state:

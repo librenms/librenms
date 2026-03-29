@@ -1,4 +1,3 @@
-mib: TRIPPLITE-MIB:TRIPPLITE-PRODUCTS:TRIPPLITE-12X
 modules:
     os:
         features: .1.3.6.1.4.1.850.10.2.2.1.9.2
@@ -13,91 +12,91 @@ modules:
         additional_oids:
             data:
                 - oid:
-                      - tlpDeviceName
-                      - tlpDeviceModel
+                      - TRIPPLITE-PRODUCTS::tlpDeviceName
+                      - TRIPPLITE-PRODUCTS::tlpDeviceModel
         charge:
             data:
-                - oid: "tlpUpsBatterySummaryTable"
-                  value: "tlpUpsEstimatedChargeRemaining"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsBatterySummaryTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsEstimatedChargeRemaining"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.1.1.1.4.{{ $index }}"
                   index: "tlpUpsEstimatedChargeRemaining.{{ $index }}"
                   descr: "Remaining"
         current:
             data:
-                - oid: "tlpPduCircuitTotalCurrent"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduCircuitTotalCurrent"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.4.1.1.4.{{ $index }}"
                   index: "tlpPduCircuitTotalCurrent.{{ $index }}"
                   divisor: 100
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Circuit {{ $subindex1 }}"
 
-                - oid: "tlpAtsOutputCurrent"
+                - oid: "TRIPPLITE-PRODUCTS::tlpAtsOutputCurrent"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.2.1.1.5.1.{{ $index }}"
                   descr: "Current"
                   divisor: 100
-                - oid: "tlpPduOutputCurrent"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduOutputCurrent"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.2.1.1.5.{{ $index }}"
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Total Output"
                   divisor: 100
-                - oid: "tlpPduOutletTable"
-                  value: "tlpPduOutletCurrent"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduOutletTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpPduOutletCurrent"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.3.1.1.8.{{ $index }}"
                   index: "tlpPduOutletIndex.{{ $index }}"
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
-                  descr: "{{ $tlpPduOutletName }}"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  descr: "{{ TRIPPLITE-PRODUCTS::tlpPduOutletName }}"
                   divisor: 100
-                - oid: "tlpUpsOutputLineTable"
-                  value: "tlpUpsOutputLineCurrent"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsOutputLineTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsOutputLineCurrent"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.3.2.1.3.{{ $index }}"
                   descr: "Output"
                   divisor: 100
 
         count:
             data:
-                - oid: tlUpsBatteryAge
+                - oid: TRIPPLITE-12X::tlUpsBatteryAge
                   num_oid: ".1.3.6.1.4.1.850.100.1.2.1.{{ $index }}"
                   descr: "Battery Age (Years)"
         frequency:
             data:
-                - oid: "tlpPduInputPhaseFrequency"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduInputPhaseFrequency"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.1.2.1.3.{{ $index }}"
                   index: "tlpPduInputPhaseIndex.{{ $index }}"
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Input"
                   divisor: 10
-                - oid: "tlpPduOutputFrequency"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduOutputFrequency"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.2.1.1.11.{{ $index }}"
                   index: "tlpPduOutputIndex.{{ $index }}"
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Output"
                   divisor: 10
-                - oid: "tlpPduOutletTable"
-                  value: "tlpPduOutletFrequency"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduOutletTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpPduOutletFrequency"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.3.1.1.22.{{ $index }}"
                   index: "tlpPduOutletIndex.{{ $index }}"
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
-                  descr: "{{ $tlpPduOutletName }}"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  descr: "{{ TRIPPLITE-PRODUCTS::tlpPduOutletName }}"
                   divisor: 10
-                - oid: "tlpUpsInputPhaseTable"
-                  value: "tlpUpsInputPhaseFrequency"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsInputPhaseTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsInputPhaseFrequency"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.2.2.1.2.{{ $index }}"
                   index: "tlpUpsInputPhaseIndex.{{ $index }}"
                   descr: "Input (Phase {{ $subindex0 }})"
                   divisor: 10
-                - oid: "tlpUpsOutputTable"
-                  value: "tlpUpsOutputFrequency"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsOutputTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsOutputFrequency"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.3.1.1.3.{{ $index }}"
                   index: "tlpUpsOutputFrequency.{{ $index }}"
                   descr: "Output"
                   divisor: 10
         humidity:
             data:
-                - oid: "tlpEnvHumidityHumidity"
+                - oid: "TRIPPLITE-PRODUCTS::tlpEnvHumidityHumidity"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.3.3.2.1.1.{{ $index }}"
-                  group: "{{ tlpDeviceName:0 }}"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceName:0 }}"
                   descr: "Humidity"
-                - oid: tlEnvHumidity
+                - oid: TRIPPLITE-12X::tlEnvHumidity
                   num_oid: ".1.3.6.1.4.1.850.101.1.2.1.{{ $index }}"
                   descr: "Ambient Humidity"
                   divisor: 10
@@ -106,49 +105,49 @@ modules:
                   high_limit: 90
                   group: "EnviroSense"
                   skip_values:
-                      - oid: tlEnvHumidity
+                      - oid: TRIPPLITE-12X::tlEnvHumidity
                         op: "exists"
                         value: false
         load:
             data:
-                - oid: "tlpUpsOutputLineTable"
-                  value: "tlpUpsOutputLinePercentLoad"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsOutputLineTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsOutputLinePercentLoad"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.3.2.1.5.{{ $index }}"
                   index: "tlpUpsOutputLineIndex.{{ $index }}"
                   descr: "Output"
         power:
             data:
-                - oid: "tlpPduOutputActivePower"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduOutputActivePower"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.2.1.1.8.{{ $index }}"
                   index: "tlpPduOutputIndex.{{ $index }}"
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Output"
-                - oid: "tlpPduOutletTable"
-                  value: "tlpPduOutletActivePower"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduOutletTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpPduOutletActivePower"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.3.1.1.9.{{ $index }}"
                   index: "tlpPduOutletIndex.{{ $index }}"
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
-                  descr: "{{ $tlpPduOutletName }}"
-                - oid: "tlpUpsOutputLineTable"
-                  value: "tlpUpsOutputLinePower"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  descr: "{{ TRIPPLITE-PRODUCTS::tlpPduOutletName }}"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsOutputLineTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsOutputLinePower"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.3.2.1.4.{{ $index }}"
                   index: "tlpUpsOutputLineIndex.{{ $index }}"
                   descr: "Output"
         state:
             data:
-                - oid: "tlpEnvDetail"
-                  value: "tlpEnvInputContactCurrentState"
-                  group: "Contacts ({{ tlpDeviceName:0 }})"
+                - oid: "TRIPPLITE-PRODUCTS::tlpEnvDetail"
+                  value: "TRIPPLITE-PRODUCTS::tlpEnvInputContactCurrentState"
+                  group: "Contacts ({{ TRIPPLITE-PRODUCTS::tlpDeviceName:0 }})"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.3.3.3.1.5.{{ $index }}"
                   index: "tlpEnvInputContactIndex.{{ $index }}"
-                  descr: "{{ $tlpEnvInputContactName }}"
+                  descr: "{{ TRIPPLITE-PRODUCTS::tlpEnvInputContactName }}"
                   state_name: tlpEnvInputContactCurrentState
                   states:
                       - { value: 0, generic: 3, graph: 0, descr: Unknown }
                       - { value: 1, generic: 2, graph: 0, descr: Alarm }
                       - { value: 2, generic: 0, graph: 0, descr: OK }
-                - oid: "tlpPduDevice"
-                  value: "tlpPduDeviceMainLoadState"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduDevice"
+                  value: "TRIPPLITE-PRODUCTS::tlpPduDeviceMainLoadState"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.2.1.1.1.{{ $index }}"
                   index: "tlpPduDeviceMainLoadState.{{ $index }}"
                   descr: "Main Load State"
@@ -157,19 +156,19 @@ modules:
                       - { value: 0, generic: 3, graph: 0, descr: unknown }
                       - { value: 1, generic: 0, graph: 0, descr: off }
                       - { value: 2, generic: 0, graph: 0, descr: on }
-                - oid: "tlpPduDetail"
-                  value: "tlpPduOutletState"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduDetail"
+                  value: "TRIPPLITE-PRODUCTS::tlpPduOutletState"
                   group: "Outlets"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.3.1.1.4.{{ $index }}"
                   index: "tlpPduOutletState.{{ $index }}"
-                  descr: "{{ $tlpPduOutletName }}"
+                  descr: "{{ TRIPPLITE-PRODUCTS::tlpPduOutletName }}"
                   state_name: tlpPduOutletState
                   states:
                       - { value: 0, generic: 3, graph: 0, descr: unknown }
                       - { value: 1, generic: 0, graph: 0, descr: off }
                       - { value: 2, generic: 0, graph: 0, descr: on }
-                - oid: "tlpUpsDevice"
-                  value: "tlpUpsDeviceMainLoadState"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsDevice"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsDeviceMainLoadState"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.2.1.1.1.{{ $index }}"
                   index: "tlpUpsMainLoadState.{{ $index }}"
                   descr: "Main Load State"
@@ -178,8 +177,8 @@ modules:
                       - { value: 0, generic: 3, graph: 0, descr: unknown }
                       - { value: 1, generic: 0, graph: 0, descr: off }
                       - { value: 2, generic: 0, graph: 0, descr: on }
-                - oid: "tlpUpsBattery"
-                  value: "tlpUpsBatteryStatus"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsBattery"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsBatteryStatus"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.1.1.1.1.{{ $index }}"
                   index: "tlpUpsBatteryStatus.{{ $subindex0 }}"
                   descr: "Battery {{ $subindex0 }} Status"
@@ -190,8 +189,8 @@ modules:
                       - { value: 2, generic: 0, graph: 0, descr: Normal }
                       - { value: 3, generic: 1, graph: 0, descr: Low }
                       - { value: 4, generic: 2, graph: 0, descr: Depleted }
-                - oid: "tlpUpsBattery"
-                  value: "tlpUpsBatteryDetailCharge"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsBattery"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsBatteryDetailCharge"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.1.2.1.4.{{ $index }}"
                   index: "tlpUpsBatteryDetailCharge.{{ $index }}"
                   descr: "Charging Status {{ $subindex0 }}"
@@ -202,8 +201,8 @@ modules:
                       - { value: 2, generic: 0, graph: 0, descr: resting }
                       - { value: 3, generic: 2, graph: 0, descr: discharging }
                       - { value: 4, generic: 0, graph: 0, descr: normal }
-                - oid: "tlpUpsBatteryPackDetailTable"
-                  value: "tlpUpsBatteryPackDetailCondition"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsBatteryPackDetailTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsBatteryPackDetailCondition"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.1.5.1.1.{{ $index }}"
                   index: "tlpUpsBatteryPackDetailCondition.{{ $index }}"
                   descr: "Battery {{ $subindex0 }} Condition"
@@ -213,8 +212,8 @@ modules:
                       - { value: 1, generic: 0, graph: 0, descr: good }
                       - { value: 2, generic: 1, graph: 0, descr: weak }
                       - { value: 3, generic: 2, graph: 0, descr: bad }
-                - oid: "tlpUpsOutputTable"
-                  value: "tlpUpsOutputSource"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsOutputTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsOutputSource"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.3.1.1.1.{{ $index }}"
                   index: "tlpUpsOutputSource.{{ $index }}"
                   descr: "Output Source"
@@ -231,12 +230,12 @@ modules:
                       - { value: 8, generic: 1, graph: 0, descr: second }
                       - { value: 9, generic: 0, graph: 0, descr: economy }
                       - { value: 10, generic: 1, graph: 0, descr: testing }
-                - oid: "tlpUpsOutletTable"
-                  value: "tlpUpsOutletState"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsOutletTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsOutletState"
                   group: "Outlets"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.5.1.1.4.{{ $index }}"
                   index: "tlpUpsOutletIndex.{{ $index }}"
-                  descr: "{{ $tlpUpsOutletName }}"
+                  descr: "{{ TRIPPLITE-PRODUCTS::tlpUpsOutletName }}"
                   state_name: tlpUpsOutletState
                   states:
                       - { value: 0, generic: 3, graph: 0, descr: unknown }
@@ -244,12 +243,12 @@ modules:
                       - { value: 2, generic: 0, graph: 0, descr: on }
         temperature:
             data:
-                - oid: "tlpEnvTemperatureC"
+                - oid: "TRIPPLITE-PRODUCTS::tlpEnvTemperatureC"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.3.3.1.1.1.{{ $index }}"
-                  group: "{{ tlpDeviceName:0 }}"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceName:0 }}"
                   descr: "Temperature"
                   divisor: 10
-                - oid: tlEnvTemperatureC
+                - oid: TRIPPLITE-12X::tlEnvTemperatureC
                   num_oid: ".1.3.6.1.4.1.850.101.1.1.1.{{ $index }}"
                   descr: "Ambient Temperature"
                   divisor: 10
@@ -258,80 +257,80 @@ modules:
                   high_limit: 40
                   group: "EnviroSense"
                   skip_values:
-                      - oid: tlEnvTemperatureC
+                      - oid: TRIPPLITE-12X::tlEnvTemperatureC
                         op: "exists"
                         value: false
-                - oid: "tlpUpsDeviceTemperatureC"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsDeviceTemperatureC"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.2.1.1.7.{{ $index }}"
                   group: "UPS"
                   descr: "Temperature"
                   divisor: 10
         voltage:
             data:
-                - oid: "tlpAtsInputPhaseTable"
-                  value: "tlpAtsInputPhaseVoltage"
+                - oid: "TRIPPLITE-PRODUCTS::tlpAtsInputPhaseTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpAtsInputPhaseVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.1.2.1.5.{{ $index }}"
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Input"
                   index: "tlpAtsInputLineIndex.{{ $index }}"
                   divisor: 10
-                  low_limit: "tlpAtsInputPhaseVoltageMin"
-                  high_limit: "tlpAtsInputPhaseVoltageMax"
-                - oid: "tlpPduInputPhaseTable"
-                  value: "tlpPduInputPhaseVoltage"
+                  low_limit: "TRIPPLITE-PRODUCTS::tlpAtsInputPhaseVoltageMin"
+                  high_limit: "TRIPPLITE-PRODUCTS::tlpAtsInputPhaseVoltageMax"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduInputPhaseTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpPduInputPhaseVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.1.2.1.4.{{ $index }}"
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Input (Phase {{ $subindex0 }})"
                   index: "tlpPduInputPhaseIndex.{{ $index }}"
                   divisor: 10
                   low_limit: 110
                   high_limit: 240
-                - oid: "tlpAtsInputPhaseVoltage"
+                - oid: "TRIPPLITE-PRODUCTS::tlpAtsInputPhaseVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.4.3.1.2.1.5.1.1.{{ $index }}"
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Input"
                   divisor: 10
                   multiplier: 1
                   low_limit: 110
                   high_limit: 240
-                - oid: "tlpPduOutputVoltage"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduOutputVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.2.1.1.4.{{ $index }}"
                   index: "tlpPduOutputIndex.{{ $index }}"
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
                   descr: "Output"
                   divisor: 10
                   low_limit: 110
                   high_limit: 240
-                - oid: "tlpPduOutletTable"
-                  value: "tlpPduOutletVoltage"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduOutletTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpPduOutletVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.3.1.1.7.{{ $index }}"
                   index: "tlpPduOutletIndex.{{ $index }}"
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
-                  descr: "{{ $tlpPduOutletName }}"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  descr: "{{ TRIPPLITE-PRODUCTS::tlpPduOutletName }}"
                   divisor: 10
-                - oid: "tlpPduCircuitTable"
-                  value: "tlpPduCircuitInputVoltage"
+                - oid: "TRIPPLITE-PRODUCTS::tlpPduCircuitTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpPduCircuitInputVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.2.3.4.1.1.3.{{ $index }}"
                   index: "tlpPduOutletIndex.{{ $index }}"
-                  group: "{{ tlpDeviceModel:0 }} ({{ $subindex0 }})"
-                  descr: "{{ $tlpPduCircuitPhase }}"
+                  group: "{{ TRIPPLITE-PRODUCTS::tlpDeviceModel:0 }} ({{ $subindex0 }})"
+                  descr: "{{ TRIPPLITE-PRODUCTS::tlpPduCircuitPhase }}"
                   divisor: 10
-                - oid: "tlpUpsBattery"
-                  value: "tlpUpsBatteryDetailVoltage"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsBattery"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsBatteryDetailVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.1.2.1.1.{{ $index }}"
                   index: "tlpUpsBatteryDetailVoltage.{{ $index }}"
                   descr: "Battery {{ $subindex0 }}"
                   divisor: 10
-                - oid: "tlpUpsInputPhaseTable"
-                  value: "tlpUpsInputPhaseVoltage"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsInputPhaseTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsInputPhaseVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.2.2.1.3.{{ $index }}"
                   index: "tlpUpsInputPhaseIndex.{{ $index }}"
                   descr: "Input (Phase {{ $subindex0 }})"
                   divisor: 10
-                  low_limit: "tlpUpsInputPhaseVoltageMin"
-                  high_limit: "tlpUpsInputPhaseVoltageMax"
-                - oid: "tlpUpsOutputLineTable"
-                  value: "tlpUpsOutputLineVoltage"
+                  low_limit: "TRIPPLITE-PRODUCTS::tlpUpsInputPhaseVoltageMin"
+                  high_limit: "TRIPPLITE-PRODUCTS::tlpUpsInputPhaseVoltageMax"
+                - oid: "TRIPPLITE-PRODUCTS::tlpUpsOutputLineTable"
+                  value: "TRIPPLITE-PRODUCTS::tlpUpsOutputLineVoltage"
                   num_oid: ".1.3.6.1.4.1.850.1.1.3.1.3.3.2.1.2.{{ $index }}"
                   index: "tlpUpsOutputLineIndex.{{ $index }}"
                   descr: "Output"

@@ -1,4 +1,3 @@
-mib: RpsSc300Mib
 modules:
     os:
         hardware:
@@ -15,122 +14,123 @@ modules:
         voltage:
             data:
                 -
-                    oid: acVoltage
+                    oid: RpsSc300Mib::acVoltage
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.40.10.{{ $index }}'
                     descr: 'Average Input Voltage'
                     index: 'acavg.{{ $index }}'
                 -
-                    oid: rectifierValuesTable
-                    value: rectifierInputVoltage
+                    oid: RpsSc300Mib::rectifierValuesTable
+                    value: RpsSc300Mib::rectifierInputVoltage
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.30.1.90.{{ $index }}'
                     descr: 'Rect {{ $index }} AC Voltage'
                     index: 'ac.{{ $index }}'
                     skip_values:
                     -
-                      oid: rectifierSerialNumber
+                      oid: RpsSc300Mib::rectifierSerialNumber
                       op: '=='
                       value: "0"
                 -
-                    oid: busVoltage
+                    oid: RpsSc300Mib::busVoltage
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.70.10.20.{{ $index }}'
                     divisor: 100
                     descr: 'Bus Voltage'
                     index: 'bus.{{ $index }}'
-                    low_limit: minimumSystemVoltage
-                    low_warn_limit: minimumSystemVoltage
-                    warn_limit: maximumSystemVoltage
-                    high_limit: maximumSystemVoltage
+                    low_limit: RpsSc300Mib::minimumSystemVoltage
+                    low_warn_limit: RpsSc300Mib::minimumSystemVoltage
+                    warn_limit: RpsSc300Mib::maximumSystemVoltage
+                    high_limit: RpsSc300Mib::maximumSystemVoltage
                 -
-                    oid: rectifierValuesTable
-                    value: rectifierReportedVoltage
+                    oid: RpsSc300Mib::rectifierValuesTable
+                    value: RpsSc300Mib::rectifierReportedVoltage
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.30.1.95.{{ $index }}'
                     descr: 'Rect {{ $index }} DC Voltage'
                     index: 'dc.{{ $index }}'
                     divisor: 100
                     low_limit: 0
                     low_warn_limit: 0
-                    warn_limit: rectifierMinimumOvsdSetPoint
-                    high_limit:  rectifierMaximumOvsdSetPoint
+                    warn_limit: RpsSc300Mib::rectifierMinimumOvsdSetPoint
+                    high_limit: RpsSc300Mib::rectifierMaximumOvsdSetPoint
                     skip_values:
                     -
-                      oid: rectifierSerialNumber
+                      oid: RpsSc300Mib::rectifierSerialNumber
                       op: '=='
                       value: "0"
         current:
             data:
                 -
-                    oid: batteryCurrent
+                    oid: RpsSc300Mib::batteryCurrent
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.100.40.{{ $index }}'
                     descr: 'Battery Current'
                     index: 'batteryCurrent.{{ $index }}'
                 -
-                    oid: rectifierCurrent
+                    oid: RpsSc300Mib::rectifierCurrent
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.20.{{ $index }}'
                     descr: 'Total Rectifier Current'
                 -
-                    oid: loadCurrent
+                    oid: RpsSc300Mib::loadCurrent
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.50.10.{{ $index }}'
                     descr: 'Total Load Current' 
                 -
-                    oid: rectifierValuesTable
-                    value: rectifierReportedCurrent
+                    oid: RpsSc300Mib::rectifierValuesTable
+                    value: RpsSc300Mib::rectifierReportedCurrent
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.30.1.100.{{ $index }}'
                     descr: 'Rect {{ $index }} Current'
                     skip_values:
                     -
-                      oid: rectifierSerialNumber
+                      oid: RpsSc300Mib::rectifierSerialNumber
                       op: '=='
                       value: "0"
         load:
             data:
                 -
-                    oid: systemPower
+                    oid: RpsSc300Mib::systemPower
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.50.20.{{ $index }}'
                     descr: 'Total Load'
                     index: 'totalLoad.{{ $index }}'
                 -
-                    oid: rectifierValuesTable
-                    value: rectifierOutputPower
+                    oid: RpsSc300Mib::rectifierValuesTable
+                    value: RpsSc300Mib::rectifierOutputPower
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.30.1.105.{{ $index }}'
                     descr: 'Rect {{ $index }} Load'
                     index: 'rectLoad.{{ $index }}'
                     divisor: 10
                     skip_values:
                     -
-                      oid: rectifierSerialNumber
+                      oid: RpsSc300Mib::rectifierSerialNumber
                       op: '=='
                       value: "0"
 
         temperature:
             data:
                 -
-                    oid: batteryTemperature
+                    oid: RpsSc300Mib::batteryTemperature
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.100.30.{{ $index }}'
                     descr: 'Battery Temperature'
                     index: 'battery-Temperature.{{ $index }}'
                 -
-                    oid: highestRectifierHeatsinkTemperature
+                    oid: RpsSc300Mib::highestRectifierHeatsinkTemperature
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.29.{{ $index }}'
                     descr: 'Highest Rectifier Heatsink Temperature'
                     index: 'highestRectTemp.{{ $index }}'
                 -
-                    oid: rectifierValuesTable
-                    value: rectifierHeatsinkTemperature
+                    oid: RpsSc300Mib::rectifierValuesTable
+                    value: RpsSc300Mib::rectifierHeatsinkTemperature
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.60.30.1.110.{{ $index }}'
                     descr: 'Rect {{ $index }} Temperature'
                     index: 'rectTemp.{{ $index }}'
                     skip_values:
                     -
-                      oid: rectifierSerialNumber
+                      oid: RpsSc300Mib::rectifierSerialNumber
                       op: '=='
                       value: "0"
         state:
             data:
                 -
-                    oid: digitalInputTable
-                    value: diState
+                    oid: RpsSc300Mib::digitalInputTable
+                    value: RpsSc300Mib::diState
                     num_oid: '.1.3.6.1.4.1.1918.2.14.10.90.40.1.20.{{ $index }}'
-                    descr: '{{ $diName }}'
+                    descr: '{{ RpsSc300Mib::diName }}'
+                    state_name: digitalInputTable
                     index: 'di.{{ $index }}'
                     states:
                       - { descr: 'OK',      graph: 0, value: 0, generic: 0 }
@@ -142,7 +142,7 @@ modules:
                       - { descr: 'Control', graph: 0, value: 6, generic: 3 }
                     skip_values:
                     -
-                      oid: diStatus
+                      oid: RpsSc300Mib::diStatus
                       op: '=='
                       value: "0"
 

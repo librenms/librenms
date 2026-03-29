@@ -1,5 +1,5 @@
 <?php
 
-$class = 'percent';
+$class = \LibreNMS\Enum\Sensor::Percent;
 
 require 'sensors.inc.php';

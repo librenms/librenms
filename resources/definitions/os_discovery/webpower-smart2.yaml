@@ -1,4 +1,3 @@
-mib: USHA-MIB
 modules:
     os:
         hardware:
@@ -14,21 +13,21 @@ modules:
             data:
                 -
                     oid:
-                        - upsBatteryGroup
-                        - upsInputGroupTable
-                        - upsOutputGroupTable
+                        - USHA-MIB::upsBatteryGroup
+                        - USHA-MIB::upsInputGroupTable
+                        - USHA-MIB::upsOutputGroupTable
         state:
             data:
                 -
-                    oid: upsTestGroup
-                    value: upsTestBatteryTestResult
+                    oid: USHA-MIB::upsTestGroup
+                    value: USHA-MIB::upsTestBatteryTestResult
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.6.3.{{ $index }}'
                     descr: 'UPS Test #{{ $index }} Result'
                     index: 'upsTestBatteryTestResult.{{ $index }}'
                     state_name: upsBatteryTest
                     skip_values:
                         -
-                            oid: upsBatteryTest
+                            oid: USHA-MIB::upsBatteryTest
                             op: '!='
                             value: 1
                     states:
@@ -39,8 +38,8 @@ modules:
                         - { value: 5, generic: 3, graph: 1, descr: 'inProgress' }
                         - { value: 6, generic: 3, graph: 1, descr: 'noData' }
                 -
-                    oid: upsBatteryGroup
-                    value: upsBatteryGroupStatus
+                    oid: USHA-MIB::upsBatteryGroup
+                    value: USHA-MIB::upsBatteryGroupStatus
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.1.{{ $index }}'
                     descr: 'UPS Battery #{{ $index }} Status'
                     index: 'upsBatteryGroupStatus.{{ $index }}'
@@ -53,8 +52,8 @@ modules:
                         - { value: 5, generic: 1, graph: 1, descr: 'Discharging' }
                         - { value: 6, generic: 2, graph: 1, descr: 'Failure' }
                 -
-                    oid: upsOutputGroupSource
-                    value: upsOutputGroupSource
+                    oid: USHA-MIB::upsOutputGroupSource
+                    value: USHA-MIB::upsOutputGroupSource
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.4.1.{{ $index }}'
                     descr: 'UPS Output #{{ $index }} Source'
                     index: 'upsOutputGroupSource.{{ $index }}'
@@ -70,8 +69,8 @@ modules:
         voltage:
             data:
                 -
-                    oid: upsInputGroupTable
-                    value: upsInputGroupVoltage
+                    oid: USHA-MIB::upsInputGroupTable
+                    value: USHA-MIB::upsInputGroupVoltage
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.3.3.1.3.{{ $index }}'
                     descr: 'Input #{{ $index }} Voltage'
                     index: 'upsInputGroupVoltage.{{ $index }}'
@@ -81,8 +80,8 @@ modules:
                     warn_limit: 235
                     high_limit: 240
                 -
-                    oid: upsOutputGroupTable
-                    value: upsOutputGroupVoltage
+                    oid: USHA-MIB::upsOutputGroupTable
+                    value: USHA-MIB::upsOutputGroupVoltage
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.4.4.1.2.{{ $index }}'
                     descr: 'Output #{{ $index }} Voltage'
                     index: 'upsOutputGroupVoltage.{{ $index }}'
@@ -92,8 +91,8 @@ modules:
                     warn_limit: 230
                     high_limit: 235
                 -
-                    oid: upsBatteryGroup
-                    value: upsBatteryGroupVoltage
+                    oid: USHA-MIB::upsBatteryGroup
+                    value: USHA-MIB::upsBatteryGroupVoltage
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.5.{{ $index }}'
                     descr: 'Battery #{{ $index }} Voltage'
                     index: 'upsBatteryGroupVoltage.{{ $index }}'
@@ -101,15 +100,15 @@ modules:
         current:
             data:
                 -
-                    oid: upsInputGroupTable
-                    value: upsInputGroupCurrent
+                    oid: USHA-MIB::upsInputGroupTable
+                    value: USHA-MIB::upsInputGroupCurrent
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.3.3.1.4.{{ $index }}'
                     descr: 'Input #{{ $index }} Current'
                     index: 'upsInputGroupCurrent.{{ $index }}'
                     divisor: 10
                 -
-                    oid: upsOutputGroupTable
-                    value: upsOutputGroupCurrent
+                    oid: USHA-MIB::upsOutputGroupTable
+                    value: USHA-MIB::upsOutputGroupCurrent
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.4.4.1.3.{{ $index }}'
                     descr: 'Output #{{ $index }} Current'
                     index: 'upsOutputGroupCurrent.{{ $index }}'
@@ -117,16 +116,16 @@ modules:
         load:
             data:
                 -
-                    oid: upsOutputGroupTable
-                    value: upsOutputGroupPercentLoad
+                    oid: USHA-MIB::upsOutputGroupTable
+                    value: USHA-MIB::upsOutputGroupPercentLoad
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.4.4.1.5.{{ $index }}'
                     descr: 'Output #{{ $index }} Load'
                     index: 'upsOutputGroupPercentLoad.{{ $index }}'
         frequency:
             data:
                 -
-                    oid: upsInputGroupTable
-                    value: upsInputGroupFrequency
+                    oid: USHA-MIB::upsInputGroupTable
+                    value: USHA-MIB::upsInputGroupFrequency
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.3.3.1.2.{{ $index }}'
                     descr: 'Input #{{ $index }} Frequency'
                     index: 'upsInputGroupFrequency.{{ $index }}'
@@ -134,24 +133,24 @@ modules:
         count:
             data:
                 -
-                    oid: upsInputGroupLineBads
-                    value: upsInputGroupLineBads
+                    oid: USHA-MIB::upsInputGroupLineBads
+                    value: USHA-MIB::upsInputGroupLineBads
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.3.1.{{ $index }}'
                     descr: 'Input #{{ $index }} Out-Of-Tolerance'
                     index: 'upsInputGroupLineBads.{{ $index }}'
         charge:
             data:
                 -
-                    oid: upsBatteryGroup
-                    value: upsBatteryGroupEstimatedChargeRemaining
+                    oid: USHA-MIB::upsBatteryGroup
+                    value: USHA-MIB::upsBatteryGroupEstimatedChargeRemaining
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.4.{{ $index }}'
                     descr: 'Battery #{{ $index }} Charge remaining'
                     index: 'upsBatteryGroupEstimatedChargeRemaining.{{ $index }}'
         temperature:
             data:
                 -
-                    oid: upsBatteryGroup
-                    value: upsBatteryGroupTemperature
+                    oid: USHA-MIB::upsBatteryGroup
+                    value: USHA-MIB::upsBatteryGroupTemperature
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.7.{{ $index }}'
                     descr: 'Battery #{{ $index }} Temperature'
                     index: 'upsBatteryGroupTemperature.{{ $index }}'
@@ -159,14 +158,14 @@ modules:
         runtime:
             data:
                 -
-                    oid: upsBatteryGroup
-                    value: upsBatteryGroupEstimatedMinutesRemaining
+                    oid: USHA-MIB::upsBatteryGroup
+                    value: USHA-MIB::upsBatteryGroupEstimatedMinutesRemaining
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.3.{{ $index }}'
                     descr: 'Battery #{{ $index }} Minutes remaining'
                     index: 'upsBatteryGroupEstimatedMinutesRemaining.{{ $index }}'
                 -
-                    oid: upsBatteryGroup
-                    value: upsBatteryGroupSecondsOnBattery
+                    oid: USHA-MIB::upsBatteryGroup
+                    value: USHA-MIB::upsBatteryGroupSecondsOnBattery
                     num_oid: '.1.3.6.1.4.1.2468.1.2.1.1.2.2.{{ $index }}'
                     descr: 'Runtime on Battery #{{ $index }}'
                     index: 'upsBatteryGroupSecondsOnBattery.{{ $index }}'

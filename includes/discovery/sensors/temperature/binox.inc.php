@@ -23,7 +23,7 @@ if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.738.10.5.100')) 
 
     $descr = 'CPU Temperature';
     $valueoid = '.1.3.6.1.4.1.738.10.111.3.1.2.0'; // PRVT-SYS-MON-MIB::prvtSysMonCurrentCpuTemperature.0
-    $value = snmp_get($device, $valueoid, '-Oqv');
+    $value = SnmpQuery::get($valueoid)->value();
     $value = str_replace('C', '', $value);
     $value = str_replace('"', '', $value);
 

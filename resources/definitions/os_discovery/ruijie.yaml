@@ -27,7 +27,7 @@ modules:
                     oid: RUIJIE-FIBER-MIB::ruijieFiberTable
                     value: RUIJIE-FIBER-MIB::ruijieFiberRXpower
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.105.1.1.1.76.{{ $index }}'
-                    descr: "{{ $RUIJIE-FIBER-MIB::ruijieFiberPortDescr }} RX"
+                    descr: "{{ RUIJIE-FIBER-MIB::ruijieFiberPortDescr }} RX"
                     divisor: 100
                     low_warn_limit: RUIJIE-FIBER-MIB::ruijieFiberRXpowerLowWarnThreshold
                     warn_limit: RUIJIE-FIBER-MIB::ruijieFiberRXpowerHighWarnThreshold
@@ -47,7 +47,7 @@ modules:
                     oid: RUIJIE-FIBER-MIB::ruijieFiberTable
                     value: RUIJIE-FIBER-MIB::ruijieFiberTXpower
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.105.1.1.1.81.{{ $index }}'
-                    descr: "{{ $RUIJIE-FIBER-MIB::ruijieFiberPortDescr }} TX"
+                    descr: "{{ RUIJIE-FIBER-MIB::ruijieFiberPortDescr }} TX"
                     divisor: 100
                     low_warn_limit: RUIJIE-FIBER-MIB::ruijieFiberTXpowerLowWarnThreshold
                     warn_limit: RUIJIE-FIBER-MIB::ruijieFiberTXpowerHighWarnThreshold
@@ -78,12 +78,12 @@ modules:
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.1.1.44.1.5.{{ $index }}'
                     warn_limit: RUIJIE-SYSTEM-MIB::ruijieSystemMultipleTemperatureWarning
                     high_limit: RUIJIE-SYSTEM-MIB::ruijieSystemMultipleTemperatureCritical
-                    descr: "{{ $RUIJIE-SYSTEM-MIB::ruijieSystemMultipleTemperatureName }} {{ $subindex0 }}/{{ $subindex1 }}"
+                    descr: "{{ RUIJIE-SYSTEM-MIB::ruijieSystemMultipleTemperatureName }} {{ $subindex0 }}/{{ $subindex1 }}"
                 -
                     oid: RUIJIE-FIBER-MIB::ruijieFiberTable
                     value: RUIJIE-FIBER-MIB::ruijieFiberTemp
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.105.1.1.1.17.{{ $index }}'
-                    descr: "{{ $RUIJIE-FIBER-MIB::ruijieFiberPortDescr }}"
+                    descr: "{{ RUIJIE-FIBER-MIB::ruijieFiberPortDescr }}"
                     index: 'ruijieSystemMultipleTemperatureCurrent.{{ $index }}'
                     group: Transceivers
                     skip_values:

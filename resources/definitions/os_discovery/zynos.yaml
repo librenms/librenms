@@ -1,4 +1,3 @@
-mib: ZYXEL-ES-COMMON:ZYXEL-HW-MONITOR-MIB:ZYXEL-MGS3712-MIB:ZYXEL-TRANSCEIVER-MIB:ZYXEL-STACKING-MIB:POWER-ETHERNET-MIB
 modules:
     mempools:
         data:
@@ -9,25 +8,25 @@ modules:
         data:
             -
                 oid: ZYXEL-GS4012F-MIB::sysMgmtCPUUsage
-                value: sysMgmtCPUUsage
+                value: ZYXEL-GS4012F-MIB::sysMgmtCPUUsage
                 num_oid: '.1.3.6.1.4.1.890.1.5.8.20.12.7.{{ $index }}'
             -
                 oid: ZYXEL-GS2200-24-MIB::sysMgmtCPUUsage
-                value: sysMgmtCPUUsage
+                value: ZYXEL-GS2200-24-MIB::sysMgmtCPUUsage
                 num_oid: '.1.3.6.1.4.1.890.1.5.8.55.12.7.{{ $index }}'
             -
                 oid: ZYXEL-MGS3712-MIB::sysMgmtCPUUsage
-                value: sysMgmtCPUUsage
+                value: ZYXEL-MGS3712-MIB::sysMgmtCPUUsage
                 num_oid: '.1.3.6.1.4.1.890.1.5.8.47.11.7.{{ $index }}'
             -
-                oid: sysMgmtCPU5SecUsage
+                oid: ZYXEL-ES-COMMON::sysMgmtCPU5SecUsage
                 num_oid: '.1.3.6.1.4.1.890.1.15.3.2.7.{{ $index }}'
     sensors:
         state:
             data:
                 -
-                    oid: zyxelStackingSlotInfoTable
-                    value: zyStackingSlotInfoRole
+                    oid: ZYXEL-STACKING-MIB::zyxelStackingSlotInfoTable
+                    value: ZYXEL-STACKING-MIB::zyStackingSlotInfoRole
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.97.2.1.1.5.{{ $index }}'
                     descr: 'Switch {{ $index }} Stacking Role'
                     group: Switch Role
@@ -40,12 +39,12 @@ modules:
                         - { value: 0, generic: 3, graph: 0, descr: none }
                     skip_values:
                         -
-                            oid: zyStackingSlotInfoStackingStatus
+                            oid: ZYXEL-STACKING-MIB::zyStackingSlotInfoStackingStatus
                             op: '=='
                             value: '0'
                 -
-                    oid: zyxelStackingSlotChannelInfoTable
-                    value: zyStackingSlotChannelInfoNeighbor
+                    oid: ZYXEL-STACKING-MIB::zyxelStackingSlotChannelInfoTable
+                    value: ZYXEL-STACKING-MIB::zyStackingSlotChannelInfoNeighbor
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.97.2.2.1.5.{{ $index }}'
                     descr: 'Switch {{ $subindex0 }} Port {{ $subindex1 }} Neighbor'
                     group: Stacking Neighbor
@@ -58,8 +57,8 @@ modules:
                         - { value: 4, generic: 0, graph: 0, descr: 'Switch 4' }
                         - { value: 0, generic: 3, graph: 0, descr: none }
                 -
-                    oid: zyStackingTopology
-                    value: zyStackingTopology
+                    oid: ZYXEL-STACKING-MIB::zyStackingTopology
+                    value: ZYXEL-STACKING-MIB::zyStackingTopology
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.97.2.3.{{ $index }}'
                     descr: 'Stacking Topology'
                     group: Stacking Topology
@@ -74,55 +73,55 @@ modules:
                 skip_value_lt: 0
             data:
                 -
-                    oid: zyxelHwMonitorFanRpmTable
-                    value: zyHwMonitorFanRpmCurrentValue
+                    oid: ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorFanRpmTable
+                    value: ZYXEL-HW-MONITOR-MIB::zyHwMonitorFanRpmCurrentValue
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.1.1.3.{{ $index }}'
-                    descr: 'Switch {{ $zyHwMonitorFanRpmDescription }}'
+                    descr: 'Switch {{ ZYXEL-HW-MONITOR-MIB::zyHwMonitorFanRpmDescription }}'
                     index: 'zyHwMonitorFanRpmCurrentValue.{{ $index }}'
-                    high_limit: zyHwMonitorFanRpmMaxValue
-                    low_limit: zyHwMonitorFanRpmMinValue
-                    low_warn_limit: zyHwMonitorFanRpmLowThreshold
+                    high_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorFanRpmMaxValue
+                    low_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorFanRpmMinValue
+                    low_warn_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorFanRpmLowThreshold
                 -
-                    oid: fanRpmTable
-                    value: fanRpmCurValue
+                    oid: ZYXEL-MGS3712-MIB::fanRpmTable
+                    value: ZYXEL-MGS3712-MIB::fanRpmCurValue
                     num_oid: '.1.3.6.1.4.1.890.1.5.8.47.8.1.1.2.{{ $index }}'
-                    descr: 'Fan {{ $index }} ({{ $fanRpmDescr }})'
+                    descr: 'Fan {{ $index }} ({{ ZYXEL-MGS3712-MIB::fanRpmDescr }})'
                     index: 'fanRpmCurValue.{{ $index }}'
-                    low_limit: fanRpmLowThresh
+                    low_limit: ZYXEL-MGS3712-MIB::fanRpmLowThresh
         temperature:
             data:
                 -
-                    oid: zyxelHwMonitorTemperatureTable
-                    value: zyHwMonitorTemperatureCurrentValue
+                    oid: ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorTemperatureTable
+                    value: ZYXEL-HW-MONITOR-MIB::zyHwMonitorTemperatureCurrentValue
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.2.1.3.{{ $index }}'
-                    descr: 'Switch {{ $zyHwMonitorTemperatureDescription }}'
+                    descr: 'Switch {{ ZYXEL-HW-MONITOR-MIB::zyHwMonitorTemperatureDescription }}'
                     index: 'zyHwMonitorTemperatureCurrentValue.{{ $index }}'
-                    high_limit: zyHwMonitorTemperatureMaxValue
-                    low_limit: zyHwMonitorTemperatureMinValue
-                    warn_limit: zyHwMonitorTemperatureHighThreshold
+                    high_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorTemperatureMaxValue
+                    low_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorTemperatureMinValue
+                    warn_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorTemperatureHighThreshold
                 -
-                    oid: tempTable
-                    value: tempCurValue
+                    oid: ZYXEL-MGS3712-MIB::tempTable
+                    value: ZYXEL-MGS3712-MIB::tempCurValue
                     num_oid: '.1.3.6.1.4.1.890.1.5.8.47.8.2.1.2.{{ $index }}'
-                    descr: 'Temp {{ $index }} ({{ $tempDescr }})'
+                    descr: 'Temp {{ $index }} ({{ ZYXEL-MGS3712-MIB::tempDescr }})'
                     index: 'tempCurValue.{{ $index }}'
-                    high_limit: tempHighThresh
+                    high_limit: ZYXEL-MGS3712-MIB::tempHighThresh
                 -
-                    oid: transceiverDdmInfoTable
-                    value: transceiverDdmInfoEntryCurrent
+                    oid: ZYXEL-MGS3712-MIB::transceiverDdmInfoTable
+                    value: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryCurrent
                     num_oid: '.1.3.6.1.4.1.890.1.5.8.47.117.2.1.7.{{ $index }}'
-                    descr: 'SFP ifIndex {{ $transceiverDdmInfoEntryPort }} {{ $transceiverDdmInfoEntryDescription }}'
+                    descr: 'SFP ifIndex {{ ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryPort }} {{ ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryDescription }}'
                     index: 'transceiverDdmInfoEntryCurrent.{{ $index }}'
-                    high_limit: transceiverDdmInfoEntryAlarmMax
-                    low_limit: transceiverDdmInfoEntryAlarmMin
-                    warn_limit: transceiverDdmInfoEntryWarnMax
-                    low_warn_limit: transceiverDdmInfoEntryWarnMin
+                    high_limit: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryAlarmMax
+                    low_limit: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryAlarmMin
+                    warn_limit: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryWarnMax
+                    low_warn_limit: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryWarnMin
                     divisor: 100
-                    entPhysicalIndex: transceiverDdmInfoEntryPort
+                    entPhysicalIndex: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryPort
                     entPhysicalIndex_measured: ports
                     skip_values:
                         -
-                            oid: transceiverDdmInfoEntryDescription
+                            oid: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryDescription
                             op: '!='
                             value: 'Temperature'
         dbm:
@@ -130,45 +129,45 @@ modules:
                 divisor: 100
             data:
                 -
-                    oid: zyxelTransceiverDdmiTable
-                    value: zyTransceiverDdmiCurrent
+                    oid: ZYXEL-TRANSCEIVER-MIB::zyxelTransceiverDdmiTable
+                    value: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiCurrent
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.2.1.6.{{ $index }}'
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: 'ports'
                     descr: '{{ $subindex0 }} Tx Power'
                     index: 'zyTransceiverDdmiCurrent.{{ $index }}'
-                    high_limit: zyTransceiverDdmiAlarmMax
-                    low_limit: zyTransceiverDdmiAlarmMin
-                    warn_limit: zyTransceiverDdmiWarnMax
-                    low_warn_limit: zyTransceiverDdmiWarnMin
+                    high_limit: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiAlarmMax
+                    low_limit: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiAlarmMin
+                    warn_limit: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiWarnMax
+                    low_warn_limit: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiWarnMin
                     skip_values:
                         -
-                            oid: zyTransceiverDdmiDescription
+                            oid: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiDescription
                             op: '!='
                             value: 'TxPower'
                         -
-                            oid: zyTransceiverDdmiCurrent
+                            oid: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiCurrent
                             op: '=='
                             value: '0'
                 -
-                    oid: zyxelTransceiverDdmiTable
-                    value: zyTransceiverDdmiCurrent
+                    oid: ZYXEL-TRANSCEIVER-MIB::zyxelTransceiverDdmiTable
+                    value: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiCurrent
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.2.1.6.{{ $index }}'
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: 'ports'
                     descr: '{{ $subindex0 }} Rx Power'
                     index: 'zyTransceiverDdmiCurrent.{{ $index }}'
-                    high_limit: zyTransceiverDdmiAlarmMax
-                    low_limit: zyTransceiverDdmiAlarmMin
-                    warn_limit: zyTransceiverDdmiWarnMax
-                    low_warn_limit: zyTransceiverDdmiWarnMin
+                    high_limit: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiAlarmMax
+                    low_limit: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiAlarmMin
+                    warn_limit: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiWarnMax
+                    low_warn_limit: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiWarnMin
                     skip_values:
                         -
-                            oid: zyTransceiverDdmiDescription
+                            oid: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiDescription
                             op: '!='
                             value: 'RxPower'
                         -
-                            oid: zyTransceiverDdmiCurrent
+                            oid: ZYXEL-TRANSCEIVER-MIB::zyTransceiverDdmiCurrent
                             op: '=='
                             value: '0'
         voltage:
@@ -176,56 +175,55 @@ modules:
                 skip_value_lt: 0
             data:
                 -
-                    oid: zyxelHwMonitorVoltageTable
-                    value: zyHwMonitorVoltageCurrentValue
+                    oid: ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorVoltageTable
+                    value: ZYXEL-HW-MONITOR-MIB::zyHwMonitorVoltageCurrentValue
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.3.1.3.{{ $index }}'
                     divisor: 1000
-                    descr: 'Switch {{ $zyHwMonitorVoltageDescription }}'
+                    descr: 'Switch {{ ZYXEL-HW-MONITOR-MIB::zyHwMonitorVoltageDescription }}'
                     index: 'zyHwMonitorVoltageCurrentValue.{{ $index }}'
-                    high_limit: zyHwMonitorVoltageMaxValue
-                    low_limit: zyHwMonitorVoltageMinValue
-                    low_warn_limit: zyHwMonitorVoltageLowThreshold
+                    high_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorVoltageMaxValue
+                    low_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorVoltageMinValue
+                    low_warn_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorVoltageLowThreshold
                 -
-                    oid: voltageTable
-                    value: voltageCurValue
+                    oid: ZYXEL-MGS3712-MIB::voltageTable
+                    value: ZYXEL-MGS3712-MIB::voltageCurValue
                     num_oid: '.1.3.6.1.4.1.890.1.5.8.47.8.3.1.2.{{ $index }}'
                     divisor: 1000
-                    descr: '{{ $voltageNominalValue }}mV ({{ $voltageDescr }})'
+                    descr: '{{ ZYXEL-MGS3712-MIB::voltageNominalValue }}mV ({{ ZYXEL-MGS3712-MIB::voltageDescr }})'
                     index: 'voltageCurValue.{{ $index }}'
-                    low_limit: voltageLowThresh
+                    low_limit: ZYXEL-MGS3712-MIB::voltageLowThresh
                 -
-                    oid: transceiverDdmInfoTable
-                    value: transceiverDdmInfoEntryCurrent
+                    oid: ZYXEL-MGS3712-MIB::transceiverDdmInfoTable
+                    value: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryCurrent
                     num_oid: '.1.3.6.1.4.1.890.1.5.8.47.117.2.1.7.{{ $index }}'
-                    descr: 'SFP ifIndex {{ $transceiverDdmInfoEntryPort }} {{ $transceiverDdmInfoEntryDescription }}'
+                    descr: 'SFP ifIndex {{ ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryPort }} {{ ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryDescription }}'
                     index: 'transceiverDdmInfoEntryCurrent.{{ $index }}'
-                    high_limit: transceiverDdmInfoEntryAlarmMax
-                    low_limit: transceiverDdmInfoEntryAlarmMin
-                    warn_limit: transceiverDdmInfoEntryWarnMax
-                    low_warn_limit: transceiverDdmInfoEntryWarnMin
+                    high_limit: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryAlarmMax
+                    low_limit: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryAlarmMin
+                    warn_limit: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryWarnMax
+                    low_warn_limit: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryWarnMin
                     divisor: 100
-                    entPhysicalIndex: transceiverDdmInfoEntryPort
+                    entPhysicalIndex: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryPort
                     entPhysicalIndex_measured: ports
                     skip_values:
                         -
-                            oid: transceiverDdmInfoEntryDescription
+                            oid: ZYXEL-MGS3712-MIB::transceiverDdmInfoEntryDescription
                             op: '!='
                             value: 'Voltage'
         power:
             data:
                 -
-                    oid: pethMainPseTable
-                    value: pethMainPsePower
+                    oid: POWER-ETHERNET-MIB::pethMainPseTable
+                    value: POWER-ETHERNET-MIB::pethMainPsePower
                     num_oid: '.1.3.6.1.2.1.105.1.3.1.1.2.{{ $index }}'
                     index: 'pethMainPsePower.{{ $index }}'
                     group: "PoE"
                     descr: "PoE Budget Total - ID {{ $index }}"
                 -
-                    oid: pethMainPseTable
-                    value: pethMainPseConsumptionPower
+                    oid: POWER-ETHERNET-MIB::pethMainPseTable
+                    value: POWER-ETHERNET-MIB::pethMainPseConsumptionPower
                     num_oid: '.1.3.6.1.2.1.105.1.3.1.1.4.{{ $index }}'
                     index: 'pethMainPseConsumptionPower.{{ $index }}'
-                    high_limit: pethMainPsePower
+                    high_limit: POWER-ETHERNET-MIB::pethMainPsePower
                     group: "PoE"
                     descr: "PoE Budget Consumed - ID {{ $index }}"
-

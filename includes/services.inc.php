@@ -11,15 +11,8 @@ use LibreNMS\Util\IP;
 
 function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0, $template_id = '', $name = '')
 {
-    $device = DeviceCache::get(is_array($device) ? $device['device_id'] : $device);
-
-    if (empty($ip)) {
-        $ip = $device->pollerTarget();
-    }
-
-    $insert = ['device_id' => $device->device_id, 'service_ip' => $ip, 'service_type' => $type, 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
-
-    return Service::create($insert);
+    // keep legacy signature, delegate to modern implementation
+    return \LibreNMS\Services::addService($device, $type, $desc, $ip, $param, $ignore, $disabled, $template_id, $name);
 }
 
 function service_get($device = null, $service = null)
@@ -58,11 +51,12 @@ function delete_service($service = null)
 
 function discover_service($device, $service)
 {
-    if (Service::query()->where('service_type', $service)->where('device_id', $device['device_id'])->doesntExist()) {
-        add_service($device, $service, "$service Monitoring (Auto Discovered)", null, null, 0, 0, 0, "AUTO: $service");
-        Eventlog::log('Autodiscovered service: type ' . $service, $device['device_id'], 'service', Severity::Info);
+    $created = \LibreNMS\Services::discover($device, $service);
+
+    if ($created) {
         echo '+';
     }
+
     echo "$service ";
 }
 
@@ -103,7 +97,7 @@ function poll_service($service)
         // Set the DS in the DB if it is blank.
         $DS = [];
         foreach ($perf as $k => $v) {
-            $DS[$k] = $v['uom'];
+            $DS[$k] = ['uom' => $v['uom'], 'full_name' => $v['full_name']];
         }
         d_echo('Service DS: ' . json_encode($DS, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
         if (($service['service_ds'] == '{}') || ($service['service_ds'] == '')) {
@@ -266,11 +260,10 @@ function check_service($command)
                         d_echo('could not generate a unique ds-name for ' . $ds . "\n");
                     }
                 }
-                $ds = $normalized_ds;
             }
             // We have a DS. Add an entry to the array.
-            d_echo('Perf Data - DS: ' . $ds . ', Value: ' . $value . ', UOM: ' . $uom . "\n");
-            $metrics[$ds] = ['value' => $value, 'uom' => $uom];
+            d_echo('Perf Data - DS: ' . $normalized_ds . ', Value: ' . $value . ', UOM: ' . $uom . "\n");
+            $metrics[$normalized_ds] = ['value' => $value, 'uom' => $uom, 'full_name' => $ds];
         } else {
             // No DS. Don't add an entry to the array.
             d_echo("Perf Data - None.\n");

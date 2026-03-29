@@ -13,7 +13,10 @@
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
+use App\Models\Bill;
+use App\Models\Device;
 use App\Models\Port;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
@@ -83,7 +86,7 @@ function generate_device_link($device, $text = null, $vars = [], $start = 0, $en
 
 function bill_permitted($bill_id)
 {
-    if (Auth::user()->hasGlobalRead()) {
+    if (Gate::allows('viewAll', Bill::class)) {
         return true;
     }
 
@@ -92,6 +95,10 @@ function bill_permitted($bill_id)
 
 function port_permitted($port_id, $device_id = null)
 {
+    if (Gate::allows('viewAll', Port::class)) {
+        return true;
+    }
+
     if (! is_numeric($device_id)) {
         $device_id = PortCache::get((int) $port_id)?->device_id;
     }
@@ -105,7 +112,7 @@ function port_permitted($port_id, $device_id = null)
 
 function device_permitted($device_id)
 {
-    if (Auth::user() && Auth::user()->hasGlobalRead()) {
+    if (Gate::allows('viewAll', Device::class)) {
         return true;
     }
 
@@ -497,11 +504,6 @@ function generate_pagination($count, $limit, $page, $links = 2)
     return $return;
 }//end generate_pagination()
 
-function demo_account()
-{
-    print_error("You are logged in as a demo account, this page isn't accessible to you");
-}//end demo_account()
-
 function get_client_ip()
 {
     if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -710,7 +712,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
         if ($tmp_alerts['app_status']) {
             $fault_detail .= ' => ' . $tmp_alerts['app_status'];
         }
-        if ($tmp_alerts['metric']) {
+        if (isset($tmp_alerts['metric']) && $tmp_alerts['metric'] && isset($tmp_alerts['value']) && $tmp_alerts['value']) {
             $fault_detail .= ' : ' . $tmp_alerts['metric'] . ' => ' . $tmp_alerts['value'];
         }
         $fallback = false;
@@ -735,21 +737,6 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
 
     return $fault_detail;
 }
-
-function dynamic_override_config($type, $name, $device)
-{
-    $attrib_val = get_dev_attrib($device, $name);
-    if ($attrib_val == 'true') {
-        $checked = 'checked';
-    } else {
-        $checked = '';
-    }
-    if ($type == 'checkbox') {
-        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="' . htmlentities((string) $name) . '" data-device_id="' . $device['device_id'] . '" data-size="small" ' . $checked . '>';
-    } elseif ($type == 'text') {
-        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . htmlentities((string) $name) . '" data-device_id="' . $device['device_id'] . '" value="' . htmlentities((string) $attrib_val) . '">';
-    }
-}//end dynamic_override_config()
 
 /**
  * Return the rows from 'ports' for all ports of a certain type as parsed by port_descr_parser.
@@ -832,7 +819,7 @@ function get_rules_from_json()
 
 function search_oxidized_config($search_in_conf_textbox)
 {
-    if (! Auth::user()->hasGlobalRead()) {
+    if (Gate::denies('oxidized.search')) {
         return false;
     }
 

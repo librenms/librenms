@@ -1,17 +1,17 @@
-mib: CAMBIUM-PTP500-V2-MIB
 modules:
     os:
         sysDescr_regex: '/5\d(?<hardware>.*?)( Wireless|,).*Version\s+(?<version>[\d-]+)/'
         hardware: CAMBIUM-PTP500-V2-MIB::masterSlaveMode.0
-        hardware_template: '{{ $hardware }} {{ CAMBIUM-PTP500-V2-MIB::masterSlaveMode.0 }}'
+        hardware_template: '{{ CAMBIUM-PTP500-V2-MIB::hardware }} {{ CAMBIUM-PTP500-V2-MIB::masterSlaveMode.0 }}'
     sensors:
         state:
             data:
                 -
-                    oid: transmitModulationMode
+                    oid: CAMBIUM-PTP500-V2-MIB::transmitModulationMode
                     num_oid: '.1.3.6.1.4.1.17713.5.12.9.{{ $index }}'
                     index: 'transmitModulationMode.{{ $index }}'
                     descr: Transmit Modulation Mode
+                    state_name: transmitModulationMode
                     states:
                         - { value: 1, generic: 0, graph: 1, descr: modBpsk50percent }
                         - { value: 2, generic: 0, graph: 1, descr: modQpsk50percentSingle }
@@ -29,10 +29,11 @@ modules:
                         - { value: 14, generic: 0, graph: 1, descr: mod64qam83percentDual }
                         - { value: 15, generic: 0, graph: 1, descr: modReserved2 }
                 -
-                    oid: receiveModulationMode
+                    oid: CAMBIUM-PTP500-V2-MIB::receiveModulationMode
                     num_oid: '.1.3.6.1.4.1.17713.5.12.8.{{ $index }}'
                     index: 'receiveModulationMode.{{ $index }}'
                     descr: Receive Modulation Mode
+                    state_name: receiveModulationMode
                     states:
                         - { value: 1, generic: 0, graph: 1, descr: modBpsk50percent }
                         - { value: 2, generic: 0, graph: 1, descr: modQpsk50percentSingle }

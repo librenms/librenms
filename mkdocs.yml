@@ -183,6 +183,7 @@ nav:
     - Advanced Setup:
       - 1 Minute Polling: Support/1-Minute-Polling.md
       - Authentication Options: Extensions/Authentication.md
+      - Authorization: Extensions/Authorization.md
       - Auto-discovery Setup: Extensions/Auto-Discovery.md
       - Bare Dashboard: Support/Bare-Dashboard.md
       - Cleanup Options: Support/Cleanup-options.md
@@ -295,6 +296,7 @@ nav:
     - SNMP Traps: Developing/SNMP-Traps.md
     - Dynamic Config: Developing/Dynamic-Config.md
     - Localization: Developing/Localization.md
+    - Time Handling: Developing/Time-Handling.md
     - Plugin System: Extensions/Plugin-System.md
     - Developer notes:
       - Merging Pull Requests: Developing/Merging-Pull-Requests.md

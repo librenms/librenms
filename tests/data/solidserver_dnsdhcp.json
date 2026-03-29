@@ -2943,5 +2943,152 @@
                 }
             ]
         }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 196608,
+                    "hrDeviceDescr": "Intel(R) Core(TM) i3-6100 CPU @ 3.70GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 4
+                },
+                {
+                    "hrDeviceIndex": 196609,
+                    "hrDeviceDescr": "Intel(R) Core(TM) i3-6100 CPU @ 3.70GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 5
+                },
+                {
+                    "hrDeviceIndex": 196610,
+                    "hrDeviceDescr": "Intel(R) Core(TM) i3-6100 CPU @ 3.70GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 5
+                },
+                {
+                    "hrDeviceIndex": 196611,
+                    "hrDeviceDescr": "Intel(R) Core(TM) i3-6100 CPU @ 3.70GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 4
+                },
+                {
+                    "hrDeviceIndex": 262145,
+                    "hrDeviceDescr": "network interface igb0",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262146,
+                    "hrDeviceDescr": "network interface igb1",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262147,
+                    "hrDeviceDescr": "network interface bge0",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262148,
+                    "hrDeviceDescr": "network interface bge1",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262149,
+                    "hrDeviceDescr": "network interface lo0",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262150,
+                    "hrDeviceDescr": "network interface lagg0",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 162,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 393248,
+                    "hrDeviceDescr": "some sort of disk",
+                    "hrDeviceType": "hrDeviceDiskStorage",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 786432,
+                    "hrDeviceDescr": "Guessing that there's a floating point co-processor",
+                    "hrDeviceType": "hrDeviceCoprocessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "00:08:e3:ff:fc:c8",
+                    "ipv6_address": "2a0b:6880:0000:0001:0000:0000:0000:0001",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "6c:2b:59:86:3f:1e",
+                    "ipv6_address": "2a0b:6880:0000:0001:0000:0000:0000:0010",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "00:08:e3:ff:fc:c8",
+                    "ipv6_address": "fe80:0000:0000:0000:0208:e3ff:feff:fcc8",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "6c:2b:59:86:3f:1e",
+                    "ipv6_address": "fe80:0000:0000:0000:6e2b:59ff:fe86:3f1e",
+                    "context_name": ""
+                }
+            ]
+        }
+    },
+    "ucd-diskio": {
+        "discovery": {
+            "disks": [
+                {
+                    "diskio_index": 3,
+                    "diskio_descr": "cd0"
+                },
+                {
+                    "diskio_index": 2,
+                    "diskio_descr": "da0"
+                },
+                {
+                    "diskio_index": 1,
+                    "diskio_descr": "md99"
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

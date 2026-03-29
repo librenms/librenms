@@ -1,5 +1,4 @@
 includes:
-    - phpstan-baseline.neon
     - vendor/larastan/larastan/extension.neon
     - vendor/phpstan/phpstan-mockery/extension.neon
 

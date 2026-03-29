@@ -1,4 +1,3 @@
-mib: HP-LASERJET-COMMON-MIB
 modules:
     os:
         serial:
@@ -19,8 +18,8 @@ modules:
         state:
             data:
                 -
-                    oid: default-media-size
-                    value: default-media-size
+                    oid: HP-LASERJET-COMMON-MIB::default-media-size
+                    value: HP-LASERJET-COMMON-MIB::default-media-size
                     num_oid: '.1.3.6.1.4.1.11.2.3.9.4.2.1.3.3.1.13.{{ $index }}'
                     descr: 'Default Paper {{ $index }}'
                     state_name: defaultMediaSize
@@ -34,43 +33,43 @@ modules:
         count:
             data:
                 -
-                    oid: scanner
-                    value: scanner-flatbed-page-count
+                    oid: HP-LASERJET-COMMON-MIB::scanner
+                    value: HP-LASERJET-COMMON-MIB::scanner-flatbed-page-count
                     num_oid: '.1.3.6.1.4.1.11.2.3.9.4.2.1.2.2.1.74.{{ $index }}'
                     group: "HP-Scanner"
                     descr: "Lifetime scanned"
                     index: 'scannerFlatbedPageCount.{{ $index }}'
                 -
-                    oid: total-engine-page-count
-                    value: total-engine-page-count
+                    oid: HP-LASERJET-COMMON-MIB::total-engine-page-count
+                    value: HP-LASERJET-COMMON-MIB::total-engine-page-count
                     num_oid: '.1.3.6.1.4.1.11.2.3.9.4.2.1.4.1.2.5.{{ $index }}'
                     group: "HP-Printer"
                     descr: "Total page cnt"
                     index: 'totalEnginePageCount.{{ $index }}'
                 -
-                    oid: total-mono-page-count
-                    value: total-mono-page-count
+                    oid: HP-LASERJET-COMMON-MIB::total-mono-page-count
+                    value: HP-LASERJET-COMMON-MIB::total-mono-page-count
                     num_oid: '.1.3.6.1.4.1.11.2.3.9.4.2.1.4.1.2.6.{{ $index }}'
                     group: "HP-Printer"
                     descr: "Total Mono cnt"
                     index: 'totalMonoPageCount.{{ $index }}'
                 -
-                    oid: total-color-page-count
-                    value: total-color-page-count
+                    oid: HP-LASERJET-COMMON-MIB::total-color-page-count
+                    value: HP-LASERJET-COMMON-MIB::total-color-page-count
                     num_oid: '.1.3.6.1.4.1.11.2.3.9.4.2.1.4.1.2.7.{{ $index }}'
                     group: "HP-Printer"
                     descr: "Total Color cnt"
                     index: 'totalColorPageCount.{{ $index }}'
                 -
-                    oid: duplex-page-count
-                    value: duplex-page-count
+                    oid: HP-LASERJET-COMMON-MIB::duplex-page-count
+                    value: HP-LASERJET-COMMON-MIB::duplex-page-count
                     num_oid: '.1.3.6.1.4.1.11.2.3.9.4.2.1.4.1.2.22.{{ $index }}'
                     group: "HP-Printer"
                     descr: "Total Duplex cnt"
                     index: 'duplexPageCount.{{ $index }}'
                 -
-                    oid: print-engine-jam-count
-                    value: print-engine-jam-count
+                    oid: HP-LASERJET-COMMON-MIB::print-engine-jam-count
+                    value: HP-LASERJET-COMMON-MIB::print-engine-jam-count
                     num_oid: '.1.3.6.1.4.1.11.2.3.9.4.2.1.4.1.2.34.{{ $index }}'
                     group: "HP-Printer"
                     descr: "Total Jam cnt"

@@ -1,66 +1,66 @@
-mib: DELL-STORAGE-SC-MIB
 modules:
     sensors:
         count:
             data:
                 -
-                    oid: scDiskFolderTable
-                    value: scDiskFolderCapcty2
+                    oid: DELL-STORAGE-SC-MIB::scDiskFolderTable
+                    value: DELL-STORAGE-SC-MIB::scDiskFolderCapcty2
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.25.1.9.{{ $index }}
-                    descr: 'Disk Folder: {{ $scDiskFolderName }} ({{ $scDiskFolderCapcty2 }}GB)'
+                    descr: 'Disk Folder: {{ DELL-STORAGE-SC-MIB::scDiskFolderName }} ({{ DELL-STORAGE-SC-MIB::scDiskFolderCapcty2 }}GB)'
                     index: scDiskFolderCapcty2.{{ $index }}
                 -
-                    oid: scServerTable
-                    value: scServerPathCount
+                    oid: DELL-STORAGE-SC-MIB::scServerTable
+                    value: DELL-STORAGE-SC-MIB::scServerPathCount
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.27.1.6.{{ $index }}
-                    descr: 'Path Count: {{ $scServerName }}'
+                    descr: 'Path Count: {{ DELL-STORAGE-SC-MIB::scServerName }}'
                     index: scServerPathCount.{{ $index }}
                 -
-                    oid: scObjCntTable
-                    value: scObjCntDevsInUse
+                    oid: DELL-STORAGE-SC-MIB::scObjCntTable
+                    value: DELL-STORAGE-SC-MIB::scObjCntDevsInUse
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.31.1.3.{{ $index }}
                     descr: 'Usage: Devices'
                     index: scObjCntDevsInUse.{{ $index }}
                 -
-                    oid: scObjCntTable
-                    value: scObjCntReplays
+                    oid: DELL-STORAGE-SC-MIB::scObjCntTable
+                    value: DELL-STORAGE-SC-MIB::scObjCntReplays
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.31.1.4.{{ $index }}
                     descr: 'Usage: Replays'
                     index: scObjCntReplays.{{ $index }}
                 -
-                    oid: scObjCntTable
-                    value: scObjCntDisks
+                    oid: DELL-STORAGE-SC-MIB::scObjCntTable
+                    value: DELL-STORAGE-SC-MIB::scObjCntDisks
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.31.1.5.{{ $index }}
                     descr: 'Usage: Disks'
                     index: scObjCntDisks.{{ $index }}
                 -
-                    oid: scObjCntTable
-                    value: scObjCntServers
+                    oid: DELL-STORAGE-SC-MIB::scObjCntTable
+                    value: DELL-STORAGE-SC-MIB::scObjCntServers
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.31.1.6.{{ $index }}
                     descr: 'Usage: Servers'
                     index: scObjCntServers.{{ $index }}
                 -
-                    oid: scObjCntTable
-                    value: scObjCntVolumes
+                    oid: DELL-STORAGE-SC-MIB::scObjCntTable
+                    value: DELL-STORAGE-SC-MIB::scObjCntVolumes
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.31.1.7.{{ $index }}
                     descr: 'Usage: Volumes'
                     index: scObjCntVolumes.{{ $index }}
         fanspeed:
             data:
                 -
-                    oid: scCtlrFanTable
-                    value: scCtlrFanCurrentRpm
+                    oid: DELL-STORAGE-SC-MIB::scCtlrFanTable
+                    value: DELL-STORAGE-SC-MIB::scCtlrFanCurrentRpm
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.16.1.5.{{ $index }}
-                    descr: '{{ $scCtlrFanName }}'
+                    descr: '{{ DELL-STORAGE-SC-MIB::scCtlrFanName }}'
                     index: scCtlrFanCurrentRpm.{{ $index }}
-                    low_limit: scCtlrFanCritLwrRpm
-                    low_warn_limit: scCtlrFanWarnLwrRpm
-                    warn_limit: scCtlrFanWarnUprRpm
-                    high_limit: scCtlrFanCritUprRpm
+                    low_limit: DELL-STORAGE-SC-MIB::scCtlrFanCritLwrRpm
+                    low_warn_limit: DELL-STORAGE-SC-MIB::scCtlrFanWarnLwrRpm
+                    warn_limit: DELL-STORAGE-SC-MIB::scCtlrFanWarnUprRpm
+                    high_limit: DELL-STORAGE-SC-MIB::scCtlrFanCritUprRpm
         state:
             data:
                 -
                     oid: DELL-STORAGE-SC-MIB::productIDGlobalStatus
+                    value: DELL-STORAGE-SC-MIB::productIDGlobalStatus
                     num_oid: '.1.3.6.1.4.1.674.11000.2000.500.1.2.6.{{ $index }}'
                     descr: 'Global Status'
                     state_name: productIDGlobalStatus
@@ -72,10 +72,10 @@ modules:
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: recoverable, graph: 1, generic: 1 }
                 -
-                    oid: scDiskTable
-                    value: scDiskStatus
+                    oid: DELL-STORAGE-SC-MIB::scDiskTable
+                    value: DELL-STORAGE-SC-MIB::scDiskStatus
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.14.1.3.{{ $index }}
-                    descr: 'Disk: {{ $scDiskNamePosition }} ({{ $scDiskSize }}GB)'
+                    descr: 'Disk: {{ DELL-STORAGE-SC-MIB::scDiskNamePosition }} ({{ DELL-STORAGE-SC-MIB::scDiskSize }}GB)'
                     index: scDiskStatus.{{ $index }}
                     state_name: scDiskStatus
                     states:
@@ -83,20 +83,20 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: degraded, graph: 1, generic: 1 }
                 -
-                    oid: scDiskTable
-                    value: scDiskHealthy
+                    oid: DELL-STORAGE-SC-MIB::scDiskTable
+                    value: DELL-STORAGE-SC-MIB::scDiskHealthy
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.14.1.5.{{ $index }}
-                    descr: 'Disk Health: {{ $scDiskNamePosition }} ({{ $scDiskSize }}GB)'
+                    descr: 'Disk Health: {{ DELL-STORAGE-SC-MIB::scDiskNamePosition }} ({{ DELL-STORAGE-SC-MIB::scDiskSize }}GB)'
                     index: scDiskHealthy.{{ $index }}
                     state_name: scDiskHealthy
                     states:
                         - { value: 1, descr: healthy, graph: 1, generic: 0 }
                         - { value: 2, descr: notHealthy, graph: 1, generic: 1 }
                 -
-                    oid: scEnclTable
-                    value: scEnclStatus
+                    oid: DELL-STORAGE-SC-MIB::scEnclTable
+                    value: DELL-STORAGE-SC-MIB::scEnclStatus
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.15.1.3.{{ $index }}
-                    descr: 'Enclosure: {{ $scEnclNbr }} ({{ $scEnclType }}/{{ $scEnclModel }})'
+                    descr: 'Enclosure: {{ DELL-STORAGE-SC-MIB::scEnclNbr }} ({{ DELL-STORAGE-SC-MIB::scEnclType }}/{{ DELL-STORAGE-SC-MIB::scEnclModel }})'
                     index: scEnclStatus.{{ $index }}
                     state_name: scEnclStatus
                     states:
@@ -104,10 +104,10 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: degraded, graph: 1, generic: 1 }
                 -
-                    oid: scCtlrPowerTable
-                    value: scCtlrPowerStatus
+                    oid: DELL-STORAGE-SC-MIB::scCtlrPowerTable
+                    value: DELL-STORAGE-SC-MIB::scCtlrPowerStatus
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.17.1.3.{{ $index }}
-                    descr: '{{ $scCtlrPowerName }}'
+                    descr: '{{ DELL-STORAGE-SC-MIB::scCtlrPowerName }}'
                     index: scCtlrPowerStatus.{{ $index }}
                     state_name: scCtlrPowerStatus
                     states:
@@ -115,10 +115,10 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: degraded, graph: 1, generic: 1 }
                 -
-                    oid: scEnclFanTable
-                    value: scEnclFanStatus
+                    oid: DELL-STORAGE-SC-MIB::scEnclFanTable
+                    value: DELL-STORAGE-SC-MIB::scEnclFanStatus
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.20.1.3.{{ $index }}
-                    descr: 'Fan: {{ $scEnclFanLocation }}'
+                    descr: 'Fan: {{ DELL-STORAGE-SC-MIB::scEnclFanLocation }}'
                     index: scEnclFanStatus.{{ $index }}
                     state_name: scEnclFanStatus
                     states:
@@ -126,10 +126,10 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: degraded, graph: 1, generic: 1 }
                 -
-                    oid: scEnclPowerTable
-                    value: scEnclPowerStatus
+                    oid: DELL-STORAGE-SC-MIB::scEnclPowerTable
+                    value: DELL-STORAGE-SC-MIB::scEnclPowerStatus
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.21.1.3.{{ $index }}
-                    descr: 'PSU: {{ $scEnclPowerPosition }}'
+                    descr: 'PSU: {{ DELL-STORAGE-SC-MIB::scEnclPowerPosition }}'
                     index: scEnclPowerStatus.{{ $index }}
                     state_name: scEnclPowerStatus
                     states:
@@ -137,10 +137,10 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: degraded, graph: 1, generic: 1 }
                 -
-                    oid: scEnclIoModTable
-                    value: scEnclIoModStatus
+                    oid: DELL-STORAGE-SC-MIB::scEnclIoModTable
+                    value: DELL-STORAGE-SC-MIB::scEnclIoModStatus
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.22.1.3.{{ $index }}
-                    descr: 'IO Module: {{ $scEnclIoModPosition }}'
+                    descr: 'IO Module: {{ DELL-STORAGE-SC-MIB::scEnclIoModPosition }}'
                     index: scEnclIoModStatus.{{ $index }}
                     state_name: scEnclIoModStatus
                     states:
@@ -148,10 +148,10 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: degraded, graph: 1, generic: 1 }
                 -
-                    oid: scEnclTempTable
-                    value: scEnclTempStatus
+                    oid: DELL-STORAGE-SC-MIB::scEnclTempTable
+                    value: DELL-STORAGE-SC-MIB::scEnclTempStatus
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.23.1.3.{{ $index }}
-                    descr: 'Temp: {{ $scEnclTempLocation }}'
+                    descr: 'Temp: {{ DELL-STORAGE-SC-MIB::scEnclTempLocation }}'
                     index: scEnclTempStatus.{{ $index }}
                     state_name: scEnclTempStatus
                     states:
@@ -159,10 +159,10 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: degraded, graph: 1, generic: 1 }
                 -
-                    oid: scEnclAlarmTable
-                    value: scEnclAlarmStatus
+                    oid: DELL-STORAGE-SC-MIB::scEnclAlarmTable
+                    value: DELL-STORAGE-SC-MIB::scEnclAlarmStatus
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.24.1.3.{{ $index }}
-                    descr: 'Alarm: {{ $scEnclAlarmName }}'
+                    descr: 'Alarm: {{ DELL-STORAGE-SC-MIB::scEnclAlarmName }}'
                     index: scEnclAlarmStatus.{{ $index }}
                     state_name: scEnclAlarmStatus
                     states:
@@ -170,10 +170,10 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: degraded, graph: 1, generic: 1 }
                 -
-                    oid: scDiskFolderTable
-                    value: scDiskFolderStatus
+                    oid: DELL-STORAGE-SC-MIB::scDiskFolderTable
+                    value: DELL-STORAGE-SC-MIB::scDiskFolderStatus
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.25.1.3.{{ $index }}
-                    descr: 'Disk Folder: {{ $scDiskFolderName }}'
+                    descr: 'Disk Folder: {{ DELL-STORAGE-SC-MIB::scDiskFolderName }}'
                     index: scDiskFolderStatus.{{ $index }}
                     state_name: scDiskFolderStatus
                     states:
@@ -181,10 +181,10 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: degraded, graph: 1, generic: 1 }
                 -
-                    oid: scVolumeTable
-                    value: scVolumeStatus
+                    oid: DELL-STORAGE-SC-MIB::scVolumeTable
+                    value: DELL-STORAGE-SC-MIB::scVolumeStatus
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.26.1.3.{{ $index }}
-                    descr: 'Volume: {{ $scVolumeName }}'
+                    descr: 'Volume: {{ DELL-STORAGE-SC-MIB::scVolumeName }}'
                     index: scVolumeStatus.{{ $index }}
                     state_name: scVolumeStatus
                     states:
@@ -192,10 +192,10 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: degraded, graph: 1, generic: 1 }
                 -
-                    oid: scServerTable
-                    value: scServerStatus
+                    oid: DELL-STORAGE-SC-MIB::scServerTable
+                    value: DELL-STORAGE-SC-MIB::scServerStatus
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.27.1.3.{{ $index }}
-                    descr: 'Server: {{ $scServerName }}'
+                    descr: 'Server: {{ DELL-STORAGE-SC-MIB::scServerName }}'
                     index: scServerStatus.{{ $index }}
                     state_name: scServerStatus
                     states:
@@ -203,10 +203,10 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: degraded, graph: 1, generic: 1 }
                 -
-                    oid: scServerTable
-                    value: scServerCnctvy
+                    oid: DELL-STORAGE-SC-MIB::scServerTable
+                    value: DELL-STORAGE-SC-MIB::scServerCnctvy
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.27.1.5.{{ $index }}
-                    descr: 'Connectivity: {{ $scServerName }}'
+                    descr: 'Connectivity: {{ DELL-STORAGE-SC-MIB::scServerName }}'
                     index: scServerCnctvy.{{ $index }}
                     state_name: scServerCnctvy
                     states:
@@ -214,10 +214,10 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: partial, graph: 1, generic: 1 }
                 -
-                    oid: scCacheTable
-                    value: scCacheStatus
+                    oid: DELL-STORAGE-SC-MIB::scCacheTable
+                    value: DELL-STORAGE-SC-MIB::scCacheStatus
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.28.1.3.{{ $index }}
-                    descr: 'Battery: {{ $scCacheName }}'
+                    descr: 'Battery: {{ DELL-STORAGE-SC-MIB::scCacheName }}'
                     index: scCacheStatus.{{ $index }}
                     state_name: scCacheStatus
                     states:
@@ -228,30 +228,30 @@ modules:
         temperature:
             data:
                 -
-                    oid: scCtlrTempTable
-                    value: scCtlrTempCurrentC
+                    oid: DELL-STORAGE-SC-MIB::scCtlrTempTable
+                    value: DELL-STORAGE-SC-MIB::scCtlrTempCurrentC
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.19.1.5.{{ $index }}
-                    descr: '{{ $scCtlrTempName }}'
+                    descr: '{{ DELL-STORAGE-SC-MIB::scCtlrTempName }}'
                     index: scCtlrTempCurrentC.{{ $index }}
-                    low_limit: scCtlrTempCritLwrC
-                    low_warn_limit: scCtlrTempWarnLwrC
-                    warn_limit: scCtlrTempWarnUprC
-                    high_limit: scCtlrTempCritUprC
+                    low_limit: DELL-STORAGE-SC-MIB::scCtlrTempCritLwrC
+                    low_warn_limit: DELL-STORAGE-SC-MIB::scCtlrTempWarnLwrC
+                    warn_limit: DELL-STORAGE-SC-MIB::scCtlrTempWarnUprC
+                    high_limit: DELL-STORAGE-SC-MIB::scCtlrTempCritUprC
                 -
-                    oid: scEnclTempTable
-                    value: scEnclTempCurrentC
+                    oid: DELL-STORAGE-SC-MIB::scEnclTempTable
+                    value: DELL-STORAGE-SC-MIB::scEnclTempCurrentC
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.23.1.5.{{ $index }}
-                    descr: '{{ $scEnclTempLocation }}'
+                    descr: '{{ DELL-STORAGE-SC-MIB::scEnclTempLocation }}'
                     index: scEnclTempCurrentC.{{ $index }}
         voltage:
             data:
                 -
-                    oid: scCtlrVoltageTable
-                    value: scCtlrVoltageCurrentV
+                    oid: DELL-STORAGE-SC-MIB::scCtlrVoltageTable
+                    value: DELL-STORAGE-SC-MIB::scCtlrVoltageCurrentV
                     num_oid: .1.3.6.1.4.1.674.11000.2000.500.1.2.18.1.{{ $index }}
-                    descr: '{{ $scCtlrVoltageName }}'
+                    descr: '{{ DELL-STORAGE-SC-MIB::scCtlrVoltageName }}'
                     index: scCtlrVoltageCurrentV.{{ $index }}
-                    low_limit: scCtlrVoltageCritLwrV
-                    low_warn_limit: scCtlrVoltageWarnLwrV
-                    warn_limit: scCtlrVoltageWarnUprV
-                    high_limit: scCtlrVoltageCritUprV
+                    low_limit: DELL-STORAGE-SC-MIB::scCtlrVoltageCritLwrV
+                    low_warn_limit: DELL-STORAGE-SC-MIB::scCtlrVoltageWarnLwrV
+                    warn_limit: DELL-STORAGE-SC-MIB::scCtlrVoltageWarnUprV
+                    high_limit: DELL-STORAGE-SC-MIB::scCtlrVoltageCritUprV

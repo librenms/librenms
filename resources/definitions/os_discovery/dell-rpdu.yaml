@@ -1,4 +1,3 @@
-mib: DellrPDU-MIB
 modules:
     os:
         hardware:
@@ -12,16 +11,16 @@ modules:
             data:
                 -
                     oid:
-                        - rPDUOutletMeteredStatusName
+                        - DellrPDU-MIB::rPDUOutletMeteredStatusName
         current:
             data:
                 -
-                    oid: rPDUOutletMeteredStatusCurrent
+                    oid: DellrPDU-MIB::rPDUOutletMeteredStatusCurrent
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.130.2.2.1.6.{{ $index }}'
                     index: 'rPDUOutletMeteredStatusIndex.{{ $index }}'
-                    descr: Outlet, {{ $rPDUOutletMeteredStatusName }}, Current
+                    descr: Outlet, {{ DellrPDU-MIB::rPDUOutletMeteredStatusName }}, Current
                 -
-                    oid: rPDUPhaseStatusCurrent
+                    oid: DellrPDU-MIB::rPDUPhaseStatusCurrent
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.120.2.1.4.{{ $index }}'
                     index: 'rPDUPhaseStatusIndex.{{ $index }}'
                     descr: 'Current, Phase #{{ $index }}'
@@ -29,12 +28,14 @@ modules:
         power:
             data:
                 -
-                    oid: rPDUOutletMeteredStatusPower
+                    oid: DellrPDU-MIB::rPDUOutletMeteredStatusPower
+                    value: DellrPDU-MIB::rPDUOutletMeteredStatusPower
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.130.2.2.1.8.{{ $index }}'
                     index: 'rPDUOutletMeteredStatusIndex.{{ $index }}'
-                    descr: Outlet, {{ $rPDUOutletMeteredStatusName }}, Power
+                    descr: Outlet, {{ DellrPDU-MIB::rPDUOutletMeteredStatusName }}, Power
                 -
-                    oid: rPDUPhaseStatusPower
+                    oid: DellrPDU-MIB::rPDUPhaseStatusPower
+                    value: DellrPDU-MIB::rPDUPhaseStatusPower
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.120.2.1.6.{{ $index }}'
                     index: 'rPDUPhaseStatusIndex.{{ $index }}'
                     descr: 'Power, Phase #{{ $index }}'
@@ -42,16 +43,18 @@ modules:
         voltage:
             data:
                 -
-                    oid: rPDUPhaseStatusVoltage
+                    oid: DellrPDU-MIB::rPDUPhaseStatusVoltage
+                    value: DellrPDU-MIB::rPDUPhaseStatusVoltage
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.120.2.1.5.{{ $index }}'
                     index: 'rPDUPhaseStatusIndex.{{ $index }}'
                     descr: 'Voltage, Phase #{{ $index }}'
         state:
             data:
                 -
-                    oid: rPDUOutMeteredStatusLoadState
+                    oid: DellrPDU-MIB::rPDUOutMeteredStatusLoadState
+                    value: DellrPDU-MIB::rPDUOutMeteredStatusLoadState
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.130.2.2.1.11.{{ $index }}'
-                    descr: Outlet, {{ $rPDUOutletMeteredStatusName }}, Load
+                    descr: Outlet, {{ DellrPDU-MIB::rPDUOutletMeteredStatusName }}, Load
                     index: 'rPDUOutletMeteredStatusIndex.{{ $index }}'
                     state_name: rPDUOutMeteredStatusLoadState
                     states:
@@ -60,9 +63,9 @@ modules:
                         - { descr: nearOverload, graph: 1, value: 3, generic: 1 }
                         - { descr: overload, graph: 1, value: 4, generic: 2 }
                 -
-                    oid: rPDUPhaseStatusTable
+                    oid: DellrPDU-MIB::rPDUPhaseStatusTable
+                    value: DellrPDU-MIB::rPDUPhaseStatusLoadState
                     state_name: rPDUPhaseStatusLoadState
-                    value: rPDUPhaseStatusLoadState
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.120.2.1.3.{{ $index }}'
                     index: 'rPDUPhaseStatusLoadState.{{ $index }}'
                     descr: 'Load State, Phase #{{ $index }}'
@@ -72,9 +75,9 @@ modules:
                         - { descr: nearOverload, graph: 1, value: 3, generic: 1 }
                         - { descr: overload, graph: 1, value: 4, generic: 2 }
                 -
-                    oid: rPDUDeviceStatusTable
+                    oid: DellrPDU-MIB::rPDUDeviceStatusTable
+                    value: DellrPDU-MIB::rPDUDeviceStatusLoadState
                     state_name: rPDUDeviceStatusLoadState
-                    value: rPDUDeviceStatusLoadState
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.110.2.1.6.{{ $index }}'
                     index: 'rPDUDeviceStatusLoadState.{{ $index }}'
                     descr: 'Device State'
@@ -86,7 +89,8 @@ modules:
         temperature:
             data:
                 -
-                    oid: rPDUSensorTempStatusTempC
+                    oid: DellrPDU-MIB::rPDUSensorTempStatusTempC
+                    value: DellrPDU-MIB::rPDUSensorTempStatusTempC
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.150.2.2.1.5.{{ $index }}'
                     index: 'rPDUSensorTempStatusTempC.{{ $index }}'
                     descr: 'Temperature'
@@ -94,7 +98,8 @@ modules:
         humidity:
             data:
                 -
-                    oid: rPDUSnsorHumStatRelativeHumdity
+                    oid: DellrPDU-MIB::rPDUSnsorHumStatRelativeHumdity
+                    value: DellrPDU-MIB::rPDUSnsorHumStatRelativeHumdity
                     num_oid: '.1.3.6.1.4.1.674.10903.200.2.200.150.3.2.1.4.{{ $index }}'
                     index: 'rPDUSnsorHumStatRelativeHumdity .{{ $index }}'
                     descr: 'Humidity'

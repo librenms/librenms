@@ -1,4 +1,3 @@
-mib: DELL-NETWORKING-CHASSIS-MIB:DELL-NETWORKING-IF-EXTENSION-MIB:DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB
 modules:
     mempools:
         additional_oids:
@@ -7,10 +6,10 @@ modules:
                 - DELL-NETWORKING-CHASSIS-MIB::dellNetProcessorTable
         data:
             -
-                snmp_flags: '-OQUs'
+                snmp_flags: '-OQ'
                 oid: DELL-NETWORKING-CHASSIS-MIB::dellNetCpuUtilTable
-                total: dellNetProcessorMemSize
-                percent_used: dellNetCpuUtilMemUsage
+                total: DELL-NETWORKING-CHASSIS-MIB::dellNetProcessorMemSize
+                percent_used: DELL-NETWORKING-CHASSIS-MIB::dellNetCpuUtilMemUsage
                 precision: 1048576
                 type: dell-net
                 descr: 'Memory Usage'
@@ -33,16 +32,16 @@ modules:
     processors:
         data:
             -
-                snmp_flags: ['-ObsQ']
-                oid: dellNetCpuUtilTable
-                value: dellNetCpuUtil1Min
+                snmp_flags: ['-OQ']
+                oid: DELL-NETWORKING-CHASSIS-MIB::dellNetCpuUtilTable
+                value: DELL-NETWORKING-CHASSIS-MIB::dellNetCpuUtil1Min
                 num_oid: '.1.3.6.1.4.1.6027.3.26.1.4.4.1.4.{{ $index }}'
                 descr: '1m Utilization'
                 index: 'dellNetCpuUtil1Min.{{ $index }}'
             -
-                snmp_flags: ['-ObsQ']
-                oid: dellNetCpuUtilTable
-                value: dellNetCpuUtil5Min
+                snmp_flags: ['-OQ']
+                oid: DELL-NETWORKING-CHASSIS-MIB::dellNetCpuUtilTable
+                value: DELL-NETWORKING-CHASSIS-MIB::dellNetCpuUtil5Min
                 num_oid: '.1.3.6.1.4.1.6027.3.26.1.4.4.1.5.{{ $index }}'
                 descr: '5m Utilization'
                 index: 'dellNetCpuUtil5Min.{{ $index }}'
@@ -52,41 +51,41 @@ modules:
                 skip_values: 0
             data:
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransVoltage
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransVoltage
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.17.{{ $index }}'
-                    descr: '{{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: '{{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransVoltage.{{ $index }}'
         current:
             options:
                 skip_values: 0
             data:
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransTransmitBiasCurrentLane1
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransTransmitBiasCurrentLane1
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.18.{{ $index }}'
-                    descr: '{{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: '{{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitBiasCurrentLane1.{{ $index }}'
                     group: Lane 1
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransTransmitBiasCurrentLane2
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransTransmitBiasCurrentLane2
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.19.{{ $index }}'
-                    descr: '{{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: '{{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitBiasCurrentLane2.{{ $index }}'
                     group: Lane 2
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransTransmitBiasCurrentLane3
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransTransmitBiasCurrentLane3
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.20.{{ $index }}'
-                    descr: '{{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: '{{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitBiasCurrentLane3.{{ $index }}'
                     group: Lane 3
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransTransmitBiasCurrentLane4
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransTransmitBiasCurrentLane4
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.21.{{ $index }}'
-                    descr: '{{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: '{{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitBiasCurrentLane4.{{ $index }}'
                     group: Lane 4
         dbm:
@@ -94,59 +93,59 @@ modules:
                 skip_values: 0
             data:
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransTransmitPowerLane1
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransTransmitPowerLane1
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.8.{{ $index }}'
-                    descr: 'Tx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: 'Tx {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitPowerLane1.{{ $index }}'
                     group: Lane 1
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransReceivePowerLane1
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransReceivePowerLane1
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.12.{{ $index }}'
-                    descr: 'Rx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: 'Rx {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransReceivePowerLane1.{{ $index }}'
                     group: Lane 1
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransTransmitPowerLane2
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransTransmitPowerLane2
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.9.{{ $index }}'
-                    descr: 'Tx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: 'Tx {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitPowerLane2.{{ $index }}'
                     group: Lane 2
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransReceivePowerLane2
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransReceivePowerLane2
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.13.{{ $index }}'
-                    descr: 'Rx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: 'Rx {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransReceivePowerLane2.{{ $index }}'
                     group: Lane 2
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransTransmitPowerLane3
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransTransmitPowerLane3
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.10.{{ $index }}'
-                    descr: 'Tx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: 'Tx {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitPowerLane3.{{ $index }}'
                     group: Lane 3
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransReceivePowerLane3
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransReceivePowerLane3
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.14.{{ $index }}'
-                    descr: 'Rx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: 'Rx {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransReceivePowerLane3.{{ $index }}'
                     group: Lane 3
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransTransmitPowerLane4
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransTransmitPowerLane4
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.11.{{ $index }}'
-                    descr: 'Tx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: 'Tx {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransTransmitPowerLane4.{{ $index }}'
                     group: Lane 4
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransReceivePowerLane4
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransReceivePowerLane4
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.15.{{ $index }}'
-                    descr: 'Rx {{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: 'Rx {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     index: 'dellNetIfTransReceivePowerLane4.{{ $index }}'
                     group: Lane 4
         temperature:
@@ -154,24 +153,24 @@ modules:
                 skip_values: 0
             data:
                 -
-                    oid: dellNetStackUnitTable
-                    value: dellNetStackUnitTemp
+                    oid: DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitTable
+                    value: DELL-NETWORKING-CHASSIS-MIB::dellNetStackUnitTemp
                     num_oid: '.1.3.6.1.4.1.6027.3.26.1.3.4.1.13.{{ $index }}'
                     descr: 'Stack Unit {{ $index }}'
                     group: Chassis
                 -
-                    oid: dellNetIfTransceiverDataTable
-                    value: dellNetIfTransTemperature
+                    oid: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransceiverDataTable
+                    value: DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransTemperature
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.16.{{ $index }}'
-                    descr: '{{ $dellNetIfTransPort }} {{ $dellNetIfTransOpticsType }}'
+                    descr: '{{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransPort }} {{ DELL-NETWORKING-IF-EXTENSION-MIB::dellNetIfTransOpticsType }}'
                     group: Transceivers
         state:
             data:
                 -
-                    oid: dellNetFanTrayTable
-                    value: dellNetFanTrayOperStatus
+                    oid: DELL-NETWORKING-CHASSIS-MIB::dellNetFanTrayTable
+                    value: DELL-NETWORKING-CHASSIS-MIB::dellNetFanTrayOperStatus
                     num_oid: '.1.3.6.1.4.1.6027.3.26.1.4.7.1.4.{{ $index }}'
-                    descr: 'Fantray {{ $dellNetFanTrayIndex }}'
+                    descr: 'Fantray {{ DELL-NETWORKING-CHASSIS-MIB::dellNetFanTrayIndex }}'
                     group: Fans
                     state_name: dellNetFanTrayOperStatus
                     states:
@@ -179,10 +178,10 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: absent, graph: 1, generic: 2 }
                 -
-                    oid: dellNetPowerSupplyTable
-                    value: dellNetPowerSupplyOperStatus
+                    oid: DELL-NETWORKING-CHASSIS-MIB::dellNetPowerSupplyTable
+                    value: DELL-NETWORKING-CHASSIS-MIB::dellNetPowerSupplyOperStatus
                     num_oid: '.1.3.6.1.4.1.6027.3.26.1.4.6.1.4.{{ $index }}'
-                    descr: 'PSU {{ $dellNetPowerSupplyIndex }}'
+                    descr: 'PSU {{ DELL-NETWORKING-CHASSIS-MIB::dellNetPowerSupplyIndex }}'
                     group: PSUs
                     state_name: dellNetPowerSupplyOperStatus
                     states:
@@ -190,14 +189,14 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: absent, graph: 1, generic: 2 }
                 -
-                    oid: dellNetVirtualLinkDetailsTable
-                    value: dellNetVLTDetailLocalStatus
+                    oid: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVirtualLinkDetailsTable
+                    value: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVLTDetailLocalStatus
                     num_oid: '.1.3.6.1.4.1.6027.3.17.1.3.1.3.{{ $index }}'
-                    descr: 'Port-channel {{ $dellNetVLTDetailLocalLagID }}'
+                    descr: 'Port-channel {{ DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVLTDetailLocalLagID }}'
                     group: 'VIRTUAL-LINK-TRUNK'
                     skip_values:
                     -
-                      oid: dellNetVLTDetailPeerStatus
+                      oid: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVLTDetailPeerStatus
                       op: '='
                       value: 0
                     state_name: dellNetVLTDetailLocalStatus
@@ -205,8 +204,8 @@ modules:
                         - { value: 0, descr: down, graph: 1, generic: 2 }
                         - { value: 1, descr: up,   graph: 1, generic: 0 }
                 -
-                    oid: dellNetVirtualLinkTrunkTable
-                    value: dellNetVLTIclBwStatus
+                    oid: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVirtualLinkTrunkTable
+                    value: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVLTIclBwStatus
                     num_oid: '.1.3.6.1.4.1.6027.3.17.1.1.1.20.{{ $index }}'
                     descr: 'ICL Bandwidth'
                     group: 'VIRTUAL-LINK-TRUNK'
@@ -215,8 +214,8 @@ modules:
                         - { value: 0, descr: '<80%', graph: 1, generic: 0 }
                         - { value: 1, descr: '>80%', graph: 1, generic: 1 }
                 -
-                    oid: dellNetVirtualLinkTrunkTable
-                    value: dellNetVLTIclStatus
+                    oid: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVirtualLinkTrunkTable
+                    value: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVLTIclStatus
                     num_oid: '.1.3.6.1.4.1.6027.3.17.1.1.1.7.{{ $index }}'
                     descr: 'Link Status'
                     group: 'VIRTUAL-LINK-TRUNK'
@@ -227,8 +226,8 @@ modules:
                         - { value: 2, descr: 'down', graph: 1, generic: 2 }
                         - { value: 3, descr: 'error', graph: 1, generic: 1 }
                 -
-                    oid: dellNetVirtualLinkTrunkTable
-                    value: dellNetVLTRole
+                    oid: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVirtualLinkTrunkTable
+                    value: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVLTRole
                     num_oid: '.1.3.6.1.4.1.6027.3.17.1.1.1.5.{{ $index }}'
                     descr: 'Role'
                     group: 'VIRTUAL-LINK-TRUNK'

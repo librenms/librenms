@@ -1,4 +1,3 @@
-mib: GAM-SYSUTIL-MIB
 modules:
     os:
         hardware: GAM-SYSUTIL-MIB::gamSysutilStatusBoardInfoBoardType.0

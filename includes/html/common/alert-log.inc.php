@@ -14,6 +14,8 @@
 * @author     LibreNMS Contributors
 */
 
+use App\Models\Alert;
+
 $param = [];
 
 $pagetitle[] = 'Alert Log';
@@ -36,7 +38,8 @@ $alert_severities = [
     'OK' => 1,
 ];
 
-if (Auth::user()->hasGlobalAdmin()) {
+$admin_verbose_details = '';
+if (Gate::allows('detail', Alert::class)) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 
@@ -59,7 +62,7 @@ $common_output[] = '
         <thead>
         <tr>
             <th data-column-id="status">State</th>
-            <th data-column-id="time_logged" data-order="desc">Timestamp</th>
+            <th data-column-id="time_logged" data-order="desc" data-converter="datetime">Timestamp</th>
             <th data-column-id="details" data-sortable="false">&nbsp;</th>
             <th data-column-id="hostname">Device</th>
             <th data-column-id="alert_rule">Alert</th>
@@ -72,7 +75,7 @@ $common_output[] = '
 </div>
 
 <script>
-
+document.addEventListener("DOMContentLoaded", function () {
     var grid = $("#alertlog").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
@@ -119,6 +122,11 @@ $common_output[] = '</select> \
                 state: $(\'#state\').val(),
                 severity: $(\'#severity\').val() || []
             };
+        },
+        converters: {
+            datetime: {
+              to: LibreNMS.Date.display
+            }
         }
     }).on("loaded.rs.jquery.bootgrid", function () {
 
@@ -184,6 +192,7 @@ $common_output[] = '</select> \
         window.history.pushState({path: newUrl}, "", newUrl);
         grid.bootgrid("reload");
     });
+});
 </script>
 <style>
 .severity-select-box .select2-search--inline {

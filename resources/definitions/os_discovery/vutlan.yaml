@@ -1,4 +1,3 @@
-mib: VUTLAN-SYSTEM-MIB
 modules:
     os:
         sysDescr_regex: '/Vutlan EMS/'

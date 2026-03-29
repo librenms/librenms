@@ -1,4 +1,3 @@
-mib: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
 modules:
     os:
         hardware_mib: CISCO-PRODUCTS-MIB
@@ -8,18 +7,19 @@ modules:
             data:
                 -
                     oid:
-                        - cucsEquipmentChassisDn
-                        - cucsEquipmentFanModuleDn
-                        - cucsEquipmentPsuDn
+                        - CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentChassisDn
+                        - CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentFanModuleDn
+                        - CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentPsuDn
         state:
             data:
                 -
-                    oid: cucsEquipmentChassisOperState
-                    value: cucsEquipmentChassisOperState
+                    oid: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentChassisOperState
+                    value: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentChassisOperState
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.15.7.1.27.{{ $index }}'
-                    descr: 'Chassis - {{ $cucsEquipmentChassisDn }}'
+                    descr: 'Chassis - {{ CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentChassisDn }}'
                     index: '{{ $index }}'
                     group: Chassis
+                    state_name: cucsEquipmentChassisOperState
                     states:
                         - { value: 0, descr: unknown, graph: 1, generic: 3 }
                         - { value: 1, descr: operable, graph: 1, generic: 0 }
@@ -52,12 +52,13 @@ modules:
                         - { value: 107, descr: auto upgrade, graph: 1, generic: 3 }
 
                 -
-                    oid: cucsEquipmentFanModuleOperState
-                    value: cucsEquipmentFanModuleOperState
+                    oid: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentFanModuleOperState
+                    value: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentFanModuleOperState
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.15.13.1.7.{{ $index }}'
-                    descr: 'Fan Module - {{ $cucsEquipmentFanModuleDn }}'
+                    descr: 'Fan Module - {{ CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentFanModuleDn }}'
                     index: '{{ $index }}'
                     group: Fans
+                    state_name: cucsEquipmentFanModuleOperState
                     states:
                         - { value: 0, descr: unknown, graph: 1, generic: 3 }
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
@@ -70,12 +71,13 @@ modules:
                         - { value: 100, descr: not supported, graph: 1, generic: 3 }
 
                 -
-                    oid: cucsEquipmentPsuPower
-                    value: cucsEquipmentPsuPower
+                    oid: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentPsuPower
+                    value: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentPsuPower
                     num_oid: '.1.3.6.1.4.1.9.9.719.1.15.56.1.10.{{ $index }}'
-                    descr: 'PSU - {{ $cucsEquipmentPsuDn }}'
+                    descr: 'PSU - {{ CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentPsuDn }}'
                     index: '{{ $index }}'
                     group: PSU
+                    state_name: cucsEquipmentPsuPower
                     states:
                         - { value: 0, descr: unknown, graph: 1, generic: 3 }
                         - { value: 1, descr: on, graph: 1, generic: 0 }

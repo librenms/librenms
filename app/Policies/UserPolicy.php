@@ -3,61 +3,60 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UserPolicy
 {
-    use HandlesAuthorization;
+    use ChecksGlobalPermissions;
+
+    public function viewAny(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'view')
+            || $this->hasGlobalPermission($user, 'create')
+            || $this->hasGlobalPermission($user, 'update')
+            || $this->hasGlobalPermission($user, 'delete');
+    }
 
     /**
      * Determine whether the user can view the user.
-     *
-     * @param  User  $user
-     * @param  User  $target
      */
-    public function view(User $user, User $target): ?bool
+    public function view(User $user, ?User $target = null): bool
     {
-        return $target->is($user) ?: null;  // allow users to view themselves
+        return ($target && $user->is($target)) // allow users to view themselves
+            || $this->hasGlobalPermission($user, 'view');
     }
 
     /**
      * Determine whether the user can create users.
-     *
-     * @param  User  $user
      */
-    public function create(User $user): ?bool
+    public function create(User $user): bool
     {
-        // if not mysql, forbid, otherwise defer to bouncer
+        // if not mysql, forbid
         if (\App\Facades\LibrenmsConfig::get('auth_mechanism') != 'mysql') {
             return false;
         }
 
-        return null;
+        return $this->hasGlobalPermission($user, 'create');
     }
 
     /**
      * Determine whether the user can update the user.
-     *
-     * @param  User  $user
-     * @param  User  $target
      */
-    public function update(User $user, ?User $target = null): ?bool
+    public function update(User $user, ?User $target = null): bool
     {
-        if ($target == null) {
-            return null;
-        }
-
-        return $target->is($user) ?: null; // allow user to update self or defer to bouncer
+        return ($target && $user->is($target)) // allow users to update themselves
+            || $this->hasGlobalPermission($user, 'update');
     }
 
     /**
      * Determine whether the user can delete the user.
-     *
-     * @param  User  $user
-     * @param  User  $target
      */
-    public function delete(User $user, User $target): ?bool
+    public function delete(User $user, ?User $target = null): bool
     {
-        return $target->is($user) ? false : null; // do not allow users to delete themselves or defer to bouncer
+        // do not allow users to delete themselves
+        if ($target && $user->is($target)) {
+            return false;
+        }
+
+        return $this->hasGlobalPermission($user, 'delete');
     }
 }

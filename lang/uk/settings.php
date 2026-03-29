@@ -466,8 +466,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -939,9 +939,6 @@ return [
             'description' => 'Суфікс імені файлу',
             'help' => 'Важливе налаштування та як імена пристроїв в NfSen обмежені 21 символом. Це значить що повні доменні імена пристроїв можуть не вміщатися, тому дане налаштування зазвичай не використовується.',
         ],
-        'nmap' => [
-            'description' => 'Шлях до nmap',
-        ],
         'opentsdb' => [
             'enable' => [
                 'description' => 'Увімкнути',
@@ -1023,9 +1020,6 @@ return [
             'description' => 'Погані інтерфейси',
             'help' => 'Типи мережевих інтерфейсів щр мають бути проігноровані',
         ],
-        'ping' => [
-            'description' => 'Шлях до ping',
-        ],
         'ping_rrd_step' => [
             'description' => 'Частота Ping',
             'help' => 'Частота перевірок. Є значенням за замовчуванням для всіх пристроїв. Увага! При зміні цього значення необхідно ввести додаткоі зміни.  Зверніться до документації Fast Ping.',
@@ -1103,8 +1097,8 @@ return [
             'slas' => [
                 'description' => 'Service Level Agreement Tracking',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC Accounting',
+            'mac-accounting' => [
+                'description' => 'MAC Accounting',
             ],
             'cipsec-tunnels' => [
                 'description' => 'Тунелі Cipsec',
@@ -1518,9 +1512,6 @@ return [
         'device_location_map_open' => [
             'description' => 'Відкрита мапа місцезнаходження',
             'help' => 'Мапа місцезнаходження показана за замовчуванням',
-        ],
-        'whois' => [
-            'description' => 'Шлях до whois',
         ],
         'smokeping.integration' => [
             'description' => 'Увімкнути',

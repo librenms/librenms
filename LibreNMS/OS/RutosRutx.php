@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
@@ -47,7 +48,7 @@ class RutosRutx extends OS implements
         $sensors = [];
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'rssi',
+                WirelessSensorType::Rssi,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.12.' . $index,
                 'rutos-rutx',
@@ -67,7 +68,7 @@ class RutosRutx extends OS implements
         $sensors = [];
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'rsrp',
+                WirelessSensorType::Rsrp,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.20.' . $index,
                 'rutos-rutx',
@@ -87,7 +88,7 @@ class RutosRutx extends OS implements
         $sensors = [];
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'rsrq',
+                WirelessSensorType::Rsrq,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.21.' . $index,
                 'rutos-rutx',
@@ -107,7 +108,7 @@ class RutosRutx extends OS implements
         $sensors = [];
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'sinr',
+                WirelessSensorType::Sinr,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.19.' . $index,
                 'rutos-rutx',
@@ -127,7 +128,7 @@ class RutosRutx extends OS implements
         $sensors = [];
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
-                'cell',
+                WirelessSensorType::Cell,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.18.' . $index,
                 'rutos-rutx',

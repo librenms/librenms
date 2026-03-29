@@ -1,41 +1,42 @@
-mib: SNR-ERD-4
 modules:
     additional_oids:
         data:
             -
                 oid:
-                 - diName
-                 - diAlarmName
-                 - doName
-                 - doDeviceName
-                 - rsshtpName
+                 - SNR-ERD-4::diName
+                 - SNR-ERD-4::diAlarmName
+                 - SNR-ERD-4::doName
+                 - SNR-ERD-4::doDeviceName
+                 - SNR-ERD-4::rsshtpName
     sensors:
         temperature:
             data:
                 -
-                    oid: rsshtpTemp
+                    oid: SNR-ERD-4::rsshtpTemp
                     num_oid: '.1.3.6.1.4.1.40418.2.6.1.30.1.1.3.{{ $index }}'
-                    descr: '{{ $rsshtpName }} {{ $index }}'
+                    descr: '{{ SNR-ERD-4::rsshtpName }} {{ $index }}'
         state:
             data:
                 -
-                    oid: diTable
-                    value: diState
+                    oid: SNR-ERD-4::diTable
+                    value: SNR-ERD-4::diState
                     num_oid: '.1.3.6.1.4.1.40418.2.6.2.1.1.3.{{ $index }}'
-                    descr: "{{ $diName }} {{ $diAlarmName }}"
+                    descr: "{{ SNR-ERD-4::diName }} {{ SNR-ERD-4::diAlarmName }}"
                     index: "diState.{{ $index }}"
                     group: "Ports DI"
+                    state_name: diTable
                     states:
                         - { descr: Connected, graph: 1, value: 0, generic: 0 }
                         - { descr: Empty, graph: 1, value: 1, generic: 1 }
                         - { descr: Off, graph: 1, value: 2, generic: 2 }
                 -
-                    oid: doTable
-                    value: doState
+                    oid: SNR-ERD-4::doTable
+                    value: SNR-ERD-4::doState
                     num_oid: '.1.3.6.1.4.1.40418.2.6.2.2.1.3.{{ $index }}'
-                    descr: "{{ $doName }} {{ $doDeviceName }}"
+                    descr: "{{ SNR-ERD-4::doName }} {{ SNR-ERD-4::doDeviceName }}"
                     index: "doState.{{ $index }}"
                     group: "Ports DO"
+                    state_name: doTable
                     states:
                         - { descr: Off, graph: 1, value: 0, generic: 1 }
                         - { descr: On, graph: 1, value: 1, generic: 0 }
@@ -43,12 +44,12 @@ modules:
         humidity:
             data:
                 -
-                    oid: rsshtpHum
+                    oid: SNR-ERD-4::rsshtpHum
                     num_oid: '.1.3.6.1.4.1.40418.2.6.1.30.1.1.4.{{ $index }}'
-                    descr: '{{ $rsshtpName }} {{ $index }}'
+                    descr: '{{ SNR-ERD-4::rsshtpName }} {{ $index }}'
         pressure:
             data:
                 -
-                    oid: rsshtpPssr
+                    oid: SNR-ERD-4::rsshtpPssr
                     num_oid: '.1.3.6.1.4.1.40418.2.6.1.30.1.1.6.{{ $index }}'
-                    descr: '{{ $rsshtpName }} {{ $index }}'
+                    descr: '{{ SNR-ERD-4::rsshtpName }} {{ $index }}'

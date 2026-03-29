@@ -5,6 +5,7 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use App\Models\Sensor;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -67,10 +68,10 @@ class GrandstreamAp extends OS implements
                 }
             }
             $total_clients += $client_count;
-            $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), [], 'grandstream-ap', $ssid_name, $description, $client_count);
+            $sensors[] = new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), [], 'grandstream-ap', $ssid_name, $description, $client_count);
         }
 
-        $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), [], 'grandstream-ap', 'total-clients', 'Total Clients', $total_clients);
+        $sensors[] = new WirelessSensor(WirelessSensorType::Clients, $this->getDeviceId(), [], 'grandstream-ap', 'total-clients', 'Total Clients', $total_clients);
 
         return $sensors;
     }
@@ -107,7 +108,7 @@ class GrandstreamAp extends OS implements
         foreach ($data as $index => $entry) {
             if (isset($entry['GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioChannel'])) {
                 $sensors[] = new WirelessSensor(
-                    'channel',
+                    WirelessSensorType::Channel,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.42397.1.1.3.1.1.4.' . $index,
                     'grandstream-ap',
@@ -137,7 +138,7 @@ class GrandstreamAp extends OS implements
         foreach ($data as $index => $entry) {
             if (isset($entry['GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioTransmitPower'])) {
                 $sensors[] = new WirelessSensor(
-                    'power',
+                    WirelessSensorType::Power,
                     $this->getDeviceId(),
                     '.1.3.6.1.4.1.42397.1.1.3.1.1.5.' . $index,
                     'grandstream-ap',

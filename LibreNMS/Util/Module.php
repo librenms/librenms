@@ -68,7 +68,7 @@ class Module
 
         Log::info(sprintf(">> Runtime for %s module '%s': %.4f seconds with %s bytes", $type->name, $module, $module_time, $module_mem));
 
-        if ($type == ProcessType::discovery) {
+        if ($type == ProcessType::Discovery) {
             return; // do not record for now as there is currently no rrd during discovery
         }
 

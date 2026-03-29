@@ -1,4 +1,3 @@
-mib: FORTINET-FORTIAP-MIB
 modules:
     os:
         version: FORTINET-FORTIAP-MIB::fapVersion.0
@@ -22,27 +21,28 @@ modules:
         temperature:
             data:
                 -
-                    oid: fapTemperature
+                    oid: FORTINET-FORTIAP-MIB::fapTemperature
                     num_oid: '.1.3.6.1.4.1.12356.120.3.44.{{ $index }}'
                     index: fapTemperature
                     descr: Temperature
-                    value: fapTemperature
+                    value: FORTINET-FORTIAP-MIB::fapTemperature
         count:
             data:
                 -
-                    oid: fapStationCount
+                    oid: FORTINET-FORTIAP-MIB::fapStationCount
                     num_oid: '.1.3.6.1.4.1.12356.120.3.43.{{ $index }}'
                     index: fapStationCount
                     descr: 'Station Count'
-                    value: fapStationCount
+                    value: FORTINET-FORTIAP-MIB::fapStationCount
         state:
             data:
                 -
-                    oid: fapPoeModeOper
+                    oid: FORTINET-FORTIAP-MIB::fapPoeModeOper
                     num_oid: '.1.3.6.1.4.1.12356.120.3.4.{{ $index }}'
+                    state_name: fapPoeModeOper
                     index: fapPoeModeOper
                     descr: 'Operating PoE Mode'
-                    value: fapPoeModeOper
+                    value: FORTINET-FORTIAP-MIB::fapPoeModeOper
                     states:
                         - { value: 0, descr: 'Autodetect', graph: 1, generic: 0 }
                         - { value: 1, descr: '802.3af', graph: 1, generic: 1 }

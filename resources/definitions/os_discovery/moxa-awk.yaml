@@ -1,4 +1,3 @@
-mib: MOXA-AWK4131A-MIB
 modules:
     os:
         hardware: MOXA-AWK4131A-MIB::overviewModelName.0
@@ -13,6 +12,6 @@ modules:
     processors:
         data:
             -
-                oid: cpuUsage
+                oid: MOXA-AWK4131A-MIB::cpuUsage
                 num_oid: '.1.3.6.1.4.1.8691.15.34.1.11.25.1.{{ $index }}'
                 type: moxa-cpu

@@ -43,7 +43,7 @@ class DeviceDiscover extends LnmsCommand
     use ProcessesDevices;
 
     protected $name = 'device:discover';
-    protected ProcessType $processType = ProcessType::discovery;
+    protected ProcessType $processType = ProcessType::Discovery;
 
     public function __construct()
     {

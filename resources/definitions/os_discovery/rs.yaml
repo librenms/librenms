@@ -1,4 +1,3 @@
-mib: RS-COMMON-MIB:RS-XX8000-COMMON-MIB:RS-XX8000-DVB-TX-MIB:IRT-DVBT-SINGLETRANSMITTER-MIB
 modules:
     os:
         serial: RS-XX8000-COMMON-MIB::serialNumber.0
@@ -8,22 +7,22 @@ modules:
         power:
             data:
                 -
-                    oid: forwardPower
-                    value: forwardPower
+                    oid: RS-XX8000-DVB-TX-MIB::forwardPower
+                    value: RS-XX8000-DVB-TX-MIB::forwardPower
                     descr: 'Output Power'
                     num_oid: '.1.3.6.1.4.1.2566.127.1.2.167.4.1.2.5.{{ $index }}'
                     index: 'forwardPower.{{ $index }}'
                 -
-                    oid: reflectedPower
-                    value: reflectedPower
+                    oid: RS-XX8000-DVB-TX-MIB::reflectedPower
+                    value: RS-XX8000-DVB-TX-MIB::reflectedPower
                     descr: 'Reflected Power'
                     num_oid: '.1.3.6.1.4.1.2566.127.1.2.167.4.1.2.6.{{ $index }}'
                     index: 'reflectedPower.{{ $index }}'
         state:
             data:
                 -
-                    oid: dvbSTTransmitterOpMode
-                    value: dvbSTTransmitterOpMode
+                    oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTTransmitterOpMode
+                    value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTTransmitterOpMode
                     descr: 'Transmitter Operational Mode'
                     num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.3.{{ $index }}'
                     index: 'dvbSTTransmitterOpMode.{{ $index }}'
@@ -33,8 +32,8 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: ON }
                         - { value: 2, generic: 1, graph: 0, descr: OFF }
                 -
-                    oid: dvbSTRFPresent
-                    value: dvbSTRFPresent
+                    oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTRFPresent
+                    value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTRFPresent
                     descr: 'Output Power'
                     num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.4.{{ $index }}'
                     index: 'dvbSTRFPresent.{{ $index }}'
@@ -44,8 +43,8 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: Present }
                         - { value: 2, generic: 1, graph: 0, descr: 'Not Present' }
                 -
-                    oid: dvbSTFault
-                    value: dvbSTFault
+                    oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTFault
+                    value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTFault
                     descr: 'Fault status'
                     num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.6.{{ $index }}'
                     index: 'dvbSTFault.{{ $index }}'
@@ -55,8 +54,8 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: Fault }
                         - { value: 2, generic: 0, graph: 0, descr: OK }
                 -
-                    oid: dvbSTWarning
-                    value: dvbSTWarning
+                    oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTWarning
+                    value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTWarning
                     descr: 'Warning status'
                     num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.7.{{ $index }}'
                     index: 'dvbSTWarning.{{ $index }}'
@@ -66,8 +65,8 @@ modules:
                         - { value: 1, generic: 1, graph: 0, descr: Warning }
                         - { value: 2, generic: 0, graph: 0, descr: OK }
                 -
-                    oid: dvbSTInput1OK
-                    value: dvbSTInput1OK
+                    oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTInput1OK
+                    value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTInput1OK
                     descr: 'Input 1'
                     num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.8.{{ $index }}'
                     index: 'dvbSTInput1OK.{{ $index }}'
@@ -77,8 +76,8 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: Ok }
                         - { value: 2, generic: 1, graph: 0, descr: 'No Signal' }
                 -
-                    oid: dvbSTInput2OK
-                    value: dvbSTInput2OK
+                    oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTInput2OK
+                    value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTInput2OK
                     descr: 'Input 2'
                     num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.9.{{ $index }}'
                     index: 'dvbSTInput2OK.{{ $index }}'
@@ -88,8 +87,8 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: Ok }
                         - { value: 2, generic: 1, graph: 0, descr: 'No Signal' }
                 -
-                    oid: dvbSTLocalMode
-                    value: dvbSTLocalMode
+                    oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTLocalMode
+                    value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTLocalMode
                     descr: 'Configuration Mode'
                     num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.10.{{ $index }}'
                     index: 'dvbSTLocalMode.{{ $index }}'
@@ -99,8 +98,8 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: Local }
                         - { value: 2, generic: 0, graph: 0, descr: Remote }
                 -
-                    oid: dvbSTActiveInput
-                    value: dvbSTActiveInput
+                    oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTActiveInput
+                    value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTActiveInput
                     descr: 'Active Input'
                     num_oid: '.1.3.6.1.4.1.19831.1.1.1.1.1.11.{{ $index }}'
                     index: 'dvbSTActiveInput.{{ $index }}'

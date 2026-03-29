@@ -92,8 +92,8 @@ class ModuleList
     public function modulesWithStatus(ProcessType $type, Device $device): array
     {
         $default_modules = match ($type) {
-            ProcessType::poller => LibrenmsConfig::get('poller_modules', []),
-            ProcessType::discovery => LibrenmsConfig::get('discovery_modules', []),
+            ProcessType::Poller => LibrenmsConfig::get('poller_modules', []),
+            ProcessType::Discovery => LibrenmsConfig::get('discovery_modules', []),
         };
 
         $modules_with_overrides = empty($this->overrides)
@@ -114,14 +114,14 @@ class ModuleList
         $override = $this->overrides[$module_name] ?? null;
 
         return match ($type) {
-            ProcessType::discovery => new ModuleStatus(
+            ProcessType::Discovery => new ModuleStatus(
                 LibrenmsConfig::get("discovery_modules.$module_name"),
                 LibrenmsConfig::get("os.{$device->os}.discovery_modules.$module_name"),
                 $device->getAttrib("discover_$module_name"),
                 $override == null ? null : true,
                 is_array($override) ? $override : null,
             ),
-            ProcessType::poller => new ModuleStatus(
+            ProcessType::Poller => new ModuleStatus(
                 LibrenmsConfig::get("poller_modules.$module_name"),
                 LibrenmsConfig::get("os.{$device->os}.poller_modules.$module_name"),
                 $device->getAttrib("poll_$module_name"),

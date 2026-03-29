@@ -122,7 +122,7 @@ class PollDevice implements ShouldQueue
 
         $datastore = app('Datastore');
 
-        foreach ($this->moduleList->modulesWithStatus(ProcessType::poller, $this->device) as $module => $module_status) {
+        foreach ($this->moduleList->modulesWithStatus(ProcessType::Poller, $this->device) as $module => $module_status) {
             $should_poll = false;
             $start_memory = memory_get_usage();
             $module_start = microtime(true);
@@ -155,7 +155,7 @@ class PollDevice implements ShouldQueue
             if ($should_poll) {
                 Log::info('');
                 app(MeasurementManager::class)->printChangedStats();
-                Module::savePerformance($module, ProcessType::poller, $module_start, $start_memory);
+                Module::savePerformance($module, ProcessType::Poller, $module_start, $start_memory);
                 $this->os->enableGraph('poller_modules_perf');
                 Log::info("#### Unload poller module $module ####\n");
             }

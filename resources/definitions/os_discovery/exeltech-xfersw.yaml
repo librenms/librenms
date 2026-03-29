@@ -1,0 +1,257 @@
+modules:
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: EXELTECH-XFERSW::batV
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.0.1.{{ $index }}'
+                    descr: "Battery Voltage"
+                    index: batV.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::aBusV
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.0.3.{{ $index }}'
+                    descr: "A Bus Voltage"
+                    index: aBusV.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::bBusV
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.0.4.{{ $index }}'
+                    descr: "B Bus Voltage"
+                    index: bBusV.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::voltage1a
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.1.1.{{ $index }}'
+                    descr: "Source 1a Voltage"
+                    index: voltage1a.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::voltage1b
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.1.4.{{ $index }}'
+                    descr: "Source 1b Voltage"
+                    index: voltage1b.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::ACVOut1
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.1.7.{{ $index }}'
+                    descr: "Source 1 Output Voltage"
+                    index: ACVOut1.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::voltage2a
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.2.1.{{ $index }}'
+                    descr: "Source 2a Voltage"
+                    index: voltage2a.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::voltage2b
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.2.4.{{ $index }}'
+                    descr: "Source 2b Voltage"
+                    index: voltage2b.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::ACVOut2
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.2.7.{{ $index }}'
+                    descr: "Source 2 Output Voltage"
+                    index: ACVOut2.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::voltage3a
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.3.1.{{ $index }}'
+                    descr: "Source 3a Voltage"
+                    index: voltage3a.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::voltage3b
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.3.4.{{ $index }}'
+                    descr: "Source 3b Voltage"
+                    index: voltage3b.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::ACVOut3
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.3.7.{{ $index }}'
+                    descr: "Source 3 Output Voltage"
+                    index: ACVOut3.{{ $index }}
+                    divisor: 10
+        current:
+            data:
+                -
+                    oid: EXELTECH-XFERSW::batI
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.0.2.{{ $index }}'
+                    descr: "Battery Current"
+                    index: batI.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::current1a
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.1.2.{{ $index }}'
+                    descr: "Source 1a Current"
+                    index: current1a.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::current1b
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.1.5.{{ $index }}'
+                    descr: "Source 1b Current"
+                    index: current1b.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::current2a
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.2.2.{{ $index }}'
+                    descr: "Source 2a Current"
+                    index: current2a.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::current2b
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.2.5.{{ $index }}'
+                    descr: "Source 2b Current"
+                    index: current2b.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::current3a
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.3.2.{{ $index }}'
+                    descr: "Source 3a Current"
+                    index: current3a.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::current3b
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.3.5.{{ $index }}'
+                    descr: "Source 3b Current"
+                    index: current3b.{{ $index }}
+                    divisor: 10
+        frequency:
+            data:
+                -
+                    oid: EXELTECH-XFERSW::freq1a
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.1.3.{{ $index }}'
+                    descr: "Source 1a Frequency"
+                    index: freq1a.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::freq1b
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.1.6.{{ $index }}'
+                    descr: "Source 1b Frequency"
+                    index: freq1b.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::freq2a
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.2.3.{{ $index }}'
+                    descr: "Source 2a Frequency"
+                    index: freq2a.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::freq2b
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.2.6.{{ $index }}'
+                    descr: "Source 2b Frequency"
+                    index: freq2b.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::freq3a
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.3.3.{{ $index }}'
+                    descr: "Source 3a Frequency"
+                    index: freq3a.{{ $index }}
+                    divisor: 10
+                -
+                    oid: EXELTECH-XFERSW::freq3b
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.3.6.{{ $index }}'
+                    descr: "Source 3b Frequency"
+                    index: freq3b.{{ $index }}
+                    divisor: 10
+        temperature:
+            data:
+                -
+                    oid: EXELTECH-XFERSW::SCRTemp1
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.1.8.{{ $index }}'
+                    descr: "Source 1 SCR Temperature"
+                    index: SCRTemp1.{{ $index }}
+                -
+                    oid: EXELTECH-XFERSW::SCRTemp2
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.2.8.{{ $index }}'
+                    descr: "Source 2 SCR Temperature"
+                    index: SCRTemp2.{{ $index }}
+                -
+                    oid: EXELTECH-XFERSW::SCRTemp3
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.3.8.{{ $index }}'
+                    descr: "Source 3 SCR Temperature"
+                    index: SCRTemp3.{{ $index }}
+        state:
+            data:
+                -
+                    oid: EXELTECH-XFERSW::source1Alarms
+                    value: EXELTECH-XFERSW::source1Alarms
+                    state_name: source1Alarms
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.4.1.{{ $index }}'
+                    descr: "Source 1 Alarms"
+                    index: source1Alarms.{{ $index }}
+                    states:
+                        - { descr: 'OK', graph: 0, value: 0, generic: 0 }
+                        - { descr: 'Power Module Overtemp', graph: 1, value: 1, generic: 2 }
+                        - { descr: 'Power Module Fail', graph: 1, value: 2, generic: 2 }
+                        - { descr: 'Control Card Fail', graph: 1, value: 4, generic: 2 }
+                        - { descr: 'One Source has failed or are not phase locked', graph: 1, value: 8, generic: 2 }
+                        - { descr: 'LvAlarm', graph: 1, value: 16, generic: 2 }
+                        - { descr: 'Control Card Overtemp', graph: 1, value: 32, generic: 2 }
+                        - { descr: 'SCRs are Warm', graph: 1, value: 64, generic: 1 }
+                        - { descr: 'Low DCV', graph: 1, value: 128, generic: 1 }
+                        - { descr: 'Popk alarm - System not redunant', graph: 1, value: 512, generic: 1 }
+                        - { descr: 'Both sources are dead', graph: 1, value: 1024, generic: 2 }
+                        - { descr: 'Fan Failed or Hot Temperature', graph: 1, value: 2048, generic: 2 }
+                -
+                    oid: EXELTECH-XFERSW::source2Alarms
+                    value: EXELTECH-XFERSW::source2Alarms
+                    state_name: source2Alarms
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.4.2.{{ $index }}'
+                    descr: "Source 2 Alarms"
+                    index: source2Alarms.{{ $index }}
+                    states:
+                        - { descr: 'OK', graph: 0, value: 0, generic: 0 }
+                        - { descr: 'Power Module Overtemp', graph: 1, value: 1, generic: 2 }
+                        - { descr: 'Power Module Fail', graph: 1, value: 2, generic: 2 }
+                        - { descr: 'Control Card Fail', graph: 1, value: 4, generic: 2 }
+                        - { descr: 'One Source has failed or are not phase locked', graph: 1, value: 8, generic: 2 }
+                        - { descr: 'LvAlarm', graph: 1, value: 16, generic: 2 }
+                        - { descr: 'Control Card Overtemp', graph: 1, value: 32, generic: 2 }
+                        - { descr: 'SCRs are Warm', graph: 1, value: 64, generic: 1 }
+                        - { descr: 'Low DCV', graph: 1, value: 128, generic: 1 }
+                        - { descr: 'Popk alarm - System not redunant', graph: 1, value: 512, generic: 1 }
+                        - { descr: 'Both sources are dead', graph: 1, value: 1024, generic: 2 }
+                        - { descr: 'Fan Failed or Hot Temperature', graph: 1, value: 2048, generic: 2 }
+                -
+                    oid: EXELTECH-XFERSW::source3Alarms
+                    value: EXELTECH-XFERSW::source3Alarms
+                    state_name: source3Alarms
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.4.3.{{ $index }}'
+                    descr: "Source 3 Alarms"
+                    index: source3Alarms.{{ $index }}
+                    states:
+                        - { descr: 'OK', graph: 0, value: 0, generic: 0 }
+                        - { descr: 'Power Module Overtemp', graph: 1, value: 1, generic: 2 }
+                        - { descr: 'Power Module Fail', graph: 1, value: 2, generic: 2 }
+                        - { descr: 'Control Card Fail', graph: 1, value: 4, generic: 2 }
+                        - { descr: 'One Source has failed or are not phase locked', graph: 1, value: 8, generic: 2 }
+                        - { descr: 'LvAlarm', graph: 1, value: 16, generic: 2 }
+                        - { descr: 'Control Card Overtemp', graph: 1, value: 32, generic: 2 }
+                        - { descr: 'SCRs are Warm', graph: 1, value: 64, generic: 1 }
+                        - { descr: 'Low DCV', graph: 1, value: 128, generic: 1 }
+                        - { descr: 'Popk alarm - System not redunant', graph: 1, value: 512, generic: 1 }
+                        - { descr: 'Both sources are dead', graph: 1, value: 1024, generic: 2 }
+                        - { descr: 'Fan Failed or Hot Temperature', graph: 1, value: 2048, generic: 2 }
+                -
+                    oid: EXELTECH-XFERSW::MinorAlarm
+                    value: EXELTECH-XFERSW::MinorAlarm
+                    state_name: MinorAlarm
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.4.4.{{ $index }}'
+                    descr: "Minor Alarm"
+                    index: MinorAlarm.{{ $index }}
+                    states:
+                        - { descr: 'OK', graph: 0, value: 0, generic: 0 }
+                        - { descr: 'Alarm', graph: 1, value: 1, generic: 1 }
+                -
+                    oid: EXELTECH-XFERSW::MajorAlarm
+                    value: EXELTECH-XFERSW::MajorAlarm
+                    state_name: MajorAlarm
+                    num_oid: '.1.3.6.1.4.1.30320.1.0.4.5.{{ $index }}'
+                    descr: "Major Alarm"
+                    index: MajorAlarm.{{ $index }}
+                    states:
+                        - { descr: 'OK', graph: 0, value: 0, generic: 0 }
+                        - { descr: 'Alarm', graph: 1, value: 1, generic: 2 }

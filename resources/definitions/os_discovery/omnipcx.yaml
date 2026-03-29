@@ -1,11 +1,10 @@
-mib: ALCATEL-NMC-PROXY-AGENT-MIB:A4400-RTM-MIB:A4400-CPU-MIB
 modules:
     sensors:
         state:
             data:
                 -
-                    oid: pbxState
-                    value: pbxState
+                    oid: A4400-CPU-MIB::pbxState
+                    value: A4400-CPU-MIB::pbxState
                     num_oid: '.1.3.6.1.4.1.637.64.4400.1.2{{ $noindex }}'
                     descr: 'Pbx State'
                     state_name: pbxState
@@ -18,8 +17,8 @@ modules:
                         - { descr: Warning , graph: 0, value: 4 , generic: 1 }
                         - { descr: Indeterminate , graph: 0, value: 0 , generic: 3 }
                 -
-                    oid: pbxRole
-                    value: pbxRole
+                    oid: A4400-RTM-MIB::pbxRole
+                    value: A4400-RTM-MIB::pbxRole
                     num_oid: '.1.3.6.1.4.1.637.64.4400.1.4.{{ $index }}'
                     descr: 'Pbx Role'
                     index: 'pbxRole{{ $index }}'
@@ -33,8 +32,8 @@ modules:
         count:
             data:
                 -
-                    oid: setsInService
-                    value: setsInService
+                    oid: A4400-RTM-MIB::setsInService
+                    value: A4400-RTM-MIB::setsInService
                     num_oid: '.1.3.6.1.4.1.637.64.4400.1.7.{{ $index }}'
                     descr: 'Pbx Sets in service'
                     index: 'setsInService{{ $index }}'
@@ -42,8 +41,8 @@ modules:
                     high_limit: 100000
                     group: 'Sets'
                 -
-                    oid: setsOutOfService
-                    value: setsOutOfService
+                    oid: A4400-RTM-MIB::setsOutOfService
+                    value: A4400-RTM-MIB::setsOutOfService
                     num_oid: '.1.3.6.1.4.1.637.64.4400.1.8.{{ $index }}'
                     descr: 'Pbx Sets out of service'
                     index: 'setsOutOfService{{ $index }}'

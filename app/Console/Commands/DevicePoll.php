@@ -21,7 +21,7 @@ class DevicePoll extends LnmsCommand
     use ProcessesDevices;
 
     protected $name = 'device:poll';
-    protected ProcessType $processType = ProcessType::poller;
+    protected ProcessType $processType = ProcessType::Poller;
 
     /**
      * Create a new command instance.

@@ -1,4 +1,3 @@
-mib: SSU2000-MIB:DATUM-MIB
 modules:
     os:
        hardware:
@@ -14,37 +13,40 @@ modules:
             data:
                 -
                     oid:
-                        - staPtPtpTable
-                        - staPtNtpTable
-                        - staGpsTable
-                        - staClkTable
+                        - SSU2000-MIB::staPtPtpTable
+                        - SSU2000-MIB::staPtNtpTable
+                        - SSU2000-MIB::staGpsTable
+                        - SSU2000-MIB::staClkTable
        state:
             data:
                 -
-                    oid: staPtPtpTable
+                    oid: SSU2000-MIB::staPtPtpTable
                     num_oid: '.1.3.6.1.4.1.601.3.1.1.2.16.1.1.3.{{ $index }}'
-                    value: staPtPtpStatus
+                    value: SSU2000-MIB::staPtPtpStatus
                     descr: 'PTP Status - Chassis.Slot# {{ $index }}'
+                    state_name: staPtPtpTable
                     states:
                         - { descr: normal, graph: 0, value: 1, generic: 0 }
                         - { descr: disabled, graph: 0, value: 3, generic: 1 }
                         - { descr: fault, graph: 0, value: 4, generic: 2 }
                         - { descr: reject, graph: 0, value: 5, generic: 1 }
                 -
-                    oid: staPtNtpTable
+                    oid: SSU2000-MIB::staPtNtpTable
                     num_oid: '.1.3.6.1.4.1.601.3.1.1.2.15.1.1.3.{{ $index }}'
-                    value: staPtNtpStatus
+                    value: SSU2000-MIB::staPtNtpStatus
                     descr: 'NTP Status - Chassis.Slot# {{ $index }}'
+                    state_name: staPtNtpTable
                     states:
                         - { descr: normal, graph: 0, value: 1, generic: 0 }
                         - { descr: disabled, graph: 0, value: 3, generic: 1 }
                         - { descr: fault, graph: 0, value: 4, generic: 2 }
                         - { descr: reject, graph: 0, value: 5, generic: 1 }
                 -
-                    oid: staGpsTable
+                    oid: SSU2000-MIB::staGpsTable
                     num_oid: '.1.3.6.1.4.1.601.3.1.1.2.5.1.1.3.{{ $index }}'
-                    value: staGpsStatus
+                    value: SSU2000-MIB::staGpsStatus
                     descr: 'GPS Status - Chassis.Slot# {{ $index }}'
+                    state_name: staGpsTable
                     states:
                         - { descr: normal, graph: 0, value: 1, generic: 0 }
                         - { descr: selected, graph: 0, value: 2, generic: 0 }
@@ -52,20 +54,22 @@ modules:
                         - { descr: fault, graph: 0, value: 4, generic: 2 }
                         - { descr: reject, graph: 0, value: 5, generic: 1 }
                 -
-                    oid: staClkTable
+                    oid: SSU2000-MIB::staClkTable
                     num_oid: '.1.3.6.1.4.1.601.3.1.1.2.2.1.1.3.{{ $index }}'
-                    value: staCkStatus
+                    value: SSU2000-MIB::staCkStatus
                     descr: 'Clock Status - Chassis.Slot# {{ $index }}'
+                    state_name: staClkTable
                     states:
                         - { descr: normal, graph: 0, value: 1, generic: 0 }
                         - { descr: selected, graph: 0, value: 2, generic: 0 }
                         - { descr: disabled, graph: 0, value: 3, generic: 1 }
                         - { descr: fault, graph: 0, value: 4, generic: 2 }
                 -
-                    oid: staClkTable
+                    oid: SSU2000-MIB::staClkTable
                     num_oid: '.1.3.6.1.4.1.601.3.1.1.2.2.1.1.4.{{ $index }}'
-                    value: staCkPLLMode
+                    value: SSU2000-MIB::staCkPLLMode
                     descr: 'PLL Mode - Chassis.Slot# {{ $index }}'
+                    state_name: staClkTable
                     states:
                         - { descr: failed, graph: 0, value: 1, generic: 2 }
                         - { descr: warmup, graph: 0, value: 2, generic: 1 }
@@ -75,16 +79,16 @@ modules:
        delay:
             data:
                 -
-                    oid: staGpsTable
+                    oid: SSU2000-MIB::staGpsTable
                     num_oid: '.1.3.6.1.4.1.601.3.1.1.2.5.1.1.4.{{ $index }}'
-                    value: staGpsPhaseA
+                    value: SSU2000-MIB::staGpsPhaseA
                     index: 'staGpsPhaseA.{{ $index }}'
                     descr: 'GPS Phase A - Chassis.Slot# {{ $index }}'
                     divisor: 1000000000
                 -
-                    oid: staGpsTable
+                    oid: SSU2000-MIB::staGpsTable
                     num_oid: '.1.3.6.1.4.1.601.3.1.1.2.5.1.1.5.{{ $index }}'
-                    value: staGpsPhaseB
+                    value: SSU2000-MIB::staGpsPhaseB
                     index: 'staGpsPhaseB.{{ $index }}'
                     descr: 'GPS Phase B - Chassis.Slot# {{ $index }}'
                     divisor: 1000000000

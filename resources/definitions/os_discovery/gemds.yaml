@@ -1,4 +1,3 @@
-mib: MDS-SYSTEM-MIB:MDS-SERVICES-MIB:MDS-SERVICE-GPS-MIB:MDS-SERIAL-MIB:MDS-IF-CELL-MIB:MDS-EVENT-MIB:MDS-REG-MIB:MDS-ORBIT-SMI-MIB:MDS-IF-NX-MIB:MDS-IF-LW-MIB:MDS-IF-LN-MIB:MDS-IF-IEEE80211-MIB
 modules:
   os:
     hardware: 'MDS-SYSTEM-MIB::mSysProductConfiguration.0'
@@ -8,8 +7,8 @@ modules:
   sensors:
     state:
       data:   
-        - oid: mIfCellStatusTable
-          value: mIfCellServiceState
+        - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
+          value: MDS-IF-CELL-MIB::mIfCellServiceState
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.11.{{ $index }}'
           state_name: mIfCellServiceState
           group: Cellular Information
@@ -32,8 +31,8 @@ modules:
             - { descr: lte, graph: 0, value: 14, generic: 0 }
             - { descr: not running, graph: 0, value: 0, generic: 3 }
                 
-        - oid: mIfCellStatusTable
-          value: mIfCellSimState
+        - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
+          value: MDS-IF-CELL-MIB::mIfCellSimState
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.8.{{ $index }}'
           state_name: mIfCellSimState
           group: Cellular Information
@@ -46,8 +45,8 @@ modules:
               - { descr: failed, graph: 0, value: 3, generic: 2 }
               - { descr: unknown, graph: 0, value: 4, generic: 1 }
 
-        - oid: mIfCellStatusTable
-          value: mIfCellModemType
+        - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
+          value: MDS-IF-CELL-MIB::mIfCellModemType
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.17.{{ $index }}'
           state_name: mIfCellModemType
           group: Cellular Information
@@ -69,8 +68,8 @@ modules:
               - { descr: 4GdLteGlobal, graph: 0, value: 12, generic: 3 }
               - { descr: evdoEhrpd, graph: 0, value: 13, generic: 0 }
 
-        - oid: mIfCellStatusTable
-          value: mIfCellModemState
+        - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
+          value: MDS-IF-CELL-MIB::mIfCellModemState
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.9.{{ $index }}'
           state_name: mIfCellModemState
           group: Cellular Information
@@ -85,8 +84,8 @@ modules:
               - { descr: connected, graph: 0, value: 5, generic: 0 }
               - { descr: fwRequired, graph: 0, value: 6, generic: 1 }
 
-        - oid: mIfCellStatusTable
-          value: mIfCellBandwidth
+        - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
+          value: MDS-IF-CELL-MIB::mIfCellBandwidth
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.23.{{ $index }}'
           state_name: mIfCellBandwidth
           group: Cellular Information
@@ -101,8 +100,8 @@ modules:
               - { descr: 15Mhz, graph: 0, value: 5, generic: 0 }
               - { descr: 20Mhz, graph: 0, value: 6, generic: 0 }
 
-        - oid: mIfCellStatusTable
-          value: mIfCellRoamingState
+        - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
+          value: MDS-IF-CELL-MIB::mIfCellRoamingState
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.10.{{ $index }}'
           state_name: mIfCellRoamingState
           group: Cellular Information
@@ -115,7 +114,7 @@ modules:
 
     temperature:
       data:
-        - oid: mSysTemperature
+        - oid: MDS-SYSTEM-MIB::mSysTemperature
           num_oid: '.1.3.6.1.4.1.4130.10.1.1.1.2.6.{{ $index }}'
           index: 'mSysTemperature.{{ $index }}'
           descr: 'System Temperature'
@@ -125,7 +124,7 @@ modules:
           high_limit: 70
     voltage:
       data:
-        - oid: mSysPowerSupplyVoltage
+        - oid: MDS-SYSTEM-MIB::mSysPowerSupplyVoltage
           num_oid: '.1.3.6.1.4.1.4130.10.1.1.1.2.9.{{ $index }}'
           index: 'mSysPowerSupplyVoltage.{{ $index }}'
           descr: 'Input Voltage'
@@ -135,36 +134,36 @@ modules:
           high_limit: 61
     signal:
       data:
-        - oid: mIfCellStatusTable
+        - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.12.{{ $index }}'
           index: 'mIfCellRssi.{{ $index }}'
           descr: 'Cellular RSSI'
-          value: mIfCellRssi
+          value: MDS-IF-CELL-MIB::mIfCellRssi
           low_warn_limit: -60
           low_limit: -70
           high_limit: -5
 
-        - oid: mIfCellStatusTable
+        - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.13.{{ $index }}'
           index: 'mIfCellRsrp.{{ $index }}'
           descr: 'Cellular RSRP'
-          value: mIfCellRsrp
+          value: MDS-IF-CELL-MIB::mIfCellRsrp
           low_warn_limit: -106
           low_limit: -120
           high_limit: -20
 
-        - oid: mIfCellStatusTable
+        - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.14.{{ $index }}'
           index: 'mIfCellRsrq.{{ $index }}'
           descr: 'Cellular RSRQ'
-          value: mIfCellRsrq
+          value: MDS-IF-CELL-MIB::mIfCellRsrq
           low_warn_limit: -10
           low_limit: -13
           high_limit: -1
 
-        - oid: mIfCellStatusTable
+        - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
           num_oid: '.1.3.6.1.4.1.4130.10.2.1.1.2.1.1.15.{{ $index }}'
           index: 'mIfCellSnr.{{ $index }}'
           descr: 'Cellular SNR'
-          value: mIfCellSnr
+          value: MDS-IF-CELL-MIB::mIfCellSnr
           high_limit: 100

@@ -1,4 +1,3 @@
-mib: MPBC-2RU-MIB
 modules:
     sensors:
         temperature:

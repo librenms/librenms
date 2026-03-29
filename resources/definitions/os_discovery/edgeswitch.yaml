@@ -1,4 +1,3 @@
-mib: EdgeSwitch-BOXSERVICES-PRIVATE-MIB
 modules:
     mempools:
         data:
@@ -13,9 +12,10 @@ modules:
         state:
             data:
                 -
-                    oid: boxServicesTempUnitEntry
-                    value: boxServicesTempUnitState
+                    oid: EdgeSwitch-BOXSERVICES-PRIVATE-MIB::boxServicesTempUnitEntry
+                    value: EdgeSwitch-BOXSERVICES-PRIVATE-MIB::boxServicesTempUnitState
                     num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.15.1.2.{{ $index }}'
+                    state_name: boxServicesTempUnitEntry
                     descr: 'Chassis state'
                     index: 'boxServicesTempUnitState.{{ $index }}'
                     states:
@@ -27,8 +27,9 @@ modules:
                         - { value: 5, descr: notpresent, graph: 1, generic: 3 }
                         - { value: 6, descr: notoperational, graph: 1, generic: 2 }
                 -
-                    oid: boxServicesTempSensorsEntry
-                    value: boxServicesTempSensorState
+                    oid: EdgeSwitch-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorsEntry
+                    value: EdgeSwitch-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorState
+                    state_name: boxServicesTempSensorsEntry
                     num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.8.1.4.{{ $index }}'
                     descr: 'Temp Sensor {{ $index }}'
                     index: 'boxServicesTempSensorState.{{ $index }}'
@@ -42,8 +43,9 @@ modules:
                         - { value: 6, descr: notoperational, graph: 1, generic: 2 }
 
                 -
-                    oid: boxServicesFansEntry
-                    value: boxServicesFanItemState
+                    oid: EdgeSwitch-BOXSERVICES-PRIVATE-MIB::boxServicesFansEntry
+                    value: EdgeSwitch-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState
+                    state_name: boxServicesFansEntry
                     num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.6.1.3.{{ $index }}'
                     descr: 'Fan {{ $index }}'
                     index: 'boxServicesFanItemState.{{ $index }}'
@@ -59,8 +61,8 @@ modules:
         fanspeed:
             data:
                 -
-                    oid: boxServicesFansEntry
-                    value: boxServicesFanSpeed
+                    oid: EdgeSwitch-BOXSERVICES-PRIVATE-MIB::boxServicesFansEntry
+                    value: EdgeSwitch-BOXSERVICES-PRIVATE-MIB::boxServicesFanSpeed
                     num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.6.1.4.{{ $index }}'
                     index: 'boxServicesFanSpeed.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -68,8 +70,8 @@ modules:
         temperature:
             data:
                 -
-                    oid: boxServicesTempSensorsEntry
-                    value: boxServicesTempSensorTemperature
+                    oid: EdgeSwitch-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorsEntry
+                    value: EdgeSwitch-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorTemperature
                     num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.8.1.5.{{ $index }}'
                     index: 'boxServicesTempSensorTemperature.{{ $index }}'
                     descr: 'Temperature {{ $index }}'

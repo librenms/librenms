@@ -1,4 +1,3 @@
-mib: ERICSSON-ROUTER-ENVMON-MIB:ERICSSON-ROUTER-CPU-METER-MIB:ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB:ERICSSON-ROUTER-SYS-RESOURCES-MIB
 modules:
     os:
         version: SNMPv2-MIB::sysDescr.0
@@ -8,13 +7,13 @@ modules:
     processors:
         data:
             -
-                oid: eriRouterCpuMeterMIBObjects
-                value: eriRouterCpuMeterFiveMinuteAvg
+                oid: ERICSSON-ROUTER-CPU-METER-MIB::eriRouterCpuMeterMIBObjects
+                value: ERICSSON-ROUTER-CPU-METER-MIB::eriRouterCpuMeterFiveMinuteAvg
                 num_oid: '.1.3.6.1.4.1.193.218.2.6.1.3.{{ $index }}'
                 descr: '5 minute average'
             -
-                oid: eriRouterCpuMeterMIBObjects
-                value: eriRouterCpuMeterFiveMinutePeak
+                oid: ERICSSON-ROUTER-CPU-METER-MIB::eriRouterCpuMeterMIBObjects
+                value: ERICSSON-ROUTER-CPU-METER-MIB::eriRouterCpuMeterFiveMinutePeak
                 num_oid: '.1.3.6.1.4.1.193.218.2.6.1.6.{{ $index }}'
                 descr: '5 minute peak'
     storage:
@@ -31,26 +30,28 @@ modules:
             data:
                 -
                     oid:
-                        - eriRouterOpticalTransceiverPortTable
-                        - eriRouterOpticalTransceiverCardSlot
-                        - eriRouterOpticalTransceiverPort
+                        - ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverPortTable
+                        - ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverCardSlot
+                        - ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverPort
         state:
             data:
                 -
-                    oid: eriRouterFanStatusTable
+                    oid: ERICSSON-ROUTER-ENVMON-MIB::eriRouterFanStatusTable
                     num_oid: '.1.3.6.1.4.1.193.218.2.4.1.1.1.4.{{ $index }}'
-                    descr: eriRouterFanDescr
-                    value: eriRouterFanStatus
+                    state_name: eriRouterFanStatusTable
+                    descr: ERICSSON-ROUTER-ENVMON-MIB::eriRouterFanDescr
+                    value: ERICSSON-ROUTER-ENVMON-MIB::eriRouterFanStatus
                     states:
-                        - { value: 1, descr: Normal,  graph: 1, generic: 0 }
-                        - { value: 2, descr: Failed,  graph: 1, generic: 2 }
-                        - { value: 3, descr: Absent,  graph: 1, generic: 0 }
+                        - { value: 1, descr: Normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: Failed, graph: 1, generic: 2 }
+                        - { value: 3, descr: Absent, graph: 1, generic: 0 }
                         - { value: 4, descr: Unknown, graph: 1, generic: 3 }
                 -
-                    oid: eriRouterPowerStatusTable
+                    oid: ERICSSON-ROUTER-ENVMON-MIB::eriRouterPowerStatusTable
                     num_oid: '.1.3.6.1.4.1.193.218.2.4.1.2.1.4.{{ $index }}'
-                    descr: eriRouterPowerDescr
-                    value: eriRouterPowerStatus
+                    state_name: eriRouterPowerStatusTable
+                    descr: ERICSSON-ROUTER-ENVMON-MIB::eriRouterPowerDescr
+                    value: ERICSSON-ROUTER-ENVMON-MIB::eriRouterPowerStatus
                     states:
                         - { value: 1, descr: Normal,  graph: 1, generic: 0 }
                         - { value: 2, descr: Failed,  graph: 1, generic: 2 }
@@ -59,88 +60,88 @@ modules:
         fanspeed:
             data:
                 -
-                    oid: EriRouterFanSpeed
-                    value: eriRouterFanSpeedCurrent
+                    oid: ERICSSON-ROUTER-ENVMON-MIB::eriRouterFanSpeedTable
+                    value: ERICSSON-ROUTER-ENVMON-MIB::eriRouterFanSpeedCurrent
                     num_oid: '.1.3.6.1.4.1.193.218.2.4.1.5.1.3.{{ $index }}'
-                    descr: eriRouterFanUnitDescr
+                    descr: ERICSSON-ROUTER-ENVMON-MIB::eriRouterFanUnitDescr
         temperature:
             data:
                 -
-                    oid: eriRouterEntityTempSensorTable
-                    value: eriRouterEntityTempCurrent
+                    oid: ERICSSON-ROUTER-ENVMON-MIB::eriRouterEntityTempSensorTable
+                    value: ERICSSON-ROUTER-ENVMON-MIB::eriRouterEntityTempCurrent
                     num_oid: '.1.3.6.1.4.1.193.218.2.4.1.6.1.3.{{ $index }}'
-                    descr: eriRouterEntityTempDescr
+                    descr: ERICSSON-ROUTER-ENVMON-MIB::eriRouterEntityTempDescr
                 -
-                    oid: eriRouterOpticalTransceiverParamTable
-                    value: eriRouterOpticalTransceiverCurrentValue
-                    high_limit: eriRouterOpticalTransceiverMaxAlarmValue
-                    warn_limit: eriRouterOpticalTransceiverMaxWarningValue
-                    low_limit: eriRouterOpticalTransceiverMinAlarmValue
-                    low_warn_limit: eriRouterOpticalTransceiverMinWarningValue
+                    oid: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverParamTable
+                    value: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverCurrentValue
+                    high_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMaxAlarmValue
+                    warn_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMaxWarningValue
+                    low_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMinAlarmValue
+                    low_warn_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMinWarningValue
                     num_oid: '.1.3.6.1.4.1.193.218.2.50.1.2.1.3.{{ $index }}'
                     index: 'eriRouterOpticalTransceiverTemp.{{ $index }}'
                     group: 'Optic Temperature'
                     divisor: 1000
-                    descr: 'Slot {{ $eriRouterOpticalTransceiverCardSlot:0 }} / Port {{ $eriRouterOpticalTransceiverPort:0 }}'
+                    descr: 'Slot {{ ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverCardSlot:0 }} / Port {{ ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverPort:0 }}'
                     skip_values:
                         -
-                            oid: eriRouterOpticalTransceiverParamType
+                            oid: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverParamType
                             op: '!='
                             value: 3
         current:
             data:
                 -
-                    oid: eriRouterOpticalTransceiverParamTable
-                    value: eriRouterOpticalTransceiverCurrentValue
-                    high_limit: eriRouterOpticalTransceiverMaxAlarmValue
-                    warn_limit: eriRouterOpticalTransceiverMaxWarningValue
-                    low_limit: eriRouterOpticalTransceiverMinAlarmValue
-                    low_warn_limit: eriRouterOpticalTransceiverMinWarningValue
+                    oid: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverParamTable
+                    value: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverCurrentValue
+                    high_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMaxAlarmValue
+                    warn_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMaxWarningValue
+                    low_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMinAlarmValue
+                    low_warn_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMinWarningValue
                     num_oid: '.1.3.6.1.4.1.193.218.2.50.1.2.1.3.{{ $index }}'
                     index: 'eriRouterOpticalTransceiverBiasCurrent.{{ $index }}'
                     group: 'Optic Bias Current'
                     divisor: 1000000
-                    descr: 'Slot {{ $eriRouterOpticalTransceiverCardSlot:0 }} / Port {{ $eriRouterOpticalTransceiverPort:0 }}'
+                    descr: 'Slot {{ ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverCardSlot:0 }} / Port {{ ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverPort:0 }}'
                     skip_values:
                         -
-                            oid: eriRouterOpticalTransceiverParamType
+                            oid: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverParamType
                             op: '!='
                             value: 4
         dbm:
             data:
                 -
-                    oid: eriRouterOpticalTransceiverParamTable
-                    value: eriRouterOpticalTransceiverCurrentValue
-                    high_limit: eriRouterOpticalTransceiverMaxAlarmValue
-                    warn_limit: eriRouterOpticalTransceiverMaxWarningValue
-                    low_limit: eriRouterOpticalTransceiverMinAlarmValue
-                    low_warn_limit: eriRouterOpticalTransceiverMinWarningValue
+                    oid: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverParamTable
+                    value: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverCurrentValue
+                    high_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMaxAlarmValue
+                    warn_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMaxWarningValue
+                    low_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMinAlarmValue
+                    low_warn_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMinWarningValue
                     num_oid: '.1.3.6.1.4.1.193.218.2.50.1.2.1.3.{{ $index }}'
                     index: 'eriRouterOpticalTransceiverRxPower.{{ $index }}'
                     group: 'Optic Rx Power'
                     divisor: 1000
-                    descr: 'Slot {{ $eriRouterOpticalTransceiverCardSlot:0 }} / Port {{ $eriRouterOpticalTransceiverPort:0 }}'
+                    descr: 'Slot {{ ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverCardSlot:0 }} / Port {{ ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverPort:0 }}'
                     skip_values:
                         -
-                            oid: eriRouterOpticalTransceiverParamType
+                            oid: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverParamType
                             op: '!='
                             value: 2
         voltage:
             data:
                 -
-                    oid: eriRouterOpticalTransceiverParamTable
-                    value: eriRouterOpticalTransceiverCurrentValue
-                    high_limit: eriRouterOpticalTransceiverMaxAlarmValue
-                    warn_limit: eriRouterOpticalTransceiverMaxWarningValue
-                    low_limit: eriRouterOpticalTransceiverMinAlarmValue
-                    low_warn_limit: eriRouterOpticalTransceiverMinWarningValue
+                    oid: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverParamTable
+                    value: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverCurrentValue
+                    high_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMaxAlarmValue
+                    warn_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMaxWarningValue
+                    low_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMinAlarmValue
+                    low_warn_limit: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverMinWarningValue
                     num_oid: '.1.3.6.1.4.1.193.218.2.50.1.2.1.3.{{ $index }}'
                     index: 'eriRouterOpticalTransceiverVcc.{{ $index }}'
                     group: 'Optic Vcc'
                     divisor: 1000
-                    descr: 'Slot {{ $eriRouterOpticalTransceiverCardSlot:0 }} / Port {{ $eriRouterOpticalTransceiverPort:0 }}'
+                    descr: 'Slot {{ ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverCardSlot:0 }} / Port {{ ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverPort:0 }}'
                     skip_values:
                         -
-                            oid: eriRouterOpticalTransceiverParamType
+                            oid: ERICSSON-ROUTER-OPTICAL-TRANSCEIVER-MIB::eriRouterOpticalTransceiverParamType
                             op: '!='
                             value: 6

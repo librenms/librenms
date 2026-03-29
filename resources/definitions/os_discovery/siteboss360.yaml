@@ -1,4 +1,3 @@
-mib: SITEBOSS-360-STD-MIB
 modules:
     os:
         sysDescr_regex: '/(?<hardware>SiteBoss \S+) (?<version>.*)/'
@@ -6,22 +5,22 @@ modules:
         temperature:
             data:
                 -
-                    oid: esPointTable
-                    value: esPointValueStr
+                    oid: SITEBOSS-360-STD-MIB::esPointTable
+                    value: SITEBOSS-360-STD-MIB::esPointValueStr
                     num_oid: '.1.3.6.1.4.1.3052.23.1.1.1.1.7.{{ $index }}'
-                    descr: esPointName
+                    descr: SITEBOSS-360-STD-MIB::esPointName
                     skip_values:
                         -
-                            oid: esIndexPC
+                            oid: SITEBOSS-360-STD-MIB::esIndexPC
                             op: '!='
                             value: 1
         state:
             data:
                 -
-                    oid: esPointTable
-                    value: esPointInEventState
+                    oid: SITEBOSS-360-STD-MIB::esPointTable
+                    value: SITEBOSS-360-STD-MIB::esPointInEventState
                     num_oid: '.1.3.6.1.4.1.3052.23.1.1.1.1.5.{{ $index }}'
-                    descr: esPointName
+                    descr: SITEBOSS-360-STD-MIB::esPointName
                     group: Contact Closures
                     state_name: contactClosure
                     states:
@@ -29,18 +28,18 @@ modules:
                         - { value: 2, generic: 0, graph: 1, descr: normal }
                     skip_values:
                         -
-                            oid: esIndexPC
+                            oid: SITEBOSS-360-STD-MIB::esIndexPC
                             op: '!='
                             value: 2
                         -
-                            oid: esPointName
+                            oid: SITEBOSS-360-STD-MIB::esPointName
                             op: '='
                             value: unnamed
                 -
-                    oid: esPointTable
-                    value: esPointValueInt
+                    oid: SITEBOSS-360-STD-MIB::esPointTable
+                    value: SITEBOSS-360-STD-MIB::esPointValueInt
                     num_oid: '.1.3.6.1.4.1.3052.23.1.1.1.1.6.{{ $index }}'
-                    descr: esPointName
+                    descr: SITEBOSS-360-STD-MIB::esPointName
                     group: Relay Outputs
                     state_name: relayOutput
                     states:
@@ -48,22 +47,22 @@ modules:
                         - { value: 1, generic: 2, graph: 1, descr: energized }
                     skip_values:
                         -
-                            oid: esIndexPC
+                            oid: SITEBOSS-360-STD-MIB::esIndexPC
                             op: '!='
                             value: 6
                         -
-                            oid: esPointValueStr
+                            oid: SITEBOSS-360-STD-MIB::esPointValueStr
                             op: 'not_in_array'
                             value: ['Active/Energized', 'Inactive/Energized', 'Active/De-energized', 'Inactive/De-energized']
                         -
-                            oid: esPointName
+                            oid: SITEBOSS-360-STD-MIB::esPointName
                             op: '='
                             value: unnamed
                 -
-                    oid: esPointTable
-                    value: esPointValueStr
+                    oid: SITEBOSS-360-STD-MIB::esPointTable
+                    value: SITEBOSS-360-STD-MIB::esPointValueStr
                     num_oid: '.1.3.6.1.4.1.3052.23.1.1.1.1.6.{{ $index }}'
-                    descr: esPointName
+                    descr: SITEBOSS-360-STD-MIB::esPointName
                     group: Power Outputs
                     state_name: powerOutput
                     states:
@@ -71,57 +70,57 @@ modules:
                         - { value: 1, generic: 2, graph: 1, descr: energized }
                     skip_values:
                         -
-                            oid: esIndexPC
+                            oid: SITEBOSS-360-STD-MIB::esIndexPC
                             op: '!='
                             value: 6
                         -
-                            oid: esPointValueStr
+                            oid: SITEBOSS-360-STD-MIB::esPointValueStr
                             op: 'not_in_array'
                             value: ['On/Energized', 'Off/De-energized']
                         -
-                            oid: esPointName
+                            oid: SITEBOSS-360-STD-MIB::esPointName
                             op: '='
                             value: unnamed
         humidity:
             data:
                 -
-                    oid: esPointTable
-                    value: esPointValueInt
+                    oid: SITEBOSS-360-STD-MIB::esPointTable
+                    value: SITEBOSS-360-STD-MIB::esPointValueInt
                     num_oid: '.1.3.6.1.4.1.3052.23.1.1.1.1.6.{{ $index }}'
-                    descr: esPointName
+                    descr: SITEBOSS-360-STD-MIB::esPointName
                     skip_values:
                         -
-                            oid: esIndexPC
+                            oid: SITEBOSS-360-STD-MIB::esIndexPC
                             op: '!='
                             value: 3
         count:
             data:
                 -
-                    oid: esPointTable
-                    value: esPointValueStr
+                    oid: SITEBOSS-360-STD-MIB::esPointTable
+                    value: SITEBOSS-360-STD-MIB::esPointValueStr
                     num_oid: '.1.3.6.1.4.1.3052.23.1.1.1.1.7.{{ $index }}'
-                    descr: esPointName
+                    descr: SITEBOSS-360-STD-MIB::esPointName
                     skip_values:
                         -
-                            oid: esIndexPC
+                            oid: SITEBOSS-360-STD-MIB::esIndexPC
                             op: '!='
                             value: 5
                         -
-                            oid: esPointName
+                            oid: SITEBOSS-360-STD-MIB::esPointName
                             op: '='
                             value: unnamed
         percent:
             data:
                 -
-                    oid: fsStatusTable
-                    value: fsStatusVolumePercentLevel
+                    oid: SITEBOSS-360-STD-MIB::fsStatusTable
+                    value: SITEBOSS-360-STD-MIB::fsStatusVolumePercentLevel
                     num_oid: '.1.3.6.1.4.1.3052.23.1.6.1.1.7.{{ $index }}'
-                    descr: fsStatusName
+                    descr: SITEBOSS-360-STD-MIB::fsStatusName
                     divisor: 100
                     low_warn_limit: 20
                     low_limit: 10
                     skip_values:
                         -
-                            oid: fsStatusVolumeValueString
+                            oid: SITEBOSS-360-STD-MIB::fsStatusVolumeValueString
                             op: '='
                             value: -999

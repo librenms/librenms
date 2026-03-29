@@ -121,6 +121,8 @@ if ($device['os_group'] == 'cisco') {
                 $limit_low = null;
                 $warn_limit = null;
                 $warn_limit_low = null;
+                $other_limit = null;
+                $other_limit_low = null;
 
                 // Check thresholds for this entry (bit dirty, but it works!)
                 if (isset($t_oids[$index]) && is_array($t_oids[$index])) {
@@ -156,6 +158,15 @@ if ($device['os_group'] == 'cisco') {
                         if ($key['entSensorThresholdSeverity'] == 'minor' && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
                             $warn_limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
+
+                        // Other Limit
+                        if ($key['entSensorThresholdSeverity'] == 'other' && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
+                            $other_limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
+                        }
+
+                        if ($key['entSensorThresholdSeverity'] == 'other' && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
+                            $other_limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
+                        }
                     }//end foreach
                 }//end if
 
@@ -170,6 +181,15 @@ if ($device['os_group'] == 'cisco') {
                     }
                 }
 
+                // Handle platforms that do not have the "Minor"/"Major"/"Critical" threshold for a sensor but instead only have the "Other" threshold for such sensor (ISR1k / ISR4k)
+                // Since there is no other threshold available other than "Other", treat these as Critical Limit
+                if (! isset($limit_low) && ! isset($warn_limit_low) && isset($other_limit_low)) {
+                    $limit_low = $other_limit_low;
+                }
+                if (! isset($limit) && ! isset($warn_limit) && isset($other_limit)) {
+                    $limit = $other_limit;
+                }
+
                 // End Threshold code
                 $ok = true;
 
@@ -182,6 +202,12 @@ if ($device['os_group'] == 'cisco') {
                     $tmp_ifindex = 0;
                     while ($phys_index != 0) {
                         if ($index === $phys_index) {
+                            break;
+                        }
+
+                        if (! isset($entity_array[$phys_index])) {
+                            // NX-OS: entPhysicalContainedIn may reference a parent index (e.g. 1)
+                            // that is not returned by the SNMP walk — stop traversal safely.
                             break;
                         }
 

@@ -28,7 +28,7 @@ foreach ($tables as $tablevalue) {
     foreach ($temp as $index => $entry) {
         //Discover Sensors
         if ($state_name == 'c3gGsmNumberOfNearbyCell' || $state_name == 'cwceLteCurrOperatingBand') {
-            $descr = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB') . ' - ' . $tablevalue['descr'];
+            $descr = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value() . ' - ' . $tablevalue['descr'];
         } else {
             $descr = ucwords((string) $temp[$index][$tablevalue['descr']]);
         }

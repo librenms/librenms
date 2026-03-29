@@ -1,4 +1,3 @@
-mib: ICT-POWERSYSTEM-MIB
 modules:
     os:
         hardware: ICT-POWERSYSTEM-MIB::deviceModel.0
@@ -7,39 +6,40 @@ modules:
         current:
             data:
                 -
-                    oid: outputCurrent
+                    oid: ICT-POWERSYSTEM-MIB::outputCurrent
                     num_oid: '.1.3.6.1.4.1.39145.13.8.{{ $index }}'
                     descr: 'Output Current'
                     index: 'outputCurrent.{{ $index }}'
         voltage:
             data:
                 -
-                    oid: inputVoltage
+                    oid: ICT-POWERSYSTEM-MIB::inputVoltage
                     num_oid: '.1.3.6.1.4.1.39145.13.6.{{ $index }}'
                     descr: 'Input Voltage'
                     index: 'inputVoltage.{{ $index }}'
                 -
-                    oid: outputVoltage
+                    oid: ICT-POWERSYSTEM-MIB::outputVoltage
                     num_oid: '.1.3.6.1.4.1.39145.13.7.{{ $index }}'
                     descr: 'Output Voltage'
                     index: 'outputVoltage.{{ $index }}'
                 -
-                    oid: moduleTable
-                    value: moduleVoltage
+                    oid: ICT-POWERSYSTEM-MIB::moduleTable
+                    value: ICT-POWERSYSTEM-MIB::moduleVoltage
                     num_oid: '.1.3.6.1.4.1.39145.13.10.1.4.{{ $index }}'
                     descr: 'Module #{{ $index }} Voltage (VDC)'
                     index: 'moduleVoltage.{{ $index }}'
                     skip_values:
                         -
-                            oid: moduleVoltage
+                            oid: ICT-POWERSYSTEM-MIB::moduleVoltage
                             op: =
                             value: '.'
         state:
             data:
                 -
-                    oid: moduleStatus
-                    value: moduleStatus
+                    oid: ICT-POWERSYSTEM-MIB::moduleStatus
+                    value: ICT-POWERSYSTEM-MIB::moduleStatus
                     num_oid: '.1.3.6.1.4.1.39145.13.10.1.2.{{ $index }}'
+                    state_name: moduleStatus
                     descr: 'Module #{{ $index }} Status'
                     index: 'moduleStatus.{{ $index }}'
                     states:
@@ -47,10 +47,11 @@ modules:
                         - { graph: 0, value: 2, generic: 0, descr: ok }
                         - { graph: 0, value: 3, generic: 2, descr: alarm }
                 -
-                    oid: moduleType
-                    value: moduleType
+                    oid: ICT-POWERSYSTEM-MIB::moduleType
+                    value: ICT-POWERSYSTEM-MIB::moduleType
                     num_oid: '.1.3.6.1.4.1.39145.13.10.1.3.{{ $index }}'
                     descr: 'Module #{{ $index }} Type'
+                    state_name: moduleType
                     index: 'moduleType.{{ $index }}'
                     states:
                         - { graph: 0, value: 1, generic: 1, descr: notInstalled }
@@ -60,21 +61,21 @@ modules:
         temperature:
             data:
                 -
-                    oid: probeTemperature.0
+                    oid: ICT-POWERSYSTEM-MIB::probeTemperature.0
                     num_oid: '.1.3.6.1.4.1.39145.13.12.{{ $index }}'
                     descr: 'Battery Probe'
-                    value: probeTemperature
+                    value: ICT-POWERSYSTEM-MIB::probeTemperature
         charge:
             data:
                 -
-                    oid: batterySoc.0
+                    oid: ICT-POWERSYSTEM-MIB::batterySoc.0
                     num_oid: '.1.3.6.1.4.1.39145.13.13.{{ $index }}'
                     descr: 'Battery Charge'
-                    value: batterySoc
+                    value: ICT-POWERSYSTEM-MIB::batterySoc
         runtime:
             data:
                 -
-                    oid: batteryRunTime.0
+                    oid: ICT-POWERSYSTEM-MIB::batteryRunTime.0
                     num_oid: '.1.3.6.1.4.1.39145.13.15.{{ $index }}'
                     descr: 'Battery Run-time'
-                    value: batteryRunTime
+                    value: ICT-POWERSYSTEM-MIB::batteryRunTime

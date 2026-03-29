@@ -1,4 +1,3 @@
-mib: TAIT-INFRA93SERIES-MIB
 modules:
     os:
         sysDescr_regex: '/Tait Communications, (?<hardware>[^,]+),/'
@@ -8,8 +7,8 @@ modules:
         state:
             data:
                 -
-                    oid: infoGroup
-                    value: infoTransmitterStatus
+                    oid: TAIT-INFRA93SERIES-MIB::infoGroup
+                    value: TAIT-INFRA93SERIES-MIB::infoTransmitterStatus
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.1.1.1.1.{{ $index }}'
                     descr: 'Transmitter Status'
                     group: Transmitter
@@ -24,8 +23,8 @@ modules:
                         - { descr: calibrating, graph: 1, value: 5, generic: 3 }
                         - { descr: fault, graph: 1, value: 6, generic: 2 }
                 -
-                    oid: health
-                    value: healthRunMode
+                    oid: TAIT-INFRA93SERIES-MIB::health
+                    value: TAIT-INFRA93SERIES-MIB::healthRunMode
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.1.1.2.2.{{ $index }}'
                     descr: 'DMR BS Health Status'
                     group: DMRHealth
@@ -36,8 +35,8 @@ modules:
                         - { descr: online, graph: 1, value: 1, generic: 0 }
                         - { descr: unknown, graph: 1, value: 2, generic: 1 }
                 -
-                    oid: health
-                    value: healthNetworkConnLogChan1State
+                    oid: TAIT-INFRA93SERIES-MIB::health
+                    value: TAIT-INFRA93SERIES-MIB::healthNetworkConnLogChan1State
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.1.1.2.3.{{ $index }}'
                     descr: 'State of Logical Ch 1'
                     group: DMRHealth
@@ -52,8 +51,8 @@ modules:
                         - { descr: poll, graph: 1, value: 5, generic: 3 }
                         - { descr: invalid, graph: 1, value: 255, generic: 2 }
                 -
-                    oid: health
-                    value: healthNetworkConnLogChan2State
+                    oid: TAIT-INFRA93SERIES-MIB::health
+                    value: TAIT-INFRA93SERIES-MIB::healthNetworkConnLogChan2State
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.1.1.2.4.{{ $index }}'
                     descr: 'State of Logical Ch 2'
                     group: DMRHealth
@@ -68,8 +67,8 @@ modules:
                         - { descr: poll, graph: 1, value: 5, generic: 3 }
                         - { descr: invalid, graph: 1, value: 255, generic: 2 }
                 -
-                    oid: pmuState
-                    value: pmuStateMainsInState
+                    oid: TAIT-INFRA93SERIES-MIB::pmuState
+                    value: TAIT-INFRA93SERIES-MIB::pmuStateMainsInState
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.1.{{ $index }}'
                     descr: 'PMU AC power input state'
                     group: PMUState
@@ -80,8 +79,8 @@ modules:
                         - { descr: good, graph: 1, value: 1, generic: 0 }
                         - { descr: not fitted, graph: 1, value: 2, generic: 3 }
                 -
-                    oid: pmuState
-                    value: pmuStateOutStatus
+                    oid: TAIT-INFRA93SERIES-MIB::pmuState
+                    value: TAIT-INFRA93SERIES-MIB::pmuStateOutStatus
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.6.{{ $index }}'
                     descr: 'PMU power supply to the PA state'
                     group: PMUState
@@ -92,8 +91,8 @@ modules:
                         - { descr: good, graph: 1, value: 1, generic: 0 }
                         - { descr: not fitted, graph: 1, value: 2, generic: 3 }
                 -
-                    oid: pmuState
-                    value: pmuStateAuxOutState
+                    oid: TAIT-INFRA93SERIES-MIB::pmuState
+                    value: TAIT-INFRA93SERIES-MIB::pmuStateAuxOutState
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.7.{{ $index }}'
                     descr: 'Auxiliary power output state'
                     group: PMUState
@@ -104,8 +103,8 @@ modules:
                         - { descr: good, graph: 1, value: 1, generic: 0 }
                         - { descr: not fitted, graph: 1, value: 2, generic: 3 }
                 -
-                    oid: pmuState
-                    value: pmuStateBatteryInState
+                    oid: TAIT-INFRA93SERIES-MIB::pmuState
+                    value: TAIT-INFRA93SERIES-MIB::pmuStateBatteryInState
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.2.{{ $index }}'
                     descr: 'PMU DC power input state'
                     group: PMUState
@@ -117,12 +116,12 @@ modules:
                         - { descr: not fitted, graph: 1, value: 2, generic: 3 }
                     skip_values:
                         -
-                            oid: pmuStateBusConnect
+                            oid: TAIT-INFRA93SERIES-MIB::pmuStateBusConnect
                             op: '='
                             value: '2'
                 -
-                    oid: pmuState
-                    value: pmuStateBusConnect
+                    oid: TAIT-INFRA93SERIES-MIB::pmuState
+                    value: TAIT-INFRA93SERIES-MIB::pmuStateBusConnect
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.9.{{ $index }}'
                     descr: 'DC supply to the PMU state'
                     group: PMUState
@@ -132,8 +131,8 @@ modules:
                         - { descr: connected, graph: 1, value: 1, generic: 0 }
                         - { descr: not connected, graph: 1, value: 2, generic: 3 }
                 -
-                    oid: linkInfo
-                    value: linkInfoCtrlProtocolStatus
+                    oid: TAIT-INFRA93SERIES-MIB::linkInfo
+                    value: TAIT-INFRA93SERIES-MIB::linkInfoCtrlProtocolStatus
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.4.1.1.1.{{ $index }}'
                     descr: 'Status of the BS'
                     group: LinkInfo
@@ -151,8 +150,8 @@ modules:
                         - { descr: test-mode, graph: 1, value: 8, generic: 3 }
                         - { descr: dmr-tier2-aligned, graph: 1, value: 9, generic: 0 }
                 -
-                    oid: alarmSummary
-                    value: alarmSummaryBaseStation
+                    oid: TAIT-INFRA93SERIES-MIB::alarmSummary
+                    value: TAIT-INFRA93SERIES-MIB::alarmSummaryBaseStation
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.1.{{ $index }}'
                     descr: 'BS Summary Alarm'
                     group: AlarmSummary
@@ -164,8 +163,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: alarmSummary
-                    value: alarmSummaryReciter
+                    oid: TAIT-INFRA93SERIES-MIB::alarmSummary
+                    value: TAIT-INFRA93SERIES-MIB::alarmSummaryReciter
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.2.{{ $index }}'
                     descr: 'Reciter Summary Alarm'
                     group: AlarmSummary
@@ -177,8 +176,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: alarmSummary
-                    value: alarmSummaryPowerAmplifier
+                    oid: TAIT-INFRA93SERIES-MIB::alarmSummary
+                    value: TAIT-INFRA93SERIES-MIB::alarmSummaryPowerAmplifier
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.3.{{ $index }}'
                     descr: 'Power Amplifier (PA) Summary Alarm'
                     group: AlarmSummary
@@ -190,8 +189,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: alarmSummary
-                    value: alarmSummaryPowerManagementUnit
+                    oid: TAIT-INFRA93SERIES-MIB::alarmSummary
+                    value: TAIT-INFRA93SERIES-MIB::alarmSummaryPowerManagementUnit
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.4.{{ $index }}'
                     descr: 'Power Management Unit (PMU) Summary Alarm'
                     group: AlarmSummary
@@ -203,8 +202,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: alarmSummary
-                    value: alarmSummaryCustomAlarms
+                    oid: TAIT-INFRA93SERIES-MIB::alarmSummary
+                    value: TAIT-INFRA93SERIES-MIB::alarmSummaryCustomAlarms
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.5.{{ $index }}'
                     descr: 'Custom Summary Alarm'
                     group: AlarmSummary
@@ -216,8 +215,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: alarmSummary
-                    value: alarmSummaryFrontPanel
+                    oid: TAIT-INFRA93SERIES-MIB::alarmSummary
+                    value: TAIT-INFRA93SERIES-MIB::alarmSummaryFrontPanel
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.6.{{ $index }}'
                     descr: 'Front Pannel Summary Alarm'
                     group: AlarmSummary
@@ -229,8 +228,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: alarmSummary
-                    value: alarmSummarySystem
+                    oid: TAIT-INFRA93SERIES-MIB::alarmSummary
+                    value: TAIT-INFRA93SERIES-MIB::alarmSummarySystem
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.7.{{ $index }}'
                     descr: 'System Summary Alarm'
                     group: AlarmSummary
@@ -242,8 +241,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: alarmSummary
-                    value: alarmSummaryMinor
+                    oid: TAIT-INFRA93SERIES-MIB::alarmSummary
+                    value: TAIT-INFRA93SERIES-MIB::alarmSummaryMinor
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.8.{{ $index }}'
                     descr: 'Minor Summary Alarm'
                     group: AlarmSummary
@@ -255,8 +254,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: alarmSummary
-                    value: alarmSummaryMajor
+                    oid: TAIT-INFRA93SERIES-MIB::alarmSummary
+                    value: TAIT-INFRA93SERIES-MIB::alarmSummaryMajor
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.1.9.{{ $index }}'
                     descr: 'Major Summary Alarm'
                     group: AlarmSummary
@@ -268,8 +267,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: reciterAlarms
-                    value: rctAlarmRxSynthOutOfLock
+                    oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
+                    value: TAIT-INFRA93SERIES-MIB::rctAlarmRxSynthOutOfLock
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.2.{{ $index }}'
                     descr: 'Receiver synthesizer alarm'
                     group: ReciterAlarms
@@ -281,8 +280,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: reciterAlarms
-                    value: rctAlarmInvalidChannelSelected
+                    oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
+                    value: TAIT-INFRA93SERIES-MIB::rctAlarmInvalidChannelSelected
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.3.{{ $index }}'
                     descr: 'Channel invalid alarm'
                     group: ReciterAlarms
@@ -294,8 +293,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: reciterAlarms
-                    value: rctAlarmOverTemperature
+                    oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
+                    value: TAIT-INFRA93SERIES-MIB::rctAlarmOverTemperature
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.10.{{ $index }}'
                     descr: 'Temperature high alarm'
                     group: ReciterAlarms
@@ -307,8 +306,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: reciterAlarms
-                    value: rctAlarmTxCalibrationInvalid
+                    oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
+                    value: TAIT-INFRA93SERIES-MIB::rctAlarmTxCalibrationInvalid
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.13.{{ $index }}'
                     descr: 'Transmitter calibration invalid alarm'
                     group: ReciterAlarms
@@ -320,8 +319,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: reciterAlarms
-                    value: rctAlarmRxCalibrationInvalid
+                    oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
+                    value: TAIT-INFRA93SERIES-MIB::rctAlarmRxCalibrationInvalid
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.14.{{ $index }}'
                     descr: 'Reciter receiver calibration invalid alarm'
                     group: ReciterAlarms
@@ -333,8 +332,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: reciterAlarms
-                    value: rctAlarmInvalidConfiguration
+                    oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
+                    value: TAIT-INFRA93SERIES-MIB::rctAlarmInvalidConfiguration
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.15.{{ $index }}'
                     descr: 'Reciter hardware configuration invalid alarm'
                     group: ReciterAlarms
@@ -346,8 +345,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: reciterAlarms
-                    value: rctAlarm25MHzSynthOutOfLock
+                    oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
+                    value: TAIT-INFRA93SERIES-MIB::rctAlarm25MHzSynthOutOfLock
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.16.{{ $index }}'
                     descr: 'Synthesizer 25 MHz out of lock alarm'
                     group: ReciterAlarms
@@ -359,8 +358,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: reciterAlarms
-                    value: rctAlarm6144MHzSynthOutOfLock
+                    oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
+                    value: TAIT-INFRA93SERIES-MIB::rctAlarm6144MHzSynthOutOfLock
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.17.{{ $index }}'
                     descr: 'Synthesizer 61.44 MHz out of lock alarm'
                     group: ReciterAlarms
@@ -372,8 +371,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: reciterAlarms
-                    value: rctAlarmTxFSynthOutOfLock
+                    oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
+                    value: TAIT-INFRA93SERIES-MIB::rctAlarmTxFSynthOutOfLock
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.18.{{ $index }}'
                     descr: 'TxF synthesizer unable to lock to freq conf'
                     group: ReciterAlarms
@@ -385,8 +384,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: reciterAlarms
-                    value: rctAlarmSimulcastSynch
+                    oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
+                    value: TAIT-INFRA93SERIES-MIB::rctAlarmSimulcastSynch
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.19.{{ $index }}'
                     descr: 'Synch to common time ref for simulcast'
                     group: ReciterAlarms
@@ -398,8 +397,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: reciterAlarms
-                    value: rctAlarmReceiverSynch
+                    oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
+                    value: TAIT-INFRA93SERIES-MIB::rctAlarmReceiverSynch
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.20.{{ $index }}'
                     descr: 'Receiver unsynchronized alarm'
                     group: ReciterAlarms
@@ -411,8 +410,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: reciterAlarms
-                    value: rctAlarmTxRSynthOutOfLock
+                    oid: TAIT-INFRA93SERIES-MIB::reciterAlarms
+                    value: TAIT-INFRA93SERIES-MIB::rctAlarmTxRSynthOutOfLock
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.3.21.{{ $index }}'
                     descr: 'TxR synthesizer unable to lock on to the freq'
                     group: ReciterAlarms
@@ -424,8 +423,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmNoPADetected
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmNoPADetected
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.1.{{ $index }}'
                     descr: 'PA not detected by Reciter'
                     group: PAAlarms
@@ -437,8 +436,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmInvalidFirmware
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmInvalidFirmware
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.2.{{ $index }}'
                     descr: 'PA firmware invalid alarm'
                     group: PAAlarms
@@ -450,8 +449,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmInvalidCalibration
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmInvalidCalibration
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.3.{{ $index }}'
                     descr: 'Invalid PA calibration alarm'
                     group: PAAlarms
@@ -463,8 +462,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmForwardPowerLow
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmForwardPowerLow
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.5.{{ $index }}'
                     descr: 'PA Forward power low alarm'
                     group: PAAlarms
@@ -476,8 +475,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmPowerFoldback
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmPowerFoldback
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.7.{{ $index }}'
                     descr: 'PA Power foldback alarm'
                     group: PAAlarms
@@ -489,8 +488,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmReversePowerHigh
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmReversePowerHigh
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.8.{{ $index }}'
                     descr: 'PA Reverse power high alarm'
                     group: PAAlarms
@@ -502,8 +501,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmShutdownImminent
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmShutdownImminent
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.9.{{ $index }}'
                     descr: 'PA Shutdown alarm'
                     group: PAAlarms
@@ -515,8 +514,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmVSWRFault
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmVSWRFault
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.10.{{ $index }}'
                     descr: 'PA VSWR alarm'
                     group: PAAlarms
@@ -528,8 +527,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmDriverCurrentHigh
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmDriverCurrentHigh
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.11.{{ $index }}'
                     descr: 'PA Driver current high alarm'
                     group: PAAlarms
@@ -541,8 +540,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmFinal1CurrentHigh
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmFinal1CurrentHigh
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.12.{{ $index }}'
                     descr: 'PA Final 1 current high alarm'
                     group: PAAlarms
@@ -554,8 +553,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmFinal2CurrentHigh
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmFinal2CurrentHigh
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.13.{{ $index }}'
                     descr: 'PA Final 2 current high alarm'
                     group: PAAlarms
@@ -567,8 +566,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmCurrentImbalance
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmCurrentImbalance
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.14.{{ $index }}'
                     descr: 'PA Current imbalance alarm'
                     group: PAAlarms
@@ -580,8 +579,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmSupplyVoltageLow
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmSupplyVoltageLow
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.15.{{ $index }}'
                     descr: 'PA Supply voltage low alarm'
                     group: PAAlarms
@@ -593,8 +592,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmSupplyVoltageHigh
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmSupplyVoltageHigh
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.16.{{ $index }}'
                     descr: 'PA Supply voltage low alarm'
                     group: PAAlarms
@@ -606,8 +605,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmDriverTemperatureHigh
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmDriverTemperatureHigh
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.17.{{ $index }}'
                     descr: 'PA Driver temp high alarm'
                     group: PAAlarms
@@ -619,8 +618,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmFinal1TemperatureHigh
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmFinal1TemperatureHigh
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.18.{{ $index }}'
                     descr: 'PA Final1 Temp high alarm'
                     group: PAAlarms
@@ -632,8 +631,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: paAlarms
-                    value: paAlarmFinal2TemperatureHigh
+                    oid: TAIT-INFRA93SERIES-MIB::paAlarms
+                    value: TAIT-INFRA93SERIES-MIB::paAlarmFinal2TemperatureHigh
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.4.19.{{ $index }}'
                     descr: 'PA Final2 Temp high alarm'
                     group: PAAlarms
@@ -645,8 +644,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: pmuAlarms
-                    value: pmuAlarmNoPMUDetected
+                    oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
+                    value: TAIT-INFRA93SERIES-MIB::pmuAlarmNoPMUDetected
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.1.{{ $index }}'
                     descr: 'PMU not detected alarm'
                     group: PMUAlarms
@@ -658,8 +657,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: pmuAlarms
-                    value: pmuAlarmInvalidFirmware
+                    oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
+                    value: TAIT-INFRA93SERIES-MIB::pmuAlarmInvalidFirmware
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.2.{{ $index }}'
                     descr: 'PMU firmware invalid alarm'
                     group: PMUAlarms
@@ -671,8 +670,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: pmuAlarms
-                    value: pmuAlarmMainsFailure
+                    oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
+                    value: TAIT-INFRA93SERIES-MIB::pmuAlarmMainsFailure
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.4.{{ $index }}'
                     descr: 'PMU Mains supply alarm'
                     group: PMUAlarms
@@ -684,8 +683,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: pmuAlarms
-                    value: pmuAlarmMainsFailure
+                    oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
+                    value: TAIT-INFRA93SERIES-MIB::pmuAlarmMainsFailure
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.4.{{ $index }}'
                     descr: 'PMU Mains supply alarm'
                     group: PMUAlarms
@@ -697,8 +696,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: pmuAlarms
-                    value: pmuAlarmSelfTestFailure
+                    oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
+                    value: TAIT-INFRA93SERIES-MIB::pmuAlarmSelfTestFailure
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.5.{{ $index }}'
                     descr: 'PMU Mains supply alarm'
                     group: PMUAlarms
@@ -710,8 +709,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: pmuAlarms
-                    value: pmuAlarmShutdownImminent
+                    oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
+                    value: TAIT-INFRA93SERIES-MIB::pmuAlarmShutdownImminent
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.6.{{ $index }}'
                     descr: 'PMU shutdown imminent alarm'
                     group: PMUAlarms
@@ -723,8 +722,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: pmuAlarms
-                    value: pmuAlarmTemperatureHigh
+                    oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
+                    value: TAIT-INFRA93SERIES-MIB::pmuAlarmTemperatureHigh
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.7.{{ $index }}'
                     descr: 'PMU high temp alarm'
                     group: PMUAlarms
@@ -736,8 +735,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: pmuAlarms
-                    value: pmuAlarmBatteryProtect
+                    oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
+                    value: TAIT-INFRA93SERIES-MIB::pmuAlarmBatteryProtect
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.8.{{ $index }}'
                     descr: 'PMU battery protect alarm'
                     group: PMUAlarms
@@ -749,8 +748,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: pmuAlarms
-                    value: pmuAlarmBatteryVoltageLow
+                    oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
+                    value: TAIT-INFRA93SERIES-MIB::pmuAlarmBatteryVoltageLow
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.9.{{ $index }}'
                     descr: 'PMU Low Battery voltage alarm'
                     group: PMUAlarms
@@ -762,8 +761,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: pmuAlarms
-                    value: pmuAlarmBatteryVoltageHigh
+                    oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
+                    value: TAIT-INFRA93SERIES-MIB::pmuAlarmBatteryVoltageHigh
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.10.{{ $index }}'
                     descr: 'PMU High Battery voltage alarm'
                     group: PMUAlarms
@@ -775,8 +774,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: pmuAlarms
-                    value: pmuAlarmCurrentOutHigh
+                    oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
+                    value: TAIT-INFRA93SERIES-MIB::pmuAlarmCurrentOutHigh
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.11.{{ $index }}'
                     descr: 'PMU high current alarm'
                     group: PMUAlarms
@@ -788,8 +787,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: pmuAlarms
-                    value: pmuAlarmVoltageOutLow
+                    oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
+                    value: TAIT-INFRA93SERIES-MIB::pmuAlarmVoltageOutLow
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.12.{{ $index }}'
                     descr: 'PMU Output voltage low alarm'
                     group: PMUAlarms
@@ -801,8 +800,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: pmuAlarms
-                    value: pmuAlarmVoltageOutHigh
+                    oid: TAIT-INFRA93SERIES-MIB::pmuAlarms
+                    value: TAIT-INFRA93SERIES-MIB::pmuAlarmVoltageOutHigh
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.5.13.{{ $index }}'
                     descr: 'PMU Output high voltage alarm'
                     group: PMUAlarms
@@ -814,8 +813,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: systemAlarms
-                    value: systemAlarmAmbientTempLow
+                    oid: TAIT-INFRA93SERIES-MIB::systemAlarms
+                    value: TAIT-INFRA93SERIES-MIB::systemAlarmAmbientTempLow
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.1.{{ $index }}'
                     descr: 'Ambient temperature low alarm'
                     group: SystemAlarms
@@ -827,8 +826,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: systemAlarms
-                    value: systemAlarmAmbientTempHigh
+                    oid: TAIT-INFRA93SERIES-MIB::systemAlarms
+                    value: TAIT-INFRA93SERIES-MIB::systemAlarmAmbientTempHigh
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.2.{{ $index }}'
                     descr: 'Ambient temperature high alarm'
                     group: SystemAlarms
@@ -840,8 +839,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: systemAlarms
-                    value: systemAlarmExternalRefAbsent
+                    oid: TAIT-INFRA93SERIES-MIB::systemAlarms
+                    value: TAIT-INFRA93SERIES-MIB::systemAlarmExternalRefAbsent
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.3.{{ $index }}'
                     descr: 'External freq ref absent alarm'
                     group: SystemAlarms
@@ -853,8 +852,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: systemAlarms
-                    value: systemAlarmQoSJitter
+                    oid: TAIT-INFRA93SERIES-MIB::systemAlarms
+                    value: TAIT-INFRA93SERIES-MIB::systemAlarmQoSJitter
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.4.{{ $index }}'
                     descr: 'QoS jitter alarm'
                     group: SystemAlarms
@@ -866,8 +865,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: systemAlarms
-                    value: systemAlarmQoSLostPackets
+                    oid: TAIT-INFRA93SERIES-MIB::systemAlarms
+                    value: TAIT-INFRA93SERIES-MIB::systemAlarmQoSLostPackets
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.5.{{ $index }}'
                     descr: 'QoS lost packets alarm'
                     group: SystemAlarms
@@ -879,8 +878,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: systemAlarms
-                    value: systemAlarmFallbackControlled
+                    oid: TAIT-INFRA93SERIES-MIB::systemAlarms
+                    value: TAIT-INFRA93SERIES-MIB::systemAlarmFallbackControlled
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.6.{{ $index }}'
                     descr: 'BS controlled by Embedded Node fallback mode'
                     group: SystemAlarms
@@ -892,8 +891,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: systemAlarms
-                    value: systemAlarmDuplicateNodePriority
+                    oid: TAIT-INFRA93SERIES-MIB::systemAlarms
+                    value: TAIT-INFRA93SERIES-MIB::systemAlarmDuplicateNodePriority
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.7.{{ $index }}'
                     descr: 'BS Duplicate node priority'
                     group: SystemAlarms
@@ -905,8 +904,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: systemAlarms
-                    value: systemAlarmNTPSynchronisation
+                    oid: TAIT-INFRA93SERIES-MIB::systemAlarms
+                    value: TAIT-INFRA93SERIES-MIB::systemAlarmNTPSynchronisation
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.8.{{ $index }}'
                     descr: 'BS NTP unsynchronized'
                     group: SystemAlarms
@@ -918,8 +917,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: systemAlarms
-                    value: systemAlarm1PPSAbsent
+                    oid: TAIT-INFRA93SERIES-MIB::systemAlarms
+                    value: TAIT-INFRA93SERIES-MIB::systemAlarm1PPSAbsent
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.9.{{ $index }}'
                     descr: 'PPS Absent'
                     group: SystemAlarms
@@ -931,8 +930,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: systemAlarms
-                    value: systemAlarmQoSTransmitBuffer
+                    oid: TAIT-INFRA93SERIES-MIB::systemAlarms
+                    value: TAIT-INFRA93SERIES-MIB::systemAlarmQoSTransmitBuffer
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.10.{{ $index }}'
                     descr: 'QoS Transmit Buffer alarm'
                     group: SystemAlarms
@@ -944,8 +943,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 1 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: systemAlarms
-                    value: systemAlarmCartesianLoopUnstable
+                    oid: TAIT-INFRA93SERIES-MIB::systemAlarms
+                    value: TAIT-INFRA93SERIES-MIB::systemAlarmCartesianLoopUnstable
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.11.{{ $index }}'
                     descr: 'PA cartesiaon loop alarm'
                     group: SystemAlarms
@@ -957,8 +956,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: systemAlarms
-                    value: systemAlarmTxRCableAbsent
+                    oid: TAIT-INFRA93SERIES-MIB::systemAlarms
+                    value: TAIT-INFRA93SERIES-MIB::systemAlarmTxRCableAbsent
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.8.12.{{ $index }}'
                     descr: 'PA feedback cable to reciter TxR alarm'
                     group: SystemAlarms
@@ -970,8 +969,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: fpAlarms
-                    value: fpAlarmFan1
+                    oid: TAIT-INFRA93SERIES-MIB::fpAlarms
+                    value: TAIT-INFRA93SERIES-MIB::fpAlarmFan1
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.7.1.{{ $index }}'
                     descr: 'Fan1 alarm'
                     group: FrontPanelAlarms
@@ -983,8 +982,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: fpAlarms
-                    value: fpAlarmFan2
+                    oid: TAIT-INFRA93SERIES-MIB::fpAlarms
+                    value: TAIT-INFRA93SERIES-MIB::fpAlarmFan2
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.7.2.{{ $index }}'
                     descr: 'Fan2 alarm'
                     group: FrontPanelAlarms
@@ -996,8 +995,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: fpAlarms
-                    value: fpAlarmFan3
+                    oid: TAIT-INFRA93SERIES-MIB::fpAlarms
+                    value: TAIT-INFRA93SERIES-MIB::fpAlarmFan3
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.7.3.{{ $index }}'
                     descr: 'Fan3 alarm'
                     group: FrontPanelAlarms
@@ -1009,8 +1008,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: fpAlarms
-                    value: fpAlarmNoFPDetected
+                    oid: TAIT-INFRA93SERIES-MIB::fpAlarms
+                    value: TAIT-INFRA93SERIES-MIB::fpAlarmNoFPDetected
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.7.4.{{ $index }}'
                     descr: 'No FrontPanel Detected alarm'
                     group: FrontPanelAlarms
@@ -1022,8 +1021,8 @@ modules:
                         - { descr: raised, graph: 1, value: 2, generic: 2 }
                         - { descr: disabled, graph: 1, value: 3, generic: 3 }
                 -
-                    oid: fpAlarms
-                    value: fpAlarmInvalidFirmware
+                    oid: TAIT-INFRA93SERIES-MIB::fpAlarms
+                    value: TAIT-INFRA93SERIES-MIB::fpAlarmInvalidFirmware
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.3.7.5.{{ $index }}'
                     descr: 'FP Invalid Firmware'
                     group: FrontPanelAlarms
@@ -1037,15 +1036,15 @@ modules:
         frequency:
             data:
                 -
-                    oid: rctSelectedChannel
-                    value: rctSelectedChannelTxFreq
+                    oid: TAIT-INFRA93SERIES-MIB::rctSelectedChannel
+                    value: TAIT-INFRA93SERIES-MIB::rctSelectedChannelTxFreq
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.2.2.6.{{ $index }}'
                     descr: 'Transmit Frequency (Hz)'
                     index: 'rctSelectedChannelTxFreq.{{ $index }}'
                     group: Transmitter
                 -
-                    oid: rctSelectedChannel
-                    value: rctSelectedChannelRxFreq
+                    oid: TAIT-INFRA93SERIES-MIB::rctSelectedChannel
+                    value: TAIT-INFRA93SERIES-MIB::rctSelectedChannelRxFreq
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.2.2.7.{{ $index }}'
                     descr: 'Receive Frequency (Hz)'
                     index: 'rctSelectedChannelRxFreq.{{ $index }}'
@@ -1053,24 +1052,24 @@ modules:
         dbm:
             data:
                 -
-                    oid: rctRfReceiver
-                    value: rctRfReceiverRSSI
+                    oid: TAIT-INFRA93SERIES-MIB::rctRfReceiver
+                    value: TAIT-INFRA93SERIES-MIB::rctRfReceiverRSSI
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.2.4.1.{{ $index }}'
                     descr: 'RSSI (dBm)'
                     index: 'rctRfReceiverRSSI.{{ $index }}'
                     divisor: 100
                     group: Receiver
                 -
-                    oid: rctRfReceiver
-                    value: rctRfReceiverLC1RSSI
+                    oid: TAIT-INFRA93SERIES-MIB::rctRfReceiver
+                    value: TAIT-INFRA93SERIES-MIB::rctRfReceiverLC1RSSI
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.2.4.2.{{ $index }}'
                     descr: 'RSSI logical ch 1 (dBm)'
                     index: 'rctRfReceiverLC1RSSI.{{ $index }}'
                     divisor: 100
                     group: Receiver
                 -
-                    oid: rctRfReceiver
-                    value: rctRfReceiverLC2RSSI
+                    oid: TAIT-INFRA93SERIES-MIB::rctRfReceiver
+                    value: TAIT-INFRA93SERIES-MIB::rctRfReceiverLC2RSSI
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.2.4.3.{{ $index }}'
                     descr: 'RSSI logical ch 2 (dBm)'
                     index: 'rctRfReceiverLC2RSSI.{{ $index }}'
@@ -1079,8 +1078,8 @@ modules:
         power:
             data:
                 -
-                    oid: paTxOutput
-                    value: paTxOutputForwardPower
+                    oid: TAIT-INFRA93SERIES-MIB::paTxOutput
+                    value: TAIT-INFRA93SERIES-MIB::paTxOutputForwardPower
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.3.2.1.{{ $index }}'
                     descr: 'PA output (W)'
                     entPhysicalIndex: '1300'
@@ -1089,8 +1088,8 @@ modules:
         count:
             data:
                 -
-                    oid: paTxOutput
-                    value: paTxOutputVSWR
+                    oid: TAIT-INFRA93SERIES-MIB::paTxOutput
+                    value: TAIT-INFRA93SERIES-MIB::paTxOutputVSWR
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.3.2.2.{{ $index }}'
                     descr: 'PA Tx Voltage Standing Wave Ratio (VSWR)'
                     index: 'paTxOutputVSWR.{{ $index }}'
@@ -1099,8 +1098,8 @@ modules:
         current:
             data:
                 -
-                    oid: pmuState
-                    value: pmuStateOutCurrent
+                    oid: TAIT-INFRA93SERIES-MIB::pmuState
+                    value: TAIT-INFRA93SERIES-MIB::pmuStateOutCurrent
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.4.{{ $index }}'
                     descr: 'Output current that  PMU is supplying to the subrack'
                     index: 'pmuStateOutCurrent.{{ $index }}'
@@ -1109,16 +1108,16 @@ modules:
         voltage:
             data:
                 -
-                    oid: pmuState
-                    value: pmuStateOutVoltage
+                    oid: TAIT-INFRA93SERIES-MIB::pmuState
+                    value: TAIT-INFRA93SERIES-MIB::pmuStateOutVoltage
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.5.{{ $index }}'
                     descr: 'Current voltage of the PMU output(s) to subrack (nominal 28V)'
                     index: 'pmuStateOutVoltage.{{ $index }}'
                     divisor: 100
                     group: PMUState
                 -
-                    oid: pmuState
-                    value: pmuStateBatteryInVoltage
+                    oid: TAIT-INFRA93SERIES-MIB::pmuState
+                    value: TAIT-INFRA93SERIES-MIB::pmuStateBatteryInVoltage
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.4.2.3.{{ $index }}'
                     descr: 'Voltage of the DC (battery) PS to the PMU'
                     index: 'pmuStateBatteryInVoltage.{{ $index }}'
@@ -1126,8 +1125,8 @@ modules:
         temperature:
             data:
                 -
-                    oid: rctTemperature
-                    value: rctTemperatureBoard
+                    oid: TAIT-INFRA93SERIES-MIB::rctTemperature
+                    value: TAIT-INFRA93SERIES-MIB::rctTemperatureBoard
                     num_oid: '.1.3.6.1.4.1.3570.2.2.2.1.2.2.6.1.{{ $index }}'
                     descr: 'Reciter Temperature (C)'
                     entPhysicalIndex: '1200'

@@ -1,4 +1,3 @@
-mib: POWER-ETHERNET-MIB:CISCO-POWER-ETHERNET-EXT-MIB:CISCO-HSRP-MIB
 modules:
     sensors:
         additional_oids:
@@ -9,34 +8,34 @@ modules:
         power:
             data:
                 -
-                    oid: pethMainPseTable
-                    value: pethMainPsePower
+                    oid: POWER-ETHERNET-MIB::pethMainPseTable
+                    value: POWER-ETHERNET-MIB::pethMainPsePower
                     num_oid: '.1.3.6.1.2.1.105.1.3.1.1.2.{{ $index }}'
                     index: 'pethMainPsePower.{{ $index }}'
                     group: "PoE"
                     descr: "PoE Budget Total - ID {{ $index }}"
                 -
-                    oid: cpeExtMainPseTable
-                    value: cpeExtMainPseUsedPower
+                    oid: CISCO-POWER-ETHERNET-EXT-MIB::cpeExtMainPseTable
+                    value: CISCO-POWER-ETHERNET-EXT-MIB::cpeExtMainPseUsedPower
                     divisor: 1000
                     num_oid: '.1.3.6.1.4.1.9.9.402.1.3.1.4.{{ $index }}'
                     index: 'cpeExtMainPseUsedPower.{{ $index }}'
                     group: "PoE"
-                    descr: "PoE Budget Consumed - {{ $cpeExtMainPseDescr }}"
+                    descr: "PoE Budget Consumed - {{ CISCO-POWER-ETHERNET-EXT-MIB::cpeExtMainPseDescr }}"
                 -
-                    oid: cpeExtMainPseTable
-                    value: cpeExtMainPseRemainingPower
+                    oid: CISCO-POWER-ETHERNET-EXT-MIB::cpeExtMainPseTable
+                    value: CISCO-POWER-ETHERNET-EXT-MIB::cpeExtMainPseRemainingPower
                     divisor: 1000
                     num_oid: '.1.3.6.1.4.1.9.9.402.1.3.1.5.{{ $index }}'
                     index: 'cpeExtMainPseRemainingPower.{{ $index }}'
                     low_limit: 0
                     group: "PoE"
-                    descr: "PoE Budget Remaining - {{ $cpeExtMainPseDescr }}"
+                    descr: "PoE Budget Remaining - {{ CISCO-POWER-ETHERNET-EXT-MIB::cpeExtMainPseDescr }}"
         count:
             data:
                 -
-                    oid: cpeExtPdStatistics
-                    value:  cpeExtPdStatsTotalDevices
+                    oid: CISCO-POWER-ETHERNET-EXT-MIB::cpeExtPdStatistics
+                    value:  CISCO-POWER-ETHERNET-EXT-MIB::cpeExtPdStatsTotalDevices
                     num_oid: '.1.3.6.1.4.1.9.9.402.1.4.1.{{ $index }}'
                     group: "PoE"
                     descr: "PoE Devices Connected"
@@ -57,10 +56,11 @@ modules:
         state:
             data:
                 -
-                    oid: cHsrpGrpTable
-                    value: cHsrpGrpStandbyState
+                    oid: CISCO-HSRP-MIB::cHsrpGrpTable
+                    value: CISCO-HSRP-MIB::cHsrpGrpStandbyState
                     num_oid: '.1.3.6.1.4.1.9.9.106.1.2.1.1.15.{{ $index }}'
-                    descr: 'HSRP Status {{ $cHsrpGrpVirtualIpAddr }}'
+                    state_name: cHsrpGrpTable
+                    descr: 'HSRP Status {{ CISCO-HSRP-MIB::cHsrpGrpVirtualIpAddr }}'
                     index: 'cHsrpGrpStandbyState.{{ $index }}'
                     group: 'HSRP'
                     states:

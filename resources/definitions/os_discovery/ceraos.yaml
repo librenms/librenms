@@ -1,10 +1,10 @@
-mib: MWRM-UNIT-MIB:MWRM-RADIO-MIB
 modules:
     sensors:
         state:
             data:
                 -
-                    oid: genEquipUnitInfoNtpStatusLockState
+                    oid: MWRM-UNIT-MIB::genEquipUnitInfoNtpStatusLockState
+                    value: MWRM-UNIT-MIB::genEquipUnitInfoNtpStatusLockState
                     num_oid: .1.3.6.1.4.1.2281.10.1.1.11.6.6.1.4.{{ $index }}
                     descr: NTP Client Lock Status
                     state_name: genEquipUnitInfoNtpStatusLockState
@@ -13,7 +13,8 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: Local }
                         - { value: 2, generic: 0, graph: 0, descr: Locked }
                 -
-                    oid: genEquipRfuStatusTxMute
+                    oid: MWRM-RADIO-MIB::genEquipRfuStatusTxMute
+                    value: MWRM-RADIO-MIB::genEquipRfuStatusTxMute
                     num_oid: .1.3.6.1.4.1.2281.10.5.1.1.25.{{ $index }}
                     descr: TX Mute Status
                     state_name: genEquipRfuStatusTxMute
@@ -21,7 +22,8 @@ modules:
                         - { value: 0, generic: 0, graph: 0, descr: Disabled }
                         - { value: 1, generic: 0, graph: 0, descr: Enabled }
                 -
-                    oid: genEquipRadioCfgRadioOperationalStatus
+                    oid: MWRM-RADIO-MIB::genEquipRadioCfgRadioOperationalStatus
+                    value: MWRM-RADIO-MIB::genEquipRadioCfgRadioOperationalStatus
                     num_oid: .1.3.6.1.4.1.2281.10.7.2.1.9.{{ $index }}
                     descr: Radio Operational Status
                     state_name: genEquipRadioCfgRadioOperationalStatus
@@ -29,7 +31,8 @@ modules:
                         - { value: 0, generic: 0, graph: 0, descr: Inactive }
                         - { value: 1, generic: 0, graph: 0, descr: Active }
                 -
-                    oid: genEquipRemoteRadioRemoteCommunication
+                    oid: MWRM-RADIO-MIB::genEquipRemoteRadioRemoteCommunication
+                    value: MWRM-RADIO-MIB::genEquipRemoteRadioRemoteCommunication
                     num_oid: .1.3.6.1.4.1.2281.10.7.3.1.1.2.{{ $index }}
                     descr: Remote Radio Operational Status
                     state_name: genEquipRemoteRadioRemoteCommunication
@@ -39,11 +42,13 @@ modules:
         temperature:
             data:
                 -
-                    oid: genEquipUnitIduTemperature
+                    oid: MWRM-UNIT-MIB::genEquipUnitIduTemperature
+                    value: MWRM-UNIT-MIB::genEquipUnitIduTemperature
                     num_oid: .1.3.6.1.4.1.2281.10.1.1.9.{{ $index }}
-                    descr: IDU Temperature
+                    descr: 'IDU Temperature'
                 -
-                    oid: genEquipRfuStatusPATemp
+                    oid: MWRM-RADIO-MIB::genEquipRfuStatusPATemp
+                    value: MWRM-RADIO-MIB::genEquipRfuStatusPATemp
                     num_oid: .1.3.6.1.4.1.2281.10.5.1.1.24.{{ $index }}
                     descr: Power Amplifier Temperature
         voltage:

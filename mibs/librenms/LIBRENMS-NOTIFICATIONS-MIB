@@ -1,0 +1,466 @@
+LIBRENMS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        enterprises, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Integer32, Unsigned32, TimeTicks
+            FROM SNMPv2-SMI
+
+        DisplayString
+            FROM SNMPv2-TC
+
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF;
+
+
+    notifications MODULE-IDENTITY
+    LAST-UPDATED "202602170000Z"
+    ORGANIZATION "LibreNMS"
+    CONTACT-INFO
+    "       LibreNMS Community
+            https://www.librenms.org
+            https://github.com/librenms/librenms
+    "
+    DESCRIPTION
+    "       MIB module describing SNMP trap notifications sent by LibreNMS
+            via the SNMP Trap alert transport.
+
+            Enterprise OID: IANA PEN 60652 (LibreNMS).
+            See https://www.iana.org/assignments/enterprise-numbers/?q=60652
+    "
+
+    REVISION    "202602170000Z"
+    DESCRIPTION
+    "       Initial release under the LibreNMS enterprise OID (60652).
+            Defines a generic alert notification covering all standard
+            LibreNMS alert template variables.
+    "
+
+    ::= { alerting 1 }
+
+
+    librenms     OBJECT IDENTIFIER ::= { enterprises 60652 }
+    alerting OBJECT IDENTIFIER ::= { librenms 1 }
+
+--------------------------------
+--
+-- Default Alert objects
+--
+--------------------------------
+
+    defaultAlert OBJECT IDENTIFIER
+    ::= { notifications 1 }
+
+    -- Alert identification
+
+    defaultAlertTitle OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Human-readable alert title."
+    REFERENCE
+    "$alert->title"
+    ::= { defaultAlert 1 }
+
+    defaultAlertID OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Unique identifier for the alert.  The same ID is used for all
+    events (state changes) related to a single alert occurrence."
+    REFERENCE
+    "$alert->id"
+    ::= { defaultAlert 2 }
+
+    defaultAlertEventID OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Unique identifier for the individual event (state change).
+    Multiple events may share the same defaultAlertID."
+    REFERENCE
+    "$alert->uid"
+    ::= { defaultAlert 3 }
+
+    defaultAlertState OBJECT-TYPE
+    SYNTAX     INTEGER
+    {
+        stateClear(0),
+        stateActive(1),
+        stateAcknowledged(2),
+        stateWorse(3),
+        stateBetter(4)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Alert state.  Maps to LibreNMS internal constants:
+        CLEAR / RECOVERED = 0
+        ACTIVE            = 1
+        ACKNOWLEDGED      = 2
+        WORSE             = 3
+        BETTER            = 4"
+    REFERENCE
+    "$alert->state"
+    ::= { defaultAlert 4 }
+
+    defaultAlertSeverity OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Alert severity as a lowercase string.  One of:
+        ok, info, notice, warning, error, critical."
+    REFERENCE
+    "$alert->severity"
+    ::= { defaultAlert 5 }
+
+    defaultAlertRuleID OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Internal identifier of the alert rule that triggered this alert."
+    REFERENCE
+    "$alert->rule_id"
+    ::= { defaultAlert 6 }
+
+    defaultAlertRuleName OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Human-readable name of the alert rule."
+    REFERENCE
+    "$alert->name"
+    ::= { defaultAlert 7 }
+
+    defaultAlertProcedure OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Optional URL linking to a documented remediation procedure (http/https)."
+    REFERENCE
+    "$alert->proc"
+    ::= { defaultAlert 8 }
+
+    defaultAlertACKNotes OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Notes recorded when the alert was acknowledged."
+    REFERENCE
+    "$alert->alert_notes"
+    ::= { defaultAlert 9 }
+
+    defaultAlertTimestamp OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Date and time when the alert event was recorded.
+    Format: YYYY-MM-DD HH:mm:ss (LibreNMS server timezone)."
+    REFERENCE
+    "$alert->timestamp"
+    ::= { defaultAlert 10 }
+
+    defaultAlertTimeElapsed OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Human-readable elapsed time since the alert triggered.
+    Only meaningful on recovery (defaultAlertState = 0)."
+    REFERENCE
+    "$alert->elapsed"
+    ::= { defaultAlert 11 }
+
+    -- Device information
+
+    defaultAlertDevice OBJECT IDENTIFIER
+    ::= { defaultAlert 12 }
+
+    defaultAlertDeviceID OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Internal LibreNMS device identifier."
+    REFERENCE
+    "$alert->device_id"
+    ::= { defaultAlertDevice 1 }
+
+    defaultAlertDevHostname OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Device hostname as stored in LibreNMS."
+    REFERENCE
+    "$alert->hostname"
+    ::= { defaultAlertDevice 2 }
+
+    defaultAlertDevSysName OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Device sysName as reported by the device via SNMP."
+    REFERENCE
+    "$alert->sysName"
+    ::= { defaultAlertDevice 3 }
+
+    defaultAlertDevSysDescr OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "System description (sysDescr) as reported by the device."
+    REFERENCE
+    "$alert->sysDescr"
+    ::= { defaultAlertDevice 4 }
+
+    defaultAlertDevMgmtIP OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Management IP address of the device."
+    REFERENCE
+    "$alert->ip"
+    ::= { defaultAlertDevice 5 }
+
+    defaultAlertDevOS OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Operating system identifier as known by LibreNMS."
+    REFERENCE
+    "$alert->os"
+    ::= { defaultAlertDevice 6 }
+
+    defaultAlertDevType OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Device type classification (e.g. router, switch, server)."
+    REFERENCE
+    "$alert->type"
+    ::= { defaultAlertDevice 7 }
+
+    defaultAlertDevHardware OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Hardware platform as reported by the device."
+    REFERENCE
+    "$alert->hardware"
+    ::= { defaultAlertDevice 8 }
+
+    defaultAlertDevVersion OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Firmware or software version as reported by the device."
+    REFERENCE
+    "$alert->version"
+    ::= { defaultAlertDevice 9 }
+
+    defaultAlertDevFeatures OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Additional software feature information."
+    REFERENCE
+    "$alert->features"
+    ::= { defaultAlertDevice 10 }
+
+    defaultAlertDevSerial OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Device serial number."
+    REFERENCE
+    "$alert->serial"
+    ::= { defaultAlertDevice 11 }
+
+    defaultAlertDevLocation OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Physical location of the device."
+    REFERENCE
+    "$alert->location"
+    ::= { defaultAlertDevice 12 }
+
+    defaultAlertDevUptime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Device uptime as reported by sysUpTime (hundredths of a second)."
+    REFERENCE
+    "$alert->uptime"
+    ::= { defaultAlertDevice 13 }
+
+    defaultAlertDevShortUptime OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Uptime in compact human-readable form (e.g. 2d 3h 10m 5s)."
+    REFERENCE
+    "$alert->uptime_short"
+    ::= { defaultAlertDevice 14 }
+
+    defaultAlertDevLongUptime OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Uptime in long human-readable form (e.g. 2 days 3 hours 10 minutes 5 seconds)."
+    REFERENCE
+    "$alert->uptime_long"
+    ::= { defaultAlertDevice 15 }
+
+    defaultAlertDevPurpose OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Free-text description / purpose of the device."
+    REFERENCE
+    "$alert->description"
+    ::= { defaultAlertDevice 16 }
+
+    defaultAlertDevNotes OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Operator notes stored against the device in LibreNMS."
+    REFERENCE
+    "$alert->notes"
+    ::= { defaultAlertDevice 17 }
+
+    -- Ping statistics (available when ICMP monitoring is enabled)
+
+    defaultAlertDevPingLoss OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Percentage of ICMP echo requests that received no reply."
+    REFERENCE
+    "$alert->ping_loss"
+    ::= { defaultAlertDevice 18 }
+
+    defaultAlertDevPingMin OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Minimum round-trip time for ICMP echo (ms)."
+    REFERENCE
+    "$alert->ping_min"
+    ::= { defaultAlertDevice 19 }
+
+    defaultAlertDevPingMax OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Maximum round-trip time for ICMP echo (ms)."
+    REFERENCE
+    "$alert->ping_max"
+    ::= { defaultAlertDevice 20 }
+
+    defaultAlertDevPingAvg OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Average round-trip time for ICMP echo (ms)."
+    REFERENCE
+    "$alert->ping_avg"
+    ::= { defaultAlertDevice 21 }
+
+    -- Fault detail table
+
+    defaultAlertFaultTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF DefaultAlertFaultTableEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+    "Table of active faults included in this alert.  The index
+    corresponds to the position in the fault list and may change
+    between events."
+    ::= { defaultAlert 13 }
+
+    defaultAlertFaultTableEntry OBJECT-TYPE
+    SYNTAX     DefaultAlertFaultTableEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+    "A single fault entry."
+    INDEX { defaultAlertFaultEntryID }
+    ::= { defaultAlertFaultTable 1 }
+
+    DefaultAlertFaultTableEntry ::=
+    SEQUENCE
+    {
+        defaultAlertFaultEntryID     Unsigned32,
+        defaultAlertFaultDetail           OCTET STRING
+    }
+
+    defaultAlertFaultEntryID OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+    "Table row index.  Not a stable fault identifier."
+    ::= { defaultAlertFaultTableEntry 1 }
+
+    defaultAlertFaultDetail OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "Full detail string for this fault entry."
+    ::= { defaultAlertFaultTableEntry 2 }
+
+    -- Notification definition
+
+    defaultAlertEvent NOTIFICATION-TYPE
+    OBJECTS
+    {
+        defaultAlertTitle, defaultAlertID, defaultAlertEventID, defaultAlertState,
+        defaultAlertSeverity, defaultAlertRuleID, defaultAlertRuleName, defaultAlertProcedure,
+        defaultAlertACKNotes, defaultAlertTimestamp, defaultAlertTimeElapsed,
+        defaultAlertDeviceID, defaultAlertDevHostname, defaultAlertDevSysName,
+        defaultAlertDevSysDescr, defaultAlertDevMgmtIP, defaultAlertDevOS, defaultAlertDevType,
+        defaultAlertDevHardware, defaultAlertDevVersion, defaultAlertDevFeatures,
+        defaultAlertDevSerial, defaultAlertDevLocation, defaultAlertDevUptime,
+        defaultAlertDevShortUptime, defaultAlertDevLongUptime,
+        defaultAlertDevPurpose, defaultAlertDevNotes,
+        defaultAlertDevPingLoss, defaultAlertDevPingMin, defaultAlertDevPingMax, defaultAlertDevPingAvg,
+        defaultAlertFaultDetail
+    }
+    STATUS  current
+    DESCRIPTION
+    "Notification generated by the LibreNMS SNMP Trap transport for any
+    alert using the default catch-all template."
+    ::= { notifications 2 }
+
+END

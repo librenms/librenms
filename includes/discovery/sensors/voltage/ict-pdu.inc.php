@@ -25,7 +25,7 @@
  */
 
 // System Voltage
-$systemVoltage = trim(snmp_get($device, 'systemVoltage.0', '-Oqv', 'ICT-PDU-MIB'), '" ');
+$systemVoltage = trim((string) SnmpQuery::get('ICT-PDU-MIB::systemVoltage.0')->value(), '" ');
 
 if (! empty($systemVoltage)) {
     $divisor = 1;

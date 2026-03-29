@@ -1,4 +1,3 @@
-mib: NETGEAR-BOXSERVICES-PRIVATE-MIB
 modules:
     mempools:
         data:
@@ -15,23 +14,23 @@ modules:
             data:
                 -
                     oid:
-                        - boxServicesNormalTempRangeMin
-                        - boxServicesNormalTempRangeMax
+                        - NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMin
+                        - NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMax
         temperature:
             data:
                 -
-                    oid: boxServicesTempSensorsTable
-                    value: boxServicesTempSensorTemperature
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorTemperature
                     num_oid: '.1.3.6.1.4.1.4526.10.43.1.8.1.5.{{ $index }}'
                     descr: 'Switch {{ $subindex0 }} Sensor {{ $subindex1 }} Temperature'
                     index: 'boxServicesTempSensorTemperature.{{ $index }}'
-                    low_limit: boxServicesNormalTempRangeMin
-                    high_limit: boxServicesNormalTempRangeMax
+                    low_limit: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMin
+                    high_limit: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMax
         state:
             data:
                 -
-                    oid: boxServicesFansTable
-                    value: boxServicesFanItemState
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFansTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState
                     num_oid: '.1.3.6.1.4.1.4526.10.43.1.6.1.3.{{ $index }}'
                     descr: 'Switch {{ $subindex0 }} Fan {{ $subindex1 }} State'
                     index: 'boxServicesFanItemState.{{ $index }}'
@@ -45,8 +44,8 @@ modules:
                         - { value: 6, generic: 3, graph: 0, descr: notpowering }
                         - { value: 7, generic: 1, graph: 0, descr: incompatible }
                 -
-                    oid: boxServicesPowSuppliesTable
-                    value: boxServicesPowSupplyItemState
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesPowSuppliesTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyItemState
                     num_oid: '.1.3.6.1.4.1.4526.10.43.1.7.1.3.{{ $index }}'
                     descr: 'PSU {{ $subindex0 }} State'
                     index: 'boxServicesPowSupplyItemState.{{ $index }}'

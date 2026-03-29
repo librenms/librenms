@@ -10,7 +10,7 @@ $oids = snmpwalk_cache_multi_oid($device, 'accessSwitchSysTempHighThresh', $oids
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
         $entPhysicalIndex = $index;
-        $descr = trim(snmp_get($device, 'accessSwitchSysTempDescr.' . $index, '-Oqv', 'ZYXEL-AS-MIB'), '"');
+        $descr = trim((string) SnmpQuery::get('ZYXEL-AS-MIB::accessSwitchSysTempDescr.' . $index)->value(), '"');
         $oid = '.1.3.6.1.4.1.890.1.5.1.1.6.1.2.' . $index;
         $current = $entry['accessSwitchSysTempCurValue'];
         $divisor = '1';

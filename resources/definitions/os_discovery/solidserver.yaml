@@ -1,4 +1,3 @@
-mib: EIP-STATS-MIB:EIP-MON-MIB
 modules:
     os:
         hardware: EIP-MON-MIB::eipHwApplianceModel.0
@@ -8,50 +7,50 @@ modules:
         power:
               data:
                 -
-                    oid: eipHwPowerInstant
-                    value: eipHwPowerInstant
+                    oid: EIP-MON-MIB::eipHwPowerInstant
+                    value: EIP-MON-MIB::eipHwPowerInstant
                     descr: 'Instant Power'
                     num_oid: '.1.3.6.1.4.1.2440.1.14.6.1.{{ $index }}'
                     index: 'power.{{ $index }}'
         temperature:
             data:
                 -
-                    oid: eipHwTempRaidController
-                    value: eipHwTempRaidController
+                    oid: EIP-MON-MIB::eipHwTempRaidController
+                    value: EIP-MON-MIB::eipHwTempRaidController
                     descr: 'Raid Controller Temperature'
                     num_oid: '.1.3.6.1.4.1.2440.1.14.3.6.{{ $index }}'
                     index: 'raid.{{ $index }}'
                 -
-                    oid: eipHwTempInlet
-                    value: eipHwTempInlet
+                    oid: EIP-MON-MIB::eipHwTempInlet
+                    value: EIP-MON-MIB::eipHwTempInlet
                     descr: 'Inlet Temperature'
                     num_oid: '.1.3.6.1.4.1.2440.1.14.3.4.{{ $index }}'
                     index: 'inlet.{{ $index }}'
                 -
-                    oid: eipHwTempCpu
-                    value: eipHwTempCpu
+                    oid: EIP-MON-MIB::eipHwTempCpu
+                    value: EIP-MON-MIB::eipHwTempCpu
                     num_oid: '.1.3.6.1.4.1.2440.1.14.3.1.{{ $index }}'
                     descr: 'Cpu Temperature'
                     index: 'cpu.{{ $index }}'
                 -
-                    oid: eipHwTempBaseboard
-                    value: eipHwTempBaseboard
+                    oid: EIP-MON-MIB::eipHwTempBaseboard
+                    value: EIP-MON-MIB::eipHwTempBaseboard
                     num_oid: '.1.3.6.1.4.1.2440.1.14.3.5.{{ $index }}'
                     descr: 'Baseboard Temperature'
                     index: 'BB.{{ $index }}'
         count:
             data:
                 -
-                    oid: eipDnsStatTable
-                    value: eipDnsStatValue
+                    oid: EIP-STATS-MIB::eipDnsStatTable
+                    value: EIP-STATS-MIB::eipDnsStatValue
                     num_oid: '.1.3.6.1.4.1.2440.1.4.2.3.1.3.{{ $index }}'
-                    descr: '{{ $eipDnsStatName }}'
+                    descr: '{{ EIP-STATS-MIB::eipDnsStatName }}'
                     index: 'counter__{{ $index_string }}'
                     rrd_type: 'COUNTER'
                     group: 'DNS'
                     skip_values:
                         -
-                            oid: eipDnsStatName
+                            oid: EIP-STATS-MIB::eipDnsStatName
                             op: 'not_in_array'
                             value:
                                 - requestv4
@@ -71,17 +70,17 @@ modules:
                                 - servfail
                                 - invalidsig
                 -
-                    oid: eipDhcpStatTable
-                    value: eipDhcpStatValue
+                    oid: EIP-STATS-MIB::eipDhcpStatTable
+                    value: EIP-STATS-MIB::eipDhcpStatValue
                     num_oid: '.1.3.6.1.4.1.2440.1.3.2.22.1.3.{{ $index }}'
-                    descr: '{{ $eipDhcpStatName }}'
+                    descr: '{{ EIP-STATS-MIB::eipDhcpStatName }}'
                     rrd_type: 'COUNTER'
                     index: 'counter__{{ $index_string }}'
                     group: 'DHCP'
         state:
              data:
                 -
-                     oid: eipHwPsuRedundancy
+                     oid: EIP-MON-MIB::eipHwPsuRedundancy
                      num_oid: '.1.3.6.1.4.1.2440.1.14.5.1.{{ $index }}'
                      descr: 'Power Supply Redundancy'
                      group: 'HW'
@@ -91,9 +90,9 @@ modules:
                          - { descr: 'fully redundant', graph: 1, value: 1, generic: 0 }
                          - { descr: 'lost redundancy', graph: 1, value: 2, generic: 2 }
                 -
-                     oid: eipSvcSyslogStatus
+                     oid: EIP-MON-MIB::eipSvcSyslogStatus
                      num_oid: '.1.3.6.1.4.1.2440.1.16.1.1.{{ $index }}'
-                     descr: 'Syslog'
+                     descr: Syslog
                      group: 'Services'
                      state_name: eipSyslogStatus
                      states:
@@ -102,9 +101,9 @@ modules:
                          - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
                          - { descr: failed, graph: 1, value: 3, generic: 2 }
                 -
-                     oid: eipSvcSshStatus
+                     oid: EIP-MON-MIB::eipSvcSshStatus
                      num_oid: '.1.3.6.1.4.1.2440.1.16.2.1.{{ $index }}'
-                     descr: 'SSH'
+                     descr: SSH
                      group: 'Services'
                      state_name: eipSshStatus
                      states:
@@ -113,9 +112,9 @@ modules:
                          - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
                          - { descr: failed, graph: 1, value: 3, generic: 2 }
                 -
-                     oid: eipSvcApacheStatus
+                     oid: EIP-MON-MIB::eipSvcApacheStatus
                      num_oid: '.1.3.6.1.4.1.2440.1.16.3.1.{{ $index }}'
-                     descr: 'Apache'
+                     descr: Apache
                      group: 'Services'
                      state_name: eipSvcApacheStatus
                      states:
@@ -124,9 +123,9 @@ modules:
                          - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
                          - { descr: failed, graph: 1, value: 3, generic: 2 }
                 -
-                     oid: eipSvcIpmServerStatus
+                     oid: EIP-MON-MIB::eipSvcIpmServerStatus
                      num_oid: '.1.3.6.1.4.1.2440.1.16.4.1.{{ $index }}'
-                     descr: 'IpmServer'
+                     descr: IpmServer
                      group: 'Services'
                      state_name: eipSvcIpmServerStatus
                      states:
@@ -135,9 +134,9 @@ modules:
                          - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
                          - { descr: failed, graph: 1, value: 3, generic: 2 }
                 -
-                     oid: eipSvcDatabaseStatus
+                     oid: EIP-MON-MIB::eipSvcDatabaseStatus
                      num_oid: '.1.3.6.1.4.1.2440.1.16.5.1.{{ $index }}'
-                     descr: 'Database'
+                     descr: Database
                      group: 'Services'
                      state_name: eipSvcDatabaseStatus
                      states:
@@ -146,9 +145,9 @@ modules:
                          - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
                          - { descr: failed, graph: 1, value: 3, generic: 2 }
                 -
-                     oid: eipSvcDhcpStatus
+                     oid: EIP-MON-MIB::eipSvcDhcpStatus
                      num_oid: '.1.3.6.1.4.1.2440.1.16.6.1.{{ $index }}'
-                     descr: 'DHCP'
+                     descr: DHCP
                      group: 'Services'
                      state_name: eipSvcDhcpStatus
                      states:
@@ -157,7 +156,7 @@ modules:
                          - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
                          - { descr: failed, graph: 1, value: 3, generic: 2 }
                 -
-                     oid: eipSvcDhcpMsStatus
+                     oid: EIP-MON-MIB::eipSvcDhcpMsStatus
                      num_oid: '.1.3.6.1.4.1.2440.1.16.7.1.{{ $index }}'
                      descr: 'DHCP MS'
                      group: 'Services'
@@ -166,9 +165,9 @@ modules:
                          - { descr: disabled, graph: 1, value: 0, generic: 3 }
                          - { descr: running, graph: 1, value: 1, generic: 0 }
                 -
-                     oid: eipSvcDnsStatus
+                     oid: EIP-MON-MIB::eipSvcDnsStatus
                      num_oid: '.1.3.6.1.4.1.2440.1.16.8.1.{{ $index }}'
-                     descr: 'DNS'
+                     descr: DNS
                      group: 'Services'
                      state_name: eipSvcDnsStatus
                      states:
@@ -177,9 +176,9 @@ modules:
                          - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
                          - { descr: failed, graph: 1, value: 3, generic: 2 }
                 -
-                     oid: eipSvcQuaggaStatus
+                     oid: EIP-MON-MIB::eipSvcQuaggaStatus
                      num_oid: '.1.3.6.1.4.1.2440.1.16.10.1.{{ $index }}'
-                     descr: 'Quagga'
+                     descr: Quagga
                      group: 'Services'
                      state_name: eipSvcQuaggaStatus
                      states:
@@ -188,9 +187,9 @@ modules:
                          - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
                          - { descr: failed, graph: 1, value: 3, generic: 2 }
                 -
-                     oid: eipSvcNtpStatus
+                     oid: EIP-MON-MIB::eipSvcNtpStatus
                      num_oid: '.1.3.6.1.4.1.2440.1.16.11.1.{{ $index }}'
-                     descr: 'Ntp'
+                     descr: Ntp
                      group: 'Services'
                      state_name: eipSvcNtpStatus
                      states:
@@ -199,9 +198,9 @@ modules:
                          - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
                          - { descr: failed, graph: 1, value: 3, generic: 2 }
                 -
-                     oid: eipSvcTftpStatus
+                     oid: EIP-MON-MIB::eipSvcTftpStatus
                      num_oid: '.1.3.6.1.4.1.2440.1.16.12.1.{{ $index }}'
-                     descr: 'Tftp'
+                     descr: Tftp
                      group: 'Services'
                      state_name: eipSvcTftpStatus
                      states:
@@ -210,9 +209,9 @@ modules:
                          - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
                          - { descr: failed, graph: 1, value: 3, generic: 2 }
                 -
-                     oid: eipSvcSendmailStatus
+                     oid: EIP-MON-MIB::eipSvcSendmailStatus
                      num_oid: '.1.3.6.1.4.1.2440.1.16.14.1.{{ $index }}'
-                     descr: 'Sendmail'
+                     descr: Sendmail
                      group: 'Services'
                      state_name: eipSvcSendmailStatus
                      states:
@@ -221,7 +220,7 @@ modules:
                          - { descr: misconfigured, graph: 1, value: 2, generic: 1 }
                          - { descr: failed, graph: 1, value: 3, generic: 2 }
                 -
-                     oid: eipSdsMemberRole
+                     oid: EIP-MON-MIB::eipSdsMemberRole
                      num_oid: '.1.3.6.1.4.1.2440.1.17.2.1.{{ $index }}'
                      descr: 'Member Role'
                      group: 'Cluster'
@@ -232,7 +231,7 @@ modules:
                          - { descr: 'hot-standby', graph: 1, value: 2, generic: 0 }
                          - { descr: 'master-recovered', graph: 1, value: 3, generic: 1 }
                 -
-                     oid: eipSdsMemberStatus
+                     oid: EIP-MON-MIB::eipSdsMemberStatus
                      num_oid: '.1.3.6.1.4.1.2440.1.17.2.2.{{ $index }}'
                      descr: 'Member Status'
                      group: 'Cluster'

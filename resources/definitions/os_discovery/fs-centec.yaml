@@ -1,4 +1,3 @@
-mib: SWITCH:IF-MIB
 modules:
     os:
         version:
@@ -25,20 +24,20 @@ modules:
         temperature:
             data:
                 -
-                    oid: devMSlotEnvironmentTable
-                    value: devMSlotEnvironmentValue
+                    oid: SWITCH::devMSlotEnvironmentTable
+                    value: SWITCH::devMSlotEnvironmentValue
                     num_oid: '.1.3.6.1.4.1.52642.1.37.1.3.1.4.{{ $index }}'
                     index: 'devMSltEnvironmentValue.{{ $index }}'
                     descr: 'System temperature {{ $subindex2 }}'
                     group: 'System'
-                    low_limit: devMSlotEnvironmentLowerLimit
-                    warn_limit: devMSlotEnvironmentUpperLimit
-                    high_limit: devMSlotEnvironmentCriticalLimit
+                    low_limit: SWITCH::devMSlotEnvironmentLowerLimit
+                    warn_limit: SWITCH::devMSlotEnvironmentUpperLimit
+                    high_limit: SWITCH::devMSlotEnvironmentCriticalLimit
         percent:
             data:
                 -
-                    oid: devMFanStatusTable
-                    value: devMFanSpeed
+                    oid: SWITCH::devMFanStatusTable
+                    value: SWITCH::devMFanSpeed
                     num_oid: '.1.3.6.1.4.1.52642.1.37.1.1.1.1.5.{{ $index }}'
                     index: 'devMFanSpeed.{{ index }}'
                     descr: 'Fan {{ $subindex2 }} speed'
@@ -46,8 +45,8 @@ modules:
         state:
             data:
                 -
-                    oid: devMFanStatusTable
-                    value: devMFanStatus
+                    oid: SWITCH::devMFanStatusTable
+                    value: SWITCH::devMFanStatus
                     num_oid: '.1.3.6.1.4.1.52642.1.37.1.1.1.1.4.{{ $index }}'
                     index: 'devMFanStatus.{{ index }}'
                     descr: 'Fan {{ $subindex2 }} status'
@@ -59,9 +58,10 @@ modules:
                         - { descr: notInstall, graph: 3, value: 3, generic: 2 }
                         - { descr: unsupport, graph: 4, value: 4, generic: 3 }
                 -
-                    oid: devMPowerStatusTable
-                    value: devMPowerAlertStatus
+                    oid: SWITCH::devMPowerStatusTable
+                    value: SWITCH::devMPowerAlertStatus
                     num_oid: '.1.3.6.1.4.1.52642.1.37.1.2.1.7.{{ $index }}'
+                    state_name: 'devMPowerStatusTable'
                     descr: 'PSU {{ $index }} alarm'
                     index: 'devMPowerAlertStatus.{{ $index }}'
                     group: 'PSU'

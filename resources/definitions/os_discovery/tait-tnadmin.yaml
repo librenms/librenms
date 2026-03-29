@@ -1,4 +1,3 @@
-mib: TAIT-TNADMIN-MIB:TAIT-TN9300-MIB
 modules:
     os:
         sysDescr_regex: '/Tait Communications, Core Network, (?<hardware>[^,]+),/'

@@ -1,4 +1,3 @@
-mib: RAISECOM-COMMON-MANAGEMENT-MIB:RAISECOM-FANMONITOR-MIB:RAISECOM-POWERMONITOR-MIB:RAISECOM-SYSTEM-MIB
 modules:
     mempools:
         data:
@@ -13,16 +12,16 @@ modules:
     processors:
         data:
             -
-                oid: raisecomTotalCPUUtilization.oneMin
-                value: raisecomTotalCPUUtilization
+                oid: RAISECOM-SYSTEM-MIB::raisecomTotalCPUUtilization.oneMin
+                value: RAISECOM-SYSTEM-MIB::raisecomTotalCPUUtilization
                 num_oid: '.1.3.6.1.4.1.8886.1.1.1.3.1.2.1.2.{{ $index }}'
                 descr: 'Processor'
     sensors:
         fanspeed:
             data:
                 -
-                    oid: raisecomFanMonitorStateTable
-                    value: raisecomFanSpeedValue
+                    oid: RAISECOM-FANMONITOR-MIB::raisecomFanMonitorStateTable
+                    value: RAISECOM-FANMONITOR-MIB::raisecomFanSpeedValue
                     num_oid: '.1.3.6.1.4.1.8886.1.1.5.2.2.1.2.{{ $index }}'
                     descr: 'Fan {{ $index }} Speed'
                     low_limit: 0
@@ -30,38 +29,41 @@ modules:
         voltage:
             data:
                 -
-                    oid: raisecomVoltTable
-                    value: raisecomVoltValue
+                    oid: RAISECOM-SYSTEM-MIB::raisecomVoltTable
+                    value: RAISECOM-SYSTEM-MIB::raisecomVoltValue
                     num_oid: '.1.3.6.1.4.1.8886.1.1.4.3.1.1.3.{{ $index }}'
-                    descr: 'Voltage {{ $index }} ({{ $raisecomVoltReference }}mV)'
+                    descr: 'Voltage {{ $index }} ({{ RAISECOM-SYSTEM-MIB::raisecomVoltReference }}mV)'
                     divisor: 1000
-                    low_limit: raisecomVoltThresholdLow
-                    high_limit: raisecomVoltThresholdHigh
+                    low_limit: RAISECOM-SYSTEM-MIB::raisecomVoltThresholdLow
+                    high_limit: RAISECOM-SYSTEM-MIB::raisecomVoltThresholdHigh
         state:
             data:
                 -
-                    oid: raisecomConfigLoadState
-                    value: raisecomConfigLoadState
+                    oid: RAISECOM-COMMON-MANAGEMENT-MIB::raisecomConfigLoadState
+                    value: RAISECOM-COMMON-MANAGEMENT-MIB::raisecomConfigLoadState
                     num_oid: '.1.3.6.1.4.1.8886.1.2.1.3.{{ $index }}'
                     descr: 'Config {{ $index }} Load  State'
+                    state_name: raisecomConfigLoadState
                     states:
                         - { descr: ready, graph: 0, value: 1, generic: 1 }
                         - { descr: running, graph: 0, value: 2, generic: 1 }
                         - { descr: successful, graph: 0, value: 3, generic: 0 }
                         - { descr: failed, graph: 0, value: 4, generic: 2 }
                 -
-                    oid: raisecomFanMonitorStateTable
-                    value: raisecomFanWorkState
+                    oid: RAISECOM-FANMONITOR-MIB::raisecomFanMonitorStateTable
+                    value: RAISECOM-FANMONITOR-MIB::raisecomFanWorkState
                     num_oid: '.1.3.6.1.4.1.8886.1.1.5.2.2.1.3.{{ $index }}'
                     descr: 'Fan {{ $index }} State'
+                    state_name: raisecomFanMonitorStateTable
                     states:
                         - { descr: normal, graph: 0, value: 1, generic: 0 }
                         - { descr: abnormal, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: raisecomPowerMonitorStateTable
-                    value: raisecomPowerStatus
+                    oid: RAISECOM-POWERMONITOR-MIB::raisecomPowerMonitorStateTable
+                    value: RAISECOM-POWERMONITOR-MIB::raisecomPowerStatus
                     num_oid: '.1.3.6.1.4.1.8886.1.24.2.1.1.6.{{ $index }}'
                     descr: 'Power Supply {{ $index }} State'
+                    state_name: raisecomPowerMonitorStateTable
                     states:
                         - { descr: offline, graph: 0, value: 1, generic: 2 }
                         - { descr: online, graph: 0, value: 2, generic: 0 }

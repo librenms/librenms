@@ -12472,6 +12472,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12491,6 +12492,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12510,6 +12512,7 @@
                     "entPhysicalContainedIn": 7,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12529,6 +12532,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12548,6 +12552,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12567,6 +12572,7 @@
                     "entPhysicalContainedIn": 7,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12586,6 +12592,7 @@
                     "entPhysicalContainedIn": 7,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Juniper",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12605,6 +12612,7 @@
                     "entPhysicalContainedIn": 9,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Juniper",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12624,6 +12632,7 @@
                     "entPhysicalContainedIn": 8,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Juniper",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -12643,6 +12652,7 @@
                     "entPhysicalContainedIn": 20,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Juniper",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -12757,6 +12767,117 @@
                     "context_name": "",
                     "ipv4_network": "185.70.40.0/24",
                     "ifIndex": 537
+                }
+            ]
+        }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 13,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 24,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 512,
+                    "low_ifIndex": 536,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 512,
+                    "low_ifIndex": 537,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 513,
+                    "low_ifIndex": 514,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 519,
+                    "low_ifIndex": 520,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 521,
+                    "low_ifIndex": 524,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 521,
+                    "low_ifIndex": 525,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 522,
+                    "low_ifIndex": 523,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 526,
+                    "low_ifIndex": 538,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 527,
+                    "low_ifIndex": 539,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 528,
+                    "low_ifIndex": 540,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 529,
+                    "low_ifIndex": 541,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 530,
+                    "low_ifIndex": 544,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 0,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 28
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "0c:20:16:22:e8:01",
+                    "ipv6_address": "fe80:0000:0000:0000:0e20:16ff:fe22:e801",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "0c:20:16:22:e8:01",
+                    "ipv6_address": "fec0:0000:0000:0000:000a:0000:0000:0004",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "0c:20:16:e8:b7:01",
+                    "ipv6_address": "fec0:0000:0000:0000:000a:0000:0000:0010",
+                    "context_name": ""
                 }
             ]
         }

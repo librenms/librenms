@@ -95,7 +95,7 @@
 
         <table class='table table-condensed'>
 
-            @admin
+            @can('reporting.update')
             <tr>
                 <td colspan='4'>
                     <div>
@@ -114,7 +114,7 @@
                     @endif
                 </td>
             </tr>
-            @endadmin
+            @endcan
 
             <tr>
                 <td><i class='fa fa-fw fa-server fa-lg icon-theme' aria-hidden='true'></i> <b>{{ __('Devices') }}</b></td>

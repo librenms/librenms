@@ -1,4 +1,3 @@
-mib: SPECTRACOM-XSYNC-MIB:SPECTRACOM-NTP-V4-MIB:SPECTRACOM-PTPBASE-MIB
 modules:
     os:
         serial: SNMPv2-SMI::enterprises.18837.3.2.2.1.16.0
@@ -8,95 +7,95 @@ modules:
             data:
                 -
                     oid:
-                        - ntpSysStaCurrentPeerName
-                        - ntpAssocEntry
-                        - ptpbaseClockParentDSEntry
+                        - SPECTRACOM-NTP-V4-MIB::ntpSysStaCurrentPeerName
+                        - SPECTRACOM-NTP-V4-MIB::ntpAssocEntry
+                        - SPECTRACOM-PTPBASE-MIB::ptpbaseClockParentDSEntry
         count:
             data:
                 -
-                    oid: ssSysStaEstPhaseError
-                    value: ssSysStaEstPhaseError
+                    oid: SPECTRACOM-XSYNC-MIB::ssSysStaEstPhaseError
+                    value: SPECTRACOM-XSYNC-MIB::ssSysStaEstPhaseError
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.8.{{ $index }}'
                     descr: 'Phase error (ns)'
                     group: PRECISION
                     index: 'ssSysStaEstPhaseError.{{ $index }}'
                 -
-                    oid: ssSysStaEstFreqError
-                    value: ssSysStaEstFreqError
+                    oid: SPECTRACOM-XSYNC-MIB::ssSysStaEstFreqError
+                    value: SPECTRACOM-XSYNC-MIB::ssSysStaEstFreqError
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.9.{{ $index }}'
                     descr: 'Frequence error (Hz)'
                     group: PRECISION
                     index: 'ssSysStaEstFreqError.{{ $index }}'
                 -
-                    oid: ssGpsRefNumSats
-                    value: ssGpsRefNumSats
+                    oid: SPECTRACOM-XSYNC-MIB::ssGpsRefNumSats
+                    value: SPECTRACOM-XSYNC-MIB::ssGpsRefNumSats
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.2.1.1.8.{{ $index }}'
                     descr: 'Current number of good/usable satellites'
                     group: GNSS
                     index: 'ssGpsRefNumSats.{{ $index }}'
                 -
-                    oid: ntpSysStaStratum
-                    value: ntpSysStaStratum
+                    oid: SPECTRACOM-NTP-V4-MIB::ntpSysStaStratum
+                    value: SPECTRACOM-NTP-V4-MIB::ntpSysStaStratum
                     num_oid: '.1.3.6.1.4.1.18837.3.3.2.2.{{ $index }}'
                     descr: 'Current stratum'
                     group: NTP
                     index: 'ntpSysStaStratum.{{ $index }}'
                 -
-                    oid: ntpSysStaPeerJitter
-                    value: ntpSysStaPeerJitter
+                    oid: SPECTRACOM-NTP-V4-MIB::ntpSysStaPeerJitter
+                    value: SPECTRACOM-NTP-V4-MIB::ntpSysStaPeerJitter
                     num_oid: '.1.3.6.1.4.1.18837.3.3.2.7.{{ $index }}'
-                    descr: 'Jitter Selected peer (ms): {{ $ntpSysStaCurrentPeerName }}'
+                    descr: 'Jitter Selected peer (ms): {{ SPECTRACOM-NTP-V4-MIB::ntpSysStaCurrentPeerName }}'
                     group: REFERENCE
                     index: 'ntpSysStaPeerJitter.{{ $index }}'
                 -
-                    oid: ntpSysStaPeerOffset
-                    value: ntpSysStaPeerOffset
+                    oid: SPECTRACOM-NTP-V4-MIB::ntpSysStaPeerOffset
+                    value: SPECTRACOM-NTP-V4-MIB::ntpSysStaPeerOffset
                     num_oid: '.1.3.6.1.4.1.18837.3.3.2.6.{{ $index }}'
-                    descr: 'Offset Selected peer (µs): {{ $ntpSysStaCurrentPeerName }}'
+                    descr: 'Offset Selected peer (µs): {{ SPECTRACOM-NTP-V4-MIB::ntpSysStaCurrentPeerName }}'
                     multiplier: 1000
                     group: REFERENCE
                     index: 'ntpSysStaPeerOffset.{{ $index }}'
                 -
-                    oid: ntpSysStaPeerDelay
-                    value: ntpSysStaPeerDelay
+                    oid: SPECTRACOM-NTP-V4-MIB::ntpSysStaPeerDelay
+                    value: SPECTRACOM-NTP-V4-MIB::ntpSysStaPeerDelay
                     num_oid: '.1.3.6.1.4.1.18837.3.3.2.5.{{ $index }}'
-                    descr: 'Delay Selected peer (ms): {{ $ntpSysStaCurrentPeerName }}'
+                    descr: 'Delay Selected peer (ms): {{ SPECTRACOM-NTP-V4-MIB::ntpSysStaCurrentPeerName }}'
                     group: REFERENCE
                     index: 'ntpSysStaPeerDelay.{{ $index }}'
                 -
-                    oid: ntpAssocEntry
-                    value: assocEntryJitter
+                    oid: SPECTRACOM-NTP-V4-MIB::ntpAssocEntry
+                    value: SPECTRACOM-NTP-V4-MIB::assocEntryJitter
                     num_oid: '.1.3.6.1.4.1.18837.3.3.3.2.1.14.{{ $index }}'
-                    descr: 'Jitter (ms): {{ $assocEntryIdentity }}'
+                    descr: 'Jitter (ms): {{ SPECTRACOM-NTP-V4-MIB::assocEntryIdentity }}'
                     group: NTP
                     index: 'assocEntryJitter.{{ $index }}'
                 -
-                    oid: ntpAssocEntry
-                    value: assocEntryOffset
+                    oid: SPECTRACOM-NTP-V4-MIB::ntpAssocEntry
+                    value: SPECTRACOM-NTP-V4-MIB::assocEntryOffset
                     num_oid: '.1.3.6.1.4.1.18837.3.3.3.2.1.13.{{ $index }}'
                     multiplier: 1000
-                    descr: 'Offset (µs): {{ $assocEntryIdentity }} {{ $assocEntryRefId }}'
+                    descr: 'Offset (µs): {{ SPECTRACOM-NTP-V4-MIB::assocEntryIdentity }} {{ SPECTRACOM-NTP-V4-MIB::assocEntryRefId }}'
                     group: NTP
                     index: 'assocEntryOffset.{{ $index }}'
                 -
-                    oid: ntpAssocEntry
-                    value: assocEntryDelay
+                    oid: SPECTRACOM-NTP-V4-MIB::ntpAssocEntry
+                    value: SPECTRACOM-NTP-V4-MIB::assocEntryDelay
                     num_oid: '.1.3.6.1.4.1.18837.3.3.3.2.1.12.{{ $index }}'
-                    descr: 'Delay (ms): {{ $assocEntryIdentity }}'
+                    descr: 'Delay (ms): {{ SPECTRACOM-NTP-V4-MIB::assocEntryIdentity }}'
                     group: NTP
                     index: 'assocEntryDelay.{{ $index }}'
                 -
-                    oid: ptpbaseClockParentDSEntry
-                    value: ptpbaseClockParentDSGMClockPriority1
+                    oid: SPECTRACOM-PTPBASE-MIB::ptpbaseClockParentDSEntry
+                    value: SPECTRACOM-PTPBASE-MIB::ptpbaseClockParentDSGMClockPriority1
                     num_oid: '.1.3.6.1.4.1.18837.3.5.1.2.2.1.9.{{ $index }}'
-                    descr: '{{ $ptpbaseClockParentDSGMClockIdentity }} master Priority'
+                    descr: '{{ SPECTRACOM-PTPBASE-MIB::ptpbaseClockParentDSGMClockIdentity }} master Priority'
                     group: PTP
                     index: 'ptpbaseClockParentDSGMClockPriority1.{{ $index }}'
                 -
-                    oid: ptpbaseClockParentDSEntry
-                    value: ptpbaseClockParentDSGMClockQualityOffset
+                    oid: SPECTRACOM-PTPBASE-MIB::ptpbaseClockParentDSEntry
+                    value: SPECTRACOM-PTPBASE-MIB::ptpbaseClockParentDSGMClockQualityOffset
                     num_oid: '.1.3.6.1.4.1.18837.3.5.1.2.2.1.13.{{ $index }}'
-                    descr: '{{ $ptpbaseClockParentDSGMClockIdentity }} master Variance'
+                    descr: '{{ SPECTRACOM-PTPBASE-MIB::ptpbaseClockParentDSGMClockIdentity }} master Variance'
                     group: PTP
                     index: 'ptpbaseClockParentDSGMClockQualityOffset.{{ $index }}'
 
@@ -104,91 +103,98 @@ modules:
             data:
 
                 -
-                    oid: ssSysStaOscTemp
-                    value: ssSysStaOscTemp
+                    oid: SPECTRACOM-XSYNC-MIB::ssSysStaOscTemp
+                    value: SPECTRACOM-XSYNC-MIB::ssSysStaOscTemp
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.17.{{ $index }}'
                     descr: 'Oscillator Temp'
                     index: 'ssSysStaOscTemp.{{ $index }}'
                 -
-                    oid: ssSysStaBrdTemp
-                    value: ssSysStaBrdTemp
+                    oid: SPECTRACOM-XSYNC-MIB::ssSysStaBrdTemp
+                    value: SPECTRACOM-XSYNC-MIB::ssSysStaBrdTemp
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.18.{{ $index }}'
                     descr: 'Board Temp'
                     index: 'ssSysStaBrdTemp.{{ $index }}'
                 -
-                    oid: ssSysStaCpuTemp
-                    value: ssSysStaCpuTemp
+                    oid: SPECTRACOM-XSYNC-MIB::ssSysStaCpuTemp
+                    value: SPECTRACOM-XSYNC-MIB::ssSysStaCpuTemp
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.19.{{ $index }}'
                     descr: 'CPU Temp'
                     index: 'ssSysStaCpuTemp.{{ $index }}'
         state:
             data:
                 -
-                    oid: ssSysStaPowerDC
-                    value: ssSysStaPowerDC
+                    oid: SPECTRACOM-XSYNC-MIB::ssSysStaPowerDC
+                    value: SPECTRACOM-XSYNC-MIB::ssSysStaPowerDC
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.2.{{ $index }}'
                     descr: 'DC power'
                     index: 'dcpower.{{ $index }}'
+                    state_name: ssSysStaPowerDC
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
                         - { value: 2, descr: nok, graph: 2, generic: 2 }
                         - { value: 3, descr: none, graph: 3, generic: 3 }
                 -
-                    oid: ssSysStaSyncState
-                    value: ssSysStaSyncState
+                    oid: SPECTRACOM-XSYNC-MIB::ssSysStaSyncState
+                    value: SPECTRACOM-XSYNC-MIB::ssSysStaSyncState
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.5.{{ $index }}'
                     descr: 'Sync status'
                     group: TIME
                     index: 'ssSysStaSyncState.{{ $index }}'
+                    state_name: ssSysStaSyncState
                     states:
                         - { value: 1, descr: sync, graph: 1, generic: 0 }
                         - { value: 2, descr: nosync, graph: 1, generic: 2 }
                 -
-                    oid: ssSysStaHoldoverState
-                    value: ssSysStaHoldoverState
+                    oid: SPECTRACOM-XSYNC-MIB::ssSysStaHoldoverState
+                    value: SPECTRACOM-XSYNC-MIB::ssSysStaHoldoverState
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.6.{{ $index }}'
                     descr: 'Holdover status'
                     group: TIME
                     index: 'ssSysStaHoldoverState.{{ $index }}'
+                    state_name: ssSysStaHoldoverState
                     states:
                         - { value: 1, descr: inHoldover, graph: 1, generic: 2 }
                         - { value: 2, descr: notInHoldover, graph: 1, generic: 0 }
                 -
-                    oid: ssSysStaTimeScale
-                    value: ssSysStaTimeScale
+                    oid: SPECTRACOM-XSYNC-MIB::ssSysStaTimeScale
+                    value: SPECTRACOM-XSYNC-MIB::ssSysStaTimeScale
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.10.{{ $index }}'
                     descr: 'Time scale'
                     group: TIME
                     index: 'ssSysStaTimeScale.{{ $index }}'
+                    state_name: ssSysStaTimeScale
                     states:
                         - { value: 1, descr: utc, graph: 1, generic: 0 }
                         - { value: 2, descr: tai, graph: 1, generic: 0 }
                         - { value: 3, descr: gps, graph: 1, generic: 0 }
                 -
-                    oid: ssSysStaBshJammingState
-                    value: ssSysStaBshJammingState
+                    oid: SPECTRACOM-XSYNC-MIB::ssSysStaBshJammingState
+                    value: SPECTRACOM-XSYNC-MIB::ssSysStaBshJammingState
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.22.{{ $index }}'
                     descr: 'Jamming status'
                     index: 'ssSysStaBshJammingState.{{ $index }}'
+                    state_name: ssSysStaBshJammingState
                     states:
                         - { value: 1, descr: active, graph: 1, generic: 2 }
                         - { value: 2, descr: inactive, graph: 1, generic: 0 }
                 -
-                    oid: ssSysStaBshSpoofingState
-                    value: ssSysStaBshSpoofingState
+                    oid: SPECTRACOM-XSYNC-MIB::ssSysStaBshSpoofingState
+                    value: SPECTRACOM-XSYNC-MIB::ssSysStaBshSpoofingState
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.23.{{ $index }}'
                     descr: 'Spoofing status'
                     index: 'ssSysStaBshSpoofingState.{{ $index }}'
+                    state_name: ssSysStaBshSpoofingState
                     states:
                         - { value: 1, descr: active, graph: 1, generic: 2 }
                         - { value: 2, descr: inactive, graph: 1, generic: 0 }
                 -
-                    oid: ssSysStaDisciplining
-                    value: ssSysStaDisciplining
+                    oid: SPECTRACOM-XSYNC-MIB::ssSysStaDisciplining
+                    value: SPECTRACOM-XSYNC-MIB::ssSysStaDisciplining
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.24.{{ $index }}'
                     descr: 'Oscillator disciplined'
                     group: TIME
                     index: 'ssSysStaDisciplining.{{ $index }}'
+                    state_name: ssSysStaDisciplining
                     states:
                         - { value: 0, descr: none, graph: 1, generic: 3 }
                         - { value: 1, descr: warmup, graph: 1, generic: 0 }
@@ -198,46 +204,50 @@ modules:
                         - { value: 5, descr: freerun, graph: 1, generic: 2 }
                         - { value: 6, descr: fault, graph: 1, generic: 2 }
                 -
-                    oid: ssGpsRefTimeValid
-                    value: ssGpsRefTimeValid
+                    oid: SPECTRACOM-XSYNC-MIB::ssGpsRefTimeValid
+                    value: SPECTRACOM-XSYNC-MIB::ssGpsRefTimeValid
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.2.1.1.4.{{ $index }}'
                     descr: 'GNSS valid time'
                     group: GNSS
                     index: 'ssGpsRefTimeValid.{{ $index }}'
+                    state_name: ssGpsRefTimeValid
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
                         - { value: 2, descr: nok, graph: 1, generic: 2 }
                 -
-                    oid: ssGpsRefAntennaState
-                    value: ssGpsRefAntennaState
+                    oid: SPECTRACOM-XSYNC-MIB::ssGpsRefAntennaState
+                    value: SPECTRACOM-XSYNC-MIB::ssGpsRefAntennaState
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.2.1.1.17.{{ $index }}'
                     descr: 'Antenna state'
                     group: GNSS
                     index: 'ssGpsRefAntennaState.{{ $index }}'
+                    state_name: ssGpsRefAntennaState
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
                         - { value: 2, descr: short, graph: 1, generic: 2 }
                         - { value: 3, descr: open, graph: 1, generic: 2 }
                         - { value: 4, descr: unknown, graph: 1, generic: 3 }
                 -
-                    oid: ntpSysStaCurrentMode
-                    value: ntpSysStaCurrentMode
+                    oid: SPECTRACOM-NTP-V4-MIB::ntpSysStaCurrentMode
+                    value: SPECTRACOM-NTP-V4-MIB::ntpSysStaCurrentMode
                     num_oid: '.1.3.6.1.4.1.18837.3.3.2.1.{{ $index }}'
                     descr: 'NTP service'
                     group: NTP
                     index: 'ntpSysStaCurrentMode.{{ $index }}'
+                    state_name: ntpSysStaCurrentMode
                     states:
                         - { value: 1, descr: unknown, graph: 1, generic: 3 }
                         - { value: 2, descr: notRunning, graph: 1, generic: 2 }
                         - { value: 3, descr: notSynchonized, graph: 1, generic: 2 }
                         - { value: 4, descr: synchronized, graph: 1, generic: 0 }
                 -
-                    oid: ptpbaseClockParentDSEntry
-                    value: ptpbaseClockParentDSGMClockQualityAccuracy
+                    oid: SPECTRACOM-PTPBASE-MIB::ptpbaseClockParentDSEntry
+                    value: SPECTRACOM-PTPBASE-MIB::ptpbaseClockParentDSGMClockQualityAccuracy
                     num_oid: '.1.3.6.1.4.1.18837.3.5.1.2.2.1.12.{{ $index }}'
-                    descr: '{{ $ptpbaseClockParentDSGMClockIdentity }} Master accuracy'
+                    descr: '{{ SPECTRACOM-PTPBASE-MIB::ptpbaseClockParentDSGMClockIdentity }} Master accuracy'
                     group: PTP
                     index: 'ptpbaseQualityAccuracy.{{ $index }}'
+                    state_name: ptpbaseClockParentDSEntry
                     states:
                         - { value: 254, descr: ok, graph: 1, generic: 3 }
                         - { value: 32, descr: <25ns, graph: 1, generic: 0 }

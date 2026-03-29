@@ -1,4 +1,3 @@
-mib: RUGGEDCOM-SYS-INFO-MIB
 modules:
     os:
         version: RUGGEDCOM-SYS-INFO-MIB::rcDeviceInfoMainSwVersion.0
@@ -8,38 +7,42 @@ modules:
         state:
             data:
                 -
-                    oid: rcDeviceStsPowerSupply1
+                    oid: RUGGEDCOM-SYS-INFO-MIB::rcDeviceStsPowerSupply1
                     num_oid: '.1.3.6.1.4.1.15004.4.2.2.4.{{ $index }}'
                     descr: 'Power Supply 1 Status'
                     index: 'rcDeviceStsPowerSupply1.{{ $index }}'
+                    state_name: rcDeviceStsPowerSupply1
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 3 }
                         - { descr: functional, graph: 0, value: 2, generic: 0 }
                         - { descr: notFunctional, graph: 0, value: 3, generic: 2 }
                         - { descr: notConnected, graph: 0, value: 4, generic: 1 }
                 -
-                    oid: rcDeviceStsPowerSupply2
+                    oid: RUGGEDCOM-SYS-INFO-MIB::rcDeviceStsPowerSupply2
                     num_oid: '.1.3.6.1.4.1.15004.4.2.2.5.{{ $index }}'
                     descr: 'Power Supply 2 Status'
                     index: 'rcDeviceStsPowerSupply2.{{ $index }}'
+                    state_name: rcDeviceStsPowerSupply2
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 3 }
                         - { descr: functional, graph: 0, value: 2, generic: 0 }
                         - { descr: notFunctional, graph: 0, value: 3, generic: 2 }
                         - { descr: notConnected, graph: 0, value: 4, generic: 1 }
                 -
-                    oid: rcDeviceStsFailSafeRelay
+                    oid: RUGGEDCOM-SYS-INFO-MIB::rcDeviceStsFailSafeRelay
                     num_oid: '.1.3.6.1.4.1.15004.4.2.2.7.{{ $index }}'
                     descr: Fail Safe Relay
                     index: 'rcDeviceStsFailSafeRelay.{{ $index }}'
+                    state_name: rcDeviceStsFailSafeRelay
                     states:
                         - { descr: energized, graph: 0, value: 1, generic: 0 }
                         - { descr: deEnergized, graph: 0, value: 2, generic: 2 }
                 -
-                    oid: rcDeviceStsFanBank1
+                    oid: RUGGEDCOM-SYS-INFO-MIB::rcDeviceStsFanBank1
                     num_oid: '.1.3.6.1.4.1.15004.4.2.2.10.{{ $index }}'
                     descr: 'Fan Bank Module 1'
                     index: 'rcDeviceStsFanBank1.{{ $index }}'
+                    state_name: rcDeviceStsFanBank1
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 3 }
                         - { descr: failed, graph: 0, value: 2, generic: 2 }
@@ -47,10 +50,11 @@ modules:
                         - { descr: off, graph: 0, value: 4, generic: 0 }
                         - { descr: on, graph: 0, value: 5, generic: 0 }
                 -
-                    oid: rcDeviceStsFanBank2
+                    oid: RUGGEDCOM-SYS-INFO-MIB::rcDeviceStsFanBank2
                     num_oid: '.1.3.6.1.4.1.15004.4.2.2.11.{{ $index }}'
                     descr: 'Fan Bank Module 2'
                     index: 'rcDeviceStsFanBank2.{{ $index }}'
+                    state_name: rcDeviceStsFanBank2
                     states:
                         - { descr: notPresent, graph: 0, value: 1, generic: 3 }
                         - { descr: failed, graph: 0, value: 2, generic: 2 }
@@ -60,7 +64,7 @@ modules:
         temperature:
             data:
                 -
-                    oid: rcDeviceStsTemperature
+                    oid: RUGGEDCOM-SYS-INFO-MIB::rcDeviceStsTemperature
                     num_oid: '.1.3.6.1.4.1.15004.4.2.2.3.{{ $index }}'
                     index: 'rcDeviceStsTemperature.{{ $index }}'
                     descr: System Temperature

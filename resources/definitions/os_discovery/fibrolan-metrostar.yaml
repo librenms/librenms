@@ -1,19 +1,18 @@
-mib: FIBROLAN-MIB-SFP:FIBROLAN-DEVICE-MIB:METROSTAR-MIB:MS-TRAPS-MIB:FIBROLAN-MIB-MSMODULE:FIBROLAN-MIB-METRO-STAR-MV
 modules:
 
     processors:
         data:
             -
-                oid: flDeviceCpuStatusEntry
-                value: flDeviceCpuUtilization
+                oid: FIBROLAN-DEVICE-MIB::flDeviceCpuStatusEntry
+                value: FIBROLAN-DEVICE-MIB::flDeviceCpuUtilization
                 num_oid: '.1.3.6.1.4.1.4467.1000.10.1.120.1.2.{{ $index }}'
                 descr: 'CPU Usage'
     sensors:
         temperature:
             data:
                 -
-                    oid: flMsChassisMvEntry
-                    value: flMsChassisMvTemperature
+                    oid: FIBROLAN-MIB-METRO-STAR-MV::flMsChassisMvEntry
+                    value: FIBROLAN-MIB-METRO-STAR-MV::flMsChassisMvTemperature
                     num_oid: '.1.3.6.1.4.1.4467.100.500.20.1.4.{{ $index }}'
                     descr: 'Chassis {{ $index }}'
                     index: flMsChassisMvTemperature.{{ $index }}
@@ -21,20 +20,20 @@ modules:
         state:
             data:
                 -
-                    oid: flMsChassisModuleMvEntry
-                    value: flMsChassisModuleMvReset
+                    oid: FIBROLAN-MIB-METRO-STAR-MV::flMsChassisModuleMvEntry
+                    value: FIBROLAN-MIB-METRO-STAR-MV::flMsChassisModuleMvReset
                     num_oid: '.1.3.6.1.4.1.4467.100.500.10.20.1.4.{{ $index }}'
-                    descr: 'Module {{ $index }} State - {{ $flMsChassisModuleMvDeviceType }}'
+                    descr: 'Module {{ $index }} State - {{ FIBROLAN-MIB-METRO-STAR-MV::flMsChassisModuleMvDeviceType }}'
                     state_name: flMsChassisModuleMvReset
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: 'running' }
                         - { value: 2, generic: 1, graph: 0, descr: 'reset' }
                     group: 'Modules'
                 -
-                    oid: flMsChassisPsuMvTable
-                    value: flMsChassisPsuMvStatus
+                    oid: FIBROLAN-MIB-METRO-STAR-MV::flMsChassisPsuMvTable
+                    value: FIBROLAN-MIB-METRO-STAR-MV::flMsChassisPsuMvStatus
                     num_oid: '.1.3.6.1.4.1.4467.100.500.10.10.1.2.{{ $index }}'
-                    descr: 'PS {{ $flMsChassisPsuMvIndex }}'
+                    descr: 'PS {{ FIBROLAN-MIB-METRO-STAR-MV::flMsChassisPsuMvIndex }}'
                     state_name: flMsChassisPsuMvStatus
                     states:
                         - { value: 1, generic: 2, graph: 0, descr: 'fail' }

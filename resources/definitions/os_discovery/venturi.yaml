@@ -1,4 +1,3 @@
-mib: VENTURI-SERVER-SYSTEM-MIB:VENTURI-SERVER-STATS-MIB
 modules:
     os:
         version:
