@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Bill;
+use App\Models\Device;
+use App\Models\Port;
 use App\Models\User;
 
 $no_refresh = true;
@@ -24,7 +27,7 @@ if (Gate::denies('update', User::class)) {
         }
 
         if ($action == 'adddevperm') {
-            if (! dbFetchCell('SELECT COUNT(*) FROM devices_perms WHERE `device_id` = ? AND `user_id` = ?', [$vars['device_id'], $user_data['user_id']])) {
+            if (! Device::where('device_id', $vars['device_id'])->hasAccess($user)->exists()) {
                 dbInsert(['device_id' => $vars['device_id'], 'user_id' => $user_data['user_id']], 'devices_perms');
             }
         }
@@ -42,7 +45,7 @@ if (Gate::denies('update', User::class)) {
         }
 
         if ($action == 'addifperm') {
-            if (! dbFetchCell('SELECT COUNT(*) FROM ports_perms WHERE `port_id` = ? AND `user_id` = ?', [$vars['port_id'], $user_data['user_id']])) {
+            if (! Port::where('port_id', $vars['port_id'])->hasAccess($user)->exists()) {
                 dbInsert(['port_id' => $vars['port_id'], 'user_id' => $user_data['user_id']], 'ports_perms');
             }
         }
@@ -52,7 +55,7 @@ if (Gate::denies('update', User::class)) {
         }
 
         if ($action == 'addbillperm') {
-            if (! dbFetchCell('SELECT COUNT(*) FROM bill_perms WHERE `bill_id` = ? AND `user_id` = ?', [$vars['bill_id'], $user_data['user_id']])) {
+            if (! Bill::where('bill_id', $vars['bill_id'])->hasAccess($user)->exists()) {
                 dbInsert(['bill_id' => $vars['bill_id'], 'user_id' => $user_data['user_id']], 'bill_perms');
             }
         }

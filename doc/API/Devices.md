@@ -1123,6 +1123,7 @@ Input:
 - ifDescr: If this is set to true then we will use ifDescr to lookup
   the port instead of ifName. Pass the ifDescr value you want to
   search as you would ifName.
+- graph_type: This can be png or svg to force the output as required.
 
 Example:
 
