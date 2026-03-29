@@ -110,10 +110,10 @@ class PhpSnmpQuery implements SnmpQueryInterface
             // Copy settings from old SNMP object
             $this->snmp->oid_increasing_check = $old_snmp->oid_increasing_check;
             $this->snmp->enum_print = $old_snmp->enum_print;
-            $this->snmp->numeric_inex = $old_snmp->numeric_index; /** @phpstan-ignore property.notFound, property.notFound */
+            $this->snmp->numeric_index = $old_snmp->numeric_index; /** @phpstan-ignore property.notFound, property.notFound */
             $this->snmp->numeric_timeticks = $old_snmp->numeric_timeticks; /** @phpstan-ignore property.notFound, property.notFound */
             $this->snmp->extended_index = $old_snmp->extended_index;  /** @phpstan-ignore property.notFound, property.notFound */
-            $this->snmp->dontprint_units = $old_snmp->dontprint_units;  /** @phpstan-ignore property.notFound, property.notFound */
+            $this->snmp->dont_print_units = $old_snmp->dont_print_units;  /** @phpstan-ignore property.notFound, property.notFound */
             if ($old_snmp->oid_output_format) {
                 $this->snmp->oid_output_format = $old_snmp->oid_output_format;
             }
@@ -124,7 +124,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
             $this->snmp->numeric_index = false;  /** @phpstan-ignore property.notFound */
             $this->snmp->numeric_timeticks = true;  /** @phpstan-ignore property.notFound */
             $this->snmp->extended_index = true;  /** @phpstan-ignore property.notFound */
-            $this->snmp->dontprint_units = true;  /** @phpstan-ignore property.notFound */
+            $this->snmp->dont_print_units = true;  /** @phpstan-ignore property.notFound */
         }
 
         // Make sure we copy settings if the device changes in future
@@ -333,7 +333,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
             return;
         }
 
-        snmp_mib_allow_underscores(true); /** @phpstan-ignore function.notFound */
+        snmp_set_mib_option(SNMP_MIB_ALLOW_UNDERSCORES, true); /** @phpstan-ignore function.notFound */
         snmp_init_mib(implode(':', $this->mibDirectories())); /** @phpstan-ignore function.notFound */
         $this->readMibs($this->mibs);
 
