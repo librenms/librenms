@@ -5,11 +5,11 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use App\Models\Mempool;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\NetSnmpTranslate;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\NetSnmpTranslate;
 use SnmpQuery;
 
 class Alaxala extends OS implements MempoolsDiscovery, ProcessorDiscovery

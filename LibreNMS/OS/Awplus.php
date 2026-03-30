@@ -31,7 +31,7 @@ use App\Models\Device;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\NetSnmpTranslate;
+use LibreNMS\Util\NetSnmpTranslate;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;

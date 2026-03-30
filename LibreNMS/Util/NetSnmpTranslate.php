@@ -24,13 +24,23 @@
  * @author     Steven Wilton <swilton@fluentit.au>
  */
 
-namespace LibreNMS\Data\Source;
+namespace LibreNMS\Util;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\Eventlog;
+use App\Polling\Measure\Measurement;
 use DeviceCache;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Enum\Severity;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\Rewrite;
+use Log;
+use Symfony\Component\Process\Process;
 
 class NetSnmpTranslate
 {

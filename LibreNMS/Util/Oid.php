@@ -27,9 +27,9 @@
 namespace LibreNMS\Util;
 
 use Cache;
-use LibreNMS\Data\Source\NetSnmpTranslate;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidOidException;
+use LibreNMS\Util\NetSnmpTranslate;
 
 class Oid implements \Stringable
 {

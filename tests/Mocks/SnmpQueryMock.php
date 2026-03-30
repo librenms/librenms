@@ -31,10 +31,10 @@ use DeviceCache;
 use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\NetSnmpTranslate;
 use LibreNMS\Data\Source\SnmpQueryInterface;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\NetSnmpTranslate;
 use LibreNMS\Util\Oid;
 use Log;
 
