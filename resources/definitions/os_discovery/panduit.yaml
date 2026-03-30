@@ -17,10 +17,10 @@ modules:
                     descr: 'System {{ $index }} Overall Status'
                     state_name: pdug5IdentEntry
                     states:
-                      - { descr: 'Other', graph: 0, value: 1, generic: 3 }
-                      - { descr: 'OK', graph: 0, value: 2, generic: 0 }
-                      - { descr: 'degraded', graph: 0, value: 3, generic: 1 }
-                      - { descr: 'failed', graph: 0, value: 4, generic: 2 }
+                      - { descr: 'Other', value: 1, generic: 3 }
+                      - { descr: 'OK', value: 2, generic: 0 }
+                      - { descr: 'degraded', value: 3, generic: 1 }
+                      - { descr: 'failed', value: 4, generic: 2 }
                   -
                     oid: PANDUIT-MIB::pdug5GroupEntry
                     value: PANDUIT-MIB::pdug5GroupBreakerStatus
@@ -29,9 +29,9 @@ modules:
                     index: 'pdug5GroupBreakerStatus.{{ $index }}'
                     state_name: pdug5GroupBreakerStatus
                     states:
-                      - { descr: 'Not Applicable', graph: 0, value: 1, generic: 0 }
-                      - { descr: 'On', graph: 0, value: 2, generic: 0 }
-                      - { descr: 'Off', graph: 0, value: 3, generic: 2 }
+                      - { descr: 'Not Applicable', value: 1, generic: 0 }
+                      - { descr: 'On', value: 2, generic: 0 }
+                      - { descr: 'Off', value: 3, generic: 2 }
                     skip_values:
                         -
                           oid: PANDUIT-MIB::pdug5GroupBreakerStatus
@@ -46,10 +46,10 @@ modules:
                     group: 'Outlets'
                     state_name: pdug5Outlet
                     states:
-                        - { value: 1, generic: 3, descr: off, graph: 0 }
-                        - { value: 2, generic: 0, descr: on, graph: 0 }
-                        - { value: 3, generic: 1, descr: pendingOff, graph: 0 }
-                        - { value: 4, generic: 2, descr: pendingOn, graph: 0 }
+                        - { value: 1, generic: 3, descr: off,  }
+                        - { value: 2, generic: 0, descr: on,  }
+                        - { value: 3, generic: 1, descr: pendingOff,  }
+                        - { value: 4, generic: 2, descr: pendingOn,  }
                     skip_values:
                         -
                           oid: 'PANDUIT-MIB::pdug5OutletIndex'

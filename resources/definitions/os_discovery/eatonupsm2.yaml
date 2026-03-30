@@ -49,8 +49,8 @@ modules:
                     state_name: xupsEnvironment
                     index: 'xupsContactState.{{ $index }}'
                     states:
-                        - { value: 1, descr: open, graph: 1, generic: 2 }
-                        - { value: 2, descr: closed, graph: 1, generic: 2 }
+                        - { value: 1, descr: open, generic: 2 }
+                        - { value: 2, descr: closed, generic: 2 }
                 -
                     oid: XUPS-MIB::xupsBatteryLowCapacity
                     value: XUPS-MIB::xupsBatteryLowCapacity
@@ -59,5 +59,5 @@ modules:
                     descr: 'Battery Low Capacity Warning'
                     index: 'xupsBatteryLowCapacity.{{ $index }}'
                     states:
-                        - { value: 1, descr: Yes, graph: 1, generic: 1 }
-                        - { value: 2, descr: No, graph: 1, generic: 0 }
+                        - { value: 1, descr: Yes, generic: 1 }
+                        - { value: 2, descr: No, generic: 0 }

@@ -300,8 +300,8 @@ modules:
                     index: '.cmcTcMibCondition.{{ $index }}'
                     state_name: cmcTcMibCondition
                     states:
-                        - { value:  1, generic: 3, graph: 0, descr: OTHER }
-                        - { value:  2, generic: 0, graph: 0, descr: OK }
-                        - { value:  3, generic: 1, graph: 0, descr: DEGRADED }
-                        - { value:  4, generic: 2, graph: 0, descr: FAILED }
-                        - { value:  5, generic: 3, graph: 0, descr: configChanged }
+                        - { value:  1, generic: 3, descr: OTHER }
+                        - { value:  2, generic: 0, descr: OK }
+                        - { value:  3, generic: 1, descr: DEGRADED }
+                        - { value:  4, generic: 2, descr: FAILED }
+                        - { value:  5, generic: 3, descr: configChanged }

@@ -29,13 +29,13 @@ modules:
                     state_name: tmnxPhysChassisFanOperStatus
                     group: 'Fan State'
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: Unknown }
-                        - { value: 2, generic: 3, graph: 0, descr: NotEquipped }
-                        - { value: 3, generic: 0, graph: 0, descr: OK }
-                        - { value: 4, generic: 2, graph: 0, descr: Failed }
-                        - { value: 5, generic: 1, graph: 0, descr: OOS }
-                        - { value: 6, generic: 1, graph: 0, descr: NotProvisioned }
-                        - { value: 7, generic: 3, graph: 0, descr: NotApplicable }
+                        - { value: 1, generic: 3, descr: Unknown }
+                        - { value: 2, generic: 3, descr: NotEquipped }
+                        - { value: 3, generic: 0, descr: OK }
+                        - { value: 4, generic: 2, descr: Failed }
+                        - { value: 5, generic: 1, descr: OOS }
+                        - { value: 6, generic: 1, descr: NotProvisioned }
+                        - { value: 7, generic: 3, descr: NotApplicable }
                 -
                     oid: TIMETRA-BGP-MIB::tBgpPeerNgTable
                     value: TIMETRA-BGP-MIB::tBgpPeerNgConnState
@@ -44,13 +44,13 @@ modules:
                     descr: '{{ TIMETRA-BGP-MIB::tBgpPeerNgDescription }}'
                     state_name: tBgpPeerNgTable
                     states:
-                        - { value: 1, generic: 1, graph: 0, descr: 'idle' }
-                        - { value: 2, generic: 1, graph: 0, descr: 'connect' }
-                        - { value: 3, generic: 1, graph: 0, descr: 'active' }
-                        - { value: 4, generic: 1, graph: 0, descr: 'openSent' }
-                        - { value: 5, generic: 1, graph: 0, descr: 'openConfirm' }
-                        - { value: 6, generic: 0, graph: 0, descr: 'established' }
-                        - { value: 7, generic: 2, graph: 0, descr: 'clearing' }
+                        - { value: 1, generic: 1, descr: 'idle' }
+                        - { value: 2, generic: 1, descr: 'connect' }
+                        - { value: 3, generic: 1, descr: 'active' }
+                        - { value: 4, generic: 1, descr: 'openSent' }
+                        - { value: 5, generic: 1, descr: 'openConfirm' }
+                        - { value: 6, generic: 0, descr: 'established' }
+                        - { value: 7, generic: 2, descr: 'clearing' }
                     skip_values:
                     -
                       oid: TIMETRA-BGP-MIB::tBgpPeerNgDescription
@@ -64,13 +64,13 @@ modules:
                     descr: '{{ $subindex3 }}.{{ $subindex4 }}.{{ $subindex5 }}.{{ $subindex6 }} - {{ TIMETRA-BGP-MIB::tBgpPeerNgPeerGroup }}'
                     state_name: tBgpPeerNgTable
                     states:
-                        - { value: 1, generic: 1, graph: 0, descr: 'idle' }
-                        - { value: 2, generic: 1, graph: 0, descr: 'connect' }
-                        - { value: 3, generic: 1, graph: 0, descr: 'active' }
-                        - { value: 4, generic: 1, graph: 0, descr: 'openSent' }
-                        - { value: 5, generic: 1, graph: 0, descr: 'openConfirm' }
-                        - { value: 6, generic: 0, graph: 0, descr: 'established' }
-                        - { value: 7, generic: 2, graph: 0, descr: 'clearing' }
+                        - { value: 1, generic: 1, descr: 'idle' }
+                        - { value: 2, generic: 1, descr: 'connect' }
+                        - { value: 3, generic: 1, descr: 'active' }
+                        - { value: 4, generic: 1, descr: 'openSent' }
+                        - { value: 5, generic: 1, descr: 'openConfirm' }
+                        - { value: 6, generic: 0, descr: 'established' }
+                        - { value: 7, generic: 2, descr: 'clearing' }
                     skip_values:
                     -
                       oid: TIMETRA-BGP-MIB::tBgpPeerNgDescription

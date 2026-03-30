@@ -31,12 +31,12 @@ modules:
                             op: '!='
                             value: 1
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'OK' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'Warning' }
-                        - { value: 3, generic: 2, graph: 1, descr: 'Error' }
-                        - { value: 4, generic: 3, graph: 1, descr: 'Aborted' }
-                        - { value: 5, generic: 3, graph: 1, descr: 'inProgress' }
-                        - { value: 6, generic: 3, graph: 1, descr: 'noData' }
+                        - { value: 1, generic: 0, descr: 'OK' }
+                        - { value: 2, generic: 1, descr: 'Warning' }
+                        - { value: 3, generic: 2, descr: 'Error' }
+                        - { value: 4, generic: 3, descr: 'Aborted' }
+                        - { value: 5, generic: 3, descr: 'inProgress' }
+                        - { value: 6, generic: 3, descr: 'noData' }
                 -
                     oid: USHA-MIB::upsBatteryGroup
                     value: USHA-MIB::upsBatteryGroupStatus
@@ -45,12 +45,12 @@ modules:
                     index: 'upsBatteryGroupStatus.{{ $index }}'
                     state_name: upsBatteryGroupStatus
                     states:
-                        - { value: 1, generic: 3, graph: 1, descr: 'Unknown' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'Normal' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'Low' }
-                        - { value: 4, generic: 2, graph: 1, descr: 'Depleeted' }
-                        - { value: 5, generic: 1, graph: 1, descr: 'Discharging' }
-                        - { value: 6, generic: 2, graph: 1, descr: 'Failure' }
+                        - { value: 1, generic: 3, descr: 'Unknown' }
+                        - { value: 2, generic: 0, descr: 'Normal' }
+                        - { value: 3, generic: 1, descr: 'Low' }
+                        - { value: 4, generic: 2, descr: 'Depleeted' }
+                        - { value: 5, generic: 1, descr: 'Discharging' }
+                        - { value: 6, generic: 2, descr: 'Failure' }
                 -
                     oid: USHA-MIB::upsOutputGroupSource
                     value: USHA-MIB::upsOutputGroupSource
@@ -59,13 +59,13 @@ modules:
                     index: 'upsOutputGroupSource.{{ $index }}'
                     state_name: upsOutputGroupSource
                     states:
-                        - { value: 1, generic: 3, graph: 1, descr: 'Other' }
-                        - { value: 2, generic: 3, graph: 1, descr: 'None' }
-                        - { value: 3, generic: 0, graph: 1, descr: 'Normal' }
-                        - { value: 4, generic: 1, graph: 1, descr: 'Bypass' }
-                        - { value: 5, generic: 1, graph: 1, descr: 'Battery' }
-                        - { value: 6, generic: 2, graph: 1, descr: 'Booster' }
-                        - { value: 7, generic: 2, graph: 1, descr: 'Reducer' }
+                        - { value: 1, generic: 3, descr: 'Other' }
+                        - { value: 2, generic: 3, descr: 'None' }
+                        - { value: 3, generic: 0, descr: 'Normal' }
+                        - { value: 4, generic: 1, descr: 'Bypass' }
+                        - { value: 5, generic: 1, descr: 'Battery' }
+                        - { value: 6, generic: 2, descr: 'Booster' }
+                        - { value: 7, generic: 2, descr: 'Reducer' }
         voltage:
             data:
                 -

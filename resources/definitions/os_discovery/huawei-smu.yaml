@@ -121,9 +121,9 @@ modules:
                     descr: "Site Status"
                     state_name: hwSiteDGWorkStatus
                     states:
-                        - { value: 1, generic: 3, graph: 1, descr: 'idle' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'working' }
-                        - { value: 3, generic: 3, graph: 1, descr: 'unknown' }
+                        - { value: 1, generic: 3, descr: 'idle' }
+                        - { value: 2, generic: 0, descr: 'working' }
+                        - { value: 3, generic: 3, descr: 'unknown' }
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwMonitorOperStatus
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.2.2.1.1.99.{{ $index }}'
@@ -131,12 +131,12 @@ modules:
                     group: Site Summary
                     state_name: hwMonitorOperStatus
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'normal' }
-                        - { value: 2, generic: 2, graph: 1, descr: 'commRs485Fail' }
-                        - { value: 3, generic: 2, graph: 1, descr: 'commNetFail' }
-                        - { value: 4, generic: 2, graph: 1, descr: 'fault' }
-                        - { value: 254, generic: 1, graph: 1, descr: 'alarmResume' }
-                        - { value: 255, generic: 3, graph: 1, descr: 'other' }
+                        - { value: 1, generic: 0, descr: 'normal' }
+                        - { value: 2, generic: 2, descr: 'commRs485Fail' }
+                        - { value: 3, generic: 2, descr: 'commNetFail' }
+                        - { value: 4, generic: 2, descr: 'fault' }
+                        - { value: 254, generic: 1, descr: 'alarmResume' }
+                        - { value: 255, generic: 3, descr: 'other' }
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwSetMonEquipCtrlState
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.2.2.1.1.11.{{ $index }}'
@@ -144,9 +144,9 @@ modules:
                     group: Site Summary
                     state_name: hwSetMonEquipCtrlState
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'manualMode' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'autoMode' }
-                        - { value: 255, generic: 3, graph: 1, descr: 'unknown' }
+                        - { value: 1, generic: 0, descr: 'manualMode' }
+                        - { value: 2, generic: 0, descr: 'autoMode' }
+                        - { value: 255, generic: 3, descr: 'unknown' }
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwSetRectsRedundEnable
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.7.{{ $index }}'
@@ -154,9 +154,9 @@ modules:
                     group: Rectifier
                     state_name: hwSetRectsRedundEnable
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'disable' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'enable' }
-                        - { value: 3, generic: 3, graph: 1, descr: 'funcNotSuppport' }
+                        - { value: 1, generic: 0, descr: 'disable' }
+                        - { value: 2, generic: 0, descr: 'enable' }
+                        - { value: 3, generic: 3, descr: 'funcNotSuppport' }
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwCtrlRectsAllOnOff
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.8.{{ $index }}'
@@ -164,9 +164,9 @@ modules:
                     group: Rectifier
                     state_name: hwCtrlRectsAllOnOff
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'on' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'off' }
-                        - { value: 255, generic: 3, graph: 1, descr: 'nullOper' }
+                        - { value: 1, generic: 0, descr: 'on' }
+                        - { value: 2, generic: 1, descr: 'off' }
+                        - { value: 255, generic: 3, descr: 'nullOper' }
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattsChargeStatus
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.3.{{ $index }}'
@@ -174,10 +174,10 @@ modules:
                     group: Battery
                     state_name: hwBattsChargeStatus
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'floatCharge' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'boostCharge' }
-                        - { value: 3, generic: 2, graph: 1, descr: 'disCharge' }
-                        - { value: 255, generic: 3, graph: 1, descr: 'unknown' }
+                        - { value: 1, generic: 0, descr: 'floatCharge' }
+                        - { value: 2, generic: 1, descr: 'boostCharge' }
+                        - { value: 3, generic: 2, descr: 'disCharge' }
+                        - { value: 255, generic: 3, descr: 'unknown' }
                 -
                     oid: HUAWEI-SITE-MONITOR-MIB::hwBattsCurrLimitStatus
                     num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.4.{{ $index }}'
@@ -185,6 +185,6 @@ modules:
                     group: Battery
                     state_name: hwBattsCurrLimitStatus
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'unlimit' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'limit' }
-                        - { value: 255, generic: 3, graph: 1, descr: 'unknown' }
+                        - { value: 1, generic: 0, descr: 'unlimit' }
+                        - { value: 2, generic: 0, descr: 'limit' }
+                        - { value: 255, generic: 3, descr: 'unknown' }

@@ -59,7 +59,7 @@ modules:
                     index: 'integraBsysLicenseGenStatus.{{ $index }}'
                     state_name: integraBsysLicenseGenStatus
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: ok }
-                        - { value: 2, generic: 2, graph: 1, descr: expired }
-                        - { value: 3, generic: 3, graph: 1, descr: unknown }
-                        - { value: 4, generic: 0, graph: 1, descr: unlimitedTime }
+                        - { value: 1, generic: 0, descr: ok }
+                        - { value: 2, generic: 2, descr: expired }
+                        - { value: 3, generic: 3, descr: unknown }
+                        - { value: 4, generic: 0, descr: unlimitedTime }
