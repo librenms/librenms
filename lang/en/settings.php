@@ -2183,6 +2183,10 @@ return [
             ],
         ],
         'snmp' => [
+            'engine' => [
+                'description' => 'SNMP Query Engine',
+                'help' => 'SNMP Query Engine. Net-SNMP is slower but is the current stable option. PHP-SNMP is faster but uses new PHP and LibreNMS code that is still experimemtal.',
+            ],
             'transports' => [
                 'description' => 'Transport (priority)',
                 'help' => 'Select enabled transports and order them as you want them to be tried.',

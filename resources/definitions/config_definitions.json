@@ -6880,6 +6880,17 @@
                 "public"
             ]
         },
+        "snmp.engine": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 0,
+            "type": "select",
+            "default": "netsnmp",
+            "options": {
+                "netsnmp": "Net-SNMP Commands",
+                "phpsnmp": "PHP-SNMP Extension (experimental)"
+            }
+        },
         "snmp.unescape": {
             "type": "boolean"
         },
