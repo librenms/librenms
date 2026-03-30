@@ -38,7 +38,8 @@ class Snmpsim extends Process
         public readonly int $port = 1161,
         public readonly ?string $log_method = null)
     {
-        $this->snmprec_dir = base_path('tests/snmpsim');
+        //$this->snmprec_dir = base_path('tests/snmpsim');
+        $this->snmprec_dir = 'tests/snmpsim';
 
         $cmd = [
             $this->getVenvPath('bin/snmpsim-command-responder-lite'),

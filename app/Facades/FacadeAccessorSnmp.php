@@ -27,9 +27,9 @@
 namespace App\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use LibrenmsConfig;
 use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Data\Source\PhpSnmpQuery;
+use LibrenmsConfig;
 
 class FacadeAccessorSnmp extends Facade
 {
