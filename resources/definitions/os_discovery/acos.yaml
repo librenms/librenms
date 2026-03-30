@@ -28,6 +28,9 @@ modules:
                     descr: HA Local Status
                     group: HA
                     states:
+                        - { value: 0, descr: 'standby', graph: 0, generic: 0 }
+                        - { value: 1, descr: 'active', graph: 0, generic: 0 }
+                        - { value: 9, descr: 'notConfigured', graph: 0, generic: 2 }
                 -
                     oid: A10-AX-MIB::axSysPowerSupplyStatusTable
                     value: A10-AX-MIB::axPowerSupplyStatus
@@ -37,6 +40,10 @@ modules:
                     index: 'axPowerSupplyStatus.{{ $index }}'
                     group: Hardware
                     states:
+                        - { value: 0, descr: off, graph: 1, generic: 2 }
+                        - { value: 1, descr: on, graph: 1, generic: 0 }
+                        - { value: 2, descr: absent, graph: 1, generic: 1 }
+                        - { value: -1, descr: unknown, graph: 1, generic: 3 }
                 -
                     oid: A10-AX-MIB::axSysFanStatusTable
                     value: A10-AX-MIB::axFanStatus
@@ -46,6 +53,13 @@ modules:
                     index: 'axFanStatus.{{ $index }}'
                     group: Hardware
                     states:
+                        - { value: 0, descr: failed, graph: 1, generic: 2 }
+                        - { value: 4, descr: okFixedHigh, graph: 1, generic: 0 }
+                        - { value: 5, descr: okLowMed, graph: 1, generic: 0 }
+                        - { value: 6, descr: okMedMed, graph: 1, generic: 0 }
+                        - { value: 7, descr: okMedHigh, graph: 1, generic: 0 }
+                        - { value: -2, descr: notReady, graph: 1, generic: 1 }
+                        - { value: -1, descr: unknown, graph: 1, generic: 3 }
                 -
                     oid: A10-AX-MIB::axPowerSupplyVoltageTable
                     value: A10-AX-MIB::axPowerSupplyVoltageStatus
@@ -55,6 +69,9 @@ modules:
                     index: 'axPowerSupplyVoltageStatus.{{ $index }}'
                     group: Hardware
                     states:
+                        - { value: 0, descr: invalid, graph: 1, generic: 2 }
+                        - { value: 1, descr: normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
                 -
                     oid: A10-AX-MIB::axSysHwPhySystemTempStatus
                     value: A10-AX-MIB::axSysHwPhySystemTempStatus
@@ -64,6 +81,11 @@ modules:
                     index: 'axSysHwPhySystemTempStatus.{{ $index }}'
                     group: Hardware
                     states:
+                        - { value: 0, descr: failed, graph: 1, generic: 2 }
+                        - { value: 1, descr: low-med, graph: 1, generic: 0 }
+                        - { value: 2, descr: med-med, graph: 1, generic: 1 }
+                        - { value: 3, descr: med-high, graph: 1, generic: 1 }
+                        - { value: 4, descr: ok, graph: 1, generic: 0 }
         voltage:
             data:
                 -

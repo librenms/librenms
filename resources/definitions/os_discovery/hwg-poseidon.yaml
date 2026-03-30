@@ -40,6 +40,8 @@ modules:
                     index: 'inpValue.{{ $index }}'
                     state_name: inpValue
                     states:
+                        - { descr: open, graph: 0, value: 0, generic: 0 }
+                        - { descr: closed, graph: 0, value: 1, generic: 2 }
                 -
                     oid: POSEIDON-MIB::inpTable
                     value: POSEIDON-MIB::inpAlarmState
@@ -48,6 +50,8 @@ modules:
                     index: 'inpAlarmState.{{ $index }}'
                     state_name: inpAlarmState
                     states:
+                        - { descr: normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: alarm, graph: 0, value: 1, generic: 2 }
                 -
                     oid: POSEIDON-MIB::sensTable
                     value: POSEIDON-MIB::sensState
@@ -56,3 +60,7 @@ modules:
                     index: 'sensState.{{ $index }}'
                     state_name: sensName
                     states:
+                        - { descr: invalid, graph: 0, value: 0, generic: 2 }
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: alarmstate, graph: 0, value: 2, generic: 2 }
+                        - { descr: alarm, graph: 0, value: 3, generic: 2 }

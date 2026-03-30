@@ -569,6 +569,8 @@ modules:
                     group: Redundancy
                     state_name: hwWlanClusterSynConfigScheduleEnable
                     states:
+                        - { descr: disable, graph: 1, value: 1, generic: 3 }
+                        - { descr: enable, graph: 1, value: 2, generic: 0 }
                 -
                     oid: HUAWEI-WLAN-CONFIGURATION-MIB::hwWlanClusterACListInfoTable
                     value: HUAWEI-WLAN-CONFIGURATION-MIB::hwWlanClusterACStatus
@@ -577,6 +579,13 @@ modules:
                     group: Redundancy
                     state_name: hwWlanClusterACStatus
                     states:
+                        - { descr: down, graph: 1, value: 1, generic: 2 }
+                        - { descr: up, graph: 1, value: 2, generic: 0 }
+                        - { descr: pskmismatch, graph: 1, value: 3, generic: 2 }
+                        - { descr: vermismatch, graph: 1, value: 4, generic: 2 }
+                        - { descr: cfgmismatch, graph: 1, value: 5, generic: 2 }
+                        - { descr: devmismatch, graph: 1, value: 6, generic: 2 }
+                        - { descr: initial, graph: 1, value: 7, generic: 3 }
                 -
                     oid: HUAWEI-WLAN-CONFIGURATION-MIB::hwWlanClusterACListInfoTable
                     value: HUAWEI-WLAN-CONFIGURATION-MIB::hwWlanClusterACRole
@@ -585,6 +594,9 @@ modules:
                     group: Redundancy
                     state_name: hwWlanClusterACRole
                     states:
+                        - { descr: Master, graph: 1, value: 1, generic: 0 }
+                        - { descr: Slave, graph: 1, value: 2, generic: 0 }
+                        - { descr: Backup, graph: 1, value: 3, generic: 0 }
                 -
                     oid: HUAWEI-ENTITY-EXTENT-MIB::hwFanStatusTable
                     value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityFanState
@@ -593,6 +605,8 @@ modules:
                     group: Fans
                     state_name: hwEntityFanState
                     states:
+                        - { descr: Normal, graph: 1, value: 1, generic: 0 }
+                        - { descr: Abnormal, graph: 1, value: 2, generic: 2 }
                 -
                     oid: HUAWEI-STACK-MIB::hwStackMemberInfoTable
                     value: HUAWEI-STACK-MIB::hwMemberStackRole
@@ -601,6 +615,9 @@ modules:
                     group: Stack
                     state_name: hwMemberStackRole
                     states:
+                        - { descr: Master, graph: 1, value: 1, generic: 0 }
+                        - { descr: Standby, graph: 1, value: 2, generic: 0 }
+                        - { descr: Slave, graph: 1, value: 3, generic: 0 }
                 -
                     oid: HUAWEI-STACK-MIB::hwStackPortTable
                     value: HUAWEI-STACK-MIB::hwStackPortStatus
@@ -609,6 +626,8 @@ modules:
                     group: Stack
                     state_name: hwStackPortStatus
                     states:
+                        - { descr: Up, graph: 0, value: 1, generic: 0 }
+                        - { descr: Down, graph: 0, value: 2, generic: 2 }
                 -
                     oid: HUAWEI-WAN-MIB::hw3GTable
                     value: HUAWEI-WAN-MIB::hw3GModemStatus
@@ -617,6 +636,8 @@ modules:
                     group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
                     state_name: hw3GModemStatus
                     states:
+                        - { descr: onLine, graph: 1, value: 1, generic: 0 }
+                        - { descr: offLine, graph: 1, value: 4, generic: 2 }
                     skip_values:
                         -
                             oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
@@ -635,6 +656,9 @@ modules:
                     group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
                     state_name: hw3GCurrentNetworkConnection
                     states:
+                        - { descr: '3G', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'LTE', graph: 1, value: 3, generic: 0 }
+                        - { descr: 'Unknown', graph: 1, value: 7, generic: 3 }
                     skip_values:
                         -
                             oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
@@ -653,6 +677,11 @@ modules:
                     group: 'Modem {{ HUAWEI-WAN-MIB::hw3GDeviceNumber }}, {{ HUAWEI-WAN-MIB::hw3GIMEI }}'
                     state_name: hw3GConnectionStatus
                     states:
+                        - { descr: 'noService', graph: 1, value: 0, generic: 2 }
+                        - { descr: 'emergency', graph: 1, value: 1, generic: 2 }
+                        - { descr: 'serviceAvailable', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'regionEmergency', graph: 1, value: 3, generic: 2 }
+                        - { descr: 'savingStatus', graph: 1, value: 4, generic: 3 }
                     skip_values:
                         -
                             oid: HUAWEI-WAN-MIB::hw3GDeviceNumber
@@ -671,6 +700,10 @@ modules:
                     descr: 'VoltStatus {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
                     state_name: hwVoltageInfoTable
                     states:
+                        - { descr: 'Normal', graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Minor', graph: 1, value: 2, generic: 1 }
+                        - { descr: 'Major', graph: 1, value: 3, generic: 2 }
+                        - { descr: 'Fatal', graph: 1, value: 4, generic: 2 }
                 -
                     oid: HUAWEI-ENTITY-EXTENT-MIB::hwTemperatureThresholdTable
                     value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityTempStatus
@@ -680,6 +713,10 @@ modules:
                     descr: 'TempStatus {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
                     state_name: hwTemperatureThresholdTable
                     states:
+                        - { descr: 'Normal', graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Minor', graph: 1, value: 2, generic: 1 }
+                        - { descr: 'Major', graph: 1, value: 3, generic: 2 }
+                        - { descr: 'Fatal', graph: 1, value: 4, generic: 2 }
                 -
                     oid: HUAWEI-ENTITY-EXTENT-MIB::hwPwrStatusTable
                     value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityPwrState
@@ -689,3 +726,7 @@ modules:
                     descr: 'PWR{{ HUAWEI-ENTITY-EXTENT-MIB::hwEntityPwrSlot }}'
                     state_name: hwPwrStatusTable
                     states:
+                        - { descr: 'Supply', graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Not Supply', graph: 1, value: 2, generic: 2 }
+                        - { descr: 'Sleep', graph: 1, value: 3, generic: 1 }
+                        - { descr: 'Unknown', graph: 1, value: 4, generic: 3 }

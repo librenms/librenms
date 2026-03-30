@@ -66,6 +66,8 @@ modules:
                             op: '!='
                             value: 3
                     states:
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 2, generic: 0, graph: 0, descr: ok }
                     group: 'Alarms - {{ CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmInstance }}'
                 -
                     oid: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmTable
@@ -79,6 +81,8 @@ modules:
                             op: '!='
                             value: 4
                     states:
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 2, generic: 0, graph: 0, descr: ok }
                     group: 'Alarms - {{ CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmInstance }}'
                 -
                     oid: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmActive
@@ -92,6 +96,8 @@ modules:
                             op: '!='
                             value: 5
                     states:
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 2, generic: 0, graph: 0, descr: ok }
                     group: 'Alarms - {{ CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmInstance }}'
                 -
                     oid: CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmTable
@@ -105,5 +111,7 @@ modules:
                             op: '>='
                             value: 3
                     states:
+                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 2, generic: 0, graph: 0, descr: ok }
                     group: 'Alarms - {{ CIENA-WS-PLATFORM-ALARM-MIB::definedAlarmInstance }}'
 

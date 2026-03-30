@@ -44,6 +44,14 @@ modules:
                     index: 'systemClimateLevel.{{ $index }}'
                     state_name: systemClimateLevel
                     states:
+                        - { descr: 'Unknown',      graph: 1, value: 0, generic: 3 }
+                        - { descr: 'criticalLow',  graph: 1, value: 1, generic: 2 }
+                        - { descr: 'low',          graph: 1, value: 2, generic: 0 }
+                        - { descr: 'normal',       graph: 1, value: 3, generic: 0 }
+                        - { descr: 'increased',    graph: 1, value: 4, generic: 0 }
+                        - { descr: 'high',         graph: 1, value: 5, generic: 1 }
+                        - { descr: 'criticalHigh', graph: 1, value: 6, generic: 2 }
+                        - { descr: 'shutdown',     graph: 1, value: 7, generic: 2 }
                 -
                     oid: G6-HARDWARE-MIB::hardwarePowerSupply1Status.0
                     value: G6-HARDWARE-MIB::hardwarePowerSupply1Status
@@ -52,6 +60,13 @@ modules:
                     index: 'hardwarePowerSupply1Status.{{ $index }}'
                     state_name: hardwarePowerSupply1Status
                     states:
+                        - { descr: 'Ok',             graph: 1, value: 0, generic: 0 }
+                        - { descr: 'overload',       graph: 1, value: 1, generic: 2 }
+                        - { descr: 'inputLow',       graph: 1, value: 2, generic: 1 }
+                        - { descr: 'fuseFail',       graph: 1, value: 3, generic: 2 }
+                        - { descr: 'notApplicable',  graph: 1, value: 4, generic: 3 }
+                        - { descr: 'unmanaged',      graph: 1, value: 5, generic: 3 }
+                        - { descr: 'notInstalled',   graph: 1, value: 6, generic: 3 }
                 -
                     oid: G6-HARDWARE-MIB::hardwarePowerSupply2Status.0
                     value: G6-HARDWARE-MIB::hardwarePowerSupply2Status
@@ -60,6 +75,13 @@ modules:
                     index: 'hardwarePowerSupply2Status.{{ $index }}'
                     state_name: hardwarePowerSupply2Status
                     states:
+                        - { descr: 'Ok',             graph: 1, value: 0, generic: 0 }
+                        - { descr: 'overload',       graph: 1, value: 1, generic: 2 }
+                        - { descr: 'inputLow',       graph: 1, value: 2, generic: 1 }
+                        - { descr: 'fuseFail',       graph: 1, value: 3, generic: 2 }
+                        - { descr: 'notApplicable',  graph: 1, value: 4, generic: 3 }
+                        - { descr: 'unmanaged',      graph: 1, value: 5, generic: 3 }
+                        - { descr: 'notInstalled',   graph: 1, value: 6, generic: 3 }
                 -
                     oid: G6-HARDWARE-MIB::hardwareFanStatus.0
                     value: G6-HARDWARE-MIB::hardwareFanStatus
@@ -68,6 +90,11 @@ modules:
                     index: 'hardwareFanStatus.{{ $index }}'
                     state_name: hardwareFanStatus
                     states:
+                        - { descr: 'unused',   graph: 1, value: 0, generic: 3 }
+                        - { descr: 'Ok',       graph: 1, value: 1, generic: 0 }
+                        - { descr: 'degraded', graph: 1, value: 2, generic: 1 }
+                        - { descr: 'fail',     graph: 1, value: 3, generic: 2 }
+                        - { descr: 'missing',  graph: 1, value: 4, generic: 2 }
                 -
                     oid: G6-HARDWARE-MIB::hardwareSdCardStatus.0
                     value: G6-HARDWARE-MIB::hardwareSdCardStatus
@@ -76,6 +103,10 @@ modules:
                     index: 'hardwareSdCardStatus.{{ $index }}'
                     state_name: hardwareSdCardStatus
                     states:
+                        - { descr: 'empty',          graph: 1, value: 0, generic: 3 }
+                        - { descr: 'inserted',       graph: 1, value: 1, generic: 0 }
+                        - { descr: 'writeProtected', graph: 1, value: 2, generic: 1 }
+                        - { descr: 'writing',        graph: 1, value: 3, generic: 1 }
                 -
                     oid: G6-POE-MIB::statusTable
                     value: G6-POE-MIB::statusCondition
@@ -84,6 +115,16 @@ modules:
                     index: 'statusCondition.{{ $index }}'
                     state_name: statusCondition
                     states:
+                        - { descr: 'disabled',       graph: 1, value: 0, generic: 3 }
+                        - { descr: 'powerOff',       graph: 1, value: 1, generic: 3 }
+                        - { descr: 'discovering',    graph: 1, value: 2, generic: 1 }
+                        - { descr: 'powered',        graph: 1, value: 3, generic: 0 }
+                        - { descr: 'classMismatch',  graph: 1, value: 4, generic: 2 }
+                        - { descr: 'shortCircuit',   graph: 1, value: 5, generic: 2 }
+                        - { descr: 'rejected',       graph: 1, value: 6, generic: 2 }
+                        - { descr: 'overCurrent',    graph: 1, value: 7, generic: 2 }
+                        - { descr: 'overTemp',       graph: 1, value: 8, generic: 2 }
+                        - { descr: 'voltageTooLow',  graph: 1, value: 9, generic: 2 }
                     skip_values:
                      -
                       oid: G6-HARDWARE-MIB::portInfoInterfaceType
@@ -97,6 +138,14 @@ modules:
                     index: 'statusDeterminedClass.{{ $index }}'
                     state_name: statusDeterminedClass
                     states:
+                        - { descr: 'isClass0',       graph: 1, value: 0, generic: 0 }
+                        - { descr: 'isClass1',       graph: 1, value: 1, generic: 0 }
+                        - { descr: 'isClass2',       graph: 1, value: 2, generic: 0 }
+                        - { descr: 'isClass3',       graph: 1, value: 3, generic: 0 }
+                        - { descr: 'isClass4',       graph: 1, value: 4, generic: 0 }
+                        - { descr: 'isOverload',     graph: 1, value: 5, generic: 2 }
+                        - { descr: 'probesNotEqual', graph: 1, value: 7, generic: 2 }
+                        - { descr: 'isUnknown',      graph: 1, value: 255, generic: 2 }
                     skip_values:
                      -
                       oid: G6-POE-MIB::statusCondition
@@ -110,6 +159,10 @@ modules:
                     index: 'statusOverallStatus.{{ $index }}'
                     state_name: statusOverallStatus
                     states:
+                        - { descr: 'notPresent',  graph: 1, value: 0, generic: 3 }
+                        - { descr: 'disabled',    graph: 1, value: 1, generic: 3 }
+                        - { descr: 'fault',       graph: 1, value: 2, generic: 2 }
+                        - { descr: 'operational', graph: 1, value: 3, generic: 0 }
                 -
                     oid: G6-RING-MIB::statusTable
                     value: G6-RING-MIB::statusState
@@ -118,6 +171,11 @@ modules:
                     index: 'statusOverallStatus.{{ $index }}'
                     state_name: statusOverallStatus
                     states:
+                        - { descr: 'unused',               graph: 1, value: 0, generic: 3 }
+                        - { descr: 'normal',               graph: 1, value: 1, generic: 0 }
+                        - { descr: 'backup',               graph: 1, value: 2, generic: 0 }
+                        - { descr: 'error',                graph: 1, value: 3, generic: 2 }
+                        - { descr: 'remoteConfigMismatch', graph: 1, value: 4, generic: 2 }
                     skip_values:
                      -
                       oid: G6-RING-MIB::configEnableRing
@@ -131,6 +189,18 @@ modules:
                     index: 'statusRingPortANeighbor.{{ $index }}'
                     state_name: statusRingPortANeighbor
                     states:
+                        - { descr: 'unused',                    graph: 1, value: 0,  generic: 3 }
+                        - { descr: 'ok',                        graph: 1, value: 1,  generic: 0 }
+                        - { descr: 'localLldpDisabled',         graph: 1, value: 2,  generic: 2 }
+                        - { descr: 'waitingForRemoteLldp',      graph: 1, value: 3,  generic: 2 }
+                        - { descr: 'remoteLldpDisabled',        graph: 1, value: 5,  generic: 2 }
+                        - { descr: 'illegalDeviceDetected',     graph: 1, value: 6,  generic: 2 }
+                        - { descr: 'remoteOlderFwVersion',      graph: 1, value: 7,  generic: 2 }
+                        - { descr: 'remoteRingDisbled',         graph: 1, value: 8,  generic: 2 }
+                        - { descr: 'wrongRemotePort',           graph: 1, value: 9,  generic: 2 }
+                        - { descr: 'wrongRemoteRingId',         graph: 1, value: 10, generic: 2 }
+                        - { descr: 'differentProtocolVersions', graph: 1, value: 11, generic: 2 }
+                        - { descr: 'multipleMasterError',       graph: 1, value: 12, generic: 2 }
                     skip_values:
                      -
                       oid: G6-RING-MIB::configEnableRing
@@ -144,6 +214,18 @@ modules:
                     index: 'statusRingPortBNeighbor.{{ $index }}'
                     state_name: statusRingPortBNeighbor
                     states:
+                        - { descr: 'unused',                    graph: 1, value: 0,  generic: 3 }
+                        - { descr: 'ok',                        graph: 1, value: 1,  generic: 0 }
+                        - { descr: 'localLldpDisabled',         graph: 1, value: 2,  generic: 2 }
+                        - { descr: 'waitingForRemoteLldp',      graph: 1, value: 3,  generic: 2 }
+                        - { descr: 'remoteLldpDisabled',        graph: 1, value: 5,  generic: 2 }
+                        - { descr: 'illegalDeviceDetected',     graph: 1, value: 6,  generic: 2 }
+                        - { descr: 'remoteOlderFwVersion',      graph: 1, value: 7,  generic: 2 }
+                        - { descr: 'remoteRingDisbled',         graph: 1, value: 8,  generic: 2 }
+                        - { descr: 'wrongRemotePort',           graph: 1, value: 9,  generic: 2 }
+                        - { descr: 'wrongRemoteRingId',         graph: 1, value: 10, generic: 2 }
+                        - { descr: 'differentProtocolVersions', graph: 1, value: 11, generic: 2 }
+                        - { descr: 'multipleMasterError',       graph: 1, value: 12, generic: 2 }
                     skip_values:
                      -
                       oid: G6-RING-MIB::configEnableRing

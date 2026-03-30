@@ -15,6 +15,21 @@ modules:
           descr: 'Service State'
           index: 'mIfCellServiceState.{{ $index }}'
           states:
+            - { descr: gprs, graph: 0, value: 1, generic: 0 }
+            - { descr: edge, graph: 0, value: 2, generic: 0 }
+            - { descr: umts, graph: 0, value: 3, generic: 0 }
+            - { descr: hsdpa, graph: 0, value: 4, generic: 0 }
+            - { descr: hsupa, graph: 0, value: 5, generic: 0 }
+            - { descr: hspaPlus, graph: 0, value: 6, generic: 0 }
+            - { descr: is95a, graph: 0, value: 7, generic: 0 }
+            - { descr: is95b, graph: 0, value: 8, generic: 0 }
+            - { descr: onexRtt, graph: 0, value: 9, generic: 0 }
+            - { descr: evdoRev0, graph: 0, value: 10, generic: 0 }
+            - { descr: evdoReva, graph: 0, value: 11, generic: 0 }
+            - { descr: evdoRevb, graph: 0, value: 12, generic: 0 }
+            - { descr: evdoEhrpd, graph: 0, value: 13, generic: 0 }
+            - { descr: lte, graph: 0, value: 14, generic: 0 }
+            - { descr: not running, graph: 0, value: 0, generic: 3 }
                 
         - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
           value: MDS-IF-CELL-MIB::mIfCellSimState
@@ -24,6 +39,11 @@ modules:
           descr: 'Sim State'
           index: 'mIfCellSimState.{{ $index }}'
           states:
+              - { descr: not inserted, graph: 0, value: 0, generic: 3 }
+              - { descr: locked, graph: 0, value: 1, generic: 1 }
+              - { descr: ready, graph: 0, value: 2, generic: 0 }
+              - { descr: failed, graph: 0, value: 3, generic: 2 }
+              - { descr: unknown, graph: 0, value: 4, generic: 1 }
 
         - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
           value: MDS-IF-CELL-MIB::mIfCellModemType
@@ -33,6 +53,20 @@ modules:
           descr: 'Modem Type'
           index: 'mIfCellModemType.{{ $index }}'
           states:
+              - { descr: unknown, graph: 0, value: 0, generic: 3 }
+              - { descr: E4VLteNaVerizon, graph: 0, value: 1, generic: 3 }
+              - { descr: 3G1GsmGlobal, graph: 0, value: 2, generic: 3 }
+              - { descr: E4xLteEmea, graph: 0, value: 3, generic: 3 }
+              - { descr: 4GxLteNa, graph: 0, value: 4, generic: 3 }
+              - { descr: 4GPLteNa, graph: 0, value: 5, generic: 3 }
+              - { descr: EZ1LteEmea, graph: 0, value: 6, generic: 3 }
+              - { descr: 4GyLteNaEu, graph: 0, value: 7, generic: 3 }
+              - { descr: 4GzLteApac, graph: 0, value: 8, generic: 3 }
+              - { descr: 4GaLteGlobal, graph: 0, value: 9, generic: 3 }
+              - { descr: 4GbLteAmericas, graph: 0, value: 10, generic: 3 }
+              - { descr: 4GcLteEu, graph: 0, value: 11, generic: 3 }
+              - { descr: 4GdLteGlobal, graph: 0, value: 12, generic: 3 }
+              - { descr: evdoEhrpd, graph: 0, value: 13, generic: 0 }
 
         - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
           value: MDS-IF-CELL-MIB::mIfCellModemState
@@ -42,6 +76,13 @@ modules:
           descr: 'Modem State'
           index: 'mIfCellModemState.{{ $index }}'
           states:
+              - { descr: unknown, graph: 0, value: 0, generic: 3 }
+              - { descr: notRegistered, graph: 0, value: 1, generic: 3 }
+              - { descr: searching, graph: 0, value: 2, generic: 3 }
+              - { descr: registrationDenied, graph: 0, value: 3, generic: 2 }
+              - { descr: idle, graph: 0, value: 4, generic: 3 }
+              - { descr: connected, graph: 0, value: 5, generic: 0 }
+              - { descr: fwRequired, graph: 0, value: 6, generic: 1 }
 
         - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
           value: MDS-IF-CELL-MIB::mIfCellBandwidth
@@ -51,6 +92,13 @@ modules:
           descr: 'Bandwidth'
           index: 'mIfCellBandwidth.{{ $index }}'
           states:
+              - { descr: unknown, graph: 0, value: 0, generic: 3 }
+              - { descr: 1.4Mhz, graph: 0, value: 1, generic: 0 }
+              - { descr: 3Mhz, graph: 0, value: 2, generic: 0 }
+              - { descr: 5Mhz, graph: 0, value: 3, generic: 0 }
+              - { descr: 10Mhz, graph: 0, value: 4, generic: 0 }
+              - { descr: 15Mhz, graph: 0, value: 5, generic: 0 }
+              - { descr: 20Mhz, graph: 0, value: 6, generic: 0 }
 
         - oid: MDS-IF-CELL-MIB::mIfCellStatusTable
           value: MDS-IF-CELL-MIB::mIfCellRoamingState
@@ -60,6 +108,9 @@ modules:
           descr: 'Roaming State'
           index: 'mIfCellRoamingState.{{ $index }}'
           states:
+              - { descr: unknown, graph: 0, value: 0, generic: 3 }
+              - { descr: home, graph: 0, value: 1, generic: 0 }
+              - { descr: roaming, graph: 0, value: 2, generic: 1 }
 
     temperature:
       data:

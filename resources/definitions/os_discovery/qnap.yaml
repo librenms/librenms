@@ -67,6 +67,11 @@ modules:
                     group: 'Disk Status'
                     state_name: hdStatus
                     states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'Ready' }
+                        - { value: -5, generic: 3, graph: 0, descr: 'No Disk' }
+                        - { value: -6, generic: 2, graph: 0, descr: 'Invalid' }
+                        - { value: -9, generic: 2, graph: 0, descr: 'RW Error' }
+                        - { value: -4, generic: 3, graph: 0, descr: 'Unknown' }
                 -
                     oid: NAS-MIB::diskTable
                     value: NAS-MIB::diskSmartInfo
@@ -76,6 +81,10 @@ modules:
                     group: 'Disk S.M.A.R.T. enclosure {{ NAS-MIB::diskEnclosureID }}'
                     state_name: diskSmartInfo
                     states:
+                        - { value: 2, generic: 2, graph: 0, descr: 'Abnormal' }
+                        - { value: 1, generic: 1, graph: 0, descr: 'Warning' }
+                        - { value: 0, generic: 0, graph: 0, descr: 'Good' }
+                        - { value: -1, generic: 2, graph: 0, descr: 'Error' }
                 -
                     oid: NAS-MIB::systemFan2Table
                     value: NAS-MIB::systemFanStatus
@@ -85,6 +94,8 @@ modules:
                     group: 'FANs enclosure {{ NAS-MIB::systemFanEnclosureID }}'
                     state_name: systemFanStatus
                     states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
+                        - { value: -1, generic: 2, graph: 0, descr: 'Fail' }
                 -
                     oid: NAS-MIB::systemPowerTable
                     value: NAS-MIB::systemPowerStatus
@@ -94,6 +105,8 @@ modules:
                     group: 'PSUs enclosure {{ NAS-MIB::systemPowerEnclosureID }}'
                     state_name: systemPowerStatus
                     states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
+                        - { value: -1, generic: 2, graph: 0, descr: 'Fail' }
                 -
                     oid: NAS-MIB::raidGroupTable
                     value: NAS-MIB::raidStatus
@@ -103,3 +116,10 @@ modules:
                     group: 'Volumes'
                     state_name: raidStatus
                     states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'Ready' }
+                        - { value: 3, generic: 2, graph: 0, descr: 'Synchronizing' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Rebulding' }
+                        - { value: 1, generic: 1, graph: 0, descr: 'Degraded' }
+                        - { value: 5, generic: 3, graph: 0, descr: 'Offline' }
+                        - { value: 4, generic: 1, graph: 0, descr: 'Failure' }
+                        - { value: 6, generic: 2, graph: 0, descr: 'Migrating...' }

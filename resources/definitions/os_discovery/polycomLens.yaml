@@ -14,6 +14,9 @@ modules:
                     index: "identityStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::serviceH323
                     value: POLYCOM-ENDPOINT-MIB::serviceH323Status
@@ -22,6 +25,9 @@ modules:
                     index: "serviceH323Status.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::serviceH323
                     value: POLYCOM-ENDPOINT-MIB::serviceH323RegistrationStatus
@@ -30,6 +36,9 @@ modules:
                     index: "serviceH323RegistrationStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::serviceSip
                     value: POLYCOM-ENDPOINT-MIB::serviceSipStatus
@@ -38,6 +47,9 @@ modules:
                     index: "serviceSipStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::serviceSipRegistrationTable
                     value: POLYCOM-ENDPOINT-MIB::serviceSipRegistrationStatus
@@ -46,6 +58,9 @@ modules:
                     index: "serviceSipRegistrationStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::serviceIsdn
                     value: POLYCOM-ENDPOINT-MIB::serviceIsdnStatus
@@ -54,6 +69,9 @@ modules:
                     index: "serviceIsdnStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::hardware
                     value: POLYCOM-ENDPOINT-MIB::hardwareOverallStatus
@@ -62,6 +80,9 @@ modules:
                     index: "hardwareOverallStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::hardwareMicrophone
                     value: POLYCOM-ENDPOINT-MIB::hardwareMicrophoneStatus
@@ -70,6 +91,9 @@ modules:
                     index: "hardwareMicrophoneStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::hardwareCamera
                     value: POLYCOM-ENDPOINT-MIB::hardwareCameraStatus
@@ -78,6 +102,9 @@ modules:
                     index: "hardwareCameraStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::hardwareNIC
                     value: POLYCOM-ENDPOINT-MIB::hardwareNICStatus
@@ -86,6 +113,9 @@ modules:
                     index: "hardwareNICStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::hardwarePTC
                     value: POLYCOM-ENDPOINT-MIB::hardwarePTCStatus
@@ -94,6 +124,9 @@ modules:
                     index: "hardwarePTCStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::hardwareUcBoard
                     value: POLYCOM-ENDPOINT-MIB::hardwareUcBoardStatus
@@ -102,6 +135,9 @@ modules:
                     index: "hardwareUcBoardStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::externalIntegrationPresence
                     value:  POLYCOM-ENDPOINT-MIB::externalIntegrationPresenceStatus
@@ -110,6 +146,9 @@ modules:
                     index: "externalIntegrationPresenceStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::externalIntegrationCDR
                     value:  POLYCOM-ENDPOINT-MIB::externalIntegrationCDRStatus
@@ -118,6 +157,9 @@ modules:
                     index: "externalIntegrationCDRStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::externalIntegrationSyslog
                     value:  POLYCOM-ENDPOINT-MIB::externalIntegrationSyslogStatus
@@ -126,6 +168,9 @@ modules:
                     index: "externalIntegrationSyslogStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::externalIntegrationSoftwareUpdate
                     value:  POLYCOM-ENDPOINT-MIB::externalIntegrationSoftwareUpdateStatus
@@ -134,6 +179,9 @@ modules:
                     index: "externalIntegrationSoftwareUpdateStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::externalIntegrationProvisioning
                     value:  POLYCOM-ENDPOINT-MIB::externalIntegrationProvisioningStatus
@@ -142,6 +190,9 @@ modules:
                     index: "externalIntegrationProvisioningStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::externalIntegrationExchange
                     value:  POLYCOM-ENDPOINT-MIB::externalIntegrationExchangeStatus
@@ -150,6 +201,9 @@ modules:
                     index: "externalIntegrationExchangeStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
                 -
                     oid: POLYCOM-ENDPOINT-MIB::externalIntegrationDirectorySvcs
                     value:  POLYCOM-ENDPOINT-MIB::externalIntegrationDirectorySvcsStatus
@@ -158,3 +212,6 @@ modules:
                     index: "externalIntegrationDirectorySvcsStatus.{{ $index }}"
                     state_name: polycomEndpointGeneric
                     states:
+                        - { value: 1, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }

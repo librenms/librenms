@@ -61,6 +61,8 @@ modules:
                     index: 'deviceioStatSystemPowerStatus.{{ $index }}'
                     state_name: deviceioStatSystemPowerStatus
                     states:
+                        - { descr: 'off', graph: 1, value: 0, generic: 1 }
+                        - { descr: 'on',  graph: 1, value: 1, generic: 0 }
                 -
                     oid: MOXA-DEVICE-IO-MIB::deviceioStatDiTable
                     value: MOXA-DEVICE-IO-MIB::deviceioStatDiStatus
@@ -69,6 +71,8 @@ modules:
                     index: 'deviceioStatDiStatus.{{ $index }}'
                     state_name: deviceioStatDiStatus
                     states:
+                        - { descr: 'open',  graph: 1, value: 0, generic: 0 }
+                        - { descr: 'short', graph: 1, value: 1, generic: 0 }
                 -
                     oid: MOXA-DEVICE-IO-MIB::deviceioStatRelayTable
                     value: MOXA-DEVICE-IO-MIB::deviceioStatRelayStatus
@@ -77,6 +81,8 @@ modules:
                     index: 'deviceioStatRelayStatus.{{ $index }}'
                     state_name: deviceioStatRelayStatus
                     states:
+                        - { descr: 'open',  graph: 1, value: 0, generic: 0 }
+                        - { descr: 'short', graph: 1, value: 1, generic: 0 }
                 -
                     oid: MOXA-POE-BT-MIB::poeBtStatPortTable
                     value: MOXA-POE-BT-MIB::poeBtStatPowerOutput
@@ -86,6 +92,8 @@ modules:
                     group: 'POE Status'
                     state_name: poeBtStatPowerOutput
                     states:
+                        - { descr: 'Enabled',  graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Disabled', graph: 1, value: 2, generic: 0 }
                     skip_values:
                     -
                       oid: MOXA-POE-BT-MIB::poeBtStatPowerOutput
@@ -100,6 +108,16 @@ modules:
                     group: 'POE Status'
                     state_name: poeBtStatDeviceType
                     states:
+                        - { descr: 'notPresent',            graph: 1, value: 0, generic: 1 }
+                        - { descr: 'legacy',                graph: 1, value: 1, generic: 0 }
+                        - { descr: 'dot3af',                graph: 1, value: 2, generic: 0 }
+                        - { descr: 'dot3at',                graph: 1, value: 3, generic: 0 }
+                        - { descr: 'reserved',              graph: 1, value: 4, generic: 3 }
+                        - { descr: 'nonPdOrPdShortCircuit', graph: 1, value: 5, generic: 2 }
+                        - { descr: 'unknown',               graph: 1, value: 6, generic: 3 }
+                        - { descr: 'na',                    graph: 1, value: 7, generic: 0 }
+                        - { descr: 'dot3btss',              graph: 1, value: 8, generic: 0 }
+                        - { descr: 'dot3btds',              graph: 1, value: 9, generic: 0 }
                     skip_values:
                     -
                       oid: MOXA-POE-BT-MIB::poeBtStatPowerOutput
@@ -114,6 +132,14 @@ modules:
                     group: 'POE Status'
                     state_name: poeBtStatConfigSuggestion
                     states:
+                        - { descr: 'noSuggestion',        graph: 1, value: 0, generic: 0 }
+                        - { descr: 'enablePoe',           graph: 1, value: 1, generic: 2 }
+                        - { descr: 'disablePoe',          graph: 1, value: 2, generic: 2 }
+                        - { descr: 'selectAuto',          graph: 1, value: 3, generic: 3 }
+                        - { descr: 'selectHighPower',     graph: 1, value: 4, generic: 3 }
+                        - { descr: 'selectForce',         graph: 1, value: 5, generic: 3 }
+                        - { descr: 'enableLegacy',        graph: 1, value: 6, generic: 3 }
+                        - { descr: 'raiseEpsVoltage',     graph: 1, value: 7, generic: 3 }
                     skip_values:
                     -
                       oid: MOXA-POE-BT-MIB::poeBtStatConfigSuggestion
@@ -128,6 +154,8 @@ modules:
                     group: 'Turbo Chain'
                     state_name: turboChainConfigEnable
                     states:
+                        - { descr: 'Enabled',  graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Disabled', graph: 1, value: 2, generic: 0 }
                 -
                     oid: MOXA-TURBOCHAIN-MIB::turboChainConfigRole
                     value: MOXA-TURBOCHAIN-MIB::turboChainConfigRole
@@ -137,6 +165,9 @@ modules:
                     group: 'Turbo Chain'
                     state_name: turboChainConfigRole
                     states:
+                        - { descr: 'Head',   graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Member', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'Tail',   graph: 1, value: 3, generic: 0 }
                     skip_values:
                     -
                       oid: MOXA-TURBOCHAIN-MIB::turboChainConfigEnable
@@ -151,6 +182,12 @@ modules:
                     group: 'Turbo Chain'
                     state_name: turboChainStatPrimaryInterfaceStatus
                     states:
+                        - { descr: 'initiated',   graph: 1, value: 0, generic: 3 }
+                        - { descr: 'linkDown',    graph: 1, value: 1, generic: 2 }
+                        - { descr: 'listening',   graph: 1, value: 2, generic: 3 }
+                        - { descr: 'blocking',    graph: 1, value: 3, generic: 0 }
+                        - { descr: 'forwarding',  graph: 1, value: 4, generic: 0 }
+                        - { descr: 'disabled',    graph: 1, value: 5, generic: 2 }
                     skip_values:
                     -
                       oid: MOXA-TURBOCHAIN-MIB::turboChainConfigEnable
@@ -165,6 +202,12 @@ modules:
                     group: 'Turbo Chain'
                     state_name: turboChainStatSecondaryInterfaceStatus
                     states:
+                        - { descr: 'initiated',   graph: 1, value: 0, generic: 3 }
+                        - { descr: 'linkDown',    graph: 1, value: 1, generic: 2 }
+                        - { descr: 'listening',   graph: 1, value: 2, generic: 3 }
+                        - { descr: 'blocking',    graph: 1, value: 3, generic: 0 }
+                        - { descr: 'forwarding',  graph: 1, value: 4, generic: 0 }
+                        - { descr: 'disabled',    graph: 1, value: 5, generic: 2 }
                     skip_values:
                     -
                       oid: MOXA-TURBOCHAIN-MIB::turboChainConfigEnable
@@ -179,6 +222,8 @@ modules:
                     group: 'Turbo Ring'
                     state_name: trv2ConfigEnable
                     states:
+                        - { descr: 'Enabled',  graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Disabled', graph: 1, value: 2, generic: 0 }
                 -
                     oid: MOXA-TURBORINGV2-MIB::trv2StatRingTable
                     value: MOXA-TURBORINGV2-MIB::trv2StatRingTableEntryMasterStatus
@@ -188,6 +233,8 @@ modules:
                     group: 'Turbo Ring'
                     state_name: trv2StatRingTableEntryMasterStatus
                     states:
+                        - { descr: 'Master',  graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Slave',   graph: 1, value: 2, generic: 0 }
                     skip_values:
                     -
                       oid: MOXA-TURBORINGV2-MIB::trv2ConfigEnable.0
@@ -202,6 +249,12 @@ modules:
                     group: 'Turbo Ring'
                     state_name: trv2StatRingTableEntryFirstRingPort
                     states:
+                        - { descr: 'disabled',    graph: 1, value: 1, generic: 1 }
+                        - { descr: 'blocking',    graph: 1, value: 2, generic: 0 }
+                        - { descr: 'listening',   graph: 1, value: 3, generic: 3 }
+                        - { descr: 'learning',    graph: 1, value: 4, generic: 3 }
+                        - { descr: 'forwarding',  graph: 1, value: 5, generic: 0 }
+                        - { descr: 'linkDown',    graph: 1, value: 6, generic: 2 }
                     skip_values:
                     -
                       oid: MOXA-TURBORINGV2-MIB::trv2ConfigEnable.0
@@ -216,6 +269,12 @@ modules:
                     group: 'Turbo Ring'
                     state_name: trv2StatRingTableEntrySecondRingPort
                     states:
+                        - { descr: 'disabled',    graph: 1, value: 1, generic: 1 }
+                        - { descr: 'blocking',    graph: 1, value: 2, generic: 0 }
+                        - { descr: 'listening',   graph: 1, value: 3, generic: 3 }
+                        - { descr: 'learning',    graph: 1, value: 4, generic: 3 }
+                        - { descr: 'forwarding',  graph: 1, value: 5, generic: 0 }
+                        - { descr: 'linkDown',    graph: 1, value: 6, generic: 2 }
                     skip_values:
                     -
                       oid: MOXA-TURBORINGV2-MIB::trv2ConfigEnable.0
@@ -230,6 +289,9 @@ modules:
                     group: 'Turbo Ring'
                     state_name: trv2StatRingTableEntryBrokenStatus
                     states:
+                        - { descr: 'NA',       graph: 1, value: 0, generic: 3 }
+                        - { descr: 'Normal',   graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Broken',   graph: 1, value: 2, generic: 2 }
                     skip_values:
                     -
                       oid: MOXA-TURBORINGV2-MIB::trv2ConfigEnable.0
@@ -244,6 +306,8 @@ modules:
                     group: 'Dual Homing'
                     state_name: dualhomingConfigEnable
                     states:
+                        - { descr: 'Enabled',  graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Disabled', graph: 1, value: 2, generic: 0 }
                 -
                     oid: MOXA-DUALHOMING-MIB::dualhomingProtocolStatePrimary
                     value: MOXA-DUALHOMING-MIB::dualhomingProtocolStatePrimary
@@ -253,6 +317,10 @@ modules:
                     group: 'Dual Homing'
                     state_name: dualhomingProtocolStatePrimary
                     states:
+                        - { descr: 'linkDown',   graph: 1, value: 0, generic: 2 }
+                        - { descr: 'blocking',   graph: 1, value: 1, generic: 0 }
+                        - { descr: 'forwarding', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'disabled',   graph: 1, value: 3, generic: 3 }
                     skip_values:
                     -
                       oid: MOXA-DUALHOMING-MIB::dualhomingConfigEnable
@@ -267,6 +335,10 @@ modules:
                     group: 'Dual Homing'
                     state_name: dualhomingProtocolStateSecondary
                     states:
+                        - { descr: 'linkDown',   graph: 1, value: 0, generic: 2 }
+                        - { descr: 'blocking',   graph: 1, value: 1, generic: 0 }
+                        - { descr: 'forwarding', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'disabled',   graph: 1, value: 3, generic: 3 }
                     skip_values:
                     -
                       oid: MOXA-DUALHOMING-MIB::dualhomingConfigEnable

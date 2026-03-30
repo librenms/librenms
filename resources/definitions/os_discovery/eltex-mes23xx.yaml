@@ -42,6 +42,8 @@ modules:
                     group: 'Chassis FAN'
                     index: 'mesFanStatus.{{ $index }}'
                     states:
+                        - { value: 1, descr: OK, graph: 1, generic: 0 }
+                        - { value: 5, descr: Missing, graph: 1, generic: 3 }
                 -
                     oid: ELTEX-MES-HWENVIROMENT-MIB::eltEnvMonBatteryStatusEntry
                     value: ELTEX-MES-HWENVIROMENT-MIB::eltEnvMonBatteryState
@@ -51,6 +53,12 @@ modules:
                     group: 'Chassis PSU'
                     index: 'mesBattStatus.{{ $index }}'
                     states:
+                        - { value: 1, descr: Charged, graph: 1, generic: 0 }
+                        - { value: 2, descr: Discharged, graph: 1, generic: 2 }
+                        - { value: 3, descr: Low, graph: 1, generic: 1 }
+                        - { value: 5, descr: Missing, graph: 1, generic: 3 }
+                        - { value: 6, descr: BattFuseError, graph: 1, generic: 2 }
+                        - { value: 7, descr: Charging, graph: 1, generic: 1 }
                 -
                     oid: RADLAN-Physicaldescription-MIB::rlPhdUnitEnvParamEntry
                     value: RADLAN-Physicaldescription-MIB::rlPhdUnitEnvParamMainPSStatus
@@ -60,6 +68,15 @@ modules:
                     group: 'Chassis PSU'
                     index: 'mesMainPsuStatus.{{ $index }}'
                     states:
+                        - { value: 1, descr: Normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: Warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: Critical, graph: 1, generic: 2 }
+                        - { value: 4, descr: Shutdown, graph: 1, generic: 2 }
+                        - { value: 5, descr: notPresent, graph: 1, generic: 3 }
+                        - { value: 6, descr: notFunctioning, graph: 1, generic: 3 }
+                        - { value: 7, descr: restore, graph: 1, generic: 2 }
+                        - { value: 8, descr: notAvailable, graph: 1, generic: 3 }
+                        - { value: 9, descr: backingUp, graph: 1, generic: 1 }
                 -
                     oid: RADLAN-Physicaldescription-MIB::rlPhdUnitEnvParamEntry
                     value: RADLAN-Physicaldescription-MIB::rlPhdUnitEnvParamRedundantPSStatus
@@ -69,6 +86,15 @@ modules:
                     descr: 'Chassis#{{ $index }} PSU#2 status'
                     index: 'mesBackupPsuStatus.{{ $index }}'
                     states:
+                        - { value: 1, descr: Normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: Warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: Critical, graph: 1, generic: 2 }
+                        - { value: 4, descr: Shutdown, graph: 1, generic: 2 }
+                        - { value: 5, descr: notPresent, graph: 1, generic: 3 }
+                        - { value: 6, descr: notFunctioning, graph: 1, generic: 3 }
+                        - { value: 7, descr: restore, graph: 1, generic: 2 }
+                        - { value: 8, descr: notAvailable, graph: 1, generic: 3 }
+                        - { value: 9, descr: backingUp, graph: 1, generic: 1 }
                 -
                     oid: RADLAN-Physicaldescription-MIB::rlPhdUnitEnvParamEntry
                     value: RADLAN-Physicaldescription-MIB::rlPhdUnitEnvParamMonitorTemperatureStatus
@@ -78,6 +104,9 @@ modules:
                     descr: 'Chassis#{{ $index }} TEMP status'
                     index: 'mesChassisTempStatus.{{ $index }}'
                     states:
+                        - { value: 1, descr: Normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: Warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: Critical, graph: 1, generic: 2 }
                 -
                     oid: RADLAN-PHY-MIB::rlPhyTestGetTable
                     value: RADLAN-PHY-MIB::rlPhyTestGetResult
@@ -89,6 +118,8 @@ modules:
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: ports
                     states:
+                        - { value: 0, descr: 'False', graph: 1, generic: 0 }
+                        - { value: 1, descr: 'True', graph: 1, generic: 2 }
                     skip_values:
                         -
                             oid: RADLAN-PHY-MIB::index

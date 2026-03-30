@@ -64,6 +64,10 @@ modules:
                     index: 'cpqDaPhyDrvCondition.{{ $index }}'
                     state_name: cpqDaPhyDrvCondition
                     states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 2 }
+                        - { descr: failed, graph: 1, value: 4, generic: 2 }
                 -
                     oid: CPQHLTH-MIB::cpqHeFltTolPowerSupplyTable
                     value: CPQHLTH-MIB::cpqHeFltTolPowerSupplyCondition
@@ -72,6 +76,10 @@ modules:
                     index: 'cpqHeFltTolPowerSupplyCondition.{{ $index }}'
                     state_name: cpqHeFltTolPowerSupplyCondition
                     states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 1 }
+                        - { descr: failed, graph: 1, value: 4, generic: 1 }
                 -
                     oid: CPQHLTH-MIB::cpqHeFltTolFanTable
                     value: CPQHLTH-MIB::cpqHeFltTolFanCondition
@@ -80,6 +88,10 @@ modules:
                     index: 'cpqHeFltTolFanCondition.{{ $index }}'
                     state_name: cpqHeFltTolFanCondition
                     states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 1 }
+                        - { descr: failed, graph: 1, value: 4, generic: 1 }
                 -
                     oid: CPQSTDEQ-MIB::cpqSeCpuTable
                     value: CPQSTDEQ-MIB::cpqSeCpuStatus
@@ -88,6 +100,10 @@ modules:
                     index: 'cpqSeCpuStatus.{{ $index }}'
                     state_name: cpqSeCpuStatus
                     states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 1 }
+                        - { descr: failed, graph: 1, value: 4, generic: 1 }
                 -
                     oid: CPQHLTH-MIB::cpqHeResMem2ModuleTable
                     value: CPQHLTH-MIB::cpqHeResMem2ModuleCondition
@@ -96,6 +112,10 @@ modules:
                     index: 'cpqHeResMem2ModuleCondition.{{ $index }}'
                     state_name: cpqHeResMem2ModuleCondition
                     states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 1 }
+                        - { descr: degradedModuleIndexUnknown, graph: 1, value: 4, generic: 1 }
                 -
                     oid: CPQHLTH-MIB::cpqHeSysBatteryTable
                     value: CPQHLTH-MIB::cpqHeSysBatteryCondition
@@ -104,6 +124,10 @@ modules:
                     index: 'cpqHeSysBatteryCondition.{{ $index }}'
                     state_name: cpqHeSysBatteryCondition
                     states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 2 }
+                        - { descr: failed, graph: 1, value: 4, generic: 2 }
                 -
                     oid: CPQHLTH-MIB::cpqHeSysBatteryTable
                     value: CPQHLTH-MIB::cpqHeSysBatteryStatus
@@ -112,6 +136,21 @@ modules:
                     index: 'cpqHeSysBatteryStatus.{{ $index }}'
                     state_name: cpqHeSysBatteryStatus
                     states:
+                        - { descr: ok, graph: 1, value: 1, generic: 0 }
+                        - { descr: generalFailure, graph: 1, value: 2, generic: 2 }
+                        - { descr: shutdownHighResistance, graph: 3, value: 3, generic: 2 }
+                        - { descr: shutdownLowVoltage, graph: 1, value: 4, generic: 2 }
+                        - { descr: shutdownShortCircuit, graph: 1, value: 5, generic: 2 }
+                        - { descr: shutdownChargeTimeout, graph: 1, value: 6, generic: 2 }
+                        - { descr: shutdownOverTemperature, graph: 1, value: 7, generic: 2 }
+                        - { descr: shutdownDischargeMinVoltage, graph: 1, value: 8, generic: 2 }
+                        - { descr: shutdownDischargeCurrent, graph: 1, value: 9, generic: 2 }
+                        - { descr: shutdownLoadCountHigh, graph: 1, value: 10, generic: 2 }
+                        - { descr: shutdownEnablePin, graph: 1, value: 11, generic: 2 }
+                        - { descr: shutdownOverCurrent, graph: 1, value: 12, generic: 2 }
+                        - { descr: shutdownPermanentFailure, graph: 1, value: 13, generic: 2 }
+                        - { descr: shutdownBackupTimeExceeded, graph: 1, value: 14, generic: 2 }
+                        - { descr: predictiveFailure, graph: 1, value: 15, generic: 2 }
                 -
                     oid: CPQIDA-MIB::cpqDaCntlrTable
                     value: CPQIDA-MIB::cpqDaCntlrCondition
@@ -120,6 +159,10 @@ modules:
                     index: 'cpqDaCntlrCondition.{{ $index }}'
                     state_name: cpqDaCntlrCondition
                     states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 1 }
+                        - { descr: failed, graph: 1, value: 4, generic: 1 }
                 -
                     oid: CPQIDA-MIB::cpqDaAccelTable
                     value: CPQIDA-MIB::cpqDaAccelBattery
@@ -128,6 +171,13 @@ modules:
                     index: 'cpqDaAccelBattery.{{ $index }}'
                     state_name: cpqDaAccelBattery
                     states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: recharging, graph: 1, value: 3, generic: 1 }
+                        - { descr: failed, graph: 1, value: 4, generic: 1 }
+                        - { descr: degraded, graph: 1, value: 5, generic: 1 }
+                        - { descr: notPresent, graph: 1, value: 6, generic: 3 }
+                        - { descr: capacitorFailed, graph: 1, value: 7, generic: 1 }
                 -
                     oid: CPQIDA-MIB::cpqDaLogDrvTable
                     value: CPQIDA-MIB::cpqDaLogDrvCondition
@@ -136,6 +186,10 @@ modules:
                     index: 'cpqDaLogDrvCondition.{{ $index }}'
                     state_name: cpqDaLogDrvCondition
                     states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 1 }
+                        - { descr: failed, graph: 1, value: 4, generic: 1 }
                 -
                     oid: CPQIDA-MIB::cpqDaLogDrvTable
                     value: CPQIDA-MIB::cpqDaLogDrvStatus
@@ -144,3 +198,28 @@ modules:
                     index: 'cpqDaLogDrvIndex.{{ $index }}'
                     state_name: cpqDaLogDrvStatus
                     states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: failed, graph: 1, value: 3, generic: 2 }
+                        - { descr: unconfigured, graph: 1, value: 4, generic: 3 }
+                        - { descr: recovering, graph: 1, value: 5, generic: 2 }
+                        - { descr: readyRebuild, graph: 1, value: 6, generic: 1 }
+                        - { descr: rebuilding, graph: 1, value: 7, generic: 2 }
+                        - { descr: wrongDrive, graph: 1, value: 8, generic: 2 }
+                        - { descr: badConnect, graph: 1, value: 9, generic: 1 }
+                        - { descr: overheating, graph: 1, value: 10, generic: 2 }
+                        - { descr: shutdown, graph: 1, value: 11, generic: 2 }
+                        - { descr: expanding, graph: 1, value: 12, generic: 1 }
+                        - { descr: notAvailable, graph: 1, value: 13, generic: 3 }
+                        - { descr: queuedForExpansion, graph: 1, value: 14, generic: 1 }
+                        - { descr: multipathAccessDegraded, graph: 1, value: 15, generic: 1 }
+                        - { descr: erasing, graph: 1, value: 16, generic: 1 }
+                        - { descr: predictiveSpareRebuildReady, graph: 1, value: 17, generic: 1 }
+                        - { descr: rapidParityInitializationInProgress, graph: 1, value: 18, generic: 1 }
+                        - { descr: rapidParityInitializationPending, graph: 1, value: 19, generic: 1 }
+                        - { descr: noAccessEncryptedWithNoControllerKey, graph: 1, value: 20, generic: 0 }
+                        - { descr: unencryptedToEncryptedTransformationInProgress, graph: 1, value: 21, generic: 1 }
+                        - { descr: newLogicalDriveKeyRekeyInProgress, graph: 1, value: 22, generic: 1 }
+                        - { descr: noAccessEncryptedWithControllerEncryptionNotEnabled, graph: 1, value: 23, generic: 1 }
+                        - { descr: unencryptedToEncryptedTransformationNotStarted, graph: 1, value: 24, generic: 1 }
+                        - { descr: newLogicalDriveKeyRekeyRequestReceived, graph: 1, value: 25, generic: 1 }
