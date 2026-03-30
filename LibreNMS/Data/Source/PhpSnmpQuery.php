@@ -253,6 +253,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         // Update NetSnmp object in case we need to switch
         $this->netsnmp->allowUnordered();
 
+        $this->options['oid_increasing_check'] = false;
         $this->snmp->oid_increasing_check = false;
 
         return $this;
@@ -266,6 +267,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         // Update NetSnmp object in case we need to switch
         $this->netsnmp->numeric();
 
+        $this->options['oid_output_format'] = ($numeric ? SNMP_OID_OUTPUT_NUMERIC : SNMP_OID_OUTPUT_MODULE);
         $this->snmp->oid_output_format = ($numeric ? SNMP_OID_OUTPUT_NUMERIC : SNMP_OID_OUTPUT_MODULE);
 
         return $this;
@@ -279,6 +281,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         // Update NetSnmp object in case we need to switch
         $this->netsnmp->numericIndex();
 
+        $this->options['numeric_index'] = true;
         $this->snmp->numeric_index = true;  /** @phpstan-ignore property.notFound */
 
         return $this;
@@ -292,6 +295,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         // Update NetSnmp object in case we need to switch
         $this->netsnmp->hideMib();
 
+        $this->options['oid_output_format'] = SNMP_OID_OUTPUT_SUFFIX;
         $this->snmp->oid_output_format = SNMP_OID_OUTPUT_SUFFIX;
 
         return $this;
@@ -305,6 +309,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         // Update NetSnmp object in case we need to switch
         $this->netsnmp->enumStrings();
 
+        $this->options['enum_print'] = false;
         $this->snmp->enum_print = false;
 
         return $this;
