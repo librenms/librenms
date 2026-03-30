@@ -50,7 +50,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         'dont_print_units' => true,
         'escape_quotes' => false,
         'print_hex_text' => false,
-        'string_output_format' => SNMP_STRING_OUTPUT_GUESS,
+        'string_output_format' => SNMP_STRING_OUTPUT_GUESS, /** @phpstan-ignore constant.notFound */
         'oid_output_format' => SNMP_OID_OUTPUT_MODULE,
     ];
 
@@ -64,7 +64,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
         'dont_print_units' => false,
         'escape_quotes' => false,
         'print_hex_text' => false,
-        'string_output_format' => SNMP_STRING_OUTPUT_GUESS,
+        'string_output_format' => SNMP_STRING_OUTPUT_GUESS, /** @phpstan-ignore constant.notFound */
         'oid_output_format' => SNMP_OID_OUTPUT_MODULE,
     ];
 
@@ -359,14 +359,14 @@ class PhpSnmpQuery implements SnmpQueryInterface
                 // Do nothing - we always accept underscores in MIBs
             } elseif ($option === '-Ih') {
                 // Ignore input options for GET requests
-            } elseif (str_starts_with($option, '-O')) {
-                foreach (str_split(substr($option, 2)) as $outopt) {
+            } elseif (str_starts_with((string) $option, '-O')) {
+                foreach (str_split(substr((string) $option, 2)) as $outopt) {
                     switch ($outopt) {
                         case 'a':
-                            $this->options['string_output_format'] = SNMP_STRING_OUTPUT_ASCII;
+                            $this->options['string_output_format'] = SNMP_STRING_OUTPUT_ASCII; /** @phpstan-ignore constant.notFound */
                             break;
                         case 'x':
-                            $this->options['string_output_format'] = SNMP_STRING_OUTPUT_HEX;
+                            $this->options['string_output_format'] = SNMP_STRING_OUTPUT_HEX; /** @phpstan-ignore constant.notFound */
                             break;
                         case 'f':
                             $this->options['oid_output_format'] = SNMP_OID_OUTPUT_FULL;
@@ -410,6 +410,7 @@ class PhpSnmpQuery implements SnmpQueryInterface
                         default:
                             // We do not know how to parse this option - return the NetSnmp object
                             Log::debug("Unknown option -C$outopt : Falling back to NetSnmp");
+
                             return $this->netsnmp;
                     }
                 }
