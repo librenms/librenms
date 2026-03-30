@@ -33,7 +33,7 @@ if (Gate::denies('delete', Poller::class)) {
     if (! is_numeric($id)) {
         $status = ['status' => 1, 'message' => 'No poller has been selected'];
     } else {
-        $poller_name = dbFetchCell('SELECT `poller_name` FROM `pollers` WHERE `id`=?', [$id]);
+        $poller_name = Poller::where('id', $id)->value('poller_name');
         if (Poller::where('id', $id)->delete()) {
             $status = ['status' => 0, 'message' => "Poller: <i>$poller_name ($id), has been deleted.</i>"];
         } else {
