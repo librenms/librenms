@@ -27,7 +27,7 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Models\Device;
-use LibreNMS\Data\Sources\NetSnmpTranslate;
+use LibreNMS\Data\Source\NetSnmpTranslate;
 use LibreNMS\Tests\TestCase;
 
 final class SnmpTranslateTest extends TestCase

@@ -38,7 +38,34 @@ use Symfony\Component\Process\Process;
 
 class NetSnmpCmd
 {
-    private bool $cache = false;
+    /** @var string[] */
+    protected array $commandCleanupPatterns = [
+        '/-c\' \'[\S]+\'/',
+        '/-u\' \'[\S]+\'/',
+        '/-U\' \'[\S]+\'/',
+        '/-A\' \'[\S]+\'/',
+        '/-X\' \'[\S]+\'/',
+        '/-P\' \'[\S]+\'/',
+        '/-H\' \'[\S]+\'/',
+        '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
+    ];
+
+    /** @var string[] */
+    protected array $commandReplacementPatterns = [
+        '-c\' \'COMMUNITY\'',
+        '-u\' \'USER\'',
+        '-U\' \'USER\'',
+        '-A\' \'PASSWORD\'',
+        '-X\' \'PASSWORD\'',
+        '-P\' \'PASSWORD\'',
+        '-H\' \'HOSTNAME\'',
+        '\1:HOSTNAME:\3',
+    ];
+
+    protected string $output_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
+    protected string $output_replacement = '*';
+
+    protected bool $cache = false;
 
     protected function exec(string $command, array $oids): SnmpResponse
     {
@@ -133,7 +160,8 @@ class NetSnmpCmd
     private function logCommand(string $command): void
     {
         if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            Log::debug('SNMP[%c' . $command . '%n]', ['color' => true]);
+            $debug_command = preg_replace($this->commandCleanupPatterns, $this->commandReplacementPatterns, $command);
+            Log::debug('SNMP[%c' . $debug_command . '%n]', ['color' => true]);
         } elseif (Debug::isVerbose()) {
             Log::debug('SNMP[%c' . $command . '%n]', ['color' => true]);
         }
@@ -142,7 +170,7 @@ class NetSnmpCmd
     private function logOutput(string $output, string $error): void
     {
         if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            Log::debug($output);
+            Log::debug(preg_replace($this->output_regex, $this->output_replacement, $output));
         } elseif (Debug::isVerbose()) {
             Log::debug($output);
         }

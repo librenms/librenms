@@ -32,13 +32,11 @@ use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 use Log;
-use Symfony\Component\Process\Process;
 
 class NetSnmpQuery extends NetSnmpCmd implements SnmpQueryInterface
 {

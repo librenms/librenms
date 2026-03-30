@@ -27,7 +27,7 @@
 namespace LibreNMS\Util;
 
 use Cache;
-use LibreNMS\Data\Sources\NetSnmpTranslate;
+use LibreNMS\Data\Source\NetSnmpTranslate;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidOidException;
 

@@ -27,7 +27,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
-use LibreNMS\Data\Sources\NetSnmpTranslate;
+use LibreNMS\Data\Source\NetSnmpTranslate;
 
 class Junose extends \LibreNMS\OS
 {
