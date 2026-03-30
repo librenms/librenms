@@ -1,7 +1,7 @@
 <?php
 
 /*
- * SNMP.php
+ * NetSnmpQuery.php
  *
  * -Description-
  *
@@ -41,7 +41,7 @@ use LibreNMS\Util\Rewrite;
 use Log;
 use Symfony\Component\Process\Process;
 
-class NetSnmpQuery implements SnmpQueryInterface
+class NetSnmpQuery extends NetSnmpCmd implements SnmpQueryInterface
 {
     private const DEFAULT_FLAGS = '-OQXUte';
 
@@ -75,14 +75,13 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * @var string[]
      */
-    private array $mibDirs = [];
+    protected array $mibDirs = [];
     private string $context = '';
-    private array|string $options = [self::DEFAULT_FLAGS, '-Pu'];
-    private Device $device;
+    protected array|string $options = [self::DEFAULT_FLAGS, '-Pu'];
+    protected Device $device;
     private bool $abort = false;
-    private bool $cache = false;
     // defaults for net-snmp https://net-snmp.sourceforge.io/docs/man/snmpcmd.html
-    private array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'];
+    protected array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'];
 
     public function __construct()
     {
@@ -280,16 +279,12 @@ class NetSnmpQuery implements SnmpQueryInterface
         return $this->execMultiple('snmpgetnext', $this->limitOids($this->parseOid($oid)));
     }
 
-    private function buildCli(string $command, array $oids): array
+    protected function buildCli(string $command, array $oids): array
     {
         $cmd = $this->initCommand($command, $oids);
 
         array_push($cmd, '-M', $this->mibDirectories());
         array_push($cmd, '-m', implode(':', $this->mibs));
-
-        if ($command === 'snmptranslate') {
-            return array_merge($cmd, $this->options, $oids);
-        }
 
         // authentication
         $this->buildAuth($cmd);
@@ -359,54 +354,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         return $response;
     }
 
-    private function exec(string $command, array $oids): SnmpResponse
-    {
-        // use runtime(array) cache if requested. The 'null' driver will simply return the value without caching
-        $driver = 'null';
-        $key = '';
-
-        if ($this->cache) {
-            $driver = 'array';
-            $key = $this->getCacheKey($command, $oids);
-
-            if (Debug::isEnabled()) {
-                $cache_performance = Cache::driver($driver)->get('SnmpQuery_cache_performance', []);
-                $cache_performance[$key] ??= 0;
-
-                if (Cache::driver($driver)->has($key)) {
-                    Log::debug("Cache hit for $command " . implode(',', $oids));
-                    $cache_performance[$key]++;
-                } else {
-                    Log::debug("Cache miss for $command " . implode(',', $oids) . ', grabbing fresh data.');
-                }
-
-                // update cache performance
-                Cache::driver($driver)->put('SnmpQuery_cache_performance', $cache_performance);
-            }
-        }
-
-        return Cache::driver($driver)->rememberForever($key, function () use ($command, $oids) {
-            $measure = Measurement::start($command);
-            $proc = new Process($this->buildCli($command, $oids));
-            $proc->setTimeout(LibrenmsConfig::get('snmp.exec_timeout', 1200));
-
-            $this->logCommand($proc->getCommandLine());
-
-            $proc->run();
-            $exitCode = $proc->getExitCode();
-            $output = $proc->getOutput();
-            $stderr = $proc->getErrorOutput();
-
-            // check exit code and log possible bad auth
-            $this->checkExitCode($exitCode, $stderr);
-            $this->logOutput($output, $stderr);
-
-            $measure->manager()->recordSnmp($measure->end());
-
-            return new SnmpResponse($output, $stderr, $exitCode);
-        });
-    }
-
     private function initCommand(string $binary, array $oids): array
     {
         if ($binary == 'snmpwalk') {
@@ -434,68 +381,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         return [LibrenmsConfig::get($binary, $binary)];
     }
 
-    private function mibDirectories(): string
-    {
-        $base = LibrenmsConfig::get('mib_dir');
-        $dirs = [$base];
-
-        // os group
-        if ($os_group = LibrenmsConfig::getOsSetting($this->device->os, 'group')) {
-            if (file_exists("$base/$os_group")) {
-                $dirs[] = "$base/$os_group";
-            }
-        }
-
-        // os directory
-        $os_mibdir = LibrenmsConfig::getOsSetting($this->device->os, 'mib_dir');
-        if ($os_mibdir && is_string($os_mibdir)) {
-            $dirs[] = "$base/$os_mibdir";
-        } elseif (file_exists($base . '/' . $this->device->os)) {
-            $dirs[] = $base . '/' . $this->device->os;
-        }
-
-        foreach ($this->mibDirs as $mibDir) {
-            $dirs[] = "$base/$mibDir";
-        }
-
-        // remove trailing /, remove empty dirs, and remove duplicates
-        $dirs = array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs)));
-
-        return implode(':', $dirs);
-    }
-
-    private function checkExitCode(int $code, string $error): void
-    {
-        if ($code) {
-            if (Str::startsWith($error, 'Invalid authentication protocol specified')) {
-                Eventlog::log('Unsupported SNMP authentication algorithm - ' . $code, $this->device, 'poller', Severity::Error);
-            } elseif (Str::startsWith($error, 'Invalid privacy protocol specified')) {
-                Eventlog::log('Unsupported SNMP privacy algorithm - ' . $code, $this->device, 'poller', Severity::Error);
-            }
-            Log::debug('Exitcode: ' . $code, [$error]);
-        }
-    }
-
-    private function logCommand(string $command): void
-    {
-        if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            $debug_command = preg_replace($this->commandCleanupPatterns, $this->commandReplacementPatterns, $command);
-            Log::debug('SNMP[%c' . $debug_command . '%n]', ['color' => true]);
-        } elseif (Debug::isVerbose()) {
-            Log::debug('SNMP[%c' . $command . '%n]', ['color' => true]);
-        }
-    }
-
-    private function logOutput(string $output, string $error): void
-    {
-        if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            Log::debug(preg_replace($this->output_regex, $this->output_replacement, $output));
-        } elseif (Debug::isVerbose()) {
-            Log::debug($output);
-        }
-        Log::debug($error);
-    }
-
     private function limitOids(array $oids): array
     {
         // get max oids per query device attrib > os setting > global setting
@@ -512,13 +397,5 @@ class NetSnmpQuery implements SnmpQueryInterface
     private function parseOid(array|string $oid): array
     {
         return is_string($oid) ? explode(' ', $oid) : $oid;
-    }
-
-    private function getCacheKey(string $type, array $oids): string
-    {
-        $oids = implode(',', $oids);
-        $options = implode(',', $this->options);
-
-        return "$type|{$this->device->hostname}|{$this->device->community}|$this->context|$oids|$options";
     }
 }

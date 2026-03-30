@@ -27,6 +27,7 @@
 namespace LibreNMS\Util;
 
 use Cache;
+use LibreNMS\Data\Sources\NetSnmpTranslate;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidOidException;
 
@@ -133,7 +134,7 @@ class Oid implements \Stringable
 
         // only cache for this runtime
         $numeric_oid = Cache::driver('array')->remember($key, null, function () use ($mib) {
-            $snmpQuery = \SnmpTranslate::numeric();
+            $snmpQuery = NetSnmpTranslate::make()->numeric();
 
             if ($mib) {
                 $snmpQuery->mibs([$mib], append: $mib !== 'ALL'); // append to base mibs unless using ALL
