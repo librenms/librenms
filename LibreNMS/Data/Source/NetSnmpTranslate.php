@@ -32,13 +32,13 @@ use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Oid;
 
-class NetSnmpTranslate extends NetSnmpCmd
+class NetSnmpTranslate
 {
-    protected array $options = [];
-    protected array $mibDirs = [];
-    protected Device $device;
+    private array $options = [];
+    private array $mibDirs = [];
+    private Device $device;
     // defaults for net-snmp https://net-snmp.sourceforge.io/docs/man/snmpcmd.html
-    protected array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'];
+    private array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'];
 
     public function __construct()
     {
@@ -133,7 +133,7 @@ class NetSnmpTranslate extends NetSnmpCmd
         return $this->exec('snmptranslate', [$oid])->value();
     }
 
-    protected function buildCli(string $command, array $oids): array
+    private function buildCli(string $command, array $oids): array
     {
         $cmd = [LibrenmsConfig::get($command, $command)];
 
@@ -141,5 +141,88 @@ class NetSnmpTranslate extends NetSnmpCmd
         array_push($cmd, '-m', implode(':', $this->mibs));
 
         return array_merge($cmd, $this->options, $oids);
+    }
+
+    private function exec(string $command, array $oids): SnmpResponse
+    {
+        $measure = Measurement::start($command);
+        $proc = new Process($this->buildCli($command, $oids));
+        $proc->setTimeout(LibrenmsConfig::get('snmp.exec_timeout', 1200));
+
+        $this->logCommand($proc->getCommandLine());
+
+        $proc->run();
+        $exitCode = $proc->getExitCode();
+        $output = $proc->getOutput();
+        $stderr = $proc->getErrorOutput();
+
+        // check exit code and log possible bad auth
+        $this->checkExitCode($exitCode, $stderr);
+        $this->logOutput($output, $stderr);
+
+        $measure->manager()->recordSnmp($measure->end());
+
+        return new SnmpResponse($output, $stderr, $exitCode);
+    }
+
+    private function mibDirectories(): string
+    {
+        $base = LibrenmsConfig::get('mib_dir');
+        $dirs = [$base];
+
+        // os group
+        if ($os_group = LibrenmsConfig::getOsSetting($this->device->os, 'group')) {
+            if (file_exists("$base/$os_group")) {
+                $dirs[] = "$base/$os_group";
+            }
+        }
+
+        // os directory
+        $os_mibdir = LibrenmsConfig::getOsSetting($this->device->os, 'mib_dir');
+        if ($os_mibdir && is_string($os_mibdir)) {
+            $dirs[] = "$base/$os_mibdir";
+        } elseif (file_exists($base . '/' . $this->device->os)) {
+            $dirs[] = $base . '/' . $this->device->os;
+        }
+
+        foreach ($this->mibDirs as $mibDir) {
+            $dirs[] = "$base/$mibDir";
+        }
+
+        // remove trailing /, remove empty dirs, and remove duplicates
+        $dirs = array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs)));
+
+        return implode(':', $dirs);
+    }
+
+    private function checkExitCode(int $code, string $error): void
+    {
+        if ($code) {
+            if (Str::startsWith($error, 'Invalid authentication protocol specified')) {
+                Eventlog::log('Unsupported SNMP authentication algorithm - ' . $code, $this->device, 'poller', Severity::Error);
+            } elseif (Str::startsWith($error, 'Invalid privacy protocol specified')) {
+                Eventlog::log('Unsupported SNMP privacy algorithm - ' . $code, $this->device, 'poller', Severity::Error);
+            }
+            Log::debug('Exitcode: ' . $code, [$error]);
+        }
+    }
+
+    private function logCommand(string $command): void
+    {
+        if (Debug::isEnabled() && ! Debug::isVerbose()) {
+            Log::debug('SNMP[%c' . $command . '%n]', ['color' => true]);
+        } elseif (Debug::isVerbose()) {
+            Log::debug('SNMP[%c' . $command . '%n]', ['color' => true]);
+        }
+    }
+
+    private function logOutput(string $output, string $error): void
+    {
+        if (Debug::isEnabled() && ! Debug::isVerbose()) {
+            Log::debug($output);
+        } elseif (Debug::isVerbose()) {
+            Log::debug($output);
+        }
+        Log::debug($error);
     }
 }

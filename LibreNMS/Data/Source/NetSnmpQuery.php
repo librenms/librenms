@@ -1,7 +1,7 @@
 <?php
 
 /*
- * NetSnmpQuery.php
+ * SNMP.php
  *
  * -Description-
  *
@@ -38,20 +38,21 @@ use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 use Log;
 
-class NetSnmpQuery extends NetSnmpCmd implements SnmpQueryInterface
+class NetSnmpQuery implements SnmpQueryInterface
 {
     private const DEFAULT_FLAGS = '-OQXUte';
 
     /**
      * @var string[]
      */
-    protected array $mibDirs = [];
+    private array $mibDirs = [];
     private string $context = '';
-    protected array|string $options = [self::DEFAULT_FLAGS, '-Pu'];
-    protected Device $device;
+    private array|string $options = [self::DEFAULT_FLAGS, '-Pu'];
+    private Device $device;
     private bool $abort = false;
+    private bool $cache = false;
     // defaults for net-snmp https://net-snmp.sourceforge.io/docs/man/snmpcmd.html
-    protected array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'];
+    private array $mibs = ['SNMPv2-TC', 'SNMPv2-MIB', 'IF-MIB', 'IP-MIB', 'TCP-MIB', 'UDP-MIB', 'NET-SNMP-VACM-MIB'];
 
     public function __construct()
     {
@@ -249,12 +250,16 @@ class NetSnmpQuery extends NetSnmpCmd implements SnmpQueryInterface
         return $this->execMultiple('snmpgetnext', $this->limitOids($this->parseOid($oid)));
     }
 
-    protected function buildCli(string $command, array $oids): array
+    private function buildCli(string $command, array $oids): array
     {
         $cmd = $this->initCommand($command, $oids);
 
         array_push($cmd, '-M', $this->mibDirectories());
         array_push($cmd, '-m', implode(':', $this->mibs));
+
+        if ($command === 'snmptranslate') {
+            return array_merge($cmd, $this->options, $oids);
+        }
 
         // authentication
         $this->buildAuth($cmd);
@@ -454,5 +459,13 @@ class NetSnmpQuery extends NetSnmpCmd implements SnmpQueryInterface
     private function parseOid(array|string $oid): array
     {
         return is_string($oid) ? explode(' ', $oid) : $oid;
+    }
+
+    private function getCacheKey(string $type, array $oids): string
+    {
+        $oids = implode(',', $oids);
+        $options = implode(',', $this->options);
+
+        return "$type|{$this->device->hostname}|{$this->device->community}|$this->context|$oids|$options";
     }
 }
