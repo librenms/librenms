@@ -31,10 +31,10 @@ use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Transceiver;
 use Illuminate\Support\Collection;
-use LibreNMS\Data\Source\NetSnmpTranslate;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\NetSnmpTranslate;
 use SnmpQuery;
 
 class Axos extends OS implements OSDiscovery, TransceiverDiscovery
