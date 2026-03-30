@@ -40,15 +40,43 @@ class PhpSnmpQuery implements SnmpQueryInterface
     private string $output_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
     private string $output_replacement = '*';
 
+    private const DEFAULT_OPTIONS = [
+        'oid_increasing_check' => true,
+        'quick_print' => true,
+        'enum_print' => true,
+        'numeric_index' => false,
+        'numeric_timeticks' => true,
+        'extended_index' => true,
+        'dont_print_units' => true,
+        'escape_quotes' => false,
+        'print_hex_text' => false,
+        'string_output_format' => SNMP_STRING_OUTPUT_GUESS,
+        'oid_output_format' => SNMP_OID_OUTPUT_MODULE,
+    ];
+
+    private const LIBRARY_DEFAULT_OPTIONS = [
+        'oid_increasing_check' => false,
+        'quick_print' => false,
+        'enum_print' => false,
+        'numeric_index' => false,
+        'numeric_timeticks' => false,
+        'extended_index' => false,
+        'dont_print_units' => false,
+        'escape_quotes' => false,
+        'print_hex_text' => false,
+        'string_output_format' => SNMP_STRING_OUTPUT_GUESS,
+        'oid_output_format' => SNMP_OID_OUTPUT_MODULE,
+    ];
+
     /**
      * @var string[]
      */
     private array $mibDirs = [];
+    private array $options = self::DEFAULT_OPTIONS;
     private array $mibs = [];
     private Device $device;
     private bool $abort = false;
     private \SNMP $snmp;
-    private bool $snmpinit = false;
     private bool $mibinit = false;
     private readonly NetSnmpQuery $netsnmp;
 
@@ -81,7 +109,6 @@ class PhpSnmpQuery implements SnmpQueryInterface
             return $this->netsnmp;
         }
 
-        $old_snmp = $this->snmpinit ? $this->snmp : null;
         $this->device = $device;
 
         $snmpver = match ($this->device->snmpver) {
@@ -99,35 +126,13 @@ class PhpSnmpQuery implements SnmpQueryInterface
             ($this->device->timeout ?? LibrenmsConfig::get('snmp.timeout')) * 1000000,
             $this->device->retries ?? LibrenmsConfig::get('snmp.retries'),
         );
-        $this->snmp->quick_print = true;
 
         if ($this->device->snmpver === 'v3') {
             $this->snmp->setSecurity(...self::getSecurityOptions($this->device, null));
         }
 
-        if ($old_snmp) {
-            // Copy settings from old SNMP object
-            $this->snmp->oid_increasing_check = $old_snmp->oid_increasing_check;
-            $this->snmp->enum_print = $old_snmp->enum_print;
-            $this->snmp->numeric_index = $old_snmp->numeric_index; /** @phpstan-ignore property.notFound, property.notFound */
-            $this->snmp->numeric_timeticks = $old_snmp->numeric_timeticks; /** @phpstan-ignore property.notFound, property.notFound */
-            $this->snmp->extended_index = $old_snmp->extended_index;  /** @phpstan-ignore property.notFound, property.notFound */
-            $this->snmp->dont_print_units = $old_snmp->dont_print_units;  /** @phpstan-ignore property.notFound, property.notFound */
-            if ($old_snmp->oid_output_format) {
-                $this->snmp->oid_output_format = $old_snmp->oid_output_format;
-            }
-        } else {
-            // Set default settings
-            $this->snmp->oid_increasing_check = true;
-            $this->snmp->enum_print = true;
-            $this->snmp->numeric_index = false;  /** @phpstan-ignore property.notFound */
-            $this->snmp->numeric_timeticks = true;  /** @phpstan-ignore property.notFound */
-            $this->snmp->extended_index = true;  /** @phpstan-ignore property.notFound */
-            $this->snmp->dont_print_units = true;  /** @phpstan-ignore property.notFound */
-        }
-
-        // Make sure we copy settings if the device changes in future
-        $this->snmpinit = true;
+        // Set SNMP options for the new SNMP object
+        $this->setOptions();
 
         return $this;
     }
@@ -330,8 +335,105 @@ class PhpSnmpQuery implements SnmpQueryInterface
      */
     public function options($options = []): SnmpQueryInterface
     {
-        // Return NetSnmp object if options are set
-        return $this->netsnmp->options($options);
+        // Update NetSnmp object
+        $this->netsnmp->options($options);
+
+        if (is_null($options)) {
+            $this->options = self::DEFAULT_OPTIONS;
+
+            return $this->setOptions();
+        }
+
+        if (is_string($options)) {
+            $options = [$options];
+        }
+
+        // Reset all options to library defaults
+        $this->options = self::LIBRARY_DEFAULT_OPTIONS;
+
+        // Parse options, returning the NetSnmp object if we come across an unknown option
+        foreach ($options as $option) {
+            if ($option === '-Ci') {
+                $this->options['oid_increasing_check'] = false;
+            } elseif ($option === '-Pu') {
+                // Do nothing - we always accept underscores in MIBs
+            } elseif ($option === '-Ih') {
+                // Ignore input options for GET requests
+            } elseif (str_starts_with($option, '-O')) {
+                foreach (str_split(substr($option, 2)) as $outopt) {
+                    switch ($outopt) {
+                        case 'a':
+                            $this->options['string_output_format'] = SNMP_STRING_OUTPUT_ASCII;
+                            break;
+                        case 'x':
+                            $this->options['string_output_format'] = SNMP_STRING_OUTPUT_HEX;
+                            break;
+                        case 'f':
+                            $this->options['oid_output_format'] = SNMP_OID_OUTPUT_FULL;
+                            break;
+                        case 's':
+                            $this->options['oid_output_format'] = SNMP_OID_OUTPUT_SUFFIX;
+                            break;
+                        case 'S':
+                            $this->options['oid_output_format'] = SNMP_OID_OUTPUT_MODULE;
+                            break;
+                        case 'u':
+                            $this->options['oid_output_format'] = SNMP_OID_OUTPUT_UCD;
+                            break;
+                        case 'n':
+                            $this->options['oid_output_format'] = SNMP_OID_OUTPUT_NUMERIC;
+                            break;
+                        case 'b':
+                            $this->options['numeric_index'] = true;
+                            break;
+                        case 'e':
+                            $this->options['enum_print'] = true;
+                            break;
+                        case 'E':
+                            $this->options['escape_quotes'] = true;
+                            break;
+                        case 'Q':
+                            $this->options['quick_print'] = true;
+                            break;
+                        case 't':
+                            $this->options['numeric_timeticks'] = true;
+                            break;
+                        case 'T':
+                            $this->options['print_hex_text'] = true;
+                            break;
+                        case 'U':
+                            $this->options['dont_print_units'] = true;
+                            break;
+                        case 'X':
+                            $this->options['extended_index'] = true;
+                            break;
+                        default:
+                            // We do not know how to parse this option - return the NetSnmp object
+                            Log::debug("Unknown option -C$outopt : Falling back to NetSnmp");
+                            return $this->netsnmp;
+                    }
+                }
+            } else {
+                Log::debug("Unknown option $option : Falling back to NetSnmp");
+
+                // We do not know how to parse this option - return the NetSnmp object
+                return $this->netsnmp;
+            }
+        }
+
+        return $this->setOptions();
+    }
+
+    /**
+     * Set the SNMP object to the configured options
+     */
+    private function setOptions(): SnmpQueryInterface
+    {
+        foreach ($this->options as $prop => $val) {
+            $this->snmp->$prop = $val;
+        }
+
+        return $this;
     }
 
     /**
