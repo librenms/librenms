@@ -3494,15 +3494,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmpwalk_cache_twopart_oid\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/discovery/sensors/temperature/nokia-isam.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_walk\(\)\:
 				Please use SnmpQuery instead$#
 			'''
