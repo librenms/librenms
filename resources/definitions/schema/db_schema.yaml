@@ -2342,7 +2342,6 @@ state_translations:
     - { Field: state_translation_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: state_index_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: state_descr, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: state_draw_graph, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: state_value, Type: smallint, 'Null': false, Extra: '', Default: '0' }
     - { Field: state_generic_value, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: state_lastupdated, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }

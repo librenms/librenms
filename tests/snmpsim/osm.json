@@ -3825,98 +3825,84 @@
                 {
                     "state_name": "hwmonFanRedundancy",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwmonFanRedundancy",
                     "state_descr": "fault",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "hwmonIntrusionStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "hwmonIntrusionStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwmonPsuRedundancy",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "hwmonPsuRedundancy",
                     "state_descr": "fault",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "modoptRxPowerOk",
                     "state_descr": "true",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "modoptRxPowerOk",
                     "state_descr": "false",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "modoptTempOk",
                     "state_descr": "true",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "modoptTempOk",
                     "state_descr": "false",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "modoptTxPowerOk",
                     "state_descr": "true",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "modoptTxPowerOk",
                     "state_descr": "false",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "modoptVoltOk",
                     "state_descr": "true",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "modoptVoltOk",
                     "state_descr": "false",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 }

@@ -33,9 +33,6 @@ modules:
                     index: 'tempertureSensorStatus.{{ $index }}'
                     group: Sensor Temperature
                     states:
-                        - { value: 0, descr: 'false', graph: 1, generic: 0 }
-                        - { value: 1, descr: 'true', graph: 1, generic: 2 }
-                        - { value: 2, descr: 'reading error', graph: 1, generic: 3 }
                 -
                     oid: CHECKPOINT-MIB::fanSpeedSensorTable
                     value: CHECKPOINT-MIB::fanSpeedSensorStatus
@@ -45,9 +42,6 @@ modules:
                     index: 'fanSpeedSensorStatus.{{ $index }}'
                     group: Sensor Fan Speed
                     states:
-                        - { value: 0, descr: 'false', graph: 1, generic: 0 }
-                        - { value: 1, descr: 'true', graph: 1, generic: 2 }
-                        - { value: 2, descr: 'reading error', graph: 1, generic: 3 }
                 -
                     oid: CHECKPOINT-MIB::voltageSensorStatus
                     value: CHECKPOINT-MIB::voltageSensorStatus
@@ -57,9 +51,6 @@ modules:
                     index: 'voltageSensorStatus.{{ $index }}'
                     group: Sensor Voltage
                     states:
-                        - { value: 0, descr: 'false', graph: 1, generic: 0 }
-                        - { value: 1, descr: 'true', graph: 1, generic: 2 }
-                        - { value: 2, descr: 'reading error', graph: 1, generic: 3 }
                 -
                     oid: CHECKPOINT-MIB::powerSupplyStatus
                     value: CHECKPOINT-MIB::powerSupplyStatus
@@ -69,8 +60,6 @@ modules:
                     index: 'powerSupplyStatus.{{ $index }}'
                     group: Sensor PSU
                     states:
-                        - { value: 0, descr: 'Up', graph: 0, generic: 0 }
-                        - { value: 1, descr: 'Down', graph: 0, generic: 2 }
                 -
                     oid: CHECKPOINT-MIB::haStarted
                     num_oid: '.1.3.6.1.4.1.2620.1.5.5.{{ $index }}'
@@ -80,8 +69,6 @@ modules:
                     group: HA
                     value: CHECKPOINT-MIB::haStarted
                     states:
-                        - { value: 1, descr: yes, graph: 1, generic: 0 }
-                        - { value: 0, descr: no, graph: 0, generic: 2 }
                 -
                     oid: CHECKPOINT-MIB::haState
                     num_oid: '.1.3.6.1.4.1.2620.1.5.6.{{ $index }}'
@@ -91,10 +78,6 @@ modules:
                     group: HA
                     value: CHECKPOINT-MIB::haState
                     states:
-                        - { value: 1, descr: active , graph: 3, generic: 0 }
-                        - { value: 2, descr: standby, graph: 2, generic: 0 }
-                        - { value: 3, descr: 'Active Attention', graph: 1, generic: 1 }
-                        - { value: 0, descr: down, graph: 0, generic: 2 }
                 -
                     oid: CHECKPOINT-MIB::haStatCode
                     num_oid: '.1.3.6.1.4.1.2620.1.5.101.{{ $index }}'
@@ -104,9 +87,6 @@ modules:
                     group: HA
                     value: CHECKPOINT-MIB::haStatCode
                     states:
-                        - { value: 0, descr: Up , graph: 2, generic: 0 }
-                        - { value: 1, descr: Attention, graph: 1, generic: 3 }
-                        - { value: 2, descr: Down, graph: 0, generic: 1 }
                 -
                     oid: CHECKPOINT-MIB::tunnelTable
                     num_oid: '.1.3.6.1.4.1.2620.500.9002.1.3.{{ $index }}'
@@ -117,13 +97,6 @@ modules:
                     group: IPSEC VPN
                     value: CHECKPOINT-MIB::tunnelState
                     states:
-                        - { value: 0, descr: Unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: Up, graph: 1, generic: 0 }
-                        - { value: 4, descr: Destroyed, graph: 1, generic: 3 }
-                        - { value: 129, descr: Idle, graph: 1, generic: 3 }
-                        - { value: 130, descr: Phase1, graph: 1, generic: 1 }
-                        - { value: 131, descr: Down, graph: 1, generic: 2 }
-                        - { value: 132, descr: Init, graph: 1, generic: 1 }
                 -
                     oid: CHECKPOINT-MIB::mglsGWState
                     num_oid: '.1.3.6.1.4.1.2620.1.7.14.4.1.3.{{ $index }}'
@@ -133,8 +106,6 @@ modules:
                     group: 'Management Connected Gateways'
                     value: CHECKPOINT-MIB::mglsGWState
                     states:
-                        - { value: 1, descr: Connected, graph: 1, generic: 0 }
-                        - { value: 0, descr: Disconnected, graph: 0, generic: 2 }
                 -
                     oid: CHECKPOINT-MIB::fwSXLStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.36.1.1.{{ $index }}'
@@ -144,8 +115,6 @@ modules:
                     group: HA
                     value: CHECKPOINT-MIB::fwSXLStatus
                     states:
-                        - { value: 1, descr: Enabled , graph: 0, generic: 0 }
-                        - { value: 0, descr: Disabled, graph: 1, generic: 1 }
                 -
                     oid: CHECKPOINT-MIB::raidVolumeState
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.7.1.1.6.{{ $index }}'
@@ -155,10 +124,6 @@ modules:
                     group: RAID
                     value: CHECKPOINT-MIB::raidVolumeState
                     states:
-                        - { value: 0, descr: OPTIMAL, graph: 3, generic: 0 }
-                        - { value: 1, descr: DEGRADED, graph: 2, generic: 1 }
-                        - { value: 2, descr: FAILED, graph: 1, generic: 2}
-                        - { value: -1, descr: 'Unknown', graph: 0, generic: 3}
                 -
                     oid: CHECKPOINT-MIB::raidVolumeType
                     num_oid: '.1.3.6.1.4.1.2620.1.6.7.7.1.1.3.{{ $index }}'
@@ -168,15 +133,6 @@ modules:
                     group: RAID
                     value: CHECKPOINT-MIB::raidVolumeType
                     states:
-                        - { value: 0, descr: 'RAID-0', graph: 8, generic: 0 }
-                        - { value: 1, descr: 'RAID-1E', graph: 7, generic: 0 }
-                        - { value: 2, descr: 'RAID-1', graph: 6, generic: 0 }
-                        - { value: 3, descr: 'RAID-10', graph: 5, generic: 0 }
-                        - { value: 4, descr: 'RAID-4', graph: 4, generic: 0 }
-                        - { value: 5, descr: 'RAID-5', graph: 3, generic: 0 }
-                        - { value: 6, descr: 'RAID-6', graph: 2, generic: 0 }
-                        - { value: 7, descr: 'RAID-60', graph: 1, generic: 0 }
-                        - { value: 8, descr: 'RAID-50', graph: 0, generic: 0 }
                 -
                     oid: CHECKPOINT-MIB::fwLSConnOverall
                     num_oid: '.1.3.6.1.4.1.2620.1.1.30.1.{{ $index }}'
@@ -186,9 +142,6 @@ modules:
                     group: Logging
                     value: CHECKPOINT-MIB::fwLSConnOverall
                     states:
-                        - {value: 0, descr: 'Ok', graph: 2, generic: 0}
-                        - {value: 1, descr: 'Warning', graph: 1, generic: 1}
-                        - {value: 2, descr: 'Error', graph: 0, generic: 2}
                 -
                     oid: CHECKPOINT-MIB::fwLSConnState
                     value: CHECKPOINT-MIB::fwLSConnState
@@ -198,9 +151,6 @@ modules:
                     descr: '{{ CHECKPOINT-MIB::fwLSConnName }}, Log Server Connectivity'
                     group: Logging
                     states:
-                        - {value: 0, descr: 'Ok', graph: 2, generic: 0}
-                        - {value: 1, descr: 'Error', graph: 1, generic: 2}
-                        - {value: 2, descr: 'Not Active', graph: 0, generic: 2}
                 -
                     oid: CHECKPOINT-MIB::fwLocalLoggingStat
                     num_oid: '.1.3.6.1.4.1.2620.1.1.30.5.{{ $index }}'
@@ -210,10 +160,6 @@ modules:
                     group: Logging
                     value: CHECKPOINT-MIB::fwLocalLoggingStat
                     states:
-                        - {value: 0, descr: 'To log servers', graph: 3, generic: 0}
-                        - {value: 1, descr: 'Local configured', graph: 2, generic: 0}
-                        - {value: 2, descr: 'Local due to connectivity', graph: 1, generic: 2}
-                        - {value: 3, descr: 'Local due to high rate', graph: 0, generic: 2}
                 -
                     oid: CHECKPOINT-MIB::mgStatCode
                     num_oid: '.1.3.6.1.4.1.2620.1.7.101.{{ $index }}'
@@ -222,9 +168,6 @@ modules:
                     descr: 'Management Sync Status'
                     group: HA
                     states:
-                        - { value: 0, descr: 'OK', graph: 0, generic: 0 }
-                        - { value: 1, descr: 'Attention', graph: 1, generic: 1 }
-                        - { value: 2, descr: 'Problem', graph: 2, generic: 2}
                 -
                     oid: CHECKPOINT-MIB::mgActiveStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.7.5.{{ $index }}'
@@ -233,8 +176,6 @@ modules:
                     descr: 'SMS Status'
                     group: HA
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'active' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'standby' }
                 -
                     oid: CHECKPOINT-MIB::mgFwmIsAlive
                     num_oid: '.1.3.6.1.4.1.2620.1.7.6.{{ $index }}'
@@ -243,8 +184,6 @@ modules:
                     descr: 'FWM Daemon Status'
                     group: HA
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: 'Down' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'Up' }
                 -
                     oid: CHECKPOINT-MIB::vsxStatusHAState
                     num_oid: '.1.3.6.1.4.1.2620.1.16.22.1.1.9.{{ $index }}'
@@ -253,9 +192,6 @@ modules:
                     descr: '{{ CHECKPOINT-MIB::vsxStatusVsName }}'
                     group: High Availability Status
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'Active' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'Standby' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'Backup' }
 #Update Status
                 -
                     oid: CHECKPOINT-MIB::advancedUrlFilteringUpdateStatus
@@ -265,11 +201,6 @@ modules:
                     descr: 'URL Filtering Update'
                     group: Update
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: 'failed' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'up-to-date' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'new' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'degrade' }
-                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
                     oid: CHECKPOINT-MIB::applicationControlUpdateStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.39.2.1.{{ $index }}'
@@ -278,11 +209,6 @@ modules:
                     descr: 'Application Control Update'
                     group: Update
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: 'failed' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'up-to-date' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'new' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'degrade' }
-                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
                     oid: CHECKPOINT-MIB::amwAVUpdateStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.46.5.1.{{ $index }}'
@@ -291,11 +217,6 @@ modules:
                     descr: 'Anti Virus Update'
                     group: Update
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: 'failed' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'up-to-date' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'new' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'degrade' }
-                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
                     oid: CHECKPOINT-MIB::amwABUpdateStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.46.1.1.{{ $index }}'
@@ -304,11 +225,6 @@ modules:
                     descr: 'Anti Malware Update'
                     group: Update
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: 'failed' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'up-to-date' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'new' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'degrade' }
-                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
 #Subscriptions
                 -
                     oid: CHECKPOINT-MIB::advancedUrlFilteringSubscriptionStatus
@@ -318,11 +234,6 @@ modules:
                     descr: 'URL Filtering Subscription'
                     group: Licenses
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'valid' }
-                        - { value: 1, generic: 2, graph: 1, descr: 'expired' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'about-to-expire' }
-                        - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
-                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
                     oid: CHECKPOINT-MIB::applicationControlSubscriptionStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.39.1.1.{{ $index }}'
@@ -331,11 +242,6 @@ modules:
                     descr: 'Application Control Subscription'
                     group: Licenses
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'valid' }
-                        - { value: 1, generic: 2, graph: 1, descr: 'expired' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'about-to-expire' }
-                        - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
-                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
                     oid: CHECKPOINT-MIB::antiVirusSubscriptionStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.46.3.1.{{ $index }}'
@@ -344,11 +250,6 @@ modules:
                     descr: 'Anti Virus Subscription'
                     group: Licenses
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'valid' }
-                        - { value: 1, generic: 2, graph: 1, descr: 'expired' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'about-to-expire' }
-                        - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
-                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
                     oid: CHECKPOINT-MIB::antiBotSubscriptionStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.46.2.1.{{ $index }}'
@@ -357,11 +258,6 @@ modules:
                     descr: 'Anti Bot Subscription'
                     group: Licenses
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'valid' }
-                        - { value: 1, generic: 2, graph: 1, descr: 'expired' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'about-to-expire' }
-                        - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
-                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
                 -
                     oid: CHECKPOINT-MIB::antiSpamSubscriptionStatus
                     num_oid: '.1.3.6.1.4.1.2620.1.46.4.1.{{ $index }}'
@@ -370,11 +266,6 @@ modules:
                     descr: 'Anti Spam Subscription'
                     group: Licenses
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'valid' }
-                        - { value: 1, generic: 2, graph: 1, descr: 'expired' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'about-to-expire' }
-                        - { value: 3, generic: 0, graph: 1, descr: 'not-associated' }
-                        - { value: 4, generic: 3, graph: 1, descr: 'unknown' }
         temperature:
             data:
                 -

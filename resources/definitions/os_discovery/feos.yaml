@@ -29,8 +29,6 @@ modules:
                     descr: 'System Temperature Health'
                     state_name: feTemperatureIsHealthy
                     states:
-                        - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'Good' } 
                 -
                     oid: FE-FIREEYE-MIB::feStorageInfo
                     value: FE-FIREEYE-MIB::feRaidIsHealthy
@@ -39,8 +37,6 @@ modules:
                     descr: 'System RAID Health'
                     state_name: feRaidIsHealthy
                     states:
-                        - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'Good' }
                 -
                     oid: FE-FIREEYE-MIB::fePhysicalDiskTable
                     value: FE-FIREEYE-MIB::fePhysicalDiskIsHealthy 
@@ -50,8 +46,6 @@ modules:
                     index: fePhysicalDiskIsHealthy.{{ FE-FIREEYE-MIB::fePhysicalDiskIndex }}
                     state_name: fePhysicalDiskIsHealthy
                     states:
-                        - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'Good' } 
                 -
                     oid: FE-FIREEYE-MIB::fePowerSupply
                     value:  FE-FIREEYE-MIB::fePowerSupplyOverallIsHealthy
@@ -60,8 +54,6 @@ modules:
                     descr: 'System Power Supply Health'
                     state_name: fePowerSupplyOverallIsHealthy
                     states:
-                        - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'Good' }
                 -
                     oid: FE-FIREEYE-MIB::feFanHealth
                     value: FE-FIREEYE-MIB::feFanOverallIsHealthy
@@ -70,8 +62,6 @@ modules:
                     descr: 'System Fan Health'
                     state_name: feFanOverallIsHealthy
                     states:
-                        - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'Good' }
                 -
                     oid: FE-FIREEYE-MIB::feFanStatusTable
                     value: FE-FIREEYE-MIB::feFanIsHealthy
@@ -81,8 +71,6 @@ modules:
                     state_name: feFanIsHealthy
                     index: feFanIsHealthy.{{ FE-FIREEYE-MIB::feFanIndex }}
                     states:
-                        - { value: 2, generic: 2, graph: 0, descr: 'Bad' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'Good' }
                 -
                     oid: FE-FIREEYE-MIB::feApplication
                     value: FE-FIREEYE-MIB::feProductLicenseActive
@@ -91,8 +79,6 @@ modules:
                     descr: 'Product License Status'
                     state_name: feProductLicenseActive
                     states:
-                        - { value: 2, generic: 2, graph: 0, descr: 'Not Active' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'Active' }
                 -
                     oid: FE-FIREEYE-MIB::feApplication
                     value: FE-FIREEYE-MIB::feContentLicenseActive 
@@ -101,8 +87,6 @@ modules:
                     descr: 'Content License Status'
                     state_name: feContentLicenseActive
                     states:
-                        - { value: 2, generic: 2, graph: 0, descr: 'Not Active' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'Active' }
                 -
                     oid: FE-FIREEYE-MIB::feApplication
                     value:  FE-FIREEYE-MIB::feSupportLicenseActive
@@ -111,5 +95,3 @@ modules:
                     descr: 'Support License Status'
                     state_name: feSupportLicenseActive
                     states:
-                        - { value: 2, generic: 2, graph: 0, descr: 'Not Active' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'Active' }

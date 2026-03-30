@@ -10,9 +10,6 @@ modules:
                     descr: 'Temperature Sensor {{ $index }}'
                     index: '{{ $index }}'
                     states:
-                        - { value: 1, descr: normal, graph: 1, generic: 0 }
-                        - { value: 2, descr: warning, graph: 1, generic: 1 }
-                        - { value: 3, descr: critical, graph: 1, generic: 2 }
                 -
                     oid: SFA-INFO::fanTable
                     value: SFA-INFO::fanStatus
@@ -21,8 +18,6 @@ modules:
                     descr: 'Fan Sensor {{ $index }}'
                     index: '{{ $index }}'
                     states:
-                        - { value: 1, descr: healthy, graph: 1, generic: 0 }
-                        - { value: 2, descr: failure, graph: 1, generic: 2 }
                 -
                     oid: SFA-INFO::powerTable
                     value: SFA-INFO::powerStatus
@@ -31,8 +26,6 @@ modules:
                     descr: 'Power Supply Sensor {{ $index }}'
                     index: '{{ $index }}'
                     states:
-                        - { value: 1, descr: healthy, graph: 1, generic: 0 }
-                        - { value: 2, descr: failure, graph: 1, generic: 2 }
                 -
                     oid: SFA-INFO::physicalDiskTable
                     value: SFA-INFO::physDiskState
@@ -41,7 +34,3 @@ modules:
                     descr: 'Disk Sensor {{ $index }}'
                     index: '{{ $index }}'
                     states:
-                        - { value: 1, descr: normal, graph: 1, generic: 0 }
-                        - { value: 2, descr: failed, graph: 1, generic: 2 }
-                        - { value: 3, descr: predictedfailure, graph: 1, generic: 1 }
-                        - { value: 4, descr: unknown, graph: 1, generic: 3 }

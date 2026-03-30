@@ -37,12 +37,6 @@ modules:
                     descr: 'Global System'
                     index: 'drsGlobalSystemStatus.{{ $index }}'
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: IDRAC-MIB::systemStateIDSDMCardUnitStatusCombined
                     value: IDRAC-MIB::systemStateIDSDMCardUnitStatusCombined
@@ -51,12 +45,6 @@ modules:
                     descr: 'IDSDM Card Unit Combined'
                     index: 'systemStateIDSDMCardUnitStatusCombined.{{ $index }}'
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: IDRAC-MIB::systemStateIDSDMCardDeviceStatusCombined
                     value: IDRAC-MIB::systemStateIDSDMCardDeviceStatusCombined
@@ -65,12 +53,6 @@ modules:
                     descr: 'IDSDM Card Device Combined'
                     index: 'systemStateIDSDMCardDeviceStatusCombined.{{ $index }}'
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: IDRAC-MIB::intrusionStatus
                     value: IDRAC-MIB::intrusionStatus
@@ -79,12 +61,6 @@ modules:
                     descr: 'Intrusion'
                     index: 'intrusionStatus.{{ $index }}'
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: IDRAC-MIB::intrusionReading
                     value: IDRAC-MIB::intrusionReading
@@ -93,10 +69,6 @@ modules:
                     descr: 'Intrusion Reading'
                     index: 'intrusionReading.{{ $index }}'
                     states:
-                        - { value: 1, descr: chassisNotBreached, graph: 1, generic: 0 }
-                        - { value: 2, descr: chassisBreached, graph: 1, generic: 2 }
-                        - { value: 3, descr: chassisBreachedPrior, graph: 1, generic: 1 }
-                        - { value: 4, descr: chassisBreachSensorFailure, graph: 1, generic: 1 }
                 -
                     oid: DELL-RAC-MIB::drsIOMCurrStatus
                     value: DELL-RAC-MIB::drsIOMCurrStatus
@@ -105,12 +77,6 @@ modules:
                     index: 'drsIOMCurrStatus.{{ $index }}'
                     state_name: drsIOMCurrStatus
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: DELL-RAC-MIB::drsKVMCurrStatus
                     value: DELL-RAC-MIB::drsKVMCurrStatus
@@ -118,12 +84,6 @@ modules:
                     descr: 'KVM'
                     index: 'drsKVMCurrStatus.{{ $index }}'
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: DELL-RAC-MIB::drsRedCurrStatus
                     value: DELL-RAC-MIB::drsRedCurrStatus
@@ -132,12 +92,6 @@ modules:
                     index: 'drsRedCurrStatus.{{ $index }}'
                     state_name: drsRedCurrStatus
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: DELL-RAC-MIB::drsPowerCurrStatus
                     value: DELL-RAC-MIB::drsPowerCurrStatus
@@ -145,12 +99,6 @@ modules:
                     descr: 'Power'
                     index: 'drsPowerCurrStatus.{{ $index }}'
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: DELL-RAC-MIB::drsFanCurrStatus
                     value: DELL-RAC-MIB::drsFanCurrStatus
@@ -159,12 +107,6 @@ modules:
                     index: 'drsFanCurrStatus.{{ $index }}'
                     state_name: drsFanCurrStatus
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: DELL-RAC-MIB::drsBladeCurrStatus
                     value: DELL-RAC-MIB::drsBladeCurrStatus
@@ -172,12 +114,6 @@ modules:
                     descr: 'Blade'
                     index: 'drsBladeCurrStatus.{{ $index }}'
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: DELL-RAC-MIB::drsTempCurrStatus
                     value: DELL-RAC-MIB::drsTempCurrStatus
@@ -185,12 +121,6 @@ modules:
                     descr: 'Temperature'
                     index: 'drsTempCurrStatus.{{ $index }}'
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: DELL-RAC-MIB::drsCMCCurrStatus
                     value: DELL-RAC-MIB::drsCMCCurrStatus
@@ -198,12 +128,6 @@ modules:
                     descr: 'CMC'
                     index: 'drsCMCCurrStatus.{{ $index }}'
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
                 -
                     oid: DELL-RAC-MIB::physicalDiskTable
                     value: DELL-RAC-MIB::physicalDiskState
@@ -213,16 +137,6 @@ modules:
                     group: 'Storage'
                     state_name: physicalDiskState
                     states:
-                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 2, descr: ready, graph: 1, generic: 0 }
-                        - { value: 3, descr: online, graph: 1, generic: 0 }
-                        - { value: 4, descr: foreign, graph: 1, generic: 1 }
-                        - { value: 5, descr: offline, graph: 1, generic: 2 }
-                        - { value: 6, descr: blocked, graph: 1, generic: 2}
-                        - { value: 7, descr: failed, graph: 1, generic: 2 }
-                        - { value: 8, descr: nonraid, graph: 1, generic: 0 }
-                        - { value: 9, descr: removed, graph: 1, generic: 2 }
-                        - { value: 10, descr: readonly, graph: 1, generic: 0 }
                 -
                     oid: IDRAC-MIB-SMIv2::physicalDiskTable
                     value: IDRAC-MIB-SMIv2::physicalDiskState
@@ -232,16 +146,6 @@ modules:
                     group: 'Storage'
                     state_name: physicalDiskState
                     states:
-                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 2, descr: ready, graph: 1, generic: 0 }
-                        - { value: 3, descr: online, graph: 1, generic: 0 }
-                        - { value: 4, descr: foreign, graph: 1, generic: 1 }
-                        - { value: 5, descr: offline, graph: 1, generic: 2 }
-                        - { value: 6, descr: blocked, graph: 1, generic: 2}
-                        - { value: 7, descr: failed, graph: 1, generic: 2 }
-                        - { value: 8, descr: nonraid, graph: 1, generic: 0 }
-                        - { value: 9, descr: removed, graph: 1, generic: 2 }
-                        - { value: 10, descr: readonly, graph: 1, generic: 0 }
                 -
                     oid: IDRAC-MIB-SMIv2::virtualDiskTable
                     value: IDRAC-MIB-SMIv2::virtualDiskState
@@ -251,10 +155,6 @@ modules:
                     group: 'Storage'
                     state_name: virtualDiskState
                     states:
-                        - { value: 1, descr: unknown, graph: 0, generic: 3 }
-                        - { value: 2, descr: online, graph: 0, generic: 0 }
-                        - { value: 3, descr: failed, graph: 0, generic: 2 }
-                        - { value: 4, descr: degraded, graph: 0, generic: 1 }
                 -
                     oid: DELL-RAC-MIB::controllerTable
                     value: DELL-RAC-MIB::controllerComponentStatus
@@ -264,12 +164,6 @@ modules:
                     group: 'Storage'
                     state_name: controllerState
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3  }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonrecoverable, graph: 1, generic: 2}
                 -
                     oid: IDRAC-MIB-SMIv2::controllerTable
                     value: IDRAC-MIB-SMIv2::controllerComponentStatus
@@ -279,12 +173,6 @@ modules:
                     group: 'Storage'
                     state_name: controllerState
                     states:
-                        - { value: 1, descr: other, graph: 0, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 0, generic: 3  }
-                        - { value: 3, descr: ok, graph: 0, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 0, generic: 1 }
-                        - { value: 5, descr: critical, graph: 0, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 0, generic: 2}
                 -
                     oid: IDRAC-MIB-SMIv2::processorDeviceTable
                     value: IDRAC-MIB-SMIv2::processorDeviceStatus
@@ -293,12 +181,6 @@ modules:
                     index: '{{ $index }}'
                     state_name: processorDeviceStatus
                     states:
-                        - { value: 1, descr: other, graph: 0, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 0, generic: 3  }
-                        - { value: 3, descr: ok, graph: 0, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 0, generic: 1 }
-                        - { value: 5, descr: critical, graph: 0, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 0, generic: 2}
                 -
                     oid: IDRAC-MIB-SMIv2::memoryDeviceTable
                     value: IDRAC-MIB-SMIv2::memoryDeviceStatus
@@ -308,12 +190,6 @@ modules:
                     group: 'Memory'
                     state_name: memoryDeviceStatus
                     states:
-                        - { value: 1, descr: other, graph: 0, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 0, generic: 3  }
-                        - { value: 3, descr: ok, graph: 0, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 0, generic: 1 }
-                        - { value: 5, descr: critical, graph: 0, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 0, generic: 2}
                 -
                     oid: IDRAC-MIB-SMIv2::voltageProbeTable
                     value: IDRAC-MIB-SMIv2::voltageProbeStatus
@@ -322,16 +198,6 @@ modules:
                     index: '{{ $index }}'
                     state_name: voltageProbeStatus
                     states:
-                        - { value: 1, descr: other, graph: 0, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 0, generic: 3  }
-                        - { value: 3, descr: ok, graph: 0, generic: 0 }
-                        - { value: 4, descr: nonCriticalUpper, graph: 0, generic: 1 }
-                        - { value: 5, descr: criticalUpper, graph: 0, generic: 2 }
-                        - { value: 6, descr: nonRecoverableUpper, graph: 0, generic: 2 }
-                        - { value: 7, descr: nonCriticalLower, graph: 0, generic: 1 }
-                        - { value: 8, descr: criticalLower, graph: 0, generic: 2 }
-                        - { value: 9, descr: nonRecoverableLower, graph: 0, generic: 2 }
-                        - { value: 10, descr: failed, graph: 0, generic: 2 }
                 -
                     oid: IDRAC-MIB-SMIv2::amperageProbeTable
                     value: IDRAC-MIB-SMIv2::amperageProbeStatus
@@ -340,16 +206,6 @@ modules:
                     index: '{{ $index }}'
                     state_name: amperageProbeStatus
                     states:
-                        - { value: 1, descr: other, graph: 0, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 0, generic: 3  }
-                        - { value: 3, descr: ok, graph: 0, generic: 0 }
-                        - { value: 4, descr: nonCriticalUpper, graph: 0, generic: 1 }
-                        - { value: 5, descr: criticalUpper, graph: 0, generic: 2 }
-                        - { value: 6, descr: nonRecoverableUpper, graph: 0, generic: 2 }
-                        - { value: 7, descr: nonCriticalLower, graph: 0, generic: 1 }
-                        - { value: 8, descr: criticalLower, graph: 0, generic: 2 }
-                        - { value: 9, descr: nonRecoverableLower, graph: 0, generic: 2 }
-                        - { value: 10, descr: failed, graph: 0, generic: 2 }
                 -
                     oid: IDRAC-MIB-SMIv2::systemBatteryTable
                     value: IDRAC-MIB-SMIv2::systemBatteryStatus
@@ -358,16 +214,6 @@ modules:
                     index: '{{ $index }}'
                     state_name: systemBatteryStatus
                     states:
-                        - { value: 1, descr: other, graph: 0, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 0, generic: 3  }
-                        - { value: 3, descr: ok, graph: 0, generic: 0 }
-                        - { value: 4, descr: nonCriticalUpper, graph: 0, generic: 1 }
-                        - { value: 5, descr: criticalUpper, graph: 0, generic: 2 }
-                        - { value: 6, descr: nonRecoverableUpper, graph: 0, generic: 2 }
-                        - { value: 7, descr: nonCriticalLower, graph: 0, generic: 1 }
-                        - { value: 8, descr: criticalLower, graph: 0, generic: 2 }
-                        - { value: 9, descr: nonRecoverableLower, graph: 0, generic: 2 }
-                        - { value: 10, descr: failed, graph: 0, generic: 2 }
                 -
                     oid: DELL-RAC-MIB::drsCMCServerTable
                     value: DELL-RAC-MIB::drsServerMonitoringCapable
@@ -381,10 +227,6 @@ modules:
                             op: '=='
                             value: 'N/A'
                     states:
-                        - { value: 1, descr: absent, graph: 1, generic: 3 }
-                        - { value: 2, descr: none, graph: 1, generic: 3  }
-                        - { value: 3, descr: basic, graph: 1, generic: 0 }
-                        - { value: 4, descr: off l, graph: 1, generic: 1 }
         temperature:
             data:
                 -

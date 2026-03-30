@@ -54,7 +54,6 @@ if (! empty($gpio_mon_data)) {
 
                         $state_data['value'] = intval($sensor_data_parts[0]);
                         $state_data['generic'] = intval($sensor_data_parts[1]);
-                        $state_data['graph'] = 1;
                         $state_data['descr'] = $sensor_data_parts[2];
                         array_push($sensor_data['state_data'], $state_data);
                     }

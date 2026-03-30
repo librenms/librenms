@@ -10,8 +10,6 @@ modules:
                     group: '{{ INNO-MIB::l2Label }}'
                     state_name: L2State
                     states:
-                        - { descr: down, graph: 0, value: 1, generic: 2 }
-                        - { descr: up,   graph: 0, value: 2, generic: 0 }
                 -
                     oid: INNO-MIB::l2Table
                     value: INNO-MIB::l2Mode
@@ -20,8 +18,6 @@ modules:
                     state_name: L2Mode
                     group: '{{ INNO-MIB::l2Label }}'
                     states:
-                        - { descr: TE, graph: 0, value: 1, generic: 0 }
-                        - { descr: NT, graph: 0, value: 2, generic: 0 }
                 -
                     oid: INNO-MIB::l1BriTable
                     value: INNO-MIB::l1BriState
@@ -30,8 +26,6 @@ modules:
                     state_name: l1BriLabel
                     group: '{{ INNO-MIB::l1BriLabel }}'
                     states:
-                        - { descr: down, graph: 0, value: 1, generic: 2 }
-                        - { descr: up,   graph: 0, value: 2, generic: 0 }
                 -
                     oid: INNO-MIB::l3Table
                     value: INNO-MIB::l3Protocol
@@ -40,10 +34,6 @@ modules:
                     state_name: l3Label
                     group: '{{ INNO-MIB::l3Label }}'
                     states:
-                        - { descr: none, graph: 0, value: 1, generic: 3 }
-                        - { descr: other,   graph: 0, value: 2, generic: 3 }
-                        - { descr: etsi,   graph: 0, value: 3, generic: 0 }
-                        - { descr: qsig,   graph: 0, value: 23, generic: 0 }
         count:
             data:
                 -

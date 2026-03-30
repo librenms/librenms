@@ -35,5 +35,3 @@ modules:
                     index: '{{ $index }}'
                     state_name: controlbox
                     states:
-                        - { descr: normal, graph: 0, value: 0, generic: 0 }
-                        - { descr: alarm, graph: 0, value: 1, generic: 2 }

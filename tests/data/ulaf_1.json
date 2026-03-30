@@ -288,42 +288,36 @@
                 {
                     "state_name": "deviceLinkAlarm",
                     "state_descr": "no Alarm",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "deviceLinkAlarm",
                     "state_descr": "UA",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "deviceLinkAlarm",
                     "state_descr": "NUA",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "deviceLinkAlarm",
                     "state_descr": "AIS",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "deviceLinkAlarm",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "deviceLinkAlarm",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 }

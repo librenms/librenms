@@ -127,10 +127,6 @@ modules:
                     descr: 'Config {{ $index }} Load  State'
                     state_name: raisecomConfigLoadState
                     states:
-                        - { descr: ready, graph: 0, value: 1, generic: 1 }
-                        - { descr: running, graph: 0, value: 2, generic: 1 }
-                        - { descr: successful, graph: 0, value: 3, generic: 0 }
-                        - { descr: failed, graph: 0, value: 4, generic: 2 }
                 -
                     oid: RAISECOM-FANMONITOR-MIB::raisecomFanMonitorStateTable
                     value: RAISECOM-FANMONITOR-MIB::raisecomFanWorkState
@@ -138,8 +134,6 @@ modules:
                     descr: 'Fan {{ $index }} State'
                     state_name: raisecomFanMonitorStateTable
                     states:
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: abnormal, graph: 0, value: 2, generic: 2 }
                 -
                     oid: RAISECOM-POWERMONITOR-MIB::raisecomPowerMonitorStateTable
                     value: RAISECOM-POWERMONITOR-MIB::raisecomPowerStatus
@@ -147,6 +141,3 @@ modules:
                     descr: 'Power Supply {{ $index }} State'
                     state_name: raisecomPowerMonitorStateTable
                     states:
-                        - { descr: offline, graph: 0, value: 1, generic: 2 }
-                        - { descr: online, graph: 0, value: 2, generic: 0 }
-                        - { descr: power-on, graph: 0, value: 3, generic: 0 }

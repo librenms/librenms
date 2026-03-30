@@ -9,8 +9,6 @@ modules:
                     descr: 'Primary power'
                     index: 'etsPrimPowAvail.{{ $index }}'
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 2 }
-                        - { descr: available, graph: 1, value: 1, generic: 0 }
                 -
                     oid: GUDEADS-ETS-MIB::etsSecPowAvail
                     state_name: etsSecPowAvail
@@ -18,5 +16,3 @@ modules:
                     descr: 'Secondary power'
                     index: 'etsSecPowAvail.{{ $index }}'
                     states:
-                        - { descr: unavailable, graph: 1, value: 0, generic: 2 }
-                        - { descr: available, graph: 1, value: 1, generic: 0 }

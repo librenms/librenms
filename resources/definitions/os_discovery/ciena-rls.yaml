@@ -27,9 +27,6 @@ modules:
                     group: 'Amplifier Mode'
                     state_name: rlsInventoryAmpsAmpMode
                     states:
-                        - { descr: Power, graph: 0, value: 1, generic: 0 }
-                        - { descr: Gain, graph: 0, value: 2, generic: 0 }
-                        - { descr: GainClamp, graph: 0, value: 3, generic: 0 }
                 -
                     oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
                     value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsState
@@ -39,11 +36,6 @@ modules:
                     group: 'Amplifier State'
                     state_name: rlsInventoryAmpsState
                     states:
-                        - { descr: Unknown, graph: 0, value: 0, generic: 3 }
-                        - { descr: Off, graph: 0, value: 1, generic: 1 }
-                        - { descr: APR, graph: 0, value: 2, generic: 1 }
-                        - { descr: Normal, graph: 0, value: 3, generic: 0 }
-                        - { descr: Clamped, graph: 0, value: 4, generic: 0 }
                 -
                     oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
                     value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsGainMode
@@ -53,8 +45,6 @@ modules:
                     group: 'Amplifier Gain Mode'
                     state_name: rlsInventoryAmpsGainMode
                     states:
-                        - { descr: Low, graph: 0, value: 1, generic: 0 }
-                        - { descr: High, graph: 0, value: 2, generic: 0 }
                 -
                     oid: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsTable
                     value: CIENA-6500R-INVENTORY-AMPS-MIB::rlsInventoryAmpsForcedShutdown
@@ -64,8 +54,6 @@ modules:
                     group: 'Amplifier Forced Shutdown State'
                     state_name: rlsInventoryAmpsForcedShutdown
                     states:
-                        - { descr: Disabled, graph: 0, value: 1, generic: 0 }
-                        - { descr: Enabled, graph: 0, value: 2, generic: 1 }
         dbm:
             data:
                 -

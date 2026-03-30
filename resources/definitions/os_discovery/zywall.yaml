@@ -34,6 +34,4 @@ modules:
                     index: 'vpnIndex.{{ $index }}'
                     state_name: vpnConnectStatus
                     states:
-                        - { descr: Disconnected, graph: 0, value: 0, generic: 2 }
-                        - { descr: Connected, graph: 0, value: 1, generic: 0 }
 
