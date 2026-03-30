@@ -46,7 +46,7 @@ use App\Models\Vlan;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Data\Sources\NetSnmpTranslate;
+use LibreNMS\Data\Source\NetSnmpTranslate;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MacAccountingDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;

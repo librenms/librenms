@@ -28,49 +28,16 @@ namespace LibreNMS\Data\Source;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use App\Models\Eventlog;
-use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use LibreNMS\Enum\Severity;
-use LibreNMS\Util\Debug;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 use Log;
-use Symfony\Component\Process\Process;
 
 class NetSnmpQuery extends NetSnmpCmd implements SnmpQueryInterface
 {
     private const DEFAULT_FLAGS = '-OQXUte';
-
-    /** @var string[] */
-    private array $commandCleanupPatterns = [
-        '/-c\' \'[\S]+\'/',
-        '/-u\' \'[\S]+\'/',
-        '/-U\' \'[\S]+\'/',
-        '/-A\' \'[\S]+\'/',
-        '/-X\' \'[\S]+\'/',
-        '/-P\' \'[\S]+\'/',
-        '/-H\' \'[\S]+\'/',
-        '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
-    ];
-
-    /** @var string[] */
-    private array $commandReplacementPatterns = [
-        '-c\' \'COMMUNITY\'',
-        '-u\' \'USER\'',
-        '-U\' \'USER\'',
-        '-A\' \'PASSWORD\'',
-        '-X\' \'PASSWORD\'',
-        '-P\' \'PASSWORD\'',
-        '-H\' \'HOSTNAME\'',
-        '\1:HOSTNAME:\3',
-    ];
-
-    private string $output_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
-    private string $output_replacement = '*';
 
     /**
      * @var string[]

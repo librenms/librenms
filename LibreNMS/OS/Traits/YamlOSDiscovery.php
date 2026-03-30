@@ -30,7 +30,7 @@ use App\Models\Device;
 use App\Models\Location;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
-use LibreNMS\Data\Sources\NetSnmpTranslate;
+use LibreNMS\Data\Source\NetSnmpTranslate;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\StringHelpers;
 use Log;
