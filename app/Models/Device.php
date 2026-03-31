@@ -216,15 +216,11 @@ class Device extends BaseModel
     }
 
     /**
-     * Returns the device name if not already displayed
+     * Returns the device sysName if it differs from diplayname
      */
     public function name(): string
     {
-        $display = $this->displayName();
-
-        if (! Str::contains($display, $this->hostname)) {
-            return (string) $this->hostname;
-        } elseif (! Str::contains($display, $this->sysName)) {
+        if ($this->displayName() != $this->sysName) {
             return (string) $this->sysName;
         }
 
