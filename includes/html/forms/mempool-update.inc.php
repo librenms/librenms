@@ -40,7 +40,7 @@ if (! is_numeric($device_id)) {
 } elseif (! is_numeric($data)) {
     $message = 'Missing value';
 } else {
-    if (dbUpdate(['mempool_perc_warn' => $data], 'mempools', '`mempool_id`=? AND `device_id`=?', [$mempool_id, $device_id]) >= 0) {
+    if (Mempool::where('mempool_id', $mempool_id)->where('device_id', $device_id)->update(['mempool_perc_warn' => $data]) >= 0) {
         $message = 'Memory information updated';
         $status = 'ok';
     } else {

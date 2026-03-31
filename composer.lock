@@ -4,8 +4,69 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2a7ecde6b61b93e38a8bec962ae9416a",
+    "content-hash": "f7fa633d2a4cfaa29194909536a2aa33",
     "packages": [
+        {
+            "name": "acmephp/ssl",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/acmephp/ssl.git",
+                "reference": "c78ad953d3680acf3f02024c93ff32724d353590"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/acmephp/ssl/zipball/c78ad953d3680acf3f02024c93ff32724d353590",
+                "reference": "c78ad953d3680acf3f02024c93ff32724d353590",
+                "shasum": ""
+            },
+            "require": {
+                "ext-hash": "*",
+                "ext-openssl": "*",
+                "lib-openssl": ">=0.9.8",
+                "php": ">=7.2.5",
+                "webmozart/assert": "^1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "AcmePhp\\Ssl\\": "."
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Titouan Galopin",
+                    "email": "galopintitouan@gmail.com",
+                    "homepage": "http://titouangalopin.com"
+                },
+                {
+                    "name": "Jérémy Derussé",
+                    "homepage": "https://twitter.com/jderusse"
+                }
+            ],
+            "description": "PHP wrapper around OpenSSL extension providing SSL encoding, decoding, parsing and signing features",
+            "homepage": "https://github.com/acmephp/ssl",
+            "keywords": [
+                "ECDSA",
+                "acmephp",
+                "certificate",
+                "csr",
+                "https",
+                "openssl",
+                "rsa",
+                "ssl",
+                "x509"
+            ],
+            "support": {
+                "issues": "https://github.com/acmephp/ssl/issues",
+                "source": "https://github.com/acmephp/ssl/tree/2.1.0"
+            },
+            "time": "2022-05-31T16:44:35+00:00"
+        },
         {
             "name": "amenadiel/jpgraph",
             "version": "v4.1.1",
@@ -1717,6 +1778,59 @@
             },
             "abandoned": true,
             "time": "2020-12-26T17:45:17+00:00"
+        },
+        {
+            "name": "jalle19/certificate-parser",
+            "version": "4.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Jalle19/certificate-parser.git",
+                "reference": "6ea3b4635004bef09020e706736cb94a5cff919c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Jalle19/certificate-parser/zipball/6ea3b4635004bef09020e706736cb94a5cff919c",
+                "reference": "6ea3b4635004bef09020e706736cb94a5cff919c",
+                "shasum": ""
+            },
+            "require": {
+                "acmephp/ssl": "^2.1",
+                "ext-openssl": "*",
+                "php": ">= 8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jalle19\\CertificateParser\\": "src/",
+                    "Jalle19\\CertificateParser\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sam Stenvall",
+                    "email": "sam.stenvall@nordsoftware.com"
+                }
+            ],
+            "description": "A proper SSL/TLS certificate parser library for PHP",
+            "homepage": "https://github.com/Jalle19/certificate-parser",
+            "keywords": [
+                "certificate",
+                "parser",
+                "ssl",
+                "tls"
+            ],
+            "support": {
+                "issues": "https://github.com/Jalle19/certificate-parser/issues",
+                "source": "https://github.com/Jalle19/certificate-parser/tree/4.0.0"
+            },
+            "time": "2026-02-21T10:38:20+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -9322,6 +9436,64 @@
                 }
             ],
             "time": "2025-12-18T14:27:35+00:00"
+        },
+        {
+            "name": "webmozart/assert",
+            "version": "1.12.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webmozarts/assert.git",
+                "reference": "9be6926d8b485f55b9229203f962b51ed377ba68"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/9be6926d8b485f55b9229203f962b51ed377ba68",
+                "reference": "9be6926d8b485f55b9229203f962b51ed377ba68",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ctype": "*",
+                "ext-date": "*",
+                "ext-filter": "*",
+                "php": "^7.2 || ^8.0"
+            },
+            "suggest": {
+                "ext-intl": "",
+                "ext-simplexml": "",
+                "ext-spl": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.10-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webmozart\\Assert\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bernhard Schussek",
+                    "email": "bschussek@gmail.com"
+                }
+            ],
+            "description": "Assertions to validate method input/output with nice error messages.",
+            "keywords": [
+                "assert",
+                "check",
+                "validate"
+            ],
+            "support": {
+                "issues": "https://github.com/webmozarts/assert/issues",
+                "source": "https://github.com/webmozarts/assert/tree/1.12.1"
+            },
+            "time": "2025-10-29T15:56:20+00:00"
         }
     ],
     "packages-dev": [
@@ -14552,5 +14724,5 @@
         "ext-zlib": "*"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

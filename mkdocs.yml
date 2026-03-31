@@ -183,6 +183,7 @@ nav:
     - Advanced Setup:
       - 1 Minute Polling: Support/1-Minute-Polling.md
       - Authentication Options: Extensions/Authentication.md
+      - Authorization: Extensions/Authorization.md
       - Auto-discovery Setup: Extensions/Auto-Discovery.md
       - Bare Dashboard: Support/Bare-Dashboard.md
       - Cleanup Options: Support/Cleanup-options.md

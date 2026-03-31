@@ -115,24 +115,10 @@ if (Gate::denies('viewAny', Vrf::class)) {
             echo $vrf['vrf_name'] . '</a><br />';
             echo '<span class=box-desc>' . $vrf['mplsVpnVrfDescription'] . '</span></td>';
             echo '<td width=100 class=box-desc>' . $vrf['mplsVpnVrfRouteDistinguisher'] . '</td>';
-            echo '<td><table border=0 cellspacing=0 cellpadding=5 width=100%>';
+            echo '<td><table class="table table-hover table-striped table-condensed">';
             $x = 1;
             foreach ($vrf_devices[$vrf['vrf_name']][$vrf['mplsVpnVrfRouteDistinguisher']] as $device) {
-                if ($i % 2) {
-                    if ($x % 2) {
-                        $dev_colour = LibrenmsConfig::get('list_colour.even_alt');
-                    } else {
-                        $dev_colour = LibrenmsConfig::get('list_colour.even_alt2');
-                    }
-                } else {
-                    if ($x % 2) {
-                        $dev_colour = LibrenmsConfig::get('list_colour.odd_alt2');
-                    } else {
-                        $dev_colour = LibrenmsConfig::get('list_colour.odd_alt');
-                    }
-                }
-
-                echo "<tr bgcolor='$dev_colour'><td width=200><a href='";
+                echo "<tr><td width=200><a href='";
                 echo \LibreNMS\Util\Url::generate(['page' => 'device'], ['device' => $device['device_id'], 'tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf']);
                 echo "'>" . DeviceCache::get($device['device_id'])->displayName() . '</a> ';
 
@@ -156,10 +142,9 @@ if (Gate::denies('viewAny', Vrf::class)) {
                             $port['height'] = '30';
                             $port['from'] = LibrenmsConfig::get('time.day');
                             $port['to'] = LibrenmsConfig::get('time.now');
-                            $port['bg'] = '#' . $bg;
                             $port['graph_type'] = 'port_' . $vars['graph'];
                             echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;
-                            text-align: center; float: left; background-color: " . LibrenmsConfig::get('list_colour.odd_alt2') . ";'>
+                            text-align: center; float: left;'>
                                 <div style='font-weight: bold;'>" . Rewrite::shortenIfName($port['ifDescr']) . '</div>';
                             print_port_thumbnail($port);
                             echo "<div style='font-size: 9px;'>" . substr((string) short_port_descr($port['ifAlias']), 0, 22) . '</div>

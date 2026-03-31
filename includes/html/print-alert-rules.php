@@ -26,6 +26,8 @@
 
 use App\Facades\DeviceCache;
 use App\Models\AlertRule;
+use App\Models\AlertTransport;
+use App\Models\AlertTransportGroup;
 use Illuminate\Support\Facades\Schema;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
@@ -198,7 +200,8 @@ foreach ($rule_list as $rule) {
     }
 
     $sub = dbFetchRows('SELECT * FROM alerts WHERE rule_id = ? ORDER BY `state` DESC, `id` DESC LIMIT 1', [$rule['id']]);
-    $severity = dbFetchCell('SELECT severity FROM alert_rules where id = ?', [$rule['id']]);
+    $alertRule = AlertRule::find($rule['id']);
+    $severity = $rule['severity'];
     $ico = 'check';
     $col = 'success';
     $extra = '';
@@ -234,23 +237,23 @@ foreach ($rule_list as $rule) {
 
     $rule_extra = json_decode((string) $rule['extra'], true);
 
-    $device_count = dbFetchCell('SELECT COUNT(*) FROM alert_device_map WHERE rule_id=?', [$rule['id']]);
-    $group_count = dbFetchCell('SELECT COUNT(*) FROM alert_group_map WHERE rule_id=?', [$rule['id']]);
-    $location_count = dbFetchCell('SELECT COUNT(*) FROM alert_location_map WHERE rule_id=?', [$rule['id']]);
+    $has_devices = $alertRule->devices()->exists();
+    $has_groups = $alertRule->groups()->exists();
+    $has_locations = $alertRule->locations()->exists();
 
     $popover_msg_parts = [];
 
     $icon_indicator = 'fa fa-globe fa-fw text-success';
 
-    if ($device_count) {
+    if ($has_devices) {
         $popover_msg_parts[] = 'Device';
         $icon_indicator = 'fa fa-server fa-fw text-primary';
     }
-    if ($group_count) {
+    if ($has_groups) {
         $popover_msg_parts[] = 'Group';
         $icon_indicator = 'fa fa-th fa-fw text-primary';
     }
-    if ($location_count) {
+    if ($has_locations) {
         $popover_msg_parts[] = 'Location';
         $icon_indicator = 'fa fa-th fa-fw text-primary';
     }
@@ -287,7 +290,7 @@ foreach ($rule_list as $rule) {
     }
 
     $locations = null;
-    if ($location_count) {
+    if ($has_locations) {
         $location_query = 'SELECT locations.location, locations.id FROM alert_location_map, locations WHERE alert_location_map.rule_id=? and alert_location_map.location_id = locations.id ORDER BY location';
         $location_maps = dbFetchRows($location_query, [$rule['id']]);
         foreach ($location_maps as $location_map) {
@@ -296,7 +299,7 @@ foreach ($rule_list as $rule) {
     }
 
     $groups = null;
-    if ($group_count) {
+    if ($has_groups) {
         $group_query = 'SELECT device_groups.name, device_groups.id FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name';
         $group_maps = dbFetchRows($group_query, [$rule['id']]);
         foreach ($group_maps as $group_map) {
@@ -305,7 +308,7 @@ foreach ($rule_list as $rule) {
     }
 
     $devices = null;
-    if ($device_count) {
+    if ($has_devices) {
         $device_query = 'SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname';
         $device_maps = dbFetchRows($device_query, [$rule['id']]);
         foreach ($device_maps as $device_map) {
@@ -330,6 +333,9 @@ foreach ($rule_list as $rule) {
 
     echo '</td>';
 
+    // Transports
+    $has_transports = $alertRule->transportSingles()->exists() || $alertRule->transportGroups()->exists();
+
     $transports_popover = 'right';
     $transports = '';
 
@@ -349,9 +355,8 @@ foreach ($rule_list as $rule) {
                 'alert_operation_segments.operation_phase',
             ]);
     }
-    $transport_count = $transport_maps->count();
 
-    if ($transport_count) {
+    if ($has_transports) {
         $singleIds = $transport_maps->where('target_type', 'single')->pluck('transport_or_group_id')->unique()->all();
         $groupIds = $transport_maps->where('target_type', 'group')->pluck('transport_or_group_id')->unique()->all();
         $singleNames = \App\Models\AlertTransport::query()->whereIn('transport_id', $singleIds)->pluck('transport_name', 'transport_id');

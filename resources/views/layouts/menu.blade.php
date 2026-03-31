@@ -79,6 +79,11 @@
                                                                        aria-hidden="true"></i> {{ __('Oxidized') }}</a>
                                 </li>
                                 @endconfig
+                                @can('viewAny', \App\Models\SslCertificate::class)
+                                <li><a href="{{ url('ssl-certificates') }}"><i class="fa fa-lock fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i> <span
+                                    class="tw:md:hidden tw:2xl:inline-block">{{ __('SSL Certificates') }}</span></a>
+                                </li>
+                                @endcan
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
@@ -421,6 +426,10 @@
                        data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons"
                                                  aria-hidden="true"></i> <span class="tw:md:hidden tw:lg:inline-block">{{ __('Health') }}</span></a>
                     <ul class="dropdown-menu">
+                        <li><a href="{{ url('health/metric=all?status=alert') }}"><i class="fas fa-bell fa-fw fa-lg"
+                                                                            aria-hidden="true"></i> {{ __('Alerts') }}</a>
+                        </li>
+                        <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('health/metric=mempool') }}"><i class="fas fa-memory fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Memory') }}</a>
                         </li>
@@ -833,7 +842,7 @@
             }
         });
 
-    var hideDashboardEditor = {{ (int)$hide_dashboard_editor }};
+    var hideDashboardEditor = {{ (int) $hide_dashboard_editor }};
     function toggleDashboardEditor() {
         $.ajax({
             url: '{{ route('preferences.store') }}',
