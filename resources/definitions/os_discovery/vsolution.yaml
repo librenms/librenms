@@ -24,13 +24,9 @@ modules:
                     oid:
                         - V1600D::ponPortDescr
                         - V1600D::onuAuthInfoDescription2
+                        - V1600G::gOnuAuthInfoAuthInfo
         temperature:
             data:
-                -
-                    oid: V1600D::ponTransceiverTable
-                    value: V1600D::tempperature
-                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.13.1.1.2.{{ $index }}'
-                    descr: "{{ V1600D::ponPortDescr }} Temperature"
                 -
                     oid: V1600D::sysTemperature
                     num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.12.5.9.{{ $index }}'
@@ -41,34 +37,46 @@ modules:
                     num_oid: '.1.3.6.1.4.1.37950.1.1.5.12.2.1.8.1.3.{{ $index }}'
                     descr: "{{ V1600D::onuAuthInfoDescription2 }}"
                     group: "ONU"
-
-
-        voltage:
-            data:
-                -
-                    oid: V1600D::ponTransceiverTable
-                    value: V1600D::voltage
-                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.13.1.1.3.{{ $index }}'
-                    descr: "{{ V1600D::ponPortDescr }} Voltage"
-        current:
-            data:
-                -
-                    oid: V1600D::ponTransceiverTable
-                    value: V1600D::biasCurrent
-                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.13.1.1.4.{{ $index }}'
-                    descr: "{{ V1600D::ponPortDescr }} Bias"
-                    divisor: 1000
         dbm:
             data:
-                -
-                    oid: V1600D::ponTransceiverTable
-                    value: V1600D::transmitPower
-                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.13.1.1.5.{{ $index }}'
-                    descr: "{{ V1600D::ponPortDescr }} TX-Power"
                 -
                     oid: V1600D::opmDiagInfoTable
                     value: V1600D::rxPower
                     num_oid: '.1.3.6.1.4.1.37950.1.1.5.12.2.1.8.1.7.{{ $index }}'
                     descr: "{{ V1600D::onuAuthInfoDescription2 }}"
                     group: "ONU"
-
+        state:
+            data:
+                -
+                    oid: V1600G::gOnuStaInfoTable
+                    value: V1600G::gOnuStaInfoPhaseSta
+                    num_oid: '.1.3.6.1.4.1.37950.1.1.6.1.1.1.1.5.{{ $index }}'
+                    descr: "ONU {{ V1600G::gOnuAuthInfoAuthInfo }}"
+                    group: "ONU"
+                    state_name: gOnuStaInfoPhaseSta
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: 'Logging' }
+                        - { value: 1, generic: 2, graph: 1, descr: 'LOS' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'Sync MIB' }
+                        - { value: 3, generic: 0, graph: 1, descr: 'Working' }
+                        - { value: 4, generic: 2, graph: 1, descr: 'Dying Gasp' }
+                        - { value: 5, generic: 2, graph: 1, descr: 'Auth Fail' }
+                        - { value: 6, generic: 2, graph: 1, descr: 'Offline' }
+                        - { value: 7, generic: 1, graph: 1, descr: 'Deactivated' }
+                        - { value: 8, generic: 2, graph: 1, descr: 'Config Fail' }
+                -
+                    oid: V1600GSwitch::sysPower1Status
+                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.12.5.16.{{ $index }}'
+                    descr: "PSU 1"
+                    state_name: vsolutionPsuStatus
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: 'Off' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'On' }
+                -
+                    oid: V1600GSwitch::sysPower2Status
+                    num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.12.5.17.{{ $index }}'
+                    descr: "PSU 2"
+                    state_name: vsolutionPsuStatus
+                    states:
+                        - { value: 0, generic: 2, graph: 1, descr: 'Off' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'On' }

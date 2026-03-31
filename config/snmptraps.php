@@ -188,5 +188,6 @@ return [
         'MPLS-LDP-MIB::mplsLdpSessionUp' => LibreNMS\Snmptrap\Handlers\CiscoLdpSesUp::class,
         'ZEBRA-QL-MIB::zebra.1.0.1' => LibreNMS\Snmptrap\Handlers\ZebraPrinterAlert::class,
         'ZEBRA-QL-MIB::zebra.1.0.2' => LibreNMS\Snmptrap\Handlers\ZebraPrinterAlertCleared::class,
+        'V1600GSwitch::dataAlarmTrap' => LibreNMS\Snmptrap\Handlers\VsolDataAlarmTrap::class,
     ],
 ];
