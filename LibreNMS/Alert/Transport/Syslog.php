@@ -43,13 +43,13 @@ class Syslog extends Transport
         }
 
         if (! empty($this->config['syslog-host'])) {
+            $syslog_host = $this->config['syslog-host'];
             if (preg_match('/[a-zA-Z]/', (string) $this->config['syslog-host'])) {
                 $syslog_host = gethostbyname($this->config['syslog-host']);
                 if ($syslog_host === $this->config['syslog-host']) {
                     throw new AlertTransportDeliveryException($alert_data, 0, 'Hostname found but does not resolve to an IP.');
                 }
             }
-            $syslog_host = $this->config['syslog-host'];
         }
 
         if (! empty($this->config['syslog-port'])) {
