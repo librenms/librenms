@@ -10,7 +10,7 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
         ->orderBy('service_type')
         ->get(['service_type', 'service_status', 'service_message', 'service_name'])
         ->map(function ($service) use ($colors) {
-            $message = htmlentities(str_replace(' ', '&nbsp;', $service->service_message));
+            $message = htmlentities(str_replace(' ', '&nbsp;', (string) $service->service_message));
             $color = $colors->get($service->service_status, 'default');
             $type = htmlentities(strtolower((string) $service->service_type));
             $name = htmlentities((string) $service->service_name);
