@@ -158,7 +158,7 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
             // Get port description for label
             $label = 'PON ' . $ponIdx;
             foreach ($ponDescrs as $oid => $descr) {
-                if (str_ends_with($oid, ".$ponIdx")) {
+                if (str_ends_with((string) $oid, ".$ponIdx")) {
                     $label = $descr;
                     break;
                 }
@@ -260,7 +260,7 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
 
         $serials = [];
         foreach ($authData as $oid => $serial) {
-            if (preg_match('/(\d+\.\d+)$/', $oid, $m)) {
+            if (preg_match('/(\d+\.\d+)$/', (string) $oid, $m)) {
                 $serials[$m[1]] = $serial;
             }
         }
@@ -352,16 +352,16 @@ class Vsolution extends OS implements TransceiverDiscovery, VlanDiscovery
 
         $ports = Port::where('device_id', $this->getDevice()->device_id)->get(['ifIndex', 'ifDescr']);
         foreach ($ports as $port) {
-            if (preg_match('/^GE(\d+)\/(\d+)\s/', $port->ifDescr, $m)) {
+            if (preg_match('/^GE(\d+)\/(\d+)\s/', (string) $port->ifDescr, $m)) {
                 // GE uplink ports: "GE0/1 Uplink" → geIdx = slot*portCount + port
                 $geIdx = (int) $m[2];
                 $this->geIfMap[$geIdx] = $port->ifIndex;
-            } elseif (preg_match('/GPON(\d{2})ONU(\d+)$/', $port->ifDescr, $m)) {
+            } elseif (preg_match('/GPON(\d{2})ONU(\d+)$/', (string) $port->ifDescr, $m)) {
                 // ONU virtual interfaces: GPON01ONU1 → ponIdx=1, onuIdx=1
                 $ponIdx = (int) $m[1];
                 $onuIdx = (int) $m[2];
                 $this->onuIfMap["$ponIdx.$onuIdx"] = $port->ifIndex;
-            } elseif (preg_match('/^GPON(\d+)\/(\d+)\s/', $port->ifDescr, $m)) {
+            } elseif (preg_match('/^GPON(\d+)\/(\d+)\s/', (string) $port->ifDescr, $m)) {
                 // PON port interfaces: "GPON0/1 Clients" → ponIdx=1
                 $ponIdx = (int) $m[2];
                 $this->ponIfMap[$ponIdx] = $port->ifIndex;
