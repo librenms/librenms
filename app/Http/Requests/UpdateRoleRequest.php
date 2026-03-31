@@ -32,7 +32,7 @@ class UpdateRoleRequest extends FormRequest
         if (in_array(strtolower((string) $role->name), ['admin', 'global-read'])) {
             $rules['name'] = 'required|in:' . $role->name;
         } else {
-            $rules['name'] = 'required|unique:roles,name,' . $role->id . '|regex:/^[a-z-]+$/';
+            $rules['name'] = 'required|unique:roles,name,' . $role->id . '|regex:/^[a-zA-Z-]+$/';
         }
 
         return $rules;
