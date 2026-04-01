@@ -1,0 +1,23 @@
+modules:
+    os:
+        sysDescr_regex: '/^(?<hardware>SL\d+S-[\w\-]+)/'
+        hardware:
+            - .1.3.6.1.4.1.12284.5.1.18.0
+            - ENTITY-MIB::entPhysicalModelName.1
+        version:
+            - .1.3.6.1.4.1.12284.5.1.10.0
+            - ENTITY-MIB::entPhysicalSoftwareRev.1
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
+        features: .1.3.6.1.4.1.12284.5.1.20.0
+    mempools:
+        data:
+            -
+                percent_used: '.1.3.6.1.4.1.12284.4.1.7.0'
+                descr: Memory
+    processors:
+        data:
+            -
+                oid: .1.3.6.1.4.1.12284.4.1.6
+                value: .1.3.6.1.4.1.12284.4.1.6
+                num_oid: '.1.3.6.1.4.1.12284.4.1.6.{{ $index }}'
+                descr: 'CPU usage'
