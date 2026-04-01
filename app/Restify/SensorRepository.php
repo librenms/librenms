@@ -68,11 +68,17 @@ class SensorRepository extends Repository
         return static::indexQuery($request, $query);
     }
 
+    /**
+     * Sensors are discovered automatically by LibreNMS during the discovery process — not created manually.
+     */
     public static function authorizedToStore(Request $request): bool
     {
         return false;
     }
 
+    /**
+     * Sensors are managed by the LibreNMS discovery process — they are removed when no longer detected.
+     */
     public function authorizedToDelete(Request $request): bool
     {
         return false;

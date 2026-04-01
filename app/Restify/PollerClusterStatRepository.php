@@ -37,11 +37,17 @@ class PollerClusterStatRepository extends Repository
         return $query;
     }
 
+    /**
+     * Poller stats are recorded automatically during polling runs — not created manually.
+     */
     public static function authorizedToStore(Request $request): bool
     {
         return false;
     }
 
+    /**
+     * Poller stats are historical records managed by the poller lifecycle.
+     */
     public function authorizedToDelete(Request $request): bool
     {
         return false;

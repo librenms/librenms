@@ -55,11 +55,17 @@ class AlertRepository extends Repository
         return static::indexQuery($request, $query);
     }
 
+    /**
+     * Alerts are created automatically by the alerting engine based on alert rules — not manually via the API.
+     */
     public static function authorizedToStore(Request $request): bool
     {
         return false;
     }
 
+    /**
+     * Alerts are managed by the alerting engine lifecycle — use acknowledge/unmute to change state instead.
+     */
     public function authorizedToDelete(Request $request): bool
     {
         return false;

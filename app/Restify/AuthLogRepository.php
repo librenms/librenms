@@ -39,11 +39,17 @@ class AuthLogRepository extends Repository
         return $query;
     }
 
+    /**
+     * Auth logs are generated internally by the authentication system — not created manually via the API.
+     */
     public static function authorizedToStore(Request $request): bool
     {
         return false;
     }
 
+    /**
+     * Auth logs are historical records and should not be deleted via the API.
+     */
     public function authorizedToDelete(Request $request): bool
     {
         return false;

@@ -59,11 +59,17 @@ class PollerClusterRepository extends Repository
         return $query;
     }
 
+    /**
+     * Poller clusters are registered automatically when a poller node starts — not created manually.
+     */
     public static function authorizedToStore(Request $request): bool
     {
         return false;
     }
 
+    /**
+     * Poller clusters are managed by the poller lifecycle — they are cleaned up when a node is decommissioned.
+     */
     public function authorizedToDelete(Request $request): bool
     {
         return false;

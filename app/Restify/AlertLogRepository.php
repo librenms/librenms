@@ -47,11 +47,17 @@ class AlertLogRepository extends Repository
         return static::indexQuery($request, $query);
     }
 
+    /**
+     * Alert logs are generated internally by the alerting engine — not created manually via the API.
+     */
     public static function authorizedToStore(Request $request): bool
     {
         return false;
     }
 
+    /**
+     * Alert logs are historical records and should not be deleted via the API.
+     */
     public function authorizedToDelete(Request $request): bool
     {
         return false;

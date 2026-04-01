@@ -57,11 +57,17 @@ class EventlogRepository extends Repository
         return static::indexQuery($request, $query);
     }
 
+    /**
+     * Event logs are generated internally by LibreNMS — not created manually via the API.
+     */
     public static function authorizedToStore(Request $request): bool
     {
         return false;
     }
 
+    /**
+     * Event logs are historical records and should not be deleted via the API.
+     */
     public function authorizedToDelete(Request $request): bool
     {
         return false;

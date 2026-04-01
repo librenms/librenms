@@ -58,11 +58,17 @@ class SyslogRepository extends Repository
         return static::indexQuery($request, $query);
     }
 
+    /**
+     * Syslog entries are received from devices via syslog — not created manually via the API.
+     */
     public static function authorizedToStore(Request $request): bool
     {
         return false;
     }
 
+    /**
+     * Syslog entries are historical records and should not be deleted via the API.
+     */
     public function authorizedToDelete(Request $request): bool
     {
         return false;
