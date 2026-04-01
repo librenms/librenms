@@ -7,6 +7,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 
 class Route extends PortRelatedModel implements Keyable
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     protected $table = 'route';
     protected $primaryKey = 'route_id';
     protected $fillable = [

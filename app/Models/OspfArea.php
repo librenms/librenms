@@ -28,6 +28,8 @@ namespace App\Models;
 
 class OspfArea extends DeviceRelatedModel
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
     public $timestamps = false;
     protected $fillable = [
         'device_id',

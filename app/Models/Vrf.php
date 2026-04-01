@@ -28,6 +28,8 @@ namespace App\Models;
 
 class Vrf extends DeviceRelatedModel
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
     public $timestamps = false;
     protected $table = 'vrfs';
     protected $primaryKey = 'vrf_id';

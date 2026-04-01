@@ -17,20 +17,28 @@ use App\Restify\DeviceGroupRepository;
 use App\Restify\DeviceRepository;
 use App\Restify\EventlogRepository;
 use App\Restify\InventoryRepository;
+use App\Restify\IsisAdjacencyRepository;
 use App\Restify\LocationRepository;
 use App\Restify\MempoolRepository;
+use App\Restify\OspfAreaRepository;
+use App\Restify\OspfInstanceRepository;
+use App\Restify\OspfNbrRepository;
+use App\Restify\OspfPortRepository;
 use App\Restify\PollerClusterRepository;
 use App\Restify\PollerClusterStatRepository;
 use App\Restify\PollerGroupRepository;
 use App\Restify\PortGroupRepository;
 use App\Restify\PortRepository;
 use App\Restify\ProcessorRepository;
+use App\Restify\RouteRepository;
 use App\Restify\SensorRepository;
 use App\Restify\ServiceRepository;
 use App\Restify\ServiceTemplateRepository;
 use App\Restify\StorageRepository;
 use App\Restify\SyslogRepository;
 use App\Restify\UserRepository;
+use App\Restify\VrfLiteRepository;
+use App\Restify\VrfRepository;
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot;
 use Binaryk\LaravelRestify\Restify;
 use Binaryk\LaravelRestify\RestifyApplicationServiceProvider;
@@ -72,35 +80,43 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
         parent::boot();
 
         Restify::repositories([
-            ApplicationRepository::class,
             AlertLogRepository::class,
             AlertRepository::class,
-            AuthLogRepository::class,
-            BgpPeerRepository::class,
-            BillRepository::class,
             AlertRuleRepository::class,
             AlertScheduleRepository::class,
             AlertTemplateRepository::class,
             AlertTransportRepository::class,
+            ApplicationRepository::class,
+            AuthLogRepository::class,
+            BgpPeerRepository::class,
+            BillRepository::class,
             ComponentRepository::class,
             DeviceGroupRepository::class,
             DeviceRepository::class,
             EventlogRepository::class,
             InventoryRepository::class,
+            IsisAdjacencyRepository::class,
             LocationRepository::class,
             MempoolRepository::class,
+            OspfAreaRepository::class,
+            OspfInstanceRepository::class,
+            OspfNbrRepository::class,
+            OspfPortRepository::class,
             PollerClusterRepository::class,
             PollerClusterStatRepository::class,
             PollerGroupRepository::class,
             PortGroupRepository::class,
             PortRepository::class,
             ProcessorRepository::class,
+            RouteRepository::class,
             SensorRepository::class,
             ServiceRepository::class,
             ServiceTemplateRepository::class,
             StorageRepository::class,
             SyslogRepository::class,
             UserRepository::class,
+            VrfLiteRepository::class,
+            VrfRepository::class,
         ]);
     }
 }
