@@ -5136,9 +5136,7 @@
         }
     },
     "vlans": {
-        "discovery": {
-            "vlans": []
-        }
+        "discovery": []
     },
     "ipv4-addresses": {
         "discovery": {
