@@ -8,6 +8,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 
 class MplsSap extends DeviceRelatedModel implements Keyable
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     protected $primaryKey = 'sap_id';
     public $timestamps = false;
     protected $fillable = [

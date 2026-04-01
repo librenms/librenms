@@ -20,6 +20,14 @@ use App\Restify\InventoryRepository;
 use App\Restify\IsisAdjacencyRepository;
 use App\Restify\LocationRepository;
 use App\Restify\MempoolRepository;
+use App\Restify\MplsLspPathRepository;
+use App\Restify\MplsLspRepository;
+use App\Restify\MplsSapRepository;
+use App\Restify\MplsSdpBindRepository;
+use App\Restify\MplsSdpRepository;
+use App\Restify\MplsServiceRepository;
+use App\Restify\MplsTunnelArHopRepository;
+use App\Restify\MplsTunnelCHopRepository;
 use App\Restify\OspfAreaRepository;
 use App\Restify\OspfInstanceRepository;
 use App\Restify\OspfNbrRepository;
@@ -102,6 +110,14 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
             IsisAdjacencyRepository::class,
             LocationRepository::class,
             MempoolRepository::class,
+            MplsLspPathRepository::class,
+            MplsLspRepository::class,
+            MplsSapRepository::class,
+            MplsSdpBindRepository::class,
+            MplsSdpRepository::class,
+            MplsServiceRepository::class,
+            MplsTunnelArHopRepository::class,
+            MplsTunnelCHopRepository::class,
             OspfAreaRepository::class,
             OspfInstanceRepository::class,
             OspfNbrRepository::class,

@@ -7,6 +7,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 
 class MplsSdpBind extends DeviceRelatedModel implements Keyable
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     protected $primaryKey = 'bind_id';
     public $timestamps = false;
     protected $fillable = [

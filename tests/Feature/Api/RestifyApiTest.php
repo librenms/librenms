@@ -18,6 +18,14 @@ use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Eventlog;
 use App\Models\IsisAdjacency;
+use App\Models\MplsLsp;
+use App\Models\MplsLspPath;
+use App\Models\MplsSap;
+use App\Models\MplsSdp;
+use App\Models\MplsSdpBind;
+use App\Models\MplsService;
+use App\Models\MplsTunnelArHop;
+use App\Models\MplsTunnelCHop;
 use App\Models\OspfArea;
 use App\Models\OspfInstance;
 use App\Models\OspfNbr;
@@ -2837,6 +2845,399 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->postJsonApi('/api/v1/routes', ['inetCidrRouteDest' => '10.0.0.0'])
+            ->assertStatus(403);
+    }
+
+    // ── MPLS LSPs ───────────────────────────────────────────
+
+    public function testAdminCanListMplsLsps(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsLsp::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-lsps')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessMplsLsps(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        MplsLsp::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-lsps')
+            ->assertStatus(403);
+    }
+
+    public function testMplsLspFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsLsp::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-lsps')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'mplsLspName', 'mplsLspAdminState', 'mplsLspOperState',
+                'mplsLspFromAddr', 'mplsLspToAddr',
+            ]]]]);
+    }
+
+    public function testMplsLspsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/mpls-lsps', ['mplsLspName' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── MPLS LSP Paths ──────────────────────────────────────
+
+    public function testAdminCanListMplsLspPaths(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsLspPath::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-lsp-paths')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessMplsLspPaths(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        MplsLspPath::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-lsp-paths')
+            ->assertStatus(403);
+    }
+
+    public function testMplsLspPathFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsLspPath::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-lsp-paths')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'lsp_id', 'mplsLspPathType', 'mplsLspPathAdminState', 'mplsLspPathOperState',
+            ]]]]);
+    }
+
+    public function testMplsLspPathsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/mpls-lsp-paths', ['mplsLspPathType' => 'primary'])
+            ->assertStatus(403);
+    }
+
+    // ── MPLS SDPs ───────────────────────────────────────────
+
+    public function testAdminCanListMplsSdps(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsSdp::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-sdps')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessMplsSdps(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        MplsSdp::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-sdps')
+            ->assertStatus(403);
+    }
+
+    public function testMplsSdpFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsSdp::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-sdps')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'sdpDescription', 'sdpAdminStatus', 'sdpOperStatus',
+            ]]]]);
+    }
+
+    public function testMplsSdpsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/mpls-sdps', ['sdpDescription' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── MPLS SDP Binds ──────────────────────────────────────
+
+    public function testAdminCanListMplsSdpBinds(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsSdpBind::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-sdp-binds')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessMplsSdpBinds(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        MplsSdpBind::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-sdp-binds')
+            ->assertStatus(403);
+    }
+
+    public function testMplsSdpBindFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsSdpBind::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-sdp-binds')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'sdp_id', 'svc_id', 'sdpBindAdminStatus', 'sdpBindOperStatus',
+            ]]]]);
+    }
+
+    public function testMplsSdpBindsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/mpls-sdp-binds', ['sdp_id' => 1])
+            ->assertStatus(403);
+    }
+
+    // ── MPLS Services ───────────────────────────────────────
+
+    public function testAdminCanListMplsServices(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsService::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-services')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessMplsServices(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        MplsService::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-services')
+            ->assertStatus(403);
+    }
+
+    public function testMplsServiceFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsService::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-services')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'svcDescription', 'svcType', 'svcAdminStatus', 'svcOperStatus',
+            ]]]]);
+    }
+
+    public function testMplsServicesCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/mpls-services', ['svcDescription' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── MPLS SAPs ───────────────────────────────────────────
+
+    public function testAdminCanListMplsSaps(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsSap::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-saps')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessMplsSaps(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        MplsSap::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-saps')
+            ->assertStatus(403);
+    }
+
+    public function testMplsSapFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsSap::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-saps')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'sapDescription', 'sapAdminStatus', 'sapOperStatus',
+            ]]]]);
+    }
+
+    public function testMplsSapsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/mpls-saps', ['sapDescription' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── MPLS Tunnel AR Hops ─────────────────────────────────
+
+    public function testAdminCanListMplsTunnelArHops(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsTunnelArHop::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-tunnel-ar-hops')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessMplsTunnelArHops(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        MplsTunnelArHop::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-tunnel-ar-hops')
+            ->assertStatus(403);
+    }
+
+    public function testMplsTunnelArHopFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsTunnelArHop::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-tunnel-ar-hops')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'lsp_path_id', 'mplsTunnelARHopIpv4Addr', 'mplsTunnelARHopAddrType',
+            ]]]]);
+    }
+
+    public function testMplsTunnelArHopsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/mpls-tunnel-ar-hops', ['mplsTunnelARHopIpv4Addr' => '10.0.0.1'])
+            ->assertStatus(403);
+    }
+
+    // ── MPLS Tunnel C Hops ──────────────────────────────────
+
+    public function testAdminCanListMplsTunnelCHops(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsTunnelCHop::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-tunnel-c-hops')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessMplsTunnelCHops(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        MplsTunnelCHop::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-tunnel-c-hops')
+            ->assertStatus(403);
+    }
+
+    public function testMplsTunnelCHopFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        MplsTunnelCHop::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/mpls-tunnel-c-hops')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'lsp_path_id', 'mplsTunnelCHopIpv4Addr', 'mplsTunnelCHopAddrType',
+            ]]]]);
+    }
+
+    public function testMplsTunnelCHopsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/mpls-tunnel-c-hops', ['mplsTunnelCHopIpv4Addr' => '10.0.0.1'])
             ->assertStatus(403);
     }
 }

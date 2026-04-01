@@ -7,6 +7,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 
 class MplsService extends DeviceRelatedModel implements Keyable
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     protected $primaryKey = 'svc_id';
     public $timestamps = false;
     protected $fillable = [

@@ -7,6 +7,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 
 class MplsTunnelArHop extends DeviceRelatedModel implements Keyable
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     protected $primaryKey = 'ar_hop_id';
     public $timestamps = false;
     protected $fillable = [
