@@ -22,6 +22,10 @@ use App\Models\OspfArea;
 use App\Models\OspfInstance;
 use App\Models\OspfNbr;
 use App\Models\OspfPort;
+use App\Models\Ospfv3Area;
+use App\Models\Ospfv3Instance;
+use App\Models\Ospfv3Nbr;
+use App\Models\Ospfv3Port;
 use App\Models\Route;
 use App\Models\Syslog;
 use App\Models\Vrf;
@@ -2366,6 +2370,232 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->postJsonApi('/api/v1/ospf-ports', ['ospfIfIpAddress' => '10.0.0.1'])
+            ->assertStatus(403);
+    }
+
+    // ── OSPFv3 Instances ─────────────────────────────────────
+
+    public function testAdminCanListOspfv3Instances(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Ospfv3Instance::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-instances')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testGlobalReadCanListOspfv3Instances(): void
+    {
+        $user = User::factory()->read()->create();
+        $device = Device::factory()->create();
+        Ospfv3Instance::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-instances')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 2);
+    }
+
+    public function testRegularUserCannotAccessOspfv3Instances(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        Ospfv3Instance::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-instances')
+            ->assertStatus(403);
+    }
+
+    public function testOspfv3InstanceFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Ospfv3Instance::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-instances')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'ospfv3RouterId', 'ospfv3AdminStatus', 'ospfv3VersionNumber',
+            ]]]]);
+    }
+
+    public function testOspfv3InstancesCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ospfv3-instances', ['ospfv3RouterId' => '1.1.1.1'])
+            ->assertStatus(403);
+    }
+
+    // ── OSPFv3 Areas ────────────────────────────────────────
+
+    public function testAdminCanListOspfv3Areas(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Ospfv3Area::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-areas')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testGlobalReadCanListOspfv3Areas(): void
+    {
+        $user = User::factory()->read()->create();
+        $device = Device::factory()->create();
+        Ospfv3Area::factory()->count(2)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-areas')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 2);
+    }
+
+    public function testRegularUserCannotAccessOspfv3Areas(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        Ospfv3Area::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-areas')
+            ->assertStatus(403);
+    }
+
+    public function testOspfv3AreaFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Ospfv3Area::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-areas')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'ospfv3AreaId', 'ospfv3AreaSpfRuns', 'ospfv3AreaSummary',
+            ]]]]);
+    }
+
+    public function testOspfv3AreasCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ospfv3-areas', ['ospfv3AreaId' => 0])
+            ->assertStatus(403);
+    }
+
+    // ── OSPFv3 Neighbors ────────────────────────────────────
+
+    public function testAdminCanListOspfv3Nbrs(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ospfv3Nbr::factory()->count(3)->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-nbrs')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessOspfv3Nbrs(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ospfv3Nbr::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-nbrs')
+            ->assertStatus(403);
+    }
+
+    public function testOspfv3NbrFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ospfv3Nbr::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-nbrs')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'ospfv3NbrRtrId', 'ospfv3NbrAddress', 'ospfv3NbrState',
+            ]]]]);
+    }
+
+    public function testOspfv3NbrsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ospfv3-nbrs', ['ospfv3NbrRtrId' => '1.1.1.1'])
+            ->assertStatus(403);
+    }
+
+    // ── OSPFv3 Ports ────────────────────────────────────────
+
+    public function testAdminCanListOspfv3Ports(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ospfv3Port::factory()->count(3)->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-ports')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessOspfv3Ports(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ospfv3Port::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-ports')
+            ->assertStatus(403);
+    }
+
+    public function testOspfv3PortFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ospfv3Port::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ospfv3-ports')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'port_id', 'ospfv3IfAreaId', 'ospfv3IfState',
+            ]]]]);
+    }
+
+    public function testOspfv3PortsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ospfv3-ports', ['ospfv3IfIndex' => 1])
             ->assertStatus(403);
     }
 

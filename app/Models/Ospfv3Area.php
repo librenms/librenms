@@ -31,6 +31,8 @@ use LibreNMS\Interfaces\Models\Keyable;
 
 class Ospfv3Area extends DeviceRelatedModel implements Keyable
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
     public $timestamps = false;
     protected $fillable = [
         'device_id',

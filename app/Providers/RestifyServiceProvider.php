@@ -24,6 +24,10 @@ use App\Restify\OspfAreaRepository;
 use App\Restify\OspfInstanceRepository;
 use App\Restify\OspfNbrRepository;
 use App\Restify\OspfPortRepository;
+use App\Restify\Ospfv3AreaRepository;
+use App\Restify\Ospfv3InstanceRepository;
+use App\Restify\Ospfv3NbrRepository;
+use App\Restify\Ospfv3PortRepository;
 use App\Restify\PollerClusterRepository;
 use App\Restify\PollerClusterStatRepository;
 use App\Restify\PollerGroupRepository;
@@ -102,6 +106,10 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
             OspfInstanceRepository::class,
             OspfNbrRepository::class,
             OspfPortRepository::class,
+            Ospfv3AreaRepository::class,
+            Ospfv3InstanceRepository::class,
+            Ospfv3NbrRepository::class,
+            Ospfv3PortRepository::class,
             PollerClusterRepository::class,
             PollerClusterStatRepository::class,
             PollerGroupRepository::class,
