@@ -1,0 +1,48 @@
+modules:
+    os:
+        hardware:
+            - PHOENIX-ISS-MIB::issSwitchModelName.0
+            - SNMPv2-MIB::sysDescr.0
+        hardware_regex:
+            - '/^(?<hardware>FL SWITCH \S+)/'
+        version: PHOENIX-ISS-MIB::issSwitchFWVersion.0
+        serial: PHOENIX-ISS-MIB::issSwitchSerialNo.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: issSwitchCurrentTemperature
+                    value: issSwitchCurrentTemperature
+                    num_oid: '.1.3.6.1.4.1.4346.99.1.2.121.66.{{ $index }}'
+                    descr: 'System Temperature'
+                    index: 'issSwitchCurrentTemperature.{{ $index }}'
+                    low_limit: issSwitchMinThresholdTemperature
+                    high_limit: issSwitchMaxThresholdTemperature
+                    group: 'System'
+        percent:
+            data:
+                -
+                    oid: issSwitchCurrentRAMUsage
+                    value: issSwitchCurrentRAMUsage
+                    num_oid: '.1.3.6.1.4.1.4346.99.1.2.121.73.{{ $index }}'
+                    descr: 'RAM Usage'
+                    index: 'issSwitchCurrentRAMUsage.{{ $index }}'
+                    high_limit: issSwitchMaxRAMUsage
+                    group: 'System'
+                -
+                    oid: issSwitchCurrentFlashUsage
+                    value: issSwitchCurrentFlashUsage
+                    num_oid: '.1.3.6.1.4.1.4346.99.1.2.121.75.{{ $index }}'
+                    descr: 'Flash Usage'
+                    index: 'issSwitchCurrentFlashUsage.{{ $index }}'
+                    high_limit: issSwitchMaxFlashUsage
+                    group: 'System'
+    processors:
+        data:
+            -
+                oid: issSwitchCurrentCPUThreshold
+                value: issSwitchCurrentCPUThreshold
+                num_oid: '.1.3.6.1.4.1.4346.99.1.2.121.68.{{ $index }}'
+                descr: 'Processor'
+                type: phoenixcontact
+                precision: 1
