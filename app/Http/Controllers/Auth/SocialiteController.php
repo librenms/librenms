@@ -178,7 +178,9 @@ class SocialiteController extends Controller
 
         $attributes = $this->normalizeAttributes($this->socialite_user->getRaw());
 
-        $claimFields = Arr::wrap($claimField ?: 'groups');
+        $claimFieldConfig = LibrenmsConfig::get("auth.socialite.configs.$provider.claim_field");
+        $claimFields = Arr::wrap($claimFieldConfig ?: 'groups');
+
         if (isset($this->socialite_user->accessTokenResponseBody['id_token'])) {
             $tokenParts = explode('.', $this->socialite_user->accessTokenResponseBody['id_token']);
 
@@ -186,24 +188,18 @@ class SocialiteController extends Controller
                 $payload = json_decode(base64_decode(strtr($tokenParts[1], '-_', '+/')), true);
 
                 if (is_array($payload)) {
-                    // We iterate over each configured field to perform the individual merge
+                    // We iterate over each configured claim field to perform the individual merge
                     foreach ($claimFields as $field) {
-                        // Save existing groups (if any) before array_merge overwrites the key
-                        $existingValues = isset($attributes[$field]) ? (array) $attributes[$field] : [];
-                        $payloadValues = isset($payload[$field]) ? (array) $payload[$field] : [];
-        
-                        // Merge OIDC groups (e.g. Graph API) with JWT groups, removing duplicates
-                        $payload[$field] = array_unique(array_merge($existingValues, $payloadValues));
+                        $existingValues = (array) ($attributes[$field] ?? []);
+                        $payloadValues = (array) ($payload[$field] ?? []);
+
+                         // Merge OIDC groups (e.g. Graph API) with JWT groups, removing duplicates
+                        $attributes[$field] = array_unique(array_merge($existingValues, $payloadValues));
                     }
                 }
             }
         }
 
-        foreach ($claimFields as $field) {
-            if (! isset($attributes[$field])) {
-                $attributes[$field] = [];
-            }
-        }
         $scopeValues = collect($claimFields)
             ->flatMap(fn ($field) => (array) ($attributes[$field] ?? []))
             ->unique()
