@@ -75,7 +75,7 @@ final class SocialiteControllerTest extends TestCase
 
         $result = $method->invoke($controller, $provider);
 
-        // Assert the returned roles match expectations
+        // Assert the returned roles match expectations.
         $this->assertEquals($expectedRoles, $result);
 
         return $result;
