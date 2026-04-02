@@ -200,8 +200,9 @@ class SocialiteController extends Controller
             }
         }
 
-        $scopeValues = collect($claimFields)
-            ->flatMap(fn ($field) => (array) ($attributes[$field] ?? []))
+        $scopeValues = collect($attributes)
+            ->filter(fn ($values, $name) => collect($claimFields)->contains(fn ($field) => str_contains(strtolower((string) $name), strtolower((string) $field))))
+            ->flatten()
             ->unique()
             ->all();
 
