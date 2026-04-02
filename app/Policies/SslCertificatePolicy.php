@@ -53,7 +53,7 @@ class SslCertificatePolicy
     public function update(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'update');
-    }   
+    }
 
     /**
      * Determine whether the user can delete the SSL certificate.
