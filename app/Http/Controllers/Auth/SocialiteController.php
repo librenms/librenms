@@ -80,6 +80,14 @@ class SocialiteController extends Controller
             return redirect()->route('login')->with('block_auto_redirect', true);
         }
 
+        $roles = $this->getAuthorizedRoles();
+
+        if ($roles === false) {
+            toast()->error(__('Access denied: Your user does not have the required privileges in this system.'));
+        
+            return redirect()->route('login')->with('block_auto_redirect', true);
+        }
+
         $this->socialite_user = Socialite::driver($provider)->user();
 
         // If we already have a valid session, user is trying to pair their account
@@ -89,7 +97,7 @@ class SocialiteController extends Controller
 
         $this->register($provider);
 
-        return $this->login($provider);
+        return $this->login($provider, $roles);
     }
 
     /**
@@ -106,7 +114,7 @@ class SocialiteController extends Controller
         abort(404);
     }
 
-    private function login(string $provider): RedirectResponse
+    private function login(string $provider, array $roles): RedirectResponse
     {
         $user = User::where('auth_type', "socialite_$provider")
             ->where('auth_id', $this->socialite_user->getId())
@@ -117,11 +125,14 @@ class SocialiteController extends Controller
                 throw new AuthenticationException();
             }
 
+            $user->syncRoles($roles);
+
             Auth::login($user);
-            $this->setRolesFromClaim($provider, $user);
 
             return redirect()->intended();
         } catch (AuthenticationException $e) {
+            Auth::logout();
+
             toast()->error($e->getMessage());
 
             return redirect()->route('login')->with('block_auto_redirect', true);
@@ -155,18 +166,46 @@ class SocialiteController extends Controller
         }
     }
 
-    private function setRolesFromClaim(string $provider, $user): bool
+    private function getAuthorizedRoles(string $provider, $user): array|false
     {
-        $scopes = LibrenmsConfig::get('auth.socialite.scopes');
-        $claims = LibrenmsConfig::get('auth.socialite.claims');
+        $scopes = LibrenmsConfig::get('auth.socialite.scopes', ['openid', 'profile', 'email']);
+        $claims = LibrenmsConfig::get('auth.socialite.claims', []);
+        $defaultRole = LibrenmsConfig::get('auth.socialite.default_role', 'none');
 
-        if (! is_array($scopes) || ! $this->socialite_user instanceof \Laravel\Socialite\AbstractUser || empty($claims)) {
+        if (! $this->socialite_user instanceof \Laravel\Socialite\AbstractUser) {
             return false;
         }
 
         $attributes = $this->normalizeAttributes($this->socialite_user->getRaw());
 
-        $claimField = LibrenmsConfig::get("auth.socialite.configs.$provider.claim_field");
+        $claimField = $this->claim_field ?: 'groups';
+        if (isset($this->socialite_user->accessTokenResponseBody['id_token'])) {
+            $tokenParts = explode('.', $this->socialite_user->accessTokenResponseBody['id_token']);
+
+            if (count($tokenParts) === 3) {
+                // Decoding the JWT token payload
+                $payload = json_decode(base64_decode(strtr($tokenParts[1], '-_', '+/')), true);
+                
+                if (is_array($payload)) {
+                    // Salva os grupos originais (se existirem) antes do array_merge sobrescrever a chave
+                    $existingGroups = isset($attributes[$claimField]) ? (array) $attributes[$claimField] : [];
+                    $payloadGroups = isset($payload[$claimField]) ? (array) $payload[$claimField] : [];
+
+                    // Mescla os atributos gerais do token
+                    $attributes = array_merge($attributes, $payload);
+
+                    // Mescla especificamente os grupos do Graph API com os grupos do JWT, removendo duplicatas
+                    $mergedGroups = array_unique(array_merge($existingGroups, $payloadGroups));
+
+                    // Reatribui a lista consolidada de grupos de volta aos atributos
+                    $attributes[$claimField] = $mergedGroups;
+                }
+            }
+        }
+
+        if (!isset($attributes[$claimField])) {
+            $attributes[$claimField] = [];
+        }
         $scopeValues = $claimField !== null
             ? collect(Arr::wrap($claimField))
                 ->flatMap(fn ($field) => Arr::wrap($attributes[$field] ?? []))
@@ -182,12 +221,14 @@ class SocialiteController extends Controller
         }
 
         if (empty($roles)) {
-            return false;
+            if (strtolower((string)$defaultRole) === 'none') {
+               \Log::warning("Socialite login denied: User {$this->socialite_user->getEmail()} has no matching claims and default_role is none.");
+                return false;
+            }
+            $roles[] = $defaultRole;
         }
 
-        $user->syncRoles(array_unique($roles));
-
-        return true;
+        return array_unique($roles);
     }
 
     private function normalizeAttributes(array $attributes): array
