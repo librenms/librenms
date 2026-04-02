@@ -179,7 +179,6 @@ final class SocialiteControllerTest extends TestCase
         $this->assertTrue($result);
     }
 
-
     public function testGetAuthorizedRolesSaml2GlobalRead(): void
     {
         // we don't import LightSaml\Model\Assertion\Attribute for testing
