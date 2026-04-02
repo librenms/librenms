@@ -55,8 +55,16 @@ final class SocialiteControllerTest extends TestCase
         \App\Facades\LibrenmsConfig::set('auth.socialite.debug', false);
         \App\Facades\LibrenmsConfig::set('auth.socialite.default_role', 'none');
 
-        // Stub the Socialite user.
-        $socialiteUserStub = $this->createMock(AbstractUser::class);
+        // Dynamically mock the correct User class based on the provider
+        if ($provider === 'saml2') {
+            // SAML2 uses the base AbstractUser (No tokens)
+            $socialiteUserStub = $this->createMock(\Laravel\Socialite\AbstractUser::class);
+        } else {
+            // OAuth2/OIDC providers (Okta, Azure, etc.) use Two\User (Has tokens)
+            $socialiteUserStub = $this->createMock(\Laravel\Socialite\Two\User::class);
+            $socialiteUserStub->accessTokenResponseBody = [];
+        }
+
         $socialiteUserStub
             ->method('getRaw')
             ->willReturn($rawAttributes);
@@ -127,13 +135,12 @@ final class SocialiteControllerTest extends TestCase
             'groups' => ['Example-ReadOnly-Group'],
         ];
 
-        $result = $this->runGetAuthorizedRolesTest(
+        $this->runGetAuthorizedRolesTest(
             'okta', $rawAttributes, ['global-read'],
             [
                 'Example-Admin-Group' => ['roles' => ['admin']],
                 'Example-ReadOnly-Group' => ['roles' => ['global-read']],
             ]);
-        $this->assertTrue($result);
     }
 
     public function testGetAuthorizedRolesAccessDenied(): void
@@ -169,7 +176,7 @@ final class SocialiteControllerTest extends TestCase
             }
         };
 
-        $result = $this->runGetAuthorizedRolesTest(
+        $this->runGetAuthorizedRolesTest(
             'saml2',
             [$attr],
             ['admin'],
@@ -178,7 +185,6 @@ final class SocialiteControllerTest extends TestCase
                 'G_librenms_users' => ['roles' => ['global-read']],
             ]
         );
-        $this->assertTrue($result);
     }
 
     public function testGetAuthorizedRolesSaml2GlobalRead(): void
@@ -197,7 +203,7 @@ final class SocialiteControllerTest extends TestCase
             }
         };
 
-        $result = $this->runGetAuthorizedRolesTest(
+        $this->runGetAuthorizedRolesTest(
             'saml2',
             [$attr],
             ['global-read'],
@@ -206,6 +212,5 @@ final class SocialiteControllerTest extends TestCase
                 'G_librenms_users' => ['roles' => ['global-read']],
             ]
         );
-        $this->assertTrue($result);
     }
 }
