@@ -55,7 +55,7 @@ final class SocialiteControllerTest extends TestCase
         \App\Facades\LibrenmsConfig::set('auth.socialite.debug', false);
         \App\Facades\LibrenmsConfig::set('auth.socialite.default_role', 'none');
 
-        // Dynamically mock the correct User class based on the provider
+        // Stub the Socialite user.
         $socialiteUserStub = $this->createMock(AbstractUser::class);
         $socialiteUserStub
             ->method('getRaw')
