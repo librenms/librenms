@@ -147,7 +147,7 @@ class DeviceController extends TableController
 
     /**
      * @param  Device  $device
-     * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection
+     * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection<string, mixed>
      */
     public function formatItem($device)
     {

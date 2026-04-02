@@ -149,7 +149,7 @@ class PortNacController extends TableController
 
     /**
      * @param  string  $ifAlias
-     * @return Collection
+     * @return Collection<int, int>
      */
     protected function findPorts($ifAlias): Collection
     {

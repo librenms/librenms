@@ -202,7 +202,7 @@ class FdbTablesController extends TableController
 
     /**
      * @param  string  $ip
-     * @return Collection
+     * @return Collection<int, string>
      */
     protected function findMacs($ip): Collection
     {
@@ -217,7 +217,7 @@ class FdbTablesController extends TableController
 
     /**
      * @param  string  $vlan
-     * @return Collection
+     * @return Collection<int, int>
      */
     protected function findVlans($vlan): Collection
     {
@@ -234,7 +234,7 @@ class FdbTablesController extends TableController
 
     /**
      * @param  string  $ifAlias
-     * @return Collection
+     * @return Collection<int, int>
      */
     protected function findPorts($ifAlias): Collection
     {
@@ -247,6 +247,9 @@ class FdbTablesController extends TableController
             ->pluck('port_id');
     }
 
+    /**
+     * @param  Collection<int, string>  $ips
+     */
     private function resolveDns(Collection $ips): string
     {
         $dns = 'N/A';

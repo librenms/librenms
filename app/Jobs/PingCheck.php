@@ -50,7 +50,7 @@ class PingCheck implements ShouldQueue
     private Collection $devices;
 
     // working data for loop
-    /** @var Collection */
+    /** @var Collection<int, \Illuminate\Database\Eloquent\Collection<int, Device>> */
     private Collection $deferred;
     /** @var Collection<int, Collection<int, bool>> device id, parent devices */
     private Collection $waiting_on;
@@ -101,6 +101,8 @@ class PingCheck implements ShouldQueue
 
     /**
      * Get an ordered list of hostnames that we need to ping starting from devices with no parents
+     *
+     * @param  Collection<string, Device>  $devices
      */
     private function orderHostnames(Collection $devices): array
     {
@@ -128,6 +130,8 @@ class PingCheck implements ShouldQueue
 
     /**
      * Fetch and cache all devices that we need to process
+     *
+     * @return Collection<string, Device>
      */
     private function fetchDevices(): Collection
     {
