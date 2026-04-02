@@ -213,6 +213,7 @@ class SocialiteController extends Controller
         if (empty($roles)) {
             if (strtolower((string) $defaultRole) === 'none') {
                 \Log::warning('Socialite login denied: User has no matching claims and default_role is none.');
+
                 return false;
             }
             $roles[] = $defaultRole;
