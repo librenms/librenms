@@ -338,7 +338,6 @@ function create_state_index($state_name, $states = []): void
 {
     app('sensor-discovery')->withStateTranslations($state_name, array_map(fn ($state) => new StateTranslation([
         'state_descr' => $state['descr'],
-        'state_draw_graph' => $state['graph'],
         'state_value' => $state['value'],
         'state_generic_value' => $state['generic'],
     ]), $states));

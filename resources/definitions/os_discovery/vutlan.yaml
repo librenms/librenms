@@ -40,7 +40,7 @@ modules:
                           op: '!='
                           value: "door"
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value: 0, generic: 0, graph: 0, descr: closed }
-                        - { value: 1, generic: 1, graph: 0, descr: open }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value: 0, generic: 0, descr: closed }
+                        - { value: 1, generic: 1, descr: open }
 

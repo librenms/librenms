@@ -26,8 +26,8 @@ modules:
                     descr: 'Module {{ $index }} State - {{ FIBROLAN-MIB-METRO-STAR-MV::flMsChassisModuleMvDeviceType }}'
                     state_name: flMsChassisModuleMvReset
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'running' }
-                        - { value: 2, generic: 1, graph: 0, descr: 'reset' }
+                        - { value: 1, generic: 0, descr: 'running' }
+                        - { value: 2, generic: 1, descr: 'reset' }
                     group: 'Modules'
                 -
                     oid: FIBROLAN-MIB-METRO-STAR-MV::flMsChassisPsuMvTable
@@ -36,7 +36,7 @@ modules:
                     descr: 'PS {{ FIBROLAN-MIB-METRO-STAR-MV::flMsChassisPsuMvIndex }}'
                     state_name: flMsChassisPsuMvStatus
                     states:
-                        - { value: 1, generic: 2, graph: 0, descr: 'fail' }
-                        - { value: 2, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 3, generic: 3, graph: 0, descr: 'uninstalled' }
+                        - { value: 1, generic: 2, descr: 'fail' }
+                        - { value: 2, generic: 0, descr: 'ok' }
+                        - { value: 3, generic: 3, descr: 'uninstalled' }
                     group: 'Power Supplies'

@@ -265,10 +265,10 @@ modules:
                     index: 'unitOnOff.{{ $index }}'
                     state_name: unitOnOff
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'off' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'on' }
-                        - { value: 2, generic: 0, graph: 0, descr: 'energy-save' }
-                        - { value: 3, generic: 0, graph: 0, descr: 'auto' }
+                        - { value: 0, generic: 0, descr: 'off' }
+                        - { value: 1, generic: 0, descr: 'on' }
+                        - { value: 2, generic: 0, descr: 'energy-save' }
+                        - { value: 3, generic: 0, descr: 'auto' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::driverPowerStatus
                     group: Power
@@ -277,9 +277,9 @@ modules:
                     index: 'driverPowerStatus.{{ $index }}'
                     state_name: driverPowerStatus
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'stop' }
-                        - { value: 2, generic: 0, graph: 0, descr: 'run' }
-                        - { value: 3, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 1, generic: 0, descr: 'stop' }
+                        - { value: 2, generic: 0, descr: 'run' }
+                        - { value: 3, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::inverterOnOff
                     group: Power
@@ -288,8 +288,8 @@ modules:
                     index: 'inverterOnOff.{{ $index }}'
                     state_name: inverterOnOff
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'off' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'on' }
+                        - { value: 0, generic: 0, descr: 'off' }
+                        - { value: 1, generic: 0, descr: 'on' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::envelopeZone
                     group: Operating envelop
@@ -298,15 +298,15 @@ modules:
                     index: 'envelopeZone.{{ $index }}'
                     state_name: envelopeZone
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'maximum compression ratio' }
-                        - { value: 2, generic: 0, graph: 0, descr: 'maximum discharge power' }
-                        - { value: 3, generic: 0, graph: 0, descr: 'current limit' }
-                        - { value: 4, generic: 0, graph: 0, descr: 'maximum suction power' }
-                        - { value: 5, generic: 0, graph: 0, descr: 'minimum compression ratio' }
-                        - { value: 6, generic: 0, graph: 0, descr: 'minimum delta power' }
-                        - { value: 7, generic: 0, graph: 0, descr: 'minimum discharge power' }
-                        - { value: 8, generic: 0, graph: 0, descr: 'minimum suction power' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 0, descr: 'maximum compression ratio' }
+                        - { value: 2, generic: 0, descr: 'maximum discharge power' }
+                        - { value: 3, generic: 0, descr: 'current limit' }
+                        - { value: 4, generic: 0, descr: 'maximum suction power' }
+                        - { value: 5, generic: 0, descr: 'minimum compression ratio' }
+                        - { value: 6, generic: 0, descr: 'minimum delta power' }
+                        - { value: 7, generic: 0, descr: 'minimum discharge power' }
+                        - { value: 8, generic: 0, descr: 'minimum suction power' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::compressorOverloadAlarm
                     group: Component alarms
@@ -315,8 +315,8 @@ modules:
                     index: 'compressorOverloadAlarm.{{ $index }}'
                     state_name: compressorOverloadAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::highPressureAlarm
                     group: Component alarms
@@ -325,8 +325,8 @@ modules:
                     index: 'highPressureAlarm.{{ $index }}'
                     state_name: highPressureAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::inverterAlarm
                     group: Component alarms
@@ -335,8 +335,8 @@ modules:
                     index: 'inverterAlarm.{{ $index }}'
                     state_name: inverterAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::driveAlarm
                     group: Component alarms
@@ -345,8 +345,8 @@ modules:
                     index: 'driveAlarm.{{ $index }}'
                     state_name: driveAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::generalAlarm
                     group: Alarms
@@ -355,8 +355,8 @@ modules:
                     index: 'generalAlarm.{{ $index }}'
                     state_name: generalAlarm
                     states:
-                        - { value: 0, generic: 2, graph: 0, descr: 'alarm' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'ok' }
+                        - { value: 0, generic: 2, descr: 'alarm' }
+                        - { value: 1, generic: 0, descr: 'ok' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::currentErrorCode
                     group: Alarms
@@ -365,39 +365,39 @@ modules:
                     index: 'currentErrorCode.{{ $index }}'
                     state_name: currentErrorCode
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }    
-                        - { value: 2, generic: 2, graph: 0, descr: 'ALA02 - Probe B2 faulty or disconnected' }
-                        - { value: 3, generic: 2, graph: 0, descr: 'ALA03 - Probe B3 faulty or disconnected' }
-                        - { value: 4, generic: 2, graph: 0, descr: 'ALA04 - Probe B4 faulty or disconnected' }
-                        - { value: 5, generic: 2, graph: 0, descr: 'ALA05 - Probe B5 faulty or disconnected' }
-                        - { value: 6, generic: 2, graph: 0, descr: 'ALA06 - Probe B6 faulty or disconnected' }
-                        - { value: 7, generic: 2, graph: 0, descr: 'ALA07 - Probe B7 faulty or disconnected' }
-                        - { value: 8, generic: 2, graph: 0, descr: 'ALA08 - Probe B8 faulty or disconnected' }
-                        - { value: 9, generic: 2, graph: 0, descr: 'ALA09 - Probe B9 faulty or disconnected' }
-                        - { value: 10, generic: 2, graph: 0, descr: 'ALA10 - Probe B10 faulty or disconnected' }
-                        - { value: 11, generic: 2, graph: 0, descr: 'ALA11 - Probe B11 faulty or disconnected' }
-                        - { value: 12, generic: 2, graph: 0, descr: 'ALA12 - Probe B12 faulty or disconnected' }
-                        - { value: 13, generic: 2, graph: 0, descr: 'ALB01 - High pressure' }
-                        - { value: 14, generic: 2, graph: 0, descr: 'ALB02 - High pressure compressor 1 by transducer' }
-                        - { value: 15, generic: 2, graph: 0, descr: 'ALB03 - Low pressure compressor/compressors by transducer' }
-                        - { value: 16, generic: 2, graph: 0, descr: 'ALC01 - Compressor 1 overload or inverter alarm' }
-                        - { value: 17, generic: 2, graph: 0, descr: 'ALC03 - Envelope alarm zone' }
-                        - { value: 18, generic: 2, graph: 0, descr: 'ALC04 - Compressor start failure' }
-                        - { value: 19, generic: 2, graph: 0, descr: 'ALC05 - High discharge gas temperature' }
-                        - { value: 20, generic: 2, graph: 0, descr: 'ALC06 - Low pressure differential (insufficient lubrication)' }
-                        - { value: 21, generic: 2, graph: 0, descr: 'ALF01 - Fan overload' }
-                        - { value: 22, generic: 2, graph: 0, descr: 'ALD02 - Sensor failure' }
-                        - { value: 23, generic: 2, graph: 0, descr: 'ALD03 - EEV motor error' }
-                        - { value: 24, generic: 2, graph: 0, descr: 'ALD04 - Low superheat' }
-                        - { value: 25, generic: 2, graph: 0, descr: 'ALD05 - Low suction temperature' }
-                        - { value: 26, generic: 2, graph: 0, descr: 'ALD06 - Low evaporation temperature' }
-                        - { value: 27, generic: 2, graph: 0, descr: 'ALD07 - High evaporation temperature' }
-                        - { value: 28, generic: 2, graph: 0, descr: 'ALD08 - High condensing temperature' }
-                        - { value: 29, generic: 2, graph: 0, descr: 'ALD09 - Driver offline' }
-                        - { value: 30, generic: 2, graph: 0, descr: 'ALL01 - Power+ offline' }
-                        - { value: 31, generic: 2, graph: 0, descr: 'ALL02 - Power+ Generic Alarm' }
-                        - { value: 32, generic: 2, graph: 0, descr: 'ALL99 - Unexpected inverter stop' }
-                        - { value: 33, generic: 2, graph: 0, descr: 'ALW04 - Max temperature (warning)' }
+                        - { value: 0, generic: 0, descr: 'ok' }    
+                        - { value: 2, generic: 2, descr: 'ALA02 - Probe B2 faulty or disconnected' }
+                        - { value: 3, generic: 2, descr: 'ALA03 - Probe B3 faulty or disconnected' }
+                        - { value: 4, generic: 2, descr: 'ALA04 - Probe B4 faulty or disconnected' }
+                        - { value: 5, generic: 2, descr: 'ALA05 - Probe B5 faulty or disconnected' }
+                        - { value: 6, generic: 2, descr: 'ALA06 - Probe B6 faulty or disconnected' }
+                        - { value: 7, generic: 2, descr: 'ALA07 - Probe B7 faulty or disconnected' }
+                        - { value: 8, generic: 2, descr: 'ALA08 - Probe B8 faulty or disconnected' }
+                        - { value: 9, generic: 2, descr: 'ALA09 - Probe B9 faulty or disconnected' }
+                        - { value: 10, generic: 2, descr: 'ALA10 - Probe B10 faulty or disconnected' }
+                        - { value: 11, generic: 2, descr: 'ALA11 - Probe B11 faulty or disconnected' }
+                        - { value: 12, generic: 2, descr: 'ALA12 - Probe B12 faulty or disconnected' }
+                        - { value: 13, generic: 2, descr: 'ALB01 - High pressure' }
+                        - { value: 14, generic: 2, descr: 'ALB02 - High pressure compressor 1 by transducer' }
+                        - { value: 15, generic: 2, descr: 'ALB03 - Low pressure compressor/compressors by transducer' }
+                        - { value: 16, generic: 2, descr: 'ALC01 - Compressor 1 overload or inverter alarm' }
+                        - { value: 17, generic: 2, descr: 'ALC03 - Envelope alarm zone' }
+                        - { value: 18, generic: 2, descr: 'ALC04 - Compressor start failure' }
+                        - { value: 19, generic: 2, descr: 'ALC05 - High discharge gas temperature' }
+                        - { value: 20, generic: 2, descr: 'ALC06 - Low pressure differential (insufficient lubrication)' }
+                        - { value: 21, generic: 2, descr: 'ALF01 - Fan overload' }
+                        - { value: 22, generic: 2, descr: 'ALD02 - Sensor failure' }
+                        - { value: 23, generic: 2, descr: 'ALD03 - EEV motor error' }
+                        - { value: 24, generic: 2, descr: 'ALD04 - Low superheat' }
+                        - { value: 25, generic: 2, descr: 'ALD05 - Low suction temperature' }
+                        - { value: 26, generic: 2, descr: 'ALD06 - Low evaporation temperature' }
+                        - { value: 27, generic: 2, descr: 'ALD07 - High evaporation temperature' }
+                        - { value: 28, generic: 2, descr: 'ALD08 - High condensing temperature' }
+                        - { value: 29, generic: 2, descr: 'ALD09 - Driver offline' }
+                        - { value: 30, generic: 2, descr: 'ALL01 - Power+ offline' }
+                        - { value: 31, generic: 2, descr: 'ALL02 - Power+ Generic Alarm' }
+                        - { value: 32, generic: 2, descr: 'ALL99 - Unexpected inverter stop' }
+                        - { value: 33, generic: 2, descr: 'ALW04 - Max temperature (warning)' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::compressorEnvelopeAlarm
                     group: Component alarms
@@ -406,8 +406,8 @@ modules:
                     index: 'compressorEnvelopeAlarm.{{ $index }}'
                     state_name: compressorEnvelopeAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::compressorStartupFailureAlarm
                     group: Component alarms
@@ -416,8 +416,8 @@ modules:
                     index: 'compressorStartupFailureAlarm.{{ $index }}'
                     state_name: compressorStartupFailureAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::maxDischargeTemperatureAlarm
                     group: Component alarms
@@ -426,8 +426,8 @@ modules:
                     index: 'maxDischargeTemperatureAlarm.{{ $index }}'
                     state_name: maxDischargeTemperatureAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::compressorDeltaPressureAlarm
                     group: Component alarms
@@ -436,8 +436,8 @@ modules:
                     index: 'compressorDeltaPressureAlarm.{{ $index }}'
                     state_name: compressorDeltaPressureAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::oilReturnAlarm
                     group: Component alarms
@@ -446,8 +446,8 @@ modules:
                     index: 'oilReturnAlarm.{{ $index }}'
                     state_name: oilReturnAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureTopProbeAlarm
                     group: Probe alarms
@@ -456,8 +456,8 @@ modules:
                     index: 'outputTemperatureTopProbeAlarm.{{ $index }}'
                     state_name: outputTemperatureTopProbeAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureMidProbeAlarm
                     group: Probe alarms
@@ -466,8 +466,8 @@ modules:
                     index: 'outputTemperatureMidProbeAlarm.{{ $index }}'
                     state_name: outputTemperatureMidProbeAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::outputTemperatureBottomProbeAlarm
                     group: Probe alarms
@@ -476,8 +476,8 @@ modules:
                     index: 'outputTemperatureBottomProbeAlarm.{{ $index }}'
                     state_name: outputTemperatureBottomProbeAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureTopProbeAlarm
                     group: Probe alarms
@@ -486,8 +486,8 @@ modules:
                     index: 'inputTemperatureTopProbeAlarm.{{ $index }}'
                     state_name: inputTemperatureTopProbeAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureMidProbeAlarm
                     group: Probe alarms
@@ -496,8 +496,8 @@ modules:
                     index: 'inputTemperatureMidProbeAlarm.{{ $index }}'
                     state_name: inputTemperatureMidProbeAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::inputTemperatureBottomProbeAlarm
                     group: Probe alarms
@@ -506,8 +506,8 @@ modules:
                     index: 'inputTemperatureBottomProbeAlarm.{{ $index }}'
                     state_name: inputTemperatureBottomProbeAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::compressorDischargeTemperatureProbeAlarm
                     group: Probe alarms
@@ -516,8 +516,8 @@ modules:
                     index: 'compressorDischargeTemperatureProbeAlarm.{{ $index }}'
                     state_name: compressorDischargeTemperatureProbeAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::compressorSuctionTemperatureProbeAlarm
                     group: Probe alarms
@@ -526,8 +526,8 @@ modules:
                     index: 'compressorSuctionTemperatureProbeAlarm.{{ $index }}'
                     state_name: compressorSuctionTemperatureProbeAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::compressorDischargePressureProbeAlarm
                     group: Probe alarms
@@ -536,8 +536,8 @@ modules:
                     index: 'compressorDischargePressureProbeAlarm.{{ $index }}'
                     state_name: compressorDischargePressureProbeAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }
                 -
                     oid: CAREL-RITTAL-LCP-3311-MIB::compressorSuctionPressureProbeAlarm
                     group: Probe alarms
@@ -546,5 +546,5 @@ modules:
                     index: 'compressorSuctionPressureProbeAlarm.{{ $index }}'
                     state_name: compressorSuctionPressureProbeAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 0, generic: 0, descr: 'ok' }
+                        - { value: 1, generic: 2, descr: 'alarm' }

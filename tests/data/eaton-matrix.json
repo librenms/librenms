@@ -1613,105 +1613,90 @@
                 {
                     "state_name": "matConfStsPriority",
                     "state_descr": "Inverter",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "matConfStsPriority",
                     "state_descr": "Mains",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "matInvOnOff",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "matInvOnOff",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "matStsMbsStatus",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "matStsMbsStatus",
                     "state_descr": "Manual - Inverted Power",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "matStsMbsStatus",
                     "state_descr": "Bypass - Inverted Power",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "matStsMbsStatus",
                     "state_descr": "Manual - Mains Power",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "matStsMbsStatus",
                     "state_descr": "Bypass - Mains Power",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "matStsMbsStatus",
                     "state_descr": "MBS Switch Error",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "matStsRunningMode",
                     "state_descr": "Inverter",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "matStsRunningMode",
                     "state_descr": "Mains",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "matStsRunningMode",
                     "state_descr": "No Output",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "matStsStatus",
                     "state_descr": "Online",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "matStsStatus",
                     "state_descr": "Offline",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 }

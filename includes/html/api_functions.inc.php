@@ -128,6 +128,7 @@ function api_get_graph(Request $request, array $additional = [])
             'bbg',
             'title',
             'graph_title',
+            'graph_type',
             'nototal',
             'nodetails',
             'noagg',

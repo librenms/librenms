@@ -1,0 +1,641 @@
+--
+-- All Rights Reserved, Copyright (c) 2016, 2017, ALAXALA Networks Corp.
+--
+-- AX-SHAPER-MIB.my : axShaper group MIB file.
+--
+
+AX-SHAPER-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter64
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axShaper MODULE-IDENTITY
+    LAST-UPDATED    "201701100000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for hierarchical shaper information."
+        
+    REVISION        "201701100000Z"
+    DESCRIPTION
+        "+Added axShaperPortStatsTable"
+    REVISION        "201610210000Z"
+    DESCRIPTION
+        "Initial release."
+    ::= { axMib 13 }
+
+--------------------------------------------------
+-- Object Identifiers
+--------------------------------------------------
+
+axShaperUser            OBJECT IDENTIFIER ::= {axShaper 1}
+axShaperUserOutQueue    OBJECT IDENTIFIER ::= {axShaper 2}
+axShaperPort            OBJECT IDENTIFIER ::= {axShaper 3}
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+--
+-- axShaperUserStatsTable
+--
+axShaperUserStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AxShaperUserStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing shaper NIF information about specific users."
+    ::= {axShaperUser 1}
+
+axShaperUserStatsEntry OBJECT-TYPE
+    SYNTAX      AxShaperUserStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing shaper NIF about specific users."
+    INDEX {
+        axShaperUserStatsNifIndex,
+        axShaperUserStatsPortIndex,
+        axShaperUserStatsUserId
+    }
+    ::= {axShaperUserStatsTable 1}
+
+AxShaperUserStatsEntry ::= SEQUENCE {
+    axShaperUserStatsNifIndex                   Integer32,
+    axShaperUserStatsPortIndex                  Integer32,
+    axShaperUserStatsUserId                     Integer32,
+    axShaperUserStatsShaperMode                 Integer32,
+    axShaperUserStatsSchedulingMode             Integer32,
+    axShaperUserStatsTotalSendPackets           Counter64,
+    axShaperUserStatsTotalDiscardPackets        Counter64,
+    axShaperUserStatsTotalSendBytes             Counter64,
+    axShaperUserStatsTotalDiscardBytes          Counter64,
+    axShaperUserStatsLlpqTotalSendPackets       Counter64,
+    axShaperUserStatsLlpqTotalDiscardPackets    Counter64,
+    axShaperUserStatsLlpqTotalSendBytes         Counter64,
+    axShaperUserStatsLlpqTotalDiscardBytes      Counter64
+}
+
+axShaperUserStatsNifIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of shaper NIF slots."
+    ::= {axShaperUserStatsEntry 1}
+
+axShaperUserStatsPortIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of ports."
+    ::= {axShaperUserStatsEntry 2}
+
+axShaperUserStatsUserId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Shaper user identifier."
+    ::= {axShaperUserStatsEntry 3}
+
+axShaperUserStatsShaperMode OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shaper mode"
+    ::= {axShaperUserStatsEntry 4}
+
+axShaperUserStatsSchedulingMode OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Scheduling mode"
+    ::= {axShaperUserStatsEntry 5}
+
+axShaperUserStatsTotalSendPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of transmitted frames from a shaper user."
+    ::= {axShaperUserStatsEntry 6}
+
+axShaperUserStatsTotalDiscardPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of discarded frames from a shaper user."
+    ::= {axShaperUserStatsEntry 7}
+
+axShaperUserStatsTotalSendBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of transmitted bytes from a shaper user."
+    ::= {axShaperUserStatsEntry 8}
+
+axShaperUserStatsTotalDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of discarded bytes from a shaper user."
+    ::= {axShaperUserStatsEntry 9}
+
+axShaperUserStatsLlpqTotalSendPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of transmitted frames from all the low latency queues."
+    ::= {axShaperUserStatsEntry 10}
+
+axShaperUserStatsLlpqTotalDiscardPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of discarded frames from all the low latency queues."
+    ::= {axShaperUserStatsEntry 11}
+
+axShaperUserStatsLlpqTotalSendBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of transmitted bytes from all the low latency queues."
+    ::= {axShaperUserStatsEntry 12}
+
+axShaperUserStatsLlpqTotalDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of discarded bytes from all the low latency queues."
+    ::= {axShaperUserStatsEntry 13}
+
+
+
+--
+-- axShaperUserOutQueueStatsTable
+--
+
+axShaperUserOutQueueStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AxShaperUserOutQueueStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing shaper NIF information about specific user-queues."
+    ::= {axShaperUserOutQueue 1}
+
+axShaperUserOutQueueStatsEntry OBJECT-TYPE
+    SYNTAX      AxShaperUserOutQueueStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing shaper NIF about specific user-queues."
+    INDEX {
+        axShaperUserOutQueueStatsNifIndex,
+        axShaperUserOutQueueStatsPortIndex,
+        axShaperUserOutQueueStatsUserId,
+        axShaperUserOutQueueStatsQueueNumber
+    }
+    ::= {axShaperUserOutQueueStatsTable 1}
+
+AxShaperUserOutQueueStatsEntry ::= SEQUENCE {
+    axShaperUserOutQueueStatsNifIndex                   Integer32,
+    axShaperUserOutQueueStatsPortIndex                  Integer32,
+    axShaperUserOutQueueStatsUserId                     Integer32,
+    axShaperUserOutQueueStatsQueueNumber                Integer32,
+    axShaperUserOutQueueStatsQueueLen                   Integer32,
+    axShaperUserOutQueueStatsQueueLimitLen              Integer32,
+    axShaperUserOutQueueStatsDiscard1SendPackets        Counter64,
+    axShaperUserOutQueueStatsDiscard1DiscardPackets     Counter64,
+    axShaperUserOutQueueStatsDiscard1SendBytes          Counter64,
+    axShaperUserOutQueueStatsDiscard1DiscardBytes       Counter64,
+    axShaperUserOutQueueStatsDiscard2SendPackets        Counter64,
+    axShaperUserOutQueueStatsDiscard2DiscardPackets     Counter64,
+    axShaperUserOutQueueStatsDiscard2SendBytes          Counter64,
+    axShaperUserOutQueueStatsDiscard2DiscardBytes       Counter64,
+    axShaperUserOutQueueStatsDiscard3SendPackets        Counter64,
+    axShaperUserOutQueueStatsDiscard3DiscardPackets     Counter64,
+    axShaperUserOutQueueStatsDiscard3SendBytes          Counter64,
+    axShaperUserOutQueueStatsDiscard3DiscardBytes       Counter64,
+    axShaperUserOutQueueStatsDiscard4SendPackets        Counter64,
+    axShaperUserOutQueueStatsDiscard4DiscardPackets     Counter64,
+    axShaperUserOutQueueStatsDiscard4SendBytes          Counter64,
+    axShaperUserOutQueueStatsDiscard4DiscardBytes       Counter64,
+    axShaperUserOutQueueStatsTotalSendPackets           Counter64,
+    axShaperUserOutQueueStatsTotalDiscardPackets        Counter64,
+    axShaperUserOutQueueStatsTotalSendBytes             Counter64,
+    axShaperUserOutQueueStatsTotalDiscardBytes          Counter64
+}
+
+axShaperUserOutQueueStatsNifIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of shaper NIF slots."
+    ::= {axShaperUserOutQueueStatsEntry 1}
+
+axShaperUserOutQueueStatsPortIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of ports."
+    ::= {axShaperUserOutQueueStatsEntry 2}
+
+axShaperUserOutQueueStatsUserId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Shaper user identifier."
+    ::= {axShaperUserOutQueueStatsEntry 3}
+
+axShaperUserOutQueueStatsQueueNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Queue number."
+    ::= {axShaperUserOutQueueStatsEntry 4}
+
+axShaperUserOutQueueStatsQueueLen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of shaper users queue."
+    ::= {axShaperUserOutQueueStatsEntry 5}
+
+axShaperUserOutQueueStatsQueueLimitLen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The upper limit number of shaper users queue."
+    ::= {axShaperUserOutQueueStatsEntry 6}
+
+axShaperUserOutQueueStatsDiscard1SendPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of send packets in the discard priority 1."
+    ::= {axShaperUserOutQueueStatsEntry 7}
+
+axShaperUserOutQueueStatsDiscard1DiscardPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discard packets in the discard priority 1."
+    ::= {axShaperUserOutQueueStatsEntry 8}
+
+axShaperUserOutQueueStatsDiscard1SendBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of send bytes in the discard priority 1."
+    ::= {axShaperUserOutQueueStatsEntry 9}
+
+axShaperUserOutQueueStatsDiscard1DiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discard bytes in the discard priority 1."
+    ::= {axShaperUserOutQueueStatsEntry 10}
+
+axShaperUserOutQueueStatsDiscard2SendPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of send packets in the discard priority 2."
+    ::= {axShaperUserOutQueueStatsEntry 11}
+
+axShaperUserOutQueueStatsDiscard2DiscardPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discard packets in the discard priority 2."
+    ::= {axShaperUserOutQueueStatsEntry 12}
+
+axShaperUserOutQueueStatsDiscard2SendBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of send bytes in the discard priority 2."
+    ::= {axShaperUserOutQueueStatsEntry 13}
+
+axShaperUserOutQueueStatsDiscard2DiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discard bytes in the discard priority 2."
+    ::= {axShaperUserOutQueueStatsEntry 14}
+
+axShaperUserOutQueueStatsDiscard3SendPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of send packets in the discard priority 3."
+    ::= {axShaperUserOutQueueStatsEntry 15}
+
+axShaperUserOutQueueStatsDiscard3DiscardPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discard packets in the discard priority 3."
+    ::= {axShaperUserOutQueueStatsEntry 16}
+
+axShaperUserOutQueueStatsDiscard3SendBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of send bytes in the discard priority 3."
+    ::= {axShaperUserOutQueueStatsEntry 17}
+
+axShaperUserOutQueueStatsDiscard3DiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discard bytes in the discard priority 3."
+    ::= {axShaperUserOutQueueStatsEntry 18}
+
+axShaperUserOutQueueStatsDiscard4SendPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of send packets in the discard priority 4."
+    ::= {axShaperUserOutQueueStatsEntry 19}
+
+axShaperUserOutQueueStatsDiscard4DiscardPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discard packets in the discard priority 4."
+    ::= {axShaperUserOutQueueStatsEntry 20}
+
+axShaperUserOutQueueStatsDiscard4SendBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of send bytes in the discard priority 4."
+    ::= {axShaperUserOutQueueStatsEntry 21}
+
+axShaperUserOutQueueStatsDiscard4DiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discard bytes in the discard priority 4."
+    ::= {axShaperUserOutQueueStatsEntry 22}
+
+axShaperUserOutQueueStatsTotalSendPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of transmitted frames from a shaper user queue."
+    ::= {axShaperUserOutQueueStatsEntry 23}
+
+axShaperUserOutQueueStatsTotalDiscardPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discarded frames in a shaper user queue."
+    ::= {axShaperUserOutQueueStatsEntry 24}
+
+axShaperUserOutQueueStatsTotalSendBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of transmitted bytes from a shaper user queue."
+    ::= {axShaperUserOutQueueStatsEntry 25}
+
+axShaperUserOutQueueStatsTotalDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discarded bytes in a shaper user queue."
+    ::= {axShaperUserOutQueueStatsEntry 26}
+
+
+
+--
+-- axShaperPortStatsTable
+--
+axShaperPortStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AxShaperPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing shaper NIF information about specific ports."
+    ::= {axShaperPort 1}
+
+axShaperPortStatsEntry OBJECT-TYPE
+    SYNTAX      AxShaperPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing shaper NIF about specific ports."
+    INDEX {
+        axShaperPortStatsNifIndex,
+        axShaperPortStatsPortIndex 
+    }
+    ::= {axShaperPortStatsTable 1}
+
+AxShaperPortStatsEntry ::= SEQUENCE {
+    axShaperPortStatsNifIndex                   Integer32,
+    axShaperPortStatsPortIndex                  Integer32,
+    axShaperPortStatsShaperMode                 Integer32,
+    axShaperPortStatsSchedulingMode             Integer32,
+    axShaperPortStatsTotalSendPackets           Counter64,
+    axShaperPortStatsTotalDiscardPackets        Counter64,
+    axShaperPortStatsTotalSendBytes             Counter64,
+    axShaperPortStatsTotalDiscardBytes          Counter64
+}
+
+axShaperPortStatsNifIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of shaper NIF slots."
+    ::= {axShaperPortStatsEntry 1}
+
+axShaperPortStatsPortIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of ports."
+    ::= {axShaperPortStatsEntry 2}
+
+axShaperPortStatsShaperMode OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shaper mode"
+    ::= {axShaperPortStatsEntry 3}
+
+axShaperPortStatsSchedulingMode OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Scheduling mode"
+    ::= {axShaperPortStatsEntry 4}
+
+axShaperPortStatsTotalSendPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of transmitted frames from a shaper port."
+    ::= {axShaperPortStatsEntry 5}
+
+axShaperPortStatsTotalDiscardPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of  discarded frames from a shaper port."
+    ::= {axShaperPortStatsEntry 6}
+
+axShaperPortStatsTotalSendBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of transmitted bytes from a shaper port."
+    ::= {axShaperPortStatsEntry 7}
+
+axShaperPortStatsTotalDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of discarded bytes from a shaper port."
+    ::= {axShaperPortStatsEntry 8}
+
+
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+
+-- None
+
+
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Confoemance identifier
+--
+
+axShaperConformance             OBJECT IDENTIFIER ::= { axShaper 1000 }
+axShaperCompliances             OBJECT IDENTIFIER ::= { axShaperConformance 1 }
+axShaperGroups                  OBJECT IDENTIFIER ::= { axShaperConformance 2 }
+
+--
+-- Compliance
+--
+
+axShaperCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for AX Shaper MIB."
+    MODULE      -- this module
+        MANDATORY-GROUPS{ axShaperGroup }
+    ::= { axShaperCompliances 1 }
+
+--
+-- Object Group
+--
+
+axShaperGroup OBJECT-GROUP
+    OBJECTS    {
+                    axShaperUserStatsShaperMode,
+                    axShaperUserStatsSchedulingMode,
+                    axShaperUserStatsTotalSendPackets,
+                    axShaperUserStatsTotalDiscardPackets,
+                    axShaperUserStatsTotalSendBytes,
+                    axShaperUserStatsTotalDiscardBytes,
+                    axShaperUserStatsLlpqTotalSendPackets,
+                    axShaperUserStatsLlpqTotalDiscardPackets,
+                    axShaperUserStatsLlpqTotalSendBytes,
+                    axShaperUserStatsLlpqTotalDiscardBytes,
+                    
+                    axShaperUserOutQueueStatsQueueLen,
+                    axShaperUserOutQueueStatsQueueLimitLen,
+                    axShaperUserOutQueueStatsDiscard1SendPackets,
+                    axShaperUserOutQueueStatsDiscard1DiscardPackets,
+                    axShaperUserOutQueueStatsDiscard1SendBytes,
+                    axShaperUserOutQueueStatsDiscard1DiscardBytes,
+                    axShaperUserOutQueueStatsDiscard2SendPackets,
+                    axShaperUserOutQueueStatsDiscard2DiscardPackets,
+                    axShaperUserOutQueueStatsDiscard2SendBytes,
+                    axShaperUserOutQueueStatsDiscard2DiscardBytes,
+                    axShaperUserOutQueueStatsDiscard3SendPackets,
+                    axShaperUserOutQueueStatsDiscard3DiscardPackets,
+                    axShaperUserOutQueueStatsDiscard3SendBytes,
+                    axShaperUserOutQueueStatsDiscard3DiscardBytes,
+                    axShaperUserOutQueueStatsDiscard4SendPackets,
+                    axShaperUserOutQueueStatsDiscard4DiscardPackets,
+                    axShaperUserOutQueueStatsDiscard4SendBytes,
+                    axShaperUserOutQueueStatsDiscard4DiscardBytes,
+                    axShaperUserOutQueueStatsTotalSendPackets,
+                    axShaperUserOutQueueStatsTotalDiscardPackets,
+                    axShaperUserOutQueueStatsTotalSendBytes,
+                    axShaperUserOutQueueStatsTotalDiscardBytes,
+                    
+                    axShaperPortStatsShaperMode,
+                    axShaperPortStatsSchedulingMode,
+                    axShaperPortStatsTotalSendPackets,
+                    axShaperPortStatsTotalDiscardPackets,
+                    axShaperPortStatsTotalSendBytes,
+                    axShaperPortStatsTotalDiscardBytes
+            }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects which are used to provide axShaper group."
+    ::= { axShaperGroups 1 }
+
+END

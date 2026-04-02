@@ -19,13 +19,13 @@ modules:
                     descr: 'Chassis state'
                     index: 'boxServicesTempUnitState.{{ $index }}'
                     states:
-                        - { value: 0, descr: low, graph: 1, generic: 1 }
-                        - { value: 1, descr: normal, graph: 1, generic: 0 }
-                        - { value: 2, descr: warning, graph: 1, generic: 1 }
-                        - { value: 3, descr: critical, graph: 1, generic: 2 }
-                        - { value: 4, descr: shutdown, graph: 1, generic: 2 }
-                        - { value: 5, descr: notpresent, graph: 1, generic: 3 }
-                        - { value: 6, descr: notoperational, graph: 1, generic: 2 }
+                        - { value: 0, descr: low, generic: 1 }
+                        - { value: 1, descr: normal, generic: 0 }
+                        - { value: 2, descr: warning, generic: 1 }
+                        - { value: 3, descr: critical, generic: 2 }
+                        - { value: 4, descr: shutdown, generic: 2 }
+                        - { value: 5, descr: notpresent, generic: 3 }
+                        - { value: 6, descr: notoperational, generic: 2 }
                 -
                     oid: EdgeSwitch-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorsEntry
                     value: EdgeSwitch-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorState
@@ -34,13 +34,13 @@ modules:
                     descr: 'Temp Sensor {{ $index }}'
                     index: 'boxServicesTempSensorState.{{ $index }}'
                     states:
-                        - { value: 0, descr: low, graph: 1, generic: 1 }
-                        - { value: 1, descr: normal, graph: 1, generic: 0 }
-                        - { value: 2, descr: warning, graph: 1, generic: 1 }
-                        - { value: 3, descr: critical, graph: 1, generic: 2 }
-                        - { value: 4, descr: shutdown, graph: 1, generic: 2 }
-                        - { value: 5, descr: notpresent, graph: 1, generic: 3 }
-                        - { value: 6, descr: notoperational, graph: 1, generic: 2 }
+                        - { value: 0, descr: low, generic: 1 }
+                        - { value: 1, descr: normal, generic: 0 }
+                        - { value: 2, descr: warning, generic: 1 }
+                        - { value: 3, descr: critical, generic: 2 }
+                        - { value: 4, descr: shutdown, generic: 2 }
+                        - { value: 5, descr: notpresent, generic: 3 }
+                        - { value: 6, descr: notoperational, generic: 2 }
 
                 -
                     oid: EdgeSwitch-BOXSERVICES-PRIVATE-MIB::boxServicesFansEntry
@@ -50,13 +50,13 @@ modules:
                     descr: 'Fan {{ $index }}'
                     index: 'boxServicesFanItemState.{{ $index }}'
                     states:
-                        - { value: 1, descr: notpresent, graph: 1, generic: 3 }
-                        - { value: 2, descr: operational, graph: 1, generic: 0 }
-                        - { value: 3, descr: failed, graph: 1, generic: 2 }
-                        - { value: 4, descr: powering, graph: 1, generic: 0 }
-                        - { value: 5, descr: nopower, graph: 1, generic: 2 }
-                        - { value: 6, descr: notpowering, graph: 1, generic: 2 }
-                        - { value: 7, descr: incompatible, graph: 1, generic: 1 }
+                        - { value: 1, descr: notpresent, generic: 3 }
+                        - { value: 2, descr: operational, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                        - { value: 4, descr: powering, generic: 0 }
+                        - { value: 5, descr: nopower, generic: 2 }
+                        - { value: 6, descr: notpowering, generic: 2 }
+                        - { value: 7, descr: incompatible, generic: 1 }
 
         fanspeed:
             data:
