@@ -56,16 +56,7 @@ final class SocialiteControllerTest extends TestCase
         \App\Facades\LibrenmsConfig::set('auth.socialite.default_role', 'none');
 
         // Dynamically mock the correct User class based on the provider
-        if ($provider === 'saml2') {
-            // SAML2 uses the base AbstractUser (No tokens)
-            $socialiteUserStub = $this->createMock(\Laravel\Socialite\AbstractUser::class);
-        } else {
-            // OAuth2/OIDC providers (Okta, Azure, etc.) use Two\User (Has tokens)
-            $socialiteUserStub = $this->createMock(\Laravel\Socialite\Two\User::class);
-            // Mock the accessTokenResponseBody property used for JWT logic
-            $socialiteUserStub->accessTokenResponseBody = [];
-        }
-
+        $socialiteUserStub = $this->createMock(AbstractUser::class);
         $socialiteUserStub
             ->method('getRaw')
             ->willReturn($rawAttributes);
