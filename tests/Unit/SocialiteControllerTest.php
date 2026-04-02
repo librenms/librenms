@@ -62,15 +62,13 @@ final class SocialiteControllerTest extends TestCase
         } else {
             // OAuth2/OIDC providers (Okta, Azure, etc.) use Two\User (Has tokens)
             $socialiteUserStub = $this->createMock(\Laravel\Socialite\Two\User::class);
+            // Mock the accessTokenResponseBody property used for JWT logic
             $socialiteUserStub->accessTokenResponseBody = [];
         }
 
         $socialiteUserStub
             ->method('getRaw')
             ->willReturn($rawAttributes);
-            
-        // Mock the accessTokenResponseBody property used for JWT logic
-        $socialiteUserStub->accessTokenResponseBody = [];
 
         // Make the SocialiteController private bits accessible via reflection.
         $controller = new SocialiteController();
