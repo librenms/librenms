@@ -84,7 +84,7 @@ class SocialiteController extends Controller
 
         if ($roles === false) {
             toast()->error(__('Access denied: Your user does not have the required privileges in this system.'));
-        
+
             return redirect()->route('login')->with('block_auto_redirect', true);
         }
 
@@ -166,7 +166,7 @@ class SocialiteController extends Controller
         }
     }
 
-    private function getAuthorizedRoles(string $provider, $user): array|false
+    private function getAuthorizedRoles(): array|false
     {
         $scopes = LibrenmsConfig::get('auth.socialite.scopes', ['openid', 'profile', 'email']);
         $claims = LibrenmsConfig::get('auth.socialite.claims', []);
@@ -178,40 +178,36 @@ class SocialiteController extends Controller
 
         $attributes = $this->normalizeAttributes($this->socialite_user->getRaw());
 
-        $claimField = $this->claim_field ?: 'groups';
+        $claimFields = Arr::wrap($claimField ?: 'groups');
         if (isset($this->socialite_user->accessTokenResponseBody['id_token'])) {
             $tokenParts = explode('.', $this->socialite_user->accessTokenResponseBody['id_token']);
 
             if (count($tokenParts) === 3) {
                 // Decoding the JWT token payload
                 $payload = json_decode(base64_decode(strtr($tokenParts[1], '-_', '+/')), true);
-                
+
                 if (is_array($payload)) {
-                    // Salva os grupos originais (se existirem) antes do array_merge sobrescrever a chave
+                    // Save existing groups (if any) before array_merge overwrites the key
                     $existingGroups = isset($attributes[$claimField]) ? (array) $attributes[$claimField] : [];
                     $payloadGroups = isset($payload[$claimField]) ? (array) $payload[$claimField] : [];
 
-                    // Mescla os atributos gerais do token
+                    // Merge JWT token attributes
                     $attributes = array_merge($attributes, $payload);
 
-                    // Mescla especificamente os grupos do Graph API com os grupos do JWT, removendo duplicatas
+                    // Merge OIDC groups (e.g. Graph API) with JWT groups, removing duplicates
                     $mergedGroups = array_unique(array_merge($existingGroups, $payloadGroups));
 
-                    // Reatribui a lista consolidada de grupos de volta aos atributos
+                    // Reassign the consolidated group list back to the attributes
                     $attributes[$claimField] = $mergedGroups;
                 }
             }
         }
 
-        if (!isset($attributes[$claimField])) {
+        if (! isset($attributes[$claimField])) {
             $attributes[$claimField] = [];
         }
-        $scopeValues = $claimField !== null
-            ? collect(Arr::wrap($claimField))
-                ->flatMap(fn ($field) => Arr::wrap($attributes[$field] ?? []))
-                ->all()
-            : collect($attributes)
-                ->filter(fn ($values, $name) => collect($scopes)->contains(fn ($scope) => str_contains((string) $name, (string) $scope)))
+        $scopeValues = collect($attributes)
+                ->filter(fn ($values, $name) => collect($scopes)->contains(fn ($scope) => (string) $name === (string) $scope))
                 ->flatten()
                 ->all();
 
@@ -221,8 +217,8 @@ class SocialiteController extends Controller
         }
 
         if (empty($roles)) {
-            if (strtolower((string)$defaultRole) === 'none') {
-               \Log::warning("Socialite login denied: User {$this->socialite_user->getEmail()} has no matching claims and default_role is none.");
+            if (strtolower((string) $defaultRole) === 'none') {
+                \Log::warning("Socialite login denied: User has no matching claims and default_role is none.");
                 return false;
             }
             $roles[] = $defaultRole;
