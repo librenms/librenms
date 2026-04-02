@@ -80,15 +80,15 @@ class SocialiteController extends Controller
             return redirect()->route('login')->with('block_auto_redirect', true);
         }
 
-        $roles = $this->getAuthorizedRoles();
+        $this->socialite_user = Socialite::driver($provider)->user();
+
+        $roles = $this->getAuthorizedRoles($provider);
 
         if ($roles === false) {
             toast()->error(__('Access denied: Your user does not have the required privileges in this system.'));
 
             return redirect()->route('login')->with('block_auto_redirect', true);
         }
-
-        $this->socialite_user = Socialite::driver($provider)->user();
 
         // If we already have a valid session, user is trying to pair their account
         if (Auth::user()) {
@@ -166,7 +166,7 @@ class SocialiteController extends Controller
         }
     }
 
-    private function getAuthorizedRoles(): array|false
+    private function getAuthorizedRoles(string $provider): array|false
     {
         $scopes = LibrenmsConfig::get('auth.socialite.scopes', ['openid', 'profile', 'email']);
         $claims = LibrenmsConfig::get('auth.socialite.claims', []);
@@ -183,33 +183,31 @@ class SocialiteController extends Controller
             $tokenParts = explode('.', $this->socialite_user->accessTokenResponseBody['id_token']);
 
             if (count($tokenParts) === 3) {
-                // Decoding the JWT token payload
                 $payload = json_decode(base64_decode(strtr($tokenParts[1], '-_', '+/')), true);
 
                 if (is_array($payload)) {
-                    // Save existing groups (if any) before array_merge overwrites the key
-                    $existingGroups = isset($attributes[$claimField]) ? (array) $attributes[$claimField] : [];
-                    $payloadGroups = isset($payload[$claimField]) ? (array) $payload[$claimField] : [];
-
-                    // Merge JWT token attributes
-                    $attributes = array_merge($attributes, $payload);
-
-                    // Merge OIDC groups (e.g. Graph API) with JWT groups, removing duplicates
-                    $mergedGroups = array_unique(array_merge($existingGroups, $payloadGroups));
-
-                    // Reassign the consolidated group list back to the attributes
-                    $attributes[$claimField] = $mergedGroups;
+                    // We iterate over each configured field to perform the individual merge
+                    foreach ($claimFields as $field) {
+                        // Save existing groups (if any) before array_merge overwrites the key
+                        $existingValues = isset($attributes[$field]) ? (array) $attributes[$field] : [];
+                        $payloadValues = isset($payload[$field]) ? (array) $payload[$field] : [];
+        
+                        // Merge OIDC groups (e.g. Graph API) with JWT groups, removing duplicates
+                        $payload[$field] = array_unique(array_merge($existingValues, $payloadValues));
+                    }
                 }
             }
         }
 
-        if (! isset($attributes[$claimField])) {
-            $attributes[$claimField] = [];
+        foreach ($claimFields as $field) {
+            if (! isset($attributes[$field])) {
+                $attributes[$field] = [];
+            }
         }
-        $scopeValues = collect($attributes)
-                ->filter(fn ($values, $name) => collect($scopes)->contains(fn ($scope) => (string) $name === (string) $scope))
-                ->flatten()
-                ->all();
+        $scopeValues = collect($claimFields)
+            ->flatMap(fn ($field) => (array) ($attributes[$field] ?? []))
+            ->unique()
+            ->all();
 
         $roles = [];
         foreach ($scopeValues as $value) {
@@ -218,7 +216,7 @@ class SocialiteController extends Controller
 
         if (empty($roles)) {
             if (strtolower((string) $defaultRole) === 'none') {
-                \Log::warning("Socialite login denied: User has no matching claims and default_role is none.");
+                \Log::warning('Socialite login denied: User has no matching claims and default_role is none.');
                 return false;
             }
             $roles[] = $defaultRole;
