@@ -27,65 +27,65 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Http\Controllers\Auth\SocialiteController;
-use App\Models\User;
 use Laravel\Socialite\AbstractUser;
 use LibreNMS\Tests\TestCase;
 
 final class SocialiteControllerTest extends TestCase
 {
     /**
-     * Helper to test setRolesFromClaim().
+     * Helper to test getAuthorizedRoles().
      *
-     * @param  string  $provider  The Socialite provider name (e.g. 'okta' or 'saml2')
+     * @param  string  $provider  The Socialite provider name
      * @param  array  $rawAttributes  The simulated raw user data from getRaw().
-     * @param  array  $expectedRoles  The roles expected to be passed to syncRoles() - the expected returns
-     * @param  array  $claimMap  A map of claim-values to roles (config for auth.socialite.claims).
+     * @param  array|false  $expectedRoles  The roles expected to be returned (or false for access denied)
+     * @param  array  $claimMap  A map of claim-values to roles.
      * @param  array  $scopes  Optional scopes config; defaults to ['groups'].
-     * @return bool The return value from setRolesFromClaim().
+     * @return array|false The return value from getAuthorizedRoles().
      */
-    private function runSetRolesFromClaimTest(
+    private function runGetAuthorizedRolesTest(
         string $provider,
         array $rawAttributes,
-        array $expectedRoles,
+        array|false $expectedRoles,
         array $claimMap,
         array $scopes = ['groups']
-    ): bool {
+    ) {
         // Inject scopes & claims.
         \App\Facades\LibrenmsConfig::set('auth.socialite.scopes', $scopes);
         \App\Facades\LibrenmsConfig::set('auth.socialite.claims', $claimMap);
         \App\Facades\LibrenmsConfig::set('auth.socialite.debug', false);
+        \App\Facades\LibrenmsConfig::set('auth.socialite.default_role', 'none');
 
         // Stub the Socialite user.
         $socialiteUserStub = $this->createMock(AbstractUser::class);
         $socialiteUserStub
             ->method('getRaw')
             ->willReturn($rawAttributes);
+            
+        // Mock the accessTokenResponseBody property used for JWT logic
+        $socialiteUserStub->accessTokenResponseBody = [];
 
-        // Make the SocialiteController private bits accessable via reflection.
+        // Make the SocialiteController private bits accessible via reflection.
         $controller = new SocialiteController();
         $reflectionClass = new \ReflectionClass($controller);
+
         $prop = $reflectionClass->getProperty('socialite_user');
+        $prop->setAccessible(true);
         $prop->setValue($controller, $socialiteUserStub);
 
-        // Stub the User model and assert syncRoles().
-        $userMock = $this->getMockBuilder(User::class)
-            ->onlyMethods(['syncRoles'])
-            ->getMock();
-
-        // we expect syncRoles is called once with our expected roles.
-        $userMock->expects($this->once())
-            ->method('syncRoles')
-            ->with($expectedRoles);
-
         // Invoke the private method with the chosen provider.
-        $method = $reflectionClass->getMethod('setRolesFromClaim');
+        $method = $reflectionClass->getMethod('getAuthorizedRoles');
+        $method->setAccessible(true);
 
-        return $method->invokeArgs($controller, [$provider, $userMock]);
+        $result = $method->invoke($controller, $provider);
+
+        // Assert the returned roles match expectations
+        $this->assertEquals($expectedRoles, $result);
+
+        return $result;
     }
 
-    public function testSetRolesFromClaimOktaAdmin(): void
+    public function testGetAuthorizedRolesOktaAdmin(): void
     {
-        // Test with a 'groups' value that should result in a role of ['admin'].
         $rawAttributes = [
             'sub' => '00REDACTED',
             'name' => 'Citizen, John',
@@ -100,19 +100,17 @@ final class SocialiteControllerTest extends TestCase
             'groups' => ['Example-Admin-Group'],
         ];
 
-        $result = $this->runSetRolesFromClaimTest(
+        $this->runGetAuthorizedRolesTest(
             'okta', $rawAttributes, ['admin'],
             [
                 'Example-Admin-Group' => ['roles' => ['admin']],
                 'Example-ReadOnly-Group' => ['roles' => ['global-read']],
             ]
         );
-        $this->assertTrue($result);
     }
 
-    public function testSetRolesFromClaimOktaGlobalRead(): void
+    public function testGetAuthorizedRolesOktaGlobalRead(): void
     {
-        // Test with a 'groups' value that should result in a role of ['global-read'].
         $rawAttributes = [
             'sub' => '00REDACTED',
             'name' => 'Citizen, John',
@@ -127,7 +125,7 @@ final class SocialiteControllerTest extends TestCase
             'groups' => ['Example-ReadOnly-Group'],
         ];
 
-        $result = $this->runSetRolesFromClaimTest(
+        $result = $this->runGetAuthorizedRolesTest(
             'okta', $rawAttributes, ['global-read'],
             [
                 'Example-Admin-Group' => ['roles' => ['admin']],
@@ -136,7 +134,24 @@ final class SocialiteControllerTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testSetRolesFromClaimSaml2Admin(): void
+    public function testGetAuthorizedRolesAccessDenied(): void
+    {
+        // Test scenario where no matching claims exist and default_role is 'none'
+        $rawAttributes = [
+            'email' => 'stranger@example.com',
+            'groups' => ['Unknown-Group'],
+        ];
+
+        $this->runGetAuthorizedRolesTest(
+            'okta', $rawAttributes, false, // Should return false (Access Denied)
+            [
+                'G_librenms_admins' => ['roles' => ['admin']],
+                'G_librenms_users' => ['roles' => ['global-read']],
+            ]
+        );
+    }
+
+    public function testGetAuthorizedRolesSaml2Admin(): void
     {
         // we don't import LightSaml\Model\Assertion\Attribute for testing
         $attr = new class
@@ -164,7 +179,8 @@ final class SocialiteControllerTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testSetRolesFromClaimSaml2GlobalRead(): void
+
+    public function testGetAuthorizedRolesSaml2GlobalRead(): void
     {
         // we don't import LightSaml\Model\Assertion\Attribute for testing
         $attr = new class
