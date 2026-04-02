@@ -86,6 +86,7 @@ final class SocialiteControllerTest extends TestCase
 
     public function testGetAuthorizedRolesOktaAdmin(): void
     {
+        // Test with a 'groups' value that should result in a role of ['admin'].
         $rawAttributes = [
             'sub' => '00REDACTED',
             'name' => 'Citizen, John',
@@ -111,6 +112,7 @@ final class SocialiteControllerTest extends TestCase
 
     public function testGetAuthorizedRolesOktaGlobalRead(): void
     {
+        // Test with a 'groups' value that should result in a role of ['global-read'].
         $rawAttributes = [
             'sub' => '00REDACTED',
             'name' => 'Citizen, John',
