@@ -169,7 +169,7 @@ final class SocialiteControllerTest extends TestCase
             }
         };
 
-        $result = $this->runSetRolesFromClaimTest(
+        $result = $this->runGetAuthorizedRolesTest(
             'saml2',
             [$attr],
             ['admin'],
@@ -197,7 +197,7 @@ final class SocialiteControllerTest extends TestCase
             }
         };
 
-        $result = $this->runSetRolesFromClaimTest(
+        $result = $this->runGetAuthorizedRolesTest(
             'saml2',
             [$attr],
             ['global-read'],
