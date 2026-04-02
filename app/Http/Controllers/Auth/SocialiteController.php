@@ -168,7 +168,9 @@ class SocialiteController extends Controller
 
         $claimField = LibrenmsConfig::get("auth.socialite.configs.$provider.claim_field");
         $scopeValues = $claimField !== null
-            ? Arr::wrap($attributes[$claimField] ?? [])
+            ? collect(Arr::wrap($claimField))
+                ->flatMap(fn ($field) => Arr::wrap($attributes[$field] ?? []))
+                ->all()
             : collect($attributes)
                 ->filter(fn ($values, $name) => collect($scopes)->contains(fn ($scope) => str_contains((string) $name, (string) $scope)))
                 ->flatten()
