@@ -139,13 +139,13 @@ modules:
                     descr: '{{ RPS-SC200-MIB::di-Name }}'
                     index: 'di.{{ $index }}'
                     states:
-                      - { descr: 'OK',      graph: 0, value: 0, generic: 0 }
-                      - { descr: 'Warning', graph: 0, value: 1, generic: 1 }
-                      - { descr: 'Major',   graph: 0, value: 2, generic: 2 }
-                      - { descr: 'Minor',   graph: 0, value: 3, generic: 2 }
-                      - { descr: 'Reserved',graph: 0, value: 4, generic: 3 }
-                      - { descr: 'Critical',graph: 0, value: 5, generic: 2 }
-                      - { descr: 'Control', graph: 0, value: 6, generic: 3 }
+                      - { descr: 'OK',      value: 0, generic: 0 }
+                      - { descr: 'Warning', value: 1, generic: 1 }
+                      - { descr: 'Major',   value: 2, generic: 2 }
+                      - { descr: 'Minor',   value: 3, generic: 2 }
+                      - { descr: 'Reserved',value: 4, generic: 3 }
+                      - { descr: 'Critical',value: 5, generic: 2 }
+                      - { descr: 'Control', value: 6, generic: 3 }
                     skip_values:
                     -
                       oid: RPS-SC200-MIB::di-Status
@@ -158,8 +158,8 @@ modules:
                     descr: 'Alarm Summary Critical'
                     state_name: summary-Alarm-Critical
                     states:
-                      - { descr: 'OK',      graph: 0, value: 0, generic: 0 }
-                      - { descr: 'Active',  graph: 1, value: 1, generic: 1 }
+                      - { descr: 'OK',      value: 0, generic: 0 }
+                      - { descr: 'Active',  value: 1, generic: 1 }
                 -
                     oid: RPS-SC200-MIB::summary-Alarm-Major
                     value: RPS-SC200-MIB::summary-Alarm-Major
@@ -167,8 +167,8 @@ modules:
                     descr: 'Alarm Summary Major'
                     state_name: summary-Alarm-Major
                     states:
-                      - { descr: 'OK',      graph: 0, value: 0, generic: 0 }
-                      - { descr: 'Active',  graph: 1, value: 1, generic: 1 }
+                      - { descr: 'OK',      value: 0, generic: 0 }
+                      - { descr: 'Active',  value: 1, generic: 1 }
                 -
                     oid: RPS-SC200-MIB::summary-Alarm-Minor
                     value: RPS-SC200-MIB::summary-Alarm-Minor
@@ -176,5 +176,5 @@ modules:
                     descr: 'Alarm Summary Minor'
                     state_name: summary-Alarm-Minor
                     states:
-                      - { descr: 'OK',      graph: 0, value: 0, generic: 0 }
-                      - { descr: 'Active',  graph: 1, value: 1, generic: 1 }
+                      - { descr: 'OK',      value: 0, generic: 0 }
+                      - { descr: 'Active',  value: 1, generic: 1 }

@@ -4022,28 +4022,24 @@
                 {
                     "state_name": "panMgmtPanorama2Connected",
                     "state_descr": "Not-Connected",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "panMgmtPanorama2Connected",
                     "state_descr": "Connected",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "panMgmtPanoramaConnected",
                     "state_descr": "Not-Connected",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "panMgmtPanoramaConnected",
                     "state_descr": "Connected",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 }

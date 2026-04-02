@@ -19,8 +19,8 @@ modules:
                     index: "pepVpnStatusConnectionState.{{ $index }}"
                     state_name: pepVpnStatusConnectionState
                     states:
-                        - { descr: start, graph: 1, value: 0, generic: 3 }
-                        - { descr: authen, graph: 1, value: 1, generic: 3 }
-                        - { descr: tunnel, graph: 1, value: 2, generic: 3 }
-                        - { descr: route, graph: 1, value: 3, generic: 3 }
-                        - { descr: connected, graph: 1, value: 4, generic: 0 }
+                        - { descr: start, value: 0, generic: 3 }
+                        - { descr: authen, value: 1, generic: 3 }
+                        - { descr: tunnel, value: 2, generic: 3 }
+                        - { descr: route, value: 3, generic: 3 }
+                        - { descr: connected, value: 4, generic: 0 }

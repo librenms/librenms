@@ -100,10 +100,10 @@ modules:
                     descr: 'Config {{ $index }} Load  State'
                     state_name: rosMgmtConfigLoadState
                     states:
-                        - { graph: 0, value: 1, generic: 1, descr: ready }
-                        - { graph: 0, value: 2, generic: 1, descr: running }
-                        - { graph: 0, value: 3, generic: 0, descr: successful }
-                        - { graph: 0, value: 4, generic: 2, descr: failed }
+                        - { value: 1, generic: 1, descr: ready }
+                        - { value: 2, generic: 1, descr: running }
+                        - { value: 3, generic: 0, descr: successful }
+                        - { value: 4, generic: 2, descr: failed }
                 -
                     oid: ROSMGMT-ALARM-MGMT-MIB::rosMgmtAlarmMgmtMonitorLevel
                     value: ROSMGMT-ALARM-MGMT-MIB::rosMgmtAlarmMgmtMonitorLevel
@@ -111,9 +111,9 @@ modules:
                     descr: 'The level of Alarm Monitor'
                     state_name: rosMgmtAlarmMgmtMonitorLevel
                     states:
-                        - { graph: 0, value: 1, generic: 0, descr: clear }
-                        - { graph: 0, value: 2, generic: 0, descr: indeterminate }
-                        - { graph: 0, value: 3, generic: 2, descr: critical }
-                        - { graph: 0, value: 4, generic: 2, descr: major }
-                        - { graph: 0, value: 5, generic: 1, descr: minor }
-                        - { graph: 0, value: 6, generic: 1, descr: warning }
+                        - { value: 1, generic: 0, descr: clear }
+                        - { value: 2, generic: 0, descr: indeterminate }
+                        - { value: 3, generic: 2, descr: critical }
+                        - { value: 4, generic: 2, descr: major }
+                        - { value: 5, generic: 1, descr: minor }
+                        - { value: 6, generic: 1, descr: warning }

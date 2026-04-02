@@ -13,6 +13,6 @@ modules:
                     descr: 'Acquisition State'
                     state_name: acquisitionState
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  1, generic: 2, graph: 1, descr: 'Un-Locked' }
-                        - { value:  0, generic: 0, graph: 1, descr: 'Locked' }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  1, generic: 2, descr: 'Un-Locked' }
+                        - { value:  0, generic: 0, descr: 'Locked' }
