@@ -428,105 +428,90 @@
                 {
                     "state_name": "GPSLinkStatus",
                     "state_descr": "Invalid",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "GPSLinkStatus",
                     "state_descr": "Valid",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "linkStatus",
                     "state_descr": "Disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "linkStatus",
                     "state_descr": "Marginal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "linkStatus",
                     "state_descr": "Connected",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "LocalGPSLinkStatus",
                     "state_descr": "Invalid",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "LocalGPSLinkStatus",
                     "state_descr": "Valid",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "NetworkGPSLinkStatus",
                     "state_descr": "Invalid",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "NetworkGPSLinkStatus",
                     "state_descr": "Valid",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "PositionerConnection",
                     "state_descr": "Disconnected",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "PositionerConnection",
                     "state_descr": "Connected",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "PositionerHeadingState",
                     "state_descr": "Invalid",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "PositionerHeadingState",
                     "state_descr": "Valid",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "PositionerMovement",
                     "state_descr": "Stopped",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "PositionerMovement",
                     "state_descr": "Moving",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 }

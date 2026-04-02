@@ -29,8 +29,8 @@ if ($switch) {
     //Create State Index
     $state_name = 'switchInput';
     $states = [
-        ['value' => 0, 'generic' => 1, 'graph' => 1, 'descr' => 'Open'],
-        ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Closed'],
+        ['value' => 0, 'generic' => 1, 'descr' => 'Open'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'Closed'],
     ];
     create_state_index($state_name, $states);
 

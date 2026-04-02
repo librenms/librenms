@@ -13,10 +13,10 @@ modules:
                     index: 'plugStatus.{{ $index }}'
                     descr: '{{ WTI-POWER-MIB::plugName }} State'
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: outletOn }
-                        - { value: 0, generic: 3, graph: 0, descr: outletOff }
-                        - { value: 2, generic: 1, graph: 0, descr: outletReboot }
-                        - { value: 4, generic: 2, graph: 0, descr: outletUnknown }
+                        - { value: 1, generic: 0, descr: outletOn }
+                        - { value: 0, generic: 3, descr: outletOff }
+                        - { value: 2, generic: 1, descr: outletReboot }
+                        - { value: 4, generic: 2, descr: outletUnknown }
         temperature:
             data:
                 -

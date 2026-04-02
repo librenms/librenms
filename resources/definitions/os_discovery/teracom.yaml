@@ -77,9 +77,9 @@ modules:
                     index: '.hardwareErr0'
                     state_name: hardwareErr
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: noErr }
-                        - { value: 1, generic: 1, graph: 0, descr: owErr }
-                        - { value: 2, generic: 2, graph: 0, descr: hwErr }
+                        - { value: 0, generic: 0, descr: noErr }
+                        - { value: 1, generic: 1, descr: owErr }
+                        - { value: 2, generic: 2, descr: hwErr }
                 -
                     oid: TERACOM-TCW241-MIB::s11Al
                     value: TERACOM-TCW241-MIB::s11Al
@@ -89,8 +89,8 @@ modules:
                     index: 's11Al.0'
                     state_name: s11Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s11Int
@@ -105,8 +105,8 @@ modules:
                     index: 's12Al.0'
                     state_name: s12Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s12Int
@@ -121,8 +121,8 @@ modules:
                     index: 's21Al.0'
                     state_name: s21Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s21Int
@@ -137,8 +137,8 @@ modules:
                     index: 's22Al.0'
                     state_name: s22Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s22Int
@@ -153,8 +153,8 @@ modules:
                     index: 's31Al.0'
                     state_name: s31Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s31Int
@@ -169,8 +169,8 @@ modules:
                     index: 's32Al.0'
                     state_name: s32Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s32Int
@@ -185,8 +185,8 @@ modules:
                     index: 's41Al.0'
                     state_name: s41Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s41Int
@@ -201,8 +201,8 @@ modules:
                     index: 's42Al.0'
                     state_name: s42Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s42Int
@@ -217,8 +217,8 @@ modules:
                     index: 's51Al.0'
                     state_name: s51Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s51Int
@@ -233,8 +233,8 @@ modules:
                     index: 's52Al.0'
                     state_name: s52Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s52Int
@@ -249,8 +249,8 @@ modules:
                     index: 's61Al.0'
                     state_name: s61Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s61Int
@@ -265,8 +265,8 @@ modules:
                     index: 's62Al.0'
                     state_name: s62Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s62Int
@@ -281,8 +281,8 @@ modules:
                     index: 's71Al.0'
                     state_name: s71Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s71Int
@@ -297,8 +297,8 @@ modules:
                     index: 's72Al.0'
                     state_name: s72Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s72Int
@@ -313,8 +313,8 @@ modules:
                     index: 's81Al.0'
                     state_name: s81Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s81Int
@@ -329,8 +329,8 @@ modules:
                     index: 's82Al.0'
                     state_name: s82Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::s82Int
@@ -345,8 +345,8 @@ modules:
                     index: 'volt1Al.0'
                     state_name: volt1Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::voltage1Int
@@ -361,8 +361,8 @@ modules:
                     index: 'volt2Al.0'
                     state_name: volt2Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::voltage2Int
@@ -377,8 +377,8 @@ modules:
                     index: 'volt3Al.0'
                     state_name: volt3Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::voltage3Int
@@ -393,8 +393,8 @@ modules:
                     index: 'volt4Al.0'
                     state_name: volt4Al
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: alarm }
                     skip_values:
                         -
                             oid: TERACOM-TCW241-MIB::voltage4Int
@@ -409,8 +409,8 @@ modules:
                     index: 'digitalInput1State.0'
                     state_name: digitalInput1State
                     states:
-                        - { value: 0, generic: 1, graph: 0, descr: closed }
-                        - { value: 1, generic: 0, graph: 0, descr: open }
+                        - { value: 0, generic: 1, descr: closed }
+                        - { value: 1, generic: 0, descr: open }
                 -
                     oid: TERACOM-TCW241-MIB::digitalInput2State
                     value: TERACOM-TCW241-MIB::digitalInput2State
@@ -420,8 +420,8 @@ modules:
                     index: 'digitalInput2State.0'
                     state_name: digitalInput2State
                     states:
-                        - { value: 0, generic: 1, graph: 0, descr: closed }
-                        - { value: 1, generic: 0, graph: 0, descr: open }
+                        - { value: 0, generic: 1, descr: closed }
+                        - { value: 1, generic: 0, descr: open }
                 -
                     oid: TERACOM-TCW241-MIB::digitalInput3State
                     value: TERACOM-TCW241-MIB::digitalInput3State
@@ -431,8 +431,8 @@ modules:
                     index: 'digitalInput3State.0'
                     state_name: digitalInput3State
                     states:
-                        - { value: 0, generic: 1, graph: 0, descr: closed }
-                        - { value: 1, generic: 0, graph: 0, descr: open }
+                        - { value: 0, generic: 1, descr: closed }
+                        - { value: 1, generic: 0, descr: open }
                 -
                     oid: TERACOM-TCW241-MIB::digitalInput4State
                     value: TERACOM-TCW241-MIB::digitalInput4State
@@ -442,8 +442,8 @@ modules:
                     index: 'digitalInput4State.0'
                     state_name: digitalInput4State
                     states:
-                        - { value: 0, generic: 1, graph: 0, descr: closed }
-                        - { value: 1, generic: 0, graph: 0, descr: open }
+                        - { value: 0, generic: 1, descr: closed }
+                        - { value: 1, generic: 0, descr: open }
                 -
                     oid: TERACOM-TCW241-MIB::relay1State
                     value: TERACOM-TCW241-MIB::relay1State
@@ -453,8 +453,8 @@ modules:
                     index: 'relay1State.0'
                     state_name: relay1State
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: off }
-                        - { value: 1, generic: 0, graph: 0, descr: on }
+                        - { value: 0, generic: 0, descr: off }
+                        - { value: 1, generic: 0, descr: on }
                 -
                     oid: TERACOM-TCW241-MIB::relay2State
                     value: TERACOM-TCW241-MIB::relay2State
@@ -464,8 +464,8 @@ modules:
                     index: 'relay2State.0'
                     state_name: relay2State
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: off }
-                        - { value: 1, generic: 0, graph: 0, descr: on }
+                        - { value: 0, generic: 0, descr: off }
+                        - { value: 1, generic: 0, descr: on }
                 -
                     oid: TERACOM-TCW241-MIB::relay3State
                     value: TERACOM-TCW241-MIB::relay3State
@@ -475,8 +475,8 @@ modules:
                     index: 'relay3State.0'
                     state_name: relay3State
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: off }
-                        - { value: 1, generic: 0, graph: 0, descr: on }
+                        - { value: 0, generic: 0, descr: off }
+                        - { value: 1, generic: 0, descr: on }
                 -
                     oid: TERACOM-TCW241-MIB::relay4State
                     value: TERACOM-TCW241-MIB::relay4State
@@ -486,8 +486,8 @@ modules:
                     index: 'relay4State.0'
                     state_name: relay4State
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: off }
-                        - { value: 1, generic: 0, graph: 0, descr: on }
+                        - { value: 0, generic: 0, descr: off }
+                        - { value: 1, generic: 0, descr: on }
         voltage:
             options:
                 skip_value_lt: 100

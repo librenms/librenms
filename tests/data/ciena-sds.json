@@ -34644,1435 +34644,1230 @@
                 {
                     "state_name": "cienaCesChassisCPUHealthStateCPUUsage",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisCPUHealthStateCPUUsage",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisCPUHealthStateCPUUsage",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisCPUHealthStateCPUUsage",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisCPUHealthStateCPUUsage",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateFlash0",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateFlash0",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateFlash0",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateFlash0",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateFlash0",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateRAM",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateRAM",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateRAM",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateRAM",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateRAM",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateUSB",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateUSB",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateUSB",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateUSB",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisDiskHealthStateUSB",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisFanStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisFanStatus",
                     "state_descr": "pending",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisFanStatus",
                     "state_descr": "rpm-warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisFanStatus",
                     "state_descr": "uninstalled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisFanStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisFanTrayStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisFanTrayStatus",
                     "state_descr": "pending",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisFanTrayStatus",
                     "state_descr": "rpm-warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisFanTrayStatus",
                     "state_descr": "uninstalled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisFanTrayStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisMemoryHealthStateGlobalHeap",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisMemoryHealthStateGlobalHeap",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisMemoryHealthStateGlobalHeap",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisMemoryHealthStateGlobalHeap",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisMemoryHealthStateGlobalHeap",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisMemoryHealthStateHeap1",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisMemoryHealthStateHeap1",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisMemoryHealthStateHeap1",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisMemoryHealthStateHeap1",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisMemoryHealthStateHeap1",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisPowerOutputVoltageHealthTable",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisPowerOutputVoltageHealthTable",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisPowerOutputVoltageHealthTable",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerOutputVoltageHealthTable",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerOutputVoltageHealthTable",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateACInput",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateACInput",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateACInput",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateACInput",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateACInput",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateLoadFuse",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateLoadFuse",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateLoadFuse",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateLoadFuse",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateLoadFuse",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateOverloadFan",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateOverloadFan",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateOverloadFan",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateOverloadFan",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateOverloadFan",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateOverloadProtection",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateOverloadProtection",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateOverloadProtection",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateOverloadProtection",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateOverloadProtection",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateTemperature",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateTemperature",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateTemperature",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateTemperature",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateTemperature",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateVoltageRegulator",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateVoltageRegulator",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateVoltageRegulator",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateVoltageRegulator",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerParamsHealthStateVoltageRegulator",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisPowerSupplyState",
                     "state_descr": "online",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisPowerSupplyState",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisPowerSupplyState",
                     "state_descr": "offline",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisPowerSupplyState",
                     "state_descr": "uninstalled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisPowerSupplyType",
                     "state_descr": "ac",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisPowerSupplyType",
                     "state_descr": "dc",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisPowerSupplyType",
                     "state_descr": "unequipped",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisPowerSupplyType",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 99,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisProcessHealthState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisProcessHealthState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisProcessHealthState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisProcessHealthState",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisProcessHealthState",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisSMFabricHealthState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisSMFabricHealthState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisSMFabricHealthState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisSMFabricHealthState",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisSMFabricHealthState",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisSMHealthState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisSMHealthState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisSMHealthState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisSMHealthState",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisSMHealthState",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesChassisThreadHealthState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesChassisThreadHealthState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesChassisThreadHealthState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisThreadHealthState",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesChassisThreadHealthState",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesModuleAdminState",
                     "state_descr": "enabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleAdminState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleAdminState",
                     "state_descr": "shutdown",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "snmp",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "pwrFail",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "appLoad",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "errorHandler",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "watchdog",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "upgrade",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "cli",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "resetButton",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "failOver",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "faultManager",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "communicationFailure",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "configurationRevert",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "unprotectedFailure",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "bootFailure",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "softwareRevert",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "processorWarmRestart",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "coldRestart",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleLastRebootReason",
                     "state_descr": "primaryRestart",
-                    "state_draw_graph": 0,
                     "state_value": 19,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "uninstalled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "unequipped",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "init",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "enabled",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "hotswap",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "poweroff",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "hitlessInit",
-                    "state_draw_graph": 0,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "fastReload",
-                    "state_draw_graph": 0,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "krnInit",
-                    "state_draw_graph": 0,
                     "state_value": 11,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "unsupported",
-                    "state_draw_graph": 0,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "installing",
-                    "state_draw_graph": 0,
                     "state_value": 13,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "failed",
-                    "state_draw_graph": 0,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "krnDisable",
-                    "state_draw_graph": 0,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "appFault",
-                    "state_draw_graph": 0,
                     "state_value": 16,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "booting",
-                    "state_draw_graph": 0,
                     "state_value": 17,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleOperState",
                     "state_descr": "powerdown",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesModuleProtectionRole",
                     "state_descr": "none",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleProtectionRole",
                     "state_descr": "primary",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleProtectionRole",
                     "state_descr": "secondary",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleStandbyStatus",
                     "state_descr": "none",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleStandbyStatus",
                     "state_descr": "cold",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleStandbyStatus",
                     "state_descr": "warm",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleStandbyStatus",
                     "state_descr": "hot",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesModuleStandbyStatus",
                     "state_descr": "protected",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesPortXcvrTxFaultStatus",
                     "state_descr": "fault",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesPortXcvrTxFaultStatus",
                     "state_descr": "noFault",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesPortXcvrTxState",
                     "state_descr": "enabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesPortXcvrTxState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesPremiumFeatureOperStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesPremiumFeatureOperStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesPremiumFeatureOperStatus",
                     "state_descr": "restrictedUse",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesPremiumFeatureOperStatus",
                     "state_descr": "fullyActive",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesPremiumFeatureOperStatus",
                     "state_descr": "someLicenseKeyMissing",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesPremiumFeatureOperStatus",
                     "state_descr": "licenseViolation",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingEastPortState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingEastPortState",
                     "state_descr": "forwarding",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingEastPortState",
                     "state_descr": "blocked",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingEastPortStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingEastPortStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingEastPortStatus",
                     "state_descr": "ccmFailure",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingEastPortStatus",
                     "state_descr": "localForceSwitch",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingEastPortStatus",
                     "state_descr": "remoteForceSwitch",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingEastPortStatus",
                     "state_descr": "remoteSignalFailure",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingState",
                     "state_descr": "adminDisabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingState",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingState",
                     "state_descr": "protecting",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingState",
                     "state_descr": "recovering",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingState",
                     "state_descr": "init",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingState",
                     "state_descr": "none",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingStatus",
                     "state_descr": "clear",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingStatus",
                     "state_descr": "localSignalFail",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingStatus",
                     "state_descr": "localForceSwitch",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingStatus",
                     "state_descr": "remoteOrOtherPortSignalFail",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingStatus",
                     "state_descr": "remoteOrOtherPortForceSwitch",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingStatus",
                     "state_descr": "provisioningMismatch",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingStatus",
                     "state_descr": "noRapsPduReceived",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingStatus",
                     "state_descr": "noRplOwnerDetected",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingWestPortState",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingWestPortState",
                     "state_descr": "forwarding",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingWestPortState",
                     "state_descr": "blocked",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingWestPortStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingWestPortStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingWestPortStatus",
                     "state_descr": "ccmFailure",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingWestPortStatus",
                     "state_descr": "localForceSwitch",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingWestPortStatus",
                     "state_descr": "remoteForceSwitch",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "cienaCesRapsVirtualRingWestPortStatus",
                     "state_descr": "remoteSignalFailure",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "wwpLeosSystemCpuUtilizationLast10SecondsState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "wwpLeosSystemCpuUtilizationLast10SecondsState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "wwpLeosSystemCpuUtilizationLast10SecondsState",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "wwpLeosSystemCpuUtilizationLast10SecondsState",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "wwpLeosSystemCpuUtilizationLast5SecondsState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "wwpLeosSystemCpuUtilizationLast5SecondsState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "wwpLeosSystemCpuUtilizationLast5SecondsState",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "wwpLeosSystemCpuUtilizationLast5SecondsState",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "wwpLeosSystemCpuUtilizationLast60SecondsState",
                     "state_descr": "normal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "wwpLeosSystemCpuUtilizationLast60SecondsState",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "wwpLeosSystemCpuUtilizationLast60SecondsState",
                     "state_descr": "degraded",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "wwpLeosSystemCpuUtilizationLast60SecondsState",
                     "state_descr": "faulted",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 }

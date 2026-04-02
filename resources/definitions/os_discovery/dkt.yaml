@@ -13,8 +13,8 @@ modules:
                     descr: 'CATV Signal Detect'
                     index: '0'
                     states:
-                        - { descr: Signal Ok, graph: 0, value: 1, generic: 0 }
-                        - { descr: No Signal, graph: 0, value: 0, generic: 3 }
+                        - { descr: Signal Ok, value: 1, generic: 0 }
+                        - { descr: No Signal, value: 0, generic: 3 }
                 -
                     oid: DKT-CATV-MIB::catvSwitch
                     value: DKT-CATV-MIB::catvSwitch
@@ -23,5 +23,5 @@ modules:
                     descr: 'CATV Module'
                     index: '0'
                     states:
-                        - { descr: Powered, graph: 0, value: 1, generic: 0 }
-                        - { descr: Not powered, graph: 0, value: 0, generic: 3 }
+                        - { descr: Powered, value: 1, generic: 0 }
+                        - { descr: Not powered, value: 0, generic: 3 }

@@ -29,6 +29,6 @@ modules:
           high_limit: 1
           state_name: NetBotz50-MIB::smokeSensor
           states:
-            - { value: -1, descr: 'undefined',      generic: 3, graph: 0 }
-            - { value:  0, descr: 'no smoke',       generic: 0, graph: 0 }
-            - { value:  1, descr: 'smoke detected', generic: 2, graph: 0 }
+            - { value: -1, descr: 'undefined',      generic: 3,  }
+            - { value:  0, descr: 'no smoke',       generic: 0,  }
+            - { value:  1, descr: 'smoke detected', generic: 2,  }

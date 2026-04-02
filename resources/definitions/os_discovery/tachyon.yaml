@@ -91,9 +91,9 @@ modules:
                     group: Wireless
                     state_name: wirelessVapOperationMode
                     states:
-                        - { descr: master, graph: 1, value: 0, generic: 0 }
-                        - { descr: no-connection, graph: 1, value: 1, generic: 2 }
-                        - { descr: stations, graph: 1, value: 2, generic: 0 }
+                        - { descr: master, value: 0, generic: 0 }
+                        - { descr: no-connection, value: 1, generic: 2 }
+                        - { descr: stations, value: 2, generic: 0 }
 
                 -
                     oid: TACHYON-MIB::wirelessVapSecurity
@@ -103,8 +103,8 @@ modules:
                     group: Wireless
                     state_name: wirelessVapSecurity
                     states:
-                        - { descr: Open, graph: 1, value: 0, generic: 0 }
-                        - { descr: WPA2-PSK (GCMP), graph: 1, value: 1, generic: 0 }
+                        - { descr: Open, value: 0, generic: 0 }
+                        - { descr: WPA2-PSK (GCMP), value: 1, generic: 0 }
 
                 -
                     oid: TACHYON-MIB::wirelessPeerAntennaKit
@@ -114,12 +114,12 @@ modules:
                     index: 'wirelessPeerAntennaKit.{{ $index }}'
                     state_name: wirelessPeerAntennaKit
                     states:
-                        - { descr: none, graph: 1, value: 0, generic: 0 }
-                        - { descr: ak-100, graph: 1, value: 1, generic: 0 }
-                        - { descr: ak-150, graph: 1, value: 2, generic: 0 }
-                        - { descr: ak-300, graph: 1, value: 3, generic: 0 }
-                        - { descr: ak-s-45, graph: 1, value: 4, generic: 0 }
-                        - { descr: ak-s-90, graph: 1, value: 4, generic: 0 }
+                        - { descr: none, value: 0, generic: 0 }
+                        - { descr: ak-100, value: 1, generic: 0 }
+                        - { descr: ak-150, value: 2, generic: 0 }
+                        - { descr: ak-300, value: 3, generic: 0 }
+                        - { descr: ak-s-45, value: 4, generic: 0 }
+                        - { descr: ak-s-90, value: 4, generic: 0 }
 
                 -
                     oid: TACHYON-MIB::wirelessPeerTxMcs
@@ -129,20 +129,20 @@ modules:
                     index: wirelessPeerTxMcs.{{ $index }}
                     state_name: wirelessPeerTxMcs
                     states:
-                        - { value: 0, descr: mcs0, graph: 1, generic: 1 }
-                        - { value: 1, descr: mcs1, graph: 1, generic: 1 }
-                        - { value: 2, descr: mcs2, graph: 1, generic: 1 }
-                        - { value: 3, descr: mcs3, graph: 1, generic: 1 }
-                        - { value: 4, descr: mcs4, graph: 1, generic: 2 }
-                        - { value: 5, descr: mcs5, graph: 1, generic: 2 }
-                        - { value: 6, descr: mcs6, graph: 1, generic: 2 }
-                        - { value: 7, descr: mcs7, graph: 1, generic: 2 }
-                        - { value: 8, descr: mcs8, graph: 1, generic: 0 }
-                        - { value: 9, descr: mcs9, graph: 1, generic: 0 }
-                        - { value: 10, descr: mcs10, graph: 1, generic: 0 }
-                        - { value: 11, descr: mcs11, graph: 1, generic: 0 }
-                        - { value: 12, descr: mcs12, graph: 1, generic: 0 }
-                        - { value: 13, descr: mcs13, graph: 1, generic: 0 }
+                        - { value: 0, descr: mcs0, generic: 1 }
+                        - { value: 1, descr: mcs1, generic: 1 }
+                        - { value: 2, descr: mcs2, generic: 1 }
+                        - { value: 3, descr: mcs3, generic: 1 }
+                        - { value: 4, descr: mcs4, generic: 2 }
+                        - { value: 5, descr: mcs5, generic: 2 }
+                        - { value: 6, descr: mcs6, generic: 2 }
+                        - { value: 7, descr: mcs7, generic: 2 }
+                        - { value: 8, descr: mcs8, generic: 0 }
+                        - { value: 9, descr: mcs9, generic: 0 }
+                        - { value: 10, descr: mcs10, generic: 0 }
+                        - { value: 11, descr: mcs11, generic: 0 }
+                        - { value: 12, descr: mcs12, generic: 0 }
+                        - { value: 13, descr: mcs13, generic: 0 }
 
                 -
                     oid: TACHYON-MIB::wirelessPeerRxMcs
@@ -152,17 +152,17 @@ modules:
                     index: wirelessPeerRxMcs.{{ $index }}
                     state_name: wirelessPeerRxMcs
                     states:
-                        - { value: 0, descr: mcs0, graph: 1, generic: 1 }
-                        - { value: 1, descr: mcs1, graph: 1, generic: 1 }
-                        - { value: 2, descr: mcs2, graph: 1, generic: 1 }
-                        - { value: 3, descr: mcs3, graph: 1, generic: 1 }
-                        - { value: 4, descr: mcs4, graph: 1, generic: 2 }
-                        - { value: 5, descr: mcs5, graph: 1, generic: 2 }
-                        - { value: 6, descr: mcs6, graph: 1, generic: 2 }
-                        - { value: 7, descr: mcs7, graph: 1, generic: 2 }
-                        - { value: 8, descr: mcs8, graph: 1, generic: 0 }
-                        - { value: 9, descr: mcs9, graph: 1, generic: 0 }
-                        - { value: 10, descr: mcs10, graph: 1, generic: 0 }
-                        - { value: 11, descr: mcs11, graph: 1, generic: 0 }
-                        - { value: 12, descr: mcs12, graph: 1, generic: 0 }
-                        - { value: 13, descr: mcs13, graph: 1, generic: 0 }
+                        - { value: 0, descr: mcs0, generic: 1 }
+                        - { value: 1, descr: mcs1, generic: 1 }
+                        - { value: 2, descr: mcs2, generic: 1 }
+                        - { value: 3, descr: mcs3, generic: 1 }
+                        - { value: 4, descr: mcs4, generic: 2 }
+                        - { value: 5, descr: mcs5, generic: 2 }
+                        - { value: 6, descr: mcs6, generic: 2 }
+                        - { value: 7, descr: mcs7, generic: 2 }
+                        - { value: 8, descr: mcs8, generic: 0 }
+                        - { value: 9, descr: mcs9, generic: 0 }
+                        - { value: 10, descr: mcs10, generic: 0 }
+                        - { value: 11, descr: mcs11, generic: 0 }
+                        - { value: 12, descr: mcs12, generic: 0 }
+                        - { value: 13, descr: mcs13, generic: 0 }

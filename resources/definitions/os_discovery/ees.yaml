@@ -154,16 +154,16 @@ modules:
           descr: 'System Status'
           index: 'systemStatus.0'
           states:
-            - { descr: unknown,   graph: 1, value: 1,  generic: 3 }
-            - { descr: normal,    graph: 1, value: 2,  generic: 0 }
-            - { descr: warning,   graph: 1, value: 3,  generic: 1 }
-            - { descr: minor,     graph: 1, value: 4,  generic: 1 }
-            - { descr: major,     graph: 1, value: 5,  generic: 2 }
-            - { descr: critical,  graph: 1, value: 6,  generic: 2 }
-            - { descr: unmanaged, graph: 1, value: 7,  generic: 1 }
-            - { descr: restricted,graph: 1, value: 8,  generic: 1 }
-            - { descr: testing,   graph: 1, value: 9,  generic: 3 }
-            - { descr: disabled,  graph: 1, value: 10, generic: 1 }
+            - { descr: unknown,   value: 1,  generic: 3 }
+            - { descr: normal,    value: 2,  generic: 0 }
+            - { descr: warning,   value: 3,  generic: 1 }
+            - { descr: minor,     value: 4,  generic: 1 }
+            - { descr: major,     value: 5,  generic: 2 }
+            - { descr: critical,  value: 6,  generic: 2 }
+            - { descr: unmanaged, value: 7,  generic: 1 }
+            - { descr: restricted,value: 8,  generic: 1 }
+            - { descr: testing,   value: 9,  generic: 3 }
+            - { descr: disabled,  value: 10, generic: 1 }
 
         - oid: EES-POWER-MIB::psStatusCommunication
           state_name: psStatusCommunication
@@ -171,9 +171,9 @@ modules:
           descr: 'Communication Status'
           index: 'psStatusCommunication.0'
           states:
-            - { descr: unknown,   graph: 1, value: 1, generic: 3 }
-            - { descr: normal,    graph: 1, value: 2, generic: 0 }
-            - { descr: interrupt, graph: 1, value: 3, generic: 2 }
+            - { descr: unknown,   value: 1, generic: 3 }
+            - { descr: normal,    value: 2, generic: 0 }
+            - { descr: interrupt, value: 3, generic: 2 }
 
         - oid: EES-POWER-MIB::psStatusBatteryMode
           state_name: psStatusBatteryMode
@@ -181,19 +181,19 @@ modules:
           descr: 'Battery Status'
           index: 'psStatusBatteryMode.0'
           states:
-            - { descr: floatCharging, graph: 1, value: 2,  generic: 0 }
-            - { descr: acFail,        graph: 1, value: 8,  generic: 2 }
-            - { descr: unknown,       graph: 1, value: 1,  generic: 3 }
-            - { descr: shortTest,     graph: 1, value: 3,  generic: 3 }
-            - { descr: bcForTest,     graph: 1, value: 4,  generic: 3 }
-            - { descr: manualTesting, graph: 1, value: 5,  generic: 3 }
-            - { descr: planTesting,   graph: 1, value: 6,  generic: 3 }
-            - { descr: acFailTesting, graph: 1, value: 7,  generic: 3 }
-            - { descr: manualBC,      graph: 1, value: 9,  generic: 3 }
-            - { descr: autoBC,        graph: 1, value: 10, generic: 3 }
-            - { descr: cyclicBC,      graph: 1, value: 11, generic: 3 }
-            - { descr: masterBC,      graph: 1, value: 12, generic: 3 }
-            - { descr: masterBT,      graph: 1, value: 13, generic: 3 }
+            - { descr: floatCharging, value: 2,  generic: 0 }
+            - { descr: acFail,        value: 8,  generic: 2 }
+            - { descr: unknown,       value: 1,  generic: 3 }
+            - { descr: shortTest,     value: 3,  generic: 3 }
+            - { descr: bcForTest,     value: 4,  generic: 3 }
+            - { descr: manualTesting, value: 5,  generic: 3 }
+            - { descr: planTesting,   value: 6,  generic: 3 }
+            - { descr: acFailTesting, value: 7,  generic: 3 }
+            - { descr: manualBC,      value: 9,  generic: 3 }
+            - { descr: autoBC,        value: 10, generic: 3 }
+            - { descr: cyclicBC,      value: 11, generic: 3 }
+            - { descr: masterBC,      value: 12, generic: 3 }
+            - { descr: masterBT,      value: 13, generic: 3 }
 
         - oid: EES-POWER-MIB::psRectifierTable
           state_name: psRectifierFail
@@ -202,5 +202,5 @@ modules:
           index: 'psRectifierFail.{{ $index }}'
           descr: '{{ EES-POWER-MIB::psRectifierIdent }} Fail'
           states:
-            - { descr: fail,   graph: 1, value: 1, generic: 2 }
-            - { descr: normal, graph: 1, value: 2, generic: 0 }
+            - { descr: fail,   value: 1, generic: 2 }
+            - { descr: normal, value: 2, generic: 0 }

@@ -14,10 +14,10 @@ modules:
                     index: 'inputStatusSatLock.{{ $index }}'
                     state_name: inputStatusSatLock
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  1, generic: 2, graph: 1, descr: 'No Lock' }
-                        - { value:  2, generic: 1, graph: 1, descr: 'Lock - Signal' }
-                        - { value:  3, generic: 0, graph: 1, descr: 'Lock + Signal' }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  1, generic: 2, descr: 'No Lock' }
+                        - { value:  2, generic: 1, descr: 'Lock - Signal' }
+                        - { value:  3, generic: 0, descr: 'Lock + Signal' }
         fanspeed:
             options:
                 # Some Models such as D9854 do not report fanspeed, but respond to OID with 0.

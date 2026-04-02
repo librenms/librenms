@@ -46,24 +46,24 @@ modules:
           num_oid: '.1.3.6.1.4.1.23180.2.1.1.2.3.1.{{ $index }}'
           descr: 'Fault Summation Status'
           states:
-            - { value: 0, generic: 0, graph: 0, descr: 'deactivatedAlarm' }
-            - { value: 1, generic: 1, graph: 0, descr: 'activatedAlarm' }
-            - { value: 2, generic: 1, graph: 0, descr: 'disabledAlarm' }
-            - { value: 3, generic: 1, graph: 0, descr: 'noApplyAlarm' }
-            - { value: 6, generic: 3, graph: 0, descr: 'uninitiatedAlarm' }
+            - { value: 0, generic: 0, descr: 'deactivatedAlarm' }
+            - { value: 1, generic: 1, descr: 'activatedAlarm' }
+            - { value: 2, generic: 1, descr: 'disabledAlarm' }
+            - { value: 3, generic: 1, descr: 'noApplyAlarm' }
+            - { value: 6, generic: 3, descr: 'uninitiatedAlarm' }
         - oid: TREDESS-FS-MIB::warningSummationStatus
           num_oid: '.1.3.6.1.4.1.23180.2.1.1.2.3.2.{{ $index }}'
           descr: 'Warning Summation Status'
           states:
-            - { value: 0, generic: 0, graph: 0, descr: 'deactivatedAlarm' }
-            - { value: 1, generic: 1, graph: 0, descr: 'activatedAlarm' }
-            - { value: 2, generic: 1, graph: 0, descr: 'disabledAlarm' }
-            - { value: 3, generic: 1, graph: 0, descr: 'noApplyAlarm' }
-            - { value: 6, generic: 3, graph: 0, descr: 'uninitiatedAlarm' }
+            - { value: 0, generic: 0, descr: 'deactivatedAlarm' }
+            - { value: 1, generic: 1, descr: 'activatedAlarm' }
+            - { value: 2, generic: 1, descr: 'disabledAlarm' }
+            - { value: 3, generic: 1, descr: 'noApplyAlarm' }
+            - { value: 6, generic: 3, descr: 'uninitiatedAlarm' }
         - oid: TREDESS-FS-MIB::rNp1Mode
           num_oid: '.1.3.6.1.4.1.23180.2.1.1.2.2.5.5.5.5.30.{{ $index }}'
           descr: 'Redundancy N+1 Mode'
           states:
-            - { value: 0, generic: 2, graph: 0, descr: 'manual' }
-            - { value: 1, generic: 0, graph: 0, descr: 'automatic' }
-            - { value: 2, generic: 1, graph: 0, descr: 'maintenance' }
+            - { value: 0, generic: 2, descr: 'manual' }
+            - { value: 1, generic: 0, descr: 'automatic' }
+            - { value: 2, generic: 1, descr: 'maintenance' }
