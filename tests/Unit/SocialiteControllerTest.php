@@ -66,12 +66,10 @@ final class SocialiteControllerTest extends TestCase
         $reflectionClass = new \ReflectionClass($controller);
 
         $prop = $reflectionClass->getProperty('socialite_user');
-        $prop->setAccessible(true);
         $prop->setValue($controller, $socialiteUserStub);
 
         // Invoke the private method with the chosen provider.
         $method = $reflectionClass->getMethod('getAuthorizedRoles');
-        $method->setAccessible(true);
 
         $result = $method->invoke($controller, $provider);
 
