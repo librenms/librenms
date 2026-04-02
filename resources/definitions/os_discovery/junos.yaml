@@ -304,9 +304,9 @@ modules:
                     state_name: jnxYellowAlarmState
                     index: '{{ $index }}'
                     states:
-                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 2, descr: off, graph: 1, generic: 0 }
-                        - { value: 3, descr: on, graph: 1, generic: 2 }
+                        - { value: 1, descr: unknown, generic: 3 }
+                        - { value: 2, descr: off, generic: 0 }
+                        - { value: 3, descr: on, generic: 2 }
                 -
                     oid: JUNIPER-ALARM-MIB::jnxRedAlarmState
                     value: JUNIPER-ALARM-MIB::jnxRedAlarmState
@@ -315,9 +315,9 @@ modules:
                     state_name: jnxRedAlarmState
                     index: '{{ $index }}'
                     states:
-                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 2, descr: off, graph: 1, generic: 0 }
-                        - { value: 3, descr: on, graph: 1, generic: 2 }
+                        - { value: 1, descr: unknown, generic: 3 }
+                        - { value: 2, descr: off, generic: 0 }
+                        - { value: 3, descr: on, generic: 2 }
                 -
                     oid: JUNIPER-MIB::jnxFruTable
                     value: JUNIPER-MIB::jnxFruState
@@ -327,16 +327,16 @@ modules:
                     index: 'jnxFruName.{{ $index }}'
                     skip_value_lt: 3
                     states:
-                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 2, descr: empty, graph: 1, generic: 3 }
-                        - { value: 3, descr: present, graph: 1, generic: 1 }
-                        - { value: 4, descr: ready, graph: 1, generic: 0 }
-                        - { value: 5, descr: announceOnline, graph: 1, generic: 0 }
-                        - { value: 6, descr: online, graph: 1, generic: 0 }
-                        - { value: 7, descr: anounceOffline, graph: 1, generic: 1 }
-                        - { value: 8, descr: offline, graph: 1, generic: 2 }
-                        - { value: 9, descr: diagnostic, graph: 1, generic: 3 }
-                        - { value: 10, descr: standby, graph: 1, generic: 3 }
+                        - { value: 1, descr: unknown, generic: 3 }
+                        - { value: 2, descr: empty, generic: 3 }
+                        - { value: 3, descr: present, generic: 1 }
+                        - { value: 4, descr: ready, generic: 0 }
+                        - { value: 5, descr: announceOnline, generic: 0 }
+                        - { value: 6, descr: online, generic: 0 }
+                        - { value: 7, descr: anounceOffline, generic: 1 }
+                        - { value: 8, descr: offline, generic: 2 }
+                        - { value: 9, descr: diagnostic, generic: 3 }
+                        - { value: 10, descr: standby, generic: 3 }
                 -
                     oid: JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberTable
                     value: JUNIPER-VIRTUALCHASSIS-MIB::jnxVirtualChassisMemberRole
@@ -346,9 +346,9 @@ modules:
                     group: Virtual Chassis Members
                     index: 'jnxVirtualChassisMemberSerialnumber.{{ $index }}'
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: master }
-                        - { value: 2, generic: 0, graph: 0, descr: backup }
-                        - { value: 3, generic: 0, graph: 0, descr: linecard }
+                        - { value: 1, generic: 0, descr: master }
+                        - { value: 2, generic: 0, descr: backup }
+                        - { value: 3, generic: 0, descr: linecard }
                 -
                     oid: POWER-ETHERNET-MIB::pethMainPseTable
                     value: POWER-ETHERNET-MIB::pethMainPseOperStatus
@@ -357,9 +357,9 @@ modules:
                     state_name: POWER-ETHERNET-MIB::pethMainPseTable
                     index: 'pethMainPseOperStatus.{{ $index }}'
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: on }
-                        - { value: 2, generic: 0, graph: 0, descr: off }
-                        - { value: 3, generic: 2, graph: 0, descr: fault }
+                        - { value: 1, generic: 0, descr: on }
+                        - { value: 2, generic: 0, descr: off }
+                        - { value: 3, generic: 2, descr: fault }
         power:
             data:
                 -

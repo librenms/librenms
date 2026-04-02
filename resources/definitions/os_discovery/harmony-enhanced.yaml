@@ -21,6 +21,6 @@ modules:
                     index: 'mwrEmcRadioLinkStatus.{{ $index }}'
                     state_name: mwrEmcRadioLinkStatus
                     states:
-                        - { value: -1, generic: 3, graph: 0, descr: 'null' }
-                        - { value:  1, generic: 0, graph: 1, descr: up }
-                        - { value:  2, generic: 2, graph: 1, descr: down }
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  1, generic: 0, descr: up }
+                        - { value:  2, generic: 2, descr: down }

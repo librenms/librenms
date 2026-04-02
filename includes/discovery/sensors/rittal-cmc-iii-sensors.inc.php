@@ -182,13 +182,11 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
             [
                 'value' => 0,
                 'generic' => 0,
-                'graph' => 1,
                 'descr' => $sensor_data['logic'][0],
             ],
             [
                 'value' => 1,
                 'generic' => 0,
-                'graph' => 1,
                 'descr' => $sensor_data['logic'][1],
             ],
         ];

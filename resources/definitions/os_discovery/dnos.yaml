@@ -174,9 +174,9 @@ modules:
                     group: Fans
                     state_name: dellNetFanTrayOperStatus
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: absent, graph: 1, generic: 2 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: absent, generic: 2 }
                 -
                     oid: DELL-NETWORKING-CHASSIS-MIB::dellNetPowerSupplyTable
                     value: DELL-NETWORKING-CHASSIS-MIB::dellNetPowerSupplyOperStatus
@@ -185,9 +185,9 @@ modules:
                     group: PSUs
                     state_name: dellNetPowerSupplyOperStatus
                     states:
-                        - { value: 1, descr: up, graph: 1, generic: 0 }
-                        - { value: 2, descr: down, graph: 1, generic: 2 }
-                        - { value: 3, descr: absent, graph: 1, generic: 2 }
+                        - { value: 1, descr: up, generic: 0 }
+                        - { value: 2, descr: down, generic: 2 }
+                        - { value: 3, descr: absent, generic: 2 }
                 -
                     oid: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVirtualLinkDetailsTable
                     value: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVLTDetailLocalStatus
@@ -201,8 +201,8 @@ modules:
                       value: 0
                     state_name: dellNetVLTDetailLocalStatus
                     states:
-                        - { value: 0, descr: down, graph: 1, generic: 2 }
-                        - { value: 1, descr: up,   graph: 1, generic: 0 }
+                        - { value: 0, descr: down, generic: 2 }
+                        - { value: 1, descr: up,   generic: 0 }
                 -
                     oid: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVirtualLinkTrunkTable
                     value: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVLTIclBwStatus
@@ -211,8 +211,8 @@ modules:
                     group: 'VIRTUAL-LINK-TRUNK'
                     state_name: dellNetVLTIclBwStatus
                     states:
-                        - { value: 0, descr: '<80%', graph: 1, generic: 0 }
-                        - { value: 1, descr: '>80%', graph: 1, generic: 1 }
+                        - { value: 0, descr: '<80%', generic: 0 }
+                        - { value: 1, descr: '>80%', generic: 1 }
                 -
                     oid: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVirtualLinkTrunkTable
                     value: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVLTIclStatus
@@ -221,10 +221,10 @@ modules:
                     group: 'VIRTUAL-LINK-TRUNK'
                     state_name: dellNetVLTIclStatus
                     states:
-                        - { value: 0, descr: 'not established', graph: 1, generic: 3 }
-                        - { value: 1, descr: 'up', graph: 1, generic: 0 }
-                        - { value: 2, descr: 'down', graph: 1, generic: 2 }
-                        - { value: 3, descr: 'error', graph: 1, generic: 1 }
+                        - { value: 0, descr: 'not established', generic: 3 }
+                        - { value: 1, descr: 'up', generic: 0 }
+                        - { value: 2, descr: 'down', generic: 2 }
+                        - { value: 3, descr: 'error', generic: 1 }
                 -
                     oid: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVirtualLinkTrunkTable
                     value: DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB::dellNetVLTRole
@@ -233,6 +233,6 @@ modules:
                     group: 'VIRTUAL-LINK-TRUNK'
                     state_name: dellNetVLTRole
                     states:
-                        - { value: 0, descr: 'Standalone', graph: 1, generic: 3 }
-                        - { value: 1, descr: 'Primary', graph: 1, generic: 0 }
-                        - { value: 2, descr: 'Secondary', graph: 1, generic: 0 }
+                        - { value: 0, descr: 'Standalone', generic: 3 }
+                        - { value: 1, descr: 'Primary', generic: 0 }
+                        - { value: 2, descr: 'Secondary', generic: 0 }

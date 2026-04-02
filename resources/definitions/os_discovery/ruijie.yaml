@@ -120,12 +120,12 @@ modules:
                     index: 'ruijieSystemFanStatus.{{ $index }}'
                     group: Fans
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: 'noexist' }
-                        - { value: 2, generic: 2, graph: 0, descr: 'existnopower' }
-                        - { value: 3, generic: 1, graph: 0, descr: 'existreadypower' }
-                        - { value: 4, generic: 0, graph: 0, descr: 'normal' }
-                        - { value: 5, generic: 2, graph: 0, descr: 'powerbutabnormal' }
-                        - { value: 6, generic: 3, graph: 0, descr: 'unknown' }
+                        - { value: 1, generic: 3, descr: 'noexist' }
+                        - { value: 2, generic: 2, descr: 'existnopower' }
+                        - { value: 3, generic: 1, descr: 'existreadypower' }
+                        - { value: 4, generic: 0, descr: 'normal' }
+                        - { value: 5, generic: 2, descr: 'powerbutabnormal' }
+                        - { value: 6, generic: 3, descr: 'unknown' }
                 -
                     oid: RUIJIE-FIBER-MIB::ruijieFiberTable
                     value: RUIJIE-FIBER-MIB::ruijieFiberTempStatus
@@ -137,9 +137,9 @@ modules:
                     skip_values:
                         - 1
                     states:
-                        - { value: 2, generic: 0, graph: 0, descr: 'ok' }
-                        - { value: 3, generic: 1, graph: 0, descr: 'warning' }
-                        - { value: 4, generic: 2, graph: 0, descr: 'alarm' }
+                        - { value: 2, generic: 0, descr: 'ok' }
+                        - { value: 3, generic: 1, descr: 'warning' }
+                        - { value: 4, generic: 2, descr: 'alarm' }
                 -
                     oid: RUIJIE-SYSTEM-MIB::ruijieSystemElectricalInformationTable
                     value: RUIJIE-SYSTEM-MIB::ruijieSystemElectricalInformationStatus
@@ -149,12 +149,12 @@ modules:
                     index: 'ruijieSystemElectricalInformationStatus.{{ $index }}'
                     group: 'Power Supplies'
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: 'noexist' }
-                        - { value: 2, generic: 2, graph: 0, descr: 'existnopower' }
-                        - { value: 3, generic: 1, graph: 0, descr: 'existreadypower' }
-                        - { value: 4, generic: 0, graph: 0, descr: 'normal' }
-                        - { value: 5, generic: 2, graph: 0, descr: 'powerbutabnormal' }
-                        - { value: 6, generic: 3, graph: 0, descr: 'unknown' }
+                        - { value: 1, generic: 3, descr: 'noexist' }
+                        - { value: 2, generic: 2, descr: 'existnopower' }
+                        - { value: 3, generic: 1, descr: 'existreadypower' }
+                        - { value: 4, generic: 0, descr: 'normal' }
+                        - { value: 5, generic: 2, descr: 'powerbutabnormal' }
+                        - { value: 6, generic: 3, descr: 'unknown' }
 
 
 

@@ -61,11 +61,11 @@ modules:
                     descr: 'Operation Mode {{ $index }}'
                     state_name: hmRS2OperMode
                     states:
-                        - { descr: normal, graph: 1, value: 1, generic: 0 }
-                        - { descr: standby-active, graph: 1, value: 2, generic: 0 }
-                        - { descr: standby-inactive, graph: 1, value: 3, generic: 3 }
-                        - { descr: redundancy-manager-active, graph: 1, value: 4, generic: 0 }
-                        - { descr: redundancy-manager-inactive, graph: 1, value: 5, generic: 3 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: standby-active, value: 2, generic: 0 }
+                        - { descr: standby-inactive, value: 3, generic: 3 }
+                        - { descr: redundancy-manager-active, value: 4, generic: 0 }
+                        - { descr: redundancy-manager-inactive, value: 5, generic: 3 }
                 -
                     oid: HMPRIV-MGMT-SNMP-MIB::hmPSTable
                     value: HMPRIV-MGMT-SNMP-MIB::hmPSState
@@ -74,10 +74,10 @@ modules:
                     index: 'hmPowerSupplyStatus{{ $index }}'
                     state_name: hmPowerSupplyStatus
                     states:
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
-                        - { descr: failed, graph: 0, value: 2, generic: 2 }
-                        - { descr: notInstalled, graph: 0, value: 3, generic: 1 }
-                        - { descr: unknown, graph: 0, value: 4, generic: 3 }
+                        - { descr: ok, value: 1, generic: 0 }
+                        - { descr: failed, value: 2, generic: 2 }
+                        - { descr: notInstalled, value: 3, generic: 1 }
+                        - { descr: unknown, value: 4, generic: 3 }
                 -
                     oid: HMPRIV-MGMT-SNMP-MIB::hmLEDRSPowerSupply
                     value: HMPRIV-MGMT-SNMP-MIB::hmLEDRSPowerSupply
@@ -86,10 +86,10 @@ modules:
                     index: 'hmLEDRSPowerSupply.{{ $index }}'
                     state_name: hmLEDRSPowerSupply
                     states:
-                        - { descr: off, graph: 0, value: 1, generic: 3 }
-                        - { descr: green, graph: 0, value: 2, generic: 0 }
-                        - { descr: yellow, graph: 0, value: 3, generic: 1 }
-                        - { descr: red, graph: 0, value: 4, generic: 2 }
+                        - { descr: off, value: 1, generic: 3 }
+                        - { descr: green, value: 2, generic: 0 }
+                        - { descr: yellow, value: 3, generic: 1 }
+                        - { descr: red, value: 4, generic: 2 }
                 -
                     oid: HMPRIV-MGMT-SNMP-MIB::hmLEDRStandby
                     value: HMPRIV-MGMT-SNMP-MIB::hmLEDRStandby
@@ -98,10 +98,10 @@ modules:
                     index: 'hmLEDRStandby.{{ $index }}'
                     state_name: hmLEDRStandby
                     states:
-                        - { descr: off, graph: 0, value: 1, generic: 3 }
-                        - { descr: green, graph: 0, value: 2, generic: 0 }
-                        - { descr: yellow, graph: 0, value: 3, generic: 1 }
-                        - { descr: red, graph: 0, value: 4, generic: 2 }
+                        - { descr: off, value: 1, generic: 3 }
+                        - { descr: green, value: 2, generic: 0 }
+                        - { descr: yellow, value: 3, generic: 1 }
+                        - { descr: red, value: 4, generic: 2 }
                 -
                     oid: HMPRIV-MGMT-SNMP-MIB::hmLEDRSRedundancyManager
                     value: HMPRIV-MGMT-SNMP-MIB::hmLEDRSRedundancyManager
@@ -110,10 +110,10 @@ modules:
                     index: 'hmLEDRSRedundancyManager.{{ $index }}'
                     state_name: hmLEDRSRedundancyManager
                     states:
-                        - { descr: off, graph: 0, value: 1, generic: 3 }
-                        - { descr: green, graph: 0, value: 2, generic: 0 }
-                        - { descr: yellow, graph: 0, value: 3, generic: 1 }
-                        - { descr: red, graph: 0, value: 4, generic: 2 }
+                        - { descr: off, value: 1, generic: 3 }
+                        - { descr: green, value: 2, generic: 0 }
+                        - { descr: yellow, value: 3, generic: 1 }
+                        - { descr: red, value: 4, generic: 2 }
                 -
                     oid: HMPRIV-MGMT-SNMP-MIB::hmLEDRSFault
                     value: HMPRIV-MGMT-SNMP-MIB::hmLEDRSFault
@@ -122,7 +122,7 @@ modules:
                     index: 'hmLEDRSFault.{{ $index }}'
                     state_name: hmLEDRSFault
                     states:
-                        - { descr: off, graph: 0, value: 1, generic: 3 }
-                        - { descr: green, graph: 0, value: 2, generic: 0 }
-                        - { descr: yellow, graph: 0, value: 3, generic: 1 }
-                        - { descr: red, graph: 0, value: 4, generic: 2 }
+                        - { descr: off, value: 1, generic: 3 }
+                        - { descr: green, value: 2, generic: 0 }
+                        - { descr: yellow, value: 3, generic: 1 }
+                        - { descr: red, value: 4, generic: 2 }

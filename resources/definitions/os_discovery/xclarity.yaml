@@ -37,10 +37,10 @@ modules:
                     state_name: systemHealthStat
                     index: 'systemHealthStat.{{ $index }}'
                     states:
-                        - { descr: 'completely failed', graph: 1, value: 0, generic: 2 }
-                        - { descr: ok, graph: 1, value: 255, generic: 0 }
-                        - { descr: degraded, graph: 1, value: 4, generic: 1 }
-                        - { descr: failed, graph: 1, value: 2, generic: 2 }
+                        - { descr: 'completely failed', value: 0, generic: 2 }
+                        - { descr: ok, value: 255, generic: 0 }
+                        - { descr: degraded, value: 4, generic: 1 }
+                        - { descr: failed, value: 2, generic: 2 }
                     low_warn_limit: 5
                     low_limit: 3
                     descr: 'Overall System Status'
@@ -51,9 +51,9 @@ modules:
                     state_name: currentSysPowerStatus
                     index: 'currentSysPowerStatus.{{ $index }}'
                     states:
-                        - { descr: 'powered off', graph: 1, value: 0, generic: 2 }
-                        - { descr: sleep, graph: 1, value: 1, generic: 1 }
-                        - { descr: 'power on', graph: 1, value: 255, generic: 0 }
+                        - { descr: 'powered off', value: 0, generic: 2 }
+                        - { descr: sleep, value: 1, generic: 1 }
+                        - { descr: 'power on', value: 255, generic: 0 }
                     descr: 'Power status'
         percent:
             data:

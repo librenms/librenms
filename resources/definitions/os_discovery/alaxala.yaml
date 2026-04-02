@@ -167,9 +167,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX3630S::ax3630sFanTable
                     value: AX3630S::ax3630sFanStatus
@@ -179,11 +179,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX3630S::ax3640sPowerUnitTable
                     value: AX3630S::ax3640sPowerSupplyStatus
@@ -193,9 +193,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX3630S::ax3640sFanTable
                     value: AX3630S::ax3640sFanStatus
@@ -205,11 +205,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX3630S::ax3650sPowerUnitTable
                     value: AX3630S::ax3650sPowerSupplyStatus
@@ -219,9 +219,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX3630S::ax3650sFanTable
                     value: AX3630S::ax3650sFanStatus
@@ -231,11 +231,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX3630S::ax3830sPowerUnitTable
                     value: AX3630S::ax3830sPowerSupplyStatus
@@ -245,9 +245,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX3630S::ax3830sFanTable
                     value: AX3630S::ax3830sFanStatus
@@ -257,11 +257,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX2430S::ax2430sPowerUnitTable
                     value: AX2430S::ax2430sPowerSupplyStatus
@@ -271,9 +271,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX2430S::ax2430sFanTable
                     value: AX2430S::ax2430sFanStatus
@@ -283,11 +283,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX1230S::ax1230sPowerUnitTable
                     value: AX1230S::ax1230sPowerSupplyStatus
@@ -297,9 +297,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX1230S::ax1230sFanTable
                     value: AX1230S::ax1230sFanStatus
@@ -309,11 +309,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX6300S::ax6300sPowerUnitTable
                     value: AX6300S::ax6300sPowerSupplyStatus
@@ -323,9 +323,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX6300S::ax6300sFanTable
                     value: AX6300S::ax6300sFanStatus
@@ -335,11 +335,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX6300S::ax6700sPowerUnitTable
                     value: AX6300S::ax6700sPowerSupplyStatus
@@ -349,9 +349,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX6300S::ax6700sFanTable
                     value: AX6300S::ax6700sFanStatus
@@ -361,11 +361,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX6300S::ax6600sPowerUnitTable
                     value: AX6300S::ax6600sPowerSupplyStatus
@@ -375,9 +375,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX6300S::ax6600sFanTable
                     value: AX6300S::ax6600sFanStatus
@@ -387,11 +387,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX1240S::ax1240sPowerUnitTable
                     value: AX1240S::ax1240sPowerSupplyStatus
@@ -401,9 +401,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX1240S::ax1240sFanTable
                     value: AX1240S::ax1240sFanStatus
@@ -413,11 +413,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX1240S::ax1250sPowerUnitTable
                     value: AX1240S::ax1250sPowerSupplyStatus
@@ -427,9 +427,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX1240S::ax1250sFanTable
                     value: AX1240S::ax1250sFanStatus
@@ -439,11 +439,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX1240S::ax2230sPowerUnitTable
                     value: AX1240S::ax2230sPowerSupplyStatus
@@ -453,9 +453,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX1240S::ax2230sFanTable
                     value: AX1240S::ax2230sFanStatus
@@ -465,11 +465,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX1240S::ax2130sPowerUnitTable
                     value: AX1240S::ax2130sPowerSupplyStatus
@@ -479,9 +479,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX1240S::ax2130sFanTable
                     value: AX1240S::ax2130sFanStatus
@@ -491,11 +491,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX260A::ax260aPowerUnitTable
                     value: AX260A::ax260aPowerSupplyStatus
@@ -505,9 +505,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX260A::ax260aFanTable
                     value: AX260A::ax260aFanStatus
@@ -517,11 +517,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX2530S::ax2530sPowerUnitTable
                     value: AX2530S::ax2530sPowerSupplyStatus
@@ -531,9 +531,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX2530S::ax2530sFanTable
                     value: AX2530S::ax2530sFanStatus
@@ -543,11 +543,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX3660S::ax3660sPowerUnitTable
                     value: AX3660S::ax3660sPowerSupplyStatus
@@ -557,9 +557,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX3660S::ax3660sFanTable
                     value: AX3660S::ax3660sFanStatus
@@ -569,11 +569,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX4630S::ax4630sPowerUnitTable
                     value: AX4630S::ax4630sPowerSupplyStatus
@@ -583,9 +583,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX4630S::ax4630sFanTable
                     value: AX4630S::ax4630sFanStatus
@@ -595,11 +595,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX7800S::ax7800sPowerUnitTable
                     value: AX7800S::ax7800sPowerSupplyStatus
@@ -609,9 +609,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX7800S::ax7800sFanTable
                     value: AX7800S::ax7800sFanStatus
@@ -621,11 +621,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX7800S::ax5400sPowerUnitTable
                     value: AX7800S::ax5400sPowerSupplyStatus
@@ -635,9 +635,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX7800S::ax5400sFanTable
                     value: AX7800S::ax5400sFanStatus
@@ -647,11 +647,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX7800R::ax7800rPowerUnitTable
                     value: AX7800R::ax7800rPowerSupplyStatus
@@ -661,9 +661,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX7800R::ax7800rFanTable
                     value: AX7800R::ax7800rFanStatus
@@ -673,11 +673,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX7800R::ax7700rPowerUnitTable
                     value: AX7800R::ax7700rPowerSupplyStatus
@@ -687,9 +687,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX7800R::ax7700rFanTable
                     value: AX7800R::ax7700rFanStatus
@@ -699,11 +699,11 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }
                 -
                     oid: AX2000R::ax2000rPowerUnitTable
                     value: AX2000R::ax2000rPowerSupplyStatus
@@ -713,9 +713,9 @@ modules:
                     group: 'Power Supplies'
                     state_name: alaxalaPowerSupplyStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: -1, generic: 2, graph: 0, descr: disconnected }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: -1, generic: 2, descr: disconnected }
                 -
                     oid: AX2000R::ax2000rFanTable
                     value: AX2000R::ax2000rFanStatus
@@ -725,8 +725,8 @@ modules:
                     group: 'Fans'
                     state_name: alaxalaFanStatus
                     states:
-                        - { value: 2,  generic: 0, graph: 0, descr: ok }
-                        - { value: 3,  generic: 1, graph: 0, descr: high-speed }
-                        - { value: 4,  generic: 2, graph: 0, descr: fault }
-                        - { value: 5,  generic: 2, graph: 0, descr: stopping }
-                        - { value: 32, generic: 2, graph: 0, descr: notconnect }
+                        - { value: 2,  generic: 0, descr: ok }
+                        - { value: 3,  generic: 1, descr: high-speed }
+                        - { value: 4,  generic: 2, descr: fault }
+                        - { value: 5,  generic: 2, descr: stopping }
+                        - { value: 32, generic: 2, descr: notconnect }

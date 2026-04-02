@@ -20,8 +20,8 @@ modules:
                     descr: Radio Role
                     state_name: af60Role
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: AP }
-                        - { value: 1, generic: 0, graph: 0, descr: CPE }
+                        - { value: 0, generic: 0, descr: AP }
+                        - { value: 1, generic: 0, descr: CPE }
                 -
                     oid: UI-AF60-MIB::af60GpsStatus
                     num_oid: '.1.3.6.1.4.1.41112.1.11.1.4.1.{{ $index }}'
@@ -29,9 +29,9 @@ modules:
                     descr: GPS Status
                     state_name: af60GpsStatus
                     states:
-                        - { value: 0, generic: 1, graph: 0, descr: Absent }
-                        - { value: 1, generic: 1, graph: 0, descr: Off }
-                        - { value: 2, generic: 0, graph: 0, descr: On }
+                        - { value: 0, generic: 1, descr: Absent }
+                        - { value: 1, generic: 1, descr: Off }
+                        - { value: 2, generic: 0, descr: On }
                 -
                     oid: UI-AF60-MIB::af60GpsFix
                     num_oid: '.1.3.6.1.4.1.41112.1.11.1.4.2.{{ $index }}'
@@ -39,10 +39,10 @@ modules:
                     descr: GPS fix
                     state_name: af60GpsFix
                     states:
-                        - { value: 0, generic: 1, graph: 0, descr: Unknown }
-                        - { value: 1, generic: 1, graph: 0, descr: Nofix }
-                        - { value: 2, generic: 0, graph: 0, descr: Fix2d }
-                        - { value: 3, generic: 0, graph: 0, descr: Fix3d }
+                        - { value: 0, generic: 1, descr: Unknown }
+                        - { value: 1, generic: 1, descr: Nofix }
+                        - { value: 2, generic: 0, descr: Fix2d }
+                        - { value: 3, generic: 0, descr: Fix3d }
         count:
             data:
                 -
