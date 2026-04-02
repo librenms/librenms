@@ -193,7 +193,7 @@ class SocialiteController extends Controller
                         $existingValues = (array) ($attributes[$field] ?? []);
                         $payloadValues = (array) ($payload[$field] ?? []);
 
-                         // Merge OIDC groups (e.g. Graph API) with JWT groups, removing duplicates
+                        // Merge OIDC groups (e.g. Graph API) with JWT groups, removing duplicates
                         $attributes[$field] = array_unique(array_merge($existingValues, $payloadValues));
                     }
                 }
