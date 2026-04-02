@@ -39,13 +39,13 @@ modules:
                     descr: 'Battery Status {{ $index }}'
                     index: 'xupsBatteryAbmStatus.{{ $index }}'
                     states:
-                        - { value: 2, descr: batteryDischarging, graph: 1, generic: 2 }
-                        - { value: 3, descr: batteryFloating, graph: 1, generic: 0 }
-                        - { value: 4, descr: batteryResting, graph: 1, generic: 0 }
-                        - { value: 5, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 6, descr: batteryDisconnected, graph: 1, generic: 2 }
-                        - { value: 7, descr: batteryUnderTest, graph: 1, generic: 0 }
-                        - { value: 8, descr: checkBattery, graph: 1, generic: 2 }
+                        - { value: 2, descr: batteryDischarging, generic: 2 }
+                        - { value: 3, descr: batteryFloating, generic: 0 }
+                        - { value: 4, descr: batteryResting, generic: 0 }
+                        - { value: 5, descr: unknown, generic: 3 }
+                        - { value: 6, descr: batteryDisconnected, generic: 2 }
+                        - { value: 7, descr: batteryUnderTest, generic: 0 }
+                        - { value: 8, descr: checkBattery, generic: 2 }
                 -
                     oid: XUPS-MIB::xupsTest
                     value: XUPS-MIB::xupsTestBatteryStatus
@@ -53,13 +53,13 @@ modules:
                     descr: 'Battery Test Status {{ $index }}'
                     index: 'xupsTestBatteryStatus.{{ $index }}'
                     states:
-                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 2, descr: passed, graph: 1, generic: 0 }
-                        - { value: 3, descr: failed, graph: 1, generic: 2 }
-                        - { value: 4, descr: inProgress, graph: 1, generic: 0 }
-                        - { value: 5, descr: notSupported, graph: 1, generic: 0 }
-                        - { value: 6, descr: inhibited, graph: 1, generic: 2 }
-                        - { value: 7, descr: scheduled, graph: 1, generic: 0 }
+                        - { value: 1, descr: unknown, generic: 3 }
+                        - { value: 2, descr: passed, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                        - { value: 4, descr: inProgress, generic: 0 }
+                        - { value: 5, descr: notSupported, generic: 0 }
+                        - { value: 6, descr: inhibited, generic: 2 }
+                        - { value: 7, descr: scheduled, generic: 0 }
         runtime:
             data:
                 -

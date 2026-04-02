@@ -64,9 +64,9 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     state_name: axosOltPonPortStatus
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: Invalid }
-                        - { value: 1, generic: 0, graph: 0, descr: Up }
-                        - { value: 2, generic: 1, graph: 0, descr: Down }
+                        - { value: 0, generic: 3, descr: Invalid }
+                        - { value: 1, generic: 0, descr: Up }
+                        - { value: 2, generic: 1, descr: Down }
 
                 -
                     oid: Axos-Card-MIB::axosCardTable
@@ -76,10 +76,10 @@ modules:
                     index: axosCardAdminStatus.{{ $index }}
                     state_name: axosCardAdminStatus
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: Unknown }
-                        - { value: 1, generic: 0, graph: 0, descr: Enabled }
-                        - { value: 2, generic: 1, graph: 0, descr: Alarm Suppress }
-                        - { value: 3, generic: 0, graph: 0, descr: Disabled }
+                        - { value: 0, generic: 3, descr: Unknown }
+                        - { value: 1, generic: 0, descr: Enabled }
+                        - { value: 2, generic: 1, descr: Alarm Suppress }
+                        - { value: 3, generic: 0, descr: Disabled }
                 -
                     oid: Axos-Ont-MIB::axosOntTable
                     value: Axos-Ont-MIB::axosOntOperStatus
@@ -88,9 +88,9 @@ modules:
                     index: axosOntOperStatus.{{ $index }}
                     state_name: axosOntOperStatus
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: Unknown }
-                        - { value: 1, generic: 0, graph: 0, descr: Enabled }
-                        - { value: 2, generic: 0, graph: 0, descr: Disabled }
+                        - { value: 0, generic: 3, descr: Unknown }
+                        - { value: 1, generic: 0, descr: Enabled }
+                        - { value: 2, generic: 0, descr: Disabled }
                 -
                     oid: Axos-Ont-MIB::axosOntTable
                     value: Axos-Ont-MIB::axosOntAdminStatus
@@ -99,9 +99,9 @@ modules:
                     index: axosOntAdminStatus.{{ $index }}
                     state_name: axosOntAdminStatus
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: Unknown }
-                        - { value: 1, generic: 0, graph: 0, descr: Enabled }
-                        - { value: 2, generic: 0, graph: 0, descr: Disabled }
+                        - { value: 0, generic: 3, descr: Unknown }
+                        - { value: 1, generic: 0, descr: Enabled }
+                        - { value: 2, generic: 0, descr: Disabled }
 
         dbm:
             data:

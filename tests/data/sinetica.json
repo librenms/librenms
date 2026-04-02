@@ -1113,28 +1113,24 @@
                 {
                     "state_name": "upsBatteryStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "upsBatteryStatus",
                     "state_descr": "batteryNormal",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "upsBatteryStatus",
                     "state_descr": "batteryLow",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "upsBatteryStatus",
                     "state_descr": "batteryDepleted",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
                 }

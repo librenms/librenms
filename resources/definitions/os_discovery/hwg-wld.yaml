@@ -13,9 +13,9 @@ modules:
                     index: 'wldState.{{ $index }}'
                     state_name: wldState
                     states:
-                        - { descr: invalid, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: alarm, graph: 0, value: 3, generic: 2 }
+                        - { descr: invalid, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: alarm, value: 3, generic: 2 }
                     skip_values:
                         -
                             oid: HWg-WLD-MIB::wldValue
@@ -29,7 +29,7 @@ modules:
                     index: 'wldValue.{{ $index }}'
                     state_name: wldValue
                     states:
-                        - { descr: disconnect, graph: 0, value: 2, generic: 3 }
-                        - { descr: flooded, graph: 0, value: 1, generic: 2 }
-                        - { descr: normal, graph: 0, value: 0, generic: 0 }
-                        - { descr: invalid, graph: 0, value: 3, generic: 2 }
+                        - { descr: disconnect, value: 2, generic: 3 }
+                        - { descr: flooded, value: 1, generic: 2 }
+                        - { descr: normal, value: 0, generic: 0 }
+                        - { descr: invalid, value: 3, generic: 2 }

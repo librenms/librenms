@@ -39,10 +39,10 @@ if (is_array($fan_trays)) {
 
         $state_name = 'cefcFanTrayOperStatus';
         $states = [
-            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-            ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'up'],
-            ['value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'down'],
-            ['value' => 4, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
+            ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'up'],
+            ['value' => 3, 'generic' => 2, 'descr' => 'down'],
+            ['value' => 4, 'generic' => 1, 'descr' => 'warning'],
         ];
         create_state_index($state_name, $states);
 

@@ -31,8 +31,8 @@ if (! empty($pre_cache['raspberry_pi_sensors'])) {
         $value = (string) current($pre_cache['raspberry_pi_sensors']['raspberry.' . $codec] ?? []);
         if (stripos($value, 'abled') !== false) {
             $states = [
-                ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'enabled'],
-                ['value' => 3, 'generic' => 3, 'graph' => 1, 'descr' => 'disabled'],
+                ['value' => 2, 'generic' => 0, 'descr' => 'enabled'],
+                ['value' => 3, 'generic' => 3, 'descr' => 'disabled'],
             ];
             create_state_index($state_name, $states);
 

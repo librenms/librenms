@@ -1288,119 +1288,102 @@
                 {
                     "state_name": "memInputNormalState",
                     "state_descr": "Closed",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "memInputNormalState",
                     "state_descr": "Open",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "memInputNormalState",
                     "state_descr": "Disabled",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "memInputNormalState",
                     "state_descr": "No State",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "memInputsStatusAlarmStatus",
                     "state_descr": "Ok",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "memInputsStatusAlarmStatus",
                     "state_descr": "Alarm",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "memInputsStatusAlarmStatus",
                     "state_descr": "Critical",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "memSensorsAlarmStatus",
                     "state_descr": "memNormal",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "memSensorsAlarmStatus",
                     "state_descr": "memWarning",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "memSensorsAlarmStatus",
                     "state_descr": "memCritical",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "memSensorsCommStatus",
                     "state_descr": "notInstalled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "memSensorsCommStatus",
                     "state_descr": "commsOK",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "memSensorsCommStatus",
                     "state_descr": "commsLost",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "Outlet",
                     "state_descr": "immediateOnEMS",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "Outlet",
                     "state_descr": "immediateOffEMS",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Relay",
                     "state_descr": "immediateCloseEMS",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "Relay",
                     "state_descr": "immediateOpenEMS",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 0
                 }

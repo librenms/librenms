@@ -28,9 +28,9 @@ modules:
                     index: 'dvbSTTransmitterOpMode.{{ $index }}'
                     state_name: dvbSTTransmitterOpMode
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
-                        - { value: 1, generic: 0, graph: 0, descr: ON }
-                        - { value: 2, generic: 1, graph: 0, descr: OFF }
+                        - { value: 0, generic: 3, descr: Undefined }
+                        - { value: 1, generic: 0, descr: ON }
+                        - { value: 2, generic: 1, descr: OFF }
                 -
                     oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTRFPresent
                     value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTRFPresent
@@ -39,9 +39,9 @@ modules:
                     index: 'dvbSTRFPresent.{{ $index }}'
                     state_name: dvbSTRFPresent
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
-                        - { value: 1, generic: 0, graph: 0, descr: Present }
-                        - { value: 2, generic: 1, graph: 0, descr: 'Not Present' }
+                        - { value: 0, generic: 3, descr: Undefined }
+                        - { value: 1, generic: 0, descr: Present }
+                        - { value: 2, generic: 1, descr: 'Not Present' }
                 -
                     oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTFault
                     value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTFault
@@ -50,9 +50,9 @@ modules:
                     index: 'dvbSTFault.{{ $index }}'
                     state_name: dvbSTFault
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
-                        - { value: 1, generic: 2, graph: 0, descr: Fault }
-                        - { value: 2, generic: 0, graph: 0, descr: OK }
+                        - { value: 0, generic: 3, descr: Undefined }
+                        - { value: 1, generic: 2, descr: Fault }
+                        - { value: 2, generic: 0, descr: OK }
                 -
                     oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTWarning
                     value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTWarning
@@ -61,9 +61,9 @@ modules:
                     index: 'dvbSTWarning.{{ $index }}'
                     state_name: dvbSTWarning
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
-                        - { value: 1, generic: 1, graph: 0, descr: Warning }
-                        - { value: 2, generic: 0, graph: 0, descr: OK }
+                        - { value: 0, generic: 3, descr: Undefined }
+                        - { value: 1, generic: 1, descr: Warning }
+                        - { value: 2, generic: 0, descr: OK }
                 -
                     oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTInput1OK
                     value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTInput1OK
@@ -72,9 +72,9 @@ modules:
                     index: 'dvbSTInput1OK.{{ $index }}'
                     state_name: dvbSTInput1OK
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
-                        - { value: 1, generic: 0, graph: 0, descr: Ok }
-                        - { value: 2, generic: 1, graph: 0, descr: 'No Signal' }
+                        - { value: 0, generic: 3, descr: Undefined }
+                        - { value: 1, generic: 0, descr: Ok }
+                        - { value: 2, generic: 1, descr: 'No Signal' }
                 -
                     oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTInput2OK
                     value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTInput2OK
@@ -83,9 +83,9 @@ modules:
                     index: 'dvbSTInput2OK.{{ $index }}'
                     state_name: dvbSTInput2OK
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
-                        - { value: 1, generic: 0, graph: 0, descr: Ok }
-                        - { value: 2, generic: 1, graph: 0, descr: 'No Signal' }
+                        - { value: 0, generic: 3, descr: Undefined }
+                        - { value: 1, generic: 0, descr: Ok }
+                        - { value: 2, generic: 1, descr: 'No Signal' }
                 -
                     oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTLocalMode
                     value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTLocalMode
@@ -94,9 +94,9 @@ modules:
                     index: 'dvbSTLocalMode.{{ $index }}'
                     state_name: dvbSTLocalMode
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
-                        - { value: 1, generic: 0, graph: 0, descr: Local }
-                        - { value: 2, generic: 0, graph: 0, descr: Remote }
+                        - { value: 0, generic: 3, descr: Undefined }
+                        - { value: 1, generic: 0, descr: Local }
+                        - { value: 2, generic: 0, descr: Remote }
                 -
                     oid: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTActiveInput
                     value: IRT-DVBT-SINGLETRANSMITTER-MIB::dvbSTActiveInput
@@ -105,8 +105,8 @@ modules:
                     index: 'dvbSTActiveInput.{{ $index }}'
                     state_name: dvbSTActiveInput
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: Undefined }
-                        - { value: 1, generic: 0, graph: 0, descr: 'Input 1' }
-                        - { value: 2, generic: 0, graph: 0, descr: 'Input 2' }
-                        - { value: 2, generic: 0, graph: 0, descr: Seamless }
-                        - { value: 2, generic: 0, graph: 0, descr: HierarchicalModulation }
+                        - { value: 0, generic: 3, descr: Undefined }
+                        - { value: 1, generic: 0, descr: 'Input 1' }
+                        - { value: 2, generic: 0, descr: 'Input 2' }
+                        - { value: 2, generic: 0, descr: Seamless }
+                        - { value: 2, generic: 0, descr: HierarchicalModulation }
