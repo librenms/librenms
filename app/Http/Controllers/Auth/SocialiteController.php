@@ -85,7 +85,6 @@ class SocialiteController extends Controller
         $roles = $this->getAuthorizedRoles($provider);
 
         if (count($roles) === 1 && $roles[0] === 'none') {
-
             $user = User::where('auth_type', "socialite_$provider")
                 ->where('auth_id', $this->socialite_user->getId())
                 ->first();
