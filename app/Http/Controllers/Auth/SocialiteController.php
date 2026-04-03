@@ -84,8 +84,19 @@ class SocialiteController extends Controller
 
         $roles = $this->getAuthorizedRoles($provider);
 
-        if ($roles === false) {
-            toast()->error(__('Access denied: Your user does not have the required privileges in this system.'));
+        if (count($roles) === 1 && $roles[0] === 'none') {
+
+            $user = User::where('auth_type', "socialite_$provider")
+                ->where('auth_id', $this->socialite_user->getId())
+                ->first();
+
+            if ($user) {
+                $user->syncRoles([]);
+            }
+
+            toast()->error(__('Access denied: Your user :username does not have the required privileges in this system.', [
+                'username' => $this->buildUsername()
+            ]));
 
             return redirect()->route('login')->with('block_auto_redirect', true);
         }
@@ -170,7 +181,7 @@ class SocialiteController extends Controller
     {
         $scopes = LibrenmsConfig::get('auth.socialite.scopes', ['openid', 'profile', 'email']);
         $claims = LibrenmsConfig::get('auth.socialite.claims', []);
-        $defaultRole = LibrenmsConfig::get('auth.socialite.default_role', 'none');
+        $defaultRole = trim(LibrenmsConfig::get('auth.socialite.default_role', 'none')) ?: 'none';
 
         if (! $this->socialite_user instanceof \Laravel\Socialite\AbstractUser) {
             return false;
@@ -212,11 +223,6 @@ class SocialiteController extends Controller
         }
 
         if (empty($roles)) {
-            if (empty($defaultRole) || strtolower((string) $defaultRole) === 'none') {
-                \Log::warning('Socialite login denied: User has no matching claims and default_role is none.');
-
-                return false;
-            }
             $roles[] = $defaultRole;
         }
 
