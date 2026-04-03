@@ -21,8 +21,8 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2026 Your Name <your@email.address>
- * @author     Your Name <your@email.address>
+ * @copyright  2026 Palerm0 <Palerm0@outlook.com>
+ * @author     Palerm0 <Palerm0@outlook.com>
  */
 $device_obj = DeviceCache::getPrimary();
 $device_id = $device_obj->device_id;
