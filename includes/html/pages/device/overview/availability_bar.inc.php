@@ -49,6 +49,10 @@ $outages = \App\Models\DeviceOutage::where('device_id', $device_id)
     ->orderBy('going_down')
     ->get();
 
+// Thresholds (configurable via config.php)
+$threshold_good = \App\Facades\LibrenmsConfig::get('availability_bar.threshold_good', 99);
+$threshold_medium = \App\Facades\LibrenmsConfig::get('availability_bar.threshold_medium', 95);
+
 // Build per-day availability data
 $day_data = [];
 for ($i = 0; $i < $days; $i++) {
@@ -81,9 +85,9 @@ for ($i = 0; $i < $days; $i++) {
     if ($day_start < $inserted) {
         $color = '#cccccc';
         $outage_lines = ['no_data'];
-    } elseif ($availability >= 99) {
+    } elseif ($availability >= $threshold_good) {
         $color = '#2ecc71';
-    } elseif ($availability >= 95) {
+    } elseif ($availability >= $threshold_medium) {
         $color = '#f39c12';
     } else {
         $color = '#e74c3c';
