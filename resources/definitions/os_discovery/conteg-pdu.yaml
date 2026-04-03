@@ -70,14 +70,14 @@ modules:
                     num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.6.1.1.10.{{ $index }}'
                     descr: 'PDU-{{ $subindex0 }} {{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }} Total Wattage'
                     index: 'sdbDevInPowerWatt.{{ $index }}'
-                    divisor: 100
+                    divisor: 1
                 -
                     oid: CONTEG-DATABUS-MIB::sdbDevOutMtTable
                     value: CONTEG-DATABUS-MIB::sdbDevOutMtPowerWatt
                     num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.7.2.1.11.{{ $index }}'
                     descr: 'PDU-{{ $subindex0 }} ({{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }}) Port-{{ $subindex1 }} ({{ CONTEG-DATABUS-MIB::sdbDevOutName }}) Wattage'
                     index: 'sdbDevOutMtActualCurrent.{{ $index }}'
-                    divisor: 100
+                    divisor: 1
                     group: 'PDU {{ $subindex0 }} {{ CONTEG-DATABUS-MIB::sdbDevIdName:0 }} '
                     skip_values:
                     -
