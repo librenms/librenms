@@ -81,9 +81,9 @@ class FdbTablesController extends TableController
      */
     protected function search($search, $query, $fields = [])
     {
-        if ($search = trim(\Request::get('searchPhrase') ?? '')) {
+        if ($search = trim(\Request::input('searchPhrase') ?? '')) {
             $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', $search) . '%';
-            switch (\Request::get('searchby') ?? '') {
+            switch (\Request::input('searchby') ?? '') {
                 case 'mac':
                     return $query->where('ports_fdb.mac_address', 'like', $mac_search);
                 case 'vlan':
@@ -206,8 +206,8 @@ class FdbTablesController extends TableController
      */
     protected function findMacs($ip): Collection
     {
-        $port_id = \Request::get('port_id');
-        $device_id = \Request::get('device_id');
+        $port_id = \Request::input('port_id');
+        $device_id = \Request::input('device_id');
 
         return Ipv4Mac::where('ipv4_address', 'like', "%$ip%")
             ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
@@ -221,8 +221,8 @@ class FdbTablesController extends TableController
      */
     protected function findVlans($vlan): Collection
     {
-        $port_id = \Request::get('port_id');
-        $device_id = \Request::get('device_id');
+        $port_id = \Request::input('port_id');
+        $device_id = \Request::input('device_id');
 
         return Vlan::where('vlan_vlan', $vlan)
             ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
@@ -238,8 +238,8 @@ class FdbTablesController extends TableController
      */
     protected function findPorts($ifAlias): Collection
     {
-        $port_id = \Request::get('port_id');
-        $device_id = \Request::get('device_id');
+        $port_id = \Request::input('port_id');
+        $device_id = \Request::input('device_id');
 
         return Port::where('ifAlias', 'like', "%$ifAlias%")
             ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
@@ -255,7 +255,7 @@ class FdbTablesController extends TableController
         $dns = 'N/A';
 
         // only fetch DNS if the column is visible
-        if (\Request::get('dns') == 'true') {
+        if (\Request::input('dns') == 'true') {
             // don't try too many dns queries, this is the slowest part
             foreach ($ips->take(3) as $ip) {
                 $hostname = gethostbyaddr($ip);
