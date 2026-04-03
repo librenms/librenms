@@ -95,7 +95,7 @@ class SocialiteController extends Controller
             }
 
             toast()->error(__('Access denied: Your user :username does not have the required privileges in this system.', [
-                'username' => $this->buildUsername()
+                'username' => $this->buildUsername(),
             ]));
 
             return redirect()->route('login')->with('block_auto_redirect', true);
@@ -184,7 +184,7 @@ class SocialiteController extends Controller
         $defaultRole = trim(LibrenmsConfig::get('auth.socialite.default_role', 'none')) ?: 'none';
 
         if (! $this->socialite_user instanceof \Laravel\Socialite\AbstractUser) {
-            return false;
+            return ['none'];
         }
 
         $attributes = $this->normalizeAttributes($this->socialite_user->getRaw());
