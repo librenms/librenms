@@ -37,15 +37,15 @@ final class SocialiteControllerTest extends TestCase
      *
      * @param  string  $provider  The Socialite provider name (e.g. 'okta' or 'saml2').
      * @param  array  $rawAttributes  The simulated raw user data from getRaw().
-     * @param  array|false  $expectedRoles  The roles expected to be returned (or false for access denied).
-     * @param  array  $claimMap  A map of claim-values to roles.
+     * @param  array  $expectedRoles  The roles expected to be returned.
+     * @param  array  $claimMap  A map of claim-values to roles (config for auth.socialite.claims).
      * @param  array  $scopes  Optional scopes config; defaults to ['groups'].
-     * @return array|false The return value from getAuthorizedRoles().
+     * @return array The return value from getAuthorizedRoles().
      */
     private function runGetAuthorizedRolesTest(
         string $provider,
         array $rawAttributes,
-        array|false $expectedRoles,
+        array $expectedRoles,
         array $claimMap,
         array $scopes = ['groups']
     ) {
@@ -64,7 +64,6 @@ final class SocialiteControllerTest extends TestCase
         // Make the SocialiteController private bits accessible via reflection.
         $controller = new SocialiteController();
         $reflectionClass = new \ReflectionClass($controller);
-
         $prop = $reflectionClass->getProperty('socialite_user');
         $prop->setValue($controller, $socialiteUserStub);
 
@@ -139,7 +138,7 @@ final class SocialiteControllerTest extends TestCase
         ];
 
         $this->runGetAuthorizedRolesTest(
-            'okta', $rawAttributes, false, // Should return false (Access Denied)
+            'okta', $rawAttributes, ['none'], // Should return 'none' (Access Denied)
             [
                 'G_librenms_admins' => ['roles' => ['admin']],
                 'G_librenms_users' => ['roles' => ['global-read']],
