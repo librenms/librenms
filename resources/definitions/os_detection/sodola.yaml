@@ -1,10 +1,16 @@
 os: sodola
 text: 'Sodola Switch'
 type: network
-icon: generic
+icon: sodola
 group: sodola
+ifname: true
+poe_ifname_regex: '/^ge1\/[1-4]$/'
+poe_admin_enable_column: 2
+poe_capability_column: 6
+poe_mode_force_disabled_ifname_regex: '/^ge1\/4$/'
 over:
-    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     -
         sysObjectID:

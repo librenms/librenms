@@ -237,6 +237,9 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                 foreach ($table_base_oids as $oid) {
                     $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
                 }
+                if ($device['os'] == 'sodola') {
+                    $port_stats = snmpwalk_cache_oid($device, 'ifSpeed', $port_stats, 'IF-MIB');
+                }
             }
         }
 
@@ -267,6 +270,11 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
                     d_echo(" $ifIndex: valid\n");
                     if (is_numeric($port_stats[$ifIndex]['ifHighSpeed']) && $port_stats[$ifIndex]['ifHighSpeed'] > 0) {
                         $full_oids = array_merge($hc_oids, $shared_oids);
+                        if ($device['os'] == 'sodola') {
+                            if (! in_array('ifSpeed', $full_oids, true)) {
+                                $full_oids[] = 'ifSpeed';
+                            }
+                        }
                     } else {
                         $full_oids = array_merge($nonhc_oids, $shared_oids);
                     }
@@ -303,7 +311,12 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
             $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, $ifEntrySnmpFlags);
         } else {
             // For devices with ifXentry data, only specific ifEntry keys are fetched to reduce SNMP load
-            foreach ($ifmib_oids as $oid) {
+            $ifentry_oids = $ifmib_oids;
+            if ($device['os'] == 'sodola') {
+                // ifSpeed lives in ifEntry, not ifXEntry; firmware may report nonsense in ifHighSpeed (e.g. 1410).
+                $ifentry_oids[] = 'ifSpeed';
+            }
+            foreach ($ifentry_oids as $oid) {
                 $fetched_data_string .= "$oid ";
                 $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB', null, '-OQUst');
             }
@@ -415,6 +428,62 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
         foreach ($port_stats_poe as $p_index => $p_stats) {
             if (is_array($port_stats[$p_index])) {
                 $port_stats[$p_index] = array_merge($port_stats[$p_index], $p_stats);
+            }
+        }
+    } elseif ($device['os'] == 'sodola') {
+        require_once base_path('includes/discovery/sensors/sodola-poe-helper.inc.php');
+        $fetched_data_string .= 'sodolaPoePortTable ';
+        $poe_rows = [];
+        $poe_resp = SnmpQuery::cache()
+            ->numeric()
+            ->options(['-OteQUsab', '-Pu', '-Ih'])
+            ->walk('.1.3.6.1.4.1.12284.7.1.1.1');
+        if ($poe_resp->isValid()) {
+            $poe_resp->groupByIndex(1, $poe_rows);
+        }
+        $poeStatsTrim = SODOLA_POE_PORT_STATS_BASE_TRIM;
+        $poeStatsRows = sodola_poe_port_stats_table();
+        $poeBaseTrim = '1.3.6.1.4.1.12284.7.1.1.1';
+        $poeAdminCol = (int) LibrenmsConfig::getOsSetting($device['os'], 'poe_admin_enable_column', 2);
+        $poeCapCol = (int) LibrenmsConfig::getOsSetting($device['os'], 'poe_capability_column', 6);
+        $useTpLinkAdmin = sodola_poe_has_tp_link_style_admin($poe_rows, $poeBaseTrim, $poeAdminCol);
+        foreach ($poe_rows as $ifIndex => $cols) {
+            if (! preg_match('/^\d+(\.\d+)*$/', (string) $ifIndex) || ! isset($port_stats[$ifIndex])) {
+                continue;
+            }
+            $byCol = sodola_poe_row_columns($poeBaseTrim, $cols);
+            $cap = isset($byCol[$poeCapCol]) ? (int) $byCol[$poeCapCol] : null;
+            $pd = isset($byCol[15]) ? (int) $byCol[15] : null;
+            $mw = isset($byCol[14]) ? (int) $byCol[14] : null;
+            $ifName = (string) ($port_stats[$ifIndex]['ifName'] ?? '');
+            if ($ifName === '') {
+                $ifName = 'if' . $ifIndex;
+            }
+            if (! sodola_poe_port_is_managed($device, $ifName, $cap)) {
+                continue;
+            }
+            $adminRaw = $byCol[$poeAdminCol] ?? null;
+            if ($useTpLinkAdmin && $adminRaw !== null && $adminRaw !== ''
+                && in_array((int) $adminRaw, [0, 1], true)) {
+                $port_stats[$ifIndex]['sodolaPoeMode'] = ((int) $adminRaw === 1) ? 3 : 1;
+            } elseif ($cap !== null) {
+                $port_stats[$ifIndex]['sodolaPoeMode'] = $cap;
+            }
+            if ($pd !== null) {
+                $port_stats[$ifIndex]['sodolaPoePdPresent'] = $pd;
+            }
+            if ($mw !== null) {
+                $port_stats[$ifIndex]['sodolaPoePowerMw'] = $mw;
+            }
+            $psc = $poeStatsRows[$ifIndex] ?? [];
+            $pst = sodola_poe_row_columns($poeStatsTrim, $psc);
+            if ($psc !== []) {
+                if (array_key_exists(5, $pst)) {
+                    $port_stats[$ifIndex]['sodolaPoePowerMw'] = (int) $pst[5];
+                }
+                if (array_key_exists(3, $pst)) {
+                    $port_stats[$ifIndex]['sodolaPoePdPresent'] = (int) $pst[3];
+                }
             }
         }
     }

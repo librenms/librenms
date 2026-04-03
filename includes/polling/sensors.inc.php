@@ -24,6 +24,10 @@ if (! empty($submodules)) {
 }
 
 $query .= ' GROUP BY `sensor_class`';
+// Sodola: poll `power` before `state` so PoE PD workaround can read companion wattage from DB (includes/polling/sensors/state/sodola.inc.php).
+if (($device['os'] ?? '') === 'sodola') {
+    $query .= ' ORDER BY `sensor_class`';
+}
 
 foreach (dbFetchRows($query, $params) as $sensor_type) {
     poll_sensor($device, $sensor_type['sensor_class']);

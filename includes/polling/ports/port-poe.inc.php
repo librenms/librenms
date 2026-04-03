@@ -86,4 +86,21 @@ if ($device['os'] == 'vrp') {
         app('Datastore')->put($device, 'poe', $tags, $fields);
         echo 'PoE(ironware) ';
     }
+} elseif ($device['os'] == 'sodola') {
+    require_once base_path('includes/discovery/sensors/sodola-poe-helper.inc.php');
+    // Enterprise PoE table: mode value 2 = not supported on this port (e.g. SFP+)
+    $sodolaMode = isset($this_port['sodolaPoeMode']) ? (int) $this_port['sodolaPoeMode'] : null;
+    if (sodola_poe_port_is_managed($device, $ifName, $sodolaMode) && $sodolaMode !== null && $sodolaMode !== 2) {
+        $mw = (int) ($this_port['sodolaPoePowerMw'] ?? 0);
+        $fields = [
+            'PortPwrAllocated' => $mw,
+            'PortPwrAvailable' => $mw,
+            'PortConsumption' => $mw,
+            'PortMaxPwrDrawn' => $mw,
+        ];
+
+        $tags = ['ifName' => $ifName, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+        app('Datastore')->put($device, 'poe', $tags, $fields);
+        echo 'PoE(sodola) ';
+    }
 }

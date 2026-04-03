@@ -478,6 +478,16 @@
         "disabled_sensors_regex": {"$ref": "#/$defs/regex_group"},
         "bad_ifname_regexp": {"$ref": "#/$defs/regex_group"},
         "bad_if_regexp": {"$ref": "#/$defs/regex_group"},
+        "poe_ifname_regex": {"$ref": "#/$defs/regex_group"},
+        "poe_admin_enable_column": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "poe_capability_column": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "poe_mode_force_disabled_ifname_regex": {"$ref": "#/$defs/regex_group"},
         "bad_snmpEngineTime": {
             "type": "boolean"
         },
