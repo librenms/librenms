@@ -177,7 +177,7 @@ class SocialiteController extends Controller
         }
     }
 
-    private function getAuthorizedRoles(string $provider): array|false
+    private function getAuthorizedRoles(string $provider): array
     {
         $scopes = LibrenmsConfig::get('auth.socialite.scopes', ['openid', 'profile', 'email']);
         $claims = LibrenmsConfig::get('auth.socialite.claims', []);
