@@ -51,12 +51,12 @@ modules:
                     state_name: cpuStatus
                     group: 'CPU'
                     states:
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
-                        - { descr: minor, graph: 0, value: 2, generic: 1 }
-                        - { descr: major, graph: 0, value: 3, generic: 2 }
-                        - { descr: critical, graph: 0, value: 4, generic: 2 }
-                        - { descr: absent, graph: 0, value: 5, generic: 3 }
-                        - { descr: unknown, graph: 0, value: 6, generic: 3 }
+                        - { descr: ok, value: 1, generic: 0 }
+                        - { descr: minor, value: 2, generic: 1 }
+                        - { descr: major, value: 3, generic: 2 }
+                        - { descr: critical, value: 4, generic: 2 }
+                        - { descr: absent, value: 5, generic: 3 }
+                        - { descr: unknown, value: 6, generic: 3 }
                 -
                     oid: HUAWEI-SERVER-IBMC-MIB::hardDiskDescriptionEntry
                     value: HUAWEI-SERVER-IBMC-MIB::hardDiskStatus
@@ -66,12 +66,12 @@ modules:
                     state_name: hardDiskStatus
                     group: 'Drive Bays'
                     states:
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
-                        - { descr: minor, graph: 0, value: 2, generic: 1 }
-                        - { descr: major, graph: 0, value: 3, generic: 2 }
-                        - { descr: critical, graph: 0, value: 4, generic: 2 }
-                        - { descr: absent, graph: 0, value: 5, generic: 3 }
-                        - { descr: unknown, graph: 0, value: 6, generic: 3 }
+                        - { descr: ok, value: 1, generic: 0 }
+                        - { descr: minor, value: 2, generic: 1 }
+                        - { descr: major, value: 3, generic: 2 }
+                        - { descr: critical, value: 4, generic: 2 }
+                        - { descr: absent, value: 5, generic: 3 }
+                        - { descr: unknown, value: 6, generic: 3 }
                 -
                     oid: HUAWEI-SERVER-IBMC-MIB::fanDescriptionTable
                     value: HUAWEI-SERVER-IBMC-MIB::fanStatus
@@ -81,12 +81,12 @@ modules:
                     state_name: fanStatus
                     group: 'Fans'
                     states:
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
-                        - { descr: minor, graph: 0, value: 2, generic: 1 }
-                        - { descr: major, graph: 0, value: 3, generic: 2 }
-                        - { descr: critical, graph: 0, value: 4, generic: 2 }
-                        - { descr: absent, graph: 0, value: 5, generic: 3 }
-                        - { descr: unknown, graph: 0, value: 6, generic: 3 }
+                        - { descr: ok, value: 1, generic: 0 }
+                        - { descr: minor, value: 2, generic: 1 }
+                        - { descr: major, value: 3, generic: 2 }
+                        - { descr: critical, value: 4, generic: 2 }
+                        - { descr: absent, value: 5, generic: 3 }
+                        - { descr: unknown, value: 6, generic: 3 }
                 -
                     oid: HUAWEI-SERVER-IBMC-MIB::memoryEntireStatus
                     value: HUAWEI-SERVER-IBMC-MIB::memoryEntireStatus
@@ -96,12 +96,12 @@ modules:
                     state_name: memoryEntireStatus
                     group: 'RAM'
                     states:
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
-                        - { descr: minor, graph: 0, value: 2, generic: 1 }
-                        - { descr: major, graph: 0, value: 3, generic: 2 }
-                        - { descr: critical, graph: 0, value: 4, generic: 2 }
-                        - { descr: absent, graph: 0, value: 5, generic: 3 }
-                        - { descr: unknown, graph: 0, value: 6, generic: 3 }
+                        - { descr: ok, value: 1, generic: 0 }
+                        - { descr: minor, value: 2, generic: 1 }
+                        - { descr: major, value: 3, generic: 2 }
+                        - { descr: critical, value: 4, generic: 2 }
+                        - { descr: absent, value: 5, generic: 3 }
+                        - { descr: unknown, value: 6, generic: 3 }
                 -
                     oid: HUAWEI-SERVER-IBMC-MIB::memoryDescriptionEntry
                     value: HUAWEI-SERVER-IBMC-MIB::memoryStatus
@@ -111,12 +111,12 @@ modules:
                     state_name: memoryStatus
                     group: 'RAM'
                     states:
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
-                        - { descr: minor, graph: 0, value: 2, generic: 1 }
-                        - { descr: major, graph: 0, value: 3, generic: 2 }
-                        - { descr: critical, graph: 0, value: 4, generic: 2 }
-                        - { descr: absent, graph: 0, value: 5, generic: 3 }
-                        - { descr: unknown, graph: 0, value: 6, generic: 3 }
+                        - { descr: ok, value: 1, generic: 0 }
+                        - { descr: minor, value: 2, generic: 1 }
+                        - { descr: major, value: 3, generic: 2 }
+                        - { descr: critical, value: 4, generic: 2 }
+                        - { descr: absent, value: 5, generic: 3 }
+                        - { descr: unknown, value: 6, generic: 3 }
                     skip_values:
                         -
                             oid: HUAWEI-SERVER-IBMC-MIB::memoryStatus

@@ -51,8 +51,8 @@ modules:
                     group: 'Power'
                     state_name: powerAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: noAlarm }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: noAlarm }
+                        - { value: 1, generic: 2, descr: alarm }
 
 
                 -
@@ -65,8 +65,8 @@ modules:
                     group: 'Power'
                     state_name: powerAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: noAlarm }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: noAlarm }
+                        - { value: 1, generic: 2, descr: alarm }
 
                 -
                     oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
@@ -78,8 +78,8 @@ modules:
                     group: 'Power'
                     state_name: psuPresence
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: 'On' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'Off' }
+                        - { value: 0, generic: 0, descr: 'On' }
+                        - { value: 1, generic: 2, descr: 'Off' }
 
                 -
                     oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
@@ -91,9 +91,9 @@ modules:
                     group: 'Power'
                     state_name: powerOutAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: noAlarm }
-                        - { value: 1, generic: 2, graph: 0, descr: highAlarm }
-                        - { value: 2, generic: 2, graph: 0, descr: lowAlarm }
+                        - { value: 0, generic: 0, descr: noAlarm }
+                        - { value: 1, generic: 2, descr: highAlarm }
+                        - { value: 2, generic: 2, descr: lowAlarm }
 
                 -
                     oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
@@ -105,8 +105,8 @@ modules:
                     group: 'Alarm'
                     state_name: lossAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: alarmOk }
-                        - { value: 1, generic: 2, graph: 0, descr: lossAlarm }
+                        - { value: 0, generic: 0, descr: alarmOk }
+                        - { value: 1, generic: 2, descr: lossAlarm }
 
                 -
                     oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
@@ -118,8 +118,8 @@ modules:
                     group: 'Alarm'
                     state_name: lossAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: alarmOk }
-                        - { value: 1, generic: 2, graph: 0, descr: lossAlarm }
+                        - { value: 0, generic: 0, descr: alarmOk }
+                        - { value: 1, generic: 2, descr: lossAlarm }
 
                 -
                     oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
@@ -131,8 +131,8 @@ modules:
                     group: 'Slot'
                     state_name: slotStatus
                     states:
-                        - { value: 0, generic: 2, graph: 0, descr: noInserted }
-                        - { value: 1, generic: 0, graph: 0, descr: inserted }
+                        - { value: 0, generic: 2, descr: noInserted }
+                        - { value: 1, generic: 0, descr: inserted }
                 
                 -
                     oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
@@ -144,8 +144,8 @@ modules:
                     group: 'Fan'
                     state_name: alpineTEFanCardFanStatus
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: anormal }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: anormal }
 
                 -
                     oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
@@ -157,8 +157,8 @@ modules:
                     group: 'Fan'
                     state_name: alpineTEFanCardFanStatus
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: anormal }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: anormal }
 
                 -
                     oid: ALPINE-TDCM-EDFA-MIB::alpineTdcmEdfaSystem
@@ -170,8 +170,8 @@ modules:
                     group: 'Fan'
                     state_name: alpineTEFanCardFanStatus
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: normal }
-                        - { value: 1, generic: 2, graph: 0, descr: anormal }
+                        - { value: 0, generic: 0, descr: normal }
+                        - { value: 1, generic: 2, descr: anormal }
 
                 -
                     oid: ALPINE-GEN-CARD-TDCM-MIB::alpineGenCardTdcm
@@ -183,8 +183,8 @@ modules:
                     group: 'Mode'
                     state_name: workModeTDCM
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: manual }
-                        - { value: 2, generic: 0, graph: 0, descr: auto }
+                        - { value: 1, generic: 0, descr: manual }
+                        - { value: 2, generic: 0, descr: auto }
 
                 -
                     oid: ALPINE-GEN-CARD-TDCM-MIB::alpineGenCardTdcm
@@ -196,9 +196,9 @@ modules:
                     state_name: saveConfigStatus
                     group: 'Config'
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: saved }
-                        - { value: 1, generic: 1, graph: 0, descr: issueSave }
-                        - { value: 2, generic: 1, graph: 0, descr: saving }
+                        - { value: 0, generic: 0, descr: saved }
+                        - { value: 1, generic: 1, descr: issueSave }
+                        - { value: 2, generic: 1, descr: saving }
 
                 -
                     oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
@@ -210,8 +210,8 @@ modules:
                     index: 'gceMode.{{ $index }}'
                     state_name: workModeEDFA
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: AGC }
-                        - { value: 2, generic: 0, graph: 0, descr: APC }
+                        - { value: 1, generic: 0, descr: AGC }
+                        - { value: 2, generic: 0, descr: APC }
 
                 -
                     oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
@@ -223,9 +223,9 @@ modules:
                     state_name: saveConfigStatus
                     group: 'Config'
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: saved }
-                        - { value: 1, generic: 1, graph: 0, descr: issueSave }
-                        - { value: 2, generic: 1, graph: 0, descr: saving }
+                        - { value: 0, generic: 0, descr: saved }
+                        - { value: 1, generic: 1, descr: issueSave }
+                        - { value: 2, generic: 1, descr: saving }
 
                 -
                     oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
@@ -237,8 +237,8 @@ modules:
                     group: 'Alarm'
                     state_name: commonAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: noAlarm }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: noAlarm }
+                        - { value: 1, generic: 2, descr: alarm }
 
                 -
                     oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
@@ -250,8 +250,8 @@ modules:
                     group: 'Alarm'
                     state_name: tempAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: noAlarm }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: noAlarm }
+                        - { value: 1, generic: 2, descr: alarm }
 
                 -
                     oid: ALPINE-GEN-CARD-EDFA-MIB::alpineGenCardEdfa
@@ -263,8 +263,8 @@ modules:
                     group: 'Alarm'
                     state_name: biasAlarm
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: noAlarm }
-                        - { value: 1, generic: 2, graph: 0, descr: alarm }
+                        - { value: 0, generic: 0, descr: noAlarm }
+                        - { value: 1, generic: 2, descr: alarm }
 
 
         fanspeed:

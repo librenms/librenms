@@ -1471,56 +1471,48 @@
                 {
                     "state_name": "TERRA-sdi480-MIB::alarmLnb1",
                     "state_descr": "OK",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "TERRA-sdi480-MIB::alarmLnb1",
                     "state_descr": "Error",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "TERRA-sdi480-MIB::alarmLnb2",
                     "state_descr": "OK",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "TERRA-sdi480-MIB::alarmLnb2",
                     "state_descr": "Error",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "TERRA-sdi480-MIB::alarmLnb3",
                     "state_descr": "OK",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "TERRA-sdi480-MIB::alarmLnb3",
                     "state_descr": "Error",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "TERRA-sdi480-MIB::alarmLnb4",
                     "state_descr": "OK",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "TERRA-sdi480-MIB::alarmLnb4",
                     "state_descr": "Error",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 }

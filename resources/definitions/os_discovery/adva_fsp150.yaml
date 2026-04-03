@@ -23,32 +23,32 @@ modules:
                     index: 'cmSysCondType.{{ $index }}'
                     state_name: cmSysCondType
                     states:
-                        - { value: 9,   generic: 3, graph: 0, descr: 'Primary NTP Server Failed' }
-                        - { value: 10,   generic: 3, graph: 0, descr: 'Secondary NTP Server Failed' }
-                        - { value: 27,  generic: 2, graph: 0, descr: 'Equipment Fault' }
-                        - { value: 34,  generic: 2, graph: 0, descr: 'PSU A Failed' }
-                        - { value: 35,  generic: 2, graph: 0, descr: 'PSU B Failed' }
-                        - { value: 53,  generic: 2, graph: 0, descr: 'SFP Mismatch' }
-                        - { value: 59,  generic: 2, graph: 0, descr: 'Over Temperature' }
-                        - { value: 60,  generic: 2, graph: 0, descr: 'Under Temperature' }
-                        - { value: 65,  generic: 2, graph: 0, descr: 'Input Power Fault' }
-                        - { value: 86,  generic: 3, graph: 0, descr: 'SNMP Dying Gasp - Host Unreachable' }
-                        - { value: 90,  generic: 3, graph: 0, descr: 'SFP Non Qualified' }
-                        - { value: 93,  generic: 2, graph: 0, descr: 'Power No Input Unit Fault' }
-                        - { value: 121, generic: 1, graph: 0, descr: 'XFP Mismatch' }
-                        - { value: 122, generic: 3, graph: 0, descr: 'XFP Non Qualified' }
-                        - { value: 125, generic: 2, graph: 0, descr: 'LAG Member Failed' }
-                        - { value: 135, generic: 2, graph: 0, descr: 'DB Corruption' }
-                        - { value: 284, generic: 1, graph: 0, descr: 'XFP Wavelength Mismatch' }
-                        - { value: 288, generic: 3, graph: 0, descr: 'Loopback Active' }
-                        - { value: 347, generic: 2, graph: 0, descr: 'Key Exchange Failed' }
-                        - { value: 348, generic: 2, graph: 0, descr: 'Key Exchange Auth Password Missing' }
-                        - { value: 389, generic: 2, graph: 0, descr: 'Power No Input 2' }
-                        - { value: 390, generic: 2, graph: 0, descr: 'Key Exchange Stop' }
-                        - { value: 403, generic: 3, graph: 0, descr: 'HTTPS SSL Certificate Expired' }
-                        - { value: 409, generic: 2, graph: 0, descr: 'Fan Fail' }
-                        - { value: 417, generic: 2, graph: 0, descr: 'PSU A Input Fail' }
-                        - { value: 418, generic: 3, graph: 0, descr: 'PSU B Input Fail' }
+                        - { value: 9,   generic: 3, descr: 'Primary NTP Server Failed' }
+                        - { value: 10,   generic: 3, descr: 'Secondary NTP Server Failed' }
+                        - { value: 27,  generic: 2, descr: 'Equipment Fault' }
+                        - { value: 34,  generic: 2, descr: 'PSU A Failed' }
+                        - { value: 35,  generic: 2, descr: 'PSU B Failed' }
+                        - { value: 53,  generic: 2, descr: 'SFP Mismatch' }
+                        - { value: 59,  generic: 2, descr: 'Over Temperature' }
+                        - { value: 60,  generic: 2, descr: 'Under Temperature' }
+                        - { value: 65,  generic: 2, descr: 'Input Power Fault' }
+                        - { value: 86,  generic: 3, descr: 'SNMP Dying Gasp - Host Unreachable' }
+                        - { value: 90,  generic: 3, descr: 'SFP Non Qualified' }
+                        - { value: 93,  generic: 2, descr: 'Power No Input Unit Fault' }
+                        - { value: 121, generic: 1, descr: 'XFP Mismatch' }
+                        - { value: 122, generic: 3, descr: 'XFP Non Qualified' }
+                        - { value: 125, generic: 2, descr: 'LAG Member Failed' }
+                        - { value: 135, generic: 2, descr: 'DB Corruption' }
+                        - { value: 284, generic: 1, descr: 'XFP Wavelength Mismatch' }
+                        - { value: 288, generic: 3, descr: 'Loopback Active' }
+                        - { value: 347, generic: 2, descr: 'Key Exchange Failed' }
+                        - { value: 348, generic: 2, descr: 'Key Exchange Auth Password Missing' }
+                        - { value: 389, generic: 2, descr: 'Power No Input 2' }
+                        - { value: 390, generic: 2, descr: 'Key Exchange Stop' }
+                        - { value: 403, generic: 3, descr: 'HTTPS SSL Certificate Expired' }
+                        - { value: 409, generic: 2, descr: 'Fan Fail' }
+                        - { value: 417, generic: 2, descr: 'PSU A Input Fail' }
+                        - { value: 418, generic: 3, descr: 'PSU B Input Fail' }
                         
                 -
                     oid: F3-ERP-MIB::f3ErpGroupTable
@@ -59,11 +59,11 @@ modules:
                     index: 'f3ErpGroupNodeState.{{ $index }}'
                     state_name: f3ErpGroupNodeState
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'IDLE' }
-                        - { value: 2, generic: 2, graph: 0, descr: 'PROTECTION' }
-                        - { value: 3, generic: 1, graph: 0, descr: 'MANUAL' }
-                        - { value: 4, generic: 3, graph: 0, descr: 'FORCED' }
-                        - { value: 5, generic: 1, graph: 0, descr: 'PENDING' }
+                        - { value: 1, generic: 0, descr: 'IDLE' }
+                        - { value: 2, generic: 2, descr: 'PROTECTION' }
+                        - { value: 3, generic: 1, descr: 'MANUAL' }
+                        - { value: 4, generic: 3, descr: 'FORCED' }
+                        - { value: 5, generic: 1, descr: 'PENDING' }
                         
                 -
                     oid: F3-ERP-MIB::f3ErpUnitTable
@@ -74,9 +74,9 @@ modules:
                     index: 'f3ErpUnitPortRole.{{ $index }}'
                     state_name: f3ErpUnitPortRole
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'NONE' }
-                        - { value: 2, generic: 0, graph: 0, descr: 'NEIGHBOR' }
-                        - { value: 3, generic: 0, graph: 0, descr: 'RPL OWNER' }
+                        - { value: 1, generic: 0, descr: 'NONE' }
+                        - { value: 2, generic: 0, descr: 'NEIGHBOR' }
+                        - { value: 3, generic: 0, descr: 'RPL OWNER' }
 
                 -
                     oid: F3-ERP-MIB::f3ErpUnitTable
@@ -87,7 +87,7 @@ modules:
                     index: 'f3ErpUnitPortStatus.{{ $index }}'
                     state_name: f3ErpUnitPortStatus
                     states:
-                        - { value: 1,  generic: 0, graph: 0, descr: 'unblocked' }
-                        - { value: 4,  generic: 0, graph: 0, descr: 'blocked RPL' }
-                        - { value: 9,  generic: 1, graph: 0, descr: 'blocked pending' }
-                        - { value: 10, generic: 3, graph: 0, descr: 'subring interconnect' }
+                        - { value: 1,  generic: 0, descr: 'unblocked' }
+                        - { value: 4,  generic: 0, descr: 'blocked RPL' }
+                        - { value: 9,  generic: 1, descr: 'blocked pending' }
+                        - { value: 10, generic: 3, descr: 'subring interconnect' }

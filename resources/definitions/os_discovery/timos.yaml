@@ -36,9 +36,9 @@ modules:
                     index: 'tmnxHwID.{{ $index }}'
                     state_name: tmnxHwAlarmState
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: unknown }
-                        - { value: 1, generic: 2, graph: 0, descr: alarmActive }
-                        - { value: 2, generic: 0, graph: 0, descr: alarmCleared }
+                        - { value: 0, generic: 3, descr: unknown }
+                        - { value: 1, generic: 2, descr: alarmActive }
+                        - { value: 2, generic: 0, descr: alarmCleared }
                 -
                     oid: TIMETRA-CHASSIS-MIB::tmnxChassisTable
                     value: TIMETRA-CHASSIS-MIB::tmnxChassisCriticalLEDState
@@ -47,16 +47,16 @@ modules:
                     state_name: tmnxChassisCriticalLEDState
                     index: 'tmnxChassisCriticalLEDState.1'
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: NotApplicable }
-                        - { value: 1, generic: 0, graph: 0, descr: Off }
-                        - { value: 2, generic: 2, graph: 0, descr: Red }
-                        - { value: 3, generic: 1, graph: 0, descr: Amber }
-                        - { value: 4, generic: 1, graph: 0, descr: Yellow }
-                        - { value: 5, generic: 0, graph: 0, descr: Green }
-                        - { value: 6, generic: 1, graph: 0, descr: AmberBlink }
-                        - { value: 7, generic: 1, graph: 0, descr: YellowBlink }
-                        - { value: 8, generic: 0, graph: 0, descr: GreenBlink }
-                        - { value: 9, generic: 2, graph: 0, descr: RedBlink }
+                        - { value: 0, generic: 3, descr: NotApplicable }
+                        - { value: 1, generic: 0, descr: Off }
+                        - { value: 2, generic: 2, descr: Red }
+                        - { value: 3, generic: 1, descr: Amber }
+                        - { value: 4, generic: 1, descr: Yellow }
+                        - { value: 5, generic: 0, descr: Green }
+                        - { value: 6, generic: 1, descr: AmberBlink }
+                        - { value: 7, generic: 1, descr: YellowBlink }
+                        - { value: 8, generic: 0, descr: GreenBlink }
+                        - { value: 9, generic: 2, descr: RedBlink }
                 -
                     oid: TIMETRA-CHASSIS-MIB::tmnxChassisTable
                     value: TIMETRA-CHASSIS-MIB::tmnxChassisMajorLEDState
@@ -65,16 +65,16 @@ modules:
                     state_name: tmnxChassisMajorLEDState
                     index: 'tmnxChassisMajorLEDState.1'
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: NotApplicable }
-                        - { value: 1, generic: 0, graph: 0, descr: Off }
-                        - { value: 2, generic: 2, graph: 0, descr: Red }
-                        - { value: 3, generic: 1, graph: 0, descr: Amber }
-                        - { value: 4, generic: 1, graph: 0, descr: Yellow }
-                        - { value: 5, generic: 0, graph: 0, descr: Green }
-                        - { value: 6, generic: 1, graph: 0, descr: AmberBlink }
-                        - { value: 7, generic: 1, graph: 0, descr: YellowBlink }
-                        - { value: 8, generic: 0, graph: 0, descr: GreenBlink }
-                        - { value: 9, generic: 2, graph: 0, descr: RedBlink }
+                        - { value: 0, generic: 3, descr: NotApplicable }
+                        - { value: 1, generic: 0, descr: Off }
+                        - { value: 2, generic: 2, descr: Red }
+                        - { value: 3, generic: 1, descr: Amber }
+                        - { value: 4, generic: 1, descr: Yellow }
+                        - { value: 5, generic: 0, descr: Green }
+                        - { value: 6, generic: 1, descr: AmberBlink }
+                        - { value: 7, generic: 1, descr: YellowBlink }
+                        - { value: 8, generic: 0, descr: GreenBlink }
+                        - { value: 9, generic: 2, descr: RedBlink }
                 -
                     oid: TIMETRA-CHASSIS-MIB::tmnxChassisTable
                     value: TIMETRA-CHASSIS-MIB::tmnxChassisMinorLEDState
@@ -83,16 +83,16 @@ modules:
                     descr: 'Minor LED'
                     index: 'tmnxChassisMinorLEDState.1'
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: NotApplicable }
-                        - { value: 1, generic: 0, graph: 0, descr: Off }
-                        - { value: 2, generic: 2, graph: 0, descr: Red }
-                        - { value: 3, generic: 1, graph: 0, descr: Amber }
-                        - { value: 4, generic: 1, graph: 0, descr: Yellow }
-                        - { value: 5, generic: 0, graph: 0, descr: Green }
-                        - { value: 6, generic: 1, graph: 0, descr: AmberBlink }
-                        - { value: 7, generic: 1, graph: 0, descr: YellowBlink }
-                        - { value: 8, generic: 0, graph: 0, descr: GreenBlink }
-                        - { value: 9, generic: 2, graph: 0, descr: RedBlink }
+                        - { value: 0, generic: 3, descr: NotApplicable }
+                        - { value: 1, generic: 0, descr: Off }
+                        - { value: 2, generic: 2, descr: Red }
+                        - { value: 3, generic: 1, descr: Amber }
+                        - { value: 4, generic: 1, descr: Yellow }
+                        - { value: 5, generic: 0, descr: Green }
+                        - { value: 6, generic: 1, descr: AmberBlink }
+                        - { value: 7, generic: 1, descr: YellowBlink }
+                        - { value: 8, generic: 0, descr: GreenBlink }
+                        - { value: 9, generic: 2, descr: RedBlink }
                 -
                     oid: TIMETRA-CHASSIS-MIB::tmnxChassisTable
                     value: TIMETRA-CHASSIS-MIB::tmnxChassisOverTempState
@@ -101,8 +101,8 @@ modules:
                     index: 'tmnxChassisOverTempState.1'
                     state_name: tmnxChassisOverTempState
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: Ok }
-                        - { value: 2, generic: 2, graph: 0, descr: OverTemp }
+                        - { value: 1, generic: 0, descr: Ok }
+                        - { value: 2, generic: 2, descr: OverTemp }
                 -
                     oid: TIMETRA-CELLULAR-MIB::tmnxCellPortRegistrationStatus
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.2.{{ $index }}'
@@ -110,17 +110,17 @@ modules:
                     index: 'tmnxCellPortRegistrationStatus.{{ $index }}'
                     state_name: tmnxCellPortRegistrationStatus
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: Not-registered }
-                        - { value: 1, generic: 0, graph: 0, descr: Registered-home }
-                        - { value: 2, generic: 0, graph: 0, descr: Searching }
-                        - { value: 3, generic: 0, graph: 0, descr: Denied }
-                        - { value: 4, generic: 0, graph: 0, descr: No-network }
-                        - { value: 5, generic: 0, graph: 0, descr: Registered-roaming }
-                        - { value: 6, generic: 0, graph: 0, descr: Sms-only-home }
-                        - { value: 7, generic: 0, graph: 0, descr: Sms-only-roaming }
-                        - { value: 8, generic: 0, graph: 0, descr: Emergency-only }
-                        - { value: 9, generic: 0, graph: 0, descr: Csfb-not-preferred-home }
-                        - { value: 10, generic: 0, graph: 0, descr: Csfb-not-preferred-roaming }
+                        - { value: 0, generic: 0, descr: Not-registered }
+                        - { value: 1, generic: 0, descr: Registered-home }
+                        - { value: 2, generic: 0, descr: Searching }
+                        - { value: 3, generic: 0, descr: Denied }
+                        - { value: 4, generic: 0, descr: No-network }
+                        - { value: 5, generic: 0, descr: Registered-roaming }
+                        - { value: 6, generic: 0, descr: Sms-only-home }
+                        - { value: 7, generic: 0, descr: Sms-only-roaming }
+                        - { value: 8, generic: 0, descr: Emergency-only }
+                        - { value: 9, generic: 0, descr: Csfb-not-preferred-home }
+                        - { value: 10, generic: 0, descr: Csfb-not-preferred-roaming }
                     group: 'Cellular status'
                 -
                     oid: TIMETRA-CELLULAR-MIB::tmnxCellPortWirelessTechnology
@@ -129,10 +129,10 @@ modules:
                     index: 'tmnxCellPortWirelessTechnology.{{ $index }}'
                     state_name: tmnxCellPortWirelessTechnology
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: None }
-                        - { value: 1, generic: 0, graph: 0, descr: Lte }
-                        - { value: 2, generic: 0, graph: 0, descr: Wcdma }
-                        - { value: 3, generic: 0, graph: 0, descr: Gsm }
+                        - { value: 0, generic: 0, descr: None }
+                        - { value: 1, generic: 0, descr: Lte }
+                        - { value: 2, generic: 0, descr: Wcdma }
+                        - { value: 3, generic: 0, descr: Gsm }
                     group: 'Cellular status'
                 -
                     oid: TIMETRA-CELLULAR-MIB::tmnxCellSimCardEquipped
@@ -141,8 +141,8 @@ modules:
                     index: 'tmnxCellSimCardEquipped.{{ $index }}'
                     state_name: tmnxCellSimCardEquipped
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: Installed }
-                        - { value: 2, generic: 0, graph: 0, descr: Not installed }
+                        - { value: 1, generic: 0, descr: Installed }
+                        - { value: 2, generic: 0, descr: Not installed }
                     group: 'Cellular status'
                 -
 
@@ -152,8 +152,8 @@ modules:
                     index: 'tmnxCellPdnConnectionState.{{ $index }}'
                     state_name: tmnxCellPdnConnectionState
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: Not connected }
-                        - { value: 1, generic: 0, graph: 0, descr: Connected }
+                        - { value: 0, generic: 0, descr: Not connected }
+                        - { value: 1, generic: 0, descr: Connected }
                     group: 'Cellular status'
                 -
                     oid: TIMETRA-CHASSIS-MIB::tmnxPhysChassisFanEntry
@@ -164,13 +164,13 @@ modules:
                     state_name: tmnxPhysChassisFanOperStatus
                     group: 'Fan State'
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: Unknown }
-                        - { value: 2, generic: 3, graph: 0, descr: NotEquipped }
-                        - { value: 3, generic: 0, graph: 0, descr: OK }
-                        - { value: 4, generic: 2, graph: 0, descr: Failed }
-                        - { value: 5, generic: 1, graph: 0, descr: OOS }
-                        - { value: 6, generic: 1, graph: 0, descr: NotProvisioned }
-                        - { value: 7, generic: 3, graph: 0, descr: NotApplicable }
+                        - { value: 1, generic: 3, descr: Unknown }
+                        - { value: 2, generic: 3, descr: NotEquipped }
+                        - { value: 3, generic: 0, descr: OK }
+                        - { value: 4, generic: 2, descr: Failed }
+                        - { value: 5, generic: 1, descr: OOS }
+                        - { value: 6, generic: 1, descr: NotProvisioned }
+                        - { value: 7, generic: 3, descr: NotApplicable }
                 -
                     oid: ALU-MICROWAVE-MIB::aluMwRadioTable
                     value: ALU-MICROWAVE-MIB::aluMwRadioAlarmState
@@ -179,14 +179,14 @@ modules:
                     index: 'aluMwRadioPortID.{{ $index }}'
                     state_name: 'aluMwRadioAlarmState'
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: alarmCleared }
-                        - { value: 1, generic: 2, graph: 0, descr: Critical }
-                        - { value: 2, generic: 2, graph: 0, descr: Major }
-                        - { value: 3, generic: 1, graph: 0, descr: Minor }
-                        - { value: 4, generic: 1, graph: 0, descr: Warning }
-                        - { value: 5, generic: 3, graph: 0, descr: Indeterminate }
-                        - { value: 6, generic: 0, graph: 0, descr: Unsupported }
-                        - { value: 7, generic: 3, graph: 0, descr: Unknown }
+                        - { value: 0, generic: 0, descr: alarmCleared }
+                        - { value: 1, generic: 2, descr: Critical }
+                        - { value: 2, generic: 2, descr: Major }
+                        - { value: 3, generic: 1, descr: Minor }
+                        - { value: 4, generic: 1, descr: Warning }
+                        - { value: 5, generic: 3, descr: Indeterminate }
+                        - { value: 6, generic: 0, descr: Unsupported }
+                        - { value: 7, generic: 3, descr: Unknown }
                 -
                     oid: ALU-MICROWAVE-MIB::aluMwRadioTable
                     value: ALU-MICROWAVE-MIB::aluMwRadioTxMuted
@@ -195,10 +195,10 @@ modules:
                     index: 'aluMwRadioPortID.{{ $index }}'
                     state_name: 'aluMwRadioTxMuted'
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: Unknown }
-                        - { value: 1, generic: 0, graph: 0, descr: None }
-                        - { value: 2, generic: 1, graph: 0, descr: Manual }
-                        - { value: 3, generic: 0, graph: 0, descr: Auto }
+                        - { value: 0, generic: 3, descr: Unknown }
+                        - { value: 1, generic: 0, descr: None }
+                        - { value: 2, generic: 1, descr: Manual }
+                        - { value: 3, generic: 0, descr: Auto }
                 # ESA (Extended Services Appliance) Sensors
                 -
                     oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
@@ -209,22 +209,22 @@ modules:
                     state_name: tmnxEsaStatsOperState
                     group: 'ESA Status'
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: inService }
-                        - { value: 3, generic: 1, graph: 0, descr: outOfService }
-                        - { value: 4, generic: 1, graph: 0, descr: booting }
-                        - { value: 5, generic: 2, graph: 0, descr: failed }
-                        - { value: 6, generic: 1, graph: 0, descr: provisioned }
-                        - { value: 7, generic: 1, graph: 0, descr: unprovisioned }
-                        - { value: 8, generic: 1, graph: 0, descr: upgrade }
-                        - { value: 9, generic: 1, graph: 0, descr: fwUpgrade }
-                        - { value: 10, generic: 1, graph: 0, descr: fwUpgradeNic }
-                        - { value: 11, generic: 1, graph: 0, descr: fwUpgradeSps }
-                        - { value: 12, generic: 1, graph: 0, descr: fwUpgradeSystemRom }
-                        - { value: 13, generic: 1, graph: 0, descr: fwUpgradeSetting }
-                        - { value: 14, generic: 1, graph: 0, descr: fwUpgradeBmc }
-                        - { value: 15, generic: 1, graph: 0, descr: fwUpgradeBmcSetting }
-                        - { value: 16, generic: 1, graph: 0, descr: fwUpgradeIe }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: inService }
+                        - { value: 3, generic: 1, descr: outOfService }
+                        - { value: 4, generic: 1, descr: booting }
+                        - { value: 5, generic: 2, descr: failed }
+                        - { value: 6, generic: 1, descr: provisioned }
+                        - { value: 7, generic: 1, descr: unprovisioned }
+                        - { value: 8, generic: 1, descr: upgrade }
+                        - { value: 9, generic: 1, descr: fwUpgrade }
+                        - { value: 10, generic: 1, descr: fwUpgradeNic }
+                        - { value: 11, generic: 1, descr: fwUpgradeSps }
+                        - { value: 12, generic: 1, descr: fwUpgradeSystemRom }
+                        - { value: 13, generic: 1, descr: fwUpgradeSetting }
+                        - { value: 14, generic: 1, descr: fwUpgradeBmc }
+                        - { value: 15, generic: 1, descr: fwUpgradeBmcSetting }
+                        - { value: 16, generic: 1, descr: fwUpgradeIe }
                 -
                     oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
                     value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsHardwareStatus
@@ -234,11 +234,11 @@ modules:
                     state_name: tmnxEsaStatsHardwareStatus
                     group: 'ESA Status'
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: ok }
-                        - { value: 3, generic: 1, graph: 0, descr: degraded }
-                        - { value: 4, generic: 2, graph: 0, descr: critical }
-                        - { value: 5, generic: 3, graph: 0, descr: unsupported }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: ok }
+                        - { value: 3, generic: 1, descr: degraded }
+                        - { value: 4, generic: 2, descr: critical }
+                        - { value: 5, generic: 3, descr: unsupported }
                 -
                     oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
                     value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsPowerSupply1Status
@@ -248,11 +248,11 @@ modules:
                     state_name: tmnxEsaDeviceState
                     group: 'ESA Status'
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: ok }
-                        - { value: 3, generic: 1, graph: 0, descr: degraded }
-                        - { value: 4, generic: 2, graph: 0, descr: failed }
-                        - { value: 5, generic: 3, graph: 0, descr: unsupported }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: ok }
+                        - { value: 3, generic: 1, descr: degraded }
+                        - { value: 4, generic: 2, descr: failed }
+                        - { value: 5, generic: 3, descr: unsupported }
                 -
                     oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
                     value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsPowerSupply2Status
@@ -262,11 +262,11 @@ modules:
                     state_name: tmnxEsaDeviceState
                     group: 'ESA Status'
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: ok }
-                        - { value: 3, generic: 1, graph: 0, descr: degraded }
-                        - { value: 4, generic: 2, graph: 0, descr: failed }
-                        - { value: 5, generic: 3, graph: 0, descr: unsupported }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: ok }
+                        - { value: 3, generic: 1, descr: degraded }
+                        - { value: 4, generic: 2, descr: failed }
+                        - { value: 5, generic: 3, descr: unsupported }
                 -
                     oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
                     value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsFanStatus
@@ -276,11 +276,11 @@ modules:
                     state_name: tmnxEsaDeviceState
                     group: 'ESA Status'
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: ok }
-                        - { value: 3, generic: 1, graph: 0, descr: degraded }
-                        - { value: 4, generic: 2, graph: 0, descr: failed }
-                        - { value: 5, generic: 3, graph: 0, descr: unsupported }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: ok }
+                        - { value: 3, generic: 1, descr: degraded }
+                        - { value: 4, generic: 2, descr: failed }
+                        - { value: 5, generic: 3, descr: unsupported }
                 -
                     oid: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTable
                     value: TIMETRA-CHASSIS-MIB::tmnxEsaStatsTemperatureStatus
@@ -290,11 +290,11 @@ modules:
                     state_name: tmnxEsaDeviceState
                     group: 'ESA Status'
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: unknown }
-                        - { value: 2, generic: 0, graph: 0, descr: ok }
-                        - { value: 3, generic: 1, graph: 0, descr: degraded }
-                        - { value: 4, generic: 2, graph: 0, descr: failed }
-                        - { value: 5, generic: 3, graph: 0, descr: unsupported }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: ok }
+                        - { value: 3, generic: 1, descr: degraded }
+                        - { value: 4, generic: 2, descr: failed }
+                        - { value: 5, generic: 3, descr: unsupported }
                 # NAT ISA Member State Sensors
                 -
                     oid: TIMETRA-NAT-MIB::tmnxNatIsaMemberTable
@@ -305,16 +305,16 @@ modules:
                     state_name: tmnxNatIsaMemberMdaState
                     group: 'NAT ISA Status'
                     states:
-                        - { value: 1, generic: 1, graph: 0, descr: inactive }
-                        - { value: 2, generic: 0, graph: 0, descr: active }
-                        - { value: 3, generic: 1, graph: 0, descr: needsReset }
-                        - { value: 4, generic: 1, graph: 0, descr: resetting }
-                        - { value: 5, generic: 1, graph: 0, descr: needsReconcile }
-                        - { value: 6, generic: 1, graph: 0, descr: reconciling }
-                        - { value: 7, generic: 1, graph: 0, descr: needsAudit }
-                        - { value: 8, generic: 1, graph: 0, descr: auditing }
-                        - { value: 9, generic: 2, graph: 0, descr: failedBypass }
-                        - { value: 10, generic: 1, graph: 0, descr: activeBypass }
+                        - { value: 1, generic: 1, descr: inactive }
+                        - { value: 2, generic: 0, descr: active }
+                        - { value: 3, generic: 1, descr: needsReset }
+                        - { value: 4, generic: 1, descr: resetting }
+                        - { value: 5, generic: 1, descr: needsReconcile }
+                        - { value: 6, generic: 1, descr: reconciling }
+                        - { value: 7, generic: 1, descr: needsAudit }
+                        - { value: 8, generic: 1, descr: auditing }
+                        - { value: 9, generic: 2, descr: failedBypass }
+                        - { value: 10, generic: 1, descr: activeBypass }
                 -
                     oid: TIMETRA-NAT-MIB::tmnxNatIsaMemberTable
                     value: TIMETRA-NAT-MIB::tmnxNatIsaMemberSessionUsageHi
@@ -324,8 +324,8 @@ modules:
                     state_name: tmnxNatIsaMemberSessionUsageHi
                     group: 'NAT ISA Status'
                     states:
-                        - { value: 1, generic: 1, graph: 0, descr: 'true' }
-                        - { value: 2, generic: 0, graph: 0, descr: 'false' }
+                        - { value: 1, generic: 1, descr: 'true' }
+                        - { value: 2, generic: 0, descr: 'false' }
         temperature:
             data:
                 -

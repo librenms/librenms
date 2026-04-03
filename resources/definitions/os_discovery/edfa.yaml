@@ -12,11 +12,11 @@ modules:
                     group: Common
                     state_name: commonDeviceResetCause
                     states:
-                        - { value: 1, generic: 3, graph: 1, descr: 'other' }
-                        - { value: 2, generic: 2, graph: 1, descr: 'powerup' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'command' }
-                        - { value: 4, generic: 1, graph: 1, descr: 'watchdog' }
-                        - { value: 5, generic: 1, graph: 1, descr: 'craft' }
+                        - { value: 1, generic: 3, descr: 'other' }
+                        - { value: 2, generic: 2, descr: 'powerup' }
+                        - { value: 3, generic: 1, descr: 'command' }
+                        - { value: 4, generic: 1, descr: 'watchdog' }
+                        - { value: 5, generic: 1, descr: 'craft' }
                 -
                     oid: NSCRTV-ROOT::commonDeviceTamperStatus
                     num_oid: '.1.3.6.1.4.1.17409.1.3.3.2.2.1.11.{{ $index }}'
@@ -24,8 +24,8 @@ modules:
                     group: Common
                     state_name: commonDeviceTamperStatus
                     states:
-                        - { value: 1, generic: 1, graph: 1, descr: 'intact' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'compromised' }
+                        - { value: 1, generic: 1, descr: 'intact' }
+                        - { value: 2, generic: 0, descr: 'compromised' }
                 -
                     oid: NSCRTV-ROOT::commonDeviceCraftStatus
                     num_oid: '.1.3.6.1.4.1.17409.1.3.3.2.2.1.14.{{ $index }}'
@@ -33,8 +33,8 @@ modules:
                     group: Common
                     state_name: commonDeviceCraftStatus
                     states:
-                        - { value: 1, generic: 2, graph: 1, descr: 'disconnected' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'connected' }
+                        - { value: 1, generic: 2, descr: 'disconnected' }
+                        - { value: 2, generic: 0, descr: 'connected' }
                 -
                     oid: NSCRTV-ROOT::powerSupplyStatusA
                     num_oid: '.1.3.6.1.4.1.17409.1.11.32.{{ $index }}'
@@ -42,10 +42,10 @@ modules:
                     group: Power
                     state_name: powerSupplyStatusA
                     states:
-                        - { value: 0, generic: 3, graph: 1, descr: 'undefined' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'nominal' }
-                        - { value: 2, generic: 2, graph: 1, descr: 'failure' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'notInstalled' }
+                        - { value: 0, generic: 3, descr: 'undefined' }
+                        - { value: 1, generic: 0, descr: 'nominal' }
+                        - { value: 2, generic: 2, descr: 'failure' }
+                        - { value: 3, generic: 1, descr: 'notInstalled' }
                 -
                     oid: NSCRTV-ROOT::powerSupplyStatusB
                     num_oid: '.1.3.6.1.4.1.17409.1.11.33.{{ $index }}'
@@ -53,10 +53,10 @@ modules:
                     group: Power
                     state_name: powerSupplyStatusB
                     states:
-                        - { value: 0, generic: 3, graph: 1, descr: 'undefined' }
-                        - { value: 1, generic: 0, graph: 1, descr: 'nominal' }
-                        - { value: 2, generic: 2, graph: 1, descr: 'failure' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'notInstalled' }
+                        - { value: 0, generic: 3, descr: 'undefined' }
+                        - { value: 1, generic: 0, descr: 'nominal' }
+                        - { value: 2, generic: 2, descr: 'failure' }
+                        - { value: 3, generic: 1, descr: 'notInstalled' }
                 -
                     oid:  NSCRTV-ROOT::oaDCPowerSupplyMode
                     num_oid: '.1.3.6.1.4.1.17409.1.11.6.{{ $index }}'
@@ -64,9 +64,9 @@ modules:
                     group: Power
                     state_name: oaDCPowerSupplyMode
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'loadsharing' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'switchRedundant' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'aloneSupply' }
+                        - { value: 1, generic: 0, descr: 'loadsharing' }
+                        - { value: 2, generic: 0, descr: 'switchRedundant' }
+                        - { value: 3, generic: 1, descr: 'aloneSupply' }
         temperature:
             data:
                 -

@@ -20,7 +20,7 @@
                 @endif
             </span>
             <br/>
-            <a href="{{ url('/devices/location=' . urlencode($device->location)) }}">{{ $device->location }}</a>
+            <a href="{{ url('/devices/location=' . urlencode((string) $device->location)) }}">{{ $device->location }}</a>
         </div>
         <div class="pull-right">
             @foreach($overviewGraphs() as $graph)

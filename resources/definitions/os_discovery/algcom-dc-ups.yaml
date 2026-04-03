@@ -88,14 +88,14 @@ modules:
                       index: chargerStatus
                       state_name: chargerStatus
                       states:
-                        - { graph: 1, value: 0, generic: 2, descr: BATTERY_DISCONNECTED }
-                        - { graph: 1, value: 1, generic: 2, descr: WRONG_BATTERY_VOLTAGE }
-                        - { graph: 1, value: 2, generic: 1, descr: DISCHARGING }
-                        - { graph: 1, value: 3, generic: 0, descr: CHARGING_BULK }
-                        - { graph: 1, value: 4, generic: 0, descr: CHARGING_ABSORPTION }
-                        - { graph: 1, value: 5, generic: 0, descr: CHARGING_FLOAT }
-                        - { graph: 1, value: 6, generic: 2, descr: CRITICAL_LOW_VOLTAGE }
-                        - { graph: 1, value: 7, generic: 0, descr: BATTERY_UNDER_TEST }
+                        - { value: 0, generic: 2, descr: BATTERY_DISCONNECTED }
+                        - { value: 1, generic: 2, descr: WRONG_BATTERY_VOLTAGE }
+                        - { value: 2, generic: 1, descr: DISCHARGING }
+                        - { value: 3, generic: 0, descr: CHARGING_BULK }
+                        - { value: 4, generic: 0, descr: CHARGING_ABSORPTION }
+                        - { value: 5, generic: 0, descr: CHARGING_FLOAT }
+                        - { value: 6, generic: 2, descr: CRITICAL_LOW_VOLTAGE }
+                        - { value: 7, generic: 0, descr: BATTERY_UNDER_TEST }
                     -
                       oid: ALGPOWER-v2-MIB::alarmOnBattery
                       value: ALGPOWER-v2-MIB::alarmOnBattery
@@ -104,8 +104,8 @@ modules:
                       index: alarmOnBattery
                       state_name: alarmOnBattery
                       states:
-                        - { graph: 1, value: 0, generic: 0, descr: AC }
-                        - { graph: 1, value: 1, generic: 1, descr: BATTERY }
+                        - { value: 0, generic: 0, descr: AC }
+                        - { value: 1, generic: 1, descr: BATTERY }
                     -
                       oid: ALGPOWER-v2-MIB::acFail
                       value: ALGPOWER-v2-MIB::acFail
@@ -114,8 +114,8 @@ modules:
                       index: acFail
                       state_name: acFail
                       states:
-                        - { graph: 1, value: 0, generic: 0, descr: OK }
-                        - { graph: 1, value: 1, generic: 1, descr: FAIL }
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 1, descr: FAIL }
                     -
                       oid: ALGPOWER-v2-MIB::batteryCharging
                       value: ALGPOWER-v2-MIB::batteryCharging
@@ -124,8 +124,8 @@ modules:
                       index: batteryCharging
                       state_name: batteryCharging
                       states:
-                        - { graph: 1, value: 0, generic: 0, descr: NO }
-                        - { graph: 1, value: 1, generic: 0, descr: YES }
+                        - { value: 0, generic: 0, descr: NO }
+                        - { value: 1, generic: 0, descr: YES }
                     -
                       oid: ALGPOWER-v2-MIB::batteryDischarging
                       value: ALGPOWER-v2-MIB::batteryDischarging
@@ -134,8 +134,8 @@ modules:
                       index: batteryDischarging
                       state_name: batteryDischarging
                       states:
-                        - { graph: 1, value: 0, generic: 0, descr: NO }
-                        - { graph: 1, value: 1, generic: 0, descr: YES }
+                        - { value: 0, generic: 0, descr: NO }
+                        - { value: 1, generic: 0, descr: YES }
                     -
                       oid: ALGPOWER-v2-MIB::overheat
                       value: ALGPOWER-v2-MIB::overheat
@@ -144,8 +144,8 @@ modules:
                       index: overheat
                       state_name: overheat
                       states:
-                        - { graph: 1, value: 0, generic: 0, descr: OK }
-                        - { graph: 1, value: 1, generic: 2, descr: OVERHEAT }
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 2, descr: OVERHEAT }
                     -
                       oid: ALGPOWER-v2-MIB::overload
                       value: ALGPOWER-v2-MIB::overload
@@ -154,8 +154,8 @@ modules:
                       index: overload
                       state_name: overload
                       states:
-                        - { graph: 1, value: 0, generic: 0, descr: OK }
-                        - { graph: 1, value: 1, generic: 2, descr: OVERLOAD }
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 2, descr: OVERLOAD }
                     -
                       oid: ALGPOWER-v2-MIB::fanAfail
                       value: ALGPOWER-v2-MIB::fanAfail
@@ -164,8 +164,8 @@ modules:
                       descr: 'Fan A'
                       index: fanAfail
                       states:
-                        - { graph: 0, value: 0, generic: 0, descr: OK }
-                        - { graph: 0, value: 1, generic: 2, descr: FAIL }
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 2, descr: FAIL }
                     -
                       oid: ALGPOWER-v2-MIB::fanBfail
                       value: ALGPOWER-v2-MIB::fanBfail
@@ -174,8 +174,8 @@ modules:
                       descr: 'Fan B'
                       index: fanBfail
                       states:
-                        - { graph: 0, value: 0, generic: 0, descr: OK }
-                        - { graph: 0, value: 1, generic: 2, descr: FAIL }
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 2, descr: FAIL }
         count:
                 data:
                     -
