@@ -37,7 +37,7 @@ final class SocialiteControllerTest extends TestCase
      *
      * @param  string  $provider  The Socialite provider name (e.g. 'okta' or 'saml2').
      * @param  array  $rawAttributes  The simulated raw user data from getRaw().
-     * @param  array  $expectedRoles  The roles expected to be returned.
+     * @param  array  $expectedRoles  The roles expected to be passed to syncRoles() - the expected returns.
      * @param  array  $claimMap  A map of claim-values to roles (config for auth.socialite.claims).
      * @param  array  $scopes  Optional scopes config; defaults to ['groups'].
      * @return array The return value from getAuthorizedRoles().
