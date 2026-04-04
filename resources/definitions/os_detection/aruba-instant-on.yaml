@@ -1,0 +1,13 @@
+os: aruba-instant-on
+text: 'Aruba Instant On'
+type: network
+icon: aruba
+mib_dir: hp
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysDescr_regex:
+            - '/^(Aruba|HPE Networking) Instant On (?<hardware>[^,]+), InstantOn_\d+_(?<version>[0-9\.]+)/'

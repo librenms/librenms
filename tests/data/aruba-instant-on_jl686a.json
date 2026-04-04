@@ -11,10 +11,10 @@
                     "hardware": "1930 48G Class4 PoE 4SFP/SFP 370W JL686A",
                     "features": null,
                     "location": null,
-                    "os": "procurve",
+                    "os": "aruba-instant-on",
                     "type": "network",
                     "serial": null,
-                    "icon": "hpe.svg"
+                    "icon": "aruba.svg"
                 }
             ]
         },
