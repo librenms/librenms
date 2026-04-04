@@ -11,28 +11,26 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
               <i class="fa fa-road fa-lg icon-theme" aria-hidden="true"></i><strong> Overall Traffic</strong>
             </div>';
 
-    if (($device['os'] ?? '') !== 'sodola') {
-        $graph_array = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth();
-        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
-        $graph_array['device'] = $device['device_id'];
-        $graph_array['type'] = 'device_bits';
-        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
-        $graph_array['legend'] = 'no';
-        $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
+    $graph_array = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth();
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
+    $graph_array['device'] = $device['device_id'];
+    $graph_array['type'] = 'device_bits';
+    $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
+    $graph_array['legend'] = 'no';
+    $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
-        //Generate tooltip
-        $graph_array['width'] = 210;
-        $graph_array['height'] = 100;
-        $link_array = $graph_array;
-        $link_array['page'] = 'graphs';
-        unset($link_array['height'], $link_array['width']);
-        $link = \LibreNMS\Util\Url::generate($link_array);
+    //Generate tooltip
+    $graph_array['width'] = 210;
+    $graph_array['height'] = 100;
+    $link_array = $graph_array;
+    $link_array['page'] = 'graphs';
+    unset($link_array['height'], $link_array['width']);
+    $link = \LibreNMS\Util\Url::generate($link_array);
 
-        $graph_array['width'] = '210';
-        $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - Device Traffic');
+    $graph_array['width'] = '210';
+    $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - Device Traffic');
 
-        echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
-    }
+    echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
 
     $ports = ObjectCache::portCounts(['total', 'up', 'down', 'disabled'], $device['device_id']);
     echo '<div class="panel-body">

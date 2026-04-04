@@ -6756,7 +6756,7 @@ parameters:
 				Please use SnmpQuery instead$#
 			'''
 			identifier: function.deprecated
-			count: 22
+			count: 23
 			path: includes/polling/ports.inc.php
 
 		-

@@ -8,6 +8,7 @@
  */
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Sensor;
 
 require_once base_path('includes/discovery/sensors/sodola-poe-helper.inc.php');
 
@@ -31,7 +32,7 @@ $pdSnmpOff = ($sensor_value === '' || $sensor_value === '0'
     || (is_numeric($sensor_value) && (int) $sensor_value === 0));
 
 if (str_ends_with($descr, ' PoE device') && $pdSnmpOff) {
-    // Prefer companion `power` row (polled earlier on sodola via includes/polling/sensors.inc.php ordering). PD uses `poe-pd.<ifIndex>`, power uses `poe-power.<ifIndex>`.
+    // Prefer companion `power` row when it was already updated this poll (`poe-pd.<ifIndex>` vs `poe-power.<ifIndex>`).
     $pdIdx = (string) ($sensor['sensor_index'] ?? '');
     $powerIdx = $pdIdx;
     if (preg_match('/^poe-pd\.(.+)$/', $pdIdx, $m)) {
@@ -41,10 +42,13 @@ if (str_ends_with($descr, ' PoE device') && $pdSnmpOff) {
     }
     $fromDb = false;
     if ($powerIdx !== '') {
-        $watts = dbFetchCell(
-            'SELECT `sensor_current` FROM `sensors` WHERE `device_id` = ? AND `sensor_class` = ? AND `sensor_type` = ? AND `sensor_index` = ? AND `sensor_deleted` = 0 LIMIT 1',
-            [$device['device_id'], 'power', 'sodola', $powerIdx]
-        );
+        $watts = Sensor::query()
+            ->where('device_id', $device['device_id'])
+            ->where('sensor_class', 'power')
+            ->where('sensor_type', 'sodola')
+            ->where('sensor_index', $powerIdx)
+            ->where('sensor_deleted', 0)
+            ->value('sensor_current');
         if (is_numeric($watts) && (float) $watts > 0) {
             $sensor_value = '1';
             $fromDb = true;
@@ -54,12 +58,15 @@ if (str_ends_with($descr, ' PoE device') && $pdSnmpOff) {
     if (! $fromDb) {
         $oid = (string) ($sensor['sensor_oid'] ?? '');
 
-        $readMw = static function (string $oidMw) use ($device): int {
+        $readMw = static function (string $oidMw): int {
             if ($oidMw === '') {
                 return 0;
             }
-            $mwRaw = snmp_get($device, $oidMw, '-OUQntea');
-            $mw = trim(str_replace('"', '', (string) ($mwRaw !== false ? $mwRaw : '')));
+            $resp = SnmpQuery::numeric()->options(['-OUQntea', '-Pu'])->get($oidMw);
+            if (! $resp->isValid()) {
+                return 0;
+            }
+            $mw = trim(str_replace('"', '', $resp->value()));
 
             return is_numeric($mw) ? (int) $mw : 0;
         };
