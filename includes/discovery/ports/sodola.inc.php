@@ -5,7 +5,7 @@
  * ifName. Prefer ifName for display (os ifname: true) and copy the description to ifAlias
  * when the device left ifAlias empty, so the ports list shows both.
  */
-foreach ($port_stats as $ifIndex => &$row) {
+foreach ($port_stats as &$row) {
     if (! is_array($row)) {
         continue;
     }

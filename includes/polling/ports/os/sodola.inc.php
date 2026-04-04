@@ -5,7 +5,7 @@
  * - Some firmware reports ifSpeed as megabits per second (e.g. 10000 for 10G) instead of bps.
  * - ifHighSpeed may be wrong (e.g. 1410 → 1.41 Gbps) while the scaled ifSpeed matches line rate.
  */
-foreach ($port_stats as $ifIndex => &$port) {
+foreach ($port_stats as &$port) {
     if (! is_array($port)) {
         continue;
     }
