@@ -61,7 +61,7 @@
                     "os": "sodola",
                     "type": "network",
                     "serial": "00:11:22:33:44:01",
-                    "icon": "generic.svg"
+                    "icon": "sodola.png"
                 }
             ]
         },
