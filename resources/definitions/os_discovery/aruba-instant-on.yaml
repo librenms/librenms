@@ -1,0 +1,28 @@
+# Aruba Instant On wired switches: ProCurve-compatible port/bridge data, but no NETSWITCH/STATISTICS
+# or HP-ICF-POE tables. CPU is exposed under the HPE rndMng-style tree; PoE via RFC 3621 POWER-ETHERNET-MIB.
+#
+# This file is merged in LibreNMS/OS/ArubaInstantOn with procurve.yaml (processors, PoE, mempools overridden).
+
+modules:
+    processors:
+        data:
+            -
+                oid: .1.3.6.1.4.1.11.2.1.9
+                num_oid: '.1.3.6.1.4.1.11.2.1.9.{{ $index }}'
+                descr: CPU
+    sensors:
+        power:
+            data:
+                -
+                    oid: POWER-ETHERNET-MIB::pethMainPseTable
+                    value: POWER-ETHERNET-MIB::pethMainPseConsumptionPower
+                    num_oid: '.1.3.6.1.2.1.105.1.3.1.1.4.{{ $index }}'
+                    index: 'pethMainPseConsumptionPower.{{ $index }}'
+                    high_limit: POWER-ETHERNET-MIB::pethMainPsePower
+                    descr: 'PoE Power Used'
+                -
+                    oid: POWER-ETHERNET-MIB::pethMainPseTable
+                    value: POWER-ETHERNET-MIB::pethMainPsePower
+                    num_oid: '.1.3.6.1.2.1.105.1.3.1.1.2.{{ $index }}'
+                    index: 'pethMainPsePower.{{ $index }}'
+                    descr: 'PoE Power Budget'

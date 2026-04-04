@@ -29,10 +29,7 @@ class ArubaInstantOn extends Procurve
     public function getDiscovery($module = null)
     {
         if (! array_key_exists('dynamic_discovery', $this->device)) {
-            $file = resource_path('definitions/os_discovery/procurve.yaml');
-            if (file_exists($file)) {
-                $this->device['dynamic_discovery'] = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
-            }
+            $this->device['dynamic_discovery'] = $this->buildMergedDiscovery();
         }
 
         if ($module) {
@@ -40,5 +37,24 @@ class ArubaInstantOn extends Procurve
         }
 
         return $this->device['dynamic_discovery'] ?? [];
+    }
+
+    /**
+     * ProCurve YAML matches port QoS/STP/VLAN behaviour; Instant On lacks ProCurve memory/CPU/PoE SNMP trees.
+     *
+     * @return array<string, mixed>
+     */
+    private function buildMergedDiscovery(): array
+    {
+        $base = \Symfony\Component\Yaml\Yaml::parseFile(resource_path('definitions/os_discovery/procurve.yaml'));
+        $instantOn = \Symfony\Component\Yaml\Yaml::parseFile(resource_path('definitions/os_discovery/aruba-instant-on.yaml'));
+
+        $base['modules']['mempools'] = ['data' => []];
+        $base['modules']['processors'] = $instantOn['modules']['processors'];
+        if (isset($instantOn['modules']['sensors']['power'])) {
+            $base['modules']['sensors']['power'] = $instantOn['modules']['sensors']['power'];
+        }
+
+        return $base;
     }
 }
