@@ -27,8 +27,8 @@ modules:
         data:
             -
                 oid: .1.3.6.1.4.1.12284.4.1.6
-                # valuesByIndex stores scalar columns as [index][ '1' => value ]; use column key, not parent OID
-                value: '1'
-                num_oid: '.1.3.6.1.4.1.12284.4.1.6.{{ $index }}'
+                # Numeric walk: row index is 12284.4.1.6.0, column key is enterprises; last subindex is .0 scalar.
+                value: enterprises
+                num_oid: '.1.3.6.1.4.1.12284.4.1.6.{{ $subindex4 }}'
                 index: '0'
                 descr: 'CPU usage'
