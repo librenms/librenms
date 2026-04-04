@@ -28,15 +28,17 @@ class ArubaInstantOn extends Procurve
 {
     public function getDiscovery($module = null)
     {
-        if (! array_key_exists('dynamic_discovery', $this->device)) {
-            $this->device['dynamic_discovery'] = $this->buildMergedDiscovery();
+        $device = &$this->getDeviceArray();
+
+        if (! array_key_exists('dynamic_discovery', $device)) {
+            $device['dynamic_discovery'] = $this->buildMergedDiscovery();
         }
 
         if ($module) {
-            return $this->device['dynamic_discovery']['modules'][$module] ?? [];
+            return $device['dynamic_discovery']['modules'][$module] ?? [];
         }
 
-        return $this->device['dynamic_discovery'] ?? [];
+        return $device['dynamic_discovery'] ?? [];
     }
 
     /**
