@@ -121,6 +121,76 @@ if (! function_exists('sodola_poe_has_tp_link_style_admin')) {
     }
 }
 
+if (! function_exists('sodola_poe_compile_ci_regex')) {
+    /**
+     * Validate user-supplied PCRE from OS config and return a case-insensitive pattern, or null if invalid.
+     * Requires a proper delimiter pair (e.g. /pat/, #pat#); rejects null bytes and malformed modifier suffixes.
+     */
+    function sodola_poe_compile_ci_regex(string $pattern): ?string
+    {
+        if (str_contains($pattern, "\0")) {
+            return null;
+        }
+        $pattern = trim($pattern);
+        if ($pattern === '') {
+            return null;
+        }
+        $delimiter = $pattern[0];
+        if (preg_match('/^[a-zA-Z0-9\\\\\\x00-\\x20]$/', $delimiter)) {
+            return null;
+        }
+        $len = strlen($pattern);
+        $escaped = false;
+        for ($i = 1; $i < $len; $i++) {
+            $c = $pattern[$i];
+            if ($escaped) {
+                $escaped = false;
+
+                continue;
+            }
+            if ($c === '\\') {
+                $escaped = true;
+
+                continue;
+            }
+            if ($c === $delimiter) {
+                $modifiers = substr($pattern, $i + 1);
+                if ($modifiers !== '' && ! preg_match('/^[a-zA-Z]*$/', $modifiers)) {
+                    return null;
+                }
+                if (! str_contains($modifiers, 'i')) {
+                    $modifiers .= 'i';
+                }
+                $full = substr($pattern, 0, $i + 1) . $modifiers;
+                @preg_match($full, '');
+                if (preg_last_error() !== PREG_NO_ERROR) {
+                    return null;
+                }
+
+                return $full;
+            }
+        }
+
+        return null;
+    }
+}
+
+if (! function_exists('sodola_poe_ifname_matches_regex')) {
+    /**
+     * Match ifName against a delimited PCRE from config (case-insensitive). Invalid patterns never match.
+     */
+    function sodola_poe_ifname_matches_regex(string $pattern, string $ifName): bool
+    {
+        $compiled = sodola_poe_compile_ci_regex($pattern);
+        if ($compiled === null) {
+            return false;
+        }
+        $ifName = str_replace("\0", '', $ifName);
+
+        return preg_match($compiled, $ifName) === 1;
+    }
+}
+
 if (! function_exists('sodola_poe_port_is_managed')) {
     /**
      * @param  array<string, mixed>  $device
@@ -147,7 +217,7 @@ if (! function_exists('sodola_poe_port_is_managed')) {
         }
 
         foreach ($list as $pattern) {
-            if (@preg_match($pattern . 'i', $ifName)) {
+            if (sodola_poe_ifname_matches_regex($pattern, $ifName)) {
                 return true;
             }
         }

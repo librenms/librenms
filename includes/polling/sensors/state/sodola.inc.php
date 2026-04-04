@@ -21,7 +21,7 @@ if (str_ends_with($descr, ' PoE mode') && $sensor_value !== '' && is_numeric($se
         is_array($patterns) ? $patterns : (($patterns !== null && $patterns !== '') ? [$patterns] : []),
         fn ($p) => is_string($p) && $p !== ''
     ) as $pattern) {
-        if (@preg_match($pattern . 'i', $ifName)) {
+        if (sodola_poe_ifname_matches_regex($pattern, $ifName)) {
             $sensor_value = '1';
             break;
         }
