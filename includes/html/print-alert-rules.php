@@ -333,13 +333,10 @@ foreach ($rule_list as $rule) {
 
     echo '</td>';
 
-    // Transports
-    $has_transports = $alertRule->transportSingles()->exists() || $alertRule->transportGroups()->exists();
-
+    // Transports from the rule's assigned alert operation (segments → alert_operation_transport_map)
     $transports_popover = 'right';
     $transports = '';
 
-    // Transports (via global operation assigned to this rule)
     $opId = (int) ($rule['alert_operation_id'] ?? 0);
     $transport_maps = collect();
     if ($opId > 0) {
@@ -356,7 +353,7 @@ foreach ($rule_list as $rule) {
             ]);
     }
 
-    if ($has_transports) {
+    if ($transport_maps->isNotEmpty()) {
         $singleIds = $transport_maps->where('target_type', 'single')->pluck('transport_or_group_id')->unique()->all();
         $groupIds = $transport_maps->where('target_type', 'group')->pluck('transport_or_group_id')->unique()->all();
         $singleNames = \App\Models\AlertTransport::query()->whereIn('transport_id', $singleIds)->pluck('transport_name', 'transport_id');
