@@ -17,7 +17,6 @@ namespace App\Http\Controllers;
 
 use App\Models\AlertOperation;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Gate;
 
 class AlertOperationsController extends Controller
 {
@@ -38,7 +37,7 @@ class AlertOperationsController extends Controller
             ->get();
 
         return view('alert.operations.index', [
-            'operations' => $operations
+            'operations' => $operations,
         ]);
     }
 }
