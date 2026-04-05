@@ -4,7 +4,6 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Ajax;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\AlertOperationController;
-use App\Http\Controllers\AlertOperationsController;
 use App\Http\Controllers\AlertRuleController;
 use App\Http\Controllers\AlertRuleTemplateController;
 use App\Http\Controllers\AlertTransportController;
@@ -195,9 +194,9 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('unregister', [PushNotificationController::class, 'unregister'])->name('push.unregister');
     });
 
+    Route::get('alert-operations', [AlertOperationController::class, 'index'])->name('alert-operations.index');
     // admin pages
     Route::middleware('can:admin')->group(function (): void {
-        Route::get('alert-operations', [AlertOperationsController::class, 'index'])->name('alert-operations.index');
 
         Route::get('settings/{tab?}/{section?}', [SettingsController::class, 'index'])->name('settings');
         Route::put('settings/{name}', [SettingsController::class, 'update'])->name('settings.update');
