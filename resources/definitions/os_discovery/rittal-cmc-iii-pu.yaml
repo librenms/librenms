@@ -14,6 +14,6 @@ modules:
                     index: 'cmcIIIUnitStatus.{{ $index }}'
                     descr: Unit Status
                     states:
-                        - { descr: OK, graph: 1, value: 1, generic: 0 }
-                        - { descr: Failed, graph: 1, value: 2, generic: 2 }
-                        - { descr: Overload, graph: 1, value: 3, generic: 1 }
+                        - { descr: OK, value: 1, generic: 0 }
+                        - { descr: Failed, value: 2, generic: 2 }
+                        - { descr: Overload, value: 3, generic: 1 }

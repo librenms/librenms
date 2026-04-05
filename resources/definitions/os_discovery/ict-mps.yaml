@@ -43,9 +43,9 @@ modules:
                     descr: 'Module #{{ $index }} Status'
                     index: 'moduleStatus.{{ $index }}'
                     states:
-                        - { graph: 0, value: 1, generic: 1, descr: notInstalled }
-                        - { graph: 0, value: 2, generic: 0, descr: ok }
-                        - { graph: 0, value: 3, generic: 2, descr: alarm }
+                        - { value: 1, generic: 1, descr: notInstalled }
+                        - { value: 2, generic: 0, descr: ok }
+                        - { value: 3, generic: 2, descr: alarm }
                 -
                     oid: ICT-POWERSYSTEM-MIB::moduleType
                     value: ICT-POWERSYSTEM-MIB::moduleType
@@ -54,10 +54,10 @@ modules:
                     state_name: moduleType
                     index: 'moduleType.{{ $index }}'
                     states:
-                        - { graph: 0, value: 1, generic: 1, descr: notInstalled }
-                        - { graph: 0, value: 2, generic: 0, descr: power }
-                        - { graph: 0, value: 3, generic: 0, descr: battery }
-                        - { graph: 0, value: 4, generic: 0, descr: distribution }
+                        - { value: 1, generic: 1, descr: notInstalled }
+                        - { value: 2, generic: 0, descr: power }
+                        - { value: 3, generic: 0, descr: battery }
+                        - { value: 4, generic: 0, descr: distribution }
         temperature:
             data:
                 -

@@ -40,18 +40,18 @@ modules:
                     index: 'fanSpeedSensorValue.{{ $index }}'
                     state_name: fanSpeedSensor
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: OK }
-                        - { value: 1, generic: 1, graph: 0, descr: Warning }
-                        - { value: 2, generic: 3, graph: 0, descr: Unknown }
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 1, descr: Warning }
+                        - { value: 2, generic: 3, descr: Unknown }
                 -
                     oid: CHECKPOINT-MIB::haStatCode
                     num_oid: '.1.3.6.1.4.1.2620.1.5.101.{{ $index }}'
                     descr: HA Status
                     state_name: haSensor
                     states:
-                        - { value: 0, generic: 0, graph: 0, descr: OK }
-                        - { value: 1, generic: 1, graph: 0, descr: 'Needs Atention' }
-                        - { value: 2, generic: 2, graph: 0, descr: 'HA Down' }
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 1, descr: 'Needs Atention' }
+                        - { value: 2, generic: 2, descr: 'HA Down' }
         temperature:
             data:
                 -

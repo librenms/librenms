@@ -403,175 +403,150 @@
                 {
                     "state_name": "mbgOsPtpMiscTableEntry",
                     "state_descr": "NOT RUN",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mbgOsPtpMiscTableEntry",
                     "state_descr": "RUNNING",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": -2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "<25ns",
-                    "state_draw_graph": 1,
                     "state_value": 32,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "<100ns",
-                    "state_draw_graph": 1,
                     "state_value": 33,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "<250ns",
-                    "state_draw_graph": 1,
                     "state_value": 34,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "<1μs",
-                    "state_draw_graph": 1,
                     "state_value": 35,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "<2.5μs",
-                    "state_draw_graph": 1,
                     "state_value": 36,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "<10μs",
-                    "state_draw_graph": 1,
                     "state_value": 37,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "<25μs",
-                    "state_draw_graph": 1,
                     "state_value": 38,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "<100μs",
-                    "state_draw_graph": 1,
                     "state_value": 39,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "<250μs",
-                    "state_draw_graph": 1,
                     "state_value": 40,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "<1ms",
-                    "state_draw_graph": 1,
                     "state_value": 41,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "<2-5ms",
-                    "state_draw_graph": 1,
                     "state_value": 42,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "<10ms",
-                    "state_draw_graph": 1,
                     "state_value": 43,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsPtpParentDsTableEntry",
                     "state_descr": "<25ms",
-                    "state_draw_graph": 1,
                     "state_value": 44,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsReceiverState",
                     "state_descr": "noData",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mbgOsReceiverState",
                     "state_descr": "waitingForData",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mbgOsReceiverState",
                     "state_descr": "antennaShortCircuit",
-                    "state_draw_graph": 2,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mbgOsReceiverState",
                     "state_descr": "antennaDisconnected",
-                    "state_draw_graph": 3,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mbgOsReceiverState",
                     "state_descr": "coldBoot",
-                    "state_draw_graph": 4,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mbgOsReceiverState",
                     "state_descr": "warmBoot",
-                    "state_draw_graph": 5,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mbgOsReceiverState",
                     "state_descr": "synchronized",
-                    "state_draw_graph": 6,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mbgOsSysrefGlbStateSysSync",
                     "state_descr": "notSynchronized",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mbgOsSysrefGlbStateSysSync",
                     "state_descr": "synchronized",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 }

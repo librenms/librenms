@@ -55,8 +55,8 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
     $stateName = 'fgHaStatsSyncStatus';
 
     $states = [
-        ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'Out Of Sync'],
-        ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'In Sync'],
+        ['value' => 0, 'generic' => 2, 'descr' => 'Out Of Sync'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'In Sync'],
     ];
 
     create_state_index($stateName, $states);

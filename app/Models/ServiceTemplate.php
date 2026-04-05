@@ -28,6 +28,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Log;
 
@@ -94,7 +95,7 @@ class ServiceTemplate extends BaseModel
     /**
      * Update devices included in this template (dynamic only)
      */
-    public function updateDevices()
+    public function updateDevices(): void
     {
         if ($this->type == 'dynamic') {
             $this->devices()->sync(QueryBuilderFluentParser::fromJson($this->rules)->toQuery()
@@ -106,7 +107,7 @@ class ServiceTemplate extends BaseModel
      * Update the device template groups for the given device or device_id
      *
      * @param  Device|int  $device
-     * @return array
+     * @return array{attached: array<int>, detached: array<int>, updated: array<int>}
      */
     public static function updateServiceTemplatesForDevice($device)
     {
@@ -152,7 +153,7 @@ class ServiceTemplate extends BaseModel
      * Update the device template groups for the given device group or device_group_id
      *
      * @param  DeviceGroup|int  $deviceGroup
-     * @return array
+     * @return array{attached: array<int>, detached: array<int>, updated: array<int>}
      */
     public static function updateServiceTemplatesForDeviceGroup($deviceGroup)
     {
@@ -192,16 +193,16 @@ class ServiceTemplate extends BaseModel
 
     // ---- Query Scopes ----
 
+    /** @param  Builder<ServiceTemplate>  $query
+     *  @return Builder<ServiceTemplate> */
     public function scopeHasAccess(Builder $query, User $user): Builder
     {
         return $query;
     }
 
-    /**
-     * @param  Builder  $query
-     * @return Builder
-     */
-    public function scopeIsDisabled($query)
+    /** @param  Builder<ServiceTemplate>  $query
+     *  @return Builder<ServiceTemplate> */
+    public function scopeIsDisabled(Builder $query): Builder
     {
         return $query->where('disabled', 1);
     }
@@ -216,11 +217,11 @@ class ServiceTemplate extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Service, $this>
+     * @return HasMany<Service, $this>
      */
-    public function services(): BelongsToMany
+    public function services(): HasMany
     {
-        return $this->belongsToMany(Service::class, 'service_templates_device', 'service_template_id', 'device_id');
+        return $this->hasMany(Service::class, 'service_template_id');
     }
 
     /**

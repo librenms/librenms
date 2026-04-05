@@ -88,12 +88,12 @@ modules:
                     descr: SW-MIB::swSensorInfo
                     state_name: swSensorStatus
                     states:
-                        - { value: 1, generic: 3, graph: 0, descr: 'unknown' }
-                        - { value: 2, generic: 2, graph: 1, descr: 'faulty' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'below-min' }
-                        - { value: 4, generic: 0, graph: 1, descr: 'nominal' }
-                        - { value: 5, generic: 1, graph: 1, descr: 'above-max' }
-                        - { value: 6, generic: 1, graph: 1, descr: 'absent' }
+                        - { value: 1, generic: 3, descr: 'unknown' }
+                        - { value: 2, generic: 2, descr: 'faulty' }
+                        - { value: 3, generic: 1, descr: 'below-min' }
+                        - { value: 4, generic: 0, descr: 'nominal' }
+                        - { value: 5, generic: 1, descr: 'above-max' }
+                        - { value: 6, generic: 1, descr: 'absent' }
                     skip_values:
                         -
                             oid: SW-MIB::swSensorValue

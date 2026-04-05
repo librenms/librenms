@@ -14,12 +14,12 @@ modules:
                     descr: 'Global System Status'
                     index: 'dmmGlobalSystemStatus.{{ $index }}'
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: unknown, generic: 3 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: nonCritical, generic: 1 }
+                        - { value: 5, descr: critical, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, generic: 2 }
                 -
                     oid: DELL-MM-MIB-SMIv2::dmmIOMCurrStatus
                     value: DELL-MM-MIB-SMIv2::dmmIOMCurrStatus
@@ -28,12 +28,12 @@ modules:
                     index: 'dmmIOMCurrStatus.{{ $index }}'
                     state_name: dmmIOMCurrStatus
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: unknown, generic: 3 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: nonCritical, generic: 1 }
+                        - { value: 5, descr: critical, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, generic: 2 }
                 -
                     oid: DELL-MM-MIB-SMIv2::dmmRedCurrStatus
                     value: DELL-MM-MIB-SMIv2::dmmRedCurrStatus
@@ -42,12 +42,12 @@ modules:
                     index: 'dmmRedCurrStatus.{{ $index }}'
                     state_name: dmmRedCurrStatus
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: unknown, generic: 3 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: nonCritical, generic: 1 }
+                        - { value: 5, descr: critical, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, generic: 2 }
                 -
                     oid: DELL-MM-MIB-SMIv2::dmmPowerCurrStatus
                     value: DELL-MM-MIB-SMIv2::dmmPowerCurrStatus
@@ -56,12 +56,12 @@ modules:
                     index: 'dmmPowerCurrStatus.{{ $index }}'
                     state_name: dmmPowerCurrStatus
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: unknown, generic: 3 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: nonCritical, generic: 1 }
+                        - { value: 5, descr: critical, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, generic: 2 }
                 -
                     oid: DELL-MM-MIB-SMIv2::dmmPSUTable
                     value: DELL-MM-MIB-SMIv2::dmmPSUCurrStatus
@@ -69,12 +69,12 @@ modules:
                     descr: 'Chassis {{ DELL-MM-MIB-SMIv2::dmmPSUChassisIndex }} PS-{{ DELL-MM-MIB-SMIv2::dmmPSUIndex }} Status'
                     state_name: dmmPSUTable
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: unknown, generic: 3 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: nonCritical, generic: 1 }
+                        - { value: 5, descr: critical, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, generic: 2 }
                 -
                     oid: DELL-MM-MIB-SMIv2::dmmFanCurrStatus
                     value: DELL-MM-MIB-SMIv2::dmmFanCurrStatus
@@ -83,12 +83,12 @@ modules:
                     index: 'dmmFanCurrStatus.{{ $index }}'
                     state_name: dmmFanCurrStatus
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: unknown, generic: 3 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: nonCritical, generic: 1 }
+                        - { value: 5, descr: critical, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, generic: 2 }
                 -
                     oid: DELL-MM-MIB-SMIv2::dmmBladeCurrStatus
                     value: DELL-MM-MIB-SMIv2::dmmBladeCurrStatus
@@ -97,12 +97,12 @@ modules:
                     index: 'dmmBladeCurrStatus.{{ $index }}'
                     state_name: dmmBladeCurrStatus
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: unknown, generic: 3 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: nonCritical, generic: 1 }
+                        - { value: 5, descr: critical, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, generic: 2 }
                 -
                     oid: DELL-MM-MIB-SMIv2::dmmTempCurrStatus
                     value: DELL-MM-MIB-SMIv2::dmmTempCurrStatus
@@ -111,12 +111,12 @@ modules:
                     index: 'dmmTempCurrStatus.{{ $index }}'
                     state_name: dmmTempCurrStatus
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: unknown, generic: 3 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: nonCritical, generic: 1 }
+                        - { value: 5, descr: critical, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, generic: 2 }
                 -
                     oid: DELL-MM-MIB-SMIv2::dmmMMCurrStatus
                     value: DELL-MM-MIB-SMIv2::dmmMMCurrStatus
@@ -125,12 +125,12 @@ modules:
                     index: 'dmmMMCurrStatus.{{ $index }}'
                     state_name: dmmMMCurrStatus
                     states:
-                        - { value: 1, descr: other, graph: 1, generic: 3 }
-                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
-                        - { value: 5, descr: critical, graph: 1, generic: 2 }
-                        - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                        - { value: 1, descr: other, generic: 3 }
+                        - { value: 2, descr: unknown, generic: 3 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: nonCritical, generic: 1 }
+                        - { value: 5, descr: critical, generic: 2 }
+                        - { value: 6, descr: nonRecoverable, generic: 2 }
         temperature:
             data:
                 -

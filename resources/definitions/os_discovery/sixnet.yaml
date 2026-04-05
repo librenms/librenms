@@ -12,9 +12,9 @@ modules:
                     index: 'p1status.{{ $index }}'
                     state_name: p1status
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: Off }
-                        - { value: 1, generic: 0, graph: 1, descr: On }
-                        - { value: 2, generic: 3, graph: 1, descr: Unknown }
+                        - { value: 0, generic: 2, descr: Off }
+                        - { value: 1, generic: 0, descr: On }
+                        - { value: 2, generic: 3, descr: Unknown }
                 -
                     oid: SIXNET-MIB::p2status
                     num_oid: '.1.3.6.1.4.1.20540.2.1.1.2.{{ $index }}'
@@ -22,9 +22,9 @@ modules:
                     index: 'p2status.{{ $index }}'
                     state_name: p2status
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: Off }
-                        - { value: 1, generic: 0, graph: 1, descr: On }
-                        - { value: 2, generic: 3, graph: 1, descr: Unknown }
+                        - { value: 0, generic: 2, descr: Off }
+                        - { value: 1, generic: 0, descr: On }
+                        - { value: 2, generic: 3, descr: Unknown }
                 -
                     oid: SIXNET-MIB::oKstatus
                     num_oid: '.1.3.6.1.4.1.20540.2.1.1.3.{{ $index }}'
@@ -32,9 +32,9 @@ modules:
                     index: 'oKstatus.{{ $index }}'
                     state_name: oKstatus
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: Off }
-                        - { value: 1, generic: 0, graph: 1, descr: On }
-                        - { value: 2, generic: 3, graph: 1, descr: Unknown }
+                        - { value: 0, generic: 2, descr: Off }
+                        - { value: 1, generic: 0, descr: On }
+                        - { value: 2, generic: 3, descr: Unknown }
                 -
                     oid: SIXNET-MIB::fromPLCstatus
                     num_oid: '.1.3.6.1.4.1.20540.2.1.1.7.{{ $index }}'
@@ -42,6 +42,6 @@ modules:
                     index: 'fromPLCstatus.{{ $index }}'
                     state_name: fromPLCstatus
                     states:
-                        - { value: 0, generic: 2, graph: 1, descr: Off }
-                        - { value: 1, generic: 0, graph: 1, descr: On }
-                        - { value: 2, generic: 3, graph: 1, descr: Unknown }
+                        - { value: 0, generic: 2, descr: Off }
+                        - { value: 1, generic: 0, descr: On }
+                        - { value: 2, generic: 3, descr: Unknown }

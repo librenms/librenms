@@ -90,8 +90,8 @@ modules:
                             op: '!='
                             value: 'Status'
                     states:
-                        - { value: 0, descr: 'FAIL', generic: 2, graph: 1 }
-                        - { value: 1, descr: 'OK', generic: 0, graph: 1 }
+                        - { value: 0, descr: 'FAIL', generic: 2,  }
+                        - { value: 1, descr: 'OK', generic: 0,  }
                 -
                     oid: PACKETPOWER-EG4-MIB::readingsTable
                     value: PACKETPOWER-EG4-MIB::reValue
@@ -110,8 +110,8 @@ modules:
                             op: 'exists'
                             value: false
                     states:
-                        - { value: 0, descr: 'OK', generic: 0, graph: 1 }
-                        - { value: 1, descr: 'FAIL', generic: 2, graph: 1 }
+                        - { value: 0, descr: 'OK', generic: 0,  }
+                        - { value: 1, descr: 'FAIL', generic: 2,  }
                 -
                     oid: PACKETPOWER-EG4-MIB::readingsTable
                     value: PACKETPOWER-EG4-MIB::reValue
@@ -130,5 +130,5 @@ modules:
                             op: '<'
                             value: 1
                     states:
-                        - { value: 2, descr: 'OPEN', generic: 2, graph: 1 }
-                        - { value: 1, descr: 'CLOSED', generic: 0, graph: 1 }
+                        - { value: 2, descr: 'OPEN', generic: 2,  }
+                        - { value: 1, descr: 'CLOSED', generic: 0,  }

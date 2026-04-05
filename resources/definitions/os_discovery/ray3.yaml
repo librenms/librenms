@@ -51,10 +51,10 @@ modules:
                     descr: System Status
                     state_name: systemStatus
                     states:
-                        - { value: 0, descr: Unknown, graph: 0, generic: 3 }
-                        - { value: 1, descr: Ok, graph: 0, generic: 0 }
-                        - { value: 2, descr: Warning, graph: 0, generic: 2 }
-                        - { value: 3, descr: Alarm, graph: 0, generic: 3 }
+                        - { value: 0, descr: Unknown, generic: 3 }
+                        - { value: 1, descr: Ok, generic: 0 }
+                        - { value: 2, descr: Warning, generic: 2 }
+                        - { value: 3, descr: Alarm, generic: 3 }
 
                 -
                     oid: RAY3-MIB::txModulationIndex
@@ -62,17 +62,17 @@ modules:
                     descr: Tx Modulation Rate
                     state_name: txModulationIndex-ray3
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'QPSK_S' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'QPSK' }
-                        - { value: 3, generic: 0, graph: 1, descr: 'QAM16' }
-                        - { value: 4, generic: 0, graph: 1, descr: 'QAM32' }
-                        - { value: 5, generic: 0, graph: 1, descr: 'QAM64' }
-                        - { value: 6, generic: 0, graph: 1, descr: 'QAM128' }
-                        - { value: 7, generic: 0, graph: 1, descr: 'QAM256' }
-                        - { value: 8, generic: 0, graph: 1, descr: 'QAM512' }
-                        - { value: 9, generic: 0, graph: 1, descr: 'QAM1024' }
-                        - { value: 10, generic: 0, graph: 1, descr: 'QAM2048' }
-                        - { value: 11, generic: 0, graph: 1, descr: 'QAM4096' }
+                        - { value: 1, generic: 0, descr: 'QPSK_S' }
+                        - { value: 2, generic: 0, descr: 'QPSK' }
+                        - { value: 3, generic: 0, descr: 'QAM16' }
+                        - { value: 4, generic: 0, descr: 'QAM32' }
+                        - { value: 5, generic: 0, descr: 'QAM64' }
+                        - { value: 6, generic: 0, descr: 'QAM128' }
+                        - { value: 7, generic: 0, descr: 'QAM256' }
+                        - { value: 8, generic: 0, descr: 'QAM512' }
+                        - { value: 9, generic: 0, descr: 'QAM1024' }
+                        - { value: 10, generic: 0, descr: 'QAM2048' }
+                        - { value: 11, generic: 0, descr: 'QAM4096' }
 
                 -
                     oid: RAY3-MIB::rxModulationIndex
@@ -80,14 +80,14 @@ modules:
                     descr: Rx Modulation Rate
                     state_name: rxModulationIndex-ray3
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'QPSK_S' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'QPSK' }
-                        - { value: 3, generic: 0, graph: 1, descr: 'QAM16' }
-                        - { value: 4, generic: 0, graph: 1, descr: 'QAM32' }
-                        - { value: 5, generic: 0, graph: 1, descr: 'QAM64' }
-                        - { value: 6, generic: 0, graph: 1, descr: 'QAM128' }
-                        - { value: 7, generic: 0, graph: 1, descr: 'QAM256' }
-                        - { value: 8, generic: 0, graph: 1, descr: 'QAM512' }
-                        - { value: 9, generic: 0, graph: 1, descr: 'QAM1024' }
-                        - { value: 10, generic: 0, graph: 1, descr: 'QAM2048' }
-                        - { value: 11, generic: 0, graph: 1, descr: 'QAM4096' }
+                        - { value: 1, generic: 0, descr: 'QPSK_S' }
+                        - { value: 2, generic: 0, descr: 'QPSK' }
+                        - { value: 3, generic: 0, descr: 'QAM16' }
+                        - { value: 4, generic: 0, descr: 'QAM32' }
+                        - { value: 5, generic: 0, descr: 'QAM64' }
+                        - { value: 6, generic: 0, descr: 'QAM128' }
+                        - { value: 7, generic: 0, descr: 'QAM256' }
+                        - { value: 8, generic: 0, descr: 'QAM512' }
+                        - { value: 9, generic: 0, descr: 'QAM1024' }
+                        - { value: 10, generic: 0, descr: 'QAM2048' }
+                        - { value: 11, generic: 0, descr: 'QAM4096' }

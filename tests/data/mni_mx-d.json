@@ -6963,252 +6963,216 @@
                 {
                     "state_name": "mnPrLinkStatLinkUp",
                     "state_descr": "Down",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mnPrLinkStatLinkUp",
                     "state_descr": "Up",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatControlOn",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mnPrRadStatControlOn",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatCurSeverity",
                     "state_descr": "Cleared",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatCurSeverity",
                     "state_descr": "Indeterminate",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mnPrRadStatCurSeverity",
                     "state_descr": "Critical",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mnPrRadStatCurSeverity",
                     "state_descr": "Major",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mnPrRadStatCurSeverity",
                     "state_descr": "Minor",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mnPrRadStatCurSeverity",
                     "state_descr": "Warning",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mnPrRadStatLatchSeverity",
                     "state_descr": "Cleared",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatLatchSeverity",
                     "state_descr": "Indeterminate",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mnPrRadStatLatchSeverity",
                     "state_descr": "Critical",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mnPrRadStatLatchSeverity",
                     "state_descr": "Major",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "mnPrRadStatLatchSeverity",
                     "state_descr": "Minor",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mnPrRadStatLatchSeverity",
                     "state_descr": "Warning",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "QPSK",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "8PSK",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "16QAM",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "32QAM",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "64QAM",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "128QAM",
-                    "state_draw_graph": 0,
                     "state_value": 7,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "256QAM",
-                    "state_draw_graph": 0,
                     "state_value": 8,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "QPSK12",
-                    "state_draw_graph": 0,
                     "state_value": 18,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "16TCM34",
-                    "state_draw_graph": 0,
                     "state_value": 20,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "64TCM56",
-                    "state_draw_graph": 0,
                     "state_value": 22,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "128TCM67",
-                    "state_draw_graph": 0,
                     "state_value": 23,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "256TCM78",
-                    "state_draw_graph": 0,
                     "state_value": 24,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "QPSK34",
-                    "state_draw_graph": 0,
                     "state_value": 34,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "16TCM78",
-                    "state_draw_graph": 0,
                     "state_value": 36,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "32TCM910",
-                    "state_draw_graph": 0,
                     "state_value": 37,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "64TCM1112",
-                    "state_draw_graph": 0,
                     "state_value": 38,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "128TCM1314",
-                    "state_draw_graph": 0,
                     "state_value": 39,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mnPrRadStatModulation",
                     "state_descr": "Other",
-                    "state_draw_graph": 0,
                     "state_value": 99,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mnPrRadStatProtManualMode",
                     "state_descr": "On",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "mnPrRadStatProtManualMode",
                     "state_descr": "Off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 }

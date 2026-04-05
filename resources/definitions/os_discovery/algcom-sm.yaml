@@ -58,8 +58,8 @@ modules:
                     high_limit: ALGSMXS-v0-MIB::SensorThrMax
                     low_limit: ALGSMXS-v0-MIB::SensorThrMin
                     states:
-                        - { value: 0, generic: 3, graph: 0, descr: open }
-                        - { value: 1, generic: 3, graph: 0, descr: closed }
+                        - { value: 0, generic: 3, descr: open }
+                        - { value: 1, generic: 3, descr: closed }
                     skip_values:
                         -   oid: ALGSMXS-v0-MIB::SensorUnits
                             op: '!='
