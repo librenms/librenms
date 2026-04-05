@@ -38,10 +38,7 @@ class AlertOperationsController extends Controller
             ->get();
 
         return view('alert.operations.index', [
-            'operations' => $operations,
-            'canCreate' => Gate::allows('create', AlertOperation::class),
-            'canUpdate' => Gate::allows('update', AlertOperation::class),
-            'canDelete' => Gate::allows('delete', AlertOperation::class),
+            'operations' => $operations
         ]);
     }
 }
