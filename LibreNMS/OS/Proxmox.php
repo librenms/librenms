@@ -48,7 +48,6 @@ class Proxmox extends OS implements VminfoDiscovery, VminfoPolling
             if (($status['status'] ?? 'stopped') === 'stopped') {
                 continue;
             }
-            dump("Geting vm: $vm->vmwVmVMID ($vm->vmwVmDisplayName)");
 
             // CPU
             $metrics->record($vm, 'vm.cpu', [
