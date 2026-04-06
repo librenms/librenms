@@ -2,7 +2,6 @@
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Rewrite;
-use LibreNMS\Util\StringHelpers;
 
 if (LibrenmsConfig::get('enable_vrfs')) {
     if (in_array($device['os_group'], ['vrp', 'cisco']) ||
