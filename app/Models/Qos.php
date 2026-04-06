@@ -41,6 +41,14 @@ class Qos extends Model implements Keyable
         return $this->device_id . '-' . $this->type . '-' . $this->rrd_id;
     }
 
+    public function tags(): array
+    {
+        return [
+            'type' => $this->type,
+            'index' => $this->rrd_id,
+        ];
+    }
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Qos, $this>
      */

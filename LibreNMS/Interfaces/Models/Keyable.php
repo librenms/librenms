@@ -34,4 +34,11 @@ interface Keyable
      * @return string|int
      */
     public function getCompositeKey(): string|int;
+
+    /**
+     * Get array of tags with key fields and values
+     *
+     * @return array<string, string|int>
+     */
+    public function tags(): array;
 }

@@ -39,4 +39,11 @@ class Stp extends DeviceRelatedModel implements Keyable
     {
         return (string) $this->vlan;
     }
+
+    public function tags(): array
+    {
+        return [
+            'vlan' => $this->vlan,
+        ];
+    }
 }

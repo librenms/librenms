@@ -6,16 +6,17 @@ use App\Facades\LibrenmsConfig;
 use Illuminate\Http\Client\Response;
 use LibreNMS\Util\Http;
 
-class ProxmoxApi extends BaseApi
+readonly class ProxmoxApi
 {
-    private readonly string $tokenName;
-    private readonly string $tokenSecret;
-    protected int $timeout = 90;
+    private string $tokenName;
+    private string $tokenSecret;
+    private string $base_uri;
 
-    public function __construct(private readonly string $hostname)
-    {
+    public function __construct(
+        private string $hostname,
+        private int $timeout = 10,
+    ){
         $this->base_uri = "https://$this->hostname:8006/api2/json";
-
         $this->tokenName = LibrenmsConfig::get('proxmox.token_id');
         $this->tokenSecret = LibrenmsConfig::get('proxmox.secret');
     }
@@ -47,7 +48,12 @@ class ProxmoxApi extends BaseApi
 
     public function getVmStatus(int $vmId, string $node = 'localhost'): array
     {
-        return $this->callApi("nodes/$node/qemu/$vmId/status/current")->json() ?? [];
+        return $this->callApi("nodes/$node/qemu/$vmId/status/current")->json('data') ?? [];
+    }
+
+    public function getVmFsInfo(int $vmId, string $node = 'localhost'): array
+    {
+        return $this->callApi("nodes/$node/qemu/$vmId/agent/get-fsinfo")->json('data.result') ?? [];
     }
 
     public function getVmGuestOs(int $vmId, string $node = 'localhost'): string

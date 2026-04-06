@@ -29,12 +29,16 @@ namespace LibreNMS\Modules;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Observers\ModuleModelObserver;
+use LibreNMS\Data\Metrics\MetricCollector;
+use LibreNMS\Data\Metrics\MetricWriter;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Traits\RequiresPollingMethod;
 
 class Vminfo implements \LibreNMS\Interfaces\Module
@@ -90,10 +94,52 @@ class Vminfo implements \LibreNMS\Interfaces\Module
         }
 
         if ($os instanceof VminfoPolling) {
-            $vms = $os->pollVminfo($os->getDevice()->vminfo);
+            $metrics = new MetricCollector([
+                'vm.cpu',
+                'vm.memory',
+                'vm.disk',
+                'vm.diskio',
+                'vm.net',
+            ]);
+
+            $vms = $os->pollVminfo($os->getDevice()->vminfo, $metrics);
 
             ModuleModelObserver::observe(\App\Models\Vminfo::class);
             $this->syncModels($os->getDevice(), 'vminfo', $vms);
+
+            if ($datastore instanceof WriteInterface) {
+                $writer = new MetricWriter($metrics, $datastore);
+                $writer->writeMetric('vm.cpu', [
+                    'rrd_def' => RrdDefinition::make()
+                        ->addDataset('usage', 'GAUGE', 0),
+                ]);
+                $writer->writeMetric('vm.memory', [
+                    'rrd_def' => RrdDefinition::make()
+                        ->addDataset('used', 'GAUGE', 0)
+                        ->addDataset('total', 'GAUGE', 0),
+                ]);
+                $writer->writeMetric('vm.disk', [
+                    'rrd_def' => RrdDefinition::make()
+                        ->addDataset('used', 'GAUGE', 0)
+                        ->addDataset('total', 'GAUGE', 0),
+                ]);
+                $writer->writeMetric('vm.diskio', [
+                    'rrd_def' => RrdDefinition::make()
+                        ->addDataset('read_bytes', 'COUNTER', 0)
+                        ->addDataset('write_bytes', 'COUNTER', 0)
+                        ->addDataset('read_ops', 'COUNTER', 0)
+                        ->addDataset('write_ops', 'COUNTER', 0)
+                        ->addDataset('read_time_ns', 'COUNTER', 0)
+                        ->addDataset('write_time_ns', 'COUNTER', 0)
+                        ->addDataset('failed_reads', 'COUNTER', 0)
+                        ->addDataset('failed_writes', 'COUNTER', 0),
+                ]);
+                $writer->writeMetric('vm.net', [
+                    'rrd_def' => RrdDefinition::make()
+                        ->addDataset('in', 'COUNTER', 0)
+                        ->addDataset('out', 'COUNTER', 0),
+                ]);
+            }
 
             return;
         }

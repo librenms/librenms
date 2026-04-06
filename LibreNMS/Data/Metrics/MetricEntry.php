@@ -2,19 +2,16 @@
 
 namespace LibreNMS\Data\Metrics;
 
-/**
- * @template TModel of object
- */
 readonly class MetricEntry
 {
     /**
-     * @param  TModel  $model
-     * @param  string  $metric
-     * @param  float|int  $value
+     * @param  string  $metric metric name
+     * @param  array<string, float|int>  $fields
+     * @param  array<string, string|int> $tags
      */
     public function __construct(
-        public object    $model,
-        public string    $metric,
-        public float|int $value,
+        public string $metric,
+        public array $fields,
+        public array $tags,
     ) {}
 }
