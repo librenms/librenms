@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use Illuminate\Support\Collection;
+use LibreNMS\Data\Metrics\MetricCollector;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\OS\Traits\VminfoVmware;
@@ -35,7 +36,7 @@ class VmwareEsxi extends \LibreNMS\OS implements VminfoDiscovery, VminfoPolling
 {
     use VminfoVmware;
 
-    public function pollVminfo(Collection $vms): Collection
+    public function pollVminfo(Collection $vms, MetricCollector $metrics): Collection
     {
         // no VMs, assume there aren't any
         if ($vms->isEmpty()) {

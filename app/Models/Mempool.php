@@ -151,4 +151,13 @@ class Mempool extends DeviceRelatedModel implements HasSyncProtectedAttributes, 
     {
         return "$this->mempool_type-$this->mempool_index";
     }
+
+    public function tags(): array
+    {
+        return [
+            'type' => $this->mempool_type,
+            'index' => $this->mempool_index,
+            'class' => $this->mempool_class,
+        ];
+    }
 }
