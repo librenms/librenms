@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\SslCertificate;
 use Illuminate\Http\Request;
 
@@ -41,6 +42,8 @@ class SslCertificateController extends TableController
     public function formatItem($model)
     {
         $sslCertificate = $model;
+        $daysWarning = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_warning', 30);
+        $daysDanger = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_danger', 0);
         $deviceLink = null;
         if ($sslCertificate->device) {
             $deviceLink = '<a href="' . url('device/' . $sslCertificate->device_id) . '">' . e($sslCertificate->device->hostname) . '</a>';
@@ -52,7 +55,7 @@ class SslCertificateController extends TableController
             $status = '<span class="label label-default">' . __('Disabled') . '</span>';
         } elseif ($sslCertificate->isExpired()) {
             $status = '<span class="label label-danger">' . __('Expired') . '</span>';
-        } elseif ($sslCertificate->expiresWithinDays(30)) {
+        } elseif ($sslCertificate->expiresWithinDays($daysWarning)) {
             $status = '<span class="label label-warning">' . __('Expires soon') . '</span>';
         } else {
             $status = '<span class="label label-success">' . __('Valid') . '</span>';
@@ -62,9 +65,9 @@ class SslCertificateController extends TableController
         $daysDisplay = $daysUntilExpiry !== null
             ? (string) $daysUntilExpiry . ' ' . __('days')
             : '—';
-        if ($daysUntilExpiry !== null && $daysUntilExpiry < 0) {
+        if ($daysUntilExpiry !== null && $daysUntilExpiry <= $daysDanger) {
             $daysDisplay = '<span class="text-danger">' . $daysUntilExpiry . ' ' . __('days') . '</span>';
-        } elseif ($daysUntilExpiry !== null && $daysUntilExpiry <= 30) {
+        } elseif ($daysUntilExpiry !== null && $daysUntilExpiry <= $daysWarning) {
             $daysDisplay = '<span class="text-warning">' . $daysUntilExpiry . ' ' . __('days') . '</span>';
         }
 
