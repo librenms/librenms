@@ -2,39 +2,32 @@
 
 namespace LibreNMS\OS;
 
+use App\ApiClients\ProxmoxApi;
 use App\Models\Vminfo;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PowerState;
-use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\OS;
-use LibreNMS\Util\JsonApp;
 
 class Proxmox extends OS implements VminfoDiscovery
 {
     public function discoverVminfo(): Collection
     {
-        try {
-            $app = JsonApp::fetch('proxmox', '2.0.0');
-            $vms = new Collection;
-            foreach ($app->data['vms'] as $vm) {
-                $vms->push(new Vminfo([
-                    'vm_type' => 'proxmox',
-                    'vmwVmVMID' => $vm['id'],
-                    'vmwVmDisplayName' => $vm['name'],
-                    'vmwVmMemSize' => $vm['mem_size'],
-                    'vmwVmCpus' => $vm['cpus'],
-                    'vmwVmGuestOS' => $vm['guest_os'],
-                    'vmwVmState' => PowerState::parse($vm['state']),
-                ]));
-            }
+        $vms = new Collection;
+        $api = new ProxmoxApi($this->getDevice()->hostname);
 
-            return $vms;
-        } catch (JsonAppException $e) {
-            Log::error($e->getMessage());
-
-            return new Collection;
+        foreach ($api->listVms() as $vm) {
+            $vms->push(new Vminfo([
+                'vm_type' => 'proxmox',
+                'vmwVmVMID' => $vm['vmid'],
+                'vmwVmDisplayName' => $vm['name'],
+                'vmwVmMemSize' => $vm['maxmem'] / 1048576,
+                'vmwVmCpus' => $vm['cpus'],
+                'vmwVmGuestOS' => $api->getVmGuestOs($vm['vmid']),
+                'vmwVmState' => PowerState::parse($vm['status']),
+            ]));
         }
+
+        return $vms;
     }
 }
