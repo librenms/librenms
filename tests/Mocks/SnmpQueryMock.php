@@ -36,6 +36,7 @@ use LibreNMS\Data\Source\SnmpQueryInterface;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Oid;
+use LibreNMS\Util\StringHelpers;
 use Log;
 
 class SnmpQueryMock implements SnmpQueryInterface
@@ -253,7 +254,7 @@ class SnmpQueryMock implements SnmpQueryInterface
                 ])) {
                     $data = Mac::parse($data)->readable();
                 } else {
-                    $data = hex2str($data);
+                    $data = hex2bin($data);
                 }
             }
 
