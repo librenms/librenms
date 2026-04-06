@@ -2,32 +2,52 @@
 
 namespace LibreNMS\Data\Metrics;
 
-/**
- * @template TModel of object
- */
+use LibreNMS\Interfaces\Models\Keyable;
+
 class MetricCollector
 {
     /**
-     * @var array<MetricEntry<TModel>>
+     * @var array<string, MetricEntry[]>
      */
     private array $entries = [];
 
-    /**
-     * @param  object  $model
-     * @param  string  $metric
-     * @param  float|int  $value
-     * @return void
-     */
-    public function record(object $model, string $metric, float|int $value): void
+    public function __construct(public readonly array $allowed = [])
     {
-        $this->entries[] = new MetricEntry($model, $metric, $value);
+    }
+
+    public function record(Keyable $model, string $metric, array $fields): void
+    {
+        if ($this->allowed && ! in_array($metric, $this->allowed)) {
+            throw new \RuntimeException('Invalid metric: ' . $metric);
+        }
+
+        $this->entries[$metric][] = new MetricEntry($metric, $fields, $model->tags());
     }
 
     /**
-     * @return MetricEntry<TModel>[]
+     * @return \Generator<MetricEntry>
      */
-    public function entries(): array
+    public function entries(): \Generator
     {
-        return $this->entries;
+        foreach ($this->entries as $metricGroup) {
+            yield from $metricGroup;
+        }
+    }
+
+    /**
+     * @param  string  $metric
+     * @return MetricEntry[]
+     */
+    public function forMetric(string $metric): array
+    {
+        return $this->entries[$metric] ?? [];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function metrics(): array
+    {
+        return array_keys($this->entries);
     }
 }

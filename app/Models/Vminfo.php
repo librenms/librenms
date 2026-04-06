@@ -159,4 +159,12 @@ class Vminfo extends DeviceRelatedModel implements Keyable
     {
         return "$this->vm_type-$this->vmwVmVMID";
     }
+
+    public function tags(): array
+    {
+        return [
+            'type' => $this->vm_type,
+            'id' => $this->vmwVmVMID,
+        ];
+    }
 }

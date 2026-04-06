@@ -179,6 +179,15 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
         return "$this->poller_type-$this->sensor_class-$this->device_id-$this->sensor_type-$this->sensor_index";
     }
 
+    public function tags(): array
+    {
+        return [
+            'class' => $this->sensor_class,
+            'type' => $this->sensor_type,
+            'index' => $this->sensor_index,
+        ];
+    }
+
     public function syncGroup(): string
     {
         return "$this->sensor_class-$this->poller_type";

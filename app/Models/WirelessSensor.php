@@ -148,6 +148,15 @@ class WirelessSensor extends SensorModel implements HasSyncProtectedAttributes, 
         return "{$this->sensor_class->value}-$this->sensor_type-$this->sensor_index";
     }
 
+    public function tags(): array
+    {
+        return [
+            'class' => $this->sensor_class->value,
+            'type' => $this->sensor_type,
+            'index' => $this->sensor_index,
+        ];
+    }
+
     public function fillValue(array $values): self
     {
         if (empty($values)) {
