@@ -2426,6 +2426,7 @@ return [
                     'description' => 'Threshold Orange',
                     'help' => 'Threshold for orange color',
                 ],
+            ],
             'alert_map_compact' => [
                 'description' => 'Alert map compact view',
                 'help' => 'Alert map view with small indicators',
