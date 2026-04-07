@@ -516,7 +516,7 @@ if (! empty($peers)) {
                     try {
                         $ip_address = IP::parse($peer_data['bgpPeerLocalAddr']);
                         $family = $ip_address->getFamily();
-                        $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->value('ifIndex');
+                        $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->where('ports.device_id', '=', $device['device_id'])->value('ifIndex');
                     } catch (InvalidIpException) {
                         $peer_data['bgpPeerIface'] = null;
                     }
@@ -525,7 +525,7 @@ if (! empty($peers)) {
                     try {
                         $ip_address = IP::parse($peer_data['bgpLocalAddr']);
                         $family = $ip_address->getFamily();
-                        $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->value('ifIndex');
+                        $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->where('ports.device_id', '=', $device['device_id'])->value('ifIndex');
                     } catch (InvalidIpException) {
                         $peer_data['bgpPeerIface'] = null;
                     }

@@ -154,22 +154,23 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         }
     }
 
-    $query = 'SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE ';
-    $query .= '(A.ipv4_address = ? AND I.port_id = A.port_id)';
-    $query .= ' AND D.device_id = I.device_id';
-    $ipv4_host = dbFetchRow($query, [$peer['bgpPeerIdentifier']]);
+    $peerhost = null;
+    if (!empty($peer['bgpPeerIface'])) {
+        $query = 'SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE ';
+        $query .= '(A.ipv4_address = ? AND I.port_id = A.port_id)';
+        $query .= ' AND D.device_id = I.device_id AND D.device_id = ?';
+        $ipv4_host = dbFetchRow($query, [$peer['bgpPeerIdentifier'], $device['device_id']]);
 
-    $query = 'SELECT * FROM ipv6_addresses AS A, ports AS I, devices AS D WHERE ';
-    $query .= '(A.ipv6_address = ? AND I.port_id = A.port_id)';
-    $query .= ' AND D.device_id = I.device_id';
-    $ipv6_host = dbFetchRow($query, [$peerIdentifierIp?->uncompressed()]);
+        $query = 'SELECT * FROM ipv6_addresses AS A, ports AS I, devices AS D WHERE ';
+        $query .= '(A.ipv6_address = ? AND I.port_id = A.port_id)';
+        $query .= ' AND D.device_id = I.device_id AND D.device_id = ?';
+        $ipv6_host = dbFetchRow($query, [$peerIdentifierIp?->uncompressed(), $device['device_id']]);
 
-    if ($ipv4_host) {
-        $peerhost = $ipv4_host;
-    } elseif ($ipv6_host) {
-        $peerhost = $ipv6_host;
-    } else {
-        $peerhost = null;
+        if ($ipv4_host) {
+            $peerhost = $ipv4_host;
+        } elseif ($ipv6_host) {
+            $peerhost = $ipv6_host;
+        }
     }
 
     if (is_array($peerhost)) {
