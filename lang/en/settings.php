@@ -32,6 +32,7 @@ return [
             'powerdns-recursor' => ['name' => 'PowerDNS Recursor'],
             'oslv_monitor' => ['name' => 'OSLV Monitor'],
             'sneck' => ['name' => 'Sneck'],
+            'ssl-certificates' => ['name' => 'SSL Certificates'],
         ],
         'auth' => [
             'general' => ['name' => 'General Authentication Settings'],
@@ -112,6 +113,7 @@ return [
             'front-page' => ['name' => 'Front Page Settings'],
             'menu' => ['name' => 'Menu Settings'],
             'scheduled-maintenance' => ['name' => 'Scheduled Maintenance'],
+            'alert-map' => ['name' => 'Alert Map Settings'],
         ],
     ],
     'settings' => [
@@ -2280,6 +2282,14 @@ return [
                 'description' => 'Skip Hosts',
                 'help' => 'Skip hosts from SSL certificate discovery',
             ],
+            'days_until_expiry_warning' => [
+                'description' => 'Warning (days)',
+                'help' => 'Number of days until certificate expiry to trigger a warning',
+            ],
+            'days_until_expiry_danger' => [
+                'description' => 'Danger (days)',
+                'help' => 'Number of days until certificate expiry to trigger a danger alert',
+            ],
         ],
         'sso' => [
             'create_users' => [
@@ -2416,6 +2426,21 @@ return [
                     'description' => 'Threshold Orange',
                     'help' => 'Threshold for orange color',
                 ],
+            'alert_map_compact' => [
+                'description' => 'Alert map compact view',
+                'help' => 'Alert map view with small indicators',
+            ],
+            'alert_map_sort_status' => [
+                'description' => 'Sort by status',
+                'help' => 'Sort alerts by status',
+            ],
+            'alert_map_use_device_groups' => [
+                'description' => 'Use device groups filter',
+                'help' => 'Enable usage of device groups filter',
+            ],
+            'alert_map_box_size' => [
+                'description' => 'Alert box width',
+                'help' => 'Input desired tile width in pixels for box size in full view',
             ],
             'availability_map_box_size' => [
                 'description' => 'Availability box width',

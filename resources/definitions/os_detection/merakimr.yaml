@@ -10,4 +10,5 @@ discovery:
     -
         sysDescr_regex:
             - '/^=?Meraki MR/'
+            - '/^=?Cisco Wireless CW/'
             - '/^=?Meraki CW/'
