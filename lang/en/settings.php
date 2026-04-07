@@ -32,6 +32,7 @@ return [
             'powerdns-recursor' => ['name' => 'PowerDNS Recursor'],
             'oslv_monitor' => ['name' => 'OSLV Monitor'],
             'sneck' => ['name' => 'Sneck'],
+            'ssl-certificates' => ['name' => 'SSL Certificates'],
         ],
         'auth' => [
             'general' => ['name' => 'General Authentication Settings'],
@@ -2278,6 +2279,14 @@ return [
             'skip_hosts' => [
                 'description' => 'Skip Hosts',
                 'help' => 'Skip hosts from SSL certificate discovery',
+            ],
+            'days_until_expiry_warning' => [
+                'description' => 'Warning (days)',
+                'help' => 'Number of days until certificate expiry to trigger a warning',
+            ],
+            'days_until_expiry_danger' => [
+                'description' => 'Danger (days)',
+                'help' => 'Number of days until certificate expiry to trigger a danger alert',
             ],
         ],
         'sso' => [
