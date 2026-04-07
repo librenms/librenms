@@ -27,6 +27,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
@@ -54,13 +55,13 @@ class LinkDown implements SnmptrapHandler
             return;
         }
 
-        $port->ifOperStatus = 'down';
+        $port->ifOperStatus = IfOperStatus::Down;
 
-        $trapAdminStatus = $trap->getOidData("IF-MIB::ifAdminStatus.$ifIndex");
+        $trapAdminStatus = IfOperStatus::tryFrom($trap->getOidData("IF-MIB::ifAdminStatus.$ifIndex"));
         if ($trapAdminStatus) {
             $port->ifAdminStatus = $trapAdminStatus;
         }
-        $trap->log("SNMP Trap: linkDown $port->ifAdminStatus/$port->ifOperStatus " . $port->ifDescr, Severity::Error, 'interface', $port->port_id);
+        $trap->log("SNMP Trap: linkDown {$port->ifAdminStatus?->value}/{$port->ifOperStatus?->value} " . $port->ifDescr, Severity::Error, 'interface', $port->port_id);
 
         if ($port->isDirty('ifAdminStatus')) {
             $trap->log("Interface Disabled : $port->ifDescr (TRAP)", Severity::Notice, 'interface', $port->port_id);

@@ -36,6 +36,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Number;
 
 class CustomMapDataController extends Controller
@@ -110,7 +111,7 @@ class CustomMapDataController extends Controller
                         $edges[$edgeid]['colour_to'] = 'darkred';
                         $edges[$edgeid]['colour_from'] = 'darkred';
                     }
-                } elseif ($edge->port->ifOperStatus != 'up') {
+                } elseif ($edge->port->ifOperStatus != IfOperStatus::Up) {
                     // If the port is not online, show the same as speed unknown
                     if ($map->legend_colours) {
                         $edges[$edgeid]['colour_to'] = $map->legend_colours['-1'];
