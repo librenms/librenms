@@ -1088,11 +1088,11 @@
   {
     "name": "Zebra Printer Trap: Warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"eventlog.type","field":"eventlog.type","type":"string","input":"text","operator":"equal","value":"trap"},{"id":"eventlog.severity","field":"eventlog.severity","type":"string","input":"text","operator":"equal","value":"4"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"zebra"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`DATE_SUB(NOW(),INTERVAL 30 SECOND)`"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"eventlog.type","field":"eventlog.type","type":"string","input":"text","operator":"equal","value":"trap"},{"id":"eventlog.severity","field":"eventlog.severity","type":"string","input":"text","operator":"equal","value":"4"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"zebra"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`DATE_SUB(NOW(),INTERVAL 5 MINUTE)`"}],"valid":true}
   },
   {
     "name": "Zebra Printer Trap: Critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"eventlog.type","field":"eventlog.type","type":"string","input":"text","operator":"equal","value":"trap"},{"id":"eventlog.severity","field":"eventlog.severity","type":"string","input":"text","operator":"equal","value":"5"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"zebra"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`DATE_SUB(NOW(),INTERVAL 30 SECOND)`"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"eventlog.type","field":"eventlog.type","type":"string","input":"text","operator":"equal","value":"trap"},{"id":"eventlog.severity","field":"eventlog.severity","type":"string","input":"text","operator":"equal","value":"5"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"zebra"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`DATE_SUB(NOW(),INTERVAL 5 MINUTE)`"}],"valid":true}
   }
 ]
