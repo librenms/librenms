@@ -112,6 +112,7 @@ return [
             'front-page' => ['name' => 'Front Page Settings'],
             'menu' => ['name' => 'Menu Settings'],
             'scheduled-maintenance' => ['name' => 'Scheduled Maintenance'],
+            'alert-map' => ['name' => 'Alert Map Settings'],
         ],
     ],
     'settings' => [
@@ -2414,6 +2415,22 @@ return [
             'scheduled_maintenance_default_behavior' => [
                 'description' => 'Default Behaviour',
                 'help' => 'When managing scheduled maintenances, this will be the default option for the Behavior option.',
+            ],
+            'alert_map_compact' => [
+                'description' => 'Alert map compact view',
+                'help' => 'Alert map view with small indicators',
+            ],
+            'alert_map_sort_status' => [
+                'description' => 'Sort by status',
+                'help' => 'Sort alerts by status',
+            ],
+            'alert_map_use_device_groups' => [
+                'description' => 'Use device groups filter',
+                'help' => 'Enable usage of device groups filter',
+            ],
+            'alert_map_box_size' => [
+                'description' => 'Alert box width',
+                'help' => 'Input desired tile width in pixels for box size in full view',
             ],
             'availability_map_box_size' => [
                 'description' => 'Availability box width',
