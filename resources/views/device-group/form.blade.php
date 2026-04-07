@@ -62,7 +62,29 @@
         $("[name$='_filter']").each(function () {
             $(this).select2({
                 dropdownAutoWidth: true,
-                width: 'auto'
+                width: 'auto',
+                matcher: function (params, data) {
+                    if ($.trim(params.term) === '') {
+                        return data;
+                    }
+                    if (typeof data.text === 'undefined') {
+                        return null;
+                    }
+                    var termParts = params.term.toLowerCase().split('.');
+                    var textParts = data.text.toLowerCase().split('.');
+                    if (termParts.length > textParts.length) {
+                        return null;
+                    }
+                    for (var i = 0; i < termParts.length; i++) {
+                        if (textParts[i].indexOf(termParts[i]) !== 0) {
+                            if (data.text.toLowerCase().indexOf(params.term.toLowerCase()) > -1) {
+                                return data;
+                            }
+                            return null;
+                        }
+                    }
+                    return data;
+                }
             });
         });
     }).on('ruleToSQL.queryBuilder.filter', function (e, rule) {

@@ -187,7 +187,31 @@ $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
                 $(this).select2({
                     dropdownParent: $("#create-alert"),
                     dropdownAutoWidth : true,
-                    width: 'auto'
+                    width: 'auto',
+                    matcher: function (params, data) {
+                        if ($.trim(params.term) === '') {
+                            return data;
+                        }
+                        if (typeof data.text === 'undefined') {
+                            return null;
+                        }
+                        // match each dot-separated segment as a prefix so "device.os" matches "devices.os"
+                        var termParts = params.term.toLowerCase().split('.');
+                        var textParts = data.text.toLowerCase().split('.');
+                        if (termParts.length > textParts.length) {
+                            return null;
+                        }
+                        for (var i = 0; i < termParts.length; i++) {
+                            if (textParts[i].indexOf(termParts[i]) !== 0) {
+                                // also allow a plain substring match on the full text
+                                if (data.text.toLowerCase().indexOf(params.term.toLowerCase()) > -1) {
+                                    return data;
+                                }
+                                return null;
+                            }
+                        }
+                        return data;
+                    }
                 });
             });
         }).on('ruleToSQL.queryBuilder.filter', function (e, rule) {
