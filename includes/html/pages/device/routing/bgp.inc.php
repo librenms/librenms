@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Port;
 use LibreNMS\Util\IP;
 
 $extra_sql = '';
@@ -155,21 +156,19 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     }
 
     $peerhost = null;
-    if (!empty($peer['bgpPeerIface'])) {
-        $query = 'SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE ';
-        $query .= '(A.ipv4_address = ? AND I.port_id = A.port_id)';
-        $query .= ' AND D.device_id = I.device_id AND D.device_id = ?';
-        $ipv4_host = dbFetchRow($query, [$peer['bgpPeerIdentifier'], $device['device_id']]);
+    if (! empty($peer['bgpPeerIface'])) {
+        $ipv4_host = Port::where('device_id', $device['device_id'])
+            ->whereHas('ipv4', fn ($q) => $q->where('ipv4_address', $peer['bgpPeerIdentifier']))
+            ->first();
 
-        $query = 'SELECT * FROM ipv6_addresses AS A, ports AS I, devices AS D WHERE ';
-        $query .= '(A.ipv6_address = ? AND I.port_id = A.port_id)';
-        $query .= ' AND D.device_id = I.device_id AND D.device_id = ?';
-        $ipv6_host = dbFetchRow($query, [$peerIdentifierIp?->uncompressed(), $device['device_id']]);
+        $ipv6_host = Port::where('device_id', $device['device_id'])
+            ->whereHas('ipv6', fn ($q) => $q->where('ipv6_address', $peerIdentifierIp?->uncompressed()))
+            ->first();
 
         if ($ipv4_host) {
-            $peerhost = $ipv4_host;
+            $peerhost = $ipv4_host->toArray();
         } elseif ($ipv6_host) {
-            $peerhost = $ipv6_host;
+            $peerhost = $ipv6_host->toArray();
         }
     }
 
