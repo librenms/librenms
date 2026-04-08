@@ -7,10 +7,10 @@ use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Eventlog;
-use File;
 use Illuminate\Support\Facades\App;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostRenameException;
+use LibreNMS\Exceptions\RrdException;
 use Log;
 
 class DeviceObserver
@@ -63,27 +63,24 @@ class DeviceObserver
         // handle device renames
         if ($device->isDirty('hostname')) {
             $new_name = $device->hostname;
-
             $old_name = $device->getOriginal('hostname');
-            $new_rrd_dir = Rrd::dirFromHost($new_name);
-            $old_rrd_dir = Rrd::dirFromHost($old_name);
 
-            if (is_dir($new_rrd_dir)) {
+            try {
+                if (! Rrd::renameDevice($old_name, $new_name)) {
+                    $device->hostname = $old_name;
+                    Eventlog::log("Renaming of $old_name failed", $device, 'system', Severity::Error);
+
+                    throw new HostRenameException("Renaming of $old_name failed");
+                }
+            } catch (RrdException $e) {
                 $device->hostname = $old_name;
-                Eventlog::log("Renaming of $old_name failed due to existing RRD folder for $new_name", $device, 'system', Severity::Error);
 
-                throw new HostRenameException("Renaming of $old_name failed due to existing RRD folder for $new_name");
+                throw new HostRenameException($e->getMessage());
             }
 
-            if (rename($old_rrd_dir, $new_rrd_dir)) {
-                $device->ip = null;
-                $source = auth()->user()?->username ?: 'console';
-                Eventlog::log("Hostname changed -> $new_name ($source)", $device, 'system', Severity::Notice);
-            } else {
-                $device->hostname = $old_name;
-                Eventlog::log("Renaming of $old_name failed", $device, 'system', Severity::Error);
-                throw new HostRenameException("Renaming of $old_name failed");
-            }
+            $device->ip = null;
+            $source = auth()->user()?->username ?: 'console';
+            Eventlog::log("Hostname changed -> $new_name ($source)", $device, 'system', Severity::Notice);
         }
     }
 
@@ -93,14 +90,8 @@ class DeviceObserver
     public function deleted(Device $device): void
     {
         if (! empty($device->hostname)) {
-            // delete rrd files
-            $host_dir = Rrd::dirFromHost($device->hostname);
             try {
-                $result = File::deleteDirectory($host_dir);
-
-                if (! $result) {
-                    Log::debug("Could not delete RRD files for: $device->hostname");
-                }
+                Rrd::deleteDevice($device->hostname);
             } catch (\Exception $e) {
                 Log::error("Could not delete RRD files for: $device->hostname", [$e]);
             }
