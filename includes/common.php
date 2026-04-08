@@ -185,11 +185,6 @@ function device_by_id_cache($device_id, $refresh = false)
     return $device;
 }
 
-function gethostbyid($device_id)
-{
-    return DeviceCache::get((int) $device_id)->hostname;
-}
-
 function getidbyname($hostname)
 {
     return DeviceCache::getByHostname($hostname)->device_id;

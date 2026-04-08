@@ -8,6 +8,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -67,7 +68,7 @@ function parse_modules($type, $options)
 
 function renamehost($id, $new, $source = 'console')
 {
-    $host = gethostbyid($id);
+    $host = DeviceCache::get((int) $id)->hostname;
     $new_rrd_dir = Rrd::dirFromHost($new);
 
     if (is_dir($new_rrd_dir)) {
