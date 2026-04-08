@@ -148,23 +148,6 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-function hex2str($hex)
-{
-    $string = '';
-
-    for ($i = 0; $i < strlen((string) $hex) - 1; $i += 2) {
-        $string .= chr(hexdec(substr((string) $hex, $i, 2)));
-    }
-
-    return $string;
-}
-
-// Convert an SNMP hex string to regular string
-function snmp_hexstring($hex)
-{
-    return hex2str(str_replace(' ', '', str_replace(' 00', '', $hex)));
-}
-
 /**
  * Check if port is valid to poll.
  * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
