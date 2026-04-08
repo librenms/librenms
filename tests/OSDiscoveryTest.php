@@ -187,10 +187,13 @@ final class OSDiscoveryTest extends TestCase
      */
     public static function osProvider(): array
     {
-        // make sure all OS are loaded
-        $config_os = array_keys(LibrenmsConfig::get('os'));
-        if (count($config_os) < count(glob(resource_path('definitions/os_detection/*.yaml')))) {
-            $config_os = array_keys(LibrenmsConfig::get('os'));
+        $definitionsPath = realpath(__DIR__ . '/../resources/definitions/os_detection');
+        $yamlFiles = glob($definitionsPath . '/*.yaml');
+
+        $config_os = [];
+        foreach ($yamlFiles as $file) {
+            $os = basename($file, '.yaml');
+            $config_os[] = $os;
         }
 
         $excluded_os = [

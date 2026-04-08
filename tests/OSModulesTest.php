@@ -153,13 +153,14 @@ final class OSModulesTest extends DBTestCase
     public static function dumpedDataProvider(): array
     {
         $modules = [];
+        $baseDir = realpath(__DIR__ . '/..');
 
         if (getenv('TEST_MODULES')) {
             $modules = explode(',', getenv('TEST_MODULES'));
         }
 
         try {
-            return ModuleTestHelper::findOsWithData($modules);
+            return ModuleTestHelper::findOsWithData($modules, base_path: $baseDir);
         } catch (InvalidModuleException $e) {
             // special case for exception
             return [[false, false, $e->getMessage()]];
