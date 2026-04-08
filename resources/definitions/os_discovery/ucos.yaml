@@ -21,35 +21,35 @@ modules:
                     group: Chassis
                     state_name: cucsEquipmentChassisOperState
                     states:
-                        - { value: 0, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 1, descr: operable, graph: 1, generic: 0 }
-                        - { value: 2, descr: inoperable, graph: 1, generic: 2 }
-                        - { value: 3, descr: degraded, graph: 1, generic: 2 }
-                        - { value: 4, descr: powered off, graph: 1, generic: 3 }
-                        - { value: 5, descr: power problem, graph: 1, generic: 2 }
-                        - { value: 6, descr: removed, graph: 1, generic: 3 }
-                        - { value: 7, descr: voltage problem, graph: 1, generic: 2 }
-                        - { value: 8, descr: thermal problem, graph: 1, generic: 2 }
-                        - { value: 9, descr: performance problem, graph: 1, generic: 2 }
-                        - { value: 10, descr: accessibility problem, graph: 1, generic: 2 }
-                        - { value: 11, descr: identity unestablishable, graph: 1, generic: 2 }
-                        - { value: 12, descr: BIOS POST timeout, graph: 1, generic: 2 }
-                        - { value: 13, descr: disabled, graph: 1, generic: 3 }
-                        - { value: 14, descr: malformed FRU, graph: 1, generic: 1 }
-                        - { value: 51, descr: fabric connectivity problem, graph: 1, generic: 2 }
-                        - { value: 52, descr: fabric unsupported connection, graph: 1, generic: 2 }
-                        - { value: 81, descr: config, graph: 1, generic: 1 }
-                        - { value: 82, descr: equipment problem, graph: 1, generic: 2 }
-                        - { value: 83, descr: decomissioning, graph: 1, generic: 1 }
-                        - { value: 84, descr: chassis limit exceeded, graph: 1, generic: 1 }
-                        - { value: 100, descr: not supported, graph: 1, generic: 1 }
-                        - { value: 101, descr: discovery, graph: 1, generic: 3 }
-                        - { value: 102, descr: discovery failed, graph: 1, generic: 1 }
-                        - { value: 103, descr: identify, graph: 1, generic: 3 }
-                        - { value: 104, descr: post failure, graph: 1, generic: 2 }
-                        - { value: 105, descr: upgrade problem, graph: 1, generic: 2 }
-                        - { value: 106, descr: peer communication problem, graph: 1, generic: 2 }
-                        - { value: 107, descr: auto upgrade, graph: 1, generic: 3 }
+                        - { value: 0, descr: unknown, generic: 3 }
+                        - { value: 1, descr: operable, generic: 0 }
+                        - { value: 2, descr: inoperable, generic: 2 }
+                        - { value: 3, descr: degraded, generic: 2 }
+                        - { value: 4, descr: powered off, generic: 3 }
+                        - { value: 5, descr: power problem, generic: 2 }
+                        - { value: 6, descr: removed, generic: 3 }
+                        - { value: 7, descr: voltage problem, generic: 2 }
+                        - { value: 8, descr: thermal problem, generic: 2 }
+                        - { value: 9, descr: performance problem, generic: 2 }
+                        - { value: 10, descr: accessibility problem, generic: 2 }
+                        - { value: 11, descr: identity unestablishable, generic: 2 }
+                        - { value: 12, descr: BIOS POST timeout, generic: 2 }
+                        - { value: 13, descr: disabled, generic: 3 }
+                        - { value: 14, descr: malformed FRU, generic: 1 }
+                        - { value: 51, descr: fabric connectivity problem, generic: 2 }
+                        - { value: 52, descr: fabric unsupported connection, generic: 2 }
+                        - { value: 81, descr: config, generic: 1 }
+                        - { value: 82, descr: equipment problem, generic: 2 }
+                        - { value: 83, descr: decomissioning, generic: 1 }
+                        - { value: 84, descr: chassis limit exceeded, generic: 1 }
+                        - { value: 100, descr: not supported, generic: 1 }
+                        - { value: 101, descr: discovery, generic: 3 }
+                        - { value: 102, descr: discovery failed, generic: 1 }
+                        - { value: 103, descr: identify, generic: 3 }
+                        - { value: 104, descr: post failure, generic: 2 }
+                        - { value: 105, descr: upgrade problem, generic: 2 }
+                        - { value: 106, descr: peer communication problem, generic: 2 }
+                        - { value: 107, descr: auto upgrade, generic: 3 }
 
                 -
                     oid: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentFanModuleOperState
@@ -60,15 +60,15 @@ modules:
                     group: Fans
                     state_name: cucsEquipmentFanModuleOperState
                     states:
-                        - { value: 0, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 1, descr: ok, graph: 1, generic: 0 }
-                        - { value: 2, descr: upper non-recoverable, graph: 1, generic: 2 }
-                        - { value: 3, descr: upper critical, graph: 1, generic: 2 }
-                        - { value: 4, descr: upper non-critical, graph: 1, generic: 1 }
-                        - { value: 5, descr: lower non-critical, graph: 1, generic: 1 }
-                        - { value: 6, descr: lower critical, graph: 1, generic: 2 }
-                        - { value: 7, descr: lower non-recoverable, graph: 1, generic: 2 }
-                        - { value: 100, descr: not supported, graph: 1, generic: 3 }
+                        - { value: 0, descr: unknown, generic: 3 }
+                        - { value: 1, descr: ok, generic: 0 }
+                        - { value: 2, descr: upper non-recoverable, generic: 2 }
+                        - { value: 3, descr: upper critical, generic: 2 }
+                        - { value: 4, descr: upper non-critical, generic: 1 }
+                        - { value: 5, descr: lower non-critical, generic: 1 }
+                        - { value: 6, descr: lower critical, generic: 2 }
+                        - { value: 7, descr: lower non-recoverable, generic: 2 }
+                        - { value: 100, descr: not supported, generic: 3 }
 
                 -
                     oid: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB::cucsEquipmentPsuPower
@@ -79,16 +79,16 @@ modules:
                     group: PSU
                     state_name: cucsEquipmentPsuPower
                     states:
-                        - { value: 0, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 1, descr: on, graph: 1, generic: 0 }
-                        - { value: 2, descr: test, graph: 1, generic: 3 }
-                        - { value: 3, descr: off, graph: 1, generic: 0 }
-                        - { value: 4, descr: online, graph: 1, generic: 0 }
-                        - { value: 5, descr: offline, graph: 1, generic: 3 }
-                        - { value: 6, descr: off duty, graph: 1, generic: 3 }
-                        - { value: 7, descr: degraded, graph: 1, generic: 2 }
-                        - { value: 8, descr: power save, graph: 1, generic: 0 }
-                        - { value: 9, descr: error, graph: 1, generic: 2 }
-                        - { value: 10, descr: ok, graph: 1, generic: 0 }
-                        - { value: 11, descr: failed, graph: 1, generic: 2 }
-                        - { value: 100, descr: not supported, graph: 1, generic: 3 }
+                        - { value: 0, descr: unknown, generic: 3 }
+                        - { value: 1, descr: on, generic: 0 }
+                        - { value: 2, descr: test, generic: 3 }
+                        - { value: 3, descr: off, generic: 0 }
+                        - { value: 4, descr: online, generic: 0 }
+                        - { value: 5, descr: offline, generic: 3 }
+                        - { value: 6, descr: off duty, generic: 3 }
+                        - { value: 7, descr: degraded, generic: 2 }
+                        - { value: 8, descr: power save, generic: 0 }
+                        - { value: 9, descr: error, generic: 2 }
+                        - { value: 10, descr: ok, generic: 0 }
+                        - { value: 11, descr: failed, generic: 2 }
+                        - { value: 100, descr: not supported, generic: 3 }

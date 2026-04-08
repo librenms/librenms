@@ -64,8 +64,8 @@ modules:
                     state_name: DigitalInputs
                     group: Inputs
                     states:
-                        - { descr: closed, graph: 1, value: 0, generic: 0 }
-                        - { descr: open, graph: 1, value: 1, generic: 1 }
+                        - { descr: closed, value: 0, generic: 0 }
+                        - { descr: open, value: 1, generic: 1 }
                 -
                     oid: ENVIROMUX-1W-MIB::alertEntry
                     value: ENVIROMUX-1W-MIB::alertStatus
@@ -74,14 +74,14 @@ modules:
                     group: Alerts
                     state_name: alertStatus
                     states:
-                        - { descr: normal, graph: 1, value: 0, generic: 0 }
-                        - { descr: enterinCritical, graph: 1, value: 1, generic: 1 }
-                        - { descr: Critical, graph: 1, value: 2, generic: 2 }
-                        - { descr: exitingCritical, graph: 1, value: 3, generic: 1 }
-                        - { descr: waitingAckDismiss, graph: 1, value: 4, generic: 1 }
-                        - { descr: acknowledged, graph: 1, value: 5, generic: 1 }
-                        - { descr: dismissed, graph: 1, value: 6, generic: 1 }
-                        - { descr: disconnected, graph: 1, value: 7, generic: 3 }
+                        - { descr: normal, value: 0, generic: 0 }
+                        - { descr: enterinCritical, value: 1, generic: 1 }
+                        - { descr: Critical, value: 2, generic: 2 }
+                        - { descr: exitingCritical, value: 3, generic: 1 }
+                        - { descr: waitingAckDismiss, value: 4, generic: 1 }
+                        - { descr: acknowledged, value: 5, generic: 1 }
+                        - { descr: dismissed, value: 6, generic: 1 }
+                        - { descr: disconnected, value: 7, generic: 3 }
                     skip_values:
                         -
                             oid: ENVIROMUX-1W-MIB::alertEnabled

@@ -63,8 +63,8 @@ modules:
                     index: 0
                     state_name: TERRA-sdi480-MIB::alarmLnb1
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: OK }
-                        - { value: 1, generic: 3, graph: 1, descr: Error }
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 3, descr: Error }
                 -
                     oid: TERRA-sdi480-MIB::sdi480alarms
                     value: TERRA-sdi480-MIB::alarmLnb2
@@ -73,8 +73,8 @@ modules:
                     index: 1
                     state_name: TERRA-sdi480-MIB::alarmLnb2
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: OK }
-                        - { value: 1, generic: 3, graph: 1, descr: Error }
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 3, descr: Error }
                 -
                     oid: TERRA-sdi480-MIB::sdi480alarms
                     value: TERRA-sdi480-MIB::alarmLnb3
@@ -83,8 +83,8 @@ modules:
                     index: 2
                     state_name: TERRA-sdi480-MIB::alarmLnb3
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: OK }
-                        - { value: 1, generic: 3, graph: 1, descr: Error }
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 3, descr: Error }
                 -
                     oid: TERRA-sdi480-MIB::sdi480alarms
                     value: TERRA-sdi480-MIB::alarmLnb4
@@ -93,5 +93,5 @@ modules:
                     index: 3
                     state_name: TERRA-sdi480-MIB::alarmLnb4
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: OK }
-                        - { value: 1, generic: 3, graph: 1, descr: Error }
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 3, descr: Error }

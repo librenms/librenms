@@ -80,9 +80,9 @@ modules:
                     index: 'linkStatusInt.{{ $index }}'
                     state_name: linkStatus
                     states:
-                        - { value:  0, generic: 2, graph: 0, descr: Disconnected }
-                        - { value:  1, generic: 1, graph: 0, descr: Marginal }
-                        - { value:  2, generic: 0, graph: 0, descr: Connected }
+                        - { value:  0, generic: 2, descr: Disconnected }
+                        - { value:  1, generic: 1, descr: Marginal }
+                        - { value:  2, generic: 0, descr: Connected }
                 -
                     oid: AATS-MIB::aatsDot1
                     value: AATS-MIB::currentGPSStatusInt
@@ -92,8 +92,8 @@ modules:
                     index: 'currentGPSStatusInt.{{ $index }}'
                     state_name: GPSLinkStatus
                     states:
-                        - { value:  0, generic: 2, graph: 0, descr: Invalid }
-                        - { value:  1, generic: 0, graph: 0, descr: Valid }
+                        - { value:  0, generic: 2, descr: Invalid }
+                        - { value:  1, generic: 0, descr: Valid }
                 -
                     oid: AATS-MIB::aatsDot1
                     value: AATS-MIB::localGPSStatusInt
@@ -103,8 +103,8 @@ modules:
                     index: 'localGPSStatusInt.{{ $index }}'
                     state_name: LocalGPSLinkStatus
                     states:
-                        - { value:  0, generic: 2, graph: 0, descr: Invalid }
-                        - { value:  1, generic: 0, graph: 0, descr: Valid }
+                        - { value:  0, generic: 2, descr: Invalid }
+                        - { value:  1, generic: 0, descr: Valid }
                 -
                     oid: AATS-MIB::aatsDot1
                     value: AATS-MIB::networkGPSStatusInt
@@ -114,8 +114,8 @@ modules:
                     index: 'networkGPSStatusInt.{{ $index }}'
                     state_name: NetworkGPSLinkStatus
                     states:
-                        - { value:  0, generic: 2, graph: 0, descr: Invalid }
-                        - { value:  1, generic: 0, graph: 0, descr: Valid }
+                        - { value:  0, generic: 2, descr: Invalid }
+                        - { value:  1, generic: 0, descr: Valid }
                 -
                     oid: AATS-MIB::aatsDot1
                     value: AATS-MIB::positionerConnected
@@ -125,8 +125,8 @@ modules:
                     index: 'positionerConnected.{{ $index }}'
                     state_name: PositionerConnection
                     states:
-                        - { value:  0, generic: 2, graph: 0, descr: Disconnected }
-                        - { value:  1, generic: 0, graph: 0, descr: Connected }
+                        - { value:  0, generic: 2, descr: Disconnected }
+                        - { value:  1, generic: 0, descr: Connected }
                 -
                     oid: AATS-MIB::aatsDot1
                     value: AATS-MIB::positionerMoving
@@ -136,8 +136,8 @@ modules:
                     index: 'positionerMoving.{{ $index }}'
                     state_name: PositionerMovement
                     states:
-                        - { value:  0, generic: 0, graph: 0, descr: Stopped }
-                        - { value:  1, generic: 0, graph: 0, descr: Moving }
+                        - { value:  0, generic: 0, descr: Stopped }
+                        - { value:  1, generic: 0, descr: Moving }
                 -
                     oid: AATS-MIB::aatsDot1
                     value: AATS-MIB::currentHeadingStatusInt
@@ -147,7 +147,7 @@ modules:
                     index: 'currentHeadingStatusInt.{{ $index }}'
                     state_name: PositionerHeadingState
                     states:
-                        - { value:  0, generic: 2, graph: 0, descr: Invalid }
-                        - { value:  1, generic: 0, graph: 0, descr: Valid }
+                        - { value:  0, generic: 2, descr: Invalid }
+                        - { value:  1, generic: 0, descr: Valid }
     os:
         sysDescr_regex: '/ radio;(?<hardware>.*) v(?<version>[0-9.]*);.*;SN: (?<serial>[0-9]+);/'

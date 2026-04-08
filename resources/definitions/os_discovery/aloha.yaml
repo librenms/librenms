@@ -16,8 +16,8 @@ modules:
                     state_name: alFrontendStatus
                     group: "Frontend status"
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: no }
-                        - { value: 1, generic: 0, graph: 1, descr: OPEN }
+                        - { value: 0, generic: 0, descr: no }
+                        - { value: 1, generic: 0, descr: OPEN }
 
                 -
                     oid: EXCELIANCE-MIB::alBackendTable
@@ -28,8 +28,8 @@ modules:
                     group: "Backend status"
                     state_name: alBackendStatus
                     states:
-                        - { value: 2, generic: 1, graph: 1, descr: DOWN }
-                        - { value: 1, generic: 0, graph: 1, descr: UP }
+                        - { value: 2, generic: 1, descr: DOWN }
+                        - { value: 1, generic: 0, descr: UP }
 
                 -
                     oid: EXCELIANCE-MIB::alServerTable
@@ -41,7 +41,7 @@ modules:
                     group: 'Server status'
                     state_name: alServerStatus
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: MAINT }
-                        - { value: 1, generic: 0, graph: 1, descr: UP }
-                        - { value: 2, generic: 2, graph: 1, descr: DOWN }
+                        - { value: 0, generic: 1, descr: MAINT }
+                        - { value: 1, generic: 0, descr: UP }
+                        - { value: 2, generic: 2, descr: DOWN }
 

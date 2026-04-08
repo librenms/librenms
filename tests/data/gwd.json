@@ -3883,28 +3883,24 @@
                 {
                     "state_name": "devFanAlarmStatus",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "devFanAlarmStatus",
                     "state_descr": "Abnormal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "powerRunStatus",
                     "state_descr": "Normal",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "powerRunStatus",
                     "state_descr": "Abnormal",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 }

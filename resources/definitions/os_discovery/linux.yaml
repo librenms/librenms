@@ -90,8 +90,8 @@ modules:
                     descr: 'Alarm'
                     state_name: alarmState
                     states:
-                        - { descr: disabled , graph: 0, value: 0, generic: 1 }
-                        - { descr: enabled  , graph: 0, value: 1, generic: 0 }
+                        - { descr: disabled , value: 0, generic: 1 }
+                        - { descr: enabled  , value: 1, generic: 0 }
                 -
                     oid: LSI-MegaRAID-SAS-MIB::enclosurePowerSupplyTable
                     value: LSI-MegaRAID-SAS-MIB::powerSupplyStatus
@@ -100,14 +100,14 @@ modules:
                     descr: 'Powersupply {{ LSI-MegaRAID-SAS-MIB::powerSupplyID }}'
                     state_name: powerSupplyStatus
                     states:
-                        - { descr: invalid       , graph: 0, value: 1, generic: 2 }
-                        - { descr: ok            , graph: 0, value: 2, generic: 0 }
-                        - { descr: critical      , graph: 0, value: 3, generic: 2 }
-                        - { descr: nonCritical   , graph: 0, value: 4, generic: 1 }
-                        - { descr: unrecoverable , graph: 0, value: 5, generic: 2 }
-                        - { descr: notInstalled  , graph: 0, value: 6, generic: 3 }
-                        - { descr: unknown       , graph: 0, value: 7, generic: 1 }
-                        - { descr: notAvailible  , graph: 0, value: 8, generic: 3 }
+                        - { descr: invalid       , value: 1, generic: 2 }
+                        - { descr: ok            , value: 2, generic: 0 }
+                        - { descr: critical      , value: 3, generic: 2 }
+                        - { descr: nonCritical   , value: 4, generic: 1 }
+                        - { descr: unrecoverable , value: 5, generic: 2 }
+                        - { descr: notInstalled  , value: 6, generic: 3 }
+                        - { descr: unknown       , value: 7, generic: 1 }
+                        - { descr: notAvailible  , value: 8, generic: 3 }
                 -
                     oid: LSI-MegaRAID-SAS-MIB::enclosureFanTable
                     value: LSI-MegaRAID-SAS-MIB::fanStatus
@@ -116,14 +116,14 @@ modules:
                     descr: 'FAN {{ LSI-MegaRAID-SAS-MIB::fanID }}'
                     state_name: fanStatus
                     states:
-                        - { descr: invalid       , graph: 0, value: 1, generic: 2 }
-                        - { descr: ok            , graph: 0, value: 2, generic: 0 }
-                        - { descr: critical      , graph: 0, value: 3, generic: 2 }
-                        - { descr: nonCritical   , graph: 0, value: 4, generic: 1 }
-                        - { descr: unrecoverable , graph: 0, value: 5, generic: 2 }
-                        - { descr: notInstalled  , graph: 0, value: 6, generic: 3 }
-                        - { descr: unknown       , graph: 0, value: 7, generic: 1 }
-                        - { descr: notAvailible  , graph: 0, value: 8, generic: 3 }
+                        - { descr: invalid       , value: 1, generic: 2 }
+                        - { descr: ok            , value: 2, generic: 0 }
+                        - { descr: critical      , value: 3, generic: 2 }
+                        - { descr: nonCritical   , value: 4, generic: 1 }
+                        - { descr: unrecoverable , value: 5, generic: 2 }
+                        - { descr: notInstalled  , value: 6, generic: 3 }
+                        - { descr: unknown       , value: 7, generic: 1 }
+                        - { descr: notAvailible  , value: 8, generic: 3 }
                 -
                     oid: LSI-MegaRAID-SAS-MIB::enclosureAlarmTable
                     value: LSI-MegaRAID-SAS-MIB::alarmStatus
@@ -132,14 +132,14 @@ modules:
                     descr: 'Alarm'
                     state_name: alarmStatus
                     states:
-                        - { descr: invalid       , graph: 0, value: 1, generic: 2 }
-                        - { descr: ok            , graph: 0, value: 2, generic: 0 }
-                        - { descr: critical      , graph: 0, value: 3, generic: 2 }
-                        - { descr: nonCritical   , graph: 0, value: 4, generic: 1 }
-                        - { descr: unrecoverable , graph: 0, value: 5, generic: 2 }
-                        - { descr: notInstalled  , graph: 0, value: 6, generic: 3 }
-                        - { descr: unknown       , graph: 0, value: 7, generic: 1 }
-                        - { descr: notAvailible  , graph: 0, value: 8, generic: 3 }
+                        - { descr: invalid       , value: 1, generic: 2 }
+                        - { descr: ok            , value: 2, generic: 0 }
+                        - { descr: critical      , value: 3, generic: 2 }
+                        - { descr: nonCritical   , value: 4, generic: 1 }
+                        - { descr: unrecoverable , value: 5, generic: 2 }
+                        - { descr: notInstalled  , value: 6, generic: 3 }
+                        - { descr: unknown       , value: 7, generic: 1 }
+                        - { descr: notAvailible  , value: 8, generic: 3 }
                 -
                     oid: LSI-MegaRAID-SAS-MIB::bbuTable
                     value: LSI-MegaRAID-SAS-MIB::chargerStatus
@@ -148,10 +148,10 @@ modules:
                     descr: 'BBU charger'
                     state_name: chargerStatus
                     states:
-                        - { descr: notAvailible, graph: 0, value: -1, generic: 3 }
-                        - { descr: off          , graph: 0, value:  0, generic: 2 }
-                        - { descr: complete     , graph: 0, value:  1, generic: 0 }
-                        - { descr: progress     , graph: 0, value:  2, generic: 1 }
+                        - { descr: notAvailible, value: -1, generic: 3 }
+                        - { descr: off          , value:  0, generic: 2 }
+                        - { descr: complete     , value:  1, generic: 0 }
+                        - { descr: progress     , value:  2, generic: 1 }
                 -
                     oid: LSI-MegaRAID-SAS-MIB::bbuTable
                     value: LSI-MegaRAID-SAS-MIB::batteryReplacement
@@ -160,6 +160,6 @@ modules:
                     descr: 'BBU replacement'
                     state_name: batteryReplacement
                     states:
-                        - { descr: not availible    , graph: 0, value: -1, generic: 3 }
-                        - { descr: needsReplacement , graph: 0, value:  1, generic: 2 }
-                        - { descr: ok               , graph: 0, value:  0, generic: 0 }
+                        - { descr: not availible    , value: -1, generic: 3 }
+                        - { descr: needsReplacement , value:  1, generic: 2 }
+                        - { descr: ok               , value:  0, generic: 0 }

@@ -39,11 +39,13 @@ use App\Http\Controllers\PortGroupController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\RealtimeDataController;
 use App\Http\Controllers\RealtimeGraphController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Search\PortSecuritySearchController;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
 use App\Http\Controllers\ServiceTemplateController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SslCertificateController;
 use App\Http\Controllers\Table;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserPreferencesController;
@@ -105,6 +107,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('templates/remove/{template}', [ServiceTemplateController::class, 'remove'])->name('templates.remove');
     });
     Route::get('locations', [LocationController::class, 'index']);
+    Route::resource('ssl-certificates', SslCertificateController::class)->except(['edit']);
     Route::resource('preferences', UserPreferencesController::class)->only('index', 'store');
     Route::resource('users', UserController::class);
     Route::get('about', [AboutController::class, 'index'])->name('about');
@@ -195,6 +198,8 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('settings/{tab?}/{section?}', [SettingsController::class, 'index'])->name('settings');
         Route::put('settings/{name}', [SettingsController::class, 'update'])->name('settings.update');
         Route::delete('settings/{name}', [SettingsController::class, 'destroy'])->name('settings.destroy');
+
+        Route::resource('roles', RoleController::class);
 
         Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
         Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
@@ -337,6 +342,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('vlan-ports', Table\VlanPortsController::class)->name('table.vlan-ports');
             Route::post('vlan-devices', Table\VlanDevicesController::class)->name('table.vlan-devices');
             Route::post('vminfo', Table\VminfoController::class);
+            Route::post('ssl-certificates', Table\SslCertificateController::class)->name('table.ssl-certificates');
         });
 
         // dashboard widgets

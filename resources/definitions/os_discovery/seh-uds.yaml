@@ -18,12 +18,12 @@ modules:
                       value: false
                    state_name: utnPortSlot
                    states:
-                       - { value:  0, generic: 3, graph: 0, descr: disabled }
-                       - { value:  1, generic: 0, graph: 0, descr: enabled }
-                       - { value:  2, generic: 0, graph: 0, descr: enabled }
-                       - { value:  3, generic: 0, graph: 0, descr: enabled }
-                       - { value:  4, generic: 0, graph: 0, descr: enabled }
-                       - { value:  5, generic: 0, graph: 0, descr: enabled }
-                       - { value:  6, generic: 0, graph: 0, descr: enabled }
-                       - { value:  7, generic: 0, graph: 0, descr: enabled }
-                       - { value:  8, generic: 0, graph: 0, descr: enabled }
+                       - { value:  0, generic: 3, descr: disabled }
+                       - { value:  1, generic: 0, descr: enabled }
+                       - { value:  2, generic: 0, descr: enabled }
+                       - { value:  3, generic: 0, descr: enabled }
+                       - { value:  4, generic: 0, descr: enabled }
+                       - { value:  5, generic: 0, descr: enabled }
+                       - { value:  6, generic: 0, descr: enabled }
+                       - { value:  7, generic: 0, descr: enabled }
+                       - { value:  8, generic: 0, descr: enabled }

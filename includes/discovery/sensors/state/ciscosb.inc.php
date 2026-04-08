@@ -31,8 +31,8 @@ if (! empty($temp)) {
     //Create State Index
     $state_name = 'swIfOperSuspendedStatus';
     $states = [
-        ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'true'],
-        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'false'],
+        ['value' => 1, 'generic' => 2, 'descr' => 'true'],
+        ['value' => 2, 'generic' => 0, 'descr' => 'false'],
     ];
     create_state_index($state_name, $states);
 

@@ -128,6 +128,7 @@ function api_get_graph(Request $request, array $additional = [])
             'bbg',
             'title',
             'graph_title',
+            'graph_type',
             'nototal',
             'nodetails',
             'noagg',
@@ -397,7 +398,7 @@ function list_devices(Illuminate\Http\Request $request)
         $sql = '1';
     }
 
-    if (Gate::denies('viewAny', Device::class)) {
+    if (Gate::denies('viewAll', Device::class)) {
         $sql .= ' AND `d`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $param[] = Auth::id();
     }
@@ -809,7 +810,7 @@ function list_cbgp(Illuminate\Http\Request $request)
         $sql = ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
     }
-    if (Gate::denies('viewAny', BgpPeer::class)) {
+    if (Gate::denies('viewAll', BgpPeer::class)) {
         $sql .= ' AND `bgpPeers_cbgp`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $sql_params[] = Auth::id();
     }
@@ -1928,7 +1929,7 @@ function list_bills(Illuminate\Http\Request $request)
     } else {
         $sql = '1';
     }
-    if (Gate::denies('viewAny', \App\Models\Bill::class)) {
+    if (Gate::denies('viewAll', \App\Models\Bill::class)) {
         $sql .= ' AND `bill_id` IN (SELECT `bill_id` FROM `bill_perms` WHERE `user_id` = ?)';
         $param[] = Auth::id();
     }
@@ -2469,7 +2470,7 @@ function add_device_group(Illuminate\Http\Request $request)
     $rules = [
         'name' => 'required|string|unique:device_groups',
         'type' => 'required|in:dynamic,static',
-        'devices' => 'array|required_if:type,static',
+        'devices' => 'array|present_if:type,static',
         'devices.*' => 'integer',
         'rules' => 'json|required_if:type,dynamic',
     ];
@@ -2522,7 +2523,7 @@ function update_device_group(Illuminate\Http\Request $request)
         'name' => 'sometimes|string|unique:device_groups',
         'desc' => 'sometimes|string',
         'type' => 'sometimes|in:dynamic,static',
-        'devices' => 'array|required_if:type,static',
+        'devices' => 'array|present_if:type,static',
         'devices.*' => 'integer',
         'rules' => 'json|required_if:type,dynamic',
     ];
@@ -2777,7 +2778,7 @@ function list_vrf(Illuminate\Http\Request $request)
         $sql = '  AND `vrfs`.`vrf_name`=?';
         $sql_params = [$vrfname];
     }
-    if (Gate::denies('viewAny', Vrf::class)) {
+    if (Gate::denies('viewAll', Vrf::class)) {
         $sql .= ' AND `vrfs`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $sql_params[] = Auth::id();
     }
@@ -2863,7 +2864,7 @@ function list_vlans(Illuminate\Http\Request $request)
         $sql = ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
     }
-    if (Gate::denies('viewAny', Vlan::class)) {
+    if (Gate::denies('viewAll', Vlan::class)) {
         $sql .= ' AND `vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $sql_params[] = Auth::id();
     }
@@ -2892,7 +2893,7 @@ function list_links(Illuminate\Http\Request $request)
         $sql = ' AND `links`.`local_device_id`=?';
         $sql_params = [$device_id];
     }
-    if (Gate::denies('viewAny', Link::class)) {
+    if (Gate::denies('viewAll', Link::class)) {
         $sql .= ' AND `links`.`local_device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
         $sql_params[] = Auth::id();
     }
@@ -3379,7 +3380,7 @@ function add_service_template_for_device_group(Illuminate\Http\Request $request)
 
 function get_service_templates(Illuminate\Http\Request $request)
 {
-    if ($request->user()->cannot('viewAny', ServiceTemplate::class)) {
+    if ($request->user()->cannot('viewAll', ServiceTemplate::class)) {
         return api_error(403, 'Insufficient permissions to access service templates');
     }
 

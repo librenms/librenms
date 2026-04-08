@@ -17,7 +17,7 @@ use App\Models\Device;
 
 $no_refresh = true;
 $param = [];
-if ($device_id = (int) Request::get('device')) {
+if ($device_id = (int) Request::input('device')) {
     $device = Device::find($device_id);
 }
 
@@ -62,7 +62,7 @@ $pagetitle[] = 'Eventlog';
         '<select name="eventtype" id="eventtype" class="form-control input-sm">' +
         '<option value="">All types</option>' +
         <?php
-        if ($type = Request::get('eventtype')) {
+        if ($type = Request::input('eventtype')) {
             $js_type = addcslashes(htmlentities($type), "'");
             echo "'<option value=\"$js_type\">$js_type</option>' +";
         }
@@ -106,6 +106,6 @@ $pagetitle[] = 'Eventlog';
                 }
             }
         }
-    })<?php echo Request::get('eventtype') ? ".val('" . htmlspecialchars(Request::get('eventtype')) . "').trigger('change');" : ''; ?>;
+    })<?php echo Request::input('eventtype') ? ".val('" . htmlspecialchars(Request::input('eventtype')) . "').trigger('change');" : ''; ?>;
 
 </script>

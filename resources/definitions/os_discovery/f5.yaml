@@ -31,11 +31,11 @@ modules:
                     descr: Failover State
                     group: HA
                     states:
-                        - { value: 0, descr: 'Unknown', graph: 0, generic: 3 }
-                        - { value: 1, descr: 'OffLine', graph: 0, generic: 2 }
-                        - { value: 2, descr: 'ForcedOffline', graph: 0, generic: 2 }
-                        - { value: 3, descr: 'Standby', graph: 0, generic: 0 }
-                        - { value: 4, descr: 'Active', graph: 0, generic: 0 }
+                        - { value: 0, descr: 'Unknown', generic: 3 }
+                        - { value: 1, descr: 'OffLine', generic: 2 }
+                        - { value: 2, descr: 'ForcedOffline', generic: 2 }
+                        - { value: 3, descr: 'Standby', generic: 0 }
+                        - { value: 4, descr: 'Active', generic: 0 }
                 -
                     oid: F5-BIGIP-SYSTEM-MIB::sysCmSyncStatusId
                     state_name: sysCmSyncStatusId
@@ -44,16 +44,16 @@ modules:
                     descr: Sync State
                     group: HA
                     states:
-                        - { value: 0, descr: 'unknown', graph: 0, generic: 3 }
-                        - { value: 1, descr: 'syncing', graph: 0, generic: 1 }
-                        - { value: 2, descr: 'needManualSync', graph: 0, generic: 2 }
-                        - { value: 3, descr: 'inSync', graph: 0, generic: 0 }
-                        - { value: 4, descr: 'syncFailed', graph: 0, generic: 1 }
-                        - { value: 5, descr: 'syncDisconnected', graph: 0, generic: 2 }
-                        - { value: 6, descr: 'standalone', graph: 0, generic: 0 }
-                        - { value: 7, descr: 'awaitingInitialSync', graph: 0, generic: 1 }
-                        - { value: 8, descr: 'incompatibleVersion', graph: 0, generic: 2 }
-                        - { value: 9, descr: 'partialSync', graph: 0, generic: 2 }
+                        - { value: 0, descr: 'unknown', generic: 3 }
+                        - { value: 1, descr: 'syncing', generic: 1 }
+                        - { value: 2, descr: 'needManualSync', generic: 2 }
+                        - { value: 3, descr: 'inSync', generic: 0 }
+                        - { value: 4, descr: 'syncFailed', generic: 1 }
+                        - { value: 5, descr: 'syncDisconnected', generic: 2 }
+                        - { value: 6, descr: 'standalone', generic: 0 }
+                        - { value: 7, descr: 'awaitingInitialSync', generic: 1 }
+                        - { value: 8, descr: 'incompatibleVersion', generic: 2 }
+                        - { value: 9, descr: 'partialSync', generic: 2 }
                 -
                     oid: F5-BIGIP-SYSTEM-MIB::sysCmFailoverStatusColor
                     state_name: sysCmFailoverStatusColor
@@ -62,12 +62,12 @@ modules:
                     descr: Failover State Color
                     group: HA
                     states:
-                        - { value: 0, descr: 'Green: functioning correctly', graph: 0, generic: 0 }
-                        - { value: 1, descr: 'Yellow: functioning suboptimally', graph: 0, generic: 1 }
-                        - { value: 2, descr: 'Red: requires attention to function correctly', graph: 0, generic: 2 }
-                        - { value: 3, descr: 'Blue: status is unknown', graph: 0, generic: 3 }
-                        - { value: 4, descr: 'Gray: intentionally not functioning', graph: 0, generic: 0 }
-                        - { value: 5, descr: 'Black: not connected to any peers', graph: 0, generic: 2 }
+                        - { value: 0, descr: 'Green: functioning correctly', generic: 0 }
+                        - { value: 1, descr: 'Yellow: functioning suboptimally', generic: 1 }
+                        - { value: 2, descr: 'Red: requires attention to function correctly', generic: 2 }
+                        - { value: 3, descr: 'Blue: status is unknown', generic: 3 }
+                        - { value: 4, descr: 'Gray: intentionally not functioning', generic: 0 }
+                        - { value: 5, descr: 'Black: not connected to any peers', generic: 2 }
                 -
                     oid: F5-BIGIP-SYSTEM-MIB::sysChassisPowerSupplyStatus
                     state_name: sysChassisPowerSupplyStatus
@@ -76,9 +76,9 @@ modules:
                     descr: "Power Supply Status {{ $index }}"
                     group: Hardware
                     states:
-                        - { value: 0, descr: 'Bad', graph: 0, generic: 2 }
-                        - { value: 1, descr: 'Good', graph: 0, generic: 0 }
-                        - { value: 2, descr: 'NotPresent', graph: 0, generic: 3 }
+                        - { value: 0, descr: 'Bad', generic: 2 }
+                        - { value: 1, descr: 'Good', generic: 0 }
+                        - { value: 2, descr: 'NotPresent', generic: 3 }
                 -
                     oid: F5-BIGIP-SYSTEM-MIB::sysChassisFanStatus
                     state_name: sysChassisFanStatus
@@ -87,9 +87,9 @@ modules:
                     descr: "Fan Status {{ $index }}"
                     group: Hardware
                     states:
-                        - { value: 0, descr: 'Bad', graph: 0, generic: 2 }
-                        - { value: 1, descr: 'Good', graph: 0, generic: 0 }
-                        - { value: 2, descr: 'NotPresent', graph: 0, generic: 3 }
+                        - { value: 0, descr: 'Bad', generic: 2 }
+                        - { value: 1, descr: 'Good', generic: 0 }
+                        - { value: 2, descr: 'NotPresent', generic: 3 }
         count:
             data:
                 -

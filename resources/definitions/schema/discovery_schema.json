@@ -250,9 +250,6 @@
                                                         "descr": {
                                                             "type": "string"
                                                         },
-                                                        "graph": {
-                                                            "type": "integer"
-                                                        },
                                                         "generic": {
                                                             "type": "integer"
                                                         }
@@ -261,7 +258,6 @@
                                                     "required": [
                                                         "descr",
                                                         "generic",
-                                                        "graph",
                                                         "value"
                                                     ]
                                                 }

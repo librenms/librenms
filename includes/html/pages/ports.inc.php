@@ -168,7 +168,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= "<select name='port_descr_type' id='port_descr_type' class='form-control input-sm'>";
     $output .= "<option value=''>All Port Types</option>";
 
-    if (Gate::allows('viewAny', Port::class)) {
+    if (Gate::allows('viewAll', Port::class)) {
         $sql = 'SELECT `port_descr_type` FROM `ports` GROUP BY `port_descr_type` ORDER BY `port_descr_type`';
     } else {
         $sql = 'SELECT `port_descr_type` FROM `ports` AS `I`, `devices` AS `D`, `devices_perms` AS `P`, `ports_perms` AS `PP` WHERE ((`P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id`) OR (`PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` AND `I`.`device_id` = `D`.`device_id`)) AND `D`.`device_id` = `I`.`device_id` GROUP BY `port_descr_type` ORDER BY `port_descr_type`';

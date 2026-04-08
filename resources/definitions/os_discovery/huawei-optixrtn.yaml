@@ -22,8 +22,8 @@ modules:
                     state_name: optixPhyBoardState
                     group: 'Board "{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}"'
                     states:
-                        - { descr: Work, graph: 1, value: 1, generic: 0 }
-                        - { descr: NotWork, graph: 1, value: 0, generic: 2 }
+                        - { descr: Work, value: 1, generic: 0 }
+                        - { descr: NotWork, value: 0, generic: 2 }
                 -
                     oid: OPTIX-BOARD-MANAGE-MIB::optixLogBoardTable
                     num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.14.1.1.1.6.{{ $index }}'
@@ -33,8 +33,8 @@ modules:
                     state_name: optixLogBoardBusdetect
                     group: 'Board "{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}"'
                     states:
-                        - { descr: Enable, graph: 1, value: 1, generic: 0 }
-                        - { descr: Disable, graph: 1, value: 0, generic: 2 }
+                        - { descr: Enable, value: 1, generic: 0 }
+                        - { descr: Disable, value: 0, generic: 2 }
                 -
                     oid: OPTIX-BOARD-MANAGE-MIB::optixPhyBoardEntry
                     num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.14.1.2.1.8.{{ $index }}'
@@ -44,9 +44,9 @@ modules:
                     state_name: optixPhyBDOnlineFlag
                     group: 'Board "{{ OPTIX-BOARD-MANAGE-MIB::optixPhyBoardType:0 }}"'
                     states:
-                        - { descr: offline, graph: 1, value: 0, generic: 2 }
-                        - { descr: online, graph: 1, value: 1, generic: 0 }
-                        - { descr: not match, graph: 1, value: 2, generic: 1 }
+                        - { descr: offline, value: 0, generic: 2 }
+                        - { descr: online, value: 1, generic: 0 }
+                        - { descr: not match, value: 2, generic: 1 }
                 -
                     oid: OPTIX-MISC-MIB::optixFanSpeed
                     num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.39.1.1.{{ $index }}'
@@ -55,14 +55,14 @@ modules:
                     state_name: optixFanSpeed
                     group: 'NE {{ OPTIX-NE-MIB::optixNeName }}'
                     states:
-                        - { descr: stop, graph: 1, value: 4, generic: 2 }
-                        - { descr: low, graph: 1, value: 1, generic: 0 }
-                        - { descr: mid, graph: 1, value: 2, generic: 0 }
-                        - { descr: high, graph: 1, value: 3, generic: 1 }
-                        - { descr: autoLow, graph: 1, value: 5, generic: 0 }
-                        - { descr: autoMid, graph: 1, value: 6, generic: 0 }
-                        - { descr: autoHigh, graph: 1, value: 7, generic: 0 }
-                        - { descr: auto, graph: 1, value: 9, generic: 0 }
+                        - { descr: stop, value: 4, generic: 2 }
+                        - { descr: low, value: 1, generic: 0 }
+                        - { descr: mid, value: 2, generic: 0 }
+                        - { descr: high, value: 3, generic: 1 }
+                        - { descr: autoLow, value: 5, generic: 0 }
+                        - { descr: autoMid, value: 6, generic: 0 }
+                        - { descr: autoHigh, value: 7, generic: 0 }
+                        - { descr: auto, value: 9, generic: 0 }
                 -
                     oid: OPTIX-MISC-MIB::optixFanMinDispersion
                     num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.39.1.2.{{ $index }}'
@@ -71,10 +71,10 @@ modules:
                     state_name: optixFanMinDispersion
                     group: 'NE {{ OPTIX-NE-MIB::optixNeName }}'
                     states:
-                        - { descr: stop, graph: 1, value: 0, generic: 2 }
-                        - { descr: low, graph: 1, value: 45, generic: 0 }
-                        - { descr: mid, graph: 1, value: 58, generic: 0 }
-                        - { descr: high, graph: 1, value: 65, generic: 1 }
+                        - { descr: stop, value: 0, generic: 2 }
+                        - { descr: low, value: 45, generic: 0 }
+                        - { descr: mid, value: 58, generic: 0 }
+                        - { descr: high, value: 65, generic: 1 }
         dbm:
             data:
                 -
