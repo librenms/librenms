@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Tests;
 
-use App\Facades\LibrenmsConfig;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use PHPUnit\Framework\Attributes\DataProvider;
 

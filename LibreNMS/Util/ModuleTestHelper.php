@@ -281,7 +281,7 @@ class ModuleTestHelper
                 $os_list[$base_name] = [
                     $os,
                     $variant,
-//                    self::resolveModuleDependencies($valid_modules),
+                    self::resolveModuleDependencies($valid_modules),
                 ];
             } catch (InvalidModuleException $e) {
                 throw new InvalidModuleException('Invalid module ' . $e->getMessage() . " in $os $variant");
@@ -304,7 +304,7 @@ class ModuleTestHelper
 
         if (! str_contains($full_name, '_')) {
             return [$full_name, ''];
-        } elseif (is_file(("$resource_path/definitions/os_detection/$full_name.yaml"))) {
+        } elseif (is_file("$resource_path/definitions/os_detection/$full_name.yaml")) {
             return [$full_name, ''];
         } else {
             [$rvar, $ros] = explode('_', strrev($full_name), 2);
