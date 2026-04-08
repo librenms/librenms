@@ -300,7 +300,7 @@ class ModuleTestHelper
     public static function extractVariant(string $os_file, ?string $base_path = null): array
     {
         $full_name = basename($os_file, '.json');
-        $resource_path = rtrim($base_path ? rtrim($base_path, '/') . '/resources' : $resource_path(), '/');
+        $resource_path = rtrim($base_path ? rtrim($base_path, '/') . '/resources' : resource_path(), '/');
 
         if (! str_contains($full_name, '_')) {
             return [$full_name, ''];
