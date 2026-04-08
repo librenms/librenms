@@ -23,9 +23,10 @@
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
 $install_dir = realpath(__DIR__ . '/..');
+
 $init_modules = ['web', 'discovery', 'polling', 'nodb'];
+
 require $install_dir . '/includes/init.php';
 
 LibrenmsConfig::invalidateAndReload();
