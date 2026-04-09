@@ -39,7 +39,6 @@ class StateTranslation extends Model implements Keyable
     protected $primaryKey = 'state_translation_id';
     protected $fillable = [
         'state_descr',
-        'state_draw_graph',
         'state_value',
         'state_generic_value',
     ];
@@ -58,7 +57,6 @@ class StateTranslation extends Model implements Keyable
             'state_descr' => $descr,
             'state_value' => $value,
             'state_generic_value' => $genericValue,
-            'state_draw_graph' => true,
         ]);
     }
 

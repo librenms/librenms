@@ -27,8 +27,8 @@ modules:
                     group: 'Contact Closures'
                     state_name: contactClosure
                     states:
-                        - { value: 1, generic: 2, graph: 1, descr: Open }
-                        - { value: 2, generic: 0, graph: 1, descr: Closed }
+                        - { value: 1, generic: 2, descr: Open }
+                        - { value: 2, generic: 0, descr: Closed }
                     skip_values:
                         -
                             oid: SITEBOSS-572-STD-MIB::esIndexPC
@@ -46,8 +46,8 @@ modules:
                     group: 'Relay Outputs'
                     state_name: relayOutput
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: de-energized }
-                        - { value: 1, generic: 2, graph: 1, descr: energized }
+                        - { value: 0, generic: 0, descr: de-energized }
+                        - { value: 1, generic: 2, descr: energized }
                     skip_values:
                         -
                             oid: SITEBOSS-572-STD-MIB::esIndexPC
@@ -69,8 +69,8 @@ modules:
                     group: 'Power Outputs'
                     state_name: powerOutput
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: de-energized }
-                        - { value: 1, generic: 0, graph: 1, descr: energized }
+                        - { value: 0, generic: 1, descr: de-energized }
+                        - { value: 1, generic: 0, descr: energized }
                     skip_values:
                         -
                             oid: SITEBOSS-572-STD-MIB::esIndexPC

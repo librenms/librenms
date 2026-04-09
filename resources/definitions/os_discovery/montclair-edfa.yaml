@@ -142,9 +142,9 @@ modules:
           descr: Power Supply 1
           state_name: devicePowerSupply1Status
           states:
-            - { value: 1, generic: 3, graph: 0, descr: Empty }
-            - { value: 3, generic: 2, graph: 0, descr: Critical }
-            - { value: 7, generic: 0, graph: 0, descr: Normal }
+            - { value: 1, generic: 3, descr: Empty }
+            - { value: 3, generic: 2, descr: Critical }
+            - { value: 7, generic: 0, descr: Normal }
         -
           oid: Montclair-MIB::deviceStatus
           value: Montclair-MIB::devicePowerSupply2Status
@@ -153,9 +153,9 @@ modules:
           descr: Power Supply 2
           state_name: devicePowerSupply2Status
           states:
-            - { value: 1, generic: 3, graph: 0, descr: Empty }
-            - { value: 3, generic: 2, graph: 0, descr: Critical }
-            - { value: 7, generic: 0, graph: 0, descr: Normal }
+            - { value: 1, generic: 3, descr: Empty }
+            - { value: 3, generic: 2, descr: Critical }
+            - { value: 7, generic: 0, descr: Normal }
         -
           oid: Montclair-MIB::deviceStatus
           value: Montclair-MIB::deviceFanStatus
@@ -164,11 +164,11 @@ modules:
           descr: Fan Status
           state_name: deviceFanStatus
           states:
-            - { value: 0, generic: 3, graph: 0, descr: Normal }
-            - { value: 1, generic: 3, graph: 0, descr: Unknown }
-            - { value: 3, generic: 2, graph: 0, descr: Critical }
-            - { value: 5, generic: 2, graph: 0, descr: Warning }
-            - { value: 7, generic: 0, graph: 0, descr: Normal }
+            - { value: 0, generic: 3, descr: Normal }
+            - { value: 1, generic: 3, descr: Unknown }
+            - { value: 3, generic: 2, descr: Critical }
+            - { value: 5, generic: 2, descr: Warning }
+            - { value: 7, generic: 0, descr: Normal }
         -
           oid: Montclair-MIB::deviceStatus
           value: Montclair-MIB::deviceFanMode
@@ -177,11 +177,11 @@ modules:
           descr: Fan Mode
           state_name: deviceFanMode
           states:
-            - { value: 1, generic: 0, graph: 0, descr: Auto }
-            - { value: 2, generic: 0, graph: 0, descr: Manual }
-            - { value: 3, generic: 0, graph: 0, descr: Low }
-            - { value: 4, generic: 0, graph: 0, descr: Linear }
-            - { value: 5, generic: 0, graph: 0, descr: High }
+            - { value: 1, generic: 0, descr: Auto }
+            - { value: 2, generic: 0, descr: Manual }
+            - { value: 3, generic: 0, descr: Low }
+            - { value: 4, generic: 0, descr: Linear }
+            - { value: 5, generic: 0, descr: High }
         -
           oid: Montclair-MIB::amplifierDynamic
           value: Montclair-MIB::amplifierEnabled
@@ -190,8 +190,8 @@ modules:
           descr: Amplifier
           state_name: amplifierStatus
           states:
-            - { value: 1, generic: 2, graph: 0, descr: Disabled }
-            - { value: 2, generic: 0, graph: 0, descr: Enabled }
+            - { value: 1, generic: 2, descr: Disabled }
+            - { value: 2, generic: 0, descr: Enabled }
             # The MIB seems to have this backwards...
         -
           oid: Montclair-MIB::amplifierDynamic
@@ -201,6 +201,6 @@ modules:
           descr: Amp Mode
           state_name: amplifierMode
           states:
-            - { value: 1, generic: 0, graph: 0, descr: ACC }
-            - { value: 2, generic: 0, graph: 0, descr: APC }
-            - { value: 3, generic: 0, graph: 0, descr: AGC }
+            - { value: 1, generic: 0, descr: ACC }
+            - { value: 2, generic: 0, descr: APC }
+            - { value: 3, generic: 0, descr: AGC }

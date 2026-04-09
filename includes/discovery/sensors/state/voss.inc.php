@@ -34,10 +34,10 @@ if (is_array($voss_fan)) {
 
         $state_name = 'rcVossSystemFanInfoOperStatus';
         $states = [
-            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
-            ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'down'],
-            ['value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
+            ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'up'],
+            ['value' => 3, 'generic' => 1, 'descr' => 'down'],
+            ['value' => 4, 'generic' => 3, 'descr' => 'notPresent'],
         ];
         create_state_index($state_name, $states);
 
@@ -53,10 +53,10 @@ if (is_array($voss_fan)) {
 
         $state_name = 'rcChasFanOperStatus';
         $states = [
-            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
-            ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'down'],
-            ['value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
+            ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'up'],
+            ['value' => 3, 'generic' => 1, 'descr' => 'down'],
+            ['value' => 4, 'generic' => 3, 'descr' => 'notPresent'],
         ];
         create_state_index($state_name, $states);
 
@@ -83,10 +83,10 @@ if (is_array($power_supply)) {
 
         $state_name = 'rcChasPowerSupplyOperStatus';
         $states = [
-            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
-            ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'empty'],
-            ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
-            ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'down'],
+            ['value' => 1, 'generic' => 3, 'descr' => 'unknown'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'empty'],
+            ['value' => 3, 'generic' => 0, 'descr' => 'up'],
+            ['value' => 4, 'generic' => 1, 'descr' => 'down'],
         ];
         create_state_index($state_name, $states);
 

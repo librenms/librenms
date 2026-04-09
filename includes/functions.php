@@ -8,6 +8,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -67,7 +68,7 @@ function parse_modules($type, $options)
 
 function renamehost($id, $new, $source = 'console')
 {
-    $host = gethostbyid($id);
+    $host = DeviceCache::get((int) $id)->hostname;
     $new_rrd_dir = Rrd::dirFromHost($new);
 
     if (is_dir($new_rrd_dir)) {
@@ -146,23 +147,6 @@ function snmp2ipv6($ipv6_snmp)
     }
 
     return implode(':', $ipv6_2);
-}
-
-function hex2str($hex)
-{
-    $string = '';
-
-    for ($i = 0; $i < strlen((string) $hex) - 1; $i += 2) {
-        $string .= chr(hexdec(substr((string) $hex, $i, 2)));
-    }
-
-    return $string;
-}
-
-// Convert an SNMP hex string to regular string
-function snmp_hexstring($hex)
-{
-    return hex2str(str_replace(' ', '', str_replace(' 00', '', $hex)));
 }
 
 /**
@@ -338,7 +322,6 @@ function create_state_index($state_name, $states = []): void
 {
     app('sensor-discovery')->withStateTranslations($state_name, array_map(fn ($state) => new StateTranslation([
         'state_descr' => $state['descr'],
-        'state_draw_graph' => $state['graph'],
         'state_value' => $state['value'],
         'state_generic_value' => $state['generic'],
     ]), $states));

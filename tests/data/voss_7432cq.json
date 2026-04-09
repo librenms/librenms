@@ -7733,56 +7733,48 @@
                 {
                     "state_name": "rcChasPowerSupplyOperStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rcChasPowerSupplyOperStatus",
                     "state_descr": "empty",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "rcChasPowerSupplyOperStatus",
                     "state_descr": "up",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "rcChasPowerSupplyOperStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rcVossSystemFanInfoOperStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "rcVossSystemFanInfoOperStatus",
                     "state_descr": "up",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "rcVossSystemFanInfoOperStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "rcVossSystemFanInfoOperStatus",
                     "state_descr": "notPresent",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 3
                 }

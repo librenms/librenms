@@ -12,9 +12,9 @@ modules:
                     descr: 'UPS Type'
                     state_name: upsIdUPSType
                     states:
-                        - { descr: 'standby', graph: 1, value: 0, generic: 0 }
-                        - { descr: 'line-interactive', graph: 1, value: 1, generic: 1 }
-                        - { descr: 'on-line', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'standby', value: 0, generic: 0 }
+                        - { descr: 'line-interactive', value: 1, generic: 1 }
+                        - { descr: 'on-line', value: 2, generic: 0 }
         count:
             data:
                 -

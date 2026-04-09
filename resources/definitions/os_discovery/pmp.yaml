@@ -17,6 +17,6 @@ modules:
                     index: 0
                     descr: GPS Status
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: gpsSynchronized }
-                        - { value: 2, generic: 2, graph: 1, descr: gpsLostSync }
-                        - { value: 3, generic: 0, graph: 1, descr: generatingSync }
+                        - { value: 1, generic: 0, descr: gpsSynchronized }
+                        - { value: 2, generic: 2, descr: gpsLostSync }
+                        - { value: 3, generic: 0, descr: generatingSync }
