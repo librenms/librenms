@@ -195,14 +195,14 @@ class ServiceTemplate extends BaseModel
 
     /** @param  Builder<ServiceTemplate>  $query
      *  @return Builder<ServiceTemplate> */
-    public function scopeHasAccess(Builder $query, User $user): Builder
+    protected function scopeHasAccess(Builder $query, User $user): Builder
     {
         return $query;
     }
 
     /** @param  Builder<ServiceTemplate>  $query
      *  @return Builder<ServiceTemplate> */
-    public function scopeIsDisabled(Builder $query): Builder
+    protected function scopeIsDisabled(Builder $query): Builder
     {
         return $query->where('disabled', 1);
     }

@@ -95,7 +95,7 @@ class Notification extends Model
      * @param  User  $user
      * @return mixed
      */
-    public function scopeIsUnread(Builder $query, User $user)
+    protected function scopeIsUnread(Builder $query, User $user)
     {
         return $query->whereNotExists(function ($query) use ($user): void {
             $query->select(DB::raw(1))
@@ -110,7 +110,7 @@ class Notification extends Model
      *
      * @param  Builder<Notification>  $query
      */
-    public function scopeIsSticky(Builder $query)
+    protected function scopeIsSticky(Builder $query)
     {
         $query->leftJoin('notifications_attribs', 'notifications_attribs.notifications_id', 'notifications.notifications_id')
             ->where(['notifications_attribs.key' => 'sticky', 'notifications_attribs.value' => 1]);
@@ -120,7 +120,7 @@ class Notification extends Model
      * @param  Builder<Notification>  $query
      * @return Builder<Notification>
      */
-    public function scopeLimit(Builder $query)
+    protected function scopeLimit(Builder $query)
     {
         return $query->select('notifications.*', 'key', 'users.username');
     }
@@ -129,7 +129,7 @@ class Notification extends Model
      * @param  Builder<Notification>  $query
      * @return Builder|static
      */
-    public function scopeSource(Builder $query)
+    protected function scopeSource(Builder $query)
     {
         return $query->leftJoin('users', 'notifications.source', '=', 'users.user_id');
     }

@@ -20,7 +20,7 @@ class Dashboard extends Model
      * @param  User  $user
      * @return Builder|static
      */
-    public function scopeAllAvailable(Builder $query, $user)
+    protected function scopeAllAvailable(Builder $query, $user)
     {
         return $query->where('user_id', $user->user_id)
             ->orWhere('access', '>', 0);

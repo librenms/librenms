@@ -56,7 +56,7 @@ class BgpPeer extends DeviceRelatedModel
     ];
     // ---- Query scopes ----
 
-    public function scopeInAlarm(Builder $query)
+    protected function scopeInAlarm(Builder $query)
     {
         return $query->where(function (Builder $query): void {
             $query->where('bgpPeerAdminStatus', 'start')

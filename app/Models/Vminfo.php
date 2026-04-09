@@ -51,7 +51,7 @@ class Vminfo extends DeviceRelatedModel implements Keyable
         }
     }
 
-    public function scopeGuessFromDevice(Builder $query, Device $device): Builder
+    protected function scopeGuessFromDevice(Builder $query, Device $device): Builder
     {
         $where = [$device->hostname];
 
