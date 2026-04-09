@@ -597,14 +597,14 @@ Graphs will be movable/scalable without reloading the page:
 The availability bar on the device overview page shows per-day uptime over the last 90 days.
 You can configure the thresholds for the colour coding:
 
-- **Green**: availability >= threshold_green (default: 99%)
-- **Orange**: availability >= threshold_orange (default: 95%)
-- **Red**: availability < threshold_orange
+- **Green**: availability >= threshold_good (default: 99%)
+- **Orange**: availability >= threshold_medium (default: 95%)
+- **Red**: availability < threshold_medium
 
 !!! setting "webui/availability-bar"
     ```bash
-    lnms config:set webui.availability_bar.threshold_green 99
-    lnms config:set webui.availability_bar.threshold_orange 95
+    lnms config:set webui.availability_bar.threshold_good 99
+    lnms config:set webui.availability_bar.threshold_medium 95
     ```
 
 ## Stacked Graphs

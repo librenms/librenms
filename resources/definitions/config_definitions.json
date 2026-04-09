@@ -7375,14 +7375,14 @@
             "order": 2,
             "type": "boolean"
         },
-        "webui.availability_bar.threshold_green": {
+        "webui.availability_bar.threshold_good": {
             "default": 99,
             "group": "webui",
             "section": "availability-bar",
             "order": 1,
             "type": "integer"
         },
-        "webui.availability_bar.threshold_orange": {
+        "webui.availability_bar.threshold_medium": {
             "default": 95,
             "group": "webui",
             "section": "availability-bar",
