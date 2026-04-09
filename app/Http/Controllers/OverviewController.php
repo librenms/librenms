@@ -9,7 +9,6 @@ use App\Models\Port;
 use App\Models\Service;
 use App\Models\Syslog;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class OverviewController extends Controller
 {
@@ -43,27 +42,27 @@ class OverviewController extends Controller
         $devices_uptime = [];
         $syslog = [];
 
-        $devices_down = Device::hasAccess(Auth::user())
+        $devices_down = Device::hasAccess($request->user())
             ->isDown()
             ->limit(LibrenmsConfig::get('front_page_down_box_limit'))
             ->get();
 
         if (LibrenmsConfig::get('warn.ifdown')) {
-            $ports_down = Port::hasAccess(Auth::user())
+            $ports_down = Port::hasAccess($request->user())
                 ->isDown()
                 ->limit(LibrenmsConfig::get('front_page_down_box_limit'))
                 ->with('device')
                 ->get();
         }
 
-        $services_down = Service::hasAccess(Auth::user())
+        $services_down = Service::hasAccess($request->user())
             ->isCritical()
             ->limit(LibrenmsConfig::get('front_page_down_box_limit'))
             ->with('device')
             ->get();
 
         // TODO: is inAlarm() equal to: bgpPeerAdminStatus != 'start' AND bgpPeerState != 'established' AND bgpPeerState != ''  ?
-        $bgp_down = BgpPeer::hasAccess(Auth::user())
+        $bgp_down = BgpPeer::hasAccess($request->user())
             ->inAlarm()
             ->limit(LibrenmsConfig::get('front_page_down_box_limit'))
             ->with('device')
@@ -72,7 +71,7 @@ class OverviewController extends Controller
         if (filter_var(LibrenmsConfig::get('uptime_warning'), FILTER_VALIDATE_FLOAT) !== false
             && LibrenmsConfig::get('uptime_warning') > 0
         ) {
-            $devices_uptime = Device::hasAccess(Auth::user())
+            $devices_uptime = Device::hasAccess($request->user())
                 ->isUp()
                 ->whereUptime(LibrenmsConfig::get('uptime_warning'))
                 ->limit(LibrenmsConfig::get('front_page_down_box_limit'))
@@ -82,7 +81,7 @@ class OverviewController extends Controller
         }
 
         if (LibrenmsConfig::get('enable_syslog')) {
-            $syslog = Syslog::hasAccess(Auth::user())
+            $syslog = Syslog::hasAccess($request->user())
                 ->orderBy('timestamp', 'desc')
                 ->limit(20)
                 ->with('device')

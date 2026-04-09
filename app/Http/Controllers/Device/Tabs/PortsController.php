@@ -154,7 +154,7 @@ class PortsController implements DeviceTab
 
         if ($this->detail) {
             $data['neighbor_ports'] = Port::with('device')
-                ->hasAccess(Auth::user())
+                ->hasAccess($request->user())
                 ->whereIn('port_id', $data['neighbors']->map(fn ($a) => array_keys($a))->flatten())
                 ->get()->keyBy('port_id');
         }
