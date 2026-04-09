@@ -91,7 +91,7 @@ class AlertRuleRequest extends FormRequest
             ->mapWithKeys(fn ($field) => [$field => match ($this->input($field)) {
                 'on', '1', 1, true => true,
                 default => false
-            }])->toArray());
+            }])->all());
 
         // Ensure maps/transports are arrays if present as empty string
         foreach (['maps', 'transports'] as $key) {
