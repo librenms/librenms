@@ -17,7 +17,7 @@ class LoadUserPreferences
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check()) {
+        if ($request->user() !== null) {
             $preferences = ['locale', 'site_style', 'timezone'];
             $this->loadPreferences($request, $preferences);
 

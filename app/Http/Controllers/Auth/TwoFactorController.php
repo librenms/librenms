@@ -53,7 +53,7 @@ class TwoFactorController extends Controller
 
         // token validated
         if (session('twofactorremove')) {
-            UserPref::forgetPref(auth()->user(), 'twofactor');
+            UserPref::forgetPref($request->user(), 'twofactor');
             $request->session()->forget(['twofactor', 'twofactorremove']);
 
             $toast->info(__('TwoFactor auth removed.'));
