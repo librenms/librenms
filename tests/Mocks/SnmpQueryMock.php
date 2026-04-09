@@ -253,7 +253,7 @@ class SnmpQueryMock implements SnmpQueryInterface
                 ])) {
                     $data = Mac::parse($data)->readable();
                 } else {
-                    $data = hex2bin($data);
+                    $data = hex2str($data);
                 }
             }
 

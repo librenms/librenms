@@ -11,7 +11,6 @@
  */
 
 use App\Models\AlertTransport;
-use App\Models\AlertTransportGroup;
 use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
@@ -26,7 +25,7 @@ if (Gate::denies('view', AlertTransport::class)) {
 $group_id = $vars['group_id'];
 // Retrieve alert transport
 if (is_numeric($group_id) && $group_id > 0) {
-    $name = AlertTransportGroup::where('transport_group_id', $group_id)->value('transport_group_name');
+    $name = dbFetchCell('SELECT `transport_group_name` FROM `alert_transport_groups` WHERE `transport_group_id`=? LIMIT 1', [$group_id]);
 
     $query = 'SELECT `a`.`transport_id`, `transport_type`, `transport_name` FROM `transport_group_transport` AS `a` LEFT JOIN `alert_transports` AS `b` ON `a`.`transport_id`=`b`.`transport_id` WHERE `transport_group_id`=?';
 

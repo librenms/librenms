@@ -223,12 +223,7 @@ class SslCertificate extends Model
         $context->setVerifyPeerName(false);
         $provider = new StreamSocketProvider($host, $port, $timeout, $context);
         $parser = new Parser;
-
-        try {
-            $results = $parser->parse($provider);
-        } catch (ProviderException|CertificateParsingException $e) {
-            throw new \Exception("Failed to fetch certificate from {$host}:{$port}: {$e->getMessage()}");
-        }
+        $results = $parser->parse($provider);
 
         return self::attributesFromParserResults($results);
     }

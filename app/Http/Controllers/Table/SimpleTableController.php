@@ -56,7 +56,7 @@ abstract class SimpleTableController extends Controller
     }
 
     /**
-     * @param  array|Collection<int, mixed>  $rows
+     * @param  array|Collection  $rows
      * @param  int  $page
      * @param  int  $currentCount
      * @param  int  $total

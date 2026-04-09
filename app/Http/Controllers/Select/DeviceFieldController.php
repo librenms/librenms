@@ -79,7 +79,7 @@ class DeviceFieldController extends SelectController
      */
     public function formatItem($device)
     {
-        $field = \Request::input('field');
+        $field = \Request::get('field');
 
         $text = $device[$field];
         if ($field == 'os') {

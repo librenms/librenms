@@ -33,7 +33,7 @@ use Minishlink\WebPush\VAPID;
 
 class ComposerHelper
 {
-    public static function postRootPackageInstall(Event $event): void
+    public static function postRootPackageInstall(Event $event)
     {
         if (! file_exists('.env')) {
             self::setPermissions();
@@ -41,7 +41,7 @@ class ComposerHelper
         }
     }
 
-    public static function postInstall(Event $event): void
+    public static function postInstall(Event $event)
     {
         if (! file_exists('.env')) {
             self::setPermissions();
@@ -50,7 +50,7 @@ class ComposerHelper
         self::populateEnv();
     }
 
-    public static function preUpdate(Event $event): void
+    public static function preUpdate(Event $event)
     {
         if (! getenv('FORCE')) {
             echo "Running composer update is not advisable.  Please run composer install to update instead.\n";
@@ -66,34 +66,46 @@ class ComposerHelper
 
     public static function addPlugin(string $package, ?string $version = null): int
     {
-        return self::execComposerCommand(
-            ['require', '--no-update', $package . ($version ? ":$version" : '')],
-            ['COMPOSER' => 'composer.plugins.json'],
-        );
+        $package = escapeshellarg($package . ($version ? ":$version" : null));
+
+        $cmds = [
+            'COMPOSER=composer.plugins.json ' . PHP_BINARY . " ./scripts/composer_wrapper.php require --no-update $package",
+        ];
+
+        return self::exec($cmds);
     }
 
     public static function addPackage(string $package, ?string $version = null): int
     {
-        return self::execComposerCommand(
-            ['require', '--update-no-dev', $package . ($version ? ":$version" : '')],
-            ['FORCE' => 1],
-        );
+        $package = escapeshellarg($package . ($version ? ":$version" : null));
+
+        $cmds = [
+            'FORCE=1 ' . PHP_BINARY . " ./scripts/composer_wrapper.php require --update-no-dev $package",
+        ];
+
+        return self::exec($cmds);
     }
 
     public static function removePlugin(string $package): int
     {
-        return self::execComposerCommand(
-            ['remove', '--no-update', $package],
-            ['COMPOSER' => 'composer.plugins.json'],
-        );
+        $package = escapeshellarg($package);
+
+        $cmds = [
+            'COMPOSER=composer.plugins.json ' . PHP_BINARY . " ./scripts/composer_wrapper.php remove --no-update $package",
+        ];
+
+        return self::exec($cmds);
     }
 
     public static function removePackage(string $package): int
     {
-        return self::execComposerCommand(
-            ['remove', '--update-no-dev', $package],
-            ['FORCE' => 1],
-        );
+        $package = escapeshellarg($package);
+
+        $cmds = [
+            'FORCE=1 ' . PHP_BINARY . " ./scripts/composer_wrapper.php remove --update-no-dev $package",
+        ];
+
+        return self::exec($cmds);
     }
 
     public static function getPlugins(): array
@@ -107,7 +119,7 @@ class ComposerHelper
     /**
      * Initially populate .env file
      */
-    private static function populateEnv(): void
+    private static function populateEnv()
     {
         $config = [
             'db_host' => '',
@@ -149,45 +161,26 @@ class ComposerHelper
         }
     }
 
-    private static function setPermissions(): void
+    private static function setPermissions()
     {
-        self::exec([
-            'cd ' . realpath(__DIR__ . '/../..'),
+        $permissions_cmds = [
             'setfacl -R -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
             'setfacl -d -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
-        ]);
+        ];
+
+        self::exec($permissions_cmds);
     }
 
     /**
      * Run a command or array of commands and echo the command and output
      *
-     * @param  string[]  $cmds
+     * @param  string|array  $cmds
      */
-    private static function exec(array $cmds): int
+    private static function exec($cmds): int
     {
-        $cmd = "set -v\n" . implode(PHP_EOL, $cmds);
+        $cmd = "set -v\n" . implode(PHP_EOL, (array) $cmds);
         passthru($cmd, $result_code);
 
         return $result_code;
-    }
-
-    /**
-     * @param  string[]  $command
-     * @param  array<string, string|int|float>  $env
-     * @return int
-     */
-    private static function execComposerCommand(array $command, array $env = []): int
-    {
-        $cli = [];
-        foreach ($env as $key => $value) {
-            $cli[] = "$key=$value";
-        }
-        $cli[] = PHP_BINARY;
-        $cli[] = realpath(__DIR__ . '/../../scripts/composer_wrapper.php');
-        foreach ($command as $word) {
-            $cli[] = escapeshellarg($word);
-        }
-
-        return self::exec([implode(' ', $cli)]);
     }
 }

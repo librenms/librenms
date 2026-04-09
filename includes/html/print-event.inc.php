@@ -1,6 +1,5 @@
 <?php
 
-use App\Facades\DeviceCache;
 use LibreNMS\Util\Rewrite;
 
 /*
@@ -19,7 +18,7 @@ use LibreNMS\Util\Rewrite;
  * @author     LibreNMS Contributors
 */
 
-$hostname = DeviceCache::get((int) $entry['device_id'])->hostname;
+$hostname = gethostbyid($entry['device_id']);
 
 unset($icon);
 

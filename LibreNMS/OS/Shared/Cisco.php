@@ -790,12 +790,7 @@ class Cisco extends OS implements
         // Iterate over a 2 level table with keys of the policy ID, then the object ID
         foreach ($qosObjects as $policyId => $spObjects) {
             // Policy level settings
-            $policySettings = $servicePolicies[$policyId] ?? null;
-            if (! is_array($policySettings)) {
-                continue;
-            }
-
-            $direction = $policySettings['cbQosPolicyDirection'] ?? null;
+            $direction = $servicePolicies[$policyId]['cbQosPolicyDirection'];
 
             foreach ($spObjects as $objectId => $qosObject) {
                 $qosObjectIndex = $qosObject['cbQosConfigIndex'];
@@ -815,15 +810,14 @@ class Cisco extends OS implements
                     // Class Map
                     $dbtype = 'cisco_cbqos_classmap';
                     // RRD name matches the original cbqos module
-                    $rrd_id = 'port-' . ($policySettings['cbQosIfIndex'] ?? 0) . '-cbqos-' . $policyId . '-' . $objectId;
+                    $rrd_id = 'port-' . $servicePolicies[$policyId]['cbQosIfIndex'] . '-cbqos-' . $policyId . '-' . $objectId;
                     $cm = $classMaps[$qosObjectIndex] ?? [];
                     $title = implode(' - ', array_filter(array_intersect_key($cm, ['cbQosCMName' => true, 'cbQosCMDesc' => true])));
-                    $cmInfo = $cm['cbQosCMInfo'] ?? null;
 
                     // Fill in the match type
-                    if ($cmInfo == 2) {
+                    if ($cm['cbQosCMInfo'] == 2) {
                         $tooltip = 'Match-All:';
-                    } elseif ($cmInfo == 3) {
+                    } elseif ($cm['cbQosCMInfo'] == 3) {
                         $tooltip = 'Match-Any:';
                     } else {
                         $tooltip = 'None';

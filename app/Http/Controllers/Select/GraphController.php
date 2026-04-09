@@ -125,10 +125,10 @@ class GraphController extends Controller
     }
 
     /**
-     * @param  Collection<string, string>  $graphs
+     * @param  Collection  $graphs
      * @param  string  $type
      * @param  string  $search
-     * @return Collection<string, string>
+     * @return Collection
      */
     private function filterTypeGraphs($graphs, $type, $search)
     {

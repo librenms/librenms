@@ -81,9 +81,9 @@ class FdbTablesController extends TableController
      */
     protected function search($search, $query, $fields = [])
     {
-        if ($search = trim(\Request::input('searchPhrase') ?? '')) {
+        if ($search = trim(\Request::get('searchPhrase') ?? '')) {
             $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', $search) . '%';
-            switch (\Request::input('searchby') ?? '') {
+            switch (\Request::get('searchby') ?? '') {
                 case 'mac':
                     return $query->where('ports_fdb.mac_address', 'like', $mac_search);
                 case 'vlan':
@@ -202,12 +202,12 @@ class FdbTablesController extends TableController
 
     /**
      * @param  string  $ip
-     * @return Collection<int, string>
+     * @return Collection
      */
     protected function findMacs($ip): Collection
     {
-        $port_id = \Request::input('port_id');
-        $device_id = \Request::input('device_id');
+        $port_id = \Request::get('port_id');
+        $device_id = \Request::get('device_id');
 
         return Ipv4Mac::where('ipv4_address', 'like', "%$ip%")
             ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
@@ -217,12 +217,12 @@ class FdbTablesController extends TableController
 
     /**
      * @param  string  $vlan
-     * @return Collection<int, int>
+     * @return Collection
      */
     protected function findVlans($vlan): Collection
     {
-        $port_id = \Request::input('port_id');
-        $device_id = \Request::input('device_id');
+        $port_id = \Request::get('port_id');
+        $device_id = \Request::get('device_id');
 
         return Vlan::where('vlan_vlan', $vlan)
             ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
@@ -234,12 +234,12 @@ class FdbTablesController extends TableController
 
     /**
      * @param  string  $ifAlias
-     * @return Collection<int, int>
+     * @return Collection
      */
     protected function findPorts($ifAlias): Collection
     {
-        $port_id = \Request::input('port_id');
-        $device_id = \Request::input('device_id');
+        $port_id = \Request::get('port_id');
+        $device_id = \Request::get('device_id');
 
         return Port::where('ifAlias', 'like', "%$ifAlias%")
             ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
@@ -247,15 +247,12 @@ class FdbTablesController extends TableController
             ->pluck('port_id');
     }
 
-    /**
-     * @param  Collection<int, string>  $ips
-     */
     private function resolveDns(Collection $ips): string
     {
         $dns = 'N/A';
 
         // only fetch DNS if the column is visible
-        if (\Request::input('dns') == 'true') {
+        if (\Request::get('dns') == 'true') {
             // don't try too many dns queries, this is the slowest part
             foreach ($ips->take(3) as $ip) {
                 $hostname = gethostbyaddr($ip);

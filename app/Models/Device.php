@@ -891,9 +891,6 @@ class Device extends BaseModel
         return $this->hasMany(Link::class, 'remote_device_id');
     }
 
-    /**
-     * @return \Illuminate\Support\Collection<int, \App\Models\Link>
-     */
     public function allLinks(): \Illuminate\Support\Collection
     {
         return $this->links->merge($this->remoteLinks);

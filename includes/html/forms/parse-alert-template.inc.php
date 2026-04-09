@@ -13,7 +13,6 @@
  */
 
 use App\Models\AlertTemplate;
-use App\Models\AlertTemplateMap;
 
 $template = AlertTemplate::find($vars['template_id'] ?? 0);
 
@@ -37,13 +36,13 @@ if ($template) {
 }
 
 foreach (dbFetchRows('SELECT `id`,`name` FROM `alert_rules` order by `name`', []) as $rule) {
-    $is_selected = $template ? AlertTemplateMap::where('alert_rule_id', $rule['id'])->where('alert_templates_id', $template->id)->value('alert_templates_id') : null;
-    $is_available = AlertTemplateMap::where('alert_rule_id', $rule['id'])->value('alert_templates_id');
+    $is_selected = $template ? dbFetchCell('SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ? AND `alert_templates_id` = ?', [$rule['id'], $template->id]) : null;
+    $is_available = dbFetchCell('SELECT `alert_templates_id` FROM `alert_template_map` WHERE `alert_rule_id` = ?', [$rule['id']]);
     $rules[] = [
         'id' => $rule['id'],
         'name' => $rule['name'],
         'selected' => isset($is_selected),
-        'used' => isset($is_available) ? AlertTemplate::where('id', $is_available)->value('name') : '',
+        'used' => isset($is_available) ? dbFetchCell('SELECT `name` FROM `alert_templates` WHERE `id` = ?', [$is_available]) : '',
     ];
 }
 $output['rules'] = $rules;

@@ -81,7 +81,7 @@ abstract class SelectController extends PaginatedAjaxController
     }
 
     /**
-     * @param  Paginator|Collection<int, mixed>  $paginator
+     * @param  Paginator|Collection  $paginator
      * @return \Illuminate\Http\JsonResponse
      */
     protected function formatResponse($paginator, bool $hasMore = false): JsonResponse

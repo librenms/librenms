@@ -171,7 +171,13 @@ class StringHelpers
             $hex = str_replace($seperator, '', $no_nulls);
         }
 
-        return hex2bin($hex);
+        $string = '';
+
+        for ($i = 0; $i < strlen($hex) - 1; $i += 2) {
+            $string .= chr(hexdec(substr($hex, $i, 2)));
+        }
+
+        return $string;
     }
 
     public static function trimHexGarbage(string $string): string

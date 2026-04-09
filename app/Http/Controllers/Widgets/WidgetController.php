@@ -120,7 +120,7 @@ abstract class WidgetController extends Controller
     public function getSettings($settingsView = false): array
     {
         if (is_null($this->settings)) {
-            $id = \Request::input('id');
+            $id = \Request::get('id');
             $widget = UserWidget::find($id);
             $this->defaults['refresh'] ??= 60;
             $this->settings = array_replace($this->defaults, $widget ? (array) $widget->settings : []);

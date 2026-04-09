@@ -69,9 +69,6 @@ class User extends Authenticatable
         $this->attributes['password'] = $password ? Hash::make($password) : null;
     }
 
-    /**
-     * @return int|Collection<int, \App\Models\Notification>
-     */
     public function getNotifications(?string $type = null): int|Collection
     {
         return match ($type) {

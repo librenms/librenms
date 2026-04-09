@@ -37,9 +37,9 @@ use Log;
 
 class PluginManager implements PluginManagerInterface
 {
-    /** @var Collection<string, Collection<int, array{plugin_name: string, instance: object}>> */
+    /** @var Collection */
     private $hooks;
-    /** @var Collection<string, \App\Models\Plugin> */
+    /** @var Collection */
     private $plugins;
 
     /** @var array */
@@ -218,9 +218,6 @@ class PluginManager implements PluginManagerInterface
         return $plugin;
     }
 
-    /**
-     * @return Collection<string, \App\Models\Plugin>
-     */
     protected function getPlugins(): Collection
     {
         if ($this->plugins === null) {
@@ -239,7 +236,7 @@ class PluginManager implements PluginManagerInterface
      * @param  string  $hookType
      * @param  array  $args
      * @param  string|null  $onlyPlugin
-     * @return Collection<int, array{plugin_name: string, instance: object}>
+     * @return Collection
      */
     protected function hooksFor(string $hookType, array $args, ?string $onlyPlugin): Collection
     {

@@ -115,9 +115,6 @@ class GraylogApi
         return implode(' && ', $query);
     }
 
-    /**
-     * @return \Illuminate\Support\Collection<int, non-falsy-string>
-     */
     public function getAddresses(Device $device): \Illuminate\Support\Collection
     {
         $addresses = collect([

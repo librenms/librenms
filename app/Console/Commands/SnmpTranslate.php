@@ -23,9 +23,6 @@ class SnmpTranslate extends SnmpFetch
         $this->getDefinition()->setOptions($options);
     }
 
-    /**
-     * @return Collection<int, \App\Models\Device>
-     */
     protected function getDevices(): Collection
     {
         if (empty($this->oids)) {

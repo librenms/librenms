@@ -70,12 +70,6 @@ if (! isset($old_data['disks_with_failed_tests'])) {
 if (! isset($old_data['disks_with_failed_health'])) {
     $old_data['disks_with_failed_health'] = [];
 }
-if (! isset($old_data['disks_with_over_temp'])) {
-    $old_data['disks_with_over_temp'] = [];
-}
-if (! isset($old_data['disks_with_dev_error'])) {
-    $old_data['disks_with_dev_error'] = [];
-}
 
 $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
@@ -115,12 +109,8 @@ $rrd_def_maxtemp = RrdDefinition::make()
 
 $new_disks_with_failed_tests = [];
 $new_disks_with_failed_health = [];
-$new_disks_with_over_temp = [];
-$new_disks_with_dev_error = [];
 $data['disks_with_failed_tests'] = [];
 $data['disks_with_failed_health'] = [];
-$data['disks_with_over_temp'] = [];
-$data['disks_with_dev_error'] = [];
 $data['has'] = [
     'id5' => 0,
     'id9' => 0,
@@ -143,15 +133,12 @@ $data['has'] = [
 ];
 
 $metrics = [
-    'disks_with_failed_tests' => 0,
-    'disks_with_over_temp' => 0,
-    'new_disks_with_failed_tests' => 0,
-    'new_disks_with_failed_health' => 0,
-    'new_disks_with_over_temp' => 0,
-    'new_disks_with_dev_error' => 0,
+    'disks_with_failed_tests_count' => 0,
+    'disks_with_failed_health_count' => 0,
+    'new_disks_with_failed_tests_count' => 0,
+    'new_disks_with_failed_health_count' => 0,
     'exit_nonzero' => $data['exit_nonzero'] ?? null,
     'unhealthy' => $data['unhealthy'] ?? null,
-    'dev_error' => $data['dev_error'] ?? null,
 ];
 foreach ($data['disks'] as $disk_id => $disk) {
     $rrd_name = ['app', $name, $app->app_id, $disk_id];
@@ -235,35 +222,6 @@ foreach ($data['disks'] as $disk_id => $disk) {
         $metrics['disk_' . $disk_id . '_max_temp'] = $disk['max_temp'];
     }
 
-    if (isset($disk['over_temp'])) {
-        $metrics['disk_' . $disk_id . '_over_temp'] = $disk['over_temp'];
-
-        // check if we have over_temp set to 1(true)
-        if (is_numeric($disk['over_temp']) && $disk['over_temp'] > 0) {
-            $metrics['disks_with_over_temp']++;
-            $data['disks_with_over_temp'][$disk_id] = 1;
-            // add it to the list to alert on if it is a new over temp
-            if (! isset($old_data['disks_with_over_temp'][$disk_id])) {
-                $new_disks_with_failed_tests[] = $disk_id;
-                $metrics['new_disks_with_over_temp']++;
-            }
-        }
-    }
-
-    if (isset($disk['dev_error'])) {
-        $metrics['disk_' . $disk_id . '_dev_error'] = $disk['dev_error'];
-
-        // check if we have over_temp set to 1(true)
-        if (is_numeric($disk['dev_error']) && $disk['dev_error'] > 0) {
-            $data['disks_with_dev_error'][$disk_id] = 1;
-            // add it to the list to alert on if it is a new over temp
-            if (! isset($old_data['disks_with_dev_error'][$disk_id])) {
-                $new_disks_with_failed_tests[] = $disk_id;
-                $metrics['new_disks_with_dev_error']++;
-            }
-        }
-    }
-
     // check if it has any failed tests
     // only counting failures, ignoring ones that have been interrupted
     if ((is_numeric($disk['read_failure']) && $disk['read_failure'] > 0) ||
@@ -271,7 +229,7 @@ foreach ($data['disks'] as $disk_id => $disk) {
         $data['disks_with_failed_tests'][$disk_id] = 1;
         $metrics['disks_with_failed_tests']++;
         // add it to the list to alert on if it is a new failure
-        if (! isset($old_data['disks_with_failed_tests'][$disk_id])) {
+        if (! isset($old_data['disks_with_failed_tests'])) {
             $new_disks_with_failed_tests[] = $disk_id;
             $metrics['new_disks_with_failed_tests']++;
         }
@@ -296,10 +254,11 @@ foreach ($data['disks'] as $disk_id => $disk) {
     // checks if the health has failed
     if (isset($disk['health_pass']) && is_numeric($disk['health_pass']) && $disk['health_pass'] < 1) {
         $data['disks_with_failed_health'][$disk_id] = 1;
+        $metrics['disks_with_failed_health_count']++;
         // add it to the list to alert on if it is a new failure
-        if (! isset($old_data['disks_with_failed_health'][$disk_id])) {
+        if (! isset($old_data['disks_with_failed_health'])) {
             $new_disks_with_failed_health[] = $disk_id;
-            $metrics['new_disks_with_failed_health']++;
+            $metrics['new_disks_with_failed_health_count']++;
         }
     }
 
@@ -312,7 +271,7 @@ foreach ($data['disks'] as $disk_id => $disk) {
     }
 }
 
-// log any new disks with failed tests is found
+// log any disks with failed tests found
 if (count($new_disks_with_failed_tests) > 0) {
     $log_message = 'SMART found new disks with failed tests: ' . json_encode($new_disks_with_failed_tests);
     Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
@@ -324,7 +283,7 @@ if (count($data['disks_with_failed_tests']) == 0 && count($old_data['disks_with_
     Eventlog::log($log_message, $device['device_id'], 'application', Severity::Ok);
 }
 
-// log any new disks with failed health is found
+// log any disks with failed tests found
 if (count($new_disks_with_failed_health) > 0) {
     $log_message = 'SMART found new disks with failed health checks: ' . json_encode($new_disks_with_failed_health);
     Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
@@ -333,30 +292,6 @@ if (count($new_disks_with_failed_health) > 0) {
 // log when there when we go to having no failed disks from having them previously
 if (count($data['disks_with_failed_health']) == 0 && count($old_data['disks_with_failed_health']) > 0) {
     $log_message = 'SMART is no longer finding any disks with failed health checks';
-    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Ok);
-}
-
-// log any new disks with over temp set is found
-if (count($new_disks_with_over_temp) > 0) {
-    $log_message = 'SMART found new disks over heating: ' . json_encode($new_disks_with_over_temp);
-    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
-}
-
-// log when all over temp disks return to normal
-if (count($data['disks_with_over_temp']) == 0 && count($old_data['disks_with_over_temp']) > 0) {
-    $log_message = 'SMART is no longer finding any disks over heating';
-    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Ok);
-}
-
-// log any new disks with dev_error set
-if (count($new_disks_with_dev_error) > 0) {
-    $log_message = 'SMART found new disks polling errors: ' . json_encode($new_disks_with_dev_error);
-    Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
-}
-
-// log when all dev_errors clear
-if (count($data['disks_with_over_temp']) == 0 && count($old_data['disks_with_over_temp']) > 0) {
-    $log_message = 'SMART is no longer finding any disks over heating';
     Eventlog::log($log_message, $device['device_id'], 'application', Severity::Ok);
 }
 

@@ -85,7 +85,7 @@ class TopDevicesController extends WidgetController
 
     /**
      * @param  array|string  $headers
-     * @param  Collection<int, mixed>  $rows
+     * @param  Collection  $rows
      * @return array
      */
     private function formatData($headers, $rows)

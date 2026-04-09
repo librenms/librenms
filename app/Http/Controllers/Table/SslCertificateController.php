@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Table;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\SslCertificate;
 use Illuminate\Http\Request;
 
@@ -42,8 +41,6 @@ class SslCertificateController extends TableController
     public function formatItem($model)
     {
         $sslCertificate = $model;
-        $daysWarning = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_warning', 30);
-        $daysDanger = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_danger', 0);
         $deviceLink = null;
         if ($sslCertificate->device) {
             $deviceLink = '<a href="' . url('device/' . $sslCertificate->device_id) . '">' . e($sslCertificate->device->hostname) . '</a>';
@@ -55,7 +52,7 @@ class SslCertificateController extends TableController
             $status = '<span class="label label-default">' . __('Disabled') . '</span>';
         } elseif ($sslCertificate->isExpired()) {
             $status = '<span class="label label-danger">' . __('Expired') . '</span>';
-        } elseif ($sslCertificate->expiresWithinDays($daysWarning)) {
+        } elseif ($sslCertificate->expiresWithinDays(30)) {
             $status = '<span class="label label-warning">' . __('Expires soon') . '</span>';
         } else {
             $status = '<span class="label label-success">' . __('Valid') . '</span>';
@@ -63,12 +60,12 @@ class SslCertificateController extends TableController
 
         $daysUntilExpiry = $sslCertificate->days_until_expiry;
         $daysDisplay = $daysUntilExpiry !== null
-            ? (string) e($daysUntilExpiry) . ' ' . __('days')
+            ? (string) $daysUntilExpiry . ' ' . __('days')
             : '—';
-        if ($daysUntilExpiry !== null && $daysUntilExpiry <= $daysDanger) {
-            $daysDisplay = '<span class="text-danger">' . e($daysUntilExpiry) . ' ' . __('days') . '</span>';
-        } elseif ($daysUntilExpiry !== null && $daysUntilExpiry <= $daysWarning) {
-            $daysDisplay = '<span class="text-warning">' . e($daysUntilExpiry) . ' ' . __('days') . '</span>';
+        if ($daysUntilExpiry !== null && $daysUntilExpiry < 0) {
+            $daysDisplay = '<span class="text-danger">' . $daysUntilExpiry . ' ' . __('days') . '</span>';
+        } elseif ($daysUntilExpiry !== null && $daysUntilExpiry <= 30) {
+            $daysDisplay = '<span class="text-warning">' . $daysUntilExpiry . ' ' . __('days') . '</span>';
         }
 
         return [
@@ -78,7 +75,7 @@ class SslCertificateController extends TableController
             'subject' => e($sslCertificate->subject),
             'issuer' => e($sslCertificate->issuer),
             'valid_to' => e($validTo),
-            'days_until_expiry' => $daysDisplay,
+            'days_until_expiry' => e($daysDisplay),
             'last_checked_at' => $sslCertificate->last_checked_at !== null ? e($sslCertificate->last_checked_at->format('Y-m-d H:i')) : null,
             'device_id' => $sslCertificate->device_id,
             'device' => $deviceLink,
