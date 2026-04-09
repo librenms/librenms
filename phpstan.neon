@@ -34,6 +34,7 @@ parameters:
     checkInternalClassCaseSensitivity: true
 
     checkModelProperties: true
+    checkModelMethodVisibility: true
 
     ignoreErrors:
         - '#Unsafe usage of new static#'

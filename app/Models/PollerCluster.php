@@ -61,14 +61,14 @@ class PollerCluster extends Model
 
     // ---- Scopes ----
 
-    public function scopeIsActive(Builder $query): Builder
+    protected function scopeIsActive(Builder $query): Builder
     {
         $default = (int) \App\Facades\LibrenmsConfig::get('service_poller_frequency');
 
         return $query->where('last_report', '>=', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
     }
 
-    public function scopeIsInactive(Builder $query): Builder
+    protected function scopeIsInactive(Builder $query): Builder
     {
         $default = (int) \App\Facades\LibrenmsConfig::get('service_poller_frequency');
 

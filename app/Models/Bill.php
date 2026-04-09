@@ -40,7 +40,7 @@ class Bill extends BaseModel
 
     // ---- Query Scopes ----
 
-    public function scopeHasAccess(Builder $query, User $user): Builder
+    protected function scopeHasAccess(Builder $query, User $user): Builder
     {
         return $this->hasBillAccess($query, $user);
     }

@@ -596,7 +596,7 @@ class Device extends BaseModel
         ]);
     }
 
-    public function scopeWhereAttributeDisabled(Builder $query, string $attribute): Builder
+    protected function scopeWhereAttributeDisabled(Builder $query, string $attribute): Builder
     {
         return $query->leftJoin('devices_attribs', function (JoinClause $query) use ($attribute): void {
             $query->on('devices.device_id', 'devices_attribs.device_id')
@@ -615,7 +615,7 @@ class Device extends BaseModel
         ]);
     }
 
-    public function scopeCanPing(Builder $query): Builder
+    protected function scopeCanPing(Builder $query): Builder
     {
         return $this->scopeWhereAttributeDisabled($query->where('disabled', 0), 'override_icmp_disable');
     }
@@ -669,7 +669,7 @@ class Device extends BaseModel
         );
     }
 
-    public function scopeWhereDeviceSpec(Builder $query, ?string $deviceSpec): Builder
+    protected function scopeWhereDeviceSpec(Builder $query, ?string $deviceSpec): Builder
     {
         if (empty($deviceSpec)) {
             return $query;
