@@ -112,6 +112,14 @@ modules:
                     descr: 'Current {{ LIEBERT-GP-PDU-MIB::lgpPduRcpEntryUsrLabel }}'
                     divisor: 10
                     index: 'lgpPduRcpEntryEc.{{ $index }}'
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementCurrent
+                    index: 'lgpPwrLineMeasurementCurrent.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.6.{{ $index }}'
+                    descr: 'Phase {{ $index }} Current'
+                    warn_limit: 750
+                    high_limit: 780
         count:
             data:
                 -
@@ -335,6 +343,32 @@ modules:
                     descr: 'Humidifying Capacity Usage'
                     index: 'lgpEnvStateHumidifyingCapacity.{{ $index }}'
                     skip_values: 4294967295
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementCapacity
+                    index: 'lgpPwrLineMeasurementCapacity.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.7.{{ $index }}'
+                    descr: 'Phase {{ $index }} Load'
+                    warn_limit: 90
+                    high_limit: 95
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementVoltageTHD
+                    index: 'lgpPwrLineMeasurementVoltageTHD.{{ $index }}'
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.10.{{ $index }}'
+                    descr: 'Phase {{ $index }} Voltage THD'
+                    warn_limit: 12
+                    high_limit: 15
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementCurrentTHD
+                    index: 'lgpPwrLineMeasurementCurrentTHD.{{ $index }}'
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.11.{{ $index }}'
+                    descr: 'Phase {{ $index }} Current THD'
+                    warn_limit: 12
+                    high_limit: 15
         power_factor:
             data:
                 -
