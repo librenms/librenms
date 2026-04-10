@@ -221,7 +221,7 @@ class PermissionsCache
         $this->billPermissions = null;
     }
 
-    private function getUserId(User|int|null $user): int
+    private function getUserId(User|int|null $user): ?int
     {
         return $user instanceof User ? $user->user_id : (is_numeric($user) ? (int) $user : Auth::id());
     }
