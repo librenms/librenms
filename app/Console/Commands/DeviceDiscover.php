@@ -57,6 +57,12 @@ class DeviceDiscover extends LnmsCommand
 
     public function handle(MeasurementManager $measurements): int
     {
+        // Save current working directory (CWD)
+        $originalCwd = getcwd();
+
+        // Force the change to the secure root of LibreNMS (e.g., /opt/librenms)
+        @chdir(base_path());
+
         try {
             $this->handleDebug();
 
@@ -78,6 +84,11 @@ class DeviceDiscover extends LnmsCommand
             return $processor->processResults($measurements, $this->getOutput());
         } catch (QueryException $e) {
             return $this->handleQueryException($e);
+        } finally {
+            // Regardless of success or failure, it returns the original CWD
+            if ($originalCwd) {
+                @chdir($originalCwd);
+            }
         }
     }
 }
