@@ -1,10 +1,13 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Sensor;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Source\Ipmitool;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
+
+/** @var array $device */
 
 $ipmiSensors = DeviceCache::getPrimary()->sensors()->where('poller_type', 'ipmi')
     ->get()->groupBy('sensor_class')->map->keyBy('sensor_descr');
@@ -14,13 +17,13 @@ if ($ipmiSensors->isEmpty()) {
 
 if ($ipmi = Ipmitool::init()) {
     Log::info('Fetching IPMI sensor data...');
-    foreach ($ipmi->sdr() as $descr => $values) {
-        [$descr, $value, $unit, $status, $detail] = array_pad($values, 5, null);
+    foreach ($ipmi->sdr() as $values) {
+        [$descr, $value, $unit, $status, $detail] = $values;
         $descr = trim($descr, ' ');
         $ipmi_unit_type = LibrenmsConfig::get("ipmi_unit.$unit");
         $sensor = $ipmiSensors->get($ipmi_unit_type)?->get($descr);
 
-        /** @var \App\Models\Sensor $sensor */
+        /** @var Sensor $sensor */
         if ($sensor) {
             // SDR records can include hexadecimal values, identified by an h like "93h"
             if (preg_match('/^([0-9A-Fa-f]+)h$/', $value, $matches)) {

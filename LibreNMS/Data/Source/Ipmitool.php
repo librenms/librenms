@@ -35,18 +35,18 @@ use LibreNMS\Exceptions\IpmiConnectionFailed;
 
 class Ipmitool
 {
-    private string $binary;
-    private string $hostname;
-    private int $port;
-    private string $username;
-    private string $password;
-    private ?string $kg_key;
-    private ?int $ciphersuite;
-    private int $timeout;
+    private readonly string $binary;
+    private readonly string $hostname;
+    private readonly int $port;
+    private readonly string $username;
+    private readonly string $password;
+    private readonly ?string $kg_key;
+    private readonly ?int $ciphersuite;
+    private readonly int $timeout;
     private ?string $type;
 
     public function __construct(
-        private Device $device,
+        private readonly Device $device,
     )
     {
         $this->binary = LibrenmsConfig::get('ipmitool', 'ipmitool');
@@ -56,7 +56,7 @@ class Ipmitool
         $this->password = $device->getAttrib('ipmi_password', '');
         $this->kg_key = $device->getAttrib('ipmi_kg_key');
         $this->ciphersuite = $device->getAttrib('ipmi_ciphersuite');
-        $this->timeout = filter_var($device->getAttrib('ipmi_timeout'), FILTER_VALIDATE_INT);
+        $this->timeout = filter_var($device->getAttrib('ipmi_timeout'), FILTER_VALIDATE_INT) ?: 0;
         $this->type = $device->getAttrib('ipmi_type');
     }
 
@@ -79,7 +79,7 @@ class Ipmitool
     public function command(array $commands): string
     {
         if ($this->type) {
-            $result = $this->runCommand($commands, $this->type);
+            $result = $this->runCommand($commands);
 
             if ($result->failed()) {
                 throw new IpmiConnectionFailed('Failed to connect to IPMI device');
@@ -107,16 +107,28 @@ class Ipmitool
         throw new IpmiConnectionFailed('Failed to discover IPMI type');
     }
 
+    /**
+     * descr, value, unit, status, detail
+     *
+     * @return list<array{string, string, string, string, string}>
+     * @throws IpmiConnectionFailed
+     */
     public function sdr(): array
     {
         $output = $this->command(['-c', 'sdr']);
 
         return array_map(
-            fn(string $line): array => array_values(array_map(trim(...), str_getcsv($line, escape: ''))),
+            fn(string $line): array => array_pad(array_values(array_map(trim(...), str_getcsv($line, escape: ''))), 5, null),
             array_filter(explode("\n", trim($output)))
         );
     }
 
+    /**
+     *  desc, current, unit, state, low_nonrecoverable, low_limit, low_warn, high_warn, high_limit, high_nonrecoverable
+     *
+     * @return list<array{string, string, string, string, string, string, string, string, string, string}>
+     * @throws IpmiConnectionFailed
+     */
     public function sensors(): array
     {
         $output = $this->command(['sensor']);
@@ -178,10 +190,10 @@ class Ipmitool
 
     /**
      * @param  string[]  $commands
-     * @param  mixed  $ipmi_type
+     * @param  string|null  $ipmi_type
      * @return ProcessResult
      */
-    private function runCommand(array $commands, mixed $ipmi_type): ProcessResult {
+    private function runCommand(array $commands, ?string $ipmi_type = null): ProcessResult {
         $cmd = $this->createCommand($commands, $ipmi_type);
         Log::debug('IPMI[%m' . implode(' ', $cmd) . '%n]', ['color' => true]);
 
