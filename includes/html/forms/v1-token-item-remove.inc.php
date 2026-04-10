@@ -12,11 +12,11 @@ if (! is_numeric($tokenId) || ($_POST['confirm'] ?? '') !== 'yes') {
     exit(json_encode(['status' => 'error', 'message' => 'ERROR: Invalid data']));
 }
 
-$isAdmin = Auth::user()->hasRole('admin');
+$canManage = Gate::allows('api.management');
 
 $query = \Laravel\Sanctum\PersonalAccessToken::where('id', $tokenId);
 
-if (! $isAdmin) {
+if (! $canManage) {
     $query->where('tokenable_id', Auth::id())
           ->where('tokenable_type', \App\Models\User::class);
 }

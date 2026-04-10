@@ -12,9 +12,9 @@ if ($tokenName === '') {
     exit(json_encode(['status' => 'error', 'message' => 'ERROR: Token name is required']));
 }
 
-$isAdmin = Auth::user()->hasRole('admin');
+$canManage = Gate::allows('api.management');
 
-if ($isAdmin && ! empty($_POST['user_id'])) {
+if ($canManage && ! empty($_POST['user_id'])) {
     $user = \App\Models\User::find($_POST['user_id']);
     if (! $user) {
         exit(json_encode(['status' => 'error', 'message' => 'ERROR: User not found']));

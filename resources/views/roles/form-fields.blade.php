@@ -61,7 +61,8 @@
         return [
             'name' => $perm,
             'label' => $labels[$group][$permName]['label'] ?? ($labels[$group]['label'] ?? $perm),
-            'description' => $labels[$group][$permName]['description'] ?? ($labels[$group]['description'] ?? '')
+            'description' => $labels[$group][$permName]['description'] ?? ($labels[$group]['description'] ?? ''),
+            'warning' => $labels[$group][$permName]['warning'] ?? '',
         ];
     }, $perms);
             @endphp
@@ -87,10 +88,20 @@
                                 <div class="tw:flex-1">
                                     <div class="tw:font-bold">
                                         {{ $p['label'] }}
+                                        @if($p['warning'])
+                                            <span class="label label-danger tw:ml-2" title="{{ $p['warning'] }}">
+                                                <i class="fa fa-exclamation-triangle"></i> {{ __('permissions.rbac.high_risk') }}
+                                            </span>
+                                        @endif
                                     </div>
                                     @if($p['description'])
                                         <div class="tw:text-base tw:text-slate-500 tw:dark:text-dark-white-400">
                                             {{ $p['description'] }}
+                                        </div>
+                                    @endif
+                                    @if($p['warning'])
+                                        <div class="tw:mt-1 tw:text-base tw:text-red-600 tw:dark:text-red-400">
+                                            <i class="fa fa-exclamation-triangle"></i> {{ $p['warning'] }}
                                         </div>
                                     @endif
                                 </div>

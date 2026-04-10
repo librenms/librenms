@@ -58,6 +58,11 @@ return [
     'api' => [
         'title' => 'API Access',
         'access' => ['label' => 'API Access', 'description' => 'Access the LibreNMS REST API'],
+        'management' => [
+            'label' => 'API Token Management',
+            'description' => 'Create, renew, and delete API tokens belonging to other users.',
+            'warning' => 'Equivalent to admin: a user with this permission can mint tokens for any account (including admins) and act as them via the API.',
+        ],
     ],
 
     'application' => [
@@ -194,7 +199,11 @@ return [
 
     'role' => [
         'title' => 'Roles',
-        'update' => ['label' => 'Edit Roles', 'description' => 'Modify role permissions and settings'],
+        'update' => [
+            'label' => 'Edit Roles',
+            'description' => 'Modify role permissions and settings',
+            'warning' => 'Equivalent to admin: a user with this permission can grant any permission (including admin) to any role, including their own.',
+        ],
     ],
 
     'routing' => [
@@ -235,8 +244,16 @@ return [
     'user' => [
         'title' => 'Users',
         'view' => ['label' => 'View User', 'description' => 'View user account details'],
-        'create' => ['label' => 'Create Users', 'description' => 'Create new user accounts'],
-        'update' => ['label' => 'Edit Users', 'description' => 'Modify user accounts, roles, and permissions'],
+        'create' => [
+            'label' => 'Create Users',
+            'description' => 'Create new user accounts',
+            'warning' => 'Equivalent to admin: a user with this permission can create accounts and assign any role to them, including admin.',
+        ],
+        'update' => [
+            'label' => 'Edit Users',
+            'description' => 'Modify user accounts, roles, and permissions',
+            'warning' => 'Equivalent to admin: a user with this permission can change any account\'s password or role, including admin accounts, and take them over.',
+        ],
         'delete' => ['label' => 'Delete Users', 'description' => 'Delete user accounts'],
         'updatePassword' => ['label' => 'Update Password', 'description' => 'Update user password'],
     ],
@@ -289,6 +306,7 @@ return [
         'search_permissions' => 'Search permissions...',
         'select_all' => 'Select All',
         'clear_all' => 'Clear All',
+        'high_risk' => 'High Risk',
         'save_role' => 'Save Role',
         'update_role' => 'Update Role',
         'created' => 'Role :name created successfully',

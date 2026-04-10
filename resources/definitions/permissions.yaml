@@ -33,6 +33,7 @@ groups:
 
     api:
         - api.access
+        - api.management
 
     application:
         - application.update

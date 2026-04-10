@@ -14,7 +14,7 @@
 
 header('Content-type: text/plain');
 
-if (Gate::denies('api.access')) {
+if (Gate::denies('api.management')) {
     exit('ERROR: You need permission');
 }
 

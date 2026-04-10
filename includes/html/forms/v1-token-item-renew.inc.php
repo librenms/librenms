@@ -17,11 +17,11 @@ if (! is_numeric($extendDays) || (int) $extendDays < 1) {
     exit(json_encode(['status' => 'error', 'message' => 'ERROR: Days must be a positive number']));
 }
 
-$isAdmin = Auth::user()->hasRole('admin');
+$canManage = Gate::allows('api.management');
 
 $query = \Laravel\Sanctum\PersonalAccessToken::where('id', $tokenId);
 
-if (! $isAdmin) {
+if (! $canManage) {
     $query->where('tokenable_id', Auth::id())
           ->where('tokenable_type', \App\Models\User::class);
 }

@@ -17,8 +17,8 @@ use App\Models\User;
 use LibreNMS\Authentication\LegacyAuth;
 
 if (Gate::allows('api.access')) {
-    $userlist = User::all();
-    $isAdmin = Auth::user()->hasRole('admin');
+    $canManage = Gate::allows('api.management');
+    $userlist = $canManage ? User::all() : collect();
 ?>
 
   <style>
@@ -31,6 +31,7 @@ if (Gate::allows('api.access')) {
     }
   </style>
 
+  <?php if ($canManage) { ?>
   <!-- V0 Modals -->
   <div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="Delete" aria-hidden="true">
     <div class="modal-dialog modal-sm">
@@ -108,6 +109,7 @@ if (Gate::allows('api.access')) {
       </div>
     </div>
   </div>
+  <?php } ?>
 
   <!-- V1 Modals -->
   <div class="modal fade" id="confirm-delete-v1" tabindex="-1" role="dialog" aria-labelledby="DeleteV1" aria-hidden="true">
@@ -173,7 +175,7 @@ if (Gate::allows('api.access')) {
         <div class="modal-body">
           <form role="form" class="form-horizontal create_v1_token_form">
             <?php echo csrf_field() ?>
-            <?php if ($isAdmin) { ?>
+            <?php if ($canManage) { ?>
             <div class="form-group">
               <label for="v1_user_id" class="col-sm-2 control-label">User: </label>
               <div class="col-sm-4">
@@ -225,11 +227,16 @@ if (Gate::allows('api.access')) {
   <hr>
 
   <ul class="nav nav-tabs">
+    <?php if ($canManage) { ?>
     <li class="active"><a href="#v0-tokens" data-toggle="tab">V0 API Tokens</a></li>
     <li><a href="#v1-tokens" data-toggle="tab">V1 API Tokens</a></li>
+    <?php } else { ?>
+    <li class="active"><a href="#v1-tokens" data-toggle="tab">V1 API Tokens</a></li>
+    <?php } ?>
   </ul>
 
   <div class="tab-content">
+    <?php if ($canManage) { ?>
     <!-- V0 API Tokens Tab -->
     <div class="tab-pane fade in active" id="v0-tokens">
       <br>
@@ -272,14 +279,15 @@ if (Gate::allows('api.access')) {
         <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-token">Create API access token</button>
       </center>
     </div>
+    <?php } ?>
 
     <!-- V1 API Tokens Tab -->
-    <div class="tab-pane fade" id="v1-tokens">
+    <div class="tab-pane fade <?php echo $canManage ? '' : 'in active'; ?>" id="v1-tokens">
       <br>
       <span id="v1-thanks"></span>
       <table class="table table-bordered table-condensed">
         <tr>
-          <?php if ($isAdmin) { ?>
+          <?php if ($canManage) { ?>
           <th>User</th>
           <?php } ?>
           <th>Token Name</th>
@@ -289,19 +297,19 @@ if (Gate::allows('api.access')) {
           <th>Actions</th>
         </tr>
         <?php
-        $v1Tokens = $isAdmin
+        $v1Tokens = $canManage
             ? \Laravel\Sanctum\PersonalAccessToken::with('tokenable')->get()
             : Auth::user()->tokens;
 
         foreach ($v1Tokens as $token) {
-            $tokenUser = $isAdmin ? $token->tokenable : Auth::user();
+            $tokenUser = $canManage ? $token->tokenable : Auth::user();
             $expired = $token->expires_at && $token->expires_at->isPast();
             $expiresLabel = $token->expires_at
                 ? ($expired ? '<span class="text-danger">' . $token->expires_at->diffForHumans() . '</span>' : $token->expires_at->diffForHumans())
                 : 'Never';
             echo '
         <tr id="v1-' . $token->id . '"' . ($expired ? ' class="warning"' : '') . '>
-          ' . ($isAdmin ? '<td>' . htmlentities((string) ($tokenUser->username ?? 'Unknown')) . '</td>' : '') . '
+          ' . ($canManage ? '<td>' . htmlentities((string) ($tokenUser->username ?? 'Unknown')) . '</td>' : '') . '
           <td>' . htmlentities((string) $token->name) . '</td>
           <td>' . ($token->last_used_at ? $token->last_used_at->diffForHumans() : 'Never') . '</td>
           <td>' . $token->created_at->diffForHumans() . '</td>
@@ -464,9 +472,9 @@ if (Gate::allows('api.access')) {
             '</div>'
           );
           // Append new row to table
-          var isAdmin = <?php echo $isAdmin ? 'true' : 'false'; ?>;
+          var canManage = <?php echo $canManage ? 'true' : 'false'; ?>;
           var row = '<tr id="v1-' + data.token_id + '">';
-          if (isAdmin) {
+          if (canManage) {
             row += '<td>' + $('<span>').text(data.username).html() + '</td>';
           }
           row += '<td>' + $('<span>').text(data.token_name).html() + '</td>';
