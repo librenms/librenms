@@ -295,29 +295,63 @@ the default User Role for Authorized users.   Appropriate care should be taken.
 Socialite can specify scopes that should be included with in the authentication request.
 (see [Larvel docs](https://laravel.com/docs/10.x/socialite#access-scopes) )
 
-For example, if Okta is configured to expose group information it is possible to use these group
-names to configure User Roles.
+=== "Okta"
 
-This requires configuration in Okta.  You can set the 'Groups claim type' to 'Filter' and supply
-a regex of which groups should be returned which can be mapped below.
+    For example, if Okta is configured to expose group information it is possible to use these group
+    names to configure User Roles.
 
-![socialite-okta-1](../img/socialite-okta-4.png)
+    This requires configuration in Okta.  You can set the 'Groups claim type' to 'Filter' and supply
+    a regex of which groups should be returned which can be mapped below.
 
-First enable sending the 'groups' claim (along with the normal openid, profile, and email claims).
-Be aware that the scope name must match the claim name. For identity providers where the scope does
-not match (e.g. Keycloak: roles -> groups) you need to configure a custom scope.
+    ![socialite-okta-1](../img/socialite-okta-4.png)
 
-!!! setting "settings/auth/socialite"
-    ```bash
-    lnms config:set auth.socialite.scopes.+ groups
-    ```
+    First enable sending the 'groups' claim (along with the normal openid, profile, and email claims).
+    Be aware that the scope name must match the claim name. For identity providers where the scope does
+    not match (e.g. Keycloak: roles -> groups) you need to configure a custom scope.
 
-Then setup mappings from the returned claim arrays to the User levels you want
-!!! setting "settings/auth/socialite"
-    ```bash
-    lnms config:set auth.socialite.claims.RETURN_FROM_CLAIM.roles '["admin"]'
-    lnms config:set auth.socialite.claims.OTHER_RETURN_FROM_CLAIM.roles '["global-read","cleaner"]'
-    ```
+    !!! setting "settings/auth/socialite"
+        ```bash
+        lnms config:set auth.socialite.scopes.+ groups
+        ```
+
+    Then setup mappings from the returned claim arrays to the User levels you want
+    !!! setting "settings/auth/socialite"
+        ```bash
+        lnms config:set auth.socialite.claims.RETURN_FROM_CLAIM.roles '["admin"]'
+        lnms config:set auth.socialite.claims.OTHER_RETURN_FROM_CLAIM.roles '["global-read","cleaner"]'
+        ```
+
+=== "Microsoft"
+
+    For example in Microsoft EntraID you need to configure roles that are send back to LibreNMS
+
+    This requires configuration in EntraID.
+    
+    create roles.
+    
+    ![socialite-microsoft-8](../img/socialite-microsoft-8.png)
+
+    assign roles to groups
+    
+    ![socialite-microsoft-9](../img/socialite-microsoft-9.png)
+
+    Then setup mappings from the returned claim arrays to the User levels you want
+    !!! setting "settings/auth/socialite"
+        ```bash
+        lnms config:set auth.socialite.claims.RETURN_FROM_CLAIM.roles '["admin"]'
+        lnms config:set auth.socialite.claims.OTHER_RETURN_FROM_CLAIM.roles '["global-read","cleaner"]'
+        ```
+        
+    !!! full config example
+        ```bash
+        lnms config:get auth.socialite.default_role none
+        lnms config:set auth.socialite.configs.microsoft.claim_field roles
+        lnms config:set auth.socialite.scopes '["profile"]'
+        lnms config:set auth.socialite.claims.admin.roles '["admin"]'
+        lnms config:set auth.socialite.claims.globalread.roles '["global-read"]'
+        lnms config:set auth.socialite.claims.user.roles '["user"]'
+        ```
+    
 ## Claim Field (advanced)
 
 Some providers deliver role or group membership under a token claim field that
@@ -332,7 +366,7 @@ AADSTS650053: The application asked for scope 'roles' that doesn't exist
 The `claim_field` option solves this by separating *what is requested from the
 IdP* (scopes) from *what key is read in the returned token* (claim_field).  It
 is configured per provider under `auth.socialite.configs.<provider>.claim_field`
-and accepts an array of strings.
+and accepts an string.
 
 ```bash
 lnms config:set auth.socialite.configs.microsoft.claim_field roles
