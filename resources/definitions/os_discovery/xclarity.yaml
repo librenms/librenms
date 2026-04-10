@@ -55,6 +55,19 @@ modules:
                         - { descr: sleep, value: 1, generic: 1 }
                         - { descr: 'power on', value: 255, generic: 0 }
                     descr: 'Power status'
+                -
+                    oid: LENOVO-XCC-MIB::fans
+                    value: LENOVO-XCC-MIB::fanHealthStatus
+                    num_oid: '.1.3.6.1.4.1.19046.11.1.1.3.2.1.10.{{ $index }}'
+                    state_name: fanHealthStatus
+                    index: 'fanHealthStatus.{{ $index }}'
+                    states:
+                        - { descr: Unknown, value: 0, generic: 3 }
+                        - { descr: Normal, value: 1, generic: 0 }
+                        - { descr: Warning, value: 2, generic: 1 }
+                        - { descr: Critical, value: 3, generic: 2 }
+                        - { descr: nonRecoverable, value: 4, generic: 2 }
+                    descr: LENOVO-XCC-MIB::fanDescr
         percent:
             data:
                 -
@@ -63,10 +76,11 @@ modules:
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.3.2.1.3.{{ $index }}'
                     index: 'fanSpeed.{{ $index }}'
                     descr: LENOVO-XCC-MIB::fanDescr
-                    high_limit: LENOVO-XCC-MIB::fanCritLimitHigh
-                    low_limit: LENOVO-XCC-MIB::fanCritLimitLow
-                    low_warn_limit: LENOVO-XCC-MIB::fanNonCritLimitLow
-                    warn_limit: LENOVO-XCC-MIB::fanNonCritLimitHigh
+                    skip_values:
+                        -
+                            oid: LENOVO-XCC-MIB::fanSpeed
+                            op: '='
+                            value: Offline
         power:
             data:
                 -

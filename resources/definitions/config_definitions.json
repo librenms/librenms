@@ -7456,6 +7456,22 @@
                 "value.*": "string"
             }
         },
+        "ssl_certificates.days_until_expiry_warning": {
+            "default": 30,
+            "group": "apps",
+            "section": "ssl-certificates",
+            "order": 2,
+            "type": "integer",
+            "units": "days"
+        },
+        "ssl_certificates.days_until_expiry_danger": {
+            "default": 0,
+            "group": "apps",
+            "section": "ssl-certificates",
+            "order": 3,
+            "type": "integer",
+            "units": "days"
+        },
         "smokeping.integration": {
             "default": false,
             "group": "external",

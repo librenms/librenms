@@ -136,7 +136,7 @@ class PortsController implements DeviceTab
             }
         }
 
-        /** @var Collection<Port>|LengthAwarePaginator<Port> $ports */
+        /** @var Collection<int, Port>|LengthAwarePaginator<Port> $ports */
         $ports = $this->getFilteredPortsQuery($device, $relationships, $request)
             ->paginate(fn ($total) => $this->settings['perPage'] == 'all' ? $total : (int) $this->settings['perPage']) // @phpstan-ignore-line missing closure type
             ->appends('perPage', $this->settings['perPage'])

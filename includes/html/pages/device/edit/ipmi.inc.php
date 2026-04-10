@@ -1,9 +1,11 @@
 <?php
 
+use App\Facades\DeviceCache;
 use Illuminate\Support\Facades\Gate;
 
 if ($_POST['editing']) {
-    if (Gate::allows('update', DeviceCache::getPrimary())) {
+    $device=DeviceCache::getPrimary();
+    if (Gate::allows('update', $device)) {
         $ipmi_hostname = $_POST['ipmi_hostname'];
         $ipmi_port = (int) $_POST['ipmi_port'];
         $ipmi_username = $_POST['ipmi_username'];
@@ -13,45 +15,45 @@ if ($_POST['editing']) {
         $ipmi_timeout = $_POST['ipmi_timeout'];
 
         if ($ipmi_hostname != '') {
-            set_dev_attrib($device, 'ipmi_hostname', $ipmi_hostname);
+            $device->setAttrib('ipmi_hostname', $ipmi_hostname);
         } else {
-            del_dev_attrib($device, 'ipmi_hostname');
+            $device->forgetAttrib('ipmi_hostname');
         }
 
         if ($ipmi_port != 0) {
-            set_dev_attrib($device, 'ipmi_port', $ipmi_port);
+            $device->setAttrib('ipmi_port', $ipmi_port);
         } else {
-            set_dev_attrib($device, 'ipmi_port', '623'); // Default port
+            $device->setAttrib('ipmi_port', 623); // Default port
         }
 
         if ($ipmi_username != '') {
-            set_dev_attrib($device, 'ipmi_username', $ipmi_username);
+            $device->setAttrib('ipmi_username', $ipmi_username);
         } else {
-            del_dev_attrib($device, 'ipmi_username');
+            $device->forgetAttrib('ipmi_username');
         }
 
         if ($ipmi_password != '') {
-            set_dev_attrib($device, 'ipmi_password', $ipmi_password);
+            $device->setAttrib('ipmi_password', $ipmi_password);
         } else {
-            del_dev_attrib($device, 'ipmi_password');
+            $device->forgetAttrib('ipmi_password');
         }
 
         if ($ipmi_kg_key != '') {
-            set_dev_attrib($device, 'ipmi_kg_key', $ipmi_kg_key);
+            $device->setAttrib('ipmi_kg_key', $ipmi_kg_key);
         } else {
-            del_dev_attrib($device, 'ipmi_kg_key');
+            $device->forgetAttrib('ipmi_kg_key');
         }
 
         if ($ipmi_ciphersuite != '') {
-            set_dev_attrib($device, 'ipmi_ciphersuite', $ipmi_ciphersuite);
+            $device->setAttrib('ipmi_ciphersuite', $ipmi_ciphersuite);
         } else {
-            del_dev_attrib($device, 'ipmi_ciphersuite');
+            $device->forgetAttrib('ipmi_ciphersuite');
         }
 
         if ($ipmi_timeout != '') {
-            set_dev_attrib($device, 'ipmi_timeout', $ipmi_timeout);
+            $device->setAttrib('ipmi_timeout', $ipmi_timeout);
         } else {
-            del_dev_attrib($device, 'ipmi_timeout');
+            $device->forgetAttrib('ipmi_timeout');
         }
 
         $update_message = 'Device IPMI data updated.';
