@@ -351,6 +351,8 @@ Socialite can specify scopes that should be included with in the authentication 
         lnms config:set auth.socialite.claims.globalread.roles '["global-read"]'
         lnms config:set auth.socialite.claims.user.roles '["user"]'
         ```
+
+    it is also possible to add groups claims and use groupids but this is the recommended microsoft way.
     
 ## Claim Field (advanced)
 
