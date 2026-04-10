@@ -101,13 +101,15 @@ modules:
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.2.1.8.{{ $index }}'
                     descr: 'True Power'
                     index: 'lgpPwrMeasurementPointTruePower.{{ $index }}'
+                    multiplier: 1000
                 -
                     oid: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointTable
                     value: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointApparentPower
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.2.1.7.{{ $index }}'
-                    descr: 'Apparent Power'
+                    descr: 'Apparent Power (in kVA)'
                     index: 'lgpPwrMeasurementPointApparentPower.{{ $index }}'
                     group: ApparentPower
+                    multiplier: 1000
                 -
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleBasicTable
                     value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryValue
@@ -145,6 +147,19 @@ modules:
                     descr: 'Phase {{ $subindex1 }} Current'
                     warn_limit: 750
                     high_limit: 780
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointNeutralCurrent
+                    index: 'lgpPwrMeasurementPointNeutralCurrent.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.2.1.12.{{ $index }}'
+                    descr: 'Neutral Current'
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointGroundCurrent
+                    index: 'lgpPwrMeasurementPointGroundCurrent.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.2.1.13.{{ $index }}'
+                    descr: 'Ground Current'
+                    divisor: 10
         count:
             data:
                 -
@@ -408,6 +423,23 @@ modules:
                     descr: 'Phase {{ $subindex1 }} THD Current'
                     warn_limit: 12
                     high_limit: 15
+        power_consumed:
+            data:
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointWattHours
+                    index: 'lgpPwrMeasurementPointWattHours.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.2.1.10.{{ $index }}'
+                    descr: 'Total Power Consumed'
+                    divisor: 1000
+        frequency:
+            data:
+                -   
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointFrequency
+                    index: 'lgpPwrMeasurementPointFrequency.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.2.1.6.{{ $index }}'
+                    descr: 'Frequency'
         power_factor:
             data:
                 -
