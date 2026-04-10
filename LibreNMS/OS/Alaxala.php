@@ -4,8 +4,9 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\Mempool;
+use App\Models\Processor;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
@@ -222,12 +223,13 @@ class Alaxala extends OS implements MempoolsDiscovery, ProcessorDiscovery
         }
     }
 
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
+        $processors = new Collection;
         $device = $this->getDevice();
         $mib = $this->findMib();
         if (! $mib) {
-            return [];
+            return $processors;
         }
 
         $profiles = [
@@ -382,25 +384,29 @@ class Alaxala extends OS implements MempoolsDiscovery, ProcessorDiscovery
 
             $cpu = $this->firstSnmpValueWithOid($device, $profile['cpu'], $mib);
             if (! $cpu) {
-                return [];
+                return $processors;
             }
 
             $proc_oid = $this->numericOid($device, $mib, $cpu['oid']);
             if (! $proc_oid) {
-                return [];
+                return $processors;
             }
 
-            return [
-                Processor::discover(
-                    $this->getName(),
-                    $this->getDeviceId(),
-                    $proc_oid,
-                    0
-                ),
-            ];
+            $processors->push(new Processor([
+                'processor_type' => $this->getName(),
+                'processor_oid' => $proc_oid,
+                'processor_index' => 0,
+                'processor_descr' => "Processor",
+                'processor_precision' => 1,
+                'hrDeviceIndex' => null,
+                'processor_perc_warn' => null,
+                'processor_usage' => $cpu['value'],
+            ]));
+
+            return $processors;
         }
 
-        return [];
+        return $processors;
     }
 
     public function discoverMempools()
