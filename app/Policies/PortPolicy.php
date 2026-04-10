@@ -39,8 +39,8 @@ class PortPolicy
         }
 
         return $this->hasGlobalPermission($user, 'view')
-            || Permissions::canAccessDevice($port->device_id, $user)
-            || Permissions::canAccessPort($port, $user);
+            && (Permissions::canAccessDevice($port->device_id, $user)
+            || Permissions::canAccessPort($port, $user));
     }
 
     /**
