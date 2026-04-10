@@ -55,6 +55,18 @@ modules:
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.55.{{ $index }}'
                     descr: 'Voltage {{ LIEBERT-GP-PDU-MIB::lgpPduRcpEntryUsrLabel }}'
                     index: 'lgpPduRcpEntryEp.{{ $index }}'
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementVoltsLL
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.4.{{ $index }}'
+                    descr: 'Phase {{ $index }} Voltage LL'
+                    index: 'lgpPwrLineMeasurementVoltsLL.{{ $index }}'
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementVoltsLN
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.5.{{ $index }}'
+                    descr: 'Phase {{ $index }} Voltage LN'
+                    index: 'lgpPwrLineMeasurementVoltsLN.{{ $index }}'
         power:
             data:
                 -
@@ -82,6 +94,19 @@ modules:
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.50.20.1.70.{{ $index }}'
                     descr: 'Apparent Power {{ LIEBERT-GP-PDU-MIB::lgpPduRcpEntryUsrLabel }}'
                     index: 'lgpPduRcpEntryApOut.{{ $index }}'
+                    group: ApparentPower
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointTruePower
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.2.1.8.{{ $index }}'
+                    descr: 'True Power'
+                    index: 'lgpPwrMeasurementPointTruePower.{{ $index }}'
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointApparentPower
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.2.1.7.{{ $index }}'
+                    descr: 'Apparent Power'
+                    index: 'lgpPwrMeasurementPointApparentPower.{{ $index }}'
                     group: ApparentPower
                 -
                     oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleBasicTable
@@ -117,7 +142,7 @@ modules:
                     value: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementCurrent
                     index: 'lgpPwrLineMeasurementCurrent.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.6.{{ $index }}'
-                    descr: 'Phase {{ $index }} Current'
+                    descr: 'Phase {{ $subindex1 }} Current'
                     warn_limit: 750
                     high_limit: 780
         count:
@@ -137,6 +162,20 @@ modules:
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.4.32.1.5.{{ $index }}'
                     descr: '{{ lgpEnvOperationTimePoint }} - ID {{ lgpEnvOperationTimeSubID }}'
                     index: '.1.3.6.1.4.1.476.1.42.3.4.4.32.1.1.{{ $index }}'
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementKFactorCurrent
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.12.{{ $index }}'
+                    descr: 'Phase {{ $subindex1 }} K-Factor'
+                    index: 'lgpPwrLineMeasurementKFactorCurrent.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementCrestFactorCurrent
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.13.{{ $index }}'
+                    descr: 'Phase {{ $subindex1 }} Crest Factor'
+                    index: 'lgpPwrLineMeasurementCrestFactorCurrent.{{ $index }}'
+                    divisor: 10
         state:
             data:
                 -
@@ -348,7 +387,7 @@ modules:
                     value: LIEBERT-GP-POWER-MIB::lgpPwrLineMeasurementCapacity
                     index: 'lgpPwrLineMeasurementCapacity.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.7.{{ $index }}'
-                    descr: 'Phase {{ $index }} Load'
+                    descr: 'Phase {{ $subindex1 }} Load'
                     warn_limit: 90
                     high_limit: 95
                 -
@@ -357,7 +396,7 @@ modules:
                     index: 'lgpPwrLineMeasurementVoltageTHD.{{ $index }}'
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.10.{{ $index }}'
-                    descr: 'Phase {{ $index }} Voltage THD'
+                    descr: 'Phase {{ $subindex1 }} THD Voltage'
                     warn_limit: 12
                     high_limit: 15
                 -
@@ -366,7 +405,7 @@ modules:
                     index: 'lgpPwrLineMeasurementCurrentTHD.{{ $index }}'
                     divisor: 10
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.11.{{ $index }}'
-                    descr: 'Phase {{ $index }} Current THD'
+                    descr: 'Phase {{ $subindex1 }} THD Current'
                     warn_limit: 12
                     high_limit: 15
         power_factor:
@@ -393,3 +432,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.8.30.20.1.95.{{ $index }}'
                     descr: 'Power Factor Total {{ LIEBERT-GP-PDU-MIB::lgpPduPsEntryModel }}'
                     index: 'lgpPduPsEntryPfTotal.{{ $index }}'
+                -
+                    oid: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointTable
+                    value: LIEBERT-GP-POWER-MIB::lgpPwrMeasurementPointPowerFactor
+                    divisor: 100
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.2.1.9.{{ $index }}'
+                    descr: 'Power Factor'
+                    index: 'lgpPwrMeasurementPointPowerFactor.{{ $index }}'
