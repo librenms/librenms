@@ -48,9 +48,9 @@ modules:
                     index: 'dryContactSensor.{{ $index }}'
                     state_name: dryContactSensor
                     states:
-                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
-                        - { descr: open, graph: 0, value: 0, generic: 0 }
-                        - { descr: closed, graph: 0, value: 1, generic: 2 }
+                        - { descr: 'null', value: -1, generic: 3 }
+                        - { descr: open, value: 0, generic: 0 }
+                        - { descr: closed, value: 1, generic: 2 }
                 -
                     oid: NETBOTZV2-MIB::doorSwitchSensorTable
                     value: NETBOTZV2-MIB::doorSwitchSensorValue
@@ -60,9 +60,9 @@ modules:
                     index: 'doorSwitchSensor.{{ $index }}'
                     state_name: doorSwitchSensor
                     states:
-                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
-                        - { descr: open, graph: 0, value: 0, generic: 0 }
-                        - { descr: closed, graph: 0, value: 1, generic: 2 }
+                        - { descr: 'null', value: -1, generic: 3 }
+                        - { descr: open, value: 0, generic: 0 }
+                        - { descr: closed, value: 1, generic: 2 }
                 -
                     oid: NETBOTZV2-MIB::cameraMotionSensorTable
                     value: NETBOTZV2-MIB::cameraMotionSensorValue
@@ -72,9 +72,9 @@ modules:
                     index: 'cameraMotionSensor.{{ $index }}'
                     state_name: cameraMotionSensor
                     states:
-                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
-                        - { descr: noMotion, graph: 0, value: 0, generic: 0 }
-                        - { descr: motionDetected, graph: 0, value: 1, generic: 2 }
+                        - { descr: 'null', value: -1, generic: 3 }
+                        - { descr: noMotion, value: 0, generic: 0 }
+                        - { descr: motionDetected, value: 1, generic: 2 }
                 -
                     oid: NETBOTZV2-MIB::otherStateSensorTable
                     value: NETBOTZV2-MIB::otherStateSensorErrorStatus
@@ -83,9 +83,9 @@ modules:
                     index: '{{ $index }}'
                     state_name: otherStateSensorErrorStatus
                     states:
-                        - { descr: normal, graph: 0, value: 0, generic: 0 }
-                        - { descr: info, graph: 0, value: 1, generic: 1 }
-                        - { descr: warning, graph: 0, value: 2, generic: 1 }
-                        - { descr: error, graph: 0, value: 3, generic: 2 }
-                        - { descr: critical, graph: 0, value: 4, generic: 2 }
-                        - { descr: failure, graph: 0, value: 5, generic: 2 }
+                        - { descr: normal, value: 0, generic: 0 }
+                        - { descr: info, value: 1, generic: 1 }
+                        - { descr: warning, value: 2, generic: 1 }
+                        - { descr: error, value: 3, generic: 2 }
+                        - { descr: critical, value: 4, generic: 2 }
+                        - { descr: failure, value: 5, generic: 2 }

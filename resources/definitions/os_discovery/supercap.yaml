@@ -1547,9 +1547,9 @@ modules:
                     group: 'BMS 01'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS01-AmbientTemperature
@@ -1564,9 +1564,9 @@ modules:
                     group: 'BMS 01'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS01-PowerTemperature
@@ -1581,9 +1581,9 @@ modules:
                     group: 'BMS 01'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS01-Current
@@ -1598,9 +1598,9 @@ modules:
                     group: 'BMS 01'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS01-Voltage
@@ -1615,9 +1615,9 @@ modules:
                     group: 'BMS 02'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS02-AmbientTemperature
@@ -1632,9 +1632,9 @@ modules:
                     group: 'BMS 02'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS02-PowerTemperature
@@ -1649,9 +1649,9 @@ modules:
                     group: 'BMS 02'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS02-Current
@@ -1666,9 +1666,9 @@ modules:
                     group: 'BMS 02'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS02-Voltage
@@ -1683,9 +1683,9 @@ modules:
                     group: 'BMS 03'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS03-AmbientTemperature
@@ -1700,9 +1700,9 @@ modules:
                     group: 'BMS 03'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS03-PowerTemperature
@@ -1717,9 +1717,9 @@ modules:
                     group: 'BMS 03'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS03-Current
@@ -1734,9 +1734,9 @@ modules:
                     group: 'BMS 03'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS03-Voltage
@@ -1751,9 +1751,9 @@ modules:
                     group: 'BMS 04'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS04-AmbientTemperature
@@ -1768,9 +1768,9 @@ modules:
                     group: 'BMS 04'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS04-PowerTemperature
@@ -1785,9 +1785,9 @@ modules:
                     group: 'BMS 04'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS04-Current
@@ -1802,9 +1802,9 @@ modules:
                     group: 'BMS 04'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS04-Voltage
@@ -1819,9 +1819,9 @@ modules:
                     group: 'BMS 05'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS05-AmbientTemperature
@@ -1836,9 +1836,9 @@ modules:
                     group: 'BMS 05'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS05-PowerTemperature
@@ -1853,9 +1853,9 @@ modules:
                     group: 'BMS 05'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS05-Current
@@ -1870,9 +1870,9 @@ modules:
                     group: 'BMS 05'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS05-Voltage
@@ -1887,9 +1887,9 @@ modules:
                     group: 'BMS 06'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS06-AmbientTemperature
@@ -1904,9 +1904,9 @@ modules:
                     group: 'BMS 06'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS06-PowerTemperature
@@ -1921,9 +1921,9 @@ modules:
                     group: 'BMS 06'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS06-Current
@@ -1938,9 +1938,9 @@ modules:
                     group: 'BMS 06'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS06-Voltage
@@ -1955,9 +1955,9 @@ modules:
                     group: 'BMS 07'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS07-AmbientTemperature
@@ -1972,9 +1972,9 @@ modules:
                     group: 'BMS 07'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS07-PowerTemperature
@@ -1989,9 +1989,9 @@ modules:
                     group: 'BMS 07'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS07-Current
@@ -2006,9 +2006,9 @@ modules:
                     group: 'BMS 07'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS07-AmbientTemperature
@@ -2023,9 +2023,9 @@ modules:
                     group: 'BMS 08'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS08-AmbientTemperature
@@ -2040,9 +2040,9 @@ modules:
                     group: 'BMS 08'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS08-PowerTemperature
@@ -2057,9 +2057,9 @@ modules:
                     group: 'BMS 08'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS08-Current
@@ -2074,9 +2074,9 @@ modules:
                     group: 'BMS 08'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS08-Voltage
@@ -2091,9 +2091,9 @@ modules:
                     group: 'BMS 09'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS09-AmbientTemperature
@@ -2108,9 +2108,9 @@ modules:
                     group: 'BMS 09'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS09-PowerTemperature
@@ -2125,9 +2125,9 @@ modules:
                     group: 'BMS 09'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS09-Current
@@ -2142,9 +2142,9 @@ modules:
                     group: 'BMS 09'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS09-Voltage
@@ -2159,9 +2159,9 @@ modules:
                     group: 'BMS 10'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS10-AmbientTemperature
@@ -2176,9 +2176,9 @@ modules:
                     group: 'BMS 10'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS10-PowerTemperature
@@ -2193,9 +2193,9 @@ modules:
                     group: 'BMS 10'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS10-Current
@@ -2210,9 +2210,9 @@ modules:
                     group: 'BMS 10'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS10-Voltage
@@ -2227,9 +2227,9 @@ modules:
                     group: 'BMS 11'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS11-AmbientTemperature
@@ -2244,9 +2244,9 @@ modules:
                     group: 'BMS 11'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS11-PowerTemperature
@@ -2261,9 +2261,9 @@ modules:
                     group: 'BMS 11'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS11-Current
@@ -2278,9 +2278,9 @@ modules:
                     group: 'BMS 11'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS11-Voltage
@@ -2295,9 +2295,9 @@ modules:
                     group: 'BMS 12'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS12-AmbientTemperature
@@ -2312,9 +2312,9 @@ modules:
                     group: 'BMS 12'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS12-PowerTemperature
@@ -2329,9 +2329,9 @@ modules:
                     group: 'BMS 12'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS12-Current
@@ -2346,9 +2346,9 @@ modules:
                     group: 'BMS 12'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS12-Voltage
@@ -2363,9 +2363,9 @@ modules:
                     group: 'BMS 13'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS13-AmbientTemperature
@@ -2380,9 +2380,9 @@ modules:
                     group: 'BMS 13'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS13-PowerTemperature
@@ -2397,9 +2397,9 @@ modules:
                     group: 'BMS 13'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS13-Current
@@ -2414,9 +2414,9 @@ modules:
                     group: 'BMS 13'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS13-Voltage
@@ -2431,9 +2431,9 @@ modules:
                     group: 'BMS 14'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS14-AmbientTemperature
@@ -2448,9 +2448,9 @@ modules:
                     group: 'BMS 14'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS14-PowerTemperature
@@ -2465,9 +2465,9 @@ modules:
                     group: 'BMS 14'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS14-Current
@@ -2482,9 +2482,9 @@ modules:
                     group: 'BMS 14'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS14-Voltage
@@ -2499,9 +2499,9 @@ modules:
                     group: 'BMS 15'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS15-AmbientTemperature
@@ -2516,9 +2516,9 @@ modules:
                     group: 'BMS 15'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS15-PowerTemperature
@@ -2533,9 +2533,9 @@ modules:
                     group: 'BMS 15'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS15-Current
@@ -2550,9 +2550,9 @@ modules:
                     group: 'BMS 15'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS15-Voltage
@@ -2567,9 +2567,9 @@ modules:
                     group: 'BMS 01'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS01-Current
@@ -2584,9 +2584,9 @@ modules:
                     group: 'BMS 02'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS02-Current
@@ -2601,9 +2601,9 @@ modules:
                     group: 'BMS 03'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS03-Current
@@ -2618,9 +2618,9 @@ modules:
                     group: 'BMS 04'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS04-Current
@@ -2635,9 +2635,9 @@ modules:
                     group: 'BMS 05'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS05-Current
@@ -2652,9 +2652,9 @@ modules:
                     group: 'BMS 06'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS06-Current
@@ -2669,9 +2669,9 @@ modules:
                     group: 'BMS 07'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS07-Current
@@ -2686,9 +2686,9 @@ modules:
                     group: 'BMS 08'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS08-Current
@@ -2703,9 +2703,9 @@ modules:
                     group: 'BMS 09'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS09-Current
@@ -2720,9 +2720,9 @@ modules:
                     group: 'BMS 10'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS10-Current
@@ -2737,9 +2737,9 @@ modules:
                     group: 'BMS 11'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS11-Current
@@ -2754,9 +2754,9 @@ modules:
                     group: 'BMS 12'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS12-Current
@@ -2771,9 +2771,9 @@ modules:
                     group: 'BMS 13'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS13-Current
@@ -2788,9 +2788,9 @@ modules:
                     group: 'BMS 14'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS14-Current
@@ -2805,9 +2805,9 @@ modules:
                     group: 'BMS 15'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS15-Current
@@ -2822,9 +2822,9 @@ modules:
                     group: 'BMS 01'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS01-Voltage
@@ -2839,9 +2839,9 @@ modules:
                     group: 'BMS 02'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS02-Voltage
@@ -2856,9 +2856,9 @@ modules:
                     group: 'BMS 03'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS03-Voltage
@@ -2873,9 +2873,9 @@ modules:
                     group: 'BMS 04'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS04-Voltage
@@ -2890,9 +2890,9 @@ modules:
                     group: 'BMS 05'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS05-Voltage
@@ -2907,9 +2907,9 @@ modules:
                     group: 'BMS 06'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS06-Voltage
@@ -2924,9 +2924,9 @@ modules:
                     group: 'BMS 07'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS07-Voltage
@@ -2941,9 +2941,9 @@ modules:
                     group: 'BMS 08'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS08-Voltage
@@ -2958,9 +2958,9 @@ modules:
                     group: 'BMS 09'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS09-Voltage
@@ -2975,9 +2975,9 @@ modules:
                     group: 'BMS 10'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS10-Voltage
@@ -2992,9 +2992,9 @@ modules:
                     group: 'BMS 11'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS11-Voltage
@@ -3009,9 +3009,9 @@ modules:
                     group: 'BMS 12'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS12-Voltage
@@ -3026,9 +3026,9 @@ modules:
                     group: 'BMS 13'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS13-Voltage
@@ -3043,9 +3043,9 @@ modules:
                     group: 'BMS 14'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS14-Voltage
@@ -3060,9 +3060,9 @@ modules:
                     group: 'BMS 15'
                     state_name: supercapStatus
                     states:
-                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
-                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
-                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                        - { value: 0, descr: "OK", generic: 0 }
+                        - { value: 1, descr: "Warning", generic: 1 }
+                        - { value: 2, descr: "Alarm", generic: 2 }
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS15-Voltage

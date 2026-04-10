@@ -73,7 +73,7 @@ $count_query = 'SELECT COUNT(*) FROM ( ';
 $query = 'SELECT packages.name FROM packages,devices ';
 $param = [];
 
-if (Gate::denies('viewAny', \App\Models\Device::class)) {
+if (Gate::denies('viewAll', \App\Models\Device::class)) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
     $where .= ' AND `D`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);

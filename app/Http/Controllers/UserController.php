@@ -35,8 +35,12 @@ use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
 use Auth;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 use LibreNMS\Authentication\LegacyAuth;
+use Spatie\Permission\Models\Role;
 use URL;
 
 class UserController extends Controller
@@ -48,29 +52,21 @@ class UserController extends Controller
 
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\View\View
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function index()
+    public function index(): View
     {
         $this->authorize('viewAny', User::class);
 
         return view('user.index', [
             'users' => User::with(['preferences', 'roles'])->orderBy('username')->get(),
-            'multiauth' => User::query()->distinct('auth_type')->count('auth_type') > 1,
+            'multiauth' => User::query()->distinct()->count('auth_type') > 1,
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\View\View
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function create()
+    public function create(): View
     {
         $this->authorize('create', User::class);
 
@@ -87,11 +83,8 @@ class UserController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param  StoreUserRequest  $request
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(StoreUserRequest $request, ToastInterface $toast)
+    public function store(StoreUserRequest $request, ToastInterface $toast): RedirectResponse
     {
         $this->authorize('create', User::class);
 
@@ -104,8 +97,8 @@ class UserController extends Controller
         $user->setPassword($request->new_password);
         $user->syncRoles($request->input('roles', []));
         $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
-        $this->updateDashboard($user, $request->input('dashboard'));
-        $this->updateTimezone($user, $request->input('timezone'));
+        $this->updateDashboard($user, $request->integer('dashboard'));
+        $this->updateTimezone($user, $request->string('timezone'));
 
         if ($user->save()) {
             $toast->success(__('User :username created', ['username' => $user->username]));
@@ -120,13 +113,8 @@ class UserController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @param  User  $user
-     * @return string
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function show(User $user)
+    public function show(User $user): string
     {
         $this->authorize('view', $user);
 
@@ -135,13 +123,8 @@ class UserController extends Controller
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param  User  $user
-     * @return \Illuminate\View\View
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function edit(User $user)
+    public function edit(User $user): View
     {
         $this->authorize('update', $user);
 
@@ -167,12 +150,8 @@ class UserController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  UpdateUserRequest  $request
-     * @param  User  $user
-     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(UpdateUserRequest $request, User $user, ToastInterface $toast)
+    public function update(UpdateUserRequest $request, User $user, ToastInterface $toast): RedirectResponse
     {
         if ($request->input('new_password')) {
             $user->setPassword($request->new_password);
@@ -189,7 +168,7 @@ class UserController extends Controller
 
         $user->fill($request->validated());
 
-        if ($request->has('roles')) {
+        if ($request->has('roles') && $request->user()->can('update', Role::class)) {
             $user->syncRoles($request->input('roles', []));
         }
 
@@ -197,7 +176,7 @@ class UserController extends Controller
             $toast->success(__('Updated dashboard for :username', ['username' => $user->username]));
         }
 
-        if ($request->has('timezone') && $this->updateTimezone($user, $request->input('timezone'))) {
+        if ($request->has('timezone') && $this->updateTimezone($user, $request->string('timezone'))) {
             if ($request->input('timezone') != 'default') {
                 $toast->success(__('Updated timezone for :username', ['username' => $user->username]));
             } else {
@@ -218,13 +197,8 @@ class UserController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  User  $user
-     * @return \Illuminate\Http\JsonResponse
-     *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function destroy(User $user)
+    public function destroy(User $user): JsonResponse
     {
         $this->authorize('delete', $user);
 
@@ -233,12 +207,7 @@ class UserController extends Controller
         return response()->json(__('User :username deleted.', ['username' => $user->username]));
     }
 
-    /**
-     * @param  User  $user
-     * @param  mixed  $dashboard
-     * @return bool
-     */
-    protected function updateDashboard(User $user, $dashboard)
+    protected function updateDashboard(User $user, int $dashboard): bool
     {
         if ($dashboard) {
             $existing = UserPref::getPref($user, 'dashboard');
@@ -252,12 +221,7 @@ class UserController extends Controller
         return false;
     }
 
-    /**
-     * @param  User  $user
-     * @param  string  $timezone
-     * @return bool
-     */
-    protected function updateTimezone(User $user, $timezone)
+    protected function updateTimezone(User $user, string $timezone): bool
     {
         $existing = UserPref::getPref($user, 'timezone');
         if ($timezone != 'default') {
@@ -281,7 +245,7 @@ class UserController extends Controller
         return false;
     }
 
-    public function authlog()
+    public function authlog(): View
     {
         $this->authorize('view', AuthLog::class);
 

@@ -435,15 +435,39 @@ chmod +x /usr/bin/distro
 
 ### Linux (snmpd v3)
 
-Go to /etc/snmp/snmpd.conf
+#### Stop the snmpd service
 
-Open the file in vi or nano /etc/snmp/snmpd.conf and add the following
+##### CentOS 6 / Red hat 6
+
+```bash
+service snmpd stop
+```
+
+##### CentOS 7 / Red hat 7
+
+```bash
+systemctl stop snmpd
+```
+
+##### Ubuntu
+
+```bash
+service snmpd stop
+```
+
+Go to /var/lib/snmp/snmpd.conf
+
+Open the file in vi or nano /var/lib/snmp/snmpd.conf and add the following
 line to create SNMPV3 User (replace username and passwords with your
 own):
 
 ```bash
 createUser authPrivUser SHA "authPassword" AES "privPassword"
 ```
+
+This line will be removed and processed into an equivalent line starting with usmUser once the service is started again.
+
+Go to /etc/snmp/snmpd.conf
 
 Make sure the agent listens to all interfaces by adding the following
 line inside snmpd.conf:

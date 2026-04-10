@@ -8,10 +8,12 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\StateTranslation;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
@@ -66,7 +68,7 @@ function parse_modules($type, $options)
 
 function renamehost($id, $new, $source = 'console')
 {
-    $host = gethostbyid($id);
+    $host = DeviceCache::get((int) $id)->hostname;
     $new_rrd_dir = Rrd::dirFromHost($new);
 
     if (is_dir($new_rrd_dir)) {
@@ -145,23 +147,6 @@ function snmp2ipv6($ipv6_snmp)
     }
 
     return implode(':', $ipv6_2);
-}
-
-function hex2str($hex)
-{
-    $string = '';
-
-    for ($i = 0; $i < strlen((string) $hex) - 1; $i += 2) {
-        $string .= chr(hexdec(substr((string) $hex, $i, 2)));
-    }
-
-    return $string;
-}
-
-// Convert an SNMP hex string to regular string
-function snmp_hexstring($hex)
-{
-    return hex2str(str_replace(' ', '', str_replace(' 00', '', $hex)));
 }
 
 /**
@@ -337,7 +322,6 @@ function create_state_index($state_name, $states = []): void
 {
     app('sensor-discovery')->withStateTranslations($state_name, array_map(fn ($state) => new StateTranslation([
         'state_descr' => $state['descr'],
-        'state_draw_graph' => $state['graph'],
         'state_value' => $state['value'],
         'state_generic_value' => $state['generic'],
     ]), $states));
@@ -487,14 +471,14 @@ function cache_peeringdb()
 
             // cleanup
             if (empty($peer_keep)) {
-                dbDelete('pdb_ix_peers');
+                \App\Models\PeeringdbIxPeer::query()->delete();
             } else {
-                dbDelete('pdb_ix_peers', '`pdb_ix_peers_id` NOT IN ' . dbGenPlaceholders(count($peer_keep)), $peer_keep);
+                \App\Models\PeeringdbIxPeer::whereNotIn('pdb_ix_peers_id', $peer_keep)->delete();
             }
             if (empty($ix_keep)) {
-                dbDelete('pdb_ix');
+                \App\Models\PeeringdbIx::query()->delete();
             } else {
-                dbDelete('pdb_ix', '`pdb_ix_id` NOT IN ' . dbGenPlaceholders(count($ix_keep)), $ix_keep);
+                \App\Models\PeeringdbIx::whereNotIn('pdb_ix_id', $ix_keep)->delete();
             }
         } else {
             echo 'Cached PeeringDB data found.....' . PHP_EOL;
@@ -544,7 +528,7 @@ function lock_and_purge($table, $sql)
 
         $name = str_replace('_', ' ', ucfirst($table));
         if (is_numeric($purge_days)) {
-            if (dbDelete($table, $sql, [$purge_days])) {
+            if (\Illuminate\Support\Facades\DB::table($table)->whereRaw($sql, [$purge_days])->delete()) {
                 echo "$name cleared for entries over $purge_days days\n";
             }
         }
@@ -574,7 +558,7 @@ function lock_and_purge_query($table, $sql, $msg)
     }
     $lock = Cache::lock($purge_name, 86000);
     if ($lock->get()) {
-        if (dbQuery($sql, [$purge_duration])) {
+        if (DB::statement($sql, [$purge_duration])) {
             printf($msg, $purge_duration);
         }
         $lock->release();

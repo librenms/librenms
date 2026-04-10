@@ -17,10 +17,10 @@ modules:
                     descr: 'Fan {{ $index }}'
                     index: '{{ $index }}'
                     states:
-                        - { value: 1, descr: active, graph: 1, generic: 0 }
-                        - { value: 2, descr: deactive, graph: 1, generic: 2 }
-                        - { value: 3, descr: not-install, graph: 1, generic: 3 }
-                        - { value: 4, descr: unsupport, graph: 1, generic: 1 }
+                        - { value: 1, descr: active, generic: 0 }
+                        - { value: 2, descr: deactive, generic: 2 }
+                        - { value: 3, descr: not-install, generic: 3 }
+                        - { value: 4, descr: unsupport, generic: 1 }
                 -
                     oid: HH3C-LswDEVM-MIB::hh3cdevMPowerStatusTable
                     value: HH3C-LswDEVM-MIB::hh3cDevMPowerStatus
@@ -29,10 +29,10 @@ modules:
                     descr: 'Power Supply {{ $index }}'
                     index: '{{ $index }}'
                     states:
-                        - { value: 1, descr: active, graph: 1, generic: 0 }
-                        - { value: 2, descr: deactive, graph: 1, generic: 2 }
-                        - { value: 3, descr: not-install, graph: 1, generic: 3 }
-                        - { value: 4, descr: unsupport, graph: 1, generic: 1 }
+                        - { value: 1, descr: active, generic: 0 }
+                        - { value: 2, descr: deactive, generic: 2 }
+                        - { value: 3, descr: not-install, generic: 3 }
+                        - { value: 4, descr: unsupport, generic: 1 }
         power:
             data:
                 -

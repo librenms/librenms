@@ -40,6 +40,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Mediant VE SBC",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -59,6 +60,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -78,6 +80,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -97,6 +100,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -116,6 +120,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -135,6 +140,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -154,6 +160,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -173,6 +180,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -192,6 +200,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -211,6 +220,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -230,6 +240,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -249,6 +260,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -933,133 +945,114 @@
                 {
                     "state_name": "accountRowStatus",
                     "state_descr": "active",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "accountRowStatus",
                     "state_descr": "notInService",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "accountRowStatus",
                     "state_descr": "notReady",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "accountRowStatus",
                     "state_descr": "createAndGo",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "accountRowStatus",
                     "state_descr": "createAndWait",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "accountRowStatus",
                     "state_descr": "destroy",
-                    "state_draw_graph": 0,
                     "state_value": 6,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "acSysHAStatusReady",
                     "state_descr": "notApplicable",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "acSysHAStatusReady",
                     "state_descr": "yes",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "acSysHAStatusReady",
                     "state_descr": "no",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "acSysStateGWSeverity",
                     "state_descr": "noAlarm",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "acSysStateGWSeverity",
                     "state_descr": "indeterminate",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "acSysStateGWSeverity",
                     "state_descr": "warning",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "acSysStateGWSeverity",
                     "state_descr": "minor",
-                    "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "acSysStateGWSeverity",
                     "state_descr": "major",
-                    "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "acSysStateGWSeverity",
                     "state_descr": "critical",
-                    "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "acSysStateOperational",
                     "state_descr": "disabled",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "acSysStateOperational",
                     "state_descr": "enabled",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "channelHookState",
                     "state_descr": "offHook",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "channelHookState",
                     "state_descr": "onHook",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 }

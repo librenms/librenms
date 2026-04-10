@@ -73,13 +73,13 @@ modules:
                         - { oid: CISCO-FIREWALL-MIB::cfwHardwareStatusDetail, op: '=', value: 'not Configured' }
                     state_name: cfwHardwareStatus
                     states:
-                        - { descr: other, graph: 0, value: 1, generic: 2 }
-                        - { descr: up, graph: 0, value: 2, generic: 0 }
-                        - { descr: down, graph: 0, value: 3, generic: 2 }
-                        - { descr: error, graph: 0, value: 4, generic: 2 }
-                        - { descr: overTemp, graph: 0, value: 5, generic: 2 }
-                        - { descr: busy, graph: 0, value: 6, generic: 2 }
-                        - { descr: noMedia, graph: 0, value: 7, generic: 2 }
-                        - { descr: backup, graph: 0, value: 8, generic: 2 }
-                        - { descr: active, graph: 0, value: 9, generic: 0 }
-                        - { descr: standby, graph: 0, value: 10, generic: 0 }
+                        - { descr: other, value: 1, generic: 2 }
+                        - { descr: up, value: 2, generic: 0 }
+                        - { descr: down, value: 3, generic: 2 }
+                        - { descr: error, value: 4, generic: 2 }
+                        - { descr: overTemp, value: 5, generic: 2 }
+                        - { descr: busy, value: 6, generic: 2 }
+                        - { descr: noMedia, value: 7, generic: 2 }
+                        - { descr: backup, value: 8, generic: 2 }
+                        - { descr: active, value: 9, generic: 0 }
+                        - { descr: standby, value: 10, generic: 0 }

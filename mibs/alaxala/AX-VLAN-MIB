@@ -1,0 +1,576 @@
+--
+-- All Rights Reserved, Copyright (c) 2014, ALAXALA Networks Corp.
+--
+-- AX-VLAN-MIB.my axVlan group MIB file.
+--
+
+AX-VLAN-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, 
+        Counter32, Integer32, TimeTicks
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION, MacAddress
+            FROM SNMPv2-TC
+        VlanIndex, PortList
+            FROM Q-BRIDGE-MIB
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axVlan MODULE-IDENTITY
+    LAST-UPDATED    "201407150001Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for VLAN information."
+    REVISION        "201407150001Z"
+    DESCRIPTION
+        "Initial release."
+::= { axMib 6 }
+
+VlanIdOrZero      ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS        current
+    DESCRIPTION  "The VLAN ID that uniquely identifies a VLAN.
+                  The value zero is NOT a valid VLAN ID. 
+                  When this textual convention is used as the
+                  syntax of an object, the object definition
+                  MUST specify in the DESCRIPTION clause what
+                  the value zero means."
+    SYNTAX        Integer32 (0 | 1..4094)
+
+--------------------------------------------------
+-- Object Identifiers
+--------------------------------------------------
+axVlanBridge         OBJECT IDENTIFIER ::= {axVlan 1}
+axVlanTagTranslation OBJECT IDENTIFIER ::= {axVlan 10}
+axVlanBridgeBase     OBJECT IDENTIFIER ::= {axVlanBridge 1}
+axVlanBridgeTp       OBJECT IDENTIFIER ::= {axVlanBridge 4}
+axVlanBridgeStatic   OBJECT IDENTIFIER ::= {axVlanBridge 5}
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+--
+--  axVBBaseTableGroup 
+--
+axVBBaseTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxVBBaseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An information table of dot1dBase by VLAN units."
+    ::= {axVlanBridgeBase 1}
+
+axVBBaseEntry OBJECT-TYPE
+    SYNTAX AxVBBaseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An informatin entry of every VLAN ID of axVBBaseTable."
+    INDEX { axVBBaseIndex }
+    ::= {axVBBaseTable 1}
+
+AxVBBaseEntry ::= SEQUENCE {
+    axVBBaseIndex                   VlanIndex,
+    axVBBaseBridgeAddress           MacAddress,
+    axVBBaseNumPorts                Integer32,
+    axVBBaseType                    INTEGER,
+    axVBBaseVlanIfIndex             Integer32,
+    axVBBaseVlanType                INTEGER,
+    axVBBaseVlanID                  VlanIdOrZero,
+    axVBBaseAssociatedPrimaryVlan   VlanIdOrZero,
+    axVBBaseIfStatus                INTEGER,
+    axVBBaseLastChange              TimeTicks,
+    axVBBasePrivateVlanType         INTEGER
+}
+
+axVBBaseIndex OBJECT-TYPE
+    SYNTAX VlanIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VLAN ID."
+    ::= {axVBBaseEntry 1}
+
+axVBBaseBridgeAddress OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC address of VLAN."
+    ::= {axVBBaseEntry 2}
+
+axVBBaseNumPorts OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of ports set at VLAN."
+    ::= {axVBBaseEntry 3}
+
+axVBBaseType OBJECT-TYPE
+    SYNTAX INTEGER {
+                      unknown(1),
+                      transparentOnly(2),
+                      sourcerouteOnly(3),
+                      srt(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A bridging type VLAN may perform."
+    ::= {axVBBaseEntry 4}
+
+axVBBaseVlanIfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Value of ifIndex of interface of VLAN."
+    ::= {axVBBaseEntry 5}
+
+axVBBaseVlanType OBJECT-TYPE
+    SYNTAX INTEGER {
+                      portBased(1),
+                      macBased(2),
+                      protocolBased(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VLAN type."
+    ::= {axVBBaseEntry 6}
+
+axVBBaseVlanID OBJECT-TYPE
+    SYNTAX VlanIdOrZero
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Value of VID of VLAN-TAG corresponding VLAN."
+    ::= {axVBBaseEntry 7}
+
+axVBBaseAssociatedPrimaryVlan OBJECT-TYPE
+    SYNTAX VlanIdOrZero
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Returns VLAN ID of Primary VLAN when private VLAN is used and the same VLAN is set at secondary VLAN."
+    ::= {axVBBaseEntry 8}
+
+axVBBaseIfStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      up(1),
+                      down(2)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Status of interface against upper level protocol of VLAN."
+    ::= {axVBBaseEntry 9}
+
+axVBBaseLastChange OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Value of sysUpTime which is set when VLAN topology changes."
+    ::= {axVBBaseEntry 10}
+
+axVBBasePrivateVlanType OBJECT-TYPE
+    SYNTAX INTEGER {
+                      normal(1),
+                      primary(2),
+                      isolated(3),
+                      community(4)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A private VLAN type of VLAN."
+    ::= {axVBBaseEntry 11}
+
+--
+--  axVBBasePortTableGroup 
+--
+axVBBasePortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxVBBasePortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An information table of dot1dBasePortTable by VLAN units."
+    ::= {axVlanBridgeBase 2}
+
+axVBBasePortEntry OBJECT-TYPE
+    SYNTAX AxVBBasePortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A configuration entry of axVBBaseTable."
+    INDEX  { axVBBasePortIndex,
+             axVBBasePort }
+    ::= {axVBBasePortTable 1}
+
+AxVBBasePortEntry ::= SEQUENCE {
+        axVBBasePortIndex                  VlanIndex,
+        axVBBasePort                       Integer32,
+        axVBBasePortIfIndex                Integer32,
+        axVBBasePortCircuit                OBJECT IDENTIFIER,
+        axVBBasePortDelayExceededDiscards  Counter32,
+        axVBBasePortMtuExceededDiscards    Counter32,
+        axVBBasePortState                  INTEGER,
+        axVBBasePortTaggedState            INTEGER,
+        axVBBasePortTranslatedTagID        VlanIdOrZero
+}
+
+axVBBasePortIndex OBJECT-TYPE
+    SYNTAX VlanIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VLAN ID."
+    ::= {axVBBasePortEntry 1}
+
+axVBBasePort OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Port number of ports set at VLAN."
+    ::= {axVBBasePortEntry 2}
+
+axVBBasePortIfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Value of ifIndex corresponding ports set at VLAN."
+    ::= {axVBBasePortEntry 3}
+
+axVBBasePortCircuit OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Identifier which identifieds ports when VLAN ports have the same value as axVBBasePortIfIndex."
+    ::= {axVBBasePortEntry 4}
+
+axVBBasePortDelayExceededDiscards OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of discard frame caused by passing delay occured at VLAN ports."
+    ::= {axVBBasePortEntry 5}
+
+axVBBasePortMtuExceededDiscards OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of discard frame caused by data over flow occured at VLAN ports."
+    ::= {axVBBasePortEntry 6}
+
+axVBBasePortState OBJECT-TYPE
+    SYNTAX INTEGER {
+                      disabled(1),
+                      blocking(2),
+                      listening(3),
+                      learning(4),
+                      forwarding(5),
+                      broken(6),
+                      fixForwarding(7)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "STP port status of port set at VLAN."
+    ::= {axVBBasePortEntry 7}
+
+axVBBasePortTaggedState OBJECT-TYPE
+    SYNTAX INTEGER {
+                      untagged(1),
+                      tagged(2)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Status of VLAN-TAG configuration of ports set at VLAN."
+    ::= {axVBBasePortEntry 8}
+
+axVBBasePortTranslatedTagID OBJECT-TYPE
+    SYNTAX VlanIdOrZero
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Translated ID of VLAN when TAG translation is set."
+    ::= {axVBBasePortEntry 9}
+
+--
+--  axVBTpTableGroup 
+--
+axVBTpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxVBTpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A dot1dTp information table by VLAN units."
+    ::= {axVlanBridgeTp 1}
+
+axVBTpEntry OBJECT-TYPE
+    SYNTAX AxVBTpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A configuration entry of axVBTpTable."
+    INDEX { axVBTpIndex }
+    ::= {axVBTpTable 1}
+
+AxVBTpEntry ::= SEQUENCE {
+        axVBTpIndex                  VlanIndex,
+        axVBTpLearnedEntryDiscards   Counter32,
+        axVBTpAgingTime              Integer32
+}
+
+axVBTpIndex OBJECT-TYPE
+    SYNTAX VlanIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VLAN ID."
+    ::= {axVBTpEntry 1}
+
+axVBTpLearnedEntryDiscards OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of discarded entries because of lack of not-used domain in filtering data base."
+    ::= {axVBTpEntry 2}
+
+axVBTpAgingTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Time-out time to aging-out entry of filtering date base which is learned dynamically."
+    ::= {axVBTpEntry 3}
+
+--
+--  axVBTpPortTableGroup 
+--
+axVBTpPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxVBTpPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An information table of dot1dTpPortTable by VLAN units."
+    ::= {axVlanBridgeTp 3}
+
+axVBTpPortEntry OBJECT-TYPE
+    SYNTAX AxVBTpPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An information entry of axVBTpPortTable of ports."
+    INDEX  { axVBTpPortIndex,
+             axVBTpPort }
+    ::= {axVBTpPortTable 1}
+
+AxVBTpPortEntry ::= SEQUENCE {
+    axVBTpPortIndex            VlanIndex,
+    axVBTpPort                 Integer32,
+    axVBTpPortMaxInfo          Integer32,
+    axVBTpPortInFrames         Counter32,
+    axVBTpPortOutFrames        Counter32,
+    axVBTpPortInDiscards       Counter32
+}
+
+axVBTpPortIndex OBJECT-TYPE
+    SYNTAX VlanIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VLAN ID."
+    ::= {axVBTpPortEntry 1}
+
+axVBTpPort OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Port number that indicates which port management information in the entry corresponds."
+    ::= {axVBTpPortEntry 2}
+
+axVBTpPortMaxInfo OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Maximum INFO field size of the port by VLAN units."
+    ::= {axVBTpPortEntry 3}
+
+axVBTpPortInFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of reception frame of the port by VLAN units."
+    ::= {axVBTpPortEntry 4}
+
+axVBTpPortOutFrames OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of sending frame of the port by VLAN units."
+    ::= {axVBTpPortEntry 5}
+
+axVBTpPortInDiscards OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of reception frame of the port by VLAN units."
+    ::= {axVBTpPortEntry 6}
+
+--
+--  axVlanBridgeGroup 
+--
+axVlanBridgeMaxVlans OBJECT-TYPE
+    SYNTAX VlanIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Maximum value of VLAN ID of this device."
+    ::= {axVlanBridge 101}
+
+axVlanBridgeMaxSpans OBJECT-TYPE
+    SYNTAX VlanIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Maximum value of VLAN ID of VLAN which may operate spanning tree in this device."
+    ::= {axVlanBridge 102}
+
+--
+--  axVlanTagTranslationTableGroup 
+--
+axVlanTagTranslationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxVlanTagTranslationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The information table about a Tag conversion function."
+    ::= {axVlanTagTranslation 1}
+
+axVlanTagTranslationEntry OBJECT-TYPE
+    SYNTAX AxVlanTagTranslationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of the information table about a Tag conversion function."
+    INDEX  { axVlanTagTranslationVlanId,
+             axVlanTagTranslationTranslatedId }
+    ::= {axVlanTagTranslationTable 1}
+
+AxVlanTagTranslationEntry ::= SEQUENCE {
+    axVlanTagTranslationVlanId            Integer32,
+    axVlanTagTranslationTranslatedId      Integer32,
+    axVlanTagTranslationPorts             PortList
+}
+
+axVlanTagTranslationVlanId OBJECT-TYPE
+    SYNTAX Integer32 (1..4095)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "VLAN ID which has set up the Tag conversion function."
+    ::= {axVlanTagTranslationEntry 1}
+
+axVlanTagTranslationTranslatedId OBJECT-TYPE
+    SYNTAX Integer32 (1..4095)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Translated ID set up by the Tag conversion function."
+    ::= {axVlanTagTranslationEntry 2}
+
+axVlanTagTranslationPorts OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The port list which has set up the same Translated ID by the same VLAN by the Tag conversion function."
+    ::= {axVlanTagTranslationEntry 3}
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Conformance identifier
+--
+
+axVlanConformance       OBJECT IDENTIFIER ::= { axVlan 1000 }
+axVlanCompliances       OBJECT IDENTIFIER ::= { axVlanConformance 1 }
+axVlanGroups            OBJECT IDENTIFIER ::= { axVlanConformance 2 }
+
+-- Compliance
+--
+
+axVlanCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "AX Vlan"
+    MODULE        -- this module
+        MANDATORY-GROUPS {  axVlanGroup }
+    ::= { axVlanCompliances 1 }
+
+--
+-- Object Group
+--
+
+axVlanGroup OBJECT-GROUP
+    OBJECTS     {
+        axVBBaseBridgeAddress,
+        axVBBaseNumPorts,
+        axVBBaseType,
+        axVBBaseVlanIfIndex,
+        axVBBaseVlanType,
+        axVBBaseVlanID,
+        axVBBaseAssociatedPrimaryVlan,
+        axVBBaseIfStatus,
+        axVBBaseLastChange,
+        axVBBasePrivateVlanType,
+        axVBBasePortIfIndex,
+        axVBBasePortCircuit,
+        axVBBasePortDelayExceededDiscards,
+        axVBBasePortMtuExceededDiscards,
+        axVBBasePortState,
+        axVBBasePortTaggedState,
+        axVBBasePortTranslatedTagID,
+        axVBTpLearnedEntryDiscards,
+        axVBTpAgingTime,
+        axVBTpPortMaxInfo,
+        axVBTpPortInFrames,
+        axVBTpPortOutFrames,
+        axVBTpPortInDiscards,
+        axVlanBridgeMaxVlans,
+        axVlanBridgeMaxSpans,
+        axVlanTagTranslationPorts,
+        axVBBaseIndex,
+        axVBBasePortIndex,
+        axVBBasePort,
+        axVBTpIndex,
+        axVBTpPortIndex,
+        axVBTpPort
+    }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects which are used to provide axVlan group."
+    ::= { axVlanGroups 1 }
+
+END

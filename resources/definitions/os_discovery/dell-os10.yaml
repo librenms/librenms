@@ -30,8 +30,8 @@ modules:
                     group: Fans
                     state_name: os10FanOperStatus
                     states:
-                        - { value: 1, descr: normal, graph: 1, generic: 0 }
-                        - { value: 2, descr: abnormal, graph: 1, generic: 2 }
+                        - { value: 1, descr: normal, generic: 0 }
+                        - { value: 2, descr: abnormal, generic: 2 }
                 -
                     oid: DELLEMC-OS10-CHASSIS-MIB::os10FanTrayTable
                     value: DELLEMC-OS10-CHASSIS-MIB::os10FanTrayOperStatus
@@ -40,8 +40,8 @@ modules:
                     group: Fans
                     state_name: os10FanTrayOperStatus
                     states:
-                        - { value: 1, descr: normal, graph: 1, generic: 0 }
-                        - { value: 2, descr: abnormal, graph: 1, generic: 2 }
+                        - { value: 1, descr: normal, generic: 0 }
+                        - { value: 2, descr: abnormal, generic: 2 }
                 -
                     oid: DELLEMC-OS10-CHASSIS-MIB::os10PowerSupplyTable
                     value: DELLEMC-OS10-CHASSIS-MIB::os10PowerSupplyOperStatus
@@ -50,5 +50,5 @@ modules:
                     group: PSUs
                     state_name: os10PowerSupplyOperStatus
                     states:
-                        - { value: 1, descr: normal, graph: 1, generic: 0 }
-                        - { value: 2, descr: abnormal, graph: 1, generic: 2 }
+                        - { value: 1, descr: normal, generic: 0 }
+                        - { value: 2, descr: abnormal, generic: 2 }

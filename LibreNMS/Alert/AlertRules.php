@@ -131,7 +131,7 @@ class AlertRules
                         if (is_null($current_state)) {
                             dbInsert(['state' => AlertState::ACTIVE, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0], 'alerts');
                         } else {
-                            dbUpdate(['state' => AlertState::ACTIVE, 'open' => 1, 'timestamp' => Carbon::now()], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
+                            dbUpdate(['state' => AlertState::ACTIVE, 'open' => 1, 'alerted' => 0, 'timestamp' => Carbon::now()], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                         }
                         Log::info(PHP_EOL . 'Status: %rALERT%n', ['color' => true]);
                     }

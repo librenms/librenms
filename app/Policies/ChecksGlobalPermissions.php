@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 
@@ -18,8 +17,8 @@ trait ChecksGlobalPermissions
 
         try {
             return $user->hasPermissionTo("$this->globalPrefix.$action");
-        } catch (PermissionDoesNotExist $e) {
-            Log::error($e->getMessage());
+        } catch (PermissionDoesNotExist) {
+            // do not log, there is no problem with permissions not existing
 
             return false;
         }

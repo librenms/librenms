@@ -723,7 +723,7 @@
   {
     "name": "Logsize: set(s) has a log file(s) with a size > 5GB",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"logsize"},{"id":"application_metrics.metric like \"set_%_max_size\"","field":"application_metrics.metric like \"set_%_max_size\"","type":null,"input":"text","operator":"equal","value":"1"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"5000000000"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"logsize"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"set_.*_max_size"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"5000000000"}],"valid":true}
   },
   {
     "name": "Logsize: total size > 5GB",
@@ -748,12 +748,32 @@
   {
     "name": "SMART: one or more disk is unhealthy",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"unhealthy"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"unhealthy"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
   },
   {
-    "name": "SMART: one or more disk could not be polled",
+    "name": "SMART: one or more disk have a smartctl exit value of non-zero",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"exit_nonzero"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"exit_nonzero"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "SMART: one or more disk reporting device error poll from smartctl",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"dev_error"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "SMART: one or more disk has failed tests",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"disks_with_failed_tests"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "SMART: one or more disk reporting as unhealthy",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"unhealthy"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "SMART: one or more disk reporting as over heating",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"disks_with_over_temp"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
   },
   {
     "name": "SS TCP TIME-WAIT Sessions > 100",
@@ -773,7 +793,7 @@
   {
     "name": "Suricata Extract Submit submission failures found > 0",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"(applications.app_type","field":"(applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata_extract"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"sub_fail"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0\")"},{"id":"(applications.app_type","field":"(applications.app_type","type":null,"input":"text","operator":"equal","value":"suricata_extract"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"sub_4xx"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"},{"id":"(applications.app_type","field":"(applications.app_type","type":null,"input":"text","operator":"equal","value":"suricata_extract"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"sub_5xx"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+    "builder": {"condition":"OR","rules":[{"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata_extract"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"sub_fail"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}]},{"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata_extract"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"sub_4xx"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}]},{"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata_extract"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"sub_5xx"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}]}],"valid":true}
   },
   {
     "name": "Suricata Extract Submit truncated extracts found > 0",
@@ -788,162 +808,162 @@
   {
     "name": "Dell DRAC amperage probe status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"amperageProbeStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6,8-9]|10\")","field":"sensors.sensor_current REGEXP \"[5-6,8-9]|10\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"amperageProbeStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6,8-9]|10"}],"valid":true}
   },
   {
     "name": "Dell DRAC amperage probe status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"amperageProbeStatus"},{"id":"sensors.sensor_current REGEXP \"[4,7]\")","field":"sensors.sensor_current REGEXP \"[4,7]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"amperageProbeStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[4,7]"}],"valid":true}
   },
   {
     "name": "Dell DRAC global system status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"drsGlobalSystemStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"drsGlobalSystemStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"}],"valid":true}
   },
   {
     "name": "Dell DRAC global system status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"drsGlobalSystemStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"drsGlobalSystemStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "Dell DRAC memory device status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"memoryDeviceStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"memoryDeviceStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"}],"valid":true}
   },
   {
     "name": "Dell DRAC memory device status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"memoryDeviceStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"memoryDeviceStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "Dell DRAC physical disk state critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"physicalDiskState"},{"id":"sensors.sensor_current REGEXP \"[5-9]|10\")","field":"sensors.sensor_current REGEXP \"[5-9]|10\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"physicalDiskState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-9]|10"}],"valid":true}
   },
   {
     "name": "Dell DRAC physical disk state warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"physicalDiskState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"physicalDiskState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "Dell DRAC processor device status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"processorDeviceStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"processorDeviceStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"}],"valid":true}
   },
   {
     "name": "Dell DRAC processor device status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"processorDeviceStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"processorDeviceStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "Dell DRAC system battery status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"systemBatteryStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6,8-9]|10\")","field":"sensors.sensor_current REGEXP \"[5-6,8-9]|10\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"systemBatteryStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6,8-9]|10"}],"valid":true}
   },
   {
     "name": "Dell DRAC system battery status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"systemBatteryStatus"},{"id":"sensors.sensor_current REGEXP \"[4,7]\")","field":"sensors.sensor_current REGEXP \"[4,7]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"systemBatteryStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[4,7]"}],"valid":true}
   },
   {
     "name": "Dell DRAC virtual disk state critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"virtualDiskState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"virtualDiskState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"}],"valid":true}
   },
   {
     "name": "Dell DRAC virtual disk state warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"virtualDiskState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"virtualDiskState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "Dell OME-M blade status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmBladeCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmBladeCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"}],"valid":true}
   },
   {
     "name": "Dell OME-M blade status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmBladeCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmBladeCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "Dell OME-M fan status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmFanCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmFanCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"}],"valid":true}
   },
   {
     "name": "Dell OME-M fan status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmFanCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmFanCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "Dell OME-M global system status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmGlobalSystemStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmGlobalSystemStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"}],"valid":true}
   },
   {
     "name": "Dell OME-M global system status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmGlobalSystemStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmGlobalSystemStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "Dell OME-M IOM status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmIOMCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmIOMCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"}],"valid":true}
   },
   {
     "name": "Dell OME-M IOM status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmIOMCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmIOMCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "Dell OME-M MM status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmMMCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmMMCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"}],"valid":true}
   },
   {
     "name": "Dell OME-M MM status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmMMCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmMMCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "Dell OME-M power status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmPowerCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmPowerCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"}],"valid":true}
   },
   {
     "name": "Dell OME-M power status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmPowerCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmPowerCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "Dell OME-M PSU status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmPSUTable"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmPSUTable"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"}],"valid":true}
   },
   {
     "name": "Dell OME-M PSU status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmPSUTable"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmPSUTable"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "Dell OME-M redundancy status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmRedCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmRedCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"}],"valid":true}
   },
   {
     "name": "Dell OME-M redundancy status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmRedCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmRedCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "Dell OME-M temperature status critical",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmTempCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmTempCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[5-6]"}],"valid":true}
   },
   {
     "name": "Dell OME-M temperature status warning",
     "severity": "warning",
-    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmTempCurrStatus"},{"id":"sensors.sensor_current REGEXP 4)","field":"sensors.sensor_current REGEXP 4)","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"sensors.sensor_class","field":"sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmTempCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"}],"valid":true}
   },
   {
     "name": "CAPE reported = 0, nothing is processing",
@@ -961,17 +981,17 @@
     "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"cape"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"error"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
   },
   {
-    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*fail.*"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*fail.*"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
     "name": "SMART: one or more disk is has failures",
     "severity": "critical"
   },
   {
-    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*readfailure"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"readfailure"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
     "name": "SMART: one or more disk is has self test read failures",
     "severity": "critical"
   },
   {
-    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*unknownfail"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"unknownfail"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
     "name": "SMART: one or more disk is has self test unknown failures",
     "severity": "critical"
   },
@@ -988,7 +1008,7 @@
   {
     "name": "ZFS: pool with errors present",
     "severity": "critical",
-    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"zfs"},{"id":"application_metrics.metric like \"pool_%_%_errors\"","field":"application_metrics.metric like \"pool_%_%_errors\"","type":null,"input":"text","operator":"equal","value":"1"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"zfs"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"pool_.*_.*_errors"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
   },
   {
     "name": "I2PD: application failed",
@@ -1009,5 +1029,10 @@
     "name": "I2PD: tunnels not establishing",
     "severity": "warning",
     "builder": {"condition":"AND","rules":[{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"tunnels_successrate"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"less_or_equal","value":"10"}],"valid":true}
+  },
+  {
+    "name": "Expiring SSL Certificates",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"ssl_certificates.days_until_expiry","field":"ssl_certificates.days_until_expiry","type":"integer","input":"text","operator":"less","value":"14"},{"id":"ssl_certificates.disabled","field":"ssl_certificates.disabled","type":"integer","input":"text","operator":"equal","value":"0"}],"valid":true}
   }
 ]

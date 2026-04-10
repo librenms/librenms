@@ -768,6 +768,7 @@ class Cisco extends OS implements
                 'vendor' => $ent['entPhysicalMfgName'] ?? null,
                 'revision' => $ent['entPhysicalHardwareRev'] ?? null,
                 'model' => $ent['entPhysicalModelName'] ?? null,
+                'date' => $ent['entPhysicalMfgDate'] ?? null,
                 'serial' => $ent['entPhysicalSerialNum'] ?? null,
                 'entity_physical_index' => $ent['entPhysicalIndex'],
             ]);
@@ -789,7 +790,12 @@ class Cisco extends OS implements
         // Iterate over a 2 level table with keys of the policy ID, then the object ID
         foreach ($qosObjects as $policyId => $spObjects) {
             // Policy level settings
-            $direction = $servicePolicies[$policyId]['cbQosPolicyDirection'];
+            $policySettings = $servicePolicies[$policyId] ?? null;
+            if (! is_array($policySettings)) {
+                continue;
+            }
+
+            $direction = $policySettings['cbQosPolicyDirection'] ?? null;
 
             foreach ($spObjects as $objectId => $qosObject) {
                 $qosObjectIndex = $qosObject['cbQosConfigIndex'];
@@ -809,14 +815,15 @@ class Cisco extends OS implements
                     // Class Map
                     $dbtype = 'cisco_cbqos_classmap';
                     // RRD name matches the original cbqos module
-                    $rrd_id = 'port-' . $servicePolicies[$policyId]['cbQosIfIndex'] . '-cbqos-' . $policyId . '-' . $objectId;
+                    $rrd_id = 'port-' . ($policySettings['cbQosIfIndex'] ?? 0) . '-cbqos-' . $policyId . '-' . $objectId;
                     $cm = $classMaps[$qosObjectIndex] ?? [];
                     $title = implode(' - ', array_filter(array_intersect_key($cm, ['cbQosCMName' => true, 'cbQosCMDesc' => true])));
+                    $cmInfo = $cm['cbQosCMInfo'] ?? null;
 
                     // Fill in the match type
-                    if ($cm['cbQosCMInfo'] == 2) {
+                    if ($cmInfo == 2) {
                         $tooltip = 'Match-All:';
-                    } elseif ($cm['cbQosCMInfo'] == 3) {
+                    } elseif ($cmInfo == 3) {
                         $tooltip = 'Match-Any:';
                     } else {
                         $tooltip = 'None';
@@ -1061,14 +1068,13 @@ class Cisco extends OS implements
 
             if ($vlan->vlan_state && $vlan_id) {
                 // collect BRIDGE-MIB in vlan context
-                $tmp_vlan_data = SnmpQuery::context($vlan_id === 1 ? '' : (string) $vlan_id, 'vlan-')
+                $vlanContext = $vlan_id == 1 ? '' : (string) $vlan_id;
+                $tmp_vlan_data = SnmpQuery::context($vlanContext, 'vlan-')
                     ->enumStrings()
                     ->abortOnFailure()
-                    ->walk([
-                        'BRIDGE-MIB::dot1dStpPortState',
-                        'BRIDGE-MIB::dot1dStpPortPriority',
-                        'BRIDGE-MIB::dot1dStpPortPathCost',
-                    ])->table(1);
+                    ->cache()
+                    ->walk('BRIDGE-MIB::dot1dStpPortTable')
+                    ->table(1);
 
                 foreach ($tmp_vlan_data as $baseport => $data) {
                     // use the collected untagged vlan info

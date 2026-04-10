@@ -234,6 +234,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function bootAuth(): void
     {
+        Gate::policy(\Spatie\Permission\Models\Role::class, \App\Policies\RolePolicy::class);
+
         Auth::provider('legacy', fn ($app, array $config) => new LegacyUserProvider());
 
         Auth::provider('token_provider', fn ($app, array $config) => new TokenUserProvider());
@@ -261,7 +263,7 @@ class AppServiceProvider extends ServiceProvider
 
             // Restify uses 'show' instead of 'view' for single-resource authorization
             // (see vendor/binaryk/laravel-restify/src/Traits/AuthorizableModels.php)
-            if ((str_ends_with($ability, 'view') || str_ends_with($ability, 'viewAny') || $ability === 'show') && $user->hasRole('global-read')) {
+            if ($user->hasRole('global-read') && (preg_match('/^(\s+\.)?view(All|Any)?$/', $ability, $match) || $ability === 'show')) {
                 return true; // global read access
             }
 

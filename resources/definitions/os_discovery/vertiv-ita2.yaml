@@ -13,11 +13,11 @@ modules:
                     index: 'upsOutputSource.{{ $index }}'
                     state_name: upsOutputSource
                     states:
-                        - { descr: 'No Output'             , graph: 1, value: 0, generic: 2 }
-                        - { descr: 'On Main'               , graph: 1, value: 1, generic: 0 }
-                        - { descr: 'On Battery'            , graph: 1, value: 2, generic: 1 }
-                        - { descr: 'On Bypass'             , graph: 1, value: 3, generic: 1 }
-                        - { descr: 'on Utility and Battery', graph: 1, value: 4, generic: 0 }
+                        - { descr: 'No Output'             , value: 0, generic: 2 }
+                        - { descr: 'On Main'               , value: 1, generic: 0 }
+                        - { descr: 'On Battery'            , value: 2, generic: 1 }
+                        - { descr: 'On Bypass'             , value: 3, generic: 1 }
+                        - { descr: 'on Utility and Battery', value: 4, generic: 0 }
                 -
                     oid: VERTIV-ITA2-MIB::systemStatus
                     value: VERTIV-ITA2-MIB::systemStatus
@@ -26,9 +26,9 @@ modules:
                     index: 'systemStatus.{{ $index }}'
                     state_name: systemStatus
                     states:
-                        - { descr: 'Normal'    , graph: 1, value: 0, generic: 0 }
-                        - { descr: 'Warning'   , graph: 1, value: 1, generic: 1 }
-                        - { descr: 'Critical'  , graph: 1, value: 2, generic: 2 }
+                        - { descr: 'Normal'    , value: 0, generic: 0 }
+                        - { descr: 'Warning'   , value: 1, generic: 1 }
+                        - { descr: 'Critical'  , value: 2, generic: 2 }
         voltage:
             data:
                 -
