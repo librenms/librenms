@@ -16,7 +16,7 @@ use App\Models\ApiToken;
 use App\Models\User;
 use LibreNMS\Authentication\LegacyAuth;
 
-if (Gate::allows('api.access')) {
+if (Gate::any(['api.access', 'api.management'])) {
     $canManage = Gate::allows('api.management');
     $userlist = $canManage ? User::all() : collect();
 ?>
