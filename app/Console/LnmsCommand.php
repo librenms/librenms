@@ -175,6 +175,20 @@ abstract class LnmsCommand extends Command
         };
     }
 
+    public function execute(\Symfony\Component\Console\Input\InputInterface $input, \Symfony\Component\Console\Output\OutputInterface $output): int
+    {
+        $originalCwd = getcwd();
+        @chdir(base_path());
+    
+        try {
+            return parent::execute($input, $output);
+        } finally {
+            if ($originalCwd) {
+                @chdir($originalCwd);
+            }
+        }
+    }
+
     private function getCallable(string $type, string $name): ?callable
     {
         if (empty($this->{'option' . $type}[$name])) {
