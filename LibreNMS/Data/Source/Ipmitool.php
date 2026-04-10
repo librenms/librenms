@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IpmitoolCommand.php
  *
@@ -47,12 +48,11 @@ class Ipmitool
 
     public function __construct(
         private readonly Device $device,
-    )
-    {
+    ) {
         $this->binary = LibrenmsConfig::get('ipmitool', 'ipmitool');
         $this->hostname = $device->getAttrib('ipmi_hostname', $device->hostname);
         $this->port = filter_var($device->getAttrib('ipmi_port'), FILTER_VALIDATE_INT) ?: 0;
-        $this->username = $device->getAttrib('ipmi_username', '') ;
+        $this->username = $device->getAttrib('ipmi_username', '');
         $this->password = $device->getAttrib('ipmi_password', '');
         $this->kg_key = $device->getAttrib('ipmi_kg_key');
         $this->ciphersuite = $device->getAttrib('ipmi_ciphersuite');
@@ -74,6 +74,7 @@ class Ipmitool
     /**
      * @param  string[]  $commands
      * @return string
+     *
      * @throws IpmiConnectionFailed
      */
     public function command(array $commands): string
@@ -111,6 +112,7 @@ class Ipmitool
      * descr, value, unit, status, detail
      *
      * @return list<array{string, string, string, string, string}>
+     *
      * @throws IpmiConnectionFailed
      */
     public function sdr(): array
@@ -118,7 +120,7 @@ class Ipmitool
         $output = $this->command(['-c', 'sdr']);
 
         return array_map(
-            fn(string $line): array => array_pad(array_values(array_map(trim(...), str_getcsv($line, escape: ''))), 5, null),
+            fn (string $line): array => array_pad(array_values(array_map(trim(...), str_getcsv($line, escape: ''))), 5, null),
             array_filter(explode("\n", trim($output)))
         );
     }
@@ -127,6 +129,7 @@ class Ipmitool
      *  desc, current, unit, state, low_nonrecoverable, low_limit, low_warn, high_warn, high_limit, high_nonrecoverable
      *
      * @return list<array{string, string, string, string, string, string, string, string, string, string}>
+     *
      * @throws IpmiConnectionFailed
      */
     public function sensors(): array
@@ -134,7 +137,7 @@ class Ipmitool
         $output = $this->command(['sensor']);
 
         return array_map(
-            fn(string $line): array => array_map(trim(...), explode('|', $line)),
+            fn (string $line): array => array_map(trim(...), explode('|', $line)),
             explode("\n", trim($output))
         );
     }
@@ -193,7 +196,8 @@ class Ipmitool
      * @param  string|null  $ipmi_type
      * @return ProcessResult
      */
-    private function runCommand(array $commands, ?string $ipmi_type = null): ProcessResult {
+    private function runCommand(array $commands, ?string $ipmi_type = null): ProcessResult
+    {
         $cmd = $this->createCommand($commands, $ipmi_type);
         Log::debug('IPMI[%m' . implode(' ', $cmd) . '%n]', ['color' => true]);
 

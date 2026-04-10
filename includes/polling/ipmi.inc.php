@@ -8,7 +8,6 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 
 /** @var array $device */
-
 $ipmiSensors = DeviceCache::getPrimary()->sensors()->where('poller_type', 'ipmi')
     ->get()->groupBy('sensor_class')->map->keyBy('sensor_descr');
 if ($ipmiSensors->isEmpty()) {

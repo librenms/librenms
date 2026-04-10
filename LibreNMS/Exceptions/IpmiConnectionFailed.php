@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IpmiConnectionFailed.php
  *
@@ -27,5 +28,4 @@ namespace LibreNMS\Exceptions;
 
 class IpmiConnectionFailed extends \Exception
 {
-
 }
