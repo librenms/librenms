@@ -179,7 +179,7 @@ abstract class LnmsCommand extends Command
     {
         $originalCwd = getcwd();
         @chdir(base_path());
-    
+
         try {
             return parent::execute($input, $output);
         } finally {
