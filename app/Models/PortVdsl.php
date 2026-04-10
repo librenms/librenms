@@ -6,6 +6,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 
 class PortVdsl extends PortRelatedModel implements Keyable
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     protected $table = 'ports_vdsl';
     protected $primaryKey = 'port_id';
     public $timestamps = false;

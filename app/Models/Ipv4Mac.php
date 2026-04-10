@@ -8,6 +8,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 
 class Ipv4Mac extends PortRelatedModel implements Keyable
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     protected $table = 'ipv4_mac';
     public $timestamps = false;
     protected $fillable = [

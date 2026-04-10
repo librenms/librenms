@@ -6,6 +6,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 
 class Stp extends DeviceRelatedModel implements Keyable
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     protected $table = 'stp';
     protected $primaryKey = 'stp_id';
     public $timestamps = false;

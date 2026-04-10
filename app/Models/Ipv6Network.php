@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Ipv6Network extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     public $timestamps = false;
     protected $primaryKey = 'ipv6_network_id';
     protected $fillable = [

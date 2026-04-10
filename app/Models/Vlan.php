@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Vlan extends DeviceRelatedModel
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     protected $primaryKey = 'vlan_id';
     public $timestamps = false;
     protected $fillable = [

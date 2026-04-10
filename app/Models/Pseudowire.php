@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pseudowire extends PortRelatedModel
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     public $timestamps = false;
     protected $primaryKey = 'pseudowire_id';
 

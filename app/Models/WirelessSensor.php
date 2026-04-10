@@ -35,6 +35,7 @@ use LibreNMS\Util\Number;
 
 class WirelessSensor extends DeviceRelatedModel implements Keyable
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     use HasThresholds;
 
     const CREATED_AT = null;

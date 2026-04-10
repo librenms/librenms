@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PortsFdb extends PortRelatedModel
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     protected $table = 'ports_fdb';
     protected $primaryKey = 'ports_fdb_id';
     public $timestamps = true;

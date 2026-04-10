@@ -25,7 +25,35 @@ use App\Models\MplsSdp;
 use App\Models\MplsSdpBind;
 use App\Models\MplsService;
 use App\Models\MplsTunnelArHop;
+use App\Models\Ipv4Address;
+use App\Models\AccessPoint;
+use App\Models\Availability;
+use App\Models\CefSwitching;
+use App\Models\DeviceOutage;
+use App\Models\DiskIo;
+use App\Models\Ipv4Mac;
+use App\Models\IpsecTunnel;
+use App\Models\Ipv6Nd;
+use App\Models\PortVlan;
+use App\Models\Ipv4Network;
+use App\Models\Ipv6Address;
+use App\Models\Ipv6Network;
+use App\Models\Link;
+use App\Models\PortAdsl;
+use App\Models\PortSecurity;
+use App\Models\PortsFdb;
+use App\Models\PortsNac;
+use App\Models\PortStack;
+use App\Models\PortStatistic;
+use App\Models\PortVdsl;
+use App\Models\PortStp;
 use App\Models\MplsTunnelCHop;
+use App\Models\Pseudowire;
+use App\Models\Sla;
+use App\Models\Stp;
+use App\Models\Transceiver;
+use App\Models\Vlan;
+use App\Models\WirelessSensor;
 use App\Models\OspfArea;
 use App\Models\OspfInstance;
 use App\Models\OspfNbr;
@@ -3238,6 +3266,1411 @@ class RestifyApiTest extends DBTestCase
         Sanctum::actingAs($user);
 
         $this->postJsonApi('/api/v1/mpls-tunnel-c-hops', ['mplsTunnelCHopIpv4Addr' => '10.0.0.1'])
+            ->assertStatus(403);
+    }
+
+    // ── IPv4 Addresses ──────────────────────────────────────
+
+    public function testAdminCanListIpv4Addresses(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ipv4Address::factory()->count(3)->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv4-addresses')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessIpv4Addresses(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ipv4Address::factory()->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv4-addresses')
+            ->assertStatus(403);
+    }
+
+    public function testIpv4AddressFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ipv4Address::factory()->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv4-addresses')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'ipv4_address', 'ipv4_prefixlen', 'port_id',
+            ]]]]);
+    }
+
+    public function testIpv4AddressesCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ipv4-addresses', ['ipv4_address' => '10.0.0.1'])
+            ->assertStatus(403);
+    }
+
+    // ── IPv6 Addresses ──────────────────────────────────────
+
+    public function testAdminCanListIpv6Addresses(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ipv6Address::factory()->count(3)->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv6-addresses')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessIpv6Addresses(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ipv6Address::factory()->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv6-addresses')
+            ->assertStatus(403);
+    }
+
+    public function testIpv6AddressFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ipv6Address::factory()->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv6-addresses')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'ipv6_address', 'ipv6_compressed', 'ipv6_prefixlen', 'port_id',
+            ]]]]);
+    }
+
+    public function testIpv6AddressesCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ipv6-addresses', ['ipv6_address' => '::1'])
+            ->assertStatus(403);
+    }
+
+    // ── VLANs ───────────────────────────────────────────────
+
+    public function testAdminCanListVlans(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Vlan::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/vlans')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessVlans(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        Vlan::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/vlans')
+            ->assertStatus(403);
+    }
+
+    public function testVlanFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Vlan::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/vlans')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'vlan_vlan', 'vlan_name', 'vlan_type',
+            ]]]]);
+    }
+
+    public function testVlansCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/vlans', ['vlan_name' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── Links ───────────────────────────────────────────────
+
+    public function testAdminCanListLinks(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Link::factory()->count(3)->create(['local_device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/links')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessLinks(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        Link::factory()->create(['local_device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/links')
+            ->assertStatus(403);
+    }
+
+    public function testLinkFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Link::factory()->create(['local_device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/links')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'local_device_id', 'remote_hostname', 'remote_port', 'protocol', 'active',
+            ]]]]);
+    }
+
+    public function testLinksCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/links', ['remote_hostname' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── IPv4 Networks ───────────────────────────────────────
+
+    public function testAdminCanListIpv4Networks(): void
+    {
+        $user = User::factory()->admin()->create();
+        Ipv4Network::factory()->count(3)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv4-networks')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessIpv4Networks(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        Ipv4Network::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv4-networks')
+            ->assertStatus(403);
+    }
+
+    public function testIpv4NetworkFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        Ipv4Network::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv4-networks')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'ipv4_network',
+            ]]]]);
+    }
+
+    public function testIpv4NetworksCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ipv4-networks', ['ipv4_network' => '10.0.0.0/8'])
+            ->assertStatus(403);
+    }
+
+    // ── IPv6 Networks ───────────────────────────────────────
+
+    public function testAdminCanListIpv6Networks(): void
+    {
+        $user = User::factory()->admin()->create();
+        Ipv6Network::factory()->count(3)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv6-networks')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessIpv6Networks(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        Ipv6Network::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv6-networks')
+            ->assertStatus(403);
+    }
+
+    public function testIpv6NetworkFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        Ipv6Network::factory()->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv6-networks')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'ipv6_network',
+            ]]]]);
+    }
+
+    public function testIpv6NetworksCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ipv6-networks', ['ipv6_network' => '2001:db8::/32'])
+            ->assertStatus(403);
+    }
+
+    // ── IPv4 MAC (ARP) ─────────────────────────────────────
+
+    public function testAdminCanListIpv4Macs(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ipv4Mac::factory()->count(3)->create(['port_id' => $port->port_id, 'device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv4-macs')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessIpv4Macs(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ipv4Mac::factory()->create(['port_id' => $port->port_id, 'device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv4-macs')
+            ->assertStatus(403);
+    }
+
+    public function testIpv4MacFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ipv4Mac::factory()->create(['port_id' => $port->port_id, 'device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv4-macs')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'port_id', 'mac_address', 'ipv4_address',
+            ]]]]);
+    }
+
+    public function testIpv4MacsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ipv4-macs', ['mac_address' => 'aa:bb:cc:dd:ee:ff'])
+            ->assertStatus(403);
+    }
+
+    // ── FDB (MAC Forwarding Table) ──────────────────────────
+
+    public function testAdminCanListPortsFdb(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortsFdb::factory()->count(3)->create(['port_id' => $port->port_id, 'device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ports-fdbs')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessPortsFdb(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortsFdb::factory()->create(['port_id' => $port->port_id, 'device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ports-fdbs')
+            ->assertStatus(403);
+    }
+
+    public function testPortsFdbFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortsFdb::factory()->create(['port_id' => $port->port_id, 'device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ports-fdbs')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'port_id', 'mac_address', 'vlan_id', 'device_id',
+            ]]]]);
+    }
+
+    public function testPortsFdbCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ports-fdbs', ['mac_address' => 'aa:bb:cc:dd:ee:ff'])
+            ->assertStatus(403);
+    }
+
+    // ── IPv6 Neighbor Discovery ─────────────────────────────
+
+    public function testAdminCanListIpv6Nd(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ipv6Nd::factory()->count(3)->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv6-nds')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessIpv6Nd(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ipv6Nd::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv6-nds')
+            ->assertStatus(403);
+    }
+
+    public function testIpv6NdFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Ipv6Nd::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipv6-nds')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'port_id', 'mac_address', 'ipv6_address',
+            ]]]]);
+    }
+
+    public function testIpv6NdCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ipv6-nds', ['ipv6_address' => '::1'])
+            ->assertStatus(403);
+    }
+
+    // ── Port VLANs ──────────────────────────────────────────
+
+    public function testAdminCanListPortVlans(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortVlan::factory()->count(3)->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-vlans')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessPortVlans(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortVlan::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-vlans')
+            ->assertStatus(403);
+    }
+
+    public function testPortVlanFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortVlan::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-vlans')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'port_id', 'vlan', 'state',
+            ]]]]);
+    }
+
+    public function testPortVlansCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/port-vlans', ['vlan' => 100])
+            ->assertStatus(403);
+    }
+
+    // ── Access Points ───────────────────────────────────────
+
+    public function testAdminCanListAccessPoints(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        AccessPoint::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/access-points')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessAccessPoints(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        AccessPoint::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/access-points')
+            ->assertStatus(403);
+    }
+
+    public function testAccessPointFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        AccessPoint::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/access-points')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'name', 'mac_addr', 'channel', 'numasoclients',
+            ]]]]);
+    }
+
+    public function testAccessPointsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/access-points', ['name' => 'test-ap'])
+            ->assertStatus(403);
+    }
+
+    // ── Wireless Sensors ────────────────────────────────────
+
+    public function testAdminCanListWirelessSensors(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        WirelessSensor::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/wireless-sensors')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessWirelessSensors(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        WirelessSensor::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/wireless-sensors')
+            ->assertStatus(403);
+    }
+
+    public function testWirelessSensorFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        WirelessSensor::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/wireless-sensors')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'sensor_class', 'sensor_descr', 'sensor_type',
+            ]]]]);
+    }
+
+    public function testWirelessSensorsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/wireless-sensors', ['sensor_descr' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── Transceivers ────────────────────────────────────────
+
+    public function testAdminCanListTransceivers(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Transceiver::factory()->count(3)->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/transceivers')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessTransceivers(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Transceiver::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/transceivers')
+            ->assertStatus(403);
+    }
+
+    public function testTransceiverFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Transceiver::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/transceivers')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'port_id', 'vendor', 'model', 'serial',
+            ]]]]);
+    }
+
+    public function testTransceiversCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/transceivers', ['vendor' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── Disk I/O ────────────────────────────────────────────
+
+    public function testAdminCanListDiskIos(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        DiskIo::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/disk-ios')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessDiskIos(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        DiskIo::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/disk-ios')
+            ->assertStatus(403);
+    }
+
+    public function testDiskIoFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        DiskIo::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/disk-ios')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'diskio_index', 'diskio_descr',
+            ]]]]);
+    }
+
+    public function testDiskIosCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/disk-ios', ['diskio_descr' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── SLAs ────────────────────────────────────────────────
+
+    public function testAdminCanListSlas(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Sla::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/slas')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessSlas(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        Sla::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/slas')
+            ->assertStatus(403);
+    }
+
+    public function testSlaFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Sla::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/slas')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'owner', 'tag', 'rtt_type', 'status',
+            ]]]]);
+    }
+
+    public function testSlasCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/slas', ['tag' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── Device Outages ──────────────────────────────────────
+
+    public function testAdminCanListDeviceOutages(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        DeviceOutage::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson('/api/v1/device-outages');
+        $response->assertStatus(200);
+        $this->assertGreaterThanOrEqual(3, $response->json('meta.total'));
+    }
+
+    public function testRegularUserCannotAccessDeviceOutages(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        DeviceOutage::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/device-outages')
+            ->assertStatus(403);
+    }
+
+    public function testDeviceOutageFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        DeviceOutage::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/device-outages')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'going_down',
+            ]]]]);
+    }
+
+    public function testDeviceOutagesCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/device-outages', ['going_down' => 1000])
+            ->assertStatus(403);
+    }
+
+    // ── Availability ────────────────────────────────────────
+
+    public function testAdminCanListAvailability(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Availability::factory()->count(3)->create(['device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson('/api/v1/availabilities');
+        $response->assertStatus(200);
+        $this->assertGreaterThanOrEqual(3, $response->json('meta.total'));
+    }
+
+    public function testRegularUserCannotAccessAvailability(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        Availability::factory()->create(['device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/availabilities')
+            ->assertStatus(403);
+    }
+
+    public function testAvailabilityFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Availability::factory()->create(['device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/availabilities')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'duration', 'availability_perc',
+            ]]]]);
+    }
+
+    public function testAvailabilityCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/availabilities', ['duration' => 86400])
+            ->assertStatus(403);
+    }
+
+    // ── IPsec Tunnels ───────────────────────────────────────
+
+    public function testAdminCanListIpsecTunnels(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        IpsecTunnel::factory()->count(3)->create(['device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipsec-tunnels')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessIpsecTunnels(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        IpsecTunnel::factory()->create(['device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipsec-tunnels')
+            ->assertStatus(403);
+    }
+
+    public function testIpsecTunnelFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        IpsecTunnel::factory()->create(['device_id' => $device->device_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ipsec-tunnels')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'tunnel_name', 'peer_addr', 'local_addr', 'tunnel_status',
+            ]]]]);
+    }
+
+    public function testIpsecTunnelsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ipsec-tunnels', ['tunnel_name' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── Pseudowires ─────────────────────────────────────────
+
+    public function testAdminCanListPseudowires(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Pseudowire::factory()->count(3)->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/pseudowires')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessPseudowires(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Pseudowire::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/pseudowires')
+            ->assertStatus(403);
+    }
+
+    public function testPseudowireFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        Pseudowire::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/pseudowires')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'port_id', 'pw_type', 'pw_descr',
+            ]]]]);
+    }
+
+    public function testPseudowiresCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/pseudowires', ['pw_descr' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── Port Stacking ───────────────────────────────────────
+
+    public function testAdminCanListPortStacks(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        PortStack::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-stacks')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessPortStacks(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        PortStack::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-stacks')
+            ->assertStatus(403);
+    }
+
+    public function testPortStackFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        PortStack::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-stacks')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'high_ifIndex', 'low_ifIndex', 'ifStackStatus',
+            ]]]]);
+    }
+
+    public function testPortStacksCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/port-stacks', ['ifStackStatus' => 'active'])
+            ->assertStatus(403);
+    }
+
+    // ── Port STP ────────────────────────────────────────────
+
+    public function testAdminCanListPortStps(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortStp::factory()->count(3)->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-stps')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessPortStps(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortStp::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-stps')
+            ->assertStatus(403);
+    }
+
+    public function testPortStpFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortStp::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-stps')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'port_id', 'vlan', 'state', 'designatedRoot',
+            ]]]]);
+    }
+
+    public function testPortStpsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/port-stps', ['state' => 'forwarding'])
+            ->assertStatus(403);
+    }
+
+    // ── STP Instances ───────────────────────────────────────
+
+    public function testAdminCanListStps(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Stp::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/stps')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessStps(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        Stp::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/stps')
+            ->assertStatus(403);
+    }
+
+    public function testStpFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        Stp::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/stps')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'bridgeAddress', 'designatedRoot', 'priority',
+            ]]]]);
+    }
+
+    public function testStpsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/stps', ['bridgeAddress' => 'aa:bb:cc:dd:ee:ff'])
+            ->assertStatus(403);
+    }
+
+    // ── Port ADSL ───────────────────────────────────────────
+
+    public function testAdminCanListPortAdsls(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortAdsl::factory()->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-adsls')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 1);
+    }
+
+    public function testRegularUserCannotAccessPortAdsls(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortAdsl::factory()->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-adsls')
+            ->assertStatus(403);
+    }
+
+    public function testPortAdslFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortAdsl::factory()->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-adsls')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'port_id', 'adslAtucCurrSnrMgn', 'adslAtucChanCurrTxRate',
+            ]]]]);
+    }
+
+    public function testPortAdslsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/port-adsls', ['adslLineCoding' => 'DMT'])
+            ->assertStatus(403);
+    }
+
+    // ── Port VDSL ───────────────────────────────────────────
+
+    public function testAdminCanListPortVdsls(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortVdsl::factory()->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-vdsls')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 1);
+    }
+
+    public function testRegularUserCannotAccessPortVdsls(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortVdsl::factory()->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-vdsls')
+            ->assertStatus(403);
+    }
+
+    public function testPortVdslFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortVdsl::factory()->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-vdsls')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'port_id', 'xdsl2LineStatusAttainableRateDs', 'xdsl2ChStatusActDataRateXtur',
+            ]]]]);
+    }
+
+    public function testPortVdslsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/port-vdsls', ['xdsl2LineStatusAttainableRateDs' => 100000])
+            ->assertStatus(403);
+    }
+
+    // ── Ports NAC ───────────────────────────────────────────
+
+    public function testAdminCanListPortsNac(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortsNac::factory()->count(3)->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ports-nacs')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessPortsNac(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortsNac::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ports-nacs')
+            ->assertStatus(403);
+    }
+
+    public function testPortsNacFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortsNac::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/ports-nacs')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'port_id', 'username', 'mac_address', 'authz_status',
+            ]]]]);
+    }
+
+    public function testPortsNacCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/ports-nacs', ['username' => 'test'])
+            ->assertStatus(403);
+    }
+
+    // ── Port Security ───────────────────────────────────────
+
+    public function testAdminCanListPortSecurity(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        PortSecurity::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-securities')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessPortSecurity(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        PortSecurity::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-securities')
+            ->assertStatus(403);
+    }
+
+    public function testPortSecurityFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        PortSecurity::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-securities')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'port_id', 'device_id', 'status', 'max_addresses',
+            ]]]]);
+    }
+
+    public function testPortSecurityCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/port-securities', ['status' => 'secureup'])
+            ->assertStatus(403);
+    }
+
+    // ── Port Statistics ─────────────────────────────────────
+
+    public function testAdminCanListPortStatistics(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortStatistic::factory()->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson('/api/v1/port-statistics');
+        $response->assertStatus(200);
+        $this->assertGreaterThanOrEqual(1, $response->json('meta.total'));
+    }
+
+    public function testRegularUserCannotAccessPortStatistics(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortStatistic::factory()->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-statistics')
+            ->assertStatus(403);
+    }
+
+    public function testPortStatisticFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create();
+        PortStatistic::factory()->create(['port_id' => $port->port_id]);
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/port-statistics')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'port_id',
+            ]]]]);
+    }
+
+    public function testPortStatisticsCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/port-statistics', ['port_id' => 1])
+            ->assertStatus(403);
+    }
+
+    // ── CEF Switching ───────────────────────────────────────
+
+    public function testAdminCanListCefSwitching(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        CefSwitching::factory()->count(3)->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/cef-switchings')
+            ->assertStatus(200)
+            ->assertJsonPath('meta.total', 3);
+    }
+
+    public function testRegularUserCannotAccessCefSwitching(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('user');
+        $device = Device::factory()->create();
+        CefSwitching::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/cef-switchings')
+            ->assertStatus(403);
+    }
+
+    public function testCefSwitchingFieldsArePresent(): void
+    {
+        $user = User::factory()->admin()->create();
+        $device = Device::factory()->create();
+        CefSwitching::factory()->for($device)->create();
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/cef-switchings')
+            ->assertStatus(200)
+            ->assertJsonStructure(['data' => [['attributes' => [
+                'device_id', 'afi', 'cef_path', 'drop', 'punt',
+            ]]]]);
+    }
+
+    public function testCefSwitchingCannotBeCreatedViaApi(): void
+    {
+        $user = User::factory()->admin()->create();
+        Sanctum::actingAs($user);
+
+        $this->postJsonApi('/api/v1/cef-switchings', ['cef_path' => 'receive'])
             ->assertStatus(403);
     }
 }

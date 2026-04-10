@@ -7,6 +7,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 
 class PortStp extends PortRelatedModel implements Keyable
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     protected $table = 'ports_stp';
     protected $primaryKey = 'port_stp_id';
     public $timestamps = false;

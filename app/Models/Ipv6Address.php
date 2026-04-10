@@ -33,6 +33,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 
 class Ipv6Address extends PortRelatedModel implements Keyable
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     public $timestamps = false;
     protected $primaryKey = 'ipv6_address_id';
     protected $fillable = [

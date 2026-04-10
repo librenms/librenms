@@ -6,6 +6,7 @@ use LibreNMS\Interfaces\Models\Keyable;
 
 class PortVlan extends PortRelatedModel implements Keyable
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
     protected $table = 'ports_vlans';
     protected $primaryKey = 'port_vlan_id';
     public $timestamps = false;
