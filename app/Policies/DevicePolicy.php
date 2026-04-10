@@ -42,9 +42,10 @@ class DevicePolicy
     /**
      * Determine whether the user can update the device.
      */
-    public function update(User $user): bool
+    public function update(User $user, ?Device $device = null): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        return $this->hasGlobalPermission($user, 'update')
+            && ($device === null || Permissions::canAccessDevice($device, $user));
     }
 
     /**
