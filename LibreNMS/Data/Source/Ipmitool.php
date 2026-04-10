@@ -28,8 +28,10 @@ namespace LibreNMS\Data\Source;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
+use LibreNMS\Exceptions\IpmiConnectionFailed;
 
 class Ipmitool
 {
@@ -72,11 +74,37 @@ class Ipmitool
     /**
      * @param  string[]  $commands
      * @return string
+     * @throws IpmiConnectionFailed
      */
     public function command(array $commands): string
     {
-        // TODO add command logging of format IPMI[<cli command>]
-        return Process::command($this->createCommand($commands))->run()->output();
+        if ($this->type) {
+            $result = $this->runCommand($commands, $this->type);
+
+            if ($result->failed()) {
+                throw new IpmiConnectionFailed('Failed to connect to IPMI device');
+            }
+
+            return $result->output();
+        }
+
+        foreach (LibrenmsConfig::get('ipmi.type', []) as $ipmi_type) {
+            try {
+                Log::debug('Trying IPMI type: ' . $ipmi_type);
+                $result = $this->runCommand($commands, $ipmi_type);
+
+                if ($result->successful()) {
+                    $this->device->setAttrib('ipmi_type', $ipmi_type);
+                    $this->type = $ipmi_type;
+
+                    return $result->output();
+                }
+            } catch (\Exception $e) {
+                Log::error('IPMI Discovery error occurred: ' . $e->getMessage());
+            }
+        }
+
+        throw new IpmiConnectionFailed('Failed to discover IPMI type');
     }
 
     public function sdr(): array
@@ -99,7 +127,12 @@ class Ipmitool
         );
     }
 
-    private function createCommand(array $args = []): array
+    /**
+     * @param  string[]  $args
+     * @param  string|null  $type
+     * @return string[]
+     */
+    private function createCommand(array $args = [], ?string $type = null): array
     {
         $cmd = [$this->binary];
 
@@ -123,37 +156,14 @@ class Ipmitool
             }
         }
 
-        array_push($cmd, '-I', $this->getInterfaceType($cmd), ...$args);
+        $type ??= $this->type;
+        if ($type) {
+            array_push($cmd, '-I', $type);
+        }
+
+        array_push($cmd, ...$args);
 
         return $cmd;
-    }
-
-    private function getInterfaceType(array $command): string
-    {
-        // fixme, run the intended command and return output, will take some restructuring
-
-        if ($this->type) {
-            return $this->type;
-        }
-
-        foreach (LibrenmsConfig::get('ipmi.type', []) as $ipmi_type) {
-            // Check if the IPMI type is available, catch segfaults of ipmitool/freeipmi.
-            try {
-                Log::debug('Trying IPMI type: ' . $ipmi_type);
-                $result = Process::command([...$command, '-I', $ipmi_type, 'chassis', 'power', 'status'])->run();
-
-                if ($result->successful()) {
-                    $this->device->setAttrib('ipmi_type', $ipmi_type);
-                    $this->type = $ipmi_type;
-
-                    return $ipmi_type;
-                }
-            } catch (\Exception $e) {
-                Log::error('IPMI Discovery error occurred: ' . $e->getMessage());
-            }
-        }
-
-        throw new \Exception('No Connection');
     }
 
     private function isLocalhost(): bool
@@ -164,5 +174,17 @@ class Ipmitool
             '::1',
             LibrenmsConfig::get('own_hostname'),
         ]);
+    }
+
+    /**
+     * @param  string[]  $commands
+     * @param  mixed  $ipmi_type
+     * @return ProcessResult
+     */
+    private function runCommand(array $commands, mixed $ipmi_type): ProcessResult {
+        $cmd = $this->createCommand($commands, $ipmi_type);
+        Log::debug('IPMI[%m' . implode(' ', $cmd) . '%n]', ['color' => true]);
+
+        return Process::command($cmd)->run();
     }
 }
