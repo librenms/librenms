@@ -5,12 +5,12 @@ namespace App\Restify;
 use App\Models\Eventlog;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 
 class EventlogRepository extends Repository
 {
+    use DeviceScopedRepository;
+
     public static string $model = Eventlog::class;
 
     public static string $id = 'event_id';
@@ -41,20 +41,6 @@ class EventlogRepository extends Repository
             field('username')->readonly(),
             field('severity')->readonly(),
         ];
-    }
-
-    public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        if ($user = $request->user()) {
-            return $query->hasAccess($user);
-        }
-
-        return $query->whereRaw('1 = 0');
-    }
-
-    public static function showQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        return static::indexQuery($request, $query);
     }
 
     /**

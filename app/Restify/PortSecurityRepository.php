@@ -5,12 +5,12 @@ namespace App\Restify;
 use App\Models\PortSecurity;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 
 class PortSecurityRepository extends Repository
 {
+    use DeviceScopedRepository;
+
     public static string $model = PortSecurity::class;
 
     public static string $title = 'last_mac_address';
@@ -40,20 +40,6 @@ class PortSecurityRepository extends Repository
             field('last_mac_address')->readonly(),
             field('sticky_enable')->readonly(),
         ];
-    }
-
-    public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        if ($user = $request->user()) {
-            return $query->hasAccess($user);
-        }
-
-        return $query->whereRaw('1 = 0');
-    }
-
-    public static function showQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        return static::indexQuery($request, $query);
     }
 
     /**

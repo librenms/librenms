@@ -5,12 +5,12 @@ namespace App\Restify;
 use App\Models\MplsTunnelCHop;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 
 class MplsTunnelCHopRepository extends Repository
 {
+    use DeviceScopedRepository;
+
     public static string $model = MplsTunnelCHop::class;
 
     public static string $id = 'c_hop_id';
@@ -43,20 +43,6 @@ class MplsTunnelCHopRepository extends Repository
             field('mplsTunnelCHopStrictOrLoose')->readonly(),
             field('mplsTunnelCHopRouterId')->readonly(),
         ];
-    }
-
-    public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        if ($user = $request->user()) {
-            return $query->hasAccess($user);
-        }
-
-        return $query->whereRaw('1 = 0');
-    }
-
-    public static function showQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        return static::indexQuery($request, $query);
     }
 
     /**

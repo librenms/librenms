@@ -5,12 +5,12 @@ namespace App\Restify;
 use App\Models\Vlan;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 
 class VlanRepository extends Repository
 {
+    use DeviceScopedRepository;
+
     public static string $model = Vlan::class;
 
     public static string $id = 'vlan_id';
@@ -39,20 +39,6 @@ class VlanRepository extends Repository
             field('vlan_type')->readonly(),
             field('vlan_mtu')->readonly(),
         ];
-    }
-
-    public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        if ($user = $request->user()) {
-            return $query->hasAccess($user);
-        }
-
-        return $query->whereRaw('1 = 0');
-    }
-
-    public static function showQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        return static::indexQuery($request, $query);
     }
 
     /**

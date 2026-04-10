@@ -5,12 +5,12 @@ namespace App\Restify;
 use App\Models\Stp;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 
 class StpRepository extends Repository
 {
+    use DeviceScopedRepository;
+
     public static string $model = Stp::class;
 
     public static string $id = 'stp_id';
@@ -51,20 +51,6 @@ class StpRepository extends Repository
             field('bridgeHelloTime')->readonly(),
             field('bridgeForwardDelay')->readonly(),
         ];
-    }
-
-    public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        if ($user = $request->user()) {
-            return $query->hasAccess($user);
-        }
-
-        return $query->whereRaw('1 = 0');
-    }
-
-    public static function showQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        return static::indexQuery($request, $query);
     }
 
     /**

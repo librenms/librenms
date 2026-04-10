@@ -5,14 +5,14 @@ namespace App\Restify;
 use App\Models\Alert;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Enum\AlertState;
 
 class AlertRepository extends Repository
 {
+    use DeviceScopedRepository;
+
     public static string $model = Alert::class;
 
     public static string $title = 'id';
@@ -39,20 +39,6 @@ class AlertRepository extends Repository
             field('timestamp')->readonly(),
             field('info')->readonly(),
         ];
-    }
-
-    public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        if ($user = $request->user()) {
-            return $query->hasAccess($user);
-        }
-
-        return $query->whereRaw('1 = 0');
-    }
-
-    public static function showQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        return static::indexQuery($request, $query);
     }
 
     /**

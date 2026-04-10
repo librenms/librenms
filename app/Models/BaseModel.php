@@ -72,6 +72,10 @@ abstract class BaseModel extends Model
 
     /**
      * Helper function to determine if user has access based on port permissions
+     *
+     * Resolves the row's owning device by joining through the `ports` table on
+     * `port_id`, so this works for any related table that has a `port_id`
+     * column — regardless of whether the table also denormalizes `device_id`.
      */
     protected function hasPortAccess(Builder $query, User $user, ?string $table = null): Builder
     {
@@ -84,7 +88,9 @@ abstract class BaseModel extends Model
         }
 
         return $query->where(fn ($query) => $query->whereIntegerInRaw("$table.port_id", \Permissions::portsForUser($user))
-            ->orWhereIntegerInRaw("$table.device_id", \Permissions::devicesForUser($user)));
+            ->orWhereIn("$table.port_id", fn ($sub) => $sub->select('port_id')
+                ->from('ports')
+                ->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user))));
     }
 
     /**

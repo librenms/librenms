@@ -12,14 +12,14 @@ class UserRepository extends Repository
 {
     public static string $model = User::class;
 
-    public static string $id = "user_id";
+    public static string $id = 'user_id';
 
-    public static string $title = "username";
+    public static string $title = 'username';
 
     public static array $search = [
-        "username",
-        "realname",
-        "email",
+        'username',
+        'realname',
+        'email',
     ];
 
     public static function related(): array
@@ -33,10 +33,10 @@ class UserRepository extends Repository
     public function fields(RestifyRequest $request): array
     {
         return [
-            field("username")->readonly(),
-            field("realname")->readonly(),
-            field("email")->readonly(),
-            field("enabled")->readonly(),
+            field('username')->readonly(),
+            field('realname')->readonly(),
+            field('email')->readonly(),
+            field('enabled')->readonly(),
         ];
     }
 
@@ -44,13 +44,13 @@ class UserRepository extends Repository
     {
         if ($user = $request->user()) {
             if (! $user->hasRole('admin')) {
-                return $query->where("user_id", $user->user_id);
+                return $query->where('user_id', $user->user_id);
             }
 
             return $query;
         }
 
-        return $query->whereRaw("1 = 0");
+        return $query->whereRaw('1 = 0');
     }
 
     public static function showQuery(RestifyRequest $request, Builder|Relation $query)

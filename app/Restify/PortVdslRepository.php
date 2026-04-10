@@ -4,12 +4,12 @@ namespace App\Restify;
 
 use App\Models\PortVdsl;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 
 class PortVdslRepository extends Repository
 {
+    use PortScopedRepository;
+
     public static string $model = PortVdsl::class;
 
     public static string $id = 'port_id';
@@ -27,20 +27,6 @@ class PortVdslRepository extends Repository
             field('xdsl2LineStatusActAtpDs')->readonly(),
             field('xdsl2LineStatusActAtpUs')->readonly(),
         ];
-    }
-
-    public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        if ($user = $request->user()) {
-            return $query->hasAccess($user);
-        }
-
-        return $query->whereRaw('1 = 0');
-    }
-
-    public static function showQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        return static::indexQuery($request, $query);
     }
 
     /**

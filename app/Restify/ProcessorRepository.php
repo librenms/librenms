@@ -5,12 +5,12 @@ namespace App\Restify;
 use App\Models\Processor;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 
 class ProcessorRepository extends Repository
 {
+    use DeviceScopedRepository;
+
     public static string $model = Processor::class;
 
     public static string $id = 'processor_id';
@@ -41,20 +41,6 @@ class ProcessorRepository extends Repository
             field('processor_precision')->readonly(),
             field('processor_perc_warn')->readonly(),
         ];
-    }
-
-    public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        if ($user = $request->user()) {
-            return $query->hasAccess($user);
-        }
-
-        return $query->whereRaw('1 = 0');
-    }
-
-    public static function showQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        return static::indexQuery($request, $query);
     }
 
     /**

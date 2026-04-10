@@ -5,12 +5,12 @@ namespace App\Restify;
 use App\Models\CefSwitching;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 
 class CefSwitchingRepository extends Repository
 {
+    use DeviceScopedRepository;
+
     public static string $model = CefSwitching::class;
 
     public static string $id = 'cef_switching_id';
@@ -42,20 +42,6 @@ class CefSwitchingRepository extends Repository
             field('punt2host')->readonly(),
             field('updated')->readonly(),
         ];
-    }
-
-    public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        if ($user = $request->user()) {
-            return $query->hasAccess($user);
-        }
-
-        return $query->whereRaw('1 = 0');
-    }
-
-    public static function showQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        return static::indexQuery($request, $query);
     }
 
     /**

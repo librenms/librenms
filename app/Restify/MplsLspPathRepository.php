@@ -5,12 +5,12 @@ namespace App\Restify;
 use App\Models\MplsLspPath;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 
 class MplsLspPathRepository extends Repository
 {
+    use DeviceScopedRepository;
+
     public static string $model = MplsLspPath::class;
 
     public static string $id = 'lsp_path_id';
@@ -54,20 +54,6 @@ class MplsLspPathRepository extends Repository
             field('mplsLspPathTunnelARHopListIndex')->readonly(),
             field('mplsLspPathTunnelCHopListIndex')->readonly(),
         ];
-    }
-
-    public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        if ($user = $request->user()) {
-            return $query->hasAccess($user);
-        }
-
-        return $query->whereRaw('1 = 0');
-    }
-
-    public static function showQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        return static::indexQuery($request, $query);
     }
 
     /**

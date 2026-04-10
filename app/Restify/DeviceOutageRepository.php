@@ -5,12 +5,12 @@ namespace App\Restify;
 use App\Models\DeviceOutage;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 
 class DeviceOutageRepository extends Repository
 {
+    use DeviceScopedRepository;
+
     public static string $model = DeviceOutage::class;
 
     public static string $title = 'going_down';
@@ -29,20 +29,6 @@ class DeviceOutageRepository extends Repository
             field('going_down')->readonly(),
             field('up_again')->readonly(),
         ];
-    }
-
-    public static function indexQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        if ($user = $request->user()) {
-            return $query->hasAccess($user);
-        }
-
-        return $query->whereRaw('1 = 0');
-    }
-
-    public static function showQuery(RestifyRequest $request, Builder|Relation $query)
-    {
-        return static::indexQuery($request, $query);
     }
 
     /**
