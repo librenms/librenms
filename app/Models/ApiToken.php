@@ -33,6 +33,13 @@ class ApiToken extends BaseModel
     public $timestamps = false;
     protected $table = 'api_tokens';
 
+    protected function casts(): array
+    {
+        return [
+            'disabled' => 'boolean',
+        ];
+    }
+
     // ---- Helper Functions ----
 
     /**

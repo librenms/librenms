@@ -83,7 +83,7 @@ class ApiAccessController extends Controller
         $token = $this->tokenOwnedByUser($request, $id);
 
         if (array_key_exists('disabled', $validated)) {
-            $token->disabled = $validated['disabled'] ? 1 : 0;
+            $token->disabled = $validated['disabled'];
         }
         if (array_key_exists('description', $validated)) {
             $token->description = $validated['description'] ?? '';

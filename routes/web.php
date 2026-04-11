@@ -1,12 +1,12 @@
 <?php
 
 use App\Http\Controllers\AboutController;
-use App\Http\Controllers\ApiAccessController;
 use App\Http\Controllers\Ajax;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\AlertRuleController;
 use App\Http\Controllers\AlertRuleTemplateController;
 use App\Http\Controllers\AlertTransportController;
+use App\Http\Controllers\ApiAccessController;
 use App\Http\Controllers\Auth;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\DashboardController;
