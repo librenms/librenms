@@ -132,15 +132,18 @@ final class MibTest extends TestCase
      */
     public static function mibFiles(): array
     {
+        $mib_base = self::basePath('mibs');
+        $install_dir = self::basePath();
+
         $file_list = [];
-        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(LibrenmsConfig::get('mib_dir'))) as $file) {
+        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($mib_base)) as $file) {
             /** @var SplFileInfo $file */
             if ($file->isDir()) {
                 continue;
             }
-            $mib_path = str_replace(LibrenmsConfig::get('mib_dir') . '/', '', $file->getPathname());
+            $mib_path = str_replace($mib_base . '/', '', $file->getPathname());
             $file_list[$mib_path] = [
-                str_replace(LibrenmsConfig::get('install_dir'), '.', $file->getPath()),
+                str_replace($install_dir, '.', $file->getPath()),
                 $file->getFilename(),
                 self::extractMibName($file->getPathname()),
             ];
@@ -150,18 +153,20 @@ final class MibTest extends TestCase
     }
 
     /**
-     * List all directories inside the mib directory
+     * Data provider: returns all MIB directories (main dir + subdirectories)
      *
      * @return array
      */
     public static function mibDirs(): array
     {
-        $dirs = glob(LibrenmsConfig::get('mib_dir') . '/*', GLOB_ONLYDIR);
-        array_unshift($dirs, LibrenmsConfig::get('mib_dir'));
+        $mib_base = self::basePath('mibs');
+
+        $dirs = glob($mib_base . '/*', GLOB_ONLYDIR);
+        array_unshift($dirs, $mib_base);
 
         $final_list = [];
         foreach ($dirs as $dir) {
-            $relative_dir = str_replace(LibrenmsConfig::get('mib_dir') . '/', '', $dir);
+            $relative_dir = ltrim(str_replace($mib_base, '', $dir), '/');
             $final_list[$relative_dir] = [$dir];
         }
 
@@ -196,5 +201,14 @@ final class MibTest extends TestCase
         }
 
         throw new Exception("Could not extract mib name from file ($file)");
+    }
+
+    private static function basePath(string $subdir = ''): string
+    {
+        $dir = rtrim(realpath(__DIR__ . '/..'), '/');
+
+        return $subdir
+            ? $dir . '/' . $subdir
+            : $dir;
     }
 }
