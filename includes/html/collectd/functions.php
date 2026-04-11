@@ -68,32 +68,6 @@ function collectd_compare_host($a, $b)
 }//end collectd_compare_host()
 
 /**
- * Fetch list of hosts found in collectd's datadirs.
- *
- * @return array Sorted list of hosts (sorted by label from rigth to left)
- */
-function collectd_list_hosts()
-{
-    $hosts = [];
-    foreach (LibrenmsConfig::get('datadirs') as $datadir) {
-        if ($d = @opendir($datadir)) {
-            while (($dent = readdir($d)) !== false) {
-                if ($dent != '.' && $dent != '..' && is_dir($datadir . '/' . $dent) && preg_match(REGEXP_HOST, $dent)) {
-                    $hosts[] = $dent;
-                }
-            }
-            closedir($d);
-        } else {
-            error_log('Failed to open datadir: ' . $datadir);
-        }
-    }
-    $hosts = array_unique($hosts);
-    usort($hosts, collectd_compare_host(...));
-
-    return $hosts;
-}
-
-/**
  * Fetch list of plugins found in collectd's datadirs for given host.
  *
  * @param  string  $arg_host  Name of host for which to return plugins
