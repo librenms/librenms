@@ -18,8 +18,8 @@ modules:
                     state_name: cubominiFanStatus
                     index: cubominiFanStatus.{{ $index }}
                     states:
-                        - { value: 2, generic: 2, graph: 0, descr: Failure }
-                        - { value: 3, generic: 0, graph: 0, descr: Okay }
+                        - { value: 2, generic: 2, descr: Failure }
+                        - { value: 3, generic: 0, descr: Okay }
                 -
                     oid: CUBO-MINI-MIB::cubominiXcvrGeneralIsInserted
                     num_oid: '.1.3.6.1.4.1.27894.11.241.1.9.2.1.4.{{ $index }}'
@@ -27,8 +27,8 @@ modules:
                     state_name: cubominiXcvrGeneralIsInserted
                     index: cubominiXcvrGeneralIsInserted.{{ $index }}
                     states:
-                        - { value: 2, generic: 2, graph: 0, descr: Not inserted }
-                        - { value: 3, generic: 0, graph: 0, descr: Inserted }
+                        - { value: 2, generic: 2, descr: Not inserted }
+                        - { value: 3, generic: 0, descr: Inserted }
         dbm:
             data:
                 -
