@@ -17,10 +17,10 @@ modules:
                     descr: GPS Fix
                     state_name: ubntGpsFix
                     states:
-                        - { value: 0, generic: 3, graph: 1, descr: unknown }
-                        - { value: 1, generic: 2, graph: 1, descr: nofix }
-                        - { value: 2, generic: 0, graph: 1, descr: fix2d }
-                        - { value: 3, generic: 0, graph: 1, descr: fix3d }
+                        - { value: 0, generic: 3, descr: unknown }
+                        - { value: 1, generic: 2, descr: nofix }
+                        - { value: 2, generic: 0, descr: fix2d }
+                        - { value: 3, generic: 0, descr: fix3d }
 
         temperature:
             data:

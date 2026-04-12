@@ -17,28 +17,28 @@ modules:
                     index: '{{ $index }}'
                     state_name: upsBasicOutputStatus
                     states:
-                        - { descr: unknown, graph: 0, value: 1, generic: 3 }
-                        - { descr: onLine, graph: 0, value: 2, generic: 0 }
-                        - { descr: onBattery, graph: 0, value: 3, generic: 1 }
-                        - { descr: onSmartBoost, graph: 0, value: 4, generic: 0 }
-                        - { descr: timedSleeping, graph: 0, value: 5, generic: 0 }
-                        - { descr: softwareBypass, graph: 0, value: 6, generic: 1 }
-                        - { descr: off, graph: 0, value: 7, generic: 2 }
-                        - { descr: rebooting, graph: 0, value: 8, generic: 1 }
-                        - { descr: switchedBypass, graph: 0, value: 9, generic: 1 }
-                        - { descr: hardwareFailureBypass, graph: 0, value: 10, generic: 2 }
-                        - { descr: sleepingUntilPowerReturn, graph: 0, value: 11, generic: 1 }
-                        - { descr: onSmartTrim, graph: 0, value: 12, generic: 1 }
-                        - { descr: ecoMode, graph: 0, value: 13, generic: 0 }
-                        - { descr: hotStandby, graph: 0, value: 14, generic: 0 }
-                        - { descr: onBatteryTest, graph: 0, value: 15, generic: 1 }
-                        - { descr: emergencyStaticBypass, graph: 0, value: 16, generic: 2 }
-                        - { descr: staticBypassStandby, graph: 0, value: 17, generic: 1 }
-                        - { descr: powerSavingMode, graph: 0, value: 18, generic: 0 }
-                        - { descr: spotMode, graph: 0, value: 19, generic: 0 }
-                        - { descr: eConversion, graph: 0, value: 20, generic: 0 }
-                        - { descr: chargerSpotmode, graph: 0, value: 21, generic: 0 }
-                        - { descr: inverterSpotmode, graph: 0, value: 22, generic: 0 }
+                        - { descr: unknown, value: 1, generic: 3 }
+                        - { descr: onLine, value: 2, generic: 0 }
+                        - { descr: onBattery, value: 3, generic: 1 }
+                        - { descr: onSmartBoost, value: 4, generic: 0 }
+                        - { descr: timedSleeping, value: 5, generic: 0 }
+                        - { descr: softwareBypass, value: 6, generic: 1 }
+                        - { descr: off, value: 7, generic: 2 }
+                        - { descr: rebooting, value: 8, generic: 1 }
+                        - { descr: switchedBypass, value: 9, generic: 1 }
+                        - { descr: hardwareFailureBypass, value: 10, generic: 2 }
+                        - { descr: sleepingUntilPowerReturn, value: 11, generic: 1 }
+                        - { descr: onSmartTrim, value: 12, generic: 1 }
+                        - { descr: ecoMode, value: 13, generic: 0 }
+                        - { descr: hotStandby, value: 14, generic: 0 }
+                        - { descr: onBatteryTest, value: 15, generic: 1 }
+                        - { descr: emergencyStaticBypass, value: 16, generic: 2 }
+                        - { descr: staticBypassStandby, value: 17, generic: 1 }
+                        - { descr: powerSavingMode, value: 18, generic: 0 }
+                        - { descr: spotMode, value: 19, generic: 0 }
+                        - { descr: eConversion, value: 20, generic: 0 }
+                        - { descr: chargerSpotmode, value: 21, generic: 0 }
+                        - { descr: inverterSpotmode, value: 22, generic: 0 }
                 -
                     oid: PowerNet-MIB::memInputsConfigTable
                     state_name: memInputNormalState
@@ -47,10 +47,10 @@ modules:
                     index: 'memInputNormalState.{{ $index }}'
                     descr: 'Normal state: {{ PowerNet-MIB::memInputName }}'
                     states:
-                        - { descr: Closed, graph: 1, value: 1, generic: 0 }
-                        - { descr: Open, graph: 1, value: 2, generic: 0 }
-                        - { descr: Disabled, graph: 1, value: 3, generic: 0 }
-                        - { descr: No State, graph: 1, value: 4, generic: 0 }
+                        - { descr: Closed, value: 1, generic: 0 }
+                        - { descr: Open, value: 2, generic: 0 }
+                        - { descr: Disabled, value: 3, generic: 0 }
+                        - { descr: No State, value: 4, generic: 0 }
                 -
                     oid: PowerNet-MIB::memInputsStatusTable
                     state_name: memInputsStatusAlarmStatus
@@ -59,9 +59,9 @@ modules:
                     index: 'memInputStatusAlarmState.{{ $index }}'
                     descr: PowerNet-MIB::memInputsStatusInputName
                     states:
-                        - { descr: Ok, graph: 1, value: 1, generic: 0 }
-                        - { descr: Alarm, graph: 1, value: 2, generic: 1 }
-                        - { descr: Critical, graph: 1, value: 3, generic: 2 }
+                        - { descr: Ok, value: 1, generic: 0 }
+                        - { descr: Alarm, value: 2, generic: 1 }
+                        - { descr: Critical, value: 3, generic: 2 }
                 -
                     oid: PowerNet-MIB::airIRRP100UnitStatusOperateMode
                     value: PowerNet-MIB::airIRRP100UnitStatusOperateMode
@@ -69,13 +69,13 @@ modules:
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.1.{{ $index }}'
                     descr: Unit Status
                     states:
-                        - { descr: standby, graph: 1, value: 1, generic: 1 }
-                        - { descr: on, graph: 1, value: 2, generic: 0 }
-                        - { descr: idle, graph: 1, value: 3, generic: 1 }
-                        - { descr: prestart, graph: 1, value: 4, generic: 1 }
-                        - { descr: service, graph: 1, value: 5, generic: 1 }
-                        - { descr: backup, graph: 1, value: 6, generic: 1 }
-                        - { descr: assist, graph: 1, value: 7, generic: 1 }
+                        - { descr: standby, value: 1, generic: 1 }
+                        - { descr: on, value: 2, generic: 0 }
+                        - { descr: idle, value: 3, generic: 1 }
+                        - { descr: prestart, value: 4, generic: 1 }
+                        - { descr: service, value: 5, generic: 1 }
+                        - { descr: backup, value: 6, generic: 1 }
+                        - { descr: assist, value: 7, generic: 1 }
                 -
                     oid: PowerNet-MIB::airIRRP100UnitStatusInputState
                     value: PowerNet-MIB::airIRRP100UnitStatusInputState
@@ -83,8 +83,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.21.{{ $index }}'
                     descr: Input State
                     states:
-                        - { descr: open, graph: 1, value: 1, generic: 0 }
-                        - { descr: closed, graph: 1, value: 2, generic: 2 }
+                        - { descr: open, value: 1, generic: 0 }
+                        - { descr: closed, value: 2, generic: 2 }
                 -
                     oid: PowerNet-MIB::airIRRP100UnitStatusOutputState
                     value: PowerNet-MIB::airIRRP100UnitStatusOutputState
@@ -92,8 +92,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.1.2.2.22.{{ $index }}'
                     descr: Output State
                     states:
-                        - { descr: open, graph: 1, value: 1, generic: 0 }
-                        - { descr: closed, graph: 1, value: 2, generic: 2 }
+                        - { descr: open, value: 1, generic: 0 }
+                        - { descr: closed, value: 2, generic: 2 }
                 -
                     oid: PowerNet-MIB::airIRRP500UnitStatusOperateMode
                     value: PowerNet-MIB::airIRRP500UnitStatusOperateMode
@@ -101,12 +101,12 @@ modules:
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.1.{{ $index }}'
                     descr: Unit Status
                     states:
-                        - { descr: standby, graph: 1, value: 1, generic: 1 }
-                        - { descr: on, graph: 1, value: 2, generic: 0 }
-                        - { descr: idle, graph: 1, value: 3, generic: 1 }
-                        - { descr: prestart, graph: 1, value: 4, generic: 1 }
-                        - { descr: backup, graph: 1, value: 5, generic: 1 }
-                        - { descr: assist, graph: 1, value: 6, generic: 1 }
+                        - { descr: standby, value: 1, generic: 1 }
+                        - { descr: on, value: 2, generic: 0 }
+                        - { descr: idle, value: 3, generic: 1 }
+                        - { descr: prestart, value: 4, generic: 1 }
+                        - { descr: backup, value: 5, generic: 1 }
+                        - { descr: assist, value: 6, generic: 1 }
                 -
                     oid: PowerNet-MIB::airIRRP500UnitStatusInputState
                     value: PowerNet-MIB::airIRRP500UnitStatusInputState
@@ -114,8 +114,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.21.{{ $index }}'
                     descr: Input State
                     states:
-                        - { descr: open, graph: 1, value: 1, generic: 0 }
-                        - { descr: closed, graph: 1, value: 2, generic: 2 }
+                        - { descr: open, value: 1, generic: 0 }
+                        - { descr: closed, value: 2, generic: 2 }
                 -
                     oid: PowerNet-MIB::airIRRP500UnitStatusOutputState
                     value: PowerNet-MIB::airIRRP500UnitStatusOutputState
@@ -123,8 +123,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.318.1.1.13.3.3.2.2.2.22.{{ $index }}'
                     descr: Output State
                     states:
-                        - { descr: open, graph: 1, value: 1, generic: 0 }
-                        - { descr: closed, graph: 1, value: 2, generic: 2 }
+                        - { descr: open, value: 1, generic: 0 }
+                        - { descr: closed, value: 2, generic: 2 }
                 -
                     oid: PowerNet-MIB::rPDU2PhaseStatusTable
                     state_name: rPDU2PhaseStatusLoadState
@@ -133,10 +133,10 @@ modules:
                     index: 'rPDU2PhaseStatusLoadState.{{ $index }}'
                     descr: 'Load State, Phase #{{ $index }}'
                     states:
-                        - { descr: lowLoad, graph: 1, value: 1, generic: 0 }
-                        - { descr: normal, graph: 1, value: 2, generic: 0 }
-                        - { descr: nearOverload, graph: 1, value: 3, generic: 1 }
-                        - { descr: overload, graph: 1, value: 4, generic: 2 }
+                        - { descr: lowLoad, value: 1, generic: 0 }
+                        - { descr: normal, value: 2, generic: 0 }
+                        - { descr: nearOverload, value: 3, generic: 1 }
+                        - { descr: overload, value: 4, generic: 2 }
                 -
                     oid: PowerNet-MIB::rPDU2DeviceStatusTable
                     state_name: rPDU2DeviceStatusLoadState
@@ -145,11 +145,11 @@ modules:
                     index: 'rPDU2DeviceStatusLoadState.{{ $index }}'
                     descr: 'Device State'
                     states:
-                        - { descr: lowLoad, graph: 1, value: 1, generic: 0 }
-                        - { descr: normal, graph: 1, value: 2, generic: 0 }
-                        - { descr: nearOverload, graph: 1, value: 3, generic: 1 }
-                        - { descr: overload, graph: 1, value: 4, generic: 2 }
-                        - { descr: notsupported, graph: 1, value: 5, generic: 3 }
+                        - { descr: lowLoad, value: 1, generic: 0 }
+                        - { descr: normal, value: 2, generic: 0 }
+                        - { descr: nearOverload, value: 3, generic: 1 }
+                        - { descr: overload, value: 4, generic: 2 }
+                        - { descr: notsupported, value: 5, generic: 3 }
                 -
                     oid: PowerNet-MIB::rPDU2DeviceStatusTable
                     state_name: rPDU2DeviceStatusPowerSupplyAlarm
@@ -158,8 +158,8 @@ modules:
                     index: 'rPDU2DeviceStatusPowerSupplyAlarm.{{ $index }}'
                     descr: 'Power Supply State'
                     states:
-                        - { descr: normal, graph: 1, value: 1, generic: 0 }
-                        - { descr: alarm, graph: 1, value: 2, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: alarm, value: 2, generic: 2 }
                 -
                     oid: PowerNet-MIB::rPDU2SensorTempHumidityStatusTable
                     state_name: rPDU2SensorTempHumidityStatusTempStatus
@@ -168,12 +168,12 @@ modules:
                     index: 'rPDU2SensorTempHumidityStatusTempStatus.{{ $index }}'
                     descr: 'Temperature Probe Status'
                     states:
-                        - { descr: notPresent, graph: 1, value: 1, generic: 3 }
-                        - { descr: belowMin, graph: 1, value: 2, generic: 2 }
-                        - { descr: belowLow, graph: 1, value: 3, generic: 1 }
-                        - { descr: normal, graph: 1, value: 4, generic: 0 }
-                        - { descr: aboveHigh, graph: 1, value: 5, generic: 1 }
-                        - { descr: aboveMax, graph: 1, value: 6, generic: 2 }
+                        - { descr: notPresent, value: 1, generic: 3 }
+                        - { descr: belowMin, value: 2, generic: 2 }
+                        - { descr: belowLow, value: 3, generic: 1 }
+                        - { descr: normal, value: 4, generic: 0 }
+                        - { descr: aboveHigh, value: 5, generic: 1 }
+                        - { descr: aboveMax, value: 6, generic: 2 }
                     skip_values:
                         -
                             oid: PowerNet-MIB::rPDU2SensorTempHumidityStatusTempStatus
@@ -188,12 +188,12 @@ modules:
                     index: 'rPDU2SensorTempHumidityStatusHumidityStatus.{{ $index }}'
                     descr: 'Humidity Probe Status'
                     states:
-                        - { descr: notPresent, graph: 1, value: 1, generic: 3 }
-                        - { descr: belowMin, graph: 1, value: 2, generic: 2 }
-                        - { descr: belowLow, graph: 1, value: 3, generic: 1 }
-                        - { descr: normal, graph: 1, value: 4, generic: 0 }
-                        - { descr: aboveHigh, graph: 1, value: 5, generic: 1 }
-                        - { descr: aboveMax, graph: 1, value: 6, generic: 2 }
+                        - { descr: notPresent, value: 1, generic: 3 }
+                        - { descr: belowMin, value: 2, generic: 2 }
+                        - { descr: belowLow, value: 3, generic: 1 }
+                        - { descr: normal, value: 4, generic: 0 }
+                        - { descr: aboveHigh, value: 5, generic: 1 }
+                        - { descr: aboveMax, value: 6, generic: 2 }
                     skip_values:
                         -
                             oid: PowerNet-MIB::rPDU2SensorTempHumidityStatusHumidityStatus
@@ -207,8 +207,8 @@ modules:
                     index: 'atsStatusSourceAStatus.{{ $index }}'
                     descr: Source A Status
                     states:
-                        - { descr: Fail, graph: 0, value: 1, generic: 2 }
-                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                        - { descr: Fail, value: 1, generic: 2 }
+                        - { descr: OK, value: 2, generic: 0 }
                 -
                     oid: PowerNet-MIB::atsStatusSourceBStatus
                     value: PowerNet-MIB::atsStatusSourceBStatus
@@ -217,8 +217,8 @@ modules:
                     index: 'atsStatusSourceBStatus.{{ $index }}'
                     descr: Source B Status
                     states:
-                        - { descr: Fail, graph: 0, value: 1, generic: 2 }
-                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                        - { descr: Fail, value: 1, generic: 2 }
+                        - { descr: OK, value: 2, generic: 0 }
                 -
                     oid: PowerNet-MIB::atsStatusSwitchStatus
                     value: PowerNet-MIB::atsStatusSwitchStatus
@@ -227,8 +227,8 @@ modules:
                     index: 'atsStatusSwitchStatus.{{ $index }}'
                     descr: Global Switch Status
                     states:
-                        - { descr: Fail, graph: 0, value: 1, generic: 2 }
-                        - { descr: OK, graph: 0, value: 2, generic: 0 }
+                        - { descr: Fail, value: 1, generic: 2 }
+                        - { descr: OK, value: 2, generic: 0 }
                 -
                     oid: PowerNet-MIB::atsStatusSelectedSource
                     value: PowerNet-MIB::atsStatusSelectedSource
@@ -237,8 +237,8 @@ modules:
                     index: 'atsStatusSelectedSource.{{ $index }}'
                     descr: Selected Source
                     states:
-                        - { descr: Source A, graph: 0, value: 1, generic: 3 }
-                        - { descr: Source B, graph: 0, value: 2, generic: 3 }
+                        - { descr: Source A, value: 1, generic: 3 }
+                        - { descr: Source B, value: 2, generic: 3 }
                 -
                     oid: PowerNet-MIB::atsStatusRedundancyState
                     value: PowerNet-MIB::atsStatusRedundancyState
@@ -247,8 +247,8 @@ modules:
                     index: 'atsStatusRedundancyState.{{ $index }}'
                     descr: Redundancy State
                     states:
-                        - { descr: Redundancy Lost, graph: 0, value: 1, generic: 2 }
-                        - { descr: Fully Redundant, graph: 0, value: 2, generic: 0 }
+                        - { descr: Redundancy Lost, value: 1, generic: 2 }
+                        - { descr: Fully Redundant, value: 2, generic: 0 }
                 -
                     oid: PowerNet-MIB::atsStatusPhaseSyncStatus
                     value: PowerNet-MIB::atsStatusPhaseSyncStatus
@@ -257,8 +257,8 @@ modules:
                     index: 'atsStatusPhaseSyncStatus.{{ $index }}'
                     descr: Phase Sync Status
                     states:
-                        - { descr: In Sync, graph: 0, value: 1, generic: 0 }
-                        - { descr: Out Of Sync, graph: 0, value: 2, generic: 2 }
+                        - { descr: In Sync, value: 1, generic: 0 }
+                        - { descr: Out Of Sync, value: 2, generic: 2 }
                 -
                     oid: PowerNet-MIB::sPDUOutletControlTable
                     value: PowerNet-MIB::sPDUOutletCtl
@@ -267,13 +267,13 @@ modules:
                     index: 'sPDUOutletCtl.{{ $index }}'
                     state_name: sPDUOutletCtl
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: outletOn }
-                        - { value: 2, generic: 3, graph: 0, descr: outletOff }
-                        - { value: 3, generic: 1, graph: 0, descr: outletReboot }
-                        - { value: 4, generic: 2, graph: 0, descr: outletUnknown }
-                        - { value: 5, generic: 0, graph: 0, descr: outletOnWithDelay }
-                        - { value: 6, generic: 3, graph: 0, descr: outletOffWithDelay }
-                        - { value: 7, generic: 1, graph: 0, descr: outletRebootWithDelay }
+                        - { value: 1, generic: 0, descr: outletOn }
+                        - { value: 2, generic: 3, descr: outletOff }
+                        - { value: 3, generic: 1, descr: outletReboot }
+                        - { value: 4, generic: 2, descr: outletUnknown }
+                        - { value: 5, generic: 0, descr: outletOnWithDelay }
+                        - { value: 6, generic: 3, descr: outletOffWithDelay }
+                        - { value: 7, generic: 1, descr: outletRebootWithDelay }
                 -
                     oid: PowerNet-MIB::airFMGroup
                     value: PowerNet-MIB::airFMGroupSysStatus
@@ -282,13 +282,13 @@ modules:
                     index: 'airFMGroupSysStatus.{{ $index }}'
                     state_name: airFMGroupSysStatus
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: Online }
-                        - { value: 2, generic: 3, graph: 0, descr: Idle }
-                        - { value: 3, generic: 0, graph: 0, descr: LoadShare }
-                        - { value: 4, generic: 1, graph: 0, descr: Offline }
-                        - { value: 5, generic: 2, graph: 0, descr: Failed }
-                        - { value: 6, generic: 3, graph: 0, descr: Disabled }
-                        - { value: 7, generic: 1, graph: 0, descr: Undefined }
+                        - { value: 1, generic: 0, descr: Online }
+                        - { value: 2, generic: 3, descr: Idle }
+                        - { value: 3, generic: 0, descr: LoadShare }
+                        - { value: 4, generic: 1, descr: Offline }
+                        - { value: 5, generic: 2, descr: Failed }
+                        - { value: 6, generic: 3, descr: Disabled }
+                        - { value: 7, generic: 1, descr: Undefined }
                 -
                     oid: PowerNet-MIB::airFMModCoolTable
                     value: PowerNet-MIB::airFMModComp1
@@ -298,8 +298,8 @@ modules:
                     state_name: airFMModComp1
                     skip_values: 1
                     states:
-                        - { value: 2, generic: 0, graph: 0, descr: On }
-                        - { value: 3, generic: 0, graph: 0, descr: Off }
+                        - { value: 2, generic: 0, descr: On }
+                        - { value: 3, generic: 0, descr: Off }
                 -
                     oid: PowerNet-MIB::airFMModCoolTable
                     value: PowerNet-MIB::airFMModComp2
@@ -309,8 +309,8 @@ modules:
                     state_name: airFMModComp2
                     skip_values: 1
                     states:
-                        - { value: 2, generic: 0, graph: 0, descr: On }
-                        - { value: 3, generic: 0, graph: 0, descr: Off }
+                        - { value: 2, generic: 0, descr: On }
+                        - { value: 3, generic: 0, descr: Off }
                 -
                     oid: PowerNet-MIB::airFMSysCoolState
                     value: PowerNet-MIB::airFMSysCoolState
@@ -320,8 +320,8 @@ modules:
                     state_name: airFMSysCoolState
                     skip_values: 1
                     states:
-                        - { value: 2, generic: 0, graph: 0, descr: Disabled }
-                        - { value: 3, generic: 0, graph: 0, descr: Enabled }
+                        - { value: 2, generic: 0, descr: Disabled }
+                        - { value: 3, generic: 0, descr: Enabled }
                 -
                     oid: PowerNet-MIB::airFMSysHumState
                     value: PowerNet-MIB::airFMSysHumState
@@ -331,8 +331,8 @@ modules:
                     state_name: airFMSysHumState
                     skip_values: 1
                     states:
-                        - { value: 2, generic: 0, graph: 0, descr: Disabled }
-                        - { value: 3, generic: 0, graph: 0, descr: Enabled }
+                        - { value: 2, generic: 0, descr: Disabled }
+                        - { value: 3, generic: 0, descr: Enabled }
                 -
                     oid: PowerNet-MIB::airFMSysDehumState
                     value: PowerNet-MIB::airFMSysDehumState
@@ -342,8 +342,8 @@ modules:
                     state_name: airFMSysDehumState
                     skip_values: 1
                     states:
-                        - { value: 2, generic: 0, graph: 0, descr: Disabled }
-                        - { value: 3, generic: 0, graph: 0, descr: Enabled }
+                        - { value: 2, generic: 0, descr: Disabled }
+                        - { value: 3, generic: 0, descr: Enabled }
                 -
                     oid: PowerNet-MIB::airFMSysReheatState
                     value: PowerNet-MIB::airFMSysReheatState
@@ -353,8 +353,8 @@ modules:
                     state_name: airFMSysReheatState
                     skip_values: 1
                     states:
-                        - { value: 2, generic: 0, graph: 0, descr: Disabled }
-                        - { value: 3, generic: 0, graph: 0, descr: Enabled }
+                        - { value: 2, generic: 0, descr: Disabled }
+                        - { value: 3, generic: 0, descr: Enabled }
                 -
                     oid: PowerNet-MIB::xATSSwitchStatusSelectedSource
                     value: PowerNet-MIB::xATSSwitchStatusSelectedSource
@@ -363,11 +363,11 @@ modules:
                     index: 'xATSSwitchStatusSelectedSource.{{ $index }}'
                     state_name: xATSSwitchStatusSelectedSource
                     states:
-                        - { value: 1, generic: 2, graph: 0, descr: none }
-                        - { value: 2, generic: 0, graph: 0, descr: source1 }
-                        - { value: 3, generic: 1, graph: 0, descr: source2 }
-                        - { value: 4, generic: 2, graph: 0, descr: fault }
-                        - { value: 5, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 2, descr: none }
+                        - { value: 2, generic: 0, descr: source1 }
+                        - { value: 3, generic: 1, descr: source2 }
+                        - { value: 4, generic: 2, descr: fault }
+                        - { value: 5, generic: 3, descr: unknown }
                 -
                     oid: PowerNet-MIB::xATSSwitchStatusOperationalMode
                     value: PowerNet-MIB::xATSSwitchStatusOperationalMode
@@ -376,10 +376,10 @@ modules:
                     index: 'xATSSwitchStatusOperationalMode.{{ $index }}'
                     state_name: xATSSwitchStatusOperationalMode
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: automatic }
-                        - { value: 2, generic: 2, graph: 0, descr: notInAutoAbnormal }
-                        - { value: 3, generic: 1, graph: 0, descr: notInAuto }
-                        - { value: 4, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 0, descr: automatic }
+                        - { value: 2, generic: 2, descr: notInAutoAbnormal }
+                        - { value: 3, generic: 1, descr: notInAuto }
+                        - { value: 4, generic: 3, descr: unknown }
                 -
                     oid: PowerNet-MIB::xATSSwitchStatusEngineStartSignal
                     value: PowerNet-MIB::xATSSwitchStatusEngineStartSignal
@@ -388,9 +388,9 @@ modules:
                     index: 'xATSSwitchStatusEngineStartSignal.{{ $index }}'
                     state_name: xATSSwitchStatusEngineStartSignal
                     states:
-                        - { value: 1, generic: 1, graph: 0, descr: run }
-                        - { value: 2, generic: 0, graph: 0, descr: stop }
-                        - { value: 3, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 1, descr: run }
+                        - { value: 2, generic: 0, descr: stop }
+                        - { value: 3, generic: 3, descr: unknown }
                 -
                     oid: PowerNet-MIB::xATSSource1Position
                     value: PowerNet-MIB::xATSSource1Position
@@ -399,10 +399,10 @@ modules:
                     index: 'xATSSource1Position.{{ $index }}'
                     state_name: xATSSource1Position
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: open }
-                        - { value: 2, generic: 0, graph: 0, descr: closed }
-                        - { value: 3, generic: 2, graph: 0, descr: tripped }
-                        - { value: 4, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 0, descr: open }
+                        - { value: 2, generic: 0, descr: closed }
+                        - { value: 3, generic: 2, descr: tripped }
+                        - { value: 4, generic: 3, descr: unknown }
                 -
                     oid: PowerNet-MIB::xATSSource2Position
                     value: PowerNet-MIB::xATSSource2Position
@@ -411,10 +411,10 @@ modules:
                     index: 'xATSSource2Position.{{ $index }}'
                     state_name: xATSSource2Position
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: open }
-                        - { value: 2, generic: 0, graph: 0, descr: closed }
-                        - { value: 3, generic: 2, graph: 0, descr: tripped }
-                        - { value: 4, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 0, descr: open }
+                        - { value: 2, generic: 0, descr: closed }
+                        - { value: 3, generic: 2, descr: tripped }
+                        - { value: 4, generic: 3, descr: unknown }
                 -
                     oid: PowerNet-MIB::xATSSource1Quality
                     value: PowerNet-MIB::xATSSource1Quality
@@ -423,13 +423,13 @@ modules:
                     index: 'xATSSource1Quality.{{ $index }}'
                     state_name: xATSSource1Quality
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: sourceGood }
-                        - { value: 2, generic: 1, graph: 0, descr: lowVoltage }
-                        - { value: 3, generic: 1, graph: 0, descr: highVoltage }
-                        - { value: 4, generic: 1, graph: 0, descr: phaseImbalance }
-                        - { value: 5, generic: 1, graph: 0, descr: freqOutOfRange }
-                        - { value: 6, generic: 1, graph: 0, descr: badRotation }
-                        - { value: 7, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 0, descr: sourceGood }
+                        - { value: 2, generic: 1, descr: lowVoltage }
+                        - { value: 3, generic: 1, descr: highVoltage }
+                        - { value: 4, generic: 1, descr: phaseImbalance }
+                        - { value: 5, generic: 1, descr: freqOutOfRange }
+                        - { value: 6, generic: 1, descr: badRotation }
+                        - { value: 7, generic: 3, descr: unknown }
                 -
                     oid: PowerNet-MIB::xATSSource2Quality
                     value: PowerNet-MIB::xATSSource2Quality
@@ -438,13 +438,13 @@ modules:
                     index: 'xATSSource2Quality.{{ $index }}'
                     state_name: xATSSource2Quality
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: sourceGood }
-                        - { value: 2, generic: 1, graph: 0, descr: lowVoltage }
-                        - { value: 3, generic: 1, graph: 0, descr: highVoltage }
-                        - { value: 4, generic: 1, graph: 0, descr: phaseImbalance }
-                        - { value: 5, generic: 1, graph: 0, descr: freqOutOfRange }
-                        - { value: 6, generic: 1, graph: 0, descr: badRotation }
-                        - { value: 7, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 0, descr: sourceGood }
+                        - { value: 2, generic: 1, descr: lowVoltage }
+                        - { value: 3, generic: 1, descr: highVoltage }
+                        - { value: 4, generic: 1, descr: phaseImbalance }
+                        - { value: 5, generic: 1, descr: freqOutOfRange }
+                        - { value: 6, generic: 1, descr: badRotation }
+                        - { value: 7, generic: 3, descr: unknown }
                 -
                     oid: PowerNet-MIB::xATSTestingStatusTestStatus
                     value: PowerNet-MIB::xATSTestingStatusTestStatus
@@ -454,16 +454,16 @@ modules:
                     state_name: xATSTestingStatusTestStatus
                     group: Test
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: noTestInProcess }
-                        - { value: 2, generic: 0, graph: 0, descr: testPending }
-                        - { value: 3, generic: 0, graph: 0, descr: startingEngine }
-                        - { value: 4, generic: 0, graph: 0, descr: engineWarmingUp }
-                        - { value: 5, generic: 0, graph: 0, descr: awaitingTransferToS2 }
-                        - { value: 6, generic: 0, graph: 0, descr: testingWithLoad }
-                        - { value: 7, generic: 0, graph: 0, descr: awaitingRetransferToS1 }
-                        - { value: 8, generic: 0, graph: 0, descr: testingWithoutLoad }
-                        - { value: 9, generic: 0, graph: 0, descr: stoppingEngine }
-                        - { value: 10, generic: 0, graph: 0, descr: holdingOnGenerator }
+                        - { value: 1, generic: 0, descr: noTestInProcess }
+                        - { value: 2, generic: 0, descr: testPending }
+                        - { value: 3, generic: 0, descr: startingEngine }
+                        - { value: 4, generic: 0, descr: engineWarmingUp }
+                        - { value: 5, generic: 0, descr: awaitingTransferToS2 }
+                        - { value: 6, generic: 0, descr: testingWithLoad }
+                        - { value: 7, generic: 0, descr: awaitingRetransferToS1 }
+                        - { value: 8, generic: 0, descr: testingWithoutLoad }
+                        - { value: 9, generic: 0, descr: stoppingEngine }
+                        - { value: 10, generic: 0, descr: holdingOnGenerator }
                 -
                     oid: PowerNet-MIB::xATSTestingResultsLastResult
                     value: PowerNet-MIB::xATSTestingResultsLastResult
@@ -473,25 +473,25 @@ modules:
                     state_name: xATSTestingResultsLastResult
                     group: Test
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: noResultsAvailable }
-                        - { value: 2, generic: 0, graph: 0, descr: startTestPassed }
-                        - { value: 3, generic: 0, graph: 0, descr: loadTestPassed }
-                        - { value: 4, generic: 2, graph: 0, descr: startSignalFailure }
-                        - { value: 5, generic: 1, graph: 0, descr: failedGenNotInAuto }
-                        - { value: 6, generic: 2, graph: 0, descr: failedGenEmerStop }
-                        - { value: 7, generic: 2, graph: 0, descr: failedGenShutdown }
-                        - { value: 8, generic: 2, graph: 0, descr: failedGenDidNotStart }
-                        - { value: 9, generic: 2, graph: 0, descr: failedS2NeverGood }
-                        - { value: 10, generic: 2, graph: 0, descr: genFailedDuringWarmup }
-                        - { value: 11, generic: 2, graph: 0, descr: failureOnXferToS1 }
-                        - { value: 12, generic: 2, graph: 0, descr: genFailedLoaded }
-                        - { value: 13, generic: 2, graph: 0, descr: failureOnRexferToS2 }
-                        - { value: 14, generic: 1, graph: 0, descr: failedOnCooldown }
-                        - { value: 15, generic: 1, graph: 0, descr: genFailedToStop }
-                        - { value: 16, generic: 2, graph: 0, descr: failedAtsInternalFault }
-                        - { value: 17, generic: 1, graph: 0, descr: failedAtsNotInAuto }
-                        - { value: 18, generic: 3, graph: 0, descr: canceledManualTest }
-                        - { value: 19, generic: 3, graph: 0, descr: canceledScheduledTest }
+                        - { value: 1, generic: 0, descr: noResultsAvailable }
+                        - { value: 2, generic: 0, descr: startTestPassed }
+                        - { value: 3, generic: 0, descr: loadTestPassed }
+                        - { value: 4, generic: 2, descr: startSignalFailure }
+                        - { value: 5, generic: 1, descr: failedGenNotInAuto }
+                        - { value: 6, generic: 2, descr: failedGenEmerStop }
+                        - { value: 7, generic: 2, descr: failedGenShutdown }
+                        - { value: 8, generic: 2, descr: failedGenDidNotStart }
+                        - { value: 9, generic: 2, descr: failedS2NeverGood }
+                        - { value: 10, generic: 2, descr: genFailedDuringWarmup }
+                        - { value: 11, generic: 2, descr: failureOnXferToS1 }
+                        - { value: 12, generic: 2, descr: genFailedLoaded }
+                        - { value: 13, generic: 2, descr: failureOnRexferToS2 }
+                        - { value: 14, generic: 1, descr: failedOnCooldown }
+                        - { value: 15, generic: 1, descr: genFailedToStop }
+                        - { value: 16, generic: 2, descr: failedAtsInternalFault }
+                        - { value: 17, generic: 1, descr: failedAtsNotInAuto }
+                        - { value: 18, generic: 3, descr: canceledManualTest }
+                        - { value: 19, generic: 3, descr: canceledScheduledTest }
                 -
                     oid: PowerNet-MIB::xATSGeneratorStatusOperational
                     value: PowerNet-MIB::xATSGeneratorStatusOperational
@@ -501,17 +501,17 @@ modules:
                     state_name: xATSGeneratorStatusOperational
                     group: Generator
                     states:
-                        - { value: 1, generic: 1, graph: 0, descr: nocomm }
-                        - { value: 2, generic: 1, graph: 0, descr: off }
-                        - { value: 3, generic: 0, graph: 0, descr: ready }
-                        - { value: 4, generic: 0, graph: 0, descr: starting }
-                        - { value: 5, generic: 0, graph: 0, descr: idle }
-                        - { value: 6, generic: 0, graph: 0, descr: running }
-                        - { value: 7, generic: 0, graph: 0, descr: normalStop }
-                        - { value: 8, generic: 2, graph: 0, descr: emergencyStop }
-                        - { value: 9, generic: 1, graph: 0, descr: notInAuto }
-                        - { value: 10, generic: 1, graph: 0, descr: shutdown }
-                        - { value: 11, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 1, descr: nocomm }
+                        - { value: 2, generic: 1, descr: off }
+                        - { value: 3, generic: 0, descr: ready }
+                        - { value: 4, generic: 0, descr: starting }
+                        - { value: 5, generic: 0, descr: idle }
+                        - { value: 6, generic: 0, descr: running }
+                        - { value: 7, generic: 0, descr: normalStop }
+                        - { value: 8, generic: 2, descr: emergencyStop }
+                        - { value: 9, generic: 1, descr: notInAuto }
+                        - { value: 10, generic: 1, descr: shutdown }
+                        - { value: 11, generic: 3, descr: unknown }
                 -
                     oid: PowerNet-MIB::xATSGeneratorStatusModeSwitchPosition
                     value: PowerNet-MIB::xATSGeneratorStatusModeSwitchPosition
@@ -521,10 +521,10 @@ modules:
                     state_name: xATSGeneratorStatusModeSwitchPosition
                     group: Generator
                     states:
-                        - { value: 1, generic: 1, graph: 0, descr: off }
-                        - { value: 2, generic: 1, graph: 0, descr: manual }
-                        - { value: 3, generic: 0, graph: 0, descr: automatic }
-                        - { value: 4, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 1, descr: off }
+                        - { value: 2, generic: 1, descr: manual }
+                        - { value: 3, generic: 0, descr: automatic }
+                        - { value: 4, generic: 3, descr: unknown }
                 -
                     oid: PowerNet-MIB::xATSGeneratorAdvStatusOilLevel
                     value: PowerNet-MIB::xATSGeneratorAdvStatusOilLevel
@@ -534,9 +534,9 @@ modules:
                     state_name: xATSGeneratorAdvStatusOilLevel
                     group: Generator
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: ok }
-                        - { value: 2, generic: 1, graph: 0, descr: low }
-                        - { value: 3, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 0, descr: ok }
+                        - { value: 2, generic: 1, descr: low }
+                        - { value: 3, generic: 3, descr: unknown }
                 -
                     oid: PowerNet-MIB::xATSGeneratorAdvStatusCoolantLevel
                     value: PowerNet-MIB::xATSGeneratorAdvStatusCoolantLevel
@@ -546,9 +546,9 @@ modules:
                     state_name: xATSGeneratorAdvStatusCoolantLevel
                     group: Generator
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: ok }
-                        - { value: 2, generic: 1, graph: 0, descr: low }
-                        - { value: 3, generic: 3, graph: 0, descr: unknown }
+                        - { value: 1, generic: 0, descr: ok }
+                        - { value: 2, generic: 1, descr: low }
+                        - { value: 3, generic: 3, descr: unknown }
                 -
                     oid: PowerNet-MIB::xPDUSystemBreakerTable
                     value: PowerNet-MIB::xPDUSystemBreakerPosition
@@ -557,9 +557,9 @@ modules:
                     index: 'xPDUSystemBreakerPosition.{{ $index }}'
                     state_name: xPDUSystemBreakerPosition
                     states:
-                        - { descr: open, graph: 0, value: 1, generic: 0 }
-                        - { descr: closed, graph: 0, value: 2, generic: 0 }
-                        - { descr: unknown, graph: 0, value: 3, generic: 3 }
+                        - { descr: open, value: 1, generic: 0 }
+                        - { descr: closed, value: 2, generic: 0 }
+                        - { descr: unknown, value: 3, generic: 3 }
                 -
                     oid: PowerNet-MIB::xPDUEPOMode
                     value: PowerNet-MIB::xPDUEPOMode
@@ -568,9 +568,9 @@ modules:
                     index: 'xPDUEPOMode.{{ $index }}'
                     state_name: xPDUEPOMode
                     states:
-                        - { descr: armed, graph: 0, value: 1, generic: 0 }
-                        - { descr: disarmed, graph: 0, value: 2, generic: 1 }
-                        - { descr: unknown, graph: 0, value: 3, generic: 3 }
+                        - { descr: armed, value: 1, generic: 0 }
+                        - { descr: disarmed, value: 2, generic: 1 }
+                        - { descr: unknown, value: 3, generic: 3 }
                 -
                     oid: PowerNet-MIB::xPDUTransformTempStatus
                     value: PowerNet-MIB::xPDUTransformTempStatus
@@ -579,10 +579,10 @@ modules:
                     index: 'xPDUTransformTempStatus.{{ $index }}'
                     state_name: xPDUTransformTempStatus
                     states:
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: overtemp, graph: 0, value: 2, generic: 1 }
-                        - { descr: noTransformerPresent, graph: 0, value: 3, generic: 0 }
-                        - { descr: unknown, graph: 0, value: 4, generic: 3 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: overtemp, value: 2, generic: 1 }
+                        - { descr: noTransformerPresent, value: 3, generic: 0 }
+                        - { descr: unknown, value: 4, generic: 3 }
                     skip_values: 3
                 -
                     oid: PowerNet-MIB::xPDUCoolingFanStatus
@@ -592,10 +592,10 @@ modules:
                     index: 'xPDUCoolingFanStatus.{{ $index }}'
                     state_name: xPDUCoolingFanStatus
                     states:
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: failed, graph: 0, value: 2, generic: 2 }
-                        - { descr: noCoolingFansPresent, graph: 0, value: 3, generic: 0 }
-                        - { descr: unknown, graph: 0, value: 4, generic: 3 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: failed, value: 2, generic: 2 }
+                        - { descr: noCoolingFansPresent, value: 3, generic: 0 }
+                        - { descr: unknown, value: 4, generic: 3 }
                     skip_values: 3
                 -
                     oid: PowerNet-MIB::upsAdvInputLineFailCause
@@ -605,16 +605,16 @@ modules:
                     index: 'upsAdvInputLineFailCause.{{ $index }}'
                     state_name: upsAdvInputLineFailCause
                     states:
-                        - { descr: noTransfer, graph: 0, value: 1, generic: 0 }
-                        - { descr: highLineVoltage, graph: 0, value: 2, generic: 0 }
-                        - { descr: brownout, graph: 0, value: 3, generic: 0 }
-                        - { descr: blackout, graph: 0, value: 4, generic: 0 }
-                        - { descr: smallMomentarySag, graph: 0, value: 5, generic: 0 }
-                        - { descr: deepMomentarySag, graph: 0, value: 6, generic: 0 }
-                        - { descr: smallMomentarySag, graph: 0, value: 7, generic: 0 }
-                        - { descr: largeMomentarySpike, graph: 0, value: 8, generic: 0 }
-                        - { descr: selfTest, graph: 0, value: 9, generic: 0 }
-                        - { descr: rateOfVoltageChange, graph: 0, value: 10, generic: 0 }
+                        - { descr: noTransfer, value: 1, generic: 0 }
+                        - { descr: highLineVoltage, value: 2, generic: 0 }
+                        - { descr: brownout, value: 3, generic: 0 }
+                        - { descr: blackout, value: 4, generic: 0 }
+                        - { descr: smallMomentarySag, value: 5, generic: 0 }
+                        - { descr: deepMomentarySag, value: 6, generic: 0 }
+                        - { descr: smallMomentarySag, value: 7, generic: 0 }
+                        - { descr: largeMomentarySpike, value: 8, generic: 0 }
+                        - { descr: selfTest, value: 9, generic: 0 }
+                        - { descr: rateOfVoltageChange, value: 10, generic: 0 }
                 -
                     oid: PowerNet-MIB::upsAdvTestDiagnosticsResults
                     value: PowerNet-MIB::upsAdvTestDiagnosticsResults
@@ -622,10 +622,10 @@ modules:
                     num_oid: '.1.3.6.1.4.1.318.1.1.1.7.2.3.{{ $index }}'
                     descr: UPS diagnostics status
                     states:
-                        - { descr: ok, graph: 0, value: 1, generic: 0 }
-                        - { descr: failed, graph: 0, value: 2, generic: 3 }
-                        - { descr: invalidTest, graph: 0, value: 3, generic: 1 }
-                        - { descr: testInProgress, graph: 0, value: 4, generic: 1 }
+                        - { descr: ok, value: 1, generic: 0 }
+                        - { descr: failed, value: 2, generic: 3 }
+                        - { descr: invalidTest, value: 3, generic: 1 }
+                        - { descr: testInProgress, value: 4, generic: 1 }
                 -
                     oid: PowerNet-MIB::upsOutletGroupControlTable
                     value: PowerNet-MIB::upsOutletGroupControlCommand
@@ -635,16 +635,16 @@ modules:
                     index: 'upsOutletGroupControlCommand.{{ $index }}'
                     state_name: upsOutletGroupControlCommand
                     states:
-                        - { value: 1,  graph: 0, generic: 0, descr: Immediate On}
-                        - { value: 2,  graph: 0, generic: 1, descr: Immediate Off}
-                        - { value: 3,  graph: 0, generic: 1, descr: Immediate Reboot With Or Without AC}
-                        - { value: 4,  graph: 0, generic: 1, descr: Delayed On}
-                        - { value: 5,  graph: 0, generic: 1, descr: Delayed Off}
-                        - { value: 6,  graph: 0, generic: 1, descr: Delayed Reboot With Or Without AC}
-                        - { value: 7,  graph: 0, generic: 1, descr: Cancel Pending Command}
-                        - { value: 8,  graph: 0, generic: 3, descr: Control Unknown}
-                        - { value: 9,  graph: 0, generic: 1, descr: Immediate Reboot Shutdown}
-                        - { value: 10, graph: 0, generic: 1, descr: Delayed Reboot Shutdown}
+                        - { value: 1,  generic: 0, descr: Immediate On}
+                        - { value: 2,  generic: 1, descr: Immediate Off}
+                        - { value: 3,  generic: 1, descr: Immediate Reboot With Or Without AC}
+                        - { value: 4,  generic: 1, descr: Delayed On}
+                        - { value: 5,  generic: 1, descr: Delayed Off}
+                        - { value: 6,  generic: 1, descr: Delayed Reboot With Or Without AC}
+                        - { value: 7,  generic: 1, descr: Cancel Pending Command}
+                        - { value: 8,  generic: 3, descr: Control Unknown}
+                        - { value: 9,  generic: 1, descr: Immediate Reboot Shutdown}
+                        - { value: 10, generic: 1, descr: Delayed Reboot Shutdown}
                     skip_values:
                         -
                             oid: PowerNet-MIB::upsOutletGroupControlOutletType
@@ -659,16 +659,16 @@ modules:
                     index: 'upsOutletGroupControlCommand.{{ $index }}'
                     state_name: upsOutletGroupControlCommand
                     states:
-                        - { value: 1,  graph: 0, generic: 0, descr: Immediate On}
-                        - { value: 2,  graph: 0, generic: 1, descr: Immediate Off}
-                        - { value: 3,  graph: 0, generic: 1, descr: Immediate Reboot With Or Without AC}
-                        - { value: 4,  graph: 0, generic: 1, descr: Delayed On}
-                        - { value: 5,  graph: 0, generic: 1, descr: Delayed Off}
-                        - { value: 6,  graph: 0, generic: 1, descr: Delayed Reboot With Or Without AC}
-                        - { value: 7,  graph: 0, generic: 1, descr: Cancel Pending Command}
-                        - { value: 8,  graph: 0, generic: 3, descr: Control Unknown}
-                        - { value: 9,  graph: 0, generic: 1, descr: Immediate Reboot Shutdown}
-                        - { value: 10, graph: 0, generic: 1, descr: Delayed Reboot Shutdown}
+                        - { value: 1,  generic: 0, descr: Immediate On}
+                        - { value: 2,  generic: 1, descr: Immediate Off}
+                        - { value: 3,  generic: 1, descr: Immediate Reboot With Or Without AC}
+                        - { value: 4,  generic: 1, descr: Delayed On}
+                        - { value: 5,  generic: 1, descr: Delayed Off}
+                        - { value: 6,  generic: 1, descr: Delayed Reboot With Or Without AC}
+                        - { value: 7,  generic: 1, descr: Cancel Pending Command}
+                        - { value: 8,  generic: 3, descr: Control Unknown}
+                        - { value: 9,  generic: 1, descr: Immediate Reboot Shutdown}
+                        - { value: 10, generic: 1, descr: Delayed Reboot Shutdown}
                     skip_values:
                         -
                             oid: PowerNet-MIB::upsOutletGroupControlOutletType

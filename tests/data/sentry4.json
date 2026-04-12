@@ -2628,2086 +2628,1788 @@
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "purged",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "reading",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "settle",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "notFound",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "lost",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "readError",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "noComm",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "pwrError",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "breakerTripped",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "fuseBlown",
-                    "state_draw_graph": 1,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "lowAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "lowWarning",
-                    "state_draw_graph": 1,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "highWarning",
-                    "state_draw_graph": 1,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "highAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "underLimit",
-                    "state_draw_graph": 1,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "overLimit",
-                    "state_draw_graph": 1,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "nvmFail",
-                    "state_draw_graph": 1,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "profileError",
-                    "state_draw_graph": 1,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchCurrentStatus",
                     "state_descr": "conflict",
-                    "state_draw_graph": 1,
                     "state_value": 23,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4BranchState",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4BranchState",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "purged",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "reading",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "settle",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "notFound",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "lost",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "readError",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "noComm",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "pwrError",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "breakerTripped",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "fuseBlown",
-                    "state_draw_graph": 1,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "lowAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "lowWarning",
-                    "state_draw_graph": 1,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "highWarning",
-                    "state_draw_graph": 1,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "highAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "underLimit",
-                    "state_draw_graph": 1,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "overLimit",
-                    "state_draw_graph": 1,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "nvmFail",
-                    "state_draw_graph": 1,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "profileError",
-                    "state_draw_graph": 1,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4BranchStatus",
                     "state_descr": "conflict",
-                    "state_draw_graph": 1,
                     "state_value": 23,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "purged",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "reading",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "settle",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "notFound",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "lost",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "readError",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "noComm",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "pwrError",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "breakerTripped",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "fuseBlown",
-                    "state_draw_graph": 1,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "lowAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "lowWarning",
-                    "state_draw_graph": 1,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "highWarning",
-                    "state_draw_graph": 1,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "highAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "underLimit",
-                    "state_draw_graph": 1,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "overLimit",
-                    "state_draw_graph": 1,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "nvmFail",
-                    "state_draw_graph": 1,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "profileError",
-                    "state_draw_graph": 1,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordActivePowerStatus",
                     "state_descr": "conflict",
-                    "state_draw_graph": 1,
                     "state_value": 23,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "purged",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "reading",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "settle",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "notFound",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "lost",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "readError",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "noComm",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "pwrError",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "breakerTripped",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "fuseBlown",
-                    "state_draw_graph": 1,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "lowAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "lowWarning",
-                    "state_draw_graph": 1,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "highWarning",
-                    "state_draw_graph": 1,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "highAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "underLimit",
-                    "state_draw_graph": 1,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "overLimit",
-                    "state_draw_graph": 1,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "nvmFail",
-                    "state_draw_graph": 1,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "profileError",
-                    "state_draw_graph": 1,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordApparentPowerStatus",
                     "state_descr": "conflict",
-                    "state_draw_graph": 1,
                     "state_value": 23,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "purged",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "reading",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "settle",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "notFound",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "lost",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "readError",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "noComm",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "pwrError",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "breakerTripped",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "fuseBlown",
-                    "state_draw_graph": 1,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "lowAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "lowWarning",
-                    "state_draw_graph": 1,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "highWarning",
-                    "state_draw_graph": 1,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "highAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "underLimit",
-                    "state_draw_graph": 1,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "overLimit",
-                    "state_draw_graph": 1,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "nvmFail",
-                    "state_draw_graph": 1,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "profileError",
-                    "state_draw_graph": 1,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordOutOfBalanceStatus",
                     "state_descr": "conflict",
-                    "state_draw_graph": 1,
                     "state_value": 23,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "purged",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "reading",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "settle",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "notFound",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "lost",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "readError",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "noComm",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "pwrError",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "breakerTripped",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "fuseBlown",
-                    "state_draw_graph": 1,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "lowAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "lowWarning",
-                    "state_draw_graph": 1,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "highWarning",
-                    "state_draw_graph": 1,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "highAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "underLimit",
-                    "state_draw_graph": 1,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "overLimit",
-                    "state_draw_graph": 1,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "nvmFail",
-                    "state_draw_graph": 1,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "profileError",
-                    "state_draw_graph": 1,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordPowerFactorStatus",
                     "state_descr": "conflict",
-                    "state_draw_graph": 1,
                     "state_value": 23,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4InputCordState",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4InputCordState",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "purged",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "reading",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "settle",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "notFound",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "lost",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "readError",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "noComm",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "pwrError",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "breakerTripped",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "fuseBlown",
-                    "state_draw_graph": 1,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "lowAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "lowWarning",
-                    "state_draw_graph": 1,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "highWarning",
-                    "state_draw_graph": 1,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "highAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "underLimit",
-                    "state_draw_graph": 1,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "overLimit",
-                    "state_draw_graph": 1,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "nvmFail",
-                    "state_draw_graph": 1,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "profileError",
-                    "state_draw_graph": 1,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4InputCordStatus",
                     "state_descr": "conflict",
-                    "state_draw_graph": 1,
                     "state_value": 23,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4LineState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4LineState",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4LineState",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "purged",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "reading",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "settle",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "notFound",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "lost",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "readError",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "noComm",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "pwrError",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "breakerTripped",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "fuseBlown",
-                    "state_draw_graph": 1,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "lowAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "lowWarning",
-                    "state_draw_graph": 1,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "highWarning",
-                    "state_draw_graph": 1,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "highAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "underLimit",
-                    "state_draw_graph": 1,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "overLimit",
-                    "state_draw_graph": 1,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "nvmFail",
-                    "state_draw_graph": 1,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "profileError",
-                    "state_draw_graph": 1,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4LineStatus",
                     "state_descr": "conflict",
-                    "state_draw_graph": 1,
                     "state_value": 23,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "purged",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "reading",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "settle",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "notFound",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "lost",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "readError",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "noComm",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "pwrError",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "breakerTripped",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "fuseBlown",
-                    "state_draw_graph": 1,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "lowAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "lowWarning",
-                    "state_draw_graph": 1,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "highWarning",
-                    "state_draw_graph": 1,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "highAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "underLimit",
-                    "state_draw_graph": 1,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "overLimit",
-                    "state_draw_graph": 1,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "nvmFail",
-                    "state_draw_graph": 1,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "profileError",
-                    "state_draw_graph": 1,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4OcpStatus",
                     "state_descr": "conflict",
-                    "state_draw_graph": 1,
                     "state_value": 23,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "purged",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "reading",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "settle",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "notFound",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "lost",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "readError",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "noComm",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "pwrError",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "breakerTripped",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "fuseBlown",
-                    "state_draw_graph": 1,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "lowAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "lowWarning",
-                    "state_draw_graph": 1,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "highWarning",
-                    "state_draw_graph": 1,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "highAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "underLimit",
-                    "state_draw_graph": 1,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "overLimit",
-                    "state_draw_graph": 1,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "nvmFail",
-                    "state_draw_graph": 1,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "profileError",
-                    "state_draw_graph": 1,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhasePowerFactorStatus",
                     "state_descr": "conflict",
-                    "state_draw_graph": 1,
                     "state_value": 23,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseState",
                     "state_descr": "unknown",
-                    "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4PhaseState",
                     "state_descr": "on",
-                    "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4PhaseState",
                     "state_descr": "off",
-                    "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "purged",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "reading",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "settle",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "notFound",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "lost",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "readError",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "noComm",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "pwrError",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "breakerTripped",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "fuseBlown",
-                    "state_draw_graph": 1,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "lowAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "lowWarning",
-                    "state_draw_graph": 1,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "highWarning",
-                    "state_draw_graph": 1,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "highAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "underLimit",
-                    "state_draw_graph": 1,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "overLimit",
-                    "state_draw_graph": 1,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "nvmFail",
-                    "state_draw_graph": 1,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "profileError",
-                    "state_draw_graph": 1,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseStatus",
                     "state_descr": "conflict",
-                    "state_draw_graph": 1,
                     "state_value": 23,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "purged",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "reading",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "settle",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "notFound",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "lost",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "readError",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "noComm",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "pwrError",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "breakerTripped",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "fuseBlown",
-                    "state_draw_graph": 1,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "lowAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "lowWarning",
-                    "state_draw_graph": 1,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "highWarning",
-                    "state_draw_graph": 1,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "highAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "underLimit",
-                    "state_draw_graph": 1,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "overLimit",
-                    "state_draw_graph": 1,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "nvmFail",
-                    "state_draw_graph": 1,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "profileError",
-                    "state_draw_graph": 1,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4PhaseVoltageStatus",
                     "state_descr": "conflict",
-                    "state_draw_graph": 1,
                     "state_value": 23,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "normal",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "disabled",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "purged",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "reading",
-                    "state_draw_graph": 1,
                     "state_value": 5,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "settle",
-                    "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "notFound",
-                    "state_draw_graph": 1,
                     "state_value": 7,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "lost",
-                    "state_draw_graph": 1,
                     "state_value": 8,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "readError",
-                    "state_draw_graph": 1,
                     "state_value": 9,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "noComm",
-                    "state_draw_graph": 1,
                     "state_value": 10,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "pwrError",
-                    "state_draw_graph": 1,
                     "state_value": 11,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "breakerTripped",
-                    "state_draw_graph": 1,
                     "state_value": 12,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "fuseBlown",
-                    "state_draw_graph": 1,
                     "state_value": 13,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "lowAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 14,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "lowWarning",
-                    "state_draw_graph": 1,
                     "state_value": 15,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "highWarning",
-                    "state_draw_graph": 1,
                     "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "highAlarm",
-                    "state_draw_graph": 1,
                     "state_value": 17,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "alarm",
-                    "state_draw_graph": 1,
                     "state_value": 18,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "underLimit",
-                    "state_draw_graph": 1,
                     "state_value": 19,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "overLimit",
-                    "state_draw_graph": 1,
                     "state_value": 20,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "nvmFail",
-                    "state_draw_graph": 1,
                     "state_value": 21,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "profileError",
-                    "state_draw_graph": 1,
                     "state_value": 22,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "st4UnitStatus",
                     "state_descr": "conflict",
-                    "state_draw_graph": 1,
                     "state_value": 23,
                     "state_generic_value": 2
                 }

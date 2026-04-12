@@ -1,0 +1,163 @@
+--
+-- All Rights Reserved, Copyright (c) 2016, ALAXALA Networks Corp.
+--
+-- AX-STMCTL-MIB.my : axStormControl group MIB file.
+--
+
+AX-STMCTL-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        ifIndex
+            FROM RFC1213-MIB
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axStormControl MODULE-IDENTITY
+    LAST-UPDATED    "201512250000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for Storm Control information."
+
+    REVISION        "201512250000Z"
+    DESCRIPTION
+        "MODULE-IDENTITY DESCRIPTION Changed."
+    REVISION        "201512030000Z"
+    DESCRIPTION
+        "Initial release."
+::= { axMib 60 }
+
+--------------------------------------------------
+-- Object Identifiers
+--------------------------------------------------
+
+-- None
+
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+-- None
+
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+
+axStormControlNotifications     OBJECT IDENTIFIER ::= { axStormControl 0 }
+
+--
+-- axStormControl Notifications
+--
+axBroadcastStormDetectTrap NOTIFICATION-TYPE
+    OBJECTS       { ifIndex }
+    STATUS        current
+    DESCRIPTION
+             "This indicates detection on broad-cast storm."
+    ::= { axStormControlNotifications 1 }
+
+axMulticastStormDetectTrap NOTIFICATION-TYPE
+    OBJECTS       { ifIndex }
+    STATUS        current
+    DESCRIPTION
+             "This indicates detection on multi-cast storm."
+    ::= { axStormControlNotifications 2 }
+
+axUnicastStormDetectTrap NOTIFICATION-TYPE
+    OBJECTS       { ifIndex }
+    STATUS        current
+    DESCRIPTION
+             "This indicates detection on uni-cast storm."
+    ::= { axStormControlNotifications 3 }
+
+axBroadcastStormPortInactivateTrap NOTIFICATION-TYPE
+    OBJECTS       { ifIndex }
+    STATUS        current
+    DESCRIPTION
+             "This indicates the port inactivated for detection on broad-cast storm."
+    ::= { axStormControlNotifications 4 }
+
+axMulticastStormPortInactivateTrap NOTIFICATION-TYPE
+    OBJECTS       { ifIndex }
+    STATUS        current
+    DESCRIPTION
+             "This indicates the port inactivated for detection on multi-cast storm."
+    ::= { axStormControlNotifications 5 }
+
+axUnicastStormPortInactivateTrap NOTIFICATION-TYPE
+    OBJECTS       { ifIndex }
+    STATUS        current
+    DESCRIPTION
+             "This indicates the port inactivated for detection on uni-cast storm."
+    ::= { axStormControlNotifications 6 }
+
+axBroadcastStormRecoverTrap NOTIFICATION-TYPE
+    OBJECTS       { ifIndex }
+    STATUS        current
+    DESCRIPTION
+             "This indicates the end of broad-cast storm."
+    ::= { axStormControlNotifications 7 }
+
+axMulticastStormRecoverTrap NOTIFICATION-TYPE
+    OBJECTS       { ifIndex }
+    STATUS        current
+    DESCRIPTION
+             "This indicates the end of multi-cast storm."
+    ::= { axStormControlNotifications 8 }
+
+axUnicastStormRecoverTrap NOTIFICATION-TYPE
+    OBJECTS       { ifIndex }
+    STATUS        current
+    DESCRIPTION
+             "This indicates the end of uni-cast storm."
+    ::= { axStormControlNotifications 9 }
+
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Conformance identifier
+--
+axStormControlConformance       OBJECT IDENTIFIER ::= { axStormControl 1000 }
+axStormControlCompliances       OBJECT IDENTIFIER ::= { axStormControlConformance 1 }
+axStormControlGroups            OBJECT IDENTIFIER ::= { axStormControlConformance 2 }
+
+--
+-- Compliance
+--
+axStormControlCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "AX Storm Control Information"
+    MODULE        -- this module
+        MANDATORY-GROUPS { axStormControlNotificationGroup }
+    ::= { axStormControlCompliances 1 }
+
+--
+-- Notification Group
+--
+axStormControlNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        axBroadcastStormDetectTrap,
+                        axMulticastStormDetectTrap,
+                        axUnicastStormDetectTrap,
+                        axBroadcastStormPortInactivateTrap,
+                        axMulticastStormPortInactivateTrap,
+                        axUnicastStormPortInactivateTrap,
+                        axBroadcastStormRecoverTrap,
+                        axMulticastStormRecoverTrap,
+                        axUnicastStormRecoverTrap
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of notifications of axStormControl."
+    ::= { axStormControlGroups 10 }
+
+END

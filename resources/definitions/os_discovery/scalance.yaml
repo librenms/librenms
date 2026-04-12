@@ -118,8 +118,8 @@ modules:
                     group: System
                     state_name: "Faults"
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'noFault' }
-                        - { value: 2, generic: 2, graph: 1, descr: 'fault' }
+                        - { value: 1, generic: 0, descr: 'noFault' }
+                        - { value: 2, generic: 2, descr: 'fault' }
                 -
                     oid: SN-MSPS-SCX200-MIB::snMspsPowerSupply1State
                     num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.28.4.{{ $index }}'
@@ -127,8 +127,8 @@ modules:
                     group: Power
                     state_name: "Power Supply 1"
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'active' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'inactive' }
+                        - { value: 0, generic: 0, descr: 'active' }
+                        - { value: 1, generic: 2, descr: 'inactive' }
                 -
                     oid: SN-MSPS-SCX200-MIB::snMspsPowerSupply2State
                     num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.28.5.{{ $index }}'
@@ -136,8 +136,8 @@ modules:
                     group: Power
                     state_name: "Power Supply 2"
                     states:
-                        - { value: 0, generic: 0, graph: 1, descr: 'active' }
-                        - { value: 1, generic: 2, graph: 0, descr: 'inactive' }
+                        - { value: 0, generic: 0, descr: 'active' }
+                        - { value: 1, generic: 2, descr: 'inactive' }
                 -
                     oid: SN-MSPS-SCX200-MIB::snMspsCplugState
                     num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.35.1.{{ $index }}'
@@ -145,11 +145,11 @@ modules:
                     group: Plugs
                     state_name: "C-Plug"
                     states:
-                        - { value: 1, generic: 2, graph: 0 , descr: 'notPresent' }
-                        - { value: 4, generic: 2, graph: 0, descr: 'notAccepted' }
-                        - { value: 5, generic: 0, graph: 1, descr: 'accepted' }
-                        - { value: 6, generic: 2, graph: 0, descr: 'factory' }
-                        - { value: 7, generic: 2, graph: 0, descr: 'missing' }
+                        - { value: 1, generic: 2,  , descr: 'notPresent' }
+                        - { value: 4, generic: 2, descr: 'notAccepted' }
+                        - { value: 5, generic: 0, descr: 'accepted' }
+                        - { value: 6, generic: 2, descr: 'factory' }
+                        - { value: 7, generic: 2, descr: 'missing' }
 # probable KEY-PLUG only supported for Scalance W series
 #                -
 #                    oid: snMspsKeyPlugState
@@ -158,11 +158,11 @@ modules:
 #                    group: Plugs
 #                    state_name: "KEY-Plug"
 #                    states:
-#                        - { value: 1, generic: 2, graph: 0 , descr: 'notPresent' }
-#                        - { value: 4, generic: 2, graph: 0, descr: 'notAccepted' }
-#                        - { value: 5, generic: 0, graph: 0, descr: 'accepted' }
-#                        - { value: 7, generic: 2, graph: 0, descr: 'missing' }
-#                        - { value: 8, generic: 2, graph: 0, descr: 'wrong' }
-#                        - { value: 9, generic: 2, graph: 0, descr: 'unknown' }
-#                        - { value: 10, generic: 2, graph: 0, descr: 'defective' }
+#                        - { value: 1, generic: 2,  , descr: 'notPresent' }
+#                        - { value: 4, generic: 2, descr: 'notAccepted' }
+#                        - { value: 5, generic: 0, descr: 'accepted' }
+#                        - { value: 7, generic: 2, descr: 'missing' }
+#                        - { value: 8, generic: 2, descr: 'wrong' }
+#                        - { value: 9, generic: 2, descr: 'unknown' }
+#                        - { value: 10, generic: 2, descr: 'defective' }
 # END

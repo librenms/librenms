@@ -456,16 +456,16 @@ modules:
                     descr: 'Charge State'
                     state_name: chargeState
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: Starting }
-                        - { value: 1, generic: 0, graph: 1, descr: 'Night Check' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'Disconnected' }
-                        - { value: 3, generic: 2, graph: 1, descr: 'Night' }
-                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
-                        - { value: 5, generic: 3, graph: 1, descr: 'Bulk' }
-                        - { value: 6, generic: 3, graph: 1, descr: 'Absorpotion' }
-                        - { value: 7, generic: 3, graph: 1, descr: 'Float' }
-                        - { value: 8, generic: 3, graph: 1, descr: 'Equalize' }
-                        - { value: 8, generic: 3, graph: 1, descr: 'Slave' }
+                        - { value: 0, generic: 1, descr: Starting }
+                        - { value: 1, generic: 0, descr: 'Night Check' }
+                        - { value: 2, generic: 1, descr: 'Disconnected' }
+                        - { value: 3, generic: 2, descr: 'Night' }
+                        - { value: 4, generic: 2, descr: 'Fault' }
+                        - { value: 5, generic: 3, descr: 'Bulk' }
+                        - { value: 6, generic: 3, descr: 'Absorpotion' }
+                        - { value: 7, generic: 3, descr: 'Float' }
+                        - { value: 8, generic: 3, descr: 'Equalize' }
+                        - { value: 8, generic: 3, descr: 'Slave' }
                 -
                     oid: SUNSAVER-MPPT::chargeState
                     value: SUNSAVER-MPPT::chargeState
@@ -474,15 +474,15 @@ modules:
                     descr: 'Charge State'
                     state_name: chargeState
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: Start }
-                        - { value: 1, generic: 0, graph: 1, descr: 'Night Check' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'Disconnect' }
-                        - { value: 3, generic: 2, graph: 1, descr: 'Night' }
-                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
-                        - { value: 5, generic: 3, graph: 1, descr: 'Bulk MPPT' }
-                        - { value: 6, generic: 3, graph: 1, descr: 'Absorpotion' }
-                        - { value: 7, generic: 3, graph: 1, descr: 'Float' }
-                        - { value: 8, generic: 3, graph: 1, descr: 'Equalize' }
+                        - { value: 0, generic: 1, descr: Start }
+                        - { value: 1, generic: 0, descr: 'Night Check' }
+                        - { value: 2, generic: 1, descr: 'Disconnect' }
+                        - { value: 3, generic: 2, descr: 'Night' }
+                        - { value: 4, generic: 2, descr: 'Fault' }
+                        - { value: 5, generic: 3, descr: 'Bulk MPPT' }
+                        - { value: 6, generic: 3, descr: 'Absorpotion' }
+                        - { value: 7, generic: 3, descr: 'Float' }
+                        - { value: 8, generic: 3, descr: 'Equalize' }
                 -
                     oid: SUNSAVER-MPPT::loadState
                     value: SUNSAVER-MPPT::loadState
@@ -491,15 +491,15 @@ modules:
                     descr: 'Load State'
                     state_name: loadState
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: Start }
-                        - { value: 1, generic: 0, graph: 1, descr: 'Norm' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'Lvd Warning' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'Lvd' }
-                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
-                        - { value: 5, generic: 3, graph: 1, descr: 'Disconnect' }
-                        - { value: 6, generic: 3, graph: 1, descr: 'Norm Off' }
-                        - { value: 7, generic: 3, graph: 1, descr: 'Override' }
-                        - { value: 7, generic: 3, graph: 1, descr: 'Not Used' }
+                        - { value: 0, generic: 1, descr: Start }
+                        - { value: 1, generic: 0, descr: 'Norm' }
+                        - { value: 2, generic: 1, descr: 'Lvd Warning' }
+                        - { value: 3, generic: 1, descr: 'Lvd' }
+                        - { value: 4, generic: 2, descr: 'Fault' }
+                        - { value: 5, generic: 3, descr: 'Disconnect' }
+                        - { value: 6, generic: 3, descr: 'Norm Off' }
+                        - { value: 7, generic: 3, descr: 'Override' }
+                        - { value: 7, generic: 3, descr: 'Not Used' }
                 -
                     oid: PROSTAR-MPPT::chargeState
                     value: PROSTAR-MPPT::chargeState
@@ -508,17 +508,17 @@ modules:
                     descr: 'Charge State'
                     state_name: chargeState
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: Start }
-                        - { value: 1, generic: 0, graph: 1, descr: 'Night Check' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'Disconnect' }
-                        - { value: 3, generic: 2, graph: 1, descr: 'Night' }
-                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
-                        - { value: 5, generic: 3, graph: 1, descr: 'Bulk MPPT' }
-                        - { value: 6, generic: 3, graph: 1, descr: 'Absorpotion' }
-                        - { value: 7, generic: 3, graph: 1, descr: 'Float' }
-                        - { value: 8, generic: 3, graph: 1, descr: 'Equalize' }
-                        - { value: 9, generic: 3, graph: 1, descr: 'Slave' }
-                        - { value: 10, generic: 3, graph: 1, descr: 'Fixed' }
+                        - { value: 0, generic: 1, descr: Start }
+                        - { value: 1, generic: 0, descr: 'Night Check' }
+                        - { value: 2, generic: 1, descr: 'Disconnect' }
+                        - { value: 3, generic: 2, descr: 'Night' }
+                        - { value: 4, generic: 2, descr: 'Fault' }
+                        - { value: 5, generic: 3, descr: 'Bulk MPPT' }
+                        - { value: 6, generic: 3, descr: 'Absorpotion' }
+                        - { value: 7, generic: 3, descr: 'Float' }
+                        - { value: 8, generic: 3, descr: 'Equalize' }
+                        - { value: 9, generic: 3, descr: 'Slave' }
+                        - { value: 10, generic: 3, descr: 'Fixed' }
                 -
                     oid: PROSTAR-MPPT::loadState
                     value: PROSTAR-MPPT::loadState
@@ -527,15 +527,15 @@ modules:
                     descr: 'Load State'
                     state_name: loadState
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: Start }
-                        - { value: 1, generic: 0, graph: 1, descr: 'Norm' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'Lvd Warning' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'Lvd' }
-                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
-                        - { value: 5, generic: 3, graph: 1, descr: 'Disconnect' }
-                        - { value: 6, generic: 3, graph: 1, descr: 'Normal Off' }
-                        - { value: 7, generic: 3, graph: 1, descr: 'Override' }
-                        - { value: 7, generic: 3, graph: 1, descr: 'Not Used' }
+                        - { value: 0, generic: 1, descr: Start }
+                        - { value: 1, generic: 0, descr: 'Norm' }
+                        - { value: 2, generic: 1, descr: 'Lvd Warning' }
+                        - { value: 3, generic: 1, descr: 'Lvd' }
+                        - { value: 4, generic: 2, descr: 'Fault' }
+                        - { value: 5, generic: 3, descr: 'Disconnect' }
+                        - { value: 6, generic: 3, descr: 'Normal Off' }
+                        - { value: 7, generic: 3, descr: 'Override' }
+                        - { value: 7, generic: 3, descr: 'Not Used' }
                 -
                     oid: TRISTAR-MPPT-600V::chargeState
                     value: TRISTAR-MPPT-600V::chargeState
@@ -544,17 +544,17 @@ modules:
                     descr: 'Charge State'
                     state_name: chargeState
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: Start }
-                        - { value: 1, generic: 0, graph: 1, descr: 'Night Check' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'Disconnect' }
-                        - { value: 3, generic: 2, graph: 1, descr: 'Night' }
-                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
-                        - { value: 5, generic: 3, graph: 1, descr: 'MPPT' }
-                        - { value: 6, generic: 3, graph: 1, descr: 'Absorpotion' }
-                        - { value: 7, generic: 3, graph: 1, descr: 'Float' }
-                        - { value: 8, generic: 3, graph: 1, descr: 'Equalize' }
-                        - { value: 9, generic: 3, graph: 1, descr: 'Slave' }
-                        - { value: 10, generic: 3, graph: 1, descr: 'Fixed' }
+                        - { value: 0, generic: 1, descr: Start }
+                        - { value: 1, generic: 0, descr: 'Night Check' }
+                        - { value: 2, generic: 1, descr: 'Disconnect' }
+                        - { value: 3, generic: 2, descr: 'Night' }
+                        - { value: 4, generic: 2, descr: 'Fault' }
+                        - { value: 5, generic: 3, descr: 'MPPT' }
+                        - { value: 6, generic: 3, descr: 'Absorpotion' }
+                        - { value: 7, generic: 3, descr: 'Float' }
+                        - { value: 8, generic: 3, descr: 'Equalize' }
+                        - { value: 9, generic: 3, descr: 'Slave' }
+                        - { value: 10, generic: 3, descr: 'Fixed' }
                 -
                     oid: GENSTAR::chargeState
                     value: GENSTAR::chargeState
@@ -563,15 +563,15 @@ modules:
                     descr: 'Charge State'
                     state_name: chargeState
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: Starting }
-                        - { value: 1, generic: 0, graph: 1, descr: 'Night Check' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'Disconnected' }
-                        - { value: 3, generic: 2, graph: 1, descr: 'Night' }
-                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
-                        - { value: 5, generic: 3, graph: 1, descr: 'Bulk' }
-                        - { value: 6, generic: 3, graph: 1, descr: 'Absorpotion' }
-                        - { value: 7, generic: 3, graph: 1, descr: 'Float' }
-                        - { value: 8, generic: 3, graph: 1, descr: 'Equalize' }
+                        - { value: 0, generic: 1, descr: Starting }
+                        - { value: 1, generic: 0, descr: 'Night Check' }
+                        - { value: 2, generic: 1, descr: 'Disconnected' }
+                        - { value: 3, generic: 2, descr: 'Night' }
+                        - { value: 4, generic: 2, descr: 'Fault' }
+                        - { value: 5, generic: 3, descr: 'Bulk' }
+                        - { value: 6, generic: 3, descr: 'Absorpotion' }
+                        - { value: 7, generic: 3, descr: 'Float' }
+                        - { value: 8, generic: 3, descr: 'Equalize' }
                 -
                     oid: GENSTAR::loadState
                     value: GENSTAR::loadState
@@ -580,14 +580,14 @@ modules:
                     descr: 'Load State'
                     state_name: loadState
                     states:
-                        - { value: 0, generic: 1, graph: 1, descr: Start }
-                        - { value: 1, generic: 0, graph: 1, descr: 'Norm' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'Lvd Warn' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'Lvd' }
-                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
-                        - { value: 5, generic: 3, graph: 1, descr: 'Disc' }
-                        - { value: 6, generic: 3, graph: 1, descr: 'Norm Off' }
-                        - { value: 7, generic: 3, graph: 1, descr: 'Override' }
+                        - { value: 0, generic: 1, descr: Start }
+                        - { value: 1, generic: 0, descr: 'Norm' }
+                        - { value: 2, generic: 1, descr: 'Lvd Warn' }
+                        - { value: 3, generic: 1, descr: 'Lvd' }
+                        - { value: 4, generic: 2, descr: 'Fault' }
+                        - { value: 5, generic: 3, descr: 'Disc' }
+                        - { value: 6, generic: 3, descr: 'Norm Off' }
+                        - { value: 7, generic: 3, descr: 'Override' }
         power_consumed:
             data:
                 -

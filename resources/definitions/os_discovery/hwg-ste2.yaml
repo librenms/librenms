@@ -40,8 +40,8 @@ modules:
                     index: 'inpAlarmState.{{ $index }}'
                     state_name: inpAlarmState
                     states:
-                        - { descr: normal, graph: 0, value: 0, generic: 0 }
-                        - { descr: alarm, graph: 0, value: 1, generic: 2 }
+                        - { descr: normal, value: 0, generic: 0 }
+                        - { descr: alarm, value: 1, generic: 2 }
                 -
                     oid: STE2-MIB::sensTable
                     value: STE2-MIB::sensState
@@ -50,10 +50,10 @@ modules:
                     index: 'sensState.{{ $index }}'
                     state_name: sensState
                     states:
-                        - { descr: unknown, graph: 0, value: 0, generic: 3 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: alarm, graph: 0, value: 4, generic: 2 }
-                        - { descr: alarm, graph: 0, value: 5, generic: 2 }
+                        - { descr: unknown, value: 0, generic: 3 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: alarm, value: 4, generic: 2 }
+                        - { descr: alarm, value: 5, generic: 2 }
                     skip_values:
                         -
                             oid: STE2-MIB::sensUnit

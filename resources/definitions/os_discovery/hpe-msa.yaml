@@ -13,11 +13,11 @@ modules:
                     index: 'connUnitSensorStatus.{{ $index }}'
                     state_name: connUnitSensorStatus
                     states:
-                        - { value: 1, generic: 3, graph: 1, descr: unknown }
-                        - { value: 2, generic: 1, graph: 1, descr: other }
-                        - { value: 3, generic: 0, graph: 1, descr: ok }
-                        - { value: 4, generic: 1, graph: 1, descr: warning }
-                        - { value: 5, generic: 2, graph: 1, descr: failed }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 1, descr: other }
+                        - { value: 3, generic: 0, descr: ok }
+                        - { value: 4, generic: 1, descr: warning }
+                        - { value: 5, generic: 2, descr: failed }
                 -
                     oid: FCMGMT-MIB::connUnitTable
                     value: FCMGMT-MIB::connUnitState
@@ -26,9 +26,9 @@ modules:
                     index: 'connUnitState.{{ $index }}'
                     state_name: connUnitState
                     states:
-                        - { value: 1, generic: 3, graph: 1, descr: unknown }
-                        - { value: 2, generic: 0, graph: 1, descr: online }
-                        - { value: 3, generic: 2, graph: 1, descr: offline }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 0, descr: online }
+                        - { value: 3, generic: 2, descr: offline }
                 -
                     oid: FCMGMT-MIB::connUnitTable
                     value: FCMGMT-MIB::connUnitStatus
@@ -37,8 +37,8 @@ modules:
                     index: 'connUnitStatus.{{ $index }}'
                     state_name: connUnitStatus
                     states:
-                        - { value: 1, generic: 3, graph: 1, descr: unknown }
-                        - { value: 2, generic: 3, graph: 1, descr: unused }
-                        - { value: 3, generic: 0, graph: 1, descr: ok }
-                        - { value: 4, generic: 1, graph: 1, descr: warning }
-                        - { value: 5, generic: 2, graph: 1, descr: failed }
+                        - { value: 1, generic: 3, descr: unknown }
+                        - { value: 2, generic: 3, descr: unused }
+                        - { value: 3, generic: 0, descr: ok }
+                        - { value: 4, generic: 1, descr: warning }
+                        - { value: 5, generic: 2, descr: failed }

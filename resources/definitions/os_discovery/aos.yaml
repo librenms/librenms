@@ -14,12 +14,12 @@ modules:
                     index: 'FanStatus.{{ $index }}'
                     state_name: rlEnvMonFanStatusTable
                     states:
-                        - { value: 1, descr: normal, graph: 1, generic: 0 }
-                        - { value: 2, descr: warning, graph: 1, generic: 1 }
-                        - { value: 3, descr: critical, graph: 1, generic: 2 }
-                        - { value: 4, descr: shutdown, graph: 1, generic: 2 }
-                        - { value: 5, descr: notpresent, graph: 1, generic: 3 }
-                        - { value: 6, descr: notFunctioning, graph: 1, generic: 2 }
+                        - { value: 1, descr: normal, generic: 0 }
+                        - { value: 2, descr: warning, generic: 1 }
+                        - { value: 3, descr: critical, generic: 2 }
+                        - { value: 4, descr: shutdown, generic: 2 }
+                        - { value: 5, descr: notpresent, generic: 3 }
+                        - { value: 6, descr: notFunctioning, generic: 2 }
                     skip_values:
                         -
                             oid: RADLAN-HWENVIROMENT::rlEnvMonFanState
@@ -33,12 +33,12 @@ modules:
                     index: 'PowerSupply.{{ $index }}'
                     state_name: rlEnvMonSupplyStatusTable
                     states:
-                        - { value: 1, descr: normal, graph: 1, generic: 0 }
-                        - { value: 2, descr: warning, graph: 1, generic: 1 }
-                        - { value: 3, descr: critical, graph: 1, generic: 2 }
-                        - { value: 4, descr: shutdown, graph: 1, generic: 2 }
-                        - { value: 5, descr: notpresent, graph: 1, generic: 3 }
-                        - { value: 6, descr: notFunctioning, graph: 1, generic: 2 }
+                        - { value: 1, descr: normal, generic: 0 }
+                        - { value: 2, descr: warning, generic: 1 }
+                        - { value: 3, descr: critical, generic: 2 }
+                        - { value: 4, descr: shutdown, generic: 2 }
+                        - { value: 5, descr: notpresent, generic: 3 }
+                        - { value: 6, descr: notFunctioning, generic: 2 }
                     skip_values:
                         -
                             oid: RADLAN-HWENVIROMENT::rlEnvMonSupplyState

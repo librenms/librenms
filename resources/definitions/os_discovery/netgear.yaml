@@ -36,13 +36,13 @@ modules:
                     index: 'boxServicesFanItemState.{{ $index }}'
                     state_name: boxServicesFanItemState
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: notpresent }
-                        - { value: 2, generic: 0, graph: 0, descr: operational }
-                        - { value: 3, generic: 2, graph: 0, descr: failed }
-                        - { value: 4, generic: 3, graph: 0, descr: powering }
-                        - { value: 5, generic: 3, graph: 0, descr: nopower }
-                        - { value: 6, generic: 3, graph: 0, descr: notpowering }
-                        - { value: 7, generic: 1, graph: 0, descr: incompatible }
+                        - { value: 1, generic: 0, descr: notpresent }
+                        - { value: 2, generic: 0, descr: operational }
+                        - { value: 3, generic: 2, descr: failed }
+                        - { value: 4, generic: 3, descr: powering }
+                        - { value: 5, generic: 3, descr: nopower }
+                        - { value: 6, generic: 3, descr: notpowering }
+                        - { value: 7, generic: 1, descr: incompatible }
                 -
                     oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesPowSuppliesTable
                     value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyItemState
@@ -51,10 +51,10 @@ modules:
                     index: 'boxServicesPowSupplyItemState.{{ $index }}'
                     state_name: boxServicesPowSupplyItemState
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: notpresent }
-                        - { value: 2, generic: 0, graph: 0, descr: operational }
-                        - { value: 3, generic: 2, graph: 0, descr: failed }
-                        - { value: 4, generic: 3, graph: 0, descr: powering }
-                        - { value: 5, generic: 3, graph: 0, descr: nopower }
-                        - { value: 6, generic: 3, graph: 0, descr: notpowering }
-                        - { value: 7, generic: 1, graph: 0, descr: incompatible }
+                        - { value: 1, generic: 0, descr: notpresent }
+                        - { value: 2, generic: 0, descr: operational }
+                        - { value: 3, generic: 2, descr: failed }
+                        - { value: 4, generic: 3, descr: powering }
+                        - { value: 5, generic: 3, descr: nopower }
+                        - { value: 6, generic: 3, descr: notpowering }
+                        - { value: 7, generic: 1, descr: incompatible }

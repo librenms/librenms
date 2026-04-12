@@ -41,6 +41,10 @@ class Module
             return true;
         }
 
+        if (! Laravel::isBooted()) {
+            return true; // if we don't have the config loaded, just allow all modules
+        }
+
         return LibrenmsConfig::has('discovery_modules.' . $module_name) || LibrenmsConfig::has('poller_modules.' . $module_name);
     }
 

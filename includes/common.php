@@ -185,11 +185,6 @@ function device_by_id_cache($device_id, $refresh = false)
     return $device;
 }
 
-function gethostbyid($device_id)
-{
-    return DeviceCache::get((int) $device_id)->hostname;
-}
-
 function getidbyname($hostname)
 {
     return DeviceCache::getByHostname($hostname)->device_id;
@@ -203,11 +198,6 @@ function set_dev_attrib($device, $attrib_type, $attrib_value)
 function get_dev_attrib($device, $attrib_type)
 {
     return DeviceCache::get((int) $device['device_id'])->getAttrib($attrib_type);
-}
-
-function del_dev_attrib($device, $attrib_type)
-{
-    return DeviceCache::get((int) $device['device_id'])->forgetAttrib($attrib_type);
 }
 
 /**

@@ -16,6 +16,81 @@ modules:
                 num_oid: '.1.3.6.1.4.1.8886.60.1.1.1.2.1.1.1.3.{{ $index }}'
                 descr: 'Processor'
     sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - IF-MIB::ifDescr
+        temperature:
+            data:
+                -
+                    oid: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverDDMTable
+                    value: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParameterValue
+                    num_oid: '.1.3.6.1.4.1.8886.60.18.1.2.2.1.1.2.{{ $index }}'
+                    divisor: 1000
+                    index: 'tx-{{ $subindex0 }}'
+                    descr: '{{ IF-MIB::ifDescr:0 }} Transceiver Temperature'
+                    high_limit: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParamHighAlarmThresh
+                    warn_limit: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParamHighWarningThresh
+                    low_limit: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParamLowAlarmThresh
+                    low_warn_limit: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParamLowWarningThresh
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: index
+                            op: 'not_ends'
+                            value: '.1'  # transceiverTemperature
+                        -
+                            oid: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverDDMValidStatus
+                            op: '!='
+                            value: 1
+        dbm:
+            data:
+                -
+                    oid: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverDDMTable
+                    value: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParameterValue
+                    num_oid: '.1.3.6.1.4.1.8886.60.18.1.2.2.1.1.2.{{ $index }}'
+                    divisor: 1000
+                    index: 'tx-{{ $subindex0 }}'
+                    descr: '{{ IF-MIB::ifDescr:0 }} Transmit Power'
+                    high_limit: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParamHighAlarmThresh
+                    warn_limit: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParamHighWarningThresh
+                    low_limit: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParamLowAlarmThresh
+                    low_warn_limit: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParamLowWarningThresh
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: index
+                            op: 'not_ends'
+                            value: '.3'  # txPower
+                        -
+                            oid: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverDDMValidStatus
+                            op: '!='
+                            value: 1
+                -
+                    oid: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverDDMTable
+                    value: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParameterValue
+                    num_oid: '.1.3.6.1.4.1.8886.60.18.1.2.2.1.1.2.{{ $index }}'
+                    divisor: 1000
+                    index: 'rx-{{ $subindex0 }}'
+                    descr: '{{ IF-MIB::ifDescr:0 }} Receive Power'
+                    high_limit: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParamHighAlarmThresh
+                    warn_limit: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParamHighWarningThresh
+                    low_limit: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParamLowAlarmThresh
+                    low_warn_limit: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverParamLowWarningThresh
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: index
+                            op: 'not_ends'
+                            value: '.4'  # rxPower
+                        -
+                            oid: ROSMGMT-OPTICAL-TRANSCEIVER-MIB::rosMgmtOpticalTransceiverDDMValidStatus
+                            op: '!='
+                            value: 1
         state:
             data:
                 -
@@ -25,10 +100,10 @@ modules:
                     descr: 'Config {{ $index }} Load  State'
                     state_name: rosMgmtConfigLoadState
                     states:
-                        - { graph: 0, value: 1, generic: 1, descr: ready }
-                        - { graph: 0, value: 2, generic: 1, descr: running }
-                        - { graph: 0, value: 3, generic: 0, descr: successful }
-                        - { graph: 0, value: 4, generic: 2, descr: failed }
+                        - { value: 1, generic: 1, descr: ready }
+                        - { value: 2, generic: 1, descr: running }
+                        - { value: 3, generic: 0, descr: successful }
+                        - { value: 4, generic: 2, descr: failed }
                 -
                     oid: ROSMGMT-ALARM-MGMT-MIB::rosMgmtAlarmMgmtMonitorLevel
                     value: ROSMGMT-ALARM-MGMT-MIB::rosMgmtAlarmMgmtMonitorLevel
@@ -36,9 +111,9 @@ modules:
                     descr: 'The level of Alarm Monitor'
                     state_name: rosMgmtAlarmMgmtMonitorLevel
                     states:
-                        - { graph: 0, value: 1, generic: 0, descr: clear }
-                        - { graph: 0, value: 2, generic: 0, descr: indeterminate }
-                        - { graph: 0, value: 3, generic: 2, descr: critical }
-                        - { graph: 0, value: 4, generic: 2, descr: major }
-                        - { graph: 0, value: 5, generic: 1, descr: minor }
-                        - { graph: 0, value: 6, generic: 1, descr: warning }
+                        - { value: 1, generic: 0, descr: clear }
+                        - { value: 2, generic: 0, descr: indeterminate }
+                        - { value: 3, generic: 2, descr: critical }
+                        - { value: 4, generic: 2, descr: major }
+                        - { value: 5, generic: 1, descr: minor }
+                        - { value: 6, generic: 1, descr: warning }

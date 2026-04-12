@@ -50,10 +50,10 @@ modules:
                     descr: System Status
                     state_name: systemStatus
                     states:
-                        - { value: 0, descr: Unknown, graph: 0, generic: 3 }
-                        - { value: 1, descr: Ok, graph: 0, generic: 0 }
-                        - { value: 2, descr: Warning, graph: 0, generic: 2 }
-                        - { value: 3, descr: Alarm, graph: 0, generic: 3 }
+                        - { value: 0, descr: Unknown, generic: 3 }
+                        - { value: 1, descr: Ok, generic: 0 }
+                        - { value: 2, descr: Warning, generic: 2 }
+                        - { value: 3, descr: Alarm, generic: 3 }
 
                 -
                     oid: RAY-MIB::rfPowerStatus
@@ -62,9 +62,9 @@ modules:
                     descr: RF Power Status
                     state_name: rfPowerStatus
                     states:
-                        - { value: 0, descr: Unknown, graph: 0, generic: 3 }
-                        - { value: 1, descr: Ok, graph: 0, generic: 0 }
-                        - { value: 2, descr: Failure, graph: 0, generic: 3 }
+                        - { value: 0, descr: Unknown, generic: 3 }
+                        - { value: 1, descr: Ok, generic: 0 }
+                        - { value: 2, descr: Failure, generic: 3 }
 
                 -
                     oid: RAY-MIB::lineStatus
@@ -73,11 +73,11 @@ modules:
                     descr: Radio Link Status
                     state_name: lineStatus
                     states:
-                        - { value: 0, descr: Unknown, graph: 0, generic: 3 }
-                        - { value: 1, descr: Ok, graph: 0, generic: 0 }
-                        - { value: 2, descr: Analyzer, graph: 0, generic: 2 }
-                        - { value: 3, descr: Connecting, graph: 0, generic: 2 }
-                        - { value: 4, descr: Searching, graph: 0, generic: 3 }
+                        - { value: 0, descr: Unknown, generic: 3 }
+                        - { value: 1, descr: Ok, generic: 0 }
+                        - { value: 2, descr: Analyzer, generic: 2 }
+                        - { value: 3, descr: Connecting, generic: 2 }
+                        - { value: 4, descr: Searching, generic: 3 }
 
                 -
                     oid: RAY-MIB::ethPeer
@@ -86,9 +86,9 @@ modules:
                     descr: Peer Station Ethernet Status
                     state_name: ethPeer
                     states:
-                        - { value: 0, descr: Unknown, graph: 0, generic: 3 }
-                        - { value: 1, descr: Up, graph: 0, generic: 0 }
-                        - { value: 2, descr: Down, graph: 0, generic: 3 }
+                        - { value: 0, descr: Unknown, generic: 3 }
+                        - { value: 1, descr: Up, generic: 0 }
+                        - { value: 2, descr: Down, generic: 3 }
 
                 -
                     oid: RAY-MIB::txModulationIndex
@@ -96,12 +96,12 @@ modules:
                     descr: Tx Modulation Rate
                     state_name: txModulationIndex-ray
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'QPSK' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'QAM16' }
-                        - { value: 3, generic: 0, graph: 1, descr: 'QAM32' }
-                        - { value: 4, generic: 0, graph: 1, descr: 'QAM64' }
-                        - { value: 5, generic: 0, graph: 1, descr: 'QAM128' }
-                        - { value: 6, generic: 0, graph: 1, descr: 'QAM256' }
+                        - { value: 1, generic: 0, descr: 'QPSK' }
+                        - { value: 2, generic: 0, descr: 'QAM16' }
+                        - { value: 3, generic: 0, descr: 'QAM32' }
+                        - { value: 4, generic: 0, descr: 'QAM64' }
+                        - { value: 5, generic: 0, descr: 'QAM128' }
+                        - { value: 6, generic: 0, descr: 'QAM256' }
 
                 -
                     oid: RAY-MIB::rxModulationIndex
@@ -109,10 +109,10 @@ modules:
                     descr: Rx Modulation Rate
                     state_name: rxModulationIndex-ray
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'QPSK' }
-                        - { value: 2, generic: 0, graph: 1, descr: 'QAM16' }
-                        - { value: 3, generic: 0, graph: 1, descr: 'QAM32' }
-                        - { value: 4, generic: 0, graph: 1, descr: 'QAM64' }
-                        - { value: 5, generic: 0, graph: 1, descr: 'QAM128' }
-                        - { value: 6, generic: 0, graph: 1, descr: 'QAM256' }
+                        - { value: 1, generic: 0, descr: 'QPSK' }
+                        - { value: 2, generic: 0, descr: 'QAM16' }
+                        - { value: 3, generic: 0, descr: 'QAM32' }
+                        - { value: 4, generic: 0, descr: 'QAM64' }
+                        - { value: 5, generic: 0, descr: 'QAM128' }
+                        - { value: 6, generic: 0, descr: 'QAM256' }
 

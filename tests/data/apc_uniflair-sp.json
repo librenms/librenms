@@ -888,84 +888,72 @@
                 {
                     "state_name": "Air Filter Clogged",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Airflow Good",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Compressor",
                     "state_descr": "On",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Compressor On",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Condensate Pan Full",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Condenser Powered",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Group State",
                     "state_descr": "Assist",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Low Suction Pressure",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Remote Shutdown Active",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Smoke/Fire Detected",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Unit",
                     "state_descr": "On",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Unit State",
                     "state_descr": "Unknown",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 }
@@ -1428,84 +1416,72 @@
                 {
                     "state_name": "Air Filter Clogged",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Airflow Good",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Compressor",
                     "state_descr": "On",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Compressor On",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Condensate Pan Full",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Condenser Powered",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Group State",
                     "state_descr": "Assist",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Low Suction Pressure",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Remote Shutdown Active",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Smoke/Fire Detected",
                     "state_descr": "Yes",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "Unit",
                     "state_descr": "On",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "Unit State",
                     "state_descr": "Unknown",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 3
                 }

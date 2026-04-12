@@ -10,6 +10,6 @@ modules:
                     index: '{{ $index }}'
                     state_name: carpIfTable
                     states:
-                        - { value: 0, descr: init, graph: 1, generic: 1 }
-                        - { value: 1, descr: backup, graph: 1, generic: 0 }
-                        - { value: 2, descr: master, graph: 1, generic: 0 }
+                        - { value: 0, descr: init, generic: 1 }
+                        - { value: 1, descr: backup, generic: 0 }
+                        - { value: 2, descr: master, generic: 0 }
