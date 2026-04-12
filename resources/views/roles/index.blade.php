@@ -68,7 +68,11 @@
                                                     </span>
                                                 @elseif($role->name == 'global-read')
                                                     <span class="label label-primary">
-                                                        {{ __('permissions.rbac.read_permissions') }}
+                                                        {{ __('permissions.rbac.view_all_permissions') }}
+                                                    </span>
+                                                @elseif($role->name == 'user')
+                                                    <span class="label label-primary">
+                                                        {{ __('permissions.rbac.view_permissions') }}
                                                     </span>
                                                 @else
                                                     <span class="tw:text-slate-400 tw:dark:text-dark-white-400 tw:italic">
