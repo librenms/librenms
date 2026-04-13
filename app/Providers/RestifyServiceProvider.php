@@ -83,7 +83,6 @@ use Binaryk\LaravelRestify\Bootstrap\RoutesBoot;
 use Binaryk\LaravelRestify\Restify;
 use Binaryk\LaravelRestify\RestifyApplicationServiceProvider;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Route;
 
 class RestifyServiceProvider extends RestifyApplicationServiceProvider
 {
@@ -96,16 +95,6 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
 
     protected function routes(): void
     {
-        // Register custom v1 action routes BEFORE Restify's catch-all routes
-        Route::prefix('api/v1')
-            ->middleware(['auth:sanctum'])
-            ->group(function () {
-                Route::post('alerts/{alertId}/acknowledge', [AlertRepository::class, 'acknowledge'])
-                    ->where('alertId', '[0-9]+');
-                Route::post('alerts/{alertId}/unmute', [AlertRepository::class, 'unmute'])
-                    ->where('alertId', '[0-9]+');
-            });
-
         parent::routes();
 
         // Parent only registers routes in console (for route:list) and

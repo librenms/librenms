@@ -3,11 +3,12 @@
 namespace App\Restify;
 
 use App\Models\Alert;
+use App\Restify\Actions\AcknowledgeAlertAction;
+use App\Restify\Actions\UnmuteAlertAction;
 use Binaryk\LaravelRestify\Fields\BelongsTo;
 use Binaryk\LaravelRestify\Http\Requests\RestifyRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
-use LibreNMS\Enum\AlertState;
+use Illuminate\Routing\Router;
 
 class AlertRepository extends Repository
 {
@@ -32,8 +33,8 @@ class AlertRepository extends Repository
         return [
             field('device_id')->readonly(),
             field('rule_id')->readonly(),
-            field('state')->rules('integer', 'in:0,1,2'),
-            field('note')->rules('nullable', 'string'),
+            field('state')->readonly(),
+            field('note')->readonly(),
             field('alerted')->readonly(),
             field('open')->readonly(),
             field('timestamp')->readonly(),
@@ -41,8 +42,22 @@ class AlertRepository extends Repository
         ];
     }
 
+    public function actions(RestifyRequest $request): array
+    {
+        // canSee gates BOTH visibility in GET /alerts/actions AND the ability to execute.
+        // (Restify's HTTP path does not call authorizedToRun, only authorizedToSee.)
+        // Per-alert device access is enforced inside each action's handle() because
+        // Restify does not apply the repository's indexQuery to action requests.
+        $canSee = fn (Request $req) => $req->user()?->can('update', Alert::class) ?? false;
+
+        return [
+            AcknowledgeAlertAction::make()->canSee($canSee),
+            UnmuteAlertAction::make()->canSee($canSee),
+        ];
+    }
+
     /**
-     * Alerts are created automatically by the alerting engine based on alert rules — not manually via the API.
+     * Alerts are created automatically by the alerting engine — not manually via the API.
      */
     public static function authorizedToStore(Request $request): bool
     {
@@ -50,64 +65,23 @@ class AlertRepository extends Repository
     }
 
     /**
-     * Alerts are managed by the alerting engine lifecycle — use acknowledge/unmute to change state instead.
+     * Alerts are managed by the alerting engine lifecycle — use acknowledge/unmute actions to change state instead.
      */
     public function authorizedToDelete(Request $request): bool
     {
         return false;
     }
 
-    public function acknowledge(Request $request, int $alertId)
+    /**
+     * Block the standard write verbs at the route layer so Laravel returns 405 (with an Allow header)
+     * instead of Restify's 403. Registered before the default CRUD routes by CustomRoutesBoot.
+     */
+    public static function routes(Router $router, array $attributes, $wrap = true)
     {
-        $alert = Alert::query()->hasAccess($request->user())->findOrFail($alertId);
+        $deny = fn () => abort(405, 'Method Not Allowed', ['Allow' => 'GET, HEAD']);
 
-        Gate::authorize('update', $alert);
-
-        $note = $request->input('note', '');
-        $existingNote = $alert->note ?? '';
-        if ($note) {
-            $alert->note = $existingNote
-                ? $existingNote . "\n" . now()->toDateTimeString() . ' - ' . $request->user()->username . ': ' . $note
-                : now()->toDateTimeString() . ' - ' . $request->user()->username . ': ' . $note;
-        }
-        $alert->state = AlertState::ACKNOWLEDGED;
-        $alert->open = 0;
-        $alert->save();
-
-        return response()->json([
-            'message' => 'Alert acknowledged.',
-            'data' => [
-                'id' => $alert->id,
-                'state' => $alert->state,
-                'note' => $alert->note,
-            ],
-        ]);
-    }
-
-    public function unmute(Request $request, int $alertId)
-    {
-        $alert = Alert::query()->hasAccess($request->user())->findOrFail($alertId);
-
-        Gate::authorize('update', $alert);
-
-        $note = $request->input('note', '');
-        $existingNote = $alert->note ?? '';
-        if ($note) {
-            $alert->note = $existingNote
-                ? $existingNote . "\n" . now()->toDateTimeString() . ' - ' . $request->user()->username . ': ' . $note
-                : now()->toDateTimeString() . ' - ' . $request->user()->username . ': ' . $note;
-        }
-        $alert->state = AlertState::ACTIVE;
-        $alert->open = 1;
-        $alert->save();
-
-        return response()->json([
-            'message' => 'Alert unmuted.',
-            'data' => [
-                'id' => $alert->id,
-                'state' => $alert->state,
-                'note' => $alert->note,
-            ],
-        ]);
+        $router->match(['put', 'patch'], '{alertId}', $deny)->where('alertId', '[0-9]+');
+        $router->delete('{alertId}', $deny)->where('alertId', '[0-9]+');
+        $router->post('/', $deny);
     }
 }
