@@ -31,7 +31,7 @@ if (isset($_POST['config'])) {
 
 <?php
 
-function validate_oxidized_cfg($tree, $wanted_leaf = false)
+function validate_oxidized_cfg($tree, $wanted_leaf = false, $path = '')
 {
     $valid_config = [
         'username' => 'string',
