@@ -73,6 +73,6 @@ return [
     ],
 
     'oxidized' => [
-        'connection_error' => "We couldn't retrieve the device information from Oxidized. Please verify the Oxidized service is running and reachable at: :url",
+        'connection_error' => "We couldn't retrieve the device information from Oxidized",
     ],
 ];
