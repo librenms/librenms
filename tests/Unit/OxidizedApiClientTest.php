@@ -41,13 +41,13 @@ final class OxidizedApiClientTest extends TestCase
 
     public function testGetContentReturnsEmptyStringOnConnectionException(): void
     {
-        Http::fake(function () {
+        Http::fake(function (): void {
             throw new ConnectionException('cURL error 7: Failed to connect');
         });
 
         Log::shouldReceive('warning')
             ->once()
-            ->withArgs(fn ($msg) => str_contains($msg, 'Oxidized is not reachable'));
+            ->withArgs(fn ($msg) => str_contains((string) $msg, 'Oxidized is not reachable'));
 
         $client = new Oxidized();
         $result = $client->getContent('/node/show/192.168.10.241?format=json');
@@ -81,13 +81,13 @@ final class OxidizedApiClientTest extends TestCase
 
     public function testUpdateNodeReturnsFalseOnConnectionException(): void
     {
-        Http::fake(function () {
+        Http::fake(function (): void {
             throw new ConnectionException('cURL error 7: Failed to connect');
         });
 
         Log::shouldReceive('warning')
             ->once()
-            ->withArgs(fn ($msg) => str_contains($msg, 'Oxidized is not reachable'));
+            ->withArgs(fn ($msg) => str_contains((string) $msg, 'Oxidized is not reachable'));
 
         $client = new Oxidized();
         $result = $client->updateNode('router', 'config changed', 'admin');
@@ -99,13 +99,13 @@ final class OxidizedApiClientTest extends TestCase
     {
         LibrenmsConfig::set('oxidized.reload_nodes', true);
 
-        Http::fake(function () {
+        Http::fake(function (): void {
             throw new ConnectionException('cURL error 7: Failed to connect');
         });
 
         Log::shouldReceive('warning')
             ->once()
-            ->withArgs(fn ($msg) => str_contains($msg, 'Oxidized is not reachable'));
+            ->withArgs(fn ($msg) => str_contains((string) $msg, 'Oxidized is not reachable'));
 
         $client = new Oxidized();
 
