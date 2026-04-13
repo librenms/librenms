@@ -143,7 +143,7 @@ foreach ($day_data as $day) {
     echo '<div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false"';
     echo ' class="tw:flex-1 tw:h-[34px] tw:rounded-sm tw:cursor-pointer tw:relative" style="background:' . $day['color'] . ';">';
     echo '<div x-show="open" x-cloak';
-    echo ' class="tw:absolute tw:bottom-[42px] tw:left-1/2 tw:-translate-x-1/2 tw:bg-white tw:border tw:border-gray-300 tw:rounded tw:px-2.5 tw:py-1.5 tw:text-xs tw:whitespace-nowrap tw:z-[9999] tw:shadow-md tw:pointer-events-none">';
+    echo ' class="tw:absolute tw:bottom-[42px] tw:left-1/2 tw:-translate-x-1/2 tw:bg-white tw:border tw:border-gray-300 tw:rounded tw:min-w-[280px] tw:px-8 tw:py-5 tw:text-xl tw:font-medium tw:whitespace-nowrap tw:z-[9999] tw:shadow-md tw:pointer-events-none">';
     echo $tip;
     echo '</div>';
     echo '</div>';
