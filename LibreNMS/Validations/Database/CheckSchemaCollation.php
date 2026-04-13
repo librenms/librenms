@@ -44,7 +44,7 @@ class CheckSchemaCollation implements Validation, ValidationFixer
         $db_collation_sql = "SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME
             FROM information_schema.SCHEMATA S
             WHERE schema_name = '$db_name' AND
-            ( DEFAULT_CHARACTER_SET_NAME != 'utf8mb4' OR DEFAULT_COLLATION_NAME != 'utf8mb4_unicode_ci' OR DEFAULT_COLLATION_NAME != 'utf8mb4_uca1400_ai_ci')";
+            ( DEFAULT_CHARACTER_SET_NAME != 'utf8mb4' OR DEFAULT_COLLATION_NAME NOT IN ('utf8mb4_unicode_ci', 'utf8mb4_uca1400_ai_ci'))";
         $collation = Eloquent::DB()->selectOne($db_collation_sql);
         if (empty($collation) !== true) {
             return ValidationResult::fail(
@@ -56,7 +56,7 @@ class CheckSchemaCollation implements Validation, ValidationFixer
         $table_collation_sql = "SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME
             FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C
             WHERE C.collation_name = T.table_collation AND T.table_schema = '$db_name' AND
-             ( C.CHARACTER_SET_NAME != 'utf8mb4' OR C.COLLATION_NAME != 'utf8mb4_unicode_ci' );";
+             ( C.CHARACTER_SET_NAME != 'utf8mb4' OR C.COLLATION_NAME NOT IN ('utf8mb4_unicode_ci', 'utf8mb4_uca1400_ai_ci'));";
         $collation_tables = Eloquent::DB()->select($table_collation_sql);
         if (empty($collation_tables) !== true) {
             return ValidationResult::fail('MySQL tables collation is wrong: ')
@@ -67,7 +67,7 @@ class CheckSchemaCollation implements Validation, ValidationFixer
 
         $column_collation_sql = "SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME
             FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$db_name' AND
-            ( CHARACTER_SET_NAME != 'utf8mb4' OR COLLATION_NAME != 'utf8mb4_unicode_ci' );";
+            ( CHARACTER_SET_NAME != 'utf8mb4' OR  COLLATION_NAME NOT IN ('utf8mb4_unicode_ci', 'utf8mb4_uca1400_ai_ci'));";
         $collation_columns = Eloquent::DB()->select($column_collation_sql);
         if (empty($collation_columns) !== true) {
             return ValidationResult::fail('MySQL column collation is wrong: ')
