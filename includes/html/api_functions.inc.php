@@ -428,8 +428,8 @@ function add_device(Illuminate\Http\Request $request)
         return api_error(400, 'Missing the device hostname');
     }
 
-    if (! \LibreNMS\Util\Validate::hostname($hostname) && ! IP::isValid($hostname)) {
-        return api_error(400, 'Invalid hostname or IP: ' . $hostname);
+    if (! \LibreNMS\Util\Validate::hostname($data['hostname']) && ! IP::isValid($data['hostname'])) {
+        return api_error(400, 'Invalid hostname or IP: ' . $data['hostname']);
     }
 
     try {
