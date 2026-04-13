@@ -161,7 +161,7 @@ function validate_oxidized_cfg($tree, $wanted_leaf = false)
             }
         } else {
             if (! isset($valid_config_tmp[$leaf]) && ($valid_config_tmp !== 'array' && $valid_config_tmp[$leaf] !== 'array')) {
-                $output[] = "[$current_path] - is not valid";
+                $output[] = "$current_path - is not valid";
             }
         }
     }
