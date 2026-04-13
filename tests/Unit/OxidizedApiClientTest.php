@@ -52,7 +52,7 @@ final class OxidizedApiClientTest extends TestCase
         $client = new Oxidized();
         $result = $client->getContent('/node/show/192.168.10.241?format=json');
 
-        $this->assertSame('', $result, 'getContent() should return empty string when Oxidized is unreachable');
+        $this->assertSame('', $result, 'getContent() should return an empty string when Oxidized is unreachable');
     }
 
     public function testGetContentReturnsEmptyStringWhenDisabled(): void
@@ -64,7 +64,7 @@ final class OxidizedApiClientTest extends TestCase
         $client = new Oxidized();
         $result = $client->getContent('/node/show/router?format=json');
 
-        $this->assertSame('', $result, 'getContent() should return empty string when Oxidized is disabled');
+        $this->assertSame('', $result, 'getContent() should return an empty string when Oxidized is disabled');
         Http::assertNothingSent();
     }
 
@@ -110,7 +110,6 @@ final class OxidizedApiClientTest extends TestCase
         $client = new Oxidized();
 
         // Should not throw
-        $this->expectNotToPerformAssertions();
         $client->reloadNodes();
     }
 }
