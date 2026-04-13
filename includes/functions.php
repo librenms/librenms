@@ -10,7 +10,6 @@
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\StateTranslation;
 use Illuminate\Support\Facades\DB;
