@@ -23,6 +23,28 @@ class SlaRepository extends Repository
         'rtt_type',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'sla_nr' => 'integer',
+        'owner' => 'text',
+        'tag' => 'text',
+        'rtt_type' => 'text',
+        'rtt' => 'integer',
+        'status' => 'integer',
+        'opstatus' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'sla_nr',
+        'owner',
+        'tag',
+        'rtt_type',
+        'rtt',
+        'status',
+        'opstatus',
+    ];
+
     public static function related(): array
     {
         return [

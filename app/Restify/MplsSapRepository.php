@@ -22,6 +22,38 @@ class MplsSapRepository extends Repository
         'ifName',
     ];
 
+    public static array $match = [
+        'svc_id' => 'integer',
+        'svc_oid' => 'integer',
+        'sapPortId' => 'integer',
+        'ifName' => 'text',
+        'sapEncapValue' => 'text',
+        'device_id' => 'integer',
+        'sapRowStatus' => 'text',
+        'sapType' => 'text',
+        'sapDescription' => 'text',
+        'sapAdminStatus' => 'text',
+        'sapOperStatus' => 'text',
+        'sapLastMgmtChange' => 'integer',
+        'sapLastStatusChange' => 'integer',
+    ];
+
+    public static array $sort = [
+        'svc_id',
+        'svc_oid',
+        'sapPortId',
+        'ifName',
+        'sapEncapValue',
+        'device_id',
+        'sapRowStatus',
+        'sapType',
+        'sapDescription',
+        'sapAdminStatus',
+        'sapOperStatus',
+        'sapLastMgmtChange',
+        'sapLastStatusChange',
+    ];
+
     public static function related(): array
     {
         return [

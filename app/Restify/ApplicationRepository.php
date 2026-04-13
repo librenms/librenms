@@ -22,6 +22,24 @@ class ApplicationRepository extends Repository
         'app_instance',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'app_type' => 'text',
+        'app_instance' => 'text',
+        'app_status' => 'text',
+        'app_state' => 'text',
+        'discovered' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'app_type',
+        'app_instance',
+        'app_status',
+        'app_state',
+        'discovered',
+    ];
+
     public static function related(): array
     {
         return [

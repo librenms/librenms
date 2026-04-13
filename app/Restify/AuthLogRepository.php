@@ -19,6 +19,20 @@ class AuthLogRepository extends Repository
         'address',
     ];
 
+    public static array $match = [
+        'datetime' => 'datetime',
+        'user' => 'text',
+        'address' => 'text',
+        'result' => 'text',
+    ];
+
+    public static array $sort = [
+        'datetime',
+        'user',
+        'address',
+        'result',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

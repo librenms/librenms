@@ -23,6 +23,44 @@ class PortRepository extends Repository
         'ifDescr',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'ifIndex' => 'integer',
+        'ifName' => 'text',
+        'ifAlias' => 'text',
+        'ifDescr' => 'text',
+        'ifType' => 'text',
+        'ifSpeed' => 'integer',
+        'ifHighSpeed' => 'text',
+        'ifOperStatus' => 'text',
+        'ifAdminStatus' => 'text',
+        'ifMtu' => 'integer',
+        'ifPhysAddress' => 'text',
+        'ifInOctets' => 'integer',
+        'ifOutOctets' => 'integer',
+        'ifInErrors' => 'integer',
+        'ifOutErrors' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'ifIndex',
+        'ifName',
+        'ifAlias',
+        'ifDescr',
+        'ifType',
+        'ifSpeed',
+        'ifHighSpeed',
+        'ifOperStatus',
+        'ifAdminStatus',
+        'ifMtu',
+        'ifPhysAddress',
+        'ifInOctets',
+        'ifOutOctets',
+        'ifInErrors',
+        'ifOutErrors',
+    ];
+
     public static function related(): array
     {
         return [

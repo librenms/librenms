@@ -20,6 +20,24 @@ class AlertRepository extends Repository
 
     public static array $search = [];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'rule_id' => 'integer',
+        'state' => 'integer',
+        'alerted' => 'integer',
+        'open' => 'integer',
+        'timestamp' => 'datetime',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'rule_id',
+        'state',
+        'alerted',
+        'open',
+        'timestamp',
+    ];
+
     public static function related(): array
     {
         return [

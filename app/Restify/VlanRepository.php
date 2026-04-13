@@ -22,6 +22,24 @@ class VlanRepository extends Repository
         'vlan_vlan',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'vlan_vlan' => 'integer',
+        'vlan_domain' => 'integer',
+        'vlan_name' => 'text',
+        'vlan_type' => 'text',
+        'vlan_mtu' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'vlan_vlan',
+        'vlan_domain',
+        'vlan_name',
+        'vlan_type',
+        'vlan_mtu',
+    ];
+
     public static function related(): array
     {
         return [

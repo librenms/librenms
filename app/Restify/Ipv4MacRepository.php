@@ -19,6 +19,22 @@ class Ipv4MacRepository extends Repository
         'mac_address',
     ];
 
+    public static array $match = [
+        'port_id' => 'integer',
+        'device_id' => 'integer',
+        'mac_address' => 'text',
+        'ipv4_address' => 'text',
+        'context_name' => 'text',
+    ];
+
+    public static array $sort = [
+        'port_id',
+        'device_id',
+        'mac_address',
+        'ipv4_address',
+        'context_name',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

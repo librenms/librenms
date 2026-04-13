@@ -19,6 +19,16 @@ class PortGroupRepository extends Repository
         'desc',
     ];
 
+    public static array $match = [
+        'name' => 'text',
+        'desc' => 'text',
+    ];
+
+    public static array $sort = [
+        'name',
+        'desc',
+    ];
+
     public static function related(): array
     {
         return [

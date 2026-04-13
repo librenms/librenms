@@ -20,6 +20,22 @@ class Ipv4AddressRepository extends Repository
         'ipv4_address',
     ];
 
+    public static array $match = [
+        'ipv4_address' => 'text',
+        'ipv4_prefixlen' => 'integer',
+        'ipv4_network_id' => 'integer',
+        'port_id' => 'integer',
+        'context_name' => 'text',
+    ];
+
+    public static array $sort = [
+        'ipv4_address',
+        'ipv4_prefixlen',
+        'ipv4_network_id',
+        'port_id',
+        'context_name',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

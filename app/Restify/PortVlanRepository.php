@@ -21,6 +21,28 @@ class PortVlanRepository extends Repository
         'state',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'port_id' => 'integer',
+        'vlan' => 'integer',
+        'baseport' => 'integer',
+        'priority' => 'integer',
+        'state' => 'text',
+        'cost' => 'integer',
+        'untagged' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'port_id',
+        'vlan',
+        'baseport',
+        'priority',
+        'state',
+        'cost',
+        'untagged',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

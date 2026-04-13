@@ -17,6 +17,14 @@ class PollerGroupRepository extends Repository
         'group_name',
     ];
 
+    public static array $match = [
+        'group_name' => 'text',
+    ];
+
+    public static array $sort = [
+        'group_name',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

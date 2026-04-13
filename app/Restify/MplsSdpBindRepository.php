@@ -17,6 +17,44 @@ class MplsSdpBindRepository extends Repository
 
     public static string $title = 'bind_id';
 
+    public static array $match = [
+        'sdp_id' => 'integer',
+        'svc_id' => 'integer',
+        'sdp_oid' => 'integer',
+        'svc_oid' => 'integer',
+        'device_id' => 'integer',
+        'sdpBindRowStatus' => 'text',
+        'sdpBindAdminStatus' => 'text',
+        'sdpBindOperStatus' => 'text',
+        'sdpBindLastMgmtChange' => 'integer',
+        'sdpBindLastStatusChange' => 'integer',
+        'sdpBindType' => 'text',
+        'sdpBindVcType' => 'text',
+        'sdpBindBaseStatsIngFwdPackets' => 'integer',
+        'sdpBindBaseStatsIngFwdOctets' => 'integer',
+        'sdpBindBaseStatsEgrFwdPackets' => 'integer',
+        'sdpBindBaseStatsEgrFwdOctets' => 'integer',
+    ];
+
+    public static array $sort = [
+        'sdp_id',
+        'svc_id',
+        'sdp_oid',
+        'svc_oid',
+        'device_id',
+        'sdpBindRowStatus',
+        'sdpBindAdminStatus',
+        'sdpBindOperStatus',
+        'sdpBindLastMgmtChange',
+        'sdpBindLastStatusChange',
+        'sdpBindType',
+        'sdpBindVcType',
+        'sdpBindBaseStatsIngFwdPackets',
+        'sdpBindBaseStatsIngFwdOctets',
+        'sdpBindBaseStatsEgrFwdPackets',
+        'sdpBindBaseStatsEgrFwdOctets',
+    ];
+
     public static function related(): array
     {
         return [

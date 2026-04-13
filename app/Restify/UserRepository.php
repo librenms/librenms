@@ -22,6 +22,20 @@ class UserRepository extends Repository
         'email',
     ];
 
+    public static array $match = [
+        'username' => 'text',
+        'realname' => 'text',
+        'email' => 'text',
+        'enabled' => 'integer',
+    ];
+
+    public static array $sort = [
+        'username',
+        'realname',
+        'email',
+        'enabled',
+    ];
+
     public static function related(): array
     {
         return [

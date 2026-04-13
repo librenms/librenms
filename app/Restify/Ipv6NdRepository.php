@@ -20,6 +20,22 @@ class Ipv6NdRepository extends Repository
         'mac_address',
     ];
 
+    public static array $match = [
+        'port_id' => 'integer',
+        'device_id' => 'integer',
+        'mac_address' => 'text',
+        'ipv6_address' => 'text',
+        'context_name' => 'text',
+    ];
+
+    public static array $sort = [
+        'port_id',
+        'device_id',
+        'mac_address',
+        'ipv6_address',
+        'context_name',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

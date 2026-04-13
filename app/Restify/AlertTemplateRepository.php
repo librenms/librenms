@@ -17,6 +17,16 @@ class AlertTemplateRepository extends Repository
         'name',
     ];
 
+    public static array $match = [
+        'name' => 'text',
+        'title' => 'text',
+    ];
+
+    public static array $sort = [
+        'name',
+        'title',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

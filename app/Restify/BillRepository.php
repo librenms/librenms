@@ -23,6 +23,46 @@ class BillRepository extends Repository
         'bill_notes',
     ];
 
+    public static array $match = [
+        'bill_name' => 'text',
+        'bill_type' => 'text',
+        'bill_day' => 'integer',
+        'bill_custid' => 'text',
+        'bill_ref' => 'text',
+        'bill_notes' => 'text',
+        'rate_95th_in' => 'integer',
+        'rate_95th_out' => 'integer',
+        'rate_95th' => 'integer',
+        'dir_95th' => 'text',
+        'total_data' => 'integer',
+        'total_data_in' => 'integer',
+        'total_data_out' => 'integer',
+        'rate_average_in' => 'integer',
+        'rate_average_out' => 'integer',
+        'rate_average' => 'integer',
+        'bill_last_calc' => 'datetime',
+    ];
+
+    public static array $sort = [
+        'bill_name',
+        'bill_type',
+        'bill_day',
+        'bill_custid',
+        'bill_ref',
+        'bill_notes',
+        'rate_95th_in',
+        'rate_95th_out',
+        'rate_95th',
+        'dir_95th',
+        'total_data',
+        'total_data_in',
+        'total_data_out',
+        'rate_average_in',
+        'rate_average_out',
+        'rate_average',
+        'bill_last_calc',
+    ];
+
     public static function related(): array
     {
         return [

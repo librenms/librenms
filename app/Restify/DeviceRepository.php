@@ -25,6 +25,60 @@ class DeviceRepository extends Repository
         'os',
     ];
 
+    public static array $match = [
+        'hostname' => 'text',
+        'sysName' => 'text',
+        'sysDescr' => 'text',
+        'sysObjectID' => 'text',
+        'os' => 'text',
+        'status' => 'bool',
+        'status_reason' => 'text',
+        'hardware' => 'text',
+        'serial' => 'text',
+        'version' => 'text',
+        'features' => 'text',
+        'ip' => 'text',
+        'uptime' => 'integer',
+        'display' => 'text',
+        'overwrite_ip' => 'text',
+        'purpose' => 'text',
+        'type' => 'text',
+        'is_polling_enabled' => 'bool',
+        'is_alerting_enabled' => 'bool',
+        'is_ignored' => 'bool',
+        'is_status_ignored' => 'bool',
+        'sys_location_override' => 'text',
+        'sys_location' => 'text',
+        'poller_group_id' => 'integer',
+    ];
+
+    public static array $sort = [
+        'hostname',
+        'sysName',
+        'sysDescr',
+        'sysObjectID',
+        'os',
+        'status',
+        'status_reason',
+        'hardware',
+        'serial',
+        'version',
+        'features',
+        'ip',
+        'uptime',
+        'display',
+        'overwrite_ip',
+        'purpose',
+        'type',
+        'is_polling_enabled',
+        'is_alerting_enabled',
+        'is_ignored',
+        'is_status_ignored',
+        'sys_location_override',
+        'sys_location',
+        'poller_group_id',
+    ];
+
     public static function related(): array
     {
         return [

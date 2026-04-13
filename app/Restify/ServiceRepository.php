@@ -22,6 +22,34 @@ class ServiceRepository extends Repository
         'service_name',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'service_type' => 'text',
+        'service_name' => 'text',
+        'service_desc' => 'text',
+        'service_ip' => 'text',
+        'service_status' => 'integer',
+        'service_message' => 'text',
+        'service_changed' => 'integer',
+        'service_ignore' => 'integer',
+        'service_disabled' => 'integer',
+        'service_template_id' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'service_type',
+        'service_name',
+        'service_desc',
+        'service_ip',
+        'service_status',
+        'service_message',
+        'service_changed',
+        'service_ignore',
+        'service_disabled',
+        'service_template_id',
+    ];
+
     public static function related(): array
     {
         return [

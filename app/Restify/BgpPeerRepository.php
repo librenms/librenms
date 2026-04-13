@@ -24,6 +24,46 @@ class BgpPeerRepository extends Repository
         'astext',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'vrf_id' => 'integer',
+        'bgpPeerIdentifier' => 'text',
+        'bgpPeerRemoteAs' => 'integer',
+        'bgpPeerState' => 'text',
+        'bgpPeerAdminStatus' => 'text',
+        'bgpLocalAddr' => 'text',
+        'bgpPeerRemoteAddr' => 'text',
+        'bgpPeerDescr' => 'text',
+        'bgpPeerIface' => 'integer',
+        'astext' => 'text',
+        'bgpPeerInUpdates' => 'integer',
+        'bgpPeerOutUpdates' => 'integer',
+        'bgpPeerInTotalMessages' => 'integer',
+        'bgpPeerOutTotalMessages' => 'integer',
+        'bgpPeerFsmEstablishedTime' => 'integer',
+        'bgpPeerInUpdateElapsedTime' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'vrf_id',
+        'bgpPeerIdentifier',
+        'bgpPeerRemoteAs',
+        'bgpPeerState',
+        'bgpPeerAdminStatus',
+        'bgpLocalAddr',
+        'bgpPeerRemoteAddr',
+        'bgpPeerDescr',
+        'bgpPeerIface',
+        'astext',
+        'bgpPeerInUpdates',
+        'bgpPeerOutUpdates',
+        'bgpPeerInTotalMessages',
+        'bgpPeerOutTotalMessages',
+        'bgpPeerFsmEstablishedTime',
+        'bgpPeerInUpdateElapsedTime',
+    ];
+
     public static function related(): array
     {
         return [

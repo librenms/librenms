@@ -18,6 +18,20 @@ class LocationRepository extends Repository
         'location',
     ];
 
+    public static array $match = [
+        'location' => 'text',
+        'lat' => 'integer',
+        'lng' => 'integer',
+        'fixed_coordinates' => 'bool',
+    ];
+
+    public static array $sort = [
+        'location',
+        'lat',
+        'lng',
+        'fixed_coordinates',
+    ];
+
     public static function related(): array
     {
         return [

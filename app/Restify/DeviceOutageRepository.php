@@ -15,6 +15,18 @@ class DeviceOutageRepository extends Repository
 
     public static string $title = 'going_down';
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'going_down' => 'integer',
+        'up_again' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'going_down',
+        'up_again',
+    ];
+
     public static function related(): array
     {
         return [

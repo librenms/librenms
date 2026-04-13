@@ -20,6 +20,46 @@ class OspfInstanceRepository extends Repository
         'context_name',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'ospf_instance_id' => 'integer',
+        'ospfRouterId' => 'text',
+        'ospfAdminStat' => 'text',
+        'ospfVersionNumber' => 'text',
+        'ospfAreaBdrRtrStatus' => 'text',
+        'ospfASBdrRtrStatus' => 'text',
+        'ospfExternLsaCount' => 'integer',
+        'ospfExternLsaCksumSum' => 'integer',
+        'ospfTOSSupport' => 'text',
+        'ospfOriginateNewLsas' => 'integer',
+        'ospfRxNewLsas' => 'integer',
+        'ospfExtLsdbLimit' => 'integer',
+        'ospfMulticastExtensions' => 'integer',
+        'ospfExitOverflowInterval' => 'integer',
+        'ospfDemandExtensions' => 'text',
+        'context_name' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'ospf_instance_id',
+        'ospfRouterId',
+        'ospfAdminStat',
+        'ospfVersionNumber',
+        'ospfAreaBdrRtrStatus',
+        'ospfASBdrRtrStatus',
+        'ospfExternLsaCount',
+        'ospfExternLsaCksumSum',
+        'ospfTOSSupport',
+        'ospfOriginateNewLsas',
+        'ospfRxNewLsas',
+        'ospfExtLsdbLimit',
+        'ospfMulticastExtensions',
+        'ospfExitOverflowInterval',
+        'ospfDemandExtensions',
+        'context_name',
+    ];
+
     public static function related(): array
     {
         return [

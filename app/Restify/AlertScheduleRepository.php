@@ -17,6 +17,22 @@ class AlertScheduleRepository extends Repository
         'title',
     ];
 
+    public static array $match = [
+        'title' => 'text',
+        'recurring' => 'integer',
+        'start' => 'datetime',
+        'end' => 'datetime',
+        'status' => 'text',
+    ];
+
+    public static array $sort = [
+        'title',
+        'recurring',
+        'start',
+        'end',
+        'status',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

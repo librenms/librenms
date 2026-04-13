@@ -15,6 +15,20 @@ class AlertLogRepository extends Repository
 
     public static string $title = 'id';
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'rule_id' => 'integer',
+        'state' => 'integer',
+        'time_logged' => 'datetime',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'rule_id',
+        'state',
+        'time_logged',
+    ];
+
     public static function related(): array
     {
         return [

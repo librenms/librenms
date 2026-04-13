@@ -23,6 +23,24 @@ class EventlogRepository extends Repository
         'username',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'datetime' => 'datetime',
+        'type' => 'text',
+        'reference' => 'text',
+        'username' => 'text',
+        'severity' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'datetime',
+        'type',
+        'reference',
+        'username',
+        'severity',
+    ];
+
     public static function related(): array
     {
         return [

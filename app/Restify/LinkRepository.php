@@ -22,6 +22,32 @@ class LinkRepository extends Repository
         'protocol',
     ];
 
+    public static array $match = [
+        'local_port_id' => 'integer',
+        'local_device_id' => 'integer',
+        'remote_port_id' => 'integer',
+        'active' => 'integer',
+        'protocol' => 'text',
+        'remote_hostname' => 'text',
+        'remote_device_id' => 'integer',
+        'remote_port' => 'text',
+        'remote_platform' => 'text',
+        'remote_version' => 'text',
+    ];
+
+    public static array $sort = [
+        'local_port_id',
+        'local_device_id',
+        'remote_port_id',
+        'active',
+        'protocol',
+        'remote_hostname',
+        'remote_device_id',
+        'remote_port',
+        'remote_platform',
+        'remote_version',
+    ];
+
     public static function related(): array
     {
         return [

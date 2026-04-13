@@ -22,6 +22,52 @@ class MplsLspPathRepository extends Repository
         'mplsLspPathFailNodeAddr',
     ];
 
+    public static array $match = [
+        'lsp_id' => 'integer',
+        'path_oid' => 'integer',
+        'device_id' => 'integer',
+        'mplsLspPathRowStatus' => 'text',
+        'mplsLspPathLastChange' => 'integer',
+        'mplsLspPathType' => 'text',
+        'mplsLspPathBandwidth' => 'integer',
+        'mplsLspPathOperBandwidth' => 'integer',
+        'mplsLspPathAdminState' => 'text',
+        'mplsLspPathOperState' => 'text',
+        'mplsLspPathState' => 'text',
+        'mplsLspPathFailCode' => 'text',
+        'mplsLspPathFailNodeAddr' => 'text',
+        'mplsLspPathMetric' => 'integer',
+        'mplsLspPathOperMetric' => 'integer',
+        'mplsLspPathTimeUp' => 'integer',
+        'mplsLspPathTimeDown' => 'integer',
+        'mplsLspPathTransitionCount' => 'integer',
+        'mplsLspPathTunnelARHopListIndex' => 'integer',
+        'mplsLspPathTunnelCHopListIndex' => 'integer',
+    ];
+
+    public static array $sort = [
+        'lsp_id',
+        'path_oid',
+        'device_id',
+        'mplsLspPathRowStatus',
+        'mplsLspPathLastChange',
+        'mplsLspPathType',
+        'mplsLspPathBandwidth',
+        'mplsLspPathOperBandwidth',
+        'mplsLspPathAdminState',
+        'mplsLspPathOperState',
+        'mplsLspPathState',
+        'mplsLspPathFailCode',
+        'mplsLspPathFailNodeAddr',
+        'mplsLspPathMetric',
+        'mplsLspPathOperMetric',
+        'mplsLspPathTimeUp',
+        'mplsLspPathTimeDown',
+        'mplsLspPathTransitionCount',
+        'mplsLspPathTunnelARHopListIndex',
+        'mplsLspPathTunnelCHopListIndex',
+    ];
+
     public static function related(): array
     {
         return [

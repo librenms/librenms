@@ -22,6 +22,32 @@ class MempoolRepository extends Repository
         'mempool_type',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'mempool_type' => 'text',
+        'mempool_class' => 'text',
+        'mempool_descr' => 'text',
+        'mempool_perc' => 'integer',
+        'mempool_used' => 'integer',
+        'mempool_free' => 'integer',
+        'mempool_total' => 'integer',
+        'mempool_perc_warn' => 'integer',
+        'mempool_index' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'mempool_type',
+        'mempool_class',
+        'mempool_descr',
+        'mempool_perc',
+        'mempool_used',
+        'mempool_free',
+        'mempool_total',
+        'mempool_perc_warn',
+        'mempool_index',
+    ];
+
     public static function related(): array
     {
         return [

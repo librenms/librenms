@@ -23,6 +23,54 @@ class MplsLspRepository extends Repository
         'mplsLspToAddr',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'vrf_oid' => 'integer',
+        'lsp_oid' => 'integer',
+        'mplsLspRowStatus' => 'text',
+        'mplsLspLastChange' => 'integer',
+        'mplsLspName' => 'text',
+        'mplsLspAdminState' => 'text',
+        'mplsLspOperState' => 'text',
+        'mplsLspFromAddr' => 'text',
+        'mplsLspToAddr' => 'text',
+        'mplsLspType' => 'text',
+        'mplsLspFastReroute' => 'text',
+        'mplsLspAge' => 'integer',
+        'mplsLspTimeUp' => 'integer',
+        'mplsLspTimeDown' => 'integer',
+        'mplsLspPrimaryTimeUp' => 'integer',
+        'mplsLspTransitions' => 'integer',
+        'mplsLspLastTransition' => 'integer',
+        'mplsLspConfiguredPaths' => 'integer',
+        'mplsLspStandbyPaths' => 'integer',
+        'mplsLspOperationalPaths' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'vrf_oid',
+        'lsp_oid',
+        'mplsLspRowStatus',
+        'mplsLspLastChange',
+        'mplsLspName',
+        'mplsLspAdminState',
+        'mplsLspOperState',
+        'mplsLspFromAddr',
+        'mplsLspToAddr',
+        'mplsLspType',
+        'mplsLspFastReroute',
+        'mplsLspAge',
+        'mplsLspTimeUp',
+        'mplsLspTimeDown',
+        'mplsLspPrimaryTimeUp',
+        'mplsLspTransitions',
+        'mplsLspLastTransition',
+        'mplsLspConfiguredPaths',
+        'mplsLspStandbyPaths',
+        'mplsLspOperationalPaths',
+    ];
+
     public static function related(): array
     {
         return [

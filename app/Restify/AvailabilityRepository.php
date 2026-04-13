@@ -17,6 +17,18 @@ class AvailabilityRepository extends Repository
 
     public static string $title = 'duration';
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'duration' => 'integer',
+        'availability_perc' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'duration',
+        'availability_perc',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

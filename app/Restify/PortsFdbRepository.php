@@ -21,6 +21,22 @@ class PortsFdbRepository extends Repository
         'mac_address',
     ];
 
+    public static array $match = [
+        'port_id' => 'integer',
+        'mac_address' => 'text',
+        'vlan_id' => 'integer',
+        'device_id' => 'integer',
+        'updated_at' => 'datetime',
+    ];
+
+    public static array $sort = [
+        'port_id',
+        'mac_address',
+        'vlan_id',
+        'device_id',
+        'updated_at',
+    ];
+
     public static function related(): array
     {
         return [

@@ -20,6 +20,42 @@ class OspfNbrRepository extends Repository
         'ospfNbrRtrId',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'port_id' => 'integer',
+        'ospf_nbr_id' => 'text',
+        'ospfNbrIpAddr' => 'text',
+        'ospfNbrAddressLessIndex' => 'integer',
+        'ospfNbrRtrId' => 'text',
+        'ospfNbrOptions' => 'integer',
+        'ospfNbrPriority' => 'integer',
+        'ospfNbrState' => 'text',
+        'ospfNbrEvents' => 'integer',
+        'ospfNbrLsRetransQLen' => 'integer',
+        'ospfNbmaNbrStatus' => 'text',
+        'ospfNbmaNbrPermanence' => 'text',
+        'ospfNbrHelloSuppressed' => 'text',
+        'context_name' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'port_id',
+        'ospf_nbr_id',
+        'ospfNbrIpAddr',
+        'ospfNbrAddressLessIndex',
+        'ospfNbrRtrId',
+        'ospfNbrOptions',
+        'ospfNbrPriority',
+        'ospfNbrState',
+        'ospfNbrEvents',
+        'ospfNbrLsRetransQLen',
+        'ospfNbmaNbrStatus',
+        'ospfNbmaNbrPermanence',
+        'ospfNbrHelloSuppressed',
+        'context_name',
+    ];
+
     public static function related(): array
     {
         return [

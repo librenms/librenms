@@ -19,6 +19,24 @@ class ServiceTemplateRepository extends Repository
         'desc',
     ];
 
+    public static array $match = [
+        'name' => 'text',
+        'check' => 'text',
+        'type' => 'text',
+        'desc' => 'text',
+        'ip' => 'text',
+        'disabled' => 'integer',
+    ];
+
+    public static array $sort = [
+        'name',
+        'check',
+        'type',
+        'desc',
+        'ip',
+        'disabled',
+    ];
+
     public static function related(): array
     {
         return [

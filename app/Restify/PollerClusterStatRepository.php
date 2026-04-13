@@ -14,6 +14,26 @@ class PollerClusterStatRepository extends Repository
 
     public static string $title = 'poller_type';
 
+    public static array $match = [
+        'parent_poller' => 'integer',
+        'poller_type' => 'text',
+        'depth' => 'integer',
+        'devices' => 'integer',
+        'worker_seconds' => 'integer',
+        'workers' => 'integer',
+        'frequency' => 'integer',
+    ];
+
+    public static array $sort = [
+        'parent_poller',
+        'poller_type',
+        'depth',
+        'devices',
+        'worker_seconds',
+        'workers',
+        'frequency',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

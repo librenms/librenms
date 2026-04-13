@@ -20,6 +20,36 @@ class OspfAreaRepository extends Repository
         'context_name',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'ospfAreaId' => 'text',
+        'ospfAuthType' => 'text',
+        'ospfImportAsExtern' => 'text',
+        'ospfSpfRuns' => 'integer',
+        'ospfAreaBdrRtrCount' => 'integer',
+        'ospfAsBdrRtrCount' => 'integer',
+        'ospfAreaLsaCount' => 'integer',
+        'ospfAreaLsaCksumSum' => 'integer',
+        'ospfAreaSummary' => 'text',
+        'ospfAreaStatus' => 'text',
+        'context_name' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'ospfAreaId',
+        'ospfAuthType',
+        'ospfImportAsExtern',
+        'ospfSpfRuns',
+        'ospfAreaBdrRtrCount',
+        'ospfAsBdrRtrCount',
+        'ospfAreaLsaCount',
+        'ospfAreaLsaCksumSum',
+        'ospfAreaSummary',
+        'ospfAreaStatus',
+        'context_name',
+    ];
+
     public static function related(): array
     {
         return [

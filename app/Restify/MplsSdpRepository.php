@@ -22,6 +22,40 @@ class MplsSdpRepository extends Repository
         'sdpFarEndInetAddress',
     ];
 
+    public static array $match = [
+        'sdp_oid' => 'integer',
+        'device_id' => 'integer',
+        'sdpRowStatus' => 'text',
+        'sdpDelivery' => 'text',
+        'sdpDescription' => 'text',
+        'sdpAdminStatus' => 'text',
+        'sdpOperStatus' => 'text',
+        'sdpAdminPathMtu' => 'integer',
+        'sdpOperPathMtu' => 'integer',
+        'sdpLastMgmtChange' => 'integer',
+        'sdpLastStatusChange' => 'integer',
+        'sdpActiveLspType' => 'text',
+        'sdpFarEndInetAddressType' => 'text',
+        'sdpFarEndInetAddress' => 'text',
+    ];
+
+    public static array $sort = [
+        'sdp_oid',
+        'device_id',
+        'sdpRowStatus',
+        'sdpDelivery',
+        'sdpDescription',
+        'sdpAdminStatus',
+        'sdpOperStatus',
+        'sdpAdminPathMtu',
+        'sdpOperPathMtu',
+        'sdpLastMgmtChange',
+        'sdpLastStatusChange',
+        'sdpActiveLspType',
+        'sdpFarEndInetAddressType',
+        'sdpFarEndInetAddress',
+    ];
+
     public static function related(): array
     {
         return [

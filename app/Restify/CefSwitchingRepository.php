@@ -22,6 +22,30 @@ class CefSwitchingRepository extends Repository
         'afi',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'entPhysicalIndex' => 'integer',
+        'afi' => 'text',
+        'cef_index' => 'integer',
+        'cef_path' => 'text',
+        'drop' => 'integer',
+        'punt' => 'integer',
+        'punt2host' => 'integer',
+        'updated' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'entPhysicalIndex',
+        'afi',
+        'cef_index',
+        'cef_path',
+        'drop',
+        'punt',
+        'punt2host',
+        'updated',
+    ];
+
     public static function related(): array
     {
         return [

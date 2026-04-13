@@ -21,6 +21,26 @@ class Ipv6AddressRepository extends Repository
         'ipv6_compressed',
     ];
 
+    public static array $match = [
+        'ipv6_address' => 'text',
+        'ipv6_compressed' => 'text',
+        'ipv6_prefixlen' => 'integer',
+        'ipv6_origin' => 'text',
+        'ipv6_network_id' => 'integer',
+        'port_id' => 'integer',
+        'context_name' => 'text',
+    ];
+
+    public static array $sort = [
+        'ipv6_address',
+        'ipv6_compressed',
+        'ipv6_prefixlen',
+        'ipv6_origin',
+        'ipv6_network_id',
+        'port_id',
+        'context_name',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

@@ -23,6 +23,28 @@ class SyslogRepository extends Repository
         'tag',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'facility' => 'text',
+        'priority' => 'text',
+        'level' => 'text',
+        'tag' => 'text',
+        'timestamp' => 'datetime',
+        'program' => 'text',
+        'msg' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'facility',
+        'priority',
+        'level',
+        'tag',
+        'timestamp',
+        'program',
+        'msg',
+    ];
+
     public static function related(): array
     {
         return [

@@ -21,6 +21,40 @@ class MplsTunnelArHopRepository extends Repository
         'mplsTunnelARHopIpv4Addr',
     ];
 
+    public static array $match = [
+        'mplsTunnelARHopListIndex' => 'integer',
+        'mplsTunnelARHopIndex' => 'integer',
+        'lsp_path_id' => 'integer',
+        'device_id' => 'integer',
+        'mplsTunnelARHopAddrType' => 'text',
+        'mplsTunnelARHopIpv4Addr' => 'text',
+        'mplsTunnelARHopIpv6Addr' => 'text',
+        'mplsTunnelARHopAsNumber' => 'integer',
+        'mplsTunnelARHopStrictOrLoose' => 'text',
+        'mplsTunnelARHopRouterId' => 'text',
+        'localProtected' => 'text',
+        'linkProtectionInUse' => 'text',
+        'bandwidthProtected' => 'text',
+        'nextNodeProtected' => 'text',
+    ];
+
+    public static array $sort = [
+        'mplsTunnelARHopListIndex',
+        'mplsTunnelARHopIndex',
+        'lsp_path_id',
+        'device_id',
+        'mplsTunnelARHopAddrType',
+        'mplsTunnelARHopIpv4Addr',
+        'mplsTunnelARHopIpv6Addr',
+        'mplsTunnelARHopAsNumber',
+        'mplsTunnelARHopStrictOrLoose',
+        'mplsTunnelARHopRouterId',
+        'localProtected',
+        'linkProtectionInUse',
+        'bandwidthProtected',
+        'nextNodeProtected',
+    ];
+
     public static function related(): array
     {
         return [

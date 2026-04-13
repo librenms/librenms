@@ -19,6 +19,18 @@ class DeviceGroupRepository extends Repository
         'desc',
     ];
 
+    public static array $match = [
+        'name' => 'text',
+        'desc' => 'text',
+        'type' => 'text',
+    ];
+
+    public static array $sort = [
+        'name',
+        'desc',
+        'type',
+    ];
+
     public static function related(): array
     {
         return [

@@ -20,6 +20,38 @@ class IsisAdjacencyRepository extends Repository
         'isisISAdjIPAddrAddress',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'port_id' => 'integer',
+        'ifIndex' => 'integer',
+        'index' => 'text',
+        'isisISAdjState' => 'text',
+        'isisISAdjNeighSysType' => 'text',
+        'isisISAdjNeighSysID' => 'text',
+        'isisISAdjNeighPriority' => 'text',
+        'isisISAdjLastUpTime' => 'integer',
+        'isisISAdjAreaAddress' => 'text',
+        'isisISAdjIPAddrType' => 'text',
+        'isisISAdjIPAddrAddress' => 'text',
+        'isisCircAdminState' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'port_id',
+        'ifIndex',
+        'index',
+        'isisISAdjState',
+        'isisISAdjNeighSysType',
+        'isisISAdjNeighSysID',
+        'isisISAdjNeighPriority',
+        'isisISAdjLastUpTime',
+        'isisISAdjAreaAddress',
+        'isisISAdjIPAddrType',
+        'isisISAdjIPAddrAddress',
+        'isisCircAdminState',
+    ];
+
     public static function related(): array
     {
         return [

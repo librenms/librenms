@@ -21,6 +21,18 @@ class DiskIoRepository extends Repository
         'diskio_descr',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'diskio_index' => 'integer',
+        'diskio_descr' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'diskio_index',
+        'diskio_descr',
+    ];
+
     public static function related(): array
     {
         return [

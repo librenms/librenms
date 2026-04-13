@@ -17,6 +17,18 @@ class AlertTransportRepository extends Repository
         'transport_name',
     ];
 
+    public static array $match = [
+        'transport_name' => 'text',
+        'transport_type' => 'text',
+        'is_default' => 'bool',
+    ];
+
+    public static array $sort = [
+        'transport_name',
+        'transport_type',
+        'is_default',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

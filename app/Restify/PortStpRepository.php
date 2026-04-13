@@ -22,6 +22,38 @@ class PortStpRepository extends Repository
         'designatedBridge',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'vlan' => 'integer',
+        'port_id' => 'integer',
+        'port_index' => 'integer',
+        'priority' => 'integer',
+        'state' => 'text',
+        'enable' => 'text',
+        'pathCost' => 'integer',
+        'designatedRoot' => 'text',
+        'designatedCost' => 'integer',
+        'designatedBridge' => 'text',
+        'designatedPort' => 'integer',
+        'forwardTransitions' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'vlan',
+        'port_id',
+        'port_index',
+        'priority',
+        'state',
+        'enable',
+        'pathCost',
+        'designatedRoot',
+        'designatedCost',
+        'designatedBridge',
+        'designatedPort',
+        'forwardTransitions',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

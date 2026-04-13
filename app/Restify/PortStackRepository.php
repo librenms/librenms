@@ -15,6 +15,24 @@ class PortStackRepository extends Repository
 
     public static string $title = 'ifStackStatus';
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'high_ifIndex' => 'integer',
+        'high_port_id' => 'integer',
+        'low_ifIndex' => 'integer',
+        'low_port_id' => 'integer',
+        'ifStackStatus' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'high_ifIndex',
+        'high_port_id',
+        'low_ifIndex',
+        'low_port_id',
+        'ifStackStatus',
+    ];
+
     public static function related(): array
     {
         return [

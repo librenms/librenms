@@ -22,6 +22,48 @@ class StpRepository extends Repository
         'designatedRoot',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'vlan' => 'integer',
+        'rootBridge' => 'integer',
+        'bridgeAddress' => 'text',
+        'protocolSpecification' => 'text',
+        'priority' => 'integer',
+        'timeSinceTopologyChange' => 'text',
+        'topChanges' => 'integer',
+        'designatedRoot' => 'text',
+        'rootCost' => 'integer',
+        'rootPort' => 'integer',
+        'maxAge' => 'integer',
+        'helloTime' => 'integer',
+        'holdTime' => 'integer',
+        'forwardDelay' => 'integer',
+        'bridgeMaxAge' => 'integer',
+        'bridgeHelloTime' => 'integer',
+        'bridgeForwardDelay' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'vlan',
+        'rootBridge',
+        'bridgeAddress',
+        'protocolSpecification',
+        'priority',
+        'timeSinceTopologyChange',
+        'topChanges',
+        'designatedRoot',
+        'rootCost',
+        'rootPort',
+        'maxAge',
+        'helloTime',
+        'holdTime',
+        'forwardDelay',
+        'bridgeMaxAge',
+        'bridgeHelloTime',
+        'bridgeForwardDelay',
+    ];
+
     public static function related(): array
     {
         return [

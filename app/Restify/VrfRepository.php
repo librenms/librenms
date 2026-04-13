@@ -27,6 +27,24 @@ class VrfRepository extends Repository
         'vrf_oid',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'vrf_oid' => 'text',
+        'vrf_name' => 'text',
+        'bgpLocalAs' => 'integer',
+        'mplsVpnVrfRouteDistinguisher' => 'text',
+        'mplsVpnVrfDescription' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'vrf_oid',
+        'vrf_name',
+        'bgpLocalAs',
+        'mplsVpnVrfRouteDistinguisher',
+        'mplsVpnVrfDescription',
+    ];
+
     public static function related(): array
     {
         return [

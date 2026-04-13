@@ -23,6 +23,54 @@ class WirelessSensorRepository extends Repository
         'sensor_type',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'sensor_class' => 'text',
+        'sensor_index' => 'text',
+        'sensor_type' => 'text',
+        'sensor_descr' => 'text',
+        'sensor_divisor' => 'integer',
+        'sensor_multiplier' => 'integer',
+        'sensor_aggregator' => 'text',
+        'sensor_current' => 'integer',
+        'sensor_prev' => 'integer',
+        'sensor_limit' => 'integer',
+        'sensor_limit_warn' => 'integer',
+        'sensor_limit_low' => 'integer',
+        'sensor_limit_low_warn' => 'integer',
+        'sensor_alert' => 'integer',
+        'sensor_custom' => 'text',
+        'entPhysicalIndex' => 'text',
+        'entPhysicalIndex_measured' => 'text',
+        'lastupdate' => 'datetime',
+        'access_point_id' => 'integer',
+        'rrd_type' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'sensor_class',
+        'sensor_index',
+        'sensor_type',
+        'sensor_descr',
+        'sensor_divisor',
+        'sensor_multiplier',
+        'sensor_aggregator',
+        'sensor_current',
+        'sensor_prev',
+        'sensor_limit',
+        'sensor_limit_warn',
+        'sensor_limit_low',
+        'sensor_limit_low_warn',
+        'sensor_alert',
+        'sensor_custom',
+        'entPhysicalIndex',
+        'entPhysicalIndex_measured',
+        'lastupdate',
+        'access_point_id',
+        'rrd_type',
+    ];
+
     public static function related(): array
     {
         return [

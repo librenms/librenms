@@ -20,6 +20,48 @@ class Ospfv3AreaRepository extends Repository
         'context_name',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'ospfv3_instance_id' => 'integer',
+        'context_name' => 'text',
+        'ospfv3AreaId' => 'integer',
+        'ospfv3AreaImportAsExtern' => 'text',
+        'ospfv3AreaSpfRuns' => 'integer',
+        'ospfv3AreaBdrRtrCount' => 'integer',
+        'ospfv3AreaAsBdrRtrCount' => 'integer',
+        'ospfv3AreaScopeLsaCount' => 'integer',
+        'ospfv3AreaScopeLsaCksumSum' => 'integer',
+        'ospfv3AreaSummary' => 'text',
+        'ospfv3AreaStubMetric' => 'integer',
+        'ospfv3AreaStubMetricType' => 'text',
+        'ospfv3AreaNssaTranslatorRole' => 'text',
+        'ospfv3AreaNssaTranslatorState' => 'text',
+        'ospfv3AreaNssaTranslatorStabInterval' => 'integer',
+        'ospfv3AreaNssaTranslatorEvents' => 'integer',
+        'ospfv3AreaTEEnabled' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'ospfv3_instance_id',
+        'context_name',
+        'ospfv3AreaId',
+        'ospfv3AreaImportAsExtern',
+        'ospfv3AreaSpfRuns',
+        'ospfv3AreaBdrRtrCount',
+        'ospfv3AreaAsBdrRtrCount',
+        'ospfv3AreaScopeLsaCount',
+        'ospfv3AreaScopeLsaCksumSum',
+        'ospfv3AreaSummary',
+        'ospfv3AreaStubMetric',
+        'ospfv3AreaStubMetricType',
+        'ospfv3AreaNssaTranslatorRole',
+        'ospfv3AreaNssaTranslatorState',
+        'ospfv3AreaNssaTranslatorStabInterval',
+        'ospfv3AreaNssaTranslatorEvents',
+        'ospfv3AreaTEEnabled',
+    ];
+
     public static function related(): array
     {
         return [

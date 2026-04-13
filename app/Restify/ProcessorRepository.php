@@ -22,6 +22,28 @@ class ProcessorRepository extends Repository
         'processor_type',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'processor_type' => 'text',
+        'processor_descr' => 'text',
+        'processor_usage' => 'integer',
+        'processor_oid' => 'text',
+        'processor_index' => 'text',
+        'processor_precision' => 'integer',
+        'processor_perc_warn' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'processor_type',
+        'processor_descr',
+        'processor_usage',
+        'processor_oid',
+        'processor_index',
+        'processor_precision',
+        'processor_perc_warn',
+    ];
+
     public static function related(): array
     {
         return [

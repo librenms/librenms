@@ -18,6 +18,20 @@ class AlertRuleRepository extends Repository
         'name',
     ];
 
+    public static array $match = [
+        'name' => 'text',
+        'severity' => 'text',
+        'disabled' => 'integer',
+        'invert_map' => 'integer',
+    ];
+
+    public static array $sort = [
+        'name',
+        'severity',
+        'disabled',
+        'invert_map',
+    ];
+
     public static function related(): array
     {
         return [

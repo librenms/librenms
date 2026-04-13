@@ -21,6 +21,34 @@ class PseudowireRepository extends Repository
         'pw_type',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'port_id' => 'integer',
+        'peer_device_id' => 'integer',
+        'peer_ldp_id' => 'integer',
+        'cpwVcID' => 'integer',
+        'cpwOid' => 'integer',
+        'pw_type' => 'text',
+        'pw_psntype' => 'text',
+        'pw_local_mtu' => 'integer',
+        'pw_peer_mtu' => 'integer',
+        'pw_descr' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'port_id',
+        'peer_device_id',
+        'peer_ldp_id',
+        'cpwVcID',
+        'cpwOid',
+        'pw_type',
+        'pw_psntype',
+        'pw_local_mtu',
+        'pw_peer_mtu',
+        'pw_descr',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

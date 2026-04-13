@@ -22,6 +22,42 @@ class RouteRepository extends Repository
         'inetCidrRouteNextHop',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'port_id' => 'integer',
+        'context_name' => 'text',
+        'inetCidrRouteIfIndex' => 'integer',
+        'inetCidrRouteDest' => 'text',
+        'inetCidrRouteDestType' => 'text',
+        'inetCidrRoutePfxLen' => 'integer',
+        'inetCidrRoutePolicy' => 'text',
+        'inetCidrRouteNextHop' => 'text',
+        'inetCidrRouteNextHopType' => 'text',
+        'inetCidrRouteMetric1' => 'integer',
+        'inetCidrRouteProto' => 'integer',
+        'inetCidrRouteType' => 'integer',
+        'inetCidrRouteNextHopAS' => 'integer',
+        'updated_at' => 'datetime',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'port_id',
+        'context_name',
+        'inetCidrRouteIfIndex',
+        'inetCidrRouteDest',
+        'inetCidrRouteDestType',
+        'inetCidrRoutePfxLen',
+        'inetCidrRoutePolicy',
+        'inetCidrRouteNextHop',
+        'inetCidrRouteNextHopType',
+        'inetCidrRouteMetric1',
+        'inetCidrRouteProto',
+        'inetCidrRouteType',
+        'inetCidrRouteNextHopAS',
+        'updated_at',
+    ];
+
     public static function related(): array
     {
         return [

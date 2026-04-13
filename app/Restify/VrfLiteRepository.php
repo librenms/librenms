@@ -22,6 +22,20 @@ class VrfLiteRepository extends Repository
         'context_name',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'context_name' => 'text',
+        'intance_name' => 'text',
+        'vrf_name' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'context_name',
+        'intance_name',
+        'vrf_name',
+    ];
+
     public static function related(): array
     {
         return [

@@ -27,6 +27,50 @@ class MplsServiceRepository extends Repository
         'svcType',
     ];
 
+    public static array $match = [
+        'svc_oid' => 'integer',
+        'device_id' => 'integer',
+        'svcRowStatus' => 'text',
+        'svcType' => 'text',
+        'svcCustId' => 'integer',
+        'svcAdminStatus' => 'text',
+        'svcOperStatus' => 'text',
+        'svcDescription' => 'text',
+        'svcMtu' => 'integer',
+        'svcNumSaps' => 'integer',
+        'svcNumSdps' => 'integer',
+        'svcLastMgmtChange' => 'integer',
+        'svcLastStatusChange' => 'integer',
+        'svcVRouterId' => 'integer',
+        'svcTlsMacLearning' => 'text',
+        'svcTlsStpAdminStatus' => 'text',
+        'svcTlsStpOperStatus' => 'text',
+        'svcTlsFdbTableSize' => 'integer',
+        'svcTlsFdbNumEntries' => 'integer',
+    ];
+
+    public static array $sort = [
+        'svc_oid',
+        'device_id',
+        'svcRowStatus',
+        'svcType',
+        'svcCustId',
+        'svcAdminStatus',
+        'svcOperStatus',
+        'svcDescription',
+        'svcMtu',
+        'svcNumSaps',
+        'svcNumSdps',
+        'svcLastMgmtChange',
+        'svcLastStatusChange',
+        'svcVRouterId',
+        'svcTlsMacLearning',
+        'svcTlsStpAdminStatus',
+        'svcTlsStpOperStatus',
+        'svcTlsFdbTableSize',
+        'svcTlsFdbNumEntries',
+    ];
+
     public static function related(): array
     {
         return [

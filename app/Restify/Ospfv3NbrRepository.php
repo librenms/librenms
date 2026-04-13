@@ -20,6 +20,50 @@ class Ospfv3NbrRepository extends Repository
         'ospfv3NbrAddress',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'ospfv3_instance_id' => 'integer',
+        'port_id' => 'integer',
+        'context_name' => 'text',
+        'ospfv3NbrRtrId' => 'integer',
+        'ospfv3NbrAddress' => 'text',
+        'ospfv3NbrAddressType' => 'text',
+        'ospfv3NbrOptions' => 'integer',
+        'ospfv3NbrPriority' => 'integer',
+        'ospfv3NbrState' => 'text',
+        'ospfv3NbrEvents' => 'integer',
+        'ospfv3NbrLsRetransQLen' => 'integer',
+        'ospfv3NbmaNbrStatus' => 'text',
+        'ospfv3NbmaNbrPermanence' => 'text',
+        'ospfv3NbrHelloSuppressed' => 'text',
+        'ospfv3NbrIfId' => 'integer',
+        'ospfv3NbrRestartHelperStatus' => 'text',
+        'ospfv3NbrRestartHelperAge' => 'integer',
+        'ospfv3NbrRestartHelperExitReason' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'ospfv3_instance_id',
+        'port_id',
+        'context_name',
+        'ospfv3NbrRtrId',
+        'ospfv3NbrAddress',
+        'ospfv3NbrAddressType',
+        'ospfv3NbrOptions',
+        'ospfv3NbrPriority',
+        'ospfv3NbrState',
+        'ospfv3NbrEvents',
+        'ospfv3NbrLsRetransQLen',
+        'ospfv3NbmaNbrStatus',
+        'ospfv3NbmaNbrPermanence',
+        'ospfv3NbrHelloSuppressed',
+        'ospfv3NbrIfId',
+        'ospfv3NbrRestartHelperStatus',
+        'ospfv3NbrRestartHelperAge',
+        'ospfv3NbrRestartHelperExitReason',
+    ];
+
     public static function related(): array
     {
         return [

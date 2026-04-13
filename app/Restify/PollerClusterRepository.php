@@ -20,6 +20,44 @@ class PollerClusterRepository extends Repository
         'node_id',
     ];
 
+    public static array $match = [
+        'node_id' => 'text',
+        'poller_name' => 'text',
+        'poller_version' => 'text',
+        'poller_groups' => 'text',
+        'last_report' => 'datetime',
+        'master' => 'integer',
+        'poller_enabled' => 'integer',
+        'poller_frequency' => 'integer',
+        'poller_workers' => 'integer',
+        'discovery_enabled' => 'integer',
+        'discovery_frequency' => 'integer',
+        'discovery_workers' => 'integer',
+        'services_enabled' => 'integer',
+        'alerting_enabled' => 'integer',
+        'ping_enabled' => 'integer',
+        'loglevel' => 'text',
+    ];
+
+    public static array $sort = [
+        'node_id',
+        'poller_name',
+        'poller_version',
+        'poller_groups',
+        'last_report',
+        'master',
+        'poller_enabled',
+        'poller_frequency',
+        'poller_workers',
+        'discovery_enabled',
+        'discovery_frequency',
+        'discovery_workers',
+        'services_enabled',
+        'alerting_enabled',
+        'ping_enabled',
+        'loglevel',
+    ];
+
     public static function related(): array
     {
         return [

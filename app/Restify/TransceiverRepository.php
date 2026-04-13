@@ -20,6 +20,48 @@ class TransceiverRepository extends Repository
         'serial',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'port_id' => 'integer',
+        'index' => 'text',
+        'entity_physical_index' => 'integer',
+        'type' => 'text',
+        'vendor' => 'text',
+        'oui' => 'text',
+        'model' => 'text',
+        'revision' => 'text',
+        'serial' => 'text',
+        'date' => 'text',
+        'ddm' => 'bool',
+        'encoding' => 'text',
+        'cable' => 'text',
+        'distance' => 'integer',
+        'wavelength' => 'integer',
+        'connector' => 'text',
+        'channels' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'port_id',
+        'index',
+        'entity_physical_index',
+        'type',
+        'vendor',
+        'oui',
+        'model',
+        'revision',
+        'serial',
+        'date',
+        'ddm',
+        'encoding',
+        'cable',
+        'distance',
+        'wavelength',
+        'connector',
+        'channels',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

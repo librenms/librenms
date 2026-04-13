@@ -19,6 +19,32 @@ class PortSecurityRepository extends Repository
         'last_mac_address',
     ];
 
+    public static array $match = [
+        'port_id' => 'integer',
+        'device_id' => 'integer',
+        'port_security_enable' => 'text',
+        'status' => 'text',
+        'max_addresses' => 'integer',
+        'address_count' => 'integer',
+        'violation_action' => 'text',
+        'violation_count' => 'integer',
+        'last_mac_address' => 'text',
+        'sticky_enable' => 'text',
+    ];
+
+    public static array $sort = [
+        'port_id',
+        'device_id',
+        'port_security_enable',
+        'status',
+        'max_addresses',
+        'address_count',
+        'violation_action',
+        'violation_count',
+        'last_mac_address',
+        'sticky_enable',
+    ];
+
     public static function related(): array
     {
         return [

@@ -23,6 +23,26 @@ class IpsecTunnelRepository extends Repository
         'local_addr',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'peer_port' => 'integer',
+        'peer_addr' => 'text',
+        'local_addr' => 'text',
+        'local_port' => 'integer',
+        'tunnel_name' => 'text',
+        'tunnel_status' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'peer_port',
+        'peer_addr',
+        'local_addr',
+        'local_port',
+        'tunnel_name',
+        'tunnel_status',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

@@ -26,6 +26,44 @@ class InventoryRepository extends Repository
         'entPhysicalModelName',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'entPhysicalIndex' => 'integer',
+        'entPhysicalDescr' => 'text',
+        'entPhysicalClass' => 'text',
+        'entPhysicalName' => 'text',
+        'entPhysicalSerialNum' => 'text',
+        'entPhysicalModelName' => 'text',
+        'entPhysicalMfgName' => 'text',
+        'entPhysicalContainedIn' => 'integer',
+        'entPhysicalParentRelPos' => 'integer',
+        'entPhysicalHardwareRev' => 'text',
+        'entPhysicalFirmwareRev' => 'text',
+        'entPhysicalSoftwareRev' => 'text',
+        'entPhysicalIsFRU' => 'text',
+        'entPhysicalAlias' => 'text',
+        'ifIndex' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'entPhysicalIndex',
+        'entPhysicalDescr',
+        'entPhysicalClass',
+        'entPhysicalName',
+        'entPhysicalSerialNum',
+        'entPhysicalModelName',
+        'entPhysicalMfgName',
+        'entPhysicalContainedIn',
+        'entPhysicalParentRelPos',
+        'entPhysicalHardwareRev',
+        'entPhysicalFirmwareRev',
+        'entPhysicalSoftwareRev',
+        'entPhysicalIsFRU',
+        'entPhysicalAlias',
+        'ifIndex',
+    ];
+
     public static function related(): array
     {
         return [

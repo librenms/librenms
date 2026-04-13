@@ -22,6 +22,32 @@ class StorageRepository extends Repository
         'storage_type',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'storage_type' => 'text',
+        'storage_descr' => 'text',
+        'storage_size' => 'integer',
+        'storage_units' => 'integer',
+        'storage_used' => 'integer',
+        'storage_free' => 'integer',
+        'storage_perc' => 'integer',
+        'storage_perc_warn' => 'integer',
+        'storage_index' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'storage_type',
+        'storage_descr',
+        'storage_size',
+        'storage_units',
+        'storage_used',
+        'storage_free',
+        'storage_perc',
+        'storage_perc_warn',
+        'storage_index',
+    ];
+
     public static function related(): array
     {
         return [

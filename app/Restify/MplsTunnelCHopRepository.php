@@ -21,6 +21,32 @@ class MplsTunnelCHopRepository extends Repository
         'mplsTunnelCHopIpv4Addr',
     ];
 
+    public static array $match = [
+        'mplsTunnelCHopListIndex' => 'integer',
+        'mplsTunnelCHopIndex' => 'integer',
+        'lsp_path_id' => 'integer',
+        'device_id' => 'integer',
+        'mplsTunnelCHopAddrType' => 'text',
+        'mplsTunnelCHopIpv4Addr' => 'text',
+        'mplsTunnelCHopIpv6Addr' => 'text',
+        'mplsTunnelCHopAsNumber' => 'integer',
+        'mplsTunnelCHopStrictOrLoose' => 'text',
+        'mplsTunnelCHopRouterId' => 'text',
+    ];
+
+    public static array $sort = [
+        'mplsTunnelCHopListIndex',
+        'mplsTunnelCHopIndex',
+        'lsp_path_id',
+        'device_id',
+        'mplsTunnelCHopAddrType',
+        'mplsTunnelCHopIpv4Addr',
+        'mplsTunnelCHopIpv6Addr',
+        'mplsTunnelCHopAsNumber',
+        'mplsTunnelCHopStrictOrLoose',
+        'mplsTunnelCHopRouterId',
+    ];
+
     public static function related(): array
     {
         return [

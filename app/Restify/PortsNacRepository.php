@@ -22,6 +22,44 @@ class PortsNacRepository extends Repository
         'ip_address',
     ];
 
+    public static array $match = [
+        'auth_id' => 'text',
+        'device_id' => 'integer',
+        'port_id' => 'integer',
+        'domain' => 'text',
+        'username' => 'text',
+        'mac_address' => 'text',
+        'ip_address' => 'text',
+        'vlan' => 'integer',
+        'host_mode' => 'text',
+        'authz_status' => 'text',
+        'authz_by' => 'text',
+        'authc_status' => 'text',
+        'method' => 'text',
+        'timeout' => 'text',
+        'time_left' => 'text',
+        'time_elapsed' => 'text',
+    ];
+
+    public static array $sort = [
+        'auth_id',
+        'device_id',
+        'port_id',
+        'domain',
+        'username',
+        'mac_address',
+        'ip_address',
+        'vlan',
+        'host_mode',
+        'authz_status',
+        'authz_by',
+        'authc_status',
+        'method',
+        'timeout',
+        'time_left',
+        'time_elapsed',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

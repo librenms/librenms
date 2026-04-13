@@ -16,6 +16,26 @@ class PortVdslRepository extends Repository
 
     public static string $title = 'port_id';
 
+    public static array $match = [
+        'port_id' => 'integer',
+        'xdsl2LineStatusAttainableRateDs' => 'integer',
+        'xdsl2LineStatusAttainableRateUs' => 'integer',
+        'xdsl2ChStatusActDataRateXtur' => 'integer',
+        'xdsl2ChStatusActDataRateXtuc' => 'integer',
+        'xdsl2LineStatusActAtpDs' => 'integer',
+        'xdsl2LineStatusActAtpUs' => 'integer',
+    ];
+
+    public static array $sort = [
+        'port_id',
+        'xdsl2LineStatusAttainableRateDs',
+        'xdsl2LineStatusAttainableRateUs',
+        'xdsl2ChStatusActDataRateXtur',
+        'xdsl2ChStatusActDataRateXtuc',
+        'xdsl2LineStatusActAtpDs',
+        'xdsl2LineStatusActAtpUs',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

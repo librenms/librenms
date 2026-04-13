@@ -16,6 +16,48 @@ class PortAdslRepository extends Repository
 
     public static string $title = 'adslLineCoding';
 
+    public static array $match = [
+        'port_id' => 'integer',
+        'adslLineCoding' => 'text',
+        'adslLineType' => 'text',
+        'adslAtucInvVendorID' => 'text',
+        'adslAtucInvVersionNumber' => 'text',
+        'adslAtucCurrSnrMgn' => 'integer',
+        'adslAtucCurrAtn' => 'integer',
+        'adslAtucCurrOutputPwr' => 'integer',
+        'adslAtucCurrAttainableRate' => 'integer',
+        'adslAtucChanCurrTxRate' => 'integer',
+        'adslAturInvSerialNumber' => 'text',
+        'adslAturInvVendorID' => 'text',
+        'adslAturInvVersionNumber' => 'text',
+        'adslAturChanCurrTxRate' => 'integer',
+        'adslAturCurrSnrMgn' => 'integer',
+        'adslAturCurrAtn' => 'integer',
+        'adslAturCurrOutputPwr' => 'integer',
+        'adslAturCurrAttainableRate' => 'integer',
+    ];
+
+    public static array $sort = [
+        'port_id',
+        'adslLineCoding',
+        'adslLineType',
+        'adslAtucInvVendorID',
+        'adslAtucInvVersionNumber',
+        'adslAtucCurrSnrMgn',
+        'adslAtucCurrAtn',
+        'adslAtucCurrOutputPwr',
+        'adslAtucCurrAttainableRate',
+        'adslAtucChanCurrTxRate',
+        'adslAturInvSerialNumber',
+        'adslAturInvVendorID',
+        'adslAturInvVersionNumber',
+        'adslAturChanCurrTxRate',
+        'adslAturCurrSnrMgn',
+        'adslAturCurrAtn',
+        'adslAturCurrOutputPwr',
+        'adslAturCurrAttainableRate',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

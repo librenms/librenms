@@ -20,6 +20,16 @@ class Ipv6NetworkRepository extends Repository
         'ipv6_network',
     ];
 
+    public static array $match = [
+        'ipv6_network' => 'text',
+        'context_name' => 'text',
+    ];
+
+    public static array $sort = [
+        'ipv6_network',
+        'context_name',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [

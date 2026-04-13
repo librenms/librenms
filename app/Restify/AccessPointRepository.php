@@ -22,6 +22,38 @@ class AccessPointRepository extends Repository
         'mac_addr',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'name' => 'text',
+        'radio_number' => 'integer',
+        'type' => 'text',
+        'mac_addr' => 'text',
+        'channel' => 'integer',
+        'txpow' => 'integer',
+        'radioutil' => 'integer',
+        'numasoclients' => 'integer',
+        'nummonclients' => 'integer',
+        'numactbssid' => 'integer',
+        'nummonbssid' => 'integer',
+        'interference' => 'integer',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'name',
+        'radio_number',
+        'type',
+        'mac_addr',
+        'channel',
+        'txpow',
+        'radioutil',
+        'numasoclients',
+        'nummonclients',
+        'numactbssid',
+        'nummonbssid',
+        'interference',
+    ];
+
     public static function related(): array
     {
         return [

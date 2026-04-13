@@ -20,6 +20,26 @@ class ComponentRepository extends Repository
         'type',
     ];
 
+    public static array $match = [
+        'device_id' => 'integer',
+        'type' => 'text',
+        'label' => 'text',
+        'status' => 'integer',
+        'disabled' => 'integer',
+        'ignore' => 'integer',
+        'error' => 'text',
+    ];
+
+    public static array $sort = [
+        'device_id',
+        'type',
+        'label',
+        'status',
+        'disabled',
+        'ignore',
+        'error',
+    ];
+
     public static function related(): array
     {
         return [

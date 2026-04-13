@@ -20,6 +20,16 @@ class Ipv4NetworkRepository extends Repository
         'ipv4_network',
     ];
 
+    public static array $match = [
+        'ipv4_network' => 'text',
+        'context_name' => 'text',
+    ];
+
+    public static array $sort = [
+        'ipv4_network',
+        'context_name',
+    ];
+
     public function fields(RestifyRequest $request): array
     {
         return [
