@@ -44,7 +44,7 @@ class CheckSchemaCollation implements Validation, ValidationFixer
         $db_collation_sql = "SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME
             FROM information_schema.SCHEMATA S
             WHERE schema_name = '$db_name' AND
-            ( DEFAULT_CHARACTER_SET_NAME != 'utf8mb4' OR DEFAULT_COLLATION_NAME != 'utf8mb4_unicode_ci')";
+            ( DEFAULT_CHARACTER_SET_NAME != 'utf8mb4' OR DEFAULT_COLLATION_NAME != 'utf8mb4_unicode_ci' OR DEFAULT_COLLATION_NAME != 'utf8mb4_uca1400_ai_ci')";
         $collation = Eloquent::DB()->selectOne($db_collation_sql);
         if (empty($collation) !== true) {
             return ValidationResult::fail(
