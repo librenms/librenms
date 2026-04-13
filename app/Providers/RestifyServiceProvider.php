@@ -79,10 +79,13 @@ use App\Restify\WirelessSensorRepository;
 use App\Restify\VlanRepository;
 use App\Restify\VrfLiteRepository;
 use App\Restify\VrfRepository;
+use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\SystemController;
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot;
 use Binaryk\LaravelRestify\Restify;
 use Binaryk\LaravelRestify\RestifyApplicationServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 
 class RestifyServiceProvider extends RestifyApplicationServiceProvider
 {
@@ -95,6 +98,15 @@ class RestifyServiceProvider extends RestifyApplicationServiceProvider
 
     protected function routes(): void
     {
+        // v1 custom endpoints that are not Restify repositories. Registered
+        // before RoutesBoot so they win over Restify's catch-all routes.
+        Route::prefix('api/v1')->group(function (): void {
+            Route::get('health', HealthController::class)->name('v1.health');
+            Route::get('system', SystemController::class)
+                ->middleware(['auth:sanctum', 'can:settings.view'])
+                ->name('v1.system');
+        });
+
         parent::routes();
 
         // Parent only registers routes in console (for route:list) and
