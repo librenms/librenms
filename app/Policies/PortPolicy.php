@@ -58,20 +58,4 @@ class PortPolicy
     {
         return $this->hasGlobalPermission($user, 'delete');
     }
-
-    /**
-     * Determine whether the user can restore the port.
-     */
-    public function restore(User $user): bool
-    {
-        return $this->hasGlobalPermission($user, 'restore');
-    }
-
-    /**
-     * Determine whether the user can permanently delete the port.
-     */
-    public function forceDelete(User $user): bool
-    {
-        return $this->hasGlobalPermission($user, 'forceDelete');
-    }
 }

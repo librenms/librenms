@@ -10,11 +10,11 @@ class SyslogPolicy
 
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAny');
+        return $this->hasGlobalPermission($user, 'delete');
     }
 
     public function view(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view');
+        return $this->hasGlobalPermission($user, 'delete');
     }
 }

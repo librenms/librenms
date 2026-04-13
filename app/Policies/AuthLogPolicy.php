@@ -10,7 +10,7 @@ class AuthLogPolicy
 
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAny');
+        return $this->hasGlobalPermission($user, 'view');
     }
 
     public function view(User $user): bool

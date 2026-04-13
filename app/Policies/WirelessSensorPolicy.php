@@ -15,8 +15,7 @@ class WirelessSensorPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
-            || $this->hasGlobalPermission($user, 'update')
+        return $this->hasGlobalPermission($user, 'update')
             || $this->hasGlobalPermission($user, 'delete');
     }
 
@@ -25,12 +24,7 @@ class WirelessSensorPolicy
      */
     public function view(User $user, WirelessSensor $wirelessSensor): bool
     {
-        if ($this->hasGlobalPermission($user, 'viewAll')) {
-            return true;
-        }
-
-        return $this->hasGlobalPermission($user, 'view')
-            && Permissions::canAccessDevice($wirelessSensor->device_id, $user);
+        return Permissions::canAccessDevice($wirelessSensor->device_id, $user);
     }
 
     /**

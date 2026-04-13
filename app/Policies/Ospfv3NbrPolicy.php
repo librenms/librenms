@@ -15,7 +15,9 @@ class Ospfv3NbrPolicy
 
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'viewAny');
+        return $this->hasGlobalPermission($user, 'view')
+            || $this->hasGlobalPermission($user, 'viewAll')
+            || $this->hasGlobalPermission($user, 'update');
     }
 
     public function view(User $user): bool

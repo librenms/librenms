@@ -14,17 +14,8 @@ class SslCertificatePolicy
     public function viewAny(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'view')
-            || $this->hasGlobalPermission($user, 'viewAll')
             || $this->hasGlobalPermission($user, 'create')
             || $this->hasGlobalPermission($user, 'delete');
-    }
-
-    /**
-     * Determine whether the user can view all SSL certificates.
-     */
-    public function viewAll(User $user): bool
-    {
-        return $this->hasGlobalPermission($user, 'viewAll');
     }
 
     /**
@@ -32,10 +23,6 @@ class SslCertificatePolicy
      */
     public function view(User $user): bool
     {
-        if ($this->hasGlobalPermission($user, 'viewAll')) {
-            return true;
-        }
-
         return $this->hasGlobalPermission($user, 'view');
     }
 
@@ -45,14 +32,6 @@ class SslCertificatePolicy
     public function create(User $user): bool
     {
         return $this->hasGlobalPermission($user, 'create');
-    }
-
-    /**
-     * Determine whether the user can update the SSL certificate.
-     */
-    public function update(User $user): bool
-    {
-        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**

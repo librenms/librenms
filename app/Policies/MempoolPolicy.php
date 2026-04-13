@@ -15,8 +15,7 @@ class MempoolPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
-            || $this->hasGlobalPermission($user, 'update');
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -24,12 +23,7 @@ class MempoolPolicy
      */
     public function view(User $user, Mempool $mempool): bool
     {
-        if ($this->hasGlobalPermission($user, 'viewAll')) {
-            return true;
-        }
-
-        return $this->hasGlobalPermission($user, 'view')
-            && Permissions::canAccessDevice($mempool->device_id, $user);
+        return Permissions::canAccessDevice($mempool->device_id, $user);
     }
 
     /**

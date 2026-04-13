@@ -15,10 +15,7 @@ class ComponentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'view')
-            || $this->hasGlobalPermission($user, 'create')
-            || $this->hasGlobalPermission($user, 'update')
-            || $this->hasGlobalPermission($user, 'delete');
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -26,12 +23,7 @@ class ComponentPolicy
      */
     public function view(User $user, Component $component): bool
     {
-        if ($this->hasGlobalPermission($user, 'viewAll')) {
-            return true;
-        }
-
-        return $this->hasGlobalPermission($user, 'view')
-            && Permissions::canAccessDevice($component->device_id, $user);
+        return Permissions::canAccessDevice($component->device_id, $user);
     }
 
     /**
@@ -39,7 +31,7 @@ class ComponentPolicy
      */
     public function create(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'create');
+        return $this->hasGlobalPermission($user, 'update');
     }
 
     /**
@@ -55,6 +47,6 @@ class ComponentPolicy
      */
     public function delete(User $user): bool
     {
-        return $this->hasGlobalPermission($user, 'delete');
+        return $this->hasGlobalPermission($user, 'update');
     }
 }
