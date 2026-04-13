@@ -4502,6 +4502,13 @@
             "section": "graylog",
             "order": 10
         },
+        "graylog.match-any-address": {
+            "default": false,
+            "type": "boolean",
+            "group": "external",
+            "section": "graylog",
+            "order": 11
+        },
         "group": {
             "type": "text",
             "default": "librenms"
