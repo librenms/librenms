@@ -804,17 +804,10 @@ function search_oxidized_config($search_in_conf_textbox)
     $nodes = json_decode(file_get_contents($oxidized_search_url, false, $context), true);
     // Look up Oxidized node names to LibreNMS devices for a link
     foreach ($nodes as &$n) {
-        $dev = device_by_name($n['node']);
-        $n['dev_id'] = $dev ? $dev['device_id'] : false;
-        $n['full_name'] = $n['dev_id'] ? DeviceCache::get($n['dev_id'])->displayName() : $n['full_name'];
+        $dev = DeviceCache::getByHostname($n['node']);
+        $n['dev_id'] = $dev ? $dev->device_id : false;
+        $n['full_name'] = $dev ? $dev->displayName() : $n['full_name'];
     }
-
-    /*
-    // Filter nodes we don't have access too
-    $nodes = array_filter($nodes, function($device) {
-        return \Permissions::canAccessDevice($device['dev_id'], Auth::id());
-    });
-    */
 
     return $nodes;
 }
@@ -846,8 +839,8 @@ function get_oxidized_nodes_list()
     $data = json_decode(file_get_contents(LibrenmsConfig::get('oxidized.url') . '/nodes?format=json', false, $context), true);
 
     foreach ($data as $object) {
-        $device = device_by_name($object['name']);
-        if (! device_permitted($device['device_id'])) {
+        $device = DeviceCache::getByHostname($object['name']);
+        if (! device_permitted($device->device_id)) {
             //user cannot see this device, so let's skip it.
             continue;
         }
@@ -865,9 +858,9 @@ function get_oxidized_nodes_list()
             $formatted_local_time = $object['time'];
         }
         echo '<tr>
-        <td>' . $device['device_id'] . '</td>
+        <td>' . $device->device_id . '</td>
         <td>' . $object['name'] . '</td>
-        <td>' . $device['sysName'] . '</td>
+        <td>' . $device->sysName . '</td>
         <td>' . $object['status'] . '</td>
         <td>' . $formatted_local_time . '</td>
         <td>' . $object['model'] . '</td>

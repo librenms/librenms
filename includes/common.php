@@ -130,11 +130,6 @@ function print_message($text)
     }
 }
 
-function get_sensor_rrd($device, $sensor)
-{
-    return Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
-}
-
 function get_sensor_rrd_name($device, $sensor)
 {
     // For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
@@ -171,21 +166,9 @@ function ifclass($ifOperStatus, $ifAdminStatus)
     ]);
 }
 
-function device_by_name($name)
+function device_by_id_cache($device_id)
 {
-    return device_by_id_cache(getidbyname($name));
-}
-
-function device_by_id_cache($device_id, $refresh = false)
-{
-    $model = $refresh ? DeviceCache::refresh((int) $device_id) : DeviceCache::get((int) $device_id);
-
-    $device = $model->toArray();
-    $device['location'] = $model->location->location ?? null;
-    $device['lat'] = $model->location->lat ?? null;
-    $device['lng'] = $model->location->lng ?? null;
-
-    return $device;
+    return DeviceCache::get((int) $device_id)->toArray();
 }
 
 function getidbyname($hostname)
