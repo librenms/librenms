@@ -244,13 +244,14 @@ class ModuleTestHelper
      *
      * @throws InvalidModuleException
      */
-    public static function findOsWithData(array $modules = [], ?string $os_filter = null): array
+    public static function findOsWithData(array $modules = [], ?string $os_filter = null, ?string $base_path = null): array
     {
         $os_list = [];
+        $base_path ??= base_path();
 
-        foreach (glob(LibrenmsConfig::get('install_dir') . '/tests/data/*.json') as $file) {
+        foreach (glob($base_path . '/tests/data/*.json') as $file) {
             $base_name = basename($file, '.json');
-            [$os, $variant] = self::extractVariant($file);
+            [$os, $variant] = self::extractVariant($file, $base_path);
 
             if ($os_filter != '' && $os_filter != $os) {
                 continue;
@@ -296,13 +297,14 @@ class ModuleTestHelper
      * @param  string  $os_file  Either a filename or the basename
      * @return array{string, string} [$os, $variant]
      */
-    public static function extractVariant(string $os_file): array
+    public static function extractVariant(string $os_file, ?string $base_path = null): array
     {
         $full_name = basename($os_file, '.json');
+        $resource_path = rtrim($base_path ? rtrim($base_path, '/') . '/resources' : resource_path(), '/');
 
         if (! str_contains($full_name, '_')) {
             return [$full_name, ''];
-        } elseif (is_file(resource_path("definitions/os_detection/$full_name.yaml"))) {
+        } elseif (is_file("$resource_path/definitions/os_detection/$full_name.yaml")) {
             return [$full_name, ''];
         } else {
             [$rvar, $ros] = explode('_', strrev($full_name), 2);
