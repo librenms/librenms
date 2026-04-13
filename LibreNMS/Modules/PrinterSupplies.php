@@ -182,8 +182,8 @@ class PrinterSupplies implements Module
 
             // Decode hex-encoded non-ASCII descriptions (e.g. UTF-8 CJK characters from Fujitsu/Ricoh/Kyocera printers)
             // When using -OQUs without -a flag, net-snmp returns non-ASCII strings as hex (e.g. "E9 BB 91 E8 89 B2")
-            if (preg_match('/^([A-Fa-f\d]{2} )*[A-Fa-f\d]{2}\s*$/', $descr)) {
-                $descr = snmp_hexstring($descr);
+            if (preg_match('/^([A-Fa-f\d]{2} )*[A-Fa-f\d]{2}\s*$/', (string) $descr)) {
+                $descr = (string) hex2bin(str_replace([' 00', ' '], '', (string) $descr));
             }
             $raw_capacity = $data['prtMarkerSuppliesMaxCapacity'];
             $raw_toner = $data['prtMarkerSuppliesLevel'];
