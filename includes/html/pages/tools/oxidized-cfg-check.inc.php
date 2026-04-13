@@ -151,14 +151,17 @@ function validate_oxidized_cfg($tree, $wanted_leaf = false)
 
     $output = [];
     foreach ($tree as $leaf => $value) {
+        // Build the current path string (e.g., "input.ssh.secure")
+        $current_path = $path === '' ? $leaf : $path . '.' . $leaf;
+
         if (is_array($tree[$leaf]) && ($valid_config_tmp !== 'array' && $valid_config_tmp[$leaf] !== 'array')) {
-            $tmp_output = validate_oxidized_cfg($tree[$leaf], $valid_config_tmp[$leaf]);
+            $tmp_output = validate_oxidized_cfg($tree[$leaf], $valid_config_tmp[$leaf], $current_path);
             if (is_array($tmp_output)) {
                 $output = array_merge($output, $tmp_output);
             }
         } else {
             if (! isset($valid_config_tmp[$leaf]) && ($valid_config_tmp !== 'array' && $valid_config_tmp[$leaf] !== 'array')) {
-                $output[] = "$leaf - is not valid";
+                $output[] = "[$current_path] - is not valid";
             }
         }
     }
