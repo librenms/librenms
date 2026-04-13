@@ -88,6 +88,7 @@ function validate_oxidized_cfg($tree, $wanted_leaf = false)
         ],
         'source' => [
             'default' => 'string',
+            'debug' => 'boolean',
             'csv' => [
                 'file' => 'string',
                 'delimiter' => 'string',
