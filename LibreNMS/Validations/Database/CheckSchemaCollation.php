@@ -67,7 +67,7 @@ class CheckSchemaCollation implements Validation, ValidationFixer
 
         $column_collation_sql = "SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME
             FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$db_name' AND
-            ( CHARACTER_SET_NAME != 'utf8mb4' OR  COLLATION_NAME NOT IN ('utf8mb4_unicode_ci', 'utf8mb4_uca1400_ai_ci');";
+            ( CHARACTER_SET_NAME != 'utf8mb4' OR  COLLATION_NAME NOT IN ('utf8mb4_unicode_ci', 'utf8mb4_uca1400_ai_ci'));";
         $collation_columns = Eloquent::DB()->select($column_collation_sql);
         if (empty($collation_columns) !== true) {
             return ValidationResult::fail('MySQL column collation is wrong: ')
