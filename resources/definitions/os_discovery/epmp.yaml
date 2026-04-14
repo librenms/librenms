@@ -12,6 +12,14 @@ modules:
                 type: cambium-cpu
                 precision: 10
     sensors:
+        dbm:
+            data:
+                -
+                    oid: CAMBIUM-PMP80211-MIB::wirelessInterfaceTXPower
+                    num_oid: '.1.3.6.1.4.1.17713.21.3.8.2.6.{{ $index }}'
+                    index: 'wirelessInterfaceTXPower.{{ $index }}'
+                    descr: TX Power
+                    group: Radio
         count:
             data:
                 -
@@ -20,6 +28,12 @@ modules:
                     descr:  DFS Detected Count
         state:
             data:
+                # cambiumEffectiveSyncSource is informational only (all generic: 0).
+                # The firmware reports value 2 ("GPS Sync Down") even on units that
+                # are configured for non-GPS sync sources, so the runtime status
+                # isn't a reliable health signal across configurations. Genuine
+                # GPS-lock health is monitored by cambiumGPSCurrentSyncState below,
+                # which uses skip_values to only run on GPS-configured devices.
                 -
                     oid: CAMBIUM-PMP80211-MIB::cambiumEffectiveSyncSource
                     num_oid: '.1.3.6.1.4.1.17713.21.1.1.7.{{ $index }}'
@@ -28,9 +42,40 @@ modules:
                     descr: GPS Status
                     states:
                         - { value: 1, generic: 0, descr: GPS Sync Up }
-                        - { value: 2, generic: 2, descr: GPS Sync Down }
+                        - { value: 2, generic: 0, descr: GPS Sync Down }
                         - { value: 3, generic: 0, descr: CMM4 Sync }
                         - { value: 4, generic: 0, descr: CMM3 Sync }
+                -
+                    oid: CAMBIUM-PMP80211-MIB::wirelessInterfaceSyncSource
+                    num_oid: '.1.3.6.1.4.1.17713.21.3.8.2.14.{{ $index }}'
+                    state_name: wirelessInterfaceSyncSource
+                    index: '{{ $index }}'
+                    descr: Sync Source
+                    states:
+                        - { value: 1, generic: 0, descr: GPS }
+                        - { value: 2, generic: 0, descr: CMM4 }
+                        - { value: 3, generic: 0, descr: Internal Free Run }
+                        - { value: 4, generic: 0, descr: CMM3 }
+                -
+                    oid: CAMBIUM-PMP80211-MIB::cambiumGPSCurrentSyncState
+                    num_oid: '.1.3.6.1.4.1.17713.21.1.3.1.{{ $index }}'
+                    state_name: cambiumGPSCurrentSyncState
+                    index: '{{ $index }}'
+                    descr: GPS Sync State
+                    # Only poll on units configured for GPS sync; values on other
+                    # configurations are firmware-dependent and not meaningful.
+                    skip_values:
+                        -
+                            oid: CAMBIUM-PMP80211-MIB::wirelessInterfaceSyncSource.0
+                            op: '!='
+                            value: 1
+                    states:
+                        - { value: 0, generic: 1, descr: Initialization }
+                        - { value: 1, generic: 2, descr: No Synchronization }
+                        - { value: 2, generic: 0, descr: Synchronized }
+                        - { value: 3, generic: 1, descr: Hold Off }
+                        - { value: 4, generic: 1, descr: Regaining Sync }
+                        - { value: 5, generic: 2, descr: Free Run }
                 -
                     oid: CAMBIUM-PMP80211-MIB::cambiumDFSStatus
                     num_oid: '.1.3.6.1.4.1.17713.21.1.1.6.{{ $index }}'
@@ -54,3 +99,25 @@ modules:
                         - { value: 0, generic: 1, descr: Not Powered }
                         - { value: 1, generic: 3, descr: Powered / Not Detected }
                         - { value: 3, generic: 0, descr: Detected }
+                -
+                    oid: CAMBIUM-PMP80211-MIB::cambiumEffectiveTDDRatio
+                    num_oid: '.1.3.6.1.4.1.17713.21.1.1.10.{{ $index }}'
+                    state_name: cambiumEffectiveTDDRatio
+                    index: '{{ $index }}'
+                    descr: Frame Ratio
+                    group: Radio
+                    states:
+                        - { value: 1, generic: 0, descr: 75/25 }
+                        - { value: 2, generic: 0, descr: 50/50 }
+                        - { value: 3, generic: 0, descr: 30/70 }
+                        - { value: 4, generic: 0, descr: Flexible }
+                -
+                    oid: CAMBIUM-PMP80211-MIB::wirelessInterfaceTDDFrameSize
+                    num_oid: '.1.3.6.1.4.1.17713.21.3.8.2.58.{{ $index }}'
+                    state_name: wirelessInterfaceTDDFrameSize
+                    index: '{{ $index }}'
+                    descr: Frame Size
+                    group: Radio
+                    states:
+                        - { value: 2500, generic: 0, descr: 2.5 ms }
+                        - { value: 5000, generic: 0, descr: 5 ms }

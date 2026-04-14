@@ -677,24 +677,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function snmp_get\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 7
-			path: LibreNMS/OS/Epmp.php
-
-		-
-			message: '''
-				#^Call to deprecated function snmp_get_multi\(\)\:
-				Please use SnmpQuery instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: LibreNMS/OS/Epmp.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmpwalk_cache_oid\(\)\:
 				Please use SnmpQuery instead$#
 			'''
