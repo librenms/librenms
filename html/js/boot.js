@@ -28,19 +28,6 @@ $.ajaxSetup({
         { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
 });
 
-// Compensate Bootstrap 3 modal scrollbar padding on the sticky navbar.
-// Bootstrap 3 adds padding-right to <body> to prevent layout shift when the
-// scrollbar disappears, but it does not handle position:sticky navbars.
-// This mirrors the behaviour Bootstrap 4+ applies to .fixed-top elements.
-$(document).on('show.bs.modal', '.modal', function () {
-    if (document.body.clientWidth < window.innerWidth) {
-        var scrollbarWidth = window.innerWidth - document.body.clientWidth;
-        $('nav.navbar-sticky-top').css('padding-right', scrollbarWidth);
-    }
-}).on('hidden.bs.modal', '.modal', function () {
-    $('nav.navbar-sticky-top').css('padding-right', '');
-});
-
 // toastr style to match php toasts
 toastr.options = {
     toastClass: 'tw:border-current tw:relative tw:pl-20 tw:py-4 tw:pr-2 tw:bg-white! tw:dark:bg-dark-gray-300! tw:opacity-80 tw:hover:opacity-100 tw:rounded-md tw:shadow-lg tw:hover:shadow-xl tw:border-l-8 tw:border-t-0.5 tw:border-r-0.5 tw:border-b-0.5 tw:mt-2 tw:cursor-pointer',
