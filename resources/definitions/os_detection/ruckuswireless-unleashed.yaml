@@ -16,6 +16,18 @@ discovery:
             oid: '.1.3.6.1.4.1.25053.1.2.1.1.1.1.9.0'
             op: starts
             value: [ ZD, zd ]
+    -
+        # Fallback for Unleashed >= 200.19.7.11 where sysObjectID returns .0.0.0
+        sysDescr_regex:
+            - '/^Ruckus Wireless /'
+        snmpget:
+            oid: '.1.3.6.1.4.1.25053.1.15.1.1.1.1.18.0' # ruckusUnleashedSystemVersion.0
+            op: regex
+            value: '/.+/'
+        snmpget_except:
+            oid: '.1.3.6.1.4.1.25053.1.2.1.1.1.1.9.0'
+            op: starts
+            value: [ ZD, zd ]
 poller_modules:
     wireless: true
 discovery_modules:
