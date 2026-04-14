@@ -571,7 +571,7 @@ Show the `X`th percentile in the graph instead of the default 95th percentile.
     lnms config:set percentile_value 90
     ```
 
-The target maximum hostname length when applying the shorthost() function.
+The target maximum hostname length when applying the $device->shortDisplayName() method.
 You can increase this if you want to try and fit more of the hostname in graph titles.
 The default value is 12. However, this can possibly break graph
 generation if this is very long.
