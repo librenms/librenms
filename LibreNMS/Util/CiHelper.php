@@ -453,8 +453,14 @@ class CiHelper
             return;
         }
         $base_dir = base_path();
-        $changed_files = trim(getenv('FILES')) ?:
-            exec("cd $base_dir && git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
+        $changed_files = trim(getenv('FILES'));
+        if (empty($changed_files)) {
+            if (!is_dir($base_dir . '/.git')) {                                                                                                                
+                echo "Warning: Skipping git-based file detection: .git/ directory not found\n";
+            } else {
+                $changed_files = exec("cd $base_dir && git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
+            }
+        }
 
         $this->flags['full'] = empty($changed_files); // don't disable full if already set
         $files = $changed_files ? explode(' ', $changed_files) : [];
