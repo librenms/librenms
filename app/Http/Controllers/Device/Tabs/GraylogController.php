@@ -72,7 +72,7 @@ class GraylogController extends Controller
                     return $text;
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // Fall through to the raw id on API failure
         }
 
