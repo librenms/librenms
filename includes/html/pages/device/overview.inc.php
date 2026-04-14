@@ -18,6 +18,7 @@ require 'includes/html/dev-overview-data.inc.php';
 require 'overview/maps.inc.php';
 require 'includes/html/dev-groups-overview-data.inc.php';
 require 'overview/puppet_agent.inc.php';
+require 'overview/wireless-subscribers.inc.php';
 
 echo LibreNMS\Plugins::call('device_overview_container', [$device]);
 foreach (PluginManager::call(DeviceOverviewHook::class, ['device' => DeviceCache::getPrimary()]) as $view) {

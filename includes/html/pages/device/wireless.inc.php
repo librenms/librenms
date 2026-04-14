@@ -4,13 +4,18 @@ use App\Models\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Util\Number;
 
-// this determines the order of the tabs
-$db_classes = WirelessSensor::where('device_id', $device['device_id'])
-    ->distinct()
-    ->pluck('sensor_class')
-    ->map(fn (WirelessSensorType $class) => $class->value)
-    ->all();
+require_once 'includes/html/pages/device/wireless-summary.inc.php';
+
+$all_wireless_sensors = WirelessSensor::where('device_id', $device['device_id'])
+    ->where('sensor_deleted', 0)
+    ->orderBy('sensor_class')
+    ->orderBy('sensor_index')
+    ->orderBy('sensor_descr')
+    ->get()
+    ->toArray();
+$db_classes = array_values(array_unique(array_map(static fn ($sensor) => $sensor['sensor_class'], $all_wireless_sensors)));
 $sensor_classes = array_intersect(WirelessSensorType::values(), $db_classes);
+$subscriber_summary = librenms_wireless_subscriber_summary((int) $device['device_id']);
 
 $wireless_link_array = [
     'page' => 'device',
@@ -31,6 +36,12 @@ echo '<span' . ($vars['metric'] == 'overview' ? ' class="pagemenu-selected"' : '
 echo generate_link('Overview', $wireless_link_array, ['metric' => 'overview']);
 echo '</span>';
 
+if (! empty($subscriber_summary['has_data'])) {
+    echo ' | <span' . ($vars['metric'] == 'subscribers' ? ' class="pagemenu-selected"' : '') . '>';
+    echo generate_link('Subscribers', $wireless_link_array, ['metric' => 'subscribers']);
+    echo '</span>';
+}
+
 foreach ($sensor_classes as $type) {
     echo ' | <span';
     if ($vars['metric'] == $type) {
@@ -46,6 +57,8 @@ foreach ($sensor_classes as $type) {
 print_optionbar_end();
 
 if ($vars['metric'] == 'overview') {
+    librenms_render_wireless_subscriber_summary($subscriber_summary);
+
     foreach ($sensor_classes as $type) {
         $text = __("wireless.$type.long");
         $unit = __("wireless.$type.unit");
@@ -58,6 +71,8 @@ if ($vars['metric'] == 'overview') {
 
         include \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/html/print-device-graph.php';
     }
+} elseif ($vars['metric'] == 'subscribers') {
+    librenms_render_wireless_subscriber_summary($subscriber_summary);
 } elseif (WirelessSensorType::tryFrom($vars['metric'])) {
     $unit = __('wireless.' . $vars['metric'] . '.unit');
     $factor = 1;

@@ -2,12 +2,24 @@
 
 use LibreNMS\Util\Html;
 
+require_once 'includes/html/pages/device/overview/epmp-radio.inc.php';
+
 $sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_class->value)->where('group', '!=', 'transceiver')->sortBy([
     ['group', 'asc'],
     ['sensor_descr', 'asc'],
 ]); // cache all sensors on device and exclude transceivers
 
-if ($sensors->isNotEmpty()) {
+$is_epmp = ($device['os'] ?? null) === 'epmp';
+
+if ($is_epmp && $sensor_class === \LibreNMS\Enum\Sensor::State) {
+    $sensors = $sensors->reject(fn ($sensor) => $sensor->group === 'Radio')->values();
+} elseif ($is_epmp && $sensor_class === \LibreNMS\Enum\Sensor::Dbm) {
+    $sensors = $sensors->reject(fn ($sensor) => $sensor->group === 'Radio' && $sensor->sensor_descr === 'TX Power')->values();
+}
+
+$render_epmp_radio_rows = $is_epmp && $sensor_class === \LibreNMS\Enum\Sensor::State && librenms_epmp_has_radio_overview_rows();
+
+if ($sensors->isNotEmpty() || $render_epmp_radio_rows) {
     $sensor_fa_icon = 'fa-' . $sensor_class->icon();
 
     echo '
@@ -18,6 +30,11 @@ if ($sensors->isNotEmpty()) {
     echo '<a href="device/device=' . $device['device_id'] . '/tab=health/metric=' . $sensor_class->value . '/"><i class="fa ' . $sensor_fa_icon . ' fa-lg icon-theme" aria-hidden="true"></i><strong> ' . $sensor_class->label() . '</strong></a>';
     echo '      </div>
         <table class="table table-hover table-condensed table-striped">';
+
+    if ($render_epmp_radio_rows) {
+        librenms_epmp_render_radio_overview_rows($device);
+    }
+
     $group = '';
     foreach ($sensors as $sensor) {
         if ($group != $sensor->group) {
