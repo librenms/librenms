@@ -24,7 +24,7 @@ class DashboardPage extends Page
      */
     public function assert(Browser $browser)
     {
-        $browser->waitFor('@editor', 30)
+        $browser->waitFor('@editor')
             ->assertPathIs($this->url());
     }
 
