@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\ApiClients\GraylogApi;
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
@@ -34,7 +35,7 @@ use Illuminate\View\View;
 
 class GraylogController extends Controller
 {
-    public function __invoke(Device $device, Request $request): View
+    public function __invoke(Device $device, Request $request, GraylogApi $api): View
     {
         $request->validate([
             'stream' => 'nullable|string',
@@ -42,14 +43,39 @@ class GraylogController extends Controller
             'loglevel' => 'nullable|int',
         ]);
 
+        $stream = $request->input('stream') ?: (string) LibrenmsConfig::get('graylog.device-page.default-stream-id', '');
+        $stream_selected = $stream !== '' ? ['id' => $stream, 'text' => $this->resolveStreamText($api, $stream)] : null;
+
         return view('device.tabs.logs.graylog', [
             'device' => $device,
             'timezone' => LibrenmsConfig::has('graylog.timezone'),
             'filter_device' => true,
             'show_form' => true,
-            'stream' => $request->input('stream', ''),
-            'range' => $request->input('range', '0'),
+            'stream' => $stream,
+            'stream_selected' => $stream_selected,
+            'range' => $request->input('range', '28800'),
             'loglevel' => $request->input('loglevel', ''),
+            'fields' => (array) LibrenmsConfig::get('graylog.device-page.fields', ['severity', 'origin', 'level', 'source', 'message', 'facility']),
         ]);
+    }
+
+    private function resolveStreamText(GraylogApi $api, string $streamId): string
+    {
+        try {
+            foreach ($api->getStreams()['streams'] ?? [] as $stream) {
+                if (($stream['id'] ?? null) === $streamId) {
+                    $text = $stream['title'] ?? $streamId;
+                    if (! empty($stream['description'])) {
+                        $text .= " ({$stream['description']})";
+                    }
+
+                    return $text;
+                }
+            }
+        } catch (\Exception $e) {
+            // Fall through to the raw id on API failure
+        }
+
+        return $streamId;
     }
 }

@@ -94,14 +94,16 @@ class GraylogApi
     }
 
     /**
-     * Build a simple query string that searches the messages field and/or filters by device
+     * Build a simple query string. The search term is passed through as a raw
+     * Graylog/Lucene query so users can use field qualifiers, wildcards, and
+     * boolean operators. A bare term still searches Graylog's default field.
      */
     public function buildSimpleQuery(?string $search = null, ?Device $device = null): string
     {
         $field = LibrenmsConfig::get('graylog.query.field');
         $query = [];
         if ($search) {
-            $query[] = 'message:"' . $search . '"';
+            $query[] = '(' . $search . ')';
         }
 
         if ($device) {

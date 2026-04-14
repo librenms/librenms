@@ -38,8 +38,12 @@ use Illuminate\Support\Facades\Blade;
 
 class GraylogController extends SimpleTableController
 {
+    private const BUILTIN_FIELDS = ['severity', 'origin', 'level', 'source', 'message', 'facility'];
+
     private readonly ?DateTimeZone $timezone;
     private array $deviceLinkCache = [];
+    private array $fields = [];
+    private array $hiddenFieldPrefixes = [];
 
     public function __construct()
     {
@@ -65,11 +69,13 @@ class GraylogController extends SimpleTableController
         $search = $request->input('searchPhrase');
         $device_id = (int) $request->input('device');
         $device = $device_id ? Device::find($device_id) : null;
-        $range = (int) $request->input('range', 0);
+        $range = (int) $request->input('range', 28800);
         $limit = (int) $request->input('rowCount', 10);
         $page = (int) $request->input('current', 1);
         $offset = (int) (($page - 1) * $limit);
         $loglevel = $request->input('loglevel') ?? LibrenmsConfig::get('graylog.loglevel');
+        $this->fields = (array) LibrenmsConfig::get('graylog.device-page.fields', self::BUILTIN_FIELDS);
+        $this->hiddenFieldPrefixes = array_filter((array) LibrenmsConfig::get('graylog.device-page.hidden-fields', ['gl2_']), 'strlen');
 
         $query = $api->buildSimpleQuery($search, $device) .
             ($loglevel !== null ? ' AND level: <=' . $loglevel : '');
@@ -79,7 +85,7 @@ class GraylogController extends SimpleTableController
             $sort = "$field:$direction";
         }
 
-        $stream = $request->input('stream');
+        $stream = $request->input('stream') ?: (string) LibrenmsConfig::get('graylog.device-page.default-stream-id', '');
         $filter = $stream ? "streams:$stream" : null;
 
         try {
@@ -103,29 +109,78 @@ class GraylogController extends SimpleTableController
 
     private function formatMessage(array $message): array
     {
+        $raw = $message['message'] ?? [];
+
         if ($this->timezone) {
-            $graylogTime = new DateTime($message['message']['timestamp']);
+            $graylogTime = new DateTime($raw['timestamp']);
             $offset = $this->timezone->getOffset($graylogTime);
 
             $timeInterval = DateInterval::createFromDateString((string) $offset . 'seconds');
             $graylogTime->add($timeInterval);
             $displayTime = $graylogTime->format('Y-m-d H:i:s');
         } else {
-            $displayTime = $message['message']['timestamp'];
+            $displayTime = $raw['timestamp'] ?? '';
         }
 
-        $level = $message['message']['level'] ?? '';
-        $facility = $message['message']['facility'] ?? '';
+        $row = ['timestamp' => $displayTime];
 
-        return [
-            'origin' => $this->deviceLinkFromSource($message['message']['gl2_remote_ip']),
-            'severity' => $this->severityLabel($level),
-            'timestamp' => $displayTime,
-            'source' => $this->deviceLinkFromSource($message['message']['source']),
-            'message' => htmlspecialchars($message['message']['message'] ?? ''),
-            'facility' => is_numeric($facility) ? "($facility) " . __("syslog.facility.$facility") : $facility,
-            'level' => (is_numeric($level) && $level >= 0) ? "($level) " . __("syslog.severity.$level") : $level,
-        ];
+        foreach ($this->fields as $field) {
+            $row[$field] = $this->renderField($field, $raw);
+        }
+
+        $row['_detail_html'] = $this->renderDetail($raw);
+
+        return $row;
+    }
+
+    private function renderField(string $field, array $raw): string
+    {
+        switch ($field) {
+            case 'severity':
+                return $this->severityLabel($raw['level'] ?? '');
+            case 'origin':
+                return $this->deviceLinkFromSource($raw['gl2_remote_ip'] ?? '');
+            case 'source':
+                return $this->deviceLinkFromSource($raw['source'] ?? '');
+            case 'message':
+                return htmlspecialchars($raw['message'] ?? '');
+            case 'level':
+                $level = $raw['level'] ?? '';
+
+                return (is_numeric($level) && $level >= 0) ? "($level) " . __("syslog.severity.$level") : $level;
+            case 'facility':
+                $facility = $raw['facility'] ?? '';
+
+                return is_numeric($facility) ? "($facility) " . __("syslog.facility.$facility") : $facility;
+            default:
+                return htmlspecialchars($this->stringifyField($raw[$field] ?? ''));
+        }
+    }
+
+    private function stringifyField($value): string
+    {
+        if (is_scalar($value) || $value === null) {
+            return (string) $value;
+        }
+
+        return (string) json_encode($value);
+    }
+
+    private function renderDetail(array $raw): string
+    {
+        ksort($raw);
+        $rows = '';
+        foreach ($raw as $key => $value) {
+            $keyStr = (string) $key;
+            foreach ($this->hiddenFieldPrefixes as $prefix) {
+                if (str_starts_with($keyStr, (string) $prefix)) {
+                    continue 2;
+                }
+            }
+            $rows .= '<dt>' . htmlspecialchars($keyStr) . '</dt><dd>' . htmlspecialchars($this->stringifyField($value)) . '</dd>';
+        }
+
+        return '<dl class="graylog-row-detail">' . $rows . '</dl>';
     }
 
     private function severityLabel(string $severity): string

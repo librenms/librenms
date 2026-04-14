@@ -101,7 +101,7 @@ $tmp_output .= '
                 "<option value=\"1800\">Search last 30 minutes</option>"+
                 "<option value=\"3600\">Search last 1 hour</option>"+
                 "<option value=\"7200\">Search last 2 hours</option>"+
-                "<option value=\"28800\">Search last 8 hours</option>"+
+                "<option value=\"28800\" selected>Search last 8 hours</option>"+
                 "<option value=\"86400\">Search last 1 day</option>"+
                 "<option value=\"172800\">Search last 2 days</option>"+
                 "<option value=\"432000\">Search last 5 days</option>"+
@@ -137,7 +137,7 @@ $tmp_output .= '
             return {
                 stream: "' . ($_POST['stream'] ?? '') . '",
                 device: "' . ($filter_device ?? '') . '",
-                range: "' . ($_POST['range'] ?? 0) . '",
+                range: "' . ($_POST['range'] ?? 28800) . '",
                 loglevel: "' . ($_POST['loglevel'] ?? '') . '",
             };
         },

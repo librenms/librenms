@@ -4481,6 +4481,35 @@
             "section": "graylog",
             "order": 9
         },
+        "graylog.device-page.default-stream-id": {
+            "default": "",
+            "type": "text",
+            "group": "external",
+            "section": "graylog",
+            "order": 10
+        },
+        "graylog.device-page.fields": {
+            "default": ["severity", "origin", "level", "source", "message", "facility"],
+            "type": "array",
+            "group": "external",
+            "section": "graylog",
+            "order": 11,
+            "validate": {
+                "value": "array",
+                "value.*": "string"
+            }
+        },
+        "graylog.device-page.hidden-fields": {
+            "default": ["gl2_"],
+            "type": "array",
+            "group": "external",
+            "section": "graylog",
+            "order": 12,
+            "validate": {
+                "value": "array",
+                "value.*": "string"
+            }
+        },
         "graylog.password": {
             "type": "password",
             "group": "external",

@@ -1116,6 +1116,18 @@ return [
                     'description' => 'Device Overview Row Count',
                     'help' => 'Sets the number of rows show on the device overview page.',
                 ],
+                'default-stream-id' => [
+                    'description' => 'Default Stream ID',
+                    'help' => 'Graylog stream ID to search when no stream filter is selected. Useful when the Graylog user only has access to specific streams (otherwise an unscoped search fails). Leave blank to search all accessible streams.',
+                ],
+                'fields' => [
+                    'description' => 'Displayed Columns',
+                    'help' => 'Ordered list of columns to show on the device log table (Timestamp is always shown). Built-in column names are: severity, origin, level, source, message, facility. Any other value is treated as a raw Graylog message field and rendered as-is (e.g. msg, source_ip for vendor-specific fields).',
+                ],
+                'hidden-fields' => [
+                    'description' => 'Hidden Detail Field Prefixes',
+                    'help' => 'Field-name prefixes to hide from the row-expand detail panel. Any field whose key starts with a listed prefix is omitted. Defaults to hiding Graylog internal fields (gl2_).',
+                ],
             ],
             'password' => [
                 'description' => 'Password',
