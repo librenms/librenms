@@ -391,31 +391,6 @@ function print_optionbar_end()
         ';
 }//end print_optionbar_end()
 
-/**
- * Get the recursive file size and count for a directory
- *
- * @param  string  $path
- * @return array [size, file count]
- */
-function foldersize($path)
-{
-    $total_size = 0;
-    $total_files = 0;
-
-    foreach (glob(rtrim($path, '/') . '/*', GLOB_NOSORT) as $item) {
-        if (is_dir($item)) {
-            [$folder_size, $file_count] = foldersize($item);
-            $total_size += $folder_size;
-            $total_files += $file_count;
-        } else {
-            $total_size += filesize($item);
-            $total_files++;
-        }
-    }
-
-    return [$total_size, $total_files];
-}
-
 function generate_ap_link($args, $text = null, $type = null)
 {
     $args = cleanPort($args);
@@ -503,17 +478,6 @@ function generate_pagination($count, $limit, $page, $links = 2)
 
     return $return;
 }//end generate_pagination()
-
-function get_client_ip()
-{
-    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } else {
-        $client_ip = $_SERVER['REMOTE_ADDR'];
-    }
-
-    return $client_ip;
-}//end get_client_ip()
 
 function clean_bootgrid($string)
 {
@@ -840,17 +804,10 @@ function search_oxidized_config($search_in_conf_textbox)
     $nodes = json_decode(file_get_contents($oxidized_search_url, false, $context), true);
     // Look up Oxidized node names to LibreNMS devices for a link
     foreach ($nodes as &$n) {
-        $dev = device_by_name($n['node']);
-        $n['dev_id'] = $dev ? $dev['device_id'] : false;
-        $n['full_name'] = $n['dev_id'] ? DeviceCache::get($n['dev_id'])->displayName() : $n['full_name'];
+        $dev = DeviceCache::getByHostname($n['node']);
+        $n['dev_id'] = $dev ? $dev->device_id : false;
+        $n['full_name'] = $dev ? $dev->displayName() : $n['full_name'];
     }
-
-    /*
-    // Filter nodes we don't have access too
-    $nodes = array_filter($nodes, function($device) {
-        return \Permissions::canAccessDevice($device['dev_id'], Auth::id());
-    });
-    */
 
     return $nodes;
 }
@@ -882,8 +839,8 @@ function get_oxidized_nodes_list()
     $data = json_decode(file_get_contents(LibrenmsConfig::get('oxidized.url') . '/nodes?format=json', false, $context), true);
 
     foreach ($data as $object) {
-        $device = device_by_name($object['name']);
-        if (! device_permitted($device['device_id'])) {
+        $device = DeviceCache::getByHostname($object['name']);
+        if (! device_permitted($device->device_id)) {
             //user cannot see this device, so let's skip it.
             continue;
         }
@@ -901,9 +858,9 @@ function get_oxidized_nodes_list()
             $formatted_local_time = $object['time'];
         }
         echo '<tr>
-        <td>' . $device['device_id'] . '</td>
+        <td>' . $device->device_id . '</td>
         <td>' . $object['name'] . '</td>
-        <td>' . $device['sysName'] . '</td>
+        <td>' . $device->sysName . '</td>
         <td>' . $object['status'] . '</td>
         <td>' . $formatted_local_time . '</td>
         <td>' . $object['model'] . '</td>

@@ -730,6 +730,45 @@ sure that 2 way communication can occure even if packets need to be fragmented a
 
 Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
 
+
+## SSL Certificates
+
+!!! note
+    This feature is disabled by default.
+
+LibreNMS can discover and monitor SSL/TLS certificates presented by your devices (for example, HTTPS on port 443). This helps you track expiry dates and receive alerts before certificates expire.
+
+**Using the feature:** From the Web UI, open **SSL Certificates** to view discovered certificates, add entries manually (host and port), pause or enable monitoring for a certificate, and remove entries. An alert rule **Expiring SSL Certificates** is available to alert when a certificate will expire within 14 days.
+
+**Behaviour:**
+
+- **Discovery:** A scheduled maintenance job (`lnms maintenance:discover-ssl-certificates`) runs daily and connects to each active device on port 443 (HTTPS). If a certificate is presented, it is stored or updated. You can also run discovery manually for all devices or a single device.
+- **Refresh:** A separate scheduled job (`lnms maintenance:refresh-ssl-certificates`) runs daily to re-check existing certificates and update expiry and other details. You can refresh all enabled certificates or a single one by ID.
+
+**Configuration options:** These can be set in the Web UI under **Applications → SSL Certificates** or via the CLI (`lnms config:set`).
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `ssl_certificates.auto_discover` | boolean | `false` | When enabled, the scheduled SSL discovery job runs daily. Set to `false` to disable automatic discovery (for example, if you only add certificates manually). |
+| `ssl_certificates.skip_hosts` | array (strings) | `[]` | List of hostnames or IPs to skip during both discovery and refresh. Matching is case-insensitive. Use this to exclude devices or hosts that should not be probed for SSL (for example, load balancers that present different certs, or hosts that block or rate-limit connections). |
+
+!!! setting "system/ssl-certificates"
+    ```bash
+    # Enable automatic SSL discovery
+    lnms config:set ssl_certificates.auto_discover true
+
+    # Skip discovery and refresh for specific hosts (add one per line)
+    lnms config:set ssl_certificates.skip_hosts.+ internal-lb.example.com
+    lnms config:set ssl_certificates.skip_hosts.+ 192.168.1.1
+    ```
+
+To set the whole array at once:
+
+!!! setting "system/ssl-certificates"
+    ```bash
+    lnms config:set ssl_certificates.skip_hosts '["host1.example.com", "host2.example.com"]'
+    ```
+
 ## Email configuration
 
 !!! setting "alerting/email"

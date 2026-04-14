@@ -1,0 +1,246 @@
+--
+-- All Rights Reserved, Copyright (c) 2015, ALAXALA Networks Corp.
+--
+-- AX-STATIC-MIB.my: axStatic group MIB file for Router.
+--
+
+AX-STATIC-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Integer32, IpAddress                  FROM SNMPv2-SMI
+        OBJECT-GROUP, NOTIFICATION-GROUP,
+        MODULE-COMPLIANCE                     FROM SNMPv2-CONF
+        Ipv6Address                           FROM IPV6-TC
+        axMib                                 FROM AX-SMI-MIB;
+
+axStatic MODULE-IDENTITY
+    LAST-UPDATED    "201505110000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for static information."
+
+    REVISION        "201505110000Z"
+    DESCRIPTION
+        "Initial release."
+::= { axMib 38 }
+
+--
+-- Textual Conventions
+--
+
+--
+-- MIB groups
+--
+
+axStaticTrap  OBJECT IDENTIFIER ::= { axStatic 2 }
+
+--
+-- axStaticTable
+--
+
+axStaticGatewayTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxStaticGatewayEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The set of instances of the static gateway state."
+    ::= {axStatic 1}
+
+axStaticGatewayEntry OBJECT-TYPE
+    SYNTAX AxStaticGatewayEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each row defines information about static route gateway state."
+    INDEX { axStaticGatewayVRFIndex,
+            axStaticGatewayAddr }
+    ::= {axStaticGatewayTable 1}
+
+AxStaticGatewayEntry ::= SEQUENCE {
+    axStaticGatewayVRFIndex Integer32,
+    axStaticGatewayAddr     IpAddress,
+    axStaticGatewayState    INTEGER
+}
+
+axStaticGatewayVRFIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies VRF number."
+    ::= {axStaticGatewayEntry 1}
+
+axStaticGatewayAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The static route gateway address."
+    ::= {axStaticGatewayEntry 2}
+
+axStaticGatewayState OBJECT-TYPE
+    SYNTAX INTEGER {
+                       reachable(1),
+                       unreachable(2)
+                   }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The state of static route gateway."
+    ::= {axStaticGatewayEntry 3}
+
+--
+-- axStaticIpv6Table
+--
+
+axStaticIpv6GatewayTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxStaticIpv6GatewayEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The set of instances of the ipv6 static gateway state."
+    ::= {axStatic 3}
+
+axStaticIpv6GatewayEntry OBJECT-TYPE
+    SYNTAX AxStaticIpv6GatewayEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each row defines information about ipv6 static route gateway state."
+    INDEX { axStaticIpv6GatewayVRFIndex,
+            axStaticIpv6GatewayIfindex,
+            axStaticIpv6GatewayAddr }
+    ::= {axStaticIpv6GatewayTable 1}
+
+AxStaticIpv6GatewayEntry ::= SEQUENCE {
+    axStaticIpv6GatewayVRFIndex Integer32,
+    axStaticIpv6GatewayIfindex  Integer32,
+    axStaticIpv6GatewayAddr     Ipv6Address,
+    axStaticIpv6GatewayState    INTEGER
+}
+
+axStaticIpv6GatewayVRFIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies VRF number."
+    ::= {axStaticIpv6GatewayEntry 1}
+
+axStaticIpv6GatewayIfindex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The ifIndex ralated static gateway address."
+    ::= {axStaticIpv6GatewayEntry 2}
+
+axStaticIpv6GatewayAddr OBJECT-TYPE
+    SYNTAX Ipv6Address
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The static route gateway address."
+    ::= {axStaticIpv6GatewayEntry 3}
+
+axStaticIpv6GatewayState OBJECT-TYPE
+    SYNTAX INTEGER {
+                       reachable(1),
+                       unreachable(2)
+                   }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The state of static route gateway."
+    ::= {axStaticIpv6GatewayEntry 4}
+
+--
+-- Notification Type definitions
+--
+
+axStaticTrapsPrefix               OBJECT IDENTIFIER ::= { axStaticTrap 0 }
+
+--
+-- axStaticTraps
+--
+axStaticGatewayStateChange NOTIFICATION-TYPE
+    OBJECTS       {
+                    axStaticGatewayVRFIndex,
+                    axStaticGatewayAddr,
+                    axStaticGatewayState
+                  }
+    STATUS        current
+    DESCRIPTION
+             "static route gateway state change."
+    ::= { axStaticTrapsPrefix 1 }
+
+axStaticIpv6GatewayStateChange NOTIFICATION-TYPE
+    OBJECTS       {
+                    axStaticIpv6GatewayVRFIndex,
+                    axStaticIpv6GatewayIfindex,
+                    axStaticIpv6GatewayAddr,
+                    axStaticIpv6GatewayState
+                  }
+    STATUS        current
+    DESCRIPTION
+             "ipv6 static route gateway state change."
+    ::= { axStaticTrapsPrefix 2 }
+
+
+--
+-- Conformance Statements
+--
+
+-- Conformance identifier
+
+axStaticConformance               OBJECT IDENTIFIER ::= { axStatic 1000 }
+axStaticCompliances               OBJECT IDENTIFIER ::= { axStaticConformance 1 }
+axStaticGroups                    OBJECT IDENTIFIER ::= { axStaticConformance 2 }
+
+--
+-- Compliance
+--
+
+    axStaticCompliance MODULE-COMPLIANCE
+        STATUS    current
+        DESCRIPTION
+            "AX Static Object"
+        MODULE
+            MANDATORY-GROUPS { axStaticGroup,
+                               axStaticTrapNotificationGroup }
+        ::= { axStaticCompliances 1 }
+--
+-- Object Group
+--
+    axStaticGroup OBJECT-GROUP
+        OBJECTS     {
+                        axStaticGatewayVRFIndex,
+                        axStaticGatewayAddr,
+                        axStaticGatewayState,
+                        axStaticIpv6GatewayVRFIndex,
+                        axStaticIpv6GatewayIfindex,
+                        axStaticIpv6GatewayAddr,
+                        axStaticIpv6GatewayState
+                    }
+        STATUS      current
+        DESCRIPTION
+            "axStatic General Group"
+        ::= { axStaticGroups 1 }
+
+--
+-- Notification Group
+--
+
+axStaticTrapNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        axStaticGatewayStateChange,
+                        axStaticIpv6GatewayStateChange
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of notifications of axStaticTrap."
+    ::= { axStaticGroups 100 }
+
+
+END

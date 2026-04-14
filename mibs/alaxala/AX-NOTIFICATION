@@ -1,0 +1,104 @@
+--
+-- All Rights Reserved, Copyright (c) 2013, ALAXALA Networks Corp.
+--
+-- AX-NOTIFICATION.my : Notification group MIB file.
+--
+
+AX-NOTIFICATION DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        ifIndex
+            FROM RFC1213-MIB
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axFrameError MODULE-IDENTITY
+    LAST-UPDATED    "201302050000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The Trap module for traps not belonging to any other groups."
+
+    REVISION        "201302050000Z"
+    DESCRIPTION
+        "Initial release."
+::= { axMib 71 }
+
+--------------------------------------------------
+-- Object Identifiers
+--------------------------------------------------
+
+axFrameErrorTraps              OBJECT IDENTIFIER ::= { axFrameError 1 }
+
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+-- None
+
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+
+axFrameErrorTrapsPrefix            OBJECT IDENTIFIER ::= { axFrameErrorTraps 0 }
+
+--
+-- FrameErrorTraps
+--
+axFrameErrorReceiveTrap  NOTIFICATION-TYPE
+    OBJECTS       { ifIndex }
+    STATUS        current
+    DESCRIPTION
+             "This indicates frame receive error."
+    ::= { axFrameErrorTrapsPrefix 1 }
+
+
+axFrameErrorSendTrap  NOTIFICATION-TYPE
+    OBJECTS       { ifIndex }
+    STATUS        current
+    DESCRIPTION
+             "This indicates frame send error."
+    ::= { axFrameErrorTrapsPrefix 2 }
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Conformance identifier
+--
+axFrameErrorConformance       OBJECT IDENTIFIER ::= { axFrameError 1000 }
+axFrameErrorCompliances       OBJECT IDENTIFIER ::= { axFrameErrorConformance 1 }
+axFrameErrorGroups            OBJECT IDENTIFIER ::= { axFrameErrorConformance 2 }
+
+--
+-- Compliance
+--
+axFrameErrorCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "AX Frame Error"
+    MODULE        -- this module
+        MANDATORY-GROUPS { axFrameErrorNotificationGroup }
+    ::= { axFrameErrorCompliances 1 }
+
+--
+-- Notification Group
+--
+axFrameErrorNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        axFrameErrorReceiveTrap,
+                        axFrameErrorSendTrap
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of notifications of axFrameError."
+    ::= { axFrameErrorGroups 10 }
+
+END

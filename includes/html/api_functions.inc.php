@@ -128,6 +128,7 @@ function api_get_graph(Request $request, array $additional = [])
             'bbg',
             'title',
             'graph_title',
+            'graph_type',
             'nototal',
             'nodetails',
             'noagg',
@@ -1247,9 +1248,12 @@ function update_port_description(Illuminate\Http\Request $request)
         ->where([
             'port_id' => $port_id,
         ])->first();
+
     if (empty($port)) {
         return api_error(400, 'Invalid port ID.');
     }
+
+    $device = DeviceCache::get($port->device_id);
 
     $data = json_decode($request->getContent(), true);
     $field = 'description';
@@ -1264,19 +1268,16 @@ function update_port_description(Illuminate\Http\Request $request)
     $port->ifAlias = $description;
     $port->save();
 
-    $ifName = $port->ifName;
-    $device = $port->device_id;
-
     if ($description == 'repoll') {
         // No description provided, clear description
-        del_dev_attrib($port, 'ifName:' . $ifName); // "port" object has required device_id
-        Eventlog::log("$ifName Port ifAlias cleared via API", $device, 'interface', Severity::Notice, $port_id);
+        $device->forgetAttrib('ifName:' . $port->ifName);
+        Eventlog::log("$port->ifName Port ifAlias cleared via API", $port->device_id, 'interface', Severity::Notice, $port->port_id);
 
         return api_success_noresult(200, 'Port description cleared.');
     } else {
         // Prevent poller from overwriting new description
-        set_dev_attrib($port, 'ifName:' . $ifName, 1); // see above
-        Eventlog::log("$ifName Port ifAlias set via API: $description", $device, 'interface', Severity::Notice, $port_id);
+        $device->setAttrib('ifName:' . $port->ifName, 1);
+        Eventlog::log("$port->ifName Port ifAlias set via API: $description", $port->device_id, 'interface', Severity::Notice, $port->port_id);
 
         return api_success_noresult(200, 'Port description updated.');
     }
@@ -2469,7 +2470,7 @@ function add_device_group(Illuminate\Http\Request $request)
     $rules = [
         'name' => 'required|string|unique:device_groups',
         'type' => 'required|in:dynamic,static',
-        'devices' => 'array|required_if:type,static',
+        'devices' => 'array|present_if:type,static',
         'devices.*' => 'integer',
         'rules' => 'json|required_if:type,dynamic',
     ];
@@ -2522,7 +2523,7 @@ function update_device_group(Illuminate\Http\Request $request)
         'name' => 'sometimes|string|unique:device_groups',
         'desc' => 'sometimes|string',
         'type' => 'sometimes|in:dynamic,static',
-        'devices' => 'array|required_if:type,static',
+        'devices' => 'array|present_if:type,static',
         'devices.*' => 'integer',
         'rules' => 'json|required_if:type,dynamic',
     ];

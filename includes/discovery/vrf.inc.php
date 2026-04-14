@@ -110,7 +110,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                     // regexp result => 5.116.101.115.116.49 -- 36 35 33 30 31 3A 31 -- 00
                     d_echo("  [DEBUG] VRP: RD HexString handling: $matches[2]");
                     $hex_vrf_rd = str_replace(' ', '', $matches[2]);
-                    $vrf_rd = hex2str($hex_vrf_rd);
+                    $vrf_rd = hex2bin($hex_vrf_rd);
                     d_echo("\n  [DEBUG] VRP: RD : $hex_vrf_rd -> $vrf_rd");
                 }
 

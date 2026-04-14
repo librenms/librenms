@@ -26,6 +26,8 @@
 
 namespace App\Http\Controllers\Table;
 
+use LibreNMS\Enum\IfOperStatus;
+
 class EditPortsController extends TableController
 {
     public function rules()
@@ -59,7 +61,7 @@ class EditPortsController extends TableController
      */
     public function formatItem($port)
     {
-        $is_port_bad = $port->ifAdminStatus != 'down' && $port->ifOperStatus != 'up';
+        $is_port_bad = $port->ifAdminStatus != IfOperStatus::Down && $port->ifOperStatus != IfOperStatus::Up;
         $do_we_care = ($port->ignore || $port->disabled) ? false : $is_port_bad;
         $out_of_sync = $do_we_care ? "class='red'" : '';
         $tune = $port->device->getAttrib('ifName_tune:' . $port->ifName) == 'true' ? 'checked' : '';
@@ -74,8 +76,8 @@ class EditPortsController extends TableController
         return [
             'ifIndex' => $port->ifIndex,
             'ifName' => htmlentities($port->getLabel()),
-            'ifAdminStatus' => htmlentities((string) $port->ifAdminStatus),
-            'ifOperStatus' => '<span id="operstatus_' . $port->port_id . '" ' . $out_of_sync . '>' . htmlentities((string) $port->ifOperStatus) . '</span>',
+            'ifAdminStatus' => htmlentities($port->ifAdminStatus->value ?? ''),
+            'ifOperStatus' => '<span id="operstatus_' . $port->port_id . '" ' . $out_of_sync . '>' . htmlentities($port->ifOperStatus->value ?? '') . '</span>',
             'disabled' => '<input type="checkbox" class="disable-check" data-size="small" name="disabled_' . $port->port_id . '"' . ($port->disabled ? 'checked' : '') . '>
                                <input type="hidden" name="olddis_' . $port->port_id . '" value="' . ($port->disabled ? 1 : 0) . '"">',
             'ignore' => '<input type="checkbox" class="ignore-check" data-size="small" name="ignore_' . $port->port_id . '"' . ($port->ignore ? 'checked' : '') . '>

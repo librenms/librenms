@@ -1073,28 +1073,24 @@
                 {
                     "state_name": "integraXsysLicenseGenStatus",
                     "state_descr": "ok",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "integraXsysLicenseGenStatus",
                     "state_descr": "expired",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "integraXsysLicenseGenStatus",
                     "state_descr": "unknown",
-                    "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "integraXsysLicenseGenStatus",
                     "state_descr": "unlimitedTime",
-                    "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 0
                 }

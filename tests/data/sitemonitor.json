@@ -228,14 +228,12 @@
                 {
                     "state_name": "switchInput",
                     "state_descr": "Open",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "switchInput",
                     "state_descr": "Closed",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 }
@@ -448,14 +446,12 @@
                 {
                     "state_name": "switchInput",
                     "state_descr": "Open",
-                    "state_draw_graph": 1,
                     "state_value": 0,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "switchInput",
                     "state_descr": "Closed",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 }

@@ -38,8 +38,8 @@ modules:
                     index: 'inpValue.{{ $index }}'
                     state_name: inpValue
                     states:
-                        - { descr: open, graph: 0, value: 0, generic: 0 }
-                        - { descr: closed, graph: 0, value: 1, generic: 2 }
+                        - { descr: open, value: 0, generic: 0 }
+                        - { descr: closed, value: 1, generic: 2 }
                 -
                     oid: STE-MIB::inpTable
                     value: STE-MIB::inpAlarmState
@@ -48,8 +48,8 @@ modules:
                     index: 'inpAlarmState.{{ $index }}'
                     state_name: inpAlarmState
                     states:
-                        - { descr: normal, graph: 0, value: 0, generic: 0 }
-                        - { descr: alarm, graph: 0, value: 1, generic: 2 }
+                        - { descr: normal, value: 0, generic: 0 }
+                        - { descr: alarm, value: 1, generic: 2 }
                 -
                     oid: STE-MIB::sensTable
                     value: STE-MIB::sensState
@@ -58,9 +58,9 @@ modules:
                     index: 'sensState.{{ $index }}'
                     state_name: sensName
                     states:
-                        - { descr: invalid, graph: 0, value: 0, generic: 2 }
-                        - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: outOfRangeLo, graph: 0, value: 2, generic: 2 }
-                        - { descr: outofRangeHi, graph: 0, value: 3, generic: 2 }
-                        - { descr: alarmLo, graph: 0, value: 4, generic: 2 }
-                        - { descr: alarmHi, graph: 0, value: 5, generic: 2 }
+                        - { descr: invalid, value: 0, generic: 2 }
+                        - { descr: normal, value: 1, generic: 0 }
+                        - { descr: outOfRangeLo, value: 2, generic: 2 }
+                        - { descr: outofRangeHi, value: 3, generic: 2 }
+                        - { descr: alarmLo, value: 4, generic: 2 }
+                        - { descr: alarmHi, value: 5, generic: 2 }

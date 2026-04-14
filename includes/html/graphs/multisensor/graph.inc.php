@@ -13,6 +13,7 @@
  * All sensors must be of the same class (e.g., all power, all temperature).
  */
 
+use App\Facades\Rrd;
 use LibreNMS\Exceptions\RrdGraphException;
 
 require 'includes/html/graphs/common.inc.php';
@@ -93,7 +94,7 @@ $aggr_fields = '';  // For building aggregate CDEF
 
 foreach ($sensors as $sensor) {
     $device = device_by_id_cache($sensor->device_id);
-    $rrd_filename = get_sensor_rrd($device, $sensor);
+    $rrd_filename = Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
 
     if (! Rrd::checkRrdExists($rrd_filename)) {
         continue;

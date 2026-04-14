@@ -1,0 +1,2840 @@
+--
+-- All Rights Reserved, Copyright (c) 2013, 2020, ALAXALA Networks Corp.
+--
+-- AX-DEVICE-MIB.my axDevice group MIB file.
+--
+
+AX-DEVICE-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Integer32,IpAddress
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        DisplayString
+            FROM SNMPv2-TC
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axDevice MODULE-IDENTITY
+    LAST-UPDATED    "202009240000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for chassis information."
+
+    REVISION        "202009240000Z"
+    DESCRIPTION
+        "+Added axPhysLineLaneTable
+         +Modified axBcuOperModeStatus (added faultRestrained)
+         +Modified axPhysLineConnectorType (added type100GBASE-CWDM4, type100GBASE-4WDM-40)"
+    REVISION        "201903110000Z"
+    DESCRIPTION
+        "+Modified axPhysLineConnectorType (added type100GBASE-SR4)
+         +Modified axPhysLineTransceiverStatus (added qsfp28-mounted, qsfp28-unmounted, unsupported-qsfp28-mounted, qsfp28-fault)"
+    REVISION        "201802130000Z"
+    DESCRIPTION
+        "+Modified axChassisType (added ax8304S)"
+    REVISION        "201607190000Z"
+    DESCRIPTION
+        "+Modified axPowerSupplyInputVoltage (added dc380V)"
+    REVISION        "201606130000Z"
+    DESCRIPTION
+        "+Modified axPhysLineConnectorType (added type40GBASE-SR4, type40GBASE-LR4)
+         +Modified axPhysLineTransceiverStatus (added qsfpp-mounted, qsfpp-unmounted, unsupported-qsfpp-mounted, qsfpp-fault)"
+    REVISION        "201602030000Z"
+    DESCRIPTION
+        "+Modified axPhysLineConnectorType (added type10GBASE-ZR)"
+    REVISION        "201512250000Z"
+    DESCRIPTION
+        "+Modified axChassisType (added ax8308S)"
+    REVISION        "201410020000Z"
+    DESCRIPTION
+        "+Added axNifReadyLedStatus
+         +Added axSmcTable
+         +Added axSmcBoardTraps"
+    REVISION        "201402280000Z"
+    DESCRIPTION
+        "+Added axPsuBoardTable
+         +Added axPsuBoardTraps
+         +Modified axChassisType"
+    REVISION        "201308020000Z"
+    DESCRIPTION
+        "Initial release."
+    ::= { axMib 1002 }
+
+
+-------------------------------------------------------------------------------
+-- Object Identifiers
+-------------------------------------------------------------------------------
+axChassis                   OBJECT IDENTIFIER ::= { axDevice 1 }
+axBcuBoard                  OBJECT IDENTIFIER ::= { axDevice 2 }
+axSfuBoard                  OBJECT IDENTIFIER ::= { axDevice 3 }
+axPruBoard                  OBJECT IDENTIFIER ::= { axDevice 4 }
+axPsuBoard                  OBJECT IDENTIFIER ::= { axDevice 5 }
+axNifBoard                  OBJECT IDENTIFIER ::= { axDevice 6 }
+axPhysLine                  OBJECT IDENTIFIER ::= { axDevice 7 }
+axInterface                 OBJECT IDENTIFIER ::= { axDevice 8 }
+axSfuBoardTraps             OBJECT IDENTIFIER ::= { axSfuBoard 2 }
+axPruBoardTraps             OBJECT IDENTIFIER ::= { axPruBoard 2 }
+axPsuBoardTraps             OBJECT IDENTIFIER ::= { axPsuBoard 2 }
+axNifBoardTraps             OBJECT IDENTIFIER ::= { axNifBoard 2 }
+axSmcBoardTraps             OBJECT IDENTIFIER ::= { axNifBoard 4 }
+
+
+-------------------------------------------------------------------------------
+-- Object Type definitions
+-------------------------------------------------------------------------------
+
+--
+--  axChassis
+--
+axChassisMaxNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Max number of chassis that can connect to this system."
+    ::= {axChassis 1}
+
+axChassisTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxChassisEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing chassis information."
+    ::= {axChassis 2}
+
+axChassisEntry OBJECT-TYPE
+    SYNTAX AxChassisEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing specific chassis."
+    INDEX { axChassisIndex }
+    ::= {axChassisTable 1}
+
+AxChassisEntry ::= SEQUENCE {
+    axChassisIndex               Integer32,
+    axChassisName                DisplayString,
+    axChassisAbbreviation        DisplayString,
+    axChassisType                INTEGER,
+    axPowerUnitNumber            Integer32,
+    axFanNumber                  Integer32,
+    axBcuBoardNumber             Integer32,
+    axSfuBoardNumber             Integer32,
+    axPruBoardNumber             Integer32,
+    axPsuBoardNumber             Integer32,
+    axNifBoardNumber             Integer32,
+    axChassisSerialInformation   DisplayString
+}
+
+axChassisIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A Index of number to specify chassis."
+    ::= {axChassisEntry 1}
+
+axChassisName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The product name of chassis."
+    ::= {axChassisEntry 2}
+
+axChassisAbbreviation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The abbreviated name of chassis."
+    ::= {axChassisEntry 3}
+
+axChassisType OBJECT-TYPE
+    SYNTAX INTEGER { other(1),
+                     ax8608R(3000),
+                     ax8616R(3001),
+                     ax8632R(3002),
+                     ax8608S(4000),
+                     ax8616S(4001),
+                     ax8632S(4002),
+                     ax8308S(4100),
+                     ax8304S(4103) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of chassis."
+    ::= {axChassisEntry 4}
+
+axPowerUnitNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of maximum power switches that this chassis can connect its."
+    ::= {axChassisEntry 5}
+
+axFanNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of fans that can connect to this chassis."
+    ::= {axChassisEntry 6}
+
+axBcuBoardNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of BCU that can connect to this chassis."
+    ::= {axChassisEntry 7}
+
+axSfuBoardNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of SFU that can connect to this chassis."
+    ::= {axChassisEntry 8}
+
+axPruBoardNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of PRU that can connect to this chassis."
+    ::= {axChassisEntry 9}
+
+axPsuBoardNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of PSU that can connect to this chassis."
+    ::= {axChassisEntry 10}
+
+axNifBoardNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of NIF that can connect to this chassis."
+    ::= {axChassisEntry 11}
+
+axChassisSerialInformation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Management information (SerialInformation) of chassis."
+    ::= {axChassisEntry 13}
+
+--
+--  axChassisSystemTable
+--
+
+axChassisSystemTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxChassisSystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing chassis system information."
+    ::= {axChassis 3}
+
+axChassisSystemEntry OBJECT-TYPE
+    SYNTAX AxChassisSystemEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing specific chassis system."
+    INDEX       { axChassisIndex }
+    ::= {axChassisSystemTable 1}
+
+AxChassisSystemEntry ::= SEQUENCE {
+    axChassisStatus                    INTEGER,
+    axPowerSupplyUnitRedundancyMode    INTEGER,
+    axFanMode                          INTEGER,
+    axBcuBoardRedundancyStatus         INTEGER,
+    axTotalPowerSupplyCapacity         Integer32,
+    axPowerSupplyCapacitySourceA       Integer32,
+    axPowerSupplyCapacitySourceB       Integer32,
+    axTotalPowerAllocated              Integer32,
+    axTotalPowerAvailable              Integer32,
+    axRedundantPowerAvailable          Integer32,
+    axPowerAvailableSourceA            Integer32,
+    axPowerAvailableSourceB            Integer32
+}
+
+axChassisStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      up(2)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current status of this chassis."
+    ::= {axChassisSystemEntry 1}
+
+axPowerSupplyUnitRedundancyMode OBJECT-TYPE
+    SYNTAX INTEGER {
+                      powerSupply(1),
+                      powerSupplyAndInputSource(2),
+                      notConfigured(99)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The redundancy mode of the power supply unit connected to this chassis."
+    ::= {axChassisSystemEntry 2}
+
+axFanMode OBJECT-TYPE
+    SYNTAX INTEGER {
+                      normal(1),
+                      cool(2)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The operation mode of fan unit connected to this chassis."
+    ::= {axChassisSystemEntry 3}
+
+axBcuBoardRedundancyStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      simplex(1),
+                      duplex(2)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The BCU redundancy status."
+    ::= {axChassisSystemEntry 4}
+
+axTotalPowerSupplyCapacity OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total power supply capacity on this chassis."
+    ::= {axChassisSystemEntry  10}
+
+axPowerSupplyCapacitySourceA OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The power supply capacity on power source A."
+    ::= {axChassisSystemEntry  11}
+
+axPowerSupplyCapacitySourceB OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The power supply capacity on power source B."
+    ::= {axChassisSystemEntry 12}
+
+axTotalPowerAllocated OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The allocated total power supply on this chassis."
+    ::= {axChassisSystemEntry  13}
+
+axTotalPowerAvailable OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total power available for additional boards on this chassis."
+    ::= {axChassisSystemEntry 14}
+
+axRedundantPowerAvailable OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The power available in the power supply unit redundant case on this chassis."
+    ::= {axChassisSystemEntry 15}
+
+axPowerAvailableSourceA OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The power available on power source A"
+    ::= {axChassisSystemEntry 16}
+
+axPowerAvailableSourceB OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The power available on power source B"
+    ::= {axChassisSystemEntry 17}
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+axChassisSystemTraps         OBJECT IDENTIFIER ::= { axChassisSystemTable 2 }
+axChassisSystemTrapsPrefix   OBJECT IDENTIFIER ::= { axChassisSystemTraps 0 }
+
+axPowerRedundancyFailureTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that the power supply unit are not redundantly mounted."
+    ::= { axChassisSystemTrapsPrefix 1 }
+
+axPowerRedundancyRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that the power supply unit are  redundantly mounted."
+    ::= { axChassisSystemTrapsPrefix 2 }
+
+axPowerSupplyInsufficientTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that the supply of power is insufficient."
+    ::= { axChassisSystemTrapsPrefix 3 }
+
+axPowerSupplyInsufficientRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that the supply of power is sufficient now."
+    ::= { axChassisSystemTrapsPrefix 4 }
+
+--
+--  axPowerSupplyUnitTable
+--
+
+axPowerSupplyUnitTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxPowerSupplyUnitEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing power unit information."
+    ::= {axChassis 4}
+
+axPowerSupplyUnitEntry OBJECT-TYPE
+    SYNTAX AxPowerSupplyUnitEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing power unit information."
+    INDEX      { axChassisIndex,
+                 axPowerSupplyUnitIndex }
+    ::= {axPowerSupplyUnitTable 1}
+
+AxPowerSupplyUnitEntry ::= SEQUENCE {
+    axPowerSupplyUnitIndex             Integer32,
+    axPowerSupplyName                  DisplayString,
+    axPowerSupplyAbbreviation          DisplayString,
+    axPowerSupplySerialInformation     DisplayString,
+    axPowerSupplyInputVoltage          INTEGER,
+    axPowerSupplyConnectStatus         INTEGER,
+    axPowerSupplyStatus                INTEGER,
+    axPowerSupplyTotalAccumRunTime     Integer32,
+    axPowerSupplyCautionAccumRunTime   Integer32,
+    axPowerSupplyCriticalAccumRunTime  Integer32,
+    axPowerSupplyElapsedTime           Integer32
+}
+
+axPowerSupplyUnitIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An Index of position number of power supply unit."
+    ::= {axPowerSupplyUnitEntry 1}
+
+axPowerSupplyName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The product name of power supply unit."
+    ::= {axPowerSupplyUnitEntry 2}
+
+axPowerSupplyAbbreviation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The abbreviated name of power supply unit."
+    ::= {axPowerSupplyUnitEntry 3}
+
+axPowerSupplySerialInformation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The serial information of power supply unit."
+    ::= {axPowerSupplyUnitEntry 4}
+
+axPowerSupplyInputVoltage OBJECT-TYPE
+    SYNTAX INTEGER {
+                      ac100V120V(1),
+                      ac200V240V(2),
+                      dc48V(3),
+                      dc380V(4),
+                      unknown(99)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The input voltage of power supply unit."
+    ::= {axPowerSupplyUnitEntry 5}
+
+axPowerSupplyConnectStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      connect(1),
+                      notconnect(2)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current connection status of the power supply unit."
+    ::= {axPowerSupplyUnitEntry 6}
+
+axPowerSupplyStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      active(1),
+                      fault(2),
+                      connect(3),
+                      notconnect(4),
+                      notsupport(5)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of power supply unit."
+    ::= {axPowerSupplyUnitEntry 7}
+
+axPowerSupplyTotalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total operation time after operation of device begins."
+    ::= {axPowerSupplyUnitEntry 8}
+
+axPowerSupplyCautionAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time of the power supply unit while the status of the inlet temperature of the device is caution or critical."
+    ::= {axPowerSupplyUnitEntry 9}
+
+axPowerSupplyCriticalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time of the power supply unit while the status of the inlet temperature of the device is critical."
+    ::= {axPowerSupplyUnitEntry 10}
+
+axPowerSupplyElapsedTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time after operation of device begins."
+    ::= {axPowerSupplyUnitEntry 11}
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+axPowerSupplyUnitTraps         OBJECT IDENTIFIER ::= { axPowerSupplyUnitTable 2 }
+axPowerSupplyUnitTrapsPrefix   OBJECT IDENTIFIER ::= { axPowerSupplyUnitTraps 0 }
+
+axPowerSupplyFailureTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex,
+                    axPowerSupplyUnitIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that a fatal error was detected on the power supply unit."
+    ::= { axPowerSupplyUnitTrapsPrefix 1 }
+
+axPowerSupplyRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex,
+                    axPowerSupplyUnitIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that the power supply unit becomes normal again."
+    ::= { axPowerSupplyUnitTrapsPrefix 2 }
+
+axPowerSupplyStatusChangeTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex,
+                    axPowerSupplyUnitIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that the status of  power supply unit changed."
+    ::= { axPowerSupplyUnitTrapsPrefix 3 }
+
+--
+--  axFanUnitTable
+--
+
+axFanUnitTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxFanUnitEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing fan unit information."
+    ::= {axChassis 5}
+
+axFanUnitEntry OBJECT-TYPE
+    SYNTAX AxFanUnitEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing fan unit information."
+    INDEX { axChassisIndex,
+            axFanUnitIndex }
+    ::= {axFanUnitTable 1}
+
+AxFanUnitEntry ::= SEQUENCE {
+    axFanUnitIndex                    Integer32,
+    axFanUnitName                     DisplayString,
+    axFanUnitAbbreviation             DisplayString,
+    axFanUnitSerialInformation        DisplayString,
+    axFanUnitStatus                   INTEGER,
+    axFanUnitSpeed                    Integer32,
+    axFanUnitTotalAccumRunTime        Integer32,
+    axFanUnitCautionAccumRunTime      Integer32,
+    axFanUnitCriticalAccumRunTime     Integer32,
+    axFanUnitElapsedTime              Integer32,
+    axFanUnitLedStatus                Integer32
+}
+
+axFanUnitIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An Index of position number of fan."
+    ::= {axFanUnitEntry 1}
+
+axFanUnitName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The product name of fan unit."
+    ::= {axFanUnitEntry 2}
+
+axFanUnitAbbreviation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The abbreviated name of fan unit."
+    ::= {axFanUnitEntry 3}
+
+axFanUnitSerialInformation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The serial information of fan unit."
+    ::= {axFanUnitEntry 4}
+
+axFanUnitStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      active(1),
+                      fault(2),
+                      notconnect(3),
+                      notsupport(4)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of fan unit."
+    ::= {axFanUnitEntry 5}
+
+axFanUnitSpeed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current speed of fan unit."
+    ::= {axFanUnitEntry 6}
+
+axFanUnitTotalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total operation time after operation of device begins."
+    ::= {axFanUnitEntry 8}
+
+axFanUnitCautionAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time of the fan unit while the status of the inlet temperature of the device is caution or critical."
+    ::= {axFanUnitEntry 9}
+
+axFanUnitCriticalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time of the fan unit while the status of the inlet temperature of the device is critical."
+    ::= {axFanUnitEntry 10}
+
+axFanUnitElapsedTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time after operation of device begins."
+    ::= {axFanUnitEntry 11}
+
+axFanUnitLedStatus OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of STATUS LED of the fan unit."
+    ::= {axFanUnitEntry 12}
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+axAirFanUnitTraps         OBJECT IDENTIFIER ::= { axFanUnitTable 2 }
+axAirFanUnitTrapsPrefix   OBJECT IDENTIFIER ::= { axAirFanUnitTraps 0 }
+
+axAirFanUnitStopTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex,
+                    axFanUnitIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicate that a fan stopped."
+    ::= { axAirFanUnitTrapsPrefix 1 }
+
+axAirFanUnitRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex,
+                    axFanUnitIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that the fan unit becomes to normal."
+    ::= { axAirFanUnitTrapsPrefix 2 }
+
+--
+--  axBcuBoardTable
+--
+
+axBcuBoardTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxBcuBoardEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The BCU information table."
+    ::= {axBcuBoard 1}
+
+axBcuBoardEntry OBJECT-TYPE
+    SYNTAX AxBcuBoardEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The BCU information entry."
+    INDEX { axChassisIndex, axBcuBoardIndex }
+    ::= {axBcuBoardTable 1}
+
+AxBcuBoardEntry ::= SEQUENCE {
+    axBcuBoardIndex              Integer32,
+    axBcuOperLedStatus           BITS,
+    axBcuOperModeStatus          BITS,
+    axBcuActiveLedStatus         BITS,
+    axBcuSystem1LedStatus        BITS,
+    axBcuSystem2LedStatus        BITS,
+    axBcuBoardName               DisplayString,
+    axBcuBoardAbbreviation       DisplayString,
+    axBcuSoftwareVersion         DisplayString,
+    axBcuFlashTotalSize          Integer32,
+    axBcuFlashUsedSize           Integer32,
+    axBcuFlashFreeSize           Integer32,
+    axBcuTemperatureStatusNumber Integer32,
+    axBcuSerialInformation       DisplayString,
+    axBcuTotalAccumRunTime       Integer32,
+    axBcuCautionAccumRunTime     Integer32,
+    axBcuCriticalAccumRunTime    Integer32,
+    axBcuElapsedTime             Integer32
+}
+
+axBcuBoardIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The index of BCU information table."
+    ::= {axBcuBoardEntry 1}
+
+axBcuOperLedStatus OBJECT-TYPE
+    SYNTAX BITS {
+                      unknown(0),
+                      notconnect(1),
+                      lightOff(2),
+                      green(3),
+                      greenBlink(4),
+                      red(5)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of BCU STATUS LED of the device."
+    ::= {axBcuBoardEntry 2}
+
+axBcuOperModeStatus OBJECT-TYPE
+    SYNTAX BITS {
+                      unknown(0),
+                      initialize(1),
+                      active(2),
+                      standby(3),
+                      standbyConfigrationDiscord(4),
+                      standbySoftwareVersionDiscord(5),
+                      fault(7),
+                      inactive(8),
+                      notconnect(9),
+                      notsupport(10),
+                      faultRestrained(11)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of operation status of the device."
+    ::= {axBcuBoardEntry 3}
+
+axBcuActiveLedStatus OBJECT-TYPE
+    SYNTAX BITS {
+                      unknown(0),
+                      notconnect(1),
+                      lightOff(2),
+                      green(3)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of ACTIVE LED status of the device."
+    ::= {axBcuBoardEntry 4}
+
+axBcuSystem1LedStatus OBJECT-TYPE
+    SYNTAX BITS {
+                      unknown(0),
+                      notconnect(1),
+                      lightOff(2),
+                      green(3),
+                      greenBlink(4),
+                      red(5)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of SYSTEM LED status of the device."
+    ::= {axBcuBoardEntry 5}
+
+axBcuSystem2LedStatus OBJECT-TYPE
+    SYNTAX BITS {
+                      unknown(0),
+                      notconnect(1),
+                      lightOff(2),
+                      green(3),
+                      greenBlink(4),
+                      red(5)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of SYSTEM2 LED status of the device."
+    ::= {axBcuBoardEntry 6}
+
+axBcuBoardName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The product name of BCU Board. If BCU Board disconnected, return 0 length DisplayString."
+    ::= {axBcuBoardEntry 7}
+
+axBcuBoardAbbreviation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The abbreviated name of BCU Board. If BCU Board disconnected, return 0 length DisplayString."
+    ::= {axBcuBoardEntry 8}
+
+axBcuSoftwareVersion OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The software version of device."
+    ::= {axBcuBoardEntry 9}
+
+axBcuFlashTotalSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total of filesystem use capacity and unused capacity in a built-in memory is shown."
+    ::= {axBcuBoardEntry 20}
+
+axBcuFlashUsedSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The use capacity of the filesystem in a built-in memory is shown."
+    ::= {axBcuBoardEntry 21}
+
+axBcuFlashFreeSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The unused capacity of the filesystem in a built-in memory is shown."
+    ::= {axBcuBoardEntry 22}
+
+axBcuTemperatureStatusNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of axTemperatureStatus in this chassis."
+    ::= {axBcuBoardEntry 23}
+
+axBcuSerialInformation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Management information (SerialInformation) of BCU board .
+        It is set to DisplayString of length zero "
+    ::= {axBcuBoardEntry 24}
+
+axBcuTotalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total operation time after operation of device begins."
+    ::= {axBcuBoardEntry 25}
+
+axBcuCautionAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time while the status of the inlet temperature of the device is caution or critical."
+    ::= {axBcuBoardEntry 26}
+
+axBcuCriticalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time while the status of the inlet temperature of the device is critical."
+    ::= {axBcuBoardEntry 27}
+
+axBcuElapsedTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time after operation of device begins.."
+    ::= {axBcuBoardEntry 28}
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+axBcuBoardTraps         OBJECT IDENTIFIER ::= { axBcuBoardTable 2 }
+axBcuBoardTrapsPrefix   OBJECT IDENTIFIER ::= { axBcuBoardTraps 0 }
+
+axStandbyUpSimplexToDuplexTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex,
+                    axBcuBoardIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "System status changed from simplex to duplex."
+    ::= { axBcuBoardTrapsPrefix 1 }
+
+axStandbyDownDuplexToSimplexTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex,
+                    axBcuBoardIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "System status changed from duplex to simplex."
+    ::= { axBcuBoardTrapsPrefix 2 }
+
+axBcuMemoryUsageAlarmTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex,
+                    axBcuBoardIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates available memory is fewer than lower limit."
+    ::= { axBcuBoardTrapsPrefix 3 }
+
+axBcuMemoryUsageRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex,
+                    axBcuBoardIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates available memory become normal."
+    ::= { axBcuBoardTrapsPrefix 4 }
+
+--
+--  axBcuTemperatureStatusTable
+--
+
+axBcuTemperatureStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxBcuTemperatureStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of temperature status maintained by the environmental monitor."
+    ::= {axBcuBoard 2}
+
+axBcuTemperatureStatusEntry OBJECT-TYPE
+    SYNTAX AxBcuTemperatureStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing the temperature information."
+    INDEX       { axChassisIndex,
+                  axBcuBoardIndex,
+                  axBcuTemperatureStatusIndex }
+    ::= {axBcuTemperatureStatusTable 1}
+
+AxBcuTemperatureStatusEntry ::= SEQUENCE {
+    axBcuTemperatureStatusIndex             Integer32,
+    axBcuTemperatureStatusDescr             DisplayString,
+    axBcuTemperatureStatusValue             Integer32,
+    axBcuTemperatureThreshold               Integer32,
+    axBcuTemperatureState                   Integer32,
+    axBcuTemperatureWarning                 Integer32,
+    axBcuTemperatureWarningAverage          Integer32,
+    axBcuTemperatureWarningAveragePeriod    Integer32
+}
+
+axBcuTemperatureStatusIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Unique index for the testpoint being instrumented.
+        This index is for SNMP purposes only, and has no intrinsic meaning."
+    ::= {axBcuTemperatureStatusEntry 1}
+
+axBcuTemperatureStatusDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Textual description of the testpoint being instrumented.
+        This description is a short textual label, suitable as a human-sensible identification for the rest of the information in the entry."
+    ::= {axBcuTemperatureStatusEntry 2}
+
+axBcuTemperatureStatusValue OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current measurement of the testpoint being instrumented."
+    ::= {axBcuTemperatureStatusEntry 3}
+
+axBcuTemperatureThreshold OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The highest value that the associated instance of the object axBcuTemperatureStatusValue may obtain before an emergency shutdown of the managed device is initiated."
+    ::= {axBcuTemperatureStatusEntry 4}
+
+axBcuTemperatureState OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current state of the testpoint being instrumented."
+    ::= {axBcuTemperatureStatusEntry 5}
+
+axBcuTemperatureWarning OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The temperature value to display warning message that configured by user."
+    ::= {axBcuTemperatureStatusEntry 6}
+
+axBcuTemperatureWarningAverage OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The average temperature value to display warning message that configured by user."
+    ::= {axBcuTemperatureStatusEntry 7}
+
+axBcuTemperatureWarningAveragePeriod OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The period for average temperature value to display warning message that configured by user."
+    ::= {axBcuTemperatureStatusEntry 8}
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+axBcuTemperatureTraps         OBJECT IDENTIFIER ::= { axBcuTemperatureStatusTable 2 }
+axBcuTemperatureTrapsPrefix   OBJECT IDENTIFIER ::= { axBcuTemperatureTraps 0 }
+
+axBcuTemperatureTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex,
+                    axBcuBoardIndex,
+                    axBcuTemperatureStatusIndex,
+                    axBcuTemperatureState
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates a change of the temperature maintained by the environmental monitor of BCU."
+    ::= { axBcuTemperatureTrapsPrefix 1 }
+
+
+
+--
+--  axMemoryCardTable
+--
+
+axMemoryCardTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxMemoryCardEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing the memory card information."
+    ::= {axBcuBoard 3}
+
+axMemoryCardEntry OBJECT-TYPE
+    SYNTAX AxMemoryCardEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing a memory card information."
+    INDEX       { axChassisIndex,
+                  axBcuBoardIndex,
+                  axMemoryCardIndex }
+    ::= {axMemoryCardTable 1}
+
+AxMemoryCardEntry ::= SEQUENCE {
+    axMemoryCardIndex         Integer32,
+    axMemoryCardConnection    INTEGER,
+    axMemoryCardID            OCTET STRING,
+    axMemoryCardTotalSize     Integer32,
+    axMemoryCardUsedSize      Integer32,
+    axMemoryCardFreeSize      Integer32
+}
+
+axMemoryCardIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An Index of position number of the memory card slot."
+    ::= {axMemoryCardEntry 1}
+
+axMemoryCardConnection OBJECT-TYPE
+    SYNTAX INTEGER {
+                      connect(1),
+                      notconnect(2),
+                      unknown(3)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current connection status of the memory card."
+    ::= {axMemoryCardEntry 2}
+
+axMemoryCardID OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The card identification number of the memory card."
+    ::= {axMemoryCardEntry 3}
+
+axMemoryCardTotalSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total capacity of the memory card. -1 is returned if the memory card is not connected."
+    ::= {axMemoryCardEntry 4}
+
+axMemoryCardUsedSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Used capacity of the memory card. -1 is returned if the memory card is not connected."
+    ::= {axMemoryCardEntry 5}
+
+axMemoryCardFreeSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The usable capacity of the memory card. -1 is returned if the memory card is not connected."
+    ::= {axMemoryCardEntry 6}
+
+--
+--  axBcuCpuTable
+--
+
+axBcuCpuTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxBcuCpuEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing information of CPU equipped with BCU."
+    ::= {axBcuBoard 4}
+
+axBcuCpuEntry OBJECT-TYPE
+    SYNTAX AxBcuCpuEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing information of CPU equipped with BCU."
+    INDEX       { axChassisIndex,
+                  axBcuBoardIndex,
+                  axBcuCpuIndex }
+    ::= {axBcuCpuTable 1}
+
+AxBcuCpuEntry ::= SEQUENCE {
+    axBcuCpuIndex                INTEGER,
+    axBcuCpuStatus               BITS,
+    axBcuCpuUpTime               DisplayString,
+    axBcuCpuClock                Integer32,
+    axBcuCpuLoad1m               Integer32,
+    axBcuMemoryTotalSize         Integer32,
+    axBcuMemoryUsedSize          Integer32,
+    axBcuMemoryFreeSize          Integer32,
+    axBcuFatalErrorRestartNum    Integer32
+}
+
+axBcuCpuIndex OBJECT-TYPE
+    SYNTAX INTEGER {
+                      bcucpu(1),
+                      pa(2)
+               }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An Index of type of CPU equipped with BCU."
+    ::= {axBcuCpuEntry 1}
+
+axBcuCpuStatus OBJECT-TYPE
+    SYNTAX BITS {
+                      unknown(0),
+                      initialize(1),
+                      active(2),
+                      fault(3),
+                      notconnect(4)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of CPU equipped with BCU."
+    ::= {axBcuCpuEntry 2}
+
+axBcuCpuUpTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Up time of BCU CPU.
+            Format : YYYY/MM/DD hh:mm:ss zone
+        It is set to DisplayString of length zero when BCU is disconnected."
+    ::= {axBcuCpuEntry 3}
+
+axBcuCpuClock OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The clock speed of CPU equipped with BCU."
+    ::= {axBcuCpuEntry 4}
+
+axBcuCpuLoad1m OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CPU utilization equipped with BCU."
+    ::= {axBcuCpuEntry 5}
+
+axBcuMemoryTotalSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The installing memory size is shown by the numerical value.
+        If BCU Board disconnected, return -1."
+    ::= {axBcuCpuEntry 6}
+
+axBcuMemoryUsedSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The used memory size is shown by the numerical value.
+        If BCU Board disconnected, return -1."
+    ::= {axBcuCpuEntry 7}
+
+axBcuMemoryFreeSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The unused memory size is shown by the numerical value.
+        If BCU Board disconnected, return -1."
+    ::= {axBcuCpuEntry 8}
+
+axBcuFatalErrorRestartNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of times the BCU has restarted automatically because of fatal error."
+    ::= {axBcuCpuEntry 9}
+
+--
+--  axLineIfTable
+--
+
+axLineIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxLineIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing physical port correspond to ifIndex."
+    ::= {axInterface 1}
+
+axLineIfEntry OBJECT-TYPE
+    SYNTAX AxLineIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing ifIndex is assigned to physical port."
+    INDEX       { axChassisIndex,
+                  axNifBoardIndex,
+                  axPhysLineIndex,
+                  axLineIfIndex }
+    ::= {axLineIfTable 1}
+
+AxLineIfEntry ::= SEQUENCE {
+    axLineIfIndex      Integer32,
+    axIfIndex          Integer32,
+    axIfIpAddress      IpAddress,
+    axIfIpv6Address    OCTET STRING
+}
+
+axLineIfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The value of ifIndex to distinguish entry of this table."
+    ::= {axLineIfEntry 1}
+
+axIfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of ifIndex which is assigned to this physical port.
+        The value is 0 when ifIndex is not assigned to this physical port."
+    ::= {axLineIfEntry 2}
+
+axIfIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP address correspond to ifIndex which is assigned to this physical port.
+        If IP address is not assigned, it is '0.0.0.0'."
+    ::= {axLineIfEntry 3}
+
+axIfIpv6Address OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IPv6 address correspond to ifIndex which is assigned to this physical port.
+        If IPv6 address is not assigned,it is '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00'."
+    ::= {axLineIfEntry 4}
+
+-------------------------------------------------------------------------------
+-- axSfuBoard
+-------------------------------------------------------------------------------
+
+axSfuBoardTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxSfuBoardEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing SFU information about specific chassis."
+    ::= {axSfuBoard 1}
+
+axSfuBoardEntry OBJECT-TYPE
+    SYNTAX AxSfuBoardEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing SFU about specific chassis."
+    INDEX {axChassisIndex, axSfuBoardIndex}
+    ::= {axSfuBoardTable 1}
+
+AxSfuBoardEntry ::= SEQUENCE {
+    axSfuBoardIndex              Integer32,
+    axSfuBoardType               Integer32,
+    axSfuOperLedStatus           INTEGER,
+    axSfuActiveLedStatus         INTEGER,
+    axSfuOperModeStatus          INTEGER,
+    axSfuUpdateStatus            INTEGER,
+    axSfuErrorRestartNum         Integer32,
+    axSfuBoardName               DisplayString,
+    axSfuBoardAbbreviation       DisplayString,
+    axSfuSerialInformation       DisplayString,
+    axSfuTemperatureState        INTEGER,
+    axSfuTotalAccumRunTime       Integer32,
+    axSfuCautionAccumRunTime     Integer32,
+    axSfuCriticalAccumRunTime    Integer32,
+    axSfuElapsedTime             Integer32
+}
+
+axSfuBoardIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Position information of the SFU slots. The value is from 1 to axSfuBoardNumber."
+    ::= {axSfuBoardEntry 1}
+
+axSfuBoardType OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "SFU ID. The value is -1 when SFU is disconnected."
+    ::= {axSfuBoardEntry 2}
+
+axSfuOperLedStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      unknown(1),
+                      green(2),
+                      greenblink(3),
+                      red(4),
+                      extinction(5)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of STATUS LED of SFU."
+    ::= {axSfuBoardEntry 3}
+
+axSfuActiveLedStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      unknown(1),
+                      green(2),
+                      extinction(3)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of ACTIVE LED of SFU."
+    ::= {axSfuBoardEntry 4}
+
+axSfuOperModeStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      notconnect(1),
+                      notsupport(2),
+                      active(3),
+                      initialize(4),
+                      fault(5),
+                      inactive(6),
+                      disable(7),
+                      unknown(99)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operate status on SFU. The value is 1 when SFU is disconnected."
+    ::= {axSfuBoardEntry 5}
+
+axSfuUpdateStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      none(1),
+                      executing(2),
+                      restartrequired(3),
+                      failed(4)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of an update process on SFU."
+    ::= {axSfuBoardEntry 6}
+
+axSfuErrorRestartNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of times the SFU has restarted automatically because of error."
+    ::= {axSfuBoardEntry 7}
+
+axSfuBoardName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "SFU name. It is set to DisplayString of length zero when SFU is disconnected or not supported."
+    ::= {axSfuBoardEntry 8}
+
+axSfuBoardAbbreviation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The abbreviation name of SFU. It is set to DisplayString of length zero when SFU is disconnected or not supported."
+    ::= {axSfuBoardEntry 9}
+
+axSfuSerialInformation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Management information (SerialInformation) of SFU. It is set to DisplayString of length zero when SFU is disconnected."
+    ::= {axSfuBoardEntry 10}
+
+axSfuTemperatureState OBJECT-TYPE
+    SYNTAX INTEGER {
+                      unknown(1),
+                      normal(2),
+                      critical(3),
+                      fault(4)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current temperature status of SFU."
+    ::= {axSfuBoardEntry 11}
+
+axSfuTotalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total operation time after operation of device begins."
+    ::= {axSfuBoardEntry 12}
+
+axSfuCautionAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time while the status of the inlet temperature of the device is caution or critical."
+    ::= {axSfuBoardEntry 13}
+
+axSfuCriticalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time while the status of the inlet temperature of the device is critical."
+    ::= {axSfuBoardEntry 14}
+
+axSfuElapsedTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time after operation of the SFU begins."
+    ::= {axSfuBoardEntry 15}
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+axSfuStateChangeTrapPrefix       OBJECT IDENTIFIER ::= { axSfuBoardTraps 0 }
+
+axSfuStateChangeTrap NOTIFICATION-TYPE
+    OBJECTS       {
+                        axChassisIndex,
+                        axSfuBoardIndex,
+                        axSfuOperModeStatus
+                  }
+    STATUS        current
+    DESCRIPTION
+             "SFU state change."
+    ::= { axSfuStateChangeTrapPrefix 1 }
+
+
+-------------------------------------------------------------------------------
+-- axPruBoard
+-------------------------------------------------------------------------------
+axPruBoardTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxPruBoardEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing PRU information about specific chassis."
+    ::= {axPruBoard 1}
+
+axPruBoardEntry OBJECT-TYPE
+    SYNTAX AxPruBoardEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing PRU about specific chassis."
+    INDEX {axChassisIndex, axPruBoardIndex}
+    ::= {axPruBoardTable 1}
+
+AxPruBoardEntry ::= SEQUENCE {
+    axPruBoardIndex                Integer32,
+    axPruBoardType                 Integer32,
+    axPruOperLedStatus             INTEGER,
+    axPruOperModeStatus            INTEGER,
+    axPruUpdateStatus              INTEGER,
+    axPruErrorRestartNum           Integer32,
+    axPruBoardName                 DisplayString,
+    axPruBoardAbbreviation         DisplayString,
+    axPruSerialInformation         DisplayString,
+    axPruCpuUpTime                 DisplayString,
+    axPruCpuClock                  Integer32,
+    axPruCpuLoad1m                 Integer32,
+    axPruMemoryTotalSize           Integer32,
+    axPruMemoryUsedSize            Integer32,
+    axPruMemoryFreeSize            Integer32,
+    axPruTemperatureState          INTEGER,
+    axPruTotalAccumRunTime         Integer32,
+    axPruCautionAccumRunTime       Integer32,
+    axPruCriticalAccumRunTime      Integer32,
+    axPruElapsedTime               Integer32
+}
+
+axPruBoardIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Position information of the PRU slots. The value is from 1 to axPruBoardNumber."
+    ::= {axPruBoardEntry 1}
+
+axPruBoardType OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PRU ID. The value is -1 when PRU is disconnected."
+    ::= {axPruBoardEntry 2}
+
+axPruOperLedStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      unknown(1),
+                      green(2),
+                      greenblink(3),
+                      red(4),
+                      extinction(5)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of STATUS LED of PRU."
+    ::= {axPruBoardEntry 3}
+
+axPruOperModeStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      notconnect(1),
+                      notsupport(2),
+                      active(3),
+                      initialize(4),
+                      fault(5),
+                      inactive(6),
+                      disable(7),
+                      powershortage(8),
+                      unknown(99)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operate status on PRU. The value is 1 when PRU is disconnected."
+    ::= {axPruBoardEntry 4}
+
+axPruUpdateStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      none(1),
+                      executing(2),
+                      restartrequired(3),
+                      failed(4)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of an update process on PRU."
+    ::= {axPruBoardEntry 5}
+
+axPruErrorRestartNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of times the PRU has restarted automatically because of error."
+    ::= {axPruBoardEntry 6}
+
+axPruBoardName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PRU name. It is set to DisplayString of length zero when PRU is disconnected or not supported."
+    ::= {axPruBoardEntry 7}
+
+axPruBoardAbbreviation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The abbreviation name of PRU. It is set to DisplayString of length zero when PRU is disconnected or not supported."
+    ::= {axPruBoardEntry 8}
+
+axPruSerialInformation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Management information (SerialInformation) of PRU. It is set to DisplayString of length zero when PRU is disconnected."
+    ::= {axPruBoardEntry 9}
+
+axPruCpuUpTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Up time of PRU CPU.
+    Format : YYYY/MM/DD hh:mm:ss XXXXXXX(time zone)
+Time zone format :
+   JST      : JST
+   GMT+09 : GMT + 09 hours
+   GMT+10 : GMT + 10 hours
+It is set to DisplayString of length zero when PRU is disconnected or inactivated."
+    ::= {axPruBoardEntry 10}
+
+axPruCpuClock OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CPU clock is shown by the numerical value.
+If PRU disconnected, return -1."
+    ::= {axPruBoardEntry 11}
+
+axPruCpuLoad1m OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PRU CPU utilization of one minute is shown by the numerical value.
+If PRU disconnected, return -1."
+    ::= {axPruBoardEntry 12}
+
+axPruMemoryTotalSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The installing memory size is shown by the numerical value.
+If PRU disconnected, return -1."
+    ::= {axPruBoardEntry 13}
+
+axPruMemoryUsedSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The use memory size is shown by the numerical value.
+If PRU disconnected, return -1."
+    ::= {axPruBoardEntry 14}
+
+axPruMemoryFreeSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The unused memory size is shown by the numerical value.
+If PRU disconnected, return -1."
+    ::= {axPruBoardEntry 15}
+
+axPruTemperatureState OBJECT-TYPE
+    SYNTAX INTEGER {
+                      unknown(1),
+                      normal(2),
+                      critical(3),
+                      fault(4)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current temperature status of PRU."
+    ::= {axPruBoardEntry 16}
+
+axPruTotalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total operation time after operation of device begins."
+    ::= {axPruBoardEntry 17}
+
+axPruCautionAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time while the status of the inlet temperature of the device is caution or critical."
+    ::= {axPruBoardEntry 18}
+
+axPruCriticalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time while the status of the inlet temperature of the device is critical."
+    ::= {axPruBoardEntry 19}
+
+axPruElapsedTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time after operation of the PRU begins."
+    ::= {axPruBoardEntry 20}
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+axPruStateChangeTrapPrefix       OBJECT IDENTIFIER ::= { axPruBoardTraps 0 }
+
+axPruStateChangeTrap NOTIFICATION-TYPE
+    OBJECTS       {
+                        axChassisIndex,
+                        axPruBoardIndex,
+                        axPruOperModeStatus
+                  }
+    STATUS        current
+    DESCRIPTION
+             "PRU state change."
+    ::= { axPruStateChangeTrapPrefix 1 }
+
+
+-------------------------------------------------------------------------------
+-- axPsuBoard
+-------------------------------------------------------------------------------
+axPsuBoardTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxPsuBoardEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing PSU information about specific chassis."
+    ::= {axPsuBoard 1}
+
+axPsuBoardEntry OBJECT-TYPE
+    SYNTAX AxPsuBoardEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing PSU about specific chassis."
+    INDEX {axChassisIndex, axPsuBoardIndex}
+    ::= {axPsuBoardTable 1}
+
+AxPsuBoardEntry ::= SEQUENCE {
+    axPsuBoardIndex                Integer32,
+    axPsuBoardType                 Integer32,
+    axPsuOperLedStatus             INTEGER,
+    axPsuOperModeStatus            INTEGER,
+    axPsuUpdateStatus              INTEGER,
+    axPsuErrorRestartNum           Integer32,
+    axPsuBoardName                 DisplayString,
+    axPsuBoardAbbreviation         DisplayString,
+    axPsuSerialInformation         DisplayString,
+    axPsuCpuUpTime                 DisplayString,
+    axPsuCpuClock                  Integer32,
+    axPsuCpuLoad1m                 Integer32,
+    axPsuMemoryTotalSize           Integer32,
+    axPsuMemoryUsedSize            Integer32,
+    axPsuMemoryFreeSize            Integer32,
+    axPsuTemperatureState          INTEGER,
+    axPsuTotalAccumRunTime         Integer32,
+    axPsuCautionAccumRunTime       Integer32,
+    axPsuCriticalAccumRunTime      Integer32,
+    axPsuElapsedTime               Integer32
+}
+
+axPsuBoardIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Position information of the PSU slots. The value is from 1 to axPsuBoardNumber."
+    ::= {axPsuBoardEntry 1}
+
+axPsuBoardType OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PSU ID. The value is -1 when PSU is disconnected."
+    ::= {axPsuBoardEntry 2}
+
+axPsuOperLedStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      unknown(1),
+                      green(2),
+                      greenblink(3),
+                      red(4),
+                      extinction(5)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of STATUS LED of PSU."
+    ::= {axPsuBoardEntry 3}
+
+axPsuOperModeStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      notconnect(1),
+                      notsupport(2),
+                      active(3),
+                      initialize(4),
+                      fault(5),
+                      inactive(6),
+                      disable(7),
+                      powershortage(8),
+                      unknown(99)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operate status on PSU. The value is 1 when PSU is disconnected."
+    ::= {axPsuBoardEntry 4}
+
+axPsuUpdateStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      none(1),
+                      executing(2),
+                      restartrequired(3),
+                      failed(4)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of an update process on PSU."
+    ::= {axPsuBoardEntry 5}
+
+axPsuErrorRestartNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of times the PSU has restarted automatically because of error."
+    ::= {axPsuBoardEntry 6}
+
+axPsuBoardName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PSU name. It is set to DisplayString of length zero when PSU is disconnected or not supported."
+    ::= {axPsuBoardEntry 7}
+
+axPsuBoardAbbreviation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The abbreviation name of PSU. It is set to DisplayString of length zero when PSU is disconnected or not supported."
+    ::= {axPsuBoardEntry 8}
+
+axPsuSerialInformation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Management information (SerialInformation) of PSU. It is set to DisplayString of length zero when PSU is disconnected."
+    ::= {axPsuBoardEntry 9}
+
+axPsuCpuUpTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Up time of PSU CPU.
+    Format : YYYY/MM/DD hh:mm:ss XXXXXXX(time zone)
+Time zone format :
+   JST      : JST
+   GMT+09 : GMT + 09 hours
+   GMT+10 : GMT + 10 hours
+It is set to DisplayString of length zero when PSU is disconnected or inactivated."
+    ::= {axPsuBoardEntry 10}
+
+axPsuCpuClock OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CPU clock is shown by the numerical value.
+If PSU disconnected, return -1."
+    ::= {axPsuBoardEntry 11}
+
+axPsuCpuLoad1m OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "PSU CPU utilization of one minute is shown by the numerical value.
+If PSU disconnected, return -1."
+    ::= {axPsuBoardEntry 12}
+
+axPsuMemoryTotalSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The installing memory size is shown by the numerical value.
+If PSU disconnected, return -1."
+    ::= {axPsuBoardEntry 13}
+
+axPsuMemoryUsedSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The use memory size is shown by the numerical value.
+If PSU disconnected, return -1."
+    ::= {axPsuBoardEntry 14}
+
+axPsuMemoryFreeSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The unused memory size is shown by the numerical value.
+If PSU disconnected, return -1."
+    ::= {axPsuBoardEntry 15}
+
+axPsuTemperatureState OBJECT-TYPE
+    SYNTAX INTEGER {
+                      unknown(1),
+                      normal(2),
+                      critical(3),
+                      fault(4)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current temperature status of PSU."
+    ::= {axPsuBoardEntry 16}
+
+axPsuTotalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total operation time after operation of device begins."
+    ::= {axPsuBoardEntry 17}
+
+axPsuCautionAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time while the status of the inlet temperature of the device is caution or critical."
+    ::= {axPsuBoardEntry 18}
+
+axPsuCriticalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time while the status of the inlet temperature of the device is critical."
+    ::= {axPsuBoardEntry 19}
+
+axPsuElapsedTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time after operation of the PSU begins."
+    ::= {axPsuBoardEntry 20}
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+axPsuStateChangeTrapPrefix       OBJECT IDENTIFIER ::= { axPsuBoardTraps 0 }
+
+axPsuStateChangeTrap NOTIFICATION-TYPE
+    OBJECTS       {
+                        axChassisIndex,
+                        axPsuBoardIndex,
+                        axPsuOperModeStatus
+                  }
+    STATUS        current
+    DESCRIPTION
+             "PSU state change."
+    ::= { axPsuStateChangeTrapPrefix 1 }
+
+-------------------------------------------------------------------------------
+-- axNifBoard
+-------------------------------------------------------------------------------
+axNifBoardTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxNifBoardEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing Network Interface cards (NIF) information that slot is loaded."
+    ::= {axNifBoard 1}
+
+axNifBoardEntry OBJECT-TYPE
+    SYNTAX AxNifBoardEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing NIF information about specific chassis."
+    INDEX {axChassisIndex, axNifBoardIndex}
+    ::= {axNifBoardTable 1}
+
+AxNifBoardEntry ::= SEQUENCE {
+    axNifBoardIndex             Integer32,
+    axNifBoardType              Integer32,
+    axNifOperLedStatus          INTEGER,
+    axNifOperModeStatus         INTEGER,
+    axNifUpdateStatus           INTEGER,
+    axNifErrorRestartNum        Integer32,
+    axNifBoardName              DisplayString,
+    axNifBoardAbbreviation      DisplayString,
+    axNifPhysLineNumber         Integer32,
+    axNifSerialInformation      DisplayString,
+    axNifTemperatureState       INTEGER,
+    axNifTotalAccumRunTime      Integer32,
+    axNifCautionAccumRunTime    Integer32,
+    axNifCriticalAccumRunTime   Integer32,
+    axNifElapsedTime            Integer32,
+    axNifReadyLedStatus         INTEGER
+}
+
+axNifBoardIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Position information of NIF loading slot. The value is from 1 to axNifBoardNumber."
+    ::= {axNifBoardEntry 1}
+
+axNifBoardType OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Type of connecting package.The value is register value of NIF package. The value is -1 when the NIF is disconnected,inactivated or disabled."
+    ::= {axNifBoardEntry 2}
+
+axNifOperLedStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      unknown(1),
+                      green(2),
+                      greenblink(3),
+                      red(4),
+                      extinction(5)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of STATUS LED of NIF."
+    ::= {axNifBoardEntry 3}
+
+axNifOperModeStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      notconnect(1),
+                      notsupport(2),
+                      active(3),
+                      initialize(4),
+                      fault(5),
+                      inactive(6),
+                      disable(7),
+                      powershortage(8),
+                      unknown(99)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operate status on NIF. The value is 1 when NIF is disconnected."
+    ::= {axNifBoardEntry 4}
+
+axNifUpdateStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      none(1),
+                      executing(2),
+                      restartrequired(3),
+                      failed(4)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of an update process on NIF."
+    ::= {axNifBoardEntry 5}
+
+axNifErrorRestartNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of times the NIF has restarted automatically because of error."
+    ::= {axNifBoardEntry 6}
+
+axNifBoardName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "NIF name. It is set to DisplayString of length zero when NIF is disconnected or not supported."
+    ::= {axNifBoardEntry 7}
+
+axNifBoardAbbreviation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The abbreviation name of NIF. It is set to DisplayString of length zero when NIF is disconnected or not supported."
+    ::= {axNifBoardEntry 8}
+
+axNifPhysLineNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of NIF's physical port.The max is 24. The value is -1 when value of axNifBoardType is -1."
+    ::= {axNifBoardEntry 9}
+
+axNifSerialInformation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Management information (SerialInformation) of NIF. It is set to DisplayString of length zero when NIF is disconnected."
+    ::= {axNifBoardEntry 10}
+
+axNifTemperatureState OBJECT-TYPE
+    SYNTAX INTEGER {
+                      unknown(1),
+                      normal(2),
+                      critical(3),
+                      fault(4)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current temperature status of NIF."
+    ::= {axNifBoardEntry 11}
+
+axNifTotalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total operation time after operation of device begins."
+    ::= {axNifBoardEntry 12}
+
+axNifCautionAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time while the status of the inlet temperature of the device is caution or critical."
+    ::= {axNifBoardEntry 13}
+
+axNifCriticalAccumRunTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time while the status of the inlet temperature of the device is critical."
+    ::= {axNifBoardEntry 14}
+
+axNifElapsedTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operating time after operation of the NIF begins."
+    ::= {axNifBoardEntry 15}
+
+axNifReadyLedStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      unknown(1),
+                      green(2),
+                      greenblink(3),
+                      extinction(5)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of READY LED of NIF."
+    ::= {axNifBoardEntry 16}
+
+axSmcTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxSmcEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing SMC information."
+    ::= {axNifBoard 3}
+
+axSmcEntry OBJECT-TYPE
+    SYNTAX AxSmcEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing SMC information about specific chassis."
+    INDEX {axChassisIndex, axNifBoardIndex}
+    ::= {axSmcTable 1}
+
+AxSmcEntry ::= SEQUENCE {
+    axSmcCpuClock                     Integer32,
+    axSmcCpuLoad1m                    Integer32,
+    axSmcMemoryTotalSize              Integer32,
+    axSmcMemoryUsedSize               Integer32,
+    axSmcMemoryFreeSize               Integer32
+}
+
+axSmcCpuClock OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The clock speed of CPU equipped with SMC."
+    ::= {axSmcEntry 1}
+
+axSmcCpuLoad1m OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CPU utilization equipped with SMC."
+    ::= {axSmcEntry 2}
+
+axSmcMemoryTotalSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The installing memory size is shown by the numerical value.
+         If axNifBoardType is not SMC , return -1."
+    ::= {axSmcEntry 3}
+
+axSmcMemoryUsedSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The used memory size is shown by the numerical value.
+         If axNifBoardType is not SMC , return -1."
+    ::= {axSmcEntry 4}
+
+axSmcMemoryFreeSize OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The unused memory size is shown by the numerical value.
+         If axNifBoardType is not SMC , return -1."
+    ::= {axSmcEntry 5}
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+axNifStateChangeTrapPrefix       OBJECT IDENTIFIER ::= { axNifBoardTraps 0 }
+
+axNifStateChangeTrap NOTIFICATION-TYPE
+    OBJECTS       {
+                         axChassisIndex,
+                         axNifBoardIndex,
+                         axNifOperModeStatus
+                  }
+    STATUS        current
+    DESCRIPTION
+             "NIF state change."
+    ::= { axNifStateChangeTrapPrefix 1 }
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+axSmcBoardTrapsPrefix         OBJECT IDENTIFIER ::= { axSmcBoardTraps 0 }
+
+axSmcMemoryUsageAlarmTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex,
+                    axNifBoardIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates available memory is fewer than lower limit."
+    ::= { axSmcBoardTrapsPrefix 1 }
+
+axSmcMemoryUsageRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axChassisIndex,
+                    axNifBoardIndex
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates available memory become normal."
+    ::= { axSmcBoardTrapsPrefix 2 }
+
+-------------------------------------------------------------------------------
+-- axPhysLine
+-------------------------------------------------------------------------------
+axPhysLineTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxPhysLineEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing physical port."
+    ::= {axPhysLine 1}
+
+axPhysLineEntry OBJECT-TYPE
+    SYNTAX AxPhysLineEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing physical port."
+    INDEX {axChassisIndex, axNifBoardIndex, axPhysLineIndex}
+    ::= {axPhysLineTable 1}
+
+AxPhysLineEntry ::= SEQUENCE {
+    axPhysLineIndex                   Integer32,
+    axPhysLineConnectorType           INTEGER,
+    axPhysLineOperStatus              INTEGER,
+    axPhysLineIfIndexNumber           Integer32,
+    axPhysLineTransceiverStatus       INTEGER
+}
+
+axPhysLineIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Physical port number. The value is from 1 to axNifPhysLineNumber."
+    ::= {axPhysLineEntry 1}
+
+axPhysLineConnectorType OBJECT-TYPE
+    SYNTAX INTEGER {
+                      other(1),
+                      type1000BASE-LX(301),
+                      type1000BASE-SX(302),
+                      type1000BASE-LH(303),
+                      type1000BASE-BX10-D(304),
+                      type1000BASE-BX10-U(305),
+                      type1000BASE-BX40-D(306),
+                      type1000BASE-BX40-U(307),
+                      type1000BASE-SX2(308),
+                      type1000BASE-UTP(309),
+                      type10GBASE-SR(401),
+                      type10GBASE-LR(402),
+                      type10GBASE-ER(403),
+                      type10GBASE-ZR(404),
+                      type40GBASE-SR4(501),
+                      type40GBASE-LR4(502),
+                      type100GBASE-LR4(601),
+                      type100GBASE-SR4(602),
+                      type100GBASE-CWDM4(603),
+                      type100GBASE-4WDM-40(604)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Connector type is connected physical port. The value is 1(other) when connector is disconnected or connector type is unknown."
+    ::= {axPhysLineEntry 2}
+
+axPhysLineOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      other(1),
+                      active(2),
+                      initialization(3),
+                      down(4),
+                      lock(6),
+                      close(7),
+                      line-fault(8),
+                      test(9),
+                      standby(10),
+                      suspend(11),
+                      unused(12),
+                      mismatch(13)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Status of physical port."
+    ::= {axPhysLineEntry 3}
+
+axPhysLineIfIndexNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of ifIndex which is included in physical port."
+    ::= {axPhysLineEntry 4}
+
+axPhysLineTransceiverStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      unchangeable-transceiver(1),
+                      sfp-mounted(20),
+                      sfp-unmounted(21),
+                      unsupported-sfp-mounted(22),
+                      sfp-fault(24),
+                      sfpp-mounted(40),
+                      sfpp-unmounted(41),
+                      unsupported-sfpp-mounted(42),
+                      sfpp-fault(44),
+                      qsfpp-mounted(50),
+                      qsfpp-unmounted(51),
+                      unsupported-qsfpp-mounted(52),
+                      qsfpp-fault(54),
+                      cfp-mounted(60),
+                      cfp-unmounted(61),
+                      unsupported-cfp-mounted(62),
+                      cfp-fault(64),
+                      qsfp28-mounted(70),
+                      qsfp28-unmounted(71),
+                      unsupported-qsfp28-mounted(72),
+                      qsfp28-fault(74)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Type and status of replaceable transceiver."
+    ::= {axPhysLineEntry 5}
+
+-------------------------------------------------------------------------------
+-- axPhysLineLane
+-------------------------------------------------------------------------------
+axPhysLineLaneTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxPhysLineLaneEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing lane information."
+    ::= {axPhysLine 2}
+
+axPhysLineLaneEntry OBJECT-TYPE
+    SYNTAX AxPhysLineLaneEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing lane information."
+    INDEX {axChassisIndex, axNifBoardIndex, axPhysLineIndex, axPhysLineLaneIndex}
+    ::= {axPhysLineLaneTable 1}
+
+AxPhysLineLaneEntry ::= SEQUENCE {
+    axPhysLineLaneIndex               Integer32,
+    axPhysLineLaneTransceiverTxPower  Integer32,
+    axPhysLineLaneTransceiverRxPower  Integer32
+}
+
+axPhysLineLaneIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Lane number. The value is from 1 to 4."
+    ::= {axPhysLineLaneEntry 1}
+
+axPhysLineLaneTransceiverTxPower OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A value obtained by multiplying the transmitted optical power (dBm) by 10. The value is from -400 to 82 or 300."
+    ::= {axPhysLineLaneEntry 2}
+
+axPhysLineLaneTransceiverRxPower OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A value obtained by multiplying the received optical power (dBm) by 10. The value is from -400 to 82 or 300."
+    ::= {axPhysLineLaneEntry 3}
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+--
+-- Conformance identifier
+--
+axDeviceConformance          OBJECT IDENTIFIER ::= { axDevice 1000 }
+axDeviceCompliances          OBJECT IDENTIFIER ::= { axDeviceConformance 1 }
+axDeviceGroups               OBJECT IDENTIFIER ::= { axDeviceConformance 2 }
+--
+-- Compliance
+--
+axDeviceCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "axDevice"
+    MODULE      -- this module
+        MANDATORY-GROUPS{ axDeviceGroup,
+                          axDeviceTrapGroup }
+    ::= { axDeviceCompliances 1 }
+
+--
+-- Object Group
+--
+axDeviceGroup OBJECT-GROUP
+    OBJECTS     {
+                     axChassisMaxNumber,
+                     axChassisName,
+                     axChassisAbbreviation,
+                     axChassisType,
+                     axPowerUnitNumber,
+                     axFanNumber,
+                     axBcuBoardNumber,
+                     axSfuBoardNumber,
+                     axPruBoardNumber,
+                     axPsuBoardNumber,
+                     axNifBoardNumber,
+                     axChassisSerialInformation,
+                     axChassisStatus,
+                     axPowerSupplyUnitRedundancyMode,
+                     axFanMode,
+                     axBcuBoardRedundancyStatus,
+                     axTotalPowerSupplyCapacity,
+                     axPowerSupplyCapacitySourceA,
+                     axPowerSupplyCapacitySourceB,
+                     axTotalPowerAllocated,
+                     axTotalPowerAvailable,
+                     axRedundantPowerAvailable,
+                     axPowerAvailableSourceA,
+                     axPowerAvailableSourceB,
+                     axPowerSupplyName,
+                     axPowerSupplyAbbreviation,
+                     axPowerSupplySerialInformation,
+                     axPowerSupplyInputVoltage,
+                     axPowerSupplyConnectStatus,
+                     axPowerSupplyStatus,
+                     axPowerSupplyTotalAccumRunTime,
+                     axPowerSupplyCautionAccumRunTime,
+                     axPowerSupplyCriticalAccumRunTime,
+                     axPowerSupplyElapsedTime,
+                     axFanUnitName,
+                     axFanUnitAbbreviation,
+                     axFanUnitSerialInformation,
+                     axFanUnitStatus,
+                     axFanUnitSpeed,
+                     axFanUnitTotalAccumRunTime,
+                     axFanUnitCautionAccumRunTime,
+                     axFanUnitCriticalAccumRunTime,
+                     axFanUnitElapsedTime,
+                     axFanUnitLedStatus,
+                     axBcuOperLedStatus,
+                     axBcuOperModeStatus,
+                     axBcuActiveLedStatus,
+                     axBcuSystem1LedStatus,
+                     axBcuSystem2LedStatus,
+                     axBcuBoardName,
+                     axBcuBoardAbbreviation,
+                     axBcuSoftwareVersion,
+                     axBcuFlashTotalSize,
+                     axBcuFlashUsedSize,
+                     axBcuFlashFreeSize,
+                     axBcuTemperatureStatusNumber,
+                     axBcuSerialInformation,
+                     axBcuTotalAccumRunTime,
+                     axBcuCautionAccumRunTime,
+                     axBcuCriticalAccumRunTime,
+                     axBcuElapsedTime,
+                     axBcuTemperatureStatusDescr,
+                     axBcuTemperatureStatusValue,
+                     axBcuTemperatureThreshold,
+                     axBcuTemperatureState,
+                     axBcuTemperatureWarning,
+                     axBcuTemperatureWarningAverage,
+                     axBcuTemperatureWarningAveragePeriod,
+                     axMemoryCardConnection,
+                     axMemoryCardID,
+                     axMemoryCardTotalSize,
+                     axMemoryCardUsedSize,
+                     axMemoryCardFreeSize,
+                     axBcuCpuStatus,
+                     axBcuCpuUpTime,
+                     axBcuCpuClock,
+                     axBcuCpuLoad1m,
+                     axBcuMemoryTotalSize,
+                     axBcuMemoryUsedSize,
+                     axBcuMemoryFreeSize,
+                     axBcuFatalErrorRestartNum,
+                     axIfIndex,
+                     axIfIpAddress,
+                     axIfIpv6Address,
+                     axSfuBoardType,
+                     axSfuOperLedStatus,
+                     axSfuActiveLedStatus,
+                     axSfuOperModeStatus,
+                     axSfuUpdateStatus,
+                     axSfuErrorRestartNum,
+                     axSfuBoardName,
+                     axSfuBoardAbbreviation,
+                     axSfuSerialInformation,
+                     axSfuTemperatureState,
+                     axSfuTotalAccumRunTime,
+                     axSfuCautionAccumRunTime,
+                     axSfuCriticalAccumRunTime,
+                     axSfuElapsedTime,
+                     axPruBoardType,
+                     axPruOperLedStatus,
+                     axPruOperModeStatus,
+                     axPruUpdateStatus,
+                     axPruErrorRestartNum,
+                     axPruBoardName,
+                     axPruBoardAbbreviation,
+                     axPruSerialInformation,
+                     axPruCpuUpTime,
+                     axPruCpuClock,
+                     axPruCpuLoad1m,
+                     axPruMemoryTotalSize,
+                     axPruMemoryUsedSize,
+                     axPruMemoryFreeSize,
+                     axPruTemperatureState,
+                     axPruTotalAccumRunTime,
+                     axPruCautionAccumRunTime,
+                     axPruCriticalAccumRunTime,
+                     axPruElapsedTime,
+                     axPsuBoardType,
+                     axPsuOperLedStatus,
+                     axPsuOperModeStatus,
+                     axPsuUpdateStatus,
+                     axPsuErrorRestartNum,
+                     axPsuBoardName,
+                     axPsuBoardAbbreviation,
+                     axPsuSerialInformation,
+                     axPsuCpuUpTime,
+                     axPsuCpuClock,
+                     axPsuCpuLoad1m,
+                     axPsuMemoryTotalSize,
+                     axPsuMemoryUsedSize,
+                     axPsuMemoryFreeSize,
+                     axPsuTemperatureState,
+                     axPsuTotalAccumRunTime,
+                     axPsuCautionAccumRunTime,
+                     axPsuCriticalAccumRunTime,
+                     axPsuElapsedTime,
+                     axNifBoardType,
+                     axNifOperLedStatus,
+                     axNifOperModeStatus,
+                     axNifUpdateStatus,
+                     axNifErrorRestartNum,
+                     axNifBoardName,
+                     axNifBoardAbbreviation,
+                     axNifPhysLineNumber,
+                     axNifSerialInformation,
+                     axNifTemperatureState,
+                     axNifTotalAccumRunTime,
+                     axNifCautionAccumRunTime,
+                     axNifCriticalAccumRunTime,
+                     axNifElapsedTime,
+                     axNifReadyLedStatus,
+                     axSmcCpuClock,
+                     axSmcCpuLoad1m,
+                     axSmcMemoryTotalSize,
+                     axSmcMemoryUsedSize,
+                     axSmcMemoryFreeSize,
+                     axPhysLineConnectorType,
+                     axPhysLineOperStatus,
+                     axPhysLineIfIndexNumber,
+                     axPhysLineTransceiverStatus,
+                     axPhysLineLaneTransceiverTxPower,
+                     axPhysLineLaneTransceiverRxPower
+                }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects Device."
+    ::= { axDeviceGroups 1 }
+
+
+--
+-- Notification Group
+--
+axDeviceTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                       axPowerRedundancyFailureTrap,
+                       axPowerRedundancyRecoveryTrap,
+                       axPowerSupplyInsufficientTrap,
+                       axPowerSupplyInsufficientRecoveryTrap,
+                       axPowerSupplyFailureTrap,
+                       axPowerSupplyRecoveryTrap,
+                       axPowerSupplyStatusChangeTrap,
+                       axAirFanUnitStopTrap,
+                       axAirFanUnitRecoveryTrap,
+                       axStandbyUpSimplexToDuplexTrap,
+                       axStandbyDownDuplexToSimplexTrap,
+                       axBcuMemoryUsageAlarmTrap,
+                       axBcuMemoryUsageRecoveryTrap,
+                       axBcuTemperatureTrap,
+                       axSfuStateChangeTrap,
+                       axPruStateChangeTrap,
+                       axPsuStateChangeTrap,
+                       axNifStateChangeTrap,
+                       axSmcMemoryUsageAlarmTrap,
+                       axSmcMemoryUsageRecoveryTrap
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of notifications of Device."
+    ::= { axDeviceGroups 10 }
+
+END

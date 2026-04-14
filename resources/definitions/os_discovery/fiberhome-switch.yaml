@@ -56,9 +56,9 @@ modules:
                     descr: 'Supply {{ WRI-POWER-MIB::powerIndexDescr }}'
                     state_name: powerState
                     states:
-                        - { value:  0, generic: 0, graph: 0, descr: Normal }
-                        - { value:  1, generic: 2, graph: 0, descr: Insufficient }
-                        - { value:  2, generic: 2, graph: 0, descr: Overload }
+                        - { value:  0, generic: 0, descr: Normal }
+                        - { value:  1, generic: 2, descr: Insufficient }
+                        - { value:  2, generic: 2, descr: Overload }
                 -
                     oid: WRI-CPU-MIB::cpuTable
                     value: WRI-CPU-MIB::cpuStatus
@@ -66,6 +66,6 @@ modules:
                     descr: CPU Status
                     state_name: cpuStatus
                     states:
-                        - { value:  0, generic: 0, graph: 0, descr: Normal }
-                        - { value:  1, generic: 2, graph: 0, descr: Overflow }
+                        - { value:  0, generic: 0, descr: Normal }
+                        - { value:  1, generic: 2, descr: Overflow }
 

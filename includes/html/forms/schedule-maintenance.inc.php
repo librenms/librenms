@@ -15,6 +15,9 @@
 use App\Facades\LibrenmsConfig;
 use App\Models\AlertSchedulable;
 use App\Models\AlertSchedule;
+use App\Models\Device;
+use App\Models\DeviceGroup;
+use App\Models\Location;
 use App\Models\UserPref;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\MaintenanceBehavior;
@@ -164,9 +167,9 @@ if ($sub_type == 'new-maintenance') {
 
                 $item = dbInsert(['schedule_id' => $alert_schedule->schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $target], 'alert_schedulables');
                 if ($notes && $type = 'device' && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
-                    $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', [$target]);
+                    $device_notes = Device::where('device_id', $target)->value('notes');
                     $device_notes .= ((empty($device_notes)) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
-                    dbUpdate(['notes' => $device_notes], 'devices', '`device_id` = ?', [$target]);
+                    Device::where('device_id', $target)->update(['notes' => $device_notes]);
                 }
                 if ($item > 0) {
                     array_push($items, $item);
@@ -204,13 +207,13 @@ if ($sub_type == 'new-maintenance') {
     foreach (dbFetchRows('SELECT `alert_schedulable_type`, `alert_schedulable_id` FROM `alert_schedulables` WHERE `schedule_id`=?', [$alert_schedule->schedule_id]) as $target) {
         $id = $target['alert_schedulable_id'];
         if ($target['alert_schedulable_type'] == 'location') {
-            $text = dbFetchCell('SELECT location FROM locations WHERE id = ?', [$id]);
+            $text = Location::where('id', $id)->value('location');
             $id = 'l' . $id;
         } elseif ($target['alert_schedulable_type'] == 'device_group') {
-            $text = dbFetchCell('SELECT name FROM device_groups WHERE id = ?', [$id]);
+            $text = DeviceGroup::where('id', $id)->value('name');
             $id = 'g' . $id;
         } else {
-            $text = dbFetchCell('SELECT hostname FROM devices WHERE device_id = ?', [$id]);
+            $text = Device::where('device_id', $id)->value('hostname');
         }
         $items[] = [
             'id' => $id,

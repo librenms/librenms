@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\DeviceStatus;
+use LibreNMS\Enum\IfOperStatus;
 use Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -521,11 +522,11 @@ class Url
      */
     public static function portLinkDisplayClass($port)
     {
-        if ($port->ifAdminStatus == 'down') {
+        if ($port->ifAdminStatus == IfOperStatus::Down) {
             return 'interface-admindown';
         }
 
-        if ($port->ifAdminStatus == 'up' && $port->ifOperStatus != 'up') {
+        if ($port->ifAdminStatus == IfOperStatus::Up && $port->ifOperStatus != IfOperStatus::Up) {
             return 'interface-updown';
         }
 

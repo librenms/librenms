@@ -2713,21 +2713,18 @@
                 {
                     "state_name": "mwrEmcRadioLinkStatus",
                     "state_descr": "null",
-                    "state_draw_graph": 0,
                     "state_value": -1,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "mwrEmcRadioLinkStatus",
                     "state_descr": "up",
-                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "mwrEmcRadioLinkStatus",
                     "state_descr": "down",
-                    "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 }

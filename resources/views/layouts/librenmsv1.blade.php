@@ -121,7 +121,7 @@
     </script>
 @endif
 
-@if(Request::get('bare') == 'yes')
+@if(request()->input('bare') == 'yes')
     <style>body { padding-top: 0 !important; padding-bottom: 0 !important; }</style>
 @elseif($show_menu)
     @include('layouts.menu')

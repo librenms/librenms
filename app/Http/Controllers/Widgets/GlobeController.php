@@ -31,6 +31,7 @@ use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Number;
 
 class GlobeController extends WidgetController
@@ -76,7 +77,7 @@ class GlobeController extends WidgetController
                 $down_items = $devices_down->map(fn ($device) => $device->displayName() . ' DOWN');
             } elseif ($data['markers'] == 'ports') {
                 foreach ($location->devices as $device) {
-                    [$ports_down, $ports_up] = $device->ports->partition(fn ($port) => $port->ifOperStatus != 'up' && $port->ifAdminStatus == 'up');
+                    [$ports_down, $ports_up] = $device->ports->partition(fn ($port) => $port->ifOperStatus != IfOperStatus::Up && $port->ifAdminStatus == IfOperStatus::Up);
                     $count += $device->ports->count();
                     $up += $ports_up->count();
                     $down_items = $ports_down->map(fn ($port) => $device->displayName() . '/' . $port->getShortLabel() . ' DOWN');

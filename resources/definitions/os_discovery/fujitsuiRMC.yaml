@@ -13,12 +13,12 @@ modules:
                     state_name: sc2AgentStatus
                     descr: 'Global System Status'
                     states:
-                        - { value: 1, descr: 'ok', graph: 1, generic: 0 }
-                        - { value: 2, descr: 'degraded', graph: 1, generic: 1 }
-                        - { value: 3, descr: 'error', graph: 1, generic: 2 }
-                        - { value: 5, descr: 'unknown', graph: 1, generic: 3 }
-                        - { value: 6, descr: 'notPresent', graph: 1, generic: 3 }
-                        - { value: 7, descr: 'notManageable', graph: 1, generic: 3 }
+                        - { value: 1, descr: 'ok', generic: 0 }
+                        - { value: 2, descr: 'degraded', generic: 1 }
+                        - { value: 3, descr: 'error', generic: 2 }
+                        - { value: 5, descr: 'unknown', generic: 3 }
+                        - { value: 6, descr: 'notPresent', generic: 3 }
+                        - { value: 7, descr: 'notManageable', generic: 3 }
                 -
                     oid: FSC-SERVERCONTROL2-MIB::sc2PowerSupplyTable
                     value: FSC-SERVERCONTROL2-MIB::sc2PowerSupplyStatus
@@ -26,13 +26,13 @@ modules:
                     state_name: sc2PowerSupplyTable
                     descr: FSC-SERVERCONTROL2-MIB::sc2PowerSupplyDesignation
                     states:
-                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 2, descr: not-present, graph: 1, generic: 2 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: fail, graph: 1, generic: 2 }
-                        - { value: 5, descr: ac-fail, graph: 1, generic: 1 }
-                        - { value: 6, descr: dc-fail, graph: 1, generic: 1 }
-                        - { value: 7, descr: critical-temp, graph: 1, generic: 1 }
+                        - { value: 1, descr: unknown, generic: 3 }
+                        - { value: 2, descr: not-present, generic: 2 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: fail, generic: 2 }
+                        - { value: 5, descr: ac-fail, generic: 1 }
+                        - { value: 6, descr: dc-fail, generic: 1 }
+                        - { value: 7, descr: critical-temp, generic: 1 }
                 -
                     oid: FSC-SERVERCONTROL2-MIB::sc2FanTable
                     value: FSC-SERVERCONTROL2-MIB::sc2fanStatus
@@ -40,14 +40,14 @@ modules:
                     descr: FSC-SERVERCONTROL2-MIB::sc2fanDesignation
                     state_name: sc2FanTable
                     states:
-                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 2, descr: disabled, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: fail, graph: 1, generic: 2 }
-                        - { value: 5, descr: pre-fail, graph: 1, generic: 1 }
-                        - { value: 6, descr: redundant-fail, graph: 1, generic: 1 }
-                        - { value: 7, descr: non-manageable, graph: 1, generic: 3 }
-                        - { value: 8, descr: not-present, graph: 1, generic: 3 }
+                        - { value: 1, descr: unknown, generic: 3 }
+                        - { value: 2, descr: disabled, generic: 3 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: fail, generic: 2 }
+                        - { value: 5, descr: pre-fail, generic: 1 }
+                        - { value: 6, descr: redundant-fail, generic: 1 }
+                        - { value: 7, descr: non-manageable, generic: 3 }
+                        - { value: 8, descr: not-present, generic: 3 }
                 -
                     oid: FSC-SERVERCONTROL2-MIB::sc2VoltageTable
                     value: FSC-SERVERCONTROL2-MIB::sc2VoltageStatus
@@ -55,13 +55,13 @@ modules:
                     descr: FSC-SERVERCONTROL2-MIB::sc2VoltageDesignation
                     state_name: sc2Voltage
                     states:
-                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 2, descr: disabled, graph: 1, generic: 3 }
-                        - { value: 3, descr: ok, graph: 1, generic: 0 }
-                        - { value: 4, descr: too-low, graph: 1, generic: 2 }
-                        - { value: 5, descr: too-high, graph: 1, generic: 2 }
-                        - { value: 6, descr: out-of-range, graph: 1, generic: 2 }
-                        - { value: 7, descr: warning, graph: 1, generic: 1 }
+                        - { value: 1, descr: unknown, generic: 3 }
+                        - { value: 2, descr: disabled, generic: 3 }
+                        - { value: 3, descr: ok, generic: 0 }
+                        - { value: 4, descr: too-low, generic: 2 }
+                        - { value: 5, descr: too-high, generic: 2 }
+                        - { value: 6, descr: out-of-range, generic: 2 }
+                        - { value: 7, descr: warning, generic: 1 }
                 -
                     oid: FSC-SERVERCONTROL2-MIB::sc2ComponentStatusSensorTable
                     value: FSC-SERVERCONTROL2-MIB::sc2cssSensorStatus
@@ -69,12 +69,12 @@ modules:
                     descr: FSC-SERVERCONTROL2-MIB::sc2cssSensorDesignation
                     state_name: sc2ComponentStatusSensor
                     states:
-                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
-                        - { value: 2, descr: ok, graph: 1, generic: 0 }
-                        - { value: 3, descr: identify, graph: 1, generic: 3 }
-                        - { value: 4, descr: pre-fail, graph: 1, generic: 1 }
-                        - { value: 5, descr: fail, graph: 1, generic: 2 }
-                        - { value: 6, descr: not-present, graph: 1, generic: 3 }
+                        - { value: 1, descr: unknown, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: identify, generic: 3 }
+                        - { value: 4, descr: pre-fail, generic: 1 }
+                        - { value: 5, descr: fail, generic: 2 }
+                        - { value: 6, descr: not-present, generic: 3 }
         temperature:
             data:
                 -

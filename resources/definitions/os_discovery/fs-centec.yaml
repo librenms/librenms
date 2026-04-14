@@ -53,10 +53,10 @@ modules:
                     state_name: FanStatus
                     group: 'Fans'
                     states:
-                        - { descr: active, graph: 1, value: 1, generic: 0 }
-                        - { descr: deactive, graph: 2, value: 2, generic: 2 }
-                        - { descr: notInstall, graph: 3, value: 3, generic: 2 }
-                        - { descr: unsupport, graph: 4, value: 4, generic: 3 }
+                        - { descr: active, value: 1, generic: 0 }
+                        - { descr: deactive, value: 2, generic: 2 }
+                        - { descr: notInstall, value: 3, generic: 2 }
+                        - { descr: unsupport, value: 4, generic: 3 }
                 -
                     oid: SWITCH::devMPowerStatusTable
                     value: SWITCH::devMPowerAlertStatus
@@ -66,7 +66,7 @@ modules:
                     index: 'devMPowerAlertStatus.{{ $index }}'
                     group: 'PSU'
                     states:
-                        - { descr: noAlert, graph: 1, value: 1, generic: 0 }
-                        - { descr: alert, graph: 2, value: 2, generic: 2 }
-                        - { descr: unsupported, graph: 3, value: 3, generic: 3 }
+                        - { descr: noAlert, value: 1, generic: 0 }
+                        - { descr: alert, value: 2, generic: 2 }
+                        - { descr: unsupported, value: 3, generic: 3 }
 
