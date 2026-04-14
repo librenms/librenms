@@ -31,18 +31,22 @@ if (isset($_POST['config'])) {
 
 <?php
 
-function validate_oxidized_cfg($tree, $wanted_leaf = false)
+function validate_oxidized_cfg($tree, $wanted_leaf = false, $path = '')
 {
     $valid_config = [
         'username' => 'string',
         'password' => 'string',
         'model' => 'string',
+        'resolve_dns' => 'boolean',
         'interval' => 'int',
         'use_syslog' => 'boolean',
         'log' => 'string',
         'debug' => 'boolean',
+        'run_once' => 'boolean',
         'threads' => 'int',
+        'use_max_threads' => 'boolean',
         'timeout' => 'int',
+        'timelimit' => 'int',
         'retries' => 'int',
         'prompt' => 'string',
         'models' => 'array',
@@ -52,14 +56,27 @@ function validate_oxidized_cfg($tree, $wanted_leaf = false)
             'remove_secret' => 'boolean',
         ],
         'groups' => 'array',
+        'group_map' => 'array',
         'rest' => 'string',
         'pid' => 'string',
+        'extensions' => 'array',
+        'crash' => [
+            'directory' => 'string',
+            'hostnames' => 'boolean',
+        ],
+        'stats' => [
+            'history_size' => 'int',
+        ],
         'input' => [
             'default' => 'string',
             'debug' => 'boolean',
             'ssh' => [
                 'secure' => 'boolean',
             ],
+            'ftp' => [
+                'passive' => 'boolean',
+            ],
+            'utf8_encoded' => 'boolean',
         ],
         'output' => [
             'default' => 'string',
@@ -71,6 +88,7 @@ function validate_oxidized_cfg($tree, $wanted_leaf = false)
         ],
         'source' => [
             'default' => 'string',
+            'debug' => 'boolean',
             'csv' => [
                 'file' => 'string',
                 'delimiter' => 'string',
@@ -133,14 +151,17 @@ function validate_oxidized_cfg($tree, $wanted_leaf = false)
 
     $output = [];
     foreach ($tree as $leaf => $value) {
+        // Build the current path string (e.g., "input.ssh.secure")
+        $current_path = $path === '' ? $leaf : $path . '.' . $leaf;
+
         if (is_array($tree[$leaf]) && ($valid_config_tmp !== 'array' && $valid_config_tmp[$leaf] !== 'array')) {
-            $tmp_output = validate_oxidized_cfg($tree[$leaf], $valid_config_tmp[$leaf]);
+            $tmp_output = validate_oxidized_cfg($tree[$leaf], $valid_config_tmp[$leaf], $current_path);
             if (is_array($tmp_output)) {
                 $output = array_merge($output, $tmp_output);
             }
         } else {
             if (! isset($valid_config_tmp[$leaf]) && ($valid_config_tmp !== 'array' && $valid_config_tmp[$leaf] !== 'array')) {
-                $output[] = "$leaf - is not valid";
+                $output[] = "$current_path - is not valid";
             }
         }
     }
