@@ -127,7 +127,7 @@ echo '</table>
 
 $("[data-toggle='popover']").popover({
     trigger: 'hover',
-    'placement': 'top'
+    placement: 'top'
 });
 
 function updateResults(rows) {
