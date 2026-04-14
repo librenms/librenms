@@ -75,7 +75,7 @@ class GraylogController extends SimpleTableController
         $offset = (int) (($page - 1) * $limit);
         $loglevel = $request->input('loglevel') ?? LibrenmsConfig::get('graylog.loglevel');
         $this->fields = (array) LibrenmsConfig::get('graylog.device-page.fields', self::BUILTIN_FIELDS);
-        $this->hiddenFieldPrefixes = array_filter((array) LibrenmsConfig::get('graylog.device-page.hidden-fields', ['gl2_']), 'strlen');
+        $this->hiddenFieldPrefixes = array_values(array_filter((array) LibrenmsConfig::get('graylog.device-page.hidden-fields', ['gl2_'])));
 
         $query = $api->buildSimpleQuery($search, $device) .
             ($loglevel !== null ? ' AND level: <=' . $loglevel : '');
