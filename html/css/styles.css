@@ -1319,12 +1319,20 @@ tr.search:nth-child(odd) {
 nav.navbar-sticky-top {
   position: sticky;
   top: 0;
-  z-index: 1100;
+  z-index: 1030;
   border-bottom-width: 2px;
   border-left-width: 0;
   border-top-width: 0;
   border-right-width: 0;
   border-radius: 0;
+}
+
+/* Ensure Bootstrap modals and backdrops appear above the sticky navbar */
+.modal-backdrop {
+  z-index: 1040;
+}
+.modal {
+  z-index: 1050;
 }
 
 .navbar-brand {

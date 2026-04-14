@@ -125,9 +125,9 @@ echo '</table>
 
 <script>
 
-$("[data-toggle='modal'], [data-toggle='popover']").popover({
+$("[data-toggle='popover']").popover({
     trigger: 'hover',
-        'placement': 'top'
+    'placement': 'top'
 });
 
 function updateResults(rows) {
