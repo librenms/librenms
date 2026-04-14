@@ -1137,6 +1137,10 @@ return [
                     'help' => 'Changes the default field to query graylog API.',
                 ],
             ],
+            'match-any-address' => [
+                'description' => 'Match any address',
+                'help' => 'This is used to match any address of a device to the source of a graylog log message, by default, only the primary address is used',
+            ],
         ],
         'html' => [
             'device' => [
