@@ -8,7 +8,6 @@ body {
   color: #555;
   font-size: 10pt;
   line-height: 20px;
-  overflow-y: scroll;
 }
 
 .pagemenu-selected {
