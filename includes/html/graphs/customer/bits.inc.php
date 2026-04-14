@@ -1,25 +1,24 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Port;
 use LibreNMS\Util\Rewrite;
 
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 
-$cust_descrs = (array) LibrenmsConfig::get('customers_descr', ['cust']);
-
-$sql = 'SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_descr_descr` = ? AND D.device_id = I.device_id AND `port_descr_type` IN ' . dbGenPlaceholders(count($cust_descrs));
-$param = $cust_descrs;
-array_unshift($param, $vars['id']);
-
+$ports = Port::with('device')
+    ->where('port_descr_descr', $vars['id'])
+    ->whereIn('port_descr_type', LibrenmsConfig::get('customers_descr', ['cust']))
+    ->get();
 $rrd_list = [];
-foreach (dbFetchRows($sql, $param) as $port) {
-    $rrd_filename = get_port_rrdfile_path($port['hostname'], $port['port_id']); // FIXME: Unification OK?
+foreach ($ports as $port) {
+    $rrd_filename = get_port_rrdfile_path($port->hostname, $port->port_id); // FIXME: Unification OK?
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
-            'descr' => $port['hostname'] . '-' . $port['ifDescr'],
-            'descr_in' => shorthost($port['hostname']),
-            'descr_out' => Rewrite::shortenIfName($port['ifDescr']),
+            'descr' => $port->hostname . '-' . $port->ifDescr,
+            'descr_in' => $port->device->shortDisplayName(),
+            'descr_out' => Rewrite::shortenIfName($port->ifDescr),
         ];
     }
 }
