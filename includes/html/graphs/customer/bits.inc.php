@@ -6,22 +6,22 @@ use LibreNMS\Util\Rewrite;
 
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 
-$ports = Port::with('device')
+$rrd_list = Port::with('device')
     ->where('port_descr_descr', $vars['id'])
     ->whereIn('port_descr_type', LibrenmsConfig::get('customers_descr', ['cust']))
-    ->get();
-$rrd_list = [];
-foreach ($ports as $port) {
-    $rrd_filename = get_port_rrdfile_path($port->hostname, $port->port_id); // FIXME: Unification OK?
-    if (Rrd::checkRrdExists($rrd_filename)) {
-        $rrd_list[] = [
-            'filename' => $rrd_filename,
-            'descr' => $port->hostname . '-' . $port->ifDescr,
-            'descr_in' => $port->device->shortDisplayName(),
-            'descr_out' => Rewrite::shortenIfName($port->ifDescr),
-        ];
-    }
-}
+    ->get()
+    ->reduce(function (array $rrd, $port) {
+        $rrd_filename = get_port_rrdfile_path($port->hostname, $port->port_id);
+        if (Rrd::checkRrdExists($rrd_filename)) {
+            $rrd[] = [
+                'filename' => $rrd_filename,
+                'descr'    => $port->device->hostname . '-' . $port->ifDescr,
+                'descr_in' => $port->device->shortDisplayName(),
+                'descr_out'=> Rewrite::shortenIfName($port->ifDescr),
+            ];
+        }
+        return $rrd;
+    }, []);
 
 $units = 'bps';
 $total_units = 'B';
