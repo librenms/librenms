@@ -45,7 +45,7 @@ class BillPolicy
         }
 
         return $this->hasGlobalPermission($user, 'view')
-            || Permissions::canAccessBill($bill, $user);
+            && Permissions::canAccessBill($bill, $user);
     }
 
     /**

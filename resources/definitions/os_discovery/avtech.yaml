@@ -120,10 +120,10 @@ modules:
                     index: 1
                     descr: Internal Heat Index
                 - # RoomAlert 32S ext temp
-                    oid: .1.3.6.1.4.1.20916.1.11.1.2
+                    oid: .1.3.6.1.4.1.20916.1.11.1.2.1
                     num_oid: '.1.3.6.1.4.1.20916.1.11.1.2.{{ $index }}'
                     value: value
-                    descr: Sensor {{ $id }}
+                    descr: label
 
                 - # TemPageR 3E internal
                     oid: .1.3.6.1.4.1.20916.1.7.1.1.1.1.0
@@ -169,6 +169,16 @@ modules:
                     descr: Sensor 3
                     high_limit: .1.3.6.1.4.1.20916.1.1.3.7.0
                     low_limit: .1.3.6.1.4.1.20916.1.1.3.8.0
+                - # RoomAlert 12S internal temp
+                    oid: .1.3.6.1.4.1.20916.1.12.1.1.1.2.0
+                    num_oid: '.1.3.6.1.4.1.20916.1.12.1.1.1.2.{{ $index }}'
+                    index: 0
+                    descr: .1.3.6.1.4.1.20916.1.12.1.4.1.1.0
+                - # RoomAlert 12S ext temp
+                    oid: .1.3.6.1.4.1.20916.1.12.1.2.1
+                    num_oid: '.1.3.6.1.4.1.20916.1.12.1.2.{{ $index }}'
+                    value: value
+                    descr: label
         humidity:
             options:
                 divisor: 100
@@ -198,6 +208,24 @@ modules:
                     num_oid: '.1.3.6.1.4.1.20916.1.10.1.4.3.{{ $index }}'
                     index: 3
                     descr: .1.3.6.1.4.1.20916.1.10.1.4.8.0
+                - # RoomAlert 32E/W ext humidity
+                    oid: .1.3.6.1.4.1.20916.1.8.1.2.3
+                    skip_value_lt: 2
+                    num_oid: '.1.3.6.1.4.1.20916.1.8.1.2.{{ $index }}'
+                    value: value
+                    descr: label
+                - # RoomAlert 32S ext humidity
+                    oid: .1.3.6.1.4.1.20916.1.11.1.2.3
+                    skip_value_lt: 2
+                    num_oid: '.1.3.6.1.4.1.20916.1.11.1.2.{{ $index }}'
+                    value: value
+                    descr: label
+                - # RoomAlert 12S ext humidity
+                    oid: .1.3.6.1.4.1.20916.1.12.1.2.3
+                    skip_value_lt: 2
+                    num_oid: '.1.3.6.1.4.1.20916.1.12.1.2.{{ $index }}'
+                    value: value
+                    descr: label
         voltage:
             data:
                 - # RoomAlert 32E/W analog
@@ -210,6 +238,13 @@ modules:
                 - # RoomAlert 32S analog
                     oid: .1.3.6.1.4.1.20916.1.11.1.1.5
                     num_oid: '.1.3.6.1.4.1.20916.1.11.1.1.5.{{ $index }}'
+                    value: value
+                    low_limit: 0
+                    high_limit: 5
+                    descr: Analog {{ $id }}
+                - # RoomAlert 12S analog
+                    oid: .1.3.6.1.4.1.20916.1.12.1.1.2
+                    num_oid: '.1.3.6.1.4.1.20916.1.12.1.1.2.{{ $index }}'
                     value: value
                     low_limit: 0
                     high_limit: 5
@@ -316,7 +351,7 @@ modules:
                     oid: .1.3.6.1.4.1.20916.1.11.1.1.6
                     value: value
                     num_oid: '.1.3.6.1.4.1.20916.1.11.1.1.6.{{ $index }}'
-                    descr: Relay {{ $id }}
+                    descr: label
                     state_name: relay
                     states:
                         - { value: 0, generic: 0, descr: Open }
@@ -325,7 +360,25 @@ modules:
                     oid: .1.3.6.1.4.1.20916.1.11.1.3
                     value: value
                     num_oid: '.1.3.6.1.4.1.20916.1.11.1.3.{{ $index }}'
-                    descr: Switch {{ $id }}
+                    descr: label
+                    state_name: switch
+                    states:
+                        - { value: 0, generic: -1, descr: Off }
+                        - { value: 1, generic: 0, descr: On }
+                - # RoomAlert 12S relay
+                    oid: .1.3.6.1.4.1.20916.1.12.1.1.3
+                    value: value
+                    num_oid: '.1.3.6.1.4.1.20916.1.12.1.1.3.{{ $index }}'
+                    descr: label
+                    state_name: relay
+                    states:
+                        - { value: 0, generic: 0, descr: Open }
+                        - { value: 1, generic: 0, descr: Closed }
+                - # RoomAlert 12S switches
+                    oid: .1.3.6.1.4.1.20916.1.12.1.3
+                    value: value
+                    num_oid: '.1.3.6.1.4.1.20916.1.12.1.3.{{ $index }}'
+                    descr: label
                     state_name: switch
                     states:
                         - { value: 0, generic: -1, descr: Off }

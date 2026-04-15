@@ -59,7 +59,7 @@ abstract class BaseModel extends Model
      */
     protected function hasDeviceAccess(Builder $query, User $user, ?string $table = null): Builder
     {
-        if (Gate::allows('viewAll', Device::class)) {
+        if (Gate::forUser($user)->allows('viewAll', Device::class)) {
             return $query;
         }
 
@@ -79,7 +79,7 @@ abstract class BaseModel extends Model
      */
     protected function hasPortAccess(Builder $query, User $user, ?string $table = null): Builder
     {
-        if (Gate::allows('viewAll', Port::class)) {
+        if (Gate::forUser($user)->allows('viewAll', Port::class)) {
             return $query;
         }
 
@@ -98,7 +98,7 @@ abstract class BaseModel extends Model
      */
     protected function hasBillAccess(Builder $query, User $user, ?string $table = null): Builder
     {
-        if (Gate::allows('viewAll', Bill::class)) {
+        if (Gate::forUser($user)->allows('viewAll', Bill::class)) {
             return $query;
         }
 

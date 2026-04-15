@@ -12,6 +12,10 @@ trait ChecksGlobalPermissions
 
     protected function hasGlobalPermission(User $user, string $action): bool
     {
+        if ($action === 'view' && $user->hasRole('user')) {
+            return true; // user role has all view permissions
+        }
+
         // Guess prefix
         $this->globalPrefix ??= Str::kebab(Str::before(class_basename($this), 'Policy'));
 

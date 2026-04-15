@@ -263,7 +263,7 @@ class AppServiceProvider extends ServiceProvider
 
             // Restify uses 'show' instead of 'view' for single-resource authorization
             // (see vendor/binaryk/laravel-restify/src/Traits/AuthorizableModels.php)
-            if ($user->hasRole('global-read') && ((preg_match('/^(\s+\.)?view(All|Any)?$/', $ability, $match) || $ability === 'show'))) {
+            if ($user->hasRole('global-read') && (preg_match('/^(\S+\.)?view(All|Any)?$/', $ability, $match) || $ability === 'show')) {
                 return true; // global read access
             }
 
