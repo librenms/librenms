@@ -253,6 +253,11 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 $remote_device_id = discover_new_device($remote_device_name, $device, 'LLDP', $port);
             }
 
+            // If we received an IP from the LLDP neighbor, and IP discovery is enabled, add the device by IP.
+            if (! $remote_device_id && $remote_device_ip && LibrenmsConfig::get('discovery_by_ip', false)) {
+                $remote_device_id = discover_new_device($remote_device_ip, $device, 'LLDP', $port);
+            }
+
             if ($port?->exists && $remote_device_name && $remote_port_descr) {
                 discover_link(
                     $port->port_id, //our port id from database
