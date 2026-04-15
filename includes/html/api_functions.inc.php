@@ -3305,7 +3305,8 @@ function get_fdb(Illuminate\Http\Request $request)
         if ($device) {
             $fdb = $device->portsFdb
                 ->when(!empty($vlan_list), fn ($q) => $q->whereIn('vlan_id', $vlan_list))
-                ->when($age, fn ($q) => $q->where('updated_at', '>=', now()->subMinutes($age)));
+                ->when($age, fn ($q) => $q->where('updated_at', '>=', now()->subMinutes($age)))
+                ->get();
             
             return api_success($fdb, 'ports_fdb');
         }
