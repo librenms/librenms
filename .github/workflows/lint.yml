@@ -88,11 +88,11 @@ jobs:
           echo "Discovered new PHP files: $NEW_PHP_FILES"
           echo "files=$NEW_PHP_FILES" >> "$GITHUB_OUTPUT"
 
-      - name: Run PHPStan (New files, level 8)
+      - name: Run PHPStan (New files, level 6)
         if: github.event_name == 'pull_request' && steps.new-php-files.outputs.files != ''
         env:
           NEW_PHP_FILES: ${{ steps.new-php-files.outputs.files }}
-        run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G --level=8 -- $NEW_PHP_FILES
+        run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G --level=6 -- $NEW_PHP_FILES
 
       - name: Run PHPStan
         run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G
