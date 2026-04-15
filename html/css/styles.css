@@ -1327,6 +1327,13 @@ nav.navbar-sticky-top {
   border-radius: 0;
 }
 
+/* Forces the removal of the body scroll ONLY when the modal is open (Removes the double vertical bar) */
+body.modal-open {
+  overflow-y: hidden !important;
+}
+body.modal-open .modal {
+  overflow-y: scroll !important;
+}
 /* Ensure Bootstrap modals and backdrops appear above the sticky navbar */
 .modal-backdrop {
   z-index: 1140;
