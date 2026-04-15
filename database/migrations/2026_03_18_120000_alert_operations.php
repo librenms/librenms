@@ -37,10 +37,11 @@ return new class extends Migration
             return;
         }
 
-        $this->renameConfigKey('alert_rule.max_alerts', 'alert_rule.default_operation_steps_to');
-        $this->renameConfigKey('alert_rule.delay', 'alert_rule.default_operation_start_in');
-        $this->renameConfigKey('alert_rule.interval', 'alert_rule.default_operation_step_duration');
-        $this->renameConfigKey('alert_rule.mute_alerts', 'alert_rule.default_operation_notifications_suppressed');
+        // Non-destructive: copy legacy keys to new names (do not delete/rename old keys).
+        $this->copyConfigKey('alert_rule.max_alerts', 'alert_rule.default_operation_steps_to');
+        $this->copyConfigKey('alert_rule.delay', 'alert_rule.default_operation_start_in');
+        $this->copyConfigKey('alert_rule.interval', 'alert_rule.default_operation_step_duration');
+        $this->copyConfigKey('alert_rule.mute_alerts', 'alert_rule.default_operation_notifications_suppressed');
     }
 
     private function renameAlertRuleConfigKeysDown(): void
@@ -49,29 +50,24 @@ return new class extends Migration
             return;
         }
 
-        $this->renameConfigKey('alert_rule.default_operation_steps_to', 'alert_rule.max_alerts');
-        $this->renameConfigKey('alert_rule.default_operation_start_in', 'alert_rule.delay');
-        $this->renameConfigKey('alert_rule.default_operation_step_duration', 'alert_rule.interval');
-        $this->renameConfigKey('alert_rule.default_operation_notifications_suppressed', 'alert_rule.mute_alerts');
+        // Non-destructive: leave config rows as-is on rollback.
     }
 
-    private function renameConfigKey(string $from, string $to): void
+    private function copyConfigKey(string $from, string $to): void
     {
-        $oldRow = DB::table('config')->where('config_name', $from)->first();
-        if (! $oldRow) {
+        $value = DB::table('config')->where('config_name', $from)->value('config_value');
+        if ($value === null) {
             return;
         }
 
-        $newExists = DB::table('config')->where('config_name', $to)->exists();
-        if ($newExists) {
-            DB::table('config')->where('config_name', $from)->delete();
-
+        if (DB::table('config')->where('config_name', $to)->exists()) {
             return;
         }
 
-        DB::table('config')
-            ->where('config_name', $from)
-            ->update(['config_name' => $to]);
+        DB::table('config')->insert([
+            'config_name' => $to,
+            'config_value' => $value,
+        ]);
     }
 
     // ---- operations schema (no FKs, simple indexes) ----
@@ -234,7 +230,6 @@ return new class extends Migration
 
             DB::table('alert_rules')->where('id', $rule->id)->update([
                 'alert_operation_id' => $opId,
-                'extra' => json_encode($this->stripLegacyExtraKeys($extra)),
             ]);
         }
     }
@@ -319,18 +314,5 @@ return new class extends Migration
         Schema::dropIfExists('alert_operation_transport_map');
         Schema::dropIfExists('alert_operation_segments');
         Schema::dropIfExists('alert_operations');
-    }
-
-    /**
-     * @param  array<string, mixed>  $extra
-     * @return array<string, mixed>
-     */
-    private function stripLegacyExtraKeys(array $extra): array
-    {
-        foreach (['count', 'delay', 'interval', 'mute'] as $k) {
-            unset($extra[$k]);
-        }
-
-        return $extra;
     }
 };
